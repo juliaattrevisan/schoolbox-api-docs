@@ -23,10 +23,19 @@ class ArbitraryFile extends Thumbnail
 
         /* If it has at least the right extension, download it directly
          */
-        $mapper = new \Schoolbox\File\MimetypeMapper();
+        $path = parse_url($this->getUrl(), PHP_URL_PATH);
+        if (!is_string($path)) {
+            return '';
+        }
+
+        $filename = pathinfo($path, PATHINFO_BASENAME);
+        if ('' === $filename) {
+            return '';
+        }
 
         try {
-            $icon = $mapper->getByFilename(parse_url($this->getUrl(), PHP_URL_PATH))->getIconFile();
+            $mapper = new \Schoolbox\File\MimetypeMapper();
+            $icon = $mapper->getByFilename($filename)->getIconFile();
         } catch (\Schoolbox\File\Exception $e) {
             return '';
         }

@@ -153,15 +153,6 @@ class Creational extends AbstractFactory
                 $url->prependScheme();
                 $this->setUrl($url->getUrl());
 
-                /* Validate that the URL is valid after prepending the scheme
-                 * If not valid, skip curling and treat as plain text
-                 */
-                if (!$url->isUrl()) {
-                    $this->product = $this->constructDefault();
-                    $this->populate($data);
-                    return $this->product;
-                }
-
                 $this->constructFromUrl();
                 $this->populate($data);
 
@@ -230,7 +221,8 @@ class Creational extends AbstractFactory
         }
 
         /* Check if we have been given a URL to an image */
-        if ($filename = pathinfo(parse_url($this->getUrl(), PHP_URL_PATH), PATHINFO_BASENAME)) {
+        $path = parse_url($this->getUrl(), PHP_URL_PATH);
+        if (is_string($path) && ($filename = pathinfo($path, PATHINFO_BASENAME))) {
             try {
                 $file = \Schoolbox\File\MimetypeMapper::getInstance()->getByFilename($filename);
 
