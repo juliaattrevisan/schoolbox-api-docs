@@ -26,12 +26,19 @@ class ValidStrats
     // retain files uploaded by users in the My Files area
     public const string MYFILES = 'myFiles';
 
+    // Student submission cleanup must be explicitly selectable because it removes assessment evidence.
+    public const string STUDENTSUBMISSIONS = 'studentSubmissions';
+
     /**
-     * These are valid as csv values in the arg
+     * These names are intentionally whitelisted so typos or future strategies
+     * cannot silently change what the retention CLI is allowed to run.
+     *
+     * @var string[]
      */
     public const array STRATS_WHITELIST = [
         self::MOMENTS,
         self::MYFILES,
+        self::STUDENTSUBMISSIONS,
     ];
 
     /**
@@ -46,6 +53,7 @@ class ValidStrats
 
     /**
      * @param string $csvArgs
+     * @return void
      */
     public function __construct(string $csvArgs)
     {

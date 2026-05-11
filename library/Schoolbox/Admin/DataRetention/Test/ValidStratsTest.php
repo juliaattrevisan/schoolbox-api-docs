@@ -44,9 +44,17 @@ class ValidStratsTest extends TestCase
                 'moments',
                 ['moments'],
             ],
+            'student submissions valid' => [
+                'studentSubmissions',
+                ['studentSubmissions'],
+            ],
             'valid and invalid mixed' => [
                 'moments,unknown,myFiles',
                 ['moments', 'myFiles'],
+            ],
+            'all valid mixed' => [
+                'moments,myFiles,studentSubmissions',
+                ['moments', 'myFiles', 'studentSubmissions'],
             ],
             'invalid only' => [
                 'foo,bar',
@@ -102,9 +110,21 @@ class ValidStratsTest extends TestCase
                 true,
             ],
 
+            'student submissions enabled' => [
+                'studentSubmissions',
+                'studentSubmissions',
+                true,
+            ],
+
             'moments not enabled when only myFiles' => [
                 'moments',
                 'myFiles',
+                false,
+            ],
+
+            'myFiles not enabled when only student submissions' => [
+                'myFiles',
+                'studentSubmissions',
                 false,
             ],
 
