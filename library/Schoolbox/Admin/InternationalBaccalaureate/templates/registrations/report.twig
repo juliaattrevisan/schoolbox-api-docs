@@ -10,6 +10,8 @@
         <div id="ib-report-app">
             <ib-report
                 candidates-endpoint="{{ _routes.candidatesEndpoint }}"
+                search-languages-endpoint="{{ _routes.searchLanguages }}"
+                session-title="{{ sessionTitle }}"
             />
         </div>
         <script src="{{ CDN_PREFIX }}/js/bundle/ibReport.js?v={{ config.site_version }}"></script>

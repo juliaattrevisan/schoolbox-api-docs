@@ -45,7 +45,7 @@ defineProps<Props>();
                     ></sbx-icon>
                 </td>
                 <td colspan="3"><ib-report-subject-labels :subjects="student.subjects" /></td>
-                <td class="ib-report-error-message">{{ student.errorMessage }}</td>
+                <td class="ib-report-error-message">{{ student.errorMessage ?? "—" }}</td>
                 <td>
                     <button type="button" disabled aria-label="More options">
                         <sbx-icon name="more"></sbx-icon>

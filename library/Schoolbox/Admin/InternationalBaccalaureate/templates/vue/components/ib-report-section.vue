@@ -9,7 +9,7 @@ interface Props {
 }
 defineProps<Props>();
 
-const isOpen = window.Vue.ref<boolean>(false);
+const isOpen = window.Vue.ref<boolean>(true);
 
 /** Toggles the section open or closed. */
 function toggle(): void {

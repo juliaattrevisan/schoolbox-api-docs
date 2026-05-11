@@ -1,7 +1,7 @@
-import IBReport from "./ib-report.vue";
+import IbReport from "./ib-report.vue";
 
 window.Vue.createApp({
     components: {
-        IBReport,
+        IbReport,
     },
 }).mount("#ib-report-app");

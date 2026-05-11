@@ -4,6 +4,7 @@
 export type SubjectEntry = {
     subject: string;
     language: string | null;
+    languageId: number | null;
 };
 
 /**
@@ -34,7 +35,7 @@ export type StudentRow = {
  * A student row used in the Failed Registrations section, extending StudentRow with an error message.
  */
 export type FailedRow = StudentRow & {
-    errorMessage: string;
+    errorMessage?: string;
 };
 
 /**
@@ -43,7 +44,7 @@ export type FailedRow = StudentRow & {
 export type InProgressRow = {
     id: number;
     name: string;
-    ibisSubmittedAt: string; // ISO 8601 timestamp
+    ibisSubmittedAt?: string;
     subjects: SubjectGroup;
 };
 
@@ -51,18 +52,64 @@ export type InProgressRow = {
  * A student row used in the Registered section, extending StudentRow with an IB candidate number.
  */
 export type RegisteredRow = StudentRow & {
-    ibCandidateNumber: string;
+    ibCandidateNumber?: string;
+};
+
+// ---------------------------------------------------------------------------
+// Raw API types — shape returned by the candidates endpoint
+// ---------------------------------------------------------------------------
+
+/**
+ * Raw language entry returned per subject from the candidates API.
+ */
+export type ApiSubjectLanguage = {
+    languageId: number | null;
+    languageName: string;
+    classCode: string | null;
 };
 
 /**
- * The full API response shape for the Diploma Programme Year 2 registration report.
+ * Raw subject entry returned from the candidates API.
  */
-export type ReportResponse = {
-    sessionTitle: string;
-    preparation: StudentRow[];
-    unconfirmed: StudentRow[];
-    confirmed: StudentRow[];
-    inProgress: InProgressRow[];
-    failed: FailedRow[];
-    registered: RegisteredRow[];
+export type ApiSubject = {
+    id: number;
+    groupId: number;
+    subject: string;
+    level: string;
+    languages: ApiSubjectLanguage[];
+};
+
+/**
+ * Raw student entry returned from the candidates API.
+ */
+export type ApiStudent = {
+    userId: number;
+    registrationSessionStudentId: number;
+    status: number;
+    userName: string;
+    hasMissingDetails: boolean;
+    missingFields: string[];
+    ibGroupSubjects: {
+        HL: ApiSubject[];
+        SL: ApiSubject[];
+        Core: ApiSubject[];
+    };
+};
+
+/**
+ * Status descriptor returned from the candidates API.
+ */
+export type ApiStatus = {
+    value: number;
+    key: string;
+    label: string;
+};
+
+/**
+ * Raw response from the candidates endpoint.
+ */
+export type ApiCandidatesResponse = {
+    success: true;
+    students: Record<string, ApiStudent[]>;
+    statuses: ApiStatus[];
 };

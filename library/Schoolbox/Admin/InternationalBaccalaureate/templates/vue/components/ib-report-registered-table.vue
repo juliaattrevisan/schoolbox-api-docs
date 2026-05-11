@@ -42,7 +42,7 @@ defineProps<Props>();
                     ></sbx-icon>
                 </td>
                 <td colspan="3"><ib-report-subject-labels :subjects="student.subjects" /></td>
-                <td>{{ student.ibCandidateNumber }}</td>
+                <td>{{ student.ibCandidateNumber ?? "—" }}</td>
             </tr>
         </tbody>
     </table>
