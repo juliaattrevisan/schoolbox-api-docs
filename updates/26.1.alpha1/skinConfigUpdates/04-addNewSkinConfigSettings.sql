@@ -81,7 +81,7 @@ SET
         FROM lu_skin_config_subcategory
         WHERE
             category_id = @category_colours
-            AND name = 'Menu'
+            AND name = 'Top Menu'
     );
 
 SET
