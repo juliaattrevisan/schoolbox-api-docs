@@ -104,10 +104,9 @@ const derivedMaxMark = window.Vue.computed(() => {
     let total = 0;
 
     for (const { rubric } of rubrics.value) {
-        let weightMultiplier = 1;
+        let weightMultiplier = 0;
         if (totalRubricWeight.value > 0) {
-            // if weights are present for any rubric, then all rubrics are weighted
-            // rubrics without a weight are equivalent to 0 weight, so they don't contribute to the total mark if other rubrics have weights
+            // rubrics without a weight are equivalent to 0 weight
             weightMultiplier = (rubric.weight ?? 0) / totalRubricWeight.value;
         }
 
@@ -137,10 +136,9 @@ const derivedTotalMark = window.Vue.computed(() => {
 
         hasMeaningfulMark = true;
 
-        let weightMultiplier = 1;
+        let weightMultiplier = 0;
         if (totalRubricWeight.value > 0) {
-            // if weights are present for any rubric, then all rubrics are weighted
-            // rubrics without a weight are equivalent to 0 weight, so they don't contribute to the total mark if other rubrics have weights
+            // rubrics without a weight are equivalent to 0 weight
             weightMultiplier = (rubric.weight ?? 0) / totalRubricWeight.value;
         }
 

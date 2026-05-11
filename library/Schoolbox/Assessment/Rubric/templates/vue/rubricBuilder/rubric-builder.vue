@@ -65,7 +65,7 @@ const allRubricsSum = window.Vue.computed(() => {
             }
         }
 
-        let weightMultiplier = 1;
+        let weightMultiplier = 0;
         if (totalRubricWeight.value > 0) {
             // rubrics with no weights don't contribute to the total if weighted rubrics are present
             weightMultiplier = (rubric.weight ?? 0) / totalRubricWeight.value;
