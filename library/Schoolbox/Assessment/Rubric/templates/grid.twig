@@ -30,6 +30,7 @@
         {# TODO: these are signs of likely permission issues #}
         {% if showRubricTotal ?? false %}show-rubric-total{% endif %}
         {% if showGroupTotal ?? false %}show-group-total{% endif %}
+        {% if collapsible ?? false %}collapsible{% endif %}
     />
 </div>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/rubricReadonly.js?v={{ config.site_version }}"></script>

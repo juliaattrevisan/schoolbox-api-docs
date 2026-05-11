@@ -249,6 +249,7 @@ Data:
             </ul>
         {% endif %}
         {# Rubric goes here #}
+        {# TODO: multi rubric - separate collapsers? there's a new "collapsible" option to somewhat deal with this later #}
         {% if currentFeedback.rubricMarkedGrid %}
             <div class="rubric-wrap {{ collapsed? 'hide' : '' }}"
                  {% if hasCollapser %}
@@ -267,7 +268,8 @@ Data:
                     studentView: true,
                     selfAssess: selfAssess ?? false,
                     selfReflect: selfReflect ?? false,
-                    selfAssessmentFeedback: selfAssessmentFeedback ?? null
+                    selfAssessmentFeedback: selfAssessmentFeedback ?? null,
+                    collapsible: false
                 } only %}
             </div>
         {% endif %}

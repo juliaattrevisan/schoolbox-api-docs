@@ -29,29 +29,47 @@ interface Props {
      * TODO: this probably needs to be delt with in SelfAssessmentFeedback as otherwise we'd be sending potentially values someone shouldn't normally access
      */
     showGroupTotal?: boolean;
+    collapsible?: boolean;
 }
 const props = defineProps<Props>();
 </script>
 
 <template>
-    <fieldset-collapsible
-        v-for="(rubric, index) in props.rubricMarkedGridsPayload"
-        :key="rubric.rubric.id"
-        initially-expanded
-        legend-class="l-pad-m--horiz"
-    >
-        <template #legend>{{ rubric.rubric.title.length ? rubric.rubric.title : `Rubric ${index + 1}` }}</template>
+    <template v-if="props.collapsible">
+        <fieldset-collapsible
+            v-for="(rubric, index) in props.rubricMarkedGridsPayload"
+            :key="rubric.rubric.id"
+            initially-expanded
+            legend-class="l-pad-m--horiz"
+        >
+            <template #legend>{{ rubric.rubric.title.length ? rubric.rubric.title : `Rubric ${index + 1}` }}</template>
 
-        <template #content>
-            <rr-readonly-grid
-                :rubric="rubric.rubric"
-                :rubric-marked-grid="rubric.markedGrid"
-                :self-assessment-feedback="rubric.selfAssessmentFeedback"
-                :assessment-mark-scheme="props.assessmentMarkScheme"
-                :participant-id="props.participantId"
-                :show-rubric-total="props.showRubricTotal"
-                :show-group-total="props.showGroupTotal"
-            />
-        </template>
-    </fieldset-collapsible>
+            <template #content>
+                <rr-readonly-grid
+                    :rubric="rubric.rubric"
+                    :rubric-marked-grid="rubric.markedGrid"
+                    :self-assessment-feedback="rubric.selfAssessmentFeedback"
+                    :assessment-mark-scheme="props.assessmentMarkScheme"
+                    :participant-id="props.participantId"
+                    :show-rubric-total="props.showRubricTotal"
+                    :show-group-total="props.showGroupTotal"
+                />
+            </template>
+        </fieldset-collapsible>
+    </template>
+    <template v-for="(rubric, index) in props.rubricMarkedGridsPayload" v-else :key="rubric.rubric.id">
+        <div class="l-pad-s">
+            <!-- TODO: figure out how people desire this to appear in places. this'll do for now... -->
+            <h3>{{ rubric.rubric.title.length ? rubric.rubric.title : `Rubric ${index + 1}` }}</h3>
+        </div>
+        <rr-readonly-grid
+            :rubric="rubric.rubric"
+            :rubric-marked-grid="rubric.markedGrid"
+            :self-assessment-feedback="rubric.selfAssessmentFeedback"
+            :assessment-mark-scheme="props.assessmentMarkScheme"
+            :participant-id="props.participantId"
+            :show-rubric-total="props.showRubricTotal"
+            :show-group-total="props.showGroupTotal"
+        />
+    </template>
 </template>
