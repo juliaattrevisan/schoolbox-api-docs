@@ -16,6 +16,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Learning\Assessment\ISelfAssessable;
 use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
 use Schoolbox\Assessment\Rubric\DataModel\Capability;
@@ -564,7 +565,7 @@ class Controller extends BaseController
                     }
 
                     // Self-assessment feedback
-                    if ($currentAssessment->isSelfAssessable() && $this->mapper->hasSelfAssessedMarkedGrid($participant)) {
+                    if ($currentAssessment instanceof ISelfAssessable && $currentAssessment->isSelfAssessable() && $this->mapper->hasSelfAssessedMarkedGrid($participant)) {
                         $response['affectedUsers'][$userId]['selfAssess'] = true;
                     }
 

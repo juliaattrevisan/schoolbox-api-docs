@@ -1197,7 +1197,7 @@ class DataSource
      *                                  be found after it was supposedly created
      * @throws MapperException          if something happens whilst retrieving
      *                                  or persisting the rowset
-     * @return void
+     * @return Grid
      */
     public function importGridFromCsv(IStorage $file, DueWorkModel $dueWork, int $maxLevels): Grid
     {
