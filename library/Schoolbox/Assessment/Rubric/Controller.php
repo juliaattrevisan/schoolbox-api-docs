@@ -344,7 +344,10 @@ class Controller extends BaseController
             // attempt to build the grid
             $maxLevels = (int)$this->getDi()->get('config')->get(ConfigMapper::NAME_RUBRIC_MAX_LEVELS);
 
-            $this->mapper->importGridFromCsv($file, $assessment, $maxLevels);
+            /* Manufacture a grid and its settings; note that this doesn't persist yet
+             * You have to hit the Update button in the modify screen of a learning activity.
+             */
+            $grid = $this->mapper->importGridFromCsv($file, $assessment, $maxLevels);
         } catch (\Exception $e) {
             $this->response = $this->responseAsJson($e->getMessage())->withStatus(400);
             return;
@@ -355,7 +358,7 @@ class Controller extends BaseController
          * Otherwise you have to infer the settings from what might have been visible in the grid
          */
         $rubricGridTranslator = new RubricGridTranslator();
-        $rubricGridPayload = $rubricGridTranslator($assessment->getRubricGrid());
+        $rubricGridPayload = $rubricGridTranslator($grid);
 
         $this->response = $this->responseAsJson([
             'rubricGrid' => $rubricGridPayload,

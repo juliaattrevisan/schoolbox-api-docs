@@ -1199,7 +1199,7 @@ class DataSource
      *                                  or persisting the rowset
      * @return void
      */
-    public function importGridFromCsv(IStorage $file, DueWorkModel $dueWork, int $maxLevels): void
+    public function importGridFromCsv(IStorage $file, DueWorkModel $dueWork, int $maxLevels): Grid
     {
         // Verify that the file is actually a CSV.
         // (I think extension checking is the most reliable way to do this. We
@@ -1213,22 +1213,23 @@ class DataSource
         $filesystemProxy = $this->storageMapper->getStorageFilesystemProxy();
 
         $importer = (new CsvImporterFactory($this->markTypeMapper))->build($filesystemProxy->readStream($file), $maxLevels, $dueWork);
-        $this->importGrid($dueWork, $importer, $file->getFilename());
+        return $this->importGrid($dueWork, $importer, $file->getFilename());
     }
 
 
     /**
      * Imports a rubric grid using importer into the given due work.
      *
-     * @param DueWorkModel $dueWork
+     * @param IAssessable $assessment
      * @param IImporter $importer
      * @param string $filename
+     * @return Grid
      * @throws MapperException
      */
-    public function importGrid(DueWorkModel $dueWork, IImporter $importer, string $filename): void
+    public function importGrid(IAssessable $assessment, IImporter $importer, string $filename): Grid
     {
         // Add to the rowset as necessary
-        $rowSet        = $this->retrieveRowSet($dueWork->getContext(), false);
+        $rowSet        = $this->retrieveRowSet($assessment->getContext(), false);
         $rowsetChanged = false;
 
         foreach ($importer->retrieveCapabilitiesWithIndicators() as $capability) {
@@ -1237,7 +1238,7 @@ class DataSource
             $thisCapability = $rowSet->retrieveCapabilityByName($capName);
 
             if (!$thisCapability) {
-                $rowsetChanged  = true;
+                $rowsetChanged = true;
 
                 /* Create a new rowset capability
                  */
@@ -1270,7 +1271,7 @@ class DataSource
         if ($rowsetChanged) {
             $this->persistRowSet($rowSet, true, false);
             // Reload it, bypassing the caches created by the last load I did
-            $rowSet = $this->retrieveRowSet($dueWork->getContext(), false, false);
+            $rowSet = $this->retrieveRowSet($assessment->getContext(), false, false);
         }
 
 
@@ -1286,7 +1287,7 @@ class DataSource
          *  convenient way to set this up (@armatronic I'm probably braindead atm, there's probably an obvious answer)
          */
         $assessmentModel = \Schoolbox\Learning\Assessment\DataModel\Mapper::getInstance()->createModel()
-            ->setId($dueWork->getId());
+            ->setId($assessment->getId());
 
         /* Fulfil rubric settings
          */
@@ -1300,7 +1301,7 @@ class DataSource
 
         $this->rubricInstanceMapper->save($rubricInstance);
 
-        $grid = new Grid($dueWork, $rubricInstance, $rowSet);
+        $grid = new Grid($assessment, $rubricInstance, $rowSet);
 
         // Create levels
         foreach ($importer->getLevels() as $i => $levelName) {
@@ -1360,7 +1361,7 @@ class DataSource
             }
         }
 
-        $dueWork->setRubricGrid($grid);
+        return $grid;
     }
 
 
