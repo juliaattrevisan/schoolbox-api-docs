@@ -98,8 +98,8 @@ const formValue = window.Vue.computed(() => JSON.stringify(translateMarkedGridTo
             <thead v-if="hasLevels">
                 <tr>
                     <th colspan="2">&nbsp;</th>
-                    <!-- TODO: level.name should be scrubbed (markdown) and output as html -->
-                    <th v-for="level in props.rubric.levels" :key="level.id" class="markdown">{{ level.name }}</th>
+                    <!-- eslint-disable-next-line vue/no-v-html -- scrubbed in the backend -->
+                    <th v-for="level in props.rubric.levels" :key="level.id" class="markdown" v-html="level.name"></th>
                 </tr>
             </thead>
             <tbody>

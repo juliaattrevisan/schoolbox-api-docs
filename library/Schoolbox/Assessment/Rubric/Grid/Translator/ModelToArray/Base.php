@@ -57,7 +57,7 @@ class Base
             ],
             'levels' => $rubricGrid->getLevels()->map(fn(Level $level) => [
                 'id' => $level->getId(),
-                'name' => $level->getName(),
+                'name' => \Scrub::markdown($level->getName()),
             ])->reindex(),
             'capabilities' => $capabilities,
         ];
@@ -81,7 +81,7 @@ class Base
 
         return [
             'id' => $capability->getId(),
-            'name' => $capability->getName(),
+            'name' => \Scrub::markdown($capability->getName()),
             'maxValue' => $capabilityUsage->getMaxValue(), // TODO: rubric-markable only, and check if it matters for perms
             'derivedMaxValue' => $capabilityUsage->calculateMaxValueFromIndicators(), // TODO: rubric-markable only, and check if it matters for perms
             'showCapabilityMark' => $rubricGrid->isCapabilityMarkShown($capability), // TODO: rubric-markable only, and check if it matters for perms
@@ -127,14 +127,14 @@ class Base
 
             $descriptors[] = [
                 'id' => $descriptor->getId(),
-                'description' => $descriptor->getDescription(),
+                'description' => \Scrub::markdown($descriptor->getDescription()),
                 'value' => $value,
             ];
         }
 
         return [
             'id' => $indicator->getId(),
-            'name' => $indicator->getName(),
+            'name' => \Scrub::markdown($indicator->getName()),
             'descriptors' => $descriptors,
         ];
     }

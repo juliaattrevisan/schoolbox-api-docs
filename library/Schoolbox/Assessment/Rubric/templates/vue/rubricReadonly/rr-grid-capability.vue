@@ -55,8 +55,8 @@ function findIndicatorMark(
             :rowspan="props.capability.indicators.length + (showSummaryForThisCapability ? 2 : 1) /* header+summary */"
         >
             <span>
-                <!-- TODO: should be scrubbed (markdown) and output as html -->
-                {{ props.capability.name }}
+                <!-- eslint-disable-next-line vue/no-v-html -- scrubbed in the backend -->
+                <span v-html="props.capability.name"></span>
             </span>
         </th>
     </tr>

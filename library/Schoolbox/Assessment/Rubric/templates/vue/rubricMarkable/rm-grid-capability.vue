@@ -253,10 +253,8 @@ window.Vue.watch(
             class="rb-group-name markdown"
             :rowspan="indicators.length + (showSummaryForThisCapability ? 2 : 1) /* header+summary */"
         >
-            <span>
-                <!-- TODO: should be scrubbed (markdown) and output as html -->
-                {{ props.capability.name }}
-            </span>
+            <!-- eslint-disable-next-line vue/no-v-html -- scrubbed in the backend -->
+            <span v-html="props.capability.name"></span>
         </th>
     </tr>
 

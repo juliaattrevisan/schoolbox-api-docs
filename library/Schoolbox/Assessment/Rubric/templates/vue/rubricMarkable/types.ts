@@ -18,11 +18,13 @@ export type RubricGrid = {
 
 export type RubricGridLevel = {
     id: number;
+    /** Level name, scrubbed in the backend */
     name: string;
 };
 
 export type RubricGridCapability = {
     id: number;
+    /** Capability name, scrubbed in the backend */
     name: string;
     maxValue: number | null;
     /** A derived maximum value for the capability, calculated from its indicators */
@@ -42,12 +44,14 @@ export type RubricGridCapability = {
 
 export type RubricGridIndicator = {
     id: number;
+    /** Indicator name, scrubbed in the backend */
     name: string;
     descriptors: (RubricGridDescriptor | null)[];
 };
 
 export type RubricGridDescriptor = {
     id: number;
+    /** Descriptor description, scrubbed in the backend */
     description: string | null;
     value:
         | { left: number; right: number } // if using mark range

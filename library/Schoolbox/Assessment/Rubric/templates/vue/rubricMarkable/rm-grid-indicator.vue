@@ -27,8 +27,8 @@ window.Vue.watch(
 
 <template>
     <tr class="rb-indicator-row">
-        <!-- TODO: should be scrubbed (markdown) and output as html -->
-        <th class="rb-criterion-name markdown">{{ props.indicator.name }}</th>
+        <!-- eslint-disable-next-line vue/no-v-html -- scrubbed in the backend -->
+        <th class="rb-criterion-name markdown" v-html="props.indicator.name"></th>
 
         <template v-for="(level, index) in props.levels" :key="level.id">
             <rm-grid-descriptor

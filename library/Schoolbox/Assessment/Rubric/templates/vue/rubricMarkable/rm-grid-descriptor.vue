@@ -120,8 +120,8 @@ window.Vue.onMounted(() => {
                 <div class="hide-for-large-up l-pad-m hide-on-print">
                     <!-- display rubric levels for the mobile view. -->
                     <p>
-                        <!-- TODO: should be scrubbed (markdown) and output as html -->
-                        <b>{{ level.name }}</b>
+                        <!-- eslint-disable-next-line vue/no-v-html -- scrubbed in the backend -->
+                        <b v-html="level.name"></b>
                     </p>
                 </div>
 
@@ -149,8 +149,8 @@ window.Vue.onMounted(() => {
                         />
                     </template>
 
-                    <!-- TODO: should be scrubbed (markdown) and output as html -->
-                    {{ props.descriptor.description?.trim() }}
+                    <!-- eslint-disable-next-line vue/no-v-html -- scrubbed in the backend -->
+                    <div v-html="props.descriptor.description?.trim()"></div>
                 </span>
 
                 <!-- Just show a text value if the descriptor is not selected -->
