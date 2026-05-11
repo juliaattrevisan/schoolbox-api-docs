@@ -375,8 +375,14 @@ class Controller extends BaseController
     public function postDownload(): void
     {
         // TODO: there's no permission check against here...
-        // TODO: ideally remove the need to provide an assessment at all if we can
+
+        /* The csv is actually populated via this rubricGrid array payload. I wasn't expecting that.
+         */
         $rubric = $this->requestPost->get('rubricGrid');
+
+        /* The assessment title is used in the filename of the csv, so we unfortunately need it.
+         * ...unless we decided that the assessment name didn't belong here at all...?
+         */
         $assessmentId = $this->requestPost->getInt('assessmentId');
         $assessment = $this->assessmentDataSource->findById($assessmentId);
 
@@ -406,16 +412,19 @@ class Controller extends BaseController
             }
         }
 
-        /* TODO This is all wrong now; these belong on a rubric instance
+        /* These settings need to be assigned to a rubric instance. Oddly, the id of the rubric instance isn't required
+         * because everything is fulfilled via $rubric from the POST payload. That's so weird. It must be so that you
+         * can export a csv -containing unsaved changes to the grid- or something like that.
          */
-        $assessment->setCapabilityMarkType($markType)
-                   ->setCapabilityGradeGroup($gradeGroup);
-
-        $assessment->setUseMarkRange($rubric['useMarkRange'] ?? false); // TODO: useMarkRange should be against a rubric
+        $rubricInstance = $this->rubricInstanceMapper->createModel()
+            ->setId(null) // Yep, that's a null right there
+            ->setCapabilityMarkType($markType)
+            ->setCapabilityGradeGroup($gradeGroup)
+            ->setMarkedUsingRange($rubric['useMarkRange'] ?? false);
 
         $grid = (new GridFactory())->buildFromPostData(
-            $this->mapper->retrieveGrid($assessment, false),
-            [ $assessmentId => $rubric ], // TODO this will probably change as we further implement multi-grid support
+            $this->mapper->retrieveOneGrid($assessment, $rubricInstance, false),
+            $rubric,
             false
         );
         $basename = (new Url($assessment->getTitle()))->getSlug();
