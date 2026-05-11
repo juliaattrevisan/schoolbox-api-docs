@@ -223,7 +223,7 @@ window.Vue.watch(
             props.capabilityMarkScheme,
         );
         const { humanReadableMark } = applyMarkScheme(
-            capabilityMark.value.value, // TODO: is that right?? might need to be scaledMark
+            scaledMark,
             props.capability.maxValue,
             props.capabilityMarkScheme,
         );
