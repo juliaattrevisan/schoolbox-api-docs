@@ -51,7 +51,8 @@ body.sbx-body {
     .selected-item,
     .selected-nodes-container,
     blockquote,
-    .clr-field button {
+    .clr-field button,
+    .article-files li {
         border-radius: var(--sbx-config-field-roundness) !important;
     }
 

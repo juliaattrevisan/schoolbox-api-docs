@@ -261,7 +261,7 @@
             margin: 0rem 0.5rem 0 -0.25rem;
             width: 3rem;
             padding-right: 0.25rem;
-            border-right: 1px solid $gainsboro;
+            border-right: 1px solid var(--sbx-color-text-secondary, $gainsboro);
         }
     }
 
