@@ -372,7 +372,7 @@ class Controller extends BaseController
      * @api POST /rubric/csv
      * @since 156
      */
-    public function download()
+    public function postDownload(): void
     {
         // TODO: there's no permission check against here...
         // TODO: ideally remove the need to provide an assessment at all if we can

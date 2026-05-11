@@ -51,7 +51,7 @@
                         route-rubric-import="{{ routeLookup("rubric.postImport") }}"
                         :assessment-id="{{ assessmentId ? assessmentId : 'null' }}"
                         {% if assessmentId %}
-                            route-rubric-download="{{ routeLookup('rubric.download') }}"
+                            route-rubric-download="{{ routeLookup('rubric.postDownload') }}"
                         {% endif %}
                     />
                 </div>
