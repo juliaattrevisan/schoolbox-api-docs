@@ -1,0 +1,192 @@
+{#
+    name:          string
+    value:         string
+    required:      bool
+    editable:      bool
+    min:           int (optional, default: 0)
+    max:           int (optional)
+    timeUnit:      'year'|'week'|'day'|'hour'|'minute' (optional, default: 'minute')
+#}
+{% extends '@settings/fieldTypeBase.twig' %}
+
+{% set fieldId = name ~ '-field' %}
+
+{% block inputElement %}
+    <input
+        id="{{ fieldId }}"
+        {{ required ? 'required ' }}
+        type="text"
+        name="{{ name }}-display" {# need a name for alaressValidate #}
+        value="{{ value }}"
+        {% if not editable %}disabled="disabled"{% endif %}
+        data-duration-field-input="{{ fieldId }}"
+    />
+
+    <input
+        {{ required ? 'required ' }}
+        type="number"
+        name="{{ name }}"
+        value="{{ value }}"
+        {% if not editable %}disabled="disabled"{% endif %}
+        {# Hidden field that the below script keeps in sync with the user-entered value above #}
+        class="hide"
+        data-duration-field-value="{{ fieldId }}"
+        data-duration-field-unit="{{ timeUnit ?? 'minute' }}"
+    >
+{% endblock %}
+
+{% block extraContent %}
+    <script>
+    $(function() {
+        const durationUserInput = document.querySelector("[data-duration-field-input='{{ fieldId }}']");
+        const durationValueInput = document.querySelector("[data-duration-field-value='{{ fieldId }}']");
+        const durationUnit = durationValueInput.dataset.durationFieldUnit;
+
+        /**
+         * Available time units and their equivalent value in minutes for conversion.
+         * The value here particularly relates to how the backend defines each unit
+         * so that it can be restored back to a human-readable format and parsed back into the same value reliably.
+         *
+         * Relying on the diff from dayjs is not sufficient as that will vary based on the date (daylight savings, leap years, etc)
+         */
+        const timeUnits = [
+            // assume a year is always 365 days, leap years are ignored as this is for parsing a duration, not a specific date
+            { unit: "year", value: 365 * 24 * 60 },
+            // omit "month" since it's highly variable and can lead to confusion
+            { unit: "week", value: 7 * 24 * 60 },
+            { unit: "day", value: 24 * 60 },
+            { unit: "hour", value: 60 },
+            { unit: "minute", value: 1 },
+        ];
+
+        const durationUnitValue = timeUnits.find(({ unit }) => unit === durationUnit)?.value;
+        if (!durationUnitValue) {
+            console.error(`Invalid duration unit "${durationUnit}" for field "${durationValueInput.name}"`);
+            return;
+        }
+
+        /**
+         * Converts an arbitrary time span to a duration relative to the current time
+         * Similar to how datepickers are able to parse "in 5 days", "tomorrow", "1 month", etc via alaress-datetime-picker.js
+         * @param {string} userInput - The user input to parse (representing an arbitrary time span or date)
+         * @returns {number|false} - The parsed duration, or null if the input is invalid
+         */
+        function parseDurationInput(userInput) {
+            // If the user input is just a number, assume it's already in the configured unit
+            if (/^-?\d+$/.test(userInput.trim())) {
+                return Math.abs(parseInt(userInput.trim(), 10));
+            }
+
+            const now = dayjs();
+            let future = dayjs.parseNatural(userInput, now);
+
+            if (future === false) {
+                return false; // invalid input
+            }
+
+            // Use only dayjs functions to reliably retrieve differences in each time unit
+            let totalMinutes = 0;
+            for (const { unit, value } of timeUnits) {
+                // 'true' ensures a float value is returned that we can round instead of floor (otherwise "5 minutes" becomes "4 minutes")
+                const diff = Math.round(future.diff(now, unit, true));
+                if (diff !== 0) {
+                    future = future.subtract(diff, unit);
+                    totalMinutes += diff * value;
+                }
+            }
+
+            // If the user entered a relative date in the past, e.g. "5 minutes ago", normalise the diff to be positive
+            totalMinutes = Math.abs(totalMinutes);
+
+            // Convert to the configured unit, rounding up I suppose
+            return Math.ceil(totalMinutes / durationUnitValue);
+        }
+
+        /**
+         * Convert a quantity of time back into a human-readable duration. (e.g. "1 hour 30 minutes")
+         * @param {number} value - The number to convert from, in the configured unit
+         * @returns {string} - A human-readable time span
+         */
+        function humanReadableDuration(value) {
+            const readable = [];
+
+            // convert the value back into minutes (the base unit) so it can be converted into the various time units again
+            let diffMinutes = value;
+            if (durationUnit !== "minute") {
+                diffMinutes = value * durationUnitValue;
+            }
+
+            for (const { unit, value: unitValue } of timeUnits) {
+                if (diffMinutes >= unitValue) {
+                    const count = Math.floor(diffMinutes / unitValue);
+                    readable.push(`${count} ${unit}${count !== 1 ? "s" : ""}`);
+                    diffMinutes %= unitValue;
+                }
+            }
+
+            return readable.join(" ");
+        }
+
+        /**
+         * When the user changes the duration input, update the hidden input with the normalised value and ensure it's >= 0
+         */
+        function onDurationChanged() {
+            if (durationUserInput.value === "") {
+                durationValueInput.value = "";
+                return;
+            }
+
+            // normalise the user input to the configured unit, or false if invalid
+            const normalisedDuration = parseDurationInput(durationUserInput.value);
+
+            if (normalisedDuration === false) {
+                // alaress validate will handle this
+                durationValueInput.value = "";
+            } else {
+                // update the hidden input with the normalised value
+                durationValueInput.value = normalisedDuration;
+                durationUserInput.value = humanReadableDuration(normalisedDuration);
+            }
+
+            $(durationValueInput).valid(); // make alaressValidate notice the change
+        }
+
+        durationUserInput.addEventListener("change", onDurationChanged);
+        durationUserInput.addEventListener("blur", onDurationChanged);
+        onDurationChanged(); // set the initial value
+
+        /**
+         * Validation Rules
+         */
+        const min = {{ min ?? 'undefined' }};
+        const max = {{ max ?? 'undefined' }};
+
+        $(durationUserInput).rules("add", {
+            required: {{ required ? 'true' : 'false' }},
+            number: true,
+            min,
+            max,
+            /** Validation for this field is based on the value of the hidden input, not the user input */
+            normalizer: (value) => {
+                // If the value is empty but the user has entered something, then the input is invalid
+                if (durationValueInput.value === "" && value.trim() !== "") {
+                    return 'invalid'; // arbitrary non-numeric value to trigger the "number" validation message
+                }
+
+                // '0' is equivalent to an empty value
+                if (durationValueInput.value === "0") {
+                    return "";
+                }
+
+                // otherwise, return the normalised value from the hidden input for validation
+                return durationValueInput.value;
+            },
+            messages: {
+                min: `Please enter a duration of at least ${humanReadableDuration(min)}`,
+                max: `Please enter a duration of no more than ${humanReadableDuration(max)}`,
+                number: "Please enter a valid duration.",
+            },
+        });
+    });
+    </script>
+{% endblock %}

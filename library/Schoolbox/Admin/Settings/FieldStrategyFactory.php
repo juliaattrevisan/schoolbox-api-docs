@@ -127,6 +127,8 @@ class FieldStrategyFactory
                 return new FieldType\URI\Renderer();
             case ConfigMapper::FIELD_RANGE:
                 return new FieldType\Range\Renderer();
+            case ConfigMapper::FIELD_DURATION:
+                return new FieldType\Duration\Renderer();
         }
         throw new UnexpectedValueException("Unable to find a field renderer for config field '{$fieldId}'");
     }
@@ -168,6 +170,8 @@ class FieldStrategyFactory
                 return new FieldType\URI\ValueSerializer();
             case ConfigMapper::FIELD_RANGE:
                 return new FieldType\Range\ValueSerializer();
+            case ConfigMapper::FIELD_DURATION:
+                return new FieldType\Duration\ValueSerializer();
             // Note that no default implicitly requires explicit registration to avoid logic errors.
         }
         throw new UnexpectedValueException("Unable to find a field value serializer for config field '{$fieldId}'");

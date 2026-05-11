@@ -45,9 +45,12 @@ function denaturalize(text: string): string {
  */
 const strToTimePlugin: PluginFunc = (option, dayjsClass, dayjsFactory) => {
     Object.defineProperty(dayjsFactory, "parseNatural", {
-        value: (text: string): DayjsInstance | false => {
+        value: (text: string, now?: number | DayjsInstance): DayjsInstance | false => {
             const denaturalized = denaturalize(text);
-            const timestamp = strtotime(denaturalized);
+            const timestamp = strtotime(
+                denaturalized,
+                now === undefined ? undefined : Math.floor(dayjsFactory(now).valueOf() / 1000),
+            );
             return timestamp ? dayjsFactory(timestamp * 1000) : false;
         },
     });
@@ -58,9 +61,10 @@ declare module "dayjs" {
      * Parse a user-friendly date string into a Dayjs object
      * For example, "in 2 hours", "tomorrow", "5 days ago", etc
      * @param text - The natural language date input
+     * @param now - Optional timestamp/Dayjs object to use as a base for relative dates
      * @returns - The Dayjs object or false if the input could not be parsed
      */
-    export const parseNatural: (text: string) => DayjsInstance | false;
+    export const parseNatural: (text: string, now?: number | DayjsInstance) => DayjsInstance | false;
 }
 
 export default strToTimePlugin;

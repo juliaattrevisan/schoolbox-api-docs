@@ -21,9 +21,9 @@ ePortfolio data includes:
 - ePortfolio filelists
 - ePortfolio permissions
 - ePortfolio components',
-           (SELECT id FROM lu_config_field WHERE field = 'selectKey'),
+           (SELECT id FROM lu_config_field WHERE field = 'duration'),
            @dataRetention_config_id,
-           '1;1 Day:30;30 Days:365;365 Days',
+           '{"min": 1, "timeUnit": "day"}',
            'true',
            'false',
            'false',
@@ -39,9 +39,9 @@ Leave empty to retain data indefinitely.
 Learning Moments data includes:
 - Learning Moments
 - Learning Moment Evidence',
-           (SELECT id FROM lu_config_field WHERE field = 'selectKey'),
+           (SELECT id FROM lu_config_field WHERE field = 'duration'),
            @dataRetention_config_id,
-           '1;1 Day:30;30 Days:365;365 Days',
+           '{"min": 1, "timeUnit": "day"}',
            'true',
            'false',
            'false',
@@ -57,9 +57,9 @@ Leave empty to retain data indefinitely.
 My Files data includes:
 - My Folders
 - My Files',
-           (SELECT id FROM lu_config_field WHERE field = 'selectKey'),
+           (SELECT id FROM lu_config_field WHERE field = 'duration'),
            @dataRetention_config_id,
-           '1;1 Day:30;30 Days:365;365 Days',
+           '{"min": 1, "timeUnit": "day"}',
            'true',
            'false',
            'false',
@@ -84,9 +84,9 @@ Resources (CMS) data includes:
   - Text boxes
   - User groups
   - Wikis',
-           (SELECT id FROM lu_config_field WHERE field = 'selectKey'),
+           (SELECT id FROM lu_config_field WHERE field = 'duration'),
            @dataRetention_config_id,
-           '1;1 Day:30;30 Days:365;365 Days',
+           '{"min": 1, "timeUnit": "day"}',
            'true',
            'false',
            'false',
@@ -105,9 +105,9 @@ Student Submission data includes:
   - Kami Documents
   - Plagscan Documents
   - Turnitin Reports',
-           (SELECT id FROM lu_config_field WHERE field = 'selectKey'),
+           (SELECT id FROM lu_config_field WHERE field = 'duration'),
            @dataRetention_config_id,
-           '1;1 Day:30;30 Days:365;365 Days',
+           '{"min": 1, "timeUnit": "day"}',
            'true',
            'false',
            'false',
