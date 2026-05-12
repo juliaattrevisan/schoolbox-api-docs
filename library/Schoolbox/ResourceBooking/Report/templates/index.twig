@@ -184,8 +184,9 @@
                 <tr>
                     <th>Start</th>
                     <th>End</th>
-                    <th>Name</th>
-                    <th>Venue</th>
+                    <th>Booking</th>
+                    <th>Venue/Resource</th>
+                    <th>Quantity</th>
                     <th>Notes</th>
                 </tr>
                 </thead>
@@ -231,6 +232,13 @@
                                 <a href="{{ routeLookup('resourceItem.read', {id: booking.getResource().getId()}) }}">
                                     {{ booking.getResource().getRoomCode() | default(booking.getResource().getName()) }}
                                 </a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if booking is empty %}
+                                &nbsp;
+                            {% else %}
+                                {{ bookingQuantity }}
                             {% endif %}
                         </td>
                         <td>

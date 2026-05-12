@@ -18,6 +18,7 @@ use Calendar\Event\Type\EventInterface;
 use Calendar_Api_Composite;
 use Schoolbox\GenericCollection;
 use Calendar\Event\Type\Day\Event as Event;
+use Schoolbox\ResourceBooking\Booking\CapacityAllocation;
 use Schoolbox\ResourceBooking\Category;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\ResourceBooking\Item\Mapper;
@@ -114,7 +115,7 @@ class Controller extends Base
         // Build the list of events (slowly)
         $showClasses = $this->requestQuery->getBool('classes', true);
         $clashesOnly = $this->requestQuery->getBool('clashesOnly', false);
-        $capacityAllocation = new \Schoolbox\ResourceBooking\Booking\CapacityAllocation();
+        $capacityAllocation = new CapacityAllocation();
 
         $this->api->add(
             $this->apiFactory->buildFromResourceCollection(
@@ -211,13 +212,14 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate(
             '@resourceBookingReport/index.twig',
             [
-                'categoryList' => $categoryList,
-                'eventList'    => $eventList,
-                'search'       => [
-                    'start'    => $start,
-                    'end'      => $end,
-                    'category' => $selectedCategories,
-                    'classes'  => $showClasses,
+                'categoryList'     => $categoryList,
+                'eventList'        => $eventList,
+                'bookingQuantity'  => CapacityAllocation::BOOKING_QUANTITY,
+                'search'           => [
+                    'start'        => $start,
+                    'end'          => $end,
+                    'category'     => $selectedCategories,
+                    'classes'      => $showClasses,
                     'clashesOnly'  => $clashesOnly,
                 ],
             ],

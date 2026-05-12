@@ -155,6 +155,61 @@ class ResourceBookingCest
         $i->assertEquals(7, $updatedItem->getCapacity(), 'Updated resource capacity is persisted');
     }
 
+    public function bookingReportDisplaysCapacityColumnsAndQuantity(IntegrationTester $i): void
+    {
+        $resource = $this->createCapacityTestResource(
+            $i,
+            'Capacity report resource',
+            7,
+            false,
+            ModerationType\Model::TYPE_OPEN
+        );
+        $startDate = date('d/m/Y g:ia', strtotime('2077-02-01 10:00:00'));
+        $endDate = date('d/m/Y g:ia', strtotime('2077-02-01 11:00:00'));
+
+        $booking = $this->createCapacityTestBooking(
+            $i,
+            $resource,
+            'Capacity report booking',
+            $startDate,
+            $endDate
+        );
+
+        $i->sendGET('/resource-booking/report?start=01%2F02%2F2077&end=01%2F02%2F2077&category%5B%5D=3&clashesOnly=0&classes=0');
+
+        $i->seeResponseCodeIs(200);
+        $response = $i->grabResponse();
+
+        $lastHeaderPosition = -1;
+        foreach (
+            [
+                '<th>Start</th>',
+                '<th>End</th>',
+                '<th>Booking</th>',
+                '<th>Venue/Resource</th>',
+                '<th>Quantity</th>',
+                '<th>Notes</th>',
+            ] as $header
+        ) {
+            $headerPosition = strpos($response, $header);
+            $i->assertNotFalse($headerPosition, $header . ' header is present');
+            $i->assertGreaterThan($lastHeaderPosition, $headerPosition, $header . ' header appears in order');
+            $lastHeaderPosition = $headerPosition;
+        }
+
+        $i->assertMatchesRegularExpression(
+            '~'
+            . preg_quote($booking->getName(), '~')
+            . '.*?'
+            . preg_quote($resource->getName(), '~')
+            . '.*?<td>\s*1\s*</td>'
+            . '.*?<article><p>These are some notes</p></article>'
+            . '~s',
+            $response,
+            'Report row shows booking, venue/resource, implicit quantity, and notes in order'
+        );
+    }
+
     public function createResourceRejectsInvalidCapacity(IntegrationTester $i): void
     {
         foreach (['0', '1000', 'abc', '1.5', ''] as $capacity) {
