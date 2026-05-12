@@ -845,9 +845,11 @@ class Cms extends Base
 
             $padDeleted = $this->deletePadFromEtherpad($padId);
             if ($padDeleted) {
+                // record if the API successfully removed the pad from redis
                 $summary['padsDeleted']++;
             }
 
+            // even if the API failed (the redis entry may already have been removed) we should remove the record from our db
             $summary['dbRowsDeleted'] += $this->hardDeleteEtherpadPad($padRecordId);
         }
 
