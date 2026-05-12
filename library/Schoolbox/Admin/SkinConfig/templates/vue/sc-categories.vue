@@ -304,10 +304,25 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
     </template>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .preview-container {
     border: 1px solid var(--sbx-color-border, #dcdcdc);
     border-radius: var(--sbx-config-field-roundness, 0);
     padding: var(--spacing-m);
+}
+
+/* use the new config setting colours */
+.component-titlebar,
+#component-layout .column-top .component-titlebar,
+#component-layout .column-left .component-titlebar,
+#component-layout .column-right .component-titlebar {
+    background-color: var(--sbx-config-color-component-heading-background);
+    h2,
+    nav a[class^="icon-"],
+    nav a[class*=" icon-"],
+    nav a.sbx-icon-only-button,
+    nav a.sbx-icon-only-button sbx-icon {
+        color: var(--sbx-config-color-component-heading-text);
+    }
 }
 </style>
