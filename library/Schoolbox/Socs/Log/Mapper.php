@@ -20,6 +20,7 @@ use Schoolbox\Mapper\Exception;
  */
 class Mapper extends \Schoolbox\Mapper
 {
+    // prune logs older than this many days
     private const int EXPIRY_THRESHOLD = 7;
 
     protected function mapping(): void
@@ -96,7 +97,7 @@ class Mapper extends \Schoolbox\Mapper
     }
 
     /**
-     * Delete old log rows beyond the expiry threshold.
+     * Delete old log rows beyond the expiry threshold (days).
      */
     public function prune(): void
     {
