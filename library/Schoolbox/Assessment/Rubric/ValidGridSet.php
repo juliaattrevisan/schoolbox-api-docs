@@ -10,6 +10,8 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Rubric\Grid\Factory as GridFactory;
+use Schoolbox\Assessment\Rubric\Grid\Grid;
+use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\ISelfAssessable;
 use Schoolbox\Mapper\Exception;
@@ -86,39 +88,57 @@ class ValidGridSet
             /* This should knowingly throw an exception if you couldn't decode it. This normally shouldn't be the case.
              * I'm not entirely sure how we'd construct an exception-throwing payload though. Arguably this should throw
              * on error: I can't tell why it didn't when I got here.
-             */
-            $rubricData = json_decode($post[$rubricInstance->getId()] ?? '[]', true);
-
-            /* Manufacture new capability mark type and mark range settings, in situ
              *
-             * These become ingredients for the grid we intend to make so we need to ensure they're split (and distinct)
-             * from whence they came, in $currentAssessment's rubric instance. The grid should be standalone.
+             * Grid deletion:
+             * Anyway, if a $rubricData didn't exist, it's probably because $rubricInstance USED to exist, but has been
+             * deleted from the frontend and thus doesn't manifest in the $post payload. That means we need to construct
+             * a totally empty grid, no caps/inds/descs and kind of trick the isCompatible methods into returning false.
+             * This basically equates to "if a grid that was in use and had marks, but it's been deleted now, then we
+             * need to invalidate feedback."
              */
-            $capabilityMarkTypeSlug = $rubricInstance->getCapabilityMarkType()->getSlug() ?? MarkType::SLUG_NONE;
+            if (!isset($post[$rubricInstance->getId()])) {
+                /* As empty as empty can be
+                 */
+                $proposedGrid = new Grid(
+                    $currentAssessment,
+                    $this->rubricInstanceMapper->createModel(),
+                    new RowSet($currentAssessment->getContext())
+                );
+            } else {
+                $rubricData = json_decode($post[$rubricInstance->getId()], true);
 
-            $capabilityMarkType = $this->markTypeMapper->createModel()
-                ->setSlug($capabilityMarkTypeSlug)
-                ->setId(MarkType::slugToId($capabilityMarkTypeSlug));
+                /* Manufacture new capability mark type and mark range settings, in situ
+                 *
+                 * These become ingredients for the grid we intend to make so we need to ensure they're split (and distinct)
+                 * from whence they came, in $currentAssessment's rubric instance. The grid should be standalone.
+                 */
+                $capabilityMarkTypeSlug = $rubricInstance->getCapabilityMarkType()->getSlug() ?? MarkType::SLUG_NONE;
 
-            $useMarkRange = $rubricInstance->getMarkedUsingRange() ?? false;
+                $capabilityMarkType = $this->markTypeMapper->createModel()
+                    ->setSlug($capabilityMarkTypeSlug)
+                    ->setId(MarkType::slugToId($capabilityMarkTypeSlug));
 
-            /* Assemble a rubric instance that can be used to compare grids before and after.
-             * We don't need to add $proposedRubricInstance to $proposedAssessment's rubric instance collection atm.
-             *
-             * The original rubric instance id is needed to find the json-encoded $_POST['rubric'][$rubricInstanceId]
-             * node, so we have to supply it here, even though $proposedRubricInstance is a whole new spawn to prevent
-             * object-by-reference conflicts. Wild.
-             */
-            $proposedRubricInstance = $this->rubricInstanceMapper->createModel()
-                ->setId($rubricInstance->getId())
-                ->setCapabilityMarkType($capabilityMarkType)
-                ->setMarkedUsingRange($useMarkRange);
+                $useMarkRange = $rubricInstance->getMarkedUsingRange() ?? false;
 
-            $proposedGrid = $gridFactory->buildFromPostData(
-                $this->rubricMapper->retrieveOneGrid($proposedAssessment, $proposedRubricInstance, false),
-                $rubricData,
-                false
-            );
+                /* Assemble a rubric instance that can be used to compare grids before and after.
+                 * We don't need to add $proposedRubricInstance to $proposedAssessment's rubric instance collection atm.
+                 *
+                 * The original rubric instance id is needed to find the json-encoded $_POST['rubric'][$rubricInstanceId]
+                 * node, so we have to supply it here, even though $proposedRubricInstance is a whole new spawn to prevent
+                 * object-by-reference conflicts. Wild.
+                 */
+                $proposedRubricInstance = $this->rubricInstanceMapper->createModel()
+                    ->setId($rubricInstance->getId())
+                    ->setCapabilityMarkType($capabilityMarkType)
+                    ->setMarkedUsingRange($useMarkRange);
+
+                $proposedGrid = $gridFactory->buildFromPostData(
+                    $this->rubricMapper->retrieveOneGrid($proposedAssessment, $proposedRubricInstance, false),
+                    $rubricData,
+                    false
+                );
+            }
+
 
             // Is the proposed grid itself not valid?
             // Doesn't matter for the purpose of this exercise
