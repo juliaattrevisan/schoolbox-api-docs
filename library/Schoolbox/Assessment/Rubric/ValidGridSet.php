@@ -2,10 +2,8 @@
 
 namespace Schoolbox\Assessment\Rubric;
 
-use Alaress\Authorizer\Authorizer;
 use Alaress\Json\Decorator\LinkDecorator;
 use Alaress\Json\Decorator\PropertyDecorator;
-use Aura\Router\Generator;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
