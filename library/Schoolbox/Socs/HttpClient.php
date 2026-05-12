@@ -6,6 +6,7 @@ namespace Schoolbox\Socs;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use SensitiveParameter;
@@ -25,6 +26,11 @@ class HttpClient
      */
     private const int NUM_RETRY = 3;
 
+    /**
+     * Request timeout
+     */
+    private const DEFAULT_TIMEOUT = 300;
+
     private Client $client;
 
     private string $baseUrl;
@@ -41,8 +47,8 @@ class HttpClient
     {
         $this->baseUrl = rtrim($host, '/');
         $this->client = new Client([
-            'timeout' => 300,
-            'http_errors' => false,
+            RequestOptions::TIMEOUT => self::DEFAULT_TIMEOUT,
+            RequestOptions::HTTP_ERRORS => false,
         ]);
     }
 
@@ -65,7 +71,7 @@ class HttpClient
         while (true) {
             try {
                 return $this->client->request('GET', $url, [
-                    'query' => $fullQuery,
+                    RequestOptions::QUERY => $fullQuery,
                 ]);
             } catch (GuzzleException $e) {
                 $fails++;
