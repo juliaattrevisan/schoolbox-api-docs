@@ -274,13 +274,15 @@
                             </label>
                         </div>
                     </div>
-                    <fieldset class="small-4 columns clear-fieldset">
-                        <legend id="capacity-label" class="required">
-                            Number of bookable items
-                            <span class="hint has-tip tip-top" data-tooltip title="The maximum number of bookings that can use this resource at the same time. Use 1 when only one booking should be available at a time.">?</span>
-                        </legend>
-                        <input name="capacity" id="capacity" type="number" min="1" max="999" step="1" value="{{ item.capacity|default(1) }}" aria-labelledby="capacity-label" required />
-                    </fieldset>
+                    <div class="small-4 columns">
+                        <fieldset class="clear-fieldset">
+                            <legend id="capacity-label" class="required">
+                                Number of bookable items
+                                <span class="hint has-tip tip-top" data-tooltip title="The maximum number of bookings that can use this resource at the same time. Use 1 when only one booking should be available at a time.">?</span>
+                            </legend>
+                            <input name="capacity" id="capacity" type="number" min="1" max="999" step="1" value="{{ item.capacity|default(1) }}" aria-labelledby="capacity-label" required />
+                        </fieldset>
+                    </div>
                 </fieldset>
 
                 <fieldset class="content">
