@@ -70,13 +70,55 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
      */
     public function loadDependencies($dependencies = null)
     {
-        $this->userMapper           = UserMapper::getInstance();
-        $this->boxMapper            = SubmissionBoxMapper::getInstance();
-        $this->termMapper           = Term\Mapper::getInstance();
-        $this->workTypeMapper       = WorkTypeMapper::getInstance();
-
-        $this->assessmentDataSource = Mapper::getDi()->get("assessmentDataSource");
+        if (!is_array($dependencies)) {
+            $dependencies = [];
+        }
+        if (empty($dependencies['userMapper'])) {
+            $dependencies['userMapper'] = UserMapper::getInstance();
+        }
+        if (empty($dependencies['boxMapper'])) {
+            $dependencies['boxMapper'] = SubmissionBoxMapper::getInstance();
+        }
+        if (empty($dependencies['termMapper'])) {
+            $dependencies['termMapper'] = Term\Mapper::getInstance();
+        }
+        if (empty($dependencies['workTypeMapper'])) {
+            $dependencies['workTypeMapper'] = WorkTypeMapper::getInstance();
+        }
+        if (empty($dependencies['assessmentDataSource'])) {
+            $dependencies['assessmentDataSource'] = Mapper::getDi()->get("assessmentDataSource");
+        }
         parent::loadDependencies($dependencies);
+    }
+
+    protected function setUserMapper(UserMapper $userMapper): self
+    {
+        $this->userMapper = $userMapper;
+        return $this;
+    }
+
+    protected function setBoxMapper(SubmissionBoxMapper $boxMapper): self
+    {
+        $this->boxMapper = $boxMapper;
+        return $this;
+    }
+
+    protected function setTermMapper(Term\Mapper $termMapper): self
+    {
+        $this->termMapper = $termMapper;
+        return $this;
+    }
+
+    protected function setWorkTypeMapper(WorkTypeMapper $workTypeMapper): self
+    {
+        $this->workTypeMapper = $workTypeMapper;
+        return $this;
+    }
+
+    protected function setAssessmentDataSource(assessmentDataSource $assessmentDataSource): self
+    {
+        $this->assessmentDataSource = $assessmentDataSource;
+        return $this;
     }
 
     /**
@@ -200,6 +242,9 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         if (!$assessment || !($assessment->isFeedbackVisibleToRoleType(Role::STUDENT) || $requestResubmission)) {
             return $envelope;
         }
+        if (!$this->isWorkTypeVisibleToLearners($assessment)) {
+            return $envelope;
+        }
         $href = "/learning/assessments/{$assessment->getId()}/{$student->getId()}";
 
         $bob = new Builder();
@@ -248,6 +293,9 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         if (!$assessment) {
             return $envelope;
         }
+        if (!$this->isWorkTypeVisibleToParents($assessment)) {
+            return $envelope;
+        }
         $cat = $assessment->getBaseContext()->getFolder();
 
         // Request re-submission, even when mark is not visible.
@@ -287,6 +335,22 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         $envelope->targetToParent($student->getId(), $bob->build());
 
         return $envelope;
+    }
+
+    /**
+     * Determines whether learner notifications may be sent for the assessment's work type.
+     */
+    private function isWorkTypeVisibleToLearners(IAssessable $assessment): bool
+    {
+        return $assessment->getWorkType()?->isVisibleToLearners() ?? true;
+    }
+
+    /**
+     * Determines whether parent notifications may be sent for the assessment's work type.
+     */
+    private function isWorkTypeVisibleToParents(IAssessable $assessment): bool
+    {
+        return $assessment->getWorkType()?->isVisibleToParents() ?? true;
     }
 
     /**

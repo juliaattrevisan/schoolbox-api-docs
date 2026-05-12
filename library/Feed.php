@@ -787,6 +787,7 @@ class Feed
 
     /**
      * Returns whether an un-hydrated numeric database boolean is enabled.
+     * The purpose of this function is to standardise the way this test is done.
      *
      * @param mixed $value
      * @return bool
