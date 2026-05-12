@@ -4,7 +4,10 @@ import type { Locator, Page } from "@playwright/test";
 export default class Common {
     private page: Page;
 
-    // sales data
+    // Sales data.
+    // Note all the user's names below should include the honorific.
+    // The honorific should not be included only if that user has no honorific.
+
     static readonly USER_JACKCOLES = "Mr Jack Coles";
 
     static readonly USER_ID_JACKCOLES = 22;
@@ -17,13 +20,13 @@ export default class Common {
 
     static readonly USER_ID_JAMALALI = 60;
 
-    static readonly USER_EDENREED = "Eden Reed";
+    static readonly USER_EDENREED = "Ms Eden Reed";
 
     static readonly USER_JANAREED = "Ms Jana Reed";
 
     static readonly USER_ID_JANAREED = 25;
 
-    static readonly USER_JENNIREED = "Jenni Reed";
+    static readonly USER_JENNIREED = "Ms Jenni Reed";
 
     static readonly CLASS_9AENG = "9A English";
 
@@ -225,7 +228,7 @@ export default class Common {
      * @returns - the surname-first name
      */
     static surnameFirst(fullname: string): string {
-        const name = fullname.replace("Mr", "").replace("Mrs", "");
+        const name = fullname.replace(/^(Mr|Mrs|Ms)\s+/, "");
         const parts = name.split(" ");
         return `${parts[1]}, ${parts[0]}`;
     }
