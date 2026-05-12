@@ -214,6 +214,9 @@ $this->setBlock('page_controls', 'manage_class', 'manage_class_block');
 $this->setBlock(TEMPLATE_content, 'readonly_switch_off', 'readonly_switch_off_block');
 $this->setBlock(TEMPLATE_content, 'readonly_switch_on', 'readonly_switch_on_block');
 
+// we want to remove the ability to change content colours with the new advanced UI, so hide the related features in the template when advanced UI is enabled
+$advancedUiEnabled = (bool)$this->getDi()->get('config')->get(ConfigMapper::NAME_SONAR_UI_TOGGLE);
+
 /* BUILD COMPONENTRY */
 $componentFactory = new Component_Homepage_Factory($sessionUser, $this);
 if ($readonly) {
@@ -237,6 +240,11 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
     $this->setBlock('customise_page', 'homepage_component_tab', 'homepage_component_tab_block');
     $this->setBlock('customise_page', 'homepage_component_page', 'homepage_component_page_block');
     $this->setBlock('customise_page', 'homepage_color_selector', 'homepage_color_selector_block');
+    $this->setBlock(
+        'homepage_color_selector',
+        'legacy_homepage_content_colours',
+        'legacy_homepage_content_colours_block'
+    );
     $this->setBlock('homepage_component_page', 'homepage_component', 'homepage_component_block');
     $this->parse('edit_page_block', 'edit_page');
     $this->parse('modify_layout_block', 'modify_layout');
@@ -256,6 +264,12 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
     }
 
     if (Config::get('homepage_enable_colour')) {
+        if ($advancedUiEnabled) {
+            $this->setVar('legacy_homepage_content_colours_block');
+        } else {
+            $this->parse('legacy_homepage_content_colours_block', 'legacy_homepage_content_colours');
+        }
+
         $this->parse('homepage_color_selector_block', 'homepage_color_selector');
     } else {
         $this->setVar('homepage_color_selector_block');
@@ -474,7 +488,7 @@ $this->setVar(array(
 
 $this->setVar($listColor);
 
-if ($this->getDi()->get('config')->get(ConfigMapper::NAME_SONAR_UI_TOGGLE)) {
+if ($advancedUiEnabled) {
     $this->setVar('legacy_homepage_colour_css_block');
 } else {
     $this->parse('legacy_homepage_colour_css_block', 'legacy_homepage_colour_css');

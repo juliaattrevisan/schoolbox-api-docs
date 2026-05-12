@@ -12,9 +12,4 @@ body.sbx-body {
         --right-font-primary: var(--sbx-color-text-primary);
         --right-bg-primary: var(--sbx-color-foreground-primary);
     }
-
-    // the ability to change the content colours is being removed with Sonar, so hide the related features in the UI
-    #content-colours {
-        display: none;
-    }
 }
