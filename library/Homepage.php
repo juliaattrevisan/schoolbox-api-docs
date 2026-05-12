@@ -112,6 +112,26 @@ class Homepage
     }
 
     /**
+     * Gets the default heading colours for a homepage, which are either the skin component heading colours
+     * (if advanced UI is enabled) or the homepage heading colours (if not).
+     *
+     * @return array
+     */
+    private function getDefaultHeadingColours(): array
+    {
+        if (Config::get('advanced_ui_enabled')) {
+            return [
+                'head_font' => Config::get('skin_colour_component_heading_text'),
+                'head_bg'   => Config::get('skin_colour_component_heading_background'),
+            ];
+        }
+        return [
+            'head_font' => Config::get('homepage_colour_head_font'),
+            'head_bg'   => Config::get('homepage_colour_head_bg'),
+        ];
+    }
+
+    /**
      * Removes componentry from homepage and resets to the template that was used to create it.
      * Also soft-deletes homepage content where applicable
      *
@@ -217,16 +237,17 @@ class Homepage
         // TODO make width a const
         $homepageConfig->setLeftColumnWidth($homepageTemplate?->getLeftColumnWidth() ?? 70);
         $homepageConfig->setRightColumnWidth($homepageTemplate?->getRightColumnWidth() ?? 30);
-        $homepageConfig->setTopHeadFont(Config::get('homepage_colour_head_font'));
-        $homepageConfig->setTopHeadBg(Config::get('homepage_colour_head_bg'));
+        $defaultHeadingColours = $this->getDefaultHeadingColours();
+        $homepageConfig->setTopHeadFont($defaultHeadingColours['head_font']);
+        $homepageConfig->setTopHeadBg($defaultHeadingColours['head_bg']);
         $homepageConfig->setTopFont(Config::get('homepage_colour_font'));
         $homepageConfig->setTopBgPrimary(Config::get('homepage_colour_bg_primary'));
-        $homepageConfig->setLeftHeadFont(Config::get('homepage_colour_head_font'));
-        $homepageConfig->setLeftHeadBg(Config::get('homepage_colour_head_bg'));
+        $homepageConfig->setLeftHeadFont($defaultHeadingColours['head_font']);
+        $homepageConfig->setLeftHeadBg($defaultHeadingColours['head_bg']);
         $homepageConfig->setLeftFont(Config::get('homepage_colour_font'));
         $homepageConfig->setLeftBgPrimary(Config::get('homepage_colour_bg_primary'));
-        $homepageConfig->setRightHeadFont(Config::get('homepage_colour_head_font'));
-        $homepageConfig->setRightHeadBg(Config::get('homepage_colour_head_bg'));
+        $homepageConfig->setRightHeadFont($defaultHeadingColours['head_font']);
+        $homepageConfig->setRightHeadBg($defaultHeadingColours['head_bg']);
         $homepageConfig->setRightFont(Config::get('homepage_colour_font'));
         $homepageConfig->setRightBgPrimary(Config::get('homepage_colour_bg_primary'));
         $this->homepageConfigMapper->save($homepageConfig);

@@ -251,17 +251,38 @@ class Eportfolio
     public function getDefaultColorList()
     {
         $colourSet = [];
+        $defaultHeadingColours = $this->getDefaultHeadingColours();
 
         foreach (['top', 'left', 'right'] as $position) {
             $colourSet = array_merge($colourSet, [
-                $position . '_head_font'  => Config::get('homepage_colour_head_font'),
-                $position . '_head_bg'    => Config::get('homepage_colour_head_bg'),
+                $position . '_head_font'  => $defaultHeadingColours['head_font'],
+                $position . '_head_bg'    => $defaultHeadingColours['head_bg'],
                 $position . '_font_primary' => Config::get('homepage_colour_font'),
                 $position . '_bg_primary' => Config::get('homepage_colour_bg_primary'),
             ]);
         }
 
         return $colourSet;
+    }
+
+    /**
+     * Gets the default heading colours for a homepage, which are either the skin component heading colours
+     * (if advanced UI is enabled) or the homepage heading colours (if not).
+     *
+     * @return array
+     */
+    private function getDefaultHeadingColours(): array
+    {
+        if (Config::get('advanced_ui_enabled')) {
+            return [
+                'head_font' => Config::get('skin_colour_component_heading_text'),
+                'head_bg'   => Config::get('skin_colour_component_heading_background'),
+            ];
+        }
+        return [
+            'head_font' => Config::get('homepage_colour_head_font'),
+            'head_bg'   => Config::get('homepage_colour_head_bg'),
+        ];
     }
 
     /**
@@ -315,16 +336,17 @@ class Eportfolio
         $page->setTemplate($templateID);
         $page->setLeftColumnWidth($template->getLeftColumnWidth());
         $page->setRightColumnWidth($template->getRightColumnWidth());
-        $page->setTopHeadFont(Config::get('homepage_colour_head_font'));
-        $page->setTopHeadBg(Config::get('homepage_colour_head_bg'));
+        $defaultHeadingColours = $this->getDefaultHeadingColours();
+        $page->setTopHeadFont($defaultHeadingColours['head_font']);
+        $page->setTopHeadBg($defaultHeadingColours['head_bg']);
         $page->setTopFont(Config::get('homepage_colour_font'));
         $page->setTopBgPrimary(Config::get('homepage_colour_bg_primary'));
-        $page->setLeftHeadFont(Config::get('homepage_colour_head_font'));
-        $page->setLeftHeadBg(Config::get('homepage_colour_head_bg'));
+        $page->setLeftHeadFont($defaultHeadingColours['head_font']);
+        $page->setLeftHeadBg($defaultHeadingColours['head_bg']);
         $page->setLeftFont(Config::get('homepage_colour_font'));
         $page->setLeftBgPrimary(Config::get('homepage_colour_bg_primary'));
-        $page->setRightHeadFont(Config::get('homepage_colour_head_font'));
-        $page->setRightHeadBg(Config::get('homepage_colour_head_bg'));
+        $page->setRightHeadFont($defaultHeadingColours['head_font']);
+        $page->setRightHeadBg($defaultHeadingColours['head_bg']);
         $page->setRightFont(Config::get('homepage_colour_font'));
         $page->setRightBgPrimary(Config::get('homepage_colour_bg_primary'));
         $this->pageMapper->save($page);
