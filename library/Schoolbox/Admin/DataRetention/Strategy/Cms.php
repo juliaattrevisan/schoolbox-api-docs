@@ -175,7 +175,7 @@ class Cms extends Base
         $counts['tileLayouts'] = $this->deleteTileLayouts($tileLayouts);
         $counts['tileLayoutsJoins'] = $this->deleteTileLayoutJoin($tileLayouts);
 
-        $counts['survey'] = $this->deleteSurveys($folderIds);
+        $counts = array_merge($counts, $this->deleteSurveys($folderIds));
 
         foreach ($this->folderOwnedTables() as $table => $column) {
             $counts[$table] = $this->deleteByFolderIds($table, $column, $folderIds);
@@ -1034,12 +1034,21 @@ class Cms extends Base
     /**
      * Deletes assess (survey), no checks, just delete
      * @param array<int, int> $folderIds
-     * @return int Number of rows deleted
+     * @return array<string, int> Number of rows deleted by table
      */
-    protected function deleteSurveys(array $folderIds): int
+    protected function deleteSurveys(array $folderIds): array
     {
+        $counts = [
+            'assess_response' => 0,
+            'assess_answer' => 0,
+            'assess_question' => 0,
+            'assess_attempt' => 0,
+            'assess_section' => 0,
+            'assess' => 0,
+        ];
+
         if ($folderIds === []) {
-            return 0;
+            return $counts;
         }
 
         $surveyIds = $this->findSurveyIds($folderIds);
@@ -1050,22 +1059,21 @@ class Cms extends Base
         ));
 
         if ($surveyIds === []) {
-            return 0;
+            return $counts;
         }
 
         $attemptIds = $this->findIdsByIds('assess_attempt', 'attempt_id', 'assess_id', $surveyIds);
         $sectionIds = $this->findIdsByIds('assess_section', 'section_id', 'assess_id', $surveyIds);
         $questionIds = $this->findIdsByIds('assess_question', 'question_id', 'section_id', $sectionIds);
 
-        $rowsDeleted = 0;
-        $rowsDeleted += $this->deleteSurveyResponses($attemptIds, $sectionIds, $questionIds);
-        $rowsDeleted += $this->deleteByIds('assess_answer', 'question_id', $questionIds);
-        $rowsDeleted += $this->deleteByIds('assess_question', 'question_id', $questionIds);
-        $rowsDeleted += $this->deleteByIds('assess_attempt', 'attempt_id', $attemptIds);
-        $rowsDeleted += $this->deleteByIds('assess_section', 'section_id', $sectionIds);
-        $rowsDeleted += $this->deleteByIds('assess', 'assess_id', $surveyIds);
+        $counts['assess_response'] = $this->deleteSurveyResponses($attemptIds, $sectionIds, $questionIds);
+        $counts['assess_answer'] = $this->deleteByIds('assess_answer', 'question_id', $questionIds);
+        $counts['assess_question'] = $this->deleteByIds('assess_question', 'question_id', $questionIds);
+        $counts['assess_attempt'] = $this->deleteByIds('assess_attempt', 'attempt_id', $attemptIds);
+        $counts['assess_section'] = $this->deleteByIds('assess_section', 'section_id', $sectionIds);
+        $counts['assess'] = $this->deleteByIds('assess', 'assess_id', $surveyIds);
 
-        return $rowsDeleted;
+        return $counts;
     }
 
     /**

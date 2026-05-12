@@ -574,14 +574,21 @@ class CmsStrategyTest extends TestCase
              * Record survey cleanup so tests can assert it runs before folder deletion.
              *
              * @param array<int, int> $folderIds
-             * @return int
+             * @return array<string, int>
              */
-            protected function deleteSurveys(array $folderIds): int
+            protected function deleteSurveys(array $folderIds): array
             {
                 $this->state->deletedSurveyFolderIds = $folderIds;
                 $this->state->calls[] = 'deleteSurveys';
 
-                return count($folderIds);
+                return [
+                    'assess_response' => count($folderIds),
+                    'assess_answer' => count($folderIds),
+                    'assess_question' => count($folderIds),
+                    'assess_attempt' => count($folderIds),
+                    'assess_section' => count($folderIds),
+                    'assess' => count($folderIds),
+                ];
             }
 
             /**
@@ -773,12 +780,12 @@ class CmsStrategyTest extends TestCase
      *
      * @param Cms $strategy
      * @param array<int, int> $folderIds
-     * @return int
+     * @return array<string, int>
      */
-    private function deleteSurveys(Cms $strategy, array $folderIds): int
+    private function deleteSurveys(Cms $strategy, array $folderIds): array
     {
         $call = \Closure::bind(
-            function (array $folderIds): int {
+            function (array $folderIds): array {
                 return $this->deleteSurveys($folderIds);
             },
             $strategy,
@@ -926,6 +933,46 @@ class CmsStrategyTest extends TestCase
         ]);
 
         $this->assertStringContainsString('userAccess=3', implode(' | ', $state->notices));
+    }
+
+    /**
+     * Chunk logging must include survey cleanup counts for each assess table.
+     *
+     * Survey cleanup touches several related legacy assess tables. The chunk
+     * summary should expose each table count separately so retention logs remain
+     * useful when investigating partial or blocked cleanup.
+     *
+     * @return void
+     */
+    public function testDeleteChunkLogsSurveyTables(): void
+    {
+        $state = new class {
+            public array $notices = [];
+        };
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->method('debug');
+        $logger->method('info');
+        $logger->method('warning');
+        $logger->method('notice')->willReturnCallback(
+            function (string $message) use ($state): void {
+                $state->notices[] = $message;
+            }
+        );
+
+        ['strategy' => $strategy] = $this->strategy(logger: $logger);
+
+        $this->delete($strategy, [
+            ['id' => 10, 'table' => 'folder'],
+        ]);
+
+        $notices = implode(' | ', $state->notices);
+        $this->assertStringContainsString('assess_response=1', $notices);
+        $this->assertStringContainsString('assess_answer=1', $notices);
+        $this->assertStringContainsString('assess_question=1', $notices);
+        $this->assertStringContainsString('assess_attempt=1', $notices);
+        $this->assertStringContainsString('assess_section=1', $notices);
+        $this->assertStringContainsString('assess=1', $notices);
     }
 
     /**
@@ -1090,9 +1137,16 @@ class CmsStrategyTest extends TestCase
             new RetentionPeriod(30),
         );
 
-        $count = $this->deleteSurveys($strategy, [10, 12]);
+        $counts = $this->deleteSurveys($strategy, [10, 12]);
 
-        $this->assertSame(6, $count);
+        $this->assertSame([
+            'assess_response' => 1,
+            'assess_answer' => 1,
+            'assess_question' => 1,
+            'assess_attempt' => 1,
+            'assess_section' => 1,
+            'assess' => 1,
+        ], $counts);
         $this->assertStringContainsString('availability = :availability', $state->preparedSql[0]);
         $this->assertStringContainsString('assessment_id IS NULL', $state->preparedSql[0]);
         $this->assertSame([
