@@ -112,7 +112,7 @@ class Cms extends Base
     /**
      * @inheritDoc
      */
-    protected function deleteChunk(array $chunk): void
+    protected function deleteChunk(array $chunk): bool
     {
         $requestedFolderIds = $this->normalizeIds(array_column($chunk, 'id'));
 
@@ -135,7 +135,7 @@ class Cms extends Base
                     implode(', ', $blockedFolderIds),
                 ));
 
-                return;
+                return false;
             }
 
             $this->log->warning(sprintf(
@@ -192,6 +192,8 @@ class Cms extends Base
                 $counts,
             )),
         ));
+
+        return true;
     }
 
     // ------------
