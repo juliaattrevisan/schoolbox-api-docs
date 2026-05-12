@@ -242,7 +242,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         if (!$assessment || !($assessment->isFeedbackVisibleToRoleType(Role::STUDENT) || $requestResubmission)) {
             return $envelope;
         }
-        if (!$this->isWorkTypeVisibleToLearners($assessment)) {
+        if (!($assessment->getWorkType()?->isVisibleToLearners() ?? true)) {
             return $envelope;
         }
         $href = "/learning/assessments/{$assessment->getId()}/{$student->getId()}";
@@ -293,7 +293,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         if (!$assessment) {
             return $envelope;
         }
-        if (!$this->isWorkTypeVisibleToParents($assessment)) {
+        if (!($assessment->getWorkType()?->isVisibleToParents() ?? true)) {
             return $envelope;
         }
         $cat = $assessment->getBaseContext()->getFolder();
@@ -335,22 +335,6 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         $envelope->targetToParent($student->getId(), $bob->build());
 
         return $envelope;
-    }
-
-    /**
-     * Determines whether learner notifications may be sent for the assessment's work type.
-     */
-    private function isWorkTypeVisibleToLearners(IAssessable $assessment): bool
-    {
-        return $assessment->getWorkType()?->isVisibleToLearners() ?? true;
-    }
-
-    /**
-     * Determines whether parent notifications may be sent for the assessment's work type.
-     */
-    private function isWorkTypeVisibleToParents(IAssessable $assessment): bool
-    {
-        return $assessment->getWorkType()?->isVisibleToParents() ?? true;
     }
 
     /**
