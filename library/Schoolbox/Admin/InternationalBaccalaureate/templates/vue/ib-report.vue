@@ -114,7 +114,7 @@ window.Vue.onMounted((): void => {
 <template>
     <div class="small-12 island l-flex-col l-gap-m">
         <div class="l-flex l-flex--align-center l-flex--justify-space f-no-margins">
-            <h1 class="f-no-margins">{{ props.sessionTitle }}</h1>
+            <h2 class="subheader f-no-margins">{{ props.sessionTitle }}</h2>
             <button type="button" class="ib-report__download-btn" disabled aria-label="Download">
                 <sbx-icon name="download"></sbx-icon>
             </button>
