@@ -13,16 +13,11 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\DataRetention\Strategy;
 
 use Alaress\Database\Predicate\Builder;
-use Alaress\Database\Connector\IConnector;
 use EtherpadLite\Client as EtherpadClient;
 use EtherpadLite\Response as EtherpadResponse;
-use Psr\Log\LoggerInterface;
-use Schoolbox\Admin\DataRetention\RetentionPeriod;
 use Schoolbox\Admin\DataRetention\ValidStrats;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\UserAccess;
-use Symfony\Component\Lock\LockInterface;
 
 class Cms extends Base
 {
