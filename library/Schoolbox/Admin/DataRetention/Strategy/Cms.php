@@ -175,6 +175,8 @@ class Cms extends Base
         $counts['tileLayouts'] = $this->deleteTileLayouts($tileLayouts);
         $counts['tileLayoutsJoins'] = $this->deleteTileLayoutJoin($tileLayouts);
 
+        $counts['survey'] = $this->deleteSurveys($folderIds);
+
         foreach ($this->folderOwnedTables() as $table => $column) {
             $counts[$table] = $this->deleteByFolderIds($table, $column, $folderIds);
         }
@@ -1007,4 +1009,163 @@ class Cms extends Base
 
     // --------------------------
     // end tile functions
+
+    // --------------
+    // assess (survey) functions
+
+    /**
+     * surveys (assess.availability= survey (with NO assessmentID) in the assessment table).
+     * we should remove all the related entries from all related assess tables (possible tables
+     * assess
+     * assess_answer
+     * assess_attempt
+     * assess_luQuestionType
+     * assess_question
+     * assess_question_bank
+     * assess_question_category
+     * assess_response
+     * assess_section
+     * )
+     *
+     * Question type, bank, and category tables are shared lookup/library data
+     * rather than survey-instance data, so folder retention does not delete them.
+     */
+
+    /**
+     * Deletes assess (survey), no checks, just delete
+     * @param array<int, int> $folderIds
+     * @return int Number of rows deleted
+     */
+    protected function deleteSurveys(array $folderIds): int
+    {
+        if ($folderIds === []) {
+            return 0;
+        }
+
+        $surveyIds = $this->findSurveyIds($folderIds);
+        $this->log->debug(sprintf(
+            "Found '%s' assess survey records for CMS folder IDs: %s",
+            count($surveyIds),
+            implode(', ', $folderIds),
+        ));
+
+        if ($surveyIds === []) {
+            return 0;
+        }
+
+        $attemptIds = $this->findIdsByIds('assess_attempt', 'attempt_id', 'assess_id', $surveyIds);
+        $sectionIds = $this->findIdsByIds('assess_section', 'section_id', 'assess_id', $surveyIds);
+        $questionIds = $this->findIdsByIds('assess_question', 'question_id', 'section_id', $sectionIds);
+
+        $rowsDeleted = 0;
+        $rowsDeleted += $this->deleteSurveyResponses($attemptIds, $sectionIds, $questionIds);
+        $rowsDeleted += $this->deleteByIds('assess_answer', 'question_id', $questionIds);
+        $rowsDeleted += $this->deleteByIds('assess_question', 'question_id', $questionIds);
+        $rowsDeleted += $this->deleteByIds('assess_attempt', 'attempt_id', $attemptIds);
+        $rowsDeleted += $this->deleteByIds('assess_section', 'section_id', $sectionIds);
+        $rowsDeleted += $this->deleteByIds('assess', 'assess_id', $surveyIds);
+
+        return $rowsDeleted;
+    }
+
+    /**
+     * Find legacy survey assess rows for the specified CMS folders.
+     *
+     * @param array<int, int> $folderIds
+     * @return array<int, int>
+     */
+    protected function findSurveyIds(array $folderIds): array
+    {
+        if ($folderIds === []) {
+            return [];
+        }
+
+        $placeholders = Builder::getArrayPlaceholders($folderIds, 'folder');
+        $statement = $this->getPreparedStatement(
+            "SELECT assess_id AS id FROM assess"
+            . " WHERE category_id IN {$placeholders}"
+            . " AND availability = :availability"
+            . " AND assessment_id IS NULL"
+        );
+        $params = Builder::getArrayParameters($folderIds, 'folder');
+        $params['availability'] = 'survey';
+        $statement->execute($params);
+
+        return array_map(
+            static fn(array $row): int => (int)$row['id'],
+            $statement->fetchAll(\PDO::FETCH_ASSOC),
+        );
+    }
+
+    /**
+     * Find ids from a table using another id column.
+     *
+     * @param string $table
+     * @param string $idColumn
+     * @param string $filterColumn
+     * @param array<int, int> $ids
+     * @return array<int, int>
+     */
+    protected function findIdsByIds(string $table, string $idColumn, string $filterColumn, array $ids): array
+    {
+        if ($ids === []) {
+            return [];
+        }
+
+        $placeholders = Builder::getArrayPlaceholders($ids, 'id');
+        $statement = $this->getPreparedStatement(
+            "SELECT {$idColumn} AS id FROM {$table} WHERE {$filterColumn} IN {$placeholders}"
+        );
+        $statement->execute(Builder::getArrayParameters($ids, 'id'));
+
+        return array_map(
+            static fn(array $row): int => (int)$row['id'],
+            $statement->fetchAll(\PDO::FETCH_ASSOC),
+        );
+    }
+
+    /**
+     * Delete survey responses by all survey-owned relations available.
+     *
+     * @param array<int, int> $attemptIds
+     * @param array<int, int> $sectionIds
+     * @param array<int, int> $questionIds
+     * @return int Number of rows deleted
+     */
+    protected function deleteSurveyResponses(array $attemptIds, array $sectionIds, array $questionIds): int
+    {
+        $conditions = [];
+        $params = [];
+
+        if ($attemptIds !== []) {
+            $conditions[] = 'attempt_id IN ' . Builder::getArrayPlaceholders($attemptIds, 'attempt');
+            $params += Builder::getArrayParameters($attemptIds, 'attempt');
+        }
+
+        if ($sectionIds !== []) {
+            $conditions[] = 'section_id IN ' . Builder::getArrayPlaceholders($sectionIds, 'section');
+            $params += Builder::getArrayParameters($sectionIds, 'section');
+        }
+
+        if ($questionIds !== []) {
+            $conditions[] = 'question_id IN ' . Builder::getArrayPlaceholders($questionIds, 'question');
+            $params += Builder::getArrayParameters($questionIds, 'question');
+        }
+
+        if ($conditions === []) {
+            return 0;
+        }
+
+        $statement = $this->getPreparedStatement(
+            $this->deleteStatement('assess_response')
+            . ' FROM assess_response WHERE '
+            . implode(' OR ', $conditions)
+        );
+        $statement->execute($params);
+
+        return $statement->rowCount();
+    }
+
+    // --------------------------
+    // end assess (survey) functions
 }

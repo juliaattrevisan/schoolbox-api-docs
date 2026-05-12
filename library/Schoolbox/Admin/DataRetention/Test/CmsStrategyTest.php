@@ -39,7 +39,8 @@ class CmsStrategyTest extends TestCase
      *     calls: list<string>,
      *     deletedFolderOwnedRowIds: list<int>,
      *     deletedHomepageUserAccessFolderIds: list<int>,
-     *     deletedFolders: list<int>
+     *     deletedFolders: list<int>,
+     *     deletedSurveyFolderIds: list<int>
      * }}
      */
     private function strategy(
@@ -78,6 +79,9 @@ class CmsStrategyTest extends TestCase
 
             /** @var list<int> */
             public array $deletedFolders = [];
+
+            /** @var list<int> */
+            public array $deletedSurveyFolderIds = [];
         };
 
         $strategy = new class (
@@ -567,6 +571,20 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
+             * Record survey cleanup so tests can assert it runs before folder deletion.
+             *
+             * @param array<int, int> $folderIds
+             * @return int
+             */
+            protected function deleteSurveys(array $folderIds): int
+            {
+                $this->state->deletedSurveyFolderIds = $folderIds;
+                $this->state->calls[] = 'deleteSurveys';
+
+                return count($folderIds);
+            }
+
+            /**
              * Capture homepage userAccess cleanup because those ACL rows block folders.
              *
              * @param array<int, int> $folderIds
@@ -622,6 +640,7 @@ class CmsStrategyTest extends TestCase
         ]);
 
         $this->assertSame($expectedCalls, $state->calls);
+        $this->assertSame([10], $state->deletedSurveyFolderIds);
         $this->assertSame([10], $state->deletedHomepageUserAccessFolderIds);
     }
 
@@ -649,6 +668,7 @@ class CmsStrategyTest extends TestCase
                     'deleteWikis',
                     'deleteComponentConfigInstances',
                     'deleteComponentInstances',
+                    'deleteSurveys',
                     'deleteHomepageUserAccess',
                     'deleteFolders',
                 ],
@@ -670,6 +690,7 @@ class CmsStrategyTest extends TestCase
                     'deleteWikis',
                     'deleteComponentConfigInstances',
                     'deleteComponentInstances',
+                    'deleteSurveys',
                     'deleteHomepageUserAccess',
                     'deleteFolders',
                 ],
@@ -739,6 +760,26 @@ class CmsStrategyTest extends TestCase
         $call = \Closure::bind(
             function (array $folderIds): int {
                 return $this->deleteHomepageUserAccess($folderIds);
+            },
+            $strategy,
+            Cms::class,
+        );
+
+        return $call($folderIds);
+    }
+
+    /**
+     * Call the protected survey cleanup helper for SQL-shape assertions.
+     *
+     * @param Cms $strategy
+     * @param array<int, int> $folderIds
+     * @return int
+     */
+    private function deleteSurveys(Cms $strategy, array $folderIds): int
+    {
+        $call = \Closure::bind(
+            function (array $folderIds): int {
+                return $this->deleteSurveys($folderIds);
             },
             $strategy,
             Cms::class,
@@ -973,6 +1014,100 @@ class CmsStrategyTest extends TestCase
     }
 
     /**
+     * Survey cleanup must only target folder-owned legacy surveys.
+     *
+     * Legacy survey records live in assess with availability=survey. Records
+     * linked to the modern assessment table are outside CMS folder retention
+     * and must not be selected by this cleanup.
+     *
+     * @return void
+     */
+    public function testDeleteSurveysTargetsFolderOwnedLegacySurveys(): void
+    {
+        $state = new class {
+            /** @var list<string> */
+            public array $preparedSql = [];
+
+            /** @var list<array<string, int>> */
+            public array $executeParams = [];
+        };
+
+        $database = $this->createMock(IConnector::class);
+        $database->method('prepare')->willReturnCallback(
+            function (string $sql) use ($state): \PDOStatement {
+                $state->preparedSql[] = $sql;
+
+                return new class ($state, $sql) extends \PDOStatement {
+                    public function __construct(private object $state, private string $sql)
+                    {
+                    }
+
+                    public function execute(?array $params = null): bool
+                    {
+                        $this->state->executeParams[] = $params ?? [];
+
+                        return true;
+                    }
+
+                    public function fetchAll(int $mode = \PDO::FETCH_DEFAULT, mixed ...$args): array
+                    {
+                        unset($mode, $args);
+
+                        if (str_contains($this->sql, 'SELECT assess_id AS id')) {
+                            return [['id' => 101]];
+                        }
+
+                        if (str_contains($this->sql, 'SELECT attempt_id AS id')) {
+                            return [['id' => 201]];
+                        }
+
+                        if (str_contains($this->sql, 'SELECT section_id AS id')) {
+                            return [['id' => 301]];
+                        }
+
+                        if (str_contains($this->sql, 'SELECT question_id AS id')) {
+                            return [['id' => 401]];
+                        }
+
+                        return [];
+                    }
+
+                    public function rowCount(): int
+                    {
+                        return 1;
+                    }
+                };
+            }
+        );
+
+        $strategy = new Cms(
+            $this->createMock(LoggerInterface::class),
+            false,
+            $database,
+            $this->createMock(LockInterface::class),
+            $this->createMock(IConfigLoader::class),
+            time() + 3600,
+            new RetentionPeriod(30),
+        );
+
+        $count = $this->deleteSurveys($strategy, [10, 12]);
+
+        $this->assertSame(6, $count);
+        $this->assertStringContainsString('availability = :availability', $state->preparedSql[0]);
+        $this->assertStringContainsString('assessment_id IS NULL', $state->preparedSql[0]);
+        $this->assertSame([
+            'folder_0' => 10,
+            'folder_1' => 12,
+            'availability' => 'survey',
+        ], $state->executeParams[0]);
+        $this->assertStringStartsWith('SELECT assess_response.* FROM assess_response WHERE', $state->preparedSql[4]);
+        $this->assertStringStartsWith(
+            'SELECT assess.* FROM assess WHERE assess_id IN',
+            $state->preparedSql[array_key_last($state->preparedSql)],
+        );
+    }
+
+    /**
      * Strategy identity must match the CLI/admin configuration contract.
      *
      * The strategy name is how command-line filtering selects CMS retention, and
@@ -1048,9 +1183,11 @@ class CmsStrategyTest extends TestCase
             'deleteWikis',
             'deleteComponentConfigInstances',
             'deleteComponentInstances',
+            'deleteSurveys',
             'deleteHomepageUserAccess',
             'deleteFolders',
         ], $state->calls);
+        $this->assertSame([13, 11, 12, 10], $state->deletedSurveyFolderIds);
     }
 
     /**
@@ -1310,6 +1447,7 @@ class CmsStrategyTest extends TestCase
             'deleteWikis',
             'deleteComponentConfigInstances',
             'deleteComponentInstances',
+            'deleteSurveys',
             'deleteHomepageUserAccess',
             'deleteFolders',
         ], $state->calls);
