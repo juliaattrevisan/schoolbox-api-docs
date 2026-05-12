@@ -40,7 +40,9 @@ body.sbx-body {
     .side-nav .flyout,
     .cover-photo,
     .cr-results-grid,
-    .introjs-whatsnewmodal {
+    .introjs-whatsnewmodal,
+    .az-list li,
+    .az-error-list li {
         border-radius: var(--sbx-config-box-roundness);
     }
 
