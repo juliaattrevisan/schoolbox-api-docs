@@ -285,7 +285,7 @@ class Feed
                 break;
             }
 
-            $assessmentsById = $this->loadAssessmentsById($rows);
+            $assessmentsById = $this->loadAssessmentsByIdWithParticipationForVisibilityChecks($rows);
 
             foreach ($rows as $row) {
                 if ($row['work_type_id'] !== null) {
@@ -803,7 +803,7 @@ class Feed
      * @param array<int, array<string, mixed>> $rows
      * @return array<int, \Schoolbox\Learning\Assessment\IAssessable>
      */
-    private function loadAssessmentsById(array $rows): array
+    private function loadAssessmentsByIdWithParticipationForVisibilityChecks(array $rows): array
     {
         $assessmentIds = array_values(array_unique(array_map(
             static fn (array $row): int => (int)$row['assessment_id'],
@@ -822,6 +822,12 @@ class Feed
         }
 
         $assessments = $this->assessmentDataSource->findAllByIds($assessmentIds);
+
+        // The intent here is to hydrate only the participation records necessary to enable calls to
+        // this->isLearnerPartipant() and this->isParentOfLearnerParticipant().  For those calls to work, we only need
+        // participation records for the logged-in user and his/her children.  The loadParticipationIntoAssessmentCollection()
+        // function gets participation records for either one user or all users, so for the case where the logged-in
+        // user has children (where we set $participantUser as null below), we are overhydrating here.
         $participantUser = $this->shouldLoadAllParticipantsForRows($rows) ? null : $this->user;
         $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($assessments, $participantUser, true);
         return $assessments->indexBy('id')->getAll();
