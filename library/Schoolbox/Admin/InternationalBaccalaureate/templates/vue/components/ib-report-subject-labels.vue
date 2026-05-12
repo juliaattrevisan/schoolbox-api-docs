@@ -1,14 +1,13 @@
 <script setup lang="ts">
 /**
- * Renders a student's subjects as grouped labels (HL, SL, Core).
+ * Renders a student's entry as grouped labels (HL, SL, Core).
  * Highlights any subject with an unknown language using the alert sentiment.
  */
-import type { SubjectGroup, SubjectEntry } from "../../js/types/ibReportTypes";
+import type { SubjectEntry } from "../../js/types/ibReportTypes";
 
-interface Props {
-    subjects: SubjectGroup;
-}
-defineProps<Props>();
+const props = defineProps<{
+    entry: SubjectEntry[];
+}>();
 
 const UNKNOWN_LANGUAGE = "UNKNOWN LANGUAGE";
 
@@ -33,43 +32,14 @@ function isUnknown(entry: SubjectEntry): boolean {
 </script>
 
 <template>
-    <div class="ib-report-labels l-flex l-gap-xs">
-        <div class="ib-report-labels__group">
-            <sbx-label
-                v-for="entry in subjects.hl"
-                :key="`hl-${entry.subject}`"
-                :text="labelText(entry)"
-                :sentiment="isUnknown(entry) ? 'alert' : 'neutral'"
-            ></sbx-label>
-        </div>
-        <div class="ib-report-labels__group">
-            <sbx-label
-                v-for="entry in subjects.sl"
-                :key="`sl-${entry.subject}`"
-                :text="labelText(entry)"
-                :sentiment="isUnknown(entry) ? 'alert' : 'neutral'"
-            ></sbx-label>
-        </div>
-        <div class="ib-report-labels__group">
-            <sbx-label
-                v-for="entry in subjects.core"
-                :key="`core-${entry.subject}`"
-                :text="labelText(entry)"
-                :sentiment="isUnknown(entry) ? 'alert' : 'neutral'"
-            ></sbx-label>
-        </div>
+    <div class="l-flex-col l-gap-s">
+        <sbx-label
+            v-for="e in props.entry"
+            :key="`hl-${e.subject}`"
+            :text="labelText(e)"
+            :sentiment="isUnknown(e) ? 'alert' : 'neutral'"
+        ></sbx-label>
     </div>
 </template>
 
-<style scoped>
-.ib-report-labels {
-    align-items: flex-start;
-}
-
-.ib-report-labels__group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    min-width: 8rem;
-}
-</style>
+<style scoped></style>
