@@ -461,21 +461,8 @@ $this->setVar('COLOUR_ARRAY', 'pickers');
 $this->setVar($listColor);
 $this->parse('colour_list_block', 'colour_list', true);
 
-// Defaults
-$defaultColour = array(
-    'head_font'    => Config::get('homepage_colour_head_font'),
-    'head_bg'      => Config::get('homepage_colour_head_bg'),
-    'font_primary' => Config::get('homepage_colour_font'),
-    'bg_primary'   => Config::get('homepage_colour_bg_primary')
-);
-
 $this->setVar('COLOUR_ARRAY', 'defaults');
-
-foreach (['top', 'left', 'right'] as $col) {
-    foreach ($defaultColour as $field => $colour) {
-        $this->setVar($col . '_' . $field, $colour);
-    }
-}
+$this->setVar($homepageHandler->getDefaultColorList());
 $this->parse('colour_list_block', 'colour_list', true);
 
 $allWidths = $homepageHandler->getColumnWidths();

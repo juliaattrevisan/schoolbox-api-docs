@@ -279,10 +279,44 @@ class Eportfolio
                 'head_bg'   => Config::get('skin_colour_component_heading_background'),
             ];
         }
+
+        return $this->getStoredDefaultHeadingColours();
+    }
+
+    private function getStoredDefaultHeadingColours(): array
+    {
         return [
             'head_font' => Config::get('homepage_colour_head_font'),
             'head_bg'   => Config::get('homepage_colour_head_bg'),
         ];
+    }
+
+    private function hasHeadingColours(array $colourList, string $position, array $headingColours): bool
+    {
+        $headFont = $colourList[$position . '_head_font'] ?? '';
+        $headBg   = $colourList[$position . '_head_bg'] ?? '';
+
+        return strcasecmp((string)$headFont, (string)$headingColours['head_font']) === 0
+            && strcasecmp((string)$headBg, (string)$headingColours['head_bg']) === 0;
+    }
+
+    private function normaliseDefaultHeadingColoursForSave(array $listColor): array
+    {
+        if (!Config::get('advanced_ui_enabled')) {
+            return $listColor;
+        }
+
+        $defaultHeadingColours       = $this->getDefaultHeadingColours();
+        $storedDefaultHeadingColours = $this->getStoredDefaultHeadingColours();
+
+        foreach (['left', 'right', 'top'] as $position) {
+            if ($this->hasHeadingColours($listColor, $position, $defaultHeadingColours)) {
+                $listColor[$position . '_head_font'] = $storedDefaultHeadingColours['head_font'];
+                $listColor[$position . '_head_bg']   = $storedDefaultHeadingColours['head_bg'];
+            }
+        }
+
+        return $listColor;
     }
 
     /**
@@ -308,6 +342,17 @@ class Eportfolio
             'top_font_primary' => $this->getPageInstance()->getTopFont(),
             'top_bg_primary' => $this->getPageInstance()->getTopBgPrimary(),
         ];
+
+        if (Config::get('advanced_ui_enabled')) {
+            $defaultHeadingColours       = $this->getDefaultHeadingColours();
+            $storedDefaultHeadingColours = $this->getStoredDefaultHeadingColours();
+            foreach (['left', 'right', 'top'] as $position) {
+                if ($this->hasHeadingColours($colourList, $position, $storedDefaultHeadingColours)) {
+                    $colourList[$position . '_head_font'] = $defaultHeadingColours['head_font'];
+                    $colourList[$position . '_head_bg']   = $defaultHeadingColours['head_bg'];
+                }
+            }
+        }
 
         return $colourList;
     }
@@ -336,7 +381,7 @@ class Eportfolio
         $page->setTemplate($templateID);
         $page->setLeftColumnWidth($template->getLeftColumnWidth());
         $page->setRightColumnWidth($template->getRightColumnWidth());
-        $defaultHeadingColours = $this->getDefaultHeadingColours();
+        $defaultHeadingColours = $this->getStoredDefaultHeadingColours();
         $page->setTopHeadFont($defaultHeadingColours['head_font']);
         $page->setTopHeadBg($defaultHeadingColours['head_bg']);
         $page->setTopFont(Config::get('homepage_colour_font'));
@@ -465,6 +510,7 @@ class Eportfolio
      */
     public function saveDisplayProperties($listColor)
     {
+        $listColor = $this->normaliseDefaultHeadingColoursForSave($listColor);
         $page = $this->pageMapper->findById($this->getPageId());
         $page->setTopHeadFont($listColor['top_head_font']);
         $page->setTopHeadBg($listColor['top_head_bg']);

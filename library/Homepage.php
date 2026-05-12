@@ -95,7 +95,7 @@ class Homepage
     public function getColorList()
     {
         $homepageConfig = $this->homepageConfigMapper->findById($this->cid);
-        return [
+        $colourList = [
             'left_head_font'     => $homepageConfig->getLeftHeadFont(),
             'left_head_bg'       => $homepageConfig->getLeftHeadBg(),
             'left_font_primary'  => $homepageConfig->getLeftFont(),
@@ -109,6 +109,19 @@ class Homepage
             'top_font_primary'   => $homepageConfig->getTopFont(),
             'top_bg_primary'     => $homepageConfig->getTopBgPrimary(),
         ];
+
+        if (Config::get('advanced_ui_enabled')) {
+            $defaultHeadingColours       = $this->getDefaultHeadingColours();
+            $storedDefaultHeadingColours = $this->getStoredDefaultHeadingColours();
+            foreach (['left', 'right', 'top'] as $position) {
+                if ($this->hasHeadingColours($colourList, $position, $storedDefaultHeadingColours)) {
+                    $colourList[$position . '_head_font'] = $defaultHeadingColours['head_font'];
+                    $colourList[$position . '_head_bg']   = $defaultHeadingColours['head_bg'];
+                }
+            }
+        }
+
+        return $colourList;
     }
 
     /**
@@ -125,10 +138,61 @@ class Homepage
                 'head_bg'   => Config::get('skin_colour_component_heading_background'),
             ];
         }
+
+        return $this->getStoredDefaultHeadingColours();
+    }
+
+    private function getStoredDefaultHeadingColours(): array
+    {
         return [
             'head_font' => Config::get('homepage_colour_head_font'),
             'head_bg'   => Config::get('homepage_colour_head_bg'),
         ];
+    }
+
+    private function hasHeadingColours(array $colourList, string $position, array $headingColours): bool
+    {
+        $headFont = $colourList[$position . '_head_font'] ?? '';
+        $headBg   = $colourList[$position . '_head_bg'] ?? '';
+
+        return strcasecmp((string)$headFont, (string)$headingColours['head_font']) === 0
+            && strcasecmp((string)$headBg, (string)$headingColours['head_bg']) === 0;
+    }
+
+    private function normaliseDefaultHeadingColoursForSave(array $listColor): array
+    {
+        if (!Config::get('advanced_ui_enabled')) {
+            return $listColor;
+        }
+
+        $defaultHeadingColours       = $this->getDefaultHeadingColours();
+        $storedDefaultHeadingColours = $this->getStoredDefaultHeadingColours();
+
+        foreach (['left', 'right', 'top'] as $position) {
+            if ($this->hasHeadingColours($listColor, $position, $defaultHeadingColours)) {
+                $listColor[$position . '_head_font'] = $storedDefaultHeadingColours['head_font'];
+                $listColor[$position . '_head_bg']   = $storedDefaultHeadingColours['head_bg'];
+            }
+        }
+
+        return $listColor;
+    }
+
+    public function getDefaultColorList(): array
+    {
+        $colourSet             = [];
+        $defaultHeadingColours = $this->getDefaultHeadingColours();
+
+        foreach (['top', 'left', 'right'] as $position) {
+            $colourSet = array_merge($colourSet, [
+                $position . '_head_font'    => $defaultHeadingColours['head_font'],
+                $position . '_head_bg'      => $defaultHeadingColours['head_bg'],
+                $position . '_font_primary' => Config::get('homepage_colour_font'),
+                $position . '_bg_primary'   => Config::get('homepage_colour_bg_primary'),
+            ]);
+        }
+
+        return $colourSet;
     }
 
     /**
@@ -237,7 +301,7 @@ class Homepage
         // TODO make width a const
         $homepageConfig->setLeftColumnWidth($homepageTemplate?->getLeftColumnWidth() ?? 70);
         $homepageConfig->setRightColumnWidth($homepageTemplate?->getRightColumnWidth() ?? 30);
-        $defaultHeadingColours = $this->getDefaultHeadingColours();
+        $defaultHeadingColours = $this->getStoredDefaultHeadingColours();
         $homepageConfig->setTopHeadFont($defaultHeadingColours['head_font']);
         $homepageConfig->setTopHeadBg($defaultHeadingColours['head_bg']);
         $homepageConfig->setTopFont(Config::get('homepage_colour_font'));
@@ -306,6 +370,7 @@ class Homepage
 
     public function saveDisplayProperties($listColor)
     {
+        $listColor = $this->normaliseDefaultHeadingColoursForSave($listColor);
         $homepageConfig = $this->homepageConfigMapper->findById($this->cid);
         $homepageConfig->setTopHeadFont($listColor['top_head_font']);
         $homepageConfig->setTopHeadBg($listColor['top_head_bg']);
