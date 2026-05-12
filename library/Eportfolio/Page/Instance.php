@@ -10,6 +10,7 @@ use Alaress\Color\ColorFactory;
 use Eportfolio\Permission;
 use Eportfolio\PermissionMapper as EportfolioPermissionMapper;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
 use Sentry\State\HubInterface;
@@ -64,9 +65,11 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
 
         $this->getPage()->setTitle($this->getEportfolioHandler()->getSettingsPageTitle());
         $this->getPage()->setBlock('custom_head', 'colour_list', 'colour_list_block');
+        $this->getPage()->setBlock('custom_head', 'legacy_homepage_colour_css', 'legacy_homepage_colour_css_block');
         $this->getPage()->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'edit_page', 'edit_page_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'customise_page', 'customise_page_block');
+        $this->getPage()->setBlock('customise_page', 'legacy_homepage_content_colours', 'legacy_homepage_content_colours_block');
         $this->getPage()->setBlock('customise_page', 'eportfolio_component_tab', 'eportfolio_component_tab_block');
         $this->getPage()->setBlock('customise_page', 'eportfolio_component_page', 'eportfolio_component_page_block');
         $this->getPage()->setBlock('eportfolio_component_page', 'eportfolio_component', 'eportfolio_component_block');
@@ -110,6 +113,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
         $this->renderColours();
         $this->renderColumnWidths();
         $this->renderPermissions();
+        $this->renderAdvancedUiBlocks();
 
         // Container blocks must parse after their inner organs
 
@@ -398,6 +402,22 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
         // Current colour set (currently chosen and saved in db)
 
         $this->renderColourSet($this->getColours(), 'original');
+    }
+
+    private function renderAdvancedUiBlocks(): void
+    {
+        if ($this->isAdvancedUiEnabled()) {
+            $this->getPage()->setVar('legacy_homepage_colour_css_block');
+            $this->getPage()->setVar('legacy_homepage_content_colours_block');
+        } else {
+            $this->getPage()->parse('legacy_homepage_colour_css_block', 'legacy_homepage_colour_css');
+            $this->getPage()->parse('legacy_homepage_content_colours_block', 'legacy_homepage_content_colours');
+        }
+    }
+
+    private function isAdvancedUiEnabled(): bool
+    {
+        return (bool)$this->getPage()->getDi()->get('config')->get(ConfigMapper::NAME_SONAR_UI_TOGGLE);
     }
 
     /**
