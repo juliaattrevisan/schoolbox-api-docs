@@ -556,6 +556,7 @@ class Controller extends ConfigController
     public function getRegistrations(): void
     {
         $pageCurrent = '/adminv2/international-baccalaureate/registrations';
+        $reportRoute = $this->getRouteIfAuthorized('internationalBaccalaureate.getReport', ['id' => 0]);
         $this->response = $this->responseDependentOnRequest(
             '@internationalBaccalaureate/registrations.twig',
             [
@@ -568,8 +569,41 @@ class Controller extends ConfigController
                         'delete' => $this->getRouteIfAuthorized('internationalBaccalaureate.deleteRegistrationSession', [
                             'sessionId' => 0,
                         ]),
+                        'reportBase' => $reportRoute !== null ? \dirname($reportRoute) : null,
                     ]
                 ]
+            ]
+        );
+    }
+
+    /**
+     * Diploma Programme Year 2 Registration Report page
+     *
+     * @api GET /adminv2/international-baccalaureate/registrations/sessions/{id}
+     */
+    public function getReport(int $id): void
+    {
+        try {
+            $session = $this->registrationSessionMapper->findById($id);
+        } catch (MapperNotFound) {
+            $this->response = $this->responseAsJson([
+                'success' => false,
+                'message' => 'Registration session not found.',
+            ])->withStatus(404);
+            return;
+        }
+
+        $pageCurrent = '/adminv2/international-baccalaureate/registrations';
+        $this->response = $this->responseDependentOnRequest(
+            '@internationalBaccalaureate/registrations/report.twig',
+            [
+                'pageCurrent' => $pageCurrent,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($pageCurrent),
+                '_routes' => [
+                    'candidatesEndpoint' => $this->getRouteIfAuthorized('internationalBaccalaureate.getRegistrationSessionStudents', ['id' => $id]),
+                    'searchLanguages' => $this->getRouteIfAuthorized('internationalBaccalaureate.searchLanguages'),
+                ],
+                'sessionTitle' => $session->jsonSerialize()['title'],
             ]
         );
     }
@@ -715,7 +749,6 @@ class Controller extends ConfigController
      */
     public function deleteRegistrationSession(RegistrationSessionModel $registrationSession): void
     {
-        //TODO: might need to add conditions to prevent deletion of a session if it's already been completed (ie registered with IB SA-21597/SA-21596)
         try {
             $registrationSession->setDeletedBy($this->getUser());
 

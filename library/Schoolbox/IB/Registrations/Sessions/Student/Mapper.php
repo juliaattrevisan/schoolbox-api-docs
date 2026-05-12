@@ -360,7 +360,7 @@ class Mapper extends BaseMapper
             "
                 SELECT
                     gsl.id AS group_subject_language_id,
-                    gsl.class_code,
+                    gslcc.class_code,
                     gs.id AS group_subject_id,
                     gs.group_id,
                     gs.level,
@@ -371,7 +371,9 @@ class Mapper extends BaseMapper
                     l.id AS language_id,
                     l.code AS language_code,
                     l.name AS language_name
-                FROM ib_group_subject_languages gsl
+                FROM ib_group_subject_language_class_codes gslcc
+                INNER JOIN ib_group_subject_languages gsl
+                    ON gsl.id = gslcc.group_subject_language_id
                 INNER JOIN ib_group_subjects gs
                     ON gs.id = gsl.group_subject_id
                 INNER JOIN lu_ib_groups g
@@ -380,8 +382,8 @@ class Mapper extends BaseMapper
                     ON s.id = gs.subject_id
                 INNER JOIN lu_language l
                     ON l.id = gsl.language_id
-                WHERE gsl.class_code IN ({$bindings->getPlaceholder()})
-                ORDER BY g.sequence ASC, s.name ASC, gs.level ASC, l.name ASC, gsl.class_code ASC
+                WHERE gslcc.class_code IN ({$bindings->getPlaceholder()})
+                ORDER BY g.sequence ASC, s.name ASC, gs.level ASC, l.name ASC, gslcc.class_code ASC
             ",
             $bindings->getParams()
         );
@@ -403,7 +405,7 @@ class Mapper extends BaseMapper
             "
                 SELECT
                     gsl.id AS group_subject_language_id,
-                    gsl.class_code,
+                    gslcc.class_code,
                     gs.id AS group_subject_id,
                     gs.group_id,
                     gs.level,
@@ -421,10 +423,12 @@ class Mapper extends BaseMapper
                     ON s.id = gs.subject_id
                 LEFT JOIN ib_group_subject_languages gsl
                     ON gsl.group_subject_id = gs.id
+                LEFT JOIN ib_group_subject_language_class_codes gslcc
+                    ON gslcc.group_subject_language_id = gsl.id
                 LEFT JOIN lu_language l
                     ON l.id = gsl.language_id
                 WHERE g.name = :groupName
-                ORDER BY g.sequence ASC, s.name ASC, l.name ASC, gsl.class_code ASC
+                ORDER BY g.sequence ASC, s.name ASC, l.name ASC, gslcc.class_code ASC
             ",
             [
                 'groupName' => self::CORE_GROUP_NAME,
