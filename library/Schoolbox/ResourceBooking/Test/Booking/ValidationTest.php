@@ -97,6 +97,75 @@ class ValidationTest extends TestCase
         return $mockValidation;
     }
 
+    private function createApprovedBookingWithPeriod(
+        int $id,
+        string $startDate,
+        string $endDate,
+        ?int $seriesId = null
+    ): Booking\Model {
+        $event = new Event();
+        $event->setStartDateTime(new DateTime($startDate));
+        $event->setEndDateTime(new DateTime($endDate));
+        $event->setSeriesId($seriesId);
+
+        return (new Booking\Model())
+            ->setId($id)
+            ->setEvent($event)
+            ->setStatus((new Booking\Status\Model())->setId(Booking\Status\Model::STATUS_APPROVED));
+    }
+
+    /**
+     * @param Collection|array<int, array{id: int, startDate: string, endDate: string, seriesId?: int|null, statusId?: int}> $bookingSpecs
+     */
+    private function createBookingsCollection(Collection|array $bookingSpecs, string $defaultStart, string $defaultEnd): Collection
+    {
+        if ($bookingSpecs instanceof Collection) {
+            return $bookingSpecs->map(function (Booking\Model $booking) use ($defaultStart, $defaultEnd): Booking\Model {
+                if ($booking->getEvent() === null) {
+                    $booking->setEvent(new Event());
+                }
+
+                if ($booking->getEvent()->getStartDateTime() === null) {
+                    $booking->getEvent()->setStartDateTime(new DateTime($defaultStart));
+                }
+
+                if ($booking->getEvent()->getEndDateTime() === null) {
+                    $booking->getEvent()->setEndDateTime(new DateTime($defaultEnd));
+                }
+
+                if ($booking->getStatus() === null) {
+                    $booking->setStatus((new Booking\Status\Model())->setId(Booking\Status\Model::STATUS_APPROVED));
+                }
+
+                return $booking;
+            });
+        }
+
+        $bookings = new Collection();
+        foreach ($bookingSpecs as $bookingSpec) {
+            $booking = $this->createApprovedBookingWithPeriod(
+                $bookingSpec['id'],
+                $bookingSpec['startDate'],
+                $bookingSpec['endDate'],
+                $bookingSpec['seriesId'] ?? null
+            );
+            if (($bookingSpec['statusId'] ?? Booking\Status\Model::STATUS_APPROVED) !== Booking\Status\Model::STATUS_APPROVED) {
+                $booking->setStatus((new Booking\Status\Model())->setId($bookingSpec['statusId']));
+            }
+
+            $bookings->add($booking);
+        }
+
+        return $bookings;
+    }
+
+    private function setResourceValidationDefaults(Item\Model $resource, string $maxReservationTime = 'PT0H'): void
+    {
+        $resource->setMinLeadTime(Interval::createFromDateInterval(new DateInterval('PT0H')));
+        $resource->setMinReservationTime(Interval::createFromDateInterval(new DateInterval('PT0H')));
+        $resource->setMaxReservationTime(Interval::createFromDateInterval(new DateInterval($maxReservationTime)));
+    }
+
     /**
      * Data provider for testValidateBeforeTime
      *
@@ -312,9 +381,49 @@ class ValidationTest extends TestCase
         $conflictingBookings0 = new Collection();
 
         return [
-            '3 conflicting bookings'    => ['2020-12-31T00:00:00', '2020-12-31T00:00:00', $conflictingBookings3, 1],
-            '1 conflicting booking'     => ['2020-12-31T00:00:00', '2020-12-31T00:00:00', $conflictingBookings1, 1],
-            'no conflicting booking'    => ['2020-12-31T00:00:00', '2020-12-31T00:00:00', $conflictingBookings0, 0],
+            '3 conflicting bookings'    => ['2020-12-31T00:00:00', '2020-12-31T01:00:00', $conflictingBookings3, 1],
+            '1 conflicting booking'     => ['2020-12-31T00:00:00', '2020-12-31T01:00:00', $conflictingBookings1, 1],
+            'no conflicting booking'    => ['2020-12-31T00:00:00', '2020-12-31T01:00:00', $conflictingBookings0, 0],
+            'capacity 1 with one overlapping approved booking remains a clash' => [
+                '2077-01-01T10:00:00+00:00',
+                '2077-01-01T11:00:00+00:00',
+                [
+                    ['id' => 11, 'startDate' => '2077-01-01T10:30:00+00:00', 'endDate' => '2077-01-01T11:30:00+00:00'],
+                ],
+                1,
+                1,
+            ],
+            'capacity 2 with one overlapping approved booking has no clash' => [
+                '2077-01-01T10:00:00+00:00',
+                '2077-01-01T11:00:00+00:00',
+                [
+                    ['id' => 11, 'startDate' => '2077-01-01T10:30:00+00:00', 'endDate' => '2077-01-01T11:30:00+00:00'],
+                ],
+                0,
+                2,
+            ],
+            'capacity 2 with two simultaneous approved bookings clashes' => [
+                '2077-01-01T10:00:00+00:00',
+                '2077-01-01T11:00:00+00:00',
+                [
+                    ['id' => 11, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => 12, 'startDate' => '2077-01-01T10:30:00+00:00', 'endDate' => '2077-01-01T11:30:00+00:00'],
+                ],
+                1,
+                2,
+            ],
+            'capacity 5 with four simultaneous approved bookings has remaining capacity' => [
+                '2077-01-01T10:00:00+00:00',
+                '2077-01-01T11:00:00+00:00',
+                [
+                    ['id' => 11, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => 12, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => 13, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => 14, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                ],
+                0,
+                5,
+            ],
         ];
     }
 
@@ -325,12 +434,19 @@ class ValidationTest extends TestCase
      *
      * @param string     $startDate
      * @param string     $endDate
-     * @param Collection $conflictingBookings
+     * @param Collection|array $conflictingBookings
      * @param int        $expected
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerSimpleValidateForConflicts')]
-    public function testSimpleValidateForConflicts(string $startDate, string $endDate, Collection $conflictingBookings, int $expected): void
-    {
+    public function testSimpleValidateForConflicts(
+        string $startDate,
+        string $endDate,
+        Collection|array $conflictingBookings,
+        int $expected,
+        int $capacity = 1
+    ): void {
+        $conflictingBookings = $this->createBookingsCollection($conflictingBookings, $startDate, $endDate);
+
         $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
         $mockMapper
             ->method('findForResource')
@@ -340,6 +456,7 @@ class ValidationTest extends TestCase
 
         $resource = new Item\Model();
         $resource->setId(123);
+        $resource->setCapacity($capacity);
 
         $errors = $validation->validateForClashes($resource, new DateTime($startDate), new DateTime($endDate));
         $errorsToCount = $validation->getAllErrorStringsAsFlatArray($errors);
@@ -384,7 +501,7 @@ class ValidationTest extends TestCase
         return [
             'No conflicting bookings, 3 timetable events' => [
                 '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
+                '2020-12-31T01:00:00',
                 $conflictingBookings0,
                 'abc1',
                 $roomEvents3,
@@ -392,7 +509,7 @@ class ValidationTest extends TestCase
             ],
             'No conflicting bookings, 1 timetable event' => [
                 '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
+                '2020-12-31T01:00:00',
                 $conflictingBookings0,
                 'abc1',
                 $roomEvents1,
@@ -400,7 +517,7 @@ class ValidationTest extends TestCase
             ],
             'No conflicting bookings, no timetable events' => [
                 '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
+                '2020-12-31T01:00:00',
                 $conflictingBookings0,
                 'abc1',
                 $roomEvents0,
@@ -408,7 +525,7 @@ class ValidationTest extends TestCase
             ],
             '3 conflicting bookings, no timetable events' => [
                 '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
+                '2020-12-31T01:00:00',
                 $conflictingBookings3,
                 'abc1',
                 $roomEvents0,
@@ -416,7 +533,7 @@ class ValidationTest extends TestCase
             ],
             '1 conflicting booking, no timetable events' => [
                 '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
+                '2020-12-31T01:00:00',
                 $conflictingBookings1,
                 'abc1',
                 $roomEvents0,
@@ -424,7 +541,7 @@ class ValidationTest extends TestCase
             ],
             'no conflicting booking, no timetable events' => [
                 '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
+                '2020-12-31T01:00:00',
                 $conflictingBookings0,
                 '',
                 $roomEvents0,
@@ -454,6 +571,8 @@ class ValidationTest extends TestCase
         Collection $roomEvents,
         int $expected
     ): void {
+        $conflictingBookings = $this->createBookingsCollection($conflictingBookings, $startDate, $endDate);
+
         $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
         $mockMapper
             ->method('findForResource')
@@ -571,49 +690,49 @@ class ValidationTest extends TestCase
         return [
             'booking conflicts with other booking series' => [
                 '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
+                '2020-12-31T01:00:00',
                 $existingBooking,
                 $conflictingBookingsOtherSeries3,
                 1,
             ],
             'no conflicting bookings' => [
                 '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
+                '2020-12-31T01:00:00',
                 $existingBooking,
                 $conflictingBookings0,
                 0,
             ],
             'booking in series does not conflict with its series' => [
                 '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
+                '2020-12-31T01:00:00',
                 $existingBookingEventInSeries,
                 $conflictingBookingsSameSeries3,
                 0,
             ],
             'booking in series conflicts with other series' => [
                 '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
+                '2020-12-31T01:00:00',
                 $existingBookingEventInSeries,
                 $conflictingBookingsOtherSeries3,
                 1
             ],
             'booking in series does not conflict with anything' => [
                 '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
+                '2020-12-31T01:00:00',
                 $existingBookingEventInSeries,
                 $conflictingBookings0,
                 0
             ],
             'booking conflicts with another booking' => [
                 '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
+                '2020-12-31T01:00:00',
                 $existingBooking,
                 $conflictingBookings1,
                 1
             ],
             'booking does not conflict with itself' => [
                 '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
+                '2020-12-31T01:00:00',
                 $existingBooking,
                 $conflictingBookingsSameId,
                 0
@@ -641,6 +760,8 @@ class ValidationTest extends TestCase
         Collection $conflictingBookings,
         int $expected
     ) {
+        $conflictingBookings = $this->createBookingsCollection($conflictingBookings, $startDate, $endDate);
+
         $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
         $mockMapper
             ->method('findForResource')
@@ -1074,6 +1195,78 @@ class ValidationTest extends TestCase
                     $booking1Id => false, // Should exit early at first period since it starts after booking end.
                 ],
             ],
+            'capacity 2 allows a second simultaneous moved booking' => [
+                'movedBookings' => [
+                    ['id' => $booking1Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                ],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T10:30:00+00:00', 'endDatetime' => '2077-01-01T11:30:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByBookingId' => [
+                    $booking1Id => false,
+                ],
+                'capacityByResourceId' => [
+                    $resource1Id => 2,
+                ],
+            ],
+            'capacity 2 rejects a third simultaneous moved booking' => [
+                'movedBookings' => [
+                    ['id' => $booking1Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                ],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T10:00:00+00:00', 'endDatetime' => '2077-01-01T11:00:00+00:00'],
+                        ['startDatetime' => '2077-01-01T10:30:00+00:00', 'endDatetime' => '2077-01-01T11:30:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByBookingId' => [
+                    $booking1Id => true,
+                ],
+                'capacityByResourceId' => [
+                    $resource1Id => 2,
+                ],
+            ],
+            'capacity 2 rejects second moved booking in same batch when one slot remains' => [
+                'movedBookings' => [
+                    ['id' => $booking1Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => $booking2Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T10:15:00+00:00', 'endDate' => '2077-01-01T10:45:00+00:00'],
+                ],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T10:30:00+00:00', 'endDatetime' => '2077-01-01T11:30:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByBookingId' => [
+                    $booking1Id => false,
+                    $booking2Id => true,
+                ],
+                'capacityByResourceId' => [
+                    $resource1Id => 2,
+                ],
+            ],
+            'capacity 2 ignores rejected moved booking in same batch allocation' => [
+                'movedBookings' => [
+                    ['id' => $booking1Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => $booking2Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T10:15:00+00:00', 'endDate' => '2077-01-01T10:45:00+00:00'],
+                ],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T10:30:00+00:00', 'endDatetime' => '2077-01-01T11:30:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByBookingId' => [
+                    $booking1Id => false,
+                    $booking2Id => false,
+                ],
+                'capacityByResourceId' => [
+                    $resource1Id => 2,
+                ],
+                'maxReservationTimeByResourceId' => [
+                    $resource1Id => 'PT30M',
+                ],
+            ],
             // Note we cannot test whether the moved bookings themselves are removed from the set of bookings
             // to check against, because the set of bookings to check against comes from the mocked Mapper.
         ];
@@ -1091,7 +1284,9 @@ class ValidationTest extends TestCase
     public function testCheckForClashesIfResourceBookingsMoved(
         array $movedBookings,
         array $approvedBookingPeriods,
-        array $expectedIsClashByBookingId
+        array $expectedIsClashByBookingId,
+        array $capacityByResourceId = [],
+        array $maxReservationTimeByResourceId = [],
     ): void {
         // Create a mock mapper that returns future approved booking periods.
         $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
@@ -1128,6 +1323,11 @@ class ValidationTest extends TestCase
             // Create resource
             $resource = new Item\Model();
             $resource->setId($bookingData['resourceId']);
+            $resource->setCapacity($capacityByResourceId[$bookingData['resourceId']] ?? 1);
+            $this->setResourceValidationDefaults(
+                $resource,
+                $maxReservationTimeByResourceId[$bookingData['resourceId']] ?? 'PT0H'
+            );
 
             $booking->setEvent($event);
             $booking->setResource($resource);
@@ -1145,6 +1345,11 @@ class ValidationTest extends TestCase
         foreach ($uniqueResourceIds as $resourceId) {
             $resource = new Item\Model();
             $resource->setId($resourceId);
+            $resource->setCapacity($capacityByResourceId[$resourceId] ?? 1);
+            $this->setResourceValidationDefaults(
+                $resource,
+                $maxReservationTimeByResourceId[$resourceId] ?? 'PT0H'
+            );
             $resourcesCollection->setOffset($resourceId, $resource);
         }
 
@@ -1339,6 +1544,96 @@ class ValidationTest extends TestCase
                     $event2Id => [$resource2Id => true], // Booking resource2 at event2 time would clash.
                 ],
             ],
+            'capacity 2 allows adding a second simultaneous booking to event' => [
+                'events' => [
+                    ['id' => $event1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                ],
+                'resourceIds' => [$resource1Id],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T10:30:00+00:00', 'endDatetime' => '2077-01-01T11:30:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByResourceIdByEventId' => [],
+                'capacityByResourceId' => [
+                    $resource1Id => 2,
+                ],
+            ],
+            'capacity 2 rejects adding a third simultaneous booking to event' => [
+                'events' => [
+                    ['id' => $event1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                ],
+                'resourceIds' => [$resource1Id],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T10:00:00+00:00', 'endDatetime' => '2077-01-01T11:00:00+00:00'],
+                        ['startDatetime' => '2077-01-01T10:30:00+00:00', 'endDatetime' => '2077-01-01T11:30:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByResourceIdByEventId' => [
+                    $event1Id => [$resource1Id => true],
+                ],
+                'capacityByResourceId' => [
+                    $resource1Id => 2,
+                ],
+            ],
+            'capacity 2 rejects adding second booking in same batch when one slot remains' => [
+                'events' => [
+                    ['id' => $event1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => $event2Id, 'startDate' => '2077-01-01T10:15:00+00:00', 'endDate' => '2077-01-01T10:45:00+00:00'],
+                ],
+                'resourceIds' => [$resource1Id],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T10:30:00+00:00', 'endDatetime' => '2077-01-01T11:30:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByResourceIdByEventId' => [
+                    $event2Id => [$resource1Id => true],
+                ],
+                'capacityByResourceId' => [
+                    $resource1Id => 2,
+                ],
+            ],
+            'capacity 2 ignores already-booked event resource pairs in same batch allocation' => [
+                'events' => [
+                    ['id' => $event1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => $event2Id, 'startDate' => '2077-01-01T10:15:00+00:00', 'endDate' => '2077-01-01T10:45:00+00:00'],
+                ],
+                'resourceIds' => [$resource1Id],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T10:30:00+00:00', 'endDatetime' => '2077-01-01T11:30:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByResourceIdByEventId' => [],
+                'capacityByResourceId' => [
+                    $resource1Id => 2,
+                ],
+                'bookedResourceIdsByEventId' => [
+                    $event1Id => [$resource1Id],
+                ],
+            ],
+            'capacity 2 ignores rejected event booking in same batch allocation' => [
+                'events' => [
+                    ['id' => $event1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => $event2Id, 'startDate' => '2077-01-01T10:15:00+00:00', 'endDate' => '2077-01-01T10:45:00+00:00'],
+                ],
+                'resourceIds' => [$resource1Id],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T10:30:00+00:00', 'endDatetime' => '2077-01-01T11:30:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByResourceIdByEventId' => [],
+                'capacityByResourceId' => [
+                    $resource1Id => 2,
+                ],
+                'bookedResourceIdsByEventId' => [],
+                'maxReservationTimeByResourceId' => [
+                    $resource1Id => 'PT30M',
+                ],
+            ],
         ];
     }
 
@@ -1356,7 +1651,10 @@ class ValidationTest extends TestCase
         array $events,
         array $resourceIds,
         array $approvedBookingPeriods,
-        array $expectedIsClashByResourceIdByEventId
+        array $expectedIsClashByResourceIdByEventId,
+        array $capacityByResourceId = [],
+        array $bookedResourceIdsByEventId = [],
+        array $maxReservationTimeByResourceId = [],
     ): void {
         // Create a mock mapper that returns future approved booking periods.
         $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
@@ -1395,12 +1693,21 @@ class ValidationTest extends TestCase
         foreach ($resourceIds as $resourceId) {
             $resource = new Item\Model();
             $resource->setId($resourceId);
+            $resource->setCapacity($capacityByResourceId[$resourceId] ?? 1);
+            $this->setResourceValidationDefaults(
+                $resource,
+                $maxReservationTimeByResourceId[$resourceId] ?? 'PT0H'
+            );
             $resourcesCollection->setOffset($resourceId, $resource);
         }
 
         // Test the function
         /** @var Validation $validation */
-        $result = $validation->checkForClashesIfResourceBookingsAddedToEvents($resourcesCollection, $eventsCollection);
+        $result = $validation->checkForClashesIfResourceBookingsAddedToEvents(
+            $resourcesCollection,
+            $eventsCollection,
+            $bookedResourceIdsByEventId,
+        );
 
         // Assert the results match expectations
         $this->assertEquals($expectedIsClashByResourceIdByEventId, $result);
@@ -1513,6 +1820,34 @@ class ValidationTest extends TestCase
                 'hasConflictingBookings' => false,
                 'expectedErrorCount' => 0,
             ],
+            'approve pending booking succeeds when capacity remains' => [
+                'status' => Booking\Status\Model::STATUS_APPROVED,
+                'hasConflictingBookings' => true,
+                'expectedErrorCount' => 0,
+                'resourceCapacity' => 2,
+                'conflictingBookings' => [
+                    ['id' => 999, 'startDate' => '2077-01-01T10:30:00+00:00', 'endDate' => '2077-01-01T11:30:00+00:00'],
+                ],
+            ],
+            'pending status change does not consume capacity or validate clashes' => [
+                'status' => Booking\Status\Model::STATUS_PENDING,
+                'hasConflictingBookings' => true,
+                'expectedErrorCount' => 0,
+                'resourceCapacity' => 1,
+                'conflictingBookings' => [
+                    ['id' => 999, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                ],
+            ],
+            'approve pending booking fails when capacity is exhausted' => [
+                'status' => Booking\Status\Model::STATUS_APPROVED,
+                'hasConflictingBookings' => true,
+                'expectedErrorCount' => 1,
+                'resourceCapacity' => 2,
+                'conflictingBookings' => [
+                    ['id' => 999, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => 1000, 'startDate' => '2077-01-01T10:30:00+00:00', 'endDate' => '2077-01-01T11:30:00+00:00'],
+                ],
+            ],
         ];
     }
 
@@ -1529,23 +1864,33 @@ class ValidationTest extends TestCase
     public function testValidateChangeStatus(
         int $status,
         bool $hasConflictingBookings,
-        int $expectedErrorCount
+        int $expectedErrorCount,
+        int $resourceCapacity = 1,
+        ?array $conflictingBookings = null
     ): void {
         // Create mock mapper
-        $conflictingBookings = $hasConflictingBookings
-            ? new Collection()->add(new Booking\Model()->setId(999))
-            : new Collection();
+        $conflictingBookingCollection = new Collection();
+        if ($hasConflictingBookings) {
+            $conflictingBookingCollection = $this->createBookingsCollection(
+                $conflictingBookings ?? [
+                    ['id' => 999, 'startDate' => '2077-01-01T10:30:00+00:00', 'endDate' => '2077-01-01T11:30:00+00:00'],
+                ],
+                '2077-01-01T10:00:00+00:00',
+                '2077-01-01T11:00:00+00:00'
+            );
+        }
 
         $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
         $mockMapper
             ->method('findForResource')
-            ->willReturn($conflictingBookings);
+            ->willReturn($conflictingBookingCollection);
 
         $validation = $this->createValidation(new User(), $mockMapper, new StatusMapper(), new TermMapper());
 
         // Create a booking
         $resource = new Item\Model();
         $resource->setId(123);
+        $resource->setCapacity($resourceCapacity);
 
         $event = new Event();
         $event->setStartDateTime(new \Alaress_Date_Format('2077-01-01T10:00:00+00:00', \Alaress_Date_Format::FORMAT_RFC3339_W3C));
@@ -1580,6 +1925,11 @@ class ValidationTest extends TestCase
         $errorsWithConflict = [
             Validation::START_PERIOD_ERRORS => [
                 $clashDate => [Validation::ERROR_CONFLICT],
+            ],
+        ];
+        $errorsWithTimetabledClass = [
+            Validation::START_PERIOD_ERRORS => [
+                $clashDate => [Validation::ERROR_TIMETABLED_CLASS],
             ],
         ];
         $errorsWithInPast = [
@@ -1633,6 +1983,24 @@ class ValidationTest extends TestCase
                 'expectedHasClashErrors'    => false,
                 'expectedHasNonClashErrors' => false,
                 'expectedClashDateCount'    => 1,
+            ],
+            'timetabled class, clashes allowed: error remains a hard blocker and no clash date is recorded' => [
+                'errorsFromValidation'      => $errorsWithTimetabledClass,
+                'allowClashBookings'        => true,
+                'overrideValidation'        => false,
+                'userIsModerator'           => false,
+                'expectedHasClashErrors'    => true,
+                'expectedHasNonClashErrors' => false,
+                'expectedClashDateCount'    => 0,
+            ],
+            'timetabled class, override validation by moderator: error remains a hard blocker' => [
+                'errorsFromValidation'      => $errorsWithTimetabledClass,
+                'allowClashBookings'        => false,
+                'overrideValidation'        => true,
+                'userIsModerator'           => true,
+                'expectedHasClashErrors'    => true,
+                'expectedHasNonClashErrors' => false,
+                'expectedClashDateCount'    => 0,
             ],
         ];
     }
@@ -1707,5 +2075,23 @@ class ValidationTest extends TestCase
         $this->assertSame($expectedHasClashErrors, $hasClashErrors, 'Clash errors in $errorsStruct');
         $this->assertSame($expectedHasNonClashErrors, $hasNonClashErrors, 'Non-clash errors in $errorsStruct');
         $this->assertCount($expectedClashDateCount, $clashBookingStartDatesAsKeys, 'Count of clash start dates');
+    }
+
+    public function testValidationErrorsContainHardBlockersOnlyForTimetabledClasses(): void
+    {
+        $validation = $this->createValidation();
+        $date = '2077-01-01 10:00:00';
+
+        $this->assertFalse($validation->validationErrorsContainHardBlockers([
+            Validation::START_PERIOD_ERRORS => [
+                $date => [Validation::ERROR_CONFLICT],
+            ],
+        ]));
+
+        $this->assertTrue($validation->validationErrorsContainHardBlockers([
+            Validation::START_PERIOD_ERRORS => [
+                $date => [Validation::ERROR_TIMETABLED_CLASS],
+            ],
+        ]));
     }
 }

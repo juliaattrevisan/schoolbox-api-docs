@@ -146,10 +146,16 @@ if (!empty($resourceIds)) {
 
         // Validate this item.
         try {
-            [$errorsStructIgnored, $clashBookingStartDatesAsKeys] = $validation->validateBookingIgnoringClashesIfClashesAllowed($item, $postVars);
+            [$errorsStruct, $clashBookingStartDatesAsKeys] = $validation->validateBookingIgnoringClashesIfClashesAllowed($item, $postVars);
             $booking = getBookingFromEvent($item, $event);
-            $isClash = count($clashBookingStartDatesAsKeys) > 0;
-            $bookingStatusId = $validation->getNewStatusIdForBooking($booking, $isClash, $user);
+
+            if ($validation->validationErrorsContainHardBlockers($errorsStruct)) {
+                $bookingStatusId = Status\Model::STATUS_REJECTED;
+            } else {
+                $isClash = count($clashBookingStartDatesAsKeys) > 0;
+                $bookingStatusId = $validation->getNewStatusIdForBooking($booking, $isClash, $user);
+            }
+
             $booking->setStatus(getStatusMapper()->createModel($bookingStatusId));
         } catch (\Schoolbox\Mapper\Exception $e) {
             // Some kind of database problem occurred, so skip this booking.

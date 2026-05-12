@@ -114,6 +114,7 @@ class Controller extends Base
         // Build the list of events (slowly)
         $showClasses = $this->requestQuery->getBool('classes', true);
         $clashesOnly = $this->requestQuery->getBool('clashesOnly', false);
+        $capacityAllocation = new \Schoolbox\ResourceBooking\Booking\CapacityAllocation();
 
         $this->api->add(
             $this->apiFactory->buildFromResourceCollection(
@@ -151,6 +152,26 @@ class Controller extends Base
             }
             // Step 2: For each resource, sort events by start time and check for overlaps
             foreach ($eventsByResource as $resourceEvents) {
+                $resourceBookingEvents = array_values(array_filter(
+                    $resourceEvents,
+                    static fn ($event): bool => $event instanceof \Calendar\Event\Type\ResourceBooking\Event
+                ));
+
+                foreach ($resourceBookingEvents as $resourceBookingEvent) {
+                    $blockingEvents = $capacityAllocation->getBlockingApprovedBookingEvents(
+                        $resourceBookingEvent,
+                        $resourceBookingEvents
+                    );
+                    if (count($blockingEvents) === 0) {
+                        continue;
+                    }
+
+                    $clashesOnlyList[spl_object_hash($resourceBookingEvent)] = $resourceBookingEvent;
+                    foreach ($blockingEvents as $blockingEvent) {
+                        $clashesOnlyList[spl_object_hash($blockingEvent)] = $blockingEvent;
+                    }
+                }
+
                 // Sort by start time
                 usort($resourceEvents, function ($a, $b) {
                     return $a->getStartTime()->compare($b->getStartTime());
@@ -168,7 +189,13 @@ class Controller extends Base
                             break;
                         }
 
-                        if ($eventA->isClash($eventB)) {
+                        if (
+                            !(
+                                $eventA instanceof \Calendar\Event\Type\ResourceBooking\Event
+                                && $eventB instanceof \Calendar\Event\Type\ResourceBooking\Event
+                            )
+                            && $eventA->isClash($eventB)
+                        ) {
                             $eventBHash = spl_object_hash($eventB);
                             // Add both events to the clash list
                             $clashesOnlyList[$eventAHash] = $eventA;

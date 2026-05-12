@@ -1274,9 +1274,17 @@ class Controller extends Base
             $eventById = new GenericCollection(Event::class, [$event->getId() => $event]);
         }
 
+        // Note we are not only interested in resources booked in the future here.
+        // We cannot allow multiple bookings of the same resource for a single event, even if only one is in the past.
+        $bookedResourceIdsByEventId = $this->bookingMapper->getBookedResourceIdsByEventId($eventById->keys());
+
         // Check whether each hypothetical booking would result in a clash.
         $isClashByResourceIdByEventId = (
-            $this->getBookingValidation()->checkForClashesIfResourceBookingsAddedToEvents($resourceById, $eventById)
+            $this->getBookingValidation()->checkForClashesIfResourceBookingsAddedToEvents(
+                $resourceById,
+                $eventById,
+                $bookedResourceIdsByEventId,
+            )
         );
 
         // This will hold the booking models to be persisted.
@@ -1288,10 +1296,6 @@ class Controller extends Base
             BookingStatusModel::STATUS_APPROVED => 0,
             BookingStatusModel::STATUS_REJECTED => 0,
         ];
-
-        // Note we are not only interested in resources booked in the future here.
-        // We cannot allow multiple bookings of the same resource for a single event, even if only one is in the past.
-        $bookedResourceIdsByEventId = $this->bookingMapper->getBookedResourceIdsByEventId($eventById->keys());
 
         // Create a list of booking models to be persisted depending on:
         //  * whether the resource has already been booked for the event
@@ -1446,6 +1450,7 @@ class Controller extends Base
         $bookingsToUpdate = $this->bookingMapper->findByColumn('id', $bookingIdsToUpdate);
         foreach ($bookingsToUpdate as $bookingToUpdate) {
             $bookingToUpdate->setEvent($eventById[$bookingToUpdate->getEvent()->getId()]);
+            $bookingToUpdate->setResource($booking->getResource());
         }
 
         foreach ($bookingsToUpdate as $loopBooking) {
@@ -1477,11 +1482,11 @@ class Controller extends Base
         // Set booking status to pending if the booking has a clash.  Otherwise the status can stay as it was.
         foreach ($bookingsToUpdate as $bookingToUpdate) {
             $statusId = $this->bookingValidation->getNewStatusIdForBooking(
-                $booking,
+                $bookingToUpdate,
                 $isClashByBookingId[$bookingToUpdate->getId()],
                 $this->getUser()
             );
-            $booking->setStatus($this->bookingStatusMapper->createModel($statusId));
+            $bookingToUpdate->setStatus($this->bookingStatusMapper->createModel($statusId));
         }
 
         try {
@@ -1869,7 +1874,16 @@ class Controller extends Base
             }
 
             $oldStatusId = $booking->getStatus()->getId();
-            $newStatusId = $validation->getNewStatusIdForBooking($booking, count($clashErrors) > 0, $this->getUser());
+            $clashErrorStrings = $validation->getAllErrorStringsAsFlatArray($clashErrors);
+            $newStatusId = (
+                $validation->validationErrorsContainHardBlockers($clashErrors)
+                ? BookingStatusModel::STATUS_REJECTED
+                : $validation->getNewStatusIdForBooking(
+                    $booking,
+                    in_array(Validation::ERROR_CONFLICT, $clashErrorStrings, true),
+                    $this->getUser()
+                )
+            );
 
             if ($newStatusId !== $oldStatusId) {
                 $booking->setStatus($this->bookingStatusMapper->createModel($newStatusId));

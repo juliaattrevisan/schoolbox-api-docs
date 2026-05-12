@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Tests\Smoketests;
 
 use Schoolbox\ResourceBooking\Item\ModerationType;
+use Schoolbox\ResourceBooking\Booking\Status\Model as BookingStatus;
 use Tests\Support\IntegrationTester;
 use Tests\Support\Payload;
 
@@ -81,6 +82,81 @@ class EventResourceBookingCest
     }
 
     /**
+     * Helper: Creates a capacity-2 resource with moderation type 'open'.
+     *
+     * @param IntegrationTester $i
+     * @param bool $allowClashBookings
+     * @return \Schoolbox\ResourceBooking\Item\Model
+     */
+    private function createCapacityTwoOpenResource(
+        IntegrationTester $i,
+        bool $allowClashBookings
+    ): \Schoolbox\ResourceBooking\Item\Model {
+        $resourceMapper = \Schoolbox\ResourceBooking\Item\Mapper::getInstance();
+
+        $resourceTitle = 'Capacity 2 event resource at ' . microtime(true);
+        $resourcePayload = new Payload\ResourceBooking\Resource\Create();
+        $resourcePayload->setResourceName($resourceTitle);
+        $resourcePayload->setResourceCat('3'); // Support Services
+        $resourcePayload->setModerationTypeId((string)ModerationType\Model::TYPE_OPEN);
+        $resourcePayload->setAllowClashBookings($allowClashBookings);
+        $resourcePayload->setCapacity('2');
+        $i->sendRequest($resourcePayload);
+        $i->seeResponseCodeIs(303);
+
+        $resource = $resourceMapper->findOneByColumn('name', $resourceTitle);
+        $i->comment('The new capacity-2 resource has id ' . $resource->getId());
+        $i->assertEquals(2, $resource->getCapacity(), 'The resource has capacity 2');
+        $i->assertEquals(
+            $allowClashBookings,
+            $resource->getAllowClashBookings(),
+            'Property allow_clash_bookings has the expected value'
+        );
+
+        return $resource;
+    }
+
+    /**
+     * Helper: Creates a timed event with one linked resource booking and returns the booking.
+     *
+     * @param IntegrationTester $i
+     * @param \Schoolbox\ResourceBooking\Item\Model $resource
+     * @param string $title
+     * @param string $startDateTime
+     * @param string $endDateTime
+     * @return \Schoolbox\ResourceBooking\Booking\Model
+     */
+    private function createEventWithResourceBooking(
+        IntegrationTester $i,
+        \Schoolbox\ResourceBooking\Item\Model $resource,
+        string $title,
+        string $startDateTime,
+        string $endDateTime
+    ): \Schoolbox\ResourceBooking\Booking\Model {
+        $eventMapper = \Schoolbox\Calendar\EventMapper::getInstance();
+        $bookingMapper = \Schoolbox\ResourceBooking\Booking\Mapper::getInstance();
+
+        $eventPayload = new Payload\Calendar\Event\Create(1, 1);
+        $eventPayload->setTitle($title);
+        $eventPayload->setFormParam('allDay', '0');
+        $eventPayload->setFormParam('startDate', $startDateTime);
+        $eventPayload->setFormParam('endDate', $endDateTime);
+        $eventPayload->setFormParam('repeat_until', substr($startDateTime, 0, 10));
+        $eventPayload->setFormParam('resourceIds[0]', (string)$resource->getId());
+        $i->sendRequest($eventPayload);
+        $i->seeResponseCodeIs(302);
+
+        $event = $eventMapper->findOneByColumn('title', $title);
+        $booking = $bookingMapper->findOneByColumnList([
+            'event_id' => $event->getId(),
+            'resource_id' => $resource->getId(),
+        ]);
+        $i->comment('Created event ' . $event->getId() . ' with booking ' . $booking->getId());
+
+        return $booking;
+    }
+
+    /**
      * Create a series of 3 daily events with a resource booking via the 'Create Event' form, and verify that
      * a booking is created for each event in the series.
      * Tests postCreate() in library/Schoolbox/Calendar/Event/Controller.php.
@@ -119,6 +195,188 @@ class EventResourceBookingCest
                 "Event on $eventDate has a booking for the expected resource"
             );
         }
+    }
+
+    /**
+     * Create two events at the same time with bookings for the same capacity-2 resource, and verify both bookings
+     * are approved.
+     *
+     * @param IntegrationTester $i
+     * @return void
+     * @throws \Exception
+     */
+    public function addBookingsToEventsAllowsCapacityTwo(IntegrationTester $i): void
+    {
+        $resource = $this->createCapacityTwoOpenResource($i, false);
+
+        $firstBooking = $this->createEventWithResourceBooking(
+            $i,
+            $resource,
+            'Capacity two event 1 ' . microtime(true),
+            '2076-04-01T10:00:00+00:00',
+            '2076-04-01T11:00:00+00:00'
+        );
+        $secondBooking = $this->createEventWithResourceBooking(
+            $i,
+            $resource,
+            'Capacity two event 2 ' . microtime(true),
+            '2076-04-01T10:00:00+00:00',
+            '2076-04-01T11:00:00+00:00'
+        );
+
+        $i->assertEquals(
+            BookingStatus::STATUS_APPROVED,
+            $firstBooking->getStatus()->getId(),
+            'The first booking is approved'
+        );
+        $i->assertEquals(
+            BookingStatus::STATUS_APPROVED,
+            $secondBooking->getStatus()->getId(),
+            'The second overlapping booking is approved while capacity remains available'
+        );
+    }
+
+    /**
+     * Create two approved overlapping bookings for a capacity-2 resource, then verify a third overlapping event-linked
+     * booking is rejected when clashes are not allowed.
+     *
+     * @param IntegrationTester $i
+     * @return void
+     * @throws \Exception
+     */
+    public function addBookingsToEventsRejectsThirdWhenCapacityTwoAndClashesAreNotAllowed(IntegrationTester $i): void
+    {
+        $resource = $this->createCapacityTwoOpenResource($i, false);
+
+        $this->createEventWithResourceBooking(
+            $i,
+            $resource,
+            'Capacity two approved event 1 ' . microtime(true),
+            '2076-04-02T10:00:00+00:00',
+            '2076-04-02T11:00:00+00:00'
+        );
+        $this->createEventWithResourceBooking(
+            $i,
+            $resource,
+            'Capacity two approved event 2 ' . microtime(true),
+            '2076-04-02T10:00:00+00:00',
+            '2076-04-02T11:00:00+00:00'
+        );
+        $thirdBooking = $this->createEventWithResourceBooking(
+            $i,
+            $resource,
+            'Capacity two rejected event ' . microtime(true),
+            '2076-04-02T10:00:00+00:00',
+            '2076-04-02T11:00:00+00:00'
+        );
+
+        $i->assertEquals(
+            BookingStatus::STATUS_REJECTED,
+            $thirdBooking->getStatus()->getId(),
+            'The third overlapping booking is rejected once capacity is full'
+        );
+    }
+
+    /**
+     * Create two approved overlapping bookings for a capacity-2 resource, then verify a third overlapping event-linked
+     * booking is pending when clashes are allowed.
+     *
+     * @param IntegrationTester $i
+     * @return void
+     * @throws \Exception
+     */
+    public function addBookingsToEventsMakesThirdPendingWhenCapacityTwoAndClashesAreAllowed(IntegrationTester $i): void
+    {
+        $resource = $this->createCapacityTwoOpenResource($i, true);
+
+        $this->createEventWithResourceBooking(
+            $i,
+            $resource,
+            'Capacity two allowed clash event 1 ' . microtime(true),
+            '2076-04-04T10:00:00+00:00',
+            '2076-04-04T11:00:00+00:00'
+        );
+        $this->createEventWithResourceBooking(
+            $i,
+            $resource,
+            'Capacity two allowed clash event 2 ' . microtime(true),
+            '2076-04-04T10:00:00+00:00',
+            '2076-04-04T11:00:00+00:00'
+        );
+        $thirdBooking = $this->createEventWithResourceBooking(
+            $i,
+            $resource,
+            'Capacity two pending clash event ' . microtime(true),
+            '2076-04-04T10:00:00+00:00',
+            '2076-04-04T11:00:00+00:00'
+        );
+
+        $i->assertEquals(
+            BookingStatus::STATUS_PENDING,
+            $thirdBooking->getStatus()->getId(),
+            'The third overlapping booking is pending once capacity is full and clashes are allowed'
+        );
+    }
+
+    /**
+     * Edit an event-linked booking into a period where two approved bookings already consume all capacity,
+     * and verify the edited booking status is recalculated on the persisted booking.
+     *
+     * @param IntegrationTester $i
+     * @return void
+     * @throws \Exception
+     */
+    public function editBookingUsesCapacityAwareStatusForUpdatedBooking(IntegrationTester $i): void
+    {
+        $bookingMapper = \Schoolbox\ResourceBooking\Booking\Mapper::getInstance();
+        $resource = $this->createCapacityTwoOpenResource($i, false);
+
+        $this->createEventWithResourceBooking(
+            $i,
+            $resource,
+            'Capacity two edit approved event 1 ' . microtime(true),
+            '2076-04-03T10:00:00+00:00',
+            '2076-04-03T11:00:00+00:00'
+        );
+        $this->createEventWithResourceBooking(
+            $i,
+            $resource,
+            'Capacity two edit approved event 2 ' . microtime(true),
+            '2076-04-03T10:00:00+00:00',
+            '2076-04-03T11:00:00+00:00'
+        );
+        $bookingToEdit = $this->createEventWithResourceBooking(
+            $i,
+            $resource,
+            'Capacity two edit pending event ' . microtime(true),
+            '2076-04-03T12:00:00+00:00',
+            '2076-04-03T13:00:00+00:00'
+        );
+
+        $i->assertEquals(
+            BookingStatus::STATUS_APPROVED,
+            $bookingToEdit->getStatus()->getId(),
+            'The booking to edit starts as approved before it clashes'
+        );
+
+        $editUrl = '/calendar/event/' . $bookingToEdit->getEvent()->getId() .
+            '/editBooking/' . $bookingToEdit->getId();
+        $editPayload = new Payload\Base('POST', $editUrl, $editUrl);
+        $editPayload->setFormParam('startDatetime', '2076-04-03T10:00:00+11:00');
+        $editPayload->setFormParam('endDatetime', '2076-04-03T11:00:00+11:00');
+        $editPayload->setFormParam('notes', 'Updated into a full capacity clash at ' . microtime(true));
+        $editPayload->setFormParam('efficacy', \Schoolbox\Calendar\EventRecurrenceMapper::EFFICACY_SELF);
+        $i->sendRequest($editPayload);
+
+        $i->seeResponseCodeIs(200);
+        $i->canSeeResponseContainsJson(['success' => true, 'nRowsAffected' => 1]);
+
+        $updatedBooking = $bookingMapper->findById($bookingToEdit->getId());
+        $i->assertEquals(
+            BookingStatus::STATUS_REJECTED,
+            $updatedBooking->getStatus()->getId(),
+            'The edited booking is rejected when capacity is full and clashes are not allowed'
+        );
     }
 
     /**
