@@ -303,16 +303,21 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             return;
         }
 
-        $currentAudienceVisibility = $this->getNotificationAudienceVisibility($assessment->getWorkType());
+        $currentWorkType = $assessment->getWorkType();
         try {
-            if ($assessment->getWorkType() !== null) {
-                $workType = $this->workTypeMapper->findById($assessment->getWorkType()->getId());
-                $currentAudienceVisibility = $this->getNotificationAudienceVisibility($workType);
+            if ($currentWorkType !== null && $currentWorkType->getIsVisibleToLearners() === null) {
+                // The assessment has a work type, but it is not hydrated.  So fetch a hydrated replacement.
+                $currentWorkType = $this->workTypeMapper->findById($currentWorkType->getId());
             }
-        } catch (BaseMapper\Exception $e) {
-            // noop;
+        } catch (BaseMapper\Exception) {
+            $currentWorkType = null;
         }
-        $isCurrentVisibleToAnyAudience = $this->isVisibleToAnyNotificationAudience($currentAudienceVisibility);
+
+        $isCurrentVisibleToAnyAudience = (
+            // If worktype is null, then worktype visibility restrictions do not apply and so the assessment is visible.
+            ($currentWorkType?->isVisibleToLearners() ?? true) ||
+            ($currentWorkType?->isVisibleToParents() ?? true)
+        );
 
         if ($method === Mapper::METHOD_CREATE && !$isCurrentVisibleToAnyAudience) {
             return;
@@ -323,7 +328,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             return;
         }
 
-        $previousAudienceVisibility = ['learners' => true, 'parents' => true];
         $isPreviousVisibleToAnyAudience = true;
         if (
             $method === Mapper::METHOD_UPDATE
@@ -332,10 +336,16 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         ) {
             try {
                 if ($diff['assessment']['workType'][1] !== null) {
+                    // Get a hydrated worktype object.
                     $previousWorkType = $this->workTypeMapper->findById($diff['assessment']['workType'][1]);
-                    $previousAudienceVisibility = $this->getNotificationAudienceVisibility($previousWorkType);
+                    $previousAudienceVisibility = [
+                        'learners' => $previousWorkType?->isVisibleToLearners() ?? true,
+                        'parents' => $previousWorkType?->isVisibleToParents() ?? true,
+                    ];
+                } else {
+                    $previousAudienceVisibility = ['learners' => true, 'parents' => true];
                 }
-                $isPreviousVisibleToAnyAudience = $this->isVisibleToAnyNotificationAudience($previousAudienceVisibility);
+                $isPreviousVisibleToAnyAudience = $previousAudienceVisibility['learners'] || $previousAudienceVisibility['parents'];
                 if (!$isPreviousVisibleToAnyAudience && !$isCurrentVisibleToAnyAudience) {
                     // no notification
                     return;
@@ -1667,29 +1677,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 // acknowledge response, though.
                 return !($assessment instanceof DueWork && $assessment->isAcceptNone());
         }
-    }
-
-
-    /**
-     * Gets learner and parent notification visibility from a work type.
-     *
-     * @return array{learners: bool, parents: bool}
-     */
-    private function getNotificationAudienceVisibility(?WorkType $workType): array
-    {
-        return [
-            'learners' => $workType?->isVisibleToLearners() ?? true,
-            'parents' => $workType?->isVisibleToParents() ?? true,
-        ];
-    }
-
-
-    /**
-     * @param array{learners: bool, parents: bool} $visibility
-     */
-    private function isVisibleToAnyNotificationAudience(array $visibility): bool
-    {
-        return $visibility['learners'] || $visibility['parents'];
     }
 
 
