@@ -567,20 +567,6 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
-             * Capture the full folder-owned row purge set for ordering assertions.
-             *
-             * @param array<int, int> $folderIds
-             * @return int
-             */
-            protected function deleteFolderOwnedRows(array $folderIds): int
-            {
-                $this->state->deletedFolderOwnedRowIds = $folderIds;
-                $this->state->calls[] = 'deleteFolderOwnedRows';
-
-                return count($folderIds);
-            }
-
-            /**
              * Capture homepage userAccess cleanup because those ACL rows block folders.
              *
              * @param array<int, int> $folderIds

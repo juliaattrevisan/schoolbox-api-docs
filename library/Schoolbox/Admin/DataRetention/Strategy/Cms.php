@@ -165,7 +165,10 @@ class Cms extends Base
         $counts['tileLayouts'] = $this->deleteTileLayouts($tileLayouts);
         $counts['tileLayoutsJoins'] = $this->deleteTileLayoutJoin($tileLayouts);
 
-        $counts['folder_owned_rows'] = $this->deleteFolderOwnedRows($folderIds);
+        foreach ($this->folderOwnedTables() as $table => $column) {
+            $counts[$table] = $this->deleteByFolderIds($table, $column, $folderIds);
+        }
+
         $counts['userAccess'] = $this->deleteHomepageUserAccess($folderIds);
         $counts['folder'] = $this->deleteFolders($folderIds);
 
@@ -208,22 +211,6 @@ class Cms extends Base
         $statement->execute($params);
 
         return $statement->rowCount();
-    }
-
-    /**
-     * Delete rows in various tables that reference the deleted folders, based on the map in
-     * @see self::folderOwnedTables()
-     * @param array<int, int> $folderIds
-     * @return int Number of rows deleted
-     */
-    protected function deleteFolderOwnedRows(array $folderIds): int
-    {
-        $count = 0;
-        foreach ($this->folderOwnedTables() as $table => $column) {
-            $count += $this->deleteByFolderIds($table, $column, $folderIds);
-        }
-
-        return $count;
     }
 
     /**
