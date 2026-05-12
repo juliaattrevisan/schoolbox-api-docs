@@ -139,23 +139,32 @@ class Cms extends Base
         $counts['etherpad_pads'] = $this->cleanupHomepagePadsForFolders($folderIds);
 
         $blogIds = $this->findIdsByFolder('blog', 'id', 'folder_id', $folderIds);
-        $forumThreadIds = $this->findIdsByFolder('forumThread', 'threadID', 'categoryID', $folderIds);
-        $pollIds = $this->findIdsByFolder('poll', 'id', 'folder_id', $folderIds);
-        $wikiIds = $this->findIdsByFolder('wiki', 'wikiID', 'categoryID', $folderIds);
-        $componentInstanceIds = $this->findIdsByFolder('component_instance', 'id', 'identifier', $folderIds);
-
         $counts['blog_comment'] = $this->deleteBlogComments($blogIds);
         $counts['blog_image'] = $this->deleteBlogImages($blogIds);
         $counts['blog'] = $this->deleteBlog($blogIds);
+
+        $forumThreadIds = $this->findIdsByFolder('forumThread', 'threadID', 'categoryID', $folderIds);
         $counts['forumPost'] = $this->deleteForumPosts($forumThreadIds);
         $counts['forumThread'] = $this->deleteForumThreads($forumThreadIds);
+
+        $pollIds = $this->findIdsByFolder('poll', 'id', 'folder_id', $folderIds);
         $counts['pollLog'] = $this->deletePollLogs($pollIds);
         $counts['poll'] = $this->deletePolls($pollIds);
+
+        $wikiIds = $this->findIdsByFolder('wiki', 'wikiID', 'categoryID', $folderIds);
         $counts['wiki_unlinked'] = $this->setWikiLatestRevisionNull($wikiIds);
         $counts['wikiRevision'] = $this->deleteWikiRevisions($wikiIds);
         $counts['wiki'] = $this->deleteWikis($wikiIds);
+
+        $componentInstanceIds = $this->findIdsByFolder('component_instance', 'id', 'identifier', $folderIds);
         $counts['component_config_instance'] = $this->deleteComponentConfigInstances($componentInstanceIds);
         $counts['component_instance'] = $this->deleteComponentInstances($componentInstanceIds);
+
+        $tileLayouts = $this->findIdsByFolder('tile_layout_for_folder', 'tile_layout_id', 'folder_id', $folderIds);
+        $counts['tiles'] = $this->deleteTiles($tileLayouts);
+        $counts['tileLayouts'] = $this->deleteTileLayouts($tileLayouts);
+        $counts['tileLayoutsJoins'] = $this->deleteTileLayoutJoin($tileLayouts);
+
         $counts['folder_owned_rows'] = $this->deleteFolderOwnedRows($folderIds);
         $counts['userAccess'] = $this->deleteHomepageUserAccess($folderIds);
         $counts['folder'] = $this->deleteFolders($folderIds);
@@ -257,7 +266,6 @@ class Cms extends Base
             'search_index' => 'folder_id',
             'socialstream_post' => 'homepage_id',
             'textbox' => 'folder_id',
-            'tile_layout_for_folder' => 'folder_id',
             'userGroups' => 'cid',
         ];
     }
@@ -954,4 +962,48 @@ class Cms extends Base
 
     //---------------------------
     // end etherpad
+
+    // --------------
+    // tile functions
+
+    /**
+     * when deleting a folder tiles are not recursively deleted. they are still marked as 'active'
+     * Steps:
+     * delete tile
+     * delete tile layout for folder
+     * delete tile layout
+     */
+
+    /**
+     * Deletes Tiles by Tile Layout, no checks, just delete
+     * @param array $tileLayouts
+     * @return int Number of rows deleted
+     */
+    protected function deleteTiles(array $tileLayouts): int
+    {
+        return $this->deleteByIds('tile', 'tile_layout_id', $tileLayouts);
+    }
+
+    /**
+     * Deletes tile_layout_for_folder Tile Layout, no checks, just delete
+     * @param array $tileLayouts
+     * @return int Number of rows deleted
+     */
+    protected function deleteTileLayoutJoin(array $tileLayouts): int
+    {
+        return $this->deleteByIds('tile_layout_for_folder', 'tile_layout_id', $tileLayouts);
+    }
+
+    /**
+     * Deletes Tile Layouts, no checks, just delete
+     * @param array $tileLayouts
+     * @return int Number of rows deleted
+     */
+    protected function deleteTileLayouts(array $tileLayouts): int
+    {
+        return $this->deleteByIds('tile_layout', 'id', $tileLayouts);
+    }
+
+    // --------------------------
+    // end tile functions
 }
