@@ -41,7 +41,9 @@ defineProps<Props>();
                         aria-label="Candidate details unconfirmed"
                     ></sbx-icon>
                 </td>
-                <td colspan="3"><ib-report-subject-labels :subjects="student.subjects" /></td>
+                <td><ib-report-subject-labels :entry="student.subjects.hl" /></td>
+                <td><ib-report-subject-labels :entry="student.subjects.sl" /></td>
+                <td><ib-report-subject-labels :entry="student.subjects.core" /></td>
                 <td>{{ student.ibCandidateNumber ?? "—" }}</td>
             </tr>
         </tbody>

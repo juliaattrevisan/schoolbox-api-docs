@@ -44,7 +44,9 @@ defineProps<Props>();
                         aria-label="Candidate details unconfirmed"
                     ></sbx-icon>
                 </td>
-                <td colspan="3"><ib-report-subject-labels :subjects="student.subjects" /></td>
+                <td><ib-report-subject-labels :entry="student.subjects.hl" /></td>
+                <td><ib-report-subject-labels :entry="student.subjects.sl" /></td>
+                <td><ib-report-subject-labels :entry="student.subjects.core" /></td>
                 <td class="ib-report-error-message">{{ student.errorMessage ?? "—" }}</td>
                 <td>
                     <button type="button" disabled aria-label="More options">
