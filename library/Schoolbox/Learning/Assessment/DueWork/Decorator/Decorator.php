@@ -89,7 +89,7 @@ class Decorator implements DecoratorInterface
     /**
      * Decorator constructor.
      *
-     * Note that $attachedFiles doesn't have private next to it.
+     * Note that $attachedFiles and $rubricData doesn't have private next to it.
      * Doing so results in this, for some reason:
      *    Schoolbox\Learning\Assessment\DueWork\Decorator\Decorator and Schoolbox\Learning\Assessment\AttachedFilesTrait define the same property ($attachedFiles) in the composition of Schoolbox\Learning\Assessment\DueWork\Decorator\Decorator. However, the definition differs and is considered incompatible. Class was composed in <b>/usr/share/schoolbox/library/Schoolbox/Learning/Assessment/DueWork/Decorator/Decorator.php</b>
      *
@@ -125,7 +125,7 @@ class Decorator implements DecoratorInterface
         private ?int $instructorGradingScheme,
         private ?float $maxMark,
         private ?float $instructorMaxMark,
-        private ?array $rubricData,
+        ?array $rubricData,
         ?array $attachedFiles,
         private ?string $selfReviewable,
         private bool $similarityCheckEnabled,
@@ -137,6 +137,7 @@ class Decorator implements DecoratorInterface
         private bool $enablePolicy,
         private ?DueWork $original
     ) {
+        $this->setRubricData($rubricData);
         $this->setAttachedFiles($attachedFiles);
 
         /* TODO Inject these, one day

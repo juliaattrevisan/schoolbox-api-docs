@@ -121,13 +121,7 @@ class AssessmentType implements IType
         }
 
         if (self::TYPE_DUE_WORK === $stringVal) {
-            $object = (new DueWork())->setContext($context);
-
-            if ($context) {
-                $object->setRubricGrid(RubricDataSource::getInstance()->retrieveGrid($object, true));
-            }
-
-            return $object;
+            return (new DueWork())->setContext($context);
         }
 
         if (self::TYPE_TASK === $stringVal) {
