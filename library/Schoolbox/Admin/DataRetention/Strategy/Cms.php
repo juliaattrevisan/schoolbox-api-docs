@@ -126,13 +126,23 @@ class Cms extends Base
         $blockedFolderIds = $this->findBlockedFolderIds($folderIds);
 
         if ($blockedFolderIds !== []) {
+            $folderIds = array_values(array_diff($folderIds, $blockedFolderIds));
+
+            if ($folderIds === []) {
+                $this->log->warning(sprintf(
+                    "Skipping Resources (CMS) chunk because all '%s' folders are referenced by excluded assessment/course relations: %s",
+                    count($blockedFolderIds),
+                    implode(', ', $blockedFolderIds),
+                ));
+
+                return;
+            }
+
             $this->log->warning(sprintf(
-                "Skipping Resources (CMS) chunk because '%s' folders are referenced by excluded assessment/course relations: %s",
+                "Excluding '%s' blocked Resources (CMS) folders from chunk due to excluded assessment/course relations: %s",
                 count($blockedFolderIds),
                 implode(', ', $blockedFolderIds),
             ));
-
-            return;
         }
 
         $counts = [];

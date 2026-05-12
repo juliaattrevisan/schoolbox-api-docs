@@ -1273,15 +1273,14 @@ class CmsStrategyTest extends TestCase
     }
 
     /**
-     * Excluded assessment/course relationships should skip a chunk before deletes.
+     * Excluded assessment/course relations should only remove blocked folders.
      *
-     * Those domains are intentionally out of scope for CMS retention, so this
-     * guards against partially deleting folder-owned CMS rows before hitting a
-     * foreign-key failure on an excluded relation.
+     * Mixed chunks must still process unblocked folders so one blocked folder
+     * does not stall retention for unrelated descendants.
      *
      * @return void
      */
-    public function testSkipsBlockedChunks(): void
+    public function testDeleteChunkExcludesBlockedFoldersAndContinues(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy(
             [
@@ -1289,6 +1288,46 @@ class CmsStrategyTest extends TestCase
                 11 => [],
             ],
             [10],
+        );
+
+        $this->delete($strategy, [
+            ['id' => 10, 'table' => 'folder'],
+        ]);
+
+        $this->assertSame([11], $state->deletedFolders);
+        $this->assertSame([11], $state->deletedHomepageUserAccessFolderIds);
+        $this->assertSame([
+            'cleanupHomepagePads:11:do',
+            'deleteBlogComments',
+            'deleteBlogImages',
+            'deleteBlog',
+            'deleteForumPosts',
+            'deleteForumThreads',
+            'deletePollLogs',
+            'deletePolls',
+            'setWikiLatestRevisionNull',
+            'deleteWikiRevisions',
+            'deleteWikis',
+            'deleteComponentConfigInstances',
+            'deleteComponentInstances',
+            'deleteHomepageUserAccess',
+            'deleteFolders',
+        ], $state->calls);
+    }
+
+    /**
+     * Excluded assessment/course relations should skip a chunk when all folders are blocked.
+     *
+     * @return void
+     */
+    public function testDeleteChunkSkipsWhenAllFoldersAreBlocked(): void
+    {
+        ['strategy' => $strategy, 'state' => $state] = $this->strategy(
+            [
+                10 => [11],
+                11 => [],
+            ],
+            [10, 11],
         );
 
         $this->delete($strategy, [
