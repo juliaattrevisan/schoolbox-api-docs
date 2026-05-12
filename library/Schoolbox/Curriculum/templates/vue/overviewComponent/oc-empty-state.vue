@@ -48,7 +48,7 @@ function onFilterSelected(): void {
 
 <template>
     <div class="empty-state">
-        <i class="icon-curriculum"></i>
+        <sbx-icon name="curriculum" size="2.5rem"></sbx-icon>
         <template v-if="!store().hasNodes">
             <p v-if="props.hasTagging">
                 <a href="#map-curriculum-codes" @click.prevent="onMapSelected">Map curriculum codes</a> to your course

@@ -190,7 +190,7 @@ window.Vue.onMounted(async () => {
                 class="empty-state"
                 data-test="dac-sandbox-disabled"
             >
-                <i class="icon-dialog-agent"></i>
+                <sbx-icon name="dialog-agent" size="2.5rem"></sbx-icon>
                 <p>Sandbox will be available once the agent configuration has been saved.</p>
             </div>
             <section v-else>

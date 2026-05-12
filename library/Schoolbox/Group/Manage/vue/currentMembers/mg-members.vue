@@ -291,7 +291,7 @@ function updateSelectedMembers() {
                 </template>
             </v-client-table>
             <div v-else-if="membersStore.hasNoGroupMembers" class="empty-state">
-                <i class="icon-group"></i>
+                <sbx-icon name="group" size="2.5rem"></sbx-icon>
                 <p>This group currently has no members.<br />Once members have been added they will appear here.</p>
             </div>
         </div>

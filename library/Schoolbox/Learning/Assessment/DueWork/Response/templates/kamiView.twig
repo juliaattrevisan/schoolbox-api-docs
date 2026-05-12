@@ -56,19 +56,19 @@
         {% else %}
             <div class="empty-state">
                 {% if kami.statusQueued%}
-                    <i class="icon-time-value"></i>
+                    <sbx-icon name="time-value" size="2.5rem"></sbx-icon>
                     <p>Queued for upload. Please refresh your browser in a few minutes.</p>
                 {% elseif kami.isStatusUploading %}
-                    <i class="icon-upload"></i>
+                    <sbx-icon name="upload" size="2.5rem"></sbx-icon>
                     <p>Uploading to Kami. Please refresh your browser in a few minutes.</p>
                 {% elseif kami.isStatusProcessing %}
-                    <i class="icon-refresh"></i>
+                    <sbx-icon name="refresh" size="2.5rem"></sbx-icon>
                     <p>Document is being processed. Please refresh your browser in a few seconds</p>
                 {% elseif kami.isStatusError %}
-                    <i class="icon-alert"></i>
+                    <sbx-icon name="alert" size="2.5rem"></sbx-icon>
                     <p>Something went wrong while processing the document.</p>
                 {% else %}
-                    <i class="icon-alert"></i>
+                    <sbx-icon name="alert" size="2.5rem"></sbx-icon>
                     <p>Unable to display document.</p>
                 {% endif %}
             </div>

@@ -371,7 +371,7 @@ window.Vue.watch(modifySelected, (newSelected) => {
         <div class="small-12 island">
             <template v-if="clientList.length === 0">
                 <div id="listEmptyState" class="empty-state">
-                    <i class="icon-list"></i>
+                    <sbx-icon name="list" size="2.5rem"></sbx-icon>
                     <p>
                         No oAuth clients have been configured.
                         <a href="#add-client" @click.prevent="showAddModal">Add an oAuth client</a>.

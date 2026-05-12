@@ -338,7 +338,7 @@ export default {
                 </template>
 
                 <div class="empty-state no-margin" v-if="!this.filteredArticles.length && !this.articlesLoading">
-                    <i class="icon-news"></i>
+                    <sbx-icon name="news" size="2.5rem"></sbx-icon>
                     <p>No {{ this.data.localeNewsPlural }} to view at this time.</p>
                 </div>
             </div>

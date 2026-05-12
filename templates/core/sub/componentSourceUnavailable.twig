@@ -1,6 +1,6 @@
 {# Component content displayed when component uses alt-data-source, and that alt-data-source's folder is soft-deleted #}
 <div class="empty-state" data-deleted-source>
-    <i class="icon-info"></i>
+    <sbx-icon name="info" size="2.5rem"></sbx-icon>
     {# Note: We show 'denied' before 'deleted' if both are true. Fallback to default if no reason set #}
     {% if isAltSourceDenied %}
         <p>You do not have permission to view this component's data source.</p>

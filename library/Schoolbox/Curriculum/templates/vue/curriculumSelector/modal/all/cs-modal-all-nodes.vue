@@ -41,14 +41,14 @@ window.Vue.watch(
 
 <template>
     <div v-if="nodesStore.hasNoCurriculum" class="empty-state-flex-centered">
-        <i class="icon-curriculum"></i>
+        <sbx-icon name="curriculum" size="2.5rem"></sbx-icon>
         <p>There's currently no Curriculum loaded to display.</p>
     </div>
     <div v-else-if="nodesStore.isLoading || modalSearchStore.isLoading">
         <loading-table />
     </div>
     <div v-else-if="modalSearchStore.hasNoResults" class="empty-state-flex-centered">
-        <i class="icon-curriculum"></i>
+        <sbx-icon name="curriculum" size="2.5rem"></sbx-icon>
         <p>No Curriculum matches your current search.</p>
         <button title="Clear the current search" @click.prevent="onClearSearchSelected">Clear search</button>
     </div>

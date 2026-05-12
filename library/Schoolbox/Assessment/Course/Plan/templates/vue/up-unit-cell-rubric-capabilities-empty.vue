@@ -14,7 +14,7 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <sbx-icon name="criteria"></sbx-icon>
+    <sbx-icon name="criteria" size="2.5rem"></sbx-icon>
     <p v-if="props.unit.rubricCapabilities._routes.manageUnit || props.unit.rubricCapabilities._routes.manageCourse">
         No rubric {{ locale.rubricGroup.plural() }} have been added to this course or {{ locale.unit.singular() }} yet,
         start by adding rubric {{ locale.rubricGroup.plural() }} to the

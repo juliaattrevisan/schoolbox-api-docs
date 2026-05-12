@@ -291,7 +291,7 @@ export default {
         </template>
         <template v-else>
             <div class="empty-state">
-                <i class="icon-showcase"></i>
+                <sbx-icon name="showcase" size="2.5rem"></sbx-icon>
 
                 <template v-if="config.currentUser.id === config.student.id">
                     <!-- Current user -->

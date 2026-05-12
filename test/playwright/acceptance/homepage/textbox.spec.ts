@@ -14,7 +14,7 @@ import TextboxForm from "@schoolboxTest/playwright/support/page/homepage/Textbox
 import SearchPage from "@schoolboxTest/playwright/support/page/search/SearchPage";
 import EditorTemplate from "@schoolboxTest/playwright/support/page/admin/design/EditorTemplates";
 
-test.describe("Textbox Tests", () => {
+test.describe.serial("Textbox Tests", () => {
     test.beforeEach(async ({ tester }) => {
         await tester.loginAsAdmin();
     });
@@ -85,7 +85,8 @@ test.describe("Textbox Tests", () => {
         tester.isGoingTo("Add a new component in the homepage");
         await homepage.addComponent("#tabs-sub-1", "Text Box");
         tester.isGoingTo("Enter content into the new component");
-        await page.waitForSelector("i.icon-textbox");
+        const textboxComponent = homepage.locateComponentByName("Text Box");
+        await expect(textboxComponent.getByTestId("component-textbox-empty-state-icon")).toBeVisible();
         const layout = Homepage.ELEMENT_COMPONENT_LAYOUT_TOP;
         const position = 1;
         await homepage.clickComponentEmptyStateLink(layout, position);

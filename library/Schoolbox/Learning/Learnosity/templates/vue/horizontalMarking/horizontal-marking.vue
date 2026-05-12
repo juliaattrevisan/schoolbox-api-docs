@@ -75,7 +75,7 @@ window.Vue.onMounted(async () => {
         </template>
         <template v-else>
             <div class="empty-state-flex-centered">
-                <i class="icon-quiz"></i>
+                <sbx-icon name="quiz" size="2.5rem"></sbx-icon>
                 <p>No attempts have been submitted yet.</p>
             </div>
         </template>

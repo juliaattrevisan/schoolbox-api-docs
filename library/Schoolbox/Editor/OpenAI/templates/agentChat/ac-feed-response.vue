@@ -150,7 +150,7 @@ function retryResponse(): void {
                 <img :src="imageSrc" @click="() => acStore.spawnLightbox(props.message.entryKey)" />
             </div>
             <div v-else-if="imageSrc === false" class="ac-img-omitted empty-state no-margin">
-                <i class="icon-image no-margin"></i>
+                <sbx-icon name="image" size="2.5rem" class="no-margin"></sbx-icon>
             </div>
             <div
                 v-if="props.message.data.message.length"

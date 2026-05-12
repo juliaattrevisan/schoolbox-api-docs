@@ -151,7 +151,7 @@
             <div class="row" {% if isSpecification %}data-collapse-state="uncollapsed" data-collapsable="collap-{{ aImpl.assessment.id }}" {% endif %} data-participant-group>
                 <div class="small-12 island">
                     <div class="empty-state hide" data-empty-filter>
-                        <i class="icon-staff-students"></i>
+                        <sbx-icon name="staff-students" size="2.5rem"></sbx-icon>
                         <p>
                             No students match the current filters.
                             Add another filter or <a data-filter-show-all>show everything</a>.
@@ -200,7 +200,7 @@
             <div class="row">
                 <div class="small-12 column">
                     <div class="empty-state">
-                        <i class="{{ icon.renderClass(assessment) }}"></i>
+                        <sbx-icon name="{{ icon.renderName(assessment) }}" size="2.5rem"></sbx-icon>
                         <p>This {{ locale.activity }} has no students participating.</p>
                     </div>
                 </div>
@@ -212,7 +212,7 @@
     <div class="row">
         <div class="small-12 column">
             <div class="empty-state">
-                <i class="{{ icon.renderClass(assessment) }}"></i>
+                <sbx-icon name="{{ icon.renderName(assessment) }}" size="2.5rem"></sbx-icon>
                 <p>This {{ locale.activity }} has no students participating.</p>
             </div>
         </div>

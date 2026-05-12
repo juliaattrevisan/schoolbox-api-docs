@@ -5,7 +5,7 @@
               <p class="no-margin">
                   {% if node.code %}
                       {% if isRouteAuthorized('curriculum.browse') %}
-                          [<a title="View in Manage Curriculum" 
+                          [<a title="View in Manage Curriculum"
                               data-test="curriculum-code-{{ node.code }}"
                               href="{{ routeLookup('curriculum.browse') }}#{{ node.id }}">{{ node.code }}</a>]
                       {% else %}
@@ -25,7 +25,7 @@
     </ul>
 {% else %}
     <div class="empty-state">
-        <i class="icon-curriculum-details"></i>
+        <sbx-icon name="curriculum-details" size="2.5rem"></sbx-icon>
 
         {% if not curriculumTagging %}
 

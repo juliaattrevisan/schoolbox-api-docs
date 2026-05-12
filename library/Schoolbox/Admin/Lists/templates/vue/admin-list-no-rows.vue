@@ -23,7 +23,7 @@ export default {
 
 <template>
     <div id="listEmptyState" class="empty-state" data-test="admin-list-empty-state">
-        <i class="icon-list"></i>
+        <sbx-icon name="list" size="2.5rem"></sbx-icon>
         <p>
             The {{ loadedData.title }} list is empty.<br /><a
                 @click.prevent="addRow_onNewRowSelected"

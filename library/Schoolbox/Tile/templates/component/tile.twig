@@ -10,7 +10,7 @@
 {% if component.layout.tileList is empty %}
 
     <div class="empty-state">
-        <i class="icon-tiles"></i>
+        <sbx-icon name="tiles" size="2.5rem"></sbx-icon>
 
         {% set addTileUrl = routeLookupIfAuthorized("tile.addToComponent", routeParams) %}
         {% if writeAccess and addTileUrl %}

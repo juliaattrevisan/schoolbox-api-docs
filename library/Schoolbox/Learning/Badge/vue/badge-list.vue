@@ -318,7 +318,7 @@ export default {
             <div v-if="data.length === 0" class="empty-state">
                 <!-- If no badges were found in the search query -->
                 <template v-if="isSelectedFiltersEmpty()">
-                    <i class="icon-search"></i>
+                    <sbx-icon name="search" size="2.5rem"></sbx-icon>
                     <p>
                         No badges were found.
                         <a :href="generateResetFilterUrl()" title="Reset filters">Reset filters</a> to see all available
@@ -328,7 +328,7 @@ export default {
 
                 <!-- If there are no badges in the system at all -->
                 <template v-else>
-                    <i class="icon-badge"></i>
+                    <sbx-icon name="badge" size="2.5rem"></sbx-icon>
                     <p>
                         <!-- the getBadgeCreateFormRoute could optionally contain a ?returnUrl=... appendage -->
                         <template v-if="getBadgeCreateFormRoute !== '' && getBadgeCreateFormRoute[0] !== '?'">

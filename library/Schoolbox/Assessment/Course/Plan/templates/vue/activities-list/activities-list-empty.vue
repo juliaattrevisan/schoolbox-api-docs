@@ -6,7 +6,7 @@ import locale from "@js/terminology/rosettaStone";
 </script>
 
 <template>
-    <sbx-icon name="due-work"></sbx-icon>
+    <sbx-icon name="due-work" size="2.5rem"></sbx-icon>
     <p>No {{ locale.activity.singular() }} has been added to this unit yet</p>
 </template>
 

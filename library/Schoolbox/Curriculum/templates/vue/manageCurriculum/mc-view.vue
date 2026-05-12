@@ -43,7 +43,7 @@ function onCreateNewSelected(): void {
                 </div>
             </section>
             <div v-else-if="nodesStore.hasNoCurriculum" class="empty-state-flex-centered">
-                <i class="icon-curriculum"></i>
+                <sbx-icon name="curriculum" size="2.5rem"></sbx-icon>
                 <p>There's currently no Curriculum loaded to display.</p>
                 <template v-if="store.hasLoadedOk && !store.isReadOnly">
                     <a href="#create-curriculum" title="Create a new Curriculum" @click.prevent="onCreateNewSelected">

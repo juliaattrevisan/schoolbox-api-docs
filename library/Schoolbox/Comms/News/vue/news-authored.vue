@@ -261,7 +261,7 @@ export default {
                     </li>
                 </ul>
                 <div v-if="isArticlesLoaded && filteredArticles.length === 0" class="empty-state no-margin">
-                    <i class="icon-news"></i>
+                    <sbx-icon name="news" size="2.5rem"></sbx-icon>
                     <p>You haven't authored any {{ localeNewsPlural }}.</p>
                     <p v-if="canCreateNews">
                         <a :href="createNewsRoute">Create {{ localeNews }}</a

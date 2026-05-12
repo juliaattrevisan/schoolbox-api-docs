@@ -550,7 +550,7 @@ export default {
                 </ul>
             </section>
             <div class="empty-state" v-if="undeletedTextboxes.length === 0">
-                <i class="icon-textbox"></i>
+                <sbx-icon name="textbox" size="2.5rem"></sbx-icon>
                 <p>No text boxes currently exist on this page.</p>
             </div>
         </template>

@@ -6,7 +6,7 @@
 
 <template>
     <div class="empty-state-flex-centered" data-test="sp-results-prompt">
-        <i class="icon-search"></i>
+        <sbx-icon name="search" size="2.5rem"></sbx-icon>
         <p>To begin searching, please enter a search term.</p>
     </div>
 </template>

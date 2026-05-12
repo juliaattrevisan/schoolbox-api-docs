@@ -73,7 +73,7 @@ async function onMapSelected(): Promise<void> {
 </script>
 
 <template>
-    <sbx-icon name="curriculum"></sbx-icon>
+    <sbx-icon name="curriculum" size="2.5rem"></sbx-icon>
     <p v-if="props.unit.curriculum._routes.createComponent && props.unit.curriculum._routes.modifyCurriculum">
         <a :data-test="`unit-planner-select-curriculum-code-${props.unit.id}`" @click.prevent="onMapSelected"
             >Select the curriculum codes</a

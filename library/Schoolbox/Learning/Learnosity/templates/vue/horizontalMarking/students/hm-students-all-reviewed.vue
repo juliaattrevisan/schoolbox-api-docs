@@ -25,7 +25,7 @@ window.Vue.watch(
     <div class="all-marked l-grid">
         <div class="all-marked__inner-container">
             <div class="empty-state-flex-centered">
-                <i class="icon-quiz"></i>
+                <sbx-icon name="quiz" size="2.5rem"></sbx-icon>
                 <p>All students who have submitted an attempt have already been reviewed.</p>
             </div>
         </div>

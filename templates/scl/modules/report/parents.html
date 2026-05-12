@@ -78,7 +78,7 @@
                     </div>
                 </div>
             </form>
-            <section>
+            </section>
     </div>
 </div>
 
@@ -86,7 +86,7 @@
 <div class="row">
     <div class="small-12 island">
         <div class="empty-state">
-            <i class="icon-user"></i>
+            <sbx-icon name="user" size="2.5rem"></sbx-icon>
             <p>Sorry, no records were found that matched your search, please revise your search below and try again.</p>
         </div>
     </div>
@@ -176,12 +176,16 @@
         /* Default visibility of search panel
          */
         $('[data-searchfilteroptions]').hide();
-
-        <!-- BEGIN show_filter_options -->
-        $('[data-searchfilteroptions]').show();
-        <!-- END show_filter_options -->
     });
 </script>
+
+<!-- BEGIN show_filter_options -->
+<script type="text/javascript">
+    $(function() {
+        $('[data-searchfilteroptions]').show();
+    });
+</script>
+<!-- END show_filter_options -->
 
 <!-- BEGIN email_all_parents -->
 <script type="text/javascript">

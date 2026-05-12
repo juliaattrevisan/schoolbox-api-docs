@@ -147,7 +147,7 @@ function toggleCollapse(assessmentId: number): void {
         </Transition>
     </div>
     <div v-if="props.assessments.length === 0" class="empty-state">
-        <i class="icon-dialog-agent"></i>
+        <sbx-icon name="dialog-agent" size="2.5rem"></sbx-icon>
         <p>This {{ locale.activity.singular() }} has no students participating.</p>
     </div>
 </template>

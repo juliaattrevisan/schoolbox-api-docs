@@ -132,7 +132,7 @@ window.Vue.onMounted(() => {
         </div>
     </section>
     <div v-else-if="props.canModify" class="empty-state">
-        <i class="icon-link"></i>
+        <sbx-icon name="link" size="2.5rem"></sbx-icon>
         <p>
             There are currently no {{ locale.activity.plural() }} linked to this {{ locale.lessonPlan.singular() }}. You
             may

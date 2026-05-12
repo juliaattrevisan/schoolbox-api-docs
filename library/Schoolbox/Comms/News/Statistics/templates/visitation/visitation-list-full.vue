@@ -138,7 +138,7 @@ export default {
                 </template>
                 <template v-else-if="!this.isLoading && rows.length === 0">
                     <div class="empty-state">
-                        <i class="icon-staff"></i>
+                        <sbx-icon name="staff" size="2.5rem"></sbx-icon>
                         <p>Nobody has visited yet.</p>
                     </div>
                 </template>

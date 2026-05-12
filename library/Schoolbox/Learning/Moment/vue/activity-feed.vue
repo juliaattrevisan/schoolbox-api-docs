@@ -1107,7 +1107,7 @@ window.Vue.onMounted(async () => {
         </div>
         <div v-else>
             <div v-if="metadata.count === 0" class="empty-state">
-                <i class="icon-advanced-list"></i>
+                <sbx-icon name="advanced-list" size="2.5rem"></sbx-icon>
 
                 <template v-if="currentUser.id === props.student.id">
                     <!-- Current user -->

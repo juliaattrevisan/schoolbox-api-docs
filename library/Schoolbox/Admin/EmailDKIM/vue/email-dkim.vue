@@ -306,7 +306,7 @@ export default {
             </section>
         </div>
         <div v-else-if="hasDataLoaded && rows.length === 0" id="listEmptyState" class="empty-state">
-            <i class="icon-email"></i>
+            <sbx-icon name="email" size="2.5rem"></sbx-icon>
             <p>DKIM, is an email standard that helps validate emails have come from a trusted source.</p>
             <p>
                 By using public/private keys a 3rd party can authorise emails signed by your Schoolbox server as valid

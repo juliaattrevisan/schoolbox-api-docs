@@ -12,7 +12,7 @@ const routes = window.Vue.inject<Routes>("pastoralRoutes");
 
 <template>
     <div class="empty-state-flex-centered f-no-margins">
-        <i class="icon-pastoral"></i>
+        <sbx-icon name="pastoral" size="2.5rem"></sbx-icon>
         <p>No {{ localePastoral }} records matched your report criteria.</p>
         <a :href="routes?.getIndex"> Select Another Report </a>
     </div>

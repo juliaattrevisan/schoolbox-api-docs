@@ -98,7 +98,7 @@
             </section>
 
             <div id="provider-empty" class="empty-state" style="{% if apps | length %}display:none;{% endif %}">
-                <i class="icon-mobile"></i>
+                <sbx-icon name="mobile" size="2.5rem"></sbx-icon>
                 <p>No mobile apps are currently registered.</p>
             </div>
 
@@ -115,7 +115,7 @@
                             <div class="column small-12 medium-6 xlarge-3{%  if loop.last %} end{% endif %}">
                                 <input type="radio" name="provider" value="{{ provider }}" id="provider-{{ provider }}" />
                                 <label for="provider-{{ provider }}" class="block">
-                                    <i class="icon-mobile"></i> {{ providerInfo.description }}
+                                    <sbx-icon name="mobile"></sbx-icon> {{ providerInfo.description }}
                                 </label>
                             </div>
                         {% endfor %}
