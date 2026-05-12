@@ -546,9 +546,7 @@ class Cms extends Base
                 'assessment_folder' => 'folder_id',
                 'course_implementation' => 'folder_id',
                 'course_specification' => 'folder_id',
-                'course_unit_implementation' => 'folder_id',
                 'course_unit_specification' => 'folder_id',
-                'assessment_course_unit_specification' => 'folder_id',
                 'mv_assessment_relation' => 'folder_id',
             ] as $table => $column
         ) {
