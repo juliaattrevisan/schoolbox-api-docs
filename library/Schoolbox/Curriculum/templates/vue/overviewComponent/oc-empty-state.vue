@@ -51,9 +51,11 @@ function onFilterSelected(): void {
         <sbx-icon name="curriculum" size="2.5rem"></sbx-icon>
         <template v-if="!store().hasNodes">
             <p v-if="props.hasTagging">
-                <a href="#map-curriculum-codes" @click.prevent="onMapSelected">Map curriculum codes</a> to your course
-                or {{ props.localeUnit }} page to display a list of all of the curriculum codes and matching skill
-                descriptors covered in this area of the curriculum.
+                <a href="#map-curriculum-codes" data-test="map-curriculum-codes" @click.prevent="onMapSelected"
+                    >Map curriculum codes</a
+                >
+                to your course or {{ props.localeUnit }} page to display a list of all of the curriculum codes and
+                matching skill descriptors covered in this area of the curriculum.
             </p>
             <template v-else>
                 <p v-if="props.isSuperUser">

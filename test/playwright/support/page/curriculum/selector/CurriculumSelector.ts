@@ -82,7 +82,7 @@ export default class CurriculumSelector {
     async browseToNode(ids: number[], $context?: Locator): Promise<void> {
         const context = $context || this.page;
         for (const id of ids) {
-            await context.getByTestId(`${CurriculumSelector.DATA_TEST_MODAL_NODE_NAME}${id.toString()}`).click();
+            await context.getByTestId(`${CurriculumSelector.DATA_TEST_MODAL_NODE_NAME}${id.toString()}`).last().click();
         }
     }
 
@@ -132,7 +132,7 @@ export default class CurriculumSelector {
      */
     async saveModal($context?: Locator): Promise<void> {
         const context = $context || this.page;
-        await context.getByTestId(CurriculumSelector.DATA_TEST_MODAL_SAVE_BUTTON).click();
+        await context.getByTestId(CurriculumSelector.DATA_TEST_MODAL_SAVE_BUTTON).last().click();
         await this.tester.common.waitForModalToBeClosed();
     }
 
