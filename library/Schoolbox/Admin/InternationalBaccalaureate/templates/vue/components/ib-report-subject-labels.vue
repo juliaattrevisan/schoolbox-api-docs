@@ -37,7 +37,7 @@ function isUnknown(entry: SubjectEntry): boolean {
             v-for="e in props.entry"
             :key="`hl-${e.subject}`"
             :text="labelText(e)"
-            :sentiment="isUnknown(e) ? 'alert' : 'neutral'"
+            :sentiment="isUnknown(e) ? 'warning' : 'neutral'"
         ></sbx-label>
     </div>
 </template>

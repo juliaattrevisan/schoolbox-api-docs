@@ -111,8 +111,7 @@ Long term they will reference the design colour tokens
     border-radius: var(--sbx-config-field-roundness, 0);
     color: white;
     display: inline-flex;
-    font-size: 0.75rem;
-    font-weight: 700;
+    font-size: var(--sbx-font-size-xs, 0.75rem);
     gap: 0.5rem;
     padding: var(--spacing-xs) var(--spacing-s);
     -webkit-print-color-adjust: exact;
@@ -139,19 +138,22 @@ Long term they will reference the design colour tokens
 
 .sbx-label--success {
     background-color: var(--sbx-color-success, #4fa74f);
+    color: var(--sbx-color-success-text, #ffffff);
 }
 
 .sbx-label--warning {
     background-color: var(--sbx-color-warning, #ff7d00);
+    color: var(--sbx-color-warning-text, #ffffff);
 }
 
 .sbx-label--alert {
     background-color: var(--sbx-color-alert, #fa4a47);
+    color: var(--sbx-color-alert-text, #ffffff);
 }
 
 .sbx-label--neutral {
-    background-color: var(--sbx-color-foreground-secondary, #dddddd);
-    color: var(--sbx-color-text-secondary, #474747);
+    background-color: var(--sbx-color-highlight, #dddddd);
+    color: var(--sbx-color-highlight-text, #474747);
 }
 
 .sbx-label__icon {
