@@ -790,7 +790,7 @@ class Cms extends Base
     // Etherpad functions
 
     /**
-     * Finds all active Etherpad pads for a homepage.
+     * Finds all Etherpad pads for a homepage.
      *
      * @param int $homepageId
      * @return array<int, array<string, mixed>>
@@ -800,7 +800,7 @@ class Cms extends Base
         $query = "
             SELECT id, pad_id
             FROM etherpad_pad
-            WHERE homepage_id = :homepageId AND deleted_at IS NULL
+            WHERE homepage_id = :homepageId
         ";
 
         $statement = $this->getPreparedStatement($query);
