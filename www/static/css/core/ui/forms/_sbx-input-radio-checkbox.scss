@@ -240,7 +240,7 @@ body.sbx-body {
             flex: 0 0 auto;
         }
         // remove the margin for better flex alignment and align the hint to the center of the checkbox if it exists
-        &:has(.hint) {
+        &:has(> .hint) {
             align-items: center;
             .hint {
                 margin: 0;
@@ -260,6 +260,10 @@ body.sbx-body {
     // special case, where there's an <article> in the row as well, so prevent the flex
     .scenarios-list li {
         display: inline-block;
+        // and align center, rather than the typical flex-start
+        .sbx-checkbox-radio-container {
+            align-items: center;
+        }
     }
 
     // Remove extra margin/padding added to checkbox labels in forms.scss
