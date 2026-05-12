@@ -237,7 +237,6 @@ class Cms extends Base
         return [
             'chat' => 'category_id',
             'chat_poll' => 'category_id',
-            'etherpad_pad' => 'homepage_id',
             'event_folder' => 'folder_id',
             'file' => 'category',
             'folder_code' => 'folder_id',
