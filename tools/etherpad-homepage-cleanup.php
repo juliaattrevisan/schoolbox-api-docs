@@ -84,7 +84,7 @@ HELP;
         $logger->notice(sprintf('Mode: %s', $dryRun ? 'dry-run' : 'perform'));
 
         $etherpadClient = $this->createEtherpadClient($logger);
-        if (!$dryRun && $etherpadClient === null) {
+        if ($etherpadClient === null) {
             $logger->error('Etherpad API is not configured; cannot perform deletions.');
             exit(1);
         }
