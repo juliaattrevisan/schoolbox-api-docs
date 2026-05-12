@@ -20,7 +20,7 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as assessmentDataSource;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Mapper;
@@ -57,7 +57,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
      */
     protected $workTypeMapper;
 
-    /** @var assessmentDataSource $assessmentDataSource */
+    /** @var AssessmentDataSource $assessmentDataSource */
     protected $assessmentDataSource;
 
     /**
@@ -91,31 +91,61 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         parent::loadDependencies($dependencies);
     }
 
+    /**
+     * This is called via reflection from AbstractModuleNotifier->loadDependencies().
+     *
+     * @param UserMapper $userMapper
+     * @return $this
+     */
     protected function setUserMapper(UserMapper $userMapper): self
     {
         $this->userMapper = $userMapper;
         return $this;
     }
 
+    /**
+     * This is called via reflection from AbstractModuleNotifier->loadDependencies().
+     *
+     * @param SubmissionBoxMapper $boxMapper
+     * @return $this
+     */
     protected function setBoxMapper(SubmissionBoxMapper $boxMapper): self
     {
         $this->boxMapper = $boxMapper;
         return $this;
     }
 
+    /**
+     * This is called via reflection from AbstractModuleNotifier->loadDependencies().
+     *
+     * @param Term\Mapper $termMapper
+     * @return $this
+     */
     protected function setTermMapper(Term\Mapper $termMapper): self
     {
         $this->termMapper = $termMapper;
         return $this;
     }
 
+    /**
+     * This is called via reflection from AbstractModuleNotifier->loadDependencies().
+     *
+     * @param WorkTypeMapper $workTypeMapper
+     * @return $this
+     */
     protected function setWorkTypeMapper(WorkTypeMapper $workTypeMapper): self
     {
         $this->workTypeMapper = $workTypeMapper;
         return $this;
     }
 
-    protected function setAssessmentDataSource(assessmentDataSource $assessmentDataSource): self
+    /**
+     * This is called via reflection from AbstractModuleNotifier->loadDependencies().
+     *
+     * @param AssessmentDataSource $assessmentDataSource
+     * @return $this
+     */
+    protected function setAssessmentDataSource(AssessmentDataSource $assessmentDataSource): self
     {
         $this->assessmentDataSource = $assessmentDataSource;
         return $this;
