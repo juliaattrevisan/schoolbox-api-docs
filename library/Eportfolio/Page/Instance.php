@@ -404,6 +404,9 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
         $this->renderColourSet($this->getColours(), 'original');
     }
 
+    /**
+     * Render the blocks toggled by the Advanced UI setting.
+     */
     private function renderAdvancedUiBlocks(): void
     {
         if ($this->isAdvancedUiEnabled()) {
@@ -415,6 +418,11 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
         }
     }
 
+    /**
+     * Determine whether the Advanced UI setting is enabled.
+     *
+     * @return bool
+     */
     private function isAdvancedUiEnabled(): bool
     {
         return (bool)$this->getPage()->getDi()->get('config')->get(ConfigMapper::NAME_SONAR_UI_TOGGLE);

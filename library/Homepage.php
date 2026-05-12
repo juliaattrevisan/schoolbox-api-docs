@@ -27,6 +27,11 @@ class Homepage
      */
     private Resource\HomepageTemplateMapper $homepageTemplateMapper;
 
+    /**
+     * Constructor
+     *
+     * @param int $cid
+     */
     public function __construct($cid)
     {
         $this->cid                    = $cid;
@@ -34,6 +39,11 @@ class Homepage
         $this->homepageTemplateMapper = Resource\HomepageTemplateMapper::getInstance();
     }
 
+    /**
+     * Get the homepage template
+     *
+     * @return mixed
+     */
     public function getTemplate()
     {
         try {
@@ -92,6 +102,11 @@ class Homepage
         $this->updateColumnWidths($leftPercent, 99 - $leftPercent);
     }
 
+    /**
+     * Get a list of colours for a particular homepage
+     *
+     * @return array
+     */
     public function getColorList()
     {
         $homepageConfig = $this->homepageConfigMapper->findById($this->cid);
@@ -142,6 +157,11 @@ class Homepage
         return $this->getStoredDefaultHeadingColours();
     }
 
+    /**
+     * Gets the stored default heading colours for a homepage.
+     *
+     * @return array
+     */
     private function getStoredDefaultHeadingColours(): array
     {
         return [
@@ -150,6 +170,14 @@ class Homepage
         ];
     }
 
+    /**
+     * Determines whether the heading colours for a position match the supplied heading colours.
+     *
+     * @param array $colourList
+     * @param string $position
+     * @param array $headingColours
+     * @return bool
+     */
     private function hasHeadingColours(array $colourList, string $position, array $headingColours): bool
     {
         $headFont = $colourList[$position . '_head_font'] ?? '';
@@ -159,6 +187,12 @@ class Homepage
             && strcasecmp((string)$headBg, (string)$headingColours['head_bg']) === 0;
     }
 
+    /**
+     * Normalises default heading colours before saving them to the homepage.
+     *
+     * @param array $listColor
+     * @return array
+     */
     private function normaliseDefaultHeadingColoursForSave(array $listColor): array
     {
         if (!Config::get('advanced_ui_enabled')) {
@@ -178,6 +212,11 @@ class Homepage
         return $listColor;
     }
 
+    /**
+     * Spawn a list of default colours
+     *
+     * @return array
+     */
     public function getDefaultColorList(): array
     {
         $colourSet             = [];
@@ -368,6 +407,12 @@ class Homepage
         return 0;
     }
 
+    /**
+     * Save colours for an individual homepage
+     *
+     * @param array $listColor
+     * @return void
+     */
     public function saveDisplayProperties($listColor)
     {
         $listColor = $this->normaliseDefaultHeadingColoursForSave($listColor);

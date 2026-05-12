@@ -283,6 +283,11 @@ class Eportfolio
         return $this->getStoredDefaultHeadingColours();
     }
 
+    /**
+     * Gets the stored default heading colours for a homepage.
+     *
+     * @return array
+     */
     private function getStoredDefaultHeadingColours(): array
     {
         return [
@@ -291,6 +296,14 @@ class Eportfolio
         ];
     }
 
+    /**
+     * Determines whether the heading colours for a position match the supplied heading colours.
+     *
+     * @param array $colourList
+     * @param string $position
+     * @param array $headingColours
+     * @return bool
+     */
     private function hasHeadingColours(array $colourList, string $position, array $headingColours): bool
     {
         $headFont = $colourList[$position . '_head_font'] ?? '';
@@ -300,6 +313,12 @@ class Eportfolio
             && strcasecmp((string)$headBg, (string)$headingColours['head_bg']) === 0;
     }
 
+    /**
+     * Normalises default heading colours before saving them to the page.
+     *
+     * @param array $listColor
+     * @return array
+     */
     private function normaliseDefaultHeadingColoursForSave(array $listColor): array
     {
         if (!Config::get('advanced_ui_enabled')) {
