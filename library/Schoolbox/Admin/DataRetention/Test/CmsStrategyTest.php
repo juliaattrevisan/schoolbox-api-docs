@@ -649,7 +649,6 @@ class CmsStrategyTest extends TestCase
                     'deleteWikis',
                     'deleteComponentConfigInstances',
                     'deleteComponentInstances',
-                    'deleteFolderOwnedRows',
                     'deleteHomepageUserAccess',
                     'deleteFolders',
                 ],
@@ -671,7 +670,6 @@ class CmsStrategyTest extends TestCase
                     'deleteWikis',
                     'deleteComponentConfigInstances',
                     'deleteComponentInstances',
-                    'deleteFolderOwnedRows',
                     'deleteHomepageUserAccess',
                     'deleteFolders',
                 ],
@@ -1050,7 +1048,6 @@ class CmsStrategyTest extends TestCase
             'deleteWikis',
             'deleteComponentConfigInstances',
             'deleteComponentInstances',
-            'deleteFolderOwnedRows',
             'deleteHomepageUserAccess',
             'deleteFolders',
         ], $state->calls);
