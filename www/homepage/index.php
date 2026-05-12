@@ -200,6 +200,7 @@ $this->setTitle($folder->getName());
 //  * 'readonly_switch_on'
 $this->setBlock('custom_head', 'google_script', 'google_script_block');
 $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
+$this->setBlock('custom_head', 'legacy_homepage_colour_css', 'legacy_homepage_colour_css_block');
 $this->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
 $this->setBlock(TEMPLATE_content, 'customise_page', 'customise_page_block');
 $this->setBlock(TEMPLATE_content, 'edit_page', 'edit_page_block');
@@ -472,6 +473,12 @@ $this->setVar(array(
 ));
 
 $this->setVar($listColor);
+
+if ($this->getDi()->get('config')->get(ConfigMapper::NAME_SONAR_UI_TOGGLE)) {
+    $this->setVar('legacy_homepage_colour_css_block');
+} else {
+    $this->parse('legacy_homepage_colour_css_block', 'legacy_homepage_colour_css');
+}
 
 /* PARSE COMPONENTRY */
 $occupiedPositionList = array();
