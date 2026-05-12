@@ -8,7 +8,14 @@
  *
  */
 
+import tinycolor from "tinycolor2";
 import { getMasonryConfig } from "../masonryConfig";
+
+const HEAD_FONT_PICKER_ID = "head_font";
+const HEAD_BACKGROUND_PICKER_ID = "head_bg";
+const HEAD_FONT_CONTRAST_ERROR = "Must contrast sufficiently against Background";
+const HEAD_BACKGROUND_CONTRAST_ERROR = "Must contrast sufficiently against Text";
+const COLOUR_CONTRAST_ERROR_ATTRIBUTE = "data-colour-contrast-error-for";
 
 /**
  * Change the column colours
@@ -59,7 +66,7 @@ function getSelectedColumnCheckboxes() {
  * Initiate the colour pickers
  */
 function initColourPickers() {
-    const currentPickerId = 0;
+    let currentPickerId = 0;
     const colourPickers = getAllColourPickers();
     colourPickers.forEach((colourPicker) => {
         // Ensure each picker has a unique ID to use as a target
@@ -79,9 +86,11 @@ function initColourPickers() {
 
         colourPicker.addEventListener("input", (event) => {
             onColourChange(event.currentTarget, event.currentTarget.value);
+            validateHeadingColourContrast();
         });
         colourPicker.addEventListener("change", (event) => {
             onColourChange(event.currentTarget, event.currentTarget.value);
+            validateHeadingColourContrast();
         });
     });
 }
@@ -172,6 +181,85 @@ function updateColourPickerColours(columnCheckboxes) {
  */
 function getAllColourPickers() {
     return Array.from(document.querySelectorAll(getMasonryConfig().editColumns.colourPickersSelector));
+}
+
+/**
+ * Validate that the visible heading text and background colour pickers contrast sufficiently.
+ *
+ * @returns { Boolean }
+ */
+export function validateHeadingColourContrast() {
+    const headFontPicker = document.getElementById(HEAD_FONT_PICKER_ID);
+    const headBackgroundPicker = document.getElementById(HEAD_BACKGROUND_PICKER_ID);
+
+    if (headFontPicker === null || headBackgroundPicker === null) {
+        return true;
+    }
+
+    clearColourContrastError(headFontPicker);
+    clearColourContrastError(headBackgroundPicker);
+
+    if (!isValidColour(headFontPicker.value) || !isValidColour(headBackgroundPicker.value)) {
+        return true;
+    }
+
+    if (
+        tinycolor.isReadable(headFontPicker.value, headBackgroundPicker.value, {
+            level: "AA",
+            size: "small",
+        })
+    ) {
+        return true;
+    }
+
+    showColourContrastError(headFontPicker, HEAD_FONT_CONTRAST_ERROR);
+    showColourContrastError(headBackgroundPicker, HEAD_BACKGROUND_CONTRAST_ERROR);
+
+    return false;
+}
+
+/**
+ * Check whether a colour can be read by tinycolor.
+ *
+ * @param { String }
+ * @returns { Boolean }
+ */
+function isValidColour(colour) {
+    return colour !== "" && tinycolor(colour).isValid();
+}
+
+/**
+ * Show a contrast validation error below a colour picker.
+ *
+ * @param { HTMLElement }
+ * @param { String }
+ */
+function showColourContrastError(colourPicker, message) {
+    colourPicker.classList.add("error");
+
+    const errorLabel = document.createElement("label");
+    errorLabel.classList.add("error");
+    errorLabel.setAttribute("for", colourPicker.id);
+    errorLabel.setAttribute(COLOUR_CONTRAST_ERROR_ATTRIBUTE, colourPicker.id);
+    errorLabel.textContent = message;
+
+    const colourPickerWrapper = colourPicker.closest(".clr-field") ?? colourPicker;
+    colourPickerWrapper.insertAdjacentElement("afterend", errorLabel);
+}
+
+/**
+ * Clear any contrast validation error for a colour picker.
+ *
+ * @param { HTMLElement }
+ */
+function clearColourContrastError(colourPicker) {
+    colourPicker.classList.remove("error");
+
+    const errorLabel = document.querySelector(`[${COLOUR_CONTRAST_ERROR_ATTRIBUTE}="${colourPicker.id}"]`);
+
+    if (errorLabel !== null) {
+        errorLabel.remove();
+    }
 }
 
 /**
