@@ -280,14 +280,14 @@ class Import implements IStrategy
                 if ($this->perform) {
                     $this->teamPlayerMapper->save($teamPlayer);
                 }
-
-                $this->log->info(sprintf(
-                    'Assigned SOCS pupil %s to team %s using schoolbox user %d',
-                    $externalId,
-                    $team->getName(),
-                    $userId
-                ));
             }
+
+            $this->log->info(sprintf(
+                'Assigned SOCS pupil %s to team %s using schoolbox user %d',
+                $externalId,
+                $team->getName(),
+                $userId
+            ));
         }
     }
 
@@ -380,14 +380,14 @@ class Import implements IStrategy
                 if ($this->perform) {
                     $this->teamCoachMapper->save($teamCoach);
                 }
-
-                $this->log->info(sprintf(
-                    'Assigned SOCS staff %s as coach to team %s using schoolbox user %d',
-                    $externalId,
-                    $team->getName(),
-                    $userId
-                ));
             }
+
+            $this->log->info(sprintf(
+                'Assigned SOCS staff %s as coach to team %s using schoolbox user %d',
+                $externalId,
+                $team->getName(),
+                $userId
+            ));
         }
     }
 }
