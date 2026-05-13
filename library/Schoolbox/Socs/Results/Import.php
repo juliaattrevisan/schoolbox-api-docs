@@ -85,7 +85,7 @@ class Import implements IStrategy
             $eventId = trim((string)$resultNode->eventid);
             $resultText = trim((string)$resultNode->result);
 
-            if ('' === $eventId || '' === $resultText) {
+            if ('' === $eventId) {
                 $this->log->info('Skipping SOCS result with missing mandatory fields');
                 continue;
             }
@@ -107,19 +107,34 @@ class Import implements IStrategy
             }
 
             if ($this->perform) {
-                $existingResults = $this->resultMapper->findByColumn('match_id', $matchup->getId());
-                foreach ($existingResults as $existingResult) {
-                    $this->resultMapper->delete($existingResult);
+                /* If the resultDescription is null, it means this matchup
+                     * shouldn't have a result; delete all results if they existed
+                     */
+                if ('' === $resultText) {
+                    foreach ($matchup->getResults() as $currentResult) {
+                        $this->resultMapper->delete($currentResult);
+                    }
+                } else {
+                    /* There was something meaningful to say; save a new Result
+                     * if one doesn't already exist for this matchup and team
+                     */
+                    try {
+                        $result = $this->resultMapper->findOneByColumnList([
+                            'match_id' => $matchup->getId(),
+                            'team_id'  => $homeTeam->getId()
+                        ]);
+                    } catch (\Schoolbox\Mapper\Exception $e) {
+                        $result = $this->resultMapper->createModel()
+                            ->setMatchup($matchup)
+                            ->setTeam($homeTeam);
+                    }
+
+                    /* Update home team's description with whatever it is now
+                     */
+                    $result->setDescription($resultText);
+
+                    $this->resultMapper->save($result);
                 }
-
-                /** @var ResultModel $result */
-                $result = $this->resultMapper->createModel();
-                $result
-                    ->setMatchup($matchup)
-                    ->setTeam($homeTeam)
-                    ->setDescription($resultText);
-
-                $this->resultMapper->save($result);
             }
 
             $imported++;
