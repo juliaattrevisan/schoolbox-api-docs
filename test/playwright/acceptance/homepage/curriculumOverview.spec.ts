@@ -1,6 +1,7 @@
 import type { Locator, Page } from "@playwright/test";
 import { test } from "@schoolboxTest/playwright/support/integrations";
 import AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import CurriculumSelector from "@schoolboxTest/playwright/support/page/curriculum/selector/CurriculumSelector";
 import CurriculumOverview from "@schoolboxTest/playwright/support/page/homepage/CurriculumOverview";
 import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 import UnitPlanner from "@schoolboxTest/playwright/support/page/unitPlanner/UnitPlanner";
@@ -16,6 +17,7 @@ import UnitPlanner from "@schoolboxTest/playwright/support/page/unitPlanner/Unit
 test.describe.serial("Curriculum Overview Component Tests", () => {
     const HOMEPAGE_ID = 83;
     const CURRICULUM_PATH = [247, 248, 250, 251];
+    const CURRICULUM_NODE_ACHHK077 = 252;
     const CURRICULUM_NODE_ACHHK078 = 257;
     const CURRICULUM_NODE_ELBH121 = 259;
     const CURRICULUM_NODE_ACHHK079 = 261;
@@ -25,6 +27,7 @@ test.describe.serial("Curriculum Overview Component Tests", () => {
 
     let curriculumOverviewComponentId: number | null = null;
     let homepage: Homepage;
+    let curriculumSelector: CurriculumSelector;
     let curriculumOverview: CurriculumOverview;
     let curriculumOverviewComponent: Locator;
     let unitPlanner: UnitPlanner;
@@ -58,6 +61,7 @@ test.describe.serial("Curriculum Overview Component Tests", () => {
 
     test.beforeEach(async ({ tester, page }) => {
         homepage = new Homepage(tester, page);
+        curriculumSelector = new CurriculumSelector(tester, page);
         curriculumOverview = new CurriculumOverview(tester, page);
         unitPlanner = new UnitPlanner(tester, page);
 
@@ -79,6 +83,7 @@ test.describe.serial("Curriculum Overview Component Tests", () => {
         await curriculumOverview.mapCurriculumCodes(curriculumOverviewComponent, HOMEPAGE_ID, CURRICULUM_PATH, [
             CURRICULUM_NODE_ACHHK078,
             CURRICULUM_NODE_ACHHK079,
+            CURRICULUM_NODE_ACHHK077,
         ]);
 
         tester.isGoingTo("verify mapped curriculum codes are visible on the component");
@@ -133,9 +138,32 @@ test.describe.serial("Curriculum Overview Component Tests", () => {
         }
     });
 
+    test("Filters curriculum via curriculum overview component", async ({ db, page, tester }) => {
+        tester.isGoingTo("unlock homepage components and open Curriculum Overview component settings");
+        await homepage.openLinkMenu();
+        await homepage.clickLockToggle();
+        await Homepage.clickComponentSettings(curriculumOverviewComponent);
+
+        tester.isGoingTo("select ACHHK077 as the Curriculum Tree Filter");
+        const settingsPanel = curriculumOverviewComponent.locator('[data-component-panel="settings"]');
+        await curriculumSelector.clickBrowse(settingsPanel);
+        await curriculumSelector.browseToNode(CURRICULUM_PATH);
+        await curriculumSelector.selectSingleNode(CURRICULUM_NODE_ACHHK077);
+        await curriculumSelector.saveModal();
+
+        tester.isGoingTo("save the component settings");
+        await Homepage.clickComponentUpdateButton(curriculumOverviewComponent);
+
+        tester.isGoingTo("verify the component is filtered to ACHHK077");
+        await CurriculumOverview.expectListToContainText(curriculumOverviewComponent, "[ACHHK077]");
+        await CurriculumOverview.expectListNotToContainText(curriculumOverviewComponent, "[ACHHK078]");
+        await CurriculumOverview.expectListNotToContainText(curriculumOverviewComponent, "[ACHHK079]");
+    });
+
     test.afterAll(async ({ api, baseTester, db }) => {
         baseTester.isGoingTo("clean up Curriculum Overview component");
         await db.dontHaveInDatabase("curriculum_node_for_category", { category_id: HOMEPAGE_ID });
+        await db.updateInDatabase("curriculum_node", { enabled: 1 }, { id: CURRICULUM_NODE_ACHHK078 });
         if (curriculumOverviewComponentId !== null) {
             await api.deleteHomepageComponent(HOMEPAGE_ID, curriculumOverviewComponentId);
         }
