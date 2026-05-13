@@ -441,7 +441,7 @@ export default {
                                 class="button"
                                 :href="getEvidenceUrl(award.badge.id)"
                             >
-                                Award with Evidence
+                                Award with evidence
                             </a>
                             <button v-if="hasGoalAwardLink() && isUnawardedGoal()" @click.prevent="awardAchievement">
                                 Award

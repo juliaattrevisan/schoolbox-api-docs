@@ -332,7 +332,7 @@ export default {
                 >
                     Confirm
                 </button>
-                <button @click.prevent="onCancelDeleteRecordingSelected">Cancel</button>
+                <button class="button" @click.prevent="onCancelDeleteRecordingSelected">Cancel</button>
             </div>
         </over-media-modal>
         <over-media-modal

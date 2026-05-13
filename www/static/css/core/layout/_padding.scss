@@ -40,6 +40,18 @@
     &--0 {
         padding: 0;
     }
+    &--0-left {
+        padding-inline-start: 0;
+    }
+    &--0-right {
+        padding-inline-end: 0;
+    }
+    &--0-top {
+        padding-block-start: 0;
+    }
+    &--0-bottom {
+        padding-block-end: 0;
+    }
 }
 
 .l-pad-xl {

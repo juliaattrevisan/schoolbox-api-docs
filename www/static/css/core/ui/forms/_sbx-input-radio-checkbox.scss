@@ -21,7 +21,6 @@ body.sbx-body {
         opacity: 1 !important; // ^foundation-fixes^ - won't need !important once _forms.scss is removed
         place-content: center;
         position: static !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
-        transform: translateY(-0.075em);
         width: 1.5rem !important; // ^foundation-fixes^ - won't need !important once _forms.scss is removed
 
         &:hover:not(:disabled) {
@@ -133,7 +132,6 @@ body.sbx-body {
         opacity: 1;
         place-content: center;
         position: static;
-        transform: translateY(-0.075em);
         width: 1.5rem;
 
         &:hover:not(:disabled):not(:read-only) {
@@ -229,8 +227,9 @@ body.sbx-body {
         margin: 0 0 var(--sbx-size-m) 0; // add bottom margin to separate from next element
     }
 
-    // Layout fixes for checkboxes inside option lists
-    .option-list li {
+    // Layout fixes for checkboxes/radio containers
+    .option-list li,
+    .sbx-checkbox-radio-container {
         align-items: flex-start;
         display: flex;
         gap: var(--sbx-size-xs);
@@ -241,9 +240,18 @@ body.sbx-body {
             flex: 0 0 auto;
         }
         // remove the margin for better flex alignment and align the hint to the center of the checkbox if it exists
-        &:has(.hint) {
+        &:has(> .hint) {
             align-items: center;
             .hint {
+                margin: 0;
+            }
+        }
+        // these need to stretch all the way across to avoid it sitting in line with the checkbox/radio
+        &:has(label.error, #search-subject-overview) {
+            flex-wrap: wrap;
+            label.error,
+            #search-subject-overview {
+                flex-basis: 100%;
                 margin: 0;
             }
         }
@@ -252,6 +260,10 @@ body.sbx-body {
     // special case, where there's an <article> in the row as well, so prevent the flex
     .scenarios-list li {
         display: inline-block;
+        // and align center, rather than the typical flex-start
+        .sbx-checkbox-radio-container {
+            align-items: center;
+        }
     }
 
     // Remove extra margin/padding added to checkbox labels in forms.scss

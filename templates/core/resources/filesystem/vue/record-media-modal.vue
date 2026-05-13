@@ -525,8 +525,6 @@ export default {
 
         <div class="component-action" ref="actions">
             <section>
-                <a role="button" class="button" disabled></a
-                ><!-- just to keep the size between all record-x.vue consistent -->
                 <transition name="fade">
                     <a
                         v-if="showUploadButton"

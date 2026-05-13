@@ -18,7 +18,7 @@ $f-dropdown-list-padding: rem-calc(($base-font-size - 6)) rem-calc(($base-font-s
 $f-dropdown-line-height: rem-calc(18) !default;
 
 .f-dropdown {
-    background: var(--content-ui-background);
+    background: var(--sbx-color-foreground-primary, var(--content-ui-background));
     border: none;
     box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.15);
     display: none;
@@ -60,6 +60,7 @@ $f-dropdown-line-height: rem-calc(18) !default;
         }
         a,
         button {
+            background: var(--sbx-color-foreground-primary, var(--content-ui-background));
             color: var(--sbx-config-color-accent, var(--content-ui-foreground));
             display: block;
             margin: 0;

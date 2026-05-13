@@ -123,7 +123,7 @@
             <ul class="option-list scenarios-list l-flex l-flex-col l-gap-m">
                 {% for scenario in dialogAgent.scenarios %}
                     <li data-test="dialog-agent-scenario-select-{{ scenario.id }}">
-                        <div class="l-flex l-flex--align-center l-gap-s f-no-margins">
+                        <div class="sbx-checkbox-radio-container f-no-margins">
                             <input type="radio" id="scenario-{{ scenario.id }}" name="scenarioId" value="{{ scenario.id }}" required />
                             <label
                                 for="scenario-{{ scenario.id }}"

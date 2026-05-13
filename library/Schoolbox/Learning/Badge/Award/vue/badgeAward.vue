@@ -293,7 +293,7 @@ export default {
                     :class="[isSubmitButtonDisabled ? 'disabled' : '']"
                     data-test="badge-award-evidence"
                 >
-                    Award with Evidence
+                    Award with evidence
                 </a>
                 <button
                     class="button"

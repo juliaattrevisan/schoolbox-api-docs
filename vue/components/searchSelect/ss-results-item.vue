@@ -102,7 +102,7 @@ const { isActive } = useActiveIndex(
         @mouseover="onMouseover"
         @mouseout="onMouseout"
     >
-        <div class="checklist l-flex-row l-flex--no-wrap l-gap-s">
+        <div class="checklist sbx-checkbox-radio-container">
             <input
                 v-if="props.isSingleSelect"
                 :id="`search-select-result-input-${result.id}`"

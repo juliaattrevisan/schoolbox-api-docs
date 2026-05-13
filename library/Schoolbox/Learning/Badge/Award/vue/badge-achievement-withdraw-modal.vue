@@ -196,7 +196,7 @@ export default {
                         class="submit"
                         @click.prevent="withdraw()"
                         v-bind:class="{ disabled: !this.selected.length }"
-                        >Withdraw Achievement</a
+                        >Withdraw achievement</a
                     >
                 </li>
                 <li><a href="#" class="button" @click.prevent="close()">Cancel</a></li>

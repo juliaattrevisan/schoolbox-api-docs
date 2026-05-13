@@ -17,7 +17,7 @@
 body.sbx-body {
     font-family: var(--sbx-font-primary) !important;
     // then prevent it overriding specific fonts that need to be preserved for icons, barcodes, etc.
-    & *:not(.barcode-39, button.vjs-control, .fc-icon, [class*=" lg-"]) {
+    & *:not(select, option, .barcode-39, .fc-icon, [class*="lg-"], [class*="vjs-"]) {
         font-family: var(--sbx-font-primary) !important;
     }
 
@@ -45,7 +45,7 @@ body.sbx-body {
     dl,
     blockquote,
     label,
-    div:not(.video-js):not(.vjs-control-bar):not(.vjs-time-control), // avoid increasing font size in video.js controls as it causes the icon sizes within to increase
+    div:not([class*="vjs-"]), // avoid increasing font size in video.js controls as it causes the icon sizes within to increase
     article,
     table tr th,
     legend {

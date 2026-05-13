@@ -499,7 +499,7 @@ export default {
                         class="button"
                         :href="getEvidenceUrl()"
                     >
-                        Award with Evidence
+                        Award with evidence
                     </a>
                     <button :title="submitButtonText" :isProcessing="isProcessing" @click.prevent="onSubmit">
                         {{ submitButtonText }}

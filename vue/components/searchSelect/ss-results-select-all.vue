@@ -109,7 +109,7 @@ const { isActive } = useActiveIndex(
         @mouseover="onMouseover"
         @mouseout="onMouseout"
     >
-        <div class="checklist">
+        <div class="checklist sbx-checkbox-radio-container">
             <input
                 id="checkbox-select-all"
                 type="checkbox"

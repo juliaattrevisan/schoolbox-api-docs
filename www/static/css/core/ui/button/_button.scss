@@ -310,6 +310,7 @@ button.submit {
     @extend .button;
     background: $white;
     border: 1px solid $form-border-color;
+    border-radius: var(--sbx-config-field-roundness, 0);
     color: var(--sbx-config-color-accent, $content-ui-foreground);
     cursor: text;
     font-size: 0.8rem;

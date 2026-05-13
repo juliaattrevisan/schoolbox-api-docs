@@ -27,6 +27,7 @@ const filterTypesStore = useFilterTypesStore();
 <style scoped>
 .checklist {
     border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
+    border-radius: var(--sbx-config-field-roundness, 0);
     max-height: 300px;
     overflow-y: auto;
     padding: var(--spacing-s);
