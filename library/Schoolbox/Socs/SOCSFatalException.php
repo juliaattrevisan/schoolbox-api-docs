@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Socs;
 
-class FatalException extends \RuntimeException
+class SOCSFatalException extends \Exception
 {
-
 }

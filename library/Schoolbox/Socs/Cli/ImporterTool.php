@@ -15,7 +15,7 @@ use Ramsey\Uuid\Uuid;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Socs\Factory as SocsFactory;
-use Schoolbox\Socs\FatalException;
+use Schoolbox\Socs\SOCSFatalException;
 use Schoolbox\Socs\Log\Mapper as SocsLogMapper;
 
 /**
@@ -152,13 +152,19 @@ class ImporterTool extends CliTool\App
             if (!$this->perform()) {
                 $logger->info('SOCS importer planning finished.');
             }
-        } catch (\Exception|FatalException $e) {
+        } catch (\Exception | SOCSFatalException $e) {
             if ($this->perform() && $importLog !== null) {
                 $importLogMapper->error($importLog, $e->getMessage());
                 $importLogMapper->prune();
             }
 
             $logger->warning($e->getMessage());
+            $logger->debug($e->getTraceAsString());
+
+            if ($e->getPrevious()) {
+                $logger->debug(sprintf('Previous: %s', $e->getPrevious()->getMessage()));
+                $logger->debug($e->getPrevious()->getTraceAsString());
+            }
         } finally {
             if ($this->perform() && $importLog !== null && !$importLog->isError()) {
                 $importLogMapper->finish($importLog);

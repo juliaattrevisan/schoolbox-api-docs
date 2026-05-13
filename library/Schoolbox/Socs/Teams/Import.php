@@ -58,6 +58,10 @@ class Import implements IStrategy
             $response = $this->httpClient->get(self::MSO_SPORT_PATH, $query);
         } catch (\RuntimeException $e) {
             $this->log->warning(sprintf('Failed to contact SOCS fixtures endpoint: %s', $e->getMessage()));
+            if ($e->getPrevious()) {
+                $this->log->debug(sprintf('Previous: %s', $e->getPrevious()->getMessage()));
+                $this->log->debug($e->getPrevious()->getTraceAsString());
+            }
             return;
         }
 

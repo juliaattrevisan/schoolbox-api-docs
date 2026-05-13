@@ -114,7 +114,7 @@ class HttpClient
                     // known errors
                     // incorrect CREDS:
                     if (self::NOT_AVAILABLE === $content) {
-                        throw new FatalException(sprintf(
+                        throw new SOCSFatalException(sprintf(
                             'SOCS endpoint returned known error string; aborting. %s',
                             self::NOT_AVAILABLE
                         ));
@@ -124,7 +124,7 @@ class HttpClient
                     $xml = @simplexml_load_string($content);
                     if (false === $xml) {
                         throw new \RuntimeException(sprintf(
-                            'Unable to parse SOCS XML payload; aborting. First 200 chars: %s',
+                            "Unable to parse SOCS XML payload; aborting. First 200 chars: '%s'",
                             substr($content, 0, 200)
                         ));
                     }
