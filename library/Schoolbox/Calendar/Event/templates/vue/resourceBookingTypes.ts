@@ -5,6 +5,7 @@ export type Booking = {
     id: number;
     name: string;
     notes: string;
+    quantity: number;
     resource: Resource;
     status: BookingStatus;
     start: string;
@@ -18,6 +19,7 @@ export type Booking = {
 export type Resource = {
     id: number;
     name: string;
+    capacity: number;
     // More key:value pairs are available in ResourceBooking/Item/Model->jsonSerialize().  Add them as they are needed.
 };
 
