@@ -186,7 +186,14 @@ async function importRubric(data: unknown): Promise<void> {
     toast.timeout({ text: "Rubric imported", isSuccess: true });
 
     // TODO: for now this will just add a new rubric, it possibly needs to do more...
-    rubricGrids.value.push(response.data.rubricGrid);
+    const newRubric = response.data.rubricGrid;
+    if (newRubric.id === null || newRubric.id < 0) {
+      // negative ID represents a new rubric that hasn't been persisted yet
+      newRubric.id =  Math.min(...rubricGrids.value.map((grid) => grid.id), 0) - 1;
+    }
+
+    rubricGrids.value.push(newRubric);
+
     showRubricCreate.value = false;
 }
 
