@@ -123,13 +123,15 @@ class ControllerTest extends TestCase
 
     public function testUpdateRegistrationSessionStudentSubjectLanguagesSavesOverrides(): void
     {
-        $registrationSessionStudent = (new RegistrationSessionStudentModel())->setId(456);
+        $registrationSessionStudent = (new RegistrationSessionStudentModel())
+            ->setId(456)
+            ->setUser((new User())->setId(234));
 
         $registrationSessionStudentMapper = $this->createStub(RegistrationSessionStudentMapper::class);
         $registrationSessionStudentMapper
             ->method('findOneByColumnList')
             ->with([
-                'id' => 456,
+                'user_id' => 234,
                 'registration_session_id' => 12,
             ])
             ->willReturn($registrationSessionStudent);
@@ -193,7 +195,7 @@ class ControllerTest extends TestCase
             ],
         ]));
 
-        $controller->updateRegistrationSessionStudentSubjectLanguages(12, 456);
+        $controller->updateRegistrationSessionStudentSubjectLanguages(12, 234);
 
         $response = $controller->getResponse();
         $this->assertNotNull($response);
@@ -230,7 +232,7 @@ class ControllerTest extends TestCase
             ],
         ]));
 
-        $controller->updateRegistrationSessionStudentSubjectLanguages(12, 456);
+        $controller->updateRegistrationSessionStudentSubjectLanguages(12, 123);
 
         $response = $controller->getResponse();
         $this->assertNotNull($response);

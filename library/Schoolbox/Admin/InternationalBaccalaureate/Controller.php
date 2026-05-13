@@ -15,6 +15,7 @@ namespace Schoolbox\Admin\InternationalBaccalaureate;
 use Alaress\Database\Predicate;
 use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
+use Alaress\Web\Request\Values;
 use Aura\Router\Exception\RouteNotFound;
 use Crell\ApiProblem\ApiProblem;
 use Exception;
@@ -809,13 +810,13 @@ class Controller extends ConfigController
     /**
      * Manually override the language selected for a student's enrolled IB subjects.
      *
-     * @api PUT /adminv2/international-baccalaureate/registrations/sessions/{id}/candidates/{registrationSessionStudentId}/subject-languages
+     * @api PUT /adminv2/international-baccalaureate/registrations/sessions/{id}/candidates/{userId}/subject-languages
      */
     public function updateRegistrationSessionStudentSubjectLanguages(
         int $id,
-        int $registrationSessionStudentId
+        int $userId
     ): void {
-        $subjects = $this->requestPost->get('subjects');
+        $subjects = new Values($this->request->getParsedBody())->get('subjects');
 
         if (!is_array($subjects)) {
             $this->response = $this->responseAsJson([
@@ -827,13 +828,13 @@ class Controller extends ConfigController
 
         try {
             $registrationSessionStudent = $this->registrationSessionStudentMapper->findOneByColumnList([
-                'id' => $registrationSessionStudentId,
+                'user_id' => $userId,
                 'registration_session_id' => $id,
             ]);
         } catch (MapperNotFound) {
             $this->response = $this->responseAsJson([
                 'success' => false,
-                'message' => 'Registration session student not found.',
+                'message' => 'Candidate not found for this user in the registration session.',
             ])->withStatus(404);
             return;
         } catch (Exception $e) {
@@ -913,7 +914,7 @@ class Controller extends ConfigController
 
             $this->registrationSessionStudentSubjectLanguageMapper->deleteByColumn(
                 'registration_session_student_id',
-                $registrationSessionStudentId
+                $registrationSessionStudent->getId()
             );
 
             if ($modelsToSave !== []) {
