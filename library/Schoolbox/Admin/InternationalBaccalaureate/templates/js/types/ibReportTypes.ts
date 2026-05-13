@@ -33,6 +33,7 @@ export type StudentRow = {
     subjects: SubjectGroup;
     updateLanguageEndpoint: string | null;
     renotifyEndpoint: string | null;
+    stage: "preparation" | "unconfirmed" | "confirmed" | "inProgress" | "failed" | "registered";
 };
 
 /**
