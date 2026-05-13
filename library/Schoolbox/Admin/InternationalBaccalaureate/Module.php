@@ -23,6 +23,7 @@ use Schoolbox\IB\Group\Subject\Mapper as IBGroupSubjectMapper;
 use Schoolbox\IB\Group\Mapper as IBGroupMapper;
 use Schoolbox\IB\Registrations\Sessions\Mapper as RegistrationSessionMapper;
 use Schoolbox\IB\Registrations\Sessions\Student\Mapper as RegistrationSessionStudentMapper;
+use Schoolbox\IB\Registrations\Sessions\Student\Subject\Language\Mapper as RegistrationSessionStudentSubjectLanguageMapper;
 use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccess;
@@ -65,6 +66,7 @@ class Module extends BaseModule
         $this->register('DELETE', '/registrations/sessions/{sessionId:\d+}', 'deleteRegistrationSession', $ruleIBCoordinatorAccess, $preloadRegistrationSession);
         $this->register('GET', '/registrations/sessions/{id:\\d+}', 'getReport', $ruleIBCoordinatorAccess);
         $this->register('GET', '/registrations/sessions/{id:\\d+}/candidates', 'getRegistrationSessionStudents', $ruleIBCoordinatorAccess);
+        $this->register('PUT', '/registrations/sessions/{id:\\d+}/candidates/{registrationSessionStudentId:\\d+}/subject-languages', 'updateRegistrationSessionStudentSubjectLanguages', $ruleIBCoordinatorAccess);
     }
 
     /**
@@ -82,6 +84,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(RegistrationSessionMapper::class),
             $this->injector->get('externalClass'),
             $this->getMapperFactory()->get(RegistrationSessionStudentMapper::class),
+            $this->getMapperFactory()->get(RegistrationSessionStudentSubjectLanguageMapper::class),
             $this->injector->get('externalUser'),
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
             $this->injector->get('moduleCache.rebuilder'),
