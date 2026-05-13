@@ -137,7 +137,9 @@ class Decorator implements DecoratorInterface
         bool $enablePolicy,
         private ?DueWork $original
     ) {
-
+        /* For unknown reasons, php finds our usage of traits objectionable: I have to go back to doing it like this.
+         * (Our constructor definitions are in conflict with traits' definitions)
+         */
         $this->setEnableWorksheet($enableWorksheet);
         $this->setWorksheetTemplate($worksheetTemplate);
         $this->setEnableOffline($enableOffline);
