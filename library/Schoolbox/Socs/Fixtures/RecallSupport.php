@@ -71,7 +71,7 @@ trait RecallSupport
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             /** @var SeasonModel $season */
             $season = $e->getDeletedObject();
-            $season->setDeletedAt(null);
+            $seasonMapper->restoreSoftDeleted($season);
             $logger->debug(sprintf('Resurrecting previously-deleted SOCS season %s', $season->getName()));
             $needsSave = true;
         } catch (\Schoolbox\Mapper\Exception $e) {
@@ -117,7 +117,7 @@ trait RecallSupport
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             /** @var SportModel $sport */
             $sport = $e->getDeletedObject();
-            $sport->setDeletedAt(null);
+            $sportMapper->restoreSoftDeleted($sport);
             $logger->debug(sprintf('Resurrecting previously-deleted SOCS sport %s', $sport->getName()));
             $needsSave = true;
         } catch (\Schoolbox\Mapper\Exception $e) {
@@ -166,7 +166,7 @@ trait RecallSupport
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             /** @var DivisionModel $division */
             $division = $e->getDeletedObject();
-            $division->setDeletedAt(null);
+            $divisionMapper->restoreSoftDeleted($division);
             $logger->debug(sprintf('Resurrecting previously-deleted SOCS division %s', $division->getName()));
             $needsSave = true;
         } catch (\Schoolbox\Mapper\Exception $e) {
@@ -210,7 +210,7 @@ trait RecallSupport
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             /** @var TeamModel $team */
             $team = $e->getDeletedObject();
-            $team->setDeletedAt(null);
+            $teamMapper->restoreSoftDeleted($team);
             $logger->debug(sprintf('Resurrecting previously-deleted SOCS team %s', $team->getName()));
             $needsSave = true;
         } catch (\Schoolbox\Mapper\Exception $e) {
@@ -249,7 +249,7 @@ trait RecallSupport
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             /** @var VenueModel $venue */
             $venue = $e->getDeletedObject();
-            $venue->setDeletedAt(null);
+            $venueMapper->restoreSoftDeleted($venue);
             $logger->debug(sprintf('Resurrecting previously-deleted SOCS venue %s', $venue->getName()));
             $needsSave = true;
         } catch (\Schoolbox\Mapper\Exception $e) {
@@ -287,7 +287,7 @@ trait RecallSupport
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             /** @var SchoolModel $school */
             $school = $e->getDeletedObject();
-            $school->setDeletedAt(null);
+            $schoolMapper->restoreSoftDeleted($school);
             $logger->debug(sprintf('Resurrecting previously-deleted SOCS school %s', $school->getName()));
             $needsSave = true;
         } catch (\Schoolbox\Mapper\Exception $e) {
