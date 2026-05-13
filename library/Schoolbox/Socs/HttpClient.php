@@ -56,10 +56,11 @@ class HttpClient
     /**
      * Perform a GET request to a SOCS endpoint, adding school ID and token.
      *
+     * @param string               $path
      * @param array<string,string> $query Non-secret query parameters; ID and key are added automatically.
      *
-     * @return false|SimpleXMLElement.
-     * @throws \RuntimeException|\JsonException
+     * @return false|SimpleXMLElement
+     * @throws \JsonException
      */
     public function get(string $path, array $query): false|SimpleXMLElement
     {

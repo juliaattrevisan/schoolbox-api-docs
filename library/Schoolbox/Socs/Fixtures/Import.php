@@ -100,35 +100,11 @@ class Import implements IStrategy
             $this->log->warning(sprintf('Failed to contact SOCS fixtures endpoint: %s', $e->getMessage()));
             return;
         }
-//
-//        if ($response->getStatusCode() !== 200) {
-//            $this->log->warning(sprintf(
-//                'Bad SOCS response: %s %s',
-//                $response->getStatusCode(),
-//                $response->getReasonPhrase()
-//            ));
-//            return;
-//        }
 
-//        $body = (string)$response->getBody();
-//        $this->log->debug(sprintf(
-//            'SOCS fixtures raw response: Content-Type %s; length %d',
-//            $response->getHeaderLine('Content-Type') ?: 'unknown',
-//            strlen($body)
-//        ));
         if (false === $response) {
             $this->log->info('SOCS fixtures feed returned an empty payload');
             return;
         }
-
-//        $xml = @simplexml_load_string($response);
-//        if (false === $xml) {
-//            $this->log->warning(sprintf(
-//                'Unable to parse SOCS XML payload; aborting. First 200 chars: %s',
-//                substr($body, 0, 200)
-//            ));
-//            return;
-//        }
 
         $imported = 0;
 

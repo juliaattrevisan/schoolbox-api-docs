@@ -58,43 +58,19 @@ class Import implements IStrategy
 
         try {
             $response = $this->httpClient->get(self::RESULTS_PATH, $query);
-        } catch (GuzzleException $e) {
-            $this->log->warning(sprintf('Failed to contact SOCS results endpoint: %s', $e->getMessage()));
+        } catch (\RuntimeException $e) {
+            $this->log->warning(sprintf('Failed to contact SOCS fixtures endpoint: %s', $e->getMessage()));
             return;
         }
 
-        if ($response->getStatusCode() !== 200) {
-            $this->log->warning(sprintf(
-                'Bad SOCS results response: %s %s',
-                $response->getStatusCode(),
-                $response->getReasonPhrase()
-            ));
-            return;
-        }
-
-        $body = (string)$response->getBody();
-        $this->log->debug(sprintf(
-            'SOCS results raw response: Content-Type %s; length %d',
-            $response->getHeaderLine('Content-Type') ?: 'unknown',
-            strlen($body)
-        ));
-        if ('' === $body) {
-            $this->log->info('SOCS results feed returned an empty payload');
-            return;
-        }
-
-        $xml = @simplexml_load_string($body);
-        if (false === $xml) {
-            $this->log->warning(sprintf(
-                'Unable to parse SOCS results XML payload; aborting. First 200 chars: %s',
-                substr($body, 0, 200)
-            ));
+        if (false === $response) {
+            $this->log->info('SOCS fixtures feed returned an empty payload');
             return;
         }
 
         $imported = 0;
 
-        foreach ($xml->children() as $resultNode) {
+        foreach ($response->children() as $resultNode) {
             $this->lock->refresh();
             $eventId = trim((string)$resultNode->eventid);
             $resultText = trim((string)$resultNode->result);

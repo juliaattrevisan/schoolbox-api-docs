@@ -50,42 +50,18 @@ class Import implements IStrategy
 
         try {
             $response = $this->httpClient->get(self::MSO_SPORT_PATH, $query);
-        } catch (GuzzleException $e) {
-            $this->log->warning(sprintf('Failed to contact SOCS teams endpoint: %s', $e->getMessage()));
+        } catch (\RuntimeException $e) {
+            $this->log->warning(sprintf('Failed to contact SOCS fixtures endpoint: %s', $e->getMessage()));
             return;
         }
 
-        if ($response->getStatusCode() !== 200) {
-            $this->log->warning(sprintf(
-                'Bad SOCS teams response: %s %s',
-                $response->getStatusCode(),
-                $response->getReasonPhrase()
-            ));
-            return;
-        }
-
-        $body = (string)$response->getBody();
-        $this->log->debug(sprintf(
-            'SOCS teams raw response: Content-Type %s; length %d',
-            $response->getHeaderLine('Content-Type') ?: 'unknown',
-            strlen($body)
-        ));
-        if ('' === $body) {
-            $this->log->info('SOCS teams feed returned an empty payload');
-            return;
-        }
-
-        $xml = @simplexml_load_string($body);
-        if (false === $xml) {
-            $this->log->warning(sprintf(
-                'Unable to parse SOCS teams XML payload; aborting. First 200 chars: %s',
-                substr($body, 0, 200)
-            ));
+        if (false === $response) {
+            $this->log->info('SOCS fixtures feed returned an empty payload');
             return;
         }
 
         /** @var \SimpleXMLElement[]|false $teams */
-        $teams = $xml->xpath('//team');
+        $teams = $response->xpath('//team');
         if (false === $teams || [] === $teams) {
             $this->log->info('SOCS teams feed contained no team records');
             return;
