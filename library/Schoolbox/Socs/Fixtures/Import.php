@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Socs\Fixtures;
 
-use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
@@ -203,24 +202,10 @@ class Import implements IStrategy
     }
 
     /**
-     * Lazily populate the external-id to user-id lookup cache.
-     */
-    private function ensureUserLookupLoaded(): void
-    {
-        if ([] !== $this->userExternalIdLookup) {
-            return;
-        }
-
-        $this->userExternalIdLookup = new PersonLookup($this->userMapper)->generate();
-    }
-
-    /**
      * Attach pupils and staff referenced in a SOCS fixture to the given team.
      */
     private function syncParticipantsWithTeam(\SimpleXMLElement $fixture, \Schoolbox\Fixtures\Team\Model $team): void
     {
-        $this->ensureUserLookupLoaded();
-
         $pupils = trim((string)($fixture->pupils ?? ''));
         $staff = trim((string)($fixture->staff ?? ''));
 
