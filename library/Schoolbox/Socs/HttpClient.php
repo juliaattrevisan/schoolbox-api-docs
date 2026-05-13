@@ -69,7 +69,7 @@ class HttpClient
      * @param array<string,string> $query Non-secret query parameters; ID and key are added automatically.
      *
      * @return false|SimpleXMLElement
-     * @throws \JsonException
+     * @throws \JsonException|SOCSFatalException
      */
     public function get(string $path, array $query): false|SimpleXMLElement
     {
