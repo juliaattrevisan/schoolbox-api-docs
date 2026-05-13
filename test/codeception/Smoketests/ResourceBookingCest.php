@@ -155,6 +155,27 @@ class ResourceBookingCest
         $i->assertEquals(7, $updatedItem->getCapacity(), 'Updated resource capacity is persisted');
     }
 
+    public function readResourceDisplaysCapacityAndConflictBookingRules(IntegrationTester $i): void
+    {
+        $resourceMapper = ResourceBooking\Item\Mapper::getInstance();
+        $resource = new Payload\ResourceBooking\Resource\Create();
+        $resourceName = 'Testing Resource Rules at ' . microtime(true);
+        $resource->setResourceName($resourceName);
+        $resource->setCapacity('7');
+        $resource->setAllowClashBookings(true);
+
+        $i->sendRequest($resource);
+
+        $i->seeResponseCodeIs(303);
+        $newItem = $resourceMapper->findOneByColumn('name', $resourceName);
+
+        $i->sendGET('/resource-booking/item/' . $newItem->getId());
+
+        $i->seeResponseCodeIs(200);
+        $i->seeResponseContains('Conflict bookings: Allowed');
+        $i->seeResponseContains('Capacity: 7 concurrent bookings');
+    }
+
     public function bookingReportDisplaysCapacityColumnsAndQuantity(IntegrationTester $i): void
     {
         $resource = $this->createCapacityTestResource(
