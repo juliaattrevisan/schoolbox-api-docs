@@ -66,7 +66,7 @@ class Module extends BaseModule
         $this->register('DELETE', '/registrations/sessions/{sessionId:\d+}', 'deleteRegistrationSession', $ruleIBCoordinatorAccess, $preloadRegistrationSession);
         $this->register('GET', '/registrations/sessions/{id:\\d+}', 'getReport', $ruleIBCoordinatorAccess);
         $this->register('GET', '/registrations/sessions/{id:\\d+}/candidates', 'getRegistrationSessionStudents', $ruleIBCoordinatorAccess);
-        $this->register('PUT', '/registrations/sessions/{id:\\d+}/candidates/{userId:\\d+}/subject-languages', 'updateRegistrationSessionStudentSubjectLanguages', $ruleIBCoordinatorAccess);
+        $this->register('PUT', '/registrations/sessions/{id:\\d+}/candidates/{userId:\\d+}/languages', 'updateRegistrationSessionStudentSubjectLanguages', $ruleIBCoordinatorAccess);
     }
 
     /**

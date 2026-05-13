@@ -810,7 +810,7 @@ class Controller extends ConfigController
     /**
      * Manually override the language selected for a student's enrolled IB subjects.
      *
-     * @api PUT /adminv2/international-baccalaureate/registrations/sessions/{id}/candidates/{userId}/subject-languages
+     * @api PUT /adminv2/international-baccalaureate/registrations/sessions/{id}/candidates/{userId}/languages
      */
     public function updateRegistrationSessionStudentSubjectLanguages(
         int $id,
