@@ -91,12 +91,12 @@
                         {% if route %}
                             <a title="{{ title }}" href="{{ route }}" class="l-flex l-gap-s" data-test="course-outline-assessment-title-{{ assessment.title }}">
                                 {# Render the icon for the assessment type #}
-                                <sbx-icon name="{{ icon.renderName(assessment)|trim }}"></sbx-icon>
+                                <sbx-icon name="{{ icon.renderName(assessment)|trim }}" size="1rem" color="var(--sbx-color-text-secondary, var(--body-foreground))" class="project-assessable-icon"></sbx-icon>
                                 <p class="t-break-word">{{ assessment.title }}</p>
                             </a>
                         {% else %}
                             <div title="{{ title }}" class="l-flex l-gap-s">
-                                <sbx-icon name="{{ icon.renderName(assessment)|trim }}"></sbx-icon>
+                                <sbx-icon name="{{ icon.renderName(assessment)|trim }}" size="1rem" color="var(--sbx-color-text-secondary, var(--body-foreground))" class="project-assessable-icon"></sbx-icon>
                                 <p class="t-break-word">{{ assessment.title }}</p>
                             </div>
                         {% endif %}
@@ -213,12 +213,12 @@
                                 {% set customRoute = viewRoute.viewRoute(customisedAssessment, USER) %}
                                 {% if customRoute %}
                                     <a title="{{ customTitle }}" href="{{ customRoute }}" class="l-flex l-gap-s">
-                                        <sbx-icon name="{{ icon.renderName(customisedAssessment)|trim }}"></sbx-icon>
+                                        <sbx-icon name="{{ icon.renderName(customisedAssessment)|trim }}" size="1rem" color="var(--sbx-color-text-secondary, var(--body-foreground))" class="project-assessable-icon"></sbx-icon>
                                         <p class="t-break-word">{{ customisedAssessment.title }}</p>
                                     </a>
                                 {% else %}
                                     <div title="{{ customTitle }}" class="l-flex l-gap-s">
-                                        <sbx-icon name="{{ icon.renderName(customisedAssessment)|trim }}"></sbx-icon>
+                                        <sbx-icon name="{{ icon.renderName(customisedAssessment)|trim }}" size="1rem" color="var(--sbx-color-text-secondary, var(--body-foreground))" class="project-assessable-icon"></sbx-icon>
                                         <p class="t-break-word">{{ customisedAssessment.title }}</p>
                                     </div>
                                 {% endif %}
