@@ -59,6 +59,8 @@ class Registry
      */
     private array $schools = [];
 
+    private const string EXTERNAL_ID_PREFIX = 'socs:';
+
     public function __construct(
         private LoggerInterface $logger,
         private bool $perform,
@@ -159,7 +161,8 @@ class Registry
         } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var SportModel $sport */
             $sport = $this->sportMapper->createModel()
-                ->setName($sportName);
+                ->setName($sportName)
+                ->setExternalId(self::EXTERNAL_ID_PREFIX . $sportName);
             $this->logger->debug(sprintf('Creating new SOCS sport %s', $sport->getName()));
         }
 
@@ -206,7 +209,8 @@ class Registry
             $division = $this->divisionMapper->createModel()
                 ->setName($divisionName)
                 ->setSport($sport)
-                ->setSeason($season);
+                ->setSeason($season)
+                ->setExternalId(self::EXTERNAL_ID_PREFIX . $divisionName);
             $this->logger->debug(sprintf('Creating new SOCS division %s', $division->getName()));
         }
 
@@ -256,7 +260,8 @@ class Registry
             /** @var TeamModel $team */
             $team = $this->teamMapper->createModel()
                 ->setName($teamName)
-                ->setDivision($division);
+                ->setDivision($division)
+                ->setExternalId(self::EXTERNAL_ID_PREFIX . $teamName);
             $this->logger->debug(sprintf('Creating new SOCS team %s', $team->getName()));
         }
 
@@ -295,7 +300,8 @@ class Registry
         } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var VenueModel $venue */
             $venue = $this->venueMapper->createModel()
-                ->setName($venueName);
+                ->setName($venueName)
+                ->setExternalId(self::EXTERNAL_ID_PREFIX . $venueName);
             $this->logger->debug(sprintf('Creating new SOCS venue %s', $venue->getName()));
         }
 
