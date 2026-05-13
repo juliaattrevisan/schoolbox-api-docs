@@ -135,6 +135,7 @@ class ImporterTool extends CliTool\App
 
         if ($this->perform()) {
             $importLog = $importLogMapper->start($runId, $scriptName);
+            $importLogMapper->prune();
         }
 
         try {
@@ -155,7 +156,6 @@ class ImporterTool extends CliTool\App
         } catch (\Exception | SOCSFatalException $e) {
             if ($this->perform() && $importLog !== null) {
                 $importLogMapper->error($importLog, $e->getMessage());
-                $importLogMapper->prune();
             }
 
             $logger->warning($e->getMessage());
@@ -168,7 +168,6 @@ class ImporterTool extends CliTool\App
         } finally {
             if ($this->perform() && $importLog !== null && !$importLog->isError()) {
                 $importLogMapper->finish($importLog);
-                $importLogMapper->prune();
             }
 
             $lock->release();
