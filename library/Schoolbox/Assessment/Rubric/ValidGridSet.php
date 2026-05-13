@@ -14,7 +14,6 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\ISelfAssessable;
 use Schoolbox\Mapper\Exception;
 
-
 class ValidGridSet
 {
     /**
