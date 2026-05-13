@@ -21,6 +21,8 @@ use Schoolbox\IB\Group\Model as IBGroupModel;
 use Schoolbox\IB\Group\Subject\Language\Model as GroupSubjectLanguageModel;
 use Schoolbox\IB\Group\Subject\Model as GroupSubjectModel;
 use Schoolbox\IB\Registrations\Sessions\Mapper as SessionMapper;
+use Schoolbox\IB\Registrations\Sessions\Student\Subject\Language\Mapper as SubjectLanguageMapper;
+use Schoolbox\IB\Registrations\Sessions\Student\Subject\Language\Model as SubjectLanguageModel;
 use Schoolbox\IB\Subject\Model as IBSubjectModel;
 use Schoolbox\Language\Model as LanguageModel;
 use Schoolbox\Mapper as BaseMapper;
@@ -257,7 +259,92 @@ class Mapper extends BaseMapper
             $students->add($student);
         }
 
+        $this->applySubjectLanguageOverrides($students);
+
         return $students;
+    }
+
+    protected function getSubjectLanguageMapper(): SubjectLanguageMapper
+    {
+        return SubjectLanguageMapper::getInstance();
+    }
+
+    /**
+     * @param GenericCollection|Model[] $students
+     */
+    protected function applySubjectLanguageOverrides(GenericCollection $students): void
+    {
+        $studentIds = [];
+
+        foreach ($students as $student) {
+            if (!$student instanceof Model || !$student->getId()) {
+                continue;
+            }
+
+            $studentIds[] = $student->getId();
+        }
+
+        if ($studentIds === []) {
+            return;
+        }
+
+        $selectionsByStudentId = $this->getSubjectLanguageMapper()
+            ->findByRegistrationSessionStudentIds($studentIds);
+
+        foreach ($students as $student) {
+            if (!$student instanceof Model || !$student->getId()) {
+                continue;
+            }
+
+            foreach ($selectionsByStudentId[$student->getId()] ?? [] as $selection) {
+                if ($selection instanceof SubjectLanguageModel) {
+                    $this->applySubjectLanguageOverride($student, $selection);
+                }
+            }
+        }
+    }
+
+    private function applySubjectLanguageOverride(Model $student, SubjectLanguageModel $selection): void
+    {
+        $groupSubjectId = $selection->getGroupSubject()?->getId();
+        $language = $selection->getLanguage();
+
+        if (!$groupSubjectId || !$language?->getId()) {
+            return;
+        }
+
+        $groupSubjects = $student->getIbGroupSubjects();
+        $groupSubject = $this->findGroupSubjectById($groupSubjects, $groupSubjectId);
+
+        if (!$groupSubject) {
+            return;
+        }
+
+        $groupSubject->setLanguages(new GenericCollection(GroupSubjectLanguageModel::class, [
+            (new GroupSubjectLanguageModel())
+                ->setGroupSubject($groupSubject)
+                ->setLanguage($language)
+                ->setClassCode(new GenericCollection(FolderCodeModel::class)),
+        ]));
+    }
+
+    private function findGroupSubjectById(GenericCollection $groupSubjects, int $groupSubjectId): ?GroupSubjectModel
+    {
+        if ($groupSubjects->offsetExists($groupSubjectId)) {
+            $groupSubject = $groupSubjects[$groupSubjectId];
+
+            if ($groupSubject instanceof GroupSubjectModel) {
+                return $groupSubject;
+            }
+        }
+
+        foreach ($groupSubjects as $groupSubject) {
+            if ($groupSubject instanceof GroupSubjectModel && $groupSubject->getId() === $groupSubjectId) {
+                return $groupSubject;
+            }
+        }
+
+        return null;
     }
 
     /**
