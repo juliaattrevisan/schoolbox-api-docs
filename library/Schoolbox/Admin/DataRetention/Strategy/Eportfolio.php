@@ -96,8 +96,14 @@ class Eportfolio extends Base
             // Each of the five subqueries excludes rows whose parents have already been counted as deletable.
             // Example:
             //  * The first subquery counts all TABLE_EPORTFOLIO_PAGE rows whose deleted_at date is older than the limit.
-            //  * The next subquery counts all TABLE_EPORTFOLIO_COMPONENT_BLOG rows whose deleted_at date is older than then limit,
-            //    but excludes rows whose parent TABLE_EPORTFOLIO_PAGE rows have already been counted.
+            //  * The next subquery counts all TABLE_EPORTFOLIO_COMPONENT_BLOG rows whose deleted_at date is older than
+            //    the limit, but excludes rows whose parent TABLE_EPORTFOLIO_PAGE rows have already been counted.
+            //
+            // The point of this is to count deletable root nodes only.  Counting only deletable root nodes is preferable
+            // to counting root nodes plus descendants because this counting method matches the actual unit of work.  A
+            // root node is what the retention strategy schedules: “delete this page”, “delete this blog”, “delete this
+            // independently deleted image”.  Descendants are implementation detail expanded inside deleteChunk() so FK
+            // order and ownership rules are handled in one transaction.
             "
             SELECT
                 (SELECT COUNT(*) FROM " . self::TABLE_EPORTFOLIO_PAGE . " p
