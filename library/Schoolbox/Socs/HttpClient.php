@@ -134,14 +134,13 @@ class HttpClient
                 if ($fails >= self::NUM_RETRY) {
                     throw new \RuntimeException(
                         sprintf(
-                            'Bad endpoint: %s: %s %s after %s retries. Payload: %s',
+                            'Bad endpoint %s: request failed after %s retries. Payload: %s. Error: %s',
                             $path,
-                            $response->getStatusCode(),
-                            $response->getReasonPhrase(),
                             self::NUM_RETRY,
-                            json_encode($query, JSON_THROW_ON_ERROR)
+                            json_encode($query, JSON_THROW_ON_ERROR),
+                            $e->getMessage()
                         ),
-                        $response->getStatusCode(),
+                        0,
                         $e
                     );
                 }

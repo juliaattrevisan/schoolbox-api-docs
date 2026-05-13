@@ -120,6 +120,29 @@ class HttpClientTest extends TestCase
     }
 
     /**
+     * Confirm all-failed SOCS request retries still raise a RuntimeException.
+     *
+     * @throws \ReflectionException
+     */
+    public function testGetThrowsRuntimeExceptionWhenAllRetriesFail(): void
+    {
+        $guzzle = $this->getMockBuilder(Client::class)
+            ->onlyMethods(['request'])
+            ->getMock();
+        $guzzle
+            ->expects($this->exactly(3))
+            ->method('request')
+            ->willThrowException(new ConnectException('SOCS unavailable', new Request('GET', 'fixturecalendar.ashx')));
+
+        $client = $this->createHttpClient($guzzle);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Bad endpoint fixturecalendar.ashx: request failed after 3 retries.');
+
+        $client->get('fixturecalendar.ashx', []);
+    }
+
+    /**
      * Confirm non-200 SOCS responses include useful request context.
      *
      * @throws \ReflectionException
