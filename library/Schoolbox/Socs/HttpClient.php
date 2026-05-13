@@ -86,6 +86,7 @@ class HttpClient
                     RequestOptions::QUERY => $fullQuery,
                 ]);
 
+                // NOT 200 status, assume broken
                 if ($response->getStatusCode() !== 200) {
                     throw new \RuntimeException(
                         sprintf(
@@ -93,11 +94,10 @@ class HttpClient
                             $path,
                             $response->getStatusCode(),
                             $response->getReasonPhrase(),
-                            self::NUM_RETRY,
+                            $fails,
                             json_encode($query, JSON_THROW_ON_ERROR)
                         ),
                         $response->getStatusCode(),
-                        null
                     );
                 }
 
@@ -131,8 +131,6 @@ class HttpClient
 
                     return $xml;
                 }
-
-                $fails++;
             } catch (GuzzleException $e) {
                 $fails++;
 
