@@ -2,6 +2,7 @@ import type { Locator, Page } from "@playwright/test";
 import { test } from "@schoolboxTest/playwright/support/integrations";
 import AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import CurriculumSelector from "@schoolboxTest/playwright/support/page/curriculum/selector/CurriculumSelector";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 import CurriculumOverview from "@schoolboxTest/playwright/support/page/homepage/CurriculumOverview";
 import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 import UnitPlanner from "@schoolboxTest/playwright/support/page/unitPlanner/UnitPlanner";
@@ -21,9 +22,17 @@ test.describe.serial("Curriculum Overview Component Tests", () => {
     const CURRICULUM_NODE_ACHHK078 = 257;
     const CURRICULUM_NODE_ELBH121 = 259;
     const CURRICULUM_NODE_ACHHK079 = 261;
+    const CURRICULUM_NODE_ELBH117 = 254;
+    const ACHHK077_TITLE =
+        "[ACHHK077] The diversity and longevity of Australia’s first peoples and the ways Aboriginal and/or Torres Strait Islander peoples are connected to Country and Place (land, sea, waterways and skies) and the implications for their daily lives.";
+    const ACHHK077_BREADCRUMB = "Year 4 History > Year 4 > Historical Knowledge and Understanding > First Contacts";
     const ACHHK078_TITLE =
         "[ACHHK078] The journey(s) of AT LEAST ONE world navigator, explorer or trader up to the late eighteenth century, including their contacts with other societies and any impacts.";
     const ACHHK078_BREADCRUMB = "Year 4 History > Year 4 > Historical Knowledge and Understanding > First Contacts";
+    const ELBH117_TITLE =
+        "[ELBH117] Mapping the diversity of Aboriginal and Torres Strait Islander language groups in Australia, with particular emphasis on the local area and state/territory.";
+    const ELBH117_BREADCRUMB =
+        "Year 4 History > Year 4 > Historical Knowledge and Understanding > First Contacts > The diversity and longevity of Australia’s first peoples and the ways Aboriginal and/or Torres Strait Islander peoples are connected to Country and Place (land, sea, waterways and skies) and the implications for their daily lives.";
 
     let curriculumOverviewComponentId: number | null = null;
     let homepage: Homepage;
@@ -158,6 +167,21 @@ test.describe.serial("Curriculum Overview Component Tests", () => {
         await CurriculumOverview.expectListToContainText(curriculumOverviewComponent, "[ACHHK077]");
         await CurriculumOverview.expectListNotToContainText(curriculumOverviewComponent, "[ACHHK078]");
         await CurriculumOverview.expectListNotToContainText(curriculumOverviewComponent, "[ACHHK079]");
+    });
+
+    test("Check the curriculum overview component as a student", async ({ db, page, tester }) => {
+        tester.isGoingTo("impersonate Jana Reed and open the homepage");
+        await tester.impersonate(Common.USER_JANAREED);
+        await homepage.goto(HOMEPAGE_ID);
+
+        tester.isGoingTo("verify Jana Reed can view the curriculum in the overview component");
+        await CurriculumOverview.expectListToContainText(curriculumOverviewComponent, "[ELBH117]");
+        await CurriculumOverview.expectListToContainText(curriculumOverviewComponent, ELBH117_TITLE);
+
+        tester.isGoingTo("open the ELBH117 curriculum details modal and verify its details");
+        await CurriculumOverview.clickCurriculumCode(curriculumOverviewComponent, CURRICULUM_NODE_ELBH117);
+        await curriculumOverview.expectDetailsModalTitle(ELBH117_TITLE);
+        await curriculumOverview.expectDetailsModalBreadcrumb(ELBH117_BREADCRUMB);
     });
 
     test.afterAll(async ({ api, baseTester, db }) => {
