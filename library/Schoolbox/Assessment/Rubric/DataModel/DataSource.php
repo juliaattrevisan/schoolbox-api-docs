@@ -1299,6 +1299,8 @@ class DataSource
             ->setCapabilityGradeGroup($capabilityGradeGroup)
             ->setMarkedUsingRange($importer->isUseMarkRange());
 
+        $assessment->getRubricInstances()->add($rubricInstance);
+
         /* $this->rubricInstanceMapper->save($rubricInstance);
          *
          * You can't save it at this point: $assessmentModel might be a new instance and not yet have an identifier.

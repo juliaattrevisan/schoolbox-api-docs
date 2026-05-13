@@ -226,8 +226,13 @@ class Decorator implements DecoratorInterface
              * This builds on the frontend assumption that totally new rubric grids have a negative int identifier,
              * because you can spawn multiple new grids in a payload here...such identifiers just become more and more
              * negative, making them signed ints in practice but when they're persisted, they'll be unsigned.
+             *
+             * TODO There's this bug where the frontend payload sends 'null' as a rubric identifier: rubric[null] = ...
+             *  This equates to $rubricId > 0 bool(true), causing a new grid to be skipped here. It means you also share
+             *  an identifier when you spawn multiple new grids via csv; they all have the same 'null' index. This
+             *  constraints you to csv importing one grid at a time, for now: idk where this occurs in the frontend.
              */
-            if ($rubricId > 0) {
+            if (is_numeric($rubricId) && $rubricId > 0) {
                 continue;
             }
 
