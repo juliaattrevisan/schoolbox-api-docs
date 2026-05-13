@@ -1299,8 +1299,17 @@ class DataSource
             ->setCapabilityGradeGroup($capabilityGradeGroup)
             ->setMarkedUsingRange($importer->isUseMarkRange());
 
-        $this->rubricInstanceMapper->save($rubricInstance);
-
+        /* $this->rubricInstanceMapper->save($rubricInstance);
+         *
+         * You can't save it at this point: $assessmentModel might be a new instance and not yet have an identifier.
+         * You can encounter this scenario via the rubric controller:
+         *
+         * elseif ($folderId = $post->get('folderId')) {
+         *     $assessment = (new DueWork())
+         *         ->setId(0)
+         *
+         * Persistence must occur later.
+         */
         $grid = new Grid($assessment, $rubricInstance, $rowSet);
 
         // Create levels

@@ -75,39 +75,39 @@ trait DueWorkTrait
 
 
     /**
-     * @var bool
+     * @var null|bool
      */
-    private bool $enableWorksheet;
+    private ?bool $enableWorksheet = null;
 
 
     /**
      * @var string|null
      */
-    private ?string $worksheetTemplate;
+    private ?string $worksheetTemplate = null;
 
 
     /**
-     * @var bool
+     * @var bool|null
      */
-    private bool $enableOffline;
+    private ?bool $enableOffline = null;
 
 
     /**
-     * @var bool
+     * @var bool|null
      */
-    private bool $enableText;
+    private ?bool $enableText = null;
 
 
     /**
-     * @var bool
+     * @var bool|null
      */
-    private bool $enableFiles;
+    private ?bool $enableFiles = null;
 
 
     /**
-     * @var bool
+     * @var bool|null
      */
-    private bool $enablePolicy;
+    private ?bool $enablePolicy = null;
 
 
     /**
@@ -287,6 +287,15 @@ trait DueWorkTrait
 
 
     /**
+     * @return bool|null
+     */
+    public function getEnableWorksheet(): ?bool
+    {
+        return $this->enableWorksheet;
+    }
+
+
+    /**
      * @param bool $enableWorksheet
      * @return $this
      */
@@ -298,11 +307,11 @@ trait DueWorkTrait
 
 
     /**
-     * @return bool
+     * @return string|null
      */
-    public function getEnableWorksheet(): bool
+    public function getWorksheetTemplate(): ?string
     {
-        return $this->enableWorksheet;
+        return $this->worksheetTemplate;
     }
 
 
@@ -318,11 +327,11 @@ trait DueWorkTrait
 
 
     /**
-     * @return string|null
+     * @return bool|null
      */
-    public function getWorksheetTemplate(): ?string
+    public function getEnableOffline(): ?bool
     {
-        return $this->worksheetTemplate;
+        return $this->enableOffline;
     }
 
 
@@ -338,11 +347,11 @@ trait DueWorkTrait
 
 
     /**
-     * @return bool
+     * @return bool|null
      */
-    public function getEnableOffline(): bool
+    public function getEnableText(): ?bool
     {
-        return $this->enableOffline;
+        return $this->enableText;
     }
 
 
@@ -358,11 +367,11 @@ trait DueWorkTrait
 
 
     /**
-     * @return bool
+     * @return bool|null
      */
-    public function getEnableText(): bool
+    public function getEnableFiles(): ?bool
     {
-        return $this->enableText;
+        return $this->enableFiles;
     }
 
 
@@ -378,11 +387,11 @@ trait DueWorkTrait
 
 
     /**
-     * @return bool
+     * @return bool|null
      */
-    public function getEnableFiles(): bool
+    public function getEnablePolicy(): ?bool
     {
-        return $this->enableFiles;
+        return $this->enablePolicy;
     }
 
 
@@ -394,14 +403,5 @@ trait DueWorkTrait
     {
         $this->enablePolicy = $enablePolicy;
         return $this;
-    }
-
-
-    /**
-     * @return bool
-     */
-    public function getEnablePolicy(): bool
-    {
-        return $this->enablePolicy;
     }
 }

@@ -599,12 +599,12 @@ class Factory
                     $this->getInstructorMaxMark(),
                     $this->getRubricData(),
                     $this->getAttachedFiles(),
-                    $this->getEnableWorksheet(),
+                    (bool)$this->getEnableWorksheet(),
                     $this->getWorksheetTemplate(),
-                    $this->getEnableOffline(),
-                    $this->getEnableText(),
-                    $this->getEnableFiles(),
-                    $this->getEnablePolicy(),
+                    (bool)$this->getEnableOffline(),
+                    (bool)$this->getEnableText(),
+                    (bool)$this->getEnableFiles(),
+                    (bool)$this->getEnablePolicy(),
                     $originalDueWork
                 );
             } else {
@@ -620,12 +620,12 @@ class Factory
                     $this->getAttachedFiles(),
                     $this->getSelfReviewable(),
                     $this->getSimilarityCheckEnabled(),
-                    $this->getEnableWorksheet(),
+                    (bool)$this->getEnableWorksheet(),
                     $this->getWorksheetTemplate(),
-                    $this->getEnableOffline(),
-                    $this->getEnableText(),
-                    $this->getEnableFiles(),
-                    $this->getEnablePolicy(),
+                    (bool)$this->getEnableOffline(),
+                    (bool)$this->getEnableText(),
+                    (bool)$this->getEnableFiles(),
+                    (bool)$this->getEnablePolicy(),
                     $originalDueWork,
                 );
             }

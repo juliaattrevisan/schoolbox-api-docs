@@ -129,14 +129,21 @@ class Decorator implements DecoratorInterface
         ?array $attachedFiles,
         private ?string $selfReviewable,
         private bool $similarityCheckEnabled,
-        private bool $enableWorksheet,
-        private ?string $worksheetTemplate,
-        private bool $enableOffline,
-        private bool $enableText,
-        private bool $enableFiles,
-        private bool $enablePolicy,
+        bool $enableWorksheet,
+        ?string $worksheetTemplate,
+        bool $enableOffline,
+        bool $enableText,
+        bool $enableFiles,
+        bool $enablePolicy,
         private ?DueWork $original
     ) {
+
+        $this->setEnableWorksheet($enableWorksheet);
+        $this->setWorksheetTemplate($worksheetTemplate);
+        $this->setEnableOffline($enableOffline);
+        $this->setEnableText($enableText);
+        $this->setEnableFiles($enableFiles);
+        $this->setEnablePolicy($enablePolicy);
         $this->setRubricData($rubricData);
         $this->setAttachedFiles($attachedFiles);
 
@@ -210,8 +217,11 @@ class Decorator implements DecoratorInterface
          *
          * Note that you can now spawn multiple grids from the frontend; the all end up here via one mega payload.
          * This mega payload contains a mix of previously-existing grids and totally new ones.
+         *
+         * Note that this null coalesce is necessary because Assessment Factory might have set this null when creating a
+         * new learning activity that never used rubrics. This set will be null in such a circumstance.
          */
-        foreach ($this->getRubricData() as $rubricId => $payload) {
+        foreach ($this->getRubricData() ?? [] as $rubricId => $payload) {
             /* This rubric instance already existed in the assessment; it already has a meaningful identifier.
              * This builds on the frontend assumption that totally new rubric grids have a negative int identifier,
              * because you can spawn multiple new grids in a payload here...such identifiers just become more and more

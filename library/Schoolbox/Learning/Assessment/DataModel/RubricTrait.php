@@ -22,7 +22,7 @@ trait RubricTrait
      *
      * @var array|null
      */
-    private ?array $rubricData;
+    private ?array $rubricData = null;
 
 
     /**
