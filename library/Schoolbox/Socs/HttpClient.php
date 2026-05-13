@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * @author    Justin Clarke <justin.clarke@schoolbox.education>
+ * @copyright Copyright 2026, Schoolbox Pty Ltd
+ * @link      https://schoolbox.education/
+ */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Socs;
@@ -38,6 +44,9 @@ class HttpClient
 
     /** @var array<string,int> */
     private array $urlUsage = [];
+
+    // known error strings
+    private const NOT_AVAILABLE = 'Not available.';
 
     /**
      * @param string $host Base URL of the SOCS API, without trailing slash.
@@ -101,6 +110,16 @@ class HttpClient
                     if ('' === $content) {
                         return false;
                     }
+
+                    // known errors
+                    // incorrect CREDS:
+                    if (self::NOT_AVAILABLE === $content) {
+                        throw new FatalException(sprintf(
+                            'SOCS endpoint returned known error string; aborting. %s',
+                            self::NOT_AVAILABLE
+                        ));
+                    }
+
 
                     $xml = @simplexml_load_string($content);
                     if (false === $xml) {

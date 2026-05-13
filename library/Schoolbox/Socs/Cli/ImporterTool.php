@@ -2,6 +2,9 @@
 
 /**
  * SOCS Fixtures CLI Importer
+ * @author    Justin Clarke <justin.clarke@schoolbox.education>
+ * @copyright Copyright 2026, Schoolbox Pty Ltd
+ * @link      https://schoolbox.education/
  */
 
 declare(strict_types=1);
@@ -12,6 +15,7 @@ use Ramsey\Uuid\Uuid;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Socs\Factory as SocsFactory;
+use Schoolbox\Socs\FatalException;
 use Schoolbox\Socs\Log\Mapper as SocsLogMapper;
 
 /**
@@ -148,7 +152,7 @@ class ImporterTool extends CliTool\App
             if (!$this->perform()) {
                 $logger->info('SOCS importer planning finished.');
             }
-        } catch (\Exception $e) {
+        } catch (\Exception|FatalException $e) {
             if ($this->perform() && $importLog !== null) {
                 $importLogMapper->error($importLog, $e->getMessage());
                 $importLogMapper->prune();
