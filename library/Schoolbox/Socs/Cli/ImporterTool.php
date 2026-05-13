@@ -154,7 +154,7 @@ class ImporterTool extends CliTool\App
                 $logger->info('SOCS importer planning finished.');
             }
         } catch (\Exception | SOCSFatalException $e) {
-            if ($this->perform() && $importLog !== null) {
+            if ($this->perform()) {
                 $importLogMapper->error($importLog, $e->getMessage());
             }
 
@@ -166,7 +166,7 @@ class ImporterTool extends CliTool\App
                 $logger->debug($e->getPrevious()->getTraceAsString());
             }
         } finally {
-            if ($this->perform() && $importLog !== null && !$importLog->isError()) {
+            if ($this->perform() && !$importLog->isError()) {
                 $importLogMapper->finish($importLog);
             }
 
