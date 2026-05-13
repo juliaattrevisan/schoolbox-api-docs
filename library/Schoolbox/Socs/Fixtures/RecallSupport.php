@@ -57,11 +57,10 @@ trait RecallSupport
         $start = $now->getStartOfSchoolYear()->startOfDay();
         $end = $now->getStartOfSchoolYear()->startOfDay()->addYears(self::END_THRESHOLD);
 
-        $needsSave = false;
-
         try {
             /** @var SeasonModel $season */
             $season = $seasonMapper->findOneByColumn('name', $seasonName);
+            $season->setUpdatedAt(\Alaress_Date_Format::now());
             $logger->debug(sprintf(
                 'Reusing existing SOCS season %s %s-%s',
                 $season->getName(),
@@ -73,8 +72,7 @@ trait RecallSupport
             $season = $e->getDeletedObject();
             $seasonMapper->restoreSoftDeleted($season);
             $logger->debug(sprintf('Resurrecting previously-deleted SOCS season %s', $season->getName()));
-            $needsSave = true;
-        } catch (\Schoolbox\Mapper\Exception $e) {
+       } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var SeasonModel $season */
             $season = $seasonMapper->createModel()
                 ->setName($seasonName)
@@ -87,10 +85,9 @@ trait RecallSupport
                 $season->getStart()->getDatabase(),
                 $season->getEnd()->getDatabase()
             ));
-            $needsSave = true;
-        }
+       }
 
-        if ($this->perform && $needsSave) {
+        if ($this->perform) {
             $seasonMapper->save($season);
         }
 
@@ -108,27 +105,24 @@ trait RecallSupport
      */
     protected function recallSport(SportMapper $sportMapper, LoggerInterface $logger, string $sportName): SportModel
     {
-        $needsSave = false;
-
         try {
             /** @var SportModel $sport */
             $sport = $sportMapper->findOneByColumn('name', $sportName);
+            $sport->setUpdatedAt(\Alaress_Date_Format::now());
             $logger->debug(sprintf('Reusing existing SOCS sport %s', $sport->getName()));
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             /** @var SportModel $sport */
             $sport = $e->getDeletedObject();
             $sportMapper->restoreSoftDeleted($sport);
             $logger->debug(sprintf('Resurrecting previously-deleted SOCS sport %s', $sport->getName()));
-            $needsSave = true;
-        } catch (\Schoolbox\Mapper\Exception $e) {
+       } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var SportModel $sport */
             $sport = $sportMapper->createModel()
                 ->setName($sportName);
             $logger->debug(sprintf('Creating new SOCS sport %s', $sport->getName()));
-            $needsSave = true;
-        }
+       }
 
-        if ($this->perform && $needsSave) {
+        if ($this->perform) {
             $sportMapper->save($sport);
         }
 
@@ -153,8 +147,6 @@ trait RecallSupport
         SportModel $sport,
         SeasonModel $season
     ): DivisionModel {
-        $needsSave = false;
-
         try {
             /** @var DivisionModel $division */
             $division = $divisionMapper->findOneByColumnList([
@@ -168,18 +160,16 @@ trait RecallSupport
             $division = $e->getDeletedObject();
             $divisionMapper->restoreSoftDeleted($division);
             $logger->debug(sprintf('Resurrecting previously-deleted SOCS division %s', $division->getName()));
-            $needsSave = true;
-        } catch (\Schoolbox\Mapper\Exception $e) {
+       } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var DivisionModel $division */
             $division = $divisionMapper->createModel()
                 ->setName($divisionName)
                 ->setSport($sport)
                 ->setSeason($season);
             $logger->debug(sprintf('Creating new SOCS division %s', $division->getName()));
-            $needsSave = true;
-        }
+       }
 
-        if ($this->perform && $needsSave) {
+        if ($this->perform) {
             $divisionMapper->save($division);
         }
 
@@ -198,8 +188,6 @@ trait RecallSupport
      */
     protected function recallTeam(TeamMapper $teamMapper, LoggerInterface $logger, string $teamName, DivisionModel $division): TeamModel
     {
-        $needsSave = false;
-
         try {
             /** @var TeamModel $team */
             $team = $teamMapper->findOneByColumnList([
@@ -212,17 +200,15 @@ trait RecallSupport
             $team = $e->getDeletedObject();
             $teamMapper->restoreSoftDeleted($team);
             $logger->debug(sprintf('Resurrecting previously-deleted SOCS team %s', $team->getName()));
-            $needsSave = true;
-        } catch (\Schoolbox\Mapper\Exception $e) {
+       } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var TeamModel $team */
             $team = $teamMapper->createModel()
                 ->setName($teamName)
                 ->setDivision($division);
             $logger->debug(sprintf('Creating new SOCS team %s', $team->getName()));
-            $needsSave = true;
-        }
+       }
 
-        if ($this->perform && $needsSave) {
+        if ($this->perform) {
             $teamMapper->save($team);
         }
 
@@ -240,27 +226,24 @@ trait RecallSupport
      */
     protected function recallVenue(VenueMapper $venueMapper, LoggerInterface $logger, string $venueName): VenueModel
     {
-        $needsSave = false;
-
         try {
             /** @var VenueModel $venue */
             $venue = $venueMapper->findOneByColumn('name', $venueName);
+            $venue->setUpdatedAt(\Alaress_Date_Format::now());
             $logger->debug(sprintf('Reusing existing SOCS venue %s', $venue->getName()));
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             /** @var VenueModel $venue */
             $venue = $e->getDeletedObject();
             $venueMapper->restoreSoftDeleted($venue);
             $logger->debug(sprintf('Resurrecting previously-deleted SOCS venue %s', $venue->getName()));
-            $needsSave = true;
-        } catch (\Schoolbox\Mapper\Exception $e) {
+       } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var VenueModel $venue */
             $venue = $venueMapper->createModel()
                 ->setName($venueName);
             $logger->debug(sprintf('Creating new SOCS venue %s', $venue->getName()));
-            $needsSave = true;
-        }
+       }
 
-        if ($this->perform && $needsSave) {
+        if ($this->perform) {
             $venueMapper->save($venue);
         }
 
@@ -278,27 +261,24 @@ trait RecallSupport
      */
     protected function recallSchool(SchoolMapper $schoolMapper, LoggerInterface $logger, string $schoolName): SchoolModel
     {
-        $needsSave = false;
-
         try {
             /** @var SchoolModel $school */
             $school = $schoolMapper->findOneByColumn('name', $schoolName);
+            $school->setUpdatedAt(\Alaress_Date_Format::now());
             $logger->debug(sprintf('Reusing existing SOCS school %s', $school->getName()));
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             /** @var SchoolModel $school */
             $school = $e->getDeletedObject();
             $schoolMapper->restoreSoftDeleted($school);
             $logger->debug(sprintf('Resurrecting previously-deleted SOCS school %s', $school->getName()));
-            $needsSave = true;
-        } catch (\Schoolbox\Mapper\Exception $e) {
+       } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var SchoolModel $school */
             $school = $schoolMapper->createModel()
                 ->setName($schoolName);
             $logger->debug(sprintf('Creating new SOCS school %s', $school->getName()));
-            $needsSave = true;
-        }
+       }
 
-        if ($this->perform && $needsSave) {
+        if ($this->perform) {
             $schoolMapper->save($school);
         }
 
