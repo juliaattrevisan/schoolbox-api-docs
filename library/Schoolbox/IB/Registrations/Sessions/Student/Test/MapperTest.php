@@ -26,6 +26,7 @@ class MapperTest extends TestCase
 {
     public function testSubjectLanguageMapperProvidesBatchedLookupMethod(): void
     {
+        // @phpstan-ignore-next-line - This contract test intentionally asserts the public mapper API exists.
         $this->assertTrue(method_exists(
             SubjectLanguageMapper::class,
             'findByRegistrationSessionStudentIds'
@@ -51,9 +52,11 @@ class MapperTest extends TestCase
             ->willReturn([
                 101 => new GenericCollection(SubjectLanguageModel::class, [$override]),
             ]);
-        $mapper = $this->buildMapperWithSubjectLanguageMapper($subjectLanguageMapper);
 
-        $mapper->applyOverrides(new GenericCollection(RegistrationSessionStudentModel::class, [$student]));
+        $this->applyOverridesWithSubjectLanguageMapper($subjectLanguageMapper, new GenericCollection(
+            RegistrationSessionStudentModel::class,
+            [$student]
+        ));
 
         $languages = $this->findGroupSubjectById($student, 201)->getLanguages();
         $this->assertCount(1, $languages);
@@ -81,9 +84,11 @@ class MapperTest extends TestCase
             ->willReturn([
                 101 => new GenericCollection(SubjectLanguageModel::class, [$override]),
             ]);
-        $mapper = $this->buildMapperWithSubjectLanguageMapper($subjectLanguageMapper);
 
-        $mapper->applyOverrides(new GenericCollection(RegistrationSessionStudentModel::class, [$student]));
+        $this->applyOverridesWithSubjectLanguageMapper($subjectLanguageMapper, new GenericCollection(
+            RegistrationSessionStudentModel::class,
+            [$student]
+        ));
 
         $this->assertSame($matchingSubject->getLanguages(), $this->findGroupSubjectById($student, 201)->getLanguages());
         $this->assertSame($unmatchedSubject->getLanguages(), $this->findGroupSubjectById($student, 202)->getLanguages());
@@ -106,12 +111,14 @@ class MapperTest extends TestCase
             ->method('findByRegistrationSessionStudentIds')
             ->with([101])
             ->willReturn([]);
-        $mapper = $this->buildMapperWithSubjectLanguageMapper($subjectLanguageMapper);
 
-        $mapper->applyOverrides(new GenericCollection(RegistrationSessionStudentModel::class, [
+        $this->applyOverridesWithSubjectLanguageMapper($subjectLanguageMapper, new GenericCollection(
+            RegistrationSessionStudentModel::class,
+            [
             $persistedStudent,
             $derivedStudent,
-        ]));
+            ]
+        ));
 
         $derivedLanguages = $this->findGroupSubjectById($derivedStudent, 202)->getLanguages();
         $this->assertCount(1, $derivedLanguages);
@@ -141,9 +148,11 @@ class MapperTest extends TestCase
             ->willReturn([
                 101 => new GenericCollection(SubjectLanguageModel::class, [$override]),
             ]);
-        $mapper = $this->buildMapperWithSubjectLanguageMapper($subjectLanguageMapper);
 
-        $mapper->applyOverrides(new GenericCollection(RegistrationSessionStudentModel::class, [$student]));
+        $this->applyOverridesWithSubjectLanguageMapper($subjectLanguageMapper, new GenericCollection(
+            RegistrationSessionStudentModel::class,
+            [$student]
+        ));
 
         $this->assertSame(
             $subjectAtCollidingOffset->getLanguages(),
@@ -154,9 +163,14 @@ class MapperTest extends TestCase
         $this->assertSame($overrideLanguage, $languages[0]->getLanguage());
     }
 
-    private function buildMapperWithSubjectLanguageMapper(SubjectLanguageMapper $subjectLanguageMapper): Mapper
-    {
-        return new class ($subjectLanguageMapper) extends Mapper {
+    /**
+     * @param GenericCollection|RegistrationSessionStudentModel[] $students
+     */
+    private function applyOverridesWithSubjectLanguageMapper(
+        SubjectLanguageMapper $subjectLanguageMapper,
+        GenericCollection $students
+    ): void {
+        $mapper = new class ($subjectLanguageMapper) extends Mapper {
             public function __construct(private SubjectLanguageMapper $subjectLanguageMapper)
             {
                 parent::__construct();
@@ -172,6 +186,8 @@ class MapperTest extends TestCase
                 return $this->subjectLanguageMapper;
             }
         };
+
+        $mapper->applyOverrides($students);
     }
 
     /**

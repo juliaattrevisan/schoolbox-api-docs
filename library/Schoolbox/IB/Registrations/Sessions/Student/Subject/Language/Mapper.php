@@ -107,7 +107,7 @@ class Mapper extends BaseMapper
             $groupSubject = $groupSubjectMapper->hydrate($row, 'gs');
             $language = $languageMapper->hydrate($row, 'l');
 
-            if (!$registrationSessionStudent?->getId() || !$groupSubject?->getId() || !$language?->getId()) {
+            if (!$registrationSessionStudent->getId() || !$groupSubject->getId() || !$language?->getId()) {
                 continue;
             }
 
