@@ -150,7 +150,10 @@ class Eportfolio extends Base
             ] as $table
         ) {
             $count = (int) ($counts[$table] ?? 0);
-            $this->log->notice("Found $count $table rows to delete (child rows will also be deleted but are not counted here - see chunk output)");
+            $this->log->notice(
+                "Found $count $table rows to delete" .
+                " (counting deletable root nodes only - rows having a soft-deleted ancestor are excluded)"
+            );
             $hasData = $hasData || $count > 0;
         }
 
