@@ -1418,6 +1418,7 @@ class MapperProxy
          * Anyway, disregard grid changes if CourseManaged is on, having said all that...lol
          * Course Managed activities don't let you change some stuff in an implementation, incl. rubric grids afaik
          */
+
         if ($assessable->getRubricInstances()->count() && !(new CourseManagedFields($currentUser, $assessable))->isReadonly()) {
             /* At this point, both the subobject and the assessment should have been persisted already.
              *
@@ -1448,6 +1449,14 @@ class MapperProxy
                      * that checks "compatibility"
                      */
                     $originalGrid = $newGrid;
+                }
+
+                /* The grid exists, but in the creational workflow, its assessment model identifier is nonexistent.
+                 * For this particular usage it should inherit whatever the assessment id now became, since we just
+                 * persisted the assessment model. Wild!
+                 */
+                if (null === $newGrid->getRubricInstance()->getAssessmentModel()->getId()) {
+                    $newGrid->getRubricInstance()->getAssessmentModel()->setId($assessable->getId());
                 }
 
                 /* TODO lol how do I get past THIS??!?!??!???
