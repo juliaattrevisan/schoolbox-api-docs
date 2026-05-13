@@ -167,9 +167,9 @@ class ImporterTool extends CliTool\App
                 $logger->debug(sprintf('Previous: %s', $e->getPrevious()->getMessage()));
                 $logger->debug($e->getPrevious()->getTraceAsString());
             }
-
-            $lock->release();
         }
+
+        $lock->release();
     }
 
     /**
