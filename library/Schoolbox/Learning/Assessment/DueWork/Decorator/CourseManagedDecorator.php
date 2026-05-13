@@ -64,16 +64,26 @@ class CourseManagedDecorator implements DecoratorInterface
         private ?int $instructorGradingScheme,
         private ?float $maxMark,
         private ?float $instructorMaxMark,
-        private ?array $rubricData,
+        ?array $rubricData,
         ?array $attachedFiles,
-        private bool $enableWorksheet,
-        private ?string $worksheetTemplate,
-        private bool $enableOffline,
-        private bool $enableText,
-        private bool $enableFiles,
-        private bool $enablePolicy,
+        bool $enableWorksheet,
+        ?string $worksheetTemplate,
+        bool $enableOffline,
+        bool $enableText,
+        bool $enableFiles,
+        bool $enablePolicy,
         private ?DueWork $original
     ) {
+        /* For unknown reasons, php finds our usage of traits objectionable: I have to go back to doing it like this.
+         * (Our constructor definitions are in conflict with traits' definitions)
+         */
+        $this->setEnableWorksheet($enableWorksheet);
+        $this->setWorksheetTemplate($worksheetTemplate);
+        $this->setEnableOffline($enableOffline);
+        $this->setEnableText($enableText);
+        $this->setEnableFiles($enableFiles);
+        $this->setEnablePolicy($enablePolicy);
+        $this->setRubricData($rubricData);
         $this->setAttachedFiles($attachedFiles);
     }
 
