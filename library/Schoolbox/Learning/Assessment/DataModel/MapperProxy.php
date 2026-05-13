@@ -1418,7 +1418,6 @@ class MapperProxy
          * Anyway, disregard grid changes if CourseManaged is on, having said all that...lol
          * Course Managed activities don't let you change some stuff in an implementation, incl. rubric grids afaik
          */
-
         if ($assessable->getRubricInstances()->count() && !(new CourseManagedFields($currentUser, $assessable))->isReadonly()) {
             /* At this point, both the subobject and the assessment should have been persisted already.
              *
@@ -1429,9 +1428,19 @@ class MapperProxy
              */
             $rubricMapper = RubricDataSource::getInstance();
 
+            /* Keep track of all the still-existing rubric instance ids
+             * We soft delete every rubric instance associated with $assessable that -isn't- in this set anymore.
+             * That's how we manage doing a diff to find rubric grids that were deleted via ui.
+             */
+            $keepRubricInstanceIds = [];
+
             /* This contains a mix of totally new, and pre-existing, rubric instances.
              */
             foreach ($assessable->getRubricInstances() as $rubricInstance) {
+                /* We need to keep this
+                 */
+                $keepRubricInstanceIds[] = $rubricInstance->getId();
+
                 /* The latest version of the rubric grid, as per the Decorators that processed the frontend
                  * payload, storing it in the temporary place so we can get it here.
                  */
@@ -1463,6 +1472,32 @@ class MapperProxy
                  */
                 $rubricMapper->persistGrid($newGrid, $originalGrid, $subObject);
             }
+
+            /* Soft delete everything except whatever we captured in $keepRubricInstanceIds
+             * Originally, I tried a predicate builder approach:
+             *
+                    $subpredicate = $rubricInstanceMapper->getPredicateBuilder()
+                        ->notIn('id', $keepRubricInstanceIds)
+                        ->equals('assessment_id', $assessable->getId());
+
+                    $pb = $rubricInstanceMapper->getPredicateBuilder()
+                        ->all($subpredicate);
+
+                    $rubricInstanceMapper->deleteByPredicates($pb);
+             *
+             * But it kept giving me this nonsensical hankypanky:
+             *    Could not save activity. Error executing statement: SQLSTATE[22007]: Invalid datetime format: 1292 Truncated incorrect DECIMAL value: 'null'.
+             */
+            $rubricInstanceMapper = \Schoolbox\Assessment\Rubric\Instance\Mapper::getInstance();
+
+            $rubricInstanceMapper->getDatabase()->executeQuery("
+                UPDATE rubric_instance
+                SET deleted_at = NOW()
+                WHERE assessment_id = :assessmentId
+                AND rubric_instance.id NOT IN (". implode(',', $keepRubricInstanceIds) .")
+            ", [
+                'assessmentId' => $assessable->getId()
+            ]);
         }
 
 

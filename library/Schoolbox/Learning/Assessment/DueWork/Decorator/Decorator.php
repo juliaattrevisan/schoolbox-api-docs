@@ -212,6 +212,10 @@ class Decorator implements DecoratorInterface
          *  to populate the $assessment with rubric instances, grids, and the max marks stuff.
          */
 
+        /* These are the rubric instance identifiers that were posted to us from the ui
+         */
+        $keepRubricInstanceIds = array_keys($this->getRubricData());
+
         /* If there are any rubric grids, we need to process each one for this assessment.
          * We also assign the assessment's maximum available marks as the summation of all the grids' maxima.
          *
@@ -221,7 +225,7 @@ class Decorator implements DecoratorInterface
          * Note that this null coalesce is necessary because Assessment Factory might have set this null when creating a
          * new learning activity that never used rubrics. This set will be null in such a circumstance.
          */
-        foreach ($this->getRubricData() ?? [] as $rubricId => $payload) {
+        foreach ($this->getRubricData() ?? [] as $rubricInstanceId => $payload) {
             /* This rubric instance already existed in the assessment; it already has a meaningful identifier.
              * This builds on the frontend assumption that totally new rubric grids have a negative int identifier,
              * because you can spawn multiple new grids in a payload here...such identifiers just become more and more
@@ -232,7 +236,7 @@ class Decorator implements DecoratorInterface
              *  an identifier when you spawn multiple new grids via csv; they all have the same 'null' index. This
              *  constraints you to csv importing one grid at a time, for now: idk where this occurs in the frontend.
              */
-            if (is_numeric($rubricId) && $rubricId > 0) {
+            if (is_numeric($rubricInstanceId) && $rubricInstanceId > 0) {
                 continue;
             }
 
@@ -244,7 +248,9 @@ class Decorator implements DecoratorInterface
              * but this is a real weird hydration that I have to do here.
              */
             $newRubricInstance = $this->rubricInstanceMapper->createModel()
-                ->setId($rubricId)
+                ->setId($rubricInstanceId)
+                ->setTitle($payload['title'])
+                ->setWeight($payload['weight'])
                 ->setAssessmentModel((new \Schoolbox\Learning\Assessment\DataModel\Model())->setId($assessment->getId()));
 
             /* "Welcome to the party, pal." --John McClane
@@ -252,9 +258,10 @@ class Decorator implements DecoratorInterface
             $assessment->getRubricInstances()->add($newRubricInstance);
         }
 
+        /* If rubric_instances exist, populate them with settings from the rubricData payload: this updates the settings
+         * for each grid that we intend to keep.
+         */
         if ($assessment->getRubricInstances()->count()) {
-            /* Populate rubric_instance records with settings from the rubricData payload
-             */
             $rubricMapper = $this->rubricMapper;
             $gridFactory  = new GridFactory();
 
@@ -265,6 +272,13 @@ class Decorator implements DecoratorInterface
             $maxMark = 0;
 
             foreach ($assessment->getRubricInstances() as $rubricInstance) {
+                /* If this is null, then $assessment knew about a grid, but it's no longer in the getRubricData() post
+                 * payload: it was removed via the ui.
+                 */
+                if (!isset($this->getRubricData()[$rubricInstance->getId()])) {
+                    continue;
+                }
+
                 $existingGrid = new Grid(
                     $assessment,
                     $rubricInstance,
@@ -306,6 +320,14 @@ class Decorator implements DecoratorInterface
                  */
                 $maxMark += $newGrid->calculateMaxValueFromCapabilities();
             }
+
+            /* Remove any rubric instances that the user intended to be deleted
+             */
+            $revisedRubricInstances = $assessment->getRubricInstances()->filter(static function (\Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance) use ($keepRubricInstanceIds) {
+                return in_array($rubricInstance->getId(), $keepRubricInstanceIds);
+            });
+
+            $assessment->setRubricInstances($revisedRubricInstances);
 
             /* The max mark is the aggregation of each grid's maximum
              */
