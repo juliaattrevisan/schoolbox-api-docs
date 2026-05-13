@@ -216,6 +216,18 @@ $inline-list-default-float-list-margin: rem-calc($base-font-size);
 // Activity list
 .activity-list {
     @include information-list;
+
+    .grades-assessment-link {
+        align-items: center;
+        display: flex;
+        gap: var(--spacing-s);
+    }
+
+    .grades-assessment-link__icon {
+        color: var(--sbx-color-text-secondary, $body-foreground);
+        flex: 0 0 auto;
+    }
+
     li {
         .grade {
             text-align: center;

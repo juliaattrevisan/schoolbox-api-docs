@@ -24,8 +24,8 @@
             student:      student
         }) %}
         {% if summaryRoute %}
-            <a href="{{ summaryRoute }}{{ returnUrlSuffix is defined ? returnUrlSuffix : '' }}">
-                <span class="{{ icon.renderClass(assessment) }}"></span>
+            <a class="grades-assessment-link" href="{{ summaryRoute }}{{ returnUrlSuffix is defined ? returnUrlSuffix : '' }}">
+                <sbx-icon class="grades-assessment-link__icon" name="{{ icon.renderName(assessment)|trim }}" color="var(--sbx-color-text-secondary)"></sbx-icon>
                 <p>{{ assessment.title }}
                     {% if participant and USER.role.isStaff and participant.plan.isStatic %}
                         <span class="individualisation has-tip tip-top" data-tooltip title="{{ participant.plan.name}} ({{ participant.plan.duedate.short}})">i</span>
@@ -33,8 +33,10 @@
                 </p>
             </a>
         {% else %}
-            <span class="{{ icon.renderClass(assessment) }}"></span>
-            <p>{{ assessment.title }}</p>
+            <div class="grades-assessment-link">
+                <sbx-icon class="grades-assessment-link__icon" name="{{ icon.renderName(assessment)|trim }}" color="var(--sbx-color-text-secondary)"></sbx-icon>
+                <p>{{ assessment.title }}</p>
+            </div>
         {% endif %}
         <p>
             {% if assessment.isSpecification %}
