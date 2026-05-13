@@ -482,8 +482,14 @@ class DataSource
          * meaningful default values; they're just null. It relies on swamp to set the meaningful defaults, but that
          * occurs elsewhere. Anyway, for our usages, it's sane enough to assume that "null" equates to "false" which
          * ultimately means "this setting is off"
+         *
+         * Note that the output of this method is used in the frontend (and its corresponding javascript) when you are
+         * creating a whole new grid. The expectations of the javascript are fulfilled in part by the settings here,
+         * such as rubric titles never being nullable forcing us to empty-string them initially here.
          */
-        $rubricInstance = \Schoolbox\Assessment\Rubric\Instance\Mapper::getInstance()->createModel();
+        $rubricInstance = \Schoolbox\Assessment\Rubric\Instance\Mapper::getInstance()->createModel()
+            ->setTitle('')
+            ->setWeight(self::RUBRIC_DEFAULT_WEIGHT);
 
         return new Grid($assessment, $rubricInstance, $this->retrieveRowSet($assessment->getContext(), $getUsages));
     }
