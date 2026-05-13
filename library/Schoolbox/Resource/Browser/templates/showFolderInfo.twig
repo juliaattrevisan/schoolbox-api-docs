@@ -28,7 +28,15 @@
         {% if folder.hasCoverImage ?? false %}
             <img class="folder-cover" src="/storage/image.php?hash={{ folder.coverImage.hash }}&size=square64" alt="{{ folder.name }}" {{ colouring }} />
         {% else %}
-            <sbx-icon name="{{ nodeIcon.sbxIcon(nodeType) }}" class="resource-browser-preview-icon {{ nodeIcon.icon(nodeType) }}" size="2rem" aria-hidden="true" color="currentColor"></sbx-icon>
+            {% set previewIconColor = 'var(--sbx-color-text-secondary, var(--body-foreground))' %}
+            {% if nodeType == 'course' %}
+                {% set previewIconColor = '#008600' %}
+            {% elseif nodeType == 'home' or nodeType == 'homepage' %}
+                {% set previewIconColor = 'darkorange' %}
+            {% elseif nodeType == 'root' or nodeType == 'folder' %}
+                {% set previewIconColor = 'var(--sbx-config-color-accent, currentColor)' %}
+            {% endif %}
+            <sbx-icon name="{{ nodeIcon.sbxIcon(nodeType) }}" class="resource-browser-preview-icon" size="2rem" aria-hidden="true" color="{{ previewIconColor }}"></sbx-icon>
         {% endif %}
         {% if hasHomepage %}
             </a>
