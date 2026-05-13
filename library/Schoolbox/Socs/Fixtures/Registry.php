@@ -99,7 +99,7 @@ class Registry
         try {
             /** @var SeasonModel $season */
             $season = $this->seasonMapper->findOneByColumn('name', $seasonName);
-            $season->setUpdatedAt(\Alaress_Date_Format::now());
+
             $this->logger->debug(sprintf(
                 'Reusing existing SOCS season %s %s-%s',
                 $season->getName(),
@@ -113,11 +113,7 @@ class Registry
             $this->logger->debug(sprintf('Resurrecting previously-deleted SOCS season %s', $season->getName()));
         } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var SeasonModel $season */
-            $season = $this->seasonMapper->createModel()
-                ->setName($seasonName)
-                ->setStart($start)
-                ->setEnd($end);
-
+            $season = $this->seasonMapper->createModel();
             $this->logger->debug(sprintf(
                 'Creating new SOCS season %s %s-%s',
                 $season->getName(),
@@ -125,6 +121,13 @@ class Registry
                 $season->getEnd()->getDatabase()
             ));
         }
+
+        // update updated at, we have seen this, we need to record it
+        // the season name and dates in case they have changed since the last import run
+        $season->setUpdatedAt(\Alaress_Date_Format::now())
+            ->setName($seasonName)
+            ->setStart($start)
+            ->setEnd($end);
 
         if ($this->perform) {
             $this->seasonMapper->save($season);
@@ -151,7 +154,6 @@ class Registry
         try {
             /** @var SportModel $sport */
             $sport = $this->sportMapper->findOneByColumn('name', $sportName);
-            $sport->setUpdatedAt(\Alaress_Date_Format::now());
             $this->logger->debug(sprintf('Reusing existing SOCS sport %s', $sport->getName()));
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             /** @var SportModel $sport */
@@ -160,11 +162,15 @@ class Registry
             $this->logger->debug(sprintf('Resurrecting previously-deleted SOCS sport %s', $sport->getName()));
         } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var SportModel $sport */
-            $sport = $this->sportMapper->createModel()
-                ->setName($sportName)
-                ->setExternalId(self::EXTERNAL_ID_PREFIX . $sportName);
+            $sport = $this->sportMapper->createModel();
             $this->logger->debug(sprintf('Creating new SOCS sport %s', $sport->getName()));
         }
+
+        // update updated at, we have seen this, we need to record it
+        // the sport name and externalID in case they have changed since the last import run
+        $sport->setUpdatedAt(\Alaress_Date_Format::now())
+              ->setName($sportName)
+              ->setExternalId(self::EXTERNAL_ID_PREFIX . $sportName);
 
         if ($this->perform) {
             $this->sportMapper->save($sport);
@@ -206,13 +212,17 @@ class Registry
             $this->logger->debug(sprintf('Resurrecting previously-deleted SOCS division %s', $division->getName()));
         } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var DivisionModel $division */
-            $division = $this->divisionMapper->createModel()
-                ->setName($divisionName)
-                ->setSport($sport)
-                ->setSeason($season)
-                ->setExternalId(self::EXTERNAL_ID_PREFIX . $divisionName);
+            $division = $this->divisionMapper->createModel();
             $this->logger->debug(sprintf('Creating new SOCS division %s', $division->getName()));
         }
+
+        // update updated at, we have seen this, we need to record it
+        // division name, sport, season and externalID in case they have changed since the last import run
+        $division->setUpdatedAt(\Alaress_Date_Format::now())
+            ->setName($divisionName)
+            ->setSport($sport)
+            ->setSeason($season)
+            ->setExternalId(self::EXTERNAL_ID_PREFIX . $divisionName);
 
         if ($this->perform) {
             $this->divisionMapper->save($division);
@@ -258,12 +268,16 @@ class Registry
             $this->logger->debug(sprintf('Resurrecting previously-deleted SOCS team %s', $team->getName()));
         } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var TeamModel $team */
-            $team = $this->teamMapper->createModel()
-                ->setName($teamName)
-                ->setDivision($division)
-                ->setExternalId(self::EXTERNAL_ID_PREFIX . $teamName);
+            $team = $this->teamMapper->createModel();
             $this->logger->debug(sprintf('Creating new SOCS team %s', $team->getName()));
         }
+
+        // update updated at, we have seen this, we need to record it
+        // team name division and externalID in case they have changed since the last import run
+        $team->setUpdatedAt(\Alaress_Date_Format::now())
+             ->setName($teamName)
+             ->setDivision($division)
+             ->setExternalId(self::EXTERNAL_ID_PREFIX . $teamName);
 
         if ($this->perform) {
             $this->teamMapper->save($team);
@@ -290,7 +304,6 @@ class Registry
         try {
             /** @var VenueModel $venue */
             $venue = $this->venueMapper->findOneByColumn('name', $venueName);
-            $venue->setUpdatedAt(\Alaress_Date_Format::now());
             $this->logger->debug(sprintf('Reusing existing SOCS venue %s', $venue->getName()));
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             /** @var VenueModel $venue */
@@ -299,11 +312,15 @@ class Registry
             $this->logger->debug(sprintf('Resurrecting previously-deleted SOCS venue %s', $venue->getName()));
         } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var VenueModel $venue */
-            $venue = $this->venueMapper->createModel()
-                ->setName($venueName)
-                ->setExternalId(self::EXTERNAL_ID_PREFIX . $venueName);
+            $venue = $this->venueMapper->createModel();
             $this->logger->debug(sprintf('Creating new SOCS venue %s', $venue->getName()));
         }
+
+        // update updated at, we have seen this, we need to record it
+        // venue name and externalID in case they have changed since the last import run
+        $venue->setUpdatedAt(\Alaress_Date_Format::now())
+              ->setName($venueName)
+              ->setExternalId(self::EXTERNAL_ID_PREFIX . $venueName);
 
         if ($this->perform) {
             $this->venueMapper->save($venue);
@@ -330,7 +347,6 @@ class Registry
         try {
             /** @var SchoolModel $school */
             $school = $this->schoolMapper->findOneByColumn('name', $schoolName);
-            $school->setUpdatedAt(\Alaress_Date_Format::now());
             $this->logger->debug(sprintf('Reusing existing SOCS school %s', $school->getName()));
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             /** @var SchoolModel $school */
@@ -339,10 +355,14 @@ class Registry
             $this->logger->debug(sprintf('Resurrecting previously-deleted SOCS school %s', $school->getName()));
         } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var SchoolModel $school */
-            $school = $this->schoolMapper->createModel()
-                ->setName($schoolName);
+            $school = $this->schoolMapper->createModel();
             $this->logger->debug(sprintf('Creating new SOCS school %s', $school->getName()));
         }
+
+        // update updated at, we have seen this, we need to record it
+        // school name to ensure it stays constant, and we remember we need to check and ensure it stays in sync
+        $school->setUpdatedAt(\Alaress_Date_Format::now())
+           ->setName($schoolName);
 
         if ($this->perform) {
             $this->schoolMapper->save($school);
