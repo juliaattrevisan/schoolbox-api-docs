@@ -1493,15 +1493,7 @@ class MapperProxy
              *  (It wasn't the rubric_instance.weight - those all had values)
              */
             $rubricInstanceMapper = \Schoolbox\Assessment\Rubric\Instance\Mapper::getInstance();
-
-            $rubricInstanceMapper->getDatabase()->executeQuery("
-                UPDATE rubric_instance
-                SET deleted_at = NOW()
-                WHERE assessment_id = :assessmentId
-                AND rubric_instance.id NOT IN (". implode(',', $keepRubricInstanceIds) .")
-            ", [
-                'assessmentId' => $assessable->getId()
-            ]);
+            $rubricInstanceMapper->removeFromAssessment($assessable, $keepRubricInstanceIds);
         }
 
 
