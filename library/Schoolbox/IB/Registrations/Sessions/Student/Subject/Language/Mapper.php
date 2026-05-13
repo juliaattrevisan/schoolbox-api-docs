@@ -11,8 +11,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\IB\Registrations\Sessions\Student\Subject\Language;
 
-use Alaress\Database\Predicate;
 use PDO;
+use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\IB\Group\Subject\Mapper as GroupSubjectMapper;
 use Schoolbox\IB\Registrations\Sessions\Student\Mapper as RegistrationSessionStudentMapper;
@@ -53,51 +53,46 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * @param int[] $registrationSessionStudentIds
-     * @return array<int, GenericCollection|Model[]>
-     * @throws BaseMapper\DefinitionException
-     * @throws BaseMapper\Exception
+     * @inheritdoc
      */
-    public function findByRegistrationSessionStudentIds(array $registrationSessionStudentIds): array
+    protected function getSelectString(): string
     {
-        $registrationSessionStudentIds = array_values(array_unique(array_filter(
-            array_map('intval', $registrationSessionStudentIds),
-            static fn(int $id): bool => $id > 0
-        )));
+        return "
+            SELECT {$this->getColumnString()},
+                   {$this->getJoinColumnString('registrationSessionStudent', 'rss')},
+                   {$this->getJoinColumnString('groupSubject', 'gs')},
+                   {$this->getJoinColumnString('language', 'l')}
+        ";
+    }
 
-        if ($registrationSessionStudentIds === []) {
-            return [];
-        }
+    /**
+     * @inheritdoc
+     */
+    protected function getFromString()
+    {
+        return "
+            FROM `{$this->table}`
+            INNER JOIN {$this->getJoinSql('registrationSessionStudent', '', 'rss')}
+            INNER JOIN {$this->getJoinSql('groupSubject', '', 'gs')}
+            INNER JOIN {$this->getJoinSql('language', '', 'l')}
+        ";
+    }
 
-        $bindings = Predicate\Builder::getBindings($registrationSessionStudentIds, 'registrationSessionStudentId');
-        $statement = $this->getDatabase()->query(
-            "
-                SELECT
-                    {$this->getColumnString('ssl')},
-                    {$this->getJoinColumnString('registrationSessionStudent', 'rss')},
-                    {$this->getJoinColumnString('groupSubject', 'gs')},
-                    {$this->getJoinColumnString('language', 'l')}
-                FROM {$this->getTable()} `ssl`
-                INNER JOIN {$this->getJoinSql('registrationSessionStudent', 'ssl', 'rss')}
-                INNER JOIN {$this->getJoinSql('groupSubject', 'ssl', 'gs')}
-                INNER JOIN {$this->getJoinSql('language', 'ssl', 'l')}
-                WHERE ssl.registration_session_student_id IN ({$bindings->getPlaceholder()})
-                ORDER BY ssl.registration_session_student_id ASC, ssl.group_subject_id ASC
-            ",
-            $bindings->getParams()
-        );
-
+    /**
+     * @inheritdoc
+     */
+    protected function hydrateSelect(PDOStatement $statement): GenericCollection
+    {
         /** @var RegistrationSessionStudentMapper $registrationSessionStudentMapper */
         $registrationSessionStudentMapper = $this->getJoinMapper('registrationSessionStudent');
         /** @var GroupSubjectMapper $groupSubjectMapper */
         $groupSubjectMapper = $this->getJoinMapper('groupSubject');
         /** @var LanguageMapper $languageMapper */
         $languageMapper = $this->getJoinMapper('language');
-
-        $selectionsByStudentId = [];
+        $collection = $this->createCollection();
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $selection = $this->hydrate($row, 'ssl');
+            $selection = $this->hydrate($row);
 
             if (!$selection) {
                 continue;
@@ -116,8 +111,42 @@ class Mapper extends BaseMapper
                 ->setGroupSubject($groupSubject)
                 ->setLanguage($language);
 
-            $studentId = $registrationSessionStudent->getId();
+            $collection[$selection->getId()] = $selection;
+        }
 
+        return $collection;
+    }
+
+    /**
+     * @param int[] $registrationSessionStudentIds
+     * @return array<int, GenericCollection|Model[]>
+     * @throws BaseMapper\Exception
+     */
+    public function findByRegistrationSessionStudentIds(array $registrationSessionStudentIds): array
+    {
+        $registrationSessionStudentIds = array_values(array_unique(array_filter(
+            array_map('intval', $registrationSessionStudentIds),
+            static fn(int $id): bool => $id > 0
+        )));
+
+        if ($registrationSessionStudentIds === []) {
+            return [];
+        }
+
+        $selectionsByStudentId = [];
+        $selections = $this->findByColumn('registration_session_student_id', $registrationSessionStudentIds, [
+            'order' => [
+                'registration_session_student_id' => 'ASC',
+                'group_subject_id' => 'ASC',
+            ],
+        ]);
+
+        foreach ($selections as $selection) {
+            $studentId = $selection->getRegistrationSessionStudent()?->getId();
+
+            if ($studentId === null) {
+                continue;
+            }
             if (!isset($selectionsByStudentId[$studentId])) {
                 $selectionsByStudentId[$studentId] = new GenericCollection(Model::class);
             }
