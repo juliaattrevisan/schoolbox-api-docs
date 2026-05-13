@@ -178,24 +178,40 @@ class ResourceBookingCest
 
     public function bookingReportDisplaysCapacityColumnsAndQuantity(IntegrationTester $i): void
     {
-        $resource = $this->createCapacityTestResource(
+        $pendingResource = $this->createCapacityTestResource(
             $i,
-            'Capacity report resource',
+            'Capacity report pending resource',
+            7,
+            false,
+            ModerationType\Model::TYPE_MANAGED
+        );
+        $pendingResource->addModerator(\Schoolbox\UserMapper::getInstance()->findById(2));
+        ResourceBooking\Item\Mapper::getInstance()->save($pendingResource);
+
+        $approvedResource = $this->createCapacityTestResource(
+            $i,
+            'Capacity report approved resource',
             7,
             false,
             ModerationType\Model::TYPE_OPEN
         );
-        $startDate = date('d/m/Y g:ia', strtotime('2077-02-01 10:00:00'));
-        $endDate = date('d/m/Y g:ia', strtotime('2077-02-01 11:00:00'));
 
-        $booking = $this->createCapacityTestBooking(
+        $pendingBooking = $this->createCapacityTestBooking(
             $i,
-            $resource,
-            'Capacity report booking',
-            $startDate,
-            $endDate
+            $pendingResource,
+            'Capacity report pending booking',
+            date('d/m/Y g:ia', strtotime('2077-02-01 10:00:00')),
+            date('d/m/Y g:ia', strtotime('2077-02-01 11:00:00'))
+        );
+        $approvedBooking = $this->createCapacityTestBooking(
+            $i,
+            $approvedResource,
+            'Capacity report approved booking',
+            date('d/m/Y g:ia', strtotime('2077-02-01 12:00:00')),
+            date('d/m/Y g:ia', strtotime('2077-02-01 13:00:00'))
         );
 
+        $i->impersonateUser(2);
         $i->sendGET('/resource-booking/report?start=01%2F02%2F2077&end=01%2F02%2F2077&category%5B%5D=3&clashesOnly=0&classes=0');
 
         $i->seeResponseCodeIs(200);
@@ -209,7 +225,10 @@ class ResourceBookingCest
                 '<th>Booking</th>',
                 '<th>Venue/Resource</th>',
                 '<th>Quantity</th>',
+                '<th>Booker</th>',
+                '<th>Status</th>',
                 '<th>Notes</th>',
+                '<th>Actions</th>',
             ] as $header
         ) {
             $headerPosition = strpos($response, $header);
@@ -217,17 +236,74 @@ class ResourceBookingCest
             $i->assertGreaterThan($lastHeaderPosition, $headerPosition, $header . ' header appears in order');
             $lastHeaderPosition = $headerPosition;
         }
+        $bookerName = \Schoolbox\UserMapper::getInstance()->findById(1)->formatName();
 
         $i->assertMatchesRegularExpression(
             '~'
-            . preg_quote($booking->getName(), '~')
+            . preg_quote($pendingBooking->getName(), '~')
             . '.*?'
-            . preg_quote($resource->getName(), '~')
+            . preg_quote($pendingResource->getName(), '~')
             . '.*?<td>\s*1\s*</td>'
+            . '.*?'
+            . preg_quote($bookerName, '~')
+            . '.*?'
+            . preg_quote('Pending', '~')
             . '.*?<article><p>These are some notes</p></article>'
+            . '.*?/resource-booking/booking/' . $pendingBooking->getId() . '/approve'
+            . '.*?/resource-booking/booking/' . $pendingBooking->getId() . '/reject'
             . '~s',
             $response,
-            'Report row shows booking, venue/resource, implicit quantity, and notes in order'
+            'Pending report row shows booking, venue/resource, quantity, booker, status, notes, and actions in order'
+        );
+        $i->assertMatchesRegularExpression(
+            '~'
+            . preg_quote($approvedBooking->getName(), '~')
+            . '.*?'
+            . preg_quote($approvedResource->getName(), '~')
+            . '.*?<td>\s*1\s*</td>'
+            . '.*?'
+            . preg_quote('Approved', '~')
+            . '.*?<td>\s*&nbsp;\s*</td>'
+            . '~s',
+            $response,
+            'Approved report row shows status without moderation actions'
+        );
+        $i->assertSame(
+            false,
+            strpos($response, '/resource-booking/booking/' . $approvedBooking->getId() . '/approve'),
+            'Approved report row has no approve action'
+        );
+        $i->assertSame(
+            false,
+            strpos($response, '/resource-booking/booking/' . $approvedBooking->getId() . '/reject'),
+            'Approved report row has no reject action'
+        );
+
+        $i->impersonateUser(3);
+        $i->sendGET('/resource-booking/report?start=01%2F02%2F2077&end=01%2F02%2F2077&category%5B%5D=3&clashesOnly=0&classes=0');
+
+        $i->seeResponseCodeIs(200);
+        $response = $i->grabResponse();
+
+        $i->assertMatchesRegularExpression(
+            '~'
+            . preg_quote($pendingBooking->getName(), '~')
+            . '.*?'
+            . preg_quote($pendingResource->getName(), '~')
+            . '.*?<td>\s*&nbsp;\s*</td>'
+            . '~s',
+            $response,
+            'Pending report row hides moderation actions from users who cannot moderate the resource'
+        );
+        $i->assertSame(
+            false,
+            strpos($response, '/resource-booking/booking/' . $pendingBooking->getId() . '/approve'),
+            'Pending report row has no approve action for users who cannot moderate the resource'
+        );
+        $i->assertSame(
+            false,
+            strpos($response, '/resource-booking/booking/' . $pendingBooking->getId() . '/reject'),
+            'Pending report row has no reject action for users who cannot moderate the resource'
         );
     }
 

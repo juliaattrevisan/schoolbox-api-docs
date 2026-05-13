@@ -187,7 +187,10 @@
                     <th>Booking</th>
                     <th>Venue/Resource</th>
                     <th>Quantity</th>
+                    <th>Booker</th>
+                    <th>Status</th>
                     <th>Notes</th>
+                    <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -245,7 +248,54 @@
                             {% if booking is empty %}
                                 &nbsp;
                             {% else %}
+                                {% set booker = booking.getEvent().getOwner() %}
+                                <a href="/search/user/{{ booker.getId() }}">
+                                    {{ booker.formatName() }}
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if booking is empty %}
+                                &nbsp;
+                            {% else %}
+                                {{ booking.getStatus().getName() }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if booking is empty %}
+                                &nbsp;
+                            {% else %}
                             <article>{{ booking.getNotes()|purify }}</article>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if booking is empty or not booking.getStatus().isPending() %}
+                                &nbsp;
+                            {% else %}
+                                {% set approveRoute = routeLookupIfAuthorized('resourceBooking.approve', {id: booking.getId(), item: booking}) %}
+                                {% set rejectRoute = routeLookupIfAuthorized('resourceBooking.reject', {id: booking.getId(), item: booking}) %}
+                                {% if approveRoute or rejectRoute %}
+                                    <ul class="flex-list buttons">
+                                        {% if approveRoute %}
+                                            <li>
+                                                <a href="{{ approveRoute }}" class="sbx-button--has-icon">
+                                                    <sbx-icon name="approve"></sbx-icon>
+                                                    Approve
+                                                </a>
+                                            </li>
+                                        {% endif %}
+                                        {% if rejectRoute %}
+                                            <li>
+                                                <a href="{{ rejectRoute }}" class="sbx-button--has-icon">
+                                                    <sbx-icon name="close"></sbx-icon>
+                                                    Reject
+                                                </a>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                {% else %}
+                                    &nbsp;
+                                {% endif %}
                             {% endif %}
                         </td>
                     </tr>
