@@ -77,7 +77,12 @@ function onRemoveSelected(): void {
     <li>
         <div class="node l-flex-row l-flex--justify-space l-flex--center l-flex--no-wrap l-pad-xs--vert">
             <div class="l-flex-row l-flex--no-wrap l-flex--align-center l-gap-xs">
-                <sbx-icon v-if="!props.node.enabled" name="hidden" title="This outcome is disabled" />
+                <sbx-icon
+                    v-if="!props.node.enabled"
+                    name="hidden"
+                    title="This outcome is disabled"
+                    :data-test="`fn-list-node-disabled-${props.node.id}`"
+                />
                 <a
                     v-if="hasCode"
                     class="node__code f-no-margins l-flex__item--0-shrink"

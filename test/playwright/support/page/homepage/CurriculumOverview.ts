@@ -65,6 +65,35 @@ export default class CurriculumOverview {
     }
 
     /**
+     * Verify the overview list does not contain text.
+     * @param component - The Curriculum Overview component locator
+     * @param text - Text that should not be present
+     */
+    public static async expectListNotToContainText(component: Locator, text: string): Promise<void> {
+        await expect(component.getByTestId(CurriculumOverview.DATA_TEST_FN_LIST_CONTAINER)).not.toContainText(text);
+    }
+
+    /**
+     * Verify the disabled icon is visible for a curriculum node.
+     * @param component - The Curriculum Overview component locator
+     * @param nodeId - Curriculum node ID
+     */
+    public static async expectDisabledIconToBeVisible(component: Locator, nodeId: number): Promise<void> {
+        await expect(component.getByTestId(`fn-list-node-disabled-${nodeId}`)).toBeVisible();
+    }
+
+    /**
+     * Verify a curriculum node link is not visible in the overview list.
+     * @param component - The Curriculum Overview component locator
+     * @param nodeId - Curriculum node ID
+     */
+    public static async expectCurriculumCodeNotToBeVisible(component: Locator, nodeId: number): Promise<void> {
+        await expect(
+            component.getByTestId(CurriculumOverview.DATA_TEST_FN_LIST_CONTAINER).locator(`a[href="#${nodeId}"]`),
+        ).not.toBeVisible();
+    }
+
+    /**
      * Click a mapped curriculum code in the overview list.
      * @param component - The Curriculum Overview component locator
      * @param nodeId - Curriculum node ID
