@@ -77,7 +77,7 @@ class Mapper extends BaseMapper
                     {$this->getJoinColumnString('registrationSessionStudent', 'rss')},
                     {$this->getJoinColumnString('groupSubject', 'gs')},
                     {$this->getJoinColumnString('language', 'l')}
-                FROM {$this->getTable()} ssl
+                FROM {$this->getTable()} `ssl`
                 INNER JOIN {$this->getJoinSql('registrationSessionStudent', 'ssl', 'rss')}
                 INNER JOIN {$this->getJoinSql('groupSubject', 'ssl', 'gs')}
                 INNER JOIN {$this->getJoinSql('language', 'ssl', 'l')}
