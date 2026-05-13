@@ -211,8 +211,7 @@ class Import implements IStrategy
             return;
         }
 
-        $lookup = new PersonLookup($this->userMapper);
-        $this->userExternalIdLookup = $lookup->generate();
+        $this->userExternalIdLookup = new PersonLookup($this->userMapper)->generate();
     }
 
     /**
