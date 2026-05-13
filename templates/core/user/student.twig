@@ -155,11 +155,16 @@
                                          # a full-width definition title without a definition data lol
                                          #}
                                         {% elseif selectedField.icon and selectedField.css %}
+                                            {% set profileIconName = selectedField.icon|replace({'icon-': ''}) %}
+                                            {% if profileIconName == 'bell' %}
+                                                {% set profileIconName = 'alert' %}
+                                            {% endif %}
                                             <dt class="full-width">
                                                 <div
-                                                    class="alert-box {{ selectedField.css ?? '' }} {{ selectedField.icon ?? '' }}"
+                                                    class="alert-box {{ selectedField.css ?? '' }}"
                                                     {% if selectedField.clickToReveal %}data-click-to-reveal{% endif %}
                                                 >
+                                                    <sbx-icon name="{{ profileIconName }}"></sbx-icon>
                                                     <span {% if selectedField.clickToReveal %}style="display:none"{% endif %}>
                                                         {% if selectedField.field in ['AlertMessages', 'AlertLegal'] %}
                                                             {# A set of Alert Messages that display in one big flag

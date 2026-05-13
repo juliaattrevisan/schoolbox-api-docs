@@ -104,7 +104,7 @@ Usage:
 
             element.confirmDialog({
                 header: "Are you sure you wish to re-apply the framework?",
-                text: '<span class="alert-box warning icon-alert">Re-applying the course framework will merge content and affect how it displays on your homepages. New content may appear as a result of re-applying the framework.</span>',
+                text: '<span class="alert-box warning"><sbx-icon name="alert"></sbx-icon>Re-applying the course framework will merge content and affect how it displays on your homepages. New content may appear as a result of re-applying the framework.</span>',
                 format: "html",
                 confirmLabel: "Yes, Re-apply",
                 cancelLabel: "No",
@@ -238,7 +238,8 @@ Usage:
                                 <option value="{{ templates.first.id }}" selected>{{ templates.first.name }}</option>
                             {% endif %}
                         </select>
-                        <div class="alert-box warning hide icon-alert" data-template-warning>
+                        <div class="alert-box warning hide" data-template-warning>
+                            <sbx-icon name="alert"></sbx-icon>
                             Changing the course framework will merge content and affect how it displays on your homepages. New content may appear as a result of framework selection.
                         </div>
                     </div>
@@ -264,7 +265,7 @@ Usage:
                         <div data-mage-submitrow>
                             <div class="small-12 column">
                                 {# Don't delete the inline style, it's needed -#}
-                                <div data-mage-error style="display:none;" class="alert alert-box icon-alert"></div>
+                                <div data-mage-error style="display:none;" class="alert alert-box"></div>
                             </div>
                             <div class="small-12 column">
                                 <input name="part1" type="submit" class="button" value="Next" data-mage-next="unit-info"

@@ -167,6 +167,13 @@ $alert-default-background: css-darken($body-bg, 10%);
             text-decoration: underline;
         }
     }
+
+    > sbx-icon:first-child {
+        color: inherit;
+        margin-right: 0.625rem;
+        vertical-align: text-bottom;
+    }
+
     .close {
         &:hover {
             text-decoration: none;

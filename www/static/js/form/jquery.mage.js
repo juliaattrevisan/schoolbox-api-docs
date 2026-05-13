@@ -631,7 +631,22 @@ import { getLoadedHTML } from "@js/util/domUtils";
      */
     function xhrFail(onXhrFail, target, error) {
         // apply the error text and slide into view
-        target.find("[data-mage-error]").hide().html(error).slideDown();
+        target
+            .find("[data-mage-error]")
+            .hide()
+            .each(function () {
+                var element = $(this),
+                    errorHtml = error;
+
+                if (
+                    element.hasClass("alert-box") &&
+                    !(typeof error === "string" && error.indexOf("<sbx-icon") !== -1)
+                ) {
+                    errorHtml = '<sbx-icon name="alert"></sbx-icon>' + error;
+                }
+
+                element.html(errorHtml).slideDown();
+            });
 
         // re-enable this section (which will implicitly reopen it if it's closed)
         this.enableSection();
