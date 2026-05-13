@@ -1464,9 +1464,9 @@ class MapperProxy
                     $newGrid->getRubricInstance()->getAssessmentModel()->setId($assessable->getId());
                 }
 
-                /* TODO lol how do I get past THIS??!?!??!???
+                /* Save a grid's contents and its rubric_instance
                  */
-                $rubricMapper->persistGrid($newGrid, $originalGrid, $subObject);
+                $rubricMapper->persistGrid($newGrid, $originalGrid);
 
                 /* Remember to keep the grid (it has a whole new rubric_instance with a freshly-persisted id)
                  * This is a grid we added

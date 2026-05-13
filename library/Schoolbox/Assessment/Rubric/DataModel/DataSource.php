@@ -695,7 +695,6 @@ class DataSource
      *
      * @param Grid $newGrid
      * @param null|Grid $originalGrid If set, this is the state of the assessment's grid pre-save
-     * @param SubmissionBox $submissionBox
      * @return void
      * @throws \UnexpectedValueException If a duplicate indicator or capability exists in the folder
      * @throws \UnexpectedValueException If course capability duplicates a unit capability
@@ -706,7 +705,7 @@ class DataSource
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function persistGrid(Grid $newGrid, ?Grid $originalGrid, SubmissionBox $submissionBox): void
+    public function persistGrid(Grid $newGrid, ?Grid $originalGrid): void
     {
         // TODO some way to wrap all this in a transaction would be nice... -_-;
         // (The answer exists: merge SA-6405)
