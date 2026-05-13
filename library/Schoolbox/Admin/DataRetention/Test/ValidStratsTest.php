@@ -47,6 +47,7 @@ class ValidStratsTest extends TestCase
             'student submissions valid' => [
                 'studentSubmissions',
                 ['studentSubmissions'],
+            ],
             'single ePortfolio valid' => [
                 'ePortfolio',
                 ['ePortfolio'],
