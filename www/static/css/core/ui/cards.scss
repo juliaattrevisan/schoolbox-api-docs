@@ -215,7 +215,7 @@
         padding: 0 1rem;
 
         [class*="icon-"],
-        sbx-icon.project-assessable-icon {
+        sbx-icon.compact-card-icon {
             width: 2rem;
             margin-top: 0;
             padding: 0 0 0 1rem;
@@ -223,7 +223,7 @@
             @extend .text-center;
         }
 
-        sbx-icon.project-assessable-icon {
+        sbx-icon.compact-card-icon {
             box-sizing: content-box;
             display: inline-flex;
             flex: 0 0 auto;
