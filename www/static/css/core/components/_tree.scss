@@ -13,6 +13,7 @@ $tree-node-selected-color: var(--sbx-config-color-accent, $content-ui-foreground
 $tree-folder-icon-color: var(--sbx-config-color-accent, $content-ui-foreground);
 $tree-homepage-icon-color: darkorange;
 $tree-course-icon-color: #008600;
+$tree-unit-icon-color: grey;
 $tree-favorite-icon-color: darkorange;
 
 %browser-icon-colors {
@@ -33,6 +34,11 @@ $tree-favorite-icon-color: darkorange;
         color: $tree-course-icon-color;
     }
 
+    .icon-unit:before,
+    sbx-icon.icon-unit {
+        color: $tree-unit-icon-color;
+    }
+
     .icon-favourite:before,
     sbx-icon.icon-favourite {
         color: $tree-favorite-icon-color;
@@ -42,6 +48,7 @@ $tree-favorite-icon-color: darkorange;
     sbx-icon.icon-home:before,
     sbx-icon.icon-course-builder:before,
     sbx-icon.icon-course:before,
+    sbx-icon.icon-unit:before,
     sbx-icon.icon-favourite:before {
         content: none;
     }
