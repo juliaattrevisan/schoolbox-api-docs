@@ -23,7 +23,6 @@ use Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
 use Schoolbox\Fixtures\Team\Coach\Mapper as TeamCoachMapper;
 use Schoolbox\Fixtures\Coach\Mapper as CoachMapper;
 use Schoolbox\Fixtures\Venue\Mapper as VenueMapper;
-use Schoolbox\Clipboard\Hierarchy\Lookup\Person as PersonLookup;
 use Schoolbox\Socs\HttpClient;
 use Schoolbox\Socs\IStrategy;
 use Schoolbox\UserMapper;
@@ -67,6 +66,7 @@ class Import implements IStrategy
         private TeamCoachMapper $teamCoachMapper,
         private CoachMapper $coachMapper,
         private bool $importHumans,
+        private PersonLookup $personLookup
     ) {
         $this->perform = $perform;
     }
@@ -253,7 +253,7 @@ class Import implements IStrategy
         foreach ($externalIds as $externalId) {
             $this->lock->refresh();
 
-            $userId = $this->userExternalIdLookup[$externalId] ?? null;
+            $userId = $this->personLookup->fetchUser($externalId);
             if (null === $userId) {
                 $this->log->debug(sprintf(
                     'SOCS pupil external id %s does not have a corresponding schoolbox user record; skipping',
@@ -305,7 +305,7 @@ class Import implements IStrategy
         foreach ($externalIds as $externalId) {
             $this->lock->refresh();
 
-            $userId = $this->userExternalIdLookup[$externalId] ?? null;
+            $userId = $this->personLookup->fetchUser($externalId);
             if (null === $userId) {
                 $this->log->debug(sprintf(
                     'SOCS staff external id %s does not have a corresponding schoolbox user record; skipping',

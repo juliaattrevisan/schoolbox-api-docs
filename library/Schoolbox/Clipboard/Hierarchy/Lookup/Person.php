@@ -28,7 +28,7 @@ class Person
     /**
      * @var array|null
      */
-    private ?array $lookup = null;
+    protected ?array $lookup = null;
 
 
     /**
