@@ -559,7 +559,7 @@ class Controller extends ConfigController
     public function getRegistrations(): void
     {
         $pageCurrent = '/adminv2/international-baccalaureate/registrations';
-        $reportRoute = $this->getRouteIfAuthorized('internationalBaccalaureate.getReport', ['id' => 0]);
+        $reportRoute = $this->getRouteIfAuthorized('internationalBaccalaureate.getReport', ['sessionId' => 0]);
         $this->response = $this->responseDependentOnRequest(
             '@internationalBaccalaureate/registrations.twig',
             [
@@ -582,12 +582,12 @@ class Controller extends ConfigController
     /**
      * Diploma Programme Year 2 Registration Report page
      *
-     * @api GET /adminv2/international-baccalaureate/registrations/sessions/{id}
+     * @api GET /adminv2/international-baccalaureate/registrations/sessions/{sessionId}
      */
-    public function getReport(int $id): void
+    public function getReport(int $sessionId): void
     {
         try {
-            $session = $this->registrationSessionMapper->findById($id);
+            $session = $this->registrationSessionMapper->findById($sessionId);
         } catch (MapperNotFound) {
             $this->response = $this->responseAsJson([
                 'success' => false,
@@ -603,7 +603,7 @@ class Controller extends ConfigController
                 'pageCurrent' => $pageCurrent,
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($pageCurrent),
                 '_routes' => [
-                    'candidatesEndpoint' => $this->getRouteIfAuthorized('internationalBaccalaureate.getRegistrationSessionStudents', ['id' => $id]),
+                    'candidatesEndpoint' => $this->getRouteIfAuthorized('internationalBaccalaureate.getRegistrationSessionStudents', ['sessionId' => $sessionId]),
                     'searchLanguages' => $this->getRouteIfAuthorized('internationalBaccalaureate.searchLanguages'),
                 ],
                 'sessionTitle' => $session->jsonSerialize()['title'],
@@ -770,14 +770,14 @@ class Controller extends ConfigController
     /**
      * Get students for a registration session.
      *
-     * @api GET /adminv2/international-baccalaureate/registrations/sessions/{id}/candidates
+     * @api GET /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/candidates
      */
-    public function getRegistrationSessionStudents(int $id): void
+    public function getRegistrationSessionStudents(int $sessionId): void
     {
         try {
             $schoolName = (string) ($this->getConfigLoader()->get(ConfigMapper::NAME_IB_SCHOOL_NAME) ?? '');
             $payloadBuilder = new RegistrationSessionStudentPayload();
-            $students = $this->registrationSessionStudentMapper->findStudentsForSession($id);
+            $students = $this->registrationSessionStudentMapper->findStudentsForSession($sessionId);
             $studentPayloads = $students
                 ->map(
                     fn(RegistrationSessionStudentModel $student): array => $payloadBuilder->build(
@@ -810,11 +810,11 @@ class Controller extends ConfigController
     /**
      * Manually override the language selected for a student's enrolled IB subjects.
      *
-     * @api PUT /adminv2/international-baccalaureate/registrations/sessions/{id}/candidates/{userId}/languages
+     * @api PUT /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/candidates/{studentId}/languages
      */
     public function updateRegistrationSessionStudentSubjectLanguages(
-        int $id,
-        int $userId
+        int $sessionId,
+        int $studentId
     ): void {
         $subjects = new Values($this->request->getParsedBody())->get('subjects');
 
@@ -828,8 +828,8 @@ class Controller extends ConfigController
 
         try {
             $registrationSessionStudent = $this->registrationSessionStudentMapper->findOneByColumnList([
-                'user_id' => $userId,
-                'registration_session_id' => $id,
+                'user_id' => $studentId,
+                'registration_session_id' => $sessionId,
             ]);
         } catch (MapperNotFound) {
             $this->response = $this->responseAsJson([

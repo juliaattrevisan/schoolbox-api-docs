@@ -194,6 +194,17 @@ class ControllerTest extends TestCase
                 ['groupSubjectId' => 125, 'languageId' => 46],
             ],
         ]));
+        $controller->setRequest(
+            (new HttpFactory())
+                ->createServerRequest('PUT', '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/234/languages')
+                ->withParsedBody([
+                    'subjects' => [
+                        ['groupSubjectId' => 123, 'languageId' => 45],
+                        ['groupSubjectId' => 124, 'languageId' => 45],
+                        ['groupSubjectId' => 125, 'languageId' => 46],
+                    ],
+                ])
+        );
 
         $controller->updateRegistrationSessionStudentSubjectLanguages(12, 234);
 
@@ -231,6 +242,15 @@ class ControllerTest extends TestCase
                 ['groupSubjectId' => 123],
             ],
         ]));
+        $controller->setRequest(
+            (new HttpFactory())
+                ->createServerRequest('PUT', '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/123/languages')
+                ->withParsedBody([
+                    'subjects' => [
+                        ['groupSubjectId' => 123],
+                    ],
+                ])
+        );
 
         $controller->updateRegistrationSessionStudentSubjectLanguages(12, 123);
 
@@ -272,6 +292,7 @@ class ControllerTest extends TestCase
                 $this->createStub(Environment::class)
             )
         );
+        $controller->setRequest($httpFactory->createServerRequest('GET', '/')->withParsedBody([]));
         $controller->setDi($this->buildContainer());
         $controller->setUser(new User());
 
