@@ -1437,10 +1437,6 @@ class MapperProxy
             /* This contains a mix of totally new, and pre-existing, rubric instances.
              */
             foreach ($assessable->getRubricInstances() as $rubricInstance) {
-                /* We need to keep this
-                 */
-                $keepRubricInstanceIds[] = $rubricInstance->getId();
-
                 /* The latest version of the rubric grid, as per the Decorators that processed the frontend
                  * payload, storing it in the temporary place so we can get it here.
                  */
@@ -1471,6 +1467,11 @@ class MapperProxy
                 /* TODO lol how do I get past THIS??!?!??!???
                  */
                 $rubricMapper->persistGrid($newGrid, $originalGrid, $subObject);
+
+                /* Remember to keep the grid (it has a whole new rubric_instance with a freshly-persisted id)
+                 * This is a grid we added
+                 */
+                $keepRubricInstanceIds[] = $newGrid->getRubricInstance()->getId();
             }
 
             /* Soft delete everything except whatever we captured in $keepRubricInstanceIds
