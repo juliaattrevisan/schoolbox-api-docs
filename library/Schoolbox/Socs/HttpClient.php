@@ -10,6 +10,7 @@ use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use SensitiveParameter;
+use SimpleXMLElement;
 
 /**
  * Lightweight HTTP client for SOCS APIs with URL usage tracking.
@@ -57,31 +58,80 @@ class HttpClient
      *
      * @param array<string,string> $query Non-secret query parameters; ID and key are added automatically.
      *
-     * @return ResponseInterface The HTTP response.
-     * @throws GuzzleException
+     * @return false|SimpleXMLElement.
+     * @throws \RuntimeException|\JsonException
      */
-    public function get(string $path, array $query): ResponseInterface
+    public function get(string $path, array $query): false|SimpleXMLElement
     {
         $url = $this->buildBaseUrl($path);
         $this->noteUrlUsed($path, $query);
 
         $fullQuery = ['ID' => $this->schoolId, 'key' => $this->token] + $query;
         $fails = 0;
+        $response = null;
 
         while (true) {
             try {
-                return $this->client->request('GET', $url, [
+                $response =  $this->client->request('GET', $url, [
                     RequestOptions::QUERY => $fullQuery,
                 ]);
+
+                if ($response->getStatusCode() !== 200) {
+                    throw new \RuntimeException(
+                        sprintf(
+                            'Bad endpoint %s: %s %s after %s retries. Payload: %s',
+                            $path,
+                            $response->getStatusCode(),
+                            $response->getReasonPhrase(),
+                            self::NUM_RETRY,
+                            json_encode($query, JSON_THROW_ON_ERROR)
+                        ),
+                        $response->getStatusCode(),
+                        null
+                    );
+                }
+
+                /* Successful response from server, but it might not send a valid data payload back
+                 * so try to decode it. If it can't decode properly, return null
+                 */
+                if ($response->getStatusCode() === 200) {
+                    $content = $response->getBody()->getContents();
+
+                    if ('' === $content) {
+                        return false;
+                    }
+
+                    $xml = @simplexml_load_string($content);
+                    if (false === $xml) {
+                        throw new \RuntimeException(sprintf(
+                            'Unable to parse SOCS XML payload; aborting. First 200 chars: %s',
+                            substr($content, 0, 200)
+                        ));
+                    }
+
+                    return $xml;
+                }
+
+                $fails++;
             } catch (GuzzleException $e) {
                 $fails++;
 
                 if ($fails >= self::NUM_RETRY) {
-                    throw $e;
+                    throw new \RuntimeException(
+                        sprintf(
+                            'Bad endpoint: %s: %s %s after %s retries. Payload: %s',
+                            $path,
+                            $response->getStatusCode(),
+                            $response->getReasonPhrase(),
+                            self::NUM_RETRY,
+                            json_encode($query, JSON_THROW_ON_ERROR)
+                        ),
+                        $response->getStatusCode(),
+                        $e
+                    );
                 }
-
-                sleep(self::NAP_TIMEOUT);
             }
+            sleep(self::NAP_TIMEOUT);
         }
     }
 
