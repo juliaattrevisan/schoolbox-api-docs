@@ -69,7 +69,7 @@ class HttpClient
      * @param array<string,string> $query Non-secret query parameters; ID and key are added automatically.
      *
      * @return false|SimpleXMLElement
-     * @throws \JsonException|SOCSFatalException
+     * @throws \JsonException|SOCSFatalException|\RuntimeException
      */
     public function get(string $path, array $query): false|SimpleXMLElement
     {
@@ -104,33 +104,30 @@ class HttpClient
                 /* Successful response from server, but it might not send a valid data payload back
                  * so try to decode it. If it can't decode properly, return null
                  */
-                if ($response->getStatusCode() === 200) {
-                    $content = $response->getBody()->getContents();
+                $content = $response->getBody()->getContents();
 
-                    if ('' === $content) {
-                        return false;
-                    }
-
-                    // known errors
-                    // incorrect CREDS:
-                    if (self::NOT_AVAILABLE === $content) {
-                        throw new SOCSFatalException(sprintf(
-                            'SOCS endpoint returned known error string; aborting. %s',
-                            self::NOT_AVAILABLE
-                        ));
-                    }
-
-
-                    $xml = @simplexml_load_string($content);
-                    if (false === $xml) {
-                        throw new \RuntimeException(sprintf(
-                            "Unable to parse SOCS XML payload; aborting. First 200 chars: '%s'",
-                            substr($content, 0, 200)
-                        ));
-                    }
-
-                    return $xml;
+                if ('' === $content) {
+                    return false;
                 }
+
+                // known errors
+                // incorrect CREDS:
+                if (self::NOT_AVAILABLE === $content) {
+                    throw new SOCSFatalException(sprintf(
+                        'SOCS endpoint returned known error string; aborting. %s',
+                        self::NOT_AVAILABLE
+                    ));
+                }
+
+                $xml = @simplexml_load_string($content);
+                if (false === $xml) {
+                    throw new \RuntimeException(sprintf(
+                        "Unable to parse SOCS XML payload; aborting. First 200 chars: '%s'",
+                        substr($content, 0, 200)
+                    ));
+                }
+
+                return $xml;
             } catch (GuzzleException $e) {
                 $fails++;
 

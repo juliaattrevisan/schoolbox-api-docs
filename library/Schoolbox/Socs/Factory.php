@@ -90,6 +90,17 @@ class Factory
         $resultMapper = ResultMapper::getInstance();
         $userMapper = UserMapper::getInstance();
 
+        $fixturesRegistry = new Fixtures\Registry(
+            $this->log,
+            $this->perform,
+            $seasonMapper,
+            $sportMapper,
+            $divisionMapper,
+            $teamMapper,
+            $venueMapper,
+            $schoolMapper
+        );
+
         $bus = new GenericCollection(IStrategy::class);
 
         if ($fixtures) {
@@ -112,12 +123,7 @@ class Factory
                 $this->perform,
                 $this->lock,
                 $this->httpClient,
-                $seasonMapper,
-                $sportMapper,
-                $divisionMapper,
-                $teamMapper,
-                $venueMapper,
-                $schoolMapper,
+                $fixturesRegistry,
                 $matchupMapper,
                 $userMapper,
                 $teamPlayerMapper,
@@ -131,12 +137,7 @@ class Factory
                 $this->perform,
                 $this->lock,
                 $this->httpClient,
-                $seasonMapper,
-                $sportMapper,
-                $divisionMapper,
-                $teamMapper,
-                $venueMapper,
-                $schoolMapper,
+                $fixturesRegistry,
                 $matchupMapper,
                 $userMapper,
                 $teamPlayerMapper,
@@ -195,10 +196,7 @@ class Factory
                 $this->perform,
                 $this->lock,
                 $this->httpClient,
-                $seasonMapper,
-                $sportMapper,
-                $divisionMapper,
-                $teamMapper
+                $fixturesRegistry
             ))
             ->add(new Teams\Cleanup(
                 $this->log,

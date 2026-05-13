@@ -11,17 +11,11 @@ declare(strict_types=1);
 namespace Schoolbox\Socs\Fixtures;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
 use Schoolbox\Fixtures\Matchup\Model as MatchupModel;
-use Schoolbox\Fixtures\School\Mapper as SchoolMapper;
-use Schoolbox\Fixtures\Season\Mapper as SeasonMapper;
-use Schoolbox\Fixtures\Sport\Mapper as SportMapper;
-use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
 use Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
 use Schoolbox\Fixtures\Team\Coach\Mapper as TeamCoachMapper;
 use Schoolbox\Fixtures\Coach\Mapper as CoachMapper;
-use Schoolbox\Fixtures\Venue\Mapper as VenueMapper;
 use Schoolbox\Socs\HttpClient;
 use Schoolbox\Socs\IStrategy;
 use Schoolbox\UserMapper;
@@ -32,8 +26,6 @@ use Symfony\Component\Lock\LockInterface;
  */
 class Import implements IStrategy
 {
-    use RecallSupport;
-
     private const string FIXTURES_PATH = 'fixturecalendar.ashx';
 
     private const string EXTERNAL_ID_PREFIX = 'socs:';
@@ -45,20 +37,12 @@ class Import implements IStrategy
     private const int FROM = -30;
     private const int TO = 100;
 
-    /** @var array<string,int> */
-    private array $userExternalIdLookup = [];
-
     public function __construct(
         private LoggerInterface $log,
-        bool $perform,
+        private bool $perform,
         private LockInterface $lock,
         private HttpClient $httpClient,
-        private SeasonMapper $seasonMapper,
-        private SportMapper $sportMapper,
-        private DivisionMapper $divisionMapper,
-        private TeamMapper $teamMapper,
-        private VenueMapper $venueMapper,
-        private SchoolMapper $schoolMapper,
+        private Registry $registry,
         private MatchupMapper $matchupMapper,
         private UserMapper $userMapper,
         private TeamPlayerMapper $teamPlayerMapper,
@@ -67,7 +51,6 @@ class Import implements IStrategy
         private bool $importHumans,
         private PersonLookup $personLookup
     ) {
-        $this->perform = $perform;
     }
 
     /**
@@ -75,7 +58,7 @@ class Import implements IStrategy
      */
     public function import(): void
     {
-        $season = $this->recallSeason($this->seasonMapper, $this->log);
+        $season = $this->registry->recallSeason();
 
         $startDate = \Alaress_Date_Format::now()->addDays(self::FROM)->getUsingFormat('j M Y');
         $endDate = \Alaress_Date_Format::now()->addDays(self::TO)->getUsingFormat('j M Y');
@@ -134,21 +117,21 @@ class Import implements IStrategy
                 continue;
             }
 
-            $sport = $this->recallSport($this->sportMapper, $this->log, $sportName);
+            $sport = $this->registry->recallSport($sportName);
 
             $divisionName = $teamName;
-            $division = $this->recallDivision($this->divisionMapper, $this->log, $divisionName, $sport, $season);
+            $division = $this->registry->recallDivision($divisionName, $sport, $season);
 
-            $team = $this->recallTeam($this->teamMapper, $this->log, $teamName, $division);
+            $team = $this->registry->recallTeam($teamName, $division);
 
             $this->syncParticipantsWithTeam($fixture, $team);
 
             $venueName = $locationName !== '' ? $locationName : 'Unspecified location';
-            $venue = $this->recallVenue($this->venueMapper, $this->log, $venueName);
+            $venue = $this->registry->recallVenue($venueName);
 
             $awaySchool = null;
             if ($oppositionSchoolName !== '') {
-                $awaySchool = $this->recallSchool($this->schoolMapper, $this->log, $oppositionSchoolName);
+                $awaySchool = $this->registry->recallSchool($oppositionSchoolName);
             }
 
             /**
@@ -305,8 +288,6 @@ class Import implements IStrategy
                     ->setPreferredName(sprintf("Coach: %s", $externalId))
                     ->setLastname('')
                     ->setExternalId($externalId);
-
-
             } else {
                 try {
                     $user = $this->userMapper->findById($userId);
@@ -374,5 +355,75 @@ class Import implements IStrategy
                 $userId
             ));
         }
+    }
+
+    /**
+     * Parse a SOCS date and time string into an Alaress_Date_Format instance.
+     *
+     * SOCS documents fixture/result date fields as DATE and time fields as
+     * STRING, but does not publish an exact feed date format. The accepted
+     * formats below document which formats come from SOCS examples, existing
+     * Schoolbox fixture import conventions, and defensive internal fallbacks.
+     *
+     * @param string          $date
+     * @param string          $time
+     * @param LoggerInterface $logger
+     * @return \Alaress_Date_Format|null
+     */
+    private function makeDateTime(string $date, string $time, LoggerInterface $logger): ?\Alaress_Date_Format
+    {
+        if ('' === $date) {
+            return null;
+        }
+
+        $time = strtolower($time);
+        // SOCS documents unset time values as "tbc" or "N\A"; empty and
+        // "N/A" are accepted as common variants so the fixture date survives.
+        $timeIsUnset = $time === '' || $time === 'tbc' || $time === 'n\\a' || $time === 'n/a';
+        if ($timeIsUnset) {
+            $time = '00:00';
+        }
+
+        $raw = sprintf('%s %s', $date, $time);
+
+        $dateTimeFormats = [
+            // SOCS date range examples use "1 Sep 2025":
+            // https://help.socscms.com/Page.asp?CatID=13&ID=276
+            'j M Y H:i',
+            // Same SOCS example date shape when the time includes seconds.
+            'j M Y H:i:s',
+            // Compatibility with the existing Schoolbox fixture CSV import.
+            // Also seen in the SOCS xml using our test creds
+            'd/m/Y H:i',
+            // Same Schoolbox CSV date shape when the time includes seconds.
+            'd/m/Y H:i:s',
+            // Schoolbox internal database/API datetime fallback.
+            \Alaress_Date_Format::DATABASE_FORMAT,
+        ];
+
+        $dateOnlyFormats = [
+            // Date-only Schoolbox CSV compatibility fallback; "|" resets time to 00:00:00.
+            'd/m/Y|',
+            // Schoolbox internal database/API date-only fallback; "|" resets time to 00:00:00.
+            \Alaress_Date_Format::DATABASE_DATE_FORMAT . '|',
+        ];
+
+        $attempts = [[$raw, $dateTimeFormats]];
+        if ($timeIsUnset) {
+            $attempts[] = [$date, $dateOnlyFormats];
+        }
+
+        $lastException = null;
+        foreach ($attempts as [$value, $formats]) {
+            try {
+                return new \Alaress_Date_Format($value, $formats);
+            } catch (\Exception $e) {
+                $lastException = $e;
+            }
+        }
+
+        $logger->debug(sprintf('Unable to parse SOCS date/time "%s": %s', $raw, $lastException->getMessage()));
+
+        return null;
     }
 }

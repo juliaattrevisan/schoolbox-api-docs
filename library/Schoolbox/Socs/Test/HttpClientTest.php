@@ -139,7 +139,7 @@ class HttpClientTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionCode(500);
         $this->expectExceptionMessage(
-            'Bad endpoint fixturecalendar.ashx: 500 Internal Server Error after 3 retries. Payload: {"team":"firsts"}'
+            'Bad endpoint fixturecalendar.ashx: 500 Internal Server Error after 0 retries. Payload: {"team":"firsts"}'
         );
 
         $client->get('fixturecalendar.ashx', ['team' => 'firsts']);

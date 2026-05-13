@@ -10,13 +10,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Socs\Teams;
 
-use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
-use Schoolbox\Fixtures\Season\Mapper as SeasonMapper;
-use Schoolbox\Fixtures\Sport\Mapper as SportMapper;
-use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
-use Schoolbox\Socs\Fixtures\RecallSupport;
+use Schoolbox\Socs\Fixtures\Registry;
 use Schoolbox\Socs\HttpClient;
 use Schoolbox\Socs\IStrategy;
 use Symfony\Component\Lock\LockInterface;
@@ -26,21 +21,15 @@ use Symfony\Component\Lock\LockInterface;
  */
 class Import implements IStrategy
 {
-    use RecallSupport;
-
     private const string MSO_SPORT_PATH = 'mso-sport.ashx';
 
     public function __construct(
         private LoggerInterface $log,
-        bool $perform,
+        private bool $perform,
         private LockInterface $lock,
         private HttpClient $httpClient,
-        private SeasonMapper $seasonMapper,
-        private SportMapper $sportMapper,
-        private DivisionMapper $divisionMapper,
-        private TeamMapper $teamMapper
+        private Registry $registry
     ) {
-        $this->perform = $perform;
     }
 
     /**
@@ -48,7 +37,7 @@ class Import implements IStrategy
      */
     public function import(): void
     {
-        $season = $this->recallSeason($this->seasonMapper, $this->log);
+        $season = $this->registry->recallSeason();
 
         $this->log->info('Downloading SOCS teams from mso-sport feed');
 
@@ -89,12 +78,12 @@ class Import implements IStrategy
                 continue;
             }
 
-            $sport = $this->recallSport($this->sportMapper, $this->log, $sportName);
+            $sport = $this->registry->recallSport($sportName);
 
             $divisionName = $teamName;
-            $division = $this->recallDivision($this->divisionMapper, $this->log, $divisionName, $sport, $season);
+            $division = $this->registry->recallDivision($divisionName, $sport, $season);
 
-            $this->recallTeam($this->teamMapper, $this->log, $teamName, $division);
+            $this->registry->recallTeam($teamName, $division);
 
             $imported++;
         }
