@@ -1488,6 +1488,9 @@ class MapperProxy
              *
              * But it kept giving me this nonsensical hankypanky:
              *    Could not save activity. Error executing statement: SQLSTATE[22007]: Invalid datetime format: 1292 Truncated incorrect DECIMAL value: 'null'.
+             *
+             * TODO Find out what particular DECIMAL field is needed
+             *  (It wasn't the rubric_instance.weight - those all had values)
              */
             $rubricInstanceMapper = \Schoolbox\Assessment\Rubric\Instance\Mapper::getInstance();
 
