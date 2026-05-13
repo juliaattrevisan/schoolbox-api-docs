@@ -86,7 +86,7 @@ class Import implements IStrategy
             $resultText = trim((string)$resultNode->result);
 
             if ('' === $eventId || '' === $resultText) {
-                $this->log->debug('Skipping SOCS result with missing mandatory fields');
+                $this->log->info('Skipping SOCS result with missing mandatory fields');
                 continue;
             }
 
