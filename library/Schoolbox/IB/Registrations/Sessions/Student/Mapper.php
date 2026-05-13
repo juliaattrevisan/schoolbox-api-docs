@@ -333,7 +333,7 @@ class Mapper extends BaseMapper
         if ($groupSubjects->offsetExists($groupSubjectId)) {
             $groupSubject = $groupSubjects[$groupSubjectId];
 
-            if ($groupSubject instanceof GroupSubjectModel) {
+            if ($groupSubject instanceof GroupSubjectModel && $groupSubject->getId() === $groupSubjectId) {
                 return $groupSubject;
             }
         }

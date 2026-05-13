@@ -118,6 +118,42 @@ class MapperTest extends TestCase
         $this->assertSame(302, $derivedLanguages[0]->getLanguage()->getId());
     }
 
+    public function testApplySubjectLanguageOverridesMatchesReindexedSubjectsByModelId(): void
+    {
+        $subjectAtCollidingOffset = $this->createGroupSubject(200, [300]);
+        $matchingSubject = $this->createGroupSubject(1, [301]);
+        $student = (new RegistrationSessionStudentModel())
+            ->setId(101)
+            ->setIbGroupSubjects(new GenericCollection(GroupSubjectModel::class, [
+                $this->createGroupSubject(100, [299]),
+                $subjectAtCollidingOffset,
+                $matchingSubject,
+            ]));
+        $overrideLanguage = (new LanguageModel())->setId(401);
+        $override = (new SubjectLanguageModel())
+            ->setGroupSubject((new GroupSubjectModel())->setId(1))
+            ->setLanguage($overrideLanguage);
+        $subjectLanguageMapper = $this->createMock(SubjectLanguageMapper::class);
+        $subjectLanguageMapper
+            ->expects($this->once())
+            ->method('findByRegistrationSessionStudentIds')
+            ->with([101])
+            ->willReturn([
+                101 => new GenericCollection(SubjectLanguageModel::class, [$override]),
+            ]);
+        $mapper = $this->buildMapperWithSubjectLanguageMapper($subjectLanguageMapper);
+
+        $mapper->applyOverrides(new GenericCollection(RegistrationSessionStudentModel::class, [$student]));
+
+        $this->assertSame(
+            $subjectAtCollidingOffset->getLanguages(),
+            $this->findGroupSubjectById($student, 200)->getLanguages()
+        );
+        $languages = $this->findGroupSubjectById($student, 1)->getLanguages();
+        $this->assertCount(1, $languages);
+        $this->assertSame($overrideLanguage, $languages[0]->getLanguage());
+    }
+
     private function buildMapperWithSubjectLanguageMapper(SubjectLanguageMapper $subjectLanguageMapper): Mapper
     {
         return new class ($subjectLanguageMapper) extends Mapper {
