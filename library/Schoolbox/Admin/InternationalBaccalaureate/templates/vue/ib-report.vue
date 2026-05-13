@@ -118,6 +118,10 @@ function toggleSelection(studentId: number): void {
     selectedStudentIds.value = next;
 }
 
+function clearSelection(): void {
+    selectedStudentIds.value = new Set();
+}
+
 async function handleCompletePreparation(studentIds: number[]): Promise<void> {
     if (isCompleting.value) return;
     isCompleting.value = true;
@@ -138,7 +142,7 @@ async function handleCompletePreparation(studentIds: number[]): Promise<void> {
 
         const removedIds = new Set(studentIds);
         preparation.value = preparation.value.filter((s) => !removedIds.has(s.id));
-        selectedStudentIds.value = new Set();
+        clearSelection();
         toast.timeout({
             text: `Preparation completed for ${studentIds.length} student${studentIds.length === 1 ? "" : "s"}.`,
         });
@@ -214,7 +218,7 @@ window.Vue.onMounted((): void => {
             :selected-count="selectedStudentIds.size"
             :is-loading="isCompleting"
             @complete-preparation="handleCompletePreparation([...selectedStudentIds])"
-            @clear-selection="selectedStudentIds = new Set()"
+            @clear-selection="clearSelection"
         />
     </div>
 </template>
