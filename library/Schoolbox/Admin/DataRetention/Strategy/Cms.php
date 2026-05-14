@@ -196,7 +196,7 @@ class Cms extends Base
 
         // if folder cache is still empty then the chunk is empty return early (not deleting anything)
         if ($folderIdsToDelete === []) {
-            $this->log->warning("Skipping Resources (CMS) chunk because all folders are blocked by excluded assessment/course relations");
+            $this->log->warning("Skipping Resources (CMS) chunk because no folders are safe to delete");
 
             return false;
         }
@@ -442,6 +442,8 @@ class Cms extends Base
 
             $activeDescendantFolderIds = $this->findActiveChildFolderIds([$folderId]);
             if ($activeDescendantFolderIds !== []) {
+                $softDeletedChildFolderIds = $this->findSoftDeletedChildFolderIds([$folderId]);
+
                 /**
                  * A folder with active descendants rejects its whole branch for
                  * this chunk. The active ids explain why the branch was rejected;
@@ -457,8 +459,15 @@ class Cms extends Base
                     ));
                 }
 
-                foreach ($this->findSoftDeletedChildFolderIds([$folderId]) as $childFolderId) {
+                foreach ($softDeletedChildFolderIds as $childFolderId) {
                     $seenFolderIds[$childFolderId] = $childFolderId;
+                    foreach ($this->findActiveChildFolderIds([$childFolderId]) as $activeDescendantFolderId) {
+                        $this->log->warning(sprintf(
+                            "Skipping deletion of folder %s because it has active child folder %s",
+                            $childFolderId,
+                            $activeDescendantFolderId,
+                        ));
+                    }
                 }
 
                 continue;

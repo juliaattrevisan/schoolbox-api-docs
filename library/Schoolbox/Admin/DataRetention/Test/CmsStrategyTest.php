@@ -1314,7 +1314,7 @@ class CmsStrategyTest extends TestCase
         ]);
 
         $this->assertSame([], $state->deletedFolders);
-        $this->assertSame([[10]], $state->activeChildLookups);
+        $this->assertSame([[10], [11]], $state->activeChildLookups);
         $this->assertSame([[10]], $state->softDeletedChildLookups);
     }
 
@@ -1347,8 +1347,65 @@ class CmsStrategyTest extends TestCase
 
         $this->assertSame([20], $state->deletedFolders);
         $this->assertSame([20], $state->deletedHomepageUserAccessFolderIds);
-        $this->assertSame([[10], [20]], $state->activeChildLookups);
+        $this->assertSame([[10], [11], [20]], $state->activeChildLookups);
         $this->assertSame([[10], [20]], $state->softDeletedChildLookups);
+    }
+
+    /**
+     * Active descendant skips should log the parent folder that owns visible content.
+     *
+     * Retention logs need to point at the soft-deleted folder that still has a
+     * non-deleted child, not only the requested root. That makes it possible to
+     * inspect the exact place in a retained tree that blocked deletion.
+     *
+     * @return void
+     */
+    public function testDeleteChunkLogsActiveDescendantParent(): void
+    {
+        $state = new class {
+            public array $warnings = [];
+        };
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->method('debug');
+        $logger->method('info');
+        $logger->method('notice');
+        $logger->method('warning')->willReturnCallback(
+            function (string $message) use ($state): void {
+                $state->warnings[] = $message;
+            }
+        );
+
+        ['strategy' => $strategy] = $this->strategy(
+            [
+                391 => [392],
+                392 => [393],
+                393 => [394],
+                394 => [],
+            ],
+            [],
+            [],
+            [],
+            [],
+            [],
+            true,
+            $logger,
+            0,
+            [391, 392, 393],
+        );
+
+        $this->delete($strategy, [
+            ['id' => 391, 'table' => 'folder'],
+        ]);
+
+        $this->assertContains(
+            'Skipping deletion of folder 393 because it has active child folder 394',
+            $state->warnings,
+        );
+        $this->assertContains(
+            'Skipping Resources (CMS) chunk because no folders are safe to delete',
+            $state->warnings,
+        );
     }
 
     /**
