@@ -90,7 +90,7 @@ if (props.forFilterPanel) {
 </script>
 
 <template>
-    <div v-if="props.selected.length > 0" class="selected l-flex-row l-gap-s l-pad-s" data-test="ss-selected">
+    <div v-if="props.selected.length > 0" class="ss-selected l-flex-row l-gap-s l-pad-s" data-test="ss-selected">
         <ss-selected-item
             v-for="item in props.selected"
             :key="item.id"
@@ -133,14 +133,3 @@ if (props.forFilterPanel) {
         </option>
     </select>
 </template>
-
-<style lang="scss" scoped>
-.selected {
-    border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
-    border-radius: var(--sbx-config-field-roundness, 0px);
-    margin-bottom: -1px; //to butt up against the search input
-    max-height: 133px;
-    min-height: 50px;
-    overflow: auto;
-}
-</style>

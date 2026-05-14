@@ -42,7 +42,7 @@ function onRemoveSelected(): void {
 
 <template>
     <div
-        :class="`selected-item l-flex l-flex--align-center l-pad-s l-gap-s ${
+        :class="`ss-selected-item l-flex l-flex--align-center l-pad-s l-gap-s ${
             props.isSingleSelect ? 'l-flex__item--1' : ''
         }`"
         :data-test="`ss-selected-item-container-${props.item.id}`"
@@ -50,7 +50,7 @@ function onRemoveSelected(): void {
         <button
             v-if="props.canSelectItem"
             type="button"
-            :class="`selected-item__name-button ${props.isSingleSelect ? 'l-flex__item--1' : ''}`"
+            :class="`ss-selected-item__name-button ${props.isSingleSelect ? 'l-flex__item--1' : ''}`"
             :title="`View ${props.item.name}`"
             :aria-label="`View ${props.item.name}`"
             :disabled="isDisabled"
@@ -59,11 +59,11 @@ function onRemoveSelected(): void {
         >
             {{ props.item.name }}
         </button>
-        <span v-else class="selected-item__name-span">{{ props.item.name }}</span>
+        <span v-else class="ss-selected-item__name-span">{{ props.item.name }}</span>
         <button
             v-if="!props.isReadOnly"
             type="button"
-            class="selected-item__remove-button icon-close"
+            class="ss-selected-item__remove-button icon-close"
             :title="`Remove ${props.item.name}`"
             :aria-label="`Remove ${props.item.name}`"
             :data-test="`ss-selected-list-item-remove-${props.item.id}`"
@@ -71,31 +71,3 @@ function onRemoveSelected(): void {
         ></button>
     </div>
 </template>
-
-<style lang="scss" scoped>
-.selected-item {
-    background: var(--sbx-config-color-active, var(--body-background));
-    color: var(--sbx-color-text-primary, #000);
-    font-size: var(--sbx-font-size-xs, 0.8125rem);
-    min-height: auto;
-    overflow: hidden;
-    text-align: left;
-    white-space: nowrap;
-    &__name-button {
-        background: none;
-        margin: 0;
-        max-width: 30rem;
-        min-height: 0;
-        padding: 0;
-        text-align: left;
-        text-overflow: ellipsis;
-    }
-    &__remove-button {
-        background: none;
-        height: 1rem;
-        min-height: 0;
-        min-width: 1.5rem;
-        padding: 0;
-    }
-}
-</style>

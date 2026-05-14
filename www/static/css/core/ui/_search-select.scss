@@ -39,3 +39,38 @@
         background: var(--sbx-config-color-active, var(--content-ui-hover));
     }
 }
+
+.ss-selected {
+    border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
+    border-radius: var(--sbx-config-field-roundness, 0px);
+    margin-bottom: -1px; // to butt up against the search input
+    max-height: 133px;
+    min-height: 50px;
+    overflow: auto;
+}
+
+.ss-selected-item {
+    background: var(--sbx-config-color-active, var(--body-background));
+    color: var(--sbx-color-text-primary, #000);
+    font-size: var(--sbx-font-size-xs, 0.8125rem);
+    min-height: auto;
+    overflow: hidden;
+    text-align: left;
+    white-space: nowrap;
+    &__name-button {
+        background: none;
+        margin: 0;
+        max-width: 30rem;
+        min-height: 0;
+        padding: 0;
+        text-align: left;
+        text-overflow: ellipsis;
+    }
+    &__remove-button {
+        background: none;
+        height: 1rem;
+        min-height: 0;
+        min-width: 1.5rem;
+        padding: 0;
+    }
+}
