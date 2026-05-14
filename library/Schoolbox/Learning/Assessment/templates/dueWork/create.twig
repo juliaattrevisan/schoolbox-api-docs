@@ -155,7 +155,7 @@
                 {% if kami_enabled %}
                 <li {% if not config.kami_worksheets_enabled %}style="display:none"{% endif %}>
                     <div class="l-flex-col l-gap-s">
-                        <div class="l-flex l-flex--align-center l-gap-s">
+                        <div class="sbx-checkbox-radio-container">
                             <input id="worksheet" {% if courseManaged.isReadonly %} readonly {% endif %} type="checkbox" {{ assessment.getEnableWorksheet ? 'checked' : '' }} name="submissionOptions[]" value="enableWorksheet" data-type-group>
                             <label for="worksheet" class="checkbox-label" data-test="assessment-form-submission-type-interactive_worksheet">Interactive Worksheet </label>
                             <span class="hint has-tip tip-top" data-tooltip title="This provides students with one interactive worksheet per {{ locale.dueWork.proper }} that they can interact with online. As a teacher, you can monitor and provide in-line feedback as the student progresses. ">?</span>
