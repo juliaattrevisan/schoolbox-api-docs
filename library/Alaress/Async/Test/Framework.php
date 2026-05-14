@@ -406,13 +406,17 @@ class Framework
      */
     private function terminateProcess($ppid)
     {
-        // check for children
-        $pids = preg_split('/\s+/', shell_exec("ps -o pid --no-heading --ppid $ppid"));
+        $pIdsString = shell_exec("ps -o pid --no-heading --ppid $ppid");
 
-        foreach ($pids as $pid) {
-            if (is_numeric($pid)) {
-                // recurse into child looking for deeper process nesting
-                $this->terminateProcess($pid);
+        if (is_string($pIdsString)) {
+            // check for children
+            $pids = preg_split('/\s+/', );
+
+            foreach ($pids as $pid) {
+                if (is_numeric($pid)) {
+                    // recurse into child looking for deeper process nesting
+                    $this->terminateProcess($pid);
+                }
             }
         }
 
