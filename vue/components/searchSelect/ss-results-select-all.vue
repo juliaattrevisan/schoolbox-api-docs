@@ -112,18 +112,13 @@ const { isActive } = useActiveIndex(
         <div class="checklist sbx-checkbox-radio-container">
             <input
                 id="checkbox-select-all"
+                class="f-no-margins"
                 type="checkbox"
                 :checked="isSelected"
                 :class="{ indeterminate: isSomeResultsSelected }"
                 @click.stop="onClick"
             />
-            <label for="checkbox-select-all">Select all</label>
+            <label for="checkbox-select-all" class="f-no-margins">Select all</label>
         </div>
     </div>
 </template>
-
-<style lang="scss" scoped>
-input[type="checkbox"]:not(.plain) + label {
-    margin: 0;
-}
-</style>

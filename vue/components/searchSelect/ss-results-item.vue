@@ -106,6 +106,7 @@ const { isActive } = useActiveIndex(
             <input
                 v-if="props.isSingleSelect"
                 :id="`search-select-result-input-${result.id}`"
+                class="f-no-margins"
                 type="radio"
                 :checked="isSelected"
                 :data-test="`ss-results-item-radio-${props.result.id}`"
@@ -114,6 +115,7 @@ const { isActive } = useActiveIndex(
             <input
                 v-else
                 :id="`search-select-result-input-${result.id}`"
+                class="f-no-margins"
                 type="checkbox"
                 :checked="isSelected"
                 :data-test="`ss-results-item-checkbox-${props.result.id}`"
@@ -131,9 +133,3 @@ const { isActive } = useActiveIndex(
         </div>
     </div>
 </template>
-
-<style lang="scss" scoped>
-input[type="checkbox"]:not(.plain) + label {
-    margin: 0;
-}
-</style>
