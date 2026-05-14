@@ -10,7 +10,7 @@ FROM ${BASE_PHP_IMAGE}
 
 ARG NVM_VERSION='0.40.3'
 ARG AWS_CLI_VERSION='2.27.55'
-ARG NODE_VERSION=20
+ARG NODE_VERSION=24
 
 # Install tools required by cron tasks and CLI:
 # * cron itself, git, mariadb client, ffmpeg, imagemagick, sudo, jq
