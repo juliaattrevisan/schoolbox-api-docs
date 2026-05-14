@@ -13,6 +13,11 @@ use Schoolbox\Learning\Assessment\IAssessable;
 
 class Visibility
 {
+    /**
+     * Return the human-readable variant of the given visibility.
+     * @param string $markVisibility - Expected to be one of the IAssessable::MARK_VISIBILITY_ constants.
+     * @return string
+     */
     public static function getMarkVisibilityDescription(string $markVisibility): string
     {
         return IAssessable::MARK_VISIBILITY_STRINGS[$markVisibility] ?? '';
