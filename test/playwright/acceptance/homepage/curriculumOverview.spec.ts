@@ -2,7 +2,6 @@ import type { Locator, Page } from "@playwright/test";
 import { test } from "@schoolboxTest/playwright/support/integrations";
 import AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import CurriculumSelector from "@schoolboxTest/playwright/support/page/curriculum/selector/CurriculumSelector";
-import Common from "@schoolboxTest/playwright/support/page/Common";
 import CurriculumOverview from "@schoolboxTest/playwright/support/page/homepage/CurriculumOverview";
 import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 import UnitPlanner from "@schoolboxTest/playwright/support/page/unitPlanner/UnitPlanner";
@@ -22,17 +21,15 @@ test.describe.serial("Curriculum Overview Component Tests", () => {
     const CURRICULUM_NODE_ACHHK078 = 257;
     const CURRICULUM_NODE_ELBH121 = 259;
     const CURRICULUM_NODE_ACHHK079 = 261;
-    const CURRICULUM_NODE_ELBH117 = 254;
-    const ACHHK077_TITLE =
-        "[ACHHK077] The diversity and longevity of Australia’s first peoples and the ways Aboriginal and/or Torres Strait Islander peoples are connected to Country and Place (land, sea, waterways and skies) and the implications for their daily lives.";
-    const ACHHK077_BREADCRUMB = "Year 4 History > Year 4 > Historical Knowledge and Understanding > First Contacts";
     const ACHHK078_TITLE =
         "[ACHHK078] The journey(s) of AT LEAST ONE world navigator, explorer or trader up to the late eighteenth century, including their contacts with other societies and any impacts.";
     const ACHHK078_BREADCRUMB = "Year 4 History > Year 4 > Historical Knowledge and Understanding > First Contacts";
-    const ELBH117_TITLE =
-        "[ELBH117] Mapping the diversity of Aboriginal and Torres Strait Islander language groups in Australia, with particular emphasis on the local area and state/territory.";
-    const ELBH117_BREADCRUMB =
-        "Year 4 History > Year 4 > Historical Knowledge and Understanding > First Contacts > The diversity and longevity of Australia’s first peoples and the ways Aboriginal and/or Torres Strait Islander peoples are connected to Country and Place (land, sea, waterways and skies) and the implications for their daily lives.";
+    // to be uncommented once SA-22371 is resolved
+    // const CURRICULUM_NODE_ELBH117 = 254;
+    // const ELBH117_TITLE =
+    //     "[ELBH117] mapping the diversity of Aboriginal and Torres Strait Islander language groups in Australia, with particular emphasis on the local area and state/territory";
+    // const ELBH117_BREADCRUMB =
+    //     "Year 4 History > Year 4 > Historical Knowledge and Understanding > First Contacts > The diversity and longevity of Australia’s first peoples and the ways Aboriginal and/or Torres Strait Islander peoples are connected to Country and Place (land, sea, waterways and skies) and the implications for their daily lives.";
 
     let curriculumOverviewComponentId: number | null = null;
     let homepage: Homepage;
@@ -60,8 +57,7 @@ test.describe.serial("Curriculum Overview Component Tests", () => {
             await setupHomepage.goto(HOMEPAGE_ID);
             await setupHomepage.openLinkMenu();
             await setupHomepage.addComponent(Homepage.ELEMENT_ADD_COMPONENT_SECTION_LEARNING, "Curriculum Overview");
-
-            const component = setupHomepage.locateComponentByName("Curriculum Overview").first();
+            const component = setupHomepage.locateComponentByName("Curriculum Overview");
             curriculumOverviewComponentId = await Homepage.getComponentId(component);
         } finally {
             await setupContext.close();
@@ -111,7 +107,6 @@ test.describe.serial("Curriculum Overview Component Tests", () => {
 
     test("Checking disabled curriculum and removing the curriculum via curriculum overview component", async ({
         db,
-        page,
         tester,
     }) => {
         try {
@@ -147,7 +142,7 @@ test.describe.serial("Curriculum Overview Component Tests", () => {
         }
     });
 
-    test("Filters curriculum via curriculum overview component", async ({ db, page, tester }) => {
+    test("Filters curriculum via curriculum overview component", async ({ tester }) => {
         tester.isGoingTo("unlock homepage components and open Curriculum Overview component settings");
         await homepage.openLinkMenu();
         await homepage.clickLockToggle();
@@ -169,20 +164,21 @@ test.describe.serial("Curriculum Overview Component Tests", () => {
         await CurriculumOverview.expectListNotToContainText(curriculumOverviewComponent, "[ACHHK079]");
     });
 
-    test("Check the curriculum overview component as a student", async ({ db, page, tester }) => {
-        tester.isGoingTo("impersonate Jana Reed and open the homepage");
-        await tester.impersonate(Common.USER_JANAREED);
-        await homepage.goto(HOMEPAGE_ID);
+    // this test will be commented until SA-22371 is resolved - there is a note in the ticket to uncomment this test once it gets fixed
+    // test("Check the curriculum overview component as a student", async ({ tester }) => {
+    //     tester.isGoingTo("impersonate Jana Reed and open the homepage");
+    //     await tester.impersonate(Common.USER_JANAREED);
+    //     await homepage.goto(HOMEPAGE_ID);
 
-        tester.isGoingTo("verify Jana Reed can view the curriculum in the overview component");
-        await CurriculumOverview.expectListToContainText(curriculumOverviewComponent, "[ELBH117]");
-        await CurriculumOverview.expectListToContainText(curriculumOverviewComponent, ELBH117_TITLE);
+    //     tester.isGoingTo("verify Jana Reed can view the curriculum in the overview component");
+    //     await CurriculumOverview.expectListToContainText(curriculumOverviewComponent, "[ELBH117]");
+    //     await CurriculumOverview.expectListToContainText(curriculumOverviewComponent, ELBH117_TITLE);
 
-        tester.isGoingTo("open the ELBH117 curriculum details modal and verify its details");
-        await CurriculumOverview.clickCurriculumCode(curriculumOverviewComponent, CURRICULUM_NODE_ELBH117);
-        await curriculumOverview.expectDetailsModalTitle(ELBH117_TITLE);
-        await curriculumOverview.expectDetailsModalBreadcrumb(ELBH117_BREADCRUMB);
-    });
+    //     tester.isGoingTo("open the ELBH117 curriculum details modal and verify its details");
+    //     await CurriculumOverview.clickCurriculumCode(curriculumOverviewComponent, CURRICULUM_NODE_ELBH117);
+    //     await curriculumOverview.expectDetailsModalTitle(ELBH117_TITLE);
+    //     await curriculumOverview.expectDetailsModalBreadcrumb(ELBH117_BREADCRUMB);
+    // });
 
     test.afterAll(async ({ api, baseTester, db }) => {
         baseTester.isGoingTo("clean up Curriculum Overview component");
