@@ -233,7 +233,7 @@
                 data-title-dock="{{ dockTitle }}"
                 data-title-undock="{{ undockTitle }}"
             >
-                <sbx-icon name="pin"></sbx-icon>
+                <sbx-icon name="{{ user.current.getHideSidenav ? 'pin-hollow' : 'pin' }}"></sbx-icon>
             </a>
             <div class="logo-wrapper">
                 <a href="/" class="logo">
@@ -426,7 +426,7 @@
                                 data-title-dock="{{ dockNotifsTitle }}"
                                 data-title-undock="{{ undockNotifsTitle }}"
                             >
-                                <sbx-icon name="pin"></sbx-icon>
+                                <sbx-icon name="{{ user.current.getHideNotificationsTray ? 'pin-hollow' : 'pin' }}"></sbx-icon>
                             </a>
                             <label id="notification-toggle-full">Notifications</label>
                             <a class="settings-button sbx-icon-only-button" href="{{ routeLookup("notifications.configure") }}" aria-label="Modify notification settings" title="Modify notification settings"><sbx-icon name="settings"></sbx-icon></a>
