@@ -414,14 +414,14 @@ class Cms extends Base
             ['id' => $rootFolderId, 'expanded' => false],
         ];
         $visited = [];
-        $folderIds = [];
+        $deletableFolderIds = [];
         $seenFolderIds = [];
 
         while ($pending !== []) {
             ['id' => $folderId, 'expanded' => $expanded] = array_pop($pending);
 
             if ($expanded) {
-                $folderIds[] = $folderId;
+                $deletableFolderIds[] = $folderId;
                 continue;
             }
 
@@ -432,20 +432,20 @@ class Cms extends Base
             $visited[$folderId] = true;
             $seenFolderIds[$folderId] = $folderId;
 
-            $activeChildFolderIds = $this->findActiveChildFolderIds([$folderId]);
-            if ($activeChildFolderIds !== []) {
+            $activeDescendantFolderIds = $this->findActiveChildFolderIds([$folderId]);
+            if ($activeDescendantFolderIds !== []) {
                 /**
                  * A folder with active descendants rejects its whole branch for
                  * this chunk. The active ids explain why the branch was rejected;
                  * the soft-deleted child ids are also marked as seen so they are
                  * not later deleted as independent roots from the same chunk.
                  */
-                foreach ($activeChildFolderIds as $activeChildFolderId) {
-                    $seenFolderIds[$activeChildFolderId] = $activeChildFolderId;
+                foreach ($activeDescendantFolderIds as $activeDescendantFolderId) {
+                    $seenFolderIds[$activeDescendantFolderId] = $activeDescendantFolderId;
                     $this->log->warning(sprintf(
                         "Skipping deletion of folder %s because it has active child folder %s",
                         $folderId,
-                        $activeChildFolderId,
+                        $activeDescendantFolderId,
                     ));
                 }
 
@@ -469,7 +469,7 @@ class Cms extends Base
         }
 
         return [
-            'folderIds' => array_values($folderIds),
+            'folderIds' => array_values($deletableFolderIds),
             'seenFolderIds' => array_values($seenFolderIds),
         ];
     }
@@ -628,13 +628,10 @@ class Cms extends Base
                 "SELECT DISTINCT {$column} AS folder_id FROM {$table} WHERE {$column} IN {$placeholders}"
             );
             $statement->execute($params);
-            $blocked = array_merge(
-                $blocked,
-                array_map(
-                    static fn(array $row): int => (int) $row['folder_id'],
-                    $statement->fetchAll(\PDO::FETCH_ASSOC),
-                )
-            );
+            foreach ($statement->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+                $folderId = (int)$row['folder_id'];
+                $blocked[$folderId] = $folderId;
+            }
         }
 
         return $this->normalizeIds($blocked);
