@@ -29,6 +29,16 @@ class Cms extends Base
     private ?EtherpadClient $etherpadClient = null;
 
     /**
+     * Remember every folder seen during branch expansion so descendant roots in
+     * the chunks do not expand their subtree again. The branch expansion
+     * performs recursive child lookups and active-folder safety checks, so
+     * repeating it for already-seen descendants is unnecessary database work.
+     *
+     * @var array<int, bool>
+     */
+    private array $classifiedFolderIds = [];
+
+    /**
      * @inheritDoc
      */
     public function getRetentionLabel(): string
@@ -131,15 +141,6 @@ class Cms extends Base
          */
         $folderIdsToDelete = [];
 
-        /**
-         * Remember every folder seen during branch expansion so descendant roots in
-         * the same chunk do not expand their subtree again. The branch expansion
-         * performs recursive child lookups and active-folder safety checks, so
-         * repeating it for already-seen descendants is unnecessary database work.
-         *
-         * @var array<int, bool>
-         */
-        $classifiedFolderIds = [];
 
         /**
          * Expand each previously unseen branch once, then classify every folder in
@@ -156,7 +157,7 @@ class Cms extends Base
          * that has already failed the CMS retention safety checks.
          */
         foreach ($requestedFolderIds as $branchStart) {
-            if (isset($classifiedFolderIds[$branchStart])) {
+            if (isset($this->classifiedFolderIds[$branchStart])) {
                 continue;
             }
 
@@ -173,7 +174,7 @@ class Cms extends Base
             }
 
             foreach ($branch['seenFolderIds'] as $folderId) {
-                $classifiedFolderIds[$folderId] = true;
+                $this->classifiedFolderIds[$folderId] = true;
             }
 
             /**
