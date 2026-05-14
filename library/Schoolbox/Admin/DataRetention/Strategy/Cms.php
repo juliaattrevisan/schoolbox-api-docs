@@ -39,6 +39,14 @@ class Cms extends Base
     private array $classifiedFolderIds = [];
 
     /**
+     * Keep the skip warnings for classified folders so later chunks can still
+     * explain why a descendant root is ignored without re-expanding the same tree.
+     *
+     * @var array<int, array<int, string>>
+     */
+    private array $classifiedFolderSkipWarnings = [];
+
+    /**
      * @inheritDoc
      */
     public function getRetentionLabel(): string
@@ -158,6 +166,10 @@ class Cms extends Base
          */
         foreach ($requestedFolderIds as $branchStart) {
             if (isset($this->classifiedFolderIds[$branchStart])) {
+                foreach ($this->classifiedFolderSkipWarnings[$branchStart] ?? [] as $warning) {
+                    $this->log->warning($warning);
+                }
+
                 continue;
             }
 
@@ -176,6 +188,7 @@ class Cms extends Base
             foreach ($branch['seenFolderIds'] as $folderId) {
                 $this->classifiedFolderIds[$folderId] = true;
             }
+            $this->recordClassifiedFolderSkipWarnings($branch['skipWarnings']);
 
             /**
              * A blocked folder means its branch must remain intact for this run.
@@ -410,7 +423,11 @@ class Cms extends Base
      * and classified again.
      *
      * @param int $rootFolderId
-     * @return array{folderIds: array<int, int>, seenFolderIds: array<int, int>}
+     * @return array{
+     *     folderIds: array<int, int>,
+     *     seenFolderIds: array<int, int>,
+     *     skipWarnings: array<int, array<int, string>>
+     * }
      */
     protected function expandFolderCascade(int $rootFolderId): array
     {
@@ -424,6 +441,7 @@ class Cms extends Base
         $visited = [];
         $deletableFolderIds = [];
         $seenFolderIds = [];
+        $skipWarnings = [];
 
         while ($pending !== []) {
             ['id' => $folderId, 'expanded' => $expanded] = array_pop($pending);
@@ -452,21 +470,25 @@ class Cms extends Base
                  */
                 foreach ($activeDescendantFolderIds as $activeDescendantFolderId) {
                     $seenFolderIds[$activeDescendantFolderId] = $activeDescendantFolderId;
-                    $this->log->warning(sprintf(
+                    $warning = sprintf(
                         "Skipping deletion of folder %s because it has active child folder %s",
                         $folderId,
                         $activeDescendantFolderId,
-                    ));
+                    );
+                    $skipWarnings[$folderId][] = $warning;
+                    $this->log->warning($warning);
                 }
 
                 foreach ($softDeletedChildFolderIds as $childFolderId) {
                     $seenFolderIds[$childFolderId] = $childFolderId;
                     foreach ($this->findActiveChildFolderIds([$childFolderId]) as $activeDescendantFolderId) {
-                        $this->log->warning(sprintf(
+                        $warning = sprintf(
                             "Skipping deletion of folder %s because it has active child folder %s",
                             $childFolderId,
                             $activeDescendantFolderId,
-                        ));
+                        );
+                        $skipWarnings[$childFolderId][] = $warning;
+                        $this->log->warning($warning);
                     }
                 }
 
@@ -488,7 +510,28 @@ class Cms extends Base
         return [
             'folderIds' => array_values($deletableFolderIds),
             'seenFolderIds' => array_values($seenFolderIds),
+            'skipWarnings' => $skipWarnings,
         ];
+    }
+
+    /**
+     * Remember skip warnings against the folder each warning describes.
+     *
+     * Classification is shared across chunks, but operators still need the
+     * original reason when a later chunk starts from a cached descendant. Keeping
+     * the warnings keyed by described folder avoids replaying unrelated ancestor
+     * warnings for a descendant chunk.
+     *
+     * @param array<int, array<int, string>> $warnings
+     * @return void
+     */
+    private function recordClassifiedFolderSkipWarnings(array $warnings): void
+    {
+        foreach ($warnings as $folderId => $folderWarnings) {
+            foreach ($folderWarnings as $warning) {
+                $this->classifiedFolderSkipWarnings[$folderId][] = $warning;
+            }
+        }
     }
 
 

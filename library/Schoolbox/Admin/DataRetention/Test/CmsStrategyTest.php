@@ -1409,6 +1409,74 @@ class CmsStrategyTest extends TestCase
     }
 
     /**
+     * Cached branch skips should still explain why later chunks are ignored.
+     *
+     * Branch classification is cached across chunks to avoid re-expanding a tree
+     * for descendant candidates. Later chunks still need an audit trail, otherwise
+     * an ignored descendant appears to have no folder-specific reason for being
+     * skipped.
+     *
+     * @return void
+     */
+    public function testDeleteChunkLogsCachedActiveDescendantSkip(): void
+    {
+        $state = new class {
+            public array $warnings = [];
+        };
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->method('debug');
+        $logger->method('info');
+        $logger->method('notice');
+        $logger->method('warning')->willReturnCallback(
+            function (string $message) use ($state): void {
+                $state->warnings[] = $message;
+            }
+        );
+
+        ['strategy' => $strategy] = $this->strategy(
+            [
+                391 => [392],
+                392 => [393],
+                393 => [394],
+                394 => [],
+            ],
+            [],
+            [],
+            [],
+            [],
+            [],
+            true,
+            $logger,
+            0,
+            [391, 392, 393],
+        );
+
+        $this->delete($strategy, [
+            ['id' => 391, 'table' => 'folder'],
+        ]);
+        $firstChunkWarnings = $state->warnings;
+        $state->warnings = [];
+
+        $this->delete($strategy, [
+            ['id' => 392, 'table' => 'folder'],
+        ]);
+
+        $this->assertContains(
+            'Skipping deletion of folder 391 because it has active child folder 394',
+            $firstChunkWarnings,
+        );
+        $this->assertContains(
+            'Skipping deletion of folder 392 because it has active child folder 394',
+            $state->warnings,
+        );
+        $this->assertNotContains(
+            'Skipping deletion of folder 391 because it has active child folder 394',
+            $state->warnings,
+        );
+    }
+
+    /**
      * Active descendants must stop the ancestor from entering the delete plan.
      *
      * This protects the bottom-up retention rule even when the candidate root is
