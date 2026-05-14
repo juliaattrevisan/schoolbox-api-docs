@@ -255,7 +255,7 @@ export default class Homepage {
      */
     public static async clickComponentUpdateButton(component: Locator): Promise<void> {
         await component.locator(Homepage.ELEMENT_COMPONENT_UPDATE_BUTTON).click();
-        await component.locator(Homepage.ELEMENT_COMPONENT_UPDATE_BUTTON).waitFor({ state: "hidden" });
+        await expect(component.locator(Homepage.ELEMENT_COMPONENT_UPDATE_BUTTON)).toBeHidden();
     }
 
     /**
