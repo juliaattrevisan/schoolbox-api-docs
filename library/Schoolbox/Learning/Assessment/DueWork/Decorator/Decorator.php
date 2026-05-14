@@ -425,13 +425,6 @@ class Decorator implements DecoratorInterface
                 ->setMaxMark($maxMark)
                 ->setInstructorMaxMark($maxMark);
         }
-//        if ($this->getUseRubric() && $this->original) {
-//            Already reimplemented above
-//        } elseif ($this->getUseRubric()) {
-//            Already reimplemented above
-//        } else {
-//            Already reimplemented above
-//        }
 
         // Only spawn the mark scheme after the max mark is finalized
         // (as it might have changed from what was submitted to the form)
