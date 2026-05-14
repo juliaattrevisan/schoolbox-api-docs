@@ -82,6 +82,22 @@ class CmsStrategyTest extends TestCase
 
             /** @var list<int> */
             public array $deletedSurveyFolderIds = [];
+
+            /**
+             * Capture cascade child lookups so branch-cache tests can prove an
+             * overlapping descendant root did not trigger a second subtree walk.
+             *
+             * @var list<list<int>>
+             */
+            public array $softDeletedChildLookups = [];
+
+            /**
+             * Capture active-child safety checks for the same reason as soft-deleted
+             * lookups: cache regressions show up as repeated checks on descendants.
+             *
+             * @var list<list<int>>
+             */
+            public array $activeChildLookups = [];
         };
 
         $strategy = new class (
@@ -210,6 +226,8 @@ class CmsStrategyTest extends TestCase
              */
             protected function findSoftDeletedChildFolderIds(array $parentIds): array
             {
+                $this->state->softDeletedChildLookups[] = $parentIds;
+
                 if ($this->softDeletedFolderIds === null) {
                     return $this->findChildFolderIds($parentIds);
                 }
@@ -254,6 +272,8 @@ class CmsStrategyTest extends TestCase
              */
             protected function findActiveChildFolderIds(array $parentIds): array
             {
+                $this->state->activeChildLookups[] = $parentIds;
+
                 if ($this->softDeletedFolderIds === null) {
                     return [];
                 }
@@ -1505,6 +1525,35 @@ class CmsStrategyTest extends TestCase
             'deleteHomepageUserAccess',
             'deleteFolders',
         ], $state->calls);
+    }
+
+    /**
+     * Overlapping candidate roots should reuse earlier branch classification.
+     *
+     * getIdsToDelete can return both an ancestor and descendant in the same chunk.
+     * Once the ancestor expansion has classified the descendant, re-processing the
+     * descendant root should not fetch that subtree again.
+     *
+     * @return void
+     */
+    public function testDeleteChunkReusesFolderBranchCache(): void
+    {
+        ['strategy' => $strategy, 'state' => $state] = $this->strategy(
+            [
+                10 => [11],
+                11 => [12],
+                12 => [],
+            ],
+        );
+
+        $this->delete($strategy, [
+            ['id' => 10, 'table' => 'folder'],
+            ['id' => 11, 'table' => 'folder'],
+        ]);
+
+        $this->assertSame([12, 11, 10], $state->deletedFolders);
+        $this->assertSame([[10], [11], [12]], $state->softDeletedChildLookups);
+        $this->assertSame([[10], [11], [12]], $state->activeChildLookups);
     }
 
     /**

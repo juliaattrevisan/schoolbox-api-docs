@@ -122,31 +122,60 @@ class Cms extends Base
             implode(', ', $requestedFolderIds),
         ));
 
-        // store a cache of folders that we are actually going to work on
+        /**
+         * Retention chunks can contain overlapping folder roots, such as a deleted
+         * parent and one of its deleted descendants. Keep the delete plan keyed by
+         * folder id so an accepted descendant is not duplicated, and so a later
+         * blocked relation can remove that folder without disturbing unrelated
+         * folders that were accepted from the same branch.
+         */
         $foldersCache = [];
 
         /**
-         * for each folderId
-         * expand that branch
-         * check if there are any blocked folder
-         * if there are no blocked folders, then continue
-         * if we have nothing left then exit
+         * Remember every folder seen during branch expansion so descendant roots in
+         * the same chunk do not expand their subtree again. The branch expansion
+         * performs recursive child lookups and active-folder safety checks, so
+         * repeating it for already-seen descendants is unnecessary database work.
+         *
+         * @var array<int, bool>
+         */
+        $folderBranchCache = [];
+
+        /**
+         * Expand each previously unseen branch once, then classify every folder in
+         * that expanded branch as deletable or blocked. Blocked folders are excluded
+         * because assessment/course relations are outside CMS retention ownership;
+         * unblocked siblings and descendants can still be deleted in the same chunk.
          */
         foreach ($requestedFolderIds as $branchStart) {
+            if (array_key_exists($branchStart, $folderBranchCache)) {
+                continue;
+            }
+
             $testBranch = $this->expandFolderCascade([$branchStart]);
             $blockedFolderIds = $this->findBlockedFolderIds($testBranch);
+            $blockedFolders = array_fill_keys($blockedFolderIds, true);
 
-            // we have blocked folders, we need log and exclude this folder branch
             if (!empty($blockedFolderIds)) {
                 $this->log->warning(sprintf(
                     "Excluding folder '%s' blocked Resources (CMS) folders from chunk due to excluded assessment/course relations: %s",
                     $branchStart,
                     implode(', ', $blockedFolderIds),
                 ));
-            } else {
-                $foldersCache = array_merge($testBranch);
+            }
+
+            $folderBranchCache[$branchStart] = false;
+            foreach ($testBranch as $folderId) {
+                $folderBranchCache[$folderId] = !isset($blockedFolders[$folderId]);
+                if (isset($blockedFolders[$folderId])) {
+                    unset($foldersCache[$folderId]);
+                    continue;
+                }
+
+                $foldersCache[$folderId] = $folderId;
             }
         }
+        $foldersCache = array_values($foldersCache);
 
         // if folder cache is still empty then the chunk is empty return early (not deleting anything)
         if ($foldersCache === []) {
