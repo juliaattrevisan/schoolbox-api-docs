@@ -89,7 +89,12 @@ class Module extends BaseModule
             $this->injector->get('externalClass'),
             $this->getMapperFactory()->get(RegistrationSessionStudentMapper::class),
             $this->getMapperFactory()->get(RegistrationSessionStudentSubjectLanguageMapper::class),
-            new RegistrationSessionStudentModelToArray($registrationSessionStudentHelper),
+            new RegistrationSessionStudentModelToArray(
+                $registrationSessionStudentHelper,
+                $this->getRouter()->getGenerator(),
+                $this->getAuthorizer(),
+                $this->injector->get('user'),
+            ),
             $registrationSessionStudentHelper,
             $this->injector->get('externalUser'),
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),

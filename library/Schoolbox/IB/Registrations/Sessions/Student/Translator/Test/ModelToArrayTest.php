@@ -11,11 +11,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\IB\Registrations\Sessions\Student\Translator\Test;
 
+use Alaress\Authorizer\Authorizer;
+use Aura\Router\Generator;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\GenericCollection;
 use Schoolbox\IB\Group\Model as IBGroupModel;
 use Schoolbox\IB\Group\Subject\Language\Model as GroupSubjectLanguageModel;
 use Schoolbox\IB\Group\Subject\Model as IBGroupSubjectModel;
+use Schoolbox\IB\Registrations\Sessions\Model as RegistrationSessionModel;
 use Schoolbox\IB\Registrations\Sessions\Student\Helper;
 use Schoolbox\IB\Registrations\Sessions\Student\Model as RegistrationSessionStudentModel;
 use Schoolbox\IB\Registrations\Sessions\Student\Translator\ModelToArray;
@@ -43,6 +46,12 @@ class ModelToArrayTest extends TestCase
         $this->assertSame('Alex, Nguyen', $payload['userName']);
         $this->assertFalse($payload['hasMissingDetails']);
         $this->assertSame([], $payload['missingFields']);
+        $this->assertSame(
+            [
+                'updateLanguages' => '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/123/languages',
+            ],
+            $payload['_routes']
+        );
         $this->assertSame(
             [
                 'HL' => [],
@@ -161,7 +170,24 @@ class ModelToArrayTest extends TestCase
 
     private function createTranslator(): ModelToArray
     {
-        return new ModelToArray(new Helper());
+        $routeGenerator = $this->createMock(Generator::class);
+        $routeGenerator
+            ->method('generate')
+            ->willReturnCallback(static function (string $route, array $params): string {
+                TestCase::assertSame('internationalBaccalaureate.updateRegistrationSessionStudentSubjectLanguages', $route);
+
+                return sprintf(
+                    '/adminv2/international-baccalaureate/registrations/sessions/%d/candidates/%d/languages',
+                    $params['sessionId'],
+                    $params['studentId']
+                );
+            });
+        $authorizer = $this->createMock(Authorizer::class);
+        $authorizer
+            ->method('isPathAuthorizedForUser')
+            ->willReturn(true);
+
+        return new ModelToArray(new Helper(), $routeGenerator, $authorizer, new User());
     }
 
     private function buildStudent(): RegistrationSessionStudentModel
@@ -169,6 +195,7 @@ class ModelToArrayTest extends TestCase
         return (new RegistrationSessionStudentModel())
             ->setId(456)
             ->setStatus(RegistrationSessionStudentModel::STATUS_CONFIRMED)
+            ->setRegistrationSession((new RegistrationSessionModel())->setId(12))
             ->setUser(
                 (new User())
                     ->setId(123)

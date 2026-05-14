@@ -11,10 +11,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\InternationalBaccalaureate\Test;
 
+use Alaress\Authorizer\Authorizer;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Response\Factory as ResponseFactory;
 use Alaress\Web\Request\Values;
+use Aura\Router\Generator;
 use GuzzleHttp\Psr7\HttpFactory;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
@@ -100,6 +102,9 @@ class ControllerTest extends TestCase
                         'SL' => [],
                         'Core' => [],
                     ],
+                    '_routes' => [
+                        'updateLanguages' => '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/123/languages',
+                    ],
                 ],
             ],
             $payload['students'][RegistrationSessionStudentModel::STATUS_CONFIRMED]
@@ -117,6 +122,9 @@ class ControllerTest extends TestCase
                         'HL' => [],
                         'SL' => [],
                         'Core' => [],
+                    ],
+                    '_routes' => [
+                        'updateLanguages' => '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/234/languages',
                     ],
                 ],
             ],
@@ -368,6 +376,23 @@ class ControllerTest extends TestCase
         ?RegistrationSessionStudentSubjectLanguageMapper $subjectLanguageMapper = null
     ): Controller {
         $registrationSessionStudentHelper = new RegistrationSessionStudentHelper();
+        $routeGenerator = $this->createMock(Generator::class);
+        $routeGenerator
+            ->method('generate')
+            ->willReturnCallback(static function (string $route, array $params): string {
+                TestCase::assertSame('internationalBaccalaureate.updateRegistrationSessionStudentSubjectLanguages', $route);
+
+                return sprintf(
+                    '/adminv2/international-baccalaureate/registrations/sessions/%d/candidates/%d/languages',
+                    $params['sessionId'],
+                    $params['studentId']
+                );
+            });
+        $authorizer = $this->createMock(Authorizer::class);
+        $authorizer
+            ->method('isPathAuthorizedForUser')
+            ->willReturn(true);
+        $currentUser = new User();
 
         $controller = new Controller(
             $this->createStub(ConfigMapper::class),
@@ -380,7 +405,12 @@ class ControllerTest extends TestCase
             $this->createStub(\External_ClassInterface::class),
             $registrationSessionStudentMapper,
             $subjectLanguageMapper ?? $this->createStub(RegistrationSessionStudentSubjectLanguageMapper::class),
-            new RegistrationSessionStudentModelToArray($registrationSessionStudentHelper),
+            new RegistrationSessionStudentModelToArray(
+                $registrationSessionStudentHelper,
+                $routeGenerator,
+                $authorizer,
+                $currentUser,
+            ),
             $registrationSessionStudentHelper,
             $externalUser,
             $this->createStub(FieldStrategyFactory::class),
@@ -398,7 +428,7 @@ class ControllerTest extends TestCase
         );
         $controller->setRequest($httpFactory->createServerRequest('GET', '/')->withParsedBody([]));
         $controller->setDi($this->buildContainer());
-        $controller->setUser(new User());
+        $controller->setUser($currentUser);
 
         return $controller;
     }
@@ -443,6 +473,7 @@ class ControllerTest extends TestCase
         return (new RegistrationSessionStudentModel())
             ->setId($id)
             ->setStatus($status)
+            ->setRegistrationSession((new RegistrationSessionModel())->setId(12))
             ->setUser(
                 (new User())
                     ->setId($userId)

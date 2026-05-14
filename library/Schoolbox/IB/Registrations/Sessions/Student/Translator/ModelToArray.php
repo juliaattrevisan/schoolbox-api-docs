@@ -11,13 +11,23 @@ declare(strict_types=1);
 
 namespace Schoolbox\IB\Registrations\Sessions\Student\Translator;
 
+use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\GetRouteIfAuthorized;
+use Aura\Router\Generator;
 use Schoolbox\IB\Registrations\Sessions\Student\Helper;
 use Schoolbox\IB\Registrations\Sessions\Student\Model;
+use Schoolbox\User;
 
 class ModelToArray
 {
-    public function __construct(private Helper $helper)
-    {
+    use GetRouteIfAuthorized;
+
+    public function __construct(
+        private Helper $helper,
+        protected Generator $routeGenerator,
+        protected Authorizer $authorizer,
+        protected User $currentUser,
+    ) {
     }
 
     /**
@@ -56,6 +66,27 @@ class ModelToArray
             'hasMissingDetails' => $missingFields !== [],
             'missingFields' => $missingFields,
             'ibGroupSubjects' => $this->helper->buildIbGroupSubjects($student->getIbGroupSubjects()),
+            '_routes' => [
+                'updateLanguages' => $this->buildUpdateLanguagesRoute($student),
+            ],
         ];
+    }
+
+    private function buildUpdateLanguagesRoute(Model $student): ?string
+    {
+        $sessionId = $student->getRegistrationSession()?->getId();
+        $studentId = $student->getUser()?->getId();
+
+        if ($sessionId === null || $studentId === null) {
+            return null;
+        }
+
+        return $this->getRouteIfAuthorized(
+            'internationalBaccalaureate.updateRegistrationSessionStudentSubjectLanguages',
+            [
+                'sessionId' => $sessionId,
+                'studentId' => $studentId,
+            ]
+        );
     }
 }
