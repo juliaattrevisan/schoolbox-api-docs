@@ -506,13 +506,22 @@ class ListController extends Web\Controller\Base
      */
     public function updateVisibility(IAssessable $assessment): void
     {
-        $visibility            = $this->requestPost['visibility'];
+        $visibility            = (string) $this->requestPost['visibility'];
+        $currentVisibility     = $assessment->getMarkVisibility();
         $availableVisibilities = FeedbackVisibility::getAvailableVisibilities(
             (bool) $this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_STUDENTS),
             (bool) $this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_PARENTS),
         );
-        if (!in_array($visibility, $availableVisibilities)) {
+        if (
+            $visibility !== $currentVisibility
+            && !in_array($visibility, $availableVisibilities, true)
+        ) {
             $this->response = $this->responseAsJson(['error' => 'Invalid visibility'])->withStatus(500);
+            return;
+        }
+
+        if ($visibility === $currentVisibility) {
+            $this->response = $this->responseAsJson(['message' => 'Loaded successfully']);
             return;
         }
 
