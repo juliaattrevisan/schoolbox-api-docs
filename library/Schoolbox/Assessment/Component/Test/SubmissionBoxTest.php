@@ -112,12 +112,12 @@ class SubmissionBoxTest extends TestCase
         $this->assertSame('Staff Only', $box->getMarkVisibilityDescription());
 
         $box->setMarkVisibility(IAssessable::MARK_VISIBILITY_STUDENT);
-        $this->assertSame('Staff and Students', $box->getMarkVisibilityDescription());
+        $this->assertSame('Staff & Student', $box->getMarkVisibilityDescription());
 
         $box->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT);
-        $this->assertSame('Staff and Parents', $box->getMarkVisibilityDescription());
+        $this->assertSame('Staff & Parent', $box->getMarkVisibilityDescription());
 
         $box->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
-        $this->assertSame('Staff, Students and Parents', $box->getMarkVisibilityDescription());
+        $this->assertSame('Staff, Student & Parent', $box->getMarkVisibilityDescription());
     }
 }
