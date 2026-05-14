@@ -33,11 +33,13 @@ async function download(): Promise<void> {
         return; // shouldn't be possible to click the button in this state, but just in case
     }
 
+    // This actually overrides our backend implementation in Rubric/Controller::postDownload() which attempts to
+    // set the filename via Content-Disposition already. I spent a while trying to debug -that- implementation
+    // only to realise that something else is taking precedence somehow...so here I am
     const filenameParts = [
-        document.querySelector<HTMLInputElement>("#title")?.value,
         parsedProps.value.rubricGrid.title,
-        "rubric",
     ];
+
     const filename = filenameParts.filter(Boolean).join("-");
 
     const toast = window.sbProps.toastActivate("Downloading rubric...");
