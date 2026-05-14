@@ -246,6 +246,190 @@ class ControllerTest extends TestCase
         ], $payload['subjects']);
     }
 
+    public function testUpdateRegistrationSessionStudentSubjectLanguagesPersistsDynamicCandidateBeforeSavingOverrides(): void
+    {
+        $dynamicRegistrationSessionStudent = (new RegistrationSessionStudentModel())
+            ->setRegistrationSession((new RegistrationSessionModel())->setId(12))
+            ->setUser((new User())->setId(234))
+            ->setStatus(RegistrationSessionStudentModel::STATUS_PREPARATION);
+        $persistedRegistrationSessionStudent = (new RegistrationSessionStudentModel())
+            ->setId(456)
+            ->setRegistrationSession((new RegistrationSessionModel())->setId(12))
+            ->setUser((new User())->setId(234))
+            ->setStatus(RegistrationSessionStudentModel::STATUS_PREPARATION);
+
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $findRegistrationSessionStudentCallCount = 0;
+        $registrationSessionStudentMapper
+            ->expects($this->exactly(2))
+            ->method('findOneByColumnList')
+            ->with([
+                'user_id' => 234,
+                'registration_session_id' => 12,
+            ])
+            ->willReturnCallback(function () use (&$findRegistrationSessionStudentCallCount, $persistedRegistrationSessionStudent) {
+                if ($findRegistrationSessionStudentCallCount++ === 0) {
+                    throw new \Schoolbox\Mapper\Exception\NotFound();
+                }
+
+                return $persistedRegistrationSessionStudent;
+            });
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('findStudentsForSession')
+            ->with(12)
+            ->willReturn(new Collection([$dynamicRegistrationSessionStudent]));
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('save')
+            ->with($this->callback(function (RegistrationSessionStudentModel $student): bool {
+                $this->assertNull($student->getId());
+                $this->assertSame(12, $student->getRegistrationSession()?->getId());
+                $this->assertSame(234, $student->getUser()?->getId());
+                $this->assertSame(RegistrationSessionStudentModel::STATUS_PREPARATION, $student->getStatus());
+
+                return true;
+            }))
+            ->willReturn([456]);
+
+        $groupSubjectMapper = $this->createStub(IBGroupSubjectMapper::class);
+        $groupSubjectMapper
+            ->method('findByColumn')
+            ->with('id', [123])
+            ->willReturn(new GenericCollection(IBGroupSubjectModel::class, [
+                (new IBGroupSubjectModel())->setId(123),
+            ]));
+
+        $languageMapper = $this->createStub(LanguageMapper::class);
+        $languageMapper
+            ->method('findByColumn')
+            ->with('id', [45])
+            ->willReturn(new GenericCollection(LanguageModel::class, [
+                (new LanguageModel())->setId(45),
+            ]));
+
+        $subjectLanguageMapper = $this->createMock(RegistrationSessionStudentSubjectLanguageMapper::class);
+        $database = $this->createMock(IConnector::class);
+        $database
+            ->expects($this->once())
+            ->method('beginTransaction')
+            ->willReturn(true);
+        $database
+            ->expects($this->once())
+            ->method('commit');
+        $database
+            ->expects($this->never())
+            ->method('rollBack');
+        $subjectLanguageMapper
+            ->method('getDatabase')
+            ->willReturn($database);
+        $subjectLanguageMapper
+            ->method('createModel')
+            ->willReturnCallback(fn() => new RegistrationSessionStudentSubjectLanguageModel());
+        $subjectLanguageMapper
+            ->expects($this->once())
+            ->method('deleteByColumn')
+            ->with('registration_session_student_id', 456);
+        $subjectLanguageMapper
+            ->expects($this->once())
+            ->method('save')
+            ->with($this->callback(function (array $models): bool {
+                $this->assertCount(1, $models);
+                $this->assertSame(456, $models[0]->getRegistrationSessionStudent()?->getId());
+                $this->assertSame(123, $models[0]->getGroupSubject()?->getId());
+                $this->assertSame(45, $models[0]->getLanguage()?->getId());
+
+                return true;
+            }));
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class),
+            $groupSubjectMapper,
+            $languageMapper,
+            $subjectLanguageMapper
+        );
+        $controller->setRequest(
+            (new HttpFactory())
+                ->createServerRequest('PUT', '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/234/languages')
+                ->withParsedBody([
+                    'subjects' => [
+                        ['groupSubjectId' => 123, 'languageId' => 45],
+                    ],
+                ])
+        );
+
+        $controller->updateRegistrationSessionStudentSubjectLanguages(12, 234);
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(200, $response->getStatusCode());
+
+        $payload = json_decode((string) $response->getBody(), true);
+        $this->assertTrue($payload['success']);
+        $this->assertSame([
+            ['groupSubjectId' => 123, 'languageId' => 45],
+        ], $payload['subjects']);
+    }
+
+    public function testUpdateRegistrationSessionStudentSubjectLanguagesReturns404WhenCandidateCannotBePersisted(): void
+    {
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('findOneByColumnList')
+            ->with([
+                'user_id' => 234,
+                'registration_session_id' => 12,
+            ])
+            ->willThrowException(new \Schoolbox\Mapper\Exception\NotFound());
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('findStudentsForSession')
+            ->with(12)
+            ->willReturn(new Collection());
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('save');
+
+        $subjectLanguageMapper = $this->createMock(RegistrationSessionStudentSubjectLanguageMapper::class);
+        $subjectLanguageMapper
+            ->expects($this->never())
+            ->method('deleteByColumn');
+        $subjectLanguageMapper
+            ->expects($this->never())
+            ->method('save');
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class),
+            $this->createStub(IBGroupSubjectMapper::class),
+            $this->createStub(LanguageMapper::class),
+            $subjectLanguageMapper
+        );
+        $controller->setRequest(
+            (new HttpFactory())
+                ->createServerRequest('PUT', '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/234/languages')
+                ->withParsedBody([
+                    'subjects' => [
+                        ['groupSubjectId' => 123, 'languageId' => 45],
+                    ],
+                ])
+        );
+
+        $controller->updateRegistrationSessionStudentSubjectLanguages(12, 234);
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(404, $response->getStatusCode());
+
+        $payload = json_decode((string) $response->getBody(), true);
+        $this->assertFalse($payload['success']);
+        $this->assertSame('Candidate not found for this user in the registration session.', $payload['message']);
+    }
+
     public function testUpdateRegistrationSessionStudentSubjectLanguagesRollsBackOnWriteFailure(): void
     {
         $registrationSessionStudent = (new RegistrationSessionStudentModel())

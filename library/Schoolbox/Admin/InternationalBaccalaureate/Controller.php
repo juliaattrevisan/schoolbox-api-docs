@@ -828,25 +828,6 @@ class Controller extends ConfigController
             return;
         }
 
-        try {
-            $registrationSessionStudent = $this->registrationSessionStudentMapper->findOneByColumnList([
-                'user_id' => $studentId,
-                'registration_session_id' => $sessionId,
-            ]);
-        } catch (MapperNotFound) {
-            $this->response = $this->responseAsJson([
-                'success' => false,
-                'message' => 'Candidate not found for this user in the registration session.',
-            ])->withStatus(404);
-            return;
-        } catch (Exception $e) {
-            $this->response = $this->responseAsJson([
-                'success' => false,
-                'message' => 'Something has gone wrong. Please try again later.',
-            ])->withStatus(500);
-            return;
-        }
-
         $subjectLanguagePayloads = [];
 
         foreach ($subjects as $subject) {
@@ -882,6 +863,7 @@ class Controller extends ConfigController
         $transactionStarted = false;
 
         try {
+            $registrationSessionStudent = $this->persistRegistrationSessionStudent($sessionId, $studentId);
             $groupSubjectsById = $groupSubjectIds === []
                 ? []
                 : $this->groupSubjectMapper
@@ -935,6 +917,11 @@ class Controller extends ConfigController
                 'success' => true,
                 'subjects' => array_values($subjectLanguagePayloads),
             ]);
+        } catch (MapperNotFound) {
+            $this->response = $this->responseAsJson([
+                'success' => false,
+                'message' => 'Candidate not found for this user in the registration session.',
+            ])->withStatus(404);
         } catch (Exception $e) {
             if ($transactionStarted) {
                 $database->rollBack();
@@ -959,5 +946,62 @@ class Controller extends ConfigController
         }
 
         return $this->externalUser->getStudent($externalId);
+    }
+
+    /**
+     * Persist a registration session student, creating the record if it doesn't exist. This is needed to ensure that
+     * there is a registration session student record to link the subject languages to,
+     * even if the student hasn't been fully registered yet.
+     *
+     * @throws MapperNotFound
+     */
+    private function persistRegistrationSessionStudent(
+        int $sessionId,
+        int $studentId
+    ): RegistrationSessionStudentModel {
+        try {
+            return $this->registrationSessionStudentMapper->findOneByColumnList([
+                'user_id' => $studentId,
+                'registration_session_id' => $sessionId,
+            ]);
+        } catch (MapperNotFound) {
+            $registrationSessionStudent = null;
+
+            foreach ($this->registrationSessionStudentMapper->findStudentsForSession($sessionId) as $student) {
+                if (
+                    $student instanceof RegistrationSessionStudentModel
+                    && $student->getUser()?->getId() === $studentId
+                ) {
+                    $registrationSessionStudent = $student;
+                    break;
+                }
+            }
+
+            if (!$registrationSessionStudent instanceof RegistrationSessionStudentModel) {
+                throw new MapperNotFound();
+            }
+
+            if ($registrationSessionStudent->getId() !== null) {
+                return $registrationSessionStudent;
+            }
+
+            try {
+                $this->registrationSessionStudentMapper->save($registrationSessionStudent);
+            } catch (Exception $e) {
+                try {
+                    return $this->registrationSessionStudentMapper->findOneByColumnList([
+                        'user_id' => $studentId,
+                        'registration_session_id' => $sessionId,
+                    ]);
+                } catch (MapperNotFound) {
+                    throw $e;
+                }
+            }
+
+            return $this->registrationSessionStudentMapper->findOneByColumnList([
+                'user_id' => $studentId,
+                'registration_session_id' => $sessionId,
+            ]);
+        }
     }
 }
