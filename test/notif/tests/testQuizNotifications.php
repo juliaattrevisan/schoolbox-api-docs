@@ -164,8 +164,8 @@ class QuizNotifications extends AbstractNotificationTestCase
         $this->log->notice('Gettin yo quiz on', [ 'char' => '>' ]);
 
         $quizzes = [
-            $this->generateQuiz(IAssessable::MARK_VISIBILITY_PRIVATE,        '1 second', '5 second'),
-            $this->generateQuiz(IAssessable::MARK_VISIBILITY_STUDENT,        '6 second', '10 second'),
+            $this->generateQuiz(IAssessable::MARK_VISIBILITY_PRIVATE, '1 second', '5 second'),
+            $this->generateQuiz(IAssessable::MARK_VISIBILITY_STUDENT, '6 second', '10 second'),
             $this->generateQuiz(IAssessable::MARK_VISIBILITY_PARENT_STUDENT, '11 second', '15 second'),
         ];
 
