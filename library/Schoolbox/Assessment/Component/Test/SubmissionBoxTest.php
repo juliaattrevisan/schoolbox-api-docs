@@ -27,21 +27,33 @@ class SubmissionBoxTest extends TestCase
         $this->object = new SubmissionBox();
     }
 
+    /**
+     * Marks rubric support as incomplete until a rubric model exists.
+     */
     public function testRubric(): void
     {
         $this->markTestIncomplete('Rubric model hasn\'t been created yet');
     }
 
+    /**
+     * Marks category support as incomplete until category/homepage models exist.
+     */
     public function testCategory(): void
     {
         $this->markTestIncomplete('Category/Homepage models haven\'t been created yet');
     }
 
+    /**
+     * Marks work type support as incomplete until a work type model exists.
+     */
     public function testWorkType(): void
     {
         $this->markTestIncomplete('Work type model hasn\'t been added yet');
     }
 
+    /**
+     * Marks mark type support as incomplete until a mark type model exists.
+     */
     public function testMarkType(): void
     {
         $this->markTestIncomplete('Mark type model hasn\'t been added yet');
