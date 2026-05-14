@@ -129,7 +129,7 @@ class Cms extends Base
          * blocked relation can remove that folder without disturbing unrelated
          * folders that were accepted from the same branch.
          */
-        $foldersCache = [];
+        $folderIdsToDelete = [];
 
         /**
          * Remember every folder seen during branch expansion so descendant roots in
@@ -178,60 +178,60 @@ class Cms extends Base
             foreach ($testBranch as $folderId) {
                 $folderBranchCache[$folderId] = !isset($blockedFolders[$folderId]);
                 if (isset($blockedFolders[$folderId])) {
-                    unset($foldersCache[$folderId]);
+                    unset($folderIdsToDelete[$folderId]);
                     continue;
                 }
 
-                $foldersCache[$folderId] = $folderId;
+                $folderIdsToDelete[$folderId] = $folderId;
             }
         }
-        $foldersCache = array_values($foldersCache);
+        $folderIdsToDelete = array_values($folderIdsToDelete);
 
         // if folder cache is still empty then the chunk is empty return early (not deleting anything)
-        if ($foldersCache === []) {
+        if ($folderIdsToDelete === []) {
             $this->log->warning("Skipping Resources (CMS) chunk because all folders are blocked by excluded assessment/course relations");
 
             return false;
         }
 
         $counts = [];
-        $counts['etherpad_pads'] = $this->cleanupHomepagePadsForFolders($foldersCache);
+        $counts['etherpad_pads'] = $this->cleanupHomepagePadsForFolders($folderIdsToDelete);
 
-        $blogIds = $this->findIdsByFolder('blog', 'id', 'folder_id', $foldersCache);
+        $blogIds = $this->findIdsByFolder('blog', 'id', 'folder_id', $folderIdsToDelete);
         $counts['blog_comment'] = $this->deleteBlogComments($blogIds);
         $counts['blog_image'] = $this->deleteBlogImages($blogIds);
         $counts['blog'] = $this->deleteBlog($blogIds);
 
-        $forumThreadIds = $this->findIdsByFolder('forumThread', 'threadID', 'categoryID', $foldersCache);
+        $forumThreadIds = $this->findIdsByFolder('forumThread', 'threadID', 'categoryID', $folderIdsToDelete);
         $counts['forumPost'] = $this->deleteForumPosts($forumThreadIds);
         $counts['forumThread'] = $this->deleteForumThreads($forumThreadIds);
 
-        $pollIds = $this->findIdsByFolder('poll', 'id', 'folder_id', $foldersCache);
+        $pollIds = $this->findIdsByFolder('poll', 'id', 'folder_id', $folderIdsToDelete);
         $counts['pollLog'] = $this->deletePollLogs($pollIds);
         $counts['poll'] = $this->deletePolls($pollIds);
 
-        $wikiIds = $this->findIdsByFolder('wiki', 'wikiID', 'categoryID', $foldersCache);
+        $wikiIds = $this->findIdsByFolder('wiki', 'wikiID', 'categoryID', $folderIdsToDelete);
         $counts['wiki_unlinked'] = $this->setWikiLatestRevisionNull($wikiIds);
         $counts['wikiRevision'] = $this->deleteWikiRevisions($wikiIds);
         $counts['wiki'] = $this->deleteWikis($wikiIds);
 
-        $componentInstanceIds = $this->findIdsByFolder('component_instance', 'id', 'identifier', $foldersCache);
+        $componentInstanceIds = $this->findIdsByFolder('component_instance', 'id', 'identifier', $folderIdsToDelete);
         $counts['component_config_instance'] = $this->deleteComponentConfigInstances($componentInstanceIds);
         $counts['component_instance'] = $this->deleteComponentInstances($componentInstanceIds);
 
-        $tileLayouts = $this->findIdsByFolder('tile_layout_for_folder', 'tile_layout_id', 'folder_id', $foldersCache);
+        $tileLayouts = $this->findIdsByFolder('tile_layout_for_folder', 'tile_layout_id', 'folder_id', $folderIdsToDelete);
         $counts['tiles'] = $this->deleteTiles($tileLayouts);
         $counts['tileLayouts'] = $this->deleteTileLayouts($tileLayouts);
         $counts['tileLayoutsJoins'] = $this->deleteTileLayoutJoin($tileLayouts);
 
-        $counts = array_merge($counts, $this->deleteSurveys($foldersCache));
+        $counts = array_merge($counts, $this->deleteSurveys($folderIdsToDelete));
 
         foreach ($this->folderOwnedTables() as $table => $column) {
-            $counts[$table] = $this->deleteByFolderIds($table, $column, $foldersCache);
+            $counts[$table] = $this->deleteByFolderIds($table, $column, $folderIdsToDelete);
         }
 
-        $counts['userAccess'] = $this->deleteHomepageUserAccess($foldersCache);
-        $counts['folder'] = $this->deleteFolders($foldersCache);
+        $counts['userAccess'] = $this->deleteHomepageUserAccess($folderIdsToDelete);
+        $counts['folder'] = $this->deleteFolders($folderIdsToDelete);
 
         $prefix = $this->perform ? 'Deleted' : 'Would have deleted';
         $this->log->notice(sprintf(
