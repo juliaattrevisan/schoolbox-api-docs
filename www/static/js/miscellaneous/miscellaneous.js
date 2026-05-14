@@ -38,6 +38,10 @@ $(function () {
         var title = dockState ? $(this).data("title-dock") : $(this).data("title-undock");
         $(this).attr("title", title);
 
+        // Update the sbx-icon to reflect the new state
+        $icon = $(this).find("sbx-icon");
+        $icon.attr("name", dockState ? "pin-hollow" : "pin");
+
         var notificationState = dockState ? "hide" : "show";
         $.post("/ajax/notificationsTray", { state: notificationState });
 
@@ -66,6 +70,10 @@ $(function () {
         // Update the hover title on the dock button
         var title = dockState ? $(this).data("title-dock") : $(this).data("title-undock");
         $(this).attr("title", title);
+
+        // Update the sbx-icon to reflect the new state
+        $icon = $(this).find("sbx-icon");
+        $icon.attr("name", dockState ? "pin-hollow" : "pin");
 
         // Update the user's sidebar state in the DB
         var leftnavState = dockState ? "hide" : "show";
