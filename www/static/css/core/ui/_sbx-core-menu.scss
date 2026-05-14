@@ -179,9 +179,9 @@ body.sbx-body {
                         border-radius: var(--sbx-config-field-roundness);
                     }
                     & p {
-                        color: var(--sbx-color-text-primary);
-                        &:not(.meta) {
-                            font-weight: var(--sbx-font-weight-active);
+                        color: var(--sbx-config-color-accent);
+                        &.meta {
+                            color: var(--sbx-color-text-secondary);
                         }
                     }
                     &:hover {

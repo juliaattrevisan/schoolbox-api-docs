@@ -266,9 +266,7 @@ $menu-slide: "transform 500ms ease" !default;
             &:not(.button.load-more) {
                 border-bottom: $off-canvas-link-border-bottom;
             }
-
             color: $off-canvas-link-color;
-            display: block;
             padding: $off-canvas-link-padding;
             transition: background 300ms ease;
             &:hover {
@@ -277,6 +275,9 @@ $menu-slide: "transform 500ms ease" !default;
             &:active {
                 background: $off-canvas-bg-active;
             }
+        }
+        a:not([data-pwa-action="retryNotifPrompt"], .sbx-icon-only-button, .sbx-button--has-icon) {
+            display: block;
         }
     }
 }
