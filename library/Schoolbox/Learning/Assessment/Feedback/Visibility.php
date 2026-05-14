@@ -13,6 +13,11 @@ use Schoolbox\Learning\Assessment\IAssessable;
 
 class Visibility
 {
+    public static function getMarkVisibilityDescription(string $markVisibility): string
+    {
+        return IAssessable::MARK_VISIBILITY_STRINGS[$markVisibility] ?? '';
+    }
+
     /**
      * Return an array of available mark visibilities for assessments.
      * @param bool $markVisibilityAllowStudents

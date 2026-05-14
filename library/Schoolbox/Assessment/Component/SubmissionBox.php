@@ -268,22 +268,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * What is the plaintext visibility of this submission box
-     *
-     * @return string
-     */
-    public function getMarkVisibilityDescription()
-    {
-        return match ($this->getMarkVisibility()) {
-            IAssessable::MARK_VISIBILITY_PRIVATE => IAssessable::MARK_VISIBILITY_PRIVATE_STRING,
-            IAssessable::MARK_VISIBILITY_STUDENT => IAssessable::MARK_VISIBILITY_STUDENT_STRING,
-            IAssessable::MARK_VISIBILITY_PARENT => IAssessable::MARK_VISIBILITY_PARENT_STRING,
-            IAssessable::MARK_VISIBILITY_PARENT_STUDENT => IAssessable::MARK_VISIBILITY_PARENT_STUDENT_STRING,
-            default => '',
-        };
-    }
-
-    /**
      * Get index of gradient
      *
      * @return int

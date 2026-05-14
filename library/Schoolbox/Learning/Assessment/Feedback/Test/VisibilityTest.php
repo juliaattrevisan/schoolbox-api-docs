@@ -41,4 +41,25 @@ class VisibilityTest extends TestCase
         $this->assertContains(IAssessable::MARK_VISIBILITY_PARENT_STUDENT, $result);
         $this->assertCount(4, $result);
     }
+
+    public function testGetMarkVisibilityDescription(): void
+    {
+        $this->assertSame(
+            'Staff Only',
+            Visibility::getMarkVisibilityDescription(IAssessable::MARK_VISIBILITY_PRIVATE)
+        );
+        $this->assertSame(
+            'Staff & Student',
+            Visibility::getMarkVisibilityDescription(IAssessable::MARK_VISIBILITY_STUDENT)
+        );
+        $this->assertSame(
+            'Staff & Parent',
+            Visibility::getMarkVisibilityDescription(IAssessable::MARK_VISIBILITY_PARENT)
+        );
+        $this->assertSame(
+            'Staff, Student & Parent',
+            Visibility::getMarkVisibilityDescription(IAssessable::MARK_VISIBILITY_PARENT_STUDENT)
+        );
+        $this->assertSame('', Visibility::getMarkVisibilityDescription('unexpected'));
+    }
 }

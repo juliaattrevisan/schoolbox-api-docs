@@ -100,24 +100,4 @@ class SubmissionBoxTest extends TestCase
         $box->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $this->assertTrue($box->isMarkShownToParents());
     }
-
-    /**
-     * Tests that getMarkVisibilityDescription() returns the correct human-readable description for each visibility setting.
-     */
-    public function testGetMarkVisibilityDescription(): void
-    {
-        $box = new SubmissionBox();
-
-        $box->setMarkVisibility(IAssessable::MARK_VISIBILITY_PRIVATE);
-        $this->assertSame('Staff Only', $box->getMarkVisibilityDescription());
-
-        $box->setMarkVisibility(IAssessable::MARK_VISIBILITY_STUDENT);
-        $this->assertSame('Staff & Student', $box->getMarkVisibilityDescription());
-
-        $box->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT);
-        $this->assertSame('Staff & Parent', $box->getMarkVisibilityDescription());
-
-        $box->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
-        $this->assertSame('Staff, Student & Parent', $box->getMarkVisibilityDescription());
-    }
 }
