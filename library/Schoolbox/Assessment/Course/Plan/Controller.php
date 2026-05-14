@@ -24,7 +24,6 @@ use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Component\CurriculumOverviewController;
 use Schoolbox\Curriculum\Node\Mapper;
-use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller as CourseBuilderController;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
