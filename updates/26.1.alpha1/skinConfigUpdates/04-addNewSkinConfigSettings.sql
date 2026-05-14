@@ -354,8 +354,8 @@ VALUES (
     (
         'skin_colour_component_heading_background',
         @value_skin_colour_component_heading_background,
-        'Component Heading Background',
-        'The colour of the heading background on homepage components.',
+        'Default Component Heading Background',
+        'The colour of the heading background on newly created Homepage/ePortfolio components.',
         @config_colour_field_id,
         @sonar_config_type_id,
         'true',
@@ -368,8 +368,8 @@ VALUES (
     (
         'skin_colour_component_heading_text',
         @value_skin_colour_component_heading_text,
-        'Component Heading Text',
-        'The colour of the heading text on homepage components.',
+        'Default Component Heading Text',
+        'The colour of the heading text on newly created Homepage/ePortfolio components.',
         @config_colour_field_id,
         @sonar_config_type_id,
         'true',
