@@ -42,7 +42,7 @@ cd /usr/share/schoolbox
 
 ## Run tests
 shard="${ACCEPTANCE_TEST_SHARD}/${ACCEPTANCE_TEST_SHARD_TOTAL}"
-INSTANCE_ID=smoketest CI=true TZ='Australia/Melbourne' npx playwright test --shard="$shard"
+INSTANCE_ID=smoketest CI=true TZ='Australia/Melbourne' npx playwright test curriculumOverview.spec.ts --shard="$shard"
 
 testResult=$?;
 

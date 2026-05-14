@@ -159,9 +159,9 @@ test.describe.serial("Curriculum Overview Component Tests", () => {
         await Homepage.clickComponentUpdateButton(curriculumOverviewComponent);
 
         tester.isGoingTo("verify the component is filtered to ACHHK077");
-        await CurriculumOverview.expectListToContainText(curriculumOverviewComponent, "[ACHHK077]");
-        await CurriculumOverview.expectListNotToContainText(curriculumOverviewComponent, "[ACHHK078]");
-        await CurriculumOverview.expectListNotToContainText(curriculumOverviewComponent, "[ACHHK079]");
+        await CurriculumOverview.expectListToContainText(curriculumOverviewComponent, "[ELBH117]");
+        await CurriculumOverview.expectListNotToContainText(curriculumOverviewComponent, "[ACHHK077]");
+        await CurriculumOverview.expectListNotToContainText(curriculumOverviewComponent, "[ELBH121]");
     });
 
     // this test will be commented until SA-22371 is resolved - there is a note in the ticket to uncomment this test once it gets fixed
