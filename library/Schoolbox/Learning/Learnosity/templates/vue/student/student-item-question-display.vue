@@ -157,13 +157,14 @@ watchDebounced(
 /**
  * Move the item response element from the entire quiz response into our own container
  */
-window.Vue.onMounted(() => {
+window.Vue.onMounted(async () => {
     if (props.question.response) {
         const selector = `[data-lrn-widget-container="${props.question.response.learnosityReference}"]`;
         const response = props.container.querySelector(selector) as HTMLDivElement;
         if (response) {
             responsesEl.value?.appendChild(response);
         }
+        await window.Vue.nextTick(); // ensure the response is rendered before we try to manipulate it
         // hide any incorrect/correct styling if we're not showing feedback
         if (response && !props.hasMarkVisibility) {
             removeClasses(response, ["lrn_incorrect", "lrn_correct"]);
@@ -203,6 +204,9 @@ window.Vue.onMounted(() => {
         if (textareaElement) {
             textareaElement.removeAttribute("disabled");
         }
+        // trigger a window resize event to ensure the response is sized correctly and to trigger any load listeners,
+        // such as those on a drag-and-drop question type which needs to position the responses according to the current reference image size
+        window.dispatchEvent(new Event("resize"));
     }
 });
 
