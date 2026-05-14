@@ -139,7 +139,7 @@ class Cms extends Base
          *
          * @var array<int, bool>
          */
-        $folderBranchCache = [];
+        $classifiedFolderIds = [];
 
         /**
          * Expand each previously unseen branch once, then classify every folder in
@@ -154,7 +154,7 @@ class Cms extends Base
          * that has already failed the CMS retention safety checks.
          */
         foreach ($requestedFolderIds as $branchStart) {
-            if (array_key_exists($branchStart, $folderBranchCache)) {
+            if (isset($classifiedFolderIds[$branchStart])) {
                 continue;
             }
 
@@ -172,11 +172,10 @@ class Cms extends Base
             }
 
             foreach ($branch['seenFolderIds'] as $folderId) {
-                $folderBranchCache[$folderId] = false;
+                $classifiedFolderIds[$folderId] = true;
             }
 
             foreach ($testBranch as $folderId) {
-                $folderBranchCache[$folderId] = !isset($blockedFolders[$folderId]);
                 if (isset($blockedFolders[$folderId])) {
                     unset($folderIdsToDelete[$folderId]);
                     continue;
