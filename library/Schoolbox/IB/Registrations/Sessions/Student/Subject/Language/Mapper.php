@@ -22,7 +22,7 @@ use Schoolbox\Mapper as BaseMapper;
 /**
  * Class Mapper
  * @method Model createModel($idValue = null)
- * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method ?Model hydrate(array $row, $alias = '', $callback = null)
  * @method GenericCollection|Model[] findByColumnList($columnList, $options = [])
  *
  * @package Schoolbox\IB\Registrations\Sessions\Student\Subject\Language
@@ -102,7 +102,7 @@ class Mapper extends BaseMapper
             $groupSubject = $groupSubjectMapper->hydrate($row, 'gs');
             $language = $languageMapper->hydrate($row, 'l');
 
-            if (!$registrationSessionStudent->getId() || !$groupSubject->getId() || !$language?->getId()) {
+            if (!$registrationSessionStudent?->getId() || !$groupSubject?->getId() || !$language?->getId()) {
                 continue;
             }
 
