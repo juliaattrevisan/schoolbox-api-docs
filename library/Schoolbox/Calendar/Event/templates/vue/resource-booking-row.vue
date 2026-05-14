@@ -26,6 +26,7 @@ type EditBookingApiRequest = {
     startDatetime: string;
     endDatetime: string;
     notes: string;
+    quantity: number;
     efficacy: string; // Efficacy will be a blank string if the event is not part of a series.
 };
 
@@ -51,12 +52,23 @@ type DeleteBookingApiResponse = { nRowsAffected: number };
 const isEditFormOpen = window.Vue.ref<boolean>(false);
 const isProcessing = window.Vue.ref<boolean>(false);
 const efficacy = window.Vue.ref<string>("");
-const isFormSubmittable = window.Vue.computed(() => {
-    return !isProcessing.value && (!props.eventSeriesId || efficacy.value !== "");
-});
 const bookingNotes = window.Vue.ref<string>(props.booking.notes);
 const startDate = window.Vue.ref<string>(props.booking.start);
 const endDate = window.Vue.ref<string>(props.booking.end);
+const bookingQuantity = window.Vue.ref<number>(props.booking.quantity);
+const showQuantityInput = window.Vue.computed(() => props.booking.resource.capacity > 1 || props.booking.quantity > 1);
+const quantityMax = window.Vue.computed(() => Math.max(props.booking.resource.capacity, props.booking.quantity));
+const isQuantityValid = window.Vue.computed(() => {
+    return (
+        !showQuantityInput.value ||
+        (Number.isInteger(bookingQuantity.value) &&
+            bookingQuantity.value >= 1 &&
+            bookingQuantity.value <= quantityMax.value)
+    );
+});
+const isFormSubmittable = window.Vue.computed(() => {
+    return !isProcessing.value && isQuantityValid.value && (!props.eventSeriesId || efficacy.value !== "");
+});
 
 /**
  * Open or close the 'edit booking' drawer.
@@ -73,6 +85,7 @@ function cancelEditBookingForm(): void {
     bookingNotes.value = props.booking.notes;
     startDate.value = props.booking.start;
     endDate.value = props.booking.end;
+    bookingQuantity.value = props.booking.quantity;
     // Close form.
     toggleEditForm();
 }
@@ -81,6 +94,10 @@ function cancelEditBookingForm(): void {
  * Post the 'Edit Booking' form.
  */
 async function postEditBookingForm(): Promise<void> {
+    if (!isFormSubmittable.value) {
+        return;
+    }
+
     isProcessing.value = true;
 
     const toast = window.sbProps.toastActivate("Saving...");
@@ -91,6 +108,7 @@ async function postEditBookingForm(): Promise<void> {
             startDatetime: startDate.value,
             endDatetime: endDate.value,
             notes: bookingNotes.value,
+            quantity: bookingQuantity.value,
             efficacy: efficacy.value,
         },
     });
@@ -168,6 +186,7 @@ async function postDeleteBookingForm(): Promise<void> {
                 title="Modify Booking"
                 aria-label="Modify Booking"
                 class="sbx-icon-only-button"
+                data-test="resource-booking-row-modify-button"
                 @click.prevent="toggleEditForm"
                 ><sbx-icon name="modify"></sbx-icon
             ></a>
@@ -185,6 +204,20 @@ async function postDeleteBookingForm(): Promise<void> {
                 label-start="From"
                 label-end="Until"
             />
+            <div v-if="showQuantityInput">
+                <label :for="`resource-booking-row-quantity-${props.booking.id}`">Quantity</label>
+                <input
+                    :id="`resource-booking-row-quantity-${props.booking.id}`"
+                    v-model.number="bookingQuantity"
+                    name="quantity"
+                    type="number"
+                    min="1"
+                    :max="quantityMax"
+                    step="1"
+                    required
+                    data-test="resource-booking-row-quantity-input"
+                />
+            </div>
             <div>
                 <label :for="`resource-booking-row-textarea-${props.booking.id}`">Notes</label>
                 <text-editor :id="`resource-booking-row-textarea-${props.booking.id}`" v-model:body="bookingNotes" />
@@ -213,7 +246,13 @@ async function postDeleteBookingForm(): Promise<void> {
             <div class="component-action">
                 <section>
                     <button @click.prevent="cancelEditBookingForm">Cancel</button>
-                    <button :disabled="!isFormSubmittable" @click.prevent="postEditBookingForm">Save</button>
+                    <button
+                        :disabled="!isFormSubmittable"
+                        data-test="resource-booking-row-save-button"
+                        @click.prevent="postEditBookingForm"
+                    >
+                        Save
+                    </button>
                     <button :disabled="!isFormSubmittable" @click.prevent="postDeleteBookingForm">Delete</button>
                 </section>
             </div>
