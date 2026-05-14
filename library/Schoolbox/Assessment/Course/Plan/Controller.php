@@ -139,16 +139,16 @@ class Controller extends Base
                 ri.name AS indicator_name
             FROM course_unit_specification cus
             INNER JOIN assessment_course_unit_specification acus ON cus.id = acus.course_unit_specification_id
-            INNER JOIN submission_box sb ON acus.assessment_id = sb.assessment_id
-            INNER JOIN assessment a ON sb.assessment_id = a.id
-            INNER JOIN rubric_indicator_usage riu ON sb.id = riu.submission_box_id
+            INNER JOIN assessment a ON acus.assessment_id = a.id
+            INNER JOIN rubric_instance ON a.id = rubric_instance.assessment_id
+            INNER JOIN rubric_indicator_usage riu ON rubric_instance.id = riu.rubric_instance_id
             INNER JOIN rubric_indicator ri ON riu.rubric_indicator_id = ri.id
             INNER JOIN rubric_capability rc ON ri.rubric_capability_id = rc.id
             WHERE cus.folder_id = :unitFolderId
             AND rc.deleted_at IS NULL
             AND ri.deleted_at IS NULL
-            AND sb.use_rubric = 1
             AND a.deleted_at IS NULL
+            AND rubric_instance.deleted_at IS NULL
             ORDER BY rc.id, riu.sequence, ri.name
         ");
     }
