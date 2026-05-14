@@ -21,6 +21,7 @@ use Crell\ApiProblem\ApiProblem;
 use Exception;
 use External_ClassInterface;
 use Psr\SimpleCache\CacheInterface;
+use Report_Exporter;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
@@ -33,6 +34,7 @@ use Schoolbox\IB\Group\Model as IBGroupModel;
 use Schoolbox\IB\Registrations\Sessions\Mapper as RegistrationSessionMapper;
 use Schoolbox\IB\Registrations\Sessions\Model as RegistrationSessionModel;
 use Schoolbox\IB\Registrations\Sessions\Student\Helper as RegistrationSessionStudentHelper;
+use Schoolbox\IB\Registrations\Sessions\Student\Export\Csv as RegistrationSessionStudentCsvExport;
 use Schoolbox\IB\Registrations\Sessions\Student\Mapper as RegistrationSessionStudentMapper;
 use Schoolbox\IB\Registrations\Sessions\Student\Model as RegistrationSessionStudentModel;
 use Schoolbox\IB\Registrations\Sessions\Student\Subject\Language\Mapper as RegistrationSessionStudentSubjectLanguageMapper;
@@ -607,6 +609,7 @@ class Controller extends ConfigController
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($pageCurrent),
                 '_routes' => [
                     'candidatesEndpoint' => $this->getRouteIfAuthorized('internationalBaccalaureate.getRegistrationSessionStudents', ['sessionId' => $sessionId]),
+                    'candidateExportEndpoint' => $this->getRouteIfAuthorized('internationalBaccalaureate.exportRegistrationSessionStudentsCsv', ['sessionId' => $id]),
                     'searchLanguages' => $this->getRouteIfAuthorized('internationalBaccalaureate.searchLanguages'),
                 ],
                 'sessionTitle' => $session->jsonSerialize()['title'],
@@ -766,6 +769,39 @@ class Controller extends ConfigController
             $this->response = $this->responseAsJson([
                 'success' => false,
                 'message' => $e->getMessage(),
+            ])->withStatus(500);
+        }
+    }
+
+    /**
+     * Export students for a registration session as a CSV.
+     *
+     * @api GET /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/candidates/export/csv
+     */
+    public function exportRegistrationSessionStudentsCsv(RegistrationSessionModel $registrationSession): void
+    {
+        try {
+            $sessionId = (int) $registrationSession->getId();
+            $csvExport = new RegistrationSessionStudentCsvExport();
+            $students = $this->registrationSessionStudentMapper->findStudentsForSession($sessionId);
+            $rows = $students
+                ->map(
+                    fn(RegistrationSessionStudentModel $student): array => $csvExport->buildRow(
+                        $student,
+                        $this->findExternalStudent($student)
+                    )
+                )
+                ->reindex()
+                ->getAll();
+
+            $exporter = new Report_Exporter(sprintf('ib-registration-candidate-details-%d', $sessionId));
+            $exporter->setHeadings($csvExport->headings());
+            $exporter->setData($rows);
+            $exporter->exportCSV();
+        } catch (Exception $e) {
+            $this->response = $this->responseAsJson([
+                'success' => false,
+                'message' => 'Something has gone wrong. Please try again later.',
             ])->withStatus(500);
         }
     }

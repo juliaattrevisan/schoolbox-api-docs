@@ -69,6 +69,7 @@ class Module extends BaseModule
         $this->register('GET', '/registrations/sessions/{sessionId:\\d+}', 'getReport', $ruleIBCoordinatorAccess);
         $this->register('GET', '/registrations/sessions/{sessionId:\\d+}/candidates', 'getRegistrationSessionStudents', $ruleIBCoordinatorAccess);
         $this->register('PUT', '/registrations/sessions/{sessionId:\\d+}/candidates/{studentId:\\d+}/languages', 'updateRegistrationSessionStudentSubjectLanguages', $ruleIBCoordinatorAccess);
+        $this->register('GET', '/registrations/sessions/{sessionId:\d+}/candidates/export/csv', 'exportRegistrationSessionStudentsCsv', $ruleIBCoordinatorAccess, $preloadRegistrationSession);
     }
 
     /**
