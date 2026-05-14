@@ -98,15 +98,18 @@ $allow-notification-stash: $xlarge-up;
         }
     }
 
-    @media #{$allow-notification-stash} {
-        .right-menu-dock {
-            color: $white;
-            left: 0;
-            position: absolute;
-            top: 1rem;
-            &:hover {
-                color: $navigation-background;
-            }
+    .right-menu-dock {
+        color: $white;
+        display: none;
+        left: 0;
+        position: absolute;
+        top: 1rem;
+        &:hover {
+            color: $navigation-background;
+        }
+        // only show when the notifications menu can be pinned to the side
+        @media #{$allow-notification-stash} {
+            display: inline-flex;
         }
     }
 
