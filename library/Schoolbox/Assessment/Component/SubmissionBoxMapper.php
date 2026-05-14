@@ -237,9 +237,15 @@ class SubmissionBoxMapper extends BaseMapper
      * @param SubmissionBox $dueWork
      * @return bool
      */
-    public function softDeleteRubricLevels(SubmissionBox $dueWork)
+    public function softDeleteRubricLevels(SubmissionBox $dueWork): bool
     {
-        RubricLevelMapper::getInstance()->deleteByColumn('box_id', $dueWork->getId());
+        /* Find the rubric levels associated with any of the rubric instances used by this submission box's assessment,
+         * and delete those rubric levels.
+         */
+        $rubricInstanceMapper = \Schoolbox\Assessment\Rubric\Instance\Mapper::getInstance();
+
+        $rubricInstanceMapper->deleteByColumn('assessment_id', $dueWork->getAssessmentModel()->getId());
+
         return true;
     }
 
