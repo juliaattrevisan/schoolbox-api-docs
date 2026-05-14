@@ -344,8 +344,30 @@ class Decorator implements DecoratorInterface
                 ->setInstructorMaxMark($this->getInstructorMaxMark());
         }
 
-        /* TODO reimplement somehow
+        /* The existence of $this->>original specifically denotes the workflow where you're Changing Location of an
+         * assessment. This is such a cryptic usage, but it stems from this implementation in ListController, where
+         * the only assignation of $originalAssessment occurs:
+
+            // Clear assessment if the context is changed
+            $relocatedContext   = $assessment ? $this->getRelocatedContext($assessment, $postData['locationId'] ?? '') : '';
+            $originalAssessment = null;
+
+            if ($relocatedContext) {
+                $postData['context'] = $relocatedContext;
+                $originalAssessment  = $assessment;
+                $assessment          = null;
+            }
+         *
+         * At this point $assessment is nulled and forced to respawn entirely from the $post payload and the
+         * corresponding decorator's invocation. You don't have access to the usual $assessment->getRubricInstances()
+         * collection anymore: those are in $original. Also at this point in this particular workflow, $assessment
+         * got deleted by some other means, expecting (assuming) success from recreation at the destination location.
+         *
+         * Wild.
          */
+        if ($this->original) {
+            new \Alaress_Probe('test');
+        }
 //        if ($this->getUseRubric() && $this->original) {
 //            // relocating
 //            $rubricMapper = RubricDataSource::getInstance();
