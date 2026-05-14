@@ -478,7 +478,9 @@ class Cursor implements ICursor
             throw new UnexpectedValueException('Unexpected User: ' . $this->viewer->getId());
         }
 
-        $visibilityPlaceholders = implode(', ', array_map(fn($i) => ":markVisibility{$i}", range(0, count($visibilities) - 1)));
+        $visibilityPredicate = $this->database
+            ->buildPredicateBuilder('')
+            ->in('submission_box.mark_visibility', $visibilities);
 
         $query = 'SELECT ';
         $params = [];
@@ -501,15 +503,13 @@ class Cursor implements ICursor
              WHERE `review_route` = :reviewRoute
              AND `submission_return`.`published_at` IS NOT NULL
              AND `submission_return`.`owner` = :userIdDueWorkFeedback
-             AND `submission_box`.`mark_visibility` IN ($visibilityPlaceholders)
+             AND {$visibilityPredicate->getWhereIntersect()}
              AND `submission_return`.`deleted_at` IS NULL
              AND `assessment`.`deleted_at` IS NULL "
         );
         $params['userIdDueWorkFeedback'] = $this->viewee->getId();
-        foreach ($visibilities as $i => $v) {
-            $params["markVisibility{$i}"] = $v;
-        }
         $params['reviewRoute']           = ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
+        $params = array_merge($params, $visibilityPredicate->getParams());
 
         // Note that since work type visibility is a bit complicated now (see comments above visibility constants in
         // Assessment\WorkType\Mapper), filtering based on work type visibility must now be done in PHP instead of SQL,
@@ -558,7 +558,9 @@ class Cursor implements ICursor
             throw new UnexpectedValueException('Unexpected User: ' . $this->viewer->getId());
         }
 
-        $visibilityPlaceholders = implode(', ', array_map(fn($i) => ":markVisibility{$i}", range(0, count($visibilities) - 1)));
+        $visibilityPredicate = $this->database
+            ->buildPredicateBuilder('')
+            ->in('assess.mark_visibility', $visibilities);
 
         $query = 'SELECT ';
         $params = [];
@@ -581,14 +583,12 @@ class Cursor implements ICursor
             JOIN `assessment` ON `assessment`.`id` = `assess`.`assessment_id`
             WHERE `assess_attempt`.`reviewed_at` IS NOT NULL
             AND `assess_attempt`.`user_id` = :userIdQuizFeedback
-            AND `assess`.`mark_visibility` IN ($visibilityPlaceholders)
+            AND {$visibilityPredicate->getWhereIntersect()}
             AND `assess_attempt`.`deleted_at` IS NULL
             AND `assessment`.`deleted_at` IS NULL
         ");
         $params['userIdQuizFeedback'] = $this->viewee->getId();
-        foreach ($visibilities as $i => $v) {
-            $params["markVisibility{$i}"] = $v;
-        }
+        $params = array_merge($params, $visibilityPredicate->getParams());
 
         // Note that since work type visibility is a bit complicated now (see comments above visibility constants in
         // Assessment\WorkType\Mapper), filtering based on work type visibility must now be done in PHP instead of SQL,
