@@ -1227,11 +1227,14 @@ class DataSource
      *
      * @param IAssessable $assessment
      * @param IImporter $importer
-     * @param string $filename
+     * @param string $title This becomes the title of the rubric grid at its destination.
+     *                      This is either derived from a csv filename or a copy of an original grid's title when changing
+     *                      the context of where an $assessment exists (such as moving it between units/projects) but you
+     *                      could just arbitrarily give it a name of your choosing, like Bastian did.
      * @return Grid
      * @throws MapperException
      */
-    public function importGrid(IAssessable $assessment, IImporter $importer, string $filename): Grid
+    public function importGrid(IAssessable $assessment, IImporter $importer, string $title): Grid
     {
         // Add to the rowset as necessary
         $rowSet        = $this->retrieveRowSet($assessment->getContext(), false);
@@ -1297,7 +1300,7 @@ class DataSource
         /* Fulfil rubric settings
          */
         $rubricInstance = $this->rubricInstanceMapper->createModel()
-            ->setTitle($filename)
+            ->setTitle($title)
             ->setWeight(self::RUBRIC_DEFAULT_WEIGHT)
             ->setAssessmentModel($assessmentModel)
             ->setCapabilityMarkType($capabilityMarkType)

@@ -366,29 +366,67 @@ class Decorator implements DecoratorInterface
          * Wild.
          */
         if ($this->original) {
-            new \Alaress_Probe('test');
+            $rubricMapper = RubricDataSource::getInstance();
+            $gridFactory  = new GridFactory();
+
+            $rowSetBeforeMove = $rubricMapper->retrieveRowSet($this->original->getBaseContext(), true);
+
+            /* An assessment's maxMark is the largest possibility, defined by the aggregation of all rubric
+             * grids. I'm sure there's a case to be made where some grids aren't supposed to contribute to an
+             * assessment's maximum marks but we'll just not entertain that theory for now
+             */
+            $maxMark = 0;
+
+            foreach ($this->original->getRubricInstances() as $originalRubricInstance) {
+                /* Make a copy of what it originally did, but unlink its identifier so it spawns anew.
+                 */
+                /** @var \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance */
+                $rubricInstance = clone $originalRubricInstance;
+                $rubricInstance->setId(null);
+
+                /* Craft a grid that uses the settings of $originalRubricInstance, especially when we interrogate the
+                 * $post payload via $this->getRubricData()[$originalRubricInstance->getId()] because we just cloned
+                 * it into $rubricInstance which was used to manufacture this grid. We need to access the $post payload
+                 * to find out what the settings *were*.
+                 */
+                $existingGrid = new Grid($this->original, $rubricInstance, $rowSetBeforeMove);
+                $existingGrid = $gridFactory->buildFromPostData($existingGrid, $this->getRubricData()[$originalRubricInstance->getId()], false);
+
+                $importer = new GenericImporter(
+                    $existingGrid,
+                    $rubricInstance->getMarkedUsingRange(),
+                    $rubricInstance->getCapabilityMarkType()->getId(),
+                    $rubricInstance->getCapabilityGradeGroup()->getId()
+                );
+
+                /* Note that $existingGrid is actually a *re-creation* of a grid that exists, using the $post data in
+                 * buildFromPostData(). If someone changed the title at the same time as relocating an assessment we
+                 * actually need *that* revised title: we can't get it from $originalRubricInstance (that's the old
+                 * title...) but instead, we need to get it from the re-created rubric instance in $existingGrid.
+                 *
+                 * These names...!
+                 */
+                $newGrid = $rubricMapper->importGrid($assessment, $importer, $existingGrid->getRubricInstance()->getTitle());
+
+                /* Each rubric instance knows the latest state of a grid, which also knew about its defining rubric
+                 * instance: that was a cyclic dependency that emerged.
+                 */
+                $newGrid->getRubricInstance()->setGrid($newGrid);
+
+                /* But, it has the same setup as the existing grid so I suppose we could accumulate the total max marks
+                 * using that instead of the new grid. This is probably more intuitive though
+                 */
+                $maxMark += $newGrid->calculateMaxValueFromCapabilities();
+            }
+
+            /* The max mark is the aggregation of each grid's maximum
+             */
+            $assessment
+                ->setMaxMark($maxMark)
+                ->setInstructorMaxMark($maxMark);
         }
 //        if ($this->getUseRubric() && $this->original) {
-//            // relocating
-//            $rubricMapper = RubricDataSource::getInstance();
-//            $gridFactory  = new GridFactory();
-//
-//            $rowSetBeforeMove = $rubricMapper->retrieveRowSet($this->original->getBaseContext(), true);
-//            $existingGrid     = new Grid($this->original, $rowSetBeforeMove);
-//            $existingGrid     = $gridFactory->buildFromPostData($existingGrid, $this->rubricData, false);
-//
-//            $importer = new GenericImporter(
-//                $existingGrid,
-//                $assessment->getUseMarkRange(),
-//                $assessment->getCapabilityMarkType()->getId(),
-//                $assessment->getCapabilityGradeGroup()->getId()
-//            );
-//
-//            // Now new assessment should have new grid
-//            $rubricMapper->importGrid($assessment, $importer);
-//            $markMax = $assessment->getRubricGrid()->calculateMaxValueFromCapabilities();
-//            $assessment->setMaxMark($markMax);
-//            $assessment->setInstructorMaxMark($markMax);
+//            Already reimplemented above
 //        } elseif ($this->getUseRubric()) {
 //            Already reimplemented above
 //        } else {
