@@ -38,7 +38,7 @@ class HelperTest extends TestCase
                 ],
             ], JSON_THROW_ON_ERROR));
 
-        $configMapper = $this->createMock(ConfigMapper::class);
+        $configMapper = $this->createStub(ConfigMapper::class);
         $configMapper
             ->method('findByColumnList')
             ->willReturn([$dropShadowConfig]);

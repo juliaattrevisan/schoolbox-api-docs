@@ -182,21 +182,43 @@ class Controller extends ConfigController
             ConfigMapper::NAME_SKIN_CATEGORY_DROP_SHADOW,
             ConfigMapper::NAME_SKIN_CATEGORY_CSS,
         ];
-
         $orderedCategories = [];
-
         foreach ($preferredOrder as $categoryName) {
             foreach ($categories as $displayName => $subcategoryMap) {
                 if (strtolower($displayName) !== $categoryName) {
                     continue;
                 }
 
-                $orderedCategories[$displayName] = $subcategoryMap;
+                $orderedCategories[$displayName] = $this->orderSubcategories($displayName, $subcategoryMap);
                 unset($categories[$displayName]);
             }
         }
-
         return $orderedCategories + $categories;
+    }
+
+    /**
+     * Reorder subcategories for categories that need a custom admin display order.
+     *
+     * @param array<int, array<string, mixed>> $subcategories
+     * @return array<int, array<string, mixed>>
+     */
+    private function orderSubcategories(string $categoryName, array $subcategories): array
+    {
+        // exit early if this category doesn't need custom ordering
+        if (strtolower($categoryName) !== ConfigMapper::NAME_SKIN_CATEGORY_COLOURS) {
+            return $subcategories;
+        }
+        $topMenuSubcategories = [];
+        $otherSubcategories = [];
+        // put the "Top Menu" subcategory first, so it's more likely users can see the top menu colour changes
+        foreach ($subcategories as $subcategory) {
+            if (strtolower((string)($subcategory['name'] ?? '')) === ConfigMapper::NAME_SKIN_SUBCATEGORY_TOP_MENU) {
+                $topMenuSubcategories[] = $subcategory;
+                continue;
+            }
+            $otherSubcategories[] = $subcategory;
+        }
+        return array_merge($topMenuSubcategories, $otherSubcategories);
     }
 
     /**
