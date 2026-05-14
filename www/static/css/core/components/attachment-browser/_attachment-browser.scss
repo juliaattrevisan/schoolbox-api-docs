@@ -27,10 +27,6 @@
                     word-wrap: break-word;
                 }
             }
-
-            &.active > a {
-                background: $white;
-            }
         }
 
         @media #{$medium-down} {

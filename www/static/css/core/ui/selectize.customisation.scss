@@ -182,7 +182,7 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
     &:hover,
     &:focus,
     &.input-active {
-        background-color: var(--sbx-color-foreground-primary, $form-bg-hover-color);
+        background-color: var(--sbx-config-color-active, $form-bg-hover-color);
         color: var(--sbx-color-text-primary, $form-bg-hover-color-contrast);
         input {
             color: var(--sbx-color-text-primary, $form-bg-hover-color-contrast);
@@ -201,6 +201,6 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
         padding: 0;
     }
     .active {
-        background-color: $content-ui-hover;
+        background-color: var(--sbx-config-color-active, $content-ui-hover);
     }
 }

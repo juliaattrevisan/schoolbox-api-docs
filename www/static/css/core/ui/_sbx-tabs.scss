@@ -42,6 +42,7 @@ body.sbx-body {
     }
 
     .tabs.vertical {
+        border-right: 2px solid var(--sbx-color-border);
         & a {
             &:hover {
                 border-bottom: none;

@@ -249,6 +249,7 @@ export default {
     flex-grow: 1;
     flex-basis: 0;
     border: 1px solid var(--sbx-config-color-accent, #ededed);
+    border-radius: var(--sbx-config-field-roundness, 0);
     margin-right: 1rem;
     padding: 20px;
     background: var(--sbx-color-foreground-primary, #fff);

@@ -248,7 +248,7 @@
                                                 {% set campusChecked = true %}
                                             {% endif %}
                                         {% endfor %}
-                                        <div class="sbx-checkbox-radio-container">
+                                        <div class="sbx-checkbox-radio-container l-mar-s--bottom">
                                             <input id="campus-{{ campus.id }}" type="checkbox" name="campus[]" value="{{ campus.id }}" {% if campusChecked %}checked{% endif %}>
                                             <label for="campus-{{ campus.id }}" class="checkbox-label">{{ campus.name }}</label>
                                         </div>
@@ -268,7 +268,7 @@
                                                 {% set qualChecked = true %}
                                             {% endif %}
                                         {% endfor %}
-                                        <div class="sbx-checkbox-radio-container">
+                                        <div class="sbx-checkbox-radio-container l-mar-s--bottom">
                                             <input id="qualification-{{ qualification.id }}" type="checkbox" name="qualification[]" value="{{ qualification.id }}" {% if qualChecked %}checked{% endif %}>
                                             <label for="qualification-{{ qualification.id }}" class="checkbox-label">{{ qualification.name }}</label>
                                         </div>
