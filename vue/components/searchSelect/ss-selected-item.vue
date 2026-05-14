@@ -63,11 +63,13 @@ function onRemoveSelected(): void {
         <button
             v-if="!props.isReadOnly"
             type="button"
-            class="ss-selected-item__remove-button icon-close"
+            class="ss-selected-item__remove-button"
             :title="`Remove ${props.item.name}`"
             :aria-label="`Remove ${props.item.name}`"
             :data-test="`ss-selected-list-item-remove-${props.item.id}`"
             @click.prevent="onRemoveSelected"
-        ></button>
+        >
+            <sbx-icon name="close"></sbx-icon>
+        </button>
     </div>
 </template>

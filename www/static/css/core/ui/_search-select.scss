@@ -51,6 +51,7 @@
 
 .ss-selected-item {
     background: var(--sbx-config-color-active, var(--body-background));
+    border-radius: var(--sbx-config-field-roundness, 0px);
     color: var(--sbx-color-text-primary, #000);
     font-size: var(--sbx-font-size-xs, 0.8125rem);
     min-height: auto;
@@ -68,9 +69,13 @@
     }
     &__remove-button {
         background: none;
-        height: 1rem;
         min-height: 0;
-        min-width: 1.5rem;
         padding: 0;
+    }
+    &__name-button,
+    &__remove-button {
+        &:hover {
+            background: none;
+        }
     }
 }
