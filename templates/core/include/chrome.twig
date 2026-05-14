@@ -227,6 +227,7 @@
             <a
                 href="#"
                 title="{{ user.current.getHideSidenav ? dockTitle : undockTitle }}"
+                aria-label="{{ user.current.getHideSidenav ? dockTitle : undockTitle }}"
                 class="left-menu-dock sbx-icon-only-button"
                 id="left-menu-dock"
                 data-dock-state="{{ not user.current.getHideSidenav }}"
@@ -420,6 +421,7 @@
                             <a
                                 href="#"
                                 title="{{ user.current.getHideNotificationsTray ? dockNotifsTitle : undockNotifsTitle }}"
+                                aria-label="{{ user.current.getHideNotificationsTray ? dockNotifsTitle : undockNotifsTitle }}"
                                 class="right-menu-dock sbx-icon-only-button"
                                 id="right-menu-dock"
                                 data-dock-state="{{ not user.current.getHideNotificationsTray }}"
