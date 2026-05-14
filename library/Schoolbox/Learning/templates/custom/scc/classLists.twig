@@ -4,7 +4,7 @@
 
 {% block classListSlots %}
     <template v-slot:student-meta="slotProps">
-        <sbx-icon v-if="slotProps.student.StudentSpecialNeedsFlag != 0" name="bell" color="var(--sbx-color-warning, var(--color-warning))" title="{{ specialNeeds }}"></sbx-icon>
+        <sbx-icon v-if="slotProps.student.StudentSpecialNeedsFlag != 0" name="notifications" color="var(--sbx-color-warning, var(--color-warning))" title="{{ specialNeeds }}"></sbx-icon>
         <sbx-icon v-if="slotProps.student.StudentMedicalAlert != ''" name="alert" color="var(--sbx-color-alert, var(--color-alert))" :title="'Medical Alert: ' + slotProps.student.StudentMedicalAlert"></sbx-icon>
         <sbx-icon v-if="slotProps.student.StudentNonResidentFlag != 0" name="international-student" color="currentColor" title="International Student"></sbx-icon>
         <sbx-icon v-if="slotProps.student.StudentIBFlag != 0" name="international-baccalaureate" color="currentColor" title="International Baccalaureate Student"></sbx-icon>
