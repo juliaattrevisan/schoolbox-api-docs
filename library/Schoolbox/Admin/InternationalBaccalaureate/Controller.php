@@ -816,7 +816,7 @@ class Controller extends ConfigController
         int $sessionId,
         int $studentId
     ): void {
-        $subjects = new Values($this->request->getParsedBody())->get('subjects');
+        $subjects = new Values($this->request->getParsedBody() ?? [])->get('subjects');
 
         if (!is_array($subjects)) {
             $this->response = $this->responseAsJson([
