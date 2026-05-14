@@ -172,14 +172,6 @@ $allow-notification-stash: $xlarge-up;
     }
 }
 
-@media #{$allow-notification-stash} {
-    // .right-open {
-    //     .right-menu-dock::after {
-    //         content: "\e913"; //.icon-pin
-    //     }
-    // }
-}
-
 .pwa-side-panel {
     background: var(--sbx-color-foreground-primary, #fff);
     border-bottom: 1px solid var(--body-background); // to separate pwa section from rest of the notification bar
