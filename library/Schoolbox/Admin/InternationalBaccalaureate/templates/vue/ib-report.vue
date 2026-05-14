@@ -25,6 +25,7 @@ import type {
 
 interface Props {
     candidatesEndpoint: string;
+    candidateExportEndpoint: string;
     searchLanguagesEndpoint: string;
     sessionTitle: string;
 }
@@ -124,9 +125,14 @@ window.Vue.onMounted((): void => {
     <div class="small-12 island l-flex-col l-gap-m">
         <div class="l-flex l-flex--align-center l-flex--justify-space f-no-margins">
             <h2 class="subheader f-no-margins">{{ props.sessionTitle }}</h2>
-            <button type="button" class="sbx-icon-only-button" disabled aria-label="Download">
+            <a
+                :href="props.candidateExportEndpoint"
+                class="sbx-icon-only-button"
+                aria-label="Download candidate details as CSV"
+                title="Download candidate details as CSV"
+            >
                 <sbx-icon name="download"></sbx-icon>
-            </button>
+            </a>
         </div>
 
         <div v-if="isLoading" class="loader"></div>
