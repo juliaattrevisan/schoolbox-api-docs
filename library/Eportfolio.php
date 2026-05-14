@@ -1,10 +1,11 @@
 <?php
 
+use Alaress\Web\Request\Values;
 use Eportfolio\PageMapper;
 use Eportfolio\Template;
 use Eportfolio\TemplateMapper;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\Homepage\HeadingColours;
 use Schoolbox\UserMapper;
 
 /**
@@ -65,8 +66,6 @@ class Eportfolio
      */
     private GenericCollection $allTemplates;
 
-    private HeadingColours $headingColours;
-
     /**
      * Constructor
      *
@@ -82,7 +81,6 @@ class Eportfolio
         $this->userMapper     = UserMapper::getInstance();
         $this->pageMapper     = PageMapper::getInstance();
         $this->templateMapper = TemplateMapper::getInstance();
-        $this->headingColours = new HeadingColours();
 
         /* Preload settings for user-built pages
          *
@@ -255,18 +253,48 @@ class Eportfolio
     public function getDefaultColorList()
     {
         $colourSet = [];
-        $defaultHeadingColours = $this->headingColours->getDefault();
+        $defaultHeadingColours = $this->getDefaultHeadingColours();
 
         foreach (['top', 'left', 'right'] as $position) {
             $colourSet = array_merge($colourSet, [
                 $position . '_head_font'  => $defaultHeadingColours['head_font'],
                 $position . '_head_bg'    => $defaultHeadingColours['head_bg'],
-                $position . '_font_primary' => Config::get('homepage_colour_font'),
-                $position . '_bg_primary' => Config::get('homepage_colour_bg_primary'),
+                $position . '_font_primary' => Config::get(ConfigMapper::NAME_HOMEPAGE_COLOUR_FONT),
+                $position . '_bg_primary' => Config::get(ConfigMapper::NAME_HOMEPAGE_COLOUR_BG_PRIMARY),
             ]);
         }
 
         return $colourSet;
+    }
+
+    /**
+     * Gets the default heading colours for a homepage, which are either the skin component heading colours
+     * (if advanced UI is enabled) or the homepage heading colours (if not).
+     *
+     * @return array
+     */
+    private function getDefaultHeadingColours(): array
+    {
+        if ($this->isAdvancedUiEnabled()) {
+            return [
+                'head_font' => Config::get(ConfigMapper::NAME_SKIN_COLOUR_COMPONENT_HEADING_TEXT),
+                'head_bg'   => Config::get(ConfigMapper::NAME_SKIN_COLOUR_COMPONENT_HEADING_BACKGROUND),
+            ];
+        }
+
+        return [
+            'head_font' => Config::get(ConfigMapper::NAME_HOMEPAGE_COLOUR_HEAD_FONT),
+            'head_bg'   => Config::get(ConfigMapper::NAME_HOMEPAGE_COLOUR_HEAD_BG),
+        ];
+    }
+
+    private function isAdvancedUiEnabled(): bool
+    {
+        $configValues = new Values([
+            ConfigMapper::NAME_SONAR_UI_TOGGLE => Config::get(ConfigMapper::NAME_SONAR_UI_TOGGLE),
+        ]);
+
+        return $configValues->getBool(ConfigMapper::NAME_SONAR_UI_TOGGLE, false) ?? false;
     }
 
     /**
@@ -293,7 +321,7 @@ class Eportfolio
             'top_bg_primary' => $this->getPageInstance()->getTopBgPrimary(),
         ];
 
-        return $this->headingColours->normaliseForDisplay($colourList);
+        return $colourList;
     }
 
     /**
@@ -320,7 +348,7 @@ class Eportfolio
         $page->setTemplate($templateID);
         $page->setLeftColumnWidth($template->getLeftColumnWidth());
         $page->setRightColumnWidth($template->getRightColumnWidth());
-        $defaultHeadingColours = $this->headingColours->getStoredDefault();
+        $defaultHeadingColours = $this->getDefaultHeadingColours();
         $page->setTopHeadFont($defaultHeadingColours['head_font']);
         $page->setTopHeadBg($defaultHeadingColours['head_bg']);
         $page->setTopFont(Config::get('homepage_colour_font'));
@@ -449,7 +477,6 @@ class Eportfolio
      */
     public function saveDisplayProperties($listColor)
     {
-        $listColor = $this->headingColours->normaliseForSave($listColor);
         $page = $this->pageMapper->findById($this->getPageId());
         $page->setTopHeadFont($listColor['top_head_font']);
         $page->setTopHeadBg($listColor['top_head_bg']);

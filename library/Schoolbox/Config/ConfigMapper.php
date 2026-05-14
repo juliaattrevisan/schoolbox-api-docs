@@ -359,6 +359,8 @@ class ConfigMapper extends Mapper
     public const string NAME_HOMEPAGE_COLOUR_HEAD_BG = 'homepage_colour_head_bg';
     public const string NAME_HOMEPAGE_COLOUR_FONT = 'homepage_colour_font';
     public const string NAME_HOMEPAGE_COLOUR_BG_PRIMARY = 'homepage_colour_bg_primary';
+    public const string NAME_SKIN_COLOUR_COMPONENT_HEADING_TEXT = 'skin_colour_component_heading_text';
+    public const string NAME_SKIN_COLOUR_COMPONENT_HEADING_BACKGROUND = 'skin_colour_component_heading_background';
     public const string NAME_SKIN_COLOUR_NAVIGATION_FOREGROUND = 'skin_colour_navigation_foreground';
     public const string NAME_SKIN_COLOUR_NAVIGATION_BACKGROUND = 'skin_colour_navigation_background';
     public const string NAME_SKIN_COLOUR_NAVIGATION_HOVER = 'skin_colour_navigation_hover';
