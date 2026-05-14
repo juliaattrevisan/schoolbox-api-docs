@@ -138,27 +138,6 @@ body.sbx-body {
                     display: none;
                 }
             }
-
-            // Notifications toggle, move it across with the margin tweak and add some padding to give it more room
-            #notifications {
-                align-items: center;
-                display: flex;
-                height: 2rem;
-                justify-content: center;
-                width: 2rem;
-
-                & sbx-icon {
-                    color: var(--sbx-config-color-accent-text);
-                    height: 100%;
-                    width: 100%;
-                }
-                & #notification-toggle[data-unread="0"] {
-                    background: var(--sbx-config-color-menu-primary);
-                    &:hover {
-                        background: var(--sbx-config-color-menu-hover);
-                    }
-                }
-            }
         }
 
         // Account dropdown
@@ -211,29 +190,29 @@ body.sbx-body {
                 }
             }
         }
+    }
 
-        // mobile account menu, when it goes into the left side menu
-        .account-menu-mobile {
-            // keep similar to the .separator styles in the desktop account menu for consistency, but with some tweaks for mobile
-            .separator {
-                color: var(--sbx-color-text-primary);
-                font-size: var(--sbx-font-size-s);
-                font-weight: var(--sbx-font-weight-active);
-                text-transform: none;
-            }
+    // mobile account menu, when it goes into the left side menu
+    .account-menu-mobile {
+        // keep similar to the .separator styles in the desktop account menu for consistency, but with some tweaks for mobile
+        .separator {
+            color: var(--sbx-color-text-primary);
+            font-size: var(--sbx-font-size-s);
+            font-weight: var(--sbx-font-weight-active);
+            text-transform: none;
+        }
 
-            // add a bit of padding for breathing space
-            .switch-user-mobile {
-                li.user {
-                    padding-block: var(--sbx-size-xxs);
-                    padding-inline: var(--sbx-size-xs);
-                }
+        // add a bit of padding for breathing space
+        .switch-user-mobile {
+            li.user {
+                padding-block: var(--sbx-size-xxs);
+                padding-inline: var(--sbx-size-xs);
             }
+        }
 
-            // remove the derived color
-            .user .card .meta {
-                color: var(--sbx-color-text-secondary);
-            }
+        // remove the derived color
+        .user .card .meta {
+            color: var(--sbx-color-text-secondary);
         }
     }
 
@@ -358,8 +337,9 @@ body.sbx-body {
         }
     }
 
+    // side menu, like within the administration section and for news page
     .side-nav {
-        border-radius: var(--sbx-border-radius-m);
+        border-radius: var(--sbx-config-box-roundness);
         overflow: hidden;
 
         & li {
@@ -372,7 +352,7 @@ body.sbx-body {
                     button.submit
                 ):not(.show-ckeditor-button) {
                 color: var(--sbx-config-color-accent);
-                font-weight: 600;
+                font-weight: var(--sbx-font-weight-heading);
             }
 
             &
@@ -380,71 +360,11 @@ body.sbx-body {
                     button.submit
                 ):not(.show-ckeditor-button) {
                 color: var(--sbx-config-color-accent);
-                font-family: var(--ff-primary);
-                padding-block: 0.5rem;
+                padding-block: var(--sbx-size-xs);
             }
 
             & > a {
                 font-size: var(--sbx-font-size-xs);
-            }
-        }
-    }
-
-    // Account content styles
-    #account-content {
-        border-radius: var(--sbx-border-radius-m);
-
-        & .separator {
-            background-color: #eee !important;
-            color: var(--sbx-config-color-accent);
-            font-weight: 600;
-        }
-
-        & [class^="icon"] {
-            color: var(--sbx-color-text-primary);
-            font-size: 14px;
-            font-weight: 500;
-            line-height: 1.2;
-
-            li:has(&) {
-                padding-block: 0.4rem;
-            }
-        }
-
-        & li.user {
-            padding-block: 0.8rem;
-            padding-inline: 0.8rem;
-
-            & img {
-                border-radius: var(--sbx-border-radius-m);
-            }
-
-            & p {
-                color: var(--sbx-color-text-primary);
-                font-weight: var(--sbx-font-weight-active);
-                text-transform: none;
-            }
-
-            // to distinguish the pwa setup from the other parts
-            .pwa-side-panel {
-                background: var(--sbx-color-foreground-secondary);
-                border-radius: var(--sbx-config-box-roundness);
-                margin-bottom: var(--sbx-size-s);
-            }
-
-            // the border is removed in www/static/css/core/ui/navigation/_offcanvas.scss
-            a.install-button,
-            a.enable-notif-button,
-            a.mark-all-read,
-            a[data-msgfooter-action] {
-                border-bottom: 1px solid var(--sbx-config-color-accent) !important;
-            }
-
-            #msg-content {
-                margin-top: var(--sbx-size-s);
-                li {
-                    padding: var(--sbx-size-xs);
-                }
             }
         }
     }
