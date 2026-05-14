@@ -122,67 +122,77 @@ class Cms extends Base
             implode(', ', $requestedFolderIds),
         ));
 
-        $folderIds = $this->expandFolderCascade($requestedFolderIds);
-        $blockedFolderIds = $this->findBlockedFolderIds($folderIds);
+        // store a cache of folders that we are actually going to work on
+        $foldersCache = [];
 
-        if ($blockedFolderIds !== []) {
-            $folderIds = array_values(array_diff($folderIds, $blockedFolderIds));
+        /**
+         * for each folderId
+         * expand that branch
+         * check if there are any blocked folder
+         * if there are no blocked folders, then continue
+         * if we have nothing left then exit
+         */
+        foreach ($requestedFolderIds as $branchStart) {
+            $testBranch = $this->expandFolderCascade([$branchStart]);
+            $blockedFolderIds = $this->findBlockedFolderIds($testBranch);
 
-            if ($folderIds === []) {
+            // we have blocked folders, we need log and exclude this folder branch
+            if (!empty($blockedFolderIds)) {
                 $this->log->warning(sprintf(
-                    "Skipping Resources (CMS) chunk because all '%s' folders are referenced by excluded assessment/course relations: %s",
-                    count($blockedFolderIds),
+                    "Excluding folder '%s' blocked Resources (CMS) folders from chunk due to excluded assessment/course relations: %s",
+                    $branchStart,
                     implode(', ', $blockedFolderIds),
                 ));
-
-                return false;
+            } else {
+                $foldersCache = array_merge($testBranch);
             }
+        }
 
-            $this->log->warning(sprintf(
-                "Excluding '%s' blocked Resources (CMS) folders from chunk due to excluded assessment/course relations: %s",
-                count($blockedFolderIds),
-                implode(', ', $blockedFolderIds),
-            ));
+        // if folder cache is still empty then the chunk is empty return early (not deleting anything)
+        if ($foldersCache === []) {
+            $this->log->warning("Skipping Resources (CMS) chunk because all folders are blocked by excluded assessment/course relations");
+
+            return false;
         }
 
         $counts = [];
-        $counts['etherpad_pads'] = $this->cleanupHomepagePadsForFolders($folderIds);
+        $counts['etherpad_pads'] = $this->cleanupHomepagePadsForFolders($foldersCache);
 
-        $blogIds = $this->findIdsByFolder('blog', 'id', 'folder_id', $folderIds);
+        $blogIds = $this->findIdsByFolder('blog', 'id', 'folder_id', $foldersCache);
         $counts['blog_comment'] = $this->deleteBlogComments($blogIds);
         $counts['blog_image'] = $this->deleteBlogImages($blogIds);
         $counts['blog'] = $this->deleteBlog($blogIds);
 
-        $forumThreadIds = $this->findIdsByFolder('forumThread', 'threadID', 'categoryID', $folderIds);
+        $forumThreadIds = $this->findIdsByFolder('forumThread', 'threadID', 'categoryID', $foldersCache);
         $counts['forumPost'] = $this->deleteForumPosts($forumThreadIds);
         $counts['forumThread'] = $this->deleteForumThreads($forumThreadIds);
 
-        $pollIds = $this->findIdsByFolder('poll', 'id', 'folder_id', $folderIds);
+        $pollIds = $this->findIdsByFolder('poll', 'id', 'folder_id', $foldersCache);
         $counts['pollLog'] = $this->deletePollLogs($pollIds);
         $counts['poll'] = $this->deletePolls($pollIds);
 
-        $wikiIds = $this->findIdsByFolder('wiki', 'wikiID', 'categoryID', $folderIds);
+        $wikiIds = $this->findIdsByFolder('wiki', 'wikiID', 'categoryID', $foldersCache);
         $counts['wiki_unlinked'] = $this->setWikiLatestRevisionNull($wikiIds);
         $counts['wikiRevision'] = $this->deleteWikiRevisions($wikiIds);
         $counts['wiki'] = $this->deleteWikis($wikiIds);
 
-        $componentInstanceIds = $this->findIdsByFolder('component_instance', 'id', 'identifier', $folderIds);
+        $componentInstanceIds = $this->findIdsByFolder('component_instance', 'id', 'identifier', $foldersCache);
         $counts['component_config_instance'] = $this->deleteComponentConfigInstances($componentInstanceIds);
         $counts['component_instance'] = $this->deleteComponentInstances($componentInstanceIds);
 
-        $tileLayouts = $this->findIdsByFolder('tile_layout_for_folder', 'tile_layout_id', 'folder_id', $folderIds);
+        $tileLayouts = $this->findIdsByFolder('tile_layout_for_folder', 'tile_layout_id', 'folder_id', $foldersCache);
         $counts['tiles'] = $this->deleteTiles($tileLayouts);
         $counts['tileLayouts'] = $this->deleteTileLayouts($tileLayouts);
         $counts['tileLayoutsJoins'] = $this->deleteTileLayoutJoin($tileLayouts);
 
-        $counts = array_merge($counts, $this->deleteSurveys($folderIds));
+        $counts = array_merge($counts, $this->deleteSurveys($foldersCache));
 
         foreach ($this->folderOwnedTables() as $table => $column) {
-            $counts[$table] = $this->deleteByFolderIds($table, $column, $folderIds);
+            $counts[$table] = $this->deleteByFolderIds($table, $column, $foldersCache);
         }
 
-        $counts['userAccess'] = $this->deleteHomepageUserAccess($folderIds);
-        $counts['folder'] = $this->deleteFolders($folderIds);
+        $counts['userAccess'] = $this->deleteHomepageUserAccess($foldersCache);
+        $counts['folder'] = $this->deleteFolders($foldersCache);
 
         $prefix = $this->perform ? 'Deleted' : 'Would have deleted';
         $this->log->notice(sprintf(
