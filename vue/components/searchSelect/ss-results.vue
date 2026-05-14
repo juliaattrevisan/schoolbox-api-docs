@@ -71,51 +71,6 @@ function onRemove(items: SearchSelectItem[]): void {
     emit("remove", items);
 }
 
-const activeIndex = window.Vue.ref(-1); // to be able to use keyboard navigation to move through the search results
-
-/**
- * Move down the search results
- */
-onKeyStroke("ArrowDown", () => {
-    if (props.hasPressedEscape) {
-        return;
-    }
-    const maxIncrement = showSelectAll.value ? props.results.length : props.results.length - 1;
-    if (activeIndex.value < maxIncrement) {
-        activeIndex.value += 1;
-    }
-});
-
-/**
- * Move up the search results
- */
-onKeyStroke("ArrowUp", () => {
-    if (props.hasPressedEscape) {
-        return;
-    }
-    if (activeIndex.value > 0) {
-        activeIndex.value -= 1;
-    }
-});
-
-/**
- * Reset the index whenever the search query changes
- */
-window.Vue.watch(
-    () => props.query,
-    () => {
-        activeIndex.value = 0;
-    },
-);
-
-/**
- * Set the active index to the result currently hovered over
- * @param index - the index of the hovered result
- */
-function onHover(index: number): void {
-    activeIndex.value = index;
-}
-
 const resultsEl = useTemplateRef<HTMLDivElement | null>("resultsEl"); // to detect when the results container is scrolled to the bottom
 const maxResultsHeight = 400; // the maximum height of the results container
 
@@ -162,25 +117,19 @@ window.Vue.watch(
                     v-if="showSelectAll"
                     :results="props.results"
                     :selected="props.selected"
-                    :index="0"
-                    :active-index="activeIndex"
                     @add="onAdd"
                     @remove="onRemove"
-                    @hover="onHover"
                 />
                 <ss-results-item
-                    v-for="(result, index) in props.results"
+                    v-for="result in props.results"
                     :key="result.id"
                     :query="props.query"
                     :allow-partial-matches="props.allowPartialMatches"
                     :selected="props.selected"
                     :result="result"
                     :is-single-select="props.isSingleSelect"
-                    :index="showSelectAll ? index + 1 : index"
-                    :active-index="activeIndex"
                     @add="onAdd"
                     @remove="onRemove"
-                    @hover="onHover"
                 />
             </ul>
             <p v-if="props.hasError" class="ss-results__status alert">

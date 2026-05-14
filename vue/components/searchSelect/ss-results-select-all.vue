@@ -4,22 +4,17 @@
  * multiple search results at once
  */
 
-import { toRef, useTemplateRef } from "vue";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
-import { useActiveIndex } from "./composables/useActiveIndex";
 
 interface Props {
     results: SearchSelectItem[]; // the results returned from the search
     selected: SearchSelectItem[]; // the selected items
-    index: number; // the index of the result
-    activeIndex: number; // the active index, to determine if this result is active
 }
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
     add: [items: SearchSelectItem[]];
     remove: [items: SearchSelectItem[]];
-    hover: [index: number];
 }>();
 
 /**
@@ -73,42 +68,10 @@ function onClick(event?: MouseEvent): void {
         emit("add", props.results);
     }
 }
-
-/**
- * To toggle the selected state of the result
- */
-function onMouseover(): void {
-    emit("hover", props.index);
-}
-
-/**
- * To unset the active index
- */
-function onMouseout(): void {
-    emit("hover", -1);
-}
-
-/**
- * To allow keyboard navigation of the search results
- */
-const resultEl = useTemplateRef<HTMLDivElement | null>("resultEl");
-const { isActive } = useActiveIndex(
-    resultEl,
-    toRef(() => props.index),
-    toRef(() => props.activeIndex),
-    onClick,
-);
 </script>
 
 <template>
-    <li
-        ref="resultEl"
-        :class="`ss-results-item ${isActive ? 'ss-results-item--active' : ''}`"
-        data-test="ss-results-select-all"
-        @click="onClick"
-        @mouseover="onMouseover"
-        @mouseout="onMouseout"
-    >
+    <li ref="resultEl" class="ss-results-item" data-test="ss-results-select-all">
         <div class="checklist sbx-checkbox-radio-container">
             <input
                 id="checkbox-select-all"

@@ -3,10 +3,8 @@
  * A single search result that can be selected / unselected with a checkbox/radio status
  */
 
-import { toRef, useTemplateRef } from "vue";
 import ShowMatches from "@schoolboxVue/components/search/show-matches.vue";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
-import { useActiveIndex } from "./composables/useActiveIndex";
 
 interface Props {
     query: string; // the search query
@@ -14,15 +12,12 @@ interface Props {
     selected: SearchSelectItem[]; // the selected items
     result: SearchSelectItem; // the result to display
     isSingleSelect: boolean; // whether only one result can be selected, to vary the input type
-    index: number; // the index of the result
-    activeIndex: number; // the active index, to determine if this result is active
 }
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
     add: [items: SearchSelectItem[]];
     remove: [items: SearchSelectItem[]];
-    hover: [index: number];
 }>();
 
 /**
@@ -46,13 +41,6 @@ function toggle(): void {
 }
 
 /**
- * When the user selects the result with the keyboard
- */
-function onKeySelect(): void {
-    toggle();
-}
-
-/**
  * To toggle the selected state of the result
  * @param event - the click event
  */
@@ -66,42 +54,10 @@ function onClick(event?: MouseEvent): void {
     }
     toggle();
 }
-
-/**
- * To potentially shift the active index to this result
- */
-function onMouseover(): void {
-    emit("hover", props.index);
-}
-
-/**
- * To unset the active index
- */
-function onMouseout(): void {
-    emit("hover", -1);
-}
-
-/**
- * To allow keyboard navigation of the search results
- */
-const resultEl = useTemplateRef<HTMLDivElement | null>("resultEl");
-const { isActive } = useActiveIndex(
-    resultEl,
-    toRef(() => props.index),
-    toRef(() => props.activeIndex),
-    onKeySelect,
-);
 </script>
 
 <template>
-    <li
-        ref="resultEl"
-        :class="`ss-results-item ${isActive ? 'ss-results-item--active' : ''}`"
-        :data-test="`ss-results-item-container-${props.result.id}`"
-        @click="onClick"
-        @mouseover="onMouseover"
-        @mouseout="onMouseout"
-    >
+    <li ref="resultEl" class="ss-results-item" :data-test="`ss-results-item-container-${props.result.id}`">
         <div class="checklist sbx-checkbox-radio-container">
             <input
                 v-if="props.isSingleSelect"
