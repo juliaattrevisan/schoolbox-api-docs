@@ -39,7 +39,7 @@ $(function () {
         $(this).attr("title", title);
 
         // Update the sbx-icon to reflect the new state
-        $icon = $(this).find("sbx-icon");
+        const $icon = $(this).find("sbx-icon");
         $icon.attr("name", dockState ? "pin-hollow" : "pin");
 
         var notificationState = dockState ? "hide" : "show";
@@ -72,7 +72,7 @@ $(function () {
         $(this).attr("title", title);
 
         // Update the sbx-icon to reflect the new state
-        $icon = $(this).find("sbx-icon");
+        const $icon = $(this).find("sbx-icon");
         $icon.attr("name", dockState ? "pin-hollow" : "pin");
 
         // Update the user's sidebar state in the DB
