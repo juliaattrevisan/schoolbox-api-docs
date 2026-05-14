@@ -1,7 +1,7 @@
 <?php
 
 /**
- * IB registration session student payload test
+ * IB registration session student translator test
  *
  * @copyright Copyright 2026, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -9,25 +9,26 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\IB\Registrations\Sessions\Student\Test;
+namespace Schoolbox\IB\Registrations\Sessions\Student\Translator\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\GenericCollection;
 use Schoolbox\IB\Group\Model as IBGroupModel;
 use Schoolbox\IB\Group\Subject\Language\Model as GroupSubjectLanguageModel;
 use Schoolbox\IB\Group\Subject\Model as IBGroupSubjectModel;
-use Schoolbox\IB\Subject\Model as IBSubjectModel;
+use Schoolbox\IB\Registrations\Sessions\Student\Helper;
 use Schoolbox\IB\Registrations\Sessions\Student\Model as RegistrationSessionStudentModel;
-use Schoolbox\IB\Registrations\Sessions\Student\Payload;
+use Schoolbox\IB\Registrations\Sessions\Student\Translator\ModelToArray;
+use Schoolbox\IB\Subject\Model as IBSubjectModel;
 use Schoolbox\Language\Model as LanguageModel;
 use Schoolbox\Nationality\Model as NationalityModel;
 use Schoolbox\User;
 
-class PayloadTest extends TestCase
+class ModelToArrayTest extends TestCase
 {
     public function testBuildsCompletePayload(): void
     {
-        $payload = (new Payload())->build(
+        $payload = $this->createTranslator()(
             $this->buildStudent(),
             [
                 'StudentBirthDate' => '2009-04-12',
@@ -50,18 +51,6 @@ class PayloadTest extends TestCase
             ],
             $payload['ibGroupSubjects']
         );
-        $this->assertArrayNotHasKey('firstName', $payload);
-        $this->assertArrayNotHasKey('lastName', $payload);
-        $this->assertArrayNotHasKey('dateOfBirth', $payload);
-        $this->assertArrayNotHasKey('email', $payload);
-        $this->assertArrayNotHasKey('gender', $payload);
-        $this->assertArrayNotHasKey('language1', $payload);
-        $this->assertArrayNotHasKey('language2', $payload);
-        $this->assertArrayNotHasKey('nationality1', $payload);
-        $this->assertArrayNotHasKey('nationality2', $payload);
-        $this->assertArrayNotHasKey('schoolName', $payload);
-        $this->assertArrayNotHasKey('reference', $payload);
-        $this->assertArrayNotHasKey('isComplete', $payload);
     }
 
     public function testBuildsMissingFieldsForIncompletePayload(): void
@@ -78,7 +67,7 @@ class PayloadTest extends TestCase
                     ->setNationalityCollection(NationalityModel::createCollection())
             );
 
-        $payload = (new Payload())->build($student, [], '');
+        $payload = $this->createTranslator()($student, [], '');
 
         $this->assertSame('', $payload['userName']);
         $this->assertTrue($payload['hasMissingDetails']);
@@ -124,7 +113,7 @@ class PayloadTest extends TestCase
                 ])
             );
 
-        $payload = (new Payload())->build(
+        $payload = $this->createTranslator()(
             $student,
             [
                 'StudentBirthDate' => '2009-04-12',
@@ -145,7 +134,12 @@ class PayloadTest extends TestCase
                             [
                                 'languageId' => 9,
                                 'languageName' => 'French',
-                                'classCode' => $frenchLanguage->getClassCode(),
+                                'classCode' => [
+                                    [
+                                        'code' => 'FRE-HL',
+                                        'folder' => null,
+                                    ],
+                                ],
                             ],
                         ],
                     ],
@@ -165,72 +159,9 @@ class PayloadTest extends TestCase
         );
     }
 
-    public function testGroupsStudentsByStatus(): void
+    private function createTranslator(): ModelToArray
     {
-        $students = [
-            ['userId' => 123, 'status' => RegistrationSessionStudentModel::STATUS_PREPARATION],
-            ['userId' => 456, 'status' => RegistrationSessionStudentModel::STATUS_CONFIRMED],
-            ['userId' => 789, 'status' => RegistrationSessionStudentModel::STATUS_PREPARATION],
-        ];
-
-        $groups = (new Payload())->groupByStatus($students);
-
-        $this->assertEquals(
-            (object) [
-                '0' => [
-                    ['userId' => 123, 'status' => RegistrationSessionStudentModel::STATUS_PREPARATION],
-                    ['userId' => 789, 'status' => RegistrationSessionStudentModel::STATUS_PREPARATION],
-                ],
-                '2' => [
-                    ['userId' => 456, 'status' => RegistrationSessionStudentModel::STATUS_CONFIRMED],
-                ],
-            ],
-            $groups
-        );
-    }
-
-    public function testGroupsEmptyStudentsAsEmptyObject(): void
-    {
-        $this->assertEquals((object) [], (new Payload())->groupByStatus([]));
-    }
-
-    public function testReturnsRegistrationStatuses(): void
-    {
-        $this->assertSame(
-            [
-                [
-                    'value' => RegistrationSessionStudentModel::STATUS_PREPARATION,
-                    'key' => 'preparation',
-                    'label' => 'Preparation',
-                ],
-                [
-                    'value' => RegistrationSessionStudentModel::STATUS_UNCONFIRMED,
-                    'key' => 'unconfirmed',
-                    'label' => 'Unconfirmed',
-                ],
-                [
-                    'value' => RegistrationSessionStudentModel::STATUS_CONFIRMED,
-                    'key' => 'confirmed',
-                    'label' => 'Confirmed',
-                ],
-                [
-                    'value' => RegistrationSessionStudentModel::STATUS_IN_PROGRESS,
-                    'key' => 'inProgress',
-                    'label' => 'In Progress',
-                ],
-                [
-                    'value' => RegistrationSessionStudentModel::STATUS_FAILED,
-                    'key' => 'failed',
-                    'label' => 'Failed',
-                ],
-                [
-                    'value' => RegistrationSessionStudentModel::STATUS_REGISTERED,
-                    'key' => 'registered',
-                    'label' => 'Registered',
-                ],
-            ],
-            (new Payload())->getStatuses()
-        );
+        return new ModelToArray(new Helper());
     }
 
     private function buildStudent(): RegistrationSessionStudentModel

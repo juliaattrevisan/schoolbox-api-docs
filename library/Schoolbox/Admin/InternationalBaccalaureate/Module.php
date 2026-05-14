@@ -22,8 +22,10 @@ use Schoolbox\IB\Group\Subject\Language\Mapper as IBGroupSubjectLanguageMapper;
 use Schoolbox\IB\Group\Subject\Mapper as IBGroupSubjectMapper;
 use Schoolbox\IB\Group\Mapper as IBGroupMapper;
 use Schoolbox\IB\Registrations\Sessions\Mapper as RegistrationSessionMapper;
+use Schoolbox\IB\Registrations\Sessions\Student\Helper as RegistrationSessionStudentHelper;
 use Schoolbox\IB\Registrations\Sessions\Student\Mapper as RegistrationSessionStudentMapper;
 use Schoolbox\IB\Registrations\Sessions\Student\Subject\Language\Mapper as RegistrationSessionStudentSubjectLanguageMapper;
+use Schoolbox\IB\Registrations\Sessions\Student\Translator\ModelToArray as RegistrationSessionStudentModelToArray;
 use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccess;
@@ -74,6 +76,8 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
+        $registrationSessionStudentHelper = new RegistrationSessionStudentHelper();
+
         return new Controller(
             $this->getMapperFactory()->get(ConfigMapper::class),
             $this->getMapperFactory()->get(IBGroupMapper::class),
@@ -85,6 +89,8 @@ class Module extends BaseModule
             $this->injector->get('externalClass'),
             $this->getMapperFactory()->get(RegistrationSessionStudentMapper::class),
             $this->getMapperFactory()->get(RegistrationSessionStudentSubjectLanguageMapper::class),
+            new RegistrationSessionStudentModelToArray($registrationSessionStudentHelper),
+            $registrationSessionStudentHelper,
             $this->injector->get('externalUser'),
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
             $this->injector->get('moduleCache.rebuilder'),

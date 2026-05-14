@@ -30,10 +30,12 @@ use Schoolbox\IB\Group\Subject\Mapper as IBGroupSubjectMapper;
 use Schoolbox\IB\Group\Subject\Model as IBGroupSubjectModel;
 use Schoolbox\IB\Registrations\Sessions\Mapper as RegistrationSessionMapper;
 use Schoolbox\IB\Registrations\Sessions\Model as RegistrationSessionModel;
+use Schoolbox\IB\Registrations\Sessions\Student\Helper as RegistrationSessionStudentHelper;
 use Schoolbox\IB\Registrations\Sessions\Student\Mapper as RegistrationSessionStudentMapper;
 use Schoolbox\IB\Registrations\Sessions\Student\Model as RegistrationSessionStudentModel;
 use Schoolbox\IB\Registrations\Sessions\Student\Subject\Language\Mapper as RegistrationSessionStudentSubjectLanguageMapper;
 use Schoolbox\IB\Registrations\Sessions\Student\Subject\Language\Model as RegistrationSessionStudentSubjectLanguageModel;
+use Schoolbox\IB\Registrations\Sessions\Student\Translator\ModelToArray as RegistrationSessionStudentModelToArray;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Language\Model as LanguageModel;
@@ -160,7 +162,8 @@ class ControllerTest extends TestCase
         $database = $this->createMock(IConnector::class);
         $database
             ->expects($this->once())
-            ->method('beginTransaction');
+            ->method('beginTransaction')
+            ->willReturn(true);
         $database
             ->expects($this->once())
             ->method('commit');
@@ -266,7 +269,8 @@ class ControllerTest extends TestCase
         $database = $this->createMock(IConnector::class);
         $database
             ->expects($this->once())
-            ->method('beginTransaction');
+            ->method('beginTransaction')
+            ->willReturn(true);
         $database
             ->expects($this->never())
             ->method('commit');
@@ -363,6 +367,8 @@ class ControllerTest extends TestCase
         ?LanguageMapper $languageMapper = null,
         ?RegistrationSessionStudentSubjectLanguageMapper $subjectLanguageMapper = null
     ): Controller {
+        $registrationSessionStudentHelper = new RegistrationSessionStudentHelper();
+
         $controller = new Controller(
             $this->createStub(ConfigMapper::class),
             $this->createStub(IBGroupMapper::class),
@@ -374,6 +380,8 @@ class ControllerTest extends TestCase
             $this->createStub(\External_ClassInterface::class),
             $registrationSessionStudentMapper,
             $subjectLanguageMapper ?? $this->createStub(RegistrationSessionStudentSubjectLanguageMapper::class),
+            new RegistrationSessionStudentModelToArray($registrationSessionStudentHelper),
+            $registrationSessionStudentHelper,
             $externalUser,
             $this->createStub(FieldStrategyFactory::class),
             $this->createStub(Rebuilder::class),

@@ -32,10 +32,11 @@ use Schoolbox\IB\Group\Mapper as IBGroupMapper;
 use Schoolbox\IB\Group\Model as IBGroupModel;
 use Schoolbox\IB\Registrations\Sessions\Mapper as RegistrationSessionMapper;
 use Schoolbox\IB\Registrations\Sessions\Model as RegistrationSessionModel;
+use Schoolbox\IB\Registrations\Sessions\Student\Helper as RegistrationSessionStudentHelper;
 use Schoolbox\IB\Registrations\Sessions\Student\Mapper as RegistrationSessionStudentMapper;
 use Schoolbox\IB\Registrations\Sessions\Student\Model as RegistrationSessionStudentModel;
-use Schoolbox\IB\Registrations\Sessions\Student\Payload as RegistrationSessionStudentPayload;
 use Schoolbox\IB\Registrations\Sessions\Student\Subject\Language\Mapper as RegistrationSessionStudentSubjectLanguageMapper;
+use Schoolbox\IB\Registrations\Sessions\Student\Translator\ModelToArray as RegistrationSessionStudentModelToArray;
 use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Language\Model as LanguageModel;
 use Schoolbox\Mapper\Exception\NotFound as MapperNotFound;
@@ -62,6 +63,8 @@ class Controller extends ConfigController
         private External_ClassInterface $externalClass,
         private RegistrationSessionStudentMapper $registrationSessionStudentMapper,
         private RegistrationSessionStudentSubjectLanguageMapper $registrationSessionStudentSubjectLanguageMapper,
+        private RegistrationSessionStudentModelToArray $registrationSessionStudentModelToArray,
+        private RegistrationSessionStudentHelper $registrationSessionStudentHelper,
         private \External_UserInterface $externalUser,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
@@ -776,11 +779,10 @@ class Controller extends ConfigController
     {
         try {
             $schoolName = (string) ($this->getConfigLoader()->get(ConfigMapper::NAME_IB_SCHOOL_NAME) ?? '');
-            $payloadBuilder = new RegistrationSessionStudentPayload();
             $students = $this->registrationSessionStudentMapper->findStudentsForSession($sessionId);
             $studentPayloads = $students
                 ->map(
-                    fn(RegistrationSessionStudentModel $student): array => $payloadBuilder->build(
+                    fn(RegistrationSessionStudentModel $student): array => ($this->registrationSessionStudentModelToArray)(
                         $student,
                         $this->findExternalStudent($student),
                         $schoolName
@@ -791,8 +793,8 @@ class Controller extends ConfigController
 
             $this->response = $this->responseAsJson([
                 'success' => true,
-                'students' => $payloadBuilder->groupByStatus($studentPayloads),
-                'statuses' => $payloadBuilder->getStatuses(),
+                'students' => $this->registrationSessionStudentHelper->groupByStatus($studentPayloads),
+                'statuses' => $this->registrationSessionStudentHelper->getStatuses(),
             ]);
         } catch (MapperNotFound) {
             $this->response = $this->responseAsJson([
