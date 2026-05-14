@@ -15,6 +15,9 @@ use Schoolbox\Learning\Learnosity\Importer\Json\Importer;
 
 class ImporterTest extends TestCase
 {
+    /**
+     * Tests current string mark visibility values pass through unchanged.
+     */
     public function testResolveMarkVisibilityPassesThroughCurrentStringValues(): void
     {
         $this->assertSame(IAssessable::MARK_VISIBILITY_PRIVATE, Importer::resolveMarkVisibility(IAssessable::MARK_VISIBILITY_PRIVATE));
@@ -23,16 +26,25 @@ class ImporterTest extends TestCase
         $this->assertSame(IAssessable::MARK_VISIBILITY_PARENT_STUDENT, Importer::resolveMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT));
     }
 
+    /**
+     * Tests legacy integer zero maps to staff-only visibility.
+     */
     public function testResolveMarkVisibilityMapsLegacyIntegerZeroToPrivate(): void
     {
         $this->assertSame(IAssessable::MARK_VISIBILITY_PRIVATE, Importer::resolveMarkVisibility(0));
     }
 
+    /**
+     * Tests legacy integer one maps to staff-and-student visibility.
+     */
     public function testResolveMarkVisibilityMapsLegacyIntegerOneToStudent(): void
     {
         $this->assertSame(IAssessable::MARK_VISIBILITY_STUDENT, Importer::resolveMarkVisibility(1));
     }
 
+    /**
+     * Tests legacy integer two maps to staff-student-and-parent visibility.
+     */
     public function testResolveMarkVisibilityMapsLegacyIntegerTwoToParentStudent(): void
     {
         $this->assertSame(IAssessable::MARK_VISIBILITY_PARENT_STUDENT, Importer::resolveMarkVisibility(2));
