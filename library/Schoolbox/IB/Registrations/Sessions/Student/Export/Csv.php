@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\IB\Registrations\Sessions\Student\Export;
 
+use Alaress_Date_Format;
 use Schoolbox\IB\Registrations\Sessions\Student\Model;
 use Schoolbox\Language\Model as LanguageModel;
 use Schoolbox\Nationality\Model as NationalityModel;
@@ -57,35 +58,40 @@ class Csv
 
     private function formatDateOfBirth(mixed $value): string
     {
-        if ($value === null || $value === false || !is_scalar($value)) {
+        if ($value === false || !is_scalar($value)) {
+            return '';
+        }
+
+        if (is_numeric($value) && (int) $value <= 0) {
             return '';
         }
 
         if (is_numeric($value)) {
-            $timestamp = (int) $value;
-
-            if ($timestamp <= 0) {
-                return '';
-            }
-
-            return date('Y-m-d', $timestamp);
+            return (new Alaress_Date_Format((int) $value, Alaress_Date_Format::TIMESTAMP))->getDatabaseDate();
         }
 
         $dateOfBirth = trim((string) $value);
 
-        if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})/', $dateOfBirth, $matches)) {
+        if ($dateOfBirth === '') {
             return '';
         }
 
-        $year = (int) $matches[1];
-        $month = (int) $matches[2];
-        $day = (int) $matches[3];
-
-        if (!checkdate($month, $day, $year)) {
+        if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})(?:T\d{2}:\d{2}:\d{2})?$/', $dateOfBirth, $matches)) {
             return '';
         }
 
-        return sprintf('%04d-%02d-%02d', $year, $month, $day);
+        if (!checkdate((int) $matches[2], (int) $matches[3], (int) $matches[1])) {
+            return '';
+        }
+
+        try {
+            return (new Alaress_Date_Format($dateOfBirth, [
+                Alaress_Date_Format::DATABASE_DATE_FORMAT,
+                'Y-m-d\TH:i:s',
+            ]))->getDatabaseDate();
+        } catch (\InvalidArgumentException) {
+            return '';
+        }
     }
 
     /**
