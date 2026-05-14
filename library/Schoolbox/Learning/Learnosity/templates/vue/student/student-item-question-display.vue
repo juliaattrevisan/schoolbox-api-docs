@@ -161,12 +161,13 @@ window.Vue.onMounted(async () => {
     if (props.question.response) {
         const selector = `[data-lrn-widget-container="${props.question.response.learnosityReference}"]`;
         const response = props.container.querySelector(selector) as HTMLDivElement;
-        if (response) {
-            responsesEl.value?.appendChild(response);
+        if (response === null || responsesEl.value === null) {
+            return;
         }
+        responsesEl.value.appendChild(response);
         await window.Vue.nextTick(); // ensure the response is rendered before we try to manipulate it
         // hide any incorrect/correct styling if we're not showing feedback
-        if (response && !props.hasMarkVisibility) {
+        if (!props.hasMarkVisibility) {
             removeClasses(response, ["lrn_incorrect", "lrn_correct"]);
         }
         score.value = props.question.response.score?.toString() ?? "";
@@ -175,7 +176,7 @@ window.Vue.onMounted(async () => {
          * ensuring we only do this on the first mount by checking if the replacement
          * container is already present
          */
-        if (response && !response.querySelector("[data-schoolboxmedia-replacement-container]")) {
+        if (response.querySelector("[data-schoolboxmedia-replacement-container]")) {
             // @ts-expect-error - schoolboxResource is available here, but untyped.
             // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- see above
             $.fn.schoolboxResource_ProxyReplacement($(selector));
@@ -183,9 +184,7 @@ window.Vue.onMounted(async () => {
 
         // Find any oembeds and load them
         responsesEl.value
-            ?.querySelectorAll(
-                "oembed[url]:not(:has(.iframely-embed)), div[data-oembed-url]:not(:has(.iframely-embed))",
-            )
+            .querySelectorAll("oembed[url]:not(:has(.iframely-embed)), div[data-oembed-url]:not(:has(.iframely-embed))")
             .forEach((oEmbedEl) => {
                 window.iframely.load(
                     oEmbedEl,
@@ -194,17 +193,17 @@ window.Vue.onMounted(async () => {
             });
 
         // Remove disabled attribute from the input field so field can be selected to view all the text within on smaller screens
-        const inputElement = response?.querySelector(".lrn_textinput input");
+        const inputElement = response.querySelector(".lrn_textinput input");
         if (inputElement) {
             inputElement.removeAttribute("disabled");
         }
 
         // Remove disabled attribute from the textarea field so field can be selected to view all the text within on smaller screens
-        const textareaElement = response?.querySelector(".lrn_plaintextarea textarea");
+        const textareaElement = response.querySelector(".lrn_plaintextarea textarea");
         if (textareaElement) {
             textareaElement.removeAttribute("disabled");
         }
-        // trigger a window resize event to ensure the response is sized correctly and to trigger any load listeners,
+        // trigger a window resize event to ensure the response is sized correctly and to trigger any resize listeners,
         // such as those on a drag-and-drop question type which needs to position the responses according to the current reference image size
         window.dispatchEvent(new Event("resize"));
     }
