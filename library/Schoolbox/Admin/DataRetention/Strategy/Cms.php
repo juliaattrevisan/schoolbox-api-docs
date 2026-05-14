@@ -159,8 +159,8 @@ class Cms extends Base
             }
 
             $branch = $this->expandFolderCascade($branchStart);
-            $testBranch = $branch['folderIds'];
-            $blockedFolderIds = $this->findBlockedFolderIds($testBranch);
+            $deletableBranchFolderIds = $branch['folderIds'];
+            $blockedFolderIds = $this->findBlockedFolderIds($deletableBranchFolderIds);
             $blockedFolders = array_fill_keys($blockedFolderIds, true);
 
             if (!empty($blockedFolderIds)) {
@@ -175,7 +175,7 @@ class Cms extends Base
                 $classifiedFolderIds[$folderId] = true;
             }
 
-            foreach ($testBranch as $folderId) {
+            foreach ($deletableBranchFolderIds as $folderId) {
                 if (isset($blockedFolders[$folderId])) {
                     unset($folderIdsToDelete[$folderId]);
                     continue;
