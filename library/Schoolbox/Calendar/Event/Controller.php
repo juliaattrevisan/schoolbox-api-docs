@@ -73,6 +73,7 @@ class Controller extends Base
 {
     private const int HTTP_STATUS_CODE_OK = 200;
     private const int HTTP_STATUS_CODE_NO_CONTENT = 204;
+    private const int HTTP_STATUS_CODE_BAD_REQUEST = 400;
     private const int HTTP_STATUS_CODE_FORBIDDEN = 403;
     private const int HTTP_STATUS_CODE_NOT_FOUND = 404;
     private const int HTTP_STATUS_CODE_SERVER_ERROR = 500;
@@ -1358,6 +1359,8 @@ class Controller extends Base
         $startDatetimeStr = $data['startDatetime'] ?? null;
         $endDatetimeStr = $data['endDatetime'] ?? null;
         $notes = $data['notes'] ?? null;
+        $quantityRaw = $data['quantity'] ?? null;
+        $quantityWasSubmitted = array_key_exists('quantity', $data);
         $efficacy = $data['efficacy'] ?? null;
         $responseData = [
             // The data structure here must match type 'EditBookingResponse' in resource-booking-row.vue.
@@ -1453,6 +1456,32 @@ class Controller extends Base
             $bookingToUpdate->setResource($booking->getResource());
         }
 
+        $quantityByBookingId = [];
+        foreach ($bookingsToUpdate as $bookingToUpdate) {
+            $quantityForBooking = $this->getBookingValidation()->getQuantityFromPostData(
+                $quantityWasSubmitted ? ['quantity' => $quantityRaw] : [],
+                $bookingToUpdate
+            );
+            $quantityErrors = $this->getBookingValidation()->validateBookingQuantity(
+                $bookingToUpdate->getResource(),
+                $quantityForBooking,
+                $bookingToUpdate
+            );
+
+            if (!empty($quantityErrors)) {
+                $this->response = $this->responseAsJson(
+                    new ApiProblem('Invalid booking quantity.')
+                        ->setDetail('Please enter a quantity between 1 and ' .
+                            max($bookingToUpdate->getResource()->getCapacity(), $bookingToUpdate->getQuantity()) . '.')
+                        ->setStatus(self::HTTP_STATUS_CODE_BAD_REQUEST)
+                        ->asArray()
+                )->withStatus(self::HTTP_STATUS_CODE_BAD_REQUEST);
+                return;
+            }
+
+            $quantityByBookingId[$bookingToUpdate->getId()] = $quantityForBooking;
+        }
+
         foreach ($bookingsToUpdate as $loopBooking) {
             $loopEventStart = $loopBooking->getEvent()->getStartDateTime();
             $loopEventEnd = $loopBooking->getEvent()->getEndDateTime();
@@ -1467,7 +1496,9 @@ class Controller extends Base
                 $loopBooking->setBookingStartAt($loopEventStart->addMinutes($startIncrementFromEventInMinutes));
                 $loopBooking->setBookingEndAt($loopEventEnd->addMinutes($endIncrementFromEventInMinutes));
             }
-            $loopBooking->setNotes($notes);
+            $loopBooking
+                ->setQuantity($quantityByBookingId[$loopBooking->getId()])
+                ->setNotes($notes);
         }
 
         // Check whether each hypothetical moved booking would result in a clash.
