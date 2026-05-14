@@ -1288,6 +1288,37 @@ class CmsStrategyTest extends TestCase
     }
 
     /**
+     * Branches rejected by active descendants should cache their deleted children.
+     *
+     * A chunk can contain both the rejected parent and a soft-deleted descendant.
+     * Once the parent branch has been rejected because it contains active content,
+     * later candidate roots inside that same tree must be ignored instead of being
+     * expanded and deleted independently.
+     *
+     * @return void
+     */
+    public function testDeleteChunkCachesBranchesSkippedForActiveChildren(): void
+    {
+        ['strategy' => $strategy, 'state' => $state] = $this->strategy(
+            [
+                10 => [11, 12],
+                11 => [],
+                12 => [],
+            ],
+            softDeletedFolderIds: [10, 11],
+        );
+
+        $this->delete($strategy, [
+            ['id' => 10, 'table' => 'folder'],
+            ['id' => 11, 'table' => 'folder'],
+        ]);
+
+        $this->assertSame([], $state->deletedFolders);
+        $this->assertSame([[10]], $state->activeChildLookups);
+        $this->assertSame([[10]], $state->softDeletedChildLookups);
+    }
+
+    /**
      * Active descendants must stop the ancestor from entering the delete plan.
      *
      * This protects the bottom-up retention rule even when the candidate root is
@@ -1328,14 +1359,14 @@ class CmsStrategyTest extends TestCase
         );
 
         $call = \Closure::bind(
-            function (array $folderIds): array {
-                return $this->expandFolderCascade($folderIds);
+            function (int $folderId): array {
+                return $this->expandFolderCascade($folderId);
             },
             $strategy,
             Cms::class,
         );
 
-        $this->assertSame([], $call([10]));
+        $this->assertSame([], $call(10)['folderIds']);
         $this->assertSame([
             'Skipping deletion of folder 10 because it has active child folder 11',
         ], $state->warnings);
