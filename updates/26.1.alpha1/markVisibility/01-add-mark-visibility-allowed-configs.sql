@@ -1,7 +1,7 @@
 # Modify the Admin > Settings - LMS Policy page as follows:
-#  * Move all settings after sequence 19 down by two positions (so the next setting moves from sequence 20 to sequence 22)
-#  * Insert two new settings at sequences 20 and 21
-#  * Deprecate and hide the setting at sequence 19 ('Restrict Visibility of Graded Due Work').
+#  * Move all settings after 'Restrict Visibility of Graded Due Work' down by two positions.
+#  * Insert two new settings immediately after 'Restrict Visibility of Graded Due Work'.
+#  * Delete the old 'Restrict Visibility of Graded Due Work' setting.
 
 # Migration of values
 # -------------------
@@ -22,11 +22,16 @@
 SET @typeIdLmsPolicy = (SELECT id FROM lu_config_type WHERE type = 'LMS Policy');
 SET @fieldIdBoolean = (SELECT id FROM lu_config_field WHERE field = 'boolean');
 SET @submissionVisibilityMax = (SELECT value FROM config WHERE name='submission_visibility_max');
+SET @submissionVisibilityMaxSequence = (SELECT sequence FROM config WHERE name='submission_visibility_max');
 
-# Move settings after sequence 19 forward by two positions.
-UPDATE config SET sequence = sequence + 2 WHERE module = 'settings' AND type_id = @typeIdLmsPolicy AND sequence > 19;
+# Move settings after the old setting forward by two positions.
+UPDATE config
+SET sequence = sequence + 2
+WHERE module = 'settings'
+    AND type_id = @typeIdLmsPolicy
+    AND sequence > @submissionVisibilityMaxSequence;
 
-# Create new setting at sequence 20.
+# Create new setting immediately after the old setting.
 INSERT INTO config (`name`, `title`, `value`, `description`, `field_id`,  `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
 VALUES (
     'mark_visibility_allow_students',
@@ -46,10 +51,10 @@ VALUES (
     'false',
     'false',
     'settings',
-    20
+    @submissionVisibilityMaxSequence + 1
 );
 
-# Create new setting at sequence 21.
+# Create new setting immediately after the preceding new setting.
 INSERT INTO config (`name`, `title`, `value`, `description`, `field_id`,  `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
 VALUES (
     'mark_visibility_allow_parents',
@@ -69,8 +74,8 @@ VALUES (
     'false',
     'false',
     'settings',
-    21
+    @submissionVisibilityMaxSequence + 2
 );
 
-# Deprecate old setting.
+# Delete old setting.
 DELETE FROM config WHERE name = 'submission_visibility_max';
