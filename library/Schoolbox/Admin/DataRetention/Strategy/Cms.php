@@ -143,9 +143,11 @@ class Cms extends Base
 
         /**
          * Expand each previously unseen branch once, then classify every folder in
-         * that expanded branch as deletable or blocked. Blocked folders are excluded
-         * because assessment/course relations are outside CMS retention ownership;
-         * unblocked siblings and descendants can still be deleted in the same chunk.
+         * that expanded branch as deletable or blocked. Assessment/course-blocked
+         * folders are outside CMS retention ownership, and non-deleted descendants
+         * are still visible content. If either exists anywhere in the expanded
+         * branch, the root branch is skipped atomically so retained folders cannot
+         * be orphaned by deleting their parent folders first.
          *
          * expandFolderCascade() also returns folders that were inspected but are
          * not safe to delete. Caching those inspected folders prevents a descendant
@@ -161,7 +163,6 @@ class Cms extends Base
             $branch = $this->expandFolderCascade($branchStart);
             $deletableBranchFolderIds = $branch['folderIds'];
             $blockedFolderIds = $this->findBlockedFolderIds($deletableBranchFolderIds);
-            $blockedFolders = array_fill_keys($blockedFolderIds, true);
 
             if (!empty($blockedFolderIds)) {
                 $this->log->warning(sprintf(
@@ -175,12 +176,18 @@ class Cms extends Base
                 $classifiedFolderIds[$folderId] = true;
             }
 
-            foreach ($deletableBranchFolderIds as $folderId) {
-                if (isset($blockedFolders[$folderId])) {
-                    unset($folderIdsToDelete[$folderId]);
-                    continue;
-                }
+            /**
+             * A blocked folder means its branch must remain intact for this run.
+             * Active descendants are handled the same way inside expandFolderCascade().
+             * This avoids deleting parents or descendants around retained data,
+             * especially because folder.parent is not foreign-key enforced and
+             * cannot protect retained children from pointing at deleted parents.
+             */
+            if ($blockedFolderIds !== []) {
+                continue;
+            }
 
+            foreach ($deletableBranchFolderIds as $folderId) {
                 $folderIdsToDelete[$folderId] = $folderId;
             }
         }

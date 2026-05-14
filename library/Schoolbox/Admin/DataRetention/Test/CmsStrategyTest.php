@@ -1319,6 +1319,39 @@ class CmsStrategyTest extends TestCase
     }
 
     /**
+     * Active descendants should block their whole branch without stalling unrelated roots.
+     *
+     * A non-deleted folder anywhere below the requested root means that CMS tree
+     * must remain intact. Other requested roots in the same chunk can still be
+     * deleted when their own branch has no active descendants or blocked relations.
+     *
+     * @return void
+     */
+    public function testDeleteChunkSkipsActiveBranchAndContinuesWithUnrelatedRoots(): void
+    {
+        ['strategy' => $strategy, 'state' => $state] = $this->strategy(
+            [
+                10 => [11],
+                11 => [12],
+                12 => [],
+                20 => [],
+            ],
+            softDeletedFolderIds: [10, 11, 20],
+        );
+
+        $this->delete($strategy, [
+            ['id' => 10, 'table' => 'folder'],
+            ['id' => 11, 'table' => 'folder'],
+            ['id' => 20, 'table' => 'folder'],
+        ]);
+
+        $this->assertSame([20], $state->deletedFolders);
+        $this->assertSame([20], $state->deletedHomepageUserAccessFolderIds);
+        $this->assertSame([[10], [20]], $state->activeChildLookups);
+        $this->assertSame([[10], [20]], $state->softDeletedChildLookups);
+    }
+
+    /**
      * Active descendants must stop the ancestor from entering the delete plan.
      *
      * This protects the bottom-up retention rule even when the candidate root is
@@ -1515,31 +1548,34 @@ class CmsStrategyTest extends TestCase
     }
 
     /**
-     * Excluded assessment/course relations should only remove blocked folders.
+     * Excluded assessment/course relations should block the whole affected branch.
      *
-     * Mixed chunks must still process unblocked folders so one blocked folder
-     * does not stall retention for unrelated descendants.
+     * Mixed chunks must still process unrelated folders, but descendants of a
+     * blocked branch cannot be deleted because they still belong under that
+     * retained parent tree.
      *
      * @return void
      */
-    public function testDeleteChunkExcludesBlockedFoldersAndContinues(): void
+    public function testDeleteChunkExcludesBlockedBranchAndContinues(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy(
             [
                 10 => [11],
                 11 => [],
+                20 => [],
             ],
             [10],
         );
 
         $this->delete($strategy, [
             ['id' => 10, 'table' => 'folder'],
+            ['id' => 20, 'table' => 'folder'],
         ]);
 
-        $this->assertSame([11], $state->deletedFolders);
-        $this->assertSame([11], $state->deletedHomepageUserAccessFolderIds);
+        $this->assertSame([20], $state->deletedFolders);
+        $this->assertSame([20], $state->deletedHomepageUserAccessFolderIds);
         $this->assertSame([
-            'cleanupHomepagePads:11:do',
+            'cleanupHomepagePads:20:do',
             'deleteBlogComments',
             'deleteBlogImages',
             'deleteBlog',
@@ -1556,6 +1592,37 @@ class CmsStrategyTest extends TestCase
             'deleteHomepageUserAccess',
             'deleteFolders',
         ], $state->calls);
+    }
+
+    /**
+     * A blocked descendant should prevent deleting every ancestor in the branch.
+     *
+     * CMS folder parent links are not foreign-key enforced, so deleting an
+     * ancestor while leaving a blocked descendant in place can leave that
+     * descendant pointing at a deleted parent. The whole candidate branch is
+     * skipped when the blocker is anywhere below the requested root.
+     *
+     * @return void
+     */
+    public function testDeleteChunkSkipsAncestorsWhenRecursiveDescendantIsBlocked(): void
+    {
+        ['strategy' => $strategy, 'state' => $state] = $this->strategy(
+            [
+                10 => [11],
+                11 => [12],
+                12 => [],
+            ],
+            [12],
+        );
+
+        $this->delete($strategy, [
+            ['id' => 10, 'table' => 'folder'],
+            ['id' => 11, 'table' => 'folder'],
+        ]);
+
+        $this->assertSame([], $state->deletedFolders);
+        $this->assertSame([], $state->deletedHomepageUserAccessFolderIds);
+        $this->assertSame([], $state->calls);
     }
 
     /**
