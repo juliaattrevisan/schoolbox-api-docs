@@ -32,6 +32,7 @@ class EventResourceBookingCest
      * Hook method to execute prior to each test
      * @param IntegrationTester $i
      */
+    // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore -- Codeception hook name.
     public function _before(IntegrationTester $i): void
     {
         $i->loginAdmin();
@@ -57,6 +58,7 @@ class EventResourceBookingCest
         $resourcePayload->setResourceName($resourceTitle);
         $resourcePayload->setResourceCat('3'); // Support Services
         $resourcePayload->setModerationTypeId((string)ModerationType\Model::TYPE_OPEN);
+        $resourcePayload->setCapacity('2');
         $i->sendRequest($resourcePayload);
         $i->seeResponseCodeIs(303);
         $resource = $resourceMapper->findOneByColumn('name', $resourceTitle);
@@ -124,6 +126,7 @@ class EventResourceBookingCest
      * @param string $title
      * @param string $startDateTime
      * @param string $endDateTime
+     * @param int $quantity
      * @return \Schoolbox\ResourceBooking\Booking\Model
      */
     private function createEventWithResourceBooking(
@@ -131,7 +134,8 @@ class EventResourceBookingCest
         \Schoolbox\ResourceBooking\Item\Model $resource,
         string $title,
         string $startDateTime,
-        string $endDateTime
+        string $endDateTime,
+        int $quantity = \Schoolbox\ResourceBooking\Booking\Model::DEFAULT_QUANTITY
     ): \Schoolbox\ResourceBooking\Booking\Model {
         $eventMapper = \Schoolbox\Calendar\EventMapper::getInstance();
         $bookingMapper = \Schoolbox\ResourceBooking\Booking\Mapper::getInstance();
@@ -151,6 +155,13 @@ class EventResourceBookingCest
             'event_id' => $event->getId(),
             'resource_id' => $resource->getId(),
         ]);
+
+        if ($quantity !== \Schoolbox\ResourceBooking\Booking\Model::DEFAULT_QUANTITY) {
+            $booking->setQuantity($quantity);
+            $bookingMapper->save($booking);
+            $booking = $bookingMapper->findById($booking->getId());
+        }
+
         $i->comment('Created event ' . $event->getId() . ' with booking ' . $booking->getId());
 
         return $booking;
@@ -380,8 +391,151 @@ class EventResourceBookingCest
     }
 
     /**
+     * Edit an event-linked resource booking quantity and verify the existing editable fields still save.
+     *
+     * @param IntegrationTester $i
+     * @return void
+     * @throws \Exception
+     */
+    public function editBookingPersistsUpdatedQuantity(IntegrationTester $i): void
+    {
+        $bookingMapper = \Schoolbox\ResourceBooking\Booking\Mapper::getInstance();
+        $resource = $this->createCapacityTwoOpenResource($i, false);
+        $bookingToEdit = $this->createEventWithResourceBooking(
+            $i,
+            $resource,
+            'Capacity two quantity edit event ' . microtime(true),
+            '2076-04-05T12:00:00+00:00',
+            '2076-04-05T13:00:00+00:00'
+        );
+
+        $editUrl = '/calendar/event/' . $bookingToEdit->getEvent()->getId() .
+            '/editBooking/' . $bookingToEdit->getId();
+        $newNotes = 'Updated quantity notes at ' . microtime(true);
+        $editPayload = new Payload\Base('POST', $editUrl, $editUrl);
+        $editPayload->setFormParam('startDatetime', '2076-04-05T12:15:00+00:00');
+        $editPayload->setFormParam('endDatetime', '2076-04-05T13:15:00+00:00');
+        $editPayload->setFormParam('notes', $newNotes);
+        $editPayload->setFormParam('quantity', '2');
+        $editPayload->setFormParam('efficacy', \Schoolbox\Calendar\EventRecurrenceMapper::EFFICACY_SELF);
+        $i->sendRequest($editPayload);
+
+        $i->seeResponseCodeIs(200);
+        $i->canSeeResponseContainsJson(['success' => true, 'nRowsAffected' => 1]);
+
+        $updatedBooking = $bookingMapper->findById($bookingToEdit->getId());
+        $i->assertEquals(2, $updatedBooking->getQuantity(), 'The edited booking quantity is persisted');
+        $i->assertEquals($newNotes, $updatedBooking->getNotes(), 'The edited booking notes are still persisted');
+        $i->assertEquals(
+            '2076-04-05 22:15:00',
+            $updatedBooking->getBookingStartAt()->getDatabase(),
+            'The edited booking start time is still persisted'
+        );
+        $i->assertEquals(
+            '2076-04-05 23:15:00',
+            $updatedBooking->getBookingEndAt()->getDatabase(),
+            'The edited booking end time is still persisted'
+        );
+
+        $i->sendGet('/calendar/event/' . $bookingToEdit->getEvent()->getId());
+        $i->seeResponseCodeIs(200);
+        $i->seeResponseContains('&quot;quantity&quot;:2');
+    }
+
+    /**
+     * Increasing quantity on an event-linked booking should feed the existing capacity-aware status calculation.
+     *
+     * @param IntegrationTester $i
+     * @return void
+     * @throws \Exception
+     */
+    public function editBookingQuantityUsesCapacityAwareStatusForUpdatedBooking(IntegrationTester $i): void
+    {
+        $bookingMapper = \Schoolbox\ResourceBooking\Booking\Mapper::getInstance();
+        $resource = $this->createCapacityTwoOpenResource($i, false);
+
+        $this->createEventWithResourceBooking(
+            $i,
+            $resource,
+            'Capacity two quantity conflict approved event ' . microtime(true),
+            '2076-04-06T10:00:00+00:00',
+            '2076-04-06T11:00:00+00:00'
+        );
+        $bookingToEdit = $this->createEventWithResourceBooking(
+            $i,
+            $resource,
+            'Capacity two quantity conflict edited event ' . microtime(true),
+            '2076-04-06T10:00:00+00:00',
+            '2076-04-06T11:00:00+00:00'
+        );
+
+        $i->assertEquals(
+            BookingStatus::STATUS_APPROVED,
+            $bookingToEdit->getStatus()->getId(),
+            'The booking to edit starts as approved before its quantity exceeds capacity'
+        );
+
+        $editUrl = '/calendar/event/' . $bookingToEdit->getEvent()->getId() .
+            '/editBooking/' . $bookingToEdit->getId();
+        $editPayload = new Payload\Base('POST', $editUrl, $editUrl);
+        $editPayload->setFormParam('startDatetime', '2076-04-06T10:00:00+10:00');
+        $editPayload->setFormParam('endDatetime', '2076-04-06T11:00:00+10:00');
+        $editPayload->setFormParam('notes', 'Updated quantity into a capacity clash at ' . microtime(true));
+        $editPayload->setFormParam('quantity', '2');
+        $editPayload->setFormParam('efficacy', \Schoolbox\Calendar\EventRecurrenceMapper::EFFICACY_SELF);
+        $i->sendRequest($editPayload);
+
+        $i->seeResponseCodeIs(200);
+        $i->canSeeResponseContainsJson(['success' => true, 'nRowsAffected' => 1]);
+
+        $updatedBooking = $bookingMapper->findById($bookingToEdit->getId());
+        $i->assertEquals(2, $updatedBooking->getQuantity(), 'The edited quantity is persisted even when it creates a clash');
+        $i->assertEquals(
+            BookingStatus::STATUS_REJECTED,
+            $updatedBooking->getStatus()->getId(),
+            'The edited booking is rejected by the existing conflict/status path when quantity exceeds capacity'
+        );
+    }
+
+    /**
+     * Event-linked booking quantity edits should reuse existing capacity validation limits.
+     *
+     * @param IntegrationTester $i
+     * @return void
+     * @throws \Exception
+     */
+    public function editBookingRejectsQuantityAboveCapacity(IntegrationTester $i): void
+    {
+        $bookingMapper = \Schoolbox\ResourceBooking\Booking\Mapper::getInstance();
+        $resource = $this->createCapacityTwoOpenResource($i, false);
+        $bookingToEdit = $this->createEventWithResourceBooking(
+            $i,
+            $resource,
+            'Capacity two invalid quantity event ' . microtime(true),
+            '2076-04-07T10:00:00+00:00',
+            '2076-04-07T11:00:00+00:00'
+        );
+
+        $editUrl = '/calendar/event/' . $bookingToEdit->getEvent()->getId() .
+            '/editBooking/' . $bookingToEdit->getId();
+        $editPayload = new Payload\Base('POST', $editUrl, $editUrl);
+        $editPayload->setFormParam('startDatetime', '2076-04-07T10:00:00+00:00');
+        $editPayload->setFormParam('endDatetime', '2076-04-07T11:00:00+00:00');
+        $editPayload->setFormParam('notes', 'Invalid quantity at ' . microtime(true));
+        $editPayload->setFormParam('quantity', '3');
+        $editPayload->setFormParam('efficacy', \Schoolbox\Calendar\EventRecurrenceMapper::EFFICACY_SELF);
+        $i->sendRequest($editPayload);
+
+        $i->seeResponseCodeIs(400);
+        $i->canSeeResponseContainsJson(['title' => 'Invalid booking quantity.']);
+
+        $unchangedBooking = $bookingMapper->findById($bookingToEdit->getId());
+        $i->assertEquals(1, $unchangedBooking->getQuantity(), 'Invalid quantity is not persisted');
+    }
+
+    /**
      * Edit the booking on the middle event in a series using efficacy=self, and verify that only that
-     * booking's notes are updated, while bookings on the other events in the series are unchanged.
+     * booking's notes and quantity are updated, while bookings on the other events in the series are unchanged.
      * Tests editBooking() in library/Schoolbox/Calendar/Event/Controller.php.
      *
      * @param IntegrationTester $i
@@ -395,7 +549,7 @@ class EventResourceBookingCest
 
     /**
      * Edit the booking on all events in a series using efficacy=series, and verify that all bookings'
-     * notes are updated.
+     * notes and quantity are updated.
      * Tests editBooking() in library/Schoolbox/Calendar/Event/Controller.php.
      *
      * @param IntegrationTester $i
@@ -411,7 +565,7 @@ class EventResourceBookingCest
      * Helper: shared logic for editBookingOnSingleEventInSeries and editBookingOnEntireSeries.
      *
      * Sets up a resource and a series of 3 events with bookings, edits the booking on the middle event
-     * (2076-03-12) using the given efficacy, then verifies the notes on all bookings in the series.
+     * (2076-03-12) using the given efficacy, then verifies the notes and quantity on all bookings in the series.
      *
      * @param IntegrationTester $i
      * @param string $efficacy
@@ -441,8 +595,18 @@ class EventResourceBookingCest
         ]);
         $i->comment('The middle event booking has id ' . $middleBooking->getId());
 
+        $originalNotesByEventId = [];
+        foreach ($seriesEvents as $seriesEvent) {
+            $booking = $bookingMapper->findOneByColumnList([
+                'event_id' => $seriesEvent->getId(),
+                'resource_id' => $resource->getId(),
+            ]);
+            $originalNotesByEventId[$seriesEvent->getId()] = $booking->getNotes();
+        }
+
         // Send the editBooking request for the middle event's booking.
         $newNotes = 'Updated notes at ' . microtime(true);
+        $newQuantity = 2;
         $i->amGoingTo(
             'edit the booking on the middle event with efficacy=' . $efficacy .
             ' and new notes "' . $newNotes . '"'
@@ -452,6 +616,7 @@ class EventResourceBookingCest
         $editPayload->setFormParam('startDatetime', '2076-03-12T01:00:00+00:00');
         $editPayload->setFormParam('endDatetime', '2076-03-12T02:00:00+00:00');
         $editPayload->setFormParam('notes', $newNotes);
+        $editPayload->setFormParam('quantity', (string)$newQuantity);
         $editPayload->setFormParam('efficacy', $efficacy);
         $i->sendRequest($editPayload);
 
@@ -461,8 +626,8 @@ class EventResourceBookingCest
         $i->seeResponseCodeIs(200);
         $i->canSeeResponseContainsJson(['success' => true, 'nRowsAffected' => $expectedNRowsAffected]);
 
-        // Verify the notes on each booking in the series.
-        $i->amGoingTo('verify notes on each booking in the series');
+        // Verify the notes and quantity on each booking in the series.
+        $i->amGoingTo('verify notes and quantity on each booking in the series');
         foreach ($seriesEvents as $seriesEvent) {
             $eventDate = $seriesEvent->getStartDateTime()->getDatabaseDate();
             $booking = $bookingMapper->findOneByColumnList([
@@ -476,13 +641,147 @@ class EventResourceBookingCest
                     $booking->getNotes(),
                     "Booking on event $eventDate has the updated notes"
                 );
+                $i->assertEquals(
+                    $newQuantity,
+                    $booking->getQuantity(),
+                    "Booking on event $eventDate has the updated quantity"
+                );
             } else {
-                $i->assertNotEquals(
-                    $newNotes,
+                $i->assertEquals(
+                    $originalNotesByEventId[$seriesEvent->getId()],
                     $booking->getNotes(),
                     "Booking on event $eventDate still has the original notes (not updated)"
                 );
+                $i->assertEquals(
+                    \Schoolbox\ResourceBooking\Booking\Model::DEFAULT_QUANTITY,
+                    $booking->getQuantity(),
+                    "Booking on event $eventDate still has the original quantity"
+                );
             }
+        }
+    }
+
+    /**
+     * Editing a series without quantity should preserve each booking's existing quantity.
+     *
+     * @param IntegrationTester $i
+     * @return void
+     * @throws \Exception
+     */
+    public function editBookingOnSeriesWithoutQuantityPreservesMixedQuantities(IntegrationTester $i): void
+    {
+        $bookingMapper = \Schoolbox\ResourceBooking\Booking\Mapper::getInstance();
+
+        ['resource' => $resource, 'seriesEvents' => $seriesEvents] =
+            $this->createResourceAndSeriesOfEventsWithBookings($i);
+
+        $existingQuantities = [];
+        foreach ($seriesEvents as $index => $seriesEvent) {
+            $booking = $bookingMapper->findOneByColumnList([
+                'event_id' => $seriesEvent->getId(),
+                'resource_id' => $resource->getId(),
+            ]);
+            $quantity = ($index === 1) ? 1 : 2;
+            $booking->setQuantity($quantity);
+            $bookingMapper->save($booking);
+            $existingQuantities[$seriesEvent->getId()] = $quantity;
+        }
+
+        /** @var \Schoolbox\Calendar\Event $middleEvent */
+        $middleEvent = $seriesEvents[1];
+        $middleBooking = $bookingMapper->findOneByColumnList([
+            'event_id' => $middleEvent->getId(),
+            'resource_id' => $resource->getId(),
+        ]);
+        $newNotes = 'Series edit without quantity at ' . microtime(true);
+        $editUrl = '/calendar/event/' . $middleEvent->getId() . '/editBooking/' . $middleBooking->getId();
+        $editPayload = new Payload\Base('POST', $editUrl, $editUrl);
+        $editPayload->setFormParam('startDatetime', '2076-03-12T01:00:00+00:00');
+        $editPayload->setFormParam('endDatetime', '2076-03-12T02:00:00+00:00');
+        $editPayload->setFormParam('notes', $newNotes);
+        $editPayload->setFormParam('efficacy', \Schoolbox\Calendar\EventRecurrenceMapper::EFFICACY_SERIES);
+        $i->sendRequest($editPayload);
+
+        $i->seeResponseCodeIs(200);
+        $i->canSeeResponseContainsJson(['success' => true, 'nRowsAffected' => 3]);
+
+        foreach ($seriesEvents as $seriesEvent) {
+            $booking = $bookingMapper->findOneByColumnList([
+                'event_id' => $seriesEvent->getId(),
+                'resource_id' => $resource->getId(),
+            ]);
+            $eventDate = $seriesEvent->getStartDateTime()->getDatabaseDate();
+            $i->assertEquals($newNotes, $booking->getNotes(), "Booking on event $eventDate has updated notes");
+            $i->assertEquals(
+                $existingQuantities[$seriesEvent->getId()],
+                $booking->getQuantity(),
+                "Booking on event $eventDate preserves its existing quantity"
+            );
+        }
+    }
+
+    /**
+     * Series quantity edits should validate the submitted quantity against every affected booking before saving.
+     *
+     * @param IntegrationTester $i
+     * @return void
+     * @throws \Exception
+     */
+    public function editBookingOnSeriesRejectsQuantityInvalidForAnyTargetBooking(IntegrationTester $i): void
+    {
+        $bookingMapper = \Schoolbox\ResourceBooking\Booking\Mapper::getInstance();
+
+        ['resource' => $resource, 'seriesEvents' => $seriesEvents] =
+            $this->createResourceAndSeriesOfEventsWithBookings($i);
+
+        $existingQuantities = [];
+        $originalNotes = [];
+        foreach ($seriesEvents as $index => $seriesEvent) {
+            $booking = $bookingMapper->findOneByColumnList([
+                'event_id' => $seriesEvent->getId(),
+                'resource_id' => $resource->getId(),
+            ]);
+            $quantity = ($index === 0) ? 4 : 1;
+            $booking->setQuantity($quantity);
+            $bookingMapper->save($booking);
+            $existingQuantities[$seriesEvent->getId()] = $quantity;
+            $originalNotes[$seriesEvent->getId()] = $booking->getNotes();
+        }
+
+        /** @var \Schoolbox\Calendar\Event $firstEvent */
+        $firstEvent = $seriesEvents[0];
+        $firstBooking = $bookingMapper->findOneByColumnList([
+            'event_id' => $firstEvent->getId(),
+            'resource_id' => $resource->getId(),
+        ]);
+        $editUrl = '/calendar/event/' . $firstEvent->getId() . '/editBooking/' . $firstBooking->getId();
+        $editPayload = new Payload\Base('POST', $editUrl, $editUrl);
+        $editPayload->setFormParam('startDatetime', '2076-03-11T01:00:00+00:00');
+        $editPayload->setFormParam('endDatetime', '2076-03-11T02:00:00+00:00');
+        $editPayload->setFormParam('notes', 'Rejected series quantity edit at ' . microtime(true));
+        $editPayload->setFormParam('quantity', '4');
+        $editPayload->setFormParam('efficacy', \Schoolbox\Calendar\EventRecurrenceMapper::EFFICACY_SERIES);
+        $i->sendRequest($editPayload);
+
+        $i->seeResponseCodeIs(400);
+        $i->canSeeResponseContainsJson(['title' => 'Invalid booking quantity.']);
+
+        foreach ($seriesEvents as $seriesEvent) {
+            $booking = $bookingMapper->findOneByColumnList([
+                'event_id' => $seriesEvent->getId(),
+                'resource_id' => $resource->getId(),
+            ]);
+            $eventDate = $seriesEvent->getStartDateTime()->getDatabaseDate();
+            $i->assertEquals(
+                $originalNotes[$seriesEvent->getId()],
+                $booking->getNotes(),
+                "Booking on event $eventDate keeps its notes after invalid series quantity edit"
+            );
+            $i->assertEquals(
+                $existingQuantities[$seriesEvent->getId()],
+                $booking->getQuantity(),
+                "Booking on event $eventDate keeps its quantity after invalid series quantity edit"
+            );
         }
     }
 
