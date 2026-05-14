@@ -77,7 +77,9 @@ function onSaved(studentId: number, updatedSubjects: SubjectGroup): void {
                         data-dropdown-content
                         aria-hidden="true"
                     >
-                        <li><a href="#" @click.prevent="openModal(student)">Update Language Selection</a></li>
+                        <li v-if="student.updateLanguageEndpoint !== null">
+                            <a href="#" @click.prevent="openModal(student)">Update Language Selection</a>
+                        </li>
                     </ul>
                 </td>
             </tr>

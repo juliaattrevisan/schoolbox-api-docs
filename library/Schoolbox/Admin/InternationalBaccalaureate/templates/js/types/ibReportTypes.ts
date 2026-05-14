@@ -2,6 +2,7 @@
  * A single subject entry with its name and associated language.
  */
 export type SubjectEntry = {
+    groupSubjectId: number;
     subject: string;
     language: string | null;
     languageId: number | null;
@@ -29,6 +30,7 @@ export type StudentRow = {
     name: string;
     candidateDetailsStatus: CandidateDetailsStatus;
     subjects: SubjectGroup;
+    updateLanguageEndpoint: string | null;
 };
 
 /**

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { apiRequest } from "@js/util/sbx/apiUtils";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
@@ -18,6 +19,7 @@ const emit = defineEmits<{
 const isOpen = defineModel<boolean>("is-open", { default: false });
 
 type SubjectRowEntry = {
+    groupSubjectId: number;
     level: "HL" | "SL" | "Core";
     subject: string;
     selected: SearchSelectItem[];
@@ -51,6 +53,7 @@ function buildSubjectRows(student: StudentRow | FailedRow): SubjectRowEntry[] {
                     ? [{ id: entry.languageId, name: entry.language }]
                     : [];
             rows.push({
+                groupSubjectId: entry.groupSubjectId,
                 level: label,
                 subject: entry.subject,
                 selected: preselected,
@@ -90,10 +93,26 @@ async function onSave(): Promise<void> {
     isSaving.value = true;
     saveError.value = null;
 
-    // TODO SA-22262: replace with real API call when backend endpoint is available
-    await new Promise<void>((resolve) => setTimeout(resolve, 300));
+    const subjects = subjectRows.value.map((row) => ({
+        groupSubjectId: row.groupSubjectId,
+        languageId: Number(row.selected[0].id),
+    }));
+
+    const toast = window.sbProps.toastActivate("Saving...");
+
+    const response = await apiRequest<{ success: boolean; message?: string }, { subjects: typeof subjects }>({
+        url: props.student.updateLanguageEndpoint!,
+        method: "PUT",
+        body: { subjects },
+    });
 
     isSaving.value = false;
+
+    if (!response.success) {
+        toast.timeout({ text: response.message ?? "Failed to save language selections.", isSuccess: false });
+        saveError.value = response.message ?? "Failed to save language selections.";
+        return;
+    }
 
     const { hl: hlEntries, sl: slEntries, core: coreEntries } = props.student.subjects;
 
@@ -114,7 +133,6 @@ async function onSave(): Promise<void> {
     const updatedSl = buildUpdatedEntries(slEntries, hlEntries.length);
     const updatedCore = buildUpdatedEntries(coreEntries, hlEntries.length + slEntries.length);
 
-    const toast = window.sbProps.toastActivate("Saving...");
     toast.timeout({ text: "Languages successfully updated." });
 
     emit("saved", props.student.id, { hl: updatedHl, sl: updatedSl, core: updatedCore });

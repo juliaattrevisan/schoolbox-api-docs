@@ -46,6 +46,7 @@ const registered = window.Vue.ref<RegisteredRow[]>([]);
 function mapSubjectEntry(apiSubject: ApiSubject): SubjectEntry {
     const lang = apiSubject.languages[0] ?? null;
     return {
+        groupSubjectId: apiSubject.id,
         subject: apiSubject.subject,
         language: lang?.languageName ?? null,
         languageId: lang?.languageId ?? null,
@@ -67,6 +68,7 @@ function mapStudentRow(s: ApiStudent): StudentRow {
             sl: s.ibGroupSubjects.SL.map(mapSubjectEntry),
             core: s.ibGroupSubjects.Core.map(mapSubjectEntry),
         },
+        updateLanguageEndpoint: s._routes.updateLanguages,
     };
 }
 
