@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\InternationalBaccalaureate\Test;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Response\Factory as ResponseFactory;
 use Alaress\Web\Request\Values;
@@ -156,6 +157,19 @@ class ControllerTest extends TestCase
             ]));
 
         $subjectLanguageMapper = $this->createMock(RegistrationSessionStudentSubjectLanguageMapper::class);
+        $database = $this->createMock(IConnector::class);
+        $database
+            ->expects($this->once())
+            ->method('beginTransaction');
+        $database
+            ->expects($this->once())
+            ->method('commit');
+        $database
+            ->expects($this->never())
+            ->method('rollBack');
+        $subjectLanguageMapper
+            ->method('getDatabase')
+            ->willReturn($database);
         $subjectLanguageMapper
             ->method('createModel')
             ->willReturnCallback(fn() => new RegistrationSessionStudentSubjectLanguageModel());
@@ -219,6 +233,88 @@ class ControllerTest extends TestCase
             ['groupSubjectId' => 124, 'languageId' => 45],
             ['groupSubjectId' => 125, 'languageId' => 46],
         ], $payload['subjects']);
+    }
+
+    public function testUpdateRegistrationSessionStudentSubjectLanguagesRollsBackOnWriteFailure(): void
+    {
+        $registrationSessionStudent = (new RegistrationSessionStudentModel())
+            ->setId(456)
+            ->setUser((new User())->setId(234));
+
+        $registrationSessionStudentMapper = $this->createStub(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->method('findOneByColumnList')
+            ->willReturn($registrationSessionStudent);
+
+        $groupSubjectMapper = $this->createStub(IBGroupSubjectMapper::class);
+        $groupSubjectMapper
+            ->method('findByColumn')
+            ->with('id', [123])
+            ->willReturn(new GenericCollection(IBGroupSubjectModel::class, [
+                (new IBGroupSubjectModel())->setId(123),
+            ]));
+
+        $languageMapper = $this->createStub(LanguageMapper::class);
+        $languageMapper
+            ->method('findByColumn')
+            ->with('id', [45])
+            ->willReturn(new GenericCollection(LanguageModel::class, [
+                (new LanguageModel())->setId(45),
+            ]));
+
+        $subjectLanguageMapper = $this->createMock(RegistrationSessionStudentSubjectLanguageMapper::class);
+        $database = $this->createMock(IConnector::class);
+        $database
+            ->expects($this->once())
+            ->method('beginTransaction');
+        $database
+            ->expects($this->never())
+            ->method('commit');
+        $database
+            ->expects($this->once())
+            ->method('rollBack');
+        $subjectLanguageMapper
+            ->method('getDatabase')
+            ->willReturn($database);
+        $subjectLanguageMapper
+            ->method('createModel')
+            ->willReturnCallback(fn() => new RegistrationSessionStudentSubjectLanguageModel());
+        $subjectLanguageMapper
+            ->expects($this->once())
+            ->method('deleteByColumn')
+            ->with('registration_session_student_id', 456)
+            ->willThrowException(new \Exception('Delete failed'));
+        $subjectLanguageMapper
+            ->expects($this->never())
+            ->method('save');
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class),
+            $groupSubjectMapper,
+            $languageMapper,
+            $subjectLanguageMapper
+        );
+        $controller->setRequest(
+            (new HttpFactory())
+                ->createServerRequest('PUT', '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/234/languages')
+                ->withParsedBody([
+                    'subjects' => [
+                        ['groupSubjectId' => 123, 'languageId' => 45],
+                    ],
+                ])
+        );
+
+        $controller->updateRegistrationSessionStudentSubjectLanguages(12, 234);
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(500, $response->getStatusCode());
+
+        $payload = json_decode((string) $response->getBody(), true);
+        $this->assertFalse($payload['success']);
+        $this->assertSame('Something has gone wrong. Please try again later.', $payload['message']);
     }
 
     public function testUpdateRegistrationSessionStudentSubjectLanguagesRejectsInvalidPayload(): void

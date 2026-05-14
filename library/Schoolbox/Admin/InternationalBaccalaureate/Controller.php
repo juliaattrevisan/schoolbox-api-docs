@@ -876,6 +876,9 @@ class Controller extends ConfigController
         $groupSubjectIds = array_keys($subjectLanguagePayloads);
         $languageIds = array_values(array_unique(array_column($subjectLanguagePayloads, 'languageId')));
 
+        $database = $this->registrationSessionStudentSubjectLanguageMapper->getDatabase();
+        $transactionStarted = false;
+
         try {
             $groupSubjectsById = $groupSubjectIds === []
                 ? []
@@ -912,6 +915,8 @@ class Controller extends ConfigController
                     ->setLanguage($languagesById[$languageId]);
             }
 
+            $transactionStarted = $database->beginTransaction();
+
             $this->registrationSessionStudentSubjectLanguageMapper->deleteByColumn(
                 'registration_session_student_id',
                 $registrationSessionStudent->getId()
@@ -921,11 +926,18 @@ class Controller extends ConfigController
                 $this->registrationSessionStudentSubjectLanguageMapper->save($modelsToSave);
             }
 
+            $database->commit();
+            $transactionStarted = false;
+
             $this->response = $this->responseAsJson([
                 'success' => true,
                 'subjects' => array_values($subjectLanguagePayloads),
             ]);
         } catch (Exception $e) {
+            if ($transactionStarted) {
+                $database->rollBack();
+            }
+
             $this->response = $this->responseAsJson([
                 'success' => false,
                 'message' => 'Something has gone wrong. Please try again later.',
