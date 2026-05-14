@@ -17,9 +17,6 @@ interface ColourProperties {
     left_head_bg: string;
     right_head_font: string;
     right_head_bg: string;
-    /**
-     * Note that the below colours under 'Content Colours' are being removed with Sonar UI,
-     */
     top_font_primary: string;
     top_bg_primary: string;
     left_font_primary: string;
