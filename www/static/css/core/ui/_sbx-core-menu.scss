@@ -274,11 +274,6 @@ body.sbx-body {
     #message-list {
         padding: var(--sbx-size-xs);
 
-        & #notification-toggle-full {
-            background-color: transparent;
-            color: var(--sbx-config-color-accent);
-        }
-
         & li:has(:is(#msg-bar, section, .button)) {
             padding-inline: 0.6rem;
         }
@@ -300,11 +295,6 @@ body.sbx-body {
         }
         .settings-button {
             right: var(--sbx-size-xs);
-        }
-
-        & #notification-toggle-full {
-            background-color: var(--bg-primary) !important;
-            color: var(--sbx-config-color-accent);
         }
 
         #notification-toggle-full {
