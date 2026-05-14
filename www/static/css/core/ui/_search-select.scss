@@ -1,0 +1,6 @@
+.search-select {
+    &__results-container {
+        position: relative;
+        top: -1px; // to align the results with the bottom of the ss-query-input
+    }
+}

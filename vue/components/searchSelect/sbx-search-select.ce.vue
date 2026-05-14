@@ -230,7 +230,7 @@ function onButtonSelected(): void {
                 {{ props.buttonTitle }}
             </button>
         </div>
-        <div class="sbx-search-select__results-container">
+        <div class="search-select__results-container">
             <ss-results
                 v-if="showResults"
                 :query="query"
@@ -249,10 +249,3 @@ function onButtonSelected(): void {
         </div>
     </div>
 </template>
-
-<style>
-.sbx-search-select__results-container {
-    position: relative;
-    top: -1px; /* to align the results with the bottom of the ss-query-input */
-}
-</style>
