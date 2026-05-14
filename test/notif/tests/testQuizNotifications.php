@@ -10,6 +10,7 @@
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Routing\Dictionary\SubscriptionDictionary;
 use Alaress\Routing\Router;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Database\Factory;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Quiz;
@@ -27,8 +28,14 @@ use Schoolbox\User;
  *
  * It checks quiz notifications.
  */
+// @phpstan-ignore-next-line phpunit.testName - Notification daemon tests are discovered as test*.php files.
 class QuizNotifications extends AbstractNotificationTestCase
 {
+    private const MARK_VISIBILITY_PROGRESSION = [
+        IAssessable::MARK_VISIBILITY_PRIVATE => IAssessable::MARK_VISIBILITY_STUDENT,
+        IAssessable::MARK_VISIBILITY_STUDENT => IAssessable::MARK_VISIBILITY_PARENT_STUDENT,
+    ];
+
     /** @var Folder\Model */
     protected $folder;
 
@@ -298,7 +305,8 @@ class QuizNotifications extends AbstractNotificationTestCase
             $quiz = $qm->findById($quizId);
 
             if (!$quiz->isMarkShownToParents()) {
-                $newVis = $quiz->getMarkVisibility() + 1;
+                $newVis = self::MARK_VISIBILITY_PROGRESSION[$quiz->getMarkVisibility()]
+                    ?? IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
                 $this->log->notice("Raising visibility of quiz $quizId to $newVis", [ 'char' => '>' ]);
                 $quiz->setMarkVisibility($newVis);
 
@@ -443,12 +451,17 @@ class QuizNotifications extends AbstractNotificationTestCase
             ->setStart($start)
             ->setFinish($finish)
             ->setDuration(120)
+            ->setReadingTimeDuration(0)
+            ->setShuffleItems(0)
+            ->setPromptsMode(0)
             ->setMarkVisibility($visibility)
             ->setMaxAttempts(1)
+            ->setAnonymousResult(false)
             ->setNotifyAuthor(false)
+            ->setMarkType((new MarkType())->setId(MarkType::TYPE_TOTAL))
             ->setTitle(
                 sprintf(
-                    'TEST QUIZ: visibility=%d; open=%s~%s; created=%s',
+                    'TEST QUIZ: visibility=%s; open=%s~%s; created=%s',
                     $visibility,
                     str_replace(' ', '_', $start->getDatabase()),
                     str_replace(' ', '_', $finish->getDatabase()),
@@ -510,16 +523,23 @@ class QuizNotifications extends AbstractNotificationTestCase
      *
      * @param DeprecatedModel $handler
      * @param array           $model
+     * @throws RuntimeException
      * @return array
      */
     private function handlerCreate(DeprecatedModel $handler, array $model)
     {
-        if ($id = $handler->create($model)) {
-            $model[$handler->_index] = $id;
-            return $model;
+        $id = $handler->create($model);
+        if (!$id) {
+            throw new RuntimeException('Failed to create legacy assessment record.');
         }
 
-        return null;
+        $index = (new ReflectionProperty($handler, '_index'))->getValue($handler);
+        if (!is_int($index) && !is_string($index)) {
+            throw new RuntimeException('Legacy assessment record has an invalid index field.');
+        }
+
+        $model[$index] = $id;
+        return $model;
     }
 
 

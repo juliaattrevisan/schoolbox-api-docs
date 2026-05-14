@@ -203,10 +203,19 @@ class Framework
         }
 
         /** @var TestCase $testCase */
-        $testCase = $rc->newInstance();
+        $testCase = $rc->isSubclassOf(\PHPUnit\Framework\TestCase::class)
+            ? $rc->newInstanceArgs(['requiredDaemons'])
+            : $rc->newInstance();
 
         // attach our logger
         $testCase->attachLogger($log);
+
+        if ($rc->hasMethod('setUp')) {
+            $setUp = $rc->getMethod('setUp');
+            $setUp->setAccessible(true);
+            $setUp->invoke($testCase);
+        }
+
         $testCase->prepare();
 
         // scan for listeners
