@@ -96,7 +96,7 @@ const { isActive } = useActiveIndex(
 <template>
     <div
         ref="resultEl"
-        :class="`search-result ${isActive ? 'search-result--active' : ''} f-no-margins`"
+        :class="`ss-results-item ${isActive ? 'ss-results-item--active' : ''} f-no-margins`"
         :data-test="`ss-results-item-container-${props.result.id}`"
         @click="onClick"
         @mouseover="onMouseover"
@@ -133,22 +133,6 @@ const { isActive } = useActiveIndex(
 </template>
 
 <style lang="scss" scoped>
-.search-result {
-    background: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
-    border-bottom: 1px solid var(--sbx-color-border, var(--body-background));
-    display: flex;
-    font-size: 0.825rem;
-    padding: var(--spacing-s);
-    transition: background 0.2s;
-    width: 100%;
-    &:last-of-type {
-        border-bottom: none;
-    }
-    &--active {
-        background: var(--sbx-config-color-active, var(--content-ui-hover));
-    }
-}
-
 input[type="checkbox"]:not(.plain) + label {
     margin: 0;
 }

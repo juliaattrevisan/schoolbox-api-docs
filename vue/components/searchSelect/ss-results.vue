@@ -152,10 +152,10 @@ window.Vue.watch(
 );
 </script>
 <template>
-    <div ref="resultsEl" class="results">
-        <div v-if="props.isSearching" class="results__status">Searching for results....</div>
-        <div v-else-if="props.hasNoResults" class="results__status">No results found for your current search.</div>
-        <fieldset v-else class="results__fieldset">
+    <div ref="resultsEl" class="ss-results">
+        <div v-if="props.isSearching" class="ss-results__status">Searching for results....</div>
+        <div v-else-if="props.hasNoResults" class="ss-results__status">No results found for your current search.</div>
+        <fieldset v-else class="ss-results__fieldset">
             <legend class="t-visually-hidden">Search results</legend>
             <ss-results-select-all
                 v-if="showSelectAll"
@@ -189,24 +189,3 @@ window.Vue.watch(
         <div v-if="props.isLoadingMore" class="results__status">Loading more results....</div>
     </div>
 </template>
-
-<style lang="scss" scoped>
-.results {
-    border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
-    border-radius: var(--sbx-config-field-roundness, 0px);
-    max-height: 400px;
-    overflow: auto;
-    width: 100%;
-    &__status {
-        background: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
-        font-size: 0.825rem;
-        font-style: italic;
-        padding: var(--spacing-s);
-    }
-    &__fieldset {
-        border: none;
-        margin: 0;
-        padding: 0;
-    }
-}
-</style>
