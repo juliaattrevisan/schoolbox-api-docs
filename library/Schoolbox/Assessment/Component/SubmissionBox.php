@@ -274,17 +274,13 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
      */
     public function getMarkVisibilityDescription()
     {
-        switch ($this->getMarkVisibility()) {
-            case IAssessable::MARK_VISIBILITY_PRIVATE:
-                return IAssessable::MARK_VISIBILITY_PRIVATE_STRING;
-            case IAssessable::MARK_VISIBILITY_STUDENT:
-                return IAssessable::MARK_VISIBILITY_STUDENT_STRING;
-            case IAssessable::MARK_VISIBILITY_PARENT:
-                return IAssessable::MARK_VISIBILITY_PARENT_STRING;
-            case IAssessable::MARK_VISIBILITY_PARENT_STUDENT:
-                return IAssessable::MARK_VISIBILITY_PARENT_STUDENT_STRING;
-        }
-        return '';
+        return match ($this->getMarkVisibility()) {
+            IAssessable::MARK_VISIBILITY_PRIVATE => IAssessable::MARK_VISIBILITY_PRIVATE_STRING,
+            IAssessable::MARK_VISIBILITY_STUDENT => IAssessable::MARK_VISIBILITY_STUDENT_STRING,
+            IAssessable::MARK_VISIBILITY_PARENT => IAssessable::MARK_VISIBILITY_PARENT_STRING,
+            IAssessable::MARK_VISIBILITY_PARENT_STUDENT => IAssessable::MARK_VISIBILITY_PARENT_STUDENT_STRING,
+            default => '',
+        };
     }
 
     /**
