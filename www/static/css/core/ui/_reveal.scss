@@ -271,7 +271,6 @@ $z-index-base: var(--sbx-depth-modal);
         max-width: calc(100% - #{rem-calc(($base-font-size * 2.5))});
     }
     .component-action {
-        margin: 0 -0.875rem -0.875rem;
         section {
             border-bottom-width: 0;
             &:empty {

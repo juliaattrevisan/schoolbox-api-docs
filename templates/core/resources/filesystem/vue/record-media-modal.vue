@@ -492,7 +492,7 @@ export default {
                         >
                             Upload
                         </button>
-                        <button @click.prevent="onCloseFilenameModalSelected">Cancel</button>
+                        <button class="button" @click.prevent="onCloseFilenameModalSelected">Cancel</button>
                     </div>
                 </over-media-modal>
                 <over-media-modal v-else-if="isUploading" key="isUploadingModal">
