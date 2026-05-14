@@ -36,9 +36,10 @@ async function download(): Promise<void> {
     // This actually overrides our backend implementation in Rubric/Controller::postDownload() which attempts to
     // set the filename via Content-Disposition already. I spent a while trying to debug -that- implementation
     // only to realise that something else is taking precedence somehow...so here I am
-    const filenameParts = [
-        parsedProps.value.rubricGrid.title,
-    ];
+    //
+    // There doesn't seem to be much appetite to encodeURIComponent the filename either as we never use it in a
+    // url - it just goes straight to Downloads: https://stackoverflow.com/questions/71048100/should-we-enclose-filename-with-encodeuricomponent-in-javascript
+    const filenameParts = [parsedProps.value.rubricGrid.title];
 
     const filename = filenameParts.filter(Boolean).join("-");
 
@@ -50,7 +51,7 @@ async function download(): Promise<void> {
             rubricGrid: translateGridToFormPayload(parsedProps.value.rubricGrid),
             assessmentId: parsedProps.value.assessmentId,
         },
-        filename: `${encodeURIComponent(filename)}.csv`,
+        filename: `${filename}.csv`,
         accept: ["text/csv"],
     });
 
