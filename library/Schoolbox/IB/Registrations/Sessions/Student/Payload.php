@@ -196,7 +196,10 @@ class Payload
                     fn(GroupSubjectLanguageModel $language): array => [
                         'languageId' => $language->getLanguage()?->getId(),
                         'languageName' => $language->getLanguage()?->getName() ?? '',
-                        'classCode' => $language->getClassCode(),
+                        'classCode' => $language->getClassCode()->map(fn(\Schoolbox\Resource\Folder\Code\Model $code) => [
+                            'code' => $code->getCode(),
+                            'folder' => $code->getFolder(),
+                        ])->reindex()
                     ]
                 )
                 ->reindex()
