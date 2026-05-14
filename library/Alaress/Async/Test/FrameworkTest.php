@@ -20,6 +20,9 @@ class FrameworkTest extends PHPUnitTestCase
 {
     private string $rootDir;
 
+    /**
+     * Tests that a notification test fixture can be instantiated as a PHPUnit test case.
+     */
     public function testBuildTestCaseInstantiatesPhpunitTestCase(): void
     {
         $className = $this->writeNotificationTestFixture();
@@ -35,6 +38,9 @@ class FrameworkTest extends PHPUnitTestCase
         $this->assertInstanceOf($className, $testCase);
     }
 
+    /**
+     * Tests that notification test setUp() runs before prepare().
+     */
     public function testBuildTestCaseRunsSetUpBeforePrepare(): void
     {
         $className = $this->writeNotificationTestFixture(
@@ -42,16 +48,25 @@ class FrameworkTest extends PHPUnitTestCase
     public static bool $setUpCalled = false;
     public static bool $prepareRanAfterSetUp = false;
 
+    /**
+     * Records that setUp() ran.
+     */
     public function setUp(): void
     {
         self::$setUpCalled = true;
     }
 
+    /**
+     * Returns the daemon required by this fixture.
+     */
     public function requiredDaemons()
     {
         return [self::DAEMON_SCHEDULE];
     }
 
+    /**
+     * Records whether prepare() ran after setUp().
+     */
     public function prepare()
     {
         self::$prepareRanAfterSetUp = self::$setUpCalled;
@@ -70,6 +85,9 @@ PHP
         $this->assertTrue($className::$prepareRanAfterSetUp);
     }
 
+    /**
+     * Removes generated notification test fixture files.
+     */
     protected function tearDown(): void
     {
         if (isset($this->rootDir)) {
@@ -85,6 +103,11 @@ PHP
         }
     }
 
+    /**
+     * Writes a temporary notification test fixture class.
+     * @param string|null $methods Fixture method source code.
+     * @return string
+     */
     private function writeNotificationTestFixture(?string $methods = null): string
     {
         $className = 'AsyncFrameworkFixture' . bin2hex(random_bytes(8));
@@ -93,11 +116,17 @@ PHP
         mkdir($testDir, 0777, true);
 
         $methods ??= <<<'PHP'
+    /**
+     * Returns the daemon required by this fixture.
+     */
     public function requiredDaemons()
     {
         return [self::DAEMON_SCHEDULE];
     }
 
+    /**
+     * Prepares this fixture.
+     */
     public function prepare()
     {
     }
