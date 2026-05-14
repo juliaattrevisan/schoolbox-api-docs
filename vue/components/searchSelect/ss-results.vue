@@ -152,40 +152,42 @@ window.Vue.watch(
 );
 </script>
 <template>
-    <div ref="resultsEl" class="ss-results">
-        <div v-if="props.isSearching" class="ss-results__status">Searching for results....</div>
-        <div v-else-if="props.hasNoResults" class="ss-results__status">No results found for your current search.</div>
-        <fieldset v-else class="ss-results__fieldset">
-            <legend class="t-visually-hidden">Search results</legend>
-            <ss-results-select-all
-                v-if="showSelectAll"
-                :results="props.results"
-                :selected="props.selected"
-                :index="0"
-                :active-index="activeIndex"
-                @add="onAdd"
-                @remove="onRemove"
-                @hover="onHover"
-            />
-            <ss-results-item
-                v-for="(result, index) in props.results"
-                :key="result.id"
-                :query="props.query"
-                :allow-partial-matches="props.allowPartialMatches"
-                :selected="props.selected"
-                :result="result"
-                :is-single-select="props.isSingleSelect"
-                :index="showSelectAll ? index + 1 : index"
-                :active-index="activeIndex"
-                @add="onAdd"
-                @remove="onRemove"
-                @hover="onHover"
-            />
-        </fieldset>
-        <div v-if="props.hasError" class="results__status alert">
-            Sorry, there was an unknown error retrieving your search results. Please try again and contact your support
-            if the problem persists.
+    <fieldset ref="resultsEl" class="ss-results">
+        <legend class="t-visually-hidden">Search results</legend>
+        <div class="ss-results__scroll-container">
+            <p v-if="props.isSearching" class="ss-results__status">Searching for results....</p>
+            <p v-else-if="props.hasNoResults" class="ss-results__status">No results found for your current search.</p>
+            <ul v-else>
+                <ss-results-select-all
+                    v-if="showSelectAll"
+                    :results="props.results"
+                    :selected="props.selected"
+                    :index="0"
+                    :active-index="activeIndex"
+                    @add="onAdd"
+                    @remove="onRemove"
+                    @hover="onHover"
+                />
+                <ss-results-item
+                    v-for="(result, index) in props.results"
+                    :key="result.id"
+                    :query="props.query"
+                    :allow-partial-matches="props.allowPartialMatches"
+                    :selected="props.selected"
+                    :result="result"
+                    :is-single-select="props.isSingleSelect"
+                    :index="showSelectAll ? index + 1 : index"
+                    :active-index="activeIndex"
+                    @add="onAdd"
+                    @remove="onRemove"
+                    @hover="onHover"
+                />
+            </ul>
+            <p v-if="props.hasError" class="ss-results__status alert">
+                Sorry, there was an unknown error retrieving your search results. Please try again and contact your
+                support if the problem persists.
+            </p>
+            <p v-if="props.isLoadingMore" class="ss-results__status">Loading more results....</p>
         </div>
-        <div v-if="props.isLoadingMore" class="results__status">Loading more results....</div>
-    </div>
+    </fieldset>
 </template>

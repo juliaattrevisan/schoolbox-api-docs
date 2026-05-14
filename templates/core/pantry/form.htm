@@ -352,12 +352,23 @@
 
                     <div class="small-12 medium-6 columns">
                         <fieldset>
-                            <legend>Check List Container</legend>
-                            <div class="checklist checklist-container">
+                            <!-- <legend>Check List Container</legend> -->
+                            <!-- <div class="checklist checklist-container">
                                 <input id="checkbox-table1" type="checkbox"><label for="checkbox-table1">Checkbox 1</label>
                                 <input id="checkbox-table2" type="checkbox"><label for="checkbox-table2">Checkbox 2</label>
                                 <input id="checkbox-table3" type="checkbox"><label for="checkbox-table3">Checkbox 3</label>
                                 <input id="checkbox-table4" type="checkbox" checked><label for="checkbox-table4">Checkbox 4</label>
+                            </div> -->
+                            <div ref="resultsEl" class="ss-results">
+                                <fieldset v-else class="ss-results__fieldset">
+                                    <legend class="t-visually-hidden">Search results</legend>
+                                    <div class="ss-results-item f-no-margins">
+                                        <div class="checklist sbx-checkbox-radio-container">
+                                            <input id="checkbox-table1" class="f-no-margins" type="checkbox" />
+                                            <label for="checkbox-table1" class="f-no-margins">Checkbox 1</label>
+                                        </div>
+                                    </div>
+                                </fieldset>
                             </div>
                         </fieldset>
                     </div>
