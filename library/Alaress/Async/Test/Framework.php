@@ -410,7 +410,7 @@ class Framework
 
         if (is_string($pIdsString)) {
             // check for children
-            $pids = preg_split('/\s+/', );
+            $pids = preg_split('/\s+/', $pIdsString);
 
             foreach ($pids as $pid) {
                 if (is_numeric($pid)) {
