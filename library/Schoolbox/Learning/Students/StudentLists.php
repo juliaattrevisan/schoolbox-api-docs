@@ -192,7 +192,8 @@ class StudentLists
                 $studentSisRecord['routes']['dueWork'] = [
                     'label' => $this->rosettaStone->translate('dueWork', false, true),
                     'href'  => $this->routeGenerator->generate('learningUpcoming.getUpcomingForStudent', ['studentId' => $user->getId()]),
-                    'class' => 'icon-due-work',
+                    'class' => '',
+                    'icon'  => 'due-work',
                     'title' => '',
                 ];
             }
@@ -203,7 +204,8 @@ class StudentLists
                 $studentSisRecord['routes']['grades'] = [
                     'label' => $this->rosettaStone->translate('grades', true, true),
                     'href'  => $this->routeGenerator->generate('learningGrades.getGrades', ['userId' => $user->getId()]),
-                    'class' => 'icon-approve',
+                    'class' => '',
+                    'icon'  => 'approve',
                     'title' => '',
                 ];
             }
@@ -214,7 +216,8 @@ class StudentLists
             $studentSisRecord['routes']['ePortfolio'] = [
                 'label' => 'ePortfolio',
                 'href'  => '/eportfolio/' . $user->getId() . '/profile',
-                'class' => 'icon-eportfolio',
+                'class' => '',
+                'icon'  => 'eportfolio',
                 'title' => '',
             ];
         }
@@ -224,7 +227,8 @@ class StudentLists
             $studentSisRecord['routes']['pastoral'] = [
                 'label' => $this->rosettaStone->translate('pastoralCare', false, true),
                 'href'  => $this->routeGenerator->generate('pastoral.getStudent', ['studentId' => $user->getId()]),
-                'class' => 'icon-pastoral',
+                'class' => '',
+                'icon'  => 'pastoral',
                 'title' => '',
             ];
         }
@@ -240,7 +244,8 @@ class StudentLists
             $studentSisRecord['routes']['calendar'] = [
                 'label' => $this->rosettaStone->translate('calendar', false, true),
                 'href'  => $this->routeGenerator->generate('calendar.getCalendar', $routeParams),
-                'class' => 'icon-calendar',
+                'class' => '',
+                'icon'  => 'calendar',
                 'title' => '',
             ];
         }
@@ -250,7 +255,8 @@ class StudentLists
             $studentSisRecord['routes']['timetable'] = [
                 'label' => 'Timetable',
                 'href'  => '/timetable/' . $user->getId(),
-                'class' => 'icon-timetable',
+                'class' => '',
+                'icon'  => 'timetable',
                 'title' => '',
             ];
         }

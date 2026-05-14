@@ -4,13 +4,13 @@
 
 {% block classListSlots %}
     <template v-slot:student-meta="slotProps">
-        <span v-if="slotProps.student.StudentSpecialNeedsFlag != 0" class="icon-bell warning" title="{{ specialNeeds }}"></span>
-        <span v-if="slotProps.student.StudentMedicalAlert != ''" class="icon-alert alert" :title="'Medical Alert: ' + slotProps.student.StudentMedicalAlert"></span>
-        <span v-if="slotProps.student.StudentNonResidentFlag != 0" class="icon-international-student" title="International Student"></span>
-        <span v-if="slotProps.student.StudentIBFlag != 0" class="icon-international-baccalaureate" title="International Baccalaureate Student"></span>
-        <span v-if="slotProps.student.EnglishSecondFlag != 0" class="icon-eng-second-lang highlight" title="English as an Additional Language"></span>
-        <span v-if="slotProps.student.StudentTSIFlag != 0" class="icon-boarder-leave" title="Boarder"></span>
-        <span v-if="slotProps.student.IntegrationFlag != 0" class="icon-integration-student" title="SAC"></span>
-        <span v-if="slotProps.student.EMAFlag != 0" class="icon-education-maintenance" title="Ed Psych"></span>
+        <sbx-icon v-if="slotProps.student.StudentSpecialNeedsFlag != 0" name="bell" color="var(--sbx-color-warning, var(--color-warning))" title="{{ specialNeeds }}"></sbx-icon>
+        <sbx-icon v-if="slotProps.student.StudentMedicalAlert != ''" name="alert" color="var(--sbx-color-alert, var(--color-alert))" :title="'Medical Alert: ' + slotProps.student.StudentMedicalAlert"></sbx-icon>
+        <sbx-icon v-if="slotProps.student.StudentNonResidentFlag != 0" name="international-student" color="currentColor" title="International Student"></sbx-icon>
+        <sbx-icon v-if="slotProps.student.StudentIBFlag != 0" name="international-baccalaureate" color="currentColor" title="International Baccalaureate Student"></sbx-icon>
+        <sbx-icon v-if="slotProps.student.EnglishSecondFlag != 0" name="eng-second-lang" color="var(--sbx-color-highlight, var(--color-highlight))" title="English as an Additional Language"></sbx-icon>
+        <sbx-icon v-if="slotProps.student.StudentTSIFlag != 0" name="boarder-leave" color="currentColor" title="Boarder"></sbx-icon>
+        <sbx-icon v-if="slotProps.student.IntegrationFlag != 0" name="integration-student" color="currentColor" title="SAC"></sbx-icon>
+        <sbx-icon v-if="slotProps.student.EMAFlag != 0" name="education-maintenance" color="currentColor" title="Ed Psych"></sbx-icon>
     </template>
 {% endblock classListSlots %}
