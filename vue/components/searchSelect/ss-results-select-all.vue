@@ -101,9 +101,9 @@ const { isActive } = useActiveIndex(
 </script>
 
 <template>
-    <div
+    <li
         ref="resultEl"
-        :class="`ss-results-item ${isActive ? 'ss-results-item--active' : ''} f-no-margins`"
+        :class="`ss-results-item ${isActive ? 'ss-results-item--active' : ''}`"
         data-test="ss-results-select-all"
         @click="onClick"
         @mouseover="onMouseover"
@@ -120,5 +120,5 @@ const { isActive } = useActiveIndex(
             />
             <label for="checkbox-select-all" class="f-no-margins">Select all</label>
         </div>
-    </div>
+    </li>
 </template>

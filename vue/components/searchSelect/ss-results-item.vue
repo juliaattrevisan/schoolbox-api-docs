@@ -94,9 +94,9 @@ const { isActive } = useActiveIndex(
 </script>
 
 <template>
-    <div
+    <li
         ref="resultEl"
-        :class="`ss-results-item ${isActive ? 'ss-results-item--active' : ''} f-no-margins`"
+        :class="`ss-results-item ${isActive ? 'ss-results-item--active' : ''}`"
         :data-test="`ss-results-item-container-${props.result.id}`"
         @click="onClick"
         @mouseover="onMouseover"
@@ -131,5 +131,5 @@ const { isActive } = useActiveIndex(
                 class="f-no-margins"
             />
         </div>
-    </div>
+    </li>
 </template>
