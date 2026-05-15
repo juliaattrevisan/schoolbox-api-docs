@@ -60,7 +60,7 @@ class CsvTest extends TestCase
         $row = (new Csv())->buildRow(
             $student,
             [
-                'StudentBirthDate' => '2009-04-12T00:00:00',
+                'StudentBirthDate' => strtotime('2009-04-12 12:00:00'),
                 'StudentGender' => ' F ',
             ]
         );
@@ -115,6 +115,7 @@ class CsvTest extends TestCase
             'empty string' => [''],
             'blank string' => ['   '],
             'non-date string' => ['not-a-date'],
+            'date string' => ['2024-02-29'],
             'calendar-invalid date string' => ['2024-02-30'],
             'zero timestamp' => [0],
             'negative timestamp' => [-1],

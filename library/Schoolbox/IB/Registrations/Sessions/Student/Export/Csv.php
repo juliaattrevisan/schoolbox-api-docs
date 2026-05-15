@@ -13,8 +13,6 @@ namespace Schoolbox\IB\Registrations\Sessions\Student\Export;
 
 use Alaress_Date_Format;
 use Schoolbox\IB\Registrations\Sessions\Student\Model;
-use Schoolbox\Language\Model as LanguageModel;
-use Schoolbox\Nationality\Model as NationalityModel;
 
 class Csv
 {
@@ -46,8 +44,8 @@ class Csv
             'lastName' => $this->normalise($user?->getLastname()),
             'dateOfBirth' => $this->formatDateOfBirth($externalStudent['StudentBirthDate'] ?? null),
             'gender' => $this->normalise($externalStudent['StudentGender'] ?? null),
-            'nationality1' => $this->firstNationalityName($user?->getNationalityCollection()),
-            'language1' => $this->firstLanguageName($user?->getLanguageCollection()),
+            'nationality1' => $this->normalise($user?->getNationalityCollection()->first()?->getName()),
+            'language1' => $this->normalise($user?->getLanguageCollection()->first()?->getName()),
         ];
     }
 
@@ -58,67 +56,14 @@ class Csv
 
     private function formatDateOfBirth(mixed $value): string
     {
-        if ($value === false || !is_scalar($value)) {
+        if (!is_scalar($value) || !is_numeric($value)) {
             return '';
         }
 
-        if (is_numeric($value) && (int) $value <= 0) {
+        if ((int) $value <= 0) {
             return '';
         }
 
-        if (is_numeric($value)) {
-            return (new Alaress_Date_Format((int) $value, Alaress_Date_Format::TIMESTAMP))->getDatabaseDate();
-        }
-
-        $dateOfBirth = trim((string) $value);
-
-        if ($dateOfBirth === '') {
-            return '';
-        }
-
-        if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})(?:T\d{2}:\d{2}:\d{2})?$/', $dateOfBirth, $matches)) {
-            return '';
-        }
-
-        if (!checkdate((int) $matches[2], (int) $matches[3], (int) $matches[1])) {
-            return '';
-        }
-
-        try {
-            return (new Alaress_Date_Format($dateOfBirth, [
-                Alaress_Date_Format::DATABASE_DATE_FORMAT,
-                'Y-m-d\TH:i:s',
-            ]))->getDatabaseDate();
-        } catch (\InvalidArgumentException) {
-            return '';
-        }
-    }
-
-    /**
-     * @param iterable<mixed>|null $nationalities
-     */
-    private function firstNationalityName(?iterable $nationalities): string
-    {
-        foreach ($nationalities ?? [] as $nationality) {
-            if ($nationality instanceof NationalityModel) {
-                return $this->normalise($nationality->getName());
-            }
-        }
-
-        return '';
-    }
-
-    /**
-     * @param iterable<mixed>|null $languages
-     */
-    private function firstLanguageName(?iterable $languages): string
-    {
-        foreach ($languages ?? [] as $language) {
-            if ($language instanceof LanguageModel) {
-                return $this->normalise($language->getName());
-            }
-        }
-
-        return '';
+        return Alaress_Date_Format::newFromTimestamp((int) $value)->getDatabaseDate();
     }
 }
