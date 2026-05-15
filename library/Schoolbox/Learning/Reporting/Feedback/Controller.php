@@ -280,12 +280,18 @@ class Controller extends Base
         $instructorScheme = $assessment->getInstructorMarkScheme();
         $learnerScheme = $assessment->getMarkScheme();
 
-        $normalisedMark = null;
-        $learnerHumanReadableMark = null;
 
         /* This human readable mark is given by the instructor, from which we derive the normalised mark
+        */
+        $mark = trim((string)$post['mark']);
+
+        /* Default values
+         * Note that $mark might be empty string at this point:
+         * this occurs when you add a comment before the grade, in the Quiz Quickmark screen (and for reporting, likely at least the markbook)
          */
-        $instructorHumanReadableMark = $post['mark'] ?? '';
+        $normalisedMark = null;
+        $learnerHumanReadableMark = null;
+        $instructorHumanReadableMark = null;
 
         /* Apparently this is how you detect a Submission State: an exception is thrown
          * trying to interpret it as one of the Mark Schemes. No wonder it was classified
@@ -294,24 +300,30 @@ class Controller extends Base
          * Shanked from Learning/Assessment/DueWork/Feedback/Factory.php::210
          */
         try {
-            $normalisedMark = $instructorScheme->getNormalisedMark($instructorHumanReadableMark);
+            /* Determine the normalised mark based on the expected mark type being used for input.
+             * Reporting assumes that the mark is always entered against the instructor scheme,
+             * as there's no self-assessment like due work.
+             */
+            $normalisedMark = $instructorScheme->getNormalisedMark($mark);
 
-            /* Find out what the learner's version would have been and save that too
-             * Arguably you could skip this derivation, only doing it if $instructor scheme was different to $learner scheme
+            /* Always rederive/sanitise both the learner and instructor human readable marks, even if they're the same.
+             * For example, this ensures a value of "5" using a percentage mark type becomes "5 %"
              */
             $learnerHumanReadableMark = $learnerScheme->getHumanReadableMark($normalisedMark);
+            $instructorHumanReadableMark = $instructorScheme->getHumanReadableMark($normalisedMark);
         } catch (\InvalidArgumentException $e) {
-            if ('' !== $instructorHumanReadableMark) {
+            if ('' !== $mark) {
                 /* If it's a Submission State, save the text as the human readable mark
                  * and derive its normalised mark from the uh Lists in admin
                  */
-                $code = $this->stateMapper->findOneByColumn('display_as', $instructorHumanReadableMark);
+                $code = $this->stateMapper->findOneByColumn('display_as', $mark);
 
                 $normalisedMark = $code->getNormaliseAs();
 
                 /* There isn't a learner-specific Submission State: it's the same for both parties.
                  */
-                $learnerHumanReadableMark = $instructorHumanReadableMark;
+                $learnerHumanReadableMark = $mark;
+                $instructorHumanReadableMark = $mark;
             }
         }
 
