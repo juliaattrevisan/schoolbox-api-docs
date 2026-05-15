@@ -202,6 +202,10 @@ class Framework
             throw new InvalidArgumentException("Test case '$testClass' does not implement Alaress\\Async\\Test\\TestCase, cannot proceed");
         }
 
+        // If $testCase is a subclass of \PHPUnit\Framework\TestCase::class, instantiate a PHPUnit-style test case
+        // outside PHPUnit’s normal runner by giving it a valid method name.  Name 'requiredDaemons' is chosen because
+        // every Alaress\Async\Test\TestCase must implement that method.
+        // @see library/Alaress/Async/Test/TestCase.php
         /** @var TestCase $testCase */
         $testCase = $rc->isSubclassOf(\PHPUnit\Framework\TestCase::class)
             ? $rc->newInstanceArgs(['requiredDaemons'])
