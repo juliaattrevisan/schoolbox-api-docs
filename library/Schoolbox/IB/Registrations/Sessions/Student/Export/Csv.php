@@ -56,14 +56,26 @@ class Csv
 
     private function formatDateOfBirth(mixed $value): string
     {
-        if (!is_scalar($value) || !is_numeric($value)) {
+        if ($value === null || $value === false || trim((string) $value) === '') {
             return '';
         }
 
-        if ((int) $value <= 0) {
+        if (is_numeric($value)) {
+            $timestamp = (int) $value;
+
+            if ($timestamp <= 0) {
+                return '';
+            }
+
+            return Alaress_Date_Format::newFromTimestamp($timestamp)->getDatabaseDate();
+        }
+
+        $timestamp = strtotime((string) $value);
+
+        if ($timestamp === false) {
             return '';
         }
 
-        return Alaress_Date_Format::newFromTimestamp((int) $value)->getDatabaseDate();
+        return Alaress_Date_Format::newFromTimestamp($timestamp)->getDatabaseDate();
     }
 }

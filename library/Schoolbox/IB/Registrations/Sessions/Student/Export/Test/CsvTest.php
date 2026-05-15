@@ -78,6 +78,17 @@ class CsvTest extends TestCase
         );
     }
 
+    #[DataProvider('validDateOfBirthProvider')]
+    public function testBuildRowAcceptsValidDateOfBirthFormats(mixed $dateOfBirth): void
+    {
+        $row = (new Csv())->buildRow(
+            new RegistrationSessionStudentModel(),
+            ['StudentBirthDate' => $dateOfBirth]
+        );
+
+        $this->assertSame('2024-02-29', $row['dateOfBirth']);
+    }
+
     public function testBuildRowUsesEmptyStringsForMissingValues(): void
     {
         $this->assertSame(
@@ -107,6 +118,18 @@ class CsvTest extends TestCase
     /**
      * @return array<string, array{mixed}>
      */
+    public static function validDateOfBirthProvider(): array
+    {
+        return [
+            'unix timestamp' => [strtotime('2024-02-29 12:00:00')],
+            'date-only string' => ['2024-02-29'],
+            'connector iso string' => ['2024-02-29T00:00:00'],
+        ];
+    }
+
+    /**
+     * @return array<string, array{mixed}>
+     */
     public static function invalidDateOfBirthProvider(): array
     {
         return [
@@ -115,8 +138,6 @@ class CsvTest extends TestCase
             'empty string' => [''],
             'blank string' => ['   '],
             'non-date string' => ['not-a-date'],
-            'date string' => ['2024-02-29'],
-            'calendar-invalid date string' => ['2024-02-30'],
             'zero timestamp' => [0],
             'negative timestamp' => [-1],
         ];
