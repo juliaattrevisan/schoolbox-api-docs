@@ -419,10 +419,8 @@ const canUpdateFeedback = window.Vue.computed(() => {
     const { participant, aImpl, activity } = cellInfo.value;
 
     // must be a due work, reporting, or quiz activity
-    const validActivityType = [ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ, ACTIVITY_TYPE_REPORTING].includes(
-        activity.assessmentType,
-    );
-    if (!validActivityType) {
+    const validActivityTypes = [ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ, ACTIVITY_TYPE_REPORTING];
+    if (!validActivityTypes.includes(activity.assessmentType)) {
         return false;
     }
 
@@ -441,7 +439,7 @@ const canUpdateFeedback = window.Vue.computed(() => {
         return false;
     }
 
-    return false;
+    return true;
 });
 
 /**
