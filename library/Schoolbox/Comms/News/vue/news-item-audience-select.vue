@@ -816,6 +816,9 @@ export default {
                                     {{ selectedAudienceOption.namePlural }} options
                                 </legend>
                                 <div class="ss-results__scroll-container ss-results__scroll-container--smaller">
+                                    <p v-if="showLoader" class="ss-results__status" aria-live="polite" aria-busy="true">
+                                        Searching for results....
+                                    </p>
                                     <ul class="ss-results-list">
                                         <li
                                             v-for="(audienceListItem, index) in audienceListItems"
