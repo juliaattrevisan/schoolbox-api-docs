@@ -62,15 +62,19 @@
 }
 
 .ss-selected {
-    border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
-    border-radius: var(--sbx-config-field-roundness, 0px);
     display: flex;
+    flex-wrap: wrap;
     gap: var(--sbx-size-xs, var(--spacing-s));
-    margin-bottom: -1px; // to butt up against the search input
-    max-height: 133px;
-    min-height: 50px;
-    overflow: auto;
-    padding: var(--sbx-size-xs, var(--spacing-s));
+    margin-bottom: var(--sbx-size-xs, var(--spacing-s));
+    &--scroll {
+        border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
+        border-radius: var(--sbx-config-field-roundness, 0px);
+        margin-bottom: -1px; // to butt up against the search input
+        max-height: 133px;
+        min-height: 50px;
+        overflow: auto;
+        padding: var(--sbx-size-xs, var(--spacing-s));
+    }
 }
 
 .ss-selected-item {
