@@ -120,7 +120,7 @@ class Importer
         $value = trim((string)$value);
 
         // First deal values expected in exports from Schoolbox >=26.1.
-        if (in_array($value, IAssessable::MARK_VISIBILITY_STRINGS)) {
+        if (array_key_exists($value, IAssessable::MARK_VISIBILITY_STRINGS)) {
             return $value;
         }
 
