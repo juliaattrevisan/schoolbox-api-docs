@@ -197,7 +197,7 @@ class Controller extends Base
                         'title' => $folder->getFolder()->getTitle(),
                     ],
                     'assessments' => $markbook->getAssessments()->indexBy('id')->map(function (IAssessable $aImpl) use ($markbook, $terms) {
-                        /** Only due work has the concept of "instructorMarkScheme", others just use markScheme for now */
+                        /** Only due work & reporting have the concept of "instructorMarkScheme", others just use markScheme for now */
                         $instructorMarkScheme = ($aImpl instanceof DueWork\Model || $aImpl instanceof Reporting\Model)
                             ? $aImpl->getInstructorMarkScheme()
                             : $aImpl->getMarkScheme();

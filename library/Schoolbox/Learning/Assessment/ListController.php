@@ -1628,6 +1628,8 @@ class ListController extends Web\Controller\Base
                 } elseif ($latestFeedback instanceof \Schoolbox\Learning\Assessment\Lti\Feedback\Model) {
                     $feedback['scoreGiven'] = $latestFeedback->getScoreGiven();
                     $feedback['scoreMaximum'] = $latestFeedback->getScoreMaximum();
+                } elseif ($latestFeedback instanceof \Schoolbox\Learning\Assessment\Reporting\Feedback\Model) {
+                    $feedback['humanReadableInstructorMark'] = $latestFeedback->getHumanReadableInstructorMark();
                 }
 
                 // coalesce humanReadableInstructorMark with humanReadable if humanReadableInstructorMark wasn't set

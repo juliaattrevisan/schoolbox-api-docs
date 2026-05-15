@@ -324,8 +324,8 @@ class Controller extends WebController\Base
                         ],
                         'assessments' => $courseMarkbook->getCourseImportAssessments()->getOffset($courseImpl->getId())->map(
                             function (IAssessable $aImpl, int $assessmentId) use ($courseImpl, $courseMarkbook, $terms) {
-                                /** Only due work has the concept of "instructorMarkScheme", others just use markScheme for now */
-                                $instructorMarkScheme = $aImpl instanceof DueWork\Model
+                                /** Only due work & reporting have the concept of "instructorMarkScheme", others just use markScheme for now */
+                                $instructorMarkScheme = ($aImpl instanceof DueWork\Model || $aImpl instanceof Reporting\Model)
                                     ? $aImpl->getInstructorMarkScheme()
                                     : $aImpl->getMarkScheme();
 
