@@ -126,9 +126,12 @@ class Importer
 
         // Next deal with values expected in exports from Schoolbox <26.1.
         switch ($value) {
-            case '0': return IAssessable::MARK_VISIBILITY_PRIVATE;
-            case '1': return IAssessable::MARK_VISIBILITY_STUDENT;
-            case '2': return IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
+            case '0':
+                return IAssessable::MARK_VISIBILITY_PRIVATE;
+            case '1':
+                return IAssessable::MARK_VISIBILITY_STUDENT;
+            case '2':
+                return IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
             // Note IAssessable::MARK_VISIBILITY_PARENT was introduced in 26.1.
         }
 
