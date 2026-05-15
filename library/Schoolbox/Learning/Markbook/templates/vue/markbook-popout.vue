@@ -14,6 +14,7 @@ import {
     ACTIVITY_TYPE_DUE_WORK,
     ACTIVITY_TYPE_QUIZ,
     ACTIVITY_TYPE_DIALOG_AGENT,
+    ACTIVITY_TYPE_REPORTING,
 } from "@schoolboxAssessment/Types/assessmentTypes";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import { usePopOut } from "@schoolboxVue/composables/popOut/usePopOut";
@@ -134,8 +135,6 @@ const routes = window.Vue.computed(() => {
     };
 });
 
-const markbookElement = window.Vue.ref<HTMLDivElement | null>(null);
-
 // Exclude confirm, popout
 const excludeModalEl = window.Vue.ref<InstanceType<typeof RevealModal> | null>(null);
 
@@ -199,25 +198,28 @@ const viewAllText = window.Vue.computed(() => {
 });
 
 /**
- * Used to determine the text shown for the view status link / menu
+ * Used to determine the text shown for the view submission history link / menu
  */
-const viewStatusText = window.Vue.computed(() => {
+const viewHistoryText = window.Vue.computed(() => {
     if (cellInfo.value === null) {
         return "";
     }
-    if (cellInfo.value.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK) {
-        return "Submission History";
+    switch (cellInfo.value.activity.assessmentType) {
+        case ACTIVITY_TYPE_DUE_WORK:
+            return "Submission History";
+        case ACTIVITY_TYPE_QUIZ:
+            return "Attempt History";
+        case ACTIVITY_TYPE_DIALOG_AGENT:
+            return `${locale.dialogAgent.proper()} History`;
+        case ACTIVITY_TYPE_TASK:
+            return "Student View";
+        case ACTIVITY_TYPE_PROJECT:
+            return "View Progress";
+        case ACTIVITY_TYPE_REPORTING:
+            return "Submission History"; // todo: language?
+        default:
+            return "View Attempts";
     }
-    if (cellInfo.value.activity.assessmentType === ACTIVITY_TYPE_DIALOG_AGENT) {
-        return `${locale.dialogAgent.proper()} History`;
-    }
-    if (cellInfo.value.activity.assessmentType === ACTIVITY_TYPE_TASK) {
-        return "Student View";
-    }
-    if (cellInfo.value.activity.assessmentType === ACTIVITY_TYPE_PROJECT) {
-        return "View Progress";
-    }
-    return "View Attempts";
 });
 
 /**
@@ -234,7 +236,7 @@ const hasVisibleMenuItems = window.Vue.computed(() => {
     const hasParticipantMenuItems =
         participant &&
         !participant.isExcluded &&
-        (activity.assessmentType === ACTIVITY_TYPE_DUE_WORK || activity.assessmentType === ACTIVITY_TYPE_QUIZ);
+        [ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ, ACTIVITY_TYPE_REPORTING].includes(activity.assessmentType);
 
     const hasIncludeMenuItem =
         participant && participant.isExcluded && routes.value.getAssessmentParticipationForm === null;
@@ -378,9 +380,12 @@ async function onMenuItemSelected(target: string | null, action: string | null =
 
             // If including student reload the activity list
             if (
-                [ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ, ACTIVITY_TYPE_DIALOG_AGENT].includes(
-                    activity.assessmentType,
-                )
+                [
+                    ACTIVITY_TYPE_DUE_WORK,
+                    ACTIVITY_TYPE_QUIZ,
+                    ACTIVITY_TYPE_DIALOG_AGENT,
+                    ACTIVITY_TYPE_REPORTING,
+                ].includes(activity.assessmentType)
             ) {
                 await getActivity();
             } else {
@@ -558,7 +563,7 @@ function onToggleSelected(): void {
         <div v-else-if="mbStore.isPopoutLoading || cellInfo === null" class="pop-out-menu__loader">
             <div class="loader"></div>
         </div>
-        <div v-else ref="markbookElement" class="pop-out-menu" :class="{ 'is-expanded': isExpanded }">
+        <div v-else class="pop-out-menu" :class="{ 'is-expanded': isExpanded }">
             <div class="collapsible">
                 <small-card v-for="(activityItem, index) in activityItems" :key="index">
                     <user-photo :user-id="activityItem.effector.id" render="tiny" rounded-corners></user-photo>
@@ -653,7 +658,7 @@ function onToggleSelected(): void {
                     }"
                     :link="routes.historyRoute ? getReturnUrl(routes.historyRoute) : undefined"
                 >
-                    {{ viewStatusText }}
+                    {{ viewHistoryText }}
                 </pop-out-menu-item>
             </div>
         </div>

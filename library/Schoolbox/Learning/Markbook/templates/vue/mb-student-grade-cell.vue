@@ -9,6 +9,7 @@ import {
     ACTIVITY_TYPE_DUE_WORK,
     ACTIVITY_TYPE_LTI_ASSESSMENT,
     ACTIVITY_TYPE_QUIZ,
+    ACTIVITY_TYPE_REPORTING,
 } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useMarkbookStore } from "./store/markbookStore";
 
@@ -75,6 +76,7 @@ const hasPopOutMenu = window.Vue.computed(() => {
         ACTIVITY_TYPE_QUIZ,
         ACTIVITY_TYPE_DIALOG_AGENT,
         ACTIVITY_TYPE_LTI_ASSESSMENT,
+        ACTIVITY_TYPE_REPORTING,
     ].includes(assessment.value.assessmentType);
 });
 
@@ -162,7 +164,7 @@ async function onClickCell(): Promise<void> {
         student.value &&
         participant.value &&
         !participant.value.isExcluded &&
-        aImpl.value?._routes.student[student.value.id].postFeedback;
+        aImpl.value?._routes.student[student.value.id].postFeedback; // TODO: did I accidentally enable this for reporting??
 
     if (Date.now() - lastClick.value < DOUBLE_CLICK_INTERVAL && canAccessUpdateFeedback) {
         /**
