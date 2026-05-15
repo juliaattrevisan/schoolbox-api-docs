@@ -6,10 +6,11 @@ export type MarkVisibilityOption = {
 };
 
 const allMarkVisibilityOptions: MarkVisibilityOption[] = [
+    // The label text here should match the text in the MARK_VISIBILITY_..._STRING constants in Assessment\IAssessable.
     { value: "staffOnly", label: "&#xe63e; Staff Only", readonlyIcon: "icon-locked" },
-    { value: "staffAndStudent", label: "&#xe667; Staff and Students", readonlyIcon: "icon-staff-students" },
-    { value: "staffAndParent", label: "&#xe666; Staff and Parents", readonlyIcon: "icon-staff" },
-    { value: "staffStudentAndParent", label: "&#xe666; Staff, Students and their Parents", readonlyIcon: "icon-staff" },
+    { value: "staffAndStudent", label: "&#xe667; Staff & Student", readonlyIcon: "icon-staff-students" },
+    { value: "staffAndParent", label: "&#xe666; Staff & Parent", readonlyIcon: "icon-staff" },
+    { value: "staffStudentAndParent", label: "&#xe666; Staff, Student & Parent", readonlyIcon: "icon-staff" },
 ];
 
 /**
