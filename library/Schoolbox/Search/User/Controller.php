@@ -884,9 +884,9 @@ class Controller extends BaseController
                     'title' => 'Impersonate',
                     'url' => ($viewer->getId() === $viewee->getId()) ? false : $urlByRouteName['user.impersonate'],
                     'iconClass' => 'icon-staff-students',
-                    'disabled' => $viewee->isDeleted(),
-                    'mouseoverText' => $viewee->isDeleted() ? 'Account Disabled' : 'Login as user',
-                    'dataTest' => $viewee->isDeleted() ? '' : 'admin-user-modify-impersonate'
+                    'disabled' => $viewee->isDeleted() || !$viewee->getEnabled(),
+                    'mouseoverText' => ($viewee->isDeleted() || !$viewee->getEnabled()) ? 'Account Disabled' : 'Login as user',
+                    'dataTest' => ($viewee->isDeleted() || !$viewee->getEnabled()) ? '' : 'admin-user-modify-impersonate'
                 ],
                 [
                     'title' => 'Create ' . $this->rosettaStone->translate('pastoral', false, true) . ' Record',
