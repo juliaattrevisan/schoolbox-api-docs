@@ -101,7 +101,7 @@ export type MarkbookClassImplActivity = {
                 "learningAssessment.postInclude": string | null;
                 "learningAssessment.getSummary": string | null;
                 "learningAssessment.getInfo": string | null;
-                /* this will change depending on if it's a quiz or due work */
+                /* this will change depending on if it's a quiz, due work, or reporting activity */
                 postFeedback: string | null;
                 /* this will change depending on if it's a due work or reporting activity */
                 postPublishFeedback: string | null;

@@ -487,7 +487,7 @@ class Controller extends WebController\Base
                                                     'student' => $student,
                                                 ]
                                             ),
-                                            /* this will change depending on if it's a quiz or due work */
+                                            /* this will change depending on if it's a due work, quiz, or reporting activity */
                                             'postFeedback' =>
                                                 $aImpl instanceof DueWork\Model ? $this->getRouteIfAuthorized(
                                                     'learningDueWorkFeedback.postParticipantFeedback',
@@ -505,7 +505,15 @@ class Controller extends WebController\Base
                                                         'studentId' => $student->getId(),
                                                         'student' => $student,
                                                     ],
-                                                ) : null
+                                                ) : ($aImpl instanceof Reporting\Model ? $this->getRouteIfAuthorized(
+                                                    'learningReportingFeedback.postParticularFeedback',
+                                                    [
+                                                        'assessment' => $aImpl,
+                                                        'assessmentId' => $aImpl->getId(),
+                                                        'learnerId' => $student->getId(),
+                                                        'learner' => $student,
+                                                    ]
+                                                ) : null)
                                             ),
                                             /* this will change depending on if it's due work or reporting activity */
                                             'postPublishFeedback' =>

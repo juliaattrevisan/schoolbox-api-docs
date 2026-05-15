@@ -287,7 +287,9 @@ async function getActivity(): Promise<void> {
          * but for now this is far more convenient and simple
          */
         if (
-            [ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ].includes(cellInfo.value.activity.assessmentType) &&
+            [ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ, ACTIVITY_TYPE_REPORTING].includes(
+                cellInfo.value.activity.assessmentType,
+            ) &&
             cellInfo.value.participant
         ) {
             await mbStore.updateExtraInfo(infoRoute, cellInfo.value.participant);
@@ -625,6 +627,15 @@ function onToggleSelected(): void {
                         </pop-out-menu-item>
                     </template>
                     <template v-else-if="cellInfo.activity.assessmentType === ACTIVITY_TYPE_REPORTING">
+                        <pop-out-menu-item
+                            v-if="!cellInfo.participant.isExcluded"
+                            :class="{ 'is-disabled': !routes.postFeedback }"
+                            :link="routes.updateRoute ? getReturnUrl(routes.updateRoute) : undefined"
+                            force-callback
+                            @selected="onUpdateFeedbackSelected"
+                        >
+                            Update Feedback
+                        </pop-out-menu-item>
                         <pop-out-menu-item
                             :class="{ 'is-disabled': !routes.reviewRoute || isActivityEmpty || !hasSubmissions }"
                             :link="routes.reviewRoute ? getReturnUrl(routes.reviewRoute) : undefined"
