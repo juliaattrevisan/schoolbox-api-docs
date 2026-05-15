@@ -153,7 +153,10 @@ window.Vue.onMounted((): void => {
             </ib-report-section>
 
             <ib-report-section title="Failed registrations" :count="failed.length">
-                <ib-report-failed-table :students="failed" />
+                <ib-report-failed-table
+                    :students="failed"
+                    :search-languages-endpoint="props.searchLanguagesEndpoint"
+                />
             </ib-report-section>
 
             <ib-report-section title="Registered" :count="registered.length">
