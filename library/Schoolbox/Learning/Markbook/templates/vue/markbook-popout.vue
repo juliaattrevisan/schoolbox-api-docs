@@ -216,7 +216,7 @@ const viewHistoryText = window.Vue.computed(() => {
         case ACTIVITY_TYPE_PROJECT:
             return "View Progress";
         case ACTIVITY_TYPE_REPORTING:
-            return "Submission History"; // todo: language?
+            return "View"; // TODO: figure out what this is eventually, but can wait til' we have the place it goes to sorted out
         default:
             return "View Attempts";
     }
@@ -635,12 +635,6 @@ function onToggleSelected(): void {
                             @selected="onUpdateFeedbackSelected"
                         >
                             Update Feedback
-                        </pop-out-menu-item>
-                        <pop-out-menu-item
-                            :class="{ 'is-disabled': !routes.reviewRoute || isActivityEmpty || !hasSubmissions }"
-                            :link="routes.reviewRoute ? getReturnUrl(routes.reviewRoute) : undefined"
-                        >
-                            Review Submission
                         </pop-out-menu-item>
                         <!-- TODO: make this publish logic the same as the rest I guess -->
                         <pop-out-menu-item
