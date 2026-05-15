@@ -378,7 +378,7 @@ class Controller extends Base
     /**
      * Submit multiple feedbacks in single call
      *
-     * This is a dueWork-only route
+     * This is a dueWork/reporting-only route
      *
      * @param Reporting\Model $assessment
      * @throws MapperException
@@ -492,7 +492,7 @@ class Controller extends Base
         (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))
             ->refresh($this->assessmentDataSource, $assessment, $learner);
 
-        $this->responseAsJson([
+        $this->response = $this->responseAsJson([
             'success' => true,
             'message' => 'OK',
             'id'      => $feedback->getId(),

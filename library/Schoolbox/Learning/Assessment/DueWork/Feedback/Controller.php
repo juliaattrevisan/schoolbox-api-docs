@@ -177,7 +177,7 @@ class Controller extends Base
     /**
      * Submit multiple feedbacks in single call
      *
-     * This is a dueWork-only route
+     * This is a dueWork/reporting-only route
      *
      * @param DueWork\Model $assessment
      * @api   POST /learning/assessments/{assessmentId}/feedbacks
