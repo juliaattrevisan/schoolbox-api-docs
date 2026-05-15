@@ -811,7 +811,7 @@ export default {
                             <div class="empty-state" v-show="showEmptyState">
                                 <p>No {{ selectedAudienceOption.namePlural }} found.</p>
                             </div>
-                            <fieldset class="ss-results" v-show="!showEmptyState">
+                            <fieldset class="ss-results l-mar-m--bottom" v-show="!showEmptyState">
                                 <legend class="t-visually-hidden">
                                     {{ selectedAudienceOption.namePlural }} options
                                 </legend>

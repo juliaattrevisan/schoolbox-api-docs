@@ -25,6 +25,9 @@
         max-height: 400px;
         overflow: auto;
         width: 100%;
+        &--smaller {
+            max-height: 200px;
+        }
     }
     &__status {
         background: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
