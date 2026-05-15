@@ -815,7 +815,7 @@ export default {
                                 <legend class="t-visually-hidden">
                                     {{ selectedAudienceOption.namePlural }} options
                                 </legend>
-                                <div class="ss-results__scroll-container">
+                                <div class="ss-results__scroll-container ss-results__scroll-container--smaller">
                                     <ul class="ss-results-list">
                                         <li
                                             v-for="(audienceListItem, index) in audienceListItems"
