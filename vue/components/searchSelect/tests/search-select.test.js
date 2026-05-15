@@ -3,11 +3,31 @@ import { timeout } from "@js/util/jsUtils";
 import SearchSelect from "../search-select.vue";
 import { DEBOUNCE_AMOUNT } from "../../../composables/search/useQuerySearch";
 
+let resizeObserverCallback;
+
+jest.mock("@vueuse/core", () => {
+    const actual = jest.requireActual("@vueuse/core");
+
+    return {
+        ...actual,
+        useResizeObserver: jest.fn((target, callback) => {
+            resizeObserverCallback = callback;
+
+            return { stop: jest.fn() };
+        }),
+    };
+});
+
 const defaultProps = {
     label: "Search Select",
     labelId: "search-select",
     endpoint: "",
 };
+
+afterEach(() => {
+    resizeObserverCallback = undefined;
+    jest.restoreAllMocks();
+});
 
 test("selected items are visible", async () => {
     const wrapper = mount(SearchSelect, {
@@ -23,6 +43,30 @@ test("selected items are visible", async () => {
     expect(wrapper.findAll('[data-test^="ss-selected-item-container-"]')).toHaveLength(3); // validate the selected items are visible
     const selectedItem = wrapper.get(`[data-test="ss-selected-item-container-1"]`); // get the first selected item
     expect(selectedItem.html()).toContain("Item 1"); // validate the selected item contains the correct text
+});
+
+test("selected items become scrollable when their height exceeds 133px", async () => {
+    const wrapper = mount(SearchSelect, {
+        props: {
+            ...defaultProps,
+            selected: [
+                { id: 1, name: "Item 1" },
+                { id: 2, name: "Item 2" },
+                { id: 3, name: "Item 3" },
+            ],
+        },
+    });
+
+    expect(resizeObserverCallback).toEqual(expect.any(Function));
+    expect(wrapper.get('[data-test="ss-selected"]').classes()).not.toContain("ss-selected--scroll");
+
+    resizeObserverCallback([{ contentRect: { height: 133 } }]);
+    await wrapper.vm.$nextTick();
+    expect(wrapper.get('[data-test="ss-selected"]').classes()).not.toContain("ss-selected--scroll");
+
+    resizeObserverCallback([{ contentRect: { height: 134 } }]);
+    await wrapper.vm.$nextTick();
+    expect(wrapper.get('[data-test="ss-selected"]').classes()).toContain("ss-selected--scroll");
 });
 
 test("search results can be added", async () => {

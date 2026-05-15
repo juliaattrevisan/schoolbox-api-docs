@@ -62,10 +62,8 @@
 }
 
 .ss-selected {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sbx-size-xs, var(--spacing-s));
     margin-bottom: var(--sbx-size-xs, var(--spacing-s));
+    // will be triggered when there's enough selected items to require scrolling
     &--scroll {
         border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
         border-radius: var(--sbx-config-field-roundness, 0px);
@@ -74,6 +72,11 @@
         min-height: 50px;
         overflow: auto;
         padding: var(--sbx-size-xs, var(--spacing-s));
+    }
+    &__items {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--sbx-size-xs, var(--spacing-s));
     }
 }
 
