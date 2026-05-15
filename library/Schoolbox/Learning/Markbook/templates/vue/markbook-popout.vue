@@ -616,7 +616,7 @@ function onToggleSelected(): void {
                         </pop-out-menu-item>
                     </template>
                     <template v-else-if="cellInfo.activity.assessmentType === ACTIVITY_TYPE_QUIZ">
-                        <!-- TODO: hmm, why doesn't quiz get a :link -->
+                        <!-- notable ommission of :link, routes.updateRoute is due work only it seems -->
                         <pop-out-menu-item
                             v-if="!cellInfo.participant.isExcluded"
                             :class="{ 'is-disabled': !routes.postFeedback }"
@@ -627,10 +627,10 @@ function onToggleSelected(): void {
                         </pop-out-menu-item>
                     </template>
                     <template v-else-if="cellInfo.activity.assessmentType === ACTIVITY_TYPE_REPORTING">
+                        <!-- notable ommission of :link, routes.updateRoute is due work only it seems -->
                         <pop-out-menu-item
                             v-if="!cellInfo.participant.isExcluded"
                             :class="{ 'is-disabled': !routes.postFeedback }"
-                            :link="routes.updateRoute ? getReturnUrl(routes.updateRoute) : undefined"
                             force-callback
                             @selected="onUpdateFeedbackSelected"
                         >
