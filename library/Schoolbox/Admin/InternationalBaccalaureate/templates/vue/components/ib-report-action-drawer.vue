@@ -16,15 +16,8 @@ defineEmits<{
         <span class="ib-action-drawer__count">
             {{ selectedCount }} student{{ selectedCount === 1 ? "" : "s" }} selected
         </span>
-        <button type="button" class="button secondary small" @click="$emit('clearSelection')">
-            Clear
-        </button>
-        <button
-            type="button"
-            class="button small"
-            :disabled="isLoading"
-            @click="$emit('completePreparation')"
-        >
+        <button type="button" class="button secondary small" @click="$emit('clearSelection')">Clear</button>
+        <button type="button" class="button small" :disabled="isLoading" @click="$emit('completePreparation')">
             Complete Preparation
         </button>
         <button
