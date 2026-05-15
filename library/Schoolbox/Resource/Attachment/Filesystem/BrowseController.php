@@ -60,6 +60,6 @@ class BrowseController extends NavigatorController
      */
     public function getIcon()
     {
-        return 'files';
+        return 'folder';
     }
 }
