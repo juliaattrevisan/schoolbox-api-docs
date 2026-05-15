@@ -77,7 +77,7 @@ function onMouseover(): void {
 /**
  * To allow keyboard navigation of the search results
  */
-const resultEl = useTemplateRef<HTMLDivElement | null>("resultEl");
+const resultEl = useTemplateRef<HTMLLIElement | null>("resultEl");
 const { isActive } = useActiveIndex(
     resultEl,
     toRef(() => props.index),
