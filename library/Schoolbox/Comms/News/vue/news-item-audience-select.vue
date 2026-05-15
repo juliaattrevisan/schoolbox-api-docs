@@ -811,22 +811,33 @@ export default {
                             <div class="empty-state" v-show="showEmptyState">
                                 <p>No {{ selectedAudienceOption.namePlural }} found.</p>
                             </div>
-                            <div class="checklist checklist-container" v-show="!showEmptyState">
-                                <div class="loader" v-show="showLoader"></div>
-                                <div
-                                    class="checklist-wrapper"
-                                    v-for="(audienceListItem, index) in audienceListItems"
-                                    :key="index"
-                                >
-                                    <input
-                                        type="checkbox"
-                                        :id="'audience-list-input-' + index"
-                                        :value="index"
-                                        v-model="audienceListChecked"
-                                    />
-                                    <label :for="'audience-list-input-' + index">{{ audienceListItem }}</label>
+                            <fieldset class="ss-results" v-show="!showEmptyState">
+                                <legend class="t-visually-hidden">
+                                    {{ selectedAudienceOption.namePlural }} options
+                                </legend>
+                                <div class="ss-results__scroll-container">
+                                    <ul class="ss-results__list">
+                                        <li
+                                            v-for="(audienceListItem, index) in audienceListItems"
+                                            :key="index"
+                                            class="ss-results-item"
+                                        >
+                                            <div class="checklist sbx-checkbox-radio-container">
+                                                <input
+                                                    :id="`audience-list-input-${index}`"
+                                                    :value="index"
+                                                    v-model="audienceListChecked"
+                                                    class="f-no-margins"
+                                                    type="checkbox"
+                                                />
+                                                <label :for="`audience-list-input-${index}`" class="f-no-margins">{{
+                                                    audienceListItem
+                                                }}</label>
+                                            </div>
+                                        </li>
+                                    </ul>
                                 </div>
-                            </div>
+                            </fieldset>
                             <fieldset class="checklist border-none" v-show="showModifierCheckboxes">
                                 <ul class="option-list">
                                     <li v-if="showModifierSelfCheckbox">
