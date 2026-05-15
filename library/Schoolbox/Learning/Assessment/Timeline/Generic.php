@@ -11,6 +11,13 @@ namespace Schoolbox\Learning\Assessment\Timeline;
 
 use Closure;
 use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Task;
+use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\Lti;
+use Schoolbox\Learning\Assessment\LessonPlan;
+use Schoolbox\Learning\Assessment\Quiz;
 
 /**
  * Generic timeline builder.
@@ -43,11 +50,38 @@ class Generic extends Full
             ? $this->participant->getSubmittedResponses()
             : $this->participant->getAllResponses();
 
-        // Respect mark visibility if it has been explicitly configured; otherwise
-        // default to visible (LTI assessments store a mark_visibility column
-        // but do not expose it in the UI, leaving it null).
         $markVisibility = $this->participant->getAssessable()->getMarkVisibility();
-        $isFeedbackVisible = $markVisibility === null || in_array($markVisibility, $allowedVisibilities);
+
+        if ($markVisibility === null) {
+            // Use the default value from the mark_visibility field of the relevant database table.
+            $assessment = $this->participant->getAssessable();
+            if ($assessment instanceof Project) {
+                // The default value of database column project.mark_visibility is 'staffAndStudent'.
+                $markVisibility = IAssessable::MARK_VISIBILITY_STUDENT;
+            } elseif ($assessment instanceof DueWork\Model) {
+                // The default value of database column submission_box.mark_visibility is 'staffOnly'.
+                $markVisibility = IAssessable::MARK_VISIBILITY_PRIVATE;
+            } elseif ($assessment instanceof Task\Model) {
+                // Table `task` has no mark_visibility column, which makes sense because
+                // Task\Model->getMarkVisibility() always returns MARK_VISIBILITY_PARENT_STUDENT.
+                // So this case should never execute.  Handle it anyway for completeness.
+                $markVisibility = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
+            } elseif ($assessment instanceof Quiz\Model) {
+                // The default value of database column assess.mark_visibility is 'staffAndStudent'.
+                $markVisibility = IAssessable::MARK_VISIBILITY_STUDENT;
+            } elseif ($assessment instanceof Lti\Model) {
+                // The default value of database column lti_assessment.mark_visibility is null.  Assume 'staffOnly'.
+                $markVisibility = IAssessable::MARK_VISIBILITY_PRIVATE;
+            } elseif ($assessment instanceof LessonPlan\Model) {
+                // The default value of database column lesson_plan.visibility is undefined.  Assume 'staffOnly'.
+                $markVisibility = IAssessable::MARK_VISIBILITY_PRIVATE;
+            } else {
+                // This should never execute, but handle it for completeness.
+                $markVisibility = IAssessable::MARK_VISIBILITY_PRIVATE;
+            }
+        }
+
+        $isFeedbackVisible = in_array($markVisibility, $allowedVisibilities, true);
 
         if ($isFeedbackVisible) {
             $feedbacks = $includeUnpublishedInstructorFeedback
