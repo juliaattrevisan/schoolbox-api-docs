@@ -50,7 +50,6 @@ export function loadReport(initOptions: LearnosityReportInitOptions, hasMarkVisi
                             }
                             disableTextAreas(reportId);
                         });
-
                         // to notify the report has loaded
                         useStudentStore().reportLoaded();
                     });
