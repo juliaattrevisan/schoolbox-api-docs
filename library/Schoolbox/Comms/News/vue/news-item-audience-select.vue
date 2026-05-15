@@ -816,24 +816,19 @@ export default {
                                     {{ selectedAudienceOption.namePlural }} options
                                 </legend>
                                 <div class="ss-results__scroll-container">
-                                    <ul class="ss-results__list">
+                                    <ul class="ss-results-list">
                                         <li
                                             v-for="(audienceListItem, index) in audienceListItems"
                                             :key="index"
-                                            class="ss-results-item"
+                                            class="ss-results-item checklist sbx-checkbox-radio-container"
                                         >
-                                            <div class="checklist sbx-checkbox-radio-container">
-                                                <input
-                                                    :id="`audience-list-input-${index}`"
-                                                    :value="index"
-                                                    v-model="audienceListChecked"
-                                                    class="f-no-margins"
-                                                    type="checkbox"
-                                                />
-                                                <label :for="`audience-list-input-${index}`" class="f-no-margins">{{
-                                                    audienceListItem
-                                                }}</label>
-                                            </div>
+                                            <input
+                                                :id="`audience-list-input-${index}`"
+                                                :value="index"
+                                                v-model="audienceListChecked"
+                                                type="checkbox"
+                                            />
+                                            <label :for="`audience-list-input-${index}`">{{ audienceListItem }}</label>
                                         </li>
                                     </ul>
                                 </div>

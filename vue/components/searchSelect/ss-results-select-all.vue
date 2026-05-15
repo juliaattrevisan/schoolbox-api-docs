@@ -96,20 +96,17 @@ const { isActive } = useActiveIndex(
 <template>
     <li
         ref="resultEl"
-        :class="`ss-results-item ${isActive ? 'ss-results-item--active' : ''}`"
+        :class="`ss-results-item ${isActive ? 'ss-results-item--active' : ''} checklist sbx-checkbox-radio-container`"
         data-test="ss-results-select-all"
         @mouseover="onMouseover"
     >
-        <div class="checklist sbx-checkbox-radio-container">
-            <input
-                id="checkbox-select-all"
-                class="f-no-margins"
-                type="checkbox"
-                :checked="isSelected"
-                :class="{ indeterminate: isSomeResultsSelected }"
-                @click.stop="onClick"
-            />
-            <label for="checkbox-select-all" class="f-no-margins">Select all</label>
-        </div>
+        <input
+            id="checkbox-select-all"
+            type="checkbox"
+            :checked="isSelected"
+            :class="{ indeterminate: isSomeResultsSelected }"
+            @click.stop="onClick"
+        />
+        <label for="checkbox-select-all">Select all</label>
     </li>
 </template>

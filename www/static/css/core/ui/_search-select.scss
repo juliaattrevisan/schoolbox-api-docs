@@ -14,7 +14,8 @@
     padding: 0;
     > legend {
         border: 0;
-        font-weight: var(--sbx-font-weight-active, 500);
+        font-size: var(--sbx-font-size-s, 0.8125rem);
+        font-weight: var(--sbx-font-weight-active, 600);
         margin: 0;
         padding: 0;
     }
@@ -25,13 +26,6 @@
         overflow: auto;
         width: 100%;
     }
-    &__list {
-        display: flex;
-        flex-direction: column;
-        gap: var(--sbx-size-xs, var(--spacing-s));
-        margin: 0;
-        padding: var(--sbx-size-xs, var(--spacing-s));
-    }
     &__status {
         background: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
         font-size: var(--sbx-font-size-xs, 0.825rem);
@@ -41,14 +35,21 @@
     }
 }
 
-.ss-results-item {
-    background: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
+.ss-results-list {
     display: flex;
-    font-size: var(--sbx-font-size-xs, 0.825rem);
+    flex-direction: column;
+    gap: var(--sbx-size-xs, var(--spacing-s));
     margin: 0;
-    padding: 0;
-    transition: background 0.2s;
-    width: 100%;
+    padding: var(--sbx-size-xs, var(--spacing-s));
+}
+
+.ss-results-item {
+    input[type="checkbox"],
+    input[type="radio"],
+    label {
+        margin: 0;
+    }
+    // triggered when there's keyboard navigation linked to a ss-query-input
     &--active {
         input[type="checkbox"],
         input[type="radio"] {

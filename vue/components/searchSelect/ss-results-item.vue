@@ -89,38 +89,33 @@ const { isActive } = useActiveIndex(
 <template>
     <li
         ref="resultEl"
-        :class="`ss-results-item ${isActive ? 'ss-results-item--active' : ''}`"
+        :class="`ss-results-item ${isActive ? 'ss-results-item--active' : ''} checklist sbx-checkbox-radio-container`"
         :data-test="`ss-results-item-container-${props.result.id}`"
         @mouseover="onMouseover"
     >
-        <div class="checklist sbx-checkbox-radio-container">
-            <input
-                v-if="props.isSingleSelect"
-                :id="`search-select-result-input-${result.id}`"
-                class="f-no-margins"
-                type="radio"
-                :checked="isSelected"
-                :data-test="`ss-results-item-radio-${props.result.id}`"
-                @click.stop="onClick"
-            />
-            <input
-                v-else
-                :id="`search-select-result-input-${result.id}`"
-                class="f-no-margins"
-                type="checkbox"
-                :checked="isSelected"
-                :data-test="`ss-results-item-checkbox-${props.result.id}`"
-                @click.stop="onClick"
-            />
-            <show-matches
-                tag="label"
-                :for="`search-select-result-input-${result.id}`"
-                :text="props.result.name"
-                :query="props.query"
-                :allow-partial-matches="props.allowPartialMatches"
-                :data-test="`ss-results-item-label-${props.result.id}`"
-                class="f-no-margins"
-            />
-        </div>
+        <input
+            v-if="props.isSingleSelect"
+            :id="`search-select-result-input-${result.id}`"
+            type="radio"
+            :checked="isSelected"
+            :data-test="`ss-results-item-radio-${props.result.id}`"
+            @click.stop="onClick"
+        />
+        <input
+            v-else
+            :id="`search-select-result-input-${result.id}`"
+            type="checkbox"
+            :checked="isSelected"
+            :data-test="`ss-results-item-checkbox-${props.result.id}`"
+            @click.stop="onClick"
+        />
+        <show-matches
+            tag="label"
+            :for="`search-select-result-input-${result.id}`"
+            :text="props.result.name"
+            :query="props.query"
+            :allow-partial-matches="props.allowPartialMatches"
+            :data-test="`ss-results-item-label-${props.result.id}`"
+        />
     </li>
 </template>
