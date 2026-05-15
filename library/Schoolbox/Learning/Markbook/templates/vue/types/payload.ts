@@ -111,6 +111,7 @@ export type MarkbookClassImplActivity = {
     };
     instructorMarkScheme: MarkScheme;
     markVisibility: string;
+    feedbackCommentsEnable: boolean;
     courseManaged: boolean | null;
     projectId: MarkbookClassImplActivity["id"] | null;
     writable: boolean;

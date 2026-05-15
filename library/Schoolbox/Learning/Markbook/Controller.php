@@ -235,6 +235,10 @@ class Controller extends Base
                             'weight'         => $aImpl->getWeight(),
                             'projectId'      => $parentProject?->getId(),
                             'writable'       => $this->isAssessmentMarkable($this->getUser(), $aImpl, $terms),
+                            /* feedback comments are enabled by default, unless a reporting activity opted out of them */
+                            'feedbackCommentsEnable' => $aImpl instanceof Reporting\Model
+                                ? $aImpl->getFeedbackCommentsEnable()
+                                : true,
                             'instructorMarkScheme' => $instructorMarkScheme?->generateContext(),
                             'participants'   => $markbook->getStudents()->map(
                                 function (User $student) use ($aImpl, $markbook) {

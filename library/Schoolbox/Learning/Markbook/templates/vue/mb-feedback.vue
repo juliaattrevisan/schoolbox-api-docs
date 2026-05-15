@@ -259,10 +259,18 @@ async function onFeedbackPublish(): Promise<void> {
                     style="margin-top: 0.5rem"
                 />
             </div>
+            <!--
+            If comments are disabled, unfortunately just set visibility to hidden
+            so that the height doesn't shrink and make the grade input unusable for submission states...
+            ***I KNOW*** this looks really wack with the large whitespace, we can figure something out in the future if needed.
+            -->
             <div
                 class="small-12 column mb-feedback-comment"
                 :class="{ 'medium-9': cellInfo.instructorMarkScheme.mode !== MarkTypeSlug.NONE }"
-                :style="{ maxHeight: `min(${props.maxHeight}, 90vh)` }"
+                :style="{
+                    maxHeight: `min(${props.maxHeight}, 90vh)`,
+                    visibility: cellInfo.aImpl.feedbackCommentsEnable ? undefined : 'hidden',
+                }"
             >
                 <comment-field
                     v-model:comment="cellInfo.feedback.data.comment"
