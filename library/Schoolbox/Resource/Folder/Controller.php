@@ -225,9 +225,19 @@ class Controller extends BaseController
             $templateId = HomepageTemplate::HOMEPAGE_NONE;
         } else {
             try {
-                $this->homepageConfigMapper->findOneByColumn('cid', $folder->getId());
+                $homepageConfig = $this->homepageConfigMapper->findOneByColumn('cid', $folder->getId());
                 $templateId = HomepageTemplate::HOMEPAGE_KEEP_EXISTING;
-                $homepageTemplates->prepend($this->homepageTemplateMapper->getKeepExistingHomepageTemplate());
+                $keepExistingTemplate = $this->homepageTemplateMapper->getKeepExistingHomepageTemplate();
+                if ($homepageConfig->getTemplate()) {
+                    $keepExistingTemplate->setName(
+                        sprintf(
+                            '%s (%s)',
+                            HomepageTemplate::KEEP_EXISTING_STRING,
+                            $homepageConfig->getTemplate()->getName()
+                        )
+                    );
+                }
+                $homepageTemplates->prepend($keepExistingTemplate);
             } catch (\Exception $e) {
                 $templateId = HomepageTemplate::HOMEPAGE_NONE;
             }
