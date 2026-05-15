@@ -6,12 +6,18 @@
 }
 
 .ss-results {
-    border: 0;
+    border: 0 !important; // important to override .mage > section > fieldset fieldset ~ fieldset
     display: flex;
     flex-direction: column;
     gap: var(--sbx-size-xs, var(--spacing-s));
     margin: 0;
     padding: 0;
+    > legend {
+        border: 0;
+        font-weight: var(--sbx-font-weight-active, 500);
+        margin: 0;
+        padding: 0;
+    }
     &__scroll-container {
         border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
         border-radius: var(--sbx-config-field-roundness, 0px);
