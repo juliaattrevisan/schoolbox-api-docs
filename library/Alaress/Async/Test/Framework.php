@@ -206,6 +206,7 @@ class Framework
         // outside PHPUnit’s normal runner by giving it a valid method name.  Name 'requiredDaemons' is chosen because
         // every Alaress\Async\Test\TestCase must implement that method.
         // @see library/Alaress/Async/Test/TestCase.php
+        // This was necessary in order to get test/notif/tests/testQuizNotifications.php to work.
         /** @var TestCase $testCase */
         $testCase = $rc->isSubclassOf(\PHPUnit\Framework\TestCase::class)
             ? $rc->newInstanceArgs(['requiredDaemons'])
