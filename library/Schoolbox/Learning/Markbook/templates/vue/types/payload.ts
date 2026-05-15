@@ -97,13 +97,14 @@ export type MarkbookClassImplActivity = {
             {
                 "learningAssessmentTimeline.getFullTimeline": string | null;
                 "learningDueWorkResponse.getParticularResponse": string | null;
-                "learningDueWorkFeedback.postPublishFeedback": string | null;
                 "learningAssessment.postExclude": string | null;
                 "learningAssessment.postInclude": string | null;
                 "learningAssessment.getSummary": string | null;
                 "learningAssessment.getInfo": string | null;
                 /* this will change depending on if it's a quiz or due work */
                 postFeedback: string | null;
+                /* this will change depending on if it's a due work or reporting activity */
+                postPublishFeedback: string | null;
                 getAssessmentParticipationForm: string | null;
             }
         >;

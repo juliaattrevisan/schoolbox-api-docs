@@ -126,7 +126,7 @@ const routes = window.Vue.computed(() => {
         infoEndpoint: studentRoutes?.["learningAssessment.getInfo"] ?? null,
         updateRoute: studentRoutes?.["learningDueWorkResponse.getParticularResponse"] ?? null,
         reviewRoute: studentRoutes?.["learningDueWorkResponse.getParticularResponse"] ?? null,
-        publishRoute: studentRoutes?.["learningDueWorkFeedback.postPublishFeedback"] ?? null,
+        publishRoute: studentRoutes?.postPublishFeedback ?? null,
         excludeRoute: studentRoutes?.["learningAssessment.postExclude"] ?? null,
         includeRoute: studentRoutes?.["learningAssessment.postInclude"] ?? null,
         historyRoute: studentRoutes?.["learningAssessment.getSummary"] ?? null,
@@ -614,6 +614,7 @@ function onToggleSelected(): void {
                         </pop-out-menu-item>
                     </template>
                     <template v-else-if="cellInfo.activity.assessmentType === ACTIVITY_TYPE_QUIZ">
+                        <!-- TODO: hmm, why doesn't quiz get a :link -->
                         <pop-out-menu-item
                             v-if="!cellInfo.participant.isExcluded"
                             :class="{ 'is-disabled': !routes.postFeedback }"
@@ -621,6 +622,21 @@ function onToggleSelected(): void {
                             @selected="onUpdateFeedbackSelected"
                         >
                             Update Feedback
+                        </pop-out-menu-item>
+                    </template>
+                    <template v-else-if="cellInfo.activity.assessmentType === ACTIVITY_TYPE_REPORTING">
+                        <pop-out-menu-item
+                            :class="{ 'is-disabled': !routes.reviewRoute || isActivityEmpty || !hasSubmissions }"
+                            :link="routes.reviewRoute ? getReturnUrl(routes.reviewRoute) : undefined"
+                        >
+                            Review Submission
+                        </pop-out-menu-item>
+                        <!-- TODO: make this publish logic the same as the rest I guess -->
+                        <pop-out-menu-item
+                            :class="{ 'is-disabled': !routes.publishRoute || isActivityEmpty || !hasDraftFeedback }"
+                            @selected="onMenuItemSelected(routes.publishRoute, 'publish')"
+                        >
+                            Publish Feedback
                         </pop-out-menu-item>
                     </template>
                 </template>
@@ -654,7 +670,8 @@ function onToggleSelected(): void {
                             !routes.historyRoute ||
                             cellInfo.participant.isExcluded ||
                             (isActivityEmpty && cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK) ||
-                            (isActivityEmpty && cellInfo.activity.assessmentType === ACTIVITY_TYPE_DIALOG_AGENT),
+                            (isActivityEmpty && cellInfo.activity.assessmentType === ACTIVITY_TYPE_DIALOG_AGENT) ||
+                            (isActivityEmpty && cellInfo.activity.assessmentType === ACTIVITY_TYPE_REPORTING),
                     }"
                     :link="routes.historyRoute ? getReturnUrl(routes.historyRoute) : undefined"
                 >

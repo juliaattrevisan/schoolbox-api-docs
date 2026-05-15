@@ -451,15 +451,6 @@ class Controller extends WebController\Base
                                                     'student' => $student,
                                                 ]
                                             ),
-                                            'learningDueWorkFeedback.postPublishFeedback' => $this->getRouteIfAuthorized(
-                                                'learningDueWorkFeedback.postPublishFeedback',
-                                                [
-                                                    'assessment' => $aImpl,
-                                                    'assessmentId' => $aImpl->getId(),
-                                                    'studentId' => $student->getId(),
-                                                    'student' => $student,
-                                                ]
-                                            ),
                                             'learningAssessment.postExclude' => $this->getRouteIfAuthorized(
                                                 'learningAssessment.postExclude',
                                                 [
@@ -513,6 +504,26 @@ class Controller extends WebController\Base
                                                         'assessmentId' => $aImpl->getId(),
                                                         'studentId' => $student->getId(),
                                                         'student' => $student,
+                                                    ],
+                                                ) : null
+                                            ),
+                                            /* this will change depending on if it's due work or reporting activity */
+                                            'postPublishFeedback' =>
+                                                $aImpl instanceof DueWork\Model ? $this->getRouteIfAuthorized(
+                                                    'learningDueWorkFeedback.postPublishFeedback',
+                                                    [
+                                                        'assessment' => $aImpl,
+                                                        'assessmentId' => $aImpl->getId(),
+                                                        'studentId' => $student->getId(),
+                                                        'student' => $student,
+                                                    ]
+                                                ) : ($aImpl instanceof Reporting\Model ? $this->getRouteIfAuthorized(
+                                                    'learningReportingFeedback.postPublishFeedback',
+                                                    [
+                                                        'assessment' => $aImpl,
+                                                        'assessmentId' => $aImpl->getId(),
+                                                        'learnerId' => $student->getId(),
+                                                        'learner' => $student,
                                                     ],
                                                 ) : null
                                             ),

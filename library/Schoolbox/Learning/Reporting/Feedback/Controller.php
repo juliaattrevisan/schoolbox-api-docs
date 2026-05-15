@@ -13,6 +13,7 @@ namespace Schoolbox\Learning\Reporting\Feedback;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
@@ -448,5 +449,41 @@ class Controller extends Base
         }
 
         $this->response = $this->responseAsJson($results);
+    }
+
+
+    /**
+     * Publish last draft feedback for a participant.
+     *
+     * This is a dueWork/reporting-only route. It is not applicable to Project, Quiz, Task, or Dialog Agent.
+     *
+     * @param Reporting\Model $assessment
+     * @param User $learner
+     */
+    public function postPublishFeedback(Reporting\Model $assessment, User $learner)
+    {
+        $participant = $assessment->getParticipant($learner);
+        $feedback = $participant->findMostRecentInstructorGivenFeedback();
+
+        if (null === $feedback) {
+            throw new NotFound("No Feedback for assessment.");
+        }
+
+        if (!$feedback->isPublished()) {
+            // publish this
+            $feedback->setPublishedAt(Alaress_Date_Format::now());
+        }
+
+        $this->feedbackDataSource->save($feedback);
+
+        // Update project mark as the published feedback may affect the project cache
+        (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))
+            ->refresh($this->assessmentDataSource, $assessment, $learner);
+
+        $this->responseAsJson([
+            'success' => true,
+            'message' => 'OK',
+            'id'      => $feedback->getId(),
+        ]);
     }
 }

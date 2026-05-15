@@ -94,6 +94,7 @@ class Module extends BaseModule
         $this->register('GET', '/{assessmentId}/feedback/view', 'getFirstParticipantFeedback', $lmsStaff, $preloadAssessment);
         $this->register('GET', '/{assessmentId}/{learnerId}/feedback{/feedbackId:\d+}', 'getParticularFeedback', $lmsStaff, $preloadParticipant);
         $this->register('POST', '/{assessmentId}/{learnerId}/feedback{/feedbackId:\d+}', 'postParticularFeedback', $lmsStaff, $preloadParticipant);
+        $this->register('POST', '/{assessmentId}/{learnerId}/feedback/publish', 'postPublishFeedback', $lmsStaff, $preloadParticipant);
         $this->register('POST', '/{assessmentId}/feedbacks', 'postParticipantFeedbacks', $canGiveFeedbackForAssessment, $preloadAssessment);
     }
 
@@ -123,7 +124,7 @@ class Module extends BaseModule
 
         /* If a feedbackId was provided, load that particular feedback up
          */
-        if ($params['feedbackId']) {
+        if ($params['feedbackId'] ?? false) {
             // Feedback will already be loaded in $assessment; no need to load again.
             // We don't know the participant yet though, so find that.
             foreach ($assessment->getAllParticipants() as $p) {
