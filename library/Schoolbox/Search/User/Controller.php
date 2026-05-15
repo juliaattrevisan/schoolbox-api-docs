@@ -572,6 +572,10 @@ class Controller extends BaseController
              * See tabConstraintsRoleType
              */
             'contacts'     => true,
+            /**
+             * TODO: Update this when we decided what is the trigger for the IB registration feature
+             */
+            'registration' => $this->getConfigLoader()->get('ib_school_name'),
         ];
 
         /* Decide whether the Contacts tab should show for the viewer:
