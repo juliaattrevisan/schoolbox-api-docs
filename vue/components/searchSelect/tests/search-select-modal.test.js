@@ -7,6 +7,7 @@ jest.mock("@vueuse/core", () => {
     return {
         onClickOutside: jest.fn(),
         useFocus: jest.fn(() => ({ focused: ref(true) })),
+        useResizeObserver: jest.fn(),
     };
 });
 

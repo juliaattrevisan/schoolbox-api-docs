@@ -133,7 +133,7 @@ test("select all can be used to add/remove all search results", async () => {
     /**
      * Add all search results
      */
-    const selectAll = wrapper.get(`[data-test="ss-results-select-all"]`);
+    const selectAll = wrapper.get(`[data-test="ss-results-select-all"] input`);
     selectAll.trigger("click"); // add the search result to the selected items
     await wrapper.vm.$nextTick();
     expect(wrapper.findAll('[data-test^="ss-selected-item-container-"]')).toHaveLength(3); // validate the items have been added to the UI
