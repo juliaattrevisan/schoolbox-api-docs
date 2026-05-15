@@ -152,9 +152,9 @@ window.Vue.watch(
 );
 </script>
 <template>
-    <fieldset ref="resultsEl" class="ss-results">
+    <fieldset class="ss-results">
         <legend class="t-visually-hidden">Search results</legend>
-        <div class="ss-results__scroll-container">
+        <div ref="resultsEl" class="ss-results__scroll-container">
             <p v-if="props.isSearching" class="ss-results__status">Searching for results....</p>
             <p v-else-if="props.hasNoResults" class="ss-results__status">No results found for your current search.</p>
             <ul v-else class="ss-results-list">
