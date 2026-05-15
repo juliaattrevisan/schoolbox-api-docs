@@ -132,7 +132,7 @@ class Importer
             // Note IAssessable::MARK_VISIBILITY_PARENT was introduced in 26.1.
         }
 
-        throw new \UnexpectedValueException("Unknown legacy mark visibility value: $value");
+        throw new \UnexpectedValueException("Unknown mark visibility value: $value");
     }
 
 
