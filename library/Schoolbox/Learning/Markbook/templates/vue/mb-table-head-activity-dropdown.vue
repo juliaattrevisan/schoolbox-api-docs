@@ -34,7 +34,11 @@ const viewStudentParticipationLink = window.Vue.computed(() => {
 
 <template>
     <li class="separator">Activity</li>
-    <li v-if="props.activity._links?.summary" :data-test="`markbook-assessment-dropdown-${props.activity.id}-view`">
+    <!-- Reporting doesn't get "View" since it's equivalent to "View Status".... the route perms aren't enough -->
+    <li
+        v-if="props.activity._links?.summary && props.activity.assessmentType !== ACTIVITY_TYPE_REPORTING"
+        :data-test="`markbook-assessment-dropdown-${props.activity.id}-view`"
+    >
         <a :href="getReturnUrl(props.activity._links.summary)" class="sbx-button--has-icon"
             ><sbx-icon name="view"></sbx-icon>View</a
         >
