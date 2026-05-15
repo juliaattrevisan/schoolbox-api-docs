@@ -67,6 +67,7 @@ class ModelToArray
             'userName' => $userName,
             'hasMissingDetails' => $missingFields !== [],
             'missingFields' => $missingFields,
+            'session' => $this->buildSession($student),
             'candidateDetails' => $this->buildCandidateDetails(
                 [
                     'firstName' => $firstName,
@@ -89,6 +90,19 @@ class ModelToArray
                 'renotify' => $this->buildRenotifyRoute($student),
             ],
         ];
+    }
+
+    private function buildSession(Model $student): string
+    {
+        $registrationSession = $student->getRegistrationSession();
+        $examSession = $this->helper->normalise($registrationSession?->getExamSession());
+        $academicYear = $this->helper->normalise($registrationSession?->getAcademicYear());
+
+        if ($examSession === '' && $academicYear === '') {
+            return '';
+        }
+
+        return trim("{$examSession} {$academicYear}");
     }
 
     /**

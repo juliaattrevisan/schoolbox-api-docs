@@ -803,6 +803,7 @@
                                 + registrationPayload.ibGroupSubjects.Core|length
                             %}
                             {% if totalSubjects %}
+                                {% set registrationSession = registrationPayload.session is defined ? registrationPayload.session : '' %}
                                 <table>
                                     <thead>
                                         <tr>
@@ -822,16 +823,12 @@
                                                 {% set level = subject.level == 'Core' ? '' : subject.level %}
                                                 {% if subject.languages|length %}
                                                     {% for language in subject.languages %}
-                                                        {% set classCodes = [] %}
-                                                        {% for classCode in language.classCode %}
-                                                            {% set classCodes = classCodes|merge([classCode.code]) %}
-                                                        {% endfor %}
                                                         <tr>
                                                             <td>{{ groupName }}</td>
                                                             <td>{{ subject.subject }}</td>
                                                             <td>{{ level }}</td>
                                                             <td>{{ language.languageName ?: 'Missing' }}</td>
-                                                            <td>{{ classCodes|length ? classCodes|join(', ') : 'Not mapped' }}</td>
+                                                            <td>{{ registrationSession }}</td>
                                                             <td>Yes</td>
                                                         </tr>
                                                     {% endfor %}
@@ -841,7 +838,7 @@
                                                         <td>{{ subject.subject }}</td>
                                                         <td>{{ level }}</td>
                                                         <td><span class="alert label">Missing</span></td>
-                                                        <td>Not mapped</td>
+                                                        <td>{{ registrationSession }}</td>
                                                         <td>Yes</td>
                                                     </tr>
                                                 {% endif %}

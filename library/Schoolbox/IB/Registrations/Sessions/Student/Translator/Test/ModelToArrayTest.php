@@ -46,6 +46,7 @@ class ModelToArrayTest extends TestCase
         $this->assertSame('Alex, Nguyen', $payload['userName']);
         $this->assertFalse($payload['hasMissingDetails']);
         $this->assertSame([], $payload['missingFields']);
+        $this->assertSame('May 2026', $payload['session']);
         $this->assertSame(
             [
                 'left' => [
@@ -312,7 +313,12 @@ class ModelToArrayTest extends TestCase
         return (new RegistrationSessionStudentModel())
             ->setId(456)
             ->setStatus(RegistrationSessionStudentModel::STATUS_CONFIRMED)
-            ->setRegistrationSession((new RegistrationSessionModel())->setId(12))
+            ->setRegistrationSession(
+                (new RegistrationSessionModel())
+                    ->setId(12)
+                    ->setExamSession('May')
+                    ->setAcademicYear('2026')
+            )
             ->setUser(
                 (new User())
                     ->setId(123)
