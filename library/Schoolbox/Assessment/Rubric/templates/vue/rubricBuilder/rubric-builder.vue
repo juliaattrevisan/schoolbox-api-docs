@@ -37,7 +37,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const rubricGrids = window.Vue.ref(cloneDeep(props.rubricGridsPayload)); // local mutable copy
-const initialGridIds = props.rubricGridsPayload.map((grid) => grid.id); // so that imported rubrics can expand by default
+const initialRubricIds = props.rubricGridsPayload.map((grid) => grid.id); // so that imported rubrics can expand by default
 
 /**
  * Calculates the assessment's total weight from the rubric grids
@@ -271,7 +271,7 @@ const rubricRows = window.Vue.computed(() => {
         data-rubric-builder-row
     >
         <fieldset-collapsible
-            :initially-expanded="rubric.id === 'create' || rubric.id < 0 || !initialGridIds.includes(rubric.id)"
+            :initially-expanded="rubric.id === 'create' || rubric.id < 0 || !initialRubricIds.includes(rubric.id)"
         >
             <template #legend>
                 Rubric {{ index + 1 }}

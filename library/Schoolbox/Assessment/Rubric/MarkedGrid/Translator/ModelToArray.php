@@ -54,7 +54,7 @@ class ModelToArray
         $canSeeMark = !($feedback->getAssessable() instanceof ISelfAssessableFeedback) || ($feedback instanceof DueWorkFeedback && $feedback->isSelfGrading());
 
         return [
-            'gridId' => $markedGrid->getGrid()->getId(),
+            'rubricId' => $markedGrid->getGrid()->getRubricInstance()->getId(),
             'humanReadableMark' => $canSeeMark ? $markedGrid->retrieveHumanReadableMark() : null,
             'normalisedMark' => $canSeeMark ? $markedGrid->retrieveNormalizedMark() : null,
             'capabilities' => $capabilities,

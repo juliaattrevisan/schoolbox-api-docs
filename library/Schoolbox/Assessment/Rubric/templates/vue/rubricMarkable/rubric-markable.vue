@@ -74,7 +74,7 @@ const rubrics = window.Vue.ref<RubricData[]>(
     props.rubricMarkedGridsPayload.map((payload) => {
         /** A blank marked grid which will be used if one isn't provided */
         const blankMarkedGrid: RubricMarkedGrid = {
-            gridId: payload.rubric.id,
+            rubricId: payload.rubric.id,
             capabilities: payload.rubric.capabilities.map((capability): RubricMarkedGridCapability => {
                 return {
                     id: capability.id,

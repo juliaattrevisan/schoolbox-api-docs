@@ -46,9 +46,9 @@ class Base
         }
 
         return [
-            'id' => $rubricGrid->getId(),
-            'title' => '(backend unimplemented)', // TODO: rubric title, string (not null)
-            'weight' => null, // TODO: rubric weight, number|null
+            'id' => $rubricGrid->getRubricInstance()->getId(),
+            'title' => $rubricGrid->getRubricInstance()->getTitle(),
+            'weight' => $rubricGrid->getRubricInstance()->getWeight(),
             'derivedMaxValue' => $rubricGrid->calculateMaxValueFromCapabilities(), // TODO: rubric-markable only, and check if it matters for perms
             'capabilityMarkScheme' => [
                 // TODO: this array format has been used at least 4 times now... (here, grid-markable.twig, and course/class markbooks)

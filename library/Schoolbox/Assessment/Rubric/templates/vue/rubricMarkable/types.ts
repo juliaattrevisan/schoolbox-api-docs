@@ -63,7 +63,7 @@ export type RubricGridDescriptor = {
  * @see /library/Schoolbox/Assessment/Rubric/MarkedGrid/Translator/ModelToArray.php
  */
 export type RubricMarkedGrid = {
-    gridId: RubricGrid["id"];
+    rubricId: RubricGrid["id"];
     /**
      * the overall human-readable mark given
      * null if it shouldn't be displayed / doesn't exist (e.g. for self assessment feedback, if feedback.isSelfGrading is false)
