@@ -93,7 +93,8 @@ const viewStudentParticipationLink = window.Vue.computed(() => {
     <!-- Additional check for whether all impls are writable before opening the bulk publish -->
     <template
         v-if="
-            props.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK &&
+            (props.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK ||
+                props.activity.assessmentType === ACTIVITY_TYPE_REPORTING) &&
             activity._routes.postFeedbacks &&
             mbStore.isActivityWritable(props.activity)
         "

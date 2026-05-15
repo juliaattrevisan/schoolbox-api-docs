@@ -26,6 +26,7 @@ use Schoolbox\Learning\Assessment\DialogAgent;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\Quiz;
 use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Reporting;
 use Schoolbox\Learning\Assessment\Task;
 use Schoolbox\Learning\Assessment\Feedback\Visibility;
 use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
@@ -290,13 +291,20 @@ class Controller extends WebController\Base
                          */
                         '_links'          => $assessment->isDeleted() ? null : $unitAssessmentsTranslator->getLinks($assessment, true),
                         '_routes'         => [
-                            'postFeedbacks' => $this->getRouteIfAuthorized(
+                            /* this will change depending on if it's due work or reporting activity */
+                            'postFeedbacks' => $assessment instanceof DueWork\Model ? $this->getRouteIfAuthorized(
                                 'learningDueWorkFeedback.postParticipantFeedbacks',
                                 [
                                     'assessment'   => $assessment,
                                     'assessmentId' => $assessment->getId(),
                                 ]
-                            ),
+                            ) : ($assessment instanceof Reporting\Model ? $this->getRouteIfAuthorized(
+                                'learningReportingFeedback.postParticipantFeedbacks',
+                                [
+                                    'assessment'   => $assessment,
+                                    'assessmentId' => $assessment->getId(),
+                                ]
+                            ) : null),
                         ],
                     ];
                 })->indexByCallback(fn(array $assessment) => $assessment['id']),

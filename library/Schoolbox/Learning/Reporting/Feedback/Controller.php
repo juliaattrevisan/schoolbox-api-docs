@@ -11,15 +11,22 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Reporting\Feedback;
 
 use Alaress\Web\Controller\Base;
+use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Reporting;
 use Schoolbox\Learning\Assessment\Reporting\Model;
 use Schoolbox\Learning\DueWork\StateMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Twig\Error\Error;
 
@@ -36,6 +43,10 @@ class Controller extends Base
         private StateMapper $stateMapper,
         private Participant\DataSource $participantDataSource,
         private IFeedbackDataSource $feedbackDataSource,
+        private \Schoolbox\Learning\Assessment\DataModel\Reporting\Feedback\Mapper $feedbackDataMapper,
+        private AssessmentDataSource $assessmentDataSource,
+        private Project\ResultCache\Mapper $projectResultCacheMapper,
+        private Access $access,
     ) {
         /* TODO Technical Uplift Candidate
          *  StateMapper.
@@ -348,5 +359,94 @@ class Controller extends Base
         ];
 
         $this->response = $this->responseAsJson($data);
+    }
+
+
+    /**
+     * Submit multiple feedbacks in single call
+     *
+     * This is a dueWork-only route
+     *
+     * @param Reporting\Model $assessment
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     */
+    public function postParticipantFeedbacks(Reporting\Model $assessment)
+    {
+        /** @var int[] $draftFeedbackIds */
+        $draftFeedbackIds = $this->requestPost->get('drafts', []);
+        $now              = Alaress_Date_Format::now();
+        $results = [];
+        $projectCache = (new Project\ResultCache\ResultCache($this->projectResultCacheMapper));
+
+        /* if this is a spec assessment, we want all implementation children assessments,
+         * with hydrated participants so we can publish all the users quickly and easily.
+         *
+         * we should be using filters, so we aren't hydrating all participation for all current assessments
+         * but we can hydrate only students for assessments that are still active, and we have write access to.
+        */
+        $aImpls = new GenericCollection(Reporting\Model::class);
+        if ($assessment->isSpecification()) {
+            $lockChecker = (new LockedChecker($this->termMapper));
+            $user = $this->getUser();
+            $access = $this->access;
+
+            // only fetch implementation assessments that are 'not locked' (i.e. not in archived terms)
+            $aImpls = $this->assessmentDataSource
+                ->findAllImplementationsBySpecificationId($assessment->getId())
+                ->filter(
+                    function (Reporting\Model $aImpl) use ($lockChecker, $access, $user) {
+                        if ($lockChecker->isLockedForInteractions($aImpl)) {
+                            // exit early if the assessment is locked
+                            return false;
+                        }
+
+                        // ensure the current user has write+ access to the homepage (See Rule\HasHomepageAccess)
+                        try {
+                            $permission = $access->getFolderAccess($user, $aImpl->getBaseContext()->getFolder()->getId());
+                        } catch (MapperException $e) {
+                            // exit early
+                            return false;
+                        }
+                        return $permission >= UserAccess::ACCESS_WRITE;
+                    }
+                )
+                ->indexBy('id');
+
+            // hydrate participants
+            $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($aImpls, null, true);
+        } else {
+            $aImpls->add($assessment)->indexBy('id');
+        }
+
+        foreach ($draftFeedbackIds as $draftFeedbackId) {
+            // Verify that this feedback is for this assessment / find the relevant implementation for this feedback
+            $feedback = $this->feedbackDataMapper->findById($draftFeedbackId);
+            $publishSuccess   = false;
+
+            $aImpl = $aImpls->getBy('id', $feedback->getReporting()->getAssessmentModel()->getId());
+            if (!$aImpl) {
+                $results[$draftFeedbackId] = ['publishSuccess' => false, 'error' => 'Assessment not found'];
+                continue;
+            }
+
+            $feedback->setPublishedAt($now);
+
+            try {
+                $this->feedbackDataMapper->save($feedback);
+                $publishSuccess = true;
+
+                /* Update project result cache when Publish All is used
+                 */
+                $projectCache->refresh($this->assessmentDataSource, $aImpl, $feedback->getLearner());
+            } catch (\PDOException | \DomainException | \InvalidArgumentException | \LogicException | \UnexpectedValueException $e) {
+                // TODO: ^ do we reallllly need to catch all of those? surely we want to know about some of this stuff
+                $publishSuccess = false;
+            }
+
+            $results[$draftFeedbackId] = ['publishSuccess'   => $publishSuccess];
+        }
+
+        $this->response = $this->responseAsJson($results);
     }
 }

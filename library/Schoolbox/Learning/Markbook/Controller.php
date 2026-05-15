@@ -166,10 +166,20 @@ class Controller extends Base
                         'stats'           => null,
                         '_links'          => $unitAssessmentsTranslator->getLinks($assessment, true),
                         '_routes'         => [
-                            'postFeedbacks' => $this->getRouteIfAuthorized(
+                            /* this will change depending on if it's due work or reporting activity */
+                            'postFeedbacks' => $assessment instanceof DueWork\Model ? $this->getRouteIfAuthorized(
                                 'learningDueWorkFeedback.postParticipantFeedbacks',
-                                ['assessment' => $assessment, 'assessmentId' => $assessment->getId()]
-                            ),
+                                [
+                                    'assessment'   => $assessment,
+                                    'assessmentId' => $assessment->getId(),
+                                ]
+                            ) : ($assessment instanceof Reporting\Model ? $this->getRouteIfAuthorized(
+                                'learningReportingFeedback.postParticipantFeedbacks',
+                                [
+                                    'assessment'   => $assessment,
+                                    'assessmentId' => $assessment->getId(),
+                                ]
+                            ) : null),
                         ],
                     ];
                 })->indexByCallback(fn(array $assessment) => $assessment['id']),
