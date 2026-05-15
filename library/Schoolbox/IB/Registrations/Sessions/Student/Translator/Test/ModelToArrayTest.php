@@ -48,6 +48,75 @@ class ModelToArrayTest extends TestCase
         $this->assertSame([], $payload['missingFields']);
         $this->assertSame(
             [
+                'left' => [
+                    [
+                        'key' => 'dateOfBirth',
+                        'label' => 'Date of Birth',
+                        'value' => '2009-04-12',
+                        'isMissing' => false,
+                    ],
+                    [
+                        'key' => 'email',
+                        'label' => 'Email',
+                        'value' => 'alex.nguyen@example.edu',
+                        'isMissing' => false,
+                    ],
+                    [
+                        'key' => 'firstName',
+                        'label' => 'First Name',
+                        'value' => 'Alex',
+                        'isMissing' => false,
+                    ],
+                    [
+                        'key' => 'lastName',
+                        'label' => 'Last Name',
+                        'value' => 'Nguyen',
+                        'isMissing' => false,
+                    ],
+                    [
+                        'key' => 'gender',
+                        'label' => 'Gender',
+                        'value' => 'F',
+                        'isMissing' => false,
+                    ],
+                ],
+                'right' => [
+                    [
+                        'key' => 'language1',
+                        'label' => 'Language 1',
+                        'value' => 'English (ENG)',
+                        'isMissing' => false,
+                    ],
+                    [
+                        'key' => 'language2',
+                        'label' => 'Language 2 (not required)',
+                        'value' => 'French (FRA)',
+                        'isMissing' => false,
+                    ],
+                    [
+                        'key' => 'nationality1',
+                        'label' => 'Nationality 1',
+                        'value' => 'Australian (AUS)',
+                        'isMissing' => false,
+                    ],
+                    [
+                        'key' => 'nationality2',
+                        'label' => 'Nationality 2 (not required)',
+                        'value' => 'New Zealander (NZL)',
+                        'isMissing' => false,
+                    ],
+                    [
+                        'key' => 'referenceCode',
+                        'label' => 'Reference Code',
+                        'value' => '-',
+                        'isMissing' => false,
+                    ],
+                ],
+            ],
+            $payload['candidateDetails']
+        );
+        $this->assertSame(
+            [
                 'updateLanguages' => '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/123/languages',
                 'updateConfirmation' => '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/123/confirmation',
                 'renotify' => null,
@@ -82,6 +151,19 @@ class ModelToArrayTest extends TestCase
 
         $this->assertSame(', Nguyen', $payload['userName']);
         $this->assertTrue($payload['hasMissingDetails']);
+        $candidateDetailsByKey = array_column(
+            array_merge($payload['candidateDetails']['left'], $payload['candidateDetails']['right']),
+            null,
+            'key'
+        );
+        $this->assertSame('Missing', $candidateDetailsByKey['firstName']['value']);
+        $this->assertTrue($candidateDetailsByKey['firstName']['isMissing']);
+        $this->assertSame('Nguyen', $candidateDetailsByKey['lastName']['value']);
+        $this->assertFalse($candidateDetailsByKey['lastName']['isMissing']);
+        $this->assertSame('Not provided', $candidateDetailsByKey['language2']['value']);
+        $this->assertFalse($candidateDetailsByKey['language2']['isMissing']);
+        $this->assertSame('Not provided', $candidateDetailsByKey['nationality2']['value']);
+        $this->assertFalse($candidateDetailsByKey['nationality2']['isMissing']);
         $this->assertSame(
             [
                 'firstName',
@@ -138,6 +220,7 @@ class ModelToArrayTest extends TestCase
                     [
                         'id' => 321,
                         'groupId' => 7,
+                        'group' => 'Language Acquisition',
                         'subject' => 'French',
                         'level' => 'HL',
                         'languages' => [
@@ -159,6 +242,7 @@ class ModelToArrayTest extends TestCase
                     [
                         'id' => 322,
                         'groupId' => 8,
+                        'group' => 'Core',
                         'subject' => 'Theory of Knowledge (TOK)',
                         'level' => 'Core',
                         'languages' => [],

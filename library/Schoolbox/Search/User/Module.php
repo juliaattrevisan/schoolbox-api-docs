@@ -24,6 +24,9 @@ use Twig\Error\LoaderError;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 use Schoolbox\Editor\Templates\Mapper as EditorTemplateMapper;
 use Schoolbox\Admin\Editor\Templates\Category\Model as EditorTemplatesCategoryModel;
+use Schoolbox\IB\Registrations\Sessions\Student\Helper as RegistrationSessionStudentHelper;
+use Schoolbox\IB\Registrations\Sessions\Student\Mapper as RegistrationSessionStudentMapper;
+use Schoolbox\IB\Registrations\Sessions\Student\Translator\ModelToArray as RegistrationSessionStudentModelToArray;
 
 /**
  * The module for user profile page.
@@ -53,6 +56,8 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
+        $registrationSessionStudentHelper = new RegistrationSessionStudentHelper();
+
         return new Controller(
             $this->getMapperFactory()->get(UserMapper::class),
             $this->getMapperFactory()->get(RoleMapper::class),
@@ -82,6 +87,13 @@ class Module extends BaseModule
                 $this->injector->get('user')
             ),
             $this->getMapperFactory()->get(\Schoolbox\DifferentiationProfile\Mapper::class),
+            $this->getMapperFactory()->get(RegistrationSessionStudentMapper::class),
+            new RegistrationSessionStudentModelToArray(
+                $registrationSessionStudentHelper,
+                $this->getRouter()->getGenerator(),
+                $this->getAuthorizer(),
+                $this->injector->get('user'),
+            ),
         );
     }
 

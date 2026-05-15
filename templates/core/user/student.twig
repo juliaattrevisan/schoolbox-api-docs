@@ -332,6 +332,7 @@
                     case '#tab-classes':
                     case '#tab-groups':
                     case '#tab-contacts':
+                    case '#tab-registration':
                         $.fn.scrollToTop({
                             scrollOnInit: true,
                             scrollTo: '[data-tab]',
@@ -745,6 +746,117 @@
                         </section>
                     </div>
                 {% endif %}
+            {% endif %}
+
+            {% if 'registration' in possibleTabNames %}
+                <div class="content no-pad {% if activeTab == 'registration' %}active{% endif %}" id="tab-registration">
+                    <section class="content">
+                        {% if registrationPayload %}
+                            <h2>Candidate details</h2>
+                            <table>
+                                <tbody>
+                                    {% for leftDetail in registrationPayload.candidateDetails.left %}
+                                        {% set rightDetail = registrationPayload.candidateDetails.right[loop.index0] %}
+                                        <tr>
+                                            <td>
+                                                <div class="l-flex-row l-flex--align-center l-flex--no-wrap l-gap-xs">
+                                                    <strong class="l-flex__item--0-shrink">{{ leftDetail.label }}</strong>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="l-flex__item--1-grow">
+                                                    {% if leftDetail.isMissing %}
+                                                        <span class="alert label">{{ leftDetail.value }}</span>
+                                                    {% else %}
+                                                        {{ leftDetail.value }}
+                                                    {% endif %}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="l-flex-row l-flex--align-center l-flex--no-wrap l-gap-xs">
+                                                    <strong class="l-flex__item--0-shrink">{{ rightDetail.label }}</strong>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="l-flex__item--1-grow">
+                                                    {% if rightDetail.isMissing %}
+                                                        <span class="alert label">{{ rightDetail.value }}</span>
+                                                    {% else %}
+                                                        {{ rightDetail.value }}
+                                                    {% endif %}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+
+                            <h2>Subject details</h2>
+                            {% set subjectGroups = {
+                                'HL': 'Higher Level',
+                                'SL': 'Standard Level',
+                                'Core': 'Core',
+                            } %}
+                            {% set totalSubjects =
+                                registrationPayload.ibGroupSubjects.HL|length
+                                + registrationPayload.ibGroupSubjects.SL|length
+                                + registrationPayload.ibGroupSubjects.Core|length
+                            %}
+                            {% if totalSubjects %}
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Group</th>
+                                            <th scope="col">Subject Name</th>
+                                            <th scope="col">Level</th>
+                                            <th scope="col">Language</th>
+                                            <th scope="col">Session</th>
+                                            <th scope="col">Anticipated Subject</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for groupKey, groupLabel in subjectGroups %}
+                                            {% set groupSubjects = registrationPayload.ibGroupSubjects[groupKey] %}
+                                            {% for subject in groupSubjects %}
+                                                {% set groupName = subject.group is defined and subject.group ? subject.group : groupLabel %}
+                                                {% set level = subject.level == 'Core' ? '' : subject.level %}
+                                                {% if subject.languages|length %}
+                                                    {% for language in subject.languages %}
+                                                        {% set classCodes = [] %}
+                                                        {% for classCode in language.classCode %}
+                                                            {% set classCodes = classCodes|merge([classCode.code]) %}
+                                                        {% endfor %}
+                                                        <tr>
+                                                            <td>{{ groupName }}</td>
+                                                            <td>{{ subject.subject }}</td>
+                                                            <td>{{ level }}</td>
+                                                            <td>{{ language.languageName ?: 'Missing' }}</td>
+                                                            <td>{{ classCodes|length ? classCodes|join(', ') : 'Not mapped' }}</td>
+                                                            <td>Yes</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <tr>
+                                                        <td>{{ groupName }}</td>
+                                                        <td>{{ subject.subject }}</td>
+                                                        <td>{{ level }}</td>
+                                                        <td><span class="alert label">Missing</span></td>
+                                                        <td>Not mapped</td>
+                                                        <td>Yes</td>
+                                                    </tr>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            {% else %}
+                                <p>No subjects are available for this registration.</p>
+                            {% endif %}
+                        {% else %}
+                            <p>No registration details are available.</p>
+                        {% endif %}
+                    </section>
+                </div>
             {% endif %}
 
             {% if 'contacts' in possibleTabNames %}

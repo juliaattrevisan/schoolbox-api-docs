@@ -99,6 +99,72 @@ class ControllerTest extends TestCase
                     'userName' => 'Alex, Nguyen',
                     'hasMissingDetails' => false,
                     'missingFields' => [],
+                    'candidateDetails' => [
+                        'left' => [
+                            [
+                                'key' => 'dateOfBirth',
+                                'label' => 'Date of Birth',
+                                'value' => '2009-04-12',
+                                'isMissing' => false,
+                            ],
+                            [
+                                'key' => 'email',
+                                'label' => 'Email',
+                                'value' => 'alex.nguyen@example.edu',
+                                'isMissing' => false,
+                            ],
+                            [
+                                'key' => 'firstName',
+                                'label' => 'First Name',
+                                'value' => 'Alex',
+                                'isMissing' => false,
+                            ],
+                            [
+                                'key' => 'lastName',
+                                'label' => 'Last Name',
+                                'value' => 'Nguyen',
+                                'isMissing' => false,
+                            ],
+                            [
+                                'key' => 'gender',
+                                'label' => 'Gender',
+                                'value' => 'F',
+                                'isMissing' => false,
+                            ],
+                        ],
+                        'right' => [
+                            [
+                                'key' => 'language1',
+                                'label' => 'Language 1',
+                                'value' => 'English (ENG)',
+                                'isMissing' => false,
+                            ],
+                            [
+                                'key' => 'language2',
+                                'label' => 'Language 2',
+                                'value' => 'Not provided',
+                                'isMissing' => false,
+                            ],
+                            [
+                                'key' => 'nationality1',
+                                'label' => 'Nationality 1',
+                                'value' => 'Australian (AUS)',
+                                'isMissing' => false,
+                            ],
+                            [
+                                'key' => 'nationality2',
+                                'label' => 'Nationality 2',
+                                'value' => 'Not provided',
+                                'isMissing' => false,
+                            ],
+                            [
+                                'key' => 'referenceCode',
+                                'label' => 'Reference Code',
+                                'value' => 'Alex, Nguyen',
+                                'isMissing' => false,
+                            ],
+                        ],
+                    ],
                     'ibGroupSubjects' => [
                         'HL' => [],
                         'SL' => [],
@@ -122,6 +188,72 @@ class ControllerTest extends TestCase
                     'userName' => 'Sam, Patel',
                     'hasMissingDetails' => false,
                     'missingFields' => [],
+                    'candidateDetails' => [
+                        'left' => [
+                            [
+                                'key' => 'dateOfBirth',
+                                'label' => 'Date of Birth',
+                                'value' => '2008-09-24',
+                                'isMissing' => false,
+                            ],
+                            [
+                                'key' => 'email',
+                                'label' => 'Email',
+                                'value' => 'sam.patel@example.edu',
+                                'isMissing' => false,
+                            ],
+                            [
+                                'key' => 'firstName',
+                                'label' => 'First Name',
+                                'value' => 'Sam',
+                                'isMissing' => false,
+                            ],
+                            [
+                                'key' => 'lastName',
+                                'label' => 'Last Name',
+                                'value' => 'Patel',
+                                'isMissing' => false,
+                            ],
+                            [
+                                'key' => 'gender',
+                                'label' => 'Gender',
+                                'value' => 'M',
+                                'isMissing' => false,
+                            ],
+                        ],
+                        'right' => [
+                            [
+                                'key' => 'language1',
+                                'label' => 'Language 1',
+                                'value' => 'English (ENG)',
+                                'isMissing' => false,
+                            ],
+                            [
+                                'key' => 'language2',
+                                'label' => 'Language 2',
+                                'value' => 'Not provided',
+                                'isMissing' => false,
+                            ],
+                            [
+                                'key' => 'nationality1',
+                                'label' => 'Nationality 1',
+                                'value' => 'Australian (AUS)',
+                                'isMissing' => false,
+                            ],
+                            [
+                                'key' => 'nationality2',
+                                'label' => 'Nationality 2',
+                                'value' => 'Not provided',
+                                'isMissing' => false,
+                            ],
+                            [
+                                'key' => 'referenceCode',
+                                'label' => 'Reference Code',
+                                'value' => 'Sam, Patel',
+                                'isMissing' => false,
+                            ],
+                        ],
+                    ],
                     'ibGroupSubjects' => [
                         'HL' => [],
                         'SL' => [],

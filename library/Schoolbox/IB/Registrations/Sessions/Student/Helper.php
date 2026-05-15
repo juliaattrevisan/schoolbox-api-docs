@@ -151,6 +151,7 @@ class Helper
         return [
             'id' => $groupSubject->getId(),
             'groupId' => $groupSubject->getGroupId(),
+            'group' => $groupSubject->getGroup()?->getName() ?? '',
             'subject' => $groupSubject->getSubject()?->getName() ?? '',
             'level' => $this->getGroupSubjectLevel($groupSubject),
             'languages' => $groupSubject->getLanguages()

@@ -23,6 +23,9 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\DifferentiationProfile\Model as DifferentiationProfileModel;
 use Schoolbox\Geosnapshot\ValidPhotosAvailable;
+use Schoolbox\IB\Registrations\Sessions\Student\Mapper as RegistrationSessionStudentMapper;
+use Schoolbox\IB\Registrations\Sessions\Student\Model as RegistrationSessionStudentModel;
+use Schoolbox\IB\Registrations\Sessions\Student\Translator\ModelToArray as RegistrationSessionStudentModelToArray;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Moment\Moderation\ModerationRequired;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -81,6 +84,8 @@ class Controller extends BaseController
      * @param RosettaStone                               $rosettaStone
      * @param EditorTemplateHelper                       $editorTemplateHelper
      * @param \Schoolbox\DifferentiationProfile\Mapper   $differentiationProfileMapper
+     * @param RegistrationSessionStudentMapper           $registrationSessionStudentMapper
+     * @param RegistrationSessionStudentModelToArray     $registrationSessionStudentModelToArray
      */
     public function __construct(
         private UserMapper $userMapper,
@@ -102,6 +107,8 @@ class Controller extends BaseController
         private RosettaStone $rosettaStone,
         private EditorTemplateHelper $editorTemplateHelper,
         private \Schoolbox\DifferentiationProfile\Mapper $differentiationProfileMapper,
+        private RegistrationSessionStudentMapper $registrationSessionStudentMapper,
+        private RegistrationSessionStudentModelToArray $registrationSessionStudentModelToArray,
     ) {
     }
 
@@ -274,6 +281,14 @@ class Controller extends BaseController
         /* Profile Tabs
          */
         $tabs = $this->tabMapper->findRenderable($student, $this->getUser());
+        $registrationSessionStudent = $this->registrationSessionStudentMapper->findUnconfirmedForUser($student);
+        $registrationPayload = $registrationSessionStudent instanceof RegistrationSessionStudentModel
+            ? ($this->registrationSessionStudentModelToArray)(
+                $registrationSessionStudent,
+                $this->findExternalStudent($registrationSessionStudent),
+                (string) ($this->getConfigLoader()->get(ConfigMapper::NAME_IB_SCHOOL_NAME) ?? '')
+            )
+            : null;
 
         /* Whether Learning Moment Moderation was required for this student; this forces their
          * learning moment posts to be moderated by a staff before being pushed into the world
@@ -572,10 +587,7 @@ class Controller extends BaseController
              * See tabConstraintsRoleType
              */
             'contacts'     => true,
-            /**
-             * TODO: Update this when we decided what is the trigger for the IB registration feature
-             */
-            'registration' => $this->getConfigLoader()->get('ib_school_name'),
+            'registration' => $registrationPayload !== null,
         ];
 
         /* Decide whether the Contacts tab should show for the viewer:
@@ -681,6 +693,9 @@ class Controller extends BaseController
                 /* Used for emailing staff (Email All Teachers)
                  */
                 'allTeacherIds' => implode(',', $allTeacherIds),
+                /* IB registration verification details shown in the Registration tab
+                 */
+                'registrationPayload' => $registrationPayload,
                 /* The current user session - sadly a superglobal for portability reasons
                  */
                 'session' => $_SESSION,
@@ -707,6 +722,20 @@ class Controller extends BaseController
                 'sharedCampuses'           => $sharedCampuses,
             ]
         );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function findExternalStudent(RegistrationSessionStudentModel $student): array
+    {
+        $externalId = trim((string) ($student->getUser()?->getExternalId() ?? ''));
+
+        if ($externalId === '') {
+            return [];
+        }
+
+        return $this->externalUser->getStudent($externalId);
     }
 
 

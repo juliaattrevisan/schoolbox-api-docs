@@ -179,6 +179,57 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Find the registration candidate that is ready for student verification.
+     *
+     * @param User $user
+     * @return Model|null
+     * @throws BaseMapper\DefinitionException
+     * @throws BaseMapper\Exception
+     */
+    public function findUnconfirmedForUser(User $user): ?Model
+    {
+        if (!$user->getId()) {
+            return null;
+        }
+
+        $statement = $this->getDatabase()->prepare(
+            "
+                {$this->getSelectString()}
+                {$this->getFromString()}
+                WHERE {$this->getTable()}.user_id = :userId
+                AND {$this->getTable()}.status = :status
+                AND rs.deleted_at IS NULL
+                ORDER BY {$this->getTable()}.updated_at DESC, {$this->getTable()}.id DESC
+                LIMIT 1
+            "
+        );
+        $statement->execute(
+            [
+                'userId' => $user->getId(),
+                'status' => Model::STATUS_UNCONFIRMED,
+            ]
+        );
+
+        $students = $this->hydrateSelect($statement);
+        $student = $students->first();
+
+        if (!$student instanceof Model) {
+            return null;
+        }
+
+        $student->setUser($user);
+        $student->setIbGroupSubjects(
+            $this->findIbGroupSubjectsForUsers([
+                $user->getId() => $user,
+            ])[$user->getId()] ?? new GenericCollection(GroupSubjectModel::class)
+        );
+
+        $this->applySubjectLanguageOverrides(new GenericCollection(Model::class, [$student]));
+
+        return $student;
+    }
+
+    /**
      * Retrieve all students for the given registration session's system purpose,
      * including users who do not yet have a session-student record.
      *
