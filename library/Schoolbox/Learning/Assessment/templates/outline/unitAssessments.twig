@@ -212,13 +212,13 @@
                                 {% set customTitle = attribute(locale, customisedAssessment.typeName|lower) is defined ? attribute(locale, customisedAssessment.typeName|lower).proper : customisedAssessment.typeName %}
                                 {% set customRoute = viewRoute.viewRoute(customisedAssessment, USER) %}
                                 {% if customRoute %}
-                                    <a title="{{ customTitle }}" href="{{ customRoute }}">
-                                        <span class="{{ icon.renderClass(customisedAssessment) }}"></span>
+                                    <a title="{{ customTitle }}" href="{{ customRoute }}" class="l-flex l-gap-s">
+                                        <sbx-icon name="{{ icon.renderName(customisedAssessment)|trim }}"></sbx-icon>
                                         <p class="t-break-word">{{ customisedAssessment.title }}</p>
                                     </a>
                                 {% else %}
-                                    <div title="{{ customTitle }}">
-                                        <span class="{{ icon.renderClass(customisedAssessment) }}"></span>
+                                    <div title="{{ customTitle }}" class="l-flex l-gap-s">
+                                        <sbx-icon name="{{ icon.renderName(customisedAssessment)|trim }}"></sbx-icon>
                                         <p class="t-break-word">{{ customisedAssessment.title }}</p>
                                     </div>
                                 {% endif %}

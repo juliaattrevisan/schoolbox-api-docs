@@ -150,7 +150,7 @@ Data:
                                         {% if viewRoute %}
                                         <a href="{{ viewRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
                                         {% endif %}
-                                        <span class="{{ icon.renderClass(assessable) }}" title="{{ assessable.getTypeName }}"></span>
+                                        <sbx-icon name="{{ icon.renderName(assessable)|trim }}" size="1rem" color="var(--sbx-color-text-secondary, var(--body-foreground))" class="compact-card-icon" title="{{ assessable.getTypeName }}"></sbx-icon>
                                         <p>{{ assessable.title }}</p>
                                         {% if viewRoute %}</a>{% endif %}
 

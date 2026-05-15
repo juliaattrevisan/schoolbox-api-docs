@@ -3,7 +3,7 @@
  # of the marks showing on the grades page
  #
  # This is designed to be used withing a dropdown menu
- # It also targets a <li data-has-student-view-meta class="icon-teacher">Teacher view</li>
+ # It also targets a <li data-has-student-view-meta><sbx-icon data-has-student-view-meta-icon name="teacher"></sbx-icon>Teacher view</li>
  # which should be placed in the meta section of the header
  #}
 
@@ -13,12 +13,10 @@
     document.addEventListener('DOMContentLoaded', function() {
         const viewSwitcher = document.querySelector('[data-has-student-view]');
         const viewSwitcherMeta = document.querySelector('[data-has-student-view-meta]');
+        const viewSwitcherMetaIcon = document.querySelector('[data-has-student-view-meta-icon]');
         const viewSwitcherSeparator = document.querySelector('[data-has-student-view-separator]');
         const viewSwitcherIcon = viewSwitcher.querySelector('[data-has-student-view-icon]');
         const viewSwitcherLabel = viewSwitcher.querySelector('[data-has-student-view-label]');
-
-        const iconTeacher = 'icon-teacher';
-        const iconStaffStudents = 'icon-staff-students';
 
         /**
             * Enable student view of all the marks
@@ -26,8 +24,8 @@
         function switchToStudentView() {
             viewSwitcherSeparator.textContent = 'You are viewing student grades';
             viewSwitcherMeta.textContent = 'Viewing student grades';
-            viewSwitcherMeta.classList.remove(iconTeacher);
-            viewSwitcherMeta.classList.add(iconStaffStudents);
+            viewSwitcherMeta.prepend(viewSwitcherMetaIcon);
+            viewSwitcherMetaIcon.setAttribute('name', 'staff-students');
 
             viewSwitcherLabel.textContent = 'View Instructor Grades';
             viewSwitcherIcon.setAttribute('name', 'teacher');
@@ -44,8 +42,8 @@
         function switchToStaffView() {
             viewSwitcherSeparator.textContent = 'You are viewing instructor grades';
             viewSwitcherMeta.textContent = 'Viewing instructor grades';
-            viewSwitcherMeta.classList.remove(iconStaffStudents);
-            viewSwitcherMeta.classList.add(iconTeacher);
+            viewSwitcherMeta.prepend(viewSwitcherMetaIcon);
+            viewSwitcherMetaIcon.setAttribute('name', 'teacher');
 
             viewSwitcherLabel.textContent = 'View Student Grades';
             viewSwitcherIcon.setAttribute('name', 'staff-students');

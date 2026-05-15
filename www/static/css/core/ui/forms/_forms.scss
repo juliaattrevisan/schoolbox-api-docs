@@ -756,7 +756,7 @@ td {
     line-height: 2;
     text-align: left;
     transition: all 0.1s ease-in;
-    i {
+    :is(i, sbx-icon) {
         @extend .size-32;
         color: var(--sbx-config-color-accent, $content-ui-foreground);
         padding-right: 0.35rem;
@@ -777,7 +777,7 @@ input[type="radio"] {
         background-color: var(--sbx-config-color-accent, $content-ui-foreground);
         border: $input-border-width solid var(--sbx-config-color-accent, $content-ui-foreground);
         color: $content-ui-selected;
-        i {
+        :is(i, sbx-icon) {
             color: $content-ui-selected;
         }
     }

@@ -214,12 +214,20 @@
         min-height: 2.5rem;
         padding: 0 1rem;
 
-        [class*="icon-"] {
+        [class*="icon-"],
+        sbx-icon.compact-card-icon {
             width: 2rem;
             margin-top: 0;
             padding: 0 0 0 1rem;
             line-height: 1.65rem;
             @extend .text-center;
+        }
+
+        sbx-icon.compact-card-icon {
+            box-sizing: content-box;
+            display: inline-flex;
+            flex: 0 0 auto;
+            vertical-align: middle;
         }
 
         > * {
