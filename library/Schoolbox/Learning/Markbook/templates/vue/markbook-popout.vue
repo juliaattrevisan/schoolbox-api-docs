@@ -411,12 +411,49 @@ async function onMenuItemSelected(target: string | null, action: string | null =
     }
 }
 
+const canUpdateFeedback = window.Vue.computed(() => {
+    if (cellInfo.value === null) {
+        return false;
+    }
+
+    const { participant, aImpl, activity } = cellInfo.value;
+
+    // must be a due work, reporting, or quiz activity
+    const validActivityType = [ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ, ACTIVITY_TYPE_REPORTING].includes(
+        activity.assessmentType,
+    );
+    if (!validActivityType) {
+        return false;
+    }
+
+    // participant must exist and not be excluded
+    if (participant === null || participant.isExcluded) {
+        return false;
+    }
+
+    // must have a postFeedback route
+    if (!routes.value.postFeedback) {
+        return false;
+    }
+
+    /* you must have the ability to either enter a mark or a comment (reporting can disable both at once) */
+    if (!aImpl.feedbackCommentsEnable && aImpl.instructorMarkScheme.template.length === 0) {
+        return false;
+    }
+
+    return false;
+});
+
 /**
  * Trigger the update feedback UI to appear for this cell
  */
 function onUpdateFeedbackSelected(): void {
     if (cellInfo.value === null) {
         throw new Error("No selected cell to update feedback for");
+    }
+
+    if (!canUpdateFeedback.value) {
+        return;
     }
 
     // Close the popout
@@ -594,7 +631,7 @@ function onToggleSelected(): void {
                     <template v-if="cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK">
                         <pop-out-menu-item
                             v-if="!cellInfo.participant.isExcluded"
-                            :class="{ 'is-disabled': !routes.postFeedback }"
+                            :class="{ 'is-disabled': !canUpdateFeedback }"
                             :link="routes.updateRoute ? getReturnUrl(routes.updateRoute) : undefined"
                             force-callback
                             @selected="onUpdateFeedbackSelected"
@@ -619,7 +656,7 @@ function onToggleSelected(): void {
                         <!-- notable ommission of :link, routes.updateRoute is due work only it seems -->
                         <pop-out-menu-item
                             v-if="!cellInfo.participant.isExcluded"
-                            :class="{ 'is-disabled': !routes.postFeedback }"
+                            :class="{ 'is-disabled': !canUpdateFeedback }"
                             force-callback
                             @selected="onUpdateFeedbackSelected"
                         >
@@ -630,7 +667,7 @@ function onToggleSelected(): void {
                         <!-- notable ommission of :link, routes.updateRoute is due work only it seems -->
                         <pop-out-menu-item
                             v-if="!cellInfo.participant.isExcluded"
-                            :class="{ 'is-disabled': !routes.postFeedback }"
+                            :class="{ 'is-disabled': !canUpdateFeedback }"
                             force-callback
                             @selected="onUpdateFeedbackSelected"
                         >

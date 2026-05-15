@@ -192,7 +192,12 @@ async function onClickCell(): Promise<void> {
         }
 
         mbStore.popoutSelectedCell = null;
-        mbStore.setFeedbackSelectedCell(selectedFeedbackInfo);
+
+        /* you must have the ability to either enter a mark or a comment (reporting can disable both at once) */
+        if (aImpl.value.feedbackCommentsEnable || aImpl.value.instructorMarkScheme.template.length > 0) {
+            mbStore.setFeedbackSelectedCell(selectedFeedbackInfo);
+        }
+
         return;
     }
 
