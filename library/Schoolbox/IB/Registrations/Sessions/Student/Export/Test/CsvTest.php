@@ -78,6 +78,38 @@ class CsvTest extends TestCase
         );
     }
 
+    #[DataProvider('dangerousCsvValueProvider')]
+    public function testBuildRowNeutralisesCsvFormulaPrefixes(string $value, string $expected): void
+    {
+        $student = (new RegistrationSessionStudentModel())
+            ->setUser(
+                (new User())
+                    ->setFirstname($value)
+                    ->setLastname($value)
+                    ->setLanguageCollection(
+                        new GenericCollection(LanguageModel::class, [
+                            (new LanguageModel())->setName($value),
+                        ])
+                    )
+                    ->setNationalityCollection(
+                        new GenericCollection(NationalityModel::class, [
+                            (new NationalityModel())->setName($value),
+                        ])
+                    )
+            );
+
+        $row = (new Csv())->buildRow(
+            $student,
+            ['StudentGender' => $value]
+        );
+
+        $this->assertSame($expected, $row['firstName']);
+        $this->assertSame($expected, $row['lastName']);
+        $this->assertSame($expected, $row['gender']);
+        $this->assertSame($expected, $row['nationality1']);
+        $this->assertSame($expected, $row['language1']);
+    }
+
     #[DataProvider('validDateOfBirthProvider')]
     public function testBuildRowAcceptsValidDateOfBirthFormats(mixed $dateOfBirth): void
     {
@@ -140,6 +172,20 @@ class CsvTest extends TestCase
             'non-date string' => ['not-a-date'],
             'zero timestamp' => [0],
             'negative timestamp' => [-1],
+        ];
+    }
+
+    /**
+     * @return array<string, array{string, string}>
+     */
+    public static function dangerousCsvValueProvider(): array
+    {
+        return [
+            'equals prefix' => ['=SUM(1,1)', "'=SUM(1,1)"],
+            'plus prefix' => ['+SUM(1,1)', "'+SUM(1,1)"],
+            'minus prefix' => ['-SUM(1,1)', "'-SUM(1,1)"],
+            'at prefix' => ['@SUM(1,1)', "'@SUM(1,1)"],
+            'tab padded prefix' => ["\t=SUM(1,1)\n", "'=SUM(1,1)"],
         ];
     }
 }

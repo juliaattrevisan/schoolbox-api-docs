@@ -16,6 +16,8 @@ use Schoolbox\IB\Registrations\Sessions\Student\Model;
 
 class Csv
 {
+    private const string CSV_FORMULA_PREFIX_PATTERN = '/^[=+\-@]/';
+
     /**
      * @return array<string, string>
      */
@@ -49,9 +51,29 @@ class Csv
         ];
     }
 
+    /**
+     * Trim exported values and neutralise spreadsheet formula prefixes so
+     * user-controlled CSV cells are treated as plain text when opened in
+     * spreadsheet applications.
+     */
     private function normalise(mixed $value): string
     {
-        return trim((string) ($value ?? ''));
+        $normalisedValue = trim((string) ($value ?? ''));
+
+        if ($normalisedValue === '') {
+            return '';
+        }
+
+        if (
+            preg_match(self::CSV_FORMULA_PREFIX_PATTERN, $normalisedValue) === 1
+            || in_array($normalisedValue[0], ["\t", "\n", "\r"], true)
+        ) {
+            // Prefix with an apostrophe so values such as =SUM(...) are
+            // exported as literal text instead of executable formulas.
+            return "'" . $normalisedValue;
+        }
+
+        return $normalisedValue;
     }
 
     private function formatDateOfBirth(mixed $value): string
