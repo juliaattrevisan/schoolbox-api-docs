@@ -42,9 +42,7 @@ function onRemoveSelected(): void {
 
 <template>
     <div
-        :class="`ss-selected-item l-flex l-flex--align-center l-pad-s l-gap-s ${
-            props.isSingleSelect ? 'l-flex__item--1' : ''
-        }`"
+        :class="`ss-selected-item ${props.isSingleSelect ? 'l-flex__item--1' : ''}`"
         :data-test="`ss-selected-item-container-${props.item.id}`"
     >
         <button
