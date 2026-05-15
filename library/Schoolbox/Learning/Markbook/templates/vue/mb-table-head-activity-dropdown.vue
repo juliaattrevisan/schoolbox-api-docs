@@ -4,6 +4,7 @@ import {
     ACTIVITY_TYPE_DIALOG_AGENT,
     ACTIVITY_TYPE_DUE_WORK,
     ACTIVITY_TYPE_QUIZ,
+    ACTIVITY_TYPE_REPORTING,
 } from "@schoolboxAssessment/Types/assessmentTypes";
 import type { MarkbookActivity } from "./types/payload";
 import { useMarkbookStore } from "./store/markbookStore";
@@ -77,7 +78,11 @@ const viewStudentParticipationLink = window.Vue.computed(() => {
         >
     </li>
     <li
-        v-if="props.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK && viewStatusLink"
+        v-if="
+            viewStatusLink &&
+            (props.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK ||
+                props.activity.assessmentType === ACTIVITY_TYPE_REPORTING)
+        "
         :data-test="`markbook-assessment-dropdown-${props.activity.id}-import-feedback`"
     >
         <a :href="`${viewStatusLink}&importFeedback`" class="sbx-button--has-icon"
