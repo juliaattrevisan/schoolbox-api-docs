@@ -116,17 +116,23 @@ class Importer
      */
     public static function resolveMarkVisibility(int|string $value): string
     {
-        if (is_string($value)) {
+        // Normalise value to trimmed string.
+        $value = trim((string)$value);
+
+        // First deal values expected in exports from Schoolbox >=26.1.
+        if (in_array($value, IAssessable::MARK_VISIBILITY_STRINGS)) {
             return $value;
         }
 
-        // Integer values were used in versions <26.1.
-        return match ($value) {
-            0 => IAssessable::MARK_VISIBILITY_PRIVATE,
-            1 => IAssessable::MARK_VISIBILITY_STUDENT,
-            2 => IAssessable::MARK_VISIBILITY_PARENT_STUDENT,
-            default => throw new \UnexpectedValueException("Unknown legacy mark visibility value: $value"),
-        };
+        // Next deal with values expected in exports from Schoolbox <26.1.
+        switch ($value) {
+            case '0': return IAssessable::MARK_VISIBILITY_PRIVATE;
+            case '1': return IAssessable::MARK_VISIBILITY_STUDENT;
+            case '2': return IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
+            // Note IAssessable::MARK_VISIBILITY_PARENT was introduced in 26.1.
+        }
+
+        throw new \UnexpectedValueException("Unknown legacy mark visibility value: $value");
     }
 
 
