@@ -370,15 +370,6 @@ class Controller extends Base
                                             'student' => $student,
                                         ]
                                     ),
-                                    'learningAssessment.getSummary' => $this->getRouteIfAuthorized(
-                                        'learningAssessment.getSummary',
-                                        [
-                                            'assessment' => $aImpl,
-                                            'assessmentId' => $aImpl->getId(),
-                                            'studentId' => $student->getId(),
-                                            'student' => $student,
-                                        ]
-                                    ),
                                     'learningAssessment.getInfo' => $this->getRouteIfAuthorized(
                                         'learningAssessment.getInfo',
                                         [
@@ -388,6 +379,25 @@ class Controller extends Base
                                             'student' => $student,
                                         ]
                                     ),
+                                    /* reporting has its own one of these as you can't submit stuff for it */
+                                    'historyRoute' =>
+                                        $aImpl instanceof Reporting\Model ? $this->getRouteIfAuthorized(
+                                            'learningReportingFeedback.getParticularFeedback',
+                                            [
+                                                'assessment' => $aImpl,
+                                                'assessmentId' => $aImpl->getId(),
+                                                'learnerId' => $student->getId(),
+                                                'learner' => $student,
+                                            ]
+                                        ) : $this->getRouteIfAuthorized(
+                                            'learningAssessment.getSummary',
+                                            [
+                                                'assessment' => $aImpl,
+                                                'assessmentId' => $aImpl->getId(),
+                                                'studentId' => $student->getId(),
+                                                'student' => $student,
+                                            ]
+                                        ),
                                     /* this will change depending on if it's a due work, quiz, or reporting activity */
                                     'postFeedback' =>
                                         $aImpl instanceof DueWork\Model ? $this->getRouteIfAuthorized(

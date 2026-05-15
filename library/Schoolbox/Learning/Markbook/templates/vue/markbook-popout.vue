@@ -129,7 +129,7 @@ const routes = window.Vue.computed(() => {
         publishRoute: studentRoutes?.postPublishFeedback ?? null,
         excludeRoute: studentRoutes?.["learningAssessment.postExclude"] ?? null,
         includeRoute: studentRoutes?.["learningAssessment.postInclude"] ?? null,
-        historyRoute: studentRoutes?.["learningAssessment.getSummary"] ?? null,
+        historyRoute: studentRoutes?.historyRoute ?? null,
         postFeedback: studentRoutes?.postFeedback ?? null,
         getAssessmentParticipationForm: studentRoutes?.getAssessmentParticipationForm ?? null,
     };

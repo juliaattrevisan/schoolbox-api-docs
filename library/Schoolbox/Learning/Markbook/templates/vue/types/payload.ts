@@ -99,7 +99,7 @@ export type MarkbookClassImplActivity = {
                 "learningDueWorkResponse.getParticularResponse": string | null;
                 "learningAssessment.postExclude": string | null;
                 "learningAssessment.postInclude": string | null;
-                "learningAssessment.getSummary": string | null;
+                historyRoute: string | null;
                 "learningAssessment.getInfo": string | null;
                 /* this will change depending on if it's a quiz, due work, or reporting activity */
                 postFeedback: string | null;
