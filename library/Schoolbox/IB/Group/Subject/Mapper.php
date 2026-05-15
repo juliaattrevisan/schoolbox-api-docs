@@ -22,7 +22,7 @@ use Schoolbox\Mapper as BaseMapper;
 /**
  * Class Mapper
  * @method Model createModel($idValue = null)
- * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method ?Model hydrate(array $row, $alias = '', $callback = null)
  * @method GenericCollection|Model[] findByColumnList($columnList, $options = [])
  *
  * @package Schoolbox\IB\GroupSubject

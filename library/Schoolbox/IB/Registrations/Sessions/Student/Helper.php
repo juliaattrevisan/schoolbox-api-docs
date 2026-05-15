@@ -1,7 +1,7 @@
 <?php
 
 /**
- * IB registration session student payload builder
+ * IB registration session student helper
  *
  * @copyright Copyright 2026, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -16,8 +16,9 @@ use Schoolbox\IB\Group\Subject\Language\Model as GroupSubjectLanguageModel;
 use Schoolbox\IB\Group\Subject\Model as GroupSubjectModel;
 use Schoolbox\Language\Model as LanguageModel;
 use Schoolbox\Nationality\Model as NationalityModel;
+use Schoolbox\Resource\Folder\Code\Model as FolderCodeModel;
 
-class Payload
+class Helper
 {
     private const LEVEL_HL = 'HL';
     private const LEVEL_SL = 'SL';
@@ -36,47 +37,7 @@ class Payload
     ];
 
     /**
-     * @param array<string, mixed> $externalStudent
-     * @return array<string, mixed>
-     */
-    public function build(Model $student, array $externalStudent, string $schoolName): array
-    {
-        $user = $student->getUser();
-
-        $firstName = $this->normalise($user?->getFirstname());
-        $lastName = $this->normalise($user?->getLastname());
-        $languageCodes = $this->extractCodes($user?->getLanguageCollection());
-        $nationalityCodes = $this->extractCodes($user?->getNationalityCollection());
-        $dateOfBirth = $this->formatDateOfBirth($externalStudent['StudentBirthDate'] ?? null);
-        $userName = $this->buildUserName($firstName, $lastName);
-
-        $requiredDetails = [
-            'userName' => $userName,
-            'firstName' => $firstName,
-            'lastName' => $lastName,
-            'dateOfBirth' => $dateOfBirth,
-            'email' => $this->normalise($user?->getEmail()),
-            'gender' => $this->normalise($externalStudent['StudentGender'] ?? null),
-            'language1' => $languageCodes[0] ?? '',
-            'nationality1' => $nationalityCodes[0] ?? '',
-            'schoolName' => $this->normalise($schoolName),
-        ];
-        $missingFields = $this->findMissingFields($requiredDetails);
-
-        return [
-            'userId' => $user?->getId(),
-            'registrationSessionStudentId' => $student->getId(),
-            'status' => $student->getStatus(),
-            'userName' => $userName,
-            'hasMissingDetails' => $missingFields !== [],
-            'missingFields' => $missingFields,
-            'ibGroupSubjects' => $this->buildIbGroupSubjects($student->getIbGroupSubjects()),
-        ];
-    }
-
-    /**
      * @param array<int, array<string, mixed>> $students
-     * @return object
      */
     public function groupByStatus(array $students): object
     {
@@ -98,7 +59,7 @@ class Payload
         return Model::STATUSES;
     }
 
-    private function buildUserName(string $firstName, string $lastName): string
+    public function buildUserName(string $firstName, string $lastName): string
     {
         if ($firstName === '' || $lastName === '') {
             return '';
@@ -111,7 +72,7 @@ class Payload
      * @param iterable<mixed>|null $models
      * @return string[]
      */
-    private function extractCodes(?iterable $models): array
+    public function extractCodes(?iterable $models): array
     {
         $codes = [];
 
@@ -130,7 +91,7 @@ class Payload
         return $codes;
     }
 
-    private function formatDateOfBirth(mixed $value): string
+    public function formatDateOfBirth(mixed $value): string
     {
         if ($value === null || $value === false || trim((string) $value) === '') {
             return '';
@@ -155,7 +116,7 @@ class Payload
         return date('Y-m-d', $timestamp);
     }
 
-    private function normalise(mixed $value): string
+    public function normalise(mixed $value): string
     {
         return trim((string) ($value ?? ''));
     }
@@ -164,7 +125,7 @@ class Payload
      * @param GenericCollection|GroupSubjectModel[] $groupSubjects
      * @return array<string, array<int, array<string, mixed>>>
      */
-    private function buildIbGroupSubjects(GenericCollection $groupSubjects): array
+    public function buildIbGroupSubjects(GenericCollection $groupSubjects): array
     {
         $subjectsByLevel = $groupSubjects->groupByCallback(
             fn(GroupSubjectModel $groupSubject): string => $this->getGroupSubjectLevel($groupSubject)
@@ -184,7 +145,7 @@ class Payload
     /**
      * @return array<string, mixed>
      */
-    private function buildIbGroupSubject(GroupSubjectModel $groupSubject): array
+    public function buildIbGroupSubject(GroupSubjectModel $groupSubject): array
     {
         return [
             'id' => $groupSubject->getId(),
@@ -196,7 +157,15 @@ class Payload
                     fn(GroupSubjectLanguageModel $language): array => [
                         'languageId' => $language->getLanguage()?->getId(),
                         'languageName' => $language->getLanguage()?->getName() ?? '',
-                        'classCode' => $language->getClassCode(),
+                        'classCode' => $language->getClassCode()
+                            ->map(
+                                static fn(FolderCodeModel $code): array => [
+                                    'code' => $code->getCode(),
+                                    'folder' => $code->getFolder(),
+                                ]
+                            )
+                            ->reindex()
+                            ->getAll(),
                     ]
                 )
                 ->reindex()
@@ -204,7 +173,7 @@ class Payload
         ];
     }
 
-    private function getGroupSubjectLevel(GroupSubjectModel $groupSubject): string
+    public function getGroupSubjectLevel(GroupSubjectModel $groupSubject): string
     {
         return $groupSubject->getLevel() ?: self::LEVEL_CORE;
     }
@@ -213,7 +182,7 @@ class Payload
      * @param array<string, mixed> $details
      * @return string[]
      */
-    private function findMissingFields(array $details): array
+    public function findMissingFields(array $details): array
     {
         $missingFields = [];
 

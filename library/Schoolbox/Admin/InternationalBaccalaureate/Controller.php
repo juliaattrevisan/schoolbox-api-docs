@@ -15,6 +15,7 @@ namespace Schoolbox\Admin\InternationalBaccalaureate;
 use Alaress\Database\Predicate;
 use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
+use Alaress\Web\Request\Values;
 use Aura\Router\Exception\RouteNotFound;
 use Crell\ApiProblem\ApiProblem;
 use Exception;
@@ -31,9 +32,11 @@ use Schoolbox\IB\Group\Mapper as IBGroupMapper;
 use Schoolbox\IB\Group\Model as IBGroupModel;
 use Schoolbox\IB\Registrations\Sessions\Mapper as RegistrationSessionMapper;
 use Schoolbox\IB\Registrations\Sessions\Model as RegistrationSessionModel;
+use Schoolbox\IB\Registrations\Sessions\Student\Helper as RegistrationSessionStudentHelper;
 use Schoolbox\IB\Registrations\Sessions\Student\Mapper as RegistrationSessionStudentMapper;
 use Schoolbox\IB\Registrations\Sessions\Student\Model as RegistrationSessionStudentModel;
-use Schoolbox\IB\Registrations\Sessions\Student\Payload as RegistrationSessionStudentPayload;
+use Schoolbox\IB\Registrations\Sessions\Student\Subject\Language\Mapper as RegistrationSessionStudentSubjectLanguageMapper;
+use Schoolbox\IB\Registrations\Sessions\Student\Translator\ModelToArray as RegistrationSessionStudentModelToArray;
 use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Language\Model as LanguageModel;
 use Schoolbox\Mapper\Exception\NotFound as MapperNotFound;
@@ -59,6 +62,9 @@ class Controller extends ConfigController
         private RegistrationSessionMapper $registrationSessionMapper,
         private External_ClassInterface $externalClass,
         private RegistrationSessionStudentMapper $registrationSessionStudentMapper,
+        private RegistrationSessionStudentSubjectLanguageMapper $registrationSessionStudentSubjectLanguageMapper,
+        private RegistrationSessionStudentModelToArray $registrationSessionStudentModelToArray,
+        private RegistrationSessionStudentHelper $registrationSessionStudentHelper,
         private \External_UserInterface $externalUser,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
@@ -556,7 +562,7 @@ class Controller extends ConfigController
     public function getRegistrations(): void
     {
         $pageCurrent = '/adminv2/international-baccalaureate/registrations';
-        $reportRoute = $this->getRouteIfAuthorized('internationalBaccalaureate.getReport', ['id' => 0]);
+        $reportRoute = $this->getRouteIfAuthorized('internationalBaccalaureate.getReport', ['sessionId' => 0]);
         $this->response = $this->responseDependentOnRequest(
             '@internationalBaccalaureate/registrations.twig',
             [
@@ -579,12 +585,12 @@ class Controller extends ConfigController
     /**
      * Diploma Programme Year 2 Registration Report page
      *
-     * @api GET /adminv2/international-baccalaureate/registrations/sessions/{id}
+     * @api GET /adminv2/international-baccalaureate/registrations/sessions/{sessionId}
      */
-    public function getReport(int $id): void
+    public function getReport(int $sessionId): void
     {
         try {
-            $session = $this->registrationSessionMapper->findById($id);
+            $session = $this->registrationSessionMapper->findById($sessionId);
         } catch (MapperNotFound) {
             $this->response = $this->responseAsJson([
                 'success' => false,
@@ -600,7 +606,7 @@ class Controller extends ConfigController
                 'pageCurrent' => $pageCurrent,
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($pageCurrent),
                 '_routes' => [
-                    'candidatesEndpoint' => $this->getRouteIfAuthorized('internationalBaccalaureate.getRegistrationSessionStudents', ['id' => $id]),
+                    'candidatesEndpoint' => $this->getRouteIfAuthorized('internationalBaccalaureate.getRegistrationSessionStudents', ['sessionId' => $sessionId]),
                     'searchLanguages' => $this->getRouteIfAuthorized('internationalBaccalaureate.searchLanguages'),
                 ],
                 'sessionTitle' => $session->jsonSerialize()['title'],
@@ -767,17 +773,16 @@ class Controller extends ConfigController
     /**
      * Get students for a registration session.
      *
-     * @api GET /adminv2/international-baccalaureate/registrations/sessions/{id}/candidates
+     * @api GET /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/candidates
      */
-    public function getRegistrationSessionStudents(int $id): void
+    public function getRegistrationSessionStudents(int $sessionId): void
     {
         try {
             $schoolName = (string) ($this->getConfigLoader()->get(ConfigMapper::NAME_IB_SCHOOL_NAME) ?? '');
-            $payloadBuilder = new RegistrationSessionStudentPayload();
-            $students = $this->registrationSessionStudentMapper->findStudentsForSession($id);
+            $students = $this->registrationSessionStudentMapper->findStudentsForSession($sessionId);
             $studentPayloads = $students
                 ->map(
-                    fn(RegistrationSessionStudentModel $student): array => $payloadBuilder->build(
+                    fn(RegistrationSessionStudentModel $student): array => ($this->registrationSessionStudentModelToArray)(
                         $student,
                         $this->findExternalStudent($student),
                         $schoolName
@@ -788,8 +793,8 @@ class Controller extends ConfigController
 
             $this->response = $this->responseAsJson([
                 'success' => true,
-                'students' => $payloadBuilder->groupByStatus($studentPayloads),
-                'statuses' => $payloadBuilder->getStatuses(),
+                'students' => $this->registrationSessionStudentHelper->groupByStatus($studentPayloads),
+                'statuses' => $this->registrationSessionStudentHelper->getStatuses(),
             ]);
         } catch (MapperNotFound) {
             $this->response = $this->responseAsJson([
@@ -797,6 +802,131 @@ class Controller extends ConfigController
                 'message' => 'Registration session not found.',
             ])->withStatus(404);
         } catch (Exception $e) {
+            $this->response = $this->responseAsJson([
+                'success' => false,
+                'message' => 'Something has gone wrong. Please try again later.',
+            ])->withStatus(500);
+        }
+    }
+
+    /**
+     * Manually override the language selected for a student's enrolled IB subjects.
+     *
+     * @api PUT /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/candidates/{studentId}/languages
+     */
+    public function updateRegistrationSessionStudentSubjectLanguages(
+        int $sessionId,
+        int $studentId
+    ): void {
+        $subjects = new Values($this->request->getParsedBody() ?? [])->get('subjects');
+
+        if (!is_array($subjects)) {
+            $this->response = $this->responseAsJson([
+                'success' => false,
+                'message' => 'Invalid subject language request data.',
+            ])->withStatus(400);
+            return;
+        }
+
+        $subjectLanguagePayloads = [];
+
+        foreach ($subjects as $subject) {
+            if (!is_array($subject)) {
+                $this->response = $this->responseAsJson([
+                    'success' => false,
+                    'message' => 'Invalid subject language request data.',
+                ])->withStatus(400);
+                return;
+            }
+
+            $groupSubjectId = (int) ($subject['groupSubjectId'] ?? 0);
+            $languageId = (int) ($subject['languageId'] ?? 0);
+
+            if ($groupSubjectId <= 0 || $languageId <= 0) {
+                $this->response = $this->responseAsJson([
+                    'success' => false,
+                    'message' => 'Invalid subject language request data.',
+                ])->withStatus(400);
+                return;
+            }
+
+            $subjectLanguagePayloads[$groupSubjectId] = [
+                'groupSubjectId' => $groupSubjectId,
+                'languageId' => $languageId,
+            ];
+        }
+
+        $groupSubjectIds = array_keys($subjectLanguagePayloads);
+        $languageIds = array_values(array_unique(array_column($subjectLanguagePayloads, 'languageId')));
+
+        $database = $this->registrationSessionStudentSubjectLanguageMapper->getDatabase();
+        $transactionStarted = false;
+
+        try {
+            $registrationSessionStudent = $this->persistRegistrationSessionStudent($sessionId, $studentId);
+            $groupSubjectsById = $groupSubjectIds === []
+                ? []
+                : $this->groupSubjectMapper
+                    ->findByColumn('id', $groupSubjectIds)
+                    ->indexBy('id')
+                    ->getAll();
+            $languagesById = $languageIds === []
+                ? []
+                : $this->languageMapper
+                    ->findByColumn('id', $languageIds)
+                    ->indexBy('id')
+                    ->getAll();
+
+            /* Making sure that all the given data are valid before updating
+             */
+            if (count($groupSubjectsById) !== count($groupSubjectIds) || count($languagesById) !== count($languageIds)) {
+                $this->response = $this->responseAsJson([
+                    'success' => false,
+                    'message' => 'Invalid subject language request data.',
+                ])->withStatus(400);
+                return;
+            }
+
+            $modelsToSave = [];
+
+            foreach ($subjectLanguagePayloads as $subjectLanguage) {
+                $groupSubjectId = $subjectLanguage['groupSubjectId'];
+                $languageId = $subjectLanguage['languageId'];
+                $modelsToSave[] = $this->registrationSessionStudentSubjectLanguageMapper
+                    ->createModel()
+                    ->setRegistrationSessionStudent($registrationSessionStudent)
+                    ->setGroupSubject($groupSubjectsById[$groupSubjectId])
+                    ->setLanguage($languagesById[$languageId]);
+            }
+
+            $transactionStarted = $database->beginTransaction();
+
+            $this->registrationSessionStudentSubjectLanguageMapper->deleteByColumn(
+                'registration_session_student_id',
+                $registrationSessionStudent->getId()
+            );
+
+            if ($modelsToSave !== []) {
+                $this->registrationSessionStudentSubjectLanguageMapper->save($modelsToSave);
+            }
+
+            $database->commit();
+            $transactionStarted = false;
+
+            $this->response = $this->responseAsJson([
+                'success' => true,
+                'subjects' => array_values($subjectLanguagePayloads),
+            ]);
+        } catch (MapperNotFound) {
+            $this->response = $this->responseAsJson([
+                'success' => false,
+                'message' => 'Candidate not found for this user in the registration session.',
+            ])->withStatus(404);
+        } catch (Exception $e) {
+            if ($transactionStarted) {
+                $database->rollBack();
+            }
+
             $this->response = $this->responseAsJson([
                 'success' => false,
                 'message' => 'Something has gone wrong. Please try again later.',
@@ -816,5 +946,62 @@ class Controller extends ConfigController
         }
 
         return $this->externalUser->getStudent($externalId);
+    }
+
+    /**
+     * Persist a registration session student, creating the record if it doesn't exist. This is needed to ensure that
+     * there is a registration session student record to link the subject languages to,
+     * even if the student hasn't been fully registered yet.
+     *
+     * @throws MapperNotFound
+     */
+    private function persistRegistrationSessionStudent(
+        int $sessionId,
+        int $studentId
+    ): RegistrationSessionStudentModel {
+        try {
+            return $this->registrationSessionStudentMapper->findOneByColumnList([
+                'user_id' => $studentId,
+                'registration_session_id' => $sessionId,
+            ]);
+        } catch (MapperNotFound) {
+            $registrationSessionStudent = null;
+
+            foreach ($this->registrationSessionStudentMapper->findStudentsForSession($sessionId) as $student) {
+                if (
+                    $student instanceof RegistrationSessionStudentModel
+                    && $student->getUser()?->getId() === $studentId
+                ) {
+                    $registrationSessionStudent = $student;
+                    break;
+                }
+            }
+
+            if (!$registrationSessionStudent instanceof RegistrationSessionStudentModel) {
+                throw new MapperNotFound();
+            }
+
+            if ($registrationSessionStudent->getId() !== null) {
+                return $registrationSessionStudent;
+            }
+
+            try {
+                $this->registrationSessionStudentMapper->save($registrationSessionStudent);
+            } catch (Exception $e) {
+                try {
+                    return $this->registrationSessionStudentMapper->findOneByColumnList([
+                        'user_id' => $studentId,
+                        'registration_session_id' => $sessionId,
+                    ]);
+                } catch (MapperNotFound) {
+                    throw $e;
+                }
+            }
+
+            return $this->registrationSessionStudentMapper->findOneByColumnList([
+                'user_id' => $studentId,
+                'registration_session_id' => $sessionId,
+            ]);
+        }
     }
 }
