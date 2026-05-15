@@ -209,6 +209,7 @@ window.Vue.onMounted((): void => {
             </ib-report-section>
         </div>
 
+<<<<<<< HEAD
         <div id="ib-report-pop-out-container"></div>
 
         <ib-update-language-modal />
@@ -220,5 +221,31 @@ window.Vue.onMounted((): void => {
             @complete-preparation="handleCompletePreparation([...selectedStudentIds])"
             @clear-selection="clearSelection"
         />
+=======
+        <bottom-drawer :show-drawer="selectedStudentIds.size > 0">
+            <h3 class="selected-count">
+                <em>
+                    {{ selectedStudentIds.size }}
+                    {{ selectedStudentIds.size === 1 ? "student" : "students" }} selected
+                </em>
+            </h3>
+            <button type="button" class="button-clear" @click="clearSelection">Clear Selection</button>
+            <ul class="flex-list buttons">
+                <li class="two-thirds">
+                    <button
+                        type="button"
+                        class="submit"
+                        :disabled="isCompleting"
+                        @click="handleCompletePreparation([...selectedStudentIds])"
+                    >
+                        {{ isCompleting ? "Completing..." : "Complete Preparation" }}
+                    </button>
+                </li>
+                <li class="one-third">
+                    <button type="button" disabled aria-disabled="true" title="Coming soon">Submit to IB</button>
+                </li>
+            </ul>
+        </bottom-drawer>
+>>>>>>> 06ba26b9b97 (Fixing selection bug [SA-21589])
     </div>
 </template>
