@@ -92,7 +92,7 @@ class V160 extends EvaluationParser implements IParser
         return match ((int) $this->getXml()->markvisibility) {
             1 => IAssessable::MARK_VISIBILITY_STUDENT,
             2 => IAssessable::MARK_VISIBILITY_PARENT_STUDENT,
-            3 => IAssessable::MARK_VISIBILITY_PARENT, // This option did not exist in version 16, so should not be encountered during import.
+            // Note '3 => MARK_VISIBILITY_PARENT' did not exist in version 16, so should not be encountered during import.
             default => IAssessable::MARK_VISIBILITY_PRIVATE,
         };
     }
