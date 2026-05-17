@@ -209,7 +209,10 @@ class Eportfolio extends Base
         $pageCascadeBlogIds = array_values(array_diff($pageBlogIds, $blogIds));     // Blogs that are children of directly targeted pages, excluding directly targeted blogs.
                                                                                     // Note array_values() just ensures that keys start from 0 and are sequential, since
                                                                                     // array_diff() preserves the keys from the array being diffed.
-        $deleted = [];
+        /**
+         * array<string, list<int>>
+         */
+        $deletedIdsByTableName = [];
 
         // Delete rows from all twelve tables covered by this strategy.
 
@@ -221,9 +224,9 @@ class Eportfolio extends Base
         // 2. Delete rows whose parent blog      is a direct target (excluding rows deleted in step 1).
         // 3. Delete rows whose grandparent page is a direct target (excluding rows deleted in step 1).
         //    (Note the sets deleted in steps 2 and 3 cannot overlap due to array_diff() call above.)
-        $this->deleteRowsByIds($deleted, $table, $blogCommentIds);
-        $this->deleteRowsByForeignIds($deleted, $table, 'blog_id', $blogIds, $blogCommentIds);
-        $this->deleteRowsByForeignIds($deleted, $table, 'blog_id', $pageCascadeBlogIds, $blogCommentIds);
+        $this->deleteRowsByIds($deletedIdsByTableName, $table, $blogCommentIds);
+        $this->deleteRowsByForeignIds($deletedIdsByTableName, $table, 'blog_id', $blogIds, $blogCommentIds);
+        $this->deleteRowsByForeignIds($deletedIdsByTableName, $table, 'blog_id', $pageCascadeBlogIds, $blogCommentIds);
 
         $table = self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE;
         // eportfolio_page
@@ -233,31 +236,31 @@ class Eportfolio extends Base
         // 2. Delete rows whose parent blog      is a direct target (excluding rows deleted in step 1).
         // 3. Delete rows whose grandparent page is a direct target (excluding rows deleted in step 1).
         //    (Note the sets deleted in steps 2 and 3 cannot overlap due to array_diff() call above.)
-        $this->deleteRowsByIds($deleted, $table, $blogImageIds);
-        $this->deleteRowsByForeignIds($deleted, $table, 'blog_id', $blogIds, $blogImageIds);
-        $this->deleteRowsByForeignIds($deleted, $table, 'blog_id', $pageCascadeBlogIds, $blogImageIds);
+        $this->deleteRowsByIds($deletedIdsByTableName, $table, $blogImageIds);
+        $this->deleteRowsByForeignIds($deletedIdsByTableName, $table, 'blog_id', $blogIds, $blogImageIds);
+        $this->deleteRowsByForeignIds($deletedIdsByTableName, $table, 'blog_id', $pageCascadeBlogIds, $blogImageIds);
 
         $table = self::TABLE_EPORTFOLIO_COMPONENT_BLOG;
         // eportfolio_page
         // └── eportfolio_component_blog
         // 1. Delete directly targeted rows,
         // 2. Delete rows whose parent page is a direct target (excluding rows deleted in step 1).
-        $this->deleteRowsByIds($deleted, $table, $blogIds);
-        $this->deleteRowsByForeignIds($deleted, $table, 'page_id', $pageIds, $blogIds);
+        $this->deleteRowsByIds($deletedIdsByTableName, $table, $blogIds);
+        $this->deleteRowsByForeignIds($deletedIdsByTableName, $table, 'page_id', $pageIds, $blogIds);
 
         $table = self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM;
         // eportfolio_page
         // └── eportfolio_component_filelist_item
         // 1. Delete directly targeted rows.
         // 2. Delete rows whose parent page is a direct target (excluding rows deleted in step 1).
-        $this->deleteRowsByIds($deleted, $table, $fileListItemIds);
-        $this->deleteRowsByForeignIds($deleted, $table, 'page_id', $pageIds, $fileListItemIds);
+        $this->deleteRowsByIds($deletedIdsByTableName, $table, $fileListItemIds);
+        $this->deleteRowsByForeignIds($deletedIdsByTableName, $table, 'page_id', $pageIds, $fileListItemIds);
 
         // Table eportfolio_permission (child of page, cascade-delete only).
         // (No need to exclude any rows, because this table is not directly targeted.)
         // eportfolio_page
         // └── eportfolio_permission
-        $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_PERMISSION, 'page_id', $pageIds);
+        $this->deleteRowsByForeignIds($deletedIdsByTableName, self::TABLE_EPORTFOLIO_PERMISSION, 'page_id', $pageIds);
 
         // Tables component_config_instance and list item tables (grandchildren of page, via component_instance, cascade-delete only).
         // (No need to exclude any rows, because these tables are not directly targeted.)
@@ -268,21 +271,21 @@ class Eportfolio extends Base
         //     ├── eportfolio_component_basiclist_item
         //     ├── eportfolio_component_linklist_item
         //     └── eportfolio_component_textbox_item
-        $this->deleteRowsByForeignIds($deleted, self::TABLE_COMPONENT_CONFIG_INSTANCE, 'component_instance_id', $componentInstanceIds);
-        $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_ADVANCEDLIST_ITEM, 'component_instance_id', $componentInstanceIds);
-        $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_BASICLIST_ITEM, 'component_instance_id', $componentInstanceIds);
-        $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_LINKLIST_ITEM, 'component_instance_id', $componentInstanceIds);
-        $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_TEXTBOX_ITEM, 'component_instance_id', $componentInstanceIds);
+        $this->deleteRowsByForeignIds($deletedIdsByTableName, self::TABLE_COMPONENT_CONFIG_INSTANCE, 'component_instance_id', $componentInstanceIds);
+        $this->deleteRowsByForeignIds($deletedIdsByTableName, self::TABLE_EPORTFOLIO_COMPONENT_ADVANCEDLIST_ITEM, 'component_instance_id', $componentInstanceIds);
+        $this->deleteRowsByForeignIds($deletedIdsByTableName, self::TABLE_EPORTFOLIO_COMPONENT_BASICLIST_ITEM, 'component_instance_id', $componentInstanceIds);
+        $this->deleteRowsByForeignIds($deletedIdsByTableName, self::TABLE_EPORTFOLIO_COMPONENT_LINKLIST_ITEM, 'component_instance_id', $componentInstanceIds);
+        $this->deleteRowsByForeignIds($deletedIdsByTableName, self::TABLE_EPORTFOLIO_COMPONENT_TEXTBOX_ITEM, 'component_instance_id', $componentInstanceIds);
 
         // Table component_instance (child of page, cascade-delete only)
         // eportfolio_page
         // └── component_instance
-        $this->deleteRowsByIds($deleted, self::TABLE_COMPONENT_INSTANCE, $componentInstanceIds);
+        $this->deleteRowsByIds($deletedIdsByTableName, self::TABLE_COMPONENT_INSTANCE, $componentInstanceIds);
 
         // Table eportfolio_page (root)
-        $this->deleteRowsByIds($deleted, self::TABLE_EPORTFOLIO_PAGE, $pageIds, 'page_id');
+        $this->deleteRowsByIds($deletedIdsByTableName, self::TABLE_EPORTFOLIO_PAGE, $pageIds, 'page_id');
 
-        $this->logChunkResult($deleted);
+        $this->logChunkResult($deletedIdsByTableName);
     }
 
     /**
@@ -382,12 +385,12 @@ class Eportfolio extends Base
     /**
      * Deletes rows from a table by primary key and records the count.
      *
-     * @param array<string, int> $deleted
+     * @param array<string, list<int>> $deletedIdsByTableName
      * @param string             $table
      * @param list<int>          $ids
      * @param string             $column
      */
-    protected function deleteRowsByIds(array &$deleted, string $table, array $ids, string $column = 'id'): void
+    protected function deleteRowsByIds(array &$deletedIdsByTableName, string $table, array $ids, string $column = 'id'): void
     {
         if ($ids === []) {
             return;
@@ -399,7 +402,7 @@ class Eportfolio extends Base
         );
         $statement->execute(Builder::getArrayParameters($ids, 'id'));
 
-        $this->recordDeleted($deleted, $table, $statement->rowCount());
+        $this->recordDeleted($deletedIdsByTableName, $table, $ids);
     }
 
     /**
@@ -409,14 +412,19 @@ class Eportfolio extends Base
      *     WHERE $column IN ($ids)
      *     AND id NOT IN ($excludedIds)
      *
-     * @param array<string, int> $deleted
+     * @param list<string, list<int>> $deletedIdsByTableName
      * @param string             $table       - The table whose rows should be deleted.
      * @param string             $column      - The name of the column of $table
      * @param list<int>          $ids         - These are ids for for use in $column of $table.
      * @param list<int>          $excludedIds - These are ids of $table.
      */
-    protected function deleteRowsByForeignIds(array &$deleted, string $table, string $column, array $ids, array $excludedIds = []): void
-    {
+    protected function deleteRowsByForeignIds(
+        array &$deletedIdsByTableName,
+        string $table,
+        string $column,
+        array $ids,
+        array $excludedIds = []
+    ): void {
         if ($ids === []) {
             return;
         }
@@ -436,32 +444,33 @@ class Eportfolio extends Base
         );
         $statement->execute($parameters);
 
-        $this->recordDeleted($deleted, $table, $statement->rowCount());
+        $this->recordDeleted($deletedIdsByTableName, $table, $ids);
     }
 
     /**
      * Accumulates a row-count into the deleted totals map for the given table.
      *
-     * @param array<string, int> $deleted
+     * @param array<string, list<int>> $deletedIdsByTableName
      * @param string             $table
-     * @param int                $count
+     * @param list<int> $ids
      */
-    protected function recordDeleted(array &$deleted, string $table, int $count): void
+    protected function recordDeleted(array &$deletedIdsByTableName, string $table, array $ids): void
     {
-        $deleted[$table] = ($deleted[$table] ?? 0) + $count;
+        $deletedIdsByTableName[$table] = $ids;
     }
 
     /**
      * Logs the number of rows deleted (or that would be deleted) per table for the current chunk.
      *
-     * @param array<string, int> $deleted
+     * @param array<string, list<int>> $deletedIdsByTableName
      */
-    protected function logChunkResult(array $deleted): void
+    protected function logChunkResult(array $deletedIdsByTableName): void
     {
-        $prefix = $this->perform ? 'Deleted' : 'Would have deleted';
-
-        foreach ($deleted as $table => $count) {
-            $this->log->notice(sprintf("%s %s %s rows", $prefix, $count, $table));
+        foreach ($deletedIdsByTableName as $table => $ids) {
+            $this->log->notice(
+                ($this->perform ? 'Deleted' : 'Would have deleted') . ' ' .
+                count($ids) . " rows from table '$table' (ids: " . implode(', ', $ids) . ')'
+            );
         }
     }
 
