@@ -343,7 +343,7 @@ class Eportfolio extends Base
         $placeholders = Builder::getArrayPlaceholders($pageIds, 'page_id');
         $statement = $this->getPreparedStatement(
             "SELECT id FROM " . self::TABLE_COMPONENT_INSTANCE . "
-            WHERE module = :module AND identifier IN {$placeholders}"
+            WHERE module = :module AND identifier IN $placeholders"
         );
         $statement->execute(
             array_merge(
@@ -372,7 +372,7 @@ class Eportfolio extends Base
 
         $placeholders = Builder::getArrayPlaceholders($pageIds, 'page_id');
         $statement = $this->getPreparedStatement(
-            "SELECT id FROM " . self::TABLE_EPORTFOLIO_COMPONENT_BLOG . " WHERE page_id IN {$placeholders}"
+            "SELECT id FROM " . self::TABLE_EPORTFOLIO_COMPONENT_BLOG . " WHERE page_id IN $placeholders"
         );
         $statement->execute(Builder::getArrayParameters($pageIds, 'page_id'));
 
@@ -398,7 +398,7 @@ class Eportfolio extends Base
 
         $placeholders = Builder::getArrayPlaceholders($ids, 'id');
         $statement = $this->getPreparedStatement(
-            $this->deleteStatement($table) . " FROM {$table} WHERE {$column} IN {$placeholders}"
+            $this->deleteStatement($table) . " FROM $table WHERE $column IN $placeholders"
         );
         $statement->execute(Builder::getArrayParameters($ids, 'id'));
 
@@ -435,12 +435,12 @@ class Eportfolio extends Base
 
         if ($excludedIds !== []) {
             $excludedPlaceholders = Builder::getArrayPlaceholders($excludedIds, 'excluded_id');
-            $exclusionPredicate = " AND id NOT IN {$excludedPlaceholders}";
+            $exclusionPredicate = " AND id NOT IN $excludedPlaceholders";
             $parameters = array_merge($parameters, Builder::getArrayParameters($excludedIds, 'excluded_id'));
         }
 
         $statement = $this->getPreparedStatement(
-            $this->deleteStatement($table) . " FROM {$table} WHERE {$column} IN {$placeholders}{$exclusionPredicate}"
+            $this->deleteStatement($table) . " FROM $table WHERE $column IN $placeholders$exclusionPredicate"
         );
         $statement->execute($parameters);
 
