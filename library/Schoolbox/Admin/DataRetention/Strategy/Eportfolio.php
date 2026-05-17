@@ -412,7 +412,7 @@ class Eportfolio extends Base
      *     WHERE $column IN ($ids)
      *     AND id NOT IN ($excludedIds)
      *
-     * @param list<string, list<int>> $deletedIdsByTableName
+     * @param array<string, list<int>> $deletedIdsByTableName
      * @param string             $table       - The table whose rows should be deleted.
      * @param string             $column      - The name of the column of $table
      * @param list<int>          $ids         - These are ids for for use in $column of $table.
