@@ -192,26 +192,17 @@ class Mapper extends BaseMapper
             return null;
         }
 
-        $statement = $this->getDatabase()->prepare(
-            "
-                {$this->getSelectString()}
-                {$this->getFromString()}
-                WHERE {$this->getTable()}.user_id = :userId
-                AND {$this->getTable()}.status = :status
-                AND rs.deleted_at IS NULL
-                ORDER BY {$this->getTable()}.updated_at DESC, {$this->getTable()}.id DESC
-                LIMIT 1
-            "
-        );
-        $statement->execute(
-            [
-                'userId' => $user->getId(),
-                'status' => Model::STATUS_UNCONFIRMED,
-            ]
-        );
+        $pb = $this->getPredicateBuilder();
+        $pb->equals('user_id', $user->getId());
+        $pb->equals('status', Model::STATUS_UNCONFIRMED);
 
-        $students = $this->hydrateSelect($statement);
-        $student = $students->first();
+        $student = $this->findOneByPredicates($pb, [
+            'order' => [
+                'updated_at' => 'DESC',
+                'id' => 'DESC',
+            ],
+            'limit' => 1,
+        ]);
 
         if (!$student instanceof Model) {
             return null;
