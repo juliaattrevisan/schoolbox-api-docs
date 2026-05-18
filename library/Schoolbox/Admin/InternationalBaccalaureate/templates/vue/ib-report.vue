@@ -117,7 +117,7 @@ window.Vue.onMounted((): void => {
     <div class="small-12 island l-flex-col l-gap-m">
         <div class="l-flex l-flex--align-center l-flex--justify-space f-no-margins">
             <h2 class="subheader f-no-margins">{{ props.sessionTitle }}</h2>
-            <button type="button" class="ib-report__download-btn" disabled aria-label="Download">
+            <button type="button" class="sbx-icon-only-button" disabled aria-label="Download">
                 <sbx-icon name="download"></sbx-icon>
             </button>
         </div>
@@ -164,14 +164,3 @@ window.Vue.onMounted((): void => {
         <div id="ib-report-pop-out-container"></div>
     </div>
 </template>
-
-<style scoped>
-.ib-report__download-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0.25rem;
-    color: var(--sbx-config-color-accent, #0066b0);
-    opacity: 0.85;
-}
-</style>
