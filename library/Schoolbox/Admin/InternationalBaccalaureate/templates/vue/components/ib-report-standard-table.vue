@@ -70,7 +70,10 @@ function onSaved(studentId: number, updatedSubjects: SubjectGroup): void {
                 <td><ib-report-subject-labels :entry="student.subjects.sl" /></td>
                 <td><ib-report-subject-labels :entry="student.subjects.core" /></td>
                 <td>
-                    <sbx-pop-out :content-id="`ib-row-dropdown-${student.id}`"></sbx-pop-out>
+                    <sbx-pop-out
+                        :content-id="`ib-row-dropdown-${student.id}`"
+                        move-to="#ib-report-pop-out-container"
+                    ></sbx-pop-out>
                     <ul
                         :id="`ib-row-dropdown-${student.id}`"
                         class="f-dropdown"

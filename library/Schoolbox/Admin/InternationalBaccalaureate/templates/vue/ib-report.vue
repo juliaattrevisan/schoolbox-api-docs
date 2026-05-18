@@ -160,6 +160,8 @@ window.Vue.onMounted((): void => {
                 <ib-report-registered-table :students="registered" />
             </ib-report-section>
         </div>
+
+        <div id="ib-report-pop-out-container"></div>
     </div>
 </template>
 
