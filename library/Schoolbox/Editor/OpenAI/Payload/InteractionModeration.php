@@ -81,10 +81,6 @@ class InteractionModeration
             'type' => 'object',
             'additionalProperties' => false,
             'properties' => [
-                'alert' => [
-                    'type' => 'boolean',
-                    'description' => 'Set to true if any concern exists that a school may need visibility of. Set to false only if no concerns are identified.',
-                ],
                 'overall_risk_level' => [
                     'type' => 'string',
                     'enum' => ['none', 'low', 'medium', 'high', 'critical'],
