@@ -99,6 +99,7 @@ class ControllerTest extends TestCase
                     'userName' => 'Alex, Nguyen',
                     'hasMissingDetails' => false,
                     'missingFields' => [],
+                    'session' => '',
                     'candidateDetails' => [
                         [
                             'key' => 'dateOfBirth',
@@ -157,7 +158,7 @@ class ControllerTest extends TestCase
                         [
                             'key' => 'referenceCode',
                             'label' => 'Reference Code',
-                            'value' => 'Alex, Nguyen',
+                            'value' => '-',
                             'isMissing' => false,
                         ],
                     ],
@@ -184,6 +185,7 @@ class ControllerTest extends TestCase
                     'userName' => 'Sam, Patel',
                     'hasMissingDetails' => false,
                     'missingFields' => [],
+                    'session' => '',
                     'candidateDetails' => [
                         [
                             'key' => 'dateOfBirth',
@@ -242,7 +244,7 @@ class ControllerTest extends TestCase
                         [
                             'key' => 'referenceCode',
                             'label' => 'Reference Code',
-                            'value' => 'Sam, Patel',
+                            'value' => '-',
                             'isMissing' => false,
                         ],
                     ],
