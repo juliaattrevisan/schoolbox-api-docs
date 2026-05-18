@@ -824,6 +824,7 @@ export default {
                                             v-for="(audienceListItem, index) in audienceListItems"
                                             :key="index"
                                             class="ss-results-item checklist sbx-checkbox-radio-container"
+                                            data-test="news-item-audience-select-audience-list-item"
                                         >
                                             <input
                                                 :id="`audience-list-input-${index}`"
@@ -831,7 +832,11 @@ export default {
                                                 v-model="audienceListChecked"
                                                 type="checkbox"
                                             />
-                                            <label :for="`audience-list-input-${index}`">{{ audienceListItem }}</label>
+                                            <label
+                                                :for="`audience-list-input-${index}`"
+                                                data-test="news-item-audience-select-audience-list-item-label"
+                                                >{{ audienceListItem }}</label
+                                            >
                                         </li>
                                     </ul>
                                 </div>
