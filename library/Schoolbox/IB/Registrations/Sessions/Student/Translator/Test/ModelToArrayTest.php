@@ -49,69 +49,65 @@ class ModelToArrayTest extends TestCase
         $this->assertSame('May 2026', $payload['session']);
         $this->assertSame(
             [
-                'left' => [
-                    [
-                        'key' => 'dateOfBirth',
-                        'label' => 'Date of Birth',
-                        'value' => '2009-04-12',
-                        'isMissing' => false,
-                    ],
-                    [
-                        'key' => 'email',
-                        'label' => 'Email',
-                        'value' => 'alex.nguyen@example.edu',
-                        'isMissing' => false,
-                    ],
-                    [
-                        'key' => 'firstName',
-                        'label' => 'First Name',
-                        'value' => 'Alex',
-                        'isMissing' => false,
-                    ],
-                    [
-                        'key' => 'lastName',
-                        'label' => 'Last Name',
-                        'value' => 'Nguyen',
-                        'isMissing' => false,
-                    ],
-                    [
-                        'key' => 'gender',
-                        'label' => 'Gender',
-                        'value' => 'F',
-                        'isMissing' => false,
-                    ],
+                [
+                    'key' => 'dateOfBirth',
+                    'label' => 'Date of Birth',
+                    'value' => '2009-04-12',
+                    'isMissing' => false,
                 ],
-                'right' => [
-                    [
-                        'key' => 'language1',
-                        'label' => 'Language 1',
-                        'value' => 'English (ENG)',
-                        'isMissing' => false,
-                    ],
-                    [
-                        'key' => 'language2',
-                        'label' => 'Language 2 (not required)',
-                        'value' => 'French (FRA)',
-                        'isMissing' => false,
-                    ],
-                    [
-                        'key' => 'nationality1',
-                        'label' => 'Nationality 1',
-                        'value' => 'Australian (AUS)',
-                        'isMissing' => false,
-                    ],
-                    [
-                        'key' => 'nationality2',
-                        'label' => 'Nationality 2 (not required)',
-                        'value' => 'New Zealander (NZL)',
-                        'isMissing' => false,
-                    ],
-                    [
-                        'key' => 'referenceCode',
-                        'label' => 'Reference Code',
-                        'value' => '-',
-                        'isMissing' => false,
-                    ],
+                [
+                    'key' => 'email',
+                    'label' => 'Email',
+                    'value' => 'alex.nguyen@example.edu',
+                    'isMissing' => false,
+                ],
+                [
+                    'key' => 'firstName',
+                    'label' => 'First Name',
+                    'value' => 'Alex',
+                    'isMissing' => false,
+                ],
+                [
+                    'key' => 'lastName',
+                    'label' => 'Last Name',
+                    'value' => 'Nguyen',
+                    'isMissing' => false,
+                ],
+                [
+                    'key' => 'gender',
+                    'label' => 'Gender',
+                    'value' => 'F',
+                    'isMissing' => false,
+                ],
+                [
+                    'key' => 'language1',
+                    'label' => 'Language 1',
+                    'value' => 'English (ENG)',
+                    'isMissing' => false,
+                ],
+                [
+                    'key' => 'language2',
+                    'label' => 'Language 2 (not required)',
+                    'value' => 'French (FRA)',
+                    'isMissing' => false,
+                ],
+                [
+                    'key' => 'nationality1',
+                    'label' => 'Nationality 1',
+                    'value' => 'Australian (AUS)',
+                    'isMissing' => false,
+                ],
+                [
+                    'key' => 'nationality2',
+                    'label' => 'Nationality 2 (not required)',
+                    'value' => 'New Zealander (NZL)',
+                    'isMissing' => false,
+                ],
+                [
+                    'key' => 'referenceCode',
+                    'label' => 'Reference Code',
+                    'value' => '-',
+                    'isMissing' => false,
                 ],
             ],
             $payload['candidateDetails']
@@ -153,7 +149,7 @@ class ModelToArrayTest extends TestCase
         $this->assertSame(', Nguyen', $payload['userName']);
         $this->assertTrue($payload['hasMissingDetails']);
         $candidateDetailsByKey = array_column(
-            array_merge($payload['candidateDetails']['left'], $payload['candidateDetails']['right']),
+            $payload['candidateDetails'],
             null,
             'key'
         );

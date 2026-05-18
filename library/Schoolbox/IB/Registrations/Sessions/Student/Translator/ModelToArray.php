@@ -108,28 +108,21 @@ class ModelToArray
     /**
      * @param array<string, string> $details
      * @param string[] $missingFields
-     * @return array{
-     *     left: array<int, array{key: string, label: string, value: string, isMissing: bool}>,
-     *     right: array<int, array{key: string, label: string, value: string, isMissing: bool}>
-     * }
+     * @return array<int, array{key: string, label: string, value: string, isMissing: bool}>
      */
     private function buildCandidateDetails(array $details, array $missingFields): array
     {
-        $columns = [
-            'left' => [
-                'dateOfBirth' => 'Date of Birth',
-                'email' => 'Email',
-                'firstName' => 'First Name',
-                'lastName' => 'Last Name',
-                'gender' => 'Gender',
-            ],
-            'right' => [
-                'language1' => 'Language 1',
-                'language2' => 'Language 2 (not required)',
-                'nationality1' => 'Nationality 1',
-                'nationality2' => 'Nationality 2 (not required)',
-                'referenceCode' => 'Reference Code',
-            ],
+        $labels = [
+            'dateOfBirth' => 'Date of Birth',
+            'email' => 'Email',
+            'firstName' => 'First Name',
+            'lastName' => 'Last Name',
+            'gender' => 'Gender',
+            'language1' => 'Language 1',
+            'language2' => 'Language 2 (not required)',
+            'nationality1' => 'Nationality 1',
+            'nationality2' => 'Nationality 2 (not required)',
+            'referenceCode' => 'Reference Code',
         ];
         $requiredFieldsByDetail = [
             'referenceCode' => 'userName',
@@ -139,24 +132,19 @@ class ModelToArray
             'nationality2' => true,
         ];
         $missingLookup = array_fill_keys($missingFields, true);
-        $candidateDetails = [
-            'left' => [],
-            'right' => [],
-        ];
+        $candidateDetails = [];
 
-        foreach ($columns as $column => $labels) {
-            foreach ($labels as $key => $label) {
-                $value = $details[$key] ?? '';
-                $requiredField = $requiredFieldsByDetail[$key] ?? $key;
-                $isMissing = isset($missingLookup[$requiredField]);
+        foreach ($labels as $key => $label) {
+            $value = $details[$key] ?? '';
+            $requiredField = $requiredFieldsByDetail[$key] ?? $key;
+            $isMissing = isset($missingLookup[$requiredField]);
 
-                $candidateDetails[$column][] = [
-                    'key' => $key,
-                    'label' => $label,
-                    'value' => $value !== '' ? $value : (isset($optionalFields[$key]) ? 'Not provided' : 'Missing'),
-                    'isMissing' => $isMissing,
-                ];
-            }
+            $candidateDetails[] = [
+                'key' => $key,
+                'label' => $label,
+                'value' => $value !== '' ? $value : (isset($optionalFields[$key]) ? 'Not provided' : 'Missing'),
+                'isMissing' => $isMissing,
+            ];
         }
 
         return $candidateDetails;

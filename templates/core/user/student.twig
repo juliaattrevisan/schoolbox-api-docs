@@ -755,45 +755,18 @@
                             If any of the details below are incorrect or if you have any questions, please speak with the DP Co-Ordinator.
                         </div>
                         {% if registrationPayload %}
+                        <section>
                             <h2>Candidate details</h2>
-                            <table>
-                                <tbody>
-                                    {% for leftDetail in registrationPayload.candidateDetails.left %}
-                                        {% set rightDetail = registrationPayload.candidateDetails.right[loop.index0] %}
-                                        <tr>
-                                            <td>
-                                                <div class="l-flex-row l-flex--align-center l-flex--no-wrap l-gap-xs">
-                                                    <strong class="l-flex__item--0-shrink">{{ leftDetail.label }}</strong>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span class="l-flex__item--1-grow">
-                                                    {% if leftDetail.isMissing %}
-                                                        <span class="alert label">{{ leftDetail.value }}</span>
-                                                    {% else %}
-                                                        {{ leftDetail.value }}
-                                                    {% endif %}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <div class="l-flex-row l-flex--align-center l-flex--no-wrap l-gap-xs">
-                                                    <strong class="l-flex__item--0-shrink">{{ rightDetail.label }}</strong>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span class="l-flex__item--1-grow">
-                                                    {% if rightDetail.isMissing %}
-                                                        <span class="alert label">{{ rightDetail.value }}</span>
-                                                    {% else %}
-                                                        {{ rightDetail.value }}
-                                                    {% endif %}
-                                                </span>
-                                            </td>
-                                        </tr>
+                            <div class="row">
+                                <dl class="">
+                                    {% for detail in registrationPayload.candidateDetails %}
+                                        <dt class="small-12 medium-4 columns"><b>{{ detail.label }}</b></dt>
+                                        <dd class="small-12 medium-8 columns">{{ detail.value }}</dd>
                                     {% endfor %}
-                                </tbody>
-                            </table>
-
+                                </dl>
+                            </div>
+                        </section>
+                        <section>
                             <h2>Subject details</h2>
                             {% set subjectGroups = {
                                 'HL': 'Higher Level',
@@ -809,13 +782,13 @@
                                 {% set registrationSession = registrationPayload.session is defined ? registrationPayload.session : '' %}
                                 <table>
                                     <thead>
-                                        <tr>
-                                            <th scope="col">Group</th>
-                                            <th scope="col">Subject Name</th>
-                                            <th scope="col">Level</th>
-                                            <th scope="col">Language</th>
-                                            <th scope="col">Session</th>
-                                        </tr>
+                                    <tr>
+                                        <th scope="col">Group</th>
+                                        <th scope="col">Subject Name</th>
+                                        <th scope="col">Level</th>
+                                        <th scope="col">Language</th>
+                                        <th scope="col">Session</th>
+                                    </tr>
                                     </thead>
                                     <tbody>
                                         {% for groupKey, groupLabel in subjectGroups %}
@@ -844,14 +817,15 @@
                                                 {% endif %}
                                             {% endfor %}
                                         {% endfor %}
-                                    </tbody>
-                                </table>
-                            {% else %}
-                                <p>No subjects are available for this registration.</p>
-                            {% endif %}
-                        {% else %}
-                            <p>No registration details are available.</p>
-                        {% endif %}
+                                        </tbody>
+                                    </table>
+                                {% else %}
+                                    <p>No subjects are available for this registration.</p>
+                                {% endif %}
+                                {% else %}
+                                    <p>No registration details are available.</p>
+                                {% endif %}
+                            </section>
                     </section>
                 </div>
             {% endif %}
@@ -1084,7 +1058,7 @@
 {# TODO: Where to pus this?
  # https://stackoverflow.com/questions/23569705/zurb-foundation-prevent-empty-column-collapsing-to-zero-width
  # https://foundation.zurb.com/forum/posts/22995-empty-column
- #}
+#}
 <style type="text/css">
     .columns, .column {
         min-height: 1px;
