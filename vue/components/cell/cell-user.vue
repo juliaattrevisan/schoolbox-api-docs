@@ -19,11 +19,11 @@ const props = defineProps<{
             <div class="l-flex-col l-flex--justify-center l-gap-sf-no-margins">
                 <a v-if="props.user._links?.profile" :href="props.user._links!.profile" title="View Profile">
                     {{ props.user.lastName }},
-                    {{ props.user.preferredName !== "" ? props.user.preferredName : props.user.firstName }}
+                    {{ props.user.preferredName || props.user.firstName }}
                 </a>
                 <template v-else>
                     {{ props.user.lastName }},
-                    {{ props.user.preferredName !== "" ? props.user.preferredName : props.user.firstName }}
+                    {{ props.user.preferredName || props.user.firstName }}
                 </template>
                 <p v-if="props.user.yearLevel || (props.user.campus && props.user.campus.length)" class="meta">
                     <template v-if="props.user.yearLevel">
