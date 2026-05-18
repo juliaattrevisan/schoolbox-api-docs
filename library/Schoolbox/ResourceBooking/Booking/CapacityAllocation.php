@@ -23,7 +23,8 @@ class CapacityAllocation
         ResourceModel $resource,
         DateTime $candidateStart,
         DateTime $candidateEnd,
-        iterable $approvedBookings
+        iterable $approvedBookings,
+        int $candidateQuantity = self::BOOKING_QUANTITY
     ): bool {
         $periods = [];
         foreach ($approvedBookings as $booking) {
@@ -35,6 +36,7 @@ class CapacityAllocation
             $periods[] = [
                 'start' => $start,
                 'end' => $end,
+                'quantity' => $booking->getQuantity(),
             ];
         }
 
@@ -42,24 +44,27 @@ class CapacityAllocation
             $resource,
             $candidateStart,
             $candidateEnd,
-            $periods
+            $periods,
+            $candidateQuantity
         );
     }
 
     /**
-     * @param array<int, array{startDatetime: Alaress_Date_Format, endDatetime: Alaress_Date_Format}> $approvedPeriods
+     * @param array<int, array{startDatetime: Alaress_Date_Format, endDatetime: Alaress_Date_Format, quantity?: int}> $approvedPeriods
      */
     public function periodWouldExceedCapacity(
         ResourceModel $resource,
         Alaress_Date_Format $candidateStart,
         Alaress_Date_Format $candidateEnd,
-        array $approvedPeriods
+        array $approvedPeriods,
+        int $candidateQuantity = self::BOOKING_QUANTITY
     ): bool {
         $periods = [];
         foreach ($approvedPeriods as $period) {
             $periods[] = [
                 'start' => $period['startDatetime'],
                 'end' => $period['endDatetime'],
+                'quantity' => $period['quantity'] ?? self::BOOKING_QUANTITY,
             ];
         }
 
@@ -67,7 +72,8 @@ class CapacityAllocation
             $resource,
             $candidateStart,
             $candidateEnd,
-            $periods
+            $periods,
+            $candidateQuantity
         );
     }
 
@@ -111,10 +117,19 @@ class CapacityAllocation
             $approvedPeriods[] = [
                 'start' => $event->getStartTime(),
                 'end' => $event->getEndTime(),
+                'quantity' => $booking->getQuantity(),
             ];
         }
 
-        if (!$this->wouldExceedCapacity($resource, $candidate->getStartTime(), $candidate->getEndTime(), $approvedPeriods)) {
+        if (
+            !$this->wouldExceedCapacity(
+                $resource,
+                $candidate->getStartTime(),
+                $candidate->getEndTime(),
+                $approvedPeriods,
+                $candidateBooking->getQuantity()
+            )
+        ) {
             return [];
         }
 
@@ -122,20 +137,21 @@ class CapacityAllocation
     }
 
     /**
-     * @param array<int, array{start: DateTimeInterface|Alaress_Date_Format, end: DateTimeInterface|Alaress_Date_Format}> $existingPeriods
+     * @param array<int, array{start: DateTimeInterface|Alaress_Date_Format, end: DateTimeInterface|Alaress_Date_Format, quantity?: int}> $existingPeriods
      */
     private function wouldExceedCapacity(
         ResourceModel $resource,
         DateTimeInterface|Alaress_Date_Format $candidateStart,
         DateTimeInterface|Alaress_Date_Format $candidateEnd,
-        array $existingPeriods
+        array $existingPeriods,
+        int $candidateQuantity = self::BOOKING_QUANTITY
     ): bool {
         $capacity = max(1, $resource->getCapacity());
         $points = [];
 
-        $this->addPeriodPoints($points, $candidateStart, $candidateEnd, self::BOOKING_QUANTITY);
+        $this->addPeriodPoints($points, $candidateStart, $candidateEnd, $candidateQuantity);
         foreach ($existingPeriods as $period) {
-            $this->addPeriodPoints($points, $period['start'], $period['end'], self::BOOKING_QUANTITY);
+            $this->addPeriodPoints($points, $period['start'], $period['end'], $period['quantity'] ?? self::BOOKING_QUANTITY);
         }
 
         usort(
@@ -170,6 +186,7 @@ class CapacityAllocation
             return;
         }
 
+        $quantity = max(1, $quantity);
         $points[] = ['time' => $startTimestamp, 'delta' => $quantity];
         $points[] = ['time' => $endTimestamp, 'delta' => -$quantity];
     }

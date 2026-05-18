@@ -5864,6 +5864,7 @@ CREATE TABLE `resource_booking` (
   `resource_id` int(11) NOT NULL,
   `name` varchar(255) DEFAULT NULL,
   `notes` text DEFAULT NULL,
+  `quantity` int(11) NOT NULL DEFAULT 1,
   `created_at` datetime NOT NULL,
   `modified_at` datetime NOT NULL,
   `deleted_at` datetime DEFAULT NULL,

@@ -175,6 +175,8 @@ class Controller extends Base
                 'returnUrl'         => $this->requestQuery->get('returnUrl'),
                 'cancelReturnUrl'   => $this->session->getHistory(),
                 'allowOverride'     => $booking->getResource()->canUserModerateThisItem($this->getUser()),
+                'showQuantity'      => $this->shouldShowQuantityInput($booking),
+                'quantityMax'       => $this->getMaxQuantity($booking),
                 'currentTerm'       => $this->getTermMapper()->findForToday(),
                 'validationData'    => [
                                         'start' => Validation::START_PERIOD_ERRORS,
@@ -253,7 +255,8 @@ class Controller extends Base
                 $event,
                 $clashBookingStartDatesAsKeys,
                 $validation,
-                $overrideValidation
+                $overrideValidation,
+                $this->getQuantityFromForm(),
             );
 
             $bookingList = new GenericCollection(Model::class);
@@ -387,13 +390,15 @@ class Controller extends Base
 
         $originalStart = clone $item->getEvent()->getStartDateTime()->getDateTimeObject();
         $originalEnd   = clone $item->getEvent()->getEndDateTime()->getDateTimeObject();
+        $originalQuantity = $item->getQuantity();
         $code = self::HTTP_STATUS_CODE_OK;
         $nBookingsUpdatedByStatusId = [];
 
         if (empty($errors)) {
             $item
                 ->setName($this->requestPost['name'])
-                ->setNotes($this->requestPost['notes']);
+                ->setNotes($this->requestPost['notes'])
+                ->setQuantity($this->getQuantityFromForm($item));
             // Note related bookings are included in $bookingSeries.
             $bookingSeries = new Series($this->getBookingMapper(), $this->getStatusMapper(), $this->getExternalTimetableHandler());
             $series = $bookingSeries->getUpdatedSeries(
@@ -426,27 +431,20 @@ class Controller extends Base
                 $event->setDetail($booking->getNotes());
                 $this->eventMapper->save($event);
 
-                if ($isTimeChanged) {
-                    // The booking's period has changed, so figure out the status as if this is a new booking.
-                    $bookingStartDateTime = $booking->getEvent()->getStartDateTime();
-                    $thisBookingHasClashes = (
-                        $bookingStartDateTime !== null &&
-                        array_key_exists($bookingStartDateTime->getDatabaseDate(), $clashBookingStartDatesAsKeys)
-                    );
-                    $bookingStatusId = $validation->getNewStatusIdForBooking(
-                        booking: $booking,
-                        isClash: $thisBookingHasClashes,
-                        user: $this->getUser(),
-                        overrideValidation: $overrideValidation,
-                    );
-                    $booking->setStatus($this->getStatusMapper()->createModel($bookingStatusId));
-                } else {
-                    // The booking's period has not changed, so leave the booking's status as it was.
-                    // Unless we are overriding validation, in which case set it to STATUS_APPROVED.
-                    if ($overrideValidation && $booking->getStatus()->getId() !== Status\Model::STATUS_APPROVED) {
-                        $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED));
-                    }
-                }
+                $bookingStartDateTime = $booking->getEvent()->getStartDateTime();
+                $thisBookingHasClashes = (
+                    $bookingStartDateTime !== null &&
+                    array_key_exists($bookingStartDateTime->getDatabaseDate(), $clashBookingStartDatesAsKeys)
+                );
+                $bookingStatusId = $validation->getNewStatusIdForUpdatedBooking(
+                    booking: $booking,
+                    isClash: $thisBookingHasClashes,
+                    user: $this->getUser(),
+                    originalQuantity: $originalQuantity,
+                    periodChanged: $isTimeChanged,
+                    overrideValidation: $overrideValidation,
+                );
+                $booking->setStatus($this->getStatusMapper()->createModel($bookingStatusId));
 
                 $bookingList->add($booking);
             }
@@ -548,6 +546,7 @@ class Controller extends Base
                         $clashBookingStartDatesAsKeys,
                         $validation,
                         $overrideValidation,
+                        Model::DEFAULT_QUANTITY,
                     );
                     $relatedBooking
                         ->setName($booking->getName())
@@ -676,6 +675,28 @@ class Controller extends Base
         return $relatedItems;
     }
 
+    private function getQuantityFromForm(?Model $existingBooking = null): int
+    {
+        $quantity = $this->requestPost->get('quantity');
+
+        if ($quantity === null || $quantity === '') {
+            return $existingBooking?->getQuantity() ?? Model::DEFAULT_QUANTITY;
+        }
+
+        return max(Model::DEFAULT_QUANTITY, (int)$quantity);
+    }
+
+    private function shouldShowQuantityInput(Model $booking): bool
+    {
+        return $booking->getResource()->getCapacity() > Model::DEFAULT_QUANTITY
+            || $booking->getQuantity() > Model::DEFAULT_QUANTITY;
+    }
+
+    private function getMaxQuantity(Model $booking): int
+    {
+        return max($booking->getResource()->getCapacity(), $booking->getQuantity());
+    }
+
     /**
      * Helper for creating events for resource bookings.
      *
@@ -728,6 +749,7 @@ class Controller extends Base
         array $clashBookingStartDatesAsKeys,
         Validation $validation,
         bool $overrideValidation,
+        int $quantity = Model::DEFAULT_QUANTITY,
     ): Model {
         $booking = new Model();
         $booking
@@ -735,6 +757,7 @@ class Controller extends Base
             ->setResource($resource)
             ->setName($this->requestPost['name'])
             ->setNotes($this->requestPost['notes'])
+            ->setQuantity($quantity)
             ->setRelatedBookingList(new GenericCollection(Model::class))
             ->setBookingStartAt(null) // Null here means 'the booking start time is the event start time'.
             ->setBookingEndAt(null);   // Null here means 'the booking end time is the event end time'.
@@ -886,6 +909,8 @@ class Controller extends Base
                 'returnUrl'         => $this->requestQuery->get('returnUrl'),
                 'cancelReturnUrl'   => $this->session->getHistory(),
                 'allowOverride'     => $item->getResource()->canUserModerateThisItem($this->getUser()),
+                'showQuantity'      => $this->shouldShowQuantityInput($item),
+                'quantityMax'       => $this->getMaxQuantity($item),
                 'currentTerm'       => $this->getTermMapper()->findForToday(),
                 'validationData'    => [
                     'start' => Validation::START_PERIOD_ERRORS,

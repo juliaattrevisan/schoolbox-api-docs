@@ -1456,8 +1456,17 @@ class Controller extends Base
             $bookingToUpdate->setResource($booking->getResource());
         }
 
+        $originalQuantityByBookingId = [];
+        $originalStartByBookingId = [];
+        $originalEndByBookingId = [];
         $quantityByBookingId = [];
         foreach ($bookingsToUpdate as $bookingToUpdate) {
+            $originalStart = $bookingToUpdate->getBookingStartAt() ?? $bookingToUpdate->getEvent()->getStartDateTime();
+            $originalEnd = $bookingToUpdate->getBookingEndAt() ?? $bookingToUpdate->getEvent()->getEndDateTime();
+            $originalQuantityByBookingId[$bookingToUpdate->getId()] = $bookingToUpdate->getQuantity();
+            $originalStartByBookingId[$bookingToUpdate->getId()] = $originalStart?->getDatabaseDate();
+            $originalEndByBookingId[$bookingToUpdate->getId()] = $originalEnd?->getDatabaseDate();
+
             $quantityForBooking = $this->getBookingValidation()->getQuantityFromPostData(
                 $quantityWasSubmitted ? ['quantity' => $quantityRaw] : [],
                 $bookingToUpdate
@@ -1512,10 +1521,19 @@ class Controller extends Base
 
         // Set booking status to pending if the booking has a clash.  Otherwise the status can stay as it was.
         foreach ($bookingsToUpdate as $bookingToUpdate) {
-            $statusId = $this->bookingValidation->getNewStatusIdForBooking(
-                $bookingToUpdate,
-                $isClashByBookingId[$bookingToUpdate->getId()],
-                $this->getUser()
+            $bookingIdToUpdate = $bookingToUpdate->getId();
+            $bookingStart = $bookingToUpdate->getBookingStartAt() ?? $bookingToUpdate->getEvent()->getStartDateTime();
+            $bookingEnd = $bookingToUpdate->getBookingEndAt() ?? $bookingToUpdate->getEvent()->getEndDateTime();
+            $periodChanged = (
+                $originalStartByBookingId[$bookingIdToUpdate] !== $bookingStart?->getDatabaseDate()
+                || $originalEndByBookingId[$bookingIdToUpdate] !== $bookingEnd?->getDatabaseDate()
+            );
+            $statusId = $this->getBookingValidation()->getNewStatusIdForUpdatedBooking(
+                booking: $bookingToUpdate,
+                isClash: $isClashByBookingId[$bookingIdToUpdate] ?? false,
+                user: $this->getUser(),
+                originalQuantity: $originalQuantityByBookingId[$bookingIdToUpdate],
+                periodChanged: $periodChanged,
             );
             $bookingToUpdate->setStatus($this->bookingStatusMapper->createModel($statusId));
         }

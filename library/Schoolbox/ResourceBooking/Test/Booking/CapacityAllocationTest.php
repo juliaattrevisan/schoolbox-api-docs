@@ -44,6 +44,54 @@ class CapacityAllocationTest extends TestCase
         ));
     }
 
+    public function testBookingQuantityConsumesMultipleCapacitySlots(): void
+    {
+        $resource = (new ResourceModel())->setId(10)->setCapacity(5);
+        $allocation = new CapacityAllocation();
+        $approvedBookings = [
+            $this->booking(
+                1,
+                $resource,
+                '2077-01-01T10:00:00+00:00',
+                '2077-01-01T11:00:00+00:00',
+                quantity: 2
+            ),
+        ];
+
+        $this->assertFalse($allocation->bookingWouldExceedCapacity(
+            $resource,
+            new DateTime('2077-01-01T10:00:00+00:00'),
+            new DateTime('2077-01-01T11:00:00+00:00'),
+            $approvedBookings,
+            3
+        ));
+        $this->assertTrue($allocation->bookingWouldExceedCapacity(
+            $resource,
+            new DateTime('2077-01-01T10:00:00+00:00'),
+            new DateTime('2077-01-01T11:00:00+00:00'),
+            $approvedBookings,
+            4
+        ));
+    }
+
+    public function testAdditionalApprovedPeriodQuantityConsumesCapacity(): void
+    {
+        $resource = (new ResourceModel())->setId(10)->setCapacity(3);
+        $allocation = new CapacityAllocation();
+
+        $this->assertTrue($allocation->periodWouldExceedCapacity(
+            $resource,
+            $this->date('2077-01-01T10:00:00+00:00'),
+            $this->date('2077-01-01T11:00:00+00:00'),
+            [[
+                'startDatetime' => $this->date('2077-01-01T10:00:00+00:00'),
+                'endDatetime' => $this->date('2077-01-01T11:00:00+00:00'),
+                'quantity' => 2,
+            ]],
+            2
+        ));
+    }
+
     public function testCapacityTwoRejectsThirdSimultaneousBooking(): void
     {
         $resource = (new ResourceModel())->setId(10)->setCapacity(2);
@@ -146,12 +194,42 @@ class CapacityAllocationTest extends TestCase
         $this->assertSame([$approved], $allocation->getBlockingApprovedBookingEvents($candidate, [$candidate, $approved]));
     }
 
+    public function testApprovedEventQuantityBlocksPendingCandidateWhenCapacityWouldBeExceeded(): void
+    {
+        $resource = (new ResourceModel())->setId(10)->setCapacity(3);
+        $allocation = new CapacityAllocation();
+
+        $candidate = $this->resourceBookingEvent(
+            $this->booking(
+                1,
+                $resource,
+                '2077-01-01T10:00:00+00:00',
+                '2077-01-01T11:00:00+00:00',
+                StatusModel::STATUS_PENDING,
+                2
+            )
+        );
+        $approved = $this->resourceBookingEvent(
+            $this->booking(
+                2,
+                $resource,
+                '2077-01-01T10:30:00+00:00',
+                '2077-01-01T11:30:00+00:00',
+                StatusModel::STATUS_APPROVED,
+                2
+            )
+        );
+
+        $this->assertSame([$approved], $allocation->getBlockingApprovedBookingEvents($candidate, [$candidate, $approved]));
+    }
+
     private function booking(
         int $id,
         ResourceModel $resource,
         string $start,
         string $end,
-        int $statusId = StatusModel::STATUS_APPROVED
+        int $statusId = StatusModel::STATUS_APPROVED,
+        int $quantity = 1
     ): BookingModel {
         $event = (new Event())
             ->setStartDateTime($this->date($start))
@@ -161,7 +239,8 @@ class CapacityAllocationTest extends TestCase
             ->setId($id)
             ->setResource($resource)
             ->setEvent($event)
-            ->setStatus((new StatusModel())->setId($statusId));
+            ->setStatus((new StatusModel())->setId($statusId))
+            ->setQuantity($quantity);
     }
 
     private function resourceBookingEvent(BookingModel $booking): ResourceBookingEvent

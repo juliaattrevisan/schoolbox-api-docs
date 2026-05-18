@@ -219,6 +219,14 @@ $(function() {
                 'remote.tooShort': true,
                 'remote.tooLong': true
             },
+            {% if showQuantity %}
+            'quantity': {
+                required: true,
+                digits: true,
+                min: 1,
+                max: {{ quantityMax }}
+            },
+            {% endif %}
             'repeat_until': {
                 datepickerDate: {
                     depends: function() {
@@ -265,6 +273,14 @@ $(function() {
                 required:       'Please enter a valid date',
                 datepickerDate: 'Please enter a valid date'
             },
+            {% if showQuantity %}
+            'quantity': {
+                required: 'Please enter a valid quantity',
+                digits: 'Please enter a whole number',
+                min: 'Please enter a quantity of at least 1',
+                max: 'Please enter a quantity no greater than {{ quantityMax }}'
+            },
+            {% endif %}
             'repeat_until': {
                 datepickerDate: 'Please enter a valid date',
                 'afterStart':   'Repeat-until date must be after start date'
@@ -439,6 +455,20 @@ $(function() {
                                maxlength="30"
                                value="{{ item.event.endDateTime.local ?? '' }}"/>
                     </div>
+                    {% if showQuantity %}
+                    <div class="small-12 columns">
+                        <label for="booking-quantity" class="required">
+                            Quantity
+                        </label>
+                        <input name="quantity"
+                               id="booking-quantity"
+                               type="number"
+                               min="1"
+                               max="{{ quantityMax }}"
+                               step="1"
+                               value="{{ item.quantity }}"/>
+                    </div>
+                    {% endif %}
                 </fieldset>
 
                 {% if item.event.id is empty %}

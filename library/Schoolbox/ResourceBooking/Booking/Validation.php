@@ -46,6 +46,7 @@ class Validation
 {
     const string START_PERIOD_ERRORS = 'start_period_errors'; // A key for errors pertaining to the start of the booking period.
     const string END_PERIOD_ERRORS = 'end_period_errors'; // A key for errors pertaining to the end of the booking period.
+    const string QUANTITY_ERRORS = 'quantity';
     const ERROR_INVALID = 'invalid';
     const ERROR_BEFORE_START = 'before_start';
     const ERROR_IN_PAST = 'in_past';
@@ -158,6 +159,7 @@ class Validation
      *            'override_validation' => '1' or blank or unset
      *            'startDate' => datetime in local format (e.g. '02/12/2025 12:00pm')
      *            'endDate' => datetime in local format (e.g. '02/12/2025 12:00pm')
+     *            'quantity' => number of resource units requested
      *            'campus' => 0 or campusId
      *            'repeat_until' => date in local format (e.g. 02/12/2025)
      *            'related_item' => array of ['resource_id' => int, 'notes' => string]
@@ -200,6 +202,7 @@ class Validation
         $errors        = [];
         $startDate     = null;
         $endDate       = null;
+        $quantity      = $this->getQuantityFromPostData($postData, $existingBooking);
 
         // Only users allowed to moderate this item may override validation
         $override = (
@@ -224,7 +227,10 @@ class Validation
             return $errors;
         }
 
-        $errors = $this->validateSimpleRules($resource, $startDate, $endDate, $override);
+        $errors = array_merge_recursive(
+            $this->validateQuantity($resource, $quantity, $existingBooking),
+            $this->validateSimpleRules($resource, $startDate, $endDate, $override),
+        );
 
         $series = new Series($this->getBookingMapper(), $this->getStatusMapper(), $this->getExternalTimetableHandler());
 
@@ -264,9 +270,15 @@ class Validation
                     $thisStart,
                     $thisEnd,
                     additionalApprovedPeriods: $allocationPeriodsByResourceId[$thisResource->getId()] ?? [],
+                    quantity: $thisResource->getId() === $resource->getId()
+                        ? $quantity
+                        : BookingModel::DEFAULT_QUANTITY,
                 );
                 $validationResults[] = $clashValidationResult;
 
+                $allocationQuantity = $thisResource->getId() === $resource->getId()
+                    ? $quantity
+                    : BookingModel::DEFAULT_QUANTITY;
                 if (
                     count($this->getAllErrorStringsAsFlatArray($clashValidationResult)) === 0
                     && $this->newResourceBookingWouldConsumeCapacityWithoutClash($thisResource, $override)
@@ -276,6 +288,7 @@ class Validation
                         $thisResource->getId(),
                         new Alaress_Date_Format($thisStart),
                         new Alaress_Date_Format($thisEnd),
+                        $allocationQuantity,
                     );
                 }
             }
@@ -310,9 +323,15 @@ class Validation
                     $thisEnd,
                     $thisBooking,
                     $allocationPeriodsByResourceId[$thisResource->getId()] ?? [],
+                    $thisResource->getId() === $resource->getId()
+                        ? $quantity
+                        : $thisBooking->getQuantity(),
                 );
                 $validationResults[] = $clashValidationResult;
 
+                $allocationQuantity = $thisResource->getId() === $resource->getId()
+                    ? $quantity
+                    : $thisBooking->getQuantity();
                 if (
                     count($this->getAllErrorStringsAsFlatArray($clashValidationResult)) === 0
                     && (
@@ -325,6 +344,7 @@ class Validation
                         $thisResource->getId(),
                         new Alaress_Date_Format($thisStart),
                         new Alaress_Date_Format($thisEnd),
+                        $allocationQuantity,
                     );
                 }
             }
@@ -332,6 +352,44 @@ class Validation
         }
 
         return $errors;
+    }
+
+    public function getQuantityFromPostData(Values|array $postData, ?BookingModel $existingBooking = null): int
+    {
+        $quantity = $postData['quantity'] ?? $existingBooking?->getQuantity() ?? BookingModel::DEFAULT_QUANTITY;
+
+        if (is_string($quantity)) {
+            $quantity = trim($quantity);
+        }
+
+        return filter_var($quantity, FILTER_VALIDATE_INT) === false ? 0 : (int)$quantity;
+    }
+
+    public function validateBookingQuantity(
+        BookingItemModel $resource,
+        int $quantity,
+        ?BookingModel $existingBooking = null
+    ): array {
+        return $this->validateQuantity($resource, $quantity, $existingBooking);
+    }
+
+    private function validateQuantity(
+        BookingItemModel $resource,
+        int $quantity,
+        ?BookingModel $existingBooking = null
+    ): array {
+        $maxQuantity = max($resource->getCapacity(), $existingBooking?->getQuantity() ?? BookingModel::DEFAULT_QUANTITY);
+        if ($quantity >= BookingModel::DEFAULT_QUANTITY && $quantity <= $maxQuantity) {
+            return [];
+        }
+
+        return [
+            self::QUANTITY_ERRORS => [
+                self::ERROR_INVALID => [
+                    self::ERROR_INVALID,
+                ],
+            ],
+        ];
     }
 
     /**
@@ -500,7 +558,8 @@ class Validation
                 $booking->getResource(),
                 $bookingStartAt->getDateTimeObject(),
                 $bookingEndAt->getDateTimeObject(),
-                $booking
+                $booking,
+                $booking->getQuantity(),
             ),
             default => [],
         };
@@ -521,18 +580,20 @@ class Validation
         Item\Model $resource,
         DateTime $startDate,
         DateTime $endDate,
-        ?Model $existingBooking = null
+        ?Model $existingBooking = null,
+        int $quantity = BookingModel::DEFAULT_QUANTITY,
     ): array {
         return $this->validateForClashesWithAdditionalApprovedPeriods(
             $resource,
             $startDate,
             $endDate,
             $existingBooking,
+            quantity: $quantity,
         );
     }
 
     /**
-     * @param array<int, array{startDatetime: Alaress_Date_Format, endDatetime: Alaress_Date_Format}> $additionalApprovedPeriods
+     * @param array<int, array{startDatetime: Alaress_Date_Format, endDatetime: Alaress_Date_Format, quantity?: int}> $additionalApprovedPeriods
      */
     private function validateForClashesWithAdditionalApprovedPeriods(
         Item\Model $resource,
@@ -540,6 +601,7 @@ class Validation
         DateTime $endDate,
         ?Model $existingBooking = null,
         array $additionalApprovedPeriods = [],
+        int $quantity = BookingModel::DEFAULT_QUANTITY,
     ): array {
         $errors = [];
 
@@ -554,10 +616,11 @@ class Validation
 
         if (
             $this->capacityAllocation->periodWouldExceedCapacity(
-                $resource,
+                $this->getResourceWithEffectiveCapacity($resource, $quantity, $existingBooking),
                 new Alaress_Date_Format($startDate),
                 new Alaress_Date_Format($endDate),
                 $approvedPeriods,
+                $quantity,
             )
         ) {
             $errors[self::START_PERIOD_ERRORS][$startDateKey][] = self::ERROR_CONFLICT;
@@ -582,7 +645,7 @@ class Validation
 
     /**
      * @param iterable<Model> $bookings
-     * @return array<int, array{startDatetime: Alaress_Date_Format, endDatetime: Alaress_Date_Format}>
+     * @return array<int, array{startDatetime: Alaress_Date_Format, endDatetime: Alaress_Date_Format, quantity: int}>
      */
     private function getAllocationPeriodsForBookings(iterable $bookings): array
     {
@@ -598,10 +661,28 @@ class Validation
             $periods[] = [
                 'startDatetime' => $startDateTime,
                 'endDatetime' => $endDateTime,
+                'quantity' => $booking->getQuantity(),
             ];
         }
 
         return $periods;
+    }
+
+    private function getResourceWithEffectiveCapacity(
+        Item\Model $resource,
+        int $quantity,
+        ?Model $existingBooking
+    ): Item\Model {
+        if (
+            $existingBooking instanceof Model
+            && $quantity <= $existingBooking->getQuantity()
+            && $resource->getCapacity() < $existingBooking->getQuantity()
+        ) {
+            $resource = clone $resource;
+            $resource->setCapacity($existingBooking->getQuantity());
+        }
+
+        return $resource;
     }
 
     /**
@@ -728,10 +809,11 @@ class Validation
 
             if (
                 $this->capacityAllocation->bookingWouldExceedCapacity(
-                    $booking->getResource(),
+                    $this->getResourceWithEffectiveCapacity($booking->getResource(), $booking->getQuantity(), $booking),
                     $startDatetime->getDateTimeObject(),
                     $endDatetime->getDateTimeObject(),
-                    $conflictingBookings
+                    $conflictingBookings,
+                    $booking->getQuantity(),
                 )
             ) {
                 $allConflictingBookings = $allConflictingBookings->merge($conflictingBookings);
@@ -1086,17 +1168,24 @@ class Validation
             }
 
             $isClashByBookingId[$movedBooking->getId()] = $this->capacityAllocation->periodWouldExceedCapacity(
-                $resource,
+                $this->getResourceWithEffectiveCapacity($resource, $movedBooking->getQuantity(), $movedBooking),
                 $bookingStartAt,
                 $bookingEndAt,
                 $allocationPeriodsByResourceId[$resourceId] ?? [],
+                $movedBooking->getQuantity(),
             );
 
             if (
                 !$isClashByBookingId[$movedBooking->getId()]
                 && $this->bookingWouldConsumeCapacityWithoutClash($movedBooking)
             ) {
-                $this->addAllocationPeriod($allocationPeriodsByResourceId, $resourceId, $bookingStartAt, $bookingEndAt);
+                $this->addAllocationPeriod(
+                    $allocationPeriodsByResourceId,
+                    $resourceId,
+                    $bookingStartAt,
+                    $bookingEndAt,
+                    $movedBooking->getQuantity(),
+                );
             }
         }
 
@@ -1249,6 +1338,28 @@ class Validation
         return $this->getStatusIdForNonClashBooking($booking, $user);
     }
 
+    public function getNewStatusIdForUpdatedBooking(
+        BookingModel $booking,
+        bool $isClash,
+        User $user,
+        int $originalQuantity,
+        bool $periodChanged,
+        bool $overrideValidation = false,
+    ): int {
+        $status = $booking->getStatus();
+        if (
+            !$overrideValidation
+            && !$periodChanged
+            && !$isClash
+            && $booking->getQuantity() <= $originalQuantity
+            && $status !== null
+        ) {
+            return $status->getId();
+        }
+
+        return $this->getNewStatusIdForBooking($booking, $isClash, $user, $overrideValidation);
+    }
+
     private function bookingWouldConsumeCapacityWithoutClash(BookingModel $booking): bool
     {
         $resource = $booking->getResource();
@@ -1354,13 +1465,14 @@ class Validation
     }
 
     /**
-     * @param array<int, array<int, array{startDatetime: Alaress_Date_Format, endDatetime: Alaress_Date_Format}>> $periodsByResourceId
+     * @param array<int, array<int, array{startDatetime: Alaress_Date_Format, endDatetime: Alaress_Date_Format, quantity: int}>> $periodsByResourceId
      */
     private function addAllocationPeriod(
         array &$periodsByResourceId,
         int $resourceId,
         Alaress_Date_Format $startDateTime,
         Alaress_Date_Format $endDateTime,
+        int $quantity = BookingModel::DEFAULT_QUANTITY,
     ): void {
         if (!array_key_exists($resourceId, $periodsByResourceId)) {
             $periodsByResourceId[$resourceId] = [];
@@ -1369,6 +1481,7 @@ class Validation
         $periodsByResourceId[$resourceId][] = [
             'startDatetime' => $startDateTime,
             'endDatetime' => $endDateTime,
+            'quantity' => $quantity,
         ];
     }
 
@@ -1391,8 +1504,17 @@ class Validation
     ): Collection {
         $conflictingBookings = new Collection();
         $approvedBookings = $this->getConflictingBookings($resource, $startDate, $endDate, $existingBooking);
+        $quantity = $existingBooking?->getQuantity() ?? BookingModel::DEFAULT_QUANTITY;
 
-        if ($this->capacityAllocation->bookingWouldExceedCapacity($resource, $startDate, $endDate, $approvedBookings)) {
+        if (
+            $this->capacityAllocation->bookingWouldExceedCapacity(
+                $this->getResourceWithEffectiveCapacity($resource, $quantity, $existingBooking),
+                $startDate,
+                $endDate,
+                $approvedBookings,
+                $quantity
+            )
+        ) {
             $conflictingBookings = $conflictingBookings->merge($approvedBookings);
         }
 

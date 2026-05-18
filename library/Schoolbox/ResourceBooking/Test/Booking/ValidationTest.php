@@ -166,6 +166,124 @@ class ValidationTest extends TestCase
         $resource->setMaxReservationTime(Interval::createFromDateInterval(new DateInterval($maxReservationTime)));
     }
 
+    public function testGetQuantityFromPostDataDefaultsToExistingBookingQuantity(): void
+    {
+        $validation = $this->createValidation();
+        $booking = (new Booking\Model())->setQuantity(3);
+
+        $this->assertSame(3, $validation->getQuantityFromPostData([], $booking));
+    }
+
+    public function testGetQuantityFromPostDataRejectsNonIntegerQuantityAsZero(): void
+    {
+        $validation = $this->createValidation();
+
+        $this->assertSame(0, $validation->getQuantityFromPostData(['quantity' => '1.5']));
+        $this->assertSame(0, $validation->getQuantityFromPostData(['quantity' => 'abc']));
+    }
+
+    public function testValidateBookingQuantityAllowsExistingQuantityAboveReducedCapacity(): void
+    {
+        $validation = $this->createValidation();
+        $resource = (new Item\Model())->setCapacity(2);
+        $booking = (new Booking\Model())->setQuantity(4);
+
+        $this->assertSame([], $validation->validateBookingQuantity($resource, 4, $booking));
+    }
+
+    public function testValidateBookingQuantityRejectsQuantityAboveCapacityAndExistingQuantity(): void
+    {
+        $validation = $this->createValidation();
+        $resource = (new Item\Model())->setCapacity(2);
+        $booking = (new Booking\Model())->setQuantity(3);
+
+        $this->assertSame(
+            [
+                Validation::QUANTITY_ERRORS => [
+                    Validation::ERROR_INVALID => [
+                        Validation::ERROR_INVALID,
+                    ],
+                ],
+            ],
+            $validation->validateBookingQuantity($resource, 4, $booking)
+        );
+    }
+
+    public function testIncreasingEditedBookingQuantityReevaluatesCapacityClashes(): void
+    {
+        $startDate = '2027-01-01T10:00:00+00:00';
+        $endDate = '2027-01-01T11:00:00+00:00';
+
+        $resource = (new Item\Model())
+            ->setId(123)
+            ->setCapacity(3);
+
+        $existingBooking = $this->createApprovedBookingWithPeriod(1, $startDate, $endDate)
+            ->setResource($resource)
+            ->setQuantity(1);
+
+        $approvedBooking = $this->createApprovedBookingWithPeriod(2, $startDate, $endDate)
+            ->setResource($resource)
+            ->setQuantity(2);
+
+        $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
+        $mockMapper
+            ->method('findForResource')
+            ->willReturn((new Collection())->add($approvedBooking));
+
+        $validation = $this->createValidation(new User(), $mockMapper, new StatusMapper(), new TermMapper());
+
+        /** @var Validation $validation */
+        $errors = $validation->validateForClashes(
+            $resource,
+            new DateTime($startDate),
+            new DateTime($endDate),
+            $existingBooking,
+            2,
+        );
+
+        $this->assertSame(
+            [Validation::ERROR_CONFLICT],
+            $validation->getAllErrorStringsAsFlatArray($errors)
+        );
+    }
+
+    public function testDecreasingApprovedBookingQuantityUsesExistingApprovedQuantityAsEffectiveCapacity(): void
+    {
+        $startDate = '2027-01-01T10:00:00+00:00';
+        $endDate = '2027-01-01T11:00:00+00:00';
+
+        $resource = (new Item\Model())
+            ->setId(123)
+            ->setCapacity(2);
+
+        $existingBooking = $this->createApprovedBookingWithPeriod(1, $startDate, $endDate)
+            ->setResource($resource)
+            ->setQuantity(3);
+
+        $approvedBooking = $this->createApprovedBookingWithPeriod(2, $startDate, $endDate)
+            ->setResource($resource)
+            ->setQuantity(1);
+
+        $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
+        $mockMapper
+            ->method('findForResource')
+            ->willReturn((new Collection())->add($approvedBooking));
+
+        $validation = $this->createValidation(new User(), $mockMapper, new StatusMapper(), new TermMapper());
+
+        /** @var Validation $validation */
+        $errors = $validation->validateForClashes(
+            $resource,
+            new DateTime($startDate),
+            new DateTime($endDate),
+            $existingBooking,
+            2,
+        );
+
+        $this->assertSame([], $validation->getAllErrorStringsAsFlatArray($errors));
+    }
+
     /**
      * Data provider for testValidateBeforeTime
      *
@@ -779,6 +897,41 @@ class ValidationTest extends TestCase
         $this->assertCount($expected, $errorsToCount);
     }
 
+    public function testGetClashEventsUsesExistingBookingQuantity(): void
+    {
+        $startDate = '2027-01-01T10:00:00+00:00';
+        $endDate = '2027-01-01T11:00:00+00:00';
+
+        $resource = (new Item\Model())
+            ->setId(123)
+            ->setCapacity(3);
+
+        $existingBooking = $this->createApprovedBookingWithPeriod(1, $startDate, $endDate)
+            ->setResource($resource)
+            ->setQuantity(2);
+
+        $approvedBooking = $this->createApprovedBookingWithPeriod(2, $startDate, $endDate)
+            ->setResource($resource)
+            ->setQuantity(2);
+
+        $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
+        $mockMapper
+            ->method('findForResource')
+            ->willReturn((new Collection())->add($approvedBooking));
+
+        $mockValidation = $this->createValidation(new User(), $mockMapper, new StatusMapper(), new TermMapper());
+
+        /** @var Validation $mockValidation */
+        $clashEvents = $mockValidation->getClashEvents(
+            $resource,
+            new DateTime($startDate),
+            new DateTime($endDate),
+            $existingBooking
+        );
+
+        $this->assertCount(1, $clashEvents);
+    }
+
     /**
      * Data provider for testGetNewStatusIdForBooking
      *
@@ -1038,6 +1191,67 @@ class ValidationTest extends TestCase
         // Test
         $result = $validation->getNewStatusIdForBooking($booking, $isClash, $user);
         $this->assertEquals($expectedStatus, $result);
+    }
+
+    public function testGetNewStatusIdForUpdatedBookingPreservesApprovedStatusWhenQuantityDecreasesWithoutClash(): void
+    {
+        $user = (new User())->setId(123);
+        $validation = $this->createValidation($user);
+        $booking = $this->createModeratedBookingForStatusUpdate($user, isUserModerator: false)
+            ->setQuantity(2)
+            ->setStatus((new Booking\Status\Model())->setId(Booking\Status\Model::STATUS_APPROVED));
+
+        $this->assertSame(
+            Booking\Status\Model::STATUS_APPROVED,
+            $validation->getNewStatusIdForUpdatedBooking(
+                booking: $booking,
+                isClash: false,
+                user: $user,
+                originalQuantity: 3,
+                periodChanged: false,
+            )
+        );
+    }
+
+    public function testGetNewStatusIdForUpdatedBookingReevaluatesStatusWhenQuantityIncreases(): void
+    {
+        $user = (new User())->setId(123);
+        $validation = $this->createValidation($user);
+        $booking = $this->createModeratedBookingForStatusUpdate($user, isUserModerator: false)
+            ->setQuantity(2)
+            ->setStatus((new Booking\Status\Model())->setId(Booking\Status\Model::STATUS_APPROVED));
+
+        $this->assertSame(
+            Booking\Status\Model::STATUS_PENDING,
+            $validation->getNewStatusIdForUpdatedBooking(
+                booking: $booking,
+                isClash: false,
+                user: $user,
+                originalQuantity: 1,
+                periodChanged: false,
+            )
+        );
+    }
+
+    private function createModeratedBookingForStatusUpdate(User $user, bool $isUserModerator): Booking\Model
+    {
+        $resource = $this->getMockBuilder(Item\Model::class)
+            ->onlyMethods(['isUserModerator'])
+            ->getMock();
+        $resource->method('isUserModerator')->willReturn($isUserModerator);
+        $resource->setId(456);
+        $resource->setModerationType(new Item\ModerationType\Model()->setId(Item\ModerationType\Model::TYPE_MODERATED));
+        $resource->setAllowClashBookings(true);
+        $this->setResourceValidationDefaults($resource);
+
+        $event = new Event();
+        $event->setStartDateTime(new \Alaress_Date_Format('2027-01-01T10:00:00+00:00', \Alaress_Date_Format::FORMAT_RFC3339_W3C));
+        $event->setEndDateTime(new \Alaress_Date_Format('2027-01-01T11:00:00+00:00', \Alaress_Date_Format::FORMAT_RFC3339_W3C));
+        $event->setAuthor((new User())->setId($user->getId() + 1));
+
+        return (new Booking\Model())
+            ->setResource($resource)
+            ->setEvent($event);
     }
 
     /**

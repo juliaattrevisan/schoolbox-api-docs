@@ -109,6 +109,13 @@ class Mapper extends BaseMapper
                 'type'     => self::TYPE_STRING,
             )
         );
+        $this->hasMap(
+            array(
+                'column'   => 'quantity',
+                'property' => 'quantity',
+                'type'     => self::TYPE_INTEGER,
+            )
+        );
 
         // Created/Modified/Deleted
         $this->hasMap(
@@ -759,7 +766,8 @@ class Mapper extends BaseMapper
             SELECT
             rb.resource_id,
             COALESCE(rb.start_datetime, e.start_datetime) AS start_datetime,
-            COALESCE(rb.end_datetime, e.end_datetime) AS end_datetime
+            COALESCE(rb.end_datetime, e.end_datetime) AS end_datetime,
+            rb.quantity
             FROM resource_booking rb
             JOIN event e ON e.id = rb.event_id AND e.deleted_at IS NULL
             WHERE rb.resource_booking_status_id = :statusId
@@ -777,6 +785,7 @@ class Mapper extends BaseMapper
             $periodsByResourceId[$row['resource_id']][] = [
                 'startDatetime' => new Alaress_Date_Format($row['start_datetime'], Alaress_Date_Format::DATABASE_FORMAT),
                 'endDatetime' => new Alaress_Date_Format($row['end_datetime'], Alaress_Date_Format::DATABASE_FORMAT),
+                'quantity' => (int)$row['quantity'],
             ];
         }
 
