@@ -543,6 +543,7 @@ class Model implements ISoftDeletable, JsonSerializable
             'category'             => $this->getCategory(),
             'bookingIsAuthorized'  => $this->getBookingIsAuthorized(),
             'capacity'             => $this->getCapacity(),
+            'allowClashBookings'   => $this->getAllowClashBookings(),
         );
     }
 }
