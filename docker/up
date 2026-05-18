@@ -340,7 +340,7 @@ function start_containers() {
             (cd ../taskd && docker run -it \
                 --volume $PWD:/app \
                 --user "${SUDO_UID:-$(id -u)}:${SUDO_GID:-$(id -g)}" \
-                composer:2.8 \
+                composer:latest \
                 install --ignore-platform-reqs
             )
             ;;

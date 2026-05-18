@@ -99,7 +99,7 @@ COPY ./config/mariadb.conf.d/* /etc/mysql/mariadb.conf.d/
 COPY ./config/php/* /usr/local/etc/php/conf.d/
 
 # Install Composer (dev only?)
-COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Cleanup
 RUN \
