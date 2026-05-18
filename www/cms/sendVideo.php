@@ -13,6 +13,7 @@ use Alaress\Exception\UnreachableException;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\Filesystem;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\File\Mimetype;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -235,6 +236,8 @@ if (isset($type) && isset($id)) {
         flush();
         ob_flush();
     }
+} else {
+    error(ErrorMapper::ERROR_FILE_NOT_FOUND);
 }
 
 /**
