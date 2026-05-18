@@ -129,7 +129,7 @@ test.describe("Course import tests", () => {
             deleted_at: null,
             "title LIKE": dueWorkName,
         })) as number;
-        await page.locator(`li[data-assessment="${dueworkId}"]`).click();
+        await page.getByTestId(`assessment-list-item-${dueworkId}`).click();
         await expect(page.locator("#ir-content")).toContainText("This is a learning activity description.");
 
         tester.isGoingTo(
