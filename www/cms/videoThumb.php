@@ -12,6 +12,7 @@
 use League\Flysystem\Filesystem;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\File\Mimetype;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\FilesystemFactory;
@@ -29,8 +30,8 @@ $kernel->setupSentryTrace(__FILE__);
 /** @var PrefixGenerator $prefixGenerator */
 $prefixGenerator = $kernel->get('cdnPrefixGenerator');
 
-$type = $_GET['type'];
-$id   = $_GET['id'];
+$type = $_GET['type'] ?? null;
+$id   = $_GET['id'] ?? null;
 
 if (
     !array_key_exists('size', $_GET) ||
@@ -156,6 +157,8 @@ if (isset($type, $id)) {
             // If anything else goes wrong, fall through to sad mountain
         }
     }
+} else {
+    error(ErrorMapper::ERROR_FILE_NOT_FOUND, code: 404);
 }
 
 if ($size === ResourceVideo::POSTER_LETTERBOX) {
