@@ -1413,7 +1413,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                             AND ID = :studentId",
                     [
                         'tDocumentSeq' => $pastoralAttachment->getExternalId(),
-                        'studentId'           => $pastoralAttachment->getPastoral()->getStudent()->getExternalId(),
+                        'studentId'           => $pastoralAttachment->getPastoral()->getExternalId(),
                     ]
                 );
             }
