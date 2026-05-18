@@ -158,7 +158,7 @@ if (isset($type, $id)) {
         }
     }
 } else {
-    error(ErrorMapper::ERROR_FILE_NOT_FOUND);
+    error(ErrorMapper::ERROR_FILE_NOT_FOUND, code: 404);
 }
 
 if ($size === ResourceVideo::POSTER_LETTERBOX) {

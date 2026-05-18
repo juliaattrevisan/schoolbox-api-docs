@@ -237,7 +237,7 @@ if (isset($type) && isset($id)) {
         ob_flush();
     }
 } else {
-    error(ErrorMapper::ERROR_FILE_NOT_FOUND);
+    error(ErrorMapper::ERROR_FILE_NOT_FOUND, code: 404);
 }
 
 /**
