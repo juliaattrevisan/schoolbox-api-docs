@@ -815,7 +815,6 @@
                                             <th scope="col">Level</th>
                                             <th scope="col">Language</th>
                                             <th scope="col">Session</th>
-                                            <th scope="col">Anticipated Subject</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -832,7 +831,6 @@
                                                             <td>{{ level }}</td>
                                                             <td>{{ language.languageName ?: 'Missing' }}</td>
                                                             <td>{{ registrationSession }}</td>
-                                                            <td>Yes</td>
                                                         </tr>
                                                     {% endfor %}
                                                 {% else %}
@@ -842,7 +840,6 @@
                                                         <td>{{ level }}</td>
                                                         <td><span class="alert label">Missing</span></td>
                                                         <td>{{ registrationSession }}</td>
-                                                        <td>Yes</td>
                                                     </tr>
                                                 {% endif %}
                                             {% endfor %}
