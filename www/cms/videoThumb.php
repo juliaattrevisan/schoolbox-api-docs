@@ -157,8 +157,6 @@ if (isset($type, $id)) {
             // If anything else goes wrong, fall through to sad mountain
         }
     }
-} else {
-    error(ErrorMapper::ERROR_FILE_NOT_FOUND, code: 404);
 }
 
 if ($size === ResourceVideo::POSTER_LETTERBOX) {
