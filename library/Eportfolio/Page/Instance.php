@@ -65,6 +65,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
 
         $this->getPage()->setTitle($this->getEportfolioHandler()->getSettingsPageTitle());
         $this->getPage()->setBlock('custom_head', 'colour_list', 'colour_list_block');
+        $this->getPage()->setBlock('colour_list', 'legacy_homepage_colour_js', 'legacy_homepage_colour_js_block');
         $this->getPage()->setBlock('custom_head', 'legacy_homepage_colour_css', 'legacy_homepage_colour_css_block');
         $this->getPage()->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'edit_page', 'edit_page_block');
@@ -362,6 +363,12 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
         $this->getPage()->setVar([
             'COLOUR_ARRAY' => $key
         ]);
+
+        if ($this->isAdvancedUiEnabled()) {
+            $this->getPage()->setVar('legacy_homepage_colour_js_block');
+        } else {
+            $this->getPage()->parse('legacy_homepage_colour_js_block', 'legacy_homepage_colour_js');
+        }
 
         $this->getPage()->parse('colour_list_block', 'colour_list', true);
     }

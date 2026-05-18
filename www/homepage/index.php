@@ -200,6 +200,7 @@ $this->setTitle($folder->getName());
 //  * 'readonly_switch_on'
 $this->setBlock('custom_head', 'google_script', 'google_script_block');
 $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
+$this->setBlock('colour_list', 'legacy_homepage_colour_js', 'legacy_homepage_colour_js_block');
 $this->setBlock('custom_head', 'legacy_homepage_colour_css', 'legacy_homepage_colour_css_block');
 $this->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
 $this->setBlock(TEMPLATE_content, 'customise_page', 'customise_page_block');
@@ -454,15 +455,30 @@ if (
 // Colors (original)
 $this->setVar('COLOUR_ARRAY', 'original');
 $this->setVar($listColor);
+if ($advancedUiEnabled) {
+    $this->setVar('legacy_homepage_colour_js_block');
+} else {
+    $this->parse('legacy_homepage_colour_js_block', 'legacy_homepage_colour_js');
+}
 $this->parse('colour_list_block', 'colour_list', true);
 
 // Colors (picker)
 $this->setVar('COLOUR_ARRAY', 'pickers');
 $this->setVar($listColor);
+if ($advancedUiEnabled) {
+    $this->setVar('legacy_homepage_colour_js_block');
+} else {
+    $this->parse('legacy_homepage_colour_js_block', 'legacy_homepage_colour_js');
+}
 $this->parse('colour_list_block', 'colour_list', true);
 
 $this->setVar('COLOUR_ARRAY', 'defaults');
 $this->setVar($homepageHandler->getDefaultColorList());
+if ($advancedUiEnabled) {
+    $this->setVar('legacy_homepage_colour_js_block');
+} else {
+    $this->parse('legacy_homepage_colour_js_block', 'legacy_homepage_colour_js');
+}
 $this->parse('colour_list_block', 'colour_list', true);
 
 $allWidths = $homepageHandler->getColumnWidths();
