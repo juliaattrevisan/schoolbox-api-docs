@@ -192,7 +192,7 @@ class ResourceBookingCest
             $i,
             'Capacity report approved resource',
             7,
-            true,
+            false,
             ModerationType\Model::TYPE_OPEN
         );
 
@@ -243,10 +243,6 @@ class ResourceBookingCest
             . preg_quote($pendingBooking->getName(), '~')
             . '.*?'
             . preg_quote($pendingResource->getName(), '~')
-            . '.*?'
-            . preg_quote('Capacity: 7', '~')
-            . '.*?'
-            . preg_quote('Conflicts Not Allowed', '~')
             . '.*?<td>\s*1\s*</td>'
             . '.*?'
             . preg_quote($bookerName, '~')
@@ -264,10 +260,6 @@ class ResourceBookingCest
             . preg_quote($approvedBooking->getName(), '~')
             . '.*?'
             . preg_quote($approvedResource->getName(), '~')
-            . '.*?'
-            . preg_quote('Capacity: 7', '~')
-            . '.*?'
-            . preg_quote('Conflicts Allowed', '~')
             . '.*?<td>\s*1\s*</td>'
             . '.*?'
             . preg_quote('Approved', '~')

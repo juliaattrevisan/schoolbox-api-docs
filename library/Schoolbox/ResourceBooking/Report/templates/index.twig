@@ -232,14 +232,9 @@
                                     </a>
                                 {% endif %}
                             {% else %}
-                                {% set resource = booking.getResource() %}
-                                <a href="{{ routeLookup('resourceItem.read', {id: resource.getId()}) }}">
-                                    {{ resource.getRoomCode() | default(resource.getName()) }}
+                                <a href="{{ routeLookup('resourceItem.read', {id: booking.getResource().getId()}) }}">
+                                    {{ booking.getResource().getRoomCode() | default(booking.getResource().getName()) }}
                                 </a>
-                                <span class="meta">
-                                    &middot; Capacity: {{ resource.getCapacity() }}
-                                    &middot; Conflicts {{ resource.getAllowClashBookings() ? 'Allowed' : 'Not Allowed' }}
-                                </span>
                             {% endif %}
                         </td>
                         <td>
