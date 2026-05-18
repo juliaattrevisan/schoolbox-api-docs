@@ -41,12 +41,6 @@ class EportfolioStrategyTest extends TestCase
             /** @var list<array{query: string, params: array<string, mixed>}> */
             public array $queries = [];
 
-            /** @var array<int, list<int>> */
-            public array $pageComponentInstanceIds = [];
-
-            /** @var array<int, list<int>> */
-            public array $pageBlogIds = [];
-
             /** @var list<array{method: string, table: string, column: string, ids: list<int>, excludedIds?: list<int>}> */
             public array $operations = [];
         };
@@ -125,10 +119,10 @@ class EportfolioStrategyTest extends TestCase
             /**
              * Record primary-key delete operations without touching a database.
              *
-             * @param array<string, int> $deleted
+             * @param array<string, list<int>> $deletedIdsByTableName
              * @param list<int> $ids
              */
-            protected function deleteRowsByIds(array &$deleted, string $table, array $ids, string $column = 'id'): void
+            protected function deleteRowsByIds(array &$deletedIdsByTableName, string $table, array $ids, string $column = 'id'): void
             {
                 if ($ids === []) {
                     return;
@@ -145,12 +139,14 @@ class EportfolioStrategyTest extends TestCase
             /**
              * Record foreign-key delete operations without touching a database.
              *
-             * @param array<string, int> $deleted
+             * @param array     $deletedIdsByTableName
+             * @param string    $table
+             * @param string    $column
              * @param list<int> $ids
              * @param list<int> $excludedIds
              */
             protected function deleteRowsByForeignIds(
-                array &$deleted,
+                array &$deletedIdsByTableName,
                 string $table,
                 string $column,
                 array $ids,
@@ -229,8 +225,8 @@ class EportfolioStrategyTest extends TestCase
         $noticeMessages = [];
         $logger->method('notice')
             ->willReturnCallback(
-                static function (string|\Stringable $message) use (&$noticeMessages): void {
-                    $noticeMessages[] = (string)$message;
+                static function (string $message) use (&$noticeMessages): void {
+                    $noticeMessages[] = $message;
                 },
             );
 
@@ -449,7 +445,7 @@ class EportfolioStrategyTest extends TestCase
             ['table' => Eportfolio::TABLE_EPORTFOLIO_PAGE, 'id' => 10],
         ]);
 
-        $allIds = array_merge(...array_map(fn(array $op): array => $op['ids'], $state->operations));
+        $allIds = array_merge(...array_map(static fn(array $op): array => $op['ids'], $state->operations));
         $this->assertNotContains(11, $allIds);
         $this->assertNotContains(302, $allIds);
         $this->assertNotContains(502, $allIds);
@@ -561,8 +557,8 @@ class EportfolioStrategyTest extends TestCase
         $logger->expects($this->exactly(2))
             ->method('debug')
             ->willReturnCallback(
-                static function (string|\Stringable $message, array $context = []) use (&$debugMessages): void {
-                    $debugMessages[] = (string)$message;
+                static function (string $message) use (&$debugMessages): void {
+                    $debugMessages[] = $message;
                 },
             );
 
