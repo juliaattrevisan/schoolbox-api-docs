@@ -31,6 +31,16 @@ export default class ProfilePage {
 
     static readonly SELECTOR_FEEDBACK_FILTER = 'label[for="filter-feedback"]';
 
+    static readonly DATA_TEST_PROFILE_DOT_BUTTON = "sbx-pop-out-header-options-button";
+
+    static readonly DATA_TEST_PROFILE_DOT_MENU = "profile-header-options";
+
+    static readonly DATA_TEST_MODIFY_USER = "user-profile-modify";
+
+    static readonly DATA_TEST_IMPERSONATE = "user-profile-impersonate";
+
+    static readonly DATA_TEST_CREATE_PASTORAL_RECORD = "user-profile-create-pastoral-record";
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -165,5 +175,89 @@ export default class ProfilePage {
     async checkImagePresence(userId: string | number): Promise<void> {
         const imageSrc = await this.page.locator("img.full-width").getAttribute("src");
         expect(imageSrc).toContain(`id=${userId}`);
+    }
+
+    /**
+     * Returns the profile page 3-dot menu button.
+     * @returns - The profile page 3-dot menu button
+     */
+    getDotMenuButton(): Locator {
+        return this.page.getByTestId(ProfilePage.DATA_TEST_PROFILE_DOT_BUTTON);
+    }
+
+    /**
+     * Returns the profile page 3-dot menu.
+     * @returns - The profile page 3-dot menu
+     */
+    getDotMenu(): Locator {
+        return this.page.getByTestId(ProfilePage.DATA_TEST_PROFILE_DOT_MENU);
+    }
+
+    /**
+     * Returns an action from the opened profile page 3-dotmenu by locating the data-test attribute
+     * @param actionDataTest - The data-test attribute value of the action
+     * @returns - The profile page 3-dot menu action
+     */
+    getDotMenuAction(actionDataTest: string): Locator {
+        return this.getDotMenu().getByTestId(`user-profile-${actionDataTest}`);
+    }
+
+    /**
+     * Opens the profile page 3-dot menu.
+     */
+    async openDotMenu(): Promise<void> {
+        await this.getDotMenuButton().click();
+        await expect(this.getDotMenu()).toBeVisible();
+    }
+
+    /**
+     * Checks the profile page 3-dot menu is not presented.
+     */
+    async checkDotMenuIsNotPresented(): Promise<void> {
+        await expect(this.getDotMenuButton()).toBeHidden();
+    }
+
+    /**
+     * Check whether or not the 3-dot menu items are visible
+     * options: modify, impersonate, create-pastoral-record
+     * e.g.: { option: "modify", isVisible: true }
+     * @param options - The array of options to check with the name and visibility
+     */
+    async checkDotMenuOptionsVisibility(options: { option: string; isVisible: boolean }[]): Promise<void> {
+        for (const option of options) {
+            if (option.isVisible) {
+                await expect(this.page.getByTestId(`user-profile-${option.option}`)).toBeVisible();
+            } else {
+                await expect(this.page.getByTestId(`user-profile-${option.option}`)).toBeHidden();
+            }
+        }
+    }
+
+    /**
+     * Checks an action in the opened profile page 3-dot menu links to the expected url.
+     * @param actionName - The action name
+     * @param expectedUrl - The expected href
+     */
+    async checkDotMenuActionUrl(actionName: string, expectedUrl: RegExp): Promise<void> {
+        await expect(this.getDotMenuAction(actionName)).toHaveAttribute("href", expectedUrl);
+    }
+
+    /**
+     * Clicks the 3-dot menu action and checks the impersonate button is disabled
+     */
+    async checkImpersonateIsDisabled(): Promise<void> {
+        await this.openDotMenu();
+        await this.page.getByTestId("user-profile-impersonate-disabled").isVisible();
+    }
+
+    /**
+     * Checks a single profile header action button is visible and links to the expected url.
+     * @param actionName - The action name
+     * @param expectedUrl - The expected href
+     */
+    async checkSingleHeaderActionButton(actionName: string, expectedUrl: RegExp): Promise<void> {
+        const button = this.page.locator(".button-action a").filter({ hasText: actionName });
+        await expect(button).toBeVisible();
+        await expect(button).toHaveAttribute("href", expectedUrl);
     }
 }
