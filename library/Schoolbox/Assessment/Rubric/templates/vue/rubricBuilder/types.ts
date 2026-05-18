@@ -5,7 +5,7 @@ import type { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 /**
  * @see /library/Schoolbox/Assessment/Rubric/Grid/Translator/ModelToArray.php
  */
-export interface RubricGrid {
+export type RubricGrid = {
     id: number; // currently the assessment ID, or 0 for new rubrics
     title: string;
     weight: number | null;
@@ -14,7 +14,7 @@ export interface RubricGrid {
     capabilities: RubricGridCapability[];
     capabilityMarkType: MarkTypeSlug | null;
     capabilityGradeGroup: number | null;
-}
+};
 
 export type RubricGridLevel = {
     id: number;
