@@ -59,10 +59,10 @@ class Controller extends Base
      * registers their app token.
      *
      * @noinspection PhpDocMissingThrowsInspection Spurious exception raised by setCode
-     * @api          POST /api/register/{provider}
+     * @param string $provider
      * @since        145
      *
-     * @param string $provider
+     * @api          POST /api/register/{provider}
      */
     public function register(string $provider): void
     {
@@ -87,6 +87,12 @@ class Controller extends Base
         $sessionUser = $provider === Registry::PROVIDER_FIREBASE
             ? $this->getUser()
             : $this->authenticate(false);
+
+        // For Firebase provider, verify the user is actually authenticated
+        if ($provider === Registry::PROVIDER_FIREBASE && $sessionUser->getId() === null) {
+            throw new NotAuthenticated('User must be authenticated to register for Firebase provider');
+        }
+
         if ($sessionUser) {
             // For Digistorm: token is always the user's username
             // Otherwise: token may be absent or blank, in which case we don't
@@ -113,10 +119,12 @@ class Controller extends Base
                         $registry
                             ->setUser($sessionUser)
                             ->setToken($token)
-                            ->setService($this->serviceMapper->findOneByColumnList([
-                                'app_identifier' => $this->requestPost->get('appId'),
-                                'provider'       => $provider,
-                            ]))
+                            ->setService(
+                                $this->serviceMapper->findOneByColumnList([
+                                                                              'app_identifier' => $this->requestPost->get('appId'),
+                                                                              'provider'       => $provider,
+                                                                          ])
+                            )
                             ->setCreatedAt($now)
                             ->setTouchedAt($now);
 
@@ -157,10 +165,10 @@ class Controller extends Base
      * removes their app token.
      *
      * @noinspection PhpDocMissingThrowsInspection Spurious exception raised by setCode
-     * @api          DELETE /api/register/{provider}
+     * @param string $provider
      * @since        24.0
      *
-     * @param string $provider
+     * @api          DELETE /api/register/{provider}
      */
     public function delete(string $provider): void
     {
@@ -185,6 +193,12 @@ class Controller extends Base
         $sessionUser = $provider === Registry::PROVIDER_FIREBASE
             ? $this->getUser()
             : $this->authenticate(false);
+
+        // For Firebase provider, verify the user is actually authenticated
+        if ($provider === Registry::PROVIDER_FIREBASE && $sessionUser->getId() === null) {
+            throw new NotAuthenticated('User must be authenticated to register for Firebase provider');
+        }
+
         if ($sessionUser) {
             // For Digistorm: token is always the user's username
             // Otherwise: token may be absent or blank, in which case we don't
@@ -277,7 +291,7 @@ class Controller extends Base
             $response = [
                 'required' => $allowQueryStringJwt
                     ? 'Either the "username" and "password" POST fields, the "jwt" POST field or the "jwt" query string field must be set'
-                    : 'Either the "username" and "password" or the "jwt" POST fields must be set'
+                    : 'Either the "username" and "password" or the "jwt" POST fields must be set',
             ];
             $status   = 400;
         } catch (JwtParser\Exception\Unparseable $e) {
@@ -351,11 +365,11 @@ class Controller extends Base
     private function assignJsonResponseForAuthenticatedUser(User $user, ?int $status = null): void
     {
         $this->response = $this->responseAsJson([
-            'id'       => $user->getId(),
-            'key'      => $user->getKey(),
-            'role'     => $user->getRole()->getType(),
-            'username' => $user->getUsername(),
-        ]);
+                                                    'id'       => $user->getId(),
+                                                    'key'      => $user->getKey(),
+                                                    'role'     => $user->getRole()->getType(),
+                                                    'username' => $user->getUsername(),
+                                                ]);
         if (isset($status)) {
             $this->response = $this->response->withStatus($status);
         }
