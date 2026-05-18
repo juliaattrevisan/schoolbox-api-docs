@@ -228,12 +228,20 @@ class Controller extends BaseController
                 $homepageConfig = $this->homepageConfigMapper->findOneByColumn('cid', $folder->getId());
                 $templateId = HomepageTemplate::HOMEPAGE_KEEP_EXISTING;
                 $keepExistingTemplate = $this->homepageTemplateMapper->getKeepExistingHomepageTemplate();
-                if ($homepageConfig->getTemplate()) {
+                $currentHomepageTemplate = $homepageConfig->getTemplate();
+                if ($currentHomepageTemplate) {
+                    try {
+                        $currentHomepageTemplate = $this->homepageTemplateMapper->findById($currentHomepageTemplate->getId());
+                    } catch (MapperException $e) {
+                        $currentHomepageTemplate = null;
+                    }
+                }
+                if ($currentHomepageTemplate) {
                     $keepExistingTemplate->setName(
                         sprintf(
                             '%s (%s)',
                             HomepageTemplate::KEEP_EXISTING_STRING,
-                            $homepageConfig->getTemplate()->getName()
+                            $currentHomepageTemplate->getName()
                         )
                     );
                 }
