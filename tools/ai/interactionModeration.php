@@ -9,6 +9,7 @@
 
 declare(strict_types=1);
 
+use Ramsey\Uuid\Uuid;
 use Schoolbox\Admin\OpenAI\Config as AIConfig;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
@@ -111,7 +112,8 @@ HELP;
 
         $this->getLogger()->info('Running moderation agent...');
 
-        $moderationResult = $interactionModeration->request(null, $sessionId, $logs);
+        $moderationSessionId = (string)Uuid::uuid4();
+        $moderationResult = $interactionModeration->request(null, $moderationSessionId, $logs);
 
         fwrite(
             $this->getOutStream(),
