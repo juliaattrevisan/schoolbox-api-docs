@@ -80,7 +80,7 @@
     }
 }
 
-.active-item {
+.sbx-tag {
     background: var(--sbx-config-color-active, var(--body-background));
     border-radius: var(--sbx-config-field-roundness, 0px);
     color: var(--sbx-color-text-primary, #000);
@@ -88,7 +88,7 @@
     padding: var(--sbx-size-xxs, var(--spacing-s)) var(--sbx-size-xs, var(--spacing-s));
     overflow: hidden;
     white-space: nowrap;
-    &:has(.active-item__remove-button) {
+    &:has(.sbx-tag__remove-button) {
         align-items: center;
         display: flex;
         gap: var(--sbx-size-xs, var(--spacing-s));
