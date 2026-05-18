@@ -14,7 +14,7 @@ external_db_db="Synergetic_AUVIC_ALARESS_PRD";
 enable_xdebug="true";
 force_upgrade=0
 instance_registry_url="https://manage.schoolbox.cloud"
-node_version="20"
+node_version="24"
 declare phpversion_supported                                # Must be specified via script arg
 
 if [[ $# -ne 12 ]]; then
