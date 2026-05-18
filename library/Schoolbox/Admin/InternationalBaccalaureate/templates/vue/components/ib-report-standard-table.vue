@@ -78,7 +78,10 @@ function onSaved(studentId: number, updatedSubjects: SubjectGroup): void {
                         aria-hidden="true"
                     >
                         <li v-if="student.updateLanguageEndpoint !== null">
-                            <a href="#" @click.prevent="openModal(student)">Update Language Selection</a>
+                            <button class="sbx-button--has-icon" @click.prevent="openModal(student)">
+                                <sbx-icon name="modify"></sbx-icon>
+                                Update Language Selection
+                            </button>
                         </li>
                     </ul>
                 </td>
