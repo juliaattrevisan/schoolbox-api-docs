@@ -50,11 +50,7 @@ class Base
             'title' => $rubricGrid->getRubricInstance()->getTitle(),
             'weight' => $rubricGrid->getRubricInstance()->getWeight(),
             'derivedMaxValue' => $rubricGrid->calculateMaxValueFromCapabilities(), // TODO: rubric-markable only, and check if it matters for perms
-            'capabilityMarkScheme' => [
-                // TODO: this array format has been used at least 4 times now... (here, grid-markable.twig, and course/class markbooks)
-                'template' => $rubricGrid->getCapabilityMarkScheme()->getTemplate(),
-                'context' => $rubricGrid->getCapabilityMarkScheme()->generateContext(),
-            ],
+            'capabilityMarkScheme' => $rubricGrid->getCapabilityMarkScheme()->generateContext(),
             'levels' => $rubricGrid->getLevels()->map(fn(Level $level) => [
                 'id' => $level->getId(),
                 'name' => \Scrub::markdown($level->getName()),

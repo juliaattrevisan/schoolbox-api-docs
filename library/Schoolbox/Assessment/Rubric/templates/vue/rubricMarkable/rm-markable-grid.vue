@@ -124,7 +124,7 @@ const formValue = window.Vue.computed(() => JSON.stringify(translateMarkedGridTo
                 />
 
                 <!-- Overall Rubric Mark -->
-                <tr v-if="props.showRubricTotal && props.assessmentMarkScheme.context.mode !== MarkTypeSlug.NONE">
+                <tr v-if="props.showRubricTotal && props.assessmentMarkScheme.mode !== MarkTypeSlug.NONE">
                     <th
                         class="rb-final-summary"
                         :colspan="props.rubric.levels.length + 2"

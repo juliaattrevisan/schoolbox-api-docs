@@ -1,4 +1,5 @@
 import { assertUnreachable } from "@js/util/errorUtils";
+import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 import type { MarkScheme } from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/markScheme";
 
 /**
@@ -38,11 +39,11 @@ export function applyMarkScheme(
     value: string | null;
     humanReadableMark: string | null;
 } {
-    if (markScheme.template === "") {
+    if (markScheme.mode === MarkTypeSlug.NONE) {
         return { value: null, humanReadableMark: null };
     }
 
-    if (markScheme.template === "TotalMarkFractional") {
+    if (markScheme.mode === MarkTypeSlug.TOTAL) {
         const stringValue = value !== null ? String(value) : null;
         return {
             value: stringValue,
@@ -53,15 +54,15 @@ export function applyMarkScheme(
     // turn whatever the value currently is into a percentage
     const percentage = getPercentage(value, maxValue ?? 0);
 
-    if (markScheme.template === "Percentage") {
+    if (markScheme.mode === MarkTypeSlug.PERCENT) {
         return {
             value: percentage !== null ? percentage.toString() : null,
             humanReadableMark: percentage !== null ? `${percentage}%` : null,
         };
     }
 
-    if (markScheme.template === "LetterGrade") {
-        const grades = markScheme.context.conf;
+    if (markScheme.mode === MarkTypeSlug.LETTER) {
+        const grades = markScheme.conf;
         if (percentage === null) {
             return { value: null, humanReadableMark: null };
         }
@@ -96,11 +97,11 @@ export function deriveScaledMark(
     maxValue: number | null,
     markScheme: MarkScheme,
 ): number | null {
-    if (markScheme.template === "") {
+    if (markScheme.mode === MarkTypeSlug.NONE) {
         return null;
     }
 
-    if (markScheme.template === "TotalMarkFractional") {
+    if (markScheme.mode === MarkTypeSlug.TOTAL) {
         const floatValue = parseFloat(String(value));
         if (Number.isNaN(floatValue)) {
             return null;
@@ -108,7 +109,7 @@ export function deriveScaledMark(
         return floatValue;
     }
 
-    if (markScheme.template === "Percentage") {
+    if (markScheme.mode === MarkTypeSlug.PERCENT) {
         const floatValue = parseFloat(String(value));
         if (Number.isNaN(floatValue)) {
             return null;
@@ -117,8 +118,8 @@ export function deriveScaledMark(
         return (floatValue * (maxValue ?? 0)) / 100;
     }
 
-    if (markScheme.template === "LetterGrade") {
-        const grades = markScheme.context.conf;
+    if (markScheme.mode === MarkTypeSlug.LETTER) {
+        const grades = markScheme.conf;
         const relevantGrade = grades.find((grade) => grade.caption === value);
         if (!relevantGrade) {
             return null;

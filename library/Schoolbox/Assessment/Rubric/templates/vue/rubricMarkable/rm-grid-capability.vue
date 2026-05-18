@@ -5,6 +5,7 @@
  */
 
 import locale from "@js/terminology/rosettaStone";
+import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 import MarkScheme from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/mark-scheme.vue";
 import type { MarkScheme as CapabilityMarkScheme } from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/markScheme";
 import type { User } from "@schoolboxLibrary/types/User";
@@ -132,7 +133,7 @@ const markIsDifferent = window.Vue.computed<boolean>(() => {
     const derivedMark = derivedCapabilityMark.value.value;
     const customMark = capabilityMark.value.value;
 
-    if (props.capabilityMarkScheme.template === "LetterGrade") {
+    if (props.capabilityMarkScheme.mode === MarkTypeSlug.LETTER) {
         // Compare letter grades by their string value (easier since we're dealing with brackets)
         return derivedMark !== customMark;
     }
@@ -294,8 +295,8 @@ window.Vue.watch(
                     class="rb-value-input groupMark"
                 />
 
-                <template v-if="props.capabilityMarkScheme.template === 'Percentage'"> % </template>
-                <template v-else-if="props.capabilityMarkScheme.template === 'TotalMarkFractional'">
+                <template v-if="props.capabilityMarkScheme.mode === MarkTypeSlug.PERCENT"> % </template>
+                <template v-else-if="props.capabilityMarkScheme.mode === MarkTypeSlug.TOTAL">
                     / {{ capability.maxValue }}
                 </template>
             </span>

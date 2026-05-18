@@ -74,7 +74,7 @@ function findCapabilityMark(
                     :show-summary-capability="
                         props.showGroupTotal &&
                         !!props.rubricMarkedGrid &&
-                        props.rubric.capabilityMarkScheme.context.mode !== MarkTypeSlug.NONE
+                        props.rubric.capabilityMarkScheme.mode !== MarkTypeSlug.NONE
                     "
                 />
 
@@ -83,7 +83,7 @@ function findCapabilityMark(
                     v-if="
                         props.showRubricTotal &&
                         props.rubricMarkedGrid &&
-                        props.assessmentMarkScheme.context.mode !== MarkTypeSlug.NONE
+                        props.assessmentMarkScheme.mode !== MarkTypeSlug.NONE
                     "
                 >
                     <th class="rb-final-summary" :colspan="props.rubric.levels.length + 2">

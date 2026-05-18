@@ -6,6 +6,7 @@
  * Currently integrates with jquery.combobox.js and jquery.alaressValidate.js down the chain
  */
 
+import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 import type { MarkScheme, SubmissionErrorStates } from "./markScheme";
 import MsLetterGrade from "./ms-letter-grade.vue";
 import MsPercentage from "./ms-percentage.vue";
@@ -48,7 +49,7 @@ const mark = defineModel<string | null>("mark", { required: true });
 
 <template>
     <ms-letter-grade
-        v-if="props.markScheme.template === 'LetterGrade'"
+        v-if="props.markScheme.mode === MarkTypeSlug.LETTER"
         :id="props.id"
         v-model:mark="mark"
         :name="props.name"
@@ -61,7 +62,7 @@ const mark = defineModel<string | null>("mark", { required: true });
         :allow-invalid-mark="props.allowInvalidMark"
     />
     <ms-percentage
-        v-else-if="props.markScheme.template === 'Percentage'"
+        v-else-if="props.markScheme.mode === MarkTypeSlug.PERCENT"
         :id="props.id"
         v-model:mark="mark"
         :name="props.name"
@@ -73,7 +74,7 @@ const mark = defineModel<string | null>("mark", { required: true });
         :allow-invalid-mark="props.allowInvalidMark"
     />
     <ms-total-mark-fractional
-        v-else-if="props.markScheme.template === 'TotalMarkFractional'"
+        v-else-if="props.markScheme.mode === MarkTypeSlug.TOTAL"
         :id="props.id"
         v-model:mark="mark"
         :name="props.name"

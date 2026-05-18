@@ -47,7 +47,7 @@ const limit = window.Vue.computed(() => {
         return props.limit;
     }
 
-    const { totalMark } = props.markScheme.context.conf;
+    const { totalMark } = props.markScheme.conf;
 
     if (Math.floor(totalMark) !== totalMark) {
         return Number(totalMark.toFixed(PRECISION));

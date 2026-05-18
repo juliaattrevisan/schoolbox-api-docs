@@ -65,10 +65,7 @@ const mark = defineModel<string | null>("mark", { required: true });
          -->
         <option :value="null" disabled :selected="mark === null">(no grade)</option>
 
-        <optgroup
-            v-if="props.markScheme.context.conf.length === 0"
-            :label="`Original ${locale.grades.properPlural()} Deleted`"
-        >
+        <optgroup v-if="props.markScheme.conf.length === 0" :label="`Original ${locale.grades.properPlural()} Deleted`">
             <option selected value="-1" disabled>empty</option>
         </optgroup>
         <!-- If humanReadableMark has a value, look for it among the current Grade Group dropdown options.
@@ -76,7 +73,7 @@ const mark = defineModel<string | null>("mark", { required: true });
          -->
         <optgroup v-else :label="locale.grades.properPlural()">
             <option
-                v-for="(level, i) in props.markScheme.context.conf"
+                v-for="(level, i) in props.markScheme.conf"
                 :key="i"
                 :value="level.caption"
                 :selected="mark === level.caption"
@@ -114,7 +111,7 @@ const mark = defineModel<string | null>("mark", { required: true });
             v-if="
                 mark !== null &&
                 mark.length &&
-                props.markScheme.context.conf.find((level) => level.caption === mark) === undefined &&
+                props.markScheme.conf.find((level) => level.caption === mark) === undefined &&
                 props.submissionErrorStates.find((state) => state.name === mark) === undefined
             "
             label="Original Deleted Grade"

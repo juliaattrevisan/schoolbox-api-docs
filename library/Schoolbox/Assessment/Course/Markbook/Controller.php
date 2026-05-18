@@ -357,10 +357,7 @@ class Controller extends WebController\Base
                                     // 'weight'         => ...,
                                     'projectId'      => $parentProject?->getId(),
                                     'writable'       => $this->isAssessmentMarkable($this->getUser(), $aImpl, $terms),
-                                    'instructorMarkScheme' => [
-                                        'template' => $instructorMarkScheme->getTemplate(),
-                                        'context'  => $instructorMarkScheme->generateContext(),
-                                    ],
+                                    'instructorMarkScheme' => $instructorMarkScheme->generateContext(),
                                     'participants' => $courseMarkbook->getCourseImportStudents()[$courseImpl->getId()]->map(
                                         function (User $student) use ($aImpl, $courseImpl, $assessmentId, $courseMarkbook) {
                                             $participant = $aImpl->getParticipantIfExtant($student, false) ?? null;
