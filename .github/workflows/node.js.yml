@@ -34,6 +34,9 @@ on:
       - "npm-shrinkwrap.json"
       - ".github/workflows/node.js.yml"
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 # Cancel on push to same branch
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
