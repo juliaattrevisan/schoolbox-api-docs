@@ -80,35 +80,36 @@
     }
 }
 
-.ss-selected-item {
-    align-items: center;
+.active-item {
     background: var(--sbx-config-color-active, var(--body-background));
     border-radius: var(--sbx-config-field-roundness, 0px);
     color: var(--sbx-color-text-primary, #000);
-    display: flex;
-    gap: var(--sbx-size-xs, var(--spacing-s));
     font-size: var(--sbx-font-size-xs, 0.8125rem);
     padding: var(--sbx-size-xxs, var(--spacing-s)) var(--sbx-size-xs, var(--spacing-s));
     overflow: hidden;
     white-space: nowrap;
+    &:has(.active-item__remove-button) {
+        align-items: center;
+        display: flex;
+        gap: var(--sbx-size-xs, var(--spacing-s));
+    }
     &__name-button {
-        background: none;
         margin: 0;
         max-width: 30rem;
-        min-height: 0;
-        padding: 0;
         text-align: left;
         text-overflow: ellipsis;
     }
+    &__name-button,
     &__remove-button {
         background: none;
         min-height: 0;
         padding: 0;
-    }
-    &__name-button,
-    &__remove-button {
         &:hover {
             background: none;
+        }
+        &:focus {
+            background: var(--sbx-config-color-active, var(--body-background));
+            outline: var(--sbx-border-width-normal, 1px) solid var(--sbx-config-color-accent, var(--form-border-color));
         }
     }
 }

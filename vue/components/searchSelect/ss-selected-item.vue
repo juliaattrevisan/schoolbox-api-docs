@@ -42,13 +42,13 @@ function onRemoveSelected(): void {
 
 <template>
     <div
-        :class="`ss-selected-item ${props.isSingleSelect ? 'l-flex__item--1' : ''}`"
+        :class="`active-item ${props.isSingleSelect ? 'l-flex__item--1' : ''}`"
         :data-test="`ss-selected-item-container-${props.item.id}`"
     >
         <button
             v-if="props.canSelectItem"
             type="button"
-            :class="`ss-selected-item__name-button ${props.isSingleSelect ? 'l-flex__item--1' : ''}`"
+            :class="`active-item__name-button ${props.isSingleSelect ? 'l-flex__item--1' : ''}`"
             :title="`View ${props.item.name}`"
             :aria-label="`View ${props.item.name}`"
             :disabled="isDisabled"
@@ -57,11 +57,11 @@ function onRemoveSelected(): void {
         >
             {{ props.item.name }}
         </button>
-        <span v-else class="ss-selected-item__name-span">{{ props.item.name }}</span>
+        <span v-else class="active-item__name-span">{{ props.item.name }}</span>
         <button
             v-if="!props.isReadOnly"
             type="button"
-            class="ss-selected-item__remove-button"
+            class="active-item__remove-button"
             :title="`Remove ${props.item.name}`"
             :aria-label="`Remove ${props.item.name}`"
             :data-test="`ss-selected-list-item-remove-${props.item.id}`"
