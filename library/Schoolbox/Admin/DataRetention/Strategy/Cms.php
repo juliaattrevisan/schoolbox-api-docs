@@ -96,9 +96,7 @@ class Cms extends Base
     /**
      * Load soft-deleted CMS folder ids that are old enough and safe to hard-delete.
      *
-     * A retained folder is not safe while it still has active direct children,
-     * because deleting it would also remove children that have not been
-     * soft-deleted.
+     * A retained folder is not safe while it still has children.
      *
      * @return array<int, array{id: int|string}>
      */
@@ -110,12 +108,11 @@ class Cms extends Base
             SELECT id
             FROM " . self::TABLE_FOLDER . "
             WHERE deleted_at IS NOT NULL AND deleted_at < :old
-                -- Keep active child folders in place; their parent can be retried after the children are deleted.
+                -- Keep parent folders in place; they can be retried after all children are deleted.
                 AND NOT EXISTS (
                     SELECT 1
                     FROM " . self::TABLE_FOLDER . " child
                     WHERE child.parent = " . self::TABLE_FOLDER . ".id
-                        AND child.deleted_at IS NULL
                 )
         ";
 
