@@ -637,11 +637,7 @@ import { getLoadedHTML } from "@js/util/domUtils";
             .each(function () {
                 var element = $(this),
                     errorHtml = error;
-
-                if (
-                    element.hasClass("alert-box") &&
-                    !(typeof error === "string" && error.indexOf("<sbx-icon") !== -1)
-                ) {
+                if (element.hasClass("alert-box") && typeof error === "string") {
                     errorHtml = '<sbx-icon name="alert"></sbx-icon>' + error;
                 }
 
