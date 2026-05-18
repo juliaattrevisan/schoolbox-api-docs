@@ -449,15 +449,8 @@ class Grid
      */
     public function toArray(bool $showPoints): array
     {
-        // TODO: this shouldn't be the same as Translator/ModelToArray/Full.
-        // figure out what's actually needed then narrow it down and figure out the best payload structure
-        // for the builder/readonly/markable grids.
-        // There's also the assessment API to consider, i'm ignoring it for now as we'll need to change it regardless to accomidate multi rubrics
-        // To avoid passing thru a translator down very deep twig file chains in a lot of places, we can do it here for now
-
-        // TODO: also check access to various things matches what we expect (particularly whether students can see mark info assuming there's cases when they shouldn't?)
-
         // TODO: injecting this stuff like this is quite unpleasant, let's review once it's at least working...
+        // ^ see MarkedGrid::toArray for further comments
         $rubricGridTranslator = new Translator\ModelToArray\Base($showPoints);
         return $rubricGridTranslator($this);
     }

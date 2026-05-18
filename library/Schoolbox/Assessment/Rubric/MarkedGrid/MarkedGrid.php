@@ -262,11 +262,15 @@ class MarkedGrid
         User $viewer,
         bool $showPoints,
     ): array {
-        // TODO: similar to Grid->jsonSerialize, this is not final and will be easier to figure out what needs
-        // to be changed once we can see all the payloads for the builder/readonly/markable grids in action.
-        // To avoid passing thru a translator down very deep twig file chains in a lot of places, we can do it here for now
+        /* TODO: similar to Grid->jsonSerialize, this is not final and will be easier to figure out what needs
+         * to be changed once we can see all the payloads for the builder/readonly/markable grids in action.
+         * There's also the assessment API to consider, i'm ignoring it for now as we'll need to change it regardless to accomidate multi rubrics
+         * To avoid passing thru a translator down very deep twig file chains in a lot of places, we can do it here for now
+         */
 
-        // TODO: also check access to various things matches what we expect (particularly whether students can see mark info assuming there's cases when they shouldn't?)
+        /* TODO: ensure access controls (particularly whether students can see mark info assuming there's cases when they shouldn't?) are handled correctly
+         * there are more notes both in this translator and in the Grid translators about addressing this.
+         */
 
         // TODO: injecting this stuff like this is quite unpleasant, let's review once it's at least working...
         $rubricMarkedGridTranslator = new Translator\ModelToArray(
