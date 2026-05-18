@@ -11,6 +11,7 @@ import IbReportActionDrawer from "./components/ib-report-action-drawer.vue";
 import { useIbReportUpdateLanguageStore } from "./store/ibReportUpdateLanguageStore";
 import type {
     StudentRow,
+    SubjectGroup,
     FailedRow,
     InProgressRow,
     RegisteredRow,
@@ -122,6 +123,16 @@ function clearSelection(): void {
     selectedStudentIds.value = new Set();
 }
 
+function onStudentUpdated(studentId: number, updatedSubjects: SubjectGroup): void {
+    for (const list of [preparation, unconfirmed, confirmed]) {
+        const idx = list.value.findIndex((s) => s.id === studentId);
+        if (idx !== -1) {
+            list.value[idx] = { ...list.value[idx], subjects: updatedSubjects };
+            return;
+        }
+    }
+}
+
 async function handleCompletePreparation(studentIds: number[]): Promise<void> {
     if (isCompleting.value) return;
     isCompleting.value = true;
@@ -185,15 +196,24 @@ window.Vue.onMounted((): void => {
                     :selected-student-ids="selectedStudentIds"
                     @toggle-selection="toggleSelection"
                     @complete-preparation-single="(id) => handleCompletePreparation([id])"
+                    @student-updated="onStudentUpdated"
                 />
             </ib-report-section>
 
             <ib-report-section title="Students with unconfirmed details" :count="unconfirmed.length">
-                <ib-report-standard-table :students="unconfirmed" />
+                <ib-report-standard-table
+                    :students="unconfirmed"
+                    :search-languages-endpoint="props.searchLanguagesEndpoint"
+                    @student-updated="onStudentUpdated"
+                />
             </ib-report-section>
 
             <ib-report-section title="Students with confirmed details ready for submission" :count="confirmed.length">
-                <ib-report-standard-table :students="confirmed" />
+                <ib-report-standard-table
+                    :students="confirmed"
+                    :search-languages-endpoint="props.searchLanguagesEndpoint"
+                    @student-updated="onStudentUpdated"
+                />
             </ib-report-section>
 
             <ib-report-section title="In progress" :count="inProgress.length">
@@ -209,10 +229,9 @@ window.Vue.onMounted((): void => {
             </ib-report-section>
         </div>
 
-<<<<<<< HEAD
         <div id="ib-report-pop-out-container"></div>
 
-        <ib-update-language-modal />
+        <ib-update-language-modal @student-updated="onStudentUpdated" />
 
         <ib-report-action-drawer
             v-if="selectedStudentIds.size > 0"
@@ -221,31 +240,5 @@ window.Vue.onMounted((): void => {
             @complete-preparation="handleCompletePreparation([...selectedStudentIds])"
             @clear-selection="clearSelection"
         />
-=======
-        <bottom-drawer :show-drawer="selectedStudentIds.size > 0">
-            <h3 class="selected-count">
-                <em>
-                    {{ selectedStudentIds.size }}
-                    {{ selectedStudentIds.size === 1 ? "student" : "students" }} selected
-                </em>
-            </h3>
-            <button type="button" class="button-clear" @click="clearSelection">Clear Selection</button>
-            <ul class="flex-list buttons">
-                <li class="two-thirds">
-                    <button
-                        type="button"
-                        class="submit"
-                        :disabled="isCompleting"
-                        @click="handleCompletePreparation([...selectedStudentIds])"
-                    >
-                        {{ isCompleting ? "Completing..." : "Complete Preparation" }}
-                    </button>
-                </li>
-                <li class="one-third">
-                    <button type="button" disabled aria-disabled="true" title="Coming soon">Submit to IB</button>
-                </li>
-            </ul>
-        </bottom-drawer>
->>>>>>> 06ba26b9b97 (Fixing selection bug [SA-21589])
     </div>
 </template>
