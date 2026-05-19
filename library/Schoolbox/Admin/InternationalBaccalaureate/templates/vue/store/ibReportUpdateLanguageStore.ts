@@ -36,7 +36,7 @@ export const useIbReportUpdateLanguageStore = defineStore("ibReportUpdateLanguag
      * Set the search endpoint used by the modal language pickers.
      * @param endpoint The search endpoint exposed by the page.
      */
-    function initialise(endpoint: string): void {
+    function init(endpoint: string): void {
         searchLanguagesEndpoint.value = endpoint;
     }
 
@@ -203,7 +203,7 @@ export const useIbReportUpdateLanguageStore = defineStore("ibReportUpdateLanguag
         activeStudent,
         searchLanguagesEndpoint,
         subjectRows,
-        initialise,
+        init,
         registerStudentUpdatedHandler,
         prompt,
         close,

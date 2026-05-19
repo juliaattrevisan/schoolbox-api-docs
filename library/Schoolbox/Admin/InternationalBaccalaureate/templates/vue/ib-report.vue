@@ -130,7 +130,7 @@ function handleStudentUpdated(studentId: number, updatedSubjects: SubjectGroup):
     }
 }
 
-updateLanguageStore.initialise(props.searchLanguagesEndpoint);
+updateLanguageStore.init(props.searchLanguagesEndpoint);
 updateLanguageStore.registerStudentUpdatedHandler(handleStudentUpdated);
 
 window.Vue.onMounted((): void => {
