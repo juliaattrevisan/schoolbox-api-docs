@@ -590,8 +590,7 @@ class Migration extends CliTool\App
                 break;
             }
             $this->getLogger()->debug("Removing directory '$dirname'");
-            if (!@rmdir($dirname) && is_dir($dirname)) {
-                // Still present after failure — concurrent write or permission change
+            if (!@rmdir($dirname)) {
                 break;
             }
             if ($dirname === $this->storageDir) {
