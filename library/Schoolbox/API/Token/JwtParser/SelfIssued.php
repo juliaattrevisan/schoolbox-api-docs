@@ -134,6 +134,7 @@ class SelfIssued extends Base
             );
         }
 
+        // TODO remove this check? Hasn't IP tracking been removed?
         if (isset($claims[self::CUSTOM_CLAIM_TASKD]) && $claims[self::CUSTOM_CLAIM_TASKD] === 1) {
             $this->log->info(sprintf('Claim "%s" is set: bypassing IP tracking', self::CUSTOM_CLAIM_TASKD));
             $this->bypassIpTracking = true;
