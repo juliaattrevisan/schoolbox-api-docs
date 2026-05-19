@@ -31,6 +31,7 @@ use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Mapper as IndicatorUsag
 use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Model as IndicatorUsageModel;
 use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper as LevelMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Level\Model as LevelModel;
+use Schoolbox\Assessment\Rubric\FeedbackMeta;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Importer\IImporter;
@@ -1101,6 +1102,10 @@ class DataSource
      */
     public function persistMarkedGrid(MarkedGrid $markedGrid): void
     {
+        new \Alaress_Probe(
+            FeedbackMeta::from(get_class($markedGrid->getFeedback()))
+        );die();
+
         // Required mappers
         $returnedWorkMapper = SubmissionBox\ReturnedWorkMapper::getInstance();
 
