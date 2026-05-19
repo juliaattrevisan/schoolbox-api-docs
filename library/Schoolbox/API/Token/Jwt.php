@@ -25,14 +25,17 @@ class Jwt
     /**
      * Signing algorithm for JWTs.
      */
-    public const SIGNING_ALGORITHM = 'RS256';
-    public const KEY_ID            = 'schoolbox';
+    public const string SIGNING_ALGORITHM = 'RS256';
 
-    /* HELP instance ID
+    /**
+     * The JWT's key ID: for now hardcoded, but may change later.
      */
-    public const HELP_ID           = '3d844bfe';
+    public const string KEY_ID = 'schoolbox';
 
-    public const API_JWT_TIMEOUT = 3600; // 1 hour
+    /**
+     * Default timeout for JWTs, in seconds: currently, this is 1 hour.
+     */
+    public const int API_JWT_TIMEOUT = 3600;
 
     /**
      * Config settings are stored here.
@@ -64,7 +67,7 @@ class Jwt
      */
     public function generate(User $user, ?string $jwtId, ?Alaress_Date_Format $expiry = null, array $additionalClaims = []): string
     {
-        $schoolboxFqdn = (new Factory($this->config))->buildFullyQualified()->getHost();
+        $schoolboxFqdn = new Factory($this->config)->buildFullyQualified()->getHost();
 
         // Issuer:     this Schoolbox instance's FQDN
         // Subject:    $user
