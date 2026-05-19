@@ -1387,13 +1387,13 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     public function deletePastoralDocument(PastoralAttachment $pastoralAttachment): bool
     {
+        if (!$pastoralAttachment->getExternalId() || !$pastoralAttachment->getPastoral()->getExternalId()) {
+            return true;
+        }
+
         $pastoral = $this->pastoralMapper->findById($pastoralAttachment->getPastoral()->getId());
         $studentExternalId = $pastoral->getStudent()?->getExternalId();
         $pastoralExternalId = $pastoral->getExternalId();
-
-        if (!$pastoralAttachment->getExternalId() || !$pastoralExternalId) {
-            return true;
-        }
 
         if (!$studentExternalId) {
             throw new ExternalException("Error delete pastoral attachment: {$pastoralAttachment->getExternalId()} missing student external ID");
