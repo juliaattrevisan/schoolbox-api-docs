@@ -4297,18 +4297,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Participant.php
 
 		-
-			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\Learning\\Assessment\\Visibility is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/Participant/Test/AssessmentListMutatorTest.php
-
-		-
-			message: '#^Property Schoolbox\\Learning\\Assessment\\ParticipantStatistics\:\:\$cacheCountAssessments \(int\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/ParticipantStatistics.php
-
-		-
 			message: '#^PHPDoc tag @param for parameter \$participants with type Schoolbox\\GenericCollection\|Schoolbox\\Learning\\Assessment\\Participant is not subtype of native type Schoolbox\\GenericCollection\.$#'
 			identifier: parameter.phpDocType
 			count: 1
