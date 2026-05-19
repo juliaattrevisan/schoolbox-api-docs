@@ -1,14 +1,21 @@
 <script setup lang="ts">
-/**
- * Student table used in the Preparation, Unconfirmed, and Confirmed sections of the registration report.
- */
 import IbReportSubjectLabels from "./ib-report-subject-labels.vue";
+import { useIbReportUpdateLanguageStore } from "../store/ibReportUpdateLanguageStore";
 import type { StudentRow } from "../../js/types/ibReportTypes";
 
 interface Props {
     students: StudentRow[];
 }
 defineProps<Props>();
+const updateLanguageStore = useIbReportUpdateLanguageStore();
+
+/**
+ * Opens the update language modal for the given student.
+ * @param student The student to update.
+ */
+function openModal(student: StudentRow): void {
+    updateLanguageStore.prompt(student);
+}
 </script>
 
 <template>
@@ -46,9 +53,23 @@ defineProps<Props>();
                 <td><ib-report-subject-labels :entry="student.subjects.sl" /></td>
                 <td><ib-report-subject-labels :entry="student.subjects.core" /></td>
                 <td>
-                    <button type="button" disabled aria-label="More options">
-                        <sbx-icon name="more"></sbx-icon>
-                    </button>
+                    <sbx-pop-out
+                        :content-id="`ib-row-dropdown-${student.id}`"
+                        move-to="#ib-report-pop-out-container"
+                    ></sbx-pop-out>
+                    <ul
+                        :id="`ib-row-dropdown-${student.id}`"
+                        class="f-dropdown"
+                        data-dropdown-content
+                        aria-hidden="true"
+                    >
+                        <li v-if="student.updateLanguageEndpoint !== null">
+                            <button class="sbx-button--has-icon" @click.prevent="openModal(student)">
+                                <sbx-icon name="modify"></sbx-icon>
+                                Update Language Selection
+                            </button>
+                        </li>
+                    </ul>
                 </td>
             </tr>
         </tbody>

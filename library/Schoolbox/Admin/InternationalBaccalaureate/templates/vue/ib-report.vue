@@ -10,6 +10,8 @@ import IbReportStandardTable from "./components/ib-report-standard-table.vue";
 import IbReportFailedTable from "./components/ib-report-failed-table.vue";
 import IbReportInProgressTable from "./components/ib-report-in-progress-table.vue";
 import IbReportRegisteredTable from "./components/ib-report-registered-table.vue";
+import IbUpdateLanguageModal from "./components/ib-update-language-modal.vue";
+import { useIbReportUpdateLanguageStore } from "./store/ibReportUpdateLanguageStore";
 import type {
     StudentRow,
     FailedRow,
@@ -27,6 +29,7 @@ interface Props {
     sessionTitle: string;
 }
 const props = defineProps<Props>();
+const updateLanguageStore = useIbReportUpdateLanguageStore();
 
 const isLoading = window.Vue.ref<boolean>(true);
 const loadError = window.Vue.ref<string | null>(null);
@@ -46,6 +49,7 @@ const registered = window.Vue.ref<RegisteredRow[]>([]);
 function mapSubjectEntry(apiSubject: ApiSubject): SubjectEntry {
     const lang = apiSubject.languages[0] ?? null;
     return {
+        groupSubjectId: apiSubject.id,
         subject: apiSubject.subject,
         language: lang?.languageName ?? null,
         languageId: lang?.languageId ?? null,
@@ -67,10 +71,13 @@ function mapStudentRow(s: ApiStudent): StudentRow {
             sl: s.ibGroupSubjects.SL.map(mapSubjectEntry),
             core: s.ibGroupSubjects.Core.map(mapSubjectEntry),
         },
+        updateLanguageEndpoint: s._routes.updateLanguages,
     };
 }
 
-/** Fetches all candidate data from the API and populates section arrays. */
+/**
+ * Fetches all candidate data from the API and populates section arrays.
+ */
 async function loadCandidates(): Promise<void> {
     isLoading.value = true;
     loadError.value = null;
@@ -106,6 +113,8 @@ async function loadCandidates(): Promise<void> {
     }
 }
 
+updateLanguageStore.init(props.searchLanguagesEndpoint, preparation, unconfirmed, confirmed, failed);
+
 window.Vue.onMounted((): void => {
     void loadCandidates();
 });
@@ -115,7 +124,7 @@ window.Vue.onMounted((): void => {
     <div class="small-12 island l-flex-col l-gap-m">
         <div class="l-flex l-flex--align-center l-flex--justify-space f-no-margins">
             <h2 class="subheader f-no-margins">{{ props.sessionTitle }}</h2>
-            <button type="button" class="ib-report__download-btn" disabled aria-label="Download">
+            <button type="button" class="sbx-icon-only-button" disabled aria-label="Download">
                 <sbx-icon name="download"></sbx-icon>
             </button>
         </div>
@@ -126,24 +135,15 @@ window.Vue.onMounted((): void => {
 
         <div v-else class="l-flex-col l-gap-s">
             <ib-report-section title="Preparation" :count="preparation.length">
-                <ib-report-standard-table
-                    :students="preparation"
-                    :search-languages-endpoint="props.searchLanguagesEndpoint"
-                />
+                <ib-report-standard-table :students="preparation" />
             </ib-report-section>
 
             <ib-report-section title="Students with unconfirmed details" :count="unconfirmed.length">
-                <ib-report-standard-table
-                    :students="unconfirmed"
-                    :search-languages-endpoint="props.searchLanguagesEndpoint"
-                />
+                <ib-report-standard-table :students="unconfirmed" />
             </ib-report-section>
 
             <ib-report-section title="Students with confirmed details ready for submission" :count="confirmed.length">
-                <ib-report-standard-table
-                    :students="confirmed"
-                    :search-languages-endpoint="props.searchLanguagesEndpoint"
-                />
+                <ib-report-standard-table :students="confirmed" />
             </ib-report-section>
 
             <ib-report-section title="In progress" :count="inProgress.length">
@@ -158,16 +158,9 @@ window.Vue.onMounted((): void => {
                 <ib-report-registered-table :students="registered" />
             </ib-report-section>
         </div>
+
+        <div id="ib-report-pop-out-container"></div>
+
+        <ib-update-language-modal />
     </div>
 </template>
-
-<style scoped>
-.ib-report__download-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0.25rem;
-    color: var(--sbx-config-color-accent, #0066b0);
-    opacity: 0.85;
-}
-</style>
