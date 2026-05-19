@@ -16,6 +16,7 @@ import type {
     InProgressRow,
     RegisteredRow,
     SubjectEntry,
+    SubjectGroup,
     ApiStudent,
     ApiSubject,
     ApiCandidatesResponse,
@@ -108,6 +109,22 @@ async function loadCandidates(): Promise<void> {
     }
 }
 
+/**
+ * Updates a student's subjects in-place across all section arrays after a language save.
+ * @param studentId The registration session student ID of the updated student.
+ * @param updatedSubjects The new subject group with updated language selections.
+ */
+function handleStudentUpdated(studentId: number, updatedSubjects: SubjectGroup): void {
+    const arrays = [preparation.value, unconfirmed.value, confirmed.value, failed.value];
+    for (const arr of arrays) {
+        const idx = arr.findIndex((s) => s.id === studentId);
+        if (idx !== -1) {
+            arr[idx] = { ...arr[idx], subjects: updatedSubjects };
+            return;
+        }
+    }
+}
+
 window.Vue.onMounted((): void => {
     void loadCandidates();
 });
@@ -131,6 +148,7 @@ window.Vue.onMounted((): void => {
                 <ib-report-standard-table
                     :students="preparation"
                     :search-languages-endpoint="props.searchLanguagesEndpoint"
+                    @student-updated="handleStudentUpdated"
                 />
             </ib-report-section>
 
@@ -138,6 +156,7 @@ window.Vue.onMounted((): void => {
                 <ib-report-standard-table
                     :students="unconfirmed"
                     :search-languages-endpoint="props.searchLanguagesEndpoint"
+                    @student-updated="handleStudentUpdated"
                 />
             </ib-report-section>
 
@@ -145,6 +164,7 @@ window.Vue.onMounted((): void => {
                 <ib-report-standard-table
                     :students="confirmed"
                     :search-languages-endpoint="props.searchLanguagesEndpoint"
+                    @student-updated="handleStudentUpdated"
                 />
             </ib-report-section>
 
@@ -153,7 +173,11 @@ window.Vue.onMounted((): void => {
             </ib-report-section>
 
             <ib-report-section title="Failed registrations" :count="failed.length">
-                <ib-report-failed-table :students="failed" :search-languages-endpoint="props.searchLanguagesEndpoint" />
+                <ib-report-failed-table
+                    :students="failed"
+                    :search-languages-endpoint="props.searchLanguagesEndpoint"
+                    @student-updated="handleStudentUpdated"
+                />
             </ib-report-section>
 
             <ib-report-section title="Registered" :count="registered.length">
