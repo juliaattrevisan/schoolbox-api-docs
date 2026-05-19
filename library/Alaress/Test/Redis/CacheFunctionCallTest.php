@@ -72,7 +72,7 @@ class CacheFunctionCallTest extends TestCase
                      * Constructor
                      *
                      * @param CacheItemPoolInterface $pool                Internal PSR-6 cache
-                     * @param string|null            $cachedValueOverride Optional ovverride for cached value
+                     * @param string|null            $cachedValueOverride Optional override for cached value
                      */
                     public function __construct(CacheItemPoolInterface $pool, private ?string $cachedValueOverride)
                     {
