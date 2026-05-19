@@ -1387,8 +1387,16 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     public function deletePastoralDocument(PastoralAttachment $pastoralAttachment): bool
     {
-        if (!$pastoralAttachment->getExternalId() || !$pastoralAttachment->getPastoral()->getExternalId()) {
+        $pastoral = $this->pastoralMapper->findById($pastoralAttachment->getPastoral()->getId());
+        $studentExternalId = $pastoral->getStudent()?->getExternalId();
+        $pastoralExternalId = $pastoral->getExternalId();
+
+        if (!$pastoralAttachment->getExternalId() || !$pastoralExternalId) {
             return true;
+        }
+
+        if (!$studentExternalId) {
+            throw new ExternalException("Error delete pastoral attachment: {$pastoralAttachment->getExternalId()} missing student external ID");
         }
 
         // Count references for the file
@@ -1413,7 +1421,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                             AND ID = :studentId",
                     [
                         'tDocumentSeq' => $pastoralAttachment->getExternalId(),
-                        'studentId'           => $pastoralAttachment->getPastoral()->getExternalId(),
+                        'studentId'     => $studentExternalId,
                     ]
                 );
             }
@@ -1427,7 +1435,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 [
                     'tDocumentSeq'         => $pastoralAttachment->getExternalId(),
                     'RelatedSeqModuleCode' => self::MODULE_CODE,
-                    'RelatedSeq'           => $pastoralAttachment->getPastoral()->getExternalId(),
+                    'RelatedSeq'           => $pastoralExternalId,
                 ]
             );
 
