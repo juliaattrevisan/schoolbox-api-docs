@@ -56,6 +56,212 @@ $masonry-drop-background: $input-focus-bg-color;
             padding: 0.75rem 0 0.5rem 0.75rem;
         }
     }
+
+    sbx-icon.icon-masonry:before {
+        content: none;
+    }
+
+    // Preserve legacy homepage palette colours on the sbx-icon host.
+    sbx-icon.icon-masonry-Component_Homepage_AudioController {
+        color: $icon-color-audio;
+    }
+
+    sbx-icon.icon-masonry-Component_Homepage_BreadcrumbController {
+        color: $icon-color-breadcrumbs;
+    }
+
+    sbx-icon.icon-masonry-Schoolbox_Calendar_Component_Homepage_Controller {
+        color: $icon-color-calendar;
+    }
+
+    sbx-icon.icon-masonry-Schoolbox_Blog_Homepage_Component_Controller,
+    sbx-icon.icon-masonry-Component_Homepage_ChatController {
+        color: $icon-color-chat;
+    }
+
+    sbx-icon.icon-masonry-Component_Homepage_ManageClassController,
+    sbx-icon.icon-masonry-Component_Homepage_ClassListController {
+        color: $icon-color-class-list;
+    }
+
+    sbx-icon.icon-masonry-Component_Homepage_TeachersController {
+        color: $icon-color-class-teachers;
+    }
+
+    sbx-icon.icon-masonry-Component_Homepage_ClickviewController {
+        color: $icon-color-clickView;
+    }
+
+    sbx-icon.icon-masonry-Component_Homepage_EtherpadController {
+        color: $icon-color-collab-doc;
+    }
+
+    sbx-icon.icon-masonry-Component_Homepage_CountdownController {
+        color: $icon-color-countdown;
+    }
+
+    sbx-icon.icon-masonry-Schoolbox_Learning_Assessment_Component_Homepage_Builder_Controller {
+        color: $icon-color-course-builder;
+    }
+
+    sbx-icon.icon-masonry-Component_Homepage_RubricController {
+        color: $icon-color-course-criteria;
+    }
+
+    sbx-icon.icon-masonry-Schoolbox_Learning_Assessment_Component_Homepage_Outline_Controller {
+        color: $icon-color-course-outline;
+    }
+
+    sbx-icon.icon-masonry-Schoolbox_Curriculum_Component_CurriculumDetailsController {
+        color: $icon-color-curriculum-details;
+    }
+
+    sbx-icon.icon-masonry-Schoolbox_Curriculum_Component_CurriculumOverviewController {
+        color: $icon-color-curriculum-overview;
+    }
+
+    sbx-icon.icon-masonry-Schoolbox_Learning_Assessment_DialogAgent_Component_Homepage_Controller {
+        color: $icon-color-dialog-agent;
+    }
+
+    sbx-icon.icon-masonry-Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller {
+        color: $icon-color-due-work;
+    }
+
+    sbx-icon.icon-masonry-Component_Homepage_DropBoxController {
+        color: $icon-color-file-drop-box;
+    }
+
+    sbx-icon.icon-masonry-Component_Homepage_FileListController {
+        color: $icon-color-files;
+    }
+
+    sbx-icon.icon-masonry-Component_Homepage_ManageFolderController,
+    sbx-icon.icon-masonry-Component_Homepage_FolderListController {
+        color: $icon-color-folders;
+    }
+
+    sbx-icon.icon-masonry-Component_Homepage_ForumListController {
+        color: $icon-color-forum;
+    }
+
+    sbx-icon.icon-masonry-Schoolbox_Geosnapshot_Component_Homepage_Controller {
+        color: $icon-color-geosnapshot;
+    }
+
+    sbx-icon.icon-masonry-Schoolbox_Resource_GoogleFile_Component_Homepage_Controller {
+        color: $icon-color-google;
+    }
+
+    sbx-icon.icon-masonry-Component_Homepage_MembersController,
+    sbx-icon.icon-masonry-Component_Homepage_ManagersController {
+        color: $icon-color-group-members;
+    }
+
+    sbx-icon.icon-masonry-Component_Homepage_FeedController {
+        color: $icon-color-homepage-feed;
+    }
+
+    sbx-icon.icon-masonry-Component_Homepage_ImageController {
+        color: $icon-color-image;
+    }
+
+    sbx-icon.icon-masonry-Component_Homepage_ImageGalleryController {
+        color: $icon-color-image-gallery;
+    }
+
+    sbx-icon.icon-masonry-Component_Homepage_SlideshowController {
+        color: $icon-color-image-slideshow;
+    }
+
+    sbx-icon.icon-masonry-Schoolbox_Intellischool_Component_Homepage_Controller {
+        color: $icon-color-intellischool;
+    }
+
+    sbx-icon.icon-masonry-Schoolbox_Learning_Component_Homepage_LearningMomentsController {
+        color: $icon-color-learning-moment;
+    }
+
+    sbx-icon.icon-masonry-Schoolbox_Learning_Component_Homepage_CurrentLessonPlanController {
+        color: $icon-color-lesson-plan;
+    }
+
+    sbx-icon.icon-masonry-Component_Homepage_LinkListController {
+        color: $icon-color-links;
+    }
+
+    sbx-icon.icon-masonry-Schoolbox_LTI_Component_Homepage_Controller,
+    sbx-icon.icon-masonry-Schoolbox_Learning_Assessment_Lti_Component_Homepage_Controller {
+        color: $icon-color-lti;
+    }
+
+    sbx-icon.icon-masonry-Schoolbox_Comms_News_Component_Homepage_Controller {
+        color: $icon-color-news;
+    }
+
+    sbx-icon.icon-masonry-Component_Homepage_PinterestController {
+        color: $icon-color-pinterest;
+    }
+
+    sbx-icon.icon-masonry-Component_Homepage_PodcastController {
+        color: $icon-color-podcast;
+    }
+
+    sbx-icon.icon-masonry-Component_Homepage_PollController {
+        color: $icon-color-poll;
+    }
+
+    sbx-icon.icon-masonry-Schoolbox_Learning_Assessment_Quiz_Component_Homepage_Controller {
+        color: $icon-color-quizzes;
+    }
+
+    sbx-icon.icon-masonry-Component_Homepage_RandImageController {
+        color: $icon-color-random-image;
+    }
+
+    sbx-icon.icon-masonry-Component_Homepage_RSSController {
+        color: $icon-color-rss-feed;
+    }
+
+    sbx-icon.icon-masonry-Component_Homepage_SocialStreamController {
+        color: $icon-color-social-stream;
+    }
+
+    sbx-icon.icon-masonry-Schoolbox_Fixtures_Component_Homepage_Controller {
+        color: $icon-color-sport;
+    }
+
+    sbx-icon.icon-masonry-Component_Homepage_SurveyController {
+        color: $icon-color-surveys;
+    }
+
+    sbx-icon.icon-masonry-Schoolbox_Learning_Assessment_Task_Component_Homepage_Controller {
+        color: $icon-color-task;
+    }
+
+    sbx-icon.icon-masonry-Schoolbox_Resource_Textbox_Component_Homepage_Controller {
+        color: $icon-color-text-box;
+    }
+
+    sbx-icon.icon-masonry-Schoolbox_Tile_Component_HomepageTileController {
+        color: $icon-color-tiles;
+    }
+
+    sbx-icon.icon-masonry-Schoolbox_Twitter_Component_Homepage_Controller {
+        color: $icon-color-twitter;
+    }
+
+    sbx-icon.icon-masonry-Component_Homepage_VideoController {
+        color: $icon-color-video-player;
+    }
+
+    sbx-icon.icon-masonry-Component_Homepage_WikiController {
+        color: $icon-color-wiki;
+    }
+
+    sbx-icon.icon-masonry-Component_Homepage_WolframController {
+        color: $icon-color-wolfram-alpha;
+    }
 }
 
 // Padding when dropping a component onto the page before it is ajaxed in
