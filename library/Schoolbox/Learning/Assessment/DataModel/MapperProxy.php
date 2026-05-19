@@ -98,21 +98,30 @@ class MapperProxy
 
 
     /**
+     * @var RubricDataSource
+     */
+    private RubricDataSource $rubricMapper;
+
+
+    /**
      * Constructor
      *
-     * @param Mapper                $baseMapper
-     * @param Translator            $translator
+     * @param Mapper $baseMapper
+     * @param Translator $translator
      * @param ParticipantDataSource $participantDataSource
+     * @param RubricDataSource $rubricMapper
      */
     public function __construct(
         Mapper $baseMapper,
         Translator $translator,
-        ParticipantDataSource $participantDataSource
+        ParticipantDataSource $participantDataSource,
+        RubricDataSource $rubricMapper,
     ) {
         $this->baseMapper            = $baseMapper;
         $this->translator            = $translator;
         $this->participantDataSource = $participantDataSource;
         $this->model                 = IAssessable::class;
+        $this->rubricMapper          = $rubricMapper;
     }
 
 
@@ -1825,6 +1834,15 @@ class MapperProxy
                 if ($loadParticipants) {
                     $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student, $options);
                 }
+
+                /* Each rubric instance represents a grid; find its latest incarnation and supply it here.
+                 * There might be another more appropriate place for such a population but idk where that is right now.
+                 * TODO There might be a nicer way to load each grid's construct than one-at-a-time
+                 */
+                foreach ($assessment->getRubricInstances() as $rubricInstance) {
+                    $rubricInstance->setGrid($this->rubricMapper->retrieveOneGrid($assessment, $rubricInstance, false));
+                }
+
                 return $assessment;
             } catch (MapperException\Deleted $e) {
                 // Populate participants for the deleted assessment, and rethrow
@@ -1835,6 +1853,15 @@ class MapperProxy
                     if ($loadParticipants) {
                         $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student, $options);
                     }
+
+                    /* Each rubric instance represents a grid; find its latest incarnation and supply it here.
+                     * There might be another more appropriate place for such a population but idk where that is right now.
+                     * TODO There might be a nicer way to load each grid's construct than one-at-a-time
+                     */
+                    foreach ($assessment->getRubricInstances() as $rubricInstance) {
+                        $rubricInstance->setGrid($this->rubricMapper->retrieveOneGrid($assessment, $rubricInstance, false));
+                    }
+
                     $e->setDeletedObject($assessment);
                 }
                 throw $e;

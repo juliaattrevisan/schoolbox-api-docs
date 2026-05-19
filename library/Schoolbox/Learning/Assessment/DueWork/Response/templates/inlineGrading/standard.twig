@@ -180,42 +180,35 @@ Usage:
                         {# Required so that this form is recognised as containing a rubric and files #}
                         <input name="fromInlineGrader" value="true" type="hidden"/>
 
-                        {# Settings for the rubric grid #}
-                        {% set showGroupTotal = assessment.isMarkPerCapability %}
-                        {% set showRubricTotal = true %}
-                        {% set self = 'none' %}
+                        {# Render each grid's markable variant so the instructor can choose descriptors
+                         # There could be multiple grids here so I suppose we render them in a giant pile here
+                         #}
+                        {% for rubricInstance in assessment.rubricInstances %}
+                            <fieldset class="content">
+                                {% set rubricTemplate = readonly ? 'grid.twig' : 'grid-markable.twig' %}
+                                {% set rubricMarkedGrid = feedback is not null ? feedback.rubricMarkedGrid : null %}
 
-                        {% block rubricGrid %}
-                            {% if assessment.useRubric %}
-                                <fieldset class="content">
-                                    {% set rubricTemplate = readonly
-                                        ? 'grid.twig'
-                                        : 'grid-markable.twig'
-                                    %}
-                                    {% set rubricMarkedGrid = feedback is not null ? feedback.rubricMarkedGrid : null %}
-
-                                    {% include '@rubric/' ~ rubricTemplate with {
-                                        rubricGrid: assessment.rubricGrid,
-                                        rubricMarkedGrid: rubricMarkedGrid,
-                                        selfAssessmentFeedback: selfAssessmentFeedback ?? null,
-                                        learner: participant.user,
-                                        markVisibility: participant.assessable.isFeedbackVisibleToUser(USER),
-                                        showGroupTotal: showGroupTotal,
-                                        showRubricTotal: showRubricTotal,
-                                        self: self,
-                                        studentView: studentView,
-                                        selfAssess: selfAssess,
-                                        selfReflect: selfReflect,
-                                        blindMode: blindMode ?? false
-                                    } only %}
-                                </fieldset>
-                            {% endif %}
-                        {% endblock %}
+                                {% include '@rubric/' ~ rubricTemplate with {
+                                    assessment: assessment,
+                                    rubricInstance: rubricInstance,
+                                    showGroupTotal: rubricInstance.isMarkPerCapability,
+                                    showRubricTotal: true,
+                                    rubricMarkedGrid: rubricMarkedGrid,
+                                    markVisibility: participant.assessable.isFeedbackVisibleToUser(USER),
+                                    blindMode: blindMode ?? false,
+                                    studentView: studentView,
+                                    selfAssess: selfAssess,
+                                    selfReflect: selfReflect,
+                                    learner: participant.user,
+                                    selfAssessmentFeedback: selfAssessmentFeedback ?? null,
+                                } only %}
+                            </fieldset>
+                        {% endfor %}
 
                         {# A hole for readonly self-reflection content
-                 # Used when the Instructor wants to see the self-reflection while providing Feedback
-                 # Presence of a Learner-authored (marker, owner) tuple activates this
-                        #}
+                         # Used when the Instructor wants to see the self-reflection while providing Feedback
+                         # Presence of a Learner-authored (marker, owner) tuple activates this
+                         #}
                         {% block readonlyFeedback %}
                             {% if selfAssessmentFeedback %}
                                 {% import '@learning/macro/urgency.twig' as urgency %}

@@ -74,6 +74,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Assessment\Course\Task\CompletionMapper as TaskCompletionMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Auth\Remember;
 use Schoolbox\Bookmark\Mapper as BookmarkMapper;
 use Schoolbox\Cdn\PrefixGenerator;
@@ -1578,6 +1579,7 @@ abstract class Kernel
                     'baseMapper'            => $mapperFactory->getLazy(AssessmentMapper::class),
                     'translator'            => $di->lazyGet('assessmentTranslator'),
                     'participantDataSource' => $di->lazyGet('participantDataSource'),
+                    'rubricMapper'          => $mapperFactory->get(RubricDataSource::class)
                 ]
             )
         );
