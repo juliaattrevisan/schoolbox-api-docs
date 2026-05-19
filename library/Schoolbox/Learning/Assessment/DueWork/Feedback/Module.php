@@ -226,6 +226,7 @@ class Module extends BaseModule
             $this->injector->get('kamiConnector'),
             $this->getMapperFactory()->get(TermMapper::class),
             $this->getAccess(),
+            $this->getMapperFactory()->get(\Schoolbox\Assessment\Rubric\Instance\Mapper::class)
         );
     }
 

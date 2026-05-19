@@ -94,6 +94,7 @@ class Controller extends Base
         private Connector $kamiConnector,
         private TermMapper $termMapper,
         private Access $access,
+        private \Schoolbox\Assessment\Rubric\Instance\Mapper $rubricInstanceMapper,
     ) {
         $this->feedbackDataSource    = $feedbackDataSource;
         $this->participantDataSource = $participantDataSource;
@@ -311,23 +312,19 @@ class Controller extends Base
         // Presumably $feedback has been saved already?
         $factory = new \Schoolbox\Assessment\Rubric\MarkedGrid\Factory();
 
-        /* TODO inject this doodad
-         */
-        $rubricInstanceMapper = \Schoolbox\Assessment\Rubric\Instance\Mapper::getInstance();
-
         /* Get a set of rubric instances that were mentioned in the post payload
          *
          * TODO somehow assert these were relevant to $feedback in some way to prevent cross-contamination
          */
         $rubricInstanceIds = [];
-        $rubricInstances = $rubricInstanceMapper->createCollection();
+        $rubricInstances = $this->rubricInstanceMapper->createCollection();
 
         foreach ($post['rubric'] ?? [] as $rubricInstanceId => $rubricJson) {
             $rubricInstanceIds[] = $rubricInstanceId;
         }
 
         if (\count($rubricInstanceIds)) {
-            $rubricInstances = $rubricInstanceMapper->findByColumn('id', $rubricInstanceIds)->indexBy('id');
+            $rubricInstances = $this->rubricInstanceMapper->findByColumn('id', $rubricInstanceIds)->indexBy('id');
         }
 
         /* Process each rubric json payload into a marked grid
