@@ -21,7 +21,7 @@ abstract class InstanceIssued extends Base
      *
      * For an instance-issued JWT, the audience must match the current hostname.
      *
-     * @param array $claims The JWT's claims, once they have been decoded.
+     * @param array $claims The JWT's claims, once decoded.
      */
     protected function assertValidAudience(array $claims): void
     {
@@ -40,6 +40,25 @@ abstract class InstanceIssued extends Base
         if (!$audienceMatch) {
             throw new Exception\Rejected(sprintf('JWT "%s" claim must match this instance\'s FQDN', self::CLAIM_AUD));
         }
+    }
+
+    /**
+     * Extract the Schoolbox username of the user to authorize for this JWT.
+     *
+     * @param array  $claims        The JWT's claims, once decoded.
+     * @param string $usernameClaim The claim which contains the username.
+     * @return string
+     */
+    protected function extractUsername(array $claims, string $usernameClaim): string
+    {
+        if (!isset($claims[$usernameClaim])) {
+            throw new Exception\InvalidIdentity(sprintf('JWT must contain a "%s" claim', $usernameClaim));
+        }
+        $username = $claims[$usernameClaim];
+        if (trim($username) === '') {
+            throw new Exception\InvalidIdentity(sprintf('JWT "%s" claim must not be empty', $usernameClaim));
+        }
+        return $username;
     }
 
     /**

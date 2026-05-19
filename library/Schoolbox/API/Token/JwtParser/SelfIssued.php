@@ -84,14 +84,8 @@ class SelfIssued extends InstanceIssued
         $this->assertValidAudience($claims);
 
         // Validate subject
-        if (!isset($claims[self::CLAIM_SUB])) {
-            throw new Exception\InvalidIdentity(sprintf('JWT must contain a "%s" claim', self::CLAIM_SUB));
-        }
-        $username = $claims[self::CLAIM_SUB];
-        if (trim($username) === '') {
-            throw new Exception\InvalidIdentity(sprintf('JWT "%s" claim must not be empty', self::CLAIM_SUB));
-        }
-        $user = $this->findUser($claims[self::CLAIM_SUB], self::CLAIM_SUB);
+        $username = $this->extractUsername($claims, self::CLAIM_SUB);
+        $user     = $this->findUser($username, self::CLAIM_SUB);
 
         // Validate JTI for self-issued tokens
         if (!isset($claims[self::CLAIM_JTI])) {

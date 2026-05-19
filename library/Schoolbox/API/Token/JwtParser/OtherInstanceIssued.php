@@ -105,24 +105,9 @@ class OtherInstanceIssued extends InstanceIssued
         $this->assertValidAudience($claims);
 
         // Now the JWT is decoded and verified:
-        // create a session for the user matching the email address in the JWT
-        $email = $claims[self::CLAIM_EMAIL] ?? null;
-        $this->log->debug(
-            sprintf(
-                'Verifying JWT claim %s "%s" exists and matches a user',
-                self::CLAIM_EMAIL,
-                $email,
-            )
-        );
-        if (!isset($email)) {
-            throw new Exception\InvalidIdentity(sprintf('JWT must contain an "%s" claim', self::CLAIM_EMAIL));
-        }
-
-        // The email must be valid too, or at least not blank
-        $email = (string)$email;
-        if (trim($email) === '') {
-            throw new Exception\InvalidIdentity(sprintf('JWT "%s" claim must not be empty', self::CLAIM_EMAIL));
-        }
+        // create a session for the user matching the email address in the JWT.
+        // Note that unlike the self-issued JWT, the JTI cannot be verified.
+        $email = $this->extractUsername($claims, self::CLAIM_EMAIL);
         return $this->findUser($email, self::CLAIM_EMAIL);
     }
 }
