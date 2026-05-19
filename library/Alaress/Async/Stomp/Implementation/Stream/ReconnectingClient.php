@@ -19,6 +19,7 @@ use React\EventLoop\TimerInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use Throwable;
+use WeakReference;
 
 /**
  * Decorator around IClient that transparently reconnects and replays
@@ -81,10 +82,16 @@ class ReconnectingClient implements IClient
         private ?LoggerInterface $log = null,
     ) {
         $this->inner = call_user_func($this->factory);
-        // PHP shutdown functions run before GC/destructors. Stopping here prevents
-        // scheduleReconnect() from registering an ev_timer on the dead loop when
-        // Connection::__destruct() fires the onClose callback during teardown.
-        register_shutdown_function($this->stop(...));
+
+        // PHP shutdown functions run before GC/destructors.
+        // Stopping on shutdown prevents scheduleReconnect() from registering an
+        // ev_timer on the dead loop when Connection::__destruct() fires the
+        // onClose callback during teardown.
+        // It's implemented as a weak reference because otherwise `$this` will
+        // not be released if the object is destructed before shutdown, thus
+        // holding this object in memory indefinitely.
+        $weakRef = WeakReference::create($this);
+        register_shutdown_function(fn () => $weakRef->get()?->stop());
     }
 
     /**
