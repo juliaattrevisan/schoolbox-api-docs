@@ -12,39 +12,12 @@ test.describe("Folder homepage template modify form", () => {
         await tester.loginAsAdmin();
     });
 
-    test("shows the current homepage template name in the keep existing option", async ({ tester, page, db, api }) => {
-        const createFolder = new CreateFolder(tester, page);
-        const folderName = `Homepage Template Modify ${Date.now()}`;
+    test("shows the current homepage template name in the keep existing option", async ({ page }) => {
+        await page.goto("/resource/folder/13/modify");
 
-        try {
-            await createFolder.createFolder(
-                folderName,
-                "Blank",
-                db,
-                [
-                    [1, "write"],
-                    [2, "write"],
-                    [3, "read"],
-                    [4, "read"],
-                    [5, "read"],
-                    [6, "read"],
-                ],
-                "",
-            );
-
-            const folderId = (await db.grabFromDatabase("folder", "id", {
-                deleted_at: null,
-                name: folderName,
-            })) as number;
-
-            await page.goto(`/resource/folder/${folderId}/modify`);
-
-            const homepageTemplateSelect = page.getByTestId(CreateFolder.DATA_TEST_FOLDER_FORM_SELECT_TEMPLATE);
-            await expect(homepageTemplateSelect).toHaveValue("0");
-            await expect(homepageTemplateSelect.locator("option:checked")).toHaveText("Keep Existing (Blank)");
-            await expect(homepageTemplateSelect.locator("option", { hasText: "Keep Existing (Blank)" })).toHaveCount(1);
-        } finally {
-            await api.deleteFoldersByName(db, `${folderName}%`);
-        }
+        const homepageTemplateSelect = page.getByTestId(CreateFolder.DATA_TEST_FOLDER_FORM_SELECT_TEMPLATE);
+        await expect(homepageTemplateSelect).toHaveValue("0");
+        await expect(homepageTemplateSelect.locator("option:checked")).toHaveText("Keep Existing (Course)");
+        await expect(homepageTemplateSelect.locator("option", { hasText: "Keep Existing (Course)" })).toHaveCount(1);
     });
 });
