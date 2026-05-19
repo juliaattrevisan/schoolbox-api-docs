@@ -185,62 +185,6 @@ class CommandLineTool extends CliTool\App
 
 
         // build the bus for all the data retention tasks
-        /** @var Strategy\IStrategy[] $bus */
-        $bus = [];
-
-        if ($validStrats->isStratEnabled(ValidStrats::MOMENTS)) {
-            $bus[] = new Strategy\Moments(
-                $logger,
-                $this->perform(),
-                $this->getDatabaseInternal(),
-                $lock,
-                $this->getConfig(),
-                $endTime,
-                clone $retentionPeriod,
-                $loopCount,
-                $chunkSize,
-            );
-        }
-        if ($validStrats->isStratEnabled(ValidStrats::MYFILES)) {
-            $bus[] = new Strategy\MyFiles(
-                $logger,
-                $this->perform(),
-                $this->getDatabaseInternal(),
-                $lock,
-                $this->getConfig(),
-                $endTime,
-                clone $retentionPeriod,
-                $loopCount,
-                $chunkSize,
-            );
-        }
-        if ($validStrats->isStratEnabled(ValidStrats::CMS)) {
-            $bus[] = new Strategy\Cms(
-                $logger,
-                $this->perform(),
-                $this->getDatabaseInternal(),
-                $lock,
-                $this->getConfig(),
-                $endTime,
-                clone $retentionPeriod,
-                $loopCount,
-                $chunkSize,
-            );
-        }
-        if ($validStrats->isStratEnabled(ValidStrats::STUDENTSUBMISSIONS)) {
-            $bus[] = new Strategy\StudentSubmissions(
-                $logger,
-                $this->perform(),
-                $this->getDatabaseInternal(),
-                $lock,
-                $this->getConfig(),
-                $endTime,
-                clone $retentionPeriod,
-                $loopCount,
-                $chunkSize,
-            );
-        }
-
         $bus = $this->buildStrategies(
             $validStrats,
             $logger,
@@ -356,6 +300,34 @@ class CommandLineTool extends CliTool\App
                 $database,
                 $lock,
                 $config,
+                $endTime,
+                clone $retentionPeriod,
+                $loopCount,
+                $chunkSize,
+            );
+        }
+
+        if ($validStrats->isStratEnabled(ValidStrats::CMS)) {
+            $bus[] = new Strategy\Cms(
+                $logger,
+                $this->perform(),
+                $this->getDatabaseInternal(),
+                $lock,
+                $this->getConfig(),
+                $endTime,
+                clone $retentionPeriod,
+                $loopCount,
+                $chunkSize,
+            );
+        }
+
+        if ($validStrats->isStratEnabled(ValidStrats::STUDENTSUBMISSIONS)) {
+            $bus[] = new Strategy\StudentSubmissions(
+                $logger,
+                $this->perform(),
+                $this->getDatabaseInternal(),
+                $lock,
+                $this->getConfig(),
                 $endTime,
                 clone $retentionPeriod,
                 $loopCount,
