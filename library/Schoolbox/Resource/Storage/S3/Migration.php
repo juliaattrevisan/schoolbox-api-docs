@@ -575,7 +575,12 @@ class Migration extends CliTool\App
         while (true) {
             $dirname = dirname($filepath, $levels);
             if (!is_dir($dirname)) {
-                break;
+                if ($dirname === $this->storageDir) {
+                    break;
+                }
+                // Already removed by a concurrent worker — keep climbing to check ancestors
+                $levels++;
+                continue;
             }
             if (!$this->isDirectoryEmpty($dirname)) {
                 break;
@@ -585,7 +590,10 @@ class Migration extends CliTool\App
                 break;
             }
             $this->getLogger()->debug("Removing directory '$dirname'");
-            rmdir($dirname);
+            if (!@rmdir($dirname) && is_dir($dirname)) {
+                // Still present after failure — concurrent write or permission change
+                break;
+            }
             if ($dirname === $this->storageDir) {
                 // We can remove the storage directory, but no higher, as it's possible to configure Schoolbox
                 // to use the storage dir's parent as a configured directory, and it may just happen to be empty.
