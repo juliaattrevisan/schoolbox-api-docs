@@ -32,6 +32,72 @@ use Schoolbox\Mapper\Exception;
  * the school's local timezone. Classes with no periods or whose periods produce
  * no occurrences in the window are skipped with a warning.
  *
+ * --------------------------------------------------------------------------
+ * Timetable assembly model
+ * --------------------------------------------------------------------------
+ *
+ * A single lesson occurrence is assembled from three Edlink entities:
+ *
+ *   1. /sessions  — term date range (start_date, end_date)
+ *   2. /periods   — bell-schedule slot (start_time, end_time, days[])
+ *   3. /classes   — the link: class.session_ids[] selects the term window,
+ *                   class.periods[] selects which bell slots the class meets in
+ *
+ * expandOccurrences() iterates every calendar day in the (clamped) session
+ * window, checks each linked period's days[] for a weekday match, and on a
+ * match emits one sis_event with start_at/finish_at = date + period
+ * start/end time in the school's local timezone.
+ *
+ * --------------------------------------------------------------------------
+ * Assumptions that may not hold across all Edlink source SISes
+ * --------------------------------------------------------------------------
+ *
+ *  - class.periods is a populated array of period IDs. Some source SISes
+ *    return classes with an empty periods[] and instead expose the
+ *    day/time directly on the class (e.g. class.meeting_times = [{day,
+ *    start_time, end_time}, ...]) or on a sections sub-resource. When
+ *    periods[] is empty, processClass() logs "has no periods — skipping"
+ *    and writes nothing.
+ *
+ *  - period.days is an array of lowercase full weekday strings ("monday",
+ *    "tuesday", …). The in_array() match in expandOccurrences() is strict
+ *    and case-sensitive, so Title-cased values ("Monday"), abbreviations
+ *    ("Mon"), numeric bitmasks, or nested shapes would silently produce
+ *    0 occurrences with no hard error.
+ *
+ *  - period.start_time / end_time arrive as ISO 8601 datetimes anchored at
+ *    the Unix epoch (e.g. "1970-01-01T09:00:00.000Z"). normaliseTimeOfDay()
+ *    strips the date portion and trusts the remainder as the school's
+ *    wall-clock time — no UTC -> local conversion is applied.
+ *
+ *  - session.start_date / end_date arrive as midnight-UTC ISO datetimes
+ *    and are treated as date-only term boundaries.
+ *
+ * --------------------------------------------------------------------------
+ * Testing gap
+ * --------------------------------------------------------------------------
+ *
+ * ClassesOccurrenceTest.php (Test/ subfolder) exercises expandOccurrences()
+ * with hand-crafted fixtures that conform to the assumed shape above. Those
+ * fixtures have NOT been validated against real /classes or /periods
+ * payloads from a production Edlink integration, so the suite cannot tell
+ * us whether the importer produces events end-to-end for a given customer
+ * — only that the expansion math is internally consistent against its own
+ * test fixtures.
+ *
+ * The first concrete signals of an assumption being wrong, visible in the
+ * import logs:
+ *   - "Loaded N periods from Edlink" with N=0, or debug lines where days=
+ *     is empty
+ *   - "Class X (Y) has no periods — skipping"
+ *   - "Class X (Y) produced 0 occurrences from N period(s) over …"
+ *
+ * Before relying on this importer for a new source SIS, capture a sample
+ * /classes and /periods response and confirm the day/time fields are where
+ * we expect them — otherwise adapt processClass() / expandOccurrences() to
+ * read from class.meeting_times (or wherever the SIS actually exposes the
+ * meeting pattern).
+ *
  * @package Schoolbox\External\Connector\Edlink\Base\Endpoint\TimetableCalendar
  */
 class Classes implements IStrategy
