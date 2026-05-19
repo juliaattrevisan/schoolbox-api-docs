@@ -189,7 +189,7 @@ class ReconnectingClientTest extends TestCase
         $secondInner = $this->makeInnerClient();
         $secondInner->expects($this->once())
             ->method('subscribeWithAck')
-            ->with('sb.schedule', IClient::ACK_MODE_CLIENT_INDIVIDUAL, $this->isType('callable'));
+            ->with('sb.schedule', IClient::ACK_MODE_CLIENT_INDIVIDUAL, $this->isCallable());
 
         $callCount = 0;
         $clients   = [$firstInner, $secondInner];
