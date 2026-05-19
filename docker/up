@@ -286,6 +286,16 @@ function build_image_names() {
         base_branch="develop"
     fi
 
+    # Validate build env
+    case "${BUILD_ENV}" in
+        prod | dev)
+            ;;
+        *)
+            echo "Invalid value of BUILD_ENV: if provided, must be one of (dev, prod)"
+            exit 1
+            ;;
+    esac
+
     # determine base images for PHP and schoolbox-cli:
     # note that if the base image is built locally, then the schoolbox-cli image
     # is as well.
