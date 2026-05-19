@@ -32,6 +32,7 @@ use Schoolbox\IB\SystemPurpose\Model as SystemPurposeModel;
 use Schoolbox\Comms\News\Topic;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
+use Schoolbox\Learning\Assessment\Reporting\Model as Reporting;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\Learning\Assessment\Lti\Model as Lti;
@@ -1138,15 +1139,16 @@ class Controller extends Base
                         'tooltipPosition' => 'right',
                     ],
                     'visibility' => [
-                        'getter'    => 'getVisibility', // Note this function returns a value derived from isVisibleToParents and isVisibleToStudents.
+                        'getter'    => 'getVisibility', // Note this function returns a value derived from isVisibleToParents and isVisibleToLearners.
                         'caption'   => 'Visibility',
                         'mandatory' => true,
-                        'default'   => WorkTypeMapper::VISIBILITY_STAFF_ONLY,
+                        'default'   => WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS,
                         'lookup'    => [
-                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_ONLY, 'value' => 'Staff Only'],
-                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_STUDENTS, 'value' => 'Staff & Students'],
-                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_PARENTS, 'value' => 'Staff & Parents'],
-                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_STUDENTS_PARENTS, 'value' => 'Staff, Students & Parents'],
+                            // Note we intentionally do not use 'instructor'/'learner' terminology here, since users are not familiar with those terms.
+                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS, 'value' => 'Staff Only'],
+                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS, 'value' => 'Staff & Students'],
+                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS_PARENTS, 'value' => 'Staff & Parents'],
+                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS_PARENTS, 'value' => 'Staff, Students & Parents'],
                         ],
                         'nullable'  => false,
                         'width'     => 2,
@@ -1208,6 +1210,13 @@ class Controller extends Base
                     ],
                     'permittedDialogAgent' => [
                         'caption'    => DialogAgent::getDefaultTypeName(),
+                        'checkbox'   => true,
+                        'mandatory'  => true,
+                        'default'    => false,
+                        'popOutList' => 'permittedActivities',
+                    ],
+                    'permittedReportingActivity' => [
+                        'caption'    => Reporting::getDefaultTypeName(),
                         'checkbox'   => true,
                         'mandatory'  => true,
                         'default'    => false,
@@ -1976,7 +1985,7 @@ class Controller extends Base
             $rows     = $mapper->findAll(['order' => $orderArr]);
         }
 
-        $idGetter = $tables[$table]['fields']['id']['getter'] ?? 'getId';
+        $idGetter = $tables[$table]['fields']['id']['getter'] ?? $mapper->getGetIdentifierMethodName();
 
         foreach ($rows as $row) {
             $rowId = $row->$idGetter();

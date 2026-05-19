@@ -4603,12 +4603,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Participant.php
 
 		-
-			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\Learning\\Assessment\\Visibility is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/Participant/Test/AssessmentListMutatorTest.php
-
-		-
 			message: '#^Property Schoolbox\\Learning\\Assessment\\ParticipantStatistics\:\:\$cacheCountAssessments \(int\) does not accept null\.$#'
 			identifier: assign.propertyType
 			count: 1
@@ -4799,12 +4793,6 @@ parameters:
 			identifier: method.notFound
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Test/DataModel/TranslatorTest.php
-
-		-
-			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\Permission\\Access\\Access is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Test/VisibilityTest.php
 
 		-
 			message: '#^Negated boolean expression is always false\.$#'

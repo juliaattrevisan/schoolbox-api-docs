@@ -130,9 +130,14 @@ class Hydrator
             ? $this->attemptDataSource->findByColumnList(['attempt_id' => $quizFeedbackIds])->indexBy('id')
             : new GenericCollection(QuizFeedback::class);
 
-        $assessmentIds          = $dueWorkFeedbackResults->map(static function (DueWorkFeedback $feedback) {
-            return $feedback->getAssessable()->getId();
-        });
+        $assessmentIds = $dueWorkFeedbackResults->map(
+            /**
+             * Extracts assessment IDs referenced by due work feedback rows.
+             */
+            static function (DueWorkFeedback $feedback) {
+                return $feedback->getAssessable()->getId();
+            }
+        );
 
         /* Add the quiz ones too
          */
@@ -140,7 +145,7 @@ class Hydrator
             return $feedback->getAssessable()->getId();
         }));
 
-        $assessments            = $this->assessmentDataSource->findAllByIds($assessmentIds->getAll())->indexBy('id');
+        $assessments = $this->assessmentDataSource->findAllByIds($assessmentIds->getAll())->indexBy('id');
         $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($assessments);
 
         // Insert matching results into the collection
@@ -172,7 +177,7 @@ class Hydrator
                     $assessment = $assessments->offsetGet($dueWorkFeedback?->getAssessable()->getId());
                     if (
                         !$assessment
-                        || !$this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->viewer, true, null, true)
+                        || !$this->visibility->isVisibleToUser($assessment, $this->viewer, true)
                         || !$assessment->isFeedbackVisibleToUser($this->viewer)
                     ) {
                         break;
@@ -192,7 +197,7 @@ class Hydrator
                     $assessment = $assessments->offsetGet($quizFeedback?->getAssessable()->getId());
                     if (
                         !$assessment
-                        || !$this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->viewer, true, null, true)
+                        || !$this->visibility->isVisibleToUser($assessment, $this->viewer, true)
                         || !$assessment->isFeedbackVisibleToUser($this->viewer)
                     ) {
                         break;

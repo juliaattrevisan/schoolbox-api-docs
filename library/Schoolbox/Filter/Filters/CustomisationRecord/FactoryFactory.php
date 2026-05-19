@@ -106,7 +106,7 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                     $this->getOptionMapper(),
                     $this->getDefaultsMapper(),
                     $this->getSelectionMapper(),
-                    $this->getMapperFactory()->get(WorkTypeMapper::class)
+                    $this->getMapperFactory()->get(WorkTypeMapper::class),
                 );
         }
         throw new InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);

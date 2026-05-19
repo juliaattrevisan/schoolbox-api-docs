@@ -16,7 +16,6 @@ use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\External\User as ExternalUser;
 use Schoolbox\GenericCollection;
 use Schoolbox\Filter;
 use Schoolbox\L10n\RosettaStone;
@@ -285,7 +284,6 @@ class Controller extends Assessment\Controller
         $mutator       = new Participant\AssessmentListMutator(
             $this->getUser(),
             $visibility,
-            new ExternalUser(),
             $now,
             true
         );

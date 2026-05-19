@@ -57,16 +57,6 @@ class CanViewAssessable extends AbstractAssessableRule
             return;
         }
 
-        // Can the user see the assessment because their child can?
-        if ($user->getRole()->isParent()) {
-            //hydrate children for $user
-            (new \Schoolbox\External\User())->loadChildren([$user]);
-            foreach ($user->getChildren() as $child) {
-                if ($this->visibility->isVisibleToUser($assessable, $child, $this->showClosed, $this->now)) {
-                    return;
-                }
-            }
-        }
         throw new Unauthorized(sprintf(
             "User %s is not permitted to see assessment %s for learner id %s; check parameters and identifiers.",
             $user->getId(),

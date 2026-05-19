@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\WorkType;
 
-use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\IComponent;
@@ -39,7 +38,6 @@ class Factory extends Filter\AbstractFactory
         parent::__construct($optionMapper, $defaultMapper, $selectionMapper);
     }
 
-
     /**
      * @inheritdoc
      * @param Filter\Model $filter
@@ -55,7 +53,6 @@ class Factory extends Filter\AbstractFactory
         );
     }
 
-
     /**
      * @inheritdoc
      * @param Filter\Model $filter
@@ -66,19 +63,16 @@ class Factory extends Filter\AbstractFactory
         return new KeyConverter($filter, new Collection($this->workTypeMapper->findAllIds()));
     }
 
-
     /**
-     * @inheritDoc
-     * @param IDefinition $definition
-     * @param User $user
-     * @param Model $pageFilter
+     * @inheritdoc
+     * @param IDefinition      $definition
+     * @param User             $user
+     * @param Model            $pageFilter
      * @param GenericCollection|null $selections
      * @param User|null $viewee
-     * @param array $routeArgs
+     * @param array            $routeArgs
      * @param GenericCollection $overrides
-     * @return IComponent
-     * @throws InvalidColumnException
-     * @throws \InvalidArgumentException If neither $selections or $overrides are supplied
+     * @return Component|IComponent
      */
     public function buildComponent(
         IDefinition $definition,
@@ -89,34 +83,6 @@ class Factory extends Filter\AbstractFactory
         array $routeArgs,
         GenericCollection $overrides
     ): IComponent {
-        /* lol...nobody can see a SIVO assessment:
-        *
-         *     - Students can never see a SIVO assessment in their due work calendar
-         *
-          *    - Staff looking at a student's due work calendar shows what the student would have seen,
-         *       hiding SIVO assessments from staff by sheer circumstance.
-         *
-         * ...but there are numerous other contexts (such as markbooks) where SIVO assessments
-         * need to be visible to $user based on their role type.
-         */
-        if (Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS === $pageFilter->getPage()) {
-            /* Due Work calendar: never see a SIVO regardless if you're a staff or a student.
-             */
-            $workTypes = $this->workTypeMapper->findByPredicates($this->workTypeMapper->getPredicateBuilder()->equals('staff_or_instructor_visible_only', 0));
-        } elseif (Filter\Page\Model::PAGE_GRADES === $pageFilter->getPage()) {
-            /* Grades page: role dependent
-             */
-            if ($user->getRole()->isStaff()) {
-                $workTypes = $this->workTypeMapper->findAll();
-            } else {
-                $workTypes = $this->workTypeMapper->findByPredicates($this->workTypeMapper->getPredicateBuilder()->equals('staff_or_instructor_visible_only', 0));
-            }
-        } else {
-            /* Everything else is a staff-only page
-             */
-            $workTypes = $this->workTypeMapper->findAll();
-        }
-
         return new Component(
             $definition,
             $user,
@@ -124,7 +90,53 @@ class Factory extends Filter\AbstractFactory
             $selections,
             $overrides[$pageFilter->getFilter()->getId()],
             $this->getSelectionMapper(),
-            $workTypes
+            $this->getWorkTypesForPage($user, $pageFilter)
         );
+    }
+
+    /**
+     * Returns a collection of work types required for filtering purposes on the given page.
+     *
+     * @param User  $user
+     * @param Model $pageFilter
+     * @return GenericCollection
+     */
+    private function getWorkTypesForPage(User $user, Model $pageFilter): GenericCollection
+    {
+        if (Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS === $pageFilter->getPage()) {
+            // The Upcoming Assessments page is for either:
+            //  * A parent viewing a child’s due work
+            //  * A student viewing their own work
+            //  * A staff member viewing a student’s due-work
+            // Note that this page will only show work types that are visible to the learner or parent.
+            // So even for staff users we want learner/parent visible work types in the filter.
+            return $this->getLearnerOrParentVisibleWorkTypes($user);
+        }
+
+        if (Filter\Page\Model::PAGE_GRADES === $pageFilter->getPage()) {
+            return $user->getRole()->isStaff()
+                ? $this->workTypeMapper->findAll()
+                : $this->getLearnerOrParentVisibleWorkTypes($user);
+        }
+
+        return $this->workTypeMapper->findAll();
+    }
+
+    /**
+     * Retrieves the collection of work types visible to a learner or their parent
+     * based on the user's role and specific visibility predicates.
+     *
+     * @param User $user The user whose role determines the visible work types.
+     * @return GenericCollection The collection of work types visible to the user or their parent.
+     */
+    private function getLearnerOrParentVisibleWorkTypes(User $user): GenericCollection
+    {
+        return $user->getRole()->isParent()
+            ? $this->workTypeMapper->findByPredicates(
+                $this->workTypeMapper->getPredicateBuilder()->notEquals('is_visible_to_parents', 0)
+            )
+            : $this->workTypeMapper->findByPredicates(
+                $this->workTypeMapper->getPredicateBuilder()->notEquals('is_visible_to_learners', 0)
+            );
     }
 }

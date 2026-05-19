@@ -434,6 +434,11 @@ abstract class AbstractAssessment implements IAssessable
         $participant = $student ? $this->getParticipantIfExtant($student) : null;
         $publishDate = $participant ? $participant->getPublishDate() : $this->getPublishAt();
 
+        // A null publish date means the assessment has not been published.
+        if (null === $publishDate) {
+            return false;
+        }
+
         return $now->gte($publishDate);
     }
 
@@ -759,19 +764,6 @@ abstract class AbstractAssessment implements IAssessable
     public function getCountInteractions(bool $includeDrafts = false): int
     {
         return $this->getCountResponses($includeDrafts) + $this->getCountFeedbacks($includeDrafts);
-    }
-
-
-    /**
-     * @inheritdoc
-     * @throws InsufficientHydrationException
-     */
-    public function isStaffOrInstructorVisibleOnly(): bool
-    {
-        if (null === $this->workType) {
-            return false;
-        }
-        return $this->workType->isStaffOrInstructorVisibleOnly();
     }
 
 

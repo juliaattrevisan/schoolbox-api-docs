@@ -128,10 +128,28 @@ export default class AcceptanceTester extends BaseTester {
      * Skip the "What's New" tour if it exists
      */
     async skipWhatsNewTour(): Promise<void> {
-        const tourButtons = this.page.locator("div.introjs-tooltipbuttons a");
-        const tourButtonCount = await tourButtons.count();
-        if (tourButtonCount > 0) {
-            await tourButtons.getByText("x").click();
+        await this.page.waitForLoadState("load");
+
+        const skipButton = this.page.locator(".introjs-skipbutton").first();
+        const canShowAutomaticTour = await this.page
+            .evaluate(() => {
+                // Chrome exposes window.tourData before tour.js has necessarily rendered the IntroJS modal.
+                // Use it to decide whether a delayed "What's New" modal may still appear after load.
+                const tourWindow = window as Window & { tourData?: unknown[] };
+                return (
+                    Array.isArray(tourWindow.tourData) && tourWindow.tourData.length > 0 && window.innerWidth >= 1024
+                );
+            })
+            .catch(() => false);
+
+        if (canShowAutomaticTour) {
+            // Avoid waiting on pages that cannot show a tour, but give tour.js time to create the skip button.
+            await skipButton.waitFor({ state: "visible", timeout: 5000 }).catch(() => undefined);
+        }
+
+        if (await skipButton.isVisible()) {
+            await skipButton.click();
+            await expect(this.page.locator(".introjs-overlay")).toHaveCount(0);
         }
     }
 

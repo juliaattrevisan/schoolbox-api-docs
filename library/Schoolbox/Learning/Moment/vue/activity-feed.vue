@@ -289,7 +289,7 @@ async function append(cursor: string | null): Promise<void> {
         };
 
         data.value = data.value.concat(responseData.data ? responseData.data : []);
-        metadata.count = responseData.metadata?.count ? responseData.metadata.count : 0;
+        metadata.count = data.value.length;
         metadata.cursor.current = responseData.metadata?.cursor?.current ? responseData.metadata.cursor.current : null;
         metadata.cursor.next = responseData.metadata?.cursor?.next ? responseData.metadata.cursor.next : null;
     } catch (error) {
@@ -390,7 +390,7 @@ async function deleteFeedItem(targetItem: FeedItem): Promise<void> {
 
         void window.Vue.nextTick(() => {
             data.value = newData;
-            metadata.count -= 1;
+            metadata.count = newData.length;
         });
     } catch {
         toast.timeout({ text: "Could not delete", isSuccess: false });
@@ -1106,7 +1106,7 @@ window.Vue.onMounted(async () => {
             </ul>
         </div>
         <div v-else>
-            <div v-if="metadata.count === 0" class="empty-state">
+            <div v-if="data.length === 0" class="empty-state">
                 <sbx-icon name="advanced-list" size="2.5rem"></sbx-icon>
 
                 <template v-if="currentUser.id === props.student.id">
@@ -1205,10 +1205,7 @@ window.Vue.onMounted(async () => {
                 </template>
             </div>
 
-            <div
-                v-else-if="metadata.cursor && metadata.cursor.next && metadata.count > data.length && data.length > 0"
-                class="feed-load-more content"
-            >
+            <div v-else-if="metadata.cursor && metadata.cursor.next && data.length > 0" class="feed-load-more content">
                 <button class="load-more expand" title="Load more" @click="append(metadata.cursor.next)">
                     Load more
                 </button>

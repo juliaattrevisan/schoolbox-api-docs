@@ -460,16 +460,13 @@ class Cursor implements ICursor
             return [null, []]; // This indicates that the query should not be run because we know that no results will be returned.
         }
 
-        // Determine work type and mark visibility.
-        $filterWorkType = false;
+        // Determine mark visibility.
         if ($this->viewer->getRole()->isStaff()) {
             $visibility = IAssessable::MARK_VISIBILITY_PRIVATE;
         } elseif ($this->viewer->getRole()->isStudent()) {
-            $visibility     = IAssessable::MARK_VISIBILITY_STUDENT;
-            $filterWorkType = true;
+            $visibility = IAssessable::MARK_VISIBILITY_STUDENT;
         } elseif ($this->viewer->getRole()->isParent()) {
-            $visibility     = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
-            $filterWorkType = true;
+            $visibility = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
         } else {
             throw new UnexpectedValueException('Unexpected User: ' . $this->viewer->getId());
         }
@@ -503,18 +500,9 @@ class Cursor implements ICursor
         $params['markVisibility']        = $visibility;
         $params['reviewRoute']           = ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
 
-        if ($filterWorkType) {
-            $query .= (
-                'AND (
-                    assessment.work_type_id IS NULL OR
-                    assessment.work_type_id IN (
-                        SELECT `id` FROM `lu_work_type`
-                        WHERE `staff_or_instructor_visible_only` = 0
-                        AND `deleted_at` IS NULL
-                    )
-                )'
-            );
-        }
+        // Note that since work type visibility is a bit complicated now (see comments above visibility constants in
+        // Assessment\WorkType\Mapper), filtering based on work type visibility must now be done in PHP instead of SQL,
+        // downstream of this function.  See calls to isVisibleTo...() functions in Feed\Hydrator->hydrateResults().
 
         return [$query, $params];
     }
@@ -541,16 +529,13 @@ class Cursor implements ICursor
             return [null, []]; // This indicates that the query should not be run because we know that no results will be returned.
         }
 
-        // Determine work type and mark visibility.
-        $filterWorkType = false;
+        // Determine mark visibility.
         if ($this->viewer->getRole()->isStaff()) {
             $visibility = IAssessable::MARK_VISIBILITY_PRIVATE;
         } elseif ($this->viewer->getRole()->isStudent()) {
-            $visibility     = IAssessable::MARK_VISIBILITY_STUDENT;
-            $filterWorkType = true;
+            $visibility = IAssessable::MARK_VISIBILITY_STUDENT;
         } elseif ($this->viewer->getRole()->isParent()) {
-            $visibility     = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
-            $filterWorkType = true;
+            $visibility = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
         } else {
             throw new UnexpectedValueException('Unexpected User: ' . $this->viewer->getId());
         }
@@ -583,18 +568,9 @@ class Cursor implements ICursor
         $params['userIdQuizFeedback'] = $this->viewee->getId();
         $params['markVisibility']     = $visibility;
 
-        if ($filterWorkType) {
-            $query .= ("
-                AND (
-                    assessment.work_type_id IS NULL OR
-                    assessment.work_type_id IN (
-                        SELECT `id` FROM `lu_work_type`
-                        WHERE `staff_or_instructor_visible_only` = 0
-                        AND `deleted_at` IS NULL
-                    )
-                )
-            ");
-        }
+        // Note that since work type visibility is a bit complicated now (see comments above visibility constants in
+        // Assessment\WorkType\Mapper), filtering based on work type visibility must now be done in PHP instead of SQL,
+        // downstream of this function.  See calls to isVisibleTo...() functions in Feed\Hydrator->hydrateResults().
 
         return [$query, $params];
     }
