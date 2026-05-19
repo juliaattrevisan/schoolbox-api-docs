@@ -170,7 +170,7 @@ class SentryWrapper implements CacheInterface
     {
         $keysList = iterator_to_array($keys);
         return $this->tracer->runWithinSpan(
-            fn () => $this->cache->deleteMultiple($keys),
+            fn () => $this->cache->deleteMultiple($keysList),
             $this->generateDescriptionForKeys($keysList),
             'cache.removeMultiple',
             'auto.cache',
