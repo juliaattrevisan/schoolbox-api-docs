@@ -111,28 +111,28 @@ export const Group: Story = {
 /**
  * Typically used when there will be an indeterminate number of checkboxes, and so the container needs to be scrollable.
  */
-export const ScrollableContainer: Story = {
+export const GroupScroll: Story = {
     render: () => ({
         template: `
-<fieldset class="ss-results">
+<fieldset class="sbx-checkbox-radio-group-scroll">
     <legend>Check List Container</legend>
-    <div class="ss-results__scroll-container">
+    <div class="sbx-scroll-container">
         <ul class="sbx-checkbox-radio-group">
             <li class="ss-results-item checklist sbx-checkbox-radio-container">
-                <input id="checkbox-table1" type="checkbox" />
-                <label for="checkbox-table1">Checkbox 1</label>
+                <input id="checkbox-table1-scrollable-container" type="checkbox" />
+                <label for="checkbox-table1-scrollable-container">Checkbox 1</label>
             </li>
             <li class="ss-results-item checklist sbx-checkbox-radio-container">
-                <input id="checkbox-table2" type="checkbox" />
-                <label for="checkbox-table2">Checkbox 2</label>
+                <input id="checkbox-table2-scrollable-container" type="checkbox" />
+                <label for="checkbox-table2-scrollable-container">Checkbox 2</label>
             </li>
             <li class="ss-results-item checklist sbx-checkbox-radio-container">
-                <input id="checkbox-table3" type="checkbox" />
-                <label for="checkbox-table3">Checkbox 3</label>
+                <input id="checkbox-table3-scrollable-container" type="checkbox" />
+                <label for="checkbox-table3-scrollable-container">Checkbox 3</label>
             </li>
             <li class="ss-results-item checklist sbx-checkbox-radio-container">
-                <input id="checkbox-table4" type="checkbox" />
-                <label for="checkbox-table4">Checkbox 4</label>
+                <input id="checkbox-table4-scrollable-container" type="checkbox" />
+                <label for="checkbox-table4-scrollable-container">Checkbox 4</label>
             </li>
         </ul>
     </div>

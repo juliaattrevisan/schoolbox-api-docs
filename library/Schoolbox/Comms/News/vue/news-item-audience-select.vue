@@ -811,12 +811,17 @@ export default {
                             <div class="empty-state" v-show="showEmptyState">
                                 <p>No {{ selectedAudienceOption.namePlural }} found.</p>
                             </div>
-                            <fieldset class="ss-results l-mar-m--bottom" v-show="!showEmptyState">
+                            <fieldset class="sbx-checkbox-radio-group-scroll l-mar-m--bottom" v-show="!showEmptyState">
                                 <legend class="t-visually-hidden">
                                     {{ selectedAudienceOption.namePlural }} options
                                 </legend>
-                                <div class="ss-results__scroll-container ss-results__scroll-container--smaller">
-                                    <p v-if="showLoader" class="ss-results__status" aria-live="polite" aria-busy="true">
+                                <div class="sbx-scroll-container sbx-scroll-container--smaller">
+                                    <p
+                                        v-if="showLoader"
+                                        class="sbx-checkbox-radio-group-scroll__status"
+                                        aria-live="polite"
+                                        aria-busy="true"
+                                    >
                                         Searching for results....
                                     </p>
                                     <ul class="sbx-checkbox-radio-group">

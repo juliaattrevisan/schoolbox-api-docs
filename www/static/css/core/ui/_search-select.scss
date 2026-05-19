@@ -5,7 +5,19 @@
     }
 }
 
-.ss-results {
+.sbx-scroll-container {
+    border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
+    border-radius: var(--sbx-config-field-roundness, 0px);
+    max-height: 400px;
+    overflow: auto;
+    padding: var(--sbx-size-xs, var(--spacing-s));
+    width: 100%;
+    &--smaller {
+        max-height: 200px;
+    }
+}
+
+.sbx-checkbox-radio-group-scroll {
     border: 0 !important; // important to override .mage > section > fieldset fieldset ~ fieldset
     display: flex;
     flex-direction: column;
@@ -18,17 +30,6 @@
         font-weight: var(--sbx-font-weight-active, 600);
         margin: 0;
         padding: 0;
-    }
-    &__scroll-container {
-        border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
-        border-radius: var(--sbx-config-field-roundness, 0px);
-        max-height: 400px;
-        overflow: auto;
-        padding: var(--sbx-size-xs, var(--spacing-s));
-        width: 100%;
-        &--smaller {
-            max-height: 200px;
-        }
     }
     &__status {
         background: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
@@ -61,17 +62,12 @@
     }
 }
 
-.ss-selected {
+.sbx-tag-group {
     margin-bottom: var(--sbx-size-xs, var(--spacing-s));
     // will be triggered when there's enough selected items to require scrolling
     &--scroll {
-        border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
-        border-radius: var(--sbx-config-field-roundness, 0px);
-        margin-bottom: -1px; // to butt up against the search input
+        margin-bottom: -1px; // to butt up against the search input border
         max-height: 133px;
-        min-height: 50px;
-        overflow: auto;
-        padding: var(--sbx-size-xs, var(--spacing-s));
     }
     &__items {
         display: flex;
