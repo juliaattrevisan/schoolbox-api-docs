@@ -311,30 +311,55 @@ class Controller extends Base
         // Presumably $feedback has been saved already?
         $factory = new \Schoolbox\Assessment\Rubric\MarkedGrid\Factory();
 
-        // Did we just give some rubric marks? Save them
-        if (\is_array($post['rubric'] ?? null)) {
+        /* TODO inject this doodad
+         */
+        $rubricInstanceMapper = \Schoolbox\Assessment\Rubric\Instance\Mapper::getInstance();
+
+        /* Get a set of rubric instances that were mentioned in the post payload
+         *
+         * TODO somehow assert these were relevant to $feedback in some way to prevent cross-contamination
+         */
+        $rubricInstanceIds = [];
+        $rubricInstances = $rubricInstanceMapper->createCollection();
+
+        foreach ($post['rubric'] ?? [] as $rubricInstanceId => $rubricJson) {
+            $rubricInstanceIds[] = $rubricInstanceId;
+        }
+
+        if (\count($rubricInstanceIds)) {
+            $rubricInstances = $rubricInstanceMapper->findByColumn('id', $rubricInstanceIds)->indexBy('id');
+        }
+
+        /* Process each rubric json payload into a marked grid
+         * This array node might not even exist
+         */
+        foreach ($post['rubric'] ?? [] as $rubricInstanceId => $rubricJson) {
+            $rubricData = json_decode($rubricJson, true);
+
             $markedGrid = $factory->buildFromPostData(
-                $this->rubricMapper->retrieveMarkedGrid($feedback),
-                $post['rubric']
+                $this->rubricMapper->retrieveMarkedGrid($feedback, $rubricInstances[$rubricInstanceId]),
+                $rubricData
             );
 
             $this->rubricMapper->persistMarkedGrid($markedGrid);
-            return true;
         }
+
         // If from inline grader, save empty marks
-        if (
-            array_key_exists('fromInlineGrader', $post) &&
-            $post['fromInlineGrader'] &&
-            $feedback->getAssessable()->getUseRubric()
-        ) {
-            $markedGrid = $factory->buildFromPostData(
-                $this->rubricMapper->retrieveMarkedGrid($feedback),
-                []
-            );
-
-            $this->rubricMapper->persistMarkedGrid($markedGrid);
-            return true;
-        }
+        /* TODO What is THIS??
+         */
+//        if (
+//            array_key_exists('fromInlineGrader', $post) &&
+//            $post['fromInlineGrader'] &&
+//            $feedback->getAssessable()->getUseRubric()
+//        ) {
+//            $markedGrid = $factory->buildFromPostData(
+//                $this->rubricMapper->retrieveMarkedGrid($feedback),
+//                []
+//            );
+//
+//            $this->rubricMapper->persistMarkedGrid($markedGrid);
+//            return true;
+//        }
 
         // Neither: do nothing (and copy from previous feedback)
         return false;

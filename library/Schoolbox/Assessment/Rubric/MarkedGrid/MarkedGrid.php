@@ -157,33 +157,6 @@ class MarkedGrid
 
 
     /**
-     * @return IFeedback
-     */
-    public function getFeedback(): IFeedback
-    {
-        return $this->feedback;
-    }
-
-
-    /**
-     * @return Grid
-     */
-    public function getGrid(): Grid
-    {
-        return $this->grid;
-    }
-
-
-    /**
-     * @return IMarkScheme
-     */
-    public function getMarkScheme(): IMarkScheme
-    {
-        return $this->markScheme;
-    }
-
-
-    /**
      * Returns an iterator over capability usages.
      *
      * @return iterable|CapabilityUsage[]
@@ -234,25 +207,6 @@ class MarkedGrid
 
 
     /**
-     * @return CapabilityMark[]|GenericCollection
-     */
-    public function getCapabilityMarks(): GenericCollection
-    {
-        return $this->capabilityMarks;
-    }
-
-
-    /**
-     * @param CapabilityMark[]|GenericCollection $capabilityMarks
-     * @return static
-     */
-    public function setCapabilityMarks(GenericCollection $capabilityMarks): self
-    {
-        $this->capabilityMarks = $capabilityMarks;
-        return $this;
-    }
-
-    /**
      * @param User $viewer the user viewing this marked grid, for permissions purposes
      * @param bool $showPoints
      * @return array
@@ -278,5 +232,54 @@ class MarkedGrid
             $showPoints,
         );
         return $rubricMarkedGridTranslator($this);
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * @return IFeedback
+     */
+    public function getFeedback(): IFeedback
+    {
+        return $this->feedback;
+    }
+
+
+    /**
+     * @return Grid
+     */
+    public function getGrid(): Grid
+    {
+        return $this->grid;
+    }
+
+
+    /**
+     * @return IMarkScheme
+     */
+    public function getMarkScheme(): IMarkScheme
+    {
+        return $this->markScheme;
+    }
+
+
+    /**
+     * @return GenericCollection<CapabilityMark>
+     */
+    public function getCapabilityMarks(): GenericCollection
+    {
+        return $this->capabilityMarks;
+    }
+
+
+    /**
+     * @param GenericCollection<CapabilityMark> $capabilityMarks
+     * @return static
+     */
+    public function setCapabilityMarks(GenericCollection $capabilityMarks): self
+    {
+        $this->capabilityMarks = $capabilityMarks;
+        return $this;
     }
 }
