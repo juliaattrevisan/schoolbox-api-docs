@@ -1,37 +1,20 @@
 <script setup lang="ts">
 import IbReportSubjectLabels from "./ib-report-subject-labels.vue";
-import IbUpdateLanguageModal from "./ib-update-language-modal.vue";
-import type { FailedRow, SubjectGroup } from "../../js/types/ibReportTypes";
+import { useIbReportUpdateLanguageStore } from "../store/ibReportUpdateLanguageStore";
+import type { FailedRow } from "../../js/types/ibReportTypes";
 
 interface Props {
     students: FailedRow[];
-    searchLanguagesEndpoint: string;
 }
 defineProps<Props>();
-
-const emit = defineEmits<{
-    studentUpdated: [studentId: number, updatedSubjects: SubjectGroup];
-}>();
-
-const isModalOpen = window.Vue.ref<boolean>(false);
-const modalStudent = window.Vue.ref<FailedRow | null>(null);
+const updateLanguageStore = useIbReportUpdateLanguageStore();
 
 /**
  * Opens the update language modal for the given student.
  * @param student The student to update.
  */
 function openModal(student: FailedRow): void {
-    modalStudent.value = student;
-    isModalOpen.value = true;
-}
-
-/**
- * Forwards the saved event up to the parent report component.
- * @param studentId The id of the updated student.
- * @param updatedSubjects The new subject group with updated language selections.
- */
-function onSaved(studentId: number, updatedSubjects: SubjectGroup): void {
-    emit("studentUpdated", studentId, updatedSubjects);
+    updateLanguageStore.prompt(student);
 }
 </script>
 
@@ -93,12 +76,6 @@ function onSaved(studentId: number, updatedSubjects: SubjectGroup): void {
             </tr>
         </tbody>
     </table>
-    <ib-update-language-modal
-        v-model:is-open="isModalOpen"
-        :student="modalStudent"
-        :search-languages-endpoint="searchLanguagesEndpoint"
-        @saved="onSaved"
-    />
 </template>
 
 <style scoped>

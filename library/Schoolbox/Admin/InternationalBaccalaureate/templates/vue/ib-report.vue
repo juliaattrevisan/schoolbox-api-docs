@@ -10,6 +10,8 @@ import IbReportStandardTable from "./components/ib-report-standard-table.vue";
 import IbReportFailedTable from "./components/ib-report-failed-table.vue";
 import IbReportInProgressTable from "./components/ib-report-in-progress-table.vue";
 import IbReportRegisteredTable from "./components/ib-report-registered-table.vue";
+import IbUpdateLanguageModal from "./components/ib-update-language-modal.vue";
+import { useIbReportUpdateLanguageStore } from "./store/ibReportUpdateLanguageStore";
 import type {
     StudentRow,
     FailedRow,
@@ -28,6 +30,7 @@ interface Props {
     sessionTitle: string;
 }
 const props = defineProps<Props>();
+const updateLanguageStore = useIbReportUpdateLanguageStore();
 
 const isLoading = window.Vue.ref<boolean>(true);
 const loadError = window.Vue.ref<string | null>(null);
@@ -73,7 +76,9 @@ function mapStudentRow(s: ApiStudent): StudentRow {
     };
 }
 
-/** Fetches all candidate data from the API and populates section arrays. */
+/**
+ * Fetches all candidate data from the API and populates section arrays.
+ */
 async function loadCandidates(): Promise<void> {
     isLoading.value = true;
     loadError.value = null;
@@ -125,6 +130,9 @@ function handleStudentUpdated(studentId: number, updatedSubjects: SubjectGroup):
     }
 }
 
+updateLanguageStore.initialise(props.searchLanguagesEndpoint);
+updateLanguageStore.registerStudentUpdatedHandler(handleStudentUpdated);
+
 window.Vue.onMounted((): void => {
     void loadCandidates();
 });
@@ -145,27 +153,15 @@ window.Vue.onMounted((): void => {
 
         <div v-else class="l-flex-col l-gap-s">
             <ib-report-section title="Preparation" :count="preparation.length">
-                <ib-report-standard-table
-                    :students="preparation"
-                    :search-languages-endpoint="props.searchLanguagesEndpoint"
-                    @student-updated="handleStudentUpdated"
-                />
+                <ib-report-standard-table :students="preparation" />
             </ib-report-section>
 
             <ib-report-section title="Students with unconfirmed details" :count="unconfirmed.length">
-                <ib-report-standard-table
-                    :students="unconfirmed"
-                    :search-languages-endpoint="props.searchLanguagesEndpoint"
-                    @student-updated="handleStudentUpdated"
-                />
+                <ib-report-standard-table :students="unconfirmed" />
             </ib-report-section>
 
             <ib-report-section title="Students with confirmed details ready for submission" :count="confirmed.length">
-                <ib-report-standard-table
-                    :students="confirmed"
-                    :search-languages-endpoint="props.searchLanguagesEndpoint"
-                    @student-updated="handleStudentUpdated"
-                />
+                <ib-report-standard-table :students="confirmed" />
             </ib-report-section>
 
             <ib-report-section title="In progress" :count="inProgress.length">
@@ -173,11 +169,7 @@ window.Vue.onMounted((): void => {
             </ib-report-section>
 
             <ib-report-section title="Failed registrations" :count="failed.length">
-                <ib-report-failed-table
-                    :students="failed"
-                    :search-languages-endpoint="props.searchLanguagesEndpoint"
-                    @student-updated="handleStudentUpdated"
-                />
+                <ib-report-failed-table :students="failed" />
             </ib-report-section>
 
             <ib-report-section title="Registered" :count="registered.length">
@@ -186,5 +178,7 @@ window.Vue.onMounted((): void => {
         </div>
 
         <div id="ib-report-pop-out-container"></div>
+
+        <ib-update-language-modal />
     </div>
 </template>
