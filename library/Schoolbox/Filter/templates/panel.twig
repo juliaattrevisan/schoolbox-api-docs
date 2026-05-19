@@ -980,15 +980,15 @@ Usage:
                         </li>
                     {% endif %}
                     <li class="filter-component btn">
-                        <input id="submit_button"
-                               class="{% if not countComponents %}hide{% endif %}"
+                        <button id="submit_button"
+                               class="button submit {% if not countComponents %}hide{% endif %}"
                                type="submit"
                                data-value="Apply filters"
                                value="Apply filters"
                                data-href="{{ panel.route }}"
                                data-working="Submitting..."
                                data-test="panel-apply-filters-button"
-                            >
+                            >Submit</button>
                     </li>
                 </ul>
             </div>
