@@ -80,6 +80,24 @@ class SelfIssued extends Base
             (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY),
         );
 
+        // Validate audience:
+        // for a self-issued JWT, the audience must match the issuer
+        if (!isset($claims[self::CLAIM_AUD])) {
+            throw new Exception\Rejected(sprintf('JWT must contain a "%s" claim', self::CLAIM_AUD));
+        }
+        $audience           = (array)$claims[self::CLAIM_AUD];
+        $audienceMatch      = false;
+        $thisInstanceIssuer = $this->determineThisInstanceIssuer();
+        foreach ($audience as $audienceValue) {
+            if ($thisInstanceIssuer === $audienceValue) {
+                $audienceMatch = true;
+                break;
+            }
+        }
+        if (!$audienceMatch) {
+            throw new Exception\Rejected(sprintf('JWT "%s" claim must match this instance\'s FQDN', self::CLAIM_AUD));
+        }
+
         // Validate subject
         if (!isset($claims[self::CLAIM_SUB])) {
             throw new Exception\InvalidIdentity(sprintf('JWT must contain a "%s" claim', self::CLAIM_SUB));
@@ -131,6 +149,6 @@ class SelfIssued extends Base
      */
     private function determineThisInstanceIssuer(): string
     {
-        return (new Factory($this->config))->buildFullyQualified()->getHost();
+        return new Factory($this->config)->buildFullyQualified()->getHost();
     }
 }
