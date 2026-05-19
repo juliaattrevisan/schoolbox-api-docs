@@ -26,7 +26,7 @@ use SensitiveParameter;
  * These JWTs are usually issued by following a school's "Visit Help" link: the
  * JWT will be accepted by the Help instance.
  */
-class OtherInstanceIssued extends Base
+class OtherInstanceIssued extends InstanceIssued
 {
     /**
      * Key for the instance ID custom JWT claim.
@@ -100,6 +100,9 @@ class OtherInstanceIssued extends Base
             $keySet,
             (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY),
         );
+
+        // Validate audience
+        $this->assertValidAudience($claims);
 
         // Now the JWT is decoded and verified:
         // create a session for the user matching the email address in the JWT
