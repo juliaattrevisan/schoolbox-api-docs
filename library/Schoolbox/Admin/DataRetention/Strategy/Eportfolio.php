@@ -213,9 +213,7 @@ class Eportfolio extends Base
         $pageCascadeBlogIds = array_values(array_diff($pageBlogIds, $blogIds));     // Blogs that are children of directly targeted pages, excluding directly targeted blogs.
                                                                                     // Note array_values() just ensures that keys start from 0 and are sequential, since
                                                                                     // array_diff() preserves the keys from the array being diffed.
-        /**
-         * array<string, list<int>>
-         */
+        /** array<string, list<int>> */
         $deletedIdsByTableName = [];
 
         // Delete rows from all twelve tables covered by this strategy.
