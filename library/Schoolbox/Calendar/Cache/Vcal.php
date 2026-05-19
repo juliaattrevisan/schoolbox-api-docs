@@ -30,8 +30,7 @@ use Sabre\VObject\Writer;
  */
 class Vcal
 {
-    private const string CACHE_PREFIX   = 'vcal_';
-    private const string CACHE_KEY_BASE = 'vcal:%s:%s';
+    private const string CACHE_PREFIX = 'vcal_';
 
 
     // Cache expiry: 3 hours.. Ensure longer than cron refresh time
