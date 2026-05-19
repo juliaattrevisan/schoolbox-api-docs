@@ -48,6 +48,14 @@ class ValidStratsTest extends TestCase
                 'studentSubmissions',
                 ['studentSubmissions'],
             ],
+            'single ePortfolio valid' => [
+                'ePortfolio',
+                ['ePortfolio'],
+            ],
+            'all valid strategies' => [
+                'moments,myFiles,ePortfolio',
+                ['moments', 'myFiles', 'ePortfolio'],
+            ],
             'valid and invalid mixed' => [
                 'moments,unknown,myFiles',
                 ['moments', 'myFiles'],
@@ -113,6 +121,12 @@ class ValidStratsTest extends TestCase
             'student submissions enabled' => [
                 'studentSubmissions',
                 'studentSubmissions',
+                true,
+            ],
+
+            'ePortfolio enabled' => [
+                'ePortfolio',
+                'ePortfolio',
                 true,
             ],
 

@@ -20,14 +20,17 @@ namespace Schoolbox\Admin\DataRetention;
  */
 class ValidStrats
 {
-    // retain learning moments and their associated data
+    // Strategy for hard-deleting learning moments and their associated data.
     public const string MOMENTS = 'moments';
 
-    // retain files uploaded by users in the My Files area
+    // Strategy for hard-deleting files uploaded by users in the My Files area.
     public const string MYFILES = 'myFiles';
 
     // Student submission cleanup must be explicitly selectable because it removes assessment evidence.
     public const string STUDENTSUBMISSIONS = 'studentSubmissions';
+
+    // Strategy for hard-deleting data in the ePortfolio area.
+    public const string EPORTFOLIO = 'ePortfolio';
 
     /**
      * These names are intentionally whitelisted so typos or future strategies
@@ -39,6 +42,7 @@ class ValidStrats
         self::MOMENTS,
         self::MYFILES,
         self::STUDENTSUBMISSIONS,
+        self::EPORTFOLIO,
     ];
 
     /**
@@ -49,7 +53,6 @@ class ValidStrats
      * @var string[]
      */
     private array $filteredStrats;
-
 
     /**
      * @param string $csvArgs

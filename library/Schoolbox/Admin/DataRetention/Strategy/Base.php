@@ -13,6 +13,8 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\DataRetention\Strategy;
 
 use Alaress\Database\Connector\IConnector;
+use PDO;
+use PDOStatement;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\DataRetention\RetentionPeriod;
 use Schoolbox\Admin\DataRetention\ValidRetentionPeriod;
@@ -40,7 +42,7 @@ abstract class Base implements IStrategy
     /**
      * A hash lookup of cached prepared statements and how often they were reused.
      *
-     * @var array<string, array{statement: \PDOStatement, count: int}>
+     * @var array<string, array{statement: PDOStatement, count: int}>
      */
     protected array $preparedStatements = [];
 
@@ -260,9 +262,9 @@ abstract class Base implements IStrategy
     /**
      * Get the cached prepared statement for a query, or create a new one if it doesn't exist
      * @param string $query
-     * @return \PDOStatement
+     * @return PDOStatement
      */
-    protected function getPreparedStatement(string $query): \PDOStatement
+    protected function getPreparedStatement(string $query): PDOStatement
     {
         if (!isset($this->preparedStatements[$query])) {
             $this->preparedStatements[$query] = [
@@ -273,5 +275,19 @@ abstract class Base implements IStrategy
         // log that fetched the prepared statement
         $this->preparedStatements[$query]['count']++;
         return $this->preparedStatements[$query]['statement'];
+    }
+
+    /**
+     * Executes a prepared query with the given parameters and returns all rows as an associative array.
+     *
+     * @param array<string, mixed> $params
+     * @return list<array<string, mixed>>
+     */
+    protected function fetchRows(string $query, array $params): array
+    {
+        $statement = $this->getPreparedStatement($query);
+        $statement->execute($params);
+
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 }
