@@ -130,6 +130,7 @@ class CacheFunctionCallTest extends TestCase
             public function setMustHit(bool $mustHit): self
             {
                 foreach ($this->caches as $cache) {
+                    /** @phpstan-ignore-next-line - setMustHit is always set on the internal cache object */
                     $cache->setMustHit($mustHit);
                 }
                 return $this;
