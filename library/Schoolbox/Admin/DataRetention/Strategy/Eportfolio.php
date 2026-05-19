@@ -287,12 +287,7 @@ class Eportfolio extends Base
         // Table eportfolio_page (root)
         $this->deleteRowsByIds($deletedIdsByTableName, self::TABLE_EPORTFOLIO_PAGE, $pageIds, 'page_id');
 
-        foreach ($deletedIdsByTableName as $table => $ids) {
-            $this->log->notice(
-                ($this->perform ? 'Deleted' : 'Would have deleted') . ' ' .
-                count($ids) . " rows from table '$table' (ids: " . implode(', ', $ids) . ')'
-            );
-        }
+        $this->logChunkResult($deletedIdsByTableName);
     }
 
     /**
@@ -459,6 +454,21 @@ class Eportfolio extends Base
         $rowIds = array_map(static fn(array $row): int => (int) $row['id'], $rows);
 
         return array_values(array_unique(array_filter($rowIds, static fn(int $id): bool => $id > 0)));
+    }
+
+    /**
+     * Logs the number of rows deleted (or that would be deleted) per table for the current chunk.
+     *
+     * @param array<string, list<int>> $deletedIdsByTableName
+     */
+    protected function logChunkResult(array $deletedIdsByTableName): void
+    {
+        foreach ($deletedIdsByTableName as $table => $ids) {
+            $this->log->notice(
+                ($this->perform ? 'Deleted' : 'Would have deleted') . ' ' .
+                count($ids) . " rows from table '$table' (ids: " . implode(', ', $ids) . ')'
+            );
+        }
     }
 
     /**
