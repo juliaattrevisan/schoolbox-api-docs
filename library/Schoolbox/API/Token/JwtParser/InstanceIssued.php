@@ -23,9 +23,18 @@ abstract class InstanceIssued extends Base
      *
      * @param array $claims The JWT's claims, once decoded.
      */
-    protected function assertValidAudience(array $claims): void
+    protected function assertValidAudience(array $claims, bool $warnOnly = true): void
     {
         if (!isset($claims[self::CLAIM_AUD])) {
+            if ($warnOnly) {
+                $this->log->warning(
+                    sprintf(
+                        'JWT should contain a "%s" claim: ignoring for now, but this will be rejected in the future',
+                        self::CLAIM_AUD,
+                    )
+                );
+                return;
+            }
             throw new Exception\Rejected(sprintf('JWT must contain a "%s" claim', self::CLAIM_AUD));
         }
         $audience      = (array)$claims[self::CLAIM_AUD];
@@ -38,6 +47,15 @@ abstract class InstanceIssued extends Base
             }
         }
         if (!$audienceMatch) {
+            if ($warnOnly) {
+                $this->log->warning(
+                    sprintf(
+                        'JWT "%s" claim should match this instance\'s FQDN: ignoring for now, but this will be rejected in the future',
+                        self::CLAIM_AUD,
+                    )
+                );
+                return;
+            }
             throw new Exception\Rejected(sprintf('JWT "%s" claim must match this instance\'s FQDN', self::CLAIM_AUD));
         }
     }
