@@ -105,7 +105,7 @@ class SentryWrapper implements CacheInterface
             'auto.cache',
             $this->generateData(key: $key),
             fn (bool $result) => [
-                'cache.success' => true,
+                'cache.success' => $result,
             ],
             fn (Throwable $e) => [
                 'cache.success' => false,
@@ -125,7 +125,7 @@ class SentryWrapper implements CacheInterface
             'auto.cache',
             $this->generateData(),
             fn (bool $result) => [
-                'cache.success' => true,
+                'cache.success' => $result,
             ],
             fn (Throwable $e) => [
                 'cache.success' => false,
