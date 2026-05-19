@@ -280,14 +280,25 @@ class Migration extends CliTool\App
 
         foreach ($pids as $workerIndex => $pid) {
             pcntl_waitpid($pid, $status);
+            $workerFailed = false;
             if (pcntl_wifsignaled($status)) {
-                $this->getLogger()->error("Worker $workerIndex killed by signal " . pcntl_wtermsig($status) . ", its chunk may be incomplete");
+                $this->getLogger()->error("Worker $workerIndex killed by signal " . pcntl_wtermsig($status) . ", retrying its chunk serially");
+                $workerFailed = true;
             } elseif (pcntl_wifexited($status) && pcntl_wexitstatus($status) !== 0) {
-                $this->getLogger()->error("Worker $workerIndex exited with status " . pcntl_wexitstatus($status));
+                $this->getLogger()->error("Worker $workerIndex exited with status " . pcntl_wexitstatus($status) . ", retrying its chunk serially");
+                $workerFailed = true;
             }
-            $result             = json_decode(file_get_contents($tempFiles[$workerIndex]), true) ?? [];
-            $countFilesInS3    += (int) ($result['filesInS3'] ?? 0);
-            $this->failedPaths  = array_merge($this->failedPaths, $result['failedPaths'] ?? []);
+            if ($workerFailed) {
+                foreach ($chunks[$workerIndex] as $file) {
+                    if ($this->migrateFile($file['hash'])) {
+                        $countFilesInS3++;
+                    }
+                }
+            } else {
+                $result            = json_decode(file_get_contents($tempFiles[$workerIndex]), true) ?? [];
+                $countFilesInS3   += (int) ($result['filesInS3'] ?? 0);
+                $this->failedPaths = array_merge($this->failedPaths, $result['failedPaths'] ?? []);
+            }
             unlink($tempFiles[$workerIndex]);
         }
 
