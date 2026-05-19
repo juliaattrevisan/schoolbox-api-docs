@@ -36,6 +36,7 @@ use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Importer\IImporter;
 use Schoolbox\Assessment\Rubric\Grid\Importer\CsvImporterFactory;
 use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
+use Schoolbox\Assessment\Rubric\Instance\Model;
 use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\IndicatorMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
@@ -923,28 +924,62 @@ class DataSource
      * Retrieve a marked grid for the given feedback.
      *
      * @param IFeedback $feedback
+     * @param Model $rubricInstance
      * @return MarkedGrid
      * @throws MapperException
      */
-    public function retrieveMarkedGrid(IFeedback $feedback): MarkedGrid
+    public function retrieveMarkedGrid(IFeedback $feedback, \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance): MarkedGrid
     {
         $assessable = $feedback->getAssessable();
 
-        $grid = $this->retrieveGrid($assessable, false);
+        $grid = $this->retrieveOneGrid($assessable, $rubricInstance, false);
         $rowSet = $grid->getRowSet();
 
-        // Get the mark scheme for the grid, instructor mark scheme only exists for due work
+        // Get the mark scheme for the grid
         $markSchemeFactory = new MarkSchemeFactory();
+
+        /* Learner and instructor mark schemes might differ; use them accordingly.
+         *    - Learners should see the learner mark scheme (this might even be the same as the instructor mark scheme)
+         *    - Instructors should see the instructor mark scheme.
+         *
+         * TODO Technical Uplift Candidate
+         *  Instead of checking concrete domain objects, check the fulfilment of interface IDualMarkType
+         *  Though I have misgivings about that name in its entirety, we'll have to live with it for now.
+         *  A MarkScheme is mainly a codec for converting normalised to human readable marks and vice versa.
+         */
+
+        /* Assume learner mark scheme initially
+         */
         $gridMarkScheme = $assessable->getMarkScheme();
 
-        // If this is a due work and not a self-assessment, use the instructor mark scheme
-        $isSelfAssessment = $feedback instanceof ISelfAssessableFeedback && $feedback->isSelfAssessment();
-
-        if (!$isSelfAssessment && $assessable instanceof DueWorkModel) {
+        /* Due Work and Reporting are the only two activities that support dual mark types
+         */
+        if ($assessable instanceof \Schoolbox\Learning\Assessment\Reporting\Model) {
             $gridMarkScheme = $assessable->getInstructorMarkScheme();
+        } else {
+            /* Check if this feedback instance supports self assessment. If it does (only due work supports this atm)
+             * then use the learner's mark scheme. If the feedback instance doesn't support self assessment then it's
+             * been given by the instructor and we should use their mark scheme instead of the learner's.
+             */
+            $isSelfAssessment = $feedback instanceof ISelfAssessableFeedback && $feedback->isSelfAssessment();
+
+            if (!$isSelfAssessment && $assessable instanceof \Schoolbox\Learning\Assessment\DueWork\Model) {
+                $gridMarkScheme = $assessable->getInstructorMarkScheme();
+            }
         }
 
         $markedGrid = new MarkedGrid($feedback, $grid, $gridMarkScheme);
+
+        /* The feedback instance determines ultimately which schema we explore to find capability marks (ugh!)
+         * This is pretty horrible but I don't really have many answers for a polymorphic schema like this
+         */
+        if ($feedback instanceof \Schoolbox\Learning\Assessment\DueWork\Feedback\Model) {
+            $feedbackTable = SubmissionBox\ReturnedWorkMapper::getInstance()->getTable();
+        } elseif ($feedback instanceof \Schoolbox\Learning\Assessment\Reporting\Feedback\Model) {
+            $feedbackTable = \Schoolbox\Learning\Assessment\DataModel\Reporting\Feedback\Mapper::getInstance()->getTable();
+        } else {
+            throw new \InvalidArgumentException('Unknown feedback table derived from feedback instance.');
+        }
 
         // What goes in the grid?
         // * Capability marks
@@ -952,7 +987,8 @@ class DataSource
         // ** more correctly known as indicator marks, which reference a descriptor
         /** @var GenericCollection<CapabilityMarkModel> $capabilityMarkModels */
         $capabilityMarkModels = $this->capabilityMarkMapper->findByColumnList([
-            'return_id' => $feedback->getId(),
+            'feedback_id' => $feedback->getId(),
+            'feedback_table' => $feedbackTable,
             'valid' => true,
         ]);
 

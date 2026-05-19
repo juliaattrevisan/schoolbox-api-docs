@@ -5,9 +5,6 @@
  # @param Rubric\Instance\Model $rubricInstance  The container containing rubric settings for this particular grid, and the grid itself.
  # @param bool $showGroupTotal                   Corresponds to whether mark-per-capability is enabled for this particular grid (ie. Capability Mark Type was used meaningfully)
  # @param bool $showRubricTotal                  Shows the total value of the rubric grid's selected descriptors; shown to instructors and self-graders
- # @param Grid $rubricGrid                       A Grid instance, obtained via the Rubric DataSource retrieveOneGrid() method or similar.
- #                                               Represents the basic structure of a rubric_instance (caps/inds/descs/levels)
- # @param Grid $rubricMarkedGrid                 "the marked rubric grid, shouldst there be one"
  # @param bool $markVisibility                   Whether this feedback is visible to the current user.
  # @param bool $blindMode                        Hides identifying information from instructors so they don't readily know who they're grading.
  # @param bool $studentView                      This decides which mark scheme to show: the learner's mark scheme (for self-grading) or the instructor's mark scheme
@@ -16,18 +13,21 @@
  # @param bool $selfReflect                      Whether self-reflection can occur on this response instance
  # @param User $learner                          The person who submitted the response instance
  # @param $selfAssessmentFeedback                "the self-assessed feedback, shouldst there be one'
+ # @param Grid $rubricGrid                       A Grid instance, obtained via the Rubric DataSource retrieveOneGrid() method or similar.
+ #                                               Represents the basic structure of a rubric_instance (caps/inds/descs/levels)
+ # @param Grid $rubricMarkedGrid                 A Grid instance corresponding to an instructor-marked grid
+ # @param Grid $rubricSelfGradedGrid             A Grid instance corresponding to a learner-marked grid
  #}
 
 {% set showPoints = true %}
-{% set selfAssessmentMarkedGrid = selfAssessmentFeedback ? selfAssessmentFeedback.rubricMarkedGrid : null %}
 {% set markScheme = selfAssess or studentView ? assessment.markScheme : assessment.instructorMarkScheme %}
 
 <div data-vue-app="rubric-markable">
     <rubric-markable
         :rubric-marked-grids-payload="[{
-            rubric: {{ rubricInstance.grid.toArray(showPoints)|json_encode }},
+            rubric: {{ rubricGrid.toArray(showPoints)|json_encode }},
             markedGrid: {{ (rubricMarkedGrid ? rubricMarkedGrid.toArray(USER, showPoints) : null)|json_encode }},
-            selfAssessmentFeedback: {{ (selfAssessmentMarkedGrid ? selfAssessmentMarkedGrid.toArray(USER, showPoints) : null)|json_encode }}
+            selfAssessmentFeedback: {{ (rubricSelfGradedGrid ? rubricSelfGradedGrid.toArray(USER, showPoints) : null)|json_encode }}
         }]"
         :assessment-mark-scheme="{{ markScheme.generateContext|json_encode }}"
         :participant-id="{{ not blindMode and learner.id ? learner.id : 'null' }}"

@@ -186,14 +186,19 @@ Usage:
                         {% for rubricInstance in assessment.rubricInstances %}
                             <fieldset class="content">
                                 {% set rubricTemplate = readonly ? 'grid.twig' : 'grid-markable.twig' %}
-                                {% set rubricMarkedGrid = feedback is not null ? feedback.rubricMarkedGrid : null %}
+
+                                {# Marked Grids might not exist yet #}
+                                {% set rubricMarkedGrid = null %}
+
+                                {% if feedback is not null and feedback.rubricMarkedGrids[rubricInstance.id] is not null %}
+                                    {% set rubricMarkedGrid = feedback.rubricMarkedGrids[rubricInstance.id] %}
+                                {% endif %}
 
                                 {% include '@rubric/' ~ rubricTemplate with {
                                     assessment: assessment,
                                     rubricInstance: rubricInstance,
                                     showGroupTotal: rubricInstance.isMarkPerCapability,
                                     showRubricTotal: true,
-                                    rubricMarkedGrid: rubricMarkedGrid,
                                     markVisibility: participant.assessable.isFeedbackVisibleToUser(USER),
                                     blindMode: blindMode ?? false,
                                     studentView: studentView,
@@ -201,6 +206,9 @@ Usage:
                                     selfReflect: selfReflect,
                                     learner: participant.user,
                                     selfAssessmentFeedback: selfAssessmentFeedback ?? null,
+                                    rubricGrid: rubricInstance.grid,
+                                    rubricMarkedGrid: rubricMarkedGrid,
+                                    rubricSelfGradedGrid: selfAssessmentFeedback.rubricMarkedGrids[rubricInstance.id] ?? null
                                 } only %}
                             </fieldset>
                         {% endfor %}
@@ -281,12 +289,15 @@ Usage:
                                             } only %}
                                         </label>
 
-                                        {% if assessment.useRubric and not readonly %}
-                                            {% include '@learningDueWorkResponse/inlineGrading/fragments/assignFromRubricButton.twig' with {
-                                                locale: locale,
-                                                rubricId: assessment.rubricGrid.id,
-                                            } only %}
-                                        {% endif %}
+                                        {# TODO I don't think we can assignFromRubricButton with a one-grid assumption
+                                         #  anymore: it has to be the aggregated total of all grids which we haven't
+                                         #  implemented yet.
+                                         #}
+{#                                        {% if assessment.rubricInstances.count and not readonly %}#}
+{#                                            {% include '@learningDueWorkResponse/inlineGrading/fragments/assignFromRubricButton.twig' with {#}
+{#                                                locale: locale,#}
+{#                                            } only %}#}
+{#                                        {% endif %}#}
                                     </div>
                                 {% endif %}
                             {% endblock %}

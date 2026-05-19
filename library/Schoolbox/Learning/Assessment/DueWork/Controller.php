@@ -451,20 +451,24 @@ class Controller extends Assessment\Controller
 
         $participant = $assessment->getParticipantIfExtant($student);
 
-        // Generate rubric marked grids for every feedback being displayed
-        if ($assessment->getUseRubric()) {
-            $assessment->setRubricGrid($this->rubricMapper->retrieveGrid($assessment, false));
-            if ($participant) {
-                foreach ($participant->getAllFeedbacks() as $feedback) {
-                    // All feedbacks ought to be due work feedbacks,
-                    // and thus have a rubric grid
-                    // TODO this returns false if I use the alias, but works correctly if I use the fully qualified name - why?
+        if ($participant) {
+            // Generate rubric marked grids for every feedback being displayed
+            foreach ($participant->getAllFeedbacks() as $feedback) {
+                foreach ($assessment->getRubricInstances() as $rubricInstance) {
+                    /* All feedbacks ought to be due work feedbacks and thus have rubric grid compatibility but we'll
+                     * assert the Due Work feedback instances anyway, just in case there's a mix
+                     *
+                     * A feedback can have multiple rubric grids as feedback now so we need to segregate by each
+                     * rubric_instance instead of assuming just one grid exists.
+                     */
                     if ($feedback instanceof Feedback\Model) {
-                        $feedback->setRubricMarkedGrid($this->rubricMapper->retrieveMarkedGrid($feedback));
+                        $feedback->getRubricMarkedGrids()->setOffset($rubricInstance->getId(), $this->rubricMapper->retrieveMarkedGrid($feedback, $rubricInstance));
                     }
                 }
             }
         }
+
+
         /**
          * record view
          */
