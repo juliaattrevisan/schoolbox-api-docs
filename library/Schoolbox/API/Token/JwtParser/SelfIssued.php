@@ -29,7 +29,7 @@ use SensitiveParameter;
  * * creating a token for a user within the admin system
  * * creating a login QR code
  */
-class SelfIssued extends Base
+class SelfIssued extends InstanceIssued
 {
     public const CUSTOM_CLAIM_TASKD = self::CUSTOM_CLAIM_NAMESPACE . 'taskd';
 
@@ -55,18 +55,18 @@ class SelfIssued extends Base
      */
     public function accepts(#[SensitiveParameter] string $jwt): bool
     {
-        $claims             = $this->decodeWithoutVerification($jwt);
-        $thisInstanceIssuer = $this->determineThisInstanceIssuer();
+        $claims   = $this->decodeWithoutVerification($jwt);
+        $hostname = $this->determineHostname();
         $this->log->debug(
             sprintf(
                 'Checking JWT %s "%s" against this instance "%s"',
                 self::CLAIM_ISS,
                 $claims[self::CLAIM_ISS] ?? '',
-                $thisInstanceIssuer,
+                $hostname,
             ),
         );
 
-        return isset($claims[self::CLAIM_ISS]) && $claims[self::CLAIM_ISS] === $thisInstanceIssuer;
+        return isset($claims[self::CLAIM_ISS]) && $claims[self::CLAIM_ISS] === $hostname;
     }
 
     /**
@@ -85,11 +85,11 @@ class SelfIssued extends Base
         if (!isset($claims[self::CLAIM_AUD])) {
             throw new Exception\Rejected(sprintf('JWT must contain a "%s" claim', self::CLAIM_AUD));
         }
-        $audience           = (array)$claims[self::CLAIM_AUD];
-        $audienceMatch      = false;
-        $thisInstanceIssuer = $this->determineThisInstanceIssuer();
+        $audience      = (array)$claims[self::CLAIM_AUD];
+        $audienceMatch = false;
+        $hostname      = $this->determineHostname();
         foreach ($audience as $audienceValue) {
-            if ($thisInstanceIssuer === $audienceValue) {
+            if ($hostname === $audienceValue) {
                 $audienceMatch = true;
                 break;
             }
@@ -141,15 +141,5 @@ class SelfIssued extends Base
         }
 
         return $user;
-    }
-
-    /**
-     * Determine what this instance's issuer value is.
-     *
-     * @return string
-     */
-    private function determineThisInstanceIssuer(): string
-    {
-        return new Factory($this->config)->buildFullyQualified()->getHost();
     }
 }
