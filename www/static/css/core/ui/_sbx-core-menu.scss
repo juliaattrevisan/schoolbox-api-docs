@@ -45,19 +45,22 @@ body.sbx-body {
             }
         }
 
-        #header-search-input {
+        #header-search-input,
+        #notifications #header-search-input {
             & button {
                 border-radius: var(--sbx-config-field-roundness);
             }
         }
 
         // move the search results in so the right side is inline with the search input
-        .c-header-search__results {
+        .c-header-search__results,
+        #notifications .c-header-search__results {
             margin-right: 72px;
         }
 
         // profile icon to trigger the account menu
-        #profile-drop {
+        #profile-drop,
+        #notifications #profile-drop {
             margin-inline-end: 1rem;
             height: 3rem;
             width: 3rem;
@@ -135,52 +138,6 @@ body.sbx-body {
                     display: none;
                 }
             }
-
-            #header-search-input {
-                & button {
-                    border-radius: var(--sbx-config-field-roundness);
-                }
-            }
-
-            // move the search results in so the right side is inline with the search input
-            .c-header-search__results {
-                margin-right: 72px;
-            }
-
-            // profile icon to trigger the account menu
-            #profile-drop {
-                margin-inline-end: 1rem;
-                height: 3rem;
-                width: 3rem;
-                top: 50%;
-                transform: translateY(-50%);
-                border-radius: var(--sbx-config-field-roundness);
-                overflow: hidden;
-                & img {
-                    border-radius: var(--sbx-config-field-roundness);
-                }
-            }
-
-            // Notifications toggle, move it across with the margin tweak and add some padding to give it more room
-            #notifications {
-                align-items: center;
-                display: flex;
-                height: 2rem;
-                justify-content: center;
-                width: 2rem;
-
-                & sbx-icon {
-                    color: var(--sbx-config-color-accent-text);
-                    height: 100%;
-                    width: 100%;
-                }
-                & #notification-toggle[data-unread="0"] {
-                    background: var(--sbx-config-color-menu-primary);
-                    &:hover {
-                        background: var(--sbx-config-color-menu-hover);
-                    }
-                }
-            }
         }
 
         // Account dropdown
@@ -222,9 +179,9 @@ body.sbx-body {
                         border-radius: var(--sbx-config-field-roundness);
                     }
                     & p {
-                        color: var(--sbx-color-text-primary);
-                        &:not(.meta) {
-                            font-weight: var(--sbx-font-weight-active);
+                        color: var(--sbx-config-color-accent);
+                        &.meta {
+                            color: var(--sbx-color-text-secondary);
                         }
                     }
                     &:hover {
@@ -233,115 +190,89 @@ body.sbx-body {
                 }
             }
         }
+    }
 
-        // mobile account menu, when it goes into the left side menu
-        .account-menu-mobile {
-            // keep similar to the .separator styles in the desktop account menu for consistency, but with some tweaks for mobile
-            .separator {
-                color: var(--sbx-color-text-primary);
-                font-size: var(--sbx-font-size-s);
-                font-weight: var(--sbx-font-weight-active);
-                text-transform: none;
-            }
+    // mobile account menu, when it goes into the left side menu
+    .account-menu-mobile {
+        // keep similar to the .separator styles in the desktop account menu for consistency, but with some tweaks for mobile
+        .separator {
+            color: var(--sbx-color-text-primary);
+            font-size: var(--sbx-font-size-s);
+            font-weight: var(--sbx-font-weight-active);
+            text-transform: none;
+        }
 
-            // add a bit of padding for breathing space
-            .switch-user-mobile {
-                li.user {
-                    padding-block: var(--sbx-size-xxs);
-                    padding-inline: var(--sbx-size-xs);
-                }
-            }
-
-            // remove the derived color
-            .user .card .meta {
-                color: var(--sbx-color-text-secondary);
+        // add a bit of padding for breathing space
+        .switch-user-mobile {
+            li.user {
+                padding-block: var(--sbx-size-xxs);
+                padding-inline: var(--sbx-size-xs);
             }
         }
 
-        // Left menu styles
-        #left-menu {
-            h3 {
-                color: var(--sbx-color-text-primary);
-                text-transform: none;
+        // remove the derived color
+        .user .card .meta {
+            color: var(--sbx-color-text-secondary);
+        }
+    }
+
+    // Left menu styles
+    #left-menu {
+        h3 {
+            color: var(--sbx-color-text-primary);
+            text-transform: none;
+        }
+        a {
+            color: var(--sbx-config-color-accent);
+            border-radius: var(--sbx-config-field-roundness);
+            font-size: var(--sbx-font-size-xs);
+            &:hover {
+                background: var(--sbx-config-color-active);
             }
+        }
+        // to help differentiate the heading links from the list below
+        .side-menu-heading-link {
+            // background: var(--sbx-color-foreground-secondary);
+            border-bottom: 1px solid var(--sbx-color-border);
+            border-radius: var(--sbx-config-field-roundness);
+            font-size: var(--sbx-font-size-s);
+            font-weight: var(--sbx-font-weight-active);
+        }
+        /* Ensure the Back link has the icon content and font-family */
+        .back {
             a {
-                color: var(--sbx-config-color-accent);
-                border-radius: var(--sbx-config-field-roundness);
-                font-size: var(--sbx-font-size-xs);
-            }
-            // to help differentiate the heading links from the list below
-            .side-menu-heading-link {
-                background: var(--sbx-color-foreground-secondary);
-                border-bottom: 1px solid var(--sbx-color-border);
-                border-radius: var(--sbx-config-field-roundness);
-                font-size: var(--sbx-font-size-s);
-                font-weight: var(--sbx-font-weight-active);
-            }
-            /* Ensure the Back link has the icon content and font-family */
-            .back {
-                a {
-                    text-transform: none;
-                    &:before {
-                        content: "\e655"; /* The icon character */
-                        font-family: var(--sbx-icon-font-family) !important; /* Forces the icon font */
-                    }
+                text-transform: none;
+                &:before {
+                    content: "\e655"; /* The icon character */
+                    font-family: var(--sbx-icon-font-family) !important; /* Forces the icon font */
                 }
             }
         }
+    }
 
-        // Left menu styles when menu is not open
-        .off-canvas-wrap.move-right :not(.left-open) {
-            & #left-menu {
-                border-radius: var(--sbx-config-box-roundness);
-                box-shadow: var(--sbx-shadow-m);
-                left: 1rem;
-                top: 1rem;
-            }
+    // Left menu styles when menu is not open
+    .off-canvas-wrap.move-right :not(.left-open) {
+        & #left-menu {
+            border-radius: var(--sbx-config-box-roundness);
+            box-shadow: var(--sbx-shadow-m);
+            left: 1rem;
+            top: 1rem;
         }
+    }
 
-        // Notifications menu styles when menu is not open
-        .off-canvas-wrap.move-left :not(.right-open) {
-            & #msgs {
-                border-radius: var(--sbx-config-box-roundness);
-                box-shadow: var(--sbx-shadow-m);
-                right: 1rem;
-                top: 1rem;
-            }
-        }
-
-        // Notifications menu styles
-        #message-list {
-            padding: var(--sbx-size-xs);
-            #right-menu-dock,
-            .settings-button {
-                border-radius: var(--sbx-config-field-roundness);
-                color: var(--sbx-config-color-accent);
-                padding: var(--sbx-size-xs);
-                top: var(--sbx-size-xs);
-                &:hover {
-                    background: var(--sbx-config-color-active);
-                }
-            }
-            #right-menu-dock {
-                left: var(--sbx-size-xs);
-            }
-            .settings-button {
-                right: var(--sbx-size-xs);
-            }
-
-            & #notification-toggle-full {
-                background-color: var(--bg-primary) !important;
-                color: var(--sbx-config-color-accent);
-            }
+    // Notifications menu styles when menu is not open
+    .off-canvas-wrap.move-left :not(.right-open) {
+        & #msgs {
+            border-radius: var(--sbx-config-box-roundness);
+            box-shadow: var(--sbx-shadow-m);
+            right: 1rem;
+            top: 1rem;
         }
     }
 
     // Message list styles
     #message-list {
-        & #notification-toggle-full {
-            background-color: transparent;
-            color: var(--sbx-config-color-accent);
-        }
+        padding: var(--sbx-size-xs);
 
         & li:has(:is(#msg-bar, section, .button)) {
             padding-inline: 0.6rem;
@@ -354,123 +285,10 @@ body.sbx-body {
         & :where(#right-menu-dock, #notification-toggle-full, .settings-button) {
             color: var(--sbx-config-color-accent);
         }
-    }
 
-    .side-nav {
-        border-radius: var(--sbx-border-radius-m);
-        overflow: hidden;
-
-        & li {
-            &.active > a {
-                border-left-width: 4px;
-            }
-
-            &.active
-                > a:first-child:not(.button):not(.adtp-btn):not(button):not([type="submit"]):not(a.submit):not(
-                    button.submit
-                ):not(.show-ckeditor-button) {
-                color: var(--sbx-config-color-accent);
-                font-weight: 600;
-            }
-
-            &
-                > a:first-child:not(.button):not(.adtp-btn):not(button):not([type="submit"]):not(a.submit):not(
-                    button.submit
-                ):not(.show-ckeditor-button) {
-                color: var(--sbx-config-color-accent);
-                font-family: var(--ff-primary);
-                padding-block: 0.5rem;
-            }
-        }
-    }
-
-    // Account content styles
-    #account-content {
-        border-radius: var(--sbx-border-radius-m);
-
-        & .separator {
-            background-color: #eee !important;
-            color: var(--sbx-config-color-accent);
-            font-weight: 600;
-        }
-
-        & [class^="icon"] {
-            color: var(--sbx-color-text-primary);
-            font-size: 14px;
-            font-weight: 500;
-            line-height: 1.2;
-
-            li:has(&) {
-                padding-block: 0.4rem;
-            }
-        }
-
-        & li.user {
-            padding-block: 0.8rem;
-            padding-inline: 0.8rem;
-
-            & img {
-                border-radius: var(--sbx-border-radius-m);
-            }
-
-            & p {
-                color: var(--sbx-color-text-primary);
-                font-weight: var(--sbx-font-weight-active);
-                text-transform: none;
-            }
-
-            // to distinguish the pwa setup from the other parts
-            .pwa-side-panel {
-                background: var(--sbx-color-foreground-secondary);
-                border-radius: var(--sbx-config-box-roundness);
-                margin-bottom: var(--sbx-size-s);
-            }
-
-            // the border is removed in www/static/css/core/ui/navigation/_offcanvas.scss
-            a.install-button,
-            a.enable-notif-button,
-            a.mark-all-read,
-            a[data-msgfooter-action] {
-                border-bottom: 1px solid var(--sbx-config-color-accent) !important;
-            }
-
-            #msg-content {
-                margin-top: var(--sbx-size-s);
-                li {
-                    padding: var(--sbx-size-xs);
-                }
-            }
-        }
-    }
-
-    // Left menu styles when menu is not open
-    .off-canvas-wrap.move-right :not(.left-open) {
-        & #left-menu {
-            border-radius: var(--sbx-config-box-roundness);
-            box-shadow: var(--sbx-shadow-m);
-        }
-    }
-
-    // Notifications menu styles when menu is not open
-    .off-canvas-wrap.move-left :not(.right-open) {
-        & #msgs {
-            border-radius: var(--sbx-config-box-roundness);
-            box-shadow: var(--sbx-shadow-m);
-        }
-    }
-
-    // Notifications menu styles
-    #message-list {
-        padding: var(--sbx-size-xs);
         #right-menu-dock,
         .settings-button {
-            border-radius: var(--sbx-config-field-roundness);
-            color: var(--sbx-config-color-accent);
-            padding: var(--sbx-size-xs);
-            top: var(--sbx-size-xs);
-            &:hover {
-                background: var(--sbx-config-color-active);
-            }
+            top: var(--sbx-size-l);
         }
         #right-menu-dock {
             left: var(--sbx-size-xs);
@@ -509,10 +327,32 @@ body.sbx-body {
         }
     }
 
-    // side nav used in admin, pastoral settings, news
+    // side menu, like within the administration section and for news page
     .side-nav {
+        border-radius: var(--sbx-config-box-roundness);
         overflow: hidden;
+
         & li {
+            &.active > a {
+                border-left-width: 4px;
+            }
+
+            &.active
+                > a:first-child:not(.button):not(.adtp-btn):not(button):not([type="submit"]):not(a.submit):not(
+                    button.submit
+                ):not(.show-ckeditor-button) {
+                color: var(--sbx-config-color-accent);
+                font-weight: var(--sbx-font-weight-heading);
+            }
+
+            &
+                > a:first-child:not(.button):not(.adtp-btn):not(button):not([type="submit"]):not(a.submit):not(
+                    button.submit
+                ):not(.show-ckeditor-button) {
+                color: var(--sbx-config-color-accent);
+                padding-block: var(--sbx-size-xs);
+            }
+
             & > a {
                 font-size: var(--sbx-font-size-xs);
             }

@@ -11,6 +11,7 @@
 
 @use "base/sbx-typography";
 @use "base/sbx-color-overrides";
+@use "base/sbx-image-overrides";
 
 @use "ui/sbx-core-menu";
 @use "ui/forms/sbx-form";
@@ -22,7 +23,8 @@
 @use "ui/sbx-pagination";
 @use "ui/sbx-filters";
 @use "ui/sbx-calendar";
+@use "ui/sbx-homepage";
+
 @use "config/sbx-field-roundness";
 @use "config/sbx-box-roundness";
 @use "config/sbx-box-drop-shadow";
-@use "base/sbx-image-overrides";

@@ -1,0 +1,15 @@
+/**
+ * Homepage tweaks
+ * Scope: UI Uplift
+ */
+
+body.sbx-body {
+    #component-layout {
+        --top-font-primary: var(--sbx-color-text-primary);
+        --top-bg-primary: var(--sbx-color-foreground-primary);
+        --left-font-primary: var(--sbx-color-text-primary);
+        --left-bg-primary: var(--sbx-color-foreground-primary);
+        --right-font-primary: var(--sbx-color-text-primary);
+        --right-bg-primary: var(--sbx-color-foreground-primary);
+    }
+}

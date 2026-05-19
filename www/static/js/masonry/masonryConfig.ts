@@ -13,16 +13,16 @@ interface Colours {
 interface ColourProperties {
     top_head_font: string;
     top_head_bg: string;
-    top_font_primary: string;
-    top_bg_primary: string;
     left_head_font: string;
     left_head_bg: string;
-    left_font_primary: string;
-    left_bg_primary: string;
     right_head_font: string;
     right_head_bg: string;
-    right_font_primary: string;
-    right_bg_primary: string;
+    top_font_primary?: string;
+    top_bg_primary?: string;
+    left_font_primary?: string;
+    left_bg_primary?: string;
+    right_font_primary?: string;
+    right_bg_primary?: string;
 }
 
 /**

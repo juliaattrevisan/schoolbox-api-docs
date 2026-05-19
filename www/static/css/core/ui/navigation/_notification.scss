@@ -98,43 +98,30 @@ $allow-notification-stash: $xlarge-up;
         }
     }
 
-    @media #{$allow-notification-stash} {
-        .right-menu-dock {
-            color: $white;
-            display: block;
-            height: 2.5rem;
-            padding: 0.5rem;
-            position: absolute;
-            left: 0;
-            transform: translateY(40%);
-            width: 2.5rem;
-            z-index: calc(var(--sbx-depth-default) + 1); // Safari will not see the icon without this
-
-            &::after {
-                content: "\e915"; //.icon-pin-hollow
-                font-family: $font-family-icon;
-                font-size: 1rem;
-                padding-left: rem-calc(4);
-            }
+    .right-menu-dock {
+        color: $white;
+        display: none;
+        left: 0;
+        position: absolute;
+        top: 1rem;
+        &:hover {
+            color: $navigation-background;
         }
-        &[data-unread="0"] {
-            .right-menu-dock {
-                color: var(--sbx-config-color-menu-foreground, $navigation-foreground);
-            }
+        // only show when the notifications menu can be pinned to the side
+        @media #{$allow-notification-stash} {
+            display: inline-flex;
         }
     }
 
     // the link to open the notification settings
     .settings-button {
         color: $white;
-        height: 2.5rem;
-        padding: 0.5rem;
         position: absolute;
-        right: 0.5rem;
-        top: 0;
-        transform: translateY(40%);
-        width: 2rem;
-        z-index: calc(var(--sbx-depth-default) + 1); // Safari will not see the icon without this
+        right: 0;
+        top: 1rem;
+        &:hover {
+            color: $navigation-background;
+        }
     }
 
     /* The button that allows you to view your notifications
@@ -181,14 +168,6 @@ $allow-notification-stash: $xlarge-up;
         background-color: $accent-background;
         a {
             font-weight: bold;
-        }
-    }
-}
-
-@media #{$allow-notification-stash} {
-    .right-open {
-        .right-menu-dock::after {
-            content: "\e913"; //.icon-pin
         }
     }
 }

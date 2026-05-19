@@ -81,7 +81,7 @@ SET
         FROM lu_skin_config_subcategory
         WHERE
             category_id = @category_colours
-            AND name = 'Menu'
+            AND name = 'Top Menu'
     );
 
 SET
@@ -256,7 +256,7 @@ INSERT INTO
 VALUES (
         'skin_colour_menu_background',
         @value_skin_colour_menu_background,
-        'Menu Background Colour',
+        'Top Menu Background',
         'The background colour of the top menu.',
         @config_colour_field_id,
         @sonar_config_type_id,
@@ -270,7 +270,7 @@ VALUES (
     (
         'skin_colour_menu_foreground',
         @value_skin_colour_menu_foreground,
-        'Menu Foreground Colour',
+        'Top Menu Foreground',
         'The foreground colour of the top menu.',
         @config_colour_field_id,
         @sonar_config_type_id,
@@ -284,8 +284,8 @@ VALUES (
     (
         'skin_colour_menu_hover',
         @value_skin_colour_menu_hover,
-        'Menu Hover Colour',
-        'The background colour of the element when the mouse is hovering over a menu element.',
+        'Top Menu Hover',
+        'The background colour of the element when the mouse is hovering over a top menu element.',
         @config_colour_field_id,
         @sonar_config_type_id,
         'true',
@@ -298,7 +298,7 @@ VALUES (
     (
         'skin_colour_body_background',
         @value_skin_colour_body_background,
-        'Body Background Colour',
+        'Body Background',
         'The background colour of every page.',
         @config_colour_field_id,
         @sonar_config_type_id,
@@ -312,7 +312,7 @@ VALUES (
     (
         'skin_colour_accent',
         @value_skin_colour_accent,
-        'Accent Colour',
+        'Accent',
         'The colour used in interactive elements like buttons, links and check boxes.',
         @config_colour_field_id,
         @sonar_config_type_id,
@@ -326,7 +326,7 @@ VALUES (
     (
         'skin_colour_accent_text',
         '#ffffff',
-        'Accent Text Colour',
+        'Accent Text',
         'The text colour for when displayed over the Accent Colour.',
         @config_colour_field_id,
         @sonar_config_type_id,
@@ -340,7 +340,7 @@ VALUES (
     (
         'skin_colour_active',
         @value_skin_colour_active,
-        'Active Colour',
+        'Active',
         'The colour used to indicate active elements, like active filters, selected menu items and hover states.',
         @config_colour_field_id,
         @sonar_config_type_id,
@@ -354,8 +354,8 @@ VALUES (
     (
         'skin_colour_component_heading_background',
         @value_skin_colour_component_heading_background,
-        'Component Heading Background Colour',
-        'The colour of the heading background on homepage components.',
+        'Default Component Heading Background',
+        'The colour of the heading background on newly created Homepage/ePortfolio components.',
         @config_colour_field_id,
         @sonar_config_type_id,
         'true',
@@ -368,8 +368,8 @@ VALUES (
     (
         'skin_colour_component_heading_text',
         @value_skin_colour_component_heading_text,
-        'Component Heading Text Colour',
-        'The colour of the heading text on homepage components.',
+        'Default Component Heading Text',
+        'The colour of the heading text on newly created Homepage/ePortfolio components.',
         @config_colour_field_id,
         @sonar_config_type_id,
         'true',
@@ -382,7 +382,7 @@ VALUES (
     (
         'skin_colour_sonar_login_background',
         @value_skin_colour_sonar_login_background,
-        'Login Background Colour',
+        'Login Background',
         'The background colour of the login form on the login page.',
         @config_colour_field_id,
         @sonar_config_type_id,
@@ -396,7 +396,7 @@ VALUES (
     (
         'skin_colour_sonar_login_foreground',
         '#ffffff',
-        'Login Foreground Colour',
+        'Login Foreground',
         'The foreground colour of the login form on the login page.',
         @config_colour_field_id,
         @sonar_config_type_id,
@@ -410,7 +410,7 @@ VALUES (
     (
         'skin_box_roundness',
         'var(--sbx-border-radius-m)',
-        'Box Roundness',
+        'Box',
         'Add rounded corners to primary container elements.',
         @config_select_field_id,
         @sonar_config_type_id,
@@ -424,7 +424,7 @@ VALUES (
     (
         'skin_field_roundness',
         'var(--sbx-border-radius-s)',
-        'Field Roundness',
+        'Field',
         'Add rounded corners to elements like check boxes, buttons and labels.',
         @config_select_field_id,
         @sonar_config_type_id,
@@ -438,7 +438,7 @@ VALUES (
     (
         'skin_box_drop_shadow',
         'var(--sbx-shadow-none)',
-        'Box Drop Shadow',
+        'Box',
         'Add a drop shadow to primary container elements.',
         @config_select_field_id,
         @sonar_config_type_id,

@@ -2,6 +2,8 @@
 
 /* This script controls homepage layout functions.  It is used for setting up templates and customising homepage */
 
+use Alaress\Web\Request\Values;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource;
 
@@ -27,6 +29,11 @@ class Homepage
      */
     private Resource\HomepageTemplateMapper $homepageTemplateMapper;
 
+    /**
+     * Constructor
+     *
+     * @param int $cid
+     */
     public function __construct($cid)
     {
         $this->cid                    = $cid;
@@ -34,6 +41,11 @@ class Homepage
         $this->homepageTemplateMapper = Resource\HomepageTemplateMapper::getInstance();
     }
 
+    /**
+     * Get the homepage template
+     *
+     * @return mixed
+     */
     public function getTemplate()
     {
         try {
@@ -92,10 +104,15 @@ class Homepage
         $this->updateColumnWidths($leftPercent, 99 - $leftPercent);
     }
 
+    /**
+     * Get a list of colours for a particular homepage
+     *
+     * @return array
+     */
     public function getColorList()
     {
         $homepageConfig = $this->homepageConfigMapper->findById($this->cid);
-        return [
+        $colourList = [
             'left_head_font'     => $homepageConfig->getLeftHeadFont(),
             'left_head_bg'       => $homepageConfig->getLeftHeadBg(),
             'left_font_primary'  => $homepageConfig->getLeftFont(),
@@ -109,6 +126,60 @@ class Homepage
             'top_font_primary'   => $homepageConfig->getTopFont(),
             'top_bg_primary'     => $homepageConfig->getTopBgPrimary(),
         ];
+
+        return $colourList;
+    }
+
+    /**
+     * Spawn a list of default colours
+     *
+     * @return array
+     */
+    public function getDefaultColorList(): array
+    {
+        $colourSet             = [];
+        $defaultHeadingColours = $this->getDefaultHeadingColours();
+
+        foreach (['top', 'left', 'right'] as $position) {
+            $colourSet = array_merge($colourSet, [
+                $position . '_head_font'    => $defaultHeadingColours['head_font'],
+                $position . '_head_bg'      => $defaultHeadingColours['head_bg'],
+                $position . '_font_primary' => Config::get(ConfigMapper::NAME_HOMEPAGE_COLOUR_FONT),
+                $position . '_bg_primary'   => Config::get(ConfigMapper::NAME_HOMEPAGE_COLOUR_BG_PRIMARY),
+            ]);
+        }
+
+        return $colourSet;
+    }
+
+    /**
+     * Gets the default heading colours for a homepage, which are either the skin component heading colours
+     * (if advanced UI is enabled) or the homepage heading colours (if not).
+     *
+     * @return array
+     */
+    private function getDefaultHeadingColours(): array
+    {
+        if ($this->isAdvancedUiEnabled()) {
+            return [
+                'head_font' => Config::get(ConfigMapper::NAME_SKIN_COLOUR_COMPONENT_HEADING_TEXT),
+                'head_bg'   => Config::get(ConfigMapper::NAME_SKIN_COLOUR_COMPONENT_HEADING_BACKGROUND),
+            ];
+        }
+
+        return [
+            'head_font' => Config::get(ConfigMapper::NAME_HOMEPAGE_COLOUR_HEAD_FONT),
+            'head_bg'   => Config::get(ConfigMapper::NAME_HOMEPAGE_COLOUR_HEAD_BG),
+        ];
+    }
+
+    private function isAdvancedUiEnabled(): bool
+    {
+        $configValues = new Values([
+            ConfigMapper::NAME_SONAR_UI_TOGGLE => Config::get(ConfigMapper::NAME_SONAR_UI_TOGGLE),
+        ]);
+
+        return $configValues->getBool(ConfigMapper::NAME_SONAR_UI_TOGGLE, false) ?? false;
     }
 
     /**
@@ -217,16 +288,17 @@ class Homepage
         // TODO make width a const
         $homepageConfig->setLeftColumnWidth($homepageTemplate?->getLeftColumnWidth() ?? 70);
         $homepageConfig->setRightColumnWidth($homepageTemplate?->getRightColumnWidth() ?? 30);
-        $homepageConfig->setTopHeadFont(Config::get('homepage_colour_head_font'));
-        $homepageConfig->setTopHeadBg(Config::get('homepage_colour_head_bg'));
+        $defaultHeadingColours = $this->getDefaultHeadingColours();
+        $homepageConfig->setTopHeadFont($defaultHeadingColours['head_font']);
+        $homepageConfig->setTopHeadBg($defaultHeadingColours['head_bg']);
         $homepageConfig->setTopFont(Config::get('homepage_colour_font'));
         $homepageConfig->setTopBgPrimary(Config::get('homepage_colour_bg_primary'));
-        $homepageConfig->setLeftHeadFont(Config::get('homepage_colour_head_font'));
-        $homepageConfig->setLeftHeadBg(Config::get('homepage_colour_head_bg'));
+        $homepageConfig->setLeftHeadFont($defaultHeadingColours['head_font']);
+        $homepageConfig->setLeftHeadBg($defaultHeadingColours['head_bg']);
         $homepageConfig->setLeftFont(Config::get('homepage_colour_font'));
         $homepageConfig->setLeftBgPrimary(Config::get('homepage_colour_bg_primary'));
-        $homepageConfig->setRightHeadFont(Config::get('homepage_colour_head_font'));
-        $homepageConfig->setRightHeadBg(Config::get('homepage_colour_head_bg'));
+        $homepageConfig->setRightHeadFont($defaultHeadingColours['head_font']);
+        $homepageConfig->setRightHeadBg($defaultHeadingColours['head_bg']);
         $homepageConfig->setRightFont(Config::get('homepage_colour_font'));
         $homepageConfig->setRightBgPrimary(Config::get('homepage_colour_bg_primary'));
         $this->homepageConfigMapper->save($homepageConfig);
@@ -283,8 +355,17 @@ class Homepage
         return 0;
     }
 
+    /**
+     * Save colours for an individual homepage
+     *
+     * @param array $listColor
+     * @return void
+     */
     public function saveDisplayProperties($listColor)
     {
+        // merge the provided colour list with the existing colour list, so that any missing values are not overwritten as null
+        $listColor = array_replace($this->getColorList(), $listColor);
+
         $homepageConfig = $this->homepageConfigMapper->findById($this->cid);
         $homepageConfig->setTopHeadFont($listColor['top_head_font']);
         $homepageConfig->setTopHeadBg($listColor['top_head_bg']);
