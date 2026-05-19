@@ -105,7 +105,7 @@ if (props.forFilterPanel) {
         :class="['sbx-tag-group', { 'sbx-scroll-container sbx-tag-group--scroll': shouldScrollSelected }]"
         data-test="ss-selected"
     >
-        <div ref="selectedContentEl" class="sbx-tag-group__items">
+        <div ref="selectedContentEl" class="l-flex-row l-gap-s">
             <ss-selected-item
                 v-for="item in props.selected"
                 :key="item.id"

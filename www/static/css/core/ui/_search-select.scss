@@ -1,3 +1,9 @@
+/**
+ * These are the styles pulled out of the <search-select> component,
+ * following the release of 26.1 (Sonar UI) they will be further broken
+ * down into the relevant style files
+ */
+
 .search-select {
     &__results-container {
         position: relative;
@@ -36,7 +42,6 @@
         font-size: var(--sbx-font-size-xs, 0.825rem);
         font-style: italic;
         margin: 0;
-        padding: var(--sbx-size-xs, var(--spacing-s));
     }
 }
 
@@ -68,11 +73,6 @@
     &--scroll {
         margin-bottom: -1px; // to butt up against the search input border
         max-height: 133px;
-    }
-    &__items {
-        display: flex;
-        flex-wrap: wrap;
-        gap: var(--sbx-size-xs, var(--spacing-s));
     }
 }
 

@@ -154,12 +154,12 @@ window.Vue.watch(
 <template>
     <fieldset class="sbx-checkbox-radio-group-scroll">
         <legend class="t-visually-hidden">Search results</legend>
-        <div ref="resultsEl" class="ss-results__scroll-container">
+        <div ref="resultsEl" class="sbx-scroll-container">
             <p v-if="props.isSearching" class="ss-results__status" aria-live="polite" aria-busy="true">
                 Searching for results....
             </p>
             <p v-else-if="props.hasNoResults" class="ss-results__status">No results found for your current search.</p>
-            <ul v-else class="sbx-checkbox-radio-group l-pad-s">
+            <ul v-else class="sbx-checkbox-radio-group">
                 <ss-results-select-all
                     v-if="showSelectAll"
                     :results="props.results"
