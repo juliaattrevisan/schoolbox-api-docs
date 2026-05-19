@@ -1,4 +1,10 @@
 <div id='component{COMPONENT_INSTANCE_ID}' class='component-container {COMPONENT_CLASS}' data-component data-component-definition-id="{COMPONENT_DEFINITION_ID}">
+    <script type="text/javascript">
+        $(function() {
+            $('[data-plugin="preview"]','#component{COMPONENT_INSTANCE_ID}').not('[rel="external"]').preview();
+        });
+    </script>
+
     {CONFIGURATION}
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
@@ -24,11 +30,11 @@
                         <div class="list-item {HIDDEN}">
                             <div class="card small-12">
                                 <h3>
-                                    <a
+                                    <a data-plugin="preview"
                                         data-test="link-list"
                                         title="{LINK_NAME}"
-                                        href="/redir.php?id={LINK_ID}"
-                                        <!-- BEGIN link_target_external -->target="_blank" rel="external"<!-- END link_target_external -->>{LINK_NAME}</a>
+                                        rel="{LINK_TARGET}"
+                                        href="/redir.php?id={LINK_ID}">{LINK_NAME}</a>
                                 </h3>
 
                                 <p class="meta {COMPONENT_COMPACTMODE_HIDE}" >
