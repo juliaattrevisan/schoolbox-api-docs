@@ -196,7 +196,11 @@ class Eportfolio extends Base
     protected function deleteChunk(array $chunk): void
     {
         $targetIds = $this->groupTargetIdsByTable($chunk);
-        $this->logRootTargetIds($targetIds);
+        foreach ($targetIds as $table => $ids) {
+            $this->log->debug(
+                sprintf('Processing ePortfolio root target %s ids: %s', $table, implode(', ', $ids)),
+            );
+        }
 
         $pageIds = $targetIds[self::TABLE_EPORTFOLIO_PAGE] ?? [];                            // Directly targeted page ids.
         $blogIds = $targetIds[self::TABLE_EPORTFOLIO_COMPONENT_BLOG] ?? [];                  // Directly targeted blog ids.
@@ -317,20 +321,6 @@ class Eportfolio extends Base
         }
 
         return $idsByTable;
-    }
-
-    /**
-     * Logs the IDs of root targets being processed in the current chunk.
-     *
-     * @param array<string, list<int>> $targetIds
-     */
-    private function logRootTargetIds(array $targetIds): void
-    {
-        foreach ($targetIds as $table => $ids) {
-            $this->log->debug(
-                sprintf('Processing ePortfolio root target %s ids: %s', $table, implode(', ', $ids)),
-            );
-        }
     }
 
     /**
