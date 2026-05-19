@@ -75,16 +75,17 @@ $swipe-color-hover: $steel;
     .swiper-button-prev,
     .swiper-button-next {
         background-image: none;
-        color: $iron;
+        color: var(--sbx-color-foreground-primary, $iron);
         font-size: rem-calc($base-font-size * 1.5);
         width: 2rem;
-        height: 4rem;
+        height: 2rem;
         margin-top: 0;
         transition: all 0.15s linear;
-        transform: translateY(-2rem);
+        opacity: 0.75;
 
         &:hover {
-            color: $swipe-color-hover;
+            color: var(--sbx-color-foreground-primary, $iron);
+            opacity: 1;
         }
 
         &:focus {
@@ -92,9 +93,7 @@ $swipe-color-hover: $steel;
         }
 
         &::before {
-            font-family: "schoolbox";
-            position: absolute;
-            top: 0.875rem;
+            display: none;
         }
     }
 
@@ -118,8 +117,8 @@ $swipe-color-hover: $steel;
 
     // image title
     .meta {
-        background: rgba($black, 0.7);
-        color: $white;
+        background: var(--sbx-color-foreground-primary, rgba($black, 0.7));
+        color: var(--sbx-color-foreground-primary, $white);
         position: absolute;
         bottom: 0;
         font-size: 0.8125rem;
@@ -142,8 +141,8 @@ $swipe-color-hover: $steel;
     position: relative;
 
     .swiper-pagination-bullet {
-        background: $swipe-color;
-        opacity: 1;
+        background: var(--sbx-color-foreground-primary, $iron);
+        opacity: 0.75;
         margin: 1rem 0.5rem;
         height: 0.625rem;
         width: 0.625rem;
@@ -151,6 +150,7 @@ $swipe-color-hover: $steel;
 
     .swiper-pagination-bullet-active,
     .swiper-pagination-bullet-active:hover {
-        background: $swipe-color-hover;
+        background: var(--sbx-color-foreground-primary, $iron);
+        opacity: 1;
     }
 }

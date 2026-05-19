@@ -17,7 +17,7 @@
 body.sbx-body {
     font-family: var(--sbx-font-primary) !important;
     // then prevent it overriding specific fonts that need to be preserved for icons, barcodes, etc.
-    & *:not(select, option, .barcode-39, .fc-icon, [class*="lg-"], [class*="vjs-"]) {
+    & *:not(select, option, .barcode-39, .fc-icon, [class*="lg-"], [class*="vjs-"], [class*="swiper-"]) {
         font-family: var(--sbx-font-primary) !important;
     }
 
