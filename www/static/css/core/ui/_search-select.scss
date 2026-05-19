@@ -43,6 +43,12 @@
         font-style: italic;
         margin: 0;
     }
+    // temporary non Sonar UI fix to remove spacing between checkboxes and radios, which is currently being handled by the parent flex container, but is added by the base form styles
+    .checklist.sbx-checkbox-radio-container {
+        input[type="checkbox"] + label {
+            margin: 0 !important ; // foundation-fix: spacing is handled by parent flex
+        }
+    }
 }
 
 .sbx-checkbox-radio-group {
