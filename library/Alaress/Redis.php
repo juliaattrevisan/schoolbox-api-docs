@@ -91,6 +91,13 @@ class Redis
     protected $instanceId = '';
 
     /**
+     * A cache factory for building Redis-backed caches.
+     *
+     * Created as needed, and only once, by `buildCache`.
+     */
+    private ?Factory $cacheFactory = null;
+
+    /**
      * Gets an instance of this wrapper.
      *
      * TODO consider replacing with a separate CacheFunctionCall class
@@ -411,8 +418,8 @@ class Redis
      */
     protected function buildCache(string $baseKey): CacheInterface
     {
-        $cacheFactory = new Factory($this->client);
-        return $cacheFactory->build($baseKey);
+        $this->cacheFactory ??= new Factory($this->client);
+        return $this->cacheFactory->build($baseKey);
     }
 
     /**
