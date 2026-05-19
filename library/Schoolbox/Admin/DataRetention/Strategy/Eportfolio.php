@@ -429,6 +429,25 @@ class Eportfolio extends Base
             return;
         }
 
+        $deletedIds = $this->findIdsByColumn($table, $column, $ids, $excludedIds);
+        if ($deletedIds === []) {
+            return;
+        }
+
+        $this->deleteRowsByIds($deletedIdsByTableName, $table, $deletedIds);
+    }
+
+    /**
+     * Finds row IDs from a table by matching a column against the given values.
+     *
+     * @param string $table
+     * @param string $column
+     * @param list<int> $ids
+     * @param list<int> $excludedIds
+     * @return list<int>
+     */
+    private function findIdsByColumn(string $table, string $column, array $ids, array $excludedIds = []): array
+    {
         $placeholders = Builder::getArrayPlaceholders($ids, $column);
         $parameters = Builder::getArrayParameters($ids, $column);
         $exclusionPredicate = '';
@@ -439,16 +458,14 @@ class Eportfolio extends Base
             $parameters = array_merge($parameters, Builder::getArrayParameters($excludedIds, 'excluded_id'));
         }
 
-        $statement = $this->getPreparedStatement(
-            $this->deleteStatement($table) . " FROM $table WHERE $column IN $placeholders$exclusionPredicate"
-        );
-        $statement->execute($parameters);
+        $rows = $this->fetchRows("SELECT id FROM $table WHERE $column IN $placeholders$exclusionPredicate", $parameters);
+        $rowIds = array_map(static fn(array $row): int => (int) $row['id'], $rows);
 
-        $this->recordDeleted($deletedIdsByTableName, $table, $ids);
+        return array_values(array_unique(array_filter($rowIds, static fn(int $id): bool => $id > 0)));
     }
 
     /**
-     * Accumulates a row-count into the deleted totals map for the given table.
+     * Accumulates row IDs into the deleted totals map for the given table.
      *
      * @param array<string, list<int>> $deletedIdsByTableName
      * @param string             $table
@@ -456,7 +473,11 @@ class Eportfolio extends Base
      */
     protected function recordDeleted(array &$deletedIdsByTableName, string $table, array $ids): void
     {
-        $deletedIdsByTableName[$table] = $ids;
+        $deletedIdsByTableName[$table] = array_values(
+            array_unique(
+                array_merge($deletedIdsByTableName[$table] ?? [], $ids),
+            ),
+        );
     }
 
     /**
