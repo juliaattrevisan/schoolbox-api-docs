@@ -70,10 +70,12 @@ class Jwt
         // Subject:    $user
         // Expiry:     optional
         // Not before: not used for now
+        // Audience:   this Schoolbox instance's FQDN by default
         // May add ability to regenerate tokens later?
         $claims = [
             IParser::CLAIM_ISS => $schoolboxFqdn,
             IParser::CLAIM_SUB => $user->getUsername(),
+            IParser::CLAIM_AUD => $schoolboxFqdn,
         ];
         if ($expiry !== null) {
             $claims[IParser::CLAIM_EXP] = $expiry->getUnixTimeStamp();

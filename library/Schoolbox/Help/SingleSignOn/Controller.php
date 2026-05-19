@@ -82,19 +82,22 @@ class Controller extends Base
      */
     public function sendTokenToHelp(): void
     {
+        $helpUrl = new Uri($this->getConfigLoader()->get('schoolbox_help_url'));
+
         // Generate a JWT
         $jwt = $this->tokenBuilder->generate(
             $this->getUser(),
             null,
             Alaress_Date_Format::now()->addSeconds(self::JWT_EXPIRY),
             [
+                JwtParser\IParser::CLAIM_AUD                     => $helpUrl->withPath(''),
                 JwtParser\IParser::CLAIM_EMAIL                   => $this->getUser()->getEmail(),
                 JwtParser\OtherInstanceIssued::CLAIM_INSTANCE_ID => INSTANCE_ID,
             ]
         );
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        $url = (new Uri($this->getConfigLoader()->get('schoolbox_help_url')))
+        $helpLoginUrl = $helpUrl
             ->withPath($this->routeGenerator->generate('helpSso.receiveTokenFromInstance'))
             ->appendQueryParameters(
                 [
@@ -103,7 +106,7 @@ class Controller extends Base
                 ]
             );
 
-        $this->response = $this->redirectSeeOther($url->__toString());
+        $this->response = $this->redirectSeeOther($helpLoginUrl->__toString());
     }
 
     /**
