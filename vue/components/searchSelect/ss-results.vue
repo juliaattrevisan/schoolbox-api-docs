@@ -159,7 +159,7 @@ window.Vue.watch(
                 Searching for results....
             </p>
             <p v-else-if="props.hasNoResults" class="ss-results__status">No results found for your current search.</p>
-            <ul v-else class="ss-results-list">
+            <ul v-else class="sbx-checkbox-radio-group l-pad-s">
                 <ss-results-select-all
                     v-if="showSelectAll"
                     :results="props.results"

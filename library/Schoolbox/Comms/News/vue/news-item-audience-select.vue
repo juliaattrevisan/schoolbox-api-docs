@@ -819,7 +819,7 @@ export default {
                                     <p v-if="showLoader" class="ss-results__status" aria-live="polite" aria-busy="true">
                                         Searching for results....
                                     </p>
-                                    <ul class="ss-results-list">
+                                    <ul class="sbx-checkbox-radio-group">
                                         <li
                                             v-for="(audienceListItem, index) in audienceListItems"
                                             :key="index"

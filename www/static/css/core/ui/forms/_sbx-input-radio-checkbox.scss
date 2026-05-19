@@ -173,7 +173,7 @@ body.sbx-body {
             }
         }
 
-        & + label {
+        &:not(:disabled) + label {
             cursor: pointer;
             font-weight: var(--sbx-font-weight-normal);
         }
@@ -188,10 +188,10 @@ body.sbx-body {
     }
 
     /* Highlights the checkbox/radio when the adjacent label is hovered */
-    label:hover + input[type="checkbox"],
-    label:hover + input[type="radio"],
-    input[type="checkbox"]:hover,
-    input[type="radio"]:hover {
+    label:hover + input[type="checkbox"]:not(:disabled):not([readonly]),
+    label:hover + input[type="radio"]:not(:disabled):not([readonly]),
+    input[type="checkbox"]:hover:not(:disabled):not([readonly]),
+    input[type="radio"]:hover:not(:disabled):not([readonly]) {
         background: var(--sbx-config-color-active);
     }
 
