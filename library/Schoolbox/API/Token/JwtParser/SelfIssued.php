@@ -79,6 +79,8 @@ class SelfIssued extends Base
             new Key($this->config->get(ConfigMapper::NAME_JWT_PUBLIC_KEY), Jwt::SIGNING_ALGORITHM),
             (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY),
         );
+
+        // Validate subject
         if (!isset($claims[self::CLAIM_SUB])) {
             throw new Exception\InvalidIdentity(sprintf('JWT must contain a "%s" claim', self::CLAIM_SUB));
         }
@@ -87,8 +89,9 @@ class SelfIssued extends Base
             throw new Exception\InvalidIdentity(sprintf('JWT "%s" claim must not be empty', self::CLAIM_SUB));
         }
         $user = $this->findUser($claims[self::CLAIM_SUB], self::CLAIM_SUB);
+
+        // Validate JTI for self-issued tokens
         if (isset($claims[self::CLAIM_JTI])) {
-            // if not help instance, validate the jti
             try {
                 /** @var User\Token\Model $token */
                 $token = $this->tokenMapper->findOneByColumnList(
@@ -108,6 +111,10 @@ class SelfIssued extends Base
                     $e,
                 );
             }
+        } else {
+            throw new Exception\InvalidIdentity(
+                sprintf('JWT must contain a "%s"', self::CLAIM_JTI)
+            );
         }
         if (isset($claims[self::CUSTOM_CLAIM_TASKD]) && $claims[self::CUSTOM_CLAIM_TASKD] === 1) {
             $this->log->info(sprintf('Claim "%s" is set: bypassing IP tracking', self::CUSTOM_CLAIM_TASKD));
