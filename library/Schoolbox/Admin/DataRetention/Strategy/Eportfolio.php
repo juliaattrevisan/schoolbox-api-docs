@@ -402,7 +402,11 @@ class Eportfolio extends Base
         );
         $statement->execute(Builder::getArrayParameters($ids, 'id'));
 
-        $this->recordDeleted($deletedIdsByTableName, $table, $ids);
+        $deletedIdsByTableName[$table] = array_values(
+            array_unique(
+                array_merge($deletedIdsByTableName[$table] ?? [], $ids),
+            ),
+        );
     }
 
     /**
@@ -462,22 +466,6 @@ class Eportfolio extends Base
         $rowIds = array_map(static fn(array $row): int => (int) $row['id'], $rows);
 
         return array_values(array_unique(array_filter($rowIds, static fn(int $id): bool => $id > 0)));
-    }
-
-    /**
-     * Accumulates row IDs into the deleted totals map for the given table.
-     *
-     * @param array<string, list<int>> $deletedIdsByTableName
-     * @param string             $table
-     * @param list<int> $ids
-     */
-    protected function recordDeleted(array &$deletedIdsByTableName, string $table, array $ids): void
-    {
-        $deletedIdsByTableName[$table] = array_values(
-            array_unique(
-                array_merge($deletedIdsByTableName[$table] ?? [], $ids),
-            ),
-        );
     }
 
     /**
