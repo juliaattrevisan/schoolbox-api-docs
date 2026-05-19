@@ -477,6 +477,9 @@ class Eportfolio
      */
     public function saveDisplayProperties($listColor)
     {
+        // merge the provided colour list with the existing colour list, so that any missing values are not overwritten as null
+        $listColor = array_replace($this->getColorList(), $listColor);
+
         $page = $this->pageMapper->findById($this->getPageId());
         $page->setTopHeadFont($listColor['top_head_font']);
         $page->setTopHeadBg($listColor['top_head_bg']);
