@@ -192,32 +192,38 @@ class Mapper extends BaseMapper
             return null;
         }
 
-        $pb = $this->getPredicateBuilder();
-        $pb->equals('user_id', $user->getId());
-        $pb->equals('status', Model::STATUS_UNCONFIRMED);
+        try {
+            $pb = $this->getPredicateBuilder();
+            $pb->equals('user_id', $user->getId());
+            $pb->equals('status', Model::STATUS_UNCONFIRMED);
 
-        $student = $this->findOneByPredicates($pb, [
-            'order' => [
-                'updated_at' => 'DESC',
-                'id' => 'DESC',
-            ],
-            'limit' => 1,
-        ]);
+            $student = $this->findOneByPredicates($pb, [
+                'order' => [
+                    'updated_at' => 'DESC',
+                    'id'         => 'DESC',
+                ],
+                'limit' => 1,
+            ]);
 
-        if (!$student instanceof Model) {
+            if (!$student instanceof Model) {
+                return null;
+            }
+
+            $student->setUser($user);
+            $student->setIbGroupSubjects(
+                $this->findIbGroupSubjectsForUsers(
+                    [
+                        $user->getId() => $user,
+                    ])
+                [$user->getId()] ?? new GenericCollection(GroupSubjectModel::class)
+            );
+
+            $this->applySubjectLanguageOverrides(new GenericCollection(Model::class, [$student]));
+
+            return $student;
+        } catch (BaseMapper\Exception\NotFound) {
             return null;
         }
-
-        $student->setUser($user);
-        $student->setIbGroupSubjects(
-            $this->findIbGroupSubjectsForUsers([
-                $user->getId() => $user,
-            ])[$user->getId()] ?? new GenericCollection(GroupSubjectModel::class)
-        );
-
-        $this->applySubjectLanguageOverrides(new GenericCollection(Model::class, [$student]));
-
-        return $student;
     }
 
     /**
