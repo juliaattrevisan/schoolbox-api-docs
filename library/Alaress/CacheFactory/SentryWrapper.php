@@ -12,6 +12,7 @@ namespace Alaress\CacheFactory;
 use Alaress\Sentry\Tracing\Tracer;
 use DateInterval;
 use Psr\SimpleCache\CacheInterface;
+use stdClass;
 use Throwable;
 
 /**
@@ -54,21 +55,25 @@ class SentryWrapper implements CacheInterface
      */
     public function get(string $key, mixed $default = null): mixed
     {
-        return $this->tracer->runWithinSpan(
-            fn () => $this->cache->get($key, $default),
+        // This sentinel value is used to distinguish between a cache miss and
+        // a hit which = $default.
+        $sentinel = new stdClass();
+        $result   = $this->tracer->runWithinSpan(
+            fn () => $this->cache->get($key, $sentinel),
             $this->generateDescription($key),
             'cache.get',
             'auto.cache',
             $this->generateData(key: $key),
             fn (mixed $result) => [
-                'cache.hit'       => $result !== $default,
-                'cache.item_size' => $this->calculateItemSize($result),
+                'cache.hit'       => $result !== $sentinel,
+                'cache.item_size' => $this->calculateItemSize($result !== $sentinel ? $result : $default),
                 'cache.success'   => true,
             ],
             fn (Throwable $e) => [
                 'cache.success' => false,
             ],
         );
+        return $result === $sentinel ? $default : $result;
     }
 
     /**
