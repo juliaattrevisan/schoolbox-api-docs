@@ -360,7 +360,12 @@ class Kernel extends WebKernelAbstract
                     $relyingPartyMapper = $mapperFactory->get(RelyingPartyMapper::class);
                     return new JwtParser\Composite(
                         $logger,
+                        // Change to AudienceMatchMode::REJECT once all instances are on 26.1:
+                        // otherwise, pre-26.1 instances won't be able to auto-signin to Help
                         new JwtParser\OtherInstanceIssued($userMapper, $config, $logger, JwtParser\AudienceMatchMode::WARN),
+                        // Change to AudienceMatchMode::REJECT sometime after 26.1:
+                        // so when there's been enough warning that JWTs generated before 26.1 will be rejected, and
+                        // users have had enough time to update their keys
                         new JwtParser\SelfIssued($userMapper, $config, $logger, JwtParser\AudienceMatchMode::WARN, $tokenMapper),
                         new JwtParser\OauthProviderIssued($userMapper, $config, $logger, $httpClient, $oidcCache),
                         new JwtParser\InstanceRegistryIssued($userMapper, $config, $logger, (string)INSTANCE_ID),
