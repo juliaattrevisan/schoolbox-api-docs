@@ -45,9 +45,10 @@ class SelfIssued extends InstanceIssued
         UserMapper $userMapper,
         IConfigLoader $config,
         LoggerInterface $log,
+        AudienceMatchMode $matchMode,
         private User\Token\Mapper $tokenMapper,
     ) {
-        parent::__construct($userMapper, $config, $log);
+        parent::__construct($userMapper, $config, $log, $matchMode);
     }
 
     /**

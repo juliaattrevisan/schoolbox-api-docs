@@ -9,7 +9,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\API\Token\JwtParser;
 
+use Psr\Log\LoggerInterface;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Url\Factory;
+use Schoolbox\UserMapper;
 
 /**
  * Class InstanceIssued
@@ -17,16 +20,33 @@ use Schoolbox\Url\Factory;
 abstract class InstanceIssued extends Base
 {
     /**
+     * Constructor
+     *
+     * @param UserMapper        $userMapper
+     * @param IConfigLoader     $config
+     * @param LoggerInterface   $log
+     * @param AudienceMatchMode $matchMode
+     */
+    public function __construct(
+        UserMapper $userMapper,
+        IConfigLoader $config,
+        LoggerInterface $log,
+        private AudienceMatchMode $matchMode,
+    ) {
+        parent::__construct($userMapper, $config, $log);
+    }
+
+    /**
      * Validate the audience of the JWT.
      *
      * For an instance-issued JWT, the audience must match the current hostname.
      *
      * @param array $claims The JWT's claims, once decoded.
      */
-    protected function assertValidAudience(array $claims, bool $warnOnly = true): void
+    protected function assertValidAudience(array $claims): void
     {
         if (!isset($claims[self::CLAIM_AUD])) {
-            if ($warnOnly) {
+            if ($this->matchMode === AudienceMatchMode::WARN) {
                 $this->log->warning(
                     sprintf(
                         'JWT should contain a "%s" claim: ignoring for now, but this will be rejected in the future',
@@ -47,7 +67,7 @@ abstract class InstanceIssued extends Base
             }
         }
         if (!$audienceMatch) {
-            if ($warnOnly) {
+            if ($this->matchMode === AudienceMatchMode::WARN) {
                 $this->log->warning(
                     sprintf(
                         'JWT "%s" claim should match this instance\'s FQDN: ignoring for now, but this will be rejected in the future',
@@ -76,7 +96,7 @@ abstract class InstanceIssued extends Base
         if (trim($username) === '') {
             throw new Exception\InvalidIdentity(sprintf('JWT "%s" claim must not be empty', $usernameClaim));
         }
-        return $username;
+        return (string)$username;
     }
 
     /**

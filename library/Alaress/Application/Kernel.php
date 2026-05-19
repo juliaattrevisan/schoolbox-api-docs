@@ -2127,10 +2127,11 @@ abstract class Kernel
                     $userMapper         = $mapperFactory->get(UserMapper::class);
                     $tokenMapper        = $mapperFactory->get(TokenMapper::class);
                     $relyingPartyMapper = $mapperFactory->get(RelyingPartyMapper::class);
+
                     return new JwtParser\Composite(
                         $logger,
-                        new JwtParser\OtherInstanceIssued($userMapper, $config, $logger),
-                        new JwtParser\SelfIssued($userMapper, $config, $logger, $tokenMapper),
+                        new JwtParser\OtherInstanceIssued($userMapper, $config, $logger, JwtParser\AudienceMatchMode::WARN),
+                        new JwtParser\SelfIssued($userMapper, $config, $logger, JwtParser\AudienceMatchMode::WARN, $tokenMapper),
                         new JwtParser\OauthProviderIssued($userMapper, $config, $logger, $httpClient, $oidcCache),
                         new JwtParser\InstanceRegistryIssued($userMapper, $config, $logger, (string)INSTANCE_ID),
                         new JwtParser\OauthClientHeld($userMapper, $config, $logger, $relyingPartyMapper),
