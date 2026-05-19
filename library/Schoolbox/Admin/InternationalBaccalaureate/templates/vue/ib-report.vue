@@ -18,7 +18,6 @@ import type {
     InProgressRow,
     RegisteredRow,
     SubjectEntry,
-    SubjectGroup,
     ApiStudent,
     ApiSubject,
     ApiCandidatesResponse,
@@ -114,24 +113,7 @@ async function loadCandidates(): Promise<void> {
     }
 }
 
-/**
- * Updates a student's subjects in-place across all section arrays after a language save.
- * @param studentId The registration session student ID of the updated student.
- * @param updatedSubjects The new subject group with updated language selections.
- */
-function handleStudentUpdated(studentId: number, updatedSubjects: SubjectGroup): void {
-    const arrays = [preparation.value, unconfirmed.value, confirmed.value, failed.value];
-    for (const arr of arrays) {
-        const idx = arr.findIndex((s) => s.id === studentId);
-        if (idx !== -1) {
-            arr[idx] = { ...arr[idx], subjects: updatedSubjects };
-            return;
-        }
-    }
-}
-
-updateLanguageStore.init(props.searchLanguagesEndpoint);
-updateLanguageStore.registerStudentUpdatedHandler(handleStudentUpdated);
+updateLanguageStore.init(props.searchLanguagesEndpoint, preparation, unconfirmed, confirmed, failed);
 
 window.Vue.onMounted((): void => {
     void loadCandidates();

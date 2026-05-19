@@ -1,10 +1,10 @@
 import { defineStore } from "pinia";
 import { apiRequest } from "@js/util/sbx/apiUtils";
+import type { Ref } from "vue";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 import type { StudentRow, FailedRow, SubjectGroup, SubjectEntry } from "../../js/types/ibReportTypes";
 
 type UpdatableStudent = StudentRow | FailedRow;
-type StudentUpdatedHandler = (studentId: number, updatedSubjects: SubjectGroup) => void;
 type SubjectRowEntry = {
     groupSubjectId: number;
     level: "HL" | "SL" | "Core";
@@ -30,22 +30,45 @@ export const useIbReportUpdateLanguageStore = defineStore("ibReportUpdateLanguag
     const activeStudent = window.Vue.ref<UpdatableStudent | null>(null);
     const searchLanguagesEndpoint = window.Vue.ref("");
     const subjectRows = window.Vue.ref<SubjectRowEntry[]>([]);
-    const onStudentUpdated = window.Vue.ref<StudentUpdatedHandler>(() => {});
+
+    let standardSections: Ref<StudentRow[]>[] = [];
+    let failedSection: Ref<FailedRow[]> | null = null;
 
     /**
-     * Set the search endpoint used by the modal language pickers.
+     * Set the search endpoint and register the report sections updated by this modal.
      * @param endpoint The search endpoint exposed by the page.
+     * @param preparationStudents The preparation section rows.
+     * @param unconfirmedStudents The unconfirmed section rows.
+     * @param confirmedStudents The confirmed section rows.
+     * @param failedStudents The failed section rows.
      */
-    function init(endpoint: string): void {
+    function init(
+        endpoint: string,
+        preparationStudents: Ref<StudentRow[]>,
+        unconfirmedStudents: Ref<StudentRow[]>,
+        confirmedStudents: Ref<StudentRow[]>,
+        failedStudents: Ref<FailedRow[]>,
+    ): void {
         searchLanguagesEndpoint.value = endpoint;
+        standardSections = [preparationStudents, unconfirmedStudents, confirmedStudents];
+        failedSection = failedStudents;
     }
 
     /**
-     * Register the callback used to patch report data after a successful save.
-     * @param callback The report-level update handler.
+     * Updates a student's subjects in-place across all registered report sections.
+     * @param studentId The registration session student ID of the updated student.
+     * @param updatedSubjects The new subject group with updated language selections.
      */
-    function registerStudentUpdatedHandler(callback: StudentUpdatedHandler): void {
-        onStudentUpdated.value = callback;
+    function handleStudentUpdated(studentId: number, updatedSubjects: SubjectGroup): void {
+        const sections = failedSection === null ? [...standardSections] : [...standardSections, failedSection];
+
+        for (const section of sections) {
+            const index = section.value.findIndex((student) => student.id === studentId);
+            if (index !== -1) {
+                section.value[index] = { ...section.value[index], subjects: updatedSubjects };
+                return;
+            }
+        }
     }
 
     /**
@@ -179,7 +202,7 @@ export const useIbReportUpdateLanguageStore = defineStore("ibReportUpdateLanguag
                 student.subjects.hl.length + student.subjects.sl.length,
             );
 
-            onStudentUpdated.value(student.id, {
+            handleStudentUpdated(student.id, {
                 hl: updatedHl,
                 sl: updatedSl,
                 core: updatedCore,
@@ -204,7 +227,6 @@ export const useIbReportUpdateLanguageStore = defineStore("ibReportUpdateLanguag
         searchLanguagesEndpoint,
         subjectRows,
         init,
-        registerStudentUpdatedHandler,
         prompt,
         close,
         save,
