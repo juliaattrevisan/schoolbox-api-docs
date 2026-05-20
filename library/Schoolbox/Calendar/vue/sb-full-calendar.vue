@@ -168,11 +168,11 @@ export default {
                     text: " ",
                 },
                 customPrev: {
-                    icon: "chevron-left",
+                    text: " ",
                     click: this.clickPrev,
                 },
                 customNext: {
-                    icon: "chevron-right",
+                    text: " ",
                     click: this.clickNext,
                 },
                 customToday: {
@@ -223,14 +223,26 @@ export default {
 
         this.registerListCustomInputFields();
 
-        // Inject calendar icon. Unfortunately, fullcalendar doesn't support injecting our own icons into the custom buttons yet...
-        let quickSwitchIcon = document.createElement("sbx-icon");
-        quickSwitchIcon.setAttribute("name", "calendar");
-        quickSwitchIcon.setAttribute("aria-hidden", "true");
-        document.getElementsByClassName("fc-quickSwitchButton-button")[0].appendChild(quickSwitchIcon);
+        this.replaceButtonIcon("fc-quickSwitchButton-button", "calendar");
+        this.replaceButtonIcon("fc-customPrev-button", "previous");
+        this.replaceButtonIcon("fc-customNext-button", "next");
     },
 
     methods: {
+        replaceButtonIcon(buttonClassName, iconName) {
+            const button = document.getElementsByClassName(buttonClassName)[0];
+            if (!button) {
+                return;
+            }
+
+            button.replaceChildren();
+
+            const icon = document.createElement("sbx-icon");
+            icon.setAttribute("name", iconName);
+            icon.setAttribute("aria-hidden", "true");
+            button.appendChild(icon);
+        },
+
         /**
          * Open the export modal.
          */
