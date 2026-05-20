@@ -162,26 +162,31 @@ class Mapper extends BaseMapper
     /**
      * This will HARD-DELETE all previously given marks with the feedback.
      *
-     * @param int $returnId
+     * @param int $feedbackId
+     * @param \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance
+     * @param string $feedbackTable
      * @return int
      */
-    public function deleteFeedbackMarks($returnId): int
+    public function deleteFeedbackMarks(int $feedbackId, \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance, string $feedbackTable): int
     {
-        /* TODO replace with an iteration through all grids associated with a feedback
-         *  -- or, supply a particular rubric instance identifier to operate on instead.
-         *  I can't really tell how we'll end up (re)using this method atm
+        /* Removes all indicator marks associated with a particular feedback, across all rubric grids/instances.
+         * Note the polymorphic (feedback_id, feedback_table) usage here.
          */
         $query = "
             DELETE     rim
-            FROM       rubric_indicator_mark rim
+            FROM       {$this->getTable()} rim
             INNER JOIN rubric_capability_mark rcm on rim.rubric_capability_mark_id = rcm.id
-            WHERE      rcm.return_id = :return_id;
+            WHERE      rcm.feedback_id = :feedbackId
+            AND        rcm.feedback_table = :feedbackTable
+            AND        rcm.rubric_instance_id = :rubricInstanceId
         ";
 
         $statement = $this->database->prepare($query);
 
         $statement->execute([
-            'return_id' => $returnId,
+            'feedbackId' => $feedbackId,
+            'feedbackTable' => $feedbackTable,
+            'rubricInstanceId' => $rubricInstance->getId(),
         ]);
 
         return $statement->rowCount();

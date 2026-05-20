@@ -125,16 +125,29 @@ class Mapper extends BaseMapper
     /**
      * This will HARD-DELETE all previously given marks with the feedback.
      *
-     * @param int $returnId
+     * @param int $feedbackId
+     * @param \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance
+     * @param string $feedbackTable
      * @return int
      */
-    public function deleteFeedbackMarks(int $returnId): int
+    public function deleteFeedbackMarks(int $feedbackId, \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance, string $feedbackTable): int
     {
-        $query = "DELETE FROM rubric_capability_mark WHERE return_id = :return_id";
+        /* Removes all capability marks associated with a particular feedback, across all rubric grids/instances.
+         * Note the polymorphic (feedback_id, feedback_table) usage here.
+         */
+        $query = "
+            DELETE FROM {$this->getTable()} rcm
+            WHERE rcm.feedback_id = :feedbackId
+            AND rcm.feedback_table = :feedbackTable
+            AND rcm.rubric_instance_id = :rubricInstanceId
+        ";
 
         $statement = $this->database->prepare($query);
+
         $statement->execute([
-            'return_id' => $returnId,
+            'feedbackId' => $feedbackId,
+            'feedbackTable' => $feedbackTable,
+            'rubricInstanceId' => $rubricInstance->getId(),
         ]);
 
         return $statement->rowCount();
