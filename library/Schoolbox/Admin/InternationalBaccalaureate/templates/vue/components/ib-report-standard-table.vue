@@ -35,6 +35,9 @@ async function renotifyStudent(student: StudentRow): Promise<void> {
         const response = await apiRequest<unknown>({
             url: student.renotifyEndpoint,
             method: "POST",
+            body: {
+                studentIds: [student.id],
+            },
         });
 
         if (!response.success) {

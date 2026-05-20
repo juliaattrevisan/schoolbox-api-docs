@@ -171,7 +171,7 @@ class ControllerTest extends TestCase
         $payload = json_decode((string) $response->getBody(), true);
         $this->assertIsArray($payload);
         $this->assertSame(
-            '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/123/renotify',
+            '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/renotify',
             $payload['students'][RegistrationSessionStudentModel::STATUS_UNCONFIRMED][0]['_routes']['renotify']
         );
     }
@@ -190,12 +190,12 @@ class ControllerTest extends TestCase
         $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
         $registrationSessionStudentMapper
             ->expects($this->once())
-            ->method('findOneByColumnList')
+            ->method('findByColumnList')
             ->with([
-                'user_id' => 234,
+                'user_id' => [234],
                 'registration_session_id' => 12,
             ])
-            ->willReturn($registrationSessionStudent);
+            ->willReturn(new Collection([$registrationSessionStudent]));
         $registrationSessionStudentMapper
             ->expects($this->once())
             ->method('propagate')
@@ -216,8 +216,11 @@ class ControllerTest extends TestCase
             $registrationSessionStudentMapper,
             $this->createStub(\External_UserInterface::class)
         );
+        $controller->setRequestPost(new Values([
+            'studentIds' => [234],
+        ]));
 
-        $controller->renotifyUnconfirmed(12, 234);
+        $controller->renotifyUnconfirmed(12);
 
         $response = $controller->getResponse();
         $this->assertNotNull($response);
@@ -225,7 +228,9 @@ class ControllerTest extends TestCase
 
         $payload = json_decode((string) $response->getBody(), true);
         $this->assertTrue($payload['success']);
-        $this->assertSame('Student renotified.', $payload['message']);
+        $this->assertSame('Student(s) renotified.', $payload['message']);
+        $this->assertSame([234], $payload['renotified']);
+        $this->assertSame([], $payload['failed']);
     }
 
     public function testSessionCompletePreparationTransitionsSelectedPreparationStudents(): void
@@ -344,17 +349,17 @@ class ControllerTest extends TestCase
         $this->assertSame('Student IDs are required.', $payload['title']);
     }
 
-    public function testRenotifyUnconfirmedReturns404WhenCandidateCannotBeFound(): void
+    public function testRenotifyUnconfirmedReportsMissingCandidate(): void
     {
         $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
         $registrationSessionStudentMapper
             ->expects($this->once())
-            ->method('findOneByColumnList')
+            ->method('findByColumnList')
             ->with([
-                'user_id' => 234,
+                'user_id' => [234],
                 'registration_session_id' => 12,
             ])
-            ->willThrowException(new \Schoolbox\Mapper\Exception\NotFound());
+            ->willReturn(new Collection());
         $registrationSessionStudentMapper
             ->expects($this->never())
             ->method('save');
@@ -367,32 +372,42 @@ class ControllerTest extends TestCase
             $registrationSessionStudentMapper,
             $this->createStub(\External_UserInterface::class)
         );
+        $controller->setRequestPost(new Values([
+            'studentIds' => [234],
+        ]));
 
-        $controller->renotifyUnconfirmed(12, 234);
+        $controller->renotifyUnconfirmed(12);
 
         $response = $controller->getResponse();
         $this->assertNotNull($response);
-        $this->assertSame(404, $response->getStatusCode());
+        $this->assertSame(200, $response->getStatusCode());
 
         $payload = json_decode((string) $response->getBody(), true);
         $this->assertFalse($payload['success']);
-        $this->assertSame('Candidate not found for this user in the registration session.', $payload['message']);
+        $this->assertSame('No students were renotified.', $payload['message']);
+        $this->assertSame([], $payload['renotified']);
+        $this->assertSame([
+            [
+                'studentId' => 234,
+                'message' => 'Candidate not found for this user in the registration session.',
+            ],
+        ], $payload['failed']);
     }
 
-    public function testRenotifyUnconfirmedReturns409WhenCandidateIsNotUnconfirmed(): void
+    public function testRenotifyUnconfirmedReportsCandidateThatIsNotUnconfirmed(): void
     {
         $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
         $registrationSessionStudentMapper
             ->expects($this->once())
-            ->method('findOneByColumnList')
-            ->willReturn($this->buildStudent(
+            ->method('findByColumnList')
+            ->willReturn(new Collection([$this->buildStudent(
                 456,
                 234,
                 RegistrationSessionStudentModel::STATUS_CONFIRMED,
                 'Sam',
                 'Patel',
                 'S234'
-            ));
+            )]));
         $registrationSessionStudentMapper
             ->expects($this->never())
             ->method('save');
@@ -405,16 +420,26 @@ class ControllerTest extends TestCase
             $registrationSessionStudentMapper,
             $this->createStub(\External_UserInterface::class)
         );
+        $controller->setRequestPost(new Values([
+            'studentIds' => [234],
+        ]));
 
-        $controller->renotifyUnconfirmed(12, 234);
+        $controller->renotifyUnconfirmed(12);
 
         $response = $controller->getResponse();
         $this->assertNotNull($response);
-        $this->assertSame(409, $response->getStatusCode());
+        $this->assertSame(200, $response->getStatusCode());
 
         $payload = json_decode((string) $response->getBody(), true);
         $this->assertFalse($payload['success']);
-        $this->assertSame('Candidate is not awaiting confirmation.', $payload['message']);
+        $this->assertSame('No students were renotified.', $payload['message']);
+        $this->assertSame([], $payload['renotified']);
+        $this->assertSame([
+            [
+                'studentId' => 234,
+                'message' => 'Candidate is not awaiting confirmation.',
+            ],
+        ], $payload['failed']);
     }
 
     public function testSessionCompletePreparationRejectsStudentThatCannotBeFound(): void
@@ -1191,9 +1216,8 @@ class ControllerTest extends TestCase
 
                 if ($route === 'internationalBaccalaureate.renotifyUnconfirmed') {
                     return sprintf(
-                        '/adminv2/international-baccalaureate/registrations/sessions/%d/candidates/%d/renotify',
-                        $params['sessionId'],
-                        $params['studentId']
+                        '/adminv2/international-baccalaureate/registrations/sessions/%d/candidates/renotify',
+                        $params['sessionId']
                     );
                 }
 

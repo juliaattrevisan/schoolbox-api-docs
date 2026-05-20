@@ -128,7 +128,6 @@ class ModelToArray
             'internationalBaccalaureate.renotifyUnconfirmed',
             [
                 'sessionId' => $sessionId,
-                'studentId' => $studentId,
             ]
         );
     }

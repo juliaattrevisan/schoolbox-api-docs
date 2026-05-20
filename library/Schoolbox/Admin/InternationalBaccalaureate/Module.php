@@ -92,7 +92,7 @@ class Module extends BaseModule
 
         /* Notifications
          */
-        $this->register('POST', '/registrations/sessions/{sessionId:\\d+}/candidates/{studentId:\\d+}/renotify', 'renotifyUnconfirmed', $ruleIBCoordinatorAccess);
+        $this->register('POST', '/registrations/sessions/{sessionId:\\d+}/candidates/renotify', 'renotifyUnconfirmed', $ruleIBCoordinatorAccess);
     }
 
     /**

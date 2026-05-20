@@ -1266,50 +1266,106 @@ class Controller extends ConfigController
     /**
      * Re-send the unconfirmed registration details notification to a student.
      *
-     * @api POST /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/candidates/{studentId}/renotify
+     * @api POST /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/candidates/renotify
      */
-    public function renotifyUnconfirmed(int $sessionId, int $studentId): void
+    public function renotifyUnconfirmed(int $sessionId): void
     {
+        $post = $this->requestPost;
+        $studentIds = $post->get('studentIds');
+
+        if (!is_array($studentIds)) {
+            $this->sendJsonError('Invalid request data', 400);
+            return;
+        }
+
+        $studentIds = array_values(array_unique(array_filter(
+            array_map('intval', $studentIds),
+            static fn(int $studentId): bool => $studentId > 0
+        )));
+
+        if ($studentIds === []) {
+            $this->sendJsonError('Invalid request data', 400);
+            return;
+        }
+
         try {
-            $registrationSessionStudent = $this->registrationSessionStudentMapper->findOneByColumnList([
-                'user_id' => $studentId,
+            $registrationSessionStudents = $this->registrationSessionStudentMapper->findByColumnList([
+                'user_id' => $studentIds,
                 'registration_session_id' => $sessionId,
             ]);
+            $registrationSessionStudentsByUserId = [];
 
-            if ($registrationSessionStudent->getStatus() !== RegistrationSessionStudentModel::STATUS_UNCONFIRMED) {
-                $this->response = $this->responseAsJson([
-                    'success' => false,
-                    'message' => 'Candidate is not awaiting confirmation.',
-                ])->withStatus(409);
-                return;
+            foreach ($registrationSessionStudents as $registrationSessionStudent) {
+                if (!$registrationSessionStudent instanceof RegistrationSessionStudentModel) {
+                    continue;
+                }
+
+                $userId = $registrationSessionStudent->getUser()?->getId();
+
+                if ($userId !== null) {
+                    $registrationSessionStudentsByUserId[$userId] = $registrationSessionStudent;
+                }
             }
 
-            $this->registrationSessionStudentMapper->propagate(
-                $this->getUser(),
-                BaseMapper::METHOD_UPDATE,
-                $registrationSessionStudent,
-                [
-                    'status' => [
-                        RegistrationSessionStudentModel::STATUS_UNCONFIRMED,
-                        RegistrationSessionStudentModel::STATUS_PREPARATION,
-                    ],
-                ]
-            );
+            $renotified = [];
+            $failed = [];
+            $registrationSessionStudentsToRenotify = [];
+
+            foreach ($studentIds as $studentId) {
+                $registrationSessionStudent = $registrationSessionStudentsByUserId[$studentId] ?? null;
+
+                if (!$registrationSessionStudent instanceof RegistrationSessionStudentModel) {
+                    $failed[] = [
+                        'studentId' => $studentId,
+                        'message' => 'Candidate not found for this user in the registration session.',
+                    ];
+                    continue;
+                }
+
+                if ($registrationSessionStudent->getStatus() !== RegistrationSessionStudentModel::STATUS_UNCONFIRMED) {
+                    $failed[] = [
+                        'studentId' => $studentId,
+                        'message' => 'Candidate is not awaiting confirmation.',
+                    ];
+                    continue;
+                }
+
+                $renotified[] = $studentId;
+                $registrationSessionStudentsToRenotify[] = $registrationSessionStudent;
+            }
+
+            if ($registrationSessionStudentsToRenotify !== []) {
+                foreach ($registrationSessionStudentsToRenotify as $registrationSessionStudent) {
+                    $this->registrationSessionStudentMapper->propagate(
+                        $this->getUser(),
+                        BaseMapper::METHOD_UPDATE,
+                        $registrationSessionStudent,
+                        [
+                            'status' => [
+                                RegistrationSessionStudentModel::STATUS_UNCONFIRMED,
+                                RegistrationSessionStudentModel::STATUS_PREPARATION,
+                            ],
+                        ]
+                    );
+                }
+            }
+
+            $message = match (true) {
+                $failed !== [] && $renotified !== [] => 'Some students could not be renotified.',
+                $failed !== [] => 'No students were renotified.',
+                default => 'Student(s) renotified.',
+            };
 
             $this->response = $this->responseAsJson([
-                'success' => true,
-                'message' => 'Student renotified.',
+                'success' => $failed === [],
+                'message' => $message,
+                'renotified' => $renotified,
+                'failed' => $failed,
             ]);
         } catch (MapperNotFound) {
-            $this->response = $this->responseAsJson([
-                'success' => false,
-                'message' => 'Candidate not found for this user in the registration session.',
-            ])->withStatus(404);
+            $this->sendJsonError('Candidate not found for this user in the registration session.', 404);
         } catch (Exception) {
-            $this->response = $this->responseAsJson([
-                'success' => false,
-                'message' => 'Something has gone wrong. Please try again later.',
-            ])->withStatus(500);
+            $this->sendJsonError('Something has gone wrong. Please try again later.', 500);
         }
     }
 }
