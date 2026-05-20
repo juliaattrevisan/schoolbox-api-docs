@@ -114,12 +114,12 @@ class Cms extends Base
      */
     protected function deleteChunk(array $chunk): bool
     {
-        $requestedFolderIds = $this->normalizeIds(array_column($chunk, 'id'));
+        $folderIdsToDelete = $this->normalizeIds(array_column($chunk, 'id'));
 
         // log the ID's we are wanting to delete, before we start checking how valid they are
         $this->log->debug(sprintf(
             "Processing Resources (CMS) chunk with folder IDs: %s",
-            implode(', ', $requestedFolderIds),
+            implode(', ', $folderIdsToDelete),
         ));
 
         /**
@@ -127,7 +127,6 @@ class Cms extends Base
          * folders with no children. Treat this chunk as the complete delete set
          * for this pass instead of expanding ids into a folder tree.
          */
-        $folderIdsToDelete = $requestedFolderIds;
         $blockedFolderIds = $this->findBlockedFolderIds($folderIdsToDelete);
 
         if ($blockedFolderIds !== []) {
