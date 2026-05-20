@@ -68,7 +68,7 @@ class OauthProviderIssuedTest extends TestCase
         yield 'no issuer configured, issuer in JWT' => [
             $defaultConfigurationClientId,
             $defaultJwtAudience + [IParser::CLAIM_ISS => 'vagrant.dev.schoolbox.cloud'],
-            true,
+            false,
         ];
         yield 'issuer configured, no issuer in JWT' => [
             $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => 'vagrant.dev.schoolbox.cloud'],
@@ -105,7 +105,7 @@ class OauthProviderIssuedTest extends TestCase
         yield 'null issuer configured, issuer in JWT' => [
             $defaultConfigurationClientId,
             $defaultJwtAudience + [IParser::CLAIM_ISS => 'vagrant.dev.schoolbox.cloud'],
-            true,
+            false,
         ];
 
         // non-string issuer configured: cast to string
@@ -134,7 +134,7 @@ class OauthProviderIssuedTest extends TestCase
         yield 'no issuer configured, non-string issuer in JWT' => [
             $defaultConfigurationClientId,
             $defaultJwtAudience + [IParser::CLAIM_ISS => 1],
-            true,
+            false,
         ];
         yield 'issuer configured, semi-matching non-string issuer in JWT' => [
             $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => '1'],
