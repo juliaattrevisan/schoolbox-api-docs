@@ -29,24 +29,6 @@ class Cms extends Base
     private ?EtherpadClient $etherpadClient = null;
 
     /**
-     * Remember every folder seen during branch expansion so descendant roots in
-     * the chunks do not expand their subtree again. The branch expansion
-     * performs recursive child lookups and active-folder safety checks, so
-     * repeating it for already-seen descendants is unnecessary database work.
-     *
-     * @var array<int, bool>
-     */
-    private array $classifiedFolderIds = [];
-
-    /**
-     * Keep the skip warnings for classified folders so later chunks can still
-     * explain why a descendant root is ignored without re-expanding the same tree.
-     *
-     * @var array<int, array<int, string>>
-     */
-    private array $classifiedFolderSkipWarnings = [];
-
-    /**
      * @inheritDoc
      */
     public function getRetentionLabel(): string
@@ -94,9 +76,12 @@ class Cms extends Base
     }
 
     /**
-     * Load soft-deleted CMS folder ids that are old enough and safe to hard-delete.
+     * Load soft-deleted CMS leaf folder ids that are old enough to hard-delete.
      *
-     * A retained folder is not safe while it still has children.
+     * Parent folders are deliberately excluded while any child folder still
+     * exists. This makes retention leaf-first across runs: children are purged in
+     * earlier chunks, and parents become eligible only after the tree below them
+     * has gone.
      *
      * @return array<int, array{id: int|string}>
      */
@@ -138,71 +123,21 @@ class Cms extends Base
         ));
 
         /**
-         * Retention chunks can contain overlapping folder roots, such as a deleted
-         * parent and one of its deleted descendants. Keep the delete plan keyed by
-         * folder id so an accepted descendant is not duplicated, and so a later
-         * blocked relation can remove that folder without disturbing unrelated
-         * folders that were accepted from the same branch.
+         * The candidate query already enforces leaf-first deletion by returning
+         * folders with no children. Treat this chunk as the complete delete set
+         * for this pass instead of expanding ids into a folder tree.
          */
-        $folderIdsToDelete = [];
+        $folderIdsToDelete = $requestedFolderIds;
+        $blockedFolderIds = $this->findBlockedFolderIds($folderIdsToDelete);
 
+        if ($blockedFolderIds !== []) {
+            $this->log->warning(sprintf(
+                "Excluding blocked Resources (CMS) folders from chunk due to excluded assessment/course relations: %s",
+                implode(', ', $blockedFolderIds),
+            ));
 
-        /**
-         * Expand each previously unseen branch once, then classify every folder in
-         * that expanded branch as deletable or blocked. Assessment/course-blocked
-         * folders are outside CMS retention ownership, and non-deleted descendants
-         * are still visible content. If either exists anywhere in the expanded
-         * branch, the root branch is skipped atomically so retained folders cannot
-         * be orphaned by deleting their parent folders first.
-         *
-         * expandFolderCascade() also returns folders that were inspected but are
-         * not safe to delete. Caching those inspected folders prevents a descendant
-         * candidate from being retried after an ancestor branch was rejected for
-         * active content, which would otherwise allow partial deletion of a tree
-         * that has already failed the CMS retention safety checks.
-         */
-        foreach ($requestedFolderIds as $branchStart) {
-            if (isset($this->classifiedFolderIds[$branchStart])) {
-                foreach ($this->classifiedFolderSkipWarnings[$branchStart] ?? [] as $warning) {
-                    $this->log->warning($warning);
-                }
-
-                continue;
-            }
-
-            $branch = $this->expandFolderCascade($branchStart);
-            $deletableBranchFolderIds = $branch['folderIds'];
-            $blockedFolderIds = $this->findBlockedFolderIds($deletableBranchFolderIds);
-
-            if (!empty($blockedFolderIds)) {
-                $this->log->warning(sprintf(
-                    "Excluding folder '%s' blocked Resources (CMS) folders from chunk due to excluded assessment/course relations: %s",
-                    $branchStart,
-                    implode(', ', $blockedFolderIds),
-                ));
-            }
-
-            foreach ($branch['seenFolderIds'] as $folderId) {
-                $this->classifiedFolderIds[$folderId] = true;
-            }
-            $this->recordClassifiedFolderSkipWarnings($branch['skipWarnings']);
-
-            /**
-             * A blocked folder means its branch must remain intact for this run.
-             * Active descendants are handled the same way inside expandFolderCascade().
-             * This avoids deleting parents or descendants around retained data,
-             * especially because folder.parent is not foreign-key enforced and
-             * cannot protect retained children from pointing at deleted parents.
-             */
-            if ($blockedFolderIds !== []) {
-                continue;
-            }
-
-            foreach ($deletableBranchFolderIds as $folderId) {
-                $folderIdsToDelete[$folderId] = $folderId;
-            }
+            $folderIdsToDelete = array_values(array_diff($folderIdsToDelete, $blockedFolderIds));
         }
-        $folderIdsToDelete = array_values($folderIdsToDelete);
 
         // if folder cache is still empty then the chunk is empty return early (not deleting anything)
         if ($folderIdsToDelete === []) {
@@ -428,254 +363,6 @@ class Cms extends Base
 
     //---------------
     // end helper functions
-
-    // ---------------
-    // start tree functions
-
-    /**
-     * Expand one retained root folder to a leaf-first hard-delete order.
-     *
-     * Only soft-deleted descendants are followed. Active descendants must stay
-     * out of the purge set so CMS retention cannot hard-delete visible child
-     * folders by cascading through a retained parent.
-     *
-     * The return separates folders that can be deleted from folders that were
-     * seen while making that decision. deleteChunk() needs both sets: folderIds
-     * drives the destructive cleanup, while seenFolderIds prevents later chunk
-     * candidates inside a rejected or already-expanded branch from being queried
-     * and classified again.
-     *
-     * @param int $rootFolderId
-     * @return array{
-     *     folderIds: array<int, int>,
-     *     seenFolderIds: array<int, int>,
-     *     skipWarnings: array<int, array<int, string>>
-     * }
-     */
-    protected function expandFolderCascade(int $rootFolderId): array
-    {
-        $this->log->debug(sprintf(
-            "Expanding Resources (CMS) folder cascade for root folder %s",
-            $rootFolderId,
-        ));
-        $pending = [
-            ['id' => $rootFolderId, 'expanded' => false],
-        ];
-        $visited = [];
-        $deletableFolderIds = [];
-        $seenFolderIds = [];
-        $skipWarnings = [];
-
-        while ($pending !== []) {
-            ['id' => $folderId, 'expanded' => $expanded] = array_pop($pending);
-
-            if ($expanded) {
-                $deletableFolderIds[] = $folderId;
-                continue;
-            }
-
-            if (isset($visited[$folderId])) {
-                continue;
-            }
-
-            $visited[$folderId] = true;
-            $seenFolderIds[$folderId] = $folderId;
-
-            $activeDescendantFolderIds = $this->findActiveChildFolderIds([$folderId]);
-            if ($activeDescendantFolderIds !== []) {
-                $softDeletedChildFolderIds = $this->findSoftDeletedChildFolderIds([$folderId]);
-
-                /**
-                 * A folder with active descendants rejects its whole branch for
-                 * this chunk. The active ids explain why the branch was rejected;
-                 * the soft-deleted child ids are also marked as seen so they are
-                 * not later deleted as independent roots from the same chunk.
-                 */
-                foreach ($activeDescendantFolderIds as $activeDescendantFolderId) {
-                    $seenFolderIds[$activeDescendantFolderId] = $activeDescendantFolderId;
-                    $warning = sprintf(
-                        "Skipping deletion of folder %s because it has active child folder %s",
-                        $folderId,
-                        $activeDescendantFolderId,
-                    );
-                    $skipWarnings[$folderId][] = $warning;
-                    $this->log->warning($warning);
-                }
-
-                foreach ($softDeletedChildFolderIds as $childFolderId) {
-                    $seenFolderIds[$childFolderId] = $childFolderId;
-                    foreach ($this->findActiveChildFolderIds([$childFolderId]) as $activeDescendantFolderId) {
-                        $warning = sprintf(
-                            "Skipping deletion of folder %s because it has active child folder %s",
-                            $childFolderId,
-                            $activeDescendantFolderId,
-                        );
-                        $skipWarnings[$childFolderId][] = $warning;
-                        $this->log->warning($warning);
-                    }
-                }
-
-                continue;
-            }
-
-            // Re-queue the folder after its eligible children so parents are deleted last.
-            $pending[] = ['id' => $folderId, 'expanded' => true];
-
-            $childFolderIds = array_reverse($this->findSoftDeletedChildFolderIds([$folderId]));
-            foreach ($childFolderIds as $childFolderId) {
-                $seenFolderIds[$childFolderId] = $childFolderId;
-                if (!isset($visited[$childFolderId])) {
-                    $pending[] = ['id' => $childFolderId, 'expanded' => false];
-                }
-            }
-        }
-
-        return [
-            'folderIds' => array_values($deletableFolderIds),
-            'seenFolderIds' => array_values($seenFolderIds),
-            'skipWarnings' => $skipWarnings,
-        ];
-    }
-
-    /**
-     * Remember skip warnings against the folder each warning describes.
-     *
-     * Classification is shared across chunks, but operators still need the
-     * original reason when a later chunk starts from a cached descendant. Keeping
-     * the warnings keyed by described folder avoids replaying unrelated ancestor
-     * warnings for a descendant chunk.
-     *
-     * @param array<int, array<int, string>> $warnings
-     * @return void
-     */
-    private function recordClassifiedFolderSkipWarnings(array $warnings): void
-    {
-        foreach ($warnings as $folderId => $folderWarnings) {
-            foreach ($folderWarnings as $warning) {
-                $this->classifiedFolderSkipWarnings[$folderId][] = $warning;
-            }
-        }
-    }
-
-
-    /**
-     * Find every direct child folder for callers that need the actual tree.
-     *
-     * This deliberately does not filter by deletion state. Some safety checks
-     * need to know whether active children exist, while the hard-delete cascade
-     * uses self::findSoftDeletedChildFolderIds() to avoid deleting those active
-     * children.
-     *
-     * @see self::findSoftDeletedChildFolderIds()
-     * @param array<int, int> $parentIds
-     * @return array<int, int>
-     */
-    protected function findChildFolderIds(array $parentIds): array
-    {
-        if ($parentIds === []) {
-            return [];
-        }
-
-        $placeholders = Builder::getArrayPlaceholders($parentIds, 'parent');
-        $statement = $this->getPreparedStatement(
-            "SELECT id FROM " . self::TABLE_FOLDER . " WHERE parent IN {$placeholders}"
-        );
-        $statement->execute(Builder::getArrayParameters($parentIds, 'parent'));
-
-        return array_map(
-            static fn(array $row): int => (int) $row['id'],
-            $statement->fetchAll(\PDO::FETCH_ASSOC),
-        );
-    }
-
-    /**
-     * Find only child folders that have already been soft-deleted.
-     *
-     * CMS retention must be bottom-up: active children are still valid content,
-     * so they must not be pulled into a hard-delete just because an ancestor is
-     * past retention. This helper is the boundary that enforces that rule during
-     * cascade expansion.
-     *
-     * @param array<int, int> $parentIds
-     * @return array<int, int>
-     */
-    protected function findSoftDeletedChildFolderIds(array $parentIds): array
-    {
-        if ($parentIds === []) {
-            return [];
-        }
-
-        $pending = $this->normalizeIds($parentIds);
-        $visited = [];
-        $softDeletedFolderIds = [];
-
-        while ($pending !== []) {
-            $placeholders = Builder::getArrayPlaceholders($pending, 'parent');
-            $statement = $this->getPreparedStatement(
-                "SELECT id FROM " . self::TABLE_FOLDER . " WHERE parent IN {$placeholders} AND deleted_at IS NOT NULL"
-            );
-            $statement->execute(Builder::getArrayParameters($pending, 'parent'));
-
-            $pending = [];
-            foreach ($statement->fetchAll(\PDO::FETCH_ASSOC) as $row) {
-                $folderId = (int)$row['id'];
-                if (isset($visited[$folderId])) {
-                    continue;
-                }
-
-                $visited[$folderId] = true;
-                $softDeletedFolderIds[$folderId] = $folderId;
-                $pending[] = $folderId;
-            }
-        }
-
-        return array_values($softDeletedFolderIds);
-    }
-
-    /**
-     * Find only active (non-deleted) descendant folders.
-     *
-     * This helper allows cascade expansion to reject any parent that still has
-     * visible child folders anywhere in its descendant tree.
-     *
-     * @param array<int, int> $parentIds
-     * @return array<int, int>
-     */
-    protected function findActiveChildFolderIds(array $parentIds): array
-    {
-        if ($parentIds === []) {
-            return [];
-        }
-
-        $pending = $this->normalizeIds($parentIds);
-        $visited = [];
-        $activeFolderIds = [];
-
-        while ($pending !== []) {
-            $placeholders = Builder::getArrayPlaceholders($pending, 'parent');
-            $statement = $this->getPreparedStatement(
-                "SELECT id, deleted_at FROM " . self::TABLE_FOLDER . " WHERE parent IN {$placeholders}"
-            );
-            $statement->execute(Builder::getArrayParameters($pending, 'parent'));
-
-            $pending = [];
-            foreach ($statement->fetchAll(\PDO::FETCH_ASSOC) as $row) {
-                $folderId = (int)$row['id'];
-                if (isset($visited[$folderId])) {
-                    continue;
-                }
-
-                $visited[$folderId] = true;
-                $pending[] = $folderId;
-
-                if ($row['deleted_at'] === null) {
-                    $activeFolderIds[$folderId] = $folderId;
-                }
-            }
-        }
-
-        return array_values($activeFolderIds);
-    }
 
     /**
      * Find folders that belong to out-of-scope assessment/course relationships.

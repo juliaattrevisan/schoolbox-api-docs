@@ -165,43 +165,6 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
-             * Expose current cascade behaviour so the leaf-first contract test goes red.
-             *
-             * The desired implementation will stop calling this hook from
-             * deleteChunk(). Until then, returning descendants from the in-memory
-             * graph proves the current strategy still expands supplied ids into a
-             * wider delete set.
-             *
-             * @param array<int, int> $parentIds
-             * @return array<int, int>
-             */
-            protected function findSoftDeletedChildFolderIds(array $parentIds): array
-            {
-                $visited = [];
-                $folderIds = [];
-                $pending = $parentIds;
-
-                while ($pending !== []) {
-                    $nextPending = [];
-                    foreach ($pending as $parentId) {
-                        foreach ($this->folderChildren[$parentId] ?? [] as $childId) {
-                            if (isset($visited[$childId])) {
-                                continue;
-                            }
-
-                            $visited[$childId] = true;
-                            $folderIds[$childId] = $childId;
-                            $nextPending[] = $childId;
-                        }
-                    }
-
-                    $pending = $nextPending;
-                }
-
-                return array_values($folderIds);
-            }
-
-            /**
              * Simulate excluded assessment/course relations without real FK tables.
              *
              * The production strategy skips chunks that still belong to out-of-scope
