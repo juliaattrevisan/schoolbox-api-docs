@@ -26,10 +26,15 @@ use Schoolbox\Curriculum\Node;
 
 interface IAssessable extends ISoftDeletable
 {
+    // Note these must match the enum values on the mark_visibility fields of various database tables:
+    //  * submission_box.mark_visibility
+    //  * project.mark_visibility
+    //  * assess.mark_visibility
+    //  * lti_assessment.mark_visibility
     public const string MARK_VISIBILITY_PRIVATE        = 'staffOnly';
     public const string MARK_VISIBILITY_STUDENT        = 'staffAndStudent';
     public const string MARK_VISIBILITY_PARENT         = 'staffAndParent';
-    public const string MARK_VISIBILITY_PARENT_STUDENT = 'staffAndParentAndStudent';
+    public const string MARK_VISIBILITY_PARENT_STUDENT = 'staffStudentAndParent';
 
     // Human-readable versions of the above consts (for use in the UI).
     public const string MARK_VISIBILITY_PRIVATE_STRING        = 'Staff Only';
