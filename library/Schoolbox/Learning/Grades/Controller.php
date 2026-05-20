@@ -20,6 +20,7 @@ use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Model;
 use Schoolbox\Collection;
+use Schoolbox\External\User as ExternalUser;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
@@ -75,6 +76,7 @@ class Controller extends Base
         private AssessmentFilters\IdFinder $assessmentIdFinder,
         private Filter\IFactoryFactory $filterFactoryFactory,
         private WorkType\Mapper $workTypeMapper,
+        private ExternalUser $externalUser,
     ) {
     }
 
@@ -165,12 +167,19 @@ class Controller extends Base
             $markSchemeFactory
         );
 
-        [$folders, $markbooks, $assessments] = $gradeHelper->generateGrades($this->getUser(), $viewee, $term);
+        $viewContext = (new ViewContextFactory($this->externalUser))->create(
+            $this->getUser(),
+            $viewee,
+            $this->requestQuery->get('viewMode')
+        );
+        $effectiveViewer = $viewContext->getViewer();
+
+        [$folders, $markbooks, $assessments] = $gradeHelper->generateGrades($effectiveViewer, $viewee, $term);
 
         $filteredWorkTypes = WorkType\Mapper::getInstance()->findByColumn('show_on_grades_page', 1);
         $assessmentTasks   = (
             ($filteredWorkTypes->count() > 0) ?
-            $gradeHelper->filterAssessments($this->getUser(), $assessments, $filteredWorkTypes, null) :
+            $gradeHelper->filterAssessments($effectiveViewer, $assessments, $filteredWorkTypes, null) :
             new Collection()
         );
 
@@ -189,7 +198,10 @@ class Controller extends Base
             'markbooks'        => $markbooks,
             'mailHandle'       => $this->getSession()->get('mailhandle'),
             'currentUser'      => $this->getUser(),
-            'yearUrl'          => $this->getYearUrl($viewee->getId())
+            'yearUrl'          => $this->getYearUrl($viewee->getId()),
+            'viewContext'      => $viewContext,
+            'viewModeQuerySuffix' => $viewContext->getQuerySuffix(),
+            'customisationsRoute' => null,
         ], '', 'grade');
     }
 
@@ -213,11 +225,16 @@ class Controller extends Base
     public function getGradesForSubject(User $viewee, Term\Model $term, Folder\Model $subject): void
     {
         $page        = FilterPage\Model::PAGE_GRADES;
+        $viewContext = (new ViewContextFactory($this->externalUser))->create(
+            $this->getUser(),
+            $viewee,
+            $this->requestQuery->get('viewMode')
+        );
         $route       = $this->routeGenerator->generate('learningGrades.postReport', [
             'userId'    => $viewee->getId(),
             'termCode'  => $term->getCode(),
             'subjectId' => $subject->getId(),
-        ]);
+        ]) . $viewContext->getQuerySuffix();
         $request     = $this->requestQuery->getArrayCopy();
         $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $viewee, func_get_args(), $request);
 
@@ -239,10 +256,12 @@ class Controller extends Base
             ]
         ];
         $assessments = $this->findByFiltersWithParticipants($filters, $viewee, false);
-        $isInstructor       = $this->access->isInstructor($this->getUser(), $subject);
         $markSchemeFactory = new Factory($this->getConfigLoader());
-        $overallMarkScheme = $markSchemeFactory->spawnForFolder($subject, $isInstructor);
-        $markbook = new Markbook($assessments, $overallMarkScheme, $this->getUser());
+        $overallMarkScheme = $markSchemeFactory->spawnForFolder(
+            $subject,
+            $viewContext->getMode() === ViewMode::STAFF
+        );
+        $markbook = new Markbook($assessments, $overallMarkScheme, $viewContext->getViewer());
 
         /* Find the teachers of this particular subject */
         $subject->loadTeachers(true);
@@ -279,6 +298,8 @@ class Controller extends Base
                 'markbook'           => $markbook,
                 'conversation'       => $conversation,
                 'yearUrl'            => $yearUrl,
+                'viewContext'        => $viewContext,
+                'viewModeQuerySuffix' => $viewContext->getQuerySuffix(),
             ],
             "Grades for {$subject->getTitle()}",
             'grade'
@@ -302,6 +323,12 @@ class Controller extends Base
     {
         $request         = $this->requestPost->get('filter_selection') ?: [];
         $page            = FilterPage\Model::PAGE_GRADES;
+        $viewContext     = (new ViewContextFactory($this->externalUser))->create(
+            $this->getUser(),
+            $viewee,
+            $this->requestQuery->get('viewMode')
+        );
+        $effectiveViewer = $viewContext->getViewer();
 
         /* @var RosettaStone $l10n */
         $l10n = $this->getDi()->get('l10n');
@@ -338,7 +365,7 @@ class Controller extends Base
         // * students (if the config var is on, and their personal grade average setting is on)
         // We no longer show the grade graph at all if there's no comparative grades.
         $hasPermissionsAndSettings =
-            ($this->getUser()->getRole()->isStaff() || $this->access->isInstructor($this->getUser(), $subject))
+            $viewContext->getMode() === ViewMode::STAFF
             || ($viewee->getDisplayGradeGraph() && $this->isTabEnabled('graph', $subject));
         $hasDataToShow = false;
 
@@ -351,17 +378,32 @@ class Controller extends Base
         // Need to load other participants if we can see graph to get assessment mark statistics
         $assessments = $this
             ->findByFiltersWithParticipants($filters, $viewee, $hasPermissionsAndSettings)
-            ->filter(function (IAssessable $a) use ($visibility) {
-                return $visibility->isVisibleToUser($a, $this->getUser(), true);
+            ->filter(function (IAssessable $a) use ($visibility, $effectiveViewer) {
+                $viewer = $effectiveViewer;
+                if ($visibility->isVisibleToUser($a, $viewer, true)) {
+                    return true;
+                }
+                if ($viewer->getRole()->isParent() && $viewer->getChildren() !== null) {
+                    //only if the $viewer is parent should we hit the external db and grab the children
+                    foreach ($viewer->getChildren() as $child) {
+                        if ($visibility->isVisibleToUser($a, $child, true)) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
             });
 
         // Only show the "send to showcase" trophy button to teachers and students, not parents
-        $canSeeShowcaseButton = $this->getUser()->getRole()->isStaff() || $this->getUser()->getRole()->isStudent();
+        $canSeeShowcaseButton = $effectiveViewer->getRole()->isStaff() || $effectiveViewer->getRole()->isStudent();
 
         // Let markbook calculate the statistics
         $markSchemeFactory = new Factory($this->getConfigLoader());
-        $overallMarkScheme = $markSchemeFactory->spawnForFolder($subject, $this->getUser()->getRole()->isStaff());
-        $filteredMarkbook = (new Markbook($assessments, $overallMarkScheme, $this->getUser()))->sortAssessables(new AssessmentComparator($viewee));
+        $overallMarkScheme = $markSchemeFactory->spawnForFolder(
+            $subject,
+            $viewContext->getMode() === ViewMode::STAFF
+        );
+        $filteredMarkbook = (new Markbook($assessments, $overallMarkScheme, $effectiveViewer))->sortAssessables(new AssessmentComparator($viewee));
 
         /* If the config option lms_cohort_comparison is set,
          * instantiate a new CohortMarks instance
@@ -387,7 +429,7 @@ class Controller extends Base
                     $this->getConfigLoader()->get('grade_gradient_enable'),
                     $this->assessmentMapperProxy,
                     $assessments,
-                    $this->getUser(),
+                    $effectiveViewer,
                     $term,
                 ))->collate($viewee, $workTypeIds);
             } else {
@@ -405,7 +447,13 @@ class Controller extends Base
                  */
                 $workTypeIds = $this->workTypeMapper->findAll()->indexBy('id')->keys();
 
-                $graph = $gradeHelper->buildGraph($filteredMarkbook, $viewee, $this->getUser(), $this->getConfigLoader()->get('grade_gradient_enable'), $workTypeIds);
+                $graph = $gradeHelper->buildGraph(
+                    $filteredMarkbook,
+                    $viewee,
+                    $effectiveViewer,
+                    $this->getConfigLoader()->get('grade_gradient_enable'),
+                    $workTypeIds
+                );
             }
 
             // return [
@@ -440,7 +488,7 @@ class Controller extends Base
         $longitudinalRubric   = [];
         $rubricAssessmentList = [];
         if ($canSeeRubricGrade || $canSeeCapabilityGrade || $canSeeProgression) {
-            $includeComparison = $this->getUser()->getRole()->isStaff() || $viewee->getDisplayGradeGraph();
+            $includeComparison = $viewContext->getMode() === ViewMode::STAFF || $viewee->getDisplayGradeGraph();
             $longitudinalRubric   = $this->getLongitudinalRubricData($assessments, $viewee, $includeComparison, $subject);
             $rubricAssessmentList = $longitudinalRubric['assessments'] ?? [];
             unset($longitudinalRubric['assessments']);
@@ -507,7 +555,8 @@ class Controller extends Base
             }
         }
 
-        $isViewerAnInstructor = $this->access->isInstructor($this->getUser(), $subject);
+        $isViewerAnInstructor = $viewContext->getMode() === ViewMode::STAFF
+            && $this->access->isInstructor($this->getUser(), $subject);
         $tickTransitions      = [
             'incomplete'      => $isViewerAnInstructor ? 'teacherAssessed' : 'selfAssessed',
             'selfAssessed'    => $isViewerAnInstructor ? 'teacherAssessed' : 'incomplete',
@@ -518,7 +567,7 @@ class Controller extends Base
          * Only staff can view instructor marks in the grade report
          * This avoids a student gaining write+ access to a page (becoming an "instructor") then seeing the marks
          */
-        $canViewInstructorMarks = $this->getUser()->getRole()->isStaff();
+        $canViewInstructorMarks = $viewContext->canViewInstructorMarks();
 
         $this->response = $this->responseAsJson([
             'status'  => 200,
@@ -530,6 +579,7 @@ class Controller extends Base
                 'selectedTab'           => $selectedTab,
                 'canSeeShowcaseButton'  => $canSeeShowcaseButton,
                 'canViewInstructorMarks' => $canViewInstructorMarks,
+                'viewContext'           => $viewContext,
                 'graph'                 => $graph,
                 'longitudinalRubric'    => $longitudinalRubric,
                 'showRubricPoints'      => $showRubricPoints,
