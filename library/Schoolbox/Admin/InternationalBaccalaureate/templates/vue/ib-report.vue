@@ -73,6 +73,7 @@ function mapStudentRow(s: ApiStudent): StudentRow {
             core: s.ibGroupSubjects.Core.map(mapSubjectEntry),
         },
         updateLanguageEndpoint: s._routes.updateLanguages,
+        renotifyEndpoint: s._routes.renotify,
     };
 }
 

@@ -72,7 +72,7 @@ class Notifier extends AbstractModuleNotifier
             ->setSeverity(Logger::INFO)
             /* Adding meta so that it will trigger renotify
              */
-            ->setMeta(['UpdatedAt' => $model->getUpdatedAt()->getUnixTimeStamp()])
+            ->setMeta(['time' => \Alaress_Date_Format::now()->getUnixTimeStamp()])
             ->addTopic(
                 sprintf(
                     '%s.%d.%s.%d.%s',

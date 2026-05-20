@@ -50,6 +50,7 @@ class ModelToArrayTest extends TestCase
             [
                 'updateLanguages' => '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/123/languages',
                 'updateConfirmation' => '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/123/confirmation',
+                'renotify' => null,
             ],
             $payload['_routes']
         );
@@ -177,6 +178,14 @@ class ModelToArrayTest extends TestCase
                 if ($route === 'internationalBaccalaureate.updateRegistrationSessionStudentConfirmation') {
                     return sprintf(
                         '/adminv2/international-baccalaureate/registrations/sessions/%d/candidates/%d/confirmation',
+                        $params['sessionId'],
+                        $params['studentId']
+                    );
+                }
+
+                if ($route === 'internationalBaccalaureate.renotifyUnconfirmed') {
+                    return sprintf(
+                        '/adminv2/international-baccalaureate/registrations/sessions/%d/candidates/%d/renotify',
                         $params['sessionId'],
                         $params['studentId']
                     );

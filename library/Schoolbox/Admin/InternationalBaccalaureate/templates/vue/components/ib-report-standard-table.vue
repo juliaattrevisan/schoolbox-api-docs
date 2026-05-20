@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { apiRequest } from "@js/util/sbx/apiUtils";
 import IbReportSubjectLabels from "./ib-report-subject-labels.vue";
 import { useIbReportUpdateLanguageStore } from "../store/ibReportUpdateLanguageStore";
 import type { StudentRow } from "../../js/types/ibReportTypes";
@@ -8,6 +9,7 @@ interface Props {
 }
 defineProps<Props>();
 const updateLanguageStore = useIbReportUpdateLanguageStore();
+const renotifyingStudentIds = window.Vue.ref<Set<number>>(new Set());
 
 /**
  * Opens the update language modal for the given student.
@@ -15,6 +17,48 @@ const updateLanguageStore = useIbReportUpdateLanguageStore();
  */
 function openModal(student: StudentRow): void {
     updateLanguageStore.prompt(student);
+}
+
+/**
+ * Re-sends the unconfirmed details notification to the given student.
+ * @param student The student to renotify.
+ */
+async function renotifyStudent(student: StudentRow): Promise<void> {
+    if (student.renotifyEndpoint === null || renotifyingStudentIds.value.has(student.id)) {
+        return;
+    }
+
+    renotifyingStudentIds.value = new Set([...renotifyingStudentIds.value, student.id]);
+    const toast = window.sbProps.toastActivate("Renotifying student...");
+
+    try {
+        const response = await apiRequest<unknown>({
+            url: student.renotifyEndpoint,
+            method: "POST",
+        });
+
+        if (!response.success) {
+            toast.timeout({ text: response.message ?? "Failed to renotify student.", isSuccess: false });
+            return;
+        }
+
+        toast.timeout({ text: "Student renotified." });
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "Failed to renotify student.";
+        toast.timeout({ text: errorMessage, isSuccess: false });
+    } finally {
+        const nextStudentIds = new Set(renotifyingStudentIds.value);
+        nextStudentIds.delete(student.id);
+        renotifyingStudentIds.value = nextStudentIds;
+    }
+}
+
+/**
+ * Whether the student currently has an in-flight renotify request.
+ * @param student The student row.
+ */
+function isRenotifying(student: StudentRow): boolean {
+    return renotifyingStudentIds.value.has(student.id);
 }
 </script>
 
@@ -76,9 +120,12 @@ function openModal(student: StudentRow): void {
                                 Update Language Selection
                             </button>
                         </li>
-                        <!-- TODO: At the moment there's no way to distinguish the different states in vue, so needs to add condition later to restrict to unconfirmed state only    -->
-                        <li>
-                            <button class="sbx-button--has-icon">
+                        <li v-if="student.renotifyEndpoint !== null">
+                            <button
+                                class="sbx-button--has-icon"
+                                :disabled="isRenotifying(student)"
+                                @click.prevent="renotifyStudent(student)"
+                            >
                                 <sbx-icon name="notifications-hollow"></sbx-icon>
                                 Renotify student
                             </button>

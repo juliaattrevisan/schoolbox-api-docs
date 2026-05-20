@@ -32,7 +32,6 @@ class NotifierTest extends TestCase implements TriggerBundleInterface
     private const int EFFECTOR_ID = 456;
 
     private const int SESSION_ID = 2;
-    private const string UPDATED_AT = '2026-05-20 10:30:00';
 
     /** @var array<string,int|callable> */
     private array $attached = [];
@@ -127,6 +126,7 @@ class NotifierTest extends TestCase implements TriggerBundleInterface
     public function testNotifyStudentUnconfirmedTargetsStudentProfile(): void
     {
         $notifier = $this->createNotifier();
+        $before = Alaress_Date_Format::now()->getUnixTimeStamp();
         $envelope = $notifier->notifyStudentUnconfirmed(
             $this->createStudent(Model::STATUS_UNCONFIRMED),
             $this->createEffector(self::EFFECTOR_ID),
@@ -158,10 +158,10 @@ class NotifierTest extends TestCase implements TriggerBundleInterface
             'Test Staff',
             $message->jsonSerialize()['title']['params']['staff']->jsonSerialize()['text']
         );
-        self::assertSame(
-            $this->createUpdatedAt()->getUnixTimeStamp(),
-            $message->jsonSerialize()['meta']['UpdatedAt']
-        );
+        $metaTime = $message->jsonSerialize()['meta']['time'];
+        self::assertIsInt($metaTime);
+        self::assertGreaterThanOrEqual($before, $metaTime);
+        self::assertLessThanOrEqual(Alaress_Date_Format::now()->getUnixTimeStamp(), $metaTime);
     }
 
     public function testNotifyStudentUnconfirmedReturnsEmptyEnvelopeWhenStudentHasNoUser(): void
@@ -210,14 +210,9 @@ class NotifierTest extends TestCase implements TriggerBundleInterface
             ->setId(789)
             ->setStatus($status)
             ->setRegistrationSession((new SessionModel())->setId(self::SESSION_ID))
-            ->setUpdatedAt($this->createUpdatedAt())
             ->setUser($this->createUser(self::STUDENT_ID));
     }
 
-    private function createUpdatedAt(): Alaress_Date_Format
-    {
-        return new Alaress_Date_Format(self::UPDATED_AT, Alaress_Date_Format::DATABASE_DATE_FORMAT);
-    }
 
     private function createUser(int $id): User
     {

@@ -42,6 +42,7 @@ use Schoolbox\IB\Registrations\Sessions\Student\Translator\ModelToArray as Regis
 use Schoolbox\IConfigLoader;
 use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Language\Model as LanguageModel;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Nationality\Model as NationalityModel;
 use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 use Schoolbox\User;
@@ -106,6 +107,7 @@ class ControllerTest extends TestCase
                     '_routes' => [
                         'updateLanguages' => '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/123/languages',
                         'updateConfirmation' => '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/123/confirmation',
+                        'renotify' => null,
                     ],
                 ],
             ],
@@ -128,11 +130,102 @@ class ControllerTest extends TestCase
                     '_routes' => [
                         'updateLanguages' => '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/234/languages',
                         'updateConfirmation' => '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/234/confirmation',
+                        'renotify' => null,
                     ],
                 ],
             ],
             $payload['students'][RegistrationSessionStudentModel::STATUS_FAILED]
         );
+    }
+
+    public function testRegistrationSessionStudentsIncludesRenotifyRouteForUnconfirmedStudents(): void
+    {
+        $registrationSessionMapper = $this->createStub(RegistrationSessionMapper::class);
+        $registrationSessionMapper
+            ->method('findById')
+            ->willReturn(new RegistrationSessionModel());
+
+        $registrationSessionStudentMapper = $this->createStub(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->method('findStudentsForSession')
+            ->willReturn(new Collection([
+                $this->buildStudent(456, 123, RegistrationSessionStudentModel::STATUS_UNCONFIRMED, 'Alex', 'Nguyen', 'S123'),
+            ]));
+
+        $externalUser = $this->createStub(\External_UserInterface::class);
+        $externalUser
+            ->method('getStudent')
+            ->willReturn(['StudentBirthDate' => '2009-04-12', 'StudentGender' => 'F']);
+
+        $controller = $this->buildController(
+            $registrationSessionMapper,
+            $registrationSessionStudentMapper,
+            $externalUser
+        );
+
+        $controller->getRegistrationSessionStudents(12);
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+
+        $payload = json_decode((string) $response->getBody(), true);
+        $this->assertIsArray($payload);
+        $this->assertSame(
+            '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/123/renotify',
+            $payload['students'][RegistrationSessionStudentModel::STATUS_UNCONFIRMED][0]['_routes']['renotify']
+        );
+    }
+
+    public function testRenotifyUnconfirmedTouchesStudentAndPropagatesUnconfirmedNotification(): void
+    {
+        $registrationSessionStudent = $this->buildStudent(
+            456,
+            234,
+            RegistrationSessionStudentModel::STATUS_UNCONFIRMED,
+            'Sam',
+            'Patel',
+            'S234'
+        );
+
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('findOneByColumnList')
+            ->with([
+                'user_id' => 234,
+                'registration_session_id' => 12,
+            ])
+            ->willReturn($registrationSessionStudent);
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('propagate')
+            ->with(
+                $this->isInstanceOf(User::class),
+                BaseMapper::METHOD_UPDATE,
+                $registrationSessionStudent,
+                [
+                    'status' => [
+                        RegistrationSessionStudentModel::STATUS_UNCONFIRMED,
+                        RegistrationSessionStudentModel::STATUS_PREPARATION,
+                    ],
+                ]
+            );
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class)
+        );
+
+        $controller->renotifyUnconfirmed(12, 234);
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(200, $response->getStatusCode());
+
+        $payload = json_decode((string) $response->getBody(), true);
+        $this->assertTrue($payload['success']);
+        $this->assertSame('Student renotified.', $payload['message']);
     }
 
     public function testSessionCompletePreparationTransitionsSelectedPreparationStudents(): void
@@ -249,6 +342,79 @@ class ControllerTest extends TestCase
         $payload = json_decode((string) $response->getBody(), true);
         $this->assertSame(400, $payload['status']);
         $this->assertSame('Student IDs are required.', $payload['title']);
+    }
+
+    public function testRenotifyUnconfirmedReturns404WhenCandidateCannotBeFound(): void
+    {
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('findOneByColumnList')
+            ->with([
+                'user_id' => 234,
+                'registration_session_id' => 12,
+            ])
+            ->willThrowException(new \Schoolbox\Mapper\Exception\NotFound());
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('save');
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('propagate');
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class)
+        );
+
+        $controller->renotifyUnconfirmed(12, 234);
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(404, $response->getStatusCode());
+
+        $payload = json_decode((string) $response->getBody(), true);
+        $this->assertFalse($payload['success']);
+        $this->assertSame('Candidate not found for this user in the registration session.', $payload['message']);
+    }
+
+    public function testRenotifyUnconfirmedReturns409WhenCandidateIsNotUnconfirmed(): void
+    {
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('findOneByColumnList')
+            ->willReturn($this->buildStudent(
+                456,
+                234,
+                RegistrationSessionStudentModel::STATUS_CONFIRMED,
+                'Sam',
+                'Patel',
+                'S234'
+            ));
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('save');
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('propagate');
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class)
+        );
+
+        $controller->renotifyUnconfirmed(12, 234);
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(409, $response->getStatusCode());
+
+        $payload = json_decode((string) $response->getBody(), true);
+        $this->assertFalse($payload['success']);
+        $this->assertSame('Candidate is not awaiting confirmation.', $payload['message']);
     }
 
     public function testSessionCompletePreparationRejectsStudentThatCannotBeFound(): void
@@ -1018,6 +1184,14 @@ class ControllerTest extends TestCase
                 if ($route === 'internationalBaccalaureate.updateRegistrationSessionStudentConfirmation') {
                     return sprintf(
                         '/adminv2/international-baccalaureate/registrations/sessions/%d/candidates/%d/confirmation',
+                        $params['sessionId'],
+                        $params['studentId']
+                    );
+                }
+
+                if ($route === 'internationalBaccalaureate.renotifyUnconfirmed') {
+                    return sprintf(
+                        '/adminv2/international-baccalaureate/registrations/sessions/%d/candidates/%d/renotify',
                         $params['sessionId'],
                         $params['studentId']
                     );

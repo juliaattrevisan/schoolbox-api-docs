@@ -69,6 +69,7 @@ class ModelToArray
             '_routes' => [
                 'updateLanguages' => $this->buildUpdateLanguagesRoute($student),
                 'updateConfirmation' => $this->buildUpdateConfirmationRoute($student),
+                'renotify' => $this->buildRenotifyRoute($student),
             ],
         ];
     }
@@ -93,6 +94,7 @@ class ModelToArray
 
     private function buildUpdateConfirmationRoute(Model $student): ?string
     {
+
         $sessionId = $student->getRegistrationSession()?->getId();
         $studentId = $student->getUser()?->getId();
 
@@ -102,6 +104,28 @@ class ModelToArray
 
         return $this->getRouteIfAuthorized(
             'internationalBaccalaureate.updateRegistrationSessionStudentConfirmation',
+            [
+                'sessionId' => $sessionId,
+                'studentId' => $studentId,
+            ]
+        );
+    }
+
+    private function buildRenotifyRoute(Model $student): ?string
+    {
+        if ($student->getStatus() !== Model::STATUS_UNCONFIRMED) {
+            return null;
+        }
+
+        $sessionId = $student->getRegistrationSession()?->getId();
+        $studentId = $student->getUser()?->getId();
+
+        if ($sessionId === null || $studentId === null) {
+            return null;
+        }
+
+        return $this->getRouteIfAuthorized(
+            'internationalBaccalaureate.renotifyUnconfirmed',
             [
                 'sessionId' => $sessionId,
                 'studentId' => $studentId,

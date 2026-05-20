@@ -42,6 +42,7 @@ use Schoolbox\IB\Registrations\Sessions\Student\Subject\Language\Mapper as Regis
 use Schoolbox\IB\Registrations\Sessions\Student\Translator\ModelToArray as RegistrationSessionStudentModelToArray;
 use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Language\Model as LanguageModel;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception\NotFound as MapperNotFound;
 use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 use Schoolbox\Resource\Folder\Code\Model as FolderCodeModel;
@@ -1255,10 +1256,60 @@ class Controller extends ConfigController
                 );
             }
 
-            $studentKey = $student->getUser()?->getId() ?? $student->getId() ?? $studentId;
+            $studentKey                        = $student->getUser()?->getId() ?? $student->getId() ?? $studentId;
             $studentsToTransition[$studentKey] = $student;
         }
 
         return array_values($studentsToTransition);
+    }
+
+    /**
+     * Re-send the unconfirmed registration details notification to a student.
+     *
+     * @api POST /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/candidates/{studentId}/renotify
+     */
+    public function renotifyUnconfirmed(int $sessionId, int $studentId): void
+    {
+        try {
+            $registrationSessionStudent = $this->registrationSessionStudentMapper->findOneByColumnList([
+                'user_id' => $studentId,
+                'registration_session_id' => $sessionId,
+            ]);
+
+            if ($registrationSessionStudent->getStatus() !== RegistrationSessionStudentModel::STATUS_UNCONFIRMED) {
+                $this->response = $this->responseAsJson([
+                    'success' => false,
+                    'message' => 'Candidate is not awaiting confirmation.',
+                ])->withStatus(409);
+                return;
+            }
+
+            $this->registrationSessionStudentMapper->propagate(
+                $this->getUser(),
+                BaseMapper::METHOD_UPDATE,
+                $registrationSessionStudent,
+                [
+                    'status' => [
+                        RegistrationSessionStudentModel::STATUS_UNCONFIRMED,
+                        RegistrationSessionStudentModel::STATUS_PREPARATION,
+                    ],
+                ]
+            );
+
+            $this->response = $this->responseAsJson([
+                'success' => true,
+                'message' => 'Student renotified.',
+            ]);
+        } catch (MapperNotFound) {
+            $this->response = $this->responseAsJson([
+                'success' => false,
+                'message' => 'Candidate not found for this user in the registration session.',
+            ])->withStatus(404);
+        } catch (Exception) {
+            $this->response = $this->responseAsJson([
+                'success' => false,
+                'message' => 'Something has gone wrong. Please try again later.',
+            ])->withStatus(500);
+        }
     }
 }

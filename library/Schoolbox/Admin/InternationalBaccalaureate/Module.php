@@ -89,6 +89,10 @@ class Module extends BaseModule
          */
         $this->register('POST', '/registrations/sessions/{sessionId:\\d+}/complete-preparation', 'sessionCompletePreparation', $ruleIBCoordinatorAccess, $preloadRegistrationSession);
         $this->register('PUT', '/registrations/sessions/{sessionId:\\d+}/candidates/{studentId:\\d+}/confirmation', 'updateRegistrationSessionStudentConfirmation', $ruleIBConfirmingDetailsPerms);
+
+        /* Notifications
+         */
+        $this->register('POST', '/registrations/sessions/{sessionId:\\d+}/candidates/{studentId:\\d+}/renotify', 'renotifyUnconfirmed', $ruleIBCoordinatorAccess);
     }
 
     /**
