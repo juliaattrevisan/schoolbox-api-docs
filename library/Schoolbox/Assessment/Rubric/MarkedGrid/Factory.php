@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\MarkedGrid;
 
-use DebugBar\DebugBarException;
-use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\ISelfAssessableFeedback;
 
 /**
@@ -117,14 +115,11 @@ class Factory
 
         // TODO mark schemes still need to be in the grid, not marked grid
         $markSchemeFactory = new \Schoolbox\Learning\MarkScheme\Factory();
-        $postCapabilities  = $postData['groups']      ?? [];
-
 
         // Is this a self-reflection?
         // Don't even save capability/indicator mark values
         $feedback         = $markedGrid->getFeedback();
         $isSelfReflection = $feedback instanceof ISelfAssessableFeedback && $feedback->isSelfReflectionOnly();
-
 
         // Set marks for all the capabilities and indicators
         foreach ($markedGrid->getGrid()->getCapabilityUsages() as $capabilityUsage) {
@@ -141,6 +136,7 @@ class Factory
                         $capabilityUsage->getMaxValue(),
                     )
                 );
+
                 $markedGrid->getCapabilityMarks()->add($capabilityMark);
             }
 
@@ -174,8 +170,6 @@ class Factory
                 } else {
                     throw new \InvalidArgumentException("Capability mark must be between 0 and " . $capabilityMark->getCapabilityUsage()->getMaxValue());
                 }
-
-
             }
 
             // Set marks for indicators
@@ -200,16 +194,19 @@ class Factory
 
                 // Add the indicator mark, and set its descriptor/value
                 $indicatorMark = $markedGrid->retrieveIndicatorMark($indicatorUsage);
+
                 if (!$indicatorMark) {
                     $indicatorMark = new IndicatorMark($indicatorUsage);
                     $capabilityMark->getIndicatorMarks()->add($indicatorMark);
                 }
 
                 $indicatorMark->setDescriptor($selectedDescriptor);
+
                 if ($isSelfReflection) {
                     $indicatorMark->setValue(null);
                 } else {
                     $indicatorMarkSpec = new ValidIndicatorMark($selectedDescriptor);
+
                     if ($indicatorMarkSpec->isSatisfiedBy($indicatorMarkValue)) {
                         $indicatorMark->setValue(
                             filter_var(
@@ -228,6 +225,7 @@ class Factory
                         } else {
                             $message = "Indicator mark must be null";
                         }
+
                         throw new \InvalidArgumentException($message);
                     }
                 }
