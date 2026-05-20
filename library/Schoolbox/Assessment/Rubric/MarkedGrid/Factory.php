@@ -110,12 +110,13 @@ class Factory
         /* This is the state of the rubric grid as it was posted to us. Each grid's selections are contained in one big
          * json-encoded grid payload - we have to decode it so we can find out what was selected
          *
-         * Anecdotally, it turns out that "scaledMark" means the value of the descriptor that was chosen.
+         * Anecdotally, it turns out that "scaledMark" means the value of the descriptor that was chosen, converted by
+         * whatever the Capability Mark Type requires. For example, a chosen descriptor will be represented as a
+         * percentage of the maximum descriptor value if Percentage was chosen as a capablity mark type.
          */
 
         // TODO mark schemes still need to be in the grid, not marked grid
         $markSchemeFactory = new \Schoolbox\Learning\MarkScheme\Factory();
-        $postDescriptors   = $postData['descriptors'] ?? [];
         $postCapabilities  = $postData['groups']      ?? [];
 
 
