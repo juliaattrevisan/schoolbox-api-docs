@@ -24,7 +24,7 @@ readonly class JobRequest
      * @param string|null                $instanceId   If provided: run the tool in the context of this instance.
      *                                                 A tool's definition will either mandate an instance ID, or
      *                                                 prohibit one.
-     * @param array{string, string}|null $environment  Any environment variables to pass to the tool.
+     * @param array<string, string>|null $environment  Any environment variables to pass to the tool.
      *                                                 A tool's definition will define its required and allowed
      *                                                 environment variables.
      */
