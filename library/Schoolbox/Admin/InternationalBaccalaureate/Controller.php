@@ -986,10 +986,7 @@ class Controller extends ConfigController
         try {
             $studentIds = $this->normalisePreparationStudentIds($studentIds);
         } catch (\InvalidArgumentException $e) {
-            $this->response = $this->responseAsJson([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ])->withStatus(400);
+            $this->sendJsonError($e->getMessage(), 400);
             return;
         }
 
