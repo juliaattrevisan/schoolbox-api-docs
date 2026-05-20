@@ -214,8 +214,8 @@ class Mapper extends BaseMapper
                 $this->findIbGroupSubjectsForUsers(
                     [
                         $user->getId() => $user,
-                    ])
-                [$user->getId()] ?? new GenericCollection(GroupSubjectModel::class)
+                    ]
+                )[$user->getId()] ?? new GenericCollection(GroupSubjectModel::class)
             );
 
             $this->applySubjectLanguageOverrides(new GenericCollection(Model::class, [$student]));

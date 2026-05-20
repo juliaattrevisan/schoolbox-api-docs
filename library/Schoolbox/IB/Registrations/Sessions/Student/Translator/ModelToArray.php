@@ -77,8 +77,8 @@ class ModelToArray
                     'gender' => $this->helper->normalise($externalStudent['StudentGender'] ?? null),
                     'language1' => $this->formatCodeModel($user?->getLanguageCollection()->reindex()->getOffset(0)),
                     'language2' => $this->formatCodeModel($user?->getLanguageCollection()->reindex()->getOffset(1)),
-                    'nationality1' => $this->formatCodeModel($user?->getNationalityCollection()->reindex()->getOffset(0)),
-                    'nationality2' => $this->formatCodeModel($user?->getNationalityCollection()->reindex()->getOffset(1)),
+                    'nationality1' => $this->formatCodeModel($user?->getNationalityCollection()?->reindex()->getOffset(0)),
+                    'nationality2' => $this->formatCodeModel($user?->getNationalityCollection()?->reindex()->getOffset(1)),
                     'referenceCode' => '-',
                 ],
                 $missingFields
