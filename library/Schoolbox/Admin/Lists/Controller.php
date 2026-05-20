@@ -1140,7 +1140,7 @@ class Controller extends Base
                     ],
                     'visibility' => [
                         'getter'    => 'getVisibility', // Note this function returns a value derived from isVisibleToParents and isVisibleToLearners.
-                        'caption'   => 'Visibility',
+                        'caption'   => 'Activity Audience',
                         'mandatory' => true,
                         'default'   => WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS,
                         'lookup'    => [
@@ -1152,7 +1152,14 @@ class Controller extends Base
                         ],
                         'nullable'  => false,
                         'width'     => 2,
-                        'tooltip'   => 'Select the role types that have access to view learning activities using this work type.  Access includes the assigning of the learning activity and the feedback that is made visible.',
+                        'tooltip'   => (
+                            "Select who can access activities using this work type. Feedback visibility is configured" .
+                            " per activity, but it cannot override the Activity Audience - roles excluded from the" .
+                            " audience won’t be able to view feedback. Note: students or parents with write access to" .
+                            " pages are acting in a staff/instructor-like role and will have access to (and visibility" .
+                            " of) the activity and feedback. Staff added to a group with read access will be treated" .
+                            " in a student/learner participant-like role."
+                        )
                     ],
                     'permittedActivities' => [
                         'caption'   => 'Permitted Activities',

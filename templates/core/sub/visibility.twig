@@ -8,8 +8,11 @@
 
 {% apply spaceless %}
 <label>
-    Mark Visibility
-    <span data-tooltip class="hint has-tip tip-top"  title="This controls who will be able to view the marks for this assessment (including feedback).">?</span>
+    Feedback Visibility
+    <span data-tooltip class="hint has-tip tip-top"
+     title="This controls who can view feedback for this {{ locale.translate('activity', false, false)}}. Feedback can only be shown to roles included in the Activity Audience.">
+     ?
+    </span>
     <select name="visibility" data-test="assessment-form-select-visibility">
         {% for currentOption, label in allOptions %}
             <option value="{{ currentOption }}"
