@@ -264,6 +264,30 @@ class Mapper extends BaseMapper
         return $students;
     }
 
+    /**
+     * Returns true if any student in the given session has reached registered (submitted to IBIS) status.
+     *
+     * @param int $sessionId
+     * @return bool
+     */
+    public function hasRegisteredStudents(int $sessionId): bool
+    {
+        $statement = $this->getDatabase()->query(
+            "
+            SELECT COUNT(*)
+            FROM ib_registration_session_student
+            WHERE registration_session_id = :sessionId
+            AND status = :status
+        ",
+            [
+                'sessionId' => $sessionId,
+                'status' => Model::STATUS_REGISTERED,
+            ]
+        );
+
+        return (int) $statement->fetchColumn() > 0;
+    }
+
     protected function getSubjectLanguageMapper(): SubjectLanguageMapper
     {
         return SubjectLanguageMapper::getInstance();
