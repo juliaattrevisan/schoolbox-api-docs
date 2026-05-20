@@ -29,7 +29,7 @@ interface IAssessable extends ISoftDeletable
     public const string MARK_VISIBILITY_PRIVATE        = 'staffOnly';
     public const string MARK_VISIBILITY_STUDENT        = 'staffAndStudent';
     public const string MARK_VISIBILITY_PARENT         = 'staffAndParent';
-    public const string MARK_VISIBILITY_PARENT_STUDENT = 'staffStudentAndParent';
+    public const string MARK_VISIBILITY_PARENT_STUDENT = 'staffAndParentAndStudent';
 
     // Human-readable versions of the above consts (for use in the UI).
     public const string MARK_VISIBILITY_PRIVATE_STRING        = 'Staff Only';
