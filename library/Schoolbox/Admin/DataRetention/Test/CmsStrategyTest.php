@@ -34,7 +34,6 @@ class CmsStrategyTest extends TestCase
      * @param array<string, bool> $padDeleteResults
      * @param array<string, int> $redisDeleteCounts
      * @param null|(LoggerInterface&MockObject) $logger
-     * @param null|list<int> $softDeletedFolderIds
      * @return array{strategy: Cms, state: object{
      *     calls: list<string>,
      *     deletedFolderOwnedRowIds: list<int>,
@@ -53,7 +52,6 @@ class CmsStrategyTest extends TestCase
         bool $perform = true,
         ?LoggerInterface $logger = null,
         int $homepageUserAccessDeleteCount = 0,
-        ?array $softDeletedFolderIds = null,
     ): array {
         if ($logger === null) {
             $logger = $this->createMock(LoggerInterface::class);
@@ -82,22 +80,6 @@ class CmsStrategyTest extends TestCase
 
             /** @var list<int> */
             public array $deletedSurveyFolderIds = [];
-
-            /**
-             * Capture cascade child lookups so branch-cache tests can prove an
-             * overlapping descendant root did not trigger a second subtree walk.
-             *
-             * @var list<list<int>>
-             */
-            public array $softDeletedChildLookups = [];
-
-            /**
-             * Capture active-child safety checks for the same reason as soft-deleted
-             * lookups: cache regressions show up as repeated checks on descendants.
-             *
-             * @var list<list<int>>
-             */
-            public array $activeChildLookups = [];
         };
 
         $strategy = new class (
@@ -116,7 +98,6 @@ class CmsStrategyTest extends TestCase
             $redisDeleteCounts,
             $state,
             $homepageUserAccessDeleteCount,
-            $softDeletedFolderIds,
         ) extends Cms {
             /** @var array<int, list<int>> */
             private array $folderChildren;
@@ -140,15 +121,12 @@ class CmsStrategyTest extends TestCase
 
             private int $homepageUserAccessDeleteCount;
 
-            /** @var null|array<int, true> */
-            private ?array $softDeletedFolderIds;
-
             /**
              * Store the in-memory graph and lookup tables used by this strategy double.
              *
              * The constructor mirrors Cms enough for parent behaviour to run, then
-             * replaces external dependencies with arrays so tests can model active
-             * children, blocked folders, and related row ids precisely.
+             * replaces external dependencies with arrays so tests can model blocked
+             * folders and related row ids precisely.
              *
              * @param array<int, list<int>> $folderChildren
              * @param list<int> $blockedFolderIds
@@ -156,7 +134,6 @@ class CmsStrategyTest extends TestCase
              * @param array<int, array<int, array<string, mixed>>> $homepagePadRecords
              * @param array<string, bool> $padDeleteResults
              * @param array<string, int> $redisDeleteCounts
-             * @param null|list<int> $softDeletedFolderIds
              * @return void
              */
             public function __construct(
@@ -175,7 +152,6 @@ class CmsStrategyTest extends TestCase
                 array $redisDeleteCounts,
                 object $state,
                 int $homepageUserAccessDeleteCount,
-                ?array $softDeletedFolderIds,
             ) {
                 parent::__construct($logger, $perform, $database, $lock, $config, $endTime, $retentionPeriod);
                 $this->folderChildren = $folderChildren;
@@ -186,70 +162,35 @@ class CmsStrategyTest extends TestCase
                 $this->redisDeleteCounts = $redisDeleteCounts;
                 $this->state = $state;
                 $this->homepageUserAccessDeleteCount = $homepageUserAccessDeleteCount;
-                $this->softDeletedFolderIds = $softDeletedFolderIds === null
-                    ? null
-                    : array_fill_keys($softDeletedFolderIds, true);
             }
 
             /**
-             * Return the raw child graph so tests can model both active and deleted children.
+             * Expose current cascade behaviour so the leaf-first contract test goes red.
              *
-             * Cms has separate child lookups for broad tree checks and retention-safe
-             * cascade expansion. Keeping this override unfiltered lets the active-child
-             * tests prove the narrower helper is doing the exclusion.
-             *
-             * @param array<int, int> $parentIds
-             * @return array<int, int>
-             */
-            protected function findChildFolderIds(array $parentIds): array
-            {
-                $children = [];
-                foreach ($parentIds as $parentId) {
-                    foreach ($this->folderChildren[$parentId] ?? [] as $childId) {
-                        $children[] = $childId;
-                    }
-                }
-
-                return $children;
-            }
-
-            /**
-             * Return retention-eligible descendants from the in-memory folder graph.
-             *
-             * The production helper asks the database for soft-deleted children. This
-             * recursive array implementation lets tests prove the cascade can still
-             * reach soft-deleted descendants without letting active folders into the
-             * delete plan.
+             * The desired implementation will stop calling this hook from
+             * deleteChunk(). Until then, returning descendants from the in-memory
+             * graph proves the current strategy still expands supplied ids into a
+             * wider delete set.
              *
              * @param array<int, int> $parentIds
              * @return array<int, int>
              */
             protected function findSoftDeletedChildFolderIds(array $parentIds): array
             {
-                $this->state->softDeletedChildLookups[] = $parentIds;
-
-                if ($this->softDeletedFolderIds === null) {
-                    return $this->findChildFolderIds($parentIds);
-                }
-
                 $visited = [];
-                $softDeletedFolderIds = [];
-                $pending = $this->findChildFolderIds($parentIds);
+                $folderIds = [];
+                $pending = $parentIds;
 
                 while ($pending !== []) {
                     $nextPending = [];
-                    foreach ($pending as $folderId) {
-                        if (isset($visited[$folderId])) {
-                            continue;
-                        }
+                    foreach ($pending as $parentId) {
+                        foreach ($this->folderChildren[$parentId] ?? [] as $childId) {
+                            if (isset($visited[$childId])) {
+                                continue;
+                            }
 
-                        $visited[$folderId] = true;
-                        if (!isset($this->softDeletedFolderIds[$folderId])) {
-                            continue;
-                        }
-
-                        $softDeletedFolderIds[$folderId] = $folderId;
-                        foreach ($this->folderChildren[$folderId] ?? [] as $childId) {
+                            $visited[$childId] = true;
+                            $folderIds[$childId] = $childId;
                             $nextPending[] = $childId;
                         }
                     }
@@ -257,52 +198,7 @@ class CmsStrategyTest extends TestCase
                     $pending = $nextPending;
                 }
 
-                return array_values($softDeletedFolderIds);
-            }
-
-            /**
-             * Find active descendants in the in-memory graph for parent safety checks.
-             *
-             * Active descendants are what prevent a retained ancestor from being
-             * hard-deleted. The test double computes them recursively so tests cover
-             * active grandchildren as well as direct children.
-             *
-             * @param array<int, int> $parentIds
-             * @return array<int, int>
-             */
-            protected function findActiveChildFolderIds(array $parentIds): array
-            {
-                $this->state->activeChildLookups[] = $parentIds;
-
-                if ($this->softDeletedFolderIds === null) {
-                    return [];
-                }
-
-                $visited = [];
-                $activeFolderIds = [];
-                $pending = $this->findChildFolderIds($parentIds);
-
-                while ($pending !== []) {
-                    $nextPending = [];
-                    foreach ($pending as $folderId) {
-                        if (isset($visited[$folderId])) {
-                            continue;
-                        }
-
-                        $visited[$folderId] = true;
-                        if (!isset($this->softDeletedFolderIds[$folderId])) {
-                            $activeFolderIds[$folderId] = $folderId;
-                        }
-
-                        foreach ($this->findChildFolderIds([$folderId]) as $childId) {
-                            $nextPending[] = $childId;
-                        }
-                    }
-
-                    $pending = $nextPending;
-                }
-
-                return array_values($activeFolderIds);
+                return array_values($folderIds);
             }
 
             /**
@@ -1206,45 +1102,37 @@ class CmsStrategyTest extends TestCase
     }
 
     /**
-     * CMS folder trees must delete child folders before parents.
+     * CMS retention deletes exactly the leaf folder ids supplied by the chunk.
      *
-     * The folder table is self-referential, so parent-first hard deletes can fail
-     * FK checks. This test also proves related homepage cleanup follows the same
-     * leaf-first folder order.
+     * `getIdsToDelete()` owns parent/child safety by selecting folders with no
+     * children. `deleteChunk()` should not expand the supplied ids into a wider
+     * tree; it should run the related CMS cleanup for only the current leaf set.
      *
      * @return void
      */
-    public function testDeletesFolderTree(): void
+    public function testDeleteChunkDeletesOnlySuppliedLeafFolders(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy(
-            [
-                10 => [11, 12],
-                11 => [13],
-                12 => [],
-                13 => [],
-            ],
+            [],
             [],
             [
                 'blog' => [
                     10 => [101],
-                    11 => [102],
-                    12 => [103],
-                    13 => [104],
+                    20 => [201],
                 ],
             ],
         );
 
         $this->delete($strategy, [
+            ['id' => 20, 'table' => 'folder'],
             ['id' => 10, 'table' => 'folder'],
         ]);
 
-        $this->assertSame([13, 11, 12, 10], $state->deletedFolders);
-        $this->assertSame([13, 11, 12, 10], $state->deletedHomepageUserAccessFolderIds);
+        $this->assertSame([10, 20], $state->deletedFolders);
+        $this->assertSame([10, 20], $state->deletedHomepageUserAccessFolderIds);
         $this->assertSame([
-            'cleanupHomepagePads:13:do',
-            'cleanupHomepagePads:11:do',
-            'cleanupHomepagePads:12:do',
             'cleanupHomepagePads:10:do',
+            'cleanupHomepagePads:20:do',
             'deleteBlogComments',
             'deleteBlogImages',
             'deleteBlog',
@@ -1261,337 +1149,39 @@ class CmsStrategyTest extends TestCase
             'deleteHomepageUserAccess',
             'deleteFolders',
         ], $state->calls);
-        $this->assertSame([13, 11, 12, 10], $state->deletedSurveyFolderIds);
+        $this->assertSame([10, 20], $state->deletedSurveyFolderIds);
     }
 
     /**
-     * A retained parent must not be hard-deleted when it has an active child.
+     * Supplied folder ids are already retention candidates, not cascade roots.
+     *
+     * A folder graph in the test fixture must not cause extra folder ids to be
+     * deleted. Parent folders become eligible in later retention passes after
+     * their children have been removed by the leaf-first candidate query.
      *
      * @return void
      */
-    public function testDeleteChunkSkipsActiveChildren(): void
-    {
-        ['strategy' => $strategy, 'state' => $state] = $this->strategy(
-            [
-                10 => [11, 12],
-                11 => [],
-                12 => [],
-            ],
-            softDeletedFolderIds: [10, 11],
-        );
-
-        $this->delete($strategy, [
-            ['id' => 10, 'table' => 'folder'],
-        ]);
-
-        $this->assertSame([], $state->deletedFolders);
-    }
-
-    /**
-     * Branches rejected by active descendants should cache their deleted children.
-     *
-     * A chunk can contain both the rejected parent and a soft-deleted descendant.
-     * Once the parent branch has been rejected because it contains active content,
-     * later candidate roots inside that same tree must be ignored instead of being
-     * expanded and deleted independently.
-     *
-     * @return void
-     */
-    public function testDeleteChunkCachesBranchesSkippedForActiveChildren(): void
-    {
-        ['strategy' => $strategy, 'state' => $state] = $this->strategy(
-            [
-                10 => [11, 12],
-                11 => [],
-                12 => [],
-            ],
-            softDeletedFolderIds: [10, 11],
-        );
-
-        $this->delete($strategy, [
-            ['id' => 10, 'table' => 'folder'],
-            ['id' => 11, 'table' => 'folder'],
-        ]);
-
-        $this->assertSame([], $state->deletedFolders);
-        $this->assertSame([[10], [11]], $state->activeChildLookups);
-        $this->assertSame([[10]], $state->softDeletedChildLookups);
-    }
-
-    /**
-     * Active descendants should block their whole branch without stalling unrelated roots.
-     *
-     * A non-deleted folder anywhere below the requested root means that CMS tree
-     * must remain intact. Other requested roots in the same chunk can still be
-     * deleted when their own branch has no active descendants or blocked relations.
-     *
-     * @return void
-     */
-    public function testDeleteChunkSkipsActiveBranchAndContinuesWithUnrelatedRoots(): void
+    public function testDeleteChunkDoesNotExpandDescendantFolders(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy(
             [
                 10 => [11],
                 11 => [12],
                 12 => [],
-                20 => [],
             ],
-            softDeletedFolderIds: [10, 11, 20],
         );
 
         $this->delete($strategy, [
             ['id' => 10, 'table' => 'folder'],
-            ['id' => 11, 'table' => 'folder'],
-            ['id' => 20, 'table' => 'folder'],
         ]);
 
-        $this->assertSame([20], $state->deletedFolders);
-        $this->assertSame([20], $state->deletedHomepageUserAccessFolderIds);
-        $this->assertSame([[10], [11], [20]], $state->activeChildLookups);
-        $this->assertSame([[10], [20]], $state->softDeletedChildLookups);
+        $this->assertSame([10], $state->deletedFolders);
+        $this->assertSame([10], $state->deletedHomepageUserAccessFolderIds);
+        $this->assertSame([10], $state->deletedSurveyFolderIds);
     }
 
     /**
-     * Active descendant skips should log the parent folder that owns visible content.
-     *
-     * Retention logs need to point at the soft-deleted folder that still has a
-     * non-deleted child, not only the requested root. That makes it possible to
-     * inspect the exact place in a retained tree that blocked deletion.
-     *
-     * @return void
-     */
-    public function testDeleteChunkLogsActiveDescendantParent(): void
-    {
-        $state = new class {
-            public array $warnings = [];
-        };
-
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->method('debug');
-        $logger->method('info');
-        $logger->method('notice');
-        $logger->method('warning')->willReturnCallback(
-            function (string $message) use ($state): void {
-                $state->warnings[] = $message;
-            }
-        );
-
-        ['strategy' => $strategy] = $this->strategy(
-            [
-                391 => [392],
-                392 => [393],
-                393 => [394],
-                394 => [],
-            ],
-            [],
-            [],
-            [],
-            [],
-            [],
-            true,
-            $logger,
-            0,
-            [391, 392, 393],
-        );
-
-        $this->delete($strategy, [
-            ['id' => 391, 'table' => 'folder'],
-        ]);
-
-        $this->assertContains(
-            'Skipping deletion of folder 393 because it has active child folder 394',
-            $state->warnings,
-        );
-        $this->assertContains(
-            'Skipping Resources (CMS) chunk because no folders are safe to delete',
-            $state->warnings,
-        );
-    }
-
-    /**
-     * Cached branch skips should still explain why later chunks are ignored.
-     *
-     * Branch classification is cached across chunks to avoid re-expanding a tree
-     * for descendant candidates. Later chunks still need an audit trail, otherwise
-     * an ignored descendant appears to have no folder-specific reason for being
-     * skipped.
-     *
-     * @return void
-     */
-    public function testDeleteChunkLogsCachedActiveDescendantSkip(): void
-    {
-        $state = new class {
-            public array $warnings = [];
-        };
-
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->method('debug');
-        $logger->method('info');
-        $logger->method('notice');
-        $logger->method('warning')->willReturnCallback(
-            function (string $message) use ($state): void {
-                $state->warnings[] = $message;
-            }
-        );
-
-        ['strategy' => $strategy] = $this->strategy(
-            [
-                391 => [392],
-                392 => [393],
-                393 => [394],
-                394 => [],
-            ],
-            [],
-            [],
-            [],
-            [],
-            [],
-            true,
-            $logger,
-            0,
-            [391, 392, 393],
-        );
-
-        $this->delete($strategy, [
-            ['id' => 391, 'table' => 'folder'],
-        ]);
-        $firstChunkWarnings = $state->warnings;
-        $state->warnings = [];
-
-        $this->delete($strategy, [
-            ['id' => 392, 'table' => 'folder'],
-        ]);
-
-        $this->assertContains(
-            'Skipping deletion of folder 391 because it has active child folder 394',
-            $firstChunkWarnings,
-        );
-        $this->assertContains(
-            'Skipping deletion of folder 392 because it has active child folder 394',
-            $state->warnings,
-        );
-        $this->assertNotContains(
-            'Skipping deletion of folder 391 because it has active child folder 394',
-            $state->warnings,
-        );
-    }
-
-    /**
-     * Active descendants must stop the ancestor from entering the delete plan.
-     *
-     * This protects the bottom-up retention rule even when the candidate root is
-     * already soft-deleted and old enough to be considered for hard deletion.
-     *
-     * @return void
-     */
-    public function testExpandFolderCascadeSkipsActiveParents(): void
-    {
-        $state = new class {
-            public array $warnings = [];
-        };
-
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->method('debug');
-        $logger->method('info');
-        $logger->method('notice');
-        $logger->method('warning')->willReturnCallback(
-            function (string $message) use ($state): void {
-                $state->warnings[] = $message;
-            }
-        );
-
-        ['strategy' => $strategy] = $this->strategy(
-            [
-                10 => [11],
-                11 => [],
-            ],
-            [],
-            [],
-            [],
-            [],
-            [],
-            true,
-            $logger,
-            0,
-            [10],
-        );
-
-        $call = \Closure::bind(
-            function (int $folderId): array {
-                return $this->expandFolderCascade($folderId);
-            },
-            $strategy,
-            Cms::class,
-        );
-
-        $this->assertSame([], $call(10)['folderIds']);
-        $this->assertSame([
-            'Skipping deletion of folder 10 because it has active child folder 11',
-        ], $state->warnings);
-    }
-
-    /**
-     * Active descendant detection must be recursive, not only direct-child based.
-     *
-     * Otherwise a soft-deleted parent could be hard-deleted while an active
-     * grandchild still exists below a soft-deleted child folder.
-     *
-     * @return void
-     */
-    public function testFindActiveChildFolderIds(): void
-    {
-        ['strategy' => $strategy] = $this->strategy(
-            [
-                10 => [11],
-                11 => [12],
-                12 => [],
-            ],
-            softDeletedFolderIds: [10, 11],
-        );
-
-        $call = \Closure::bind(
-            function (array $parentIds): array {
-                return $this->findActiveChildFolderIds($parentIds);
-            },
-            $strategy,
-            Cms::class,
-        );
-
-        $this->assertSame([12], $call([10]));
-    }
-
-    /**
-     * Soft-deleted descendant discovery must be recursive for leaf-first cleanup.
-     *
-     * This proves the test double models the production cascade closely enough to
-     * catch parent/child ordering regressions across more than one folder level.
-     *
-     * @return void
-     */
-    public function testFindSoftDeletedChildFolderIds(): void
-    {
-        ['strategy' => $strategy] = $this->strategy(
-            [
-                10 => [11],
-                11 => [12],
-                12 => [],
-            ],
-            softDeletedFolderIds: [10, 11, 12],
-        );
-
-        $call = \Closure::bind(
-            function (array $parentIds): array {
-                return $this->findSoftDeletedChildFolderIds($parentIds);
-            },
-            $strategy,
-            Cms::class,
-        );
-
-        $this->assertSame([11, 12], $call([10]));
-    }
-
-    /**
-     * Candidate SQL must leave parents alone while they still have active children.
+     * Candidate SQL must leave parent folders alone while they still have children.
      *
      * @return void
      */
@@ -1667,28 +1257,24 @@ class CmsStrategyTest extends TestCase
         $this->assertSame([['id' => 10]], $ids);
         $this->assertStringContainsString('NOT EXISTS', $state->preparedSql);
         $this->assertStringContainsString('child.parent = folder.id', $state->preparedSql);
-        $this->assertStringContainsString('child.deleted_at IS NULL', $state->preparedSql);
         $this->assertArrayHasKey('old', $state->executeParams);
         $this->assertNotEmpty($state->executeParams['old']);
     }
 
     /**
-     * Excluded assessment/course relations should block the whole affected branch.
+     * Blocked folders are removed from the current leaf chunk only.
      *
-     * Mixed chunks must still process unrelated folders, but descendants of a
-     * blocked branch cannot be deleted because they still belong under that
-     * retained parent tree.
+     * Assessment/course relations are outside CMS retention ownership. Under the
+     * leaf-first contract, a blocked folder does not imply branch-wide skipping;
+     * the strategy simply excludes that id and continues with the other supplied
+     * leaf folders.
      *
      * @return void
      */
-    public function testDeleteChunkExcludesBlockedBranchAndContinues(): void
+    public function testDeleteChunkExcludesBlockedLeafAndContinues(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy(
-            [
-                10 => [11],
-                11 => [],
-                20 => [],
-            ],
+            [],
             [10],
         );
 
@@ -1720,78 +1306,15 @@ class CmsStrategyTest extends TestCase
     }
 
     /**
-     * A blocked descendant should prevent deleting every ancestor in the branch.
-     *
-     * CMS folder parent links are not foreign-key enforced, so deleting an
-     * ancestor while leaving a blocked descendant in place can leave that
-     * descendant pointing at a deleted parent. The whole candidate branch is
-     * skipped when the blocker is anywhere below the requested root.
-     *
-     * @return void
-     */
-    public function testDeleteChunkSkipsAncestorsWhenRecursiveDescendantIsBlocked(): void
-    {
-        ['strategy' => $strategy, 'state' => $state] = $this->strategy(
-            [
-                10 => [11],
-                11 => [12],
-                12 => [],
-            ],
-            [12],
-        );
-
-        $this->delete($strategy, [
-            ['id' => 10, 'table' => 'folder'],
-            ['id' => 11, 'table' => 'folder'],
-        ]);
-
-        $this->assertSame([], $state->deletedFolders);
-        $this->assertSame([], $state->deletedHomepageUserAccessFolderIds);
-        $this->assertSame([], $state->calls);
-    }
-
-    /**
-     * Overlapping candidate roots should reuse earlier branch classification.
-     *
-     * getIdsToDelete can return both an ancestor and descendant in the same chunk.
-     * Once the ancestor expansion has classified the descendant, re-processing the
-     * descendant root should not fetch that subtree again.
-     *
-     * @return void
-     */
-    public function testDeleteChunkReusesFolderBranchCache(): void
-    {
-        ['strategy' => $strategy, 'state' => $state] = $this->strategy(
-            [
-                10 => [11],
-                11 => [12],
-                12 => [],
-            ],
-        );
-
-        $this->delete($strategy, [
-            ['id' => 10, 'table' => 'folder'],
-            ['id' => 11, 'table' => 'folder'],
-        ]);
-
-        $this->assertSame([12, 11, 10], $state->deletedFolders);
-        $this->assertSame([[10], [11], [12]], $state->softDeletedChildLookups);
-        $this->assertSame([[10], [11], [12]], $state->activeChildLookups);
-    }
-
-    /**
-     * Excluded assessment/course relations should skip a chunk when all folders are blocked.
+     * Excluded assessment/course relations should skip a chunk when all leaf folders are blocked.
      *
      * @return void
      */
     public function testDeleteChunkSkipsWhenAllFoldersAreBlocked(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy(
-            [
-                10 => [11],
-                11 => [],
-            ],
-            [10, 11],
+            [],
+            [10],
         );
 
         $this->delete($strategy, [
