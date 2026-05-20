@@ -73,7 +73,17 @@
         self = this;
         opt = self.options;
         azone = $(this.element);
-        dzone = azone.find(opt.dropzoneSelector).html("").addClass(opt.iconClass);
+        dzone = azone.find(opt.dropzoneSelector).html("");
+
+        var renderDropzoneIcon = function () {
+            dzone.find("sbx-icon[data-attach-icon]").remove();
+            $("<sbx-icon></sbx-icon>")
+                .attr("data-attach-icon", "true")
+                .attr("name", "attach")
+                .attr("size", "l")
+                .addClass(opt.iconClass)
+                .prependTo(dzone);
+        };
 
         if (opt.title == null) {
             opt.title = "Select file" + (opt.multi ? "s" : "") + " to attach";
@@ -128,7 +138,8 @@
             fallback: function () {
                 var mk =
                         opt.fallbackButtonMarkup ||
-                        '<a href="#" data-attach-fallback class="button icon-attach">' +
+                        '<a href="#" data-attach-fallback class="button">' +
+                            '<sbx-icon name="attach" size="l" class="icon-attach"></sbx-icon>' +
                             opt.dictDefaultMessage +
                             "</a>",
                     btn = $(mk);
@@ -143,6 +154,7 @@
             },
 
             init: function () {
+                renderDropzoneIcon();
                 dzone.append($("<span/>").html(prompt));
                 // *goes crosseyed*
                 self.dropzone = this;

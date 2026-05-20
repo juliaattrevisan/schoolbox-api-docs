@@ -54,7 +54,11 @@ const activityLink = window.Vue.computed(() => {
 <template>
     <div class="card small-12">
         <h3>
-            <span :class="'icon-' + kebabCase(activity.assessmentType)"></span>
+            <sbx-icon
+                :class="'icon-' + kebabCase(activity.assessmentType)"
+                :name="kebabCase(activity.assessmentType)"
+                size="l"
+            ></sbx-icon>
             <component :is="activity._links !== null ? 'a' : 'span'" class="title" :href="activityLink">
                 {{ activity.title }}
             </component>

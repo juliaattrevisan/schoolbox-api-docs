@@ -39,7 +39,7 @@
         {# Don't show the select-all checkbox if we are modifying a unit implementation #}
         {% if unitAction == 'modify' %}
         <h3>
-            <span class="icon-unit"></span>
+                <sbx-icon class="icon-unit" name="unit" size="l"></sbx-icon>
                {{ unitSpec.folder.name ?? unitImpl.title }}
             <span class="pipe meta">
                 {{ assessmentCountMessage }}
@@ -53,7 +53,7 @@
                data-select-all-unit-assessments="unit-spec-{{ unitSpec.id }}"
         >
         <label class="checkbox-label" for="select-all-unit-assessments-{{ unitSpec.id }}">
-            <span class="icon-unit"></span><span class="unit-heading">{{ unitSpec.folder.name }}</span>
+            <sbx-icon class="icon-unit" name="unit" size="l"></sbx-icon><span class="unit-heading">{{ unitSpec.folder.name }}</span>
             <span class="pipe meta">
                 {{ assessmentCountMessage }}
                 {% if unitAssessmentCount %}<span data-show-count="{{ countSelected }}"> selected</span>{% endif %}

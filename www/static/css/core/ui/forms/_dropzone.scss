@@ -259,6 +259,19 @@ ul.az-error-list {
 .s64 {
     .dzone {
         //@extend .icon-attach;
+        > sbx-icon {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 0;
+            margin-right: 0;
+            @media #{$small-only} {
+                left: 0.625rem;
+            }
+            @media #{$medium-up} {
+                left: 1rem;
+            }
+        }
         &:before {
             position: absolute;
             font-weight: $font-weight-normal;
@@ -317,6 +330,14 @@ ul.az-error-list {
     }
     .dzone {
         //@extend .icon-attach;
+        > sbx-icon {
+            position: absolute;
+            left: 1rem;
+            top: 0.5rem;
+            transform: none;
+            padding: 0;
+            margin-right: 0;
+        }
         background-position: 0.875rem;
         background-size: 1rem;
         margin-bottom: $form-spacing;
@@ -405,6 +426,10 @@ ul.az-error-list {
                 left: 7px;
                 font-size: 1.75rem;
             }
+        }
+        > sbx-icon {
+            color: inherit;
+            display: block;
         }
         span {
             display: table-cell;

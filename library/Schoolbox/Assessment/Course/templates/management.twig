@@ -147,9 +147,9 @@ Usage:
                             {% endif %}
                                 <h3>
                                     {% if not componentNames[currentCourse.id] | length %}
-                                        <span class="icon-archive" data-course-impl-icon></span> <span class="del" data-course-impl-name>{{ currentCourse.specification.folder.name }}</span>
+                                        <sbx-icon class="icon-archive" data-course-impl-icon name="archive" size="l"></sbx-icon><span class="del" data-course-impl-name>{{ currentCourse.specification.folder.name }}</span>
                                     {% else %}
-                                        <span class="icon-course" data-course-impl-icon></span> <span data-course-impl-name>{{ currentCourse.specification.folder.name }}</span>
+                                        <sbx-icon class="icon-course" data-course-impl-icon name="course" size="l"></sbx-icon><span data-course-impl-name>{{ currentCourse.specification.folder.name }}</span>
                                     {% endif %}
                                 </h3>
                             {% if not currentCourse.specification.folder.isDeleted %}
