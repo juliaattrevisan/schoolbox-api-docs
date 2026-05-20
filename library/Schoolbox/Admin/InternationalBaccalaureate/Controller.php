@@ -974,8 +974,7 @@ class Controller extends ConfigController
     /**
      * Move selected candidates out of preparation.
      *
-     * Dynamic preparation rows are persisted before being transitioned. The next state is determined from whether the
-     * candidate still has missing required details.
+     * Dynamic preparation rows are persisted before being transitioned.
      *
      * @api POST /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/complete-preparation
      */
