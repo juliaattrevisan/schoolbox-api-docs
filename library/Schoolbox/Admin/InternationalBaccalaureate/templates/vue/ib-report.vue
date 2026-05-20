@@ -66,6 +66,7 @@ function mapStudentRow(s: ApiStudent): StudentRow {
     return {
         id: s.registrationSessionStudentId ?? s.userId,
         name: s.userName,
+        userId: s.userId,
         candidateDetailsStatus: s.hasMissingDetails ? "unconfirmed" : "confirmed",
         subjects: {
             hl: s.ibGroupSubjects.HL.map(mapSubjectEntry),

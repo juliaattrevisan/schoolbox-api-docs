@@ -28,6 +28,7 @@ export type CandidateDetailsStatus = "confirmed" | "unconfirmed";
 export type StudentRow = {
     id: number;
     name: string;
+    userId: number;
     candidateDetailsStatus: CandidateDetailsStatus;
     subjects: SubjectGroup;
     updateLanguageEndpoint: string | null;

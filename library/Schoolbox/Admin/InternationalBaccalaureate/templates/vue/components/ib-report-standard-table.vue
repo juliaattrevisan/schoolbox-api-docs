@@ -24,11 +24,11 @@ function openModal(student: StudentRow): void {
  * @param student The student to renotify.
  */
 async function renotifyStudent(student: StudentRow): Promise<void> {
-    if (student.renotifyEndpoint === null || renotifyingStudentIds.value.has(student.id)) {
+    if (student.renotifyEndpoint === null || renotifyingStudentIds.value.has(student.userId)) {
         return;
     }
 
-    renotifyingStudentIds.value = new Set([...renotifyingStudentIds.value, student.id]);
+    renotifyingStudentIds.value = new Set([...renotifyingStudentIds.value, student.userId]);
     const toast = window.sbProps.toastActivate("Renotifying student...");
 
     try {
@@ -36,7 +36,7 @@ async function renotifyStudent(student: StudentRow): Promise<void> {
             url: student.renotifyEndpoint,
             method: "POST",
             body: {
-                studentIds: [student.id],
+                studentIds: [student.userId],
             },
         });
 
@@ -51,7 +51,7 @@ async function renotifyStudent(student: StudentRow): Promise<void> {
         toast.timeout({ text: errorMessage, isSuccess: false });
     } finally {
         const nextStudentIds = new Set(renotifyingStudentIds.value);
-        nextStudentIds.delete(student.id);
+        nextStudentIds.delete(student.userId);
         renotifyingStudentIds.value = nextStudentIds;
     }
 }
