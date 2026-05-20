@@ -196,7 +196,11 @@ class Eportfolio extends Base
     protected function deleteChunk(array $chunk): void
     {
         $targetIds = $this->groupTargetIdsByTable($chunk);
-        $this->logRootTargetIds($targetIds);
+        foreach ($targetIds as $table => $ids) {
+            $this->log->debug(
+                sprintf('Processing ePortfolio root target %s ids: %s', $table, implode(', ', $ids)),
+            );
+        }
 
         $pageIds = $targetIds[self::TABLE_EPORTFOLIO_PAGE] ?? [];                            // Directly targeted page ids.
         $blogIds = $targetIds[self::TABLE_EPORTFOLIO_COMPONENT_BLOG] ?? [];                  // Directly targeted blog ids.
@@ -209,9 +213,7 @@ class Eportfolio extends Base
         $pageCascadeBlogIds = array_values(array_diff($pageBlogIds, $blogIds));     // Blogs that are children of directly targeted pages, excluding directly targeted blogs.
                                                                                     // Note array_values() just ensures that keys start from 0 and are sequential, since
                                                                                     // array_diff() preserves the keys from the array being diffed.
-        /**
-         * array<string, list<int>>
-         */
+        /** array<string, list<int>> */
         $deletedIdsByTableName = [];
 
         // Delete rows from all twelve tables covered by this strategy.
@@ -315,20 +317,6 @@ class Eportfolio extends Base
     }
 
     /**
-     * Logs the IDs of root targets being processed in the current chunk.
-     *
-     * @param array<string, list<int>> $targetIds
-     */
-    private function logRootTargetIds(array $targetIds): void
-    {
-        foreach ($targetIds as $table => $ids) {
-            $this->log->debug(
-                sprintf('Processing ePortfolio root target %s ids: %s', $table, implode(', ', $ids)),
-            );
-        }
-    }
-
-    /**
      * Returns the component_instance IDs for the given ePortfolio page IDs.
      *
      * @param list<int> $pageIds
@@ -402,7 +390,11 @@ class Eportfolio extends Base
         );
         $statement->execute(Builder::getArrayParameters($ids, 'id'));
 
-        $this->recordDeleted($deletedIdsByTableName, $table, $ids);
+        $deletedIdsByTableName[$table] = array_values(
+            array_unique(
+                array_merge($deletedIdsByTableName[$table] ?? [], $ids),
+            ),
+        );
     }
 
     /**
@@ -429,6 +421,25 @@ class Eportfolio extends Base
             return;
         }
 
+        $deletedIds = $this->findIdsByColumn($table, $column, $ids, $excludedIds);
+        if ($deletedIds === []) {
+            return;
+        }
+
+        $this->deleteRowsByIds($deletedIdsByTableName, $table, $deletedIds);
+    }
+
+    /**
+     * Finds row IDs from a table by matching a column against the given values.
+     *
+     * @param string $table
+     * @param string $column
+     * @param list<int> $ids
+     * @param list<int> $excludedIds
+     * @return list<int>
+     */
+    private function findIdsByColumn(string $table, string $column, array $ids, array $excludedIds = []): array
+    {
         $placeholders = Builder::getArrayPlaceholders($ids, $column);
         $parameters = Builder::getArrayParameters($ids, $column);
         $exclusionPredicate = '';
@@ -439,24 +450,10 @@ class Eportfolio extends Base
             $parameters = array_merge($parameters, Builder::getArrayParameters($excludedIds, 'excluded_id'));
         }
 
-        $statement = $this->getPreparedStatement(
-            $this->deleteStatement($table) . " FROM $table WHERE $column IN $placeholders$exclusionPredicate"
-        );
-        $statement->execute($parameters);
+        $rows = $this->fetchRows("SELECT id FROM $table WHERE $column IN $placeholders$exclusionPredicate", $parameters);
+        $rowIds = array_map(static fn(array $row): int => (int) $row['id'], $rows);
 
-        $this->recordDeleted($deletedIdsByTableName, $table, $ids);
-    }
-
-    /**
-     * Accumulates a row-count into the deleted totals map for the given table.
-     *
-     * @param array<string, list<int>> $deletedIdsByTableName
-     * @param string             $table
-     * @param list<int> $ids
-     */
-    protected function recordDeleted(array &$deletedIdsByTableName, string $table, array $ids): void
-    {
-        $deletedIdsByTableName[$table] = $ids;
+        return array_values(array_unique(array_filter($rowIds, static fn(int $id): bool => $id > 0)));
     }
 
     /**

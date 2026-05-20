@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\DataRetention\Test;
 
 use Alaress\Database\Connector\IConnector;
+use PDOStatement;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\DataRetention\RetentionPeriod;
@@ -204,6 +205,110 @@ class EportfolioStrategyTest extends TestCase
         );
 
         $deleteChunk($chunk);
+    }
+
+    /**
+     * Creates a strategy test double for assertions against final chunk logging.
+     *
+     * Most tests in this class intercept delete helper calls before SQL is built, so
+     * they can assert delete order and target tables directly. This fixture takes the
+     * opposite approach for the logging regression: it lets deleteRowsByIds(),
+     * deleteRowsByForeignIds(), recordDeleted(), and logChunkResult() run together,
+     * while still avoiding a real database.
+     *
+     * The queued $fetchRows values stand in for the row-id lookup performed before a
+     * foreign-key delete, and the stub logger captures notice messages so the test can
+     * assert that direct deletes and cascade deletes for the same table are accumulated
+     * and logged using target-table row IDs.
+     *
+     * @param list<list<array{id: int|string}>> $fetchRows
+     * @return array{strategy: object, state: object}
+     */
+    private function loggingStrategy(array $fetchRows): array
+    {
+        $logger = $this->createStub(LoggerInterface::class);
+        $database = $this->createStub(IConnector::class);
+        $lock = $this->createStub(LockInterface::class);
+        $config = $this->createStub(IConfigLoader::class);
+        $statement = $this->createStub(PDOStatement::class);
+        $state = new class ($fetchRows) {
+            /**
+             * @param list<list<array{id: int|string}>> $fetchRows
+             */
+            public function __construct(public array $fetchRows)
+            {
+            }
+
+            /** @var list<string> */
+            public array $noticeMessages = [];
+        };
+
+        $logger->method('notice')
+            ->willReturnCallback(
+                static function (string $message) use ($state): void {
+                    $state->noticeMessages[] = $message;
+                },
+            );
+        $statement->method('execute')->willReturn(true);
+        $database->method('prepare')->willReturn($statement);
+
+        $strategy = new class (
+            $logger,
+            true,
+            $database,
+            $lock,
+            $config,
+            time() + 3600,
+            new RetentionPeriod(30),
+            $state,
+        ) extends Eportfolio {
+            public function __construct(
+                LoggerInterface $logger,
+                bool $perform,
+                IConnector $database,
+                LockInterface $lock,
+                IConfigLoader $config,
+                int $endTime,
+                RetentionPeriod $retentionPeriod,
+                private object $state,
+            ) {
+                parent::__construct($logger, $perform, $database, $lock, $config, $endTime, $retentionPeriod);
+            }
+
+            /**
+             * Exercise a direct delete followed by a foreign-key cascade delete against the same table.
+             */
+            public function deleteCommentsAndLog(): void
+            {
+                $deletedIdsByTableName = [];
+
+                $this->deleteRowsByIds(
+                    $deletedIdsByTableName,
+                    self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT,
+                    [30],
+                );
+                $this->deleteRowsByForeignIds(
+                    $deletedIdsByTableName,
+                    self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT,
+                    'blog_id',
+                    [20],
+                    [30],
+                );
+
+                $this->logChunkResult($deletedIdsByTableName);
+            }
+
+            /**
+             * @param array<string, mixed> $params
+             * @return list<array{id: int|string}>
+             */
+            protected function fetchRows(string $query, array $params): array
+            {
+                return array_shift($this->state->fetchRows) ?? [];
+            }
+        };
+
+        return ['strategy' => $strategy, 'state' => $state];
     }
 
     /**
@@ -542,6 +647,26 @@ class EportfolioStrategyTest extends TestCase
                 ['method' => 'ids', 'table' => Eportfolio::TABLE_EPORTFOLIO_PAGE, 'column' => 'page_id', 'ids' => [10]],
             ],
             $state->operations,
+        );
+    }
+
+    /**
+     * Verifies final chunk logging reports row IDs from the deleted table, and accumulates
+     * direct and foreign-key deletes for the same table instead of overwriting the earlier delete.
+     */
+    public function testForeignKeyDeletesLogDeletedTableRowIdsAndAccumulateWithDirectDeletes(): void
+    {
+        ['strategy' => $strategy, 'state' => $state] = $this->loggingStrategy([
+            [['id' => 31], ['id' => 32]],
+        ]);
+
+        $strategy->deleteCommentsAndLog();
+
+        $this->assertSame(
+            [
+                "Deleted 3 rows from table 'eportfolio_component_blog_comment' (ids: 30, 31, 32)",
+            ],
+            $state->noticeMessages,
         );
     }
 
