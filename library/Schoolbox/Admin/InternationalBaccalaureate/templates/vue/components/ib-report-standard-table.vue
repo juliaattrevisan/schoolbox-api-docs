@@ -76,6 +76,13 @@ function openModal(student: StudentRow): void {
                                 Update Language Selection
                             </button>
                         </li>
+                        <!-- TODO: At the moment there's no way to distinguish the different states in vue, so needs to add condition later to restrict to unconfirmed state only    -->
+                        <li>
+                            <button class="sbx-button--has-icon">
+                                <sbx-icon name="notifications-hollow"></sbx-icon>
+                                Renotify student
+                            </button>
+                        </li>
                     </ul>
                 </td>
             </tr>
