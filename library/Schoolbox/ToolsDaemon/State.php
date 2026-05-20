@@ -75,6 +75,6 @@ enum State : string
      */
     public function isFinished(): bool
     {
-        return in_array($this, [self::SUCCESS, self::FAILURE, self::REVOKED]);
+        return in_array($this, [self::SUCCESS, self::FAILURE, self::REVOKED], true);
     }
 }
