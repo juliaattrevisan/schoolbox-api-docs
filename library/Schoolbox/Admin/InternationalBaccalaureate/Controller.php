@@ -611,6 +611,7 @@ class Controller extends ConfigController
                     'candidatesEndpoint' => $this->getRouteIfAuthorized('internationalBaccalaureate.getRegistrationSessionStudents', ['sessionId' => $sessionId]),
                     'candidateExportEndpoint' => $this->getRouteIfAuthorized('internationalBaccalaureate.exportRegistrationSessionStudentsCsv', ['sessionId' => $sessionId]),
                     'searchLanguages' => $this->getRouteIfAuthorized('internationalBaccalaureate.searchLanguages'),
+                    'completePreparation' => $this->getRouteIfAuthorized('internationalBaccalaureate.sessionCompletePreparation', ['sessionId' => $sessionId]),
                 ],
                 'sessionTitle' => $session->jsonSerialize()['title'],
             ]
@@ -971,6 +972,63 @@ class Controller extends ConfigController
     }
 
     /**
+     * Move selected candidates out of preparation.
+     *
+     * Dynamic preparation rows are persisted before being transitioned. The next state is determined from whether the
+     * candidate still has missing required details.
+     *
+     * @api POST /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/complete-preparation
+     */
+    public function sessionCompletePreparation(RegistrationSessionModel $registrationSession): void
+    {
+        $post = $this->requestPost;
+        $studentIds = $post->get('studentIds');
+
+        try {
+            $studentIds = $this->normalisePreparationStudentIds($studentIds);
+        } catch (\InvalidArgumentException $e) {
+            $this->response = $this->responseAsJson([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ])->withStatus(400);
+            return;
+        }
+
+        $database = $this->registrationSessionStudentMapper->getDatabase();
+        $transactionStarted = false;
+
+        try {
+            $students = $this->registrationSessionStudentMapper->findStudentsForSession((int) $registrationSession->getId());
+            $studentsToTransition = $this->resolvePreparationStudentsForTransition($students, $studentIds);
+
+            $transactionStarted = $database->beginTransaction();
+
+            foreach ($studentsToTransition as $student) {
+                $student->setStatus(RegistrationSessionStudentModel::STATUS_UNCONFIRMED);
+                $this->registrationSessionStudentMapper->save($student);
+            }
+
+            $database->commit();
+            $transactionStarted = false;
+
+            $this->response = $this->responseAsJson([
+                'success' => true,
+                'transitionedCount' => count($studentsToTransition),
+            ]);
+        } catch (\InvalidArgumentException $e) {
+            if ($transactionStarted) {
+                $database->rollBack();
+            }
+            $this->sendJsonError($e->getMessage(), 400);
+        } catch (Exception) {
+            if ($transactionStarted) {
+                $database->rollBack();
+            }
+            $this->sendJsonError('Something has gone wrong. Please try again later.', 500);
+        }
+    }
+
+    /**
      * @return array<string, mixed>
      */
     private function findExternalStudent(RegistrationSessionStudentModel $student): array
@@ -1039,5 +1097,95 @@ class Controller extends ConfigController
                 'registration_session_id' => $sessionId,
             ]);
         }
+    }
+
+    /**
+     * @param mixed $studentIds
+     * @return int[]
+     */
+    private function normalisePreparationStudentIds(mixed $studentIds): array
+    {
+        if (!is_array($studentIds) || $studentIds === []) {
+            throw new \InvalidArgumentException('Student IDs are required.');
+        }
+
+        $normalisedStudentIds = [];
+
+        foreach ($studentIds as $studentId) {
+            $studentId = (int) $studentId;
+
+            if ($studentId <= 0) {
+                throw new \InvalidArgumentException('Student IDs are required.');
+            }
+
+            $normalisedStudentIds[$studentId] = $studentId;
+        }
+
+        return array_values($normalisedStudentIds);
+    }
+
+    /**
+     * @param iterable<mixed> $students
+     * @param int[] $studentIds
+     * @return RegistrationSessionStudentModel[]
+     */
+    private function resolvePreparationStudentsForTransition(iterable $students, array $studentIds): array
+    {
+        $studentsByRequestedId = [];
+
+        foreach ($students as $student) {
+            if (!$student instanceof RegistrationSessionStudentModel) {
+                continue;
+            }
+
+            $candidateIds = [];
+
+            if ($student->getId() !== null) {
+                $candidateIds[] = $student->getId();
+            }
+
+            if ($student->getUser()?->getId() !== null) {
+                $candidateIds[] = $student->getUser()->getId();
+            }
+
+            foreach (array_unique($candidateIds) as $candidateId) {
+                $studentsByRequestedId[$candidateId][] = $student;
+            }
+        }
+
+        $studentsToTransition = [];
+
+        foreach ($studentIds as $studentId) {
+            $matches = $studentsByRequestedId[$studentId] ?? [];
+
+            if ($matches === []) {
+                throw new \InvalidArgumentException('One or more selected students could not be found in this registration session.');
+            }
+
+            if (count($matches) > 1) {
+                foreach ($matches as $match) {
+                    if ($match->getStatus() !== RegistrationSessionStudentModel::STATUS_PREPARATION) {
+                        throw new \InvalidArgumentException(
+                            'One or more selected student IDs belong to candidates who are already further down the process.'
+                        );
+                    }
+                }
+
+                throw new \InvalidArgumentException('One or more selected student IDs are ambiguous in this registration session.');
+            }
+
+            $student = $matches[0];
+
+            if ($student->getStatus() !== RegistrationSessionStudentModel::STATUS_PREPARATION) {
+                throw new \InvalidArgumentException(
+                    'One or more selected student IDs belong to candidates who are already further down the process.'
+                );
+            }
+
+            $studentKey = $student->getUser()?->getId() ?? $student->getId() ?? $studentId;
+            $studentsToTransition[$studentKey] = $student;
+        }
+
+        return array_values($studentsToTransition);
     }
 }
