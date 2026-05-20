@@ -20,7 +20,7 @@ class NullClient implements IClient
      */
     public function run(JobRequest $request): string
     {
-        return '';
+        throw new ClientException('Tools daemon null client is unable to run jobs');
     }
 
     /**
