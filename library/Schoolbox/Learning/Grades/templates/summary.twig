@@ -52,6 +52,11 @@
                     </div>
                 </li>
             </ul>
+            {% if customisationsRoute %}
+                <a class="button icon-view" href="{{ customisationsRoute }}" data-test="grades-view-customisations">
+                    View Customisations
+                </a>
+            {% endif %}
         </section>
     </div>
     <div class="small-12 medium-7 columns">
