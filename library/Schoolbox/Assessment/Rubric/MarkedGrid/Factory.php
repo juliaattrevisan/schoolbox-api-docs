@@ -144,35 +144,38 @@ class Factory
                 $markedGrid->getCapabilityMarks()->add($capabilityMark);
             }
 
-            // If mark per cap is off, this will be empty as no capability data gets posted
-            if ($postCapabilities) {
-                // This is the literal string the user entered into the capability mark input field
-                $capabilityCustomMarkInput = $isSelfReflection
-                    ? null
-                    : ($postCapabilities[$capabilityId]['customMark'] ?? null);
+            /* The Capability Mark initial state is null until otherwise determined, I guess, from the post payload
+             * that is sent back per grid. At this point a $capabilityMark is presumed to always exist, since it was
+             * either retrieved from the $markedGrid or spawned anew and added to $markedGrid.
+             */
+            $capabilityMark
+                ->setHumanReadableValue(null)
+                ->setValue(null);
 
-                //if null that is a valid entry
-                if ($capabilityCustomMarkInput === '') {
-                    $capabilityCustomMarkInput = null;
-                }
+            /* Self reflection feedbacks have no utilisation of capability marks.
+             */
+            if (!$isSelfReflection) {
+                /* Check the post payload for the capability mark type values.
+                 */
+                $capabilityMarkHumanReadable = $postData['capabilities'][$capabilityId]['humanReadableMark'] ?? null;
 
-                // Validate the input string first
-                $capMarkSpec = new ValidCapabilityMark($capabilityMark->getMarkScheme());
-                if ($capMarkSpec->isSatisfiedBy($capabilityCustomMarkInput)) {
-                    // Set the capability mark's values:
-                    // human-readable: whatever was passed in the form
-                    // standard value: calculated based on the human-readable value
+                /* This seems unused because there's a backend converter that reverse-engineers a numeric value from the
+                 * human-readable input someone provided via the ui
+                 */
+                //$capabilityMarkValue = $post['capabilities'][$capabilityId]['value'] ?? null;
+
+                /* Check whether the capability mark's human readable string is a valid input; if it is, assign its
+                 * values to the $capabilityMark instance.
+                 */
+                if ((new ValidCapabilityMark($capabilityMark->getMarkScheme()))->isSatisfiedBy($capabilityMarkHumanReadable)) {
                     $capabilityMark
-                        ->setHumanReadableValue($capabilityMark->convertFormInputToHumanReadableValue($capabilityCustomMarkInput))
-                        ->setValue($capabilityMark->convertFormInputToValue($capabilityCustomMarkInput));
+                        ->setHumanReadableValue($capabilityMark->convertFormInputToHumanReadableValue($capabilityMarkHumanReadable))
+                        ->setValue($capabilityMark->convertFormInputToValue($capabilityMarkHumanReadable));
                 } else {
                     throw new \InvalidArgumentException("Capability mark must be between 0 and " . $capabilityMark->getCapabilityUsage()->getMaxValue());
                 }
-            } else {
-                // If mark per cap is off, set capability mark to null; the model knows how to handle this.
-                $capabilityMark
-                    ->setHumanReadableValue(null)
-                    ->setValue(null);
+
+
             }
 
             // Set marks for indicators
