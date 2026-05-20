@@ -23,25 +23,20 @@ enum FeedbackMeta: string
     case DUE_WORK = 'Schoolbox\Learning\Assessment\DueWork\Feedback\Model';
     case REPORTING = 'Schoolbox\Learning\Assessment\Reporting\Feedback\Model';
 
+
     /**
      * Returns some mapper info corresponding to the given IFeedback instance
      *
-     * @return array
+     * @return \Schoolbox\Mapper
      */
-    public function translate(): array
+    public function translate(): \Schoolbox\Mapper
     {
         // This is a valid use of $this:
         // see https://www.php.net/manual/en/language.enumerations.methods.php
         // phpcs:ignore
         return match ($this) {
-            FeedbackMeta::DUE_WORK => [
-                'mapper' => \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper::getInstance(),
-                'feedbackTable' => \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper::getInstance()->getTable()
-            ],
-            FeedbackMeta::REPORTING => [
-                'mapper' => \Schoolbox\Learning\Assessment\DataModel\Reporting\Feedback\Mapper::getInstance(),
-                'feedbackTable' => \Schoolbox\Learning\Assessment\DataModel\Reporting\Feedback\Mapper::getInstance()->getTable()
-            ]
+            FeedbackMeta::DUE_WORK => \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper::getInstance(),
+            FeedbackMeta::REPORTING => \Schoolbox\Learning\Assessment\DataModel\Reporting\Feedback\Mapper::getInstance(),
         };
     }
 }
