@@ -114,6 +114,8 @@ class Factory
          */
 
         // TODO mark schemes still need to be in the grid, not marked grid
+        /* TODO What does that even mean??
+         */
         $markSchemeFactory = new \Schoolbox\Learning\MarkScheme\Factory();
 
         // Is this a self-reflection?
