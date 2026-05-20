@@ -215,19 +215,23 @@ class Cms extends Base
         $counts['etherpad_pads'] = $this->cleanupHomepagePadsForFolders($folderIdsToDelete);
 
         $blogIds = $this->findIdsByFolder('blog', 'id', 'folder_id', $folderIdsToDelete);
+        $this->log->info(sprintf("Found '%s' blog to delete ids: %s", count($blogIds), implode(',', $blogIds)));
         $counts['blog_comment'] = $this->deleteBlogComments($blogIds);
         $counts['blog_image'] = $this->deleteBlogImages($blogIds);
         $counts['blog'] = $this->deleteBlog($blogIds);
 
         $forumThreadIds = $this->findIdsByFolder('forumThread', 'threadID', 'categoryID', $folderIdsToDelete);
+        $this->log->info(sprintf("Found '%s' forumThread to delete ids: %s", count($forumThreadIds), implode(',', $forumThreadIds)));
         $counts['forumPost'] = $this->deleteForumPosts($forumThreadIds);
         $counts['forumThread'] = $this->deleteForumThreads($forumThreadIds);
 
         $pollIds = $this->findIdsByFolder('poll', 'id', 'folder_id', $folderIdsToDelete);
+        $this->log->info(sprintf("Found '%s' poll to delete ids: %s", count($pollIds), implode(',', $pollIds)));
         $counts['pollLog'] = $this->deletePollLogs($pollIds);
         $counts['poll'] = $this->deletePolls($pollIds);
 
         $wikiIds = $this->findIdsByFolder('wiki', 'wikiID', 'categoryID', $folderIdsToDelete);
+        $this->log->info(sprintf("Found '%s' wiki to delete ids: %s", count($wikiIds), implode(',', $wikiIds)));
         $counts['wiki_unlinked'] = $this->setWikiLatestRevisionNull($wikiIds);
         $counts['wikiRevision'] = $this->deleteWikiRevisions($wikiIds);
         $counts['wiki'] = $this->deleteWikis($wikiIds);
@@ -237,6 +241,7 @@ class Cms extends Base
         $counts['component_instance'] = $this->deleteComponentInstances($componentInstanceIds);
 
         $tileLayouts = $this->findIdsByFolder('tile_layout_for_folder', 'tile_layout_id', 'folder_id', $folderIdsToDelete);
+        $this->log->info(sprintf("Found '%s' tile_layout_for_folder to delete ids: %s", count($tileLayouts), implode(',', $tileLayouts)));
         $counts['tiles'] = $this->deleteTiles($tileLayouts);
         $counts['tileLayouts'] = $this->deleteTileLayouts($tileLayouts);
         $counts['tileLayoutsJoins'] = $this->deleteTileLayoutJoin($tileLayouts);
@@ -392,6 +397,20 @@ class Cms extends Base
         }
 
         $placeholders = Builder::getArrayPlaceholders($folderIds, 'folder');
+//
+//        // firstly fetch ID's for each entry, so we know what we have deleted
+//        $findStatement = $this->getPreparedStatement(
+//            "SELECT id FROM {$table} WHERE {$column} IN {$placeholders}"
+//        );
+//        $findStatement->execute(Builder::getArrayParameters($folderIds, 'folder'));
+//
+//        $this->log->info(sprintf(
+//            "Found '%s' entries in table '%s' ids: %s",
+//            $findStatement->rowCount(),
+//            $table,
+//            implode(', ', array_map(static fn(array $row): int => (int) $row['id'], $findStatement->fetchAll(\PDO::FETCH_ASSOC))),
+//        ));
+
         $statement = $this->getPreparedStatement(
             $this->deleteStatement($table) . " FROM {$table} WHERE {$column} IN {$placeholders}"
         );
@@ -1178,11 +1197,8 @@ class Cms extends Base
         }
 
         $surveyIds = $this->findSurveyIds($folderIds);
-        $this->log->debug(sprintf(
-            "Found '%s' assess survey records for CMS folder IDs: %s",
-            count($surveyIds),
-            implode(', ', $folderIds),
-        ));
+
+        $this->log->info(sprintf("Found '%s' assess surveys to delete ids: %s", count($surveyIds), implode(',', $surveyIds)));
 
         if ($surveyIds === []) {
             return $counts;
