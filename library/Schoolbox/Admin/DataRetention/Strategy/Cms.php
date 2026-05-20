@@ -248,8 +248,8 @@ class Cms extends Base
 
         $counts = array_merge($counts, $this->deleteSurveys($folderIdsToDelete));
 
-        foreach ($this->folderOwnedTables() as $table => $column) {
-            $counts[$table] = $this->deleteByFolderIds($table, $column, $folderIdsToDelete);
+        foreach ($this->folderOwnedTables() as $table => $columns) {
+            $counts[$table] = $this->deleteByFolderIds($table, $columns, $folderIdsToDelete);
         }
 
         $counts['userAccess'] = $this->deleteHomepageUserAccess($folderIdsToDelete);
@@ -315,29 +315,29 @@ class Cms extends Base
 
     /**
      * Map of tables with foreign keys into folder ids, for feature-specific cleanup during folder deletion.
-     * @return array<string, string>
+     * @return array<string, array{folderColumn: string, idColumn: string|null}>
      */
     private function folderOwnedTables(): array
     {
         return [
-            'chat' => 'category_id',
-            'chat_poll' => 'category_id',
-            'event_folder' => 'folder_id',
-            'file' => 'category',
-            'folder_code' => 'folder_id',
-            'folder_year_level' => 'folder_id',
-            'google_file' => 'folder_id',
-            'homepage_config' => 'cid',
-            'homepage_log' => 'folder_id',
-            'homepage_visits' => 'category_id',
-            'link' => 'category',
-            'moment_folder' => 'folder_id',
-            'perms' => 'cid',
-            'reportcard_comment' => 'category_id',
-            'search_index' => 'folder_id',
-            'socialstream_post' => 'homepage_id',
-            'textbox' => 'folder_id',
-            'userGroups' => 'cid',
+            'chat' => ['folderColumn' => 'category_id', 'idColumn' => 'id'],
+            'chat_poll' => ['folderColumn' => 'category_id', 'idColumn' => null],
+            'event_folder' => ['folderColumn' => 'folder_id', 'idColumn' => null],
+            'file' => ['folderColumn' => 'category', 'idColumn' => 'id'],
+            'folder_code' => ['folderColumn' => 'folder_id', 'idColumn' => null],
+            'folder_year_level' => ['folderColumn' => 'folder_id', 'idColumn' => null],
+            'google_file' => ['folderColumn' => 'folder_id', 'idColumn' => 'id'],
+            'homepage_config' => ['folderColumn' => 'cid', 'idColumn' => 'cid'],
+            'homepage_log' => ['folderColumn' => 'folder_id', 'idColumn' => null],
+            'homepage_visits' => ['folderColumn' => 'category_id', 'idColumn' => null],
+            'link' => ['folderColumn' => 'category', 'idColumn' => 'id'],
+            'moment_folder' => ['folderColumn' => 'folder_id', 'idColumn' => null],
+            'perms' => ['folderColumn' => 'cid', 'idColumn' => null],
+            'reportcard_comment' => ['folderColumn' => 'category_id', 'idColumn' => 'id'],
+            'search_index' => ['folderColumn' => 'folder_id', 'idColumn' => 'id'],
+            'socialstream_post' => ['folderColumn' => 'homepage_id', 'idColumn' => 'post_id'],
+            'textbox' => ['folderColumn' => 'folder_id', 'idColumn' => 'id'],
+            'userGroups' => ['folderColumn' => 'cid', 'idColumn' => 'cid'],
         ];
     }
 
@@ -386,33 +386,40 @@ class Cms extends Base
     /**
      * For a given table, delete entries that are for the specified folder (based on $column)
      * @param string $table
-     * @param string $column
+     * @param array{folderColumn: string, idColumn: string|null} $columns
      * @param array  $folderIds
      * @return int
      */
-    protected function deleteByFolderIds(string $table, string $column, array $folderIds): int
+    protected function deleteByFolderIds(string $table, array $columns, array $folderIds): int
     {
         if ($folderIds === []) {
             return 0;
         }
 
         $placeholders = Builder::getArrayPlaceholders($folderIds, 'folder');
-//
-//        // firstly fetch ID's for each entry, so we know what we have deleted
-//        $findStatement = $this->getPreparedStatement(
-//            "SELECT id FROM {$table} WHERE {$column} IN {$placeholders}"
-//        );
-//        $findStatement->execute(Builder::getArrayParameters($folderIds, 'folder'));
-//
-//        $this->log->info(sprintf(
-//            "Found '%s' entries in table '%s' ids: %s",
-//            $findStatement->rowCount(),
-//            $table,
-//            implode(', ', array_map(static fn(array $row): int => (int) $row['id'], $findStatement->fetchAll(\PDO::FETCH_ASSOC))),
-//        ));
+        $folderColumn = $columns['folderColumn'];
+
+        if ($columns['idColumn']) {
+            // firstly fetch ID's for each entry, so we know what we have deleted
+            $findStatement = $this->getPreparedStatement(
+                "SELECT {$columns['idColumn']} FROM {$table} WHERE {$folderColumn} IN {$placeholders}"
+            );
+            $findStatement->execute(Builder::getArrayParameters($folderIds, 'folder'));
+
+            $this->log->info(
+                sprintf(
+                    "Found '%s' entries in table '%s' %s: %s",
+                    $findStatement->rowCount(),
+                    $table,
+                    $columns['idColumn'],
+                    implode(', ', array_map(static fn(array $row): int => (int)$row[$columns['idColumn']], $findStatement->fetchAll(\PDO::FETCH_ASSOC))),
+                )
+            );
+        }
+
 
         $statement = $this->getPreparedStatement(
-            $this->deleteStatement($table) . " FROM {$table} WHERE {$column} IN {$placeholders}"
+            $this->deleteStatement($table) . " FROM {$table} WHERE {$folderColumn} IN {$placeholders}"
         );
         $statement->execute(Builder::getArrayParameters($folderIds, 'folder'));
 
