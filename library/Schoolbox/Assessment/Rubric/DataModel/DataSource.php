@@ -1113,20 +1113,10 @@ class DataSource
         /* This is the rubric_instance id associated with this $markedGrid, afaict
          *
          * This lets you delete feedback marks associated with this particular grid, rather than all grids, which might
-         * be a bit too brutal: persistMarkedGrid() gets called on each grid, so it shouldn't be mass-deleteing data
+         * be a bit too brutal: persistMarkedGrid() gets called on each grid, so it shouldn't be mass-deleting data
          * each iteration.
          */
         $rubricInstance = $markedGrid->getGrid()->getRubricInstance();
-
-        /* Use the derived mapper and the derived feedbackId to delete any rubric pieces that were previously associated
-         * with it which essentially cleanses the slate. Although, I think you'd be better off deleting them immediately
-         * prior to saving, in case something died during the construction of whatever you were going to save. That
-         * would have left you in a half-baked state, deleting previous data but not persisting current data.
-         *
-         * TODO move this prior to saving
-         */
-        $this->indicatorMarkMapper->deleteFeedbackMarks($feedbackId, $rubricInstance, $mapper->getTable());
-        $this->capabilityMarkMapper->deleteFeedbackMarks($feedbackId, $rubricInstance, $mapper->getTable());
 
         /* This feedback could be any of the learning activities' data model feedback schema, such as submission_return
          * or reporting_feedback etc. so it's a bit sort-of-polymorphic. Conceptually they're all synonymous though.
@@ -1173,7 +1163,18 @@ class DataSource
             }
         }
 
-        // And save cap/ind marks
+        /* Remove previous marks
+         *
+         * Use the derived mapper and the derived feedbackId to delete any rubric pieces that were previously associated
+         * with it which essentially cleanses the slate. Although, I think you'd be better off deleting them immediately
+         * prior to saving, in case something died during the construction of whatever you were going to save. That
+         * would have left you in a half-baked state, deleting previous data but not persisting current data.
+         */
+        $this->indicatorMarkMapper->deleteFeedbackMarks($feedbackId, $rubricInstance, $mapper->getTable());
+        $this->capabilityMarkMapper->deleteFeedbackMarks($feedbackId, $rubricInstance, $mapper->getTable());
+
+        /* Save the updated cap/ind marks
+         */
         $this->capabilityMarkMapper->save($capabilityMarksToSave);
         $this->indicatorMarkMapper->save($indicatorMarksToSave);
     }
