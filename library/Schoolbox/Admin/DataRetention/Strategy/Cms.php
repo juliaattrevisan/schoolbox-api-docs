@@ -280,7 +280,7 @@ class Cms extends Base
      * Canonicalise ids before building SQL placeholders or delete plans.
      *
      * Retention chunks may contain duplicate or string-cast ids from PDO. This
-     * keeps later cascade and blocker checks deterministic, which matters for
+     * keeps later blocker checks deterministic, which matters for
      * predictable logging and leaf-first deletion order.
      *
      * @param array<int, int|string> $ids
@@ -446,9 +446,6 @@ class Cms extends Base
             $statement->fetchAll(\PDO::FETCH_ASSOC),
         );
     }
-
-    // --------------
-    // end tree functions
 
     // --------------
     // wiki functions

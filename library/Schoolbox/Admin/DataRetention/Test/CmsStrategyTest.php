@@ -27,7 +27,6 @@ class CmsStrategyTest extends TestCase
      * testable without a real database or Etherpad service, while still running
      * the production orchestration in Cms::deleteChunk().
      *
-     * @param array<int, list<int>> $folderChildren
      * @param list<int> $blockedFolderIds
      * @param array<string, array<int, list<int>>> $lookupIds
      * @param array<int, array<int, array<string, mixed>>> $homepagePadRecords
@@ -43,7 +42,6 @@ class CmsStrategyTest extends TestCase
      * }}
      */
     private function strategy(
-        array $folderChildren = [],
         array $blockedFolderIds = [],
         array $lookupIds = [],
         array $homepagePadRecords = [],
@@ -90,7 +88,6 @@ class CmsStrategyTest extends TestCase
             $config,
             time() + 3600,
             new RetentionPeriod(30),
-            $folderChildren,
             $blockedFolderIds,
             $lookupIds,
             $homepagePadRecords,
@@ -99,9 +96,6 @@ class CmsStrategyTest extends TestCase
             $state,
             $homepageUserAccessDeleteCount,
         ) extends Cms {
-            /** @var array<int, list<int>> */
-            private array $folderChildren;
-
             /** @var list<int> */
             private array $blockedFolderIds;
 
@@ -128,7 +122,6 @@ class CmsStrategyTest extends TestCase
              * replaces external dependencies with arrays so tests can model blocked
              * folders and related row ids precisely.
              *
-             * @param array<int, list<int>> $folderChildren
              * @param list<int> $blockedFolderIds
              * @param array<string, array<int, list<int>>> $lookupIds
              * @param array<int, array<int, array<string, mixed>>> $homepagePadRecords
@@ -144,7 +137,6 @@ class CmsStrategyTest extends TestCase
                 IConfigLoader $config,
                 int $endTime,
                 RetentionPeriod $retentionPeriod,
-                array $folderChildren,
                 array $blockedFolderIds,
                 array $lookupIds,
                 array $homepagePadRecords,
@@ -154,7 +146,6 @@ class CmsStrategyTest extends TestCase
                 int $homepageUserAccessDeleteCount,
             ) {
                 parent::__construct($logger, $perform, $database, $lock, $config, $endTime, $retentionPeriod);
-                $this->folderChildren = $folderChildren;
                 $this->blockedFolderIds = $blockedFolderIds;
                 $this->lookupIds = $lookupIds;
                 $this->homepagePadRecords = $homepagePadRecords;
@@ -168,7 +159,7 @@ class CmsStrategyTest extends TestCase
              * Simulate excluded assessment/course relations without real FK tables.
              *
              * The production strategy skips chunks that still belong to out-of-scope
-             * relations. This override lets tests exercise that branch by supplying
+             * relations. This override lets tests exercise that path by supplying
              * just the blocked folder ids.
              *
              * @param array<int, int> $folderIds
@@ -519,7 +510,7 @@ class CmsStrategyTest extends TestCase
     #[DataProvider('providerDeleteChunkHomepageCleanup')]
     public function testDeleteChunkHomepageCleanup(bool $perform, array $expectedCalls): void
     {
-        ['strategy' => $strategy, 'state' => $state] = $this->strategy([], [], [], [], [], [], $perform);
+        ['strategy' => $strategy, 'state' => $state] = $this->strategy([], [], [], [], [], $perform);
 
         $this->delete($strategy, [
             ['id' => 10, 'table' => 'folder'],
@@ -588,7 +579,7 @@ class CmsStrategyTest extends TestCase
      * Invoke deleteChunk() directly so tests can focus on one chunk's orchestration.
      *
      * Base::process() covers transactions, lock refresh, and chunk iteration.
-     * These tests need the smaller unit where CMS-specific cascade and delete
+     * These tests need the smaller unit where CMS-specific leaf filtering and delete
      * ordering decisions happen.
      *
      * @param Cms $strategy
@@ -709,7 +700,6 @@ class CmsStrategyTest extends TestCase
         ['strategy' => $strategy, 'state' => $state] = $this->strategy(
             [],
             [],
-            [],
             [
                 10 => [
                     ['id' => 1, 'pad_id' => 'g.test1'],
@@ -756,7 +746,6 @@ class CmsStrategyTest extends TestCase
         );
 
         ['strategy' => $strategy] = $this->strategy(
-            [],
             [],
             [],
             [
@@ -1077,7 +1066,6 @@ class CmsStrategyTest extends TestCase
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy(
             [],
-            [],
             [
                 'blog' => [
                     10 => [101],
@@ -1116,23 +1104,17 @@ class CmsStrategyTest extends TestCase
     }
 
     /**
-     * Supplied folder ids are already retention candidates, not cascade roots.
+     * Supplied folder ids are already retention candidates, not tree roots.
      *
-     * A folder graph in the test fixture must not cause extra folder ids to be
-     * deleted. Parent folders become eligible in later retention passes after
-     * their children have been removed by the leaf-first candidate query.
+     * Parent folders become eligible in later retention passes after their
+     * children have been removed by the leaf-first candidate query. This chunk
+     * should therefore delete only the id it was given.
      *
      * @return void
      */
     public function testDeleteChunkDoesNotExpandDescendantFolders(): void
     {
-        ['strategy' => $strategy, 'state' => $state] = $this->strategy(
-            [
-                10 => [11],
-                11 => [12],
-                12 => [],
-            ],
-        );
+        ['strategy' => $strategy, 'state' => $state] = $this->strategy();
 
         $this->delete($strategy, [
             ['id' => 10, 'table' => 'folder'],
@@ -1228,16 +1210,14 @@ class CmsStrategyTest extends TestCase
      * Blocked folders are removed from the current leaf chunk only.
      *
      * Assessment/course relations are outside CMS retention ownership. Under the
-     * leaf-first contract, a blocked folder does not imply branch-wide skipping;
-     * the strategy simply excludes that id and continues with the other supplied
-     * leaf folders.
+     * leaf-first contract, blocked folders are excluded from the current leaf set
+     * without expanding or classifying wider folder trees.
      *
      * @return void
      */
     public function testDeleteChunkExcludesBlockedLeafAndContinues(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy(
-            [],
             [10],
         );
 
@@ -1276,7 +1256,6 @@ class CmsStrategyTest extends TestCase
     public function testDeleteChunkSkipsWhenAllFoldersAreBlocked(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy(
-            [],
             [10],
         );
 
