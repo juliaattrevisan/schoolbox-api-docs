@@ -37,30 +37,42 @@
 
 {# Crumbs: Learning > Grades > {subject.name} #}
 
-{{ bread.crumbs(['Learning', '/learning/classes'], [locale.grades.properPlural, routeLookup('learningGrades.getGrades', {userId: student.id, termCode: term.code})], [subject.name]) }}
+{{ bread.crumbs(['Learning', '/learning/classes'], [locale.grades.properPlural, routeLookup('learningGrades.getGrades', {userId: student.id, termCode: term.code}) ~ viewModeQuerySuffix], [subject.name]) }}
 
-{% set canViewInstructorMarks = USER.role.isStaff %}
-<div class="row{% if canViewInstructorMarks %} actions-small-2{% endif %}">
+{% set canSwitchViewMode = USER.role.isStaff %}
+{% set canViewInstructorMarks = viewContext.canViewInstructorMarks() %}
+<div class="row{% if canSwitchViewMode %} actions-small-2{% endif %}">
     <div class="small-12 columns">
         <h1>{{ locale.grades.properPlural }} for {{ subject.name }} - {{ student.fullName }}</h1>
 
-        {% if subject.teachers|length or canViewInstructorMarks %}
+        {% if subject.teachers|length or canSwitchViewMode %}
         <ul class="meta">
             {% if subject.teachers|length %}
                 <li><sbx-icon name="teacher" color="var(--sbx-color-text-secondary)"></sbx-icon>Teacher(s): {% for teacher in subject.teachers %}<a href="/search/user/{{ teacher.id }}" title="View Profile">{{ teacher.fullName }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</li>
             {% endif %}
-            {% if canViewInstructorMarks %}
-                <li data-has-student-view-meta><sbx-icon data-has-student-view-meta-icon name="teacher" color="var(--sbx-color-text-secondary)"></sbx-icon>Teacher view</li>
+            {% if canSwitchViewMode %}
+                <li data-grades-view-mode-meta class="icon-view">Viewing as {{ viewContext.getLabel() }}</li>
             {% endif %}
         </ul>
         {% endif %}
     </div>
-    {% if canViewInstructorMarks %}
+    {% if canSwitchViewMode %}
         <nav>
             <sbx-pop-out content-id="header-options" data-test="sbx-pop-out-header-options"></sbx-pop-out>
         </nav>
         <ul id="header-options" class="f-dropdown" data-dropdown-content>
-            {% include '@learningGrades/fragments/studentViewNavSwitcher.twig' %}
+            {% set currentRouteBase = routeLookup('learningGrades.getGradesForSubject', {
+                viewee: student,
+                userId: student.id,
+                term: term,
+                termCode: term.code,
+                subject: subject,
+                subjectId: subject.id
+            }) %}
+            {% include '@learningGrades/fragments/studentViewNavSwitcher.twig' with {
+                viewContext: viewContext,
+                currentRouteBase: currentRouteBase
+            } only %}
         </ul>
     {% endif %}
 </div>
@@ -76,14 +88,16 @@
                     route:       'learningGrades.getGradesForSubject',
                     routeArgs:   {userId: student.id, subjectId: subject.id},
                     yearUrl:     yearUrl,
-                    year:        year is defined ? year : null
+                    year:        year is defined ? year : null,
+                    viewModeQuerySuffix: viewModeQuerySuffix
                 } only %}
                 {% include 'sub/subjectSelector.twig' with {
                     currentSubject: subject,
                     subjects:       folders,
                     route:         'learningGrades.getGradesForSubject',
                     routeArgs:      {userId: student.id, termCode: term.code},
-                    year:        year is defined ? year : null
+                    year:        year is defined ? year : null,
+                    viewModeQuerySuffix: viewModeQuerySuffix
                 } only %}
             </div>
         </div>

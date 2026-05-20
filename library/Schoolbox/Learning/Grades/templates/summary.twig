@@ -12,23 +12,28 @@
 
 {{ bread.crumbs(['Learning', routeLookup('learning.getClasses')], [locale.grades.properPlural]) }}
 
-{% set canViewInstructorMarks = USER.role.isStaff %}
-<div class="row{% if canViewInstructorMarks %} actions-small-2{% endif %}">
+{% set canSwitchViewMode = USER.role.isStaff %}
+{% set canViewInstructorMarks = viewContext.canViewInstructorMarks() %}
+<div class="row{% if canSwitchViewMode %} actions-small-2{% endif %}">
     <div class="small-12 columns">
         <h1>{{ locale.grades.properPlural }} for {{ term.title }}</h1>
 
-        {% if canViewInstructorMarks %}
+        {% if canSwitchViewMode %}
         <ul class="meta">
-            <li data-has-student-view-meta><sbx-icon data-has-student-view-meta-icon name="teacher" color="var(--sbx-color-text-secondary)"></sbx-icon>Teacher view</li>
+            <li data-grades-view-mode-meta class="icon-view">Viewing as {{ viewContext.getLabel() }}</li>
         </ul>
         {% endif %}
     </div>
-    {% if canViewInstructorMarks %}
+    {% if canSwitchViewMode %}
         <nav>
             <sbx-pop-out content-id="header-options" data-test="sbx-pop-out-header-options"></sbx-pop-out>
         </nav>
         <ul id="header-options" class="f-dropdown" data-dropdown-content>
-            {% include '@learningGrades/fragments/studentViewNavSwitcher.twig' %}
+            {% set currentRouteBase = routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, term: term, termCode: term.code}) %}
+            {% include '@learningGrades/fragments/studentViewNavSwitcher.twig' with {
+                viewContext: viewContext,
+                currentRouteBase: currentRouteBase
+            } only %}
         </ul>
     {% endif %}
 </div>
@@ -59,14 +64,16 @@
                     routeArgs:   {viewee: student, userId: student.id},
                     userId:      student.id,
                     yearUrl:     yearUrl,
-                    year:        year
+                    year:        year,
+                    viewModeQuerySuffix: viewModeQuerySuffix
                 } only %}
 
                 {% include 'sub/subjectSelector.twig' with {
                     subjects:    folders,
                     route:       'learningGrades.getGradesForSubject',
                     routeArgs:   {viewee: student, userId: student.id, term: term, termCode: term.code},
-                    year:        year
+                    year:        year,
+                    viewModeQuerySuffix: viewModeQuerySuffix
                 } only %}
             </div>
         </div>
@@ -83,7 +90,7 @@
                     <li class="subject-group" data-test="grades-subject-heading">
                         {% if term.id is not null %}
                             {# The supplied term matches a row in the schoolbox.term database table, so we can link to the getGradesForSubject() page for this term/subject. #}
-                            <a href="{{ routeLookup('learningGrades.getGradesForSubject', {viewee: student, userId: student.id, term: term, termCode: term.code, subject: folder, subjectId: folder.id}) }}"
+                            <a href="{{ routeLookup('learningGrades.getGradesForSubject', {viewee: student, userId: student.id, term: term, termCode: term.code, subject: folder, subjectId: folder.id}) ~ viewModeQuerySuffix }}"
                                class="flex-grade link-row" title="View {{ locale.grades.properPlural }}">
                                 {% include '@learningGrades/fragments/subject.twig' with {
                                     folder:              folder,
