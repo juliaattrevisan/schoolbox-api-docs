@@ -104,7 +104,8 @@
                                     {% include '@learningGrades/fragments/assessmentGrade.twig' with {
                                         assessment:  assessment.assessment,
                                         student:     student,
-                                        canViewInstructorMarks: canViewInstructorMarks
+                                        canViewInstructorMarks: canViewInstructorMarks,
+                                        viewContext: viewContext
                                     } only %}
                                     <ul>
                                         {% for projectAssessment in assessment.assessments %}
@@ -112,7 +113,8 @@
                                             {% include '@learningGrades/fragments/assessmentGrade.twig' with {
                                                 assessment:  projectAssessment,
                                                 student:     student,
-                                                canViewInstructorMarks: canViewInstructorMarks
+                                                canViewInstructorMarks: canViewInstructorMarks,
+                                        viewContext: viewContext
                                             } only %}
                                         </li>
                                         {% endfor %}
@@ -123,7 +125,8 @@
                                     {% include '@learningGrades/fragments/assessmentGrade.twig' with {
                                         assessment:  assessment.assessment,
                                         student:     student,
-                                        canViewInstructorMarks: canViewInstructorMarks
+                                        canViewInstructorMarks: canViewInstructorMarks,
+                                        viewContext: viewContext
                                     } only %}
                                 </li>
                                 {% endif %}

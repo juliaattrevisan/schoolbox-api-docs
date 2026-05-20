@@ -130,7 +130,8 @@
                                     {% include '@learningGrades/fragments/assessmentGrade.twig' with {
                                         assessment:  assessment,
                                         student:     student,
-                                        canViewInstructorMarks: canViewInstructorMarks
+                                        canViewInstructorMarks: canViewInstructorMarks,
+                                        viewContext: viewContext
                                     } only %}
                                 </li>
                             {% endfor %}

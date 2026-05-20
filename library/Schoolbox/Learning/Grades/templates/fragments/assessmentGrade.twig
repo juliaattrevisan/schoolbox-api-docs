@@ -11,6 +11,7 @@
 {% import '@learningAssessment/project/macro/icon.twig' as icon %}
 
 {% set participant = assessment ? assessment.participantIfExtant(student) : null %}
+{% set gradesViewer = viewContext is defined ? viewContext.viewer : USER %}
 
 {# Lesson Plans do not appear in the Grades page
  # cos nothing to do about Responses or Feedbacks
@@ -57,7 +58,7 @@
         </p>
     </div>
 
-    {% if participant and assessment.isFeedbackVisibleToUser(USER) %}
+    {% if participant and assessment.isFeedbackVisibleToUser(gradesViewer) %}
         {% if assessment is task %}
             {% include '@learningAssessment/fragments/progressTick.twig' with {
                 assessment: assessment,
@@ -85,8 +86,8 @@
         {% endif %}
     {% endif %}
 </div>
-{% if participant and assessment.isFeedbackVisibleToUser(USER) %}
-    {% set feedback = participant.findAuthoritativeVisibleFeedback(USER) %}
+{% if participant and assessment.isFeedbackVisibleToUser(gradesViewer) %}
+    {% set feedback = participant.findAuthoritativeVisibleFeedback(gradesViewer) %}
     {% if feedback and feedback.comment   %}
         <div class="content">
             <blockquote>{{ feedback.comment | purify }}</blockquote>
