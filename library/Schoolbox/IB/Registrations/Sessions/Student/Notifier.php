@@ -70,6 +70,9 @@ class Notifier extends AbstractModuleNotifier
             ->setHref($href)
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::INFO)
+            /* Adding meta so that it will trigger renotify
+             */
+            ->setMeta(['UpdatedAt' => $model->getUpdatedAt()->getUnixTimeStamp()])
             ->addTopic(
                 sprintf(
                     '%s.%d.%s.%d.%s',
