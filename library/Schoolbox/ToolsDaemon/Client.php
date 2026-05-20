@@ -67,7 +67,7 @@ class Client implements IClient
         try {
             $response = $this->httpClient->request(
                 'GET',
-                $this->baseUri->withPath("jobs/$jobId"),
+                $this->baseUri->withPath("/jobs/$jobId"),
             );
         } catch (GuzzleException $e) {
             throw new ClientException('Tools daemon returned an error: ' . $e->getMessage(), $e->getCode(), $e);
@@ -95,7 +95,7 @@ class Client implements IClient
         try {
             $response = $this->httpClient->request(
                 'GET',
-                $this->baseUri->withPath("jobs/$jobId/output"),
+                $this->baseUri->withPath("/jobs/$jobId/output"),
             );
         } catch (GuzzleException $e) {
             throw new ClientException('Tools daemon returned an error: ' . $e->getMessage(), $e->getCode(), $e);
