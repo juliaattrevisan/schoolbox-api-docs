@@ -78,7 +78,7 @@ class Controller extends Base
             null,
             Alaress_Date_Format::now()->addSeconds(self::JWT_EXPIRY),
             [
-                JwtParser\IParser::CLAIM_AUD                     => $helpUrl->withPath('')->__toString(),
+                JwtParser\IParser::CLAIM_AUD                     => $helpUrl->getHost(),
                 JwtParser\IParser::CLAIM_EMAIL                   => $this->getUser()->getEmail(),
                 JwtParser\OtherInstanceIssued::CLAIM_INSTANCE_ID => INSTANCE_ID,
             ]
