@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2026, Schoolbox Pty Ltd
  * @link      https://schoolbox.education/
