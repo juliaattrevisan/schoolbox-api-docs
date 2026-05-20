@@ -68,6 +68,7 @@ class ModelToArray
             'hasMissingDetails' => $missingFields !== [],
             'missingFields' => $missingFields,
             'session' => $this->buildSession($student),
+            'qualification' => $this->helper->normalise($student->getRegistrationSession()?->getSystemPurpose()?->getQualification()?->getName()),
             'candidateDetails' => $this->buildCandidateDetails(
                 [
                     'firstName' => $firstName,

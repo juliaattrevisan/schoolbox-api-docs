@@ -751,14 +751,15 @@
             {% if 'registration' in possibleTabNames %}
                 <div class="content no-pad {% if activeTab == 'registration' %}active{% endif %}" id="tab-registration">
                     <section class="content">
+                        {% if registrationPayload %}
+                        <h1>{{ registrationPayload.qualification }}</h1>
                         <div class="alert-box">
                             If any of the details below are incorrect or if you have any questions, please speak with the DP Co-Ordinator.
                         </div>
-                        {% if registrationPayload %}
                         <section>
                             <h2>Candidate details</h2>
                             <div class="row">
-                                <dl class="">
+                                <dl>
                                     {% for detail in registrationPayload.candidateDetails %}
                                         <dt class="small-12 medium-4 columns"><b>{{ detail.label }}</b></dt>
                                         <dd class="small-12 medium-8 columns">{{ detail.value }}</dd>

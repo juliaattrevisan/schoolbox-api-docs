@@ -73,6 +73,7 @@ class Mapper extends BaseMapper
                    {$this->getJoinColumnString('registrationSession', 'rs')},
                    {$this->getJoinColumnString('registrationSession.systemPurpose', 'sp')},
                    {$this->getJoinColumnString('registrationSession.systemPurpose.category', 'c')},
+                   {$this->getJoinColumnString('registrationSession.systemPurpose.qualification', 'q')},
                    {$this->getJoinColumnString('registrationSession.createdBy', 'uc')},
                    {$this->getJoinColumnString('registrationSession.updatedBy', 'uu')},
                    {$this->getJoinColumnString('registrationSession.deletedBy', 'ud')},
@@ -92,6 +93,7 @@ class Mapper extends BaseMapper
             INNER JOIN {$this->getJoinSql('registrationSession', '', 'rs')}
             LEFT JOIN {$this->getJoinSql('registrationSession.systemPurpose', 'rs', 'sp')}
             LEFT JOIN {$this->getJoinSql('registrationSession.systemPurpose.category', 'sp', 'c')}
+            LEFT JOIN {$this->getJoinSql('registrationSession.systemPurpose.qualification', 'sp', 'q')}
             LEFT JOIN {$this->getJoinSql('registrationSession.createdBy', 'rs', 'uc')}
             LEFT JOIN {$this->getJoinSql('registrationSession.updatedBy', 'rs', 'uu')}
             LEFT JOIN {$this->getJoinSql('registrationSession.deletedBy', 'rs', 'ud')}
@@ -126,11 +128,15 @@ class Mapper extends BaseMapper
                 $session = $sessionMapper->hydrate($row, 'rs');
 
                 if ($session) {
+                    /** @var \Schoolbox\IB\SystemPurpose\Model $systemPurpose */
                     $systemPurpose = $sessionMapper->getJoinMapper('systemPurpose')->hydrate($row, 'sp');
 
                     if ($systemPurpose) {
+                        $systemPurpose->setQualification(
+                            $sessionMapper->getJoinMapper('systemPurpose.qualification')->hydrate($row, 'q')
+                        );
                         $systemPurpose->setCategory(
-                            $sessionMapper->getJoinMapper('systemPurpose')->getJoinMapper('category')->hydrate($row, 'c')
+                            $sessionMapper->getJoinMapper('systemPurpose.category')->hydrate($row, 'c')
                         );
                         $session->setSystemPurpose($systemPurpose);
                     }

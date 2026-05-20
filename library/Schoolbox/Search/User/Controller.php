@@ -283,12 +283,12 @@ class Controller extends BaseController
         $tabs = $this->tabMapper->findRenderable($student, $this->getUser());
         $registrationSessionStudent = $this->registrationSessionStudentMapper->findUnconfirmedForUser($student);
         $registrationPayload = $registrationSessionStudent instanceof RegistrationSessionStudentModel
-            ? ($this->registrationSessionStudentModelToArray)(
+            ? call_user_func(
+                $this->registrationSessionStudentModelToArray,
                 $registrationSessionStudent,
                 $this->findExternalStudent($registrationSessionStudent),
                 (string) ($this->getConfigLoader()->get(ConfigMapper::NAME_IB_SCHOOL_NAME) ?? '')
-            )
-            : null;
+            ) : null;
 
         /* Whether Learning Moment Moderation was required for this student; this forces their
          * learning moment posts to be moderated by a staff before being pushed into the world
