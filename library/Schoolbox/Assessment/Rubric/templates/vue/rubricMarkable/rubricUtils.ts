@@ -39,11 +39,21 @@ export function applyMarkScheme(
     value: string | null;
     humanReadableMark: string | null;
 } {
-    if (markScheme.mode === MarkTypeSlug.NONE) {
+    // TODO mega mystery
+    // rubric-markable.vue:188
+    // const { humanReadableMark } = applyMarkScheme(scaledMark, props.rubric.derivedMaxValue, props.assessmentMarkScheme);
+    //
+    // This props.assessmentMarkScheme has a different structure than props.capabilityMarkScheme in rm-grid-capability.vue:226
+    //
+    // The latter is inside a .context; the former is not.
+    //
+    // This forces you to check in two place: markScheme.mode and markScheme.context.mode
+    // SURELY there was meant to be one synonymous struct for both, right...?
+    if ((markScheme.mode ?? markScheme.context.mode) === MarkTypeSlug.NONE) {
         return { value: null, humanReadableMark: null };
     }
 
-    if (markScheme.mode === MarkTypeSlug.TOTAL) {
+    if ((markScheme.mode ?? markScheme.context.mode) === MarkTypeSlug.TOTAL) {
         const stringValue = value !== null ? String(value) : null;
         return {
             value: stringValue,
@@ -54,14 +64,14 @@ export function applyMarkScheme(
     // turn whatever the value currently is into a percentage
     const percentage = getPercentage(value, maxValue ?? 0);
 
-    if (markScheme.mode === MarkTypeSlug.PERCENT) {
+    if ((markScheme.mode ?? markScheme.context.mode) === MarkTypeSlug.PERCENT) {
         return {
             value: percentage !== null ? percentage.toString() : null,
             humanReadableMark: percentage !== null ? `${percentage}%` : null,
         };
     }
 
-    if (markScheme.mode === MarkTypeSlug.LETTER) {
+    if ((markScheme.mode ?? markScheme.context.mode) === MarkTypeSlug.LETTER) {
         const grades = markScheme.conf;
         if (percentage === null) {
             return { value: null, humanReadableMark: null };
