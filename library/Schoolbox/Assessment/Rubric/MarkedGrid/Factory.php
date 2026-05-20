@@ -9,7 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\MarkedGrid;
 
+use DebugBar\DebugBarException;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+use Schoolbox\Learning\Assessment\ISelfAssessableFeedback;
 
 /**
  * Factory for building `MarkedGrid` objects.
@@ -20,12 +22,97 @@ class Factory
      * Build a rubric's marked grid from POST data.
      *
      * @param MarkedGrid $markedGrid A grid (which already contains an assessment and rowset)
-     * @param array      $postData
+     * @param array $postData An array corresponding to the construction of a particular grid
      * @return MarkedGrid
      * @throws \InvalidArgumentException if a bad capability mark is found
      */
     public function buildFromPostData(MarkedGrid $markedGrid, array $postData): MarkedGrid
     {
+        /* $postData is the stuff in a particular grid, like this:
+
+            Array
+            (
+                [humanReadableMark] => 30.77%
+                [normalisedMark] => 30.77
+                [capabilities] => Array
+                    (
+                        [19] => Array
+                            (
+                                [humanReadableMark] => 100%
+                                [value] => 100
+                                [scaledMark] => 4
+                            )
+
+                        [20] => Array
+                            (
+                                [humanReadableMark] => 50%
+                                [value] => 50
+                                [scaledMark] => 4
+                            )
+
+                        [24] => Array
+                            (
+                                [humanReadableMark] =>
+                                [value] =>
+                                [scaledMark] =>
+                            )
+
+                    )
+
+                [indicators] => Array
+                    (
+                        [37] => Array
+                            (
+                                [value] => 4
+                                [descriptorId] => 211
+                            )
+
+                        [38] => Array
+                            (
+                                [value] => 4
+                                [descriptorId] => 212
+                            )
+
+                        [39] => Array
+                            (
+                                [value] =>
+                                [descriptorId] =>
+                            )
+
+                        [44] => Array
+                            (
+                                [value] =>
+                                [descriptorId] =>
+                            )
+
+                        [45] => Array
+                            (
+                                [value] =>
+                                [descriptorId] =>
+                            )
+
+                        [46] => Array
+                            (
+                                [value] =>
+                                [descriptorId] =>
+                            )
+
+                        [47] => Array
+                            (
+                                [value] =>
+                                [descriptorId] =>
+                            )
+
+                    )
+            )
+         */
+
+        /* This is the state of the rubric grid as it was posted to us. Each grid's selections are contained in one big
+         * json-encoded grid payload - we have to decode it so we can find out what was selected
+         *
+         * Anecdotally, it turns out that "scaledMark" means the value of the descriptor that was chosen.
+         */
+
         // TODO mark schemes still need to be in the grid, not marked grid
         $markSchemeFactory = new \Schoolbox\Learning\MarkScheme\Factory();
         $postDescriptors   = $postData['descriptors'] ?? [];
@@ -35,13 +122,16 @@ class Factory
         // Is this a self-reflection?
         // Don't even save capability/indicator mark values
         $feedback         = $markedGrid->getFeedback();
-        $isSelfReflection = $feedback instanceof DueWorkFeedback && $feedback->isSelfReflectionOnly();
+        $isSelfReflection = $feedback instanceof ISelfAssessableFeedback && $feedback->isSelfReflectionOnly();
 
 
         // Set marks for all the capabilities and indicators
         foreach ($markedGrid->getGrid()->getCapabilityUsages() as $capabilityUsage) {
+            $capabilityId = $capabilityUsage->getCapability()->getId();
+
             // Add the cap mark if it wasn't in the marked grid already
             $capabilityMark = $markedGrid->retrieveCapabilityMark($capabilityUsage);
+
             if (!$capabilityMark) {
                 $capabilityMark = new CapabilityMark(
                     $capabilityUsage,
@@ -52,10 +142,6 @@ class Factory
                 );
                 $markedGrid->getCapabilityMarks()->add($capabilityMark);
             }
-
-
-            // Set its value
-            $capabilityId = $capabilityUsage->getCapability()->getId();
 
             // If mark per cap is off, this will be empty as no capability data gets posted
             if ($postCapabilities) {
@@ -90,15 +176,19 @@ class Factory
 
             // Set marks for indicators
             foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
+                $indicatorId = $indicatorUsage->getIndicator()->getId();
+
                 $indicatorMarkValue = null;
                 $selectedDescriptor = null;
+
                 foreach ($indicatorUsage->getDescriptors() as $descriptor) {
-                    $descriptorId = $descriptor->getId();
+                    $descriptorId = (int)$descriptor->getId();
 
                     // Find which descriptor was actually selected
-                    $isDescriptorSelected = !empty($postDescriptors[$descriptorId]['selected']);
+                    $isDescriptorSelected = (int)$postData['indicators'][$indicatorId]['descriptorId'] == $descriptorId;
+
                     if ($isDescriptorSelected) {
-                        $indicatorMarkValue = $postDescriptors[$descriptorId]['value'] ?? $descriptor->getMaxValue();
+                        $indicatorMarkValue = $postData['indicators'][$indicatorId]['value'] ?? $descriptor->getMaxValue();
                         $selectedDescriptor = $descriptor;
                         break;
                     }

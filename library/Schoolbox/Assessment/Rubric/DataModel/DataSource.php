@@ -1102,21 +1102,36 @@ class DataSource
      */
     public function persistMarkedGrid(MarkedGrid $markedGrid): void
     {
-        new \Alaress_Probe(
-            FeedbackMeta::from(get_class($markedGrid->getFeedback()))
-        );die();
-
-        // Required mappers
-        $returnedWorkMapper = SubmissionBox\ReturnedWorkMapper::getInstance();
+        /* Obtain the corresponding feedback mapper and the database table that it operates upon. For some reason I
+         * needed this to address the polymorphic db schema's usage of (feedback_id, feedback_table)
+         */
+        $mapper = FeedbackMeta::from(get_class($markedGrid->getFeedback()))->translate();
 
         // Blow away any previous cap/ind marks for this feedback
-        $returnId = $markedGrid->getFeedback()->getId();
+        $feedbackId = $markedGrid->getFeedback()->getId();
 
-        $this->indicatorMarkMapper->deleteFeedbackMarks($returnId);
-        $this->capabilityMarkMapper->deleteFeedbackMarks($returnId);
+        /* This is the rubric_instance id associated with this $markedGrid, afaict
+         *
+         * This lets you delete feedback marks associated with this particular grid, rather than all grids, which might
+         * be a bit too brutal: persistMarkedGrid() gets called on each grid, so it shouldn't be mass-deleteing data
+         * each iteration.
+         */
+        $rubricInstance = $markedGrid->getGrid()->getRubricInstance();
 
-        // What am I saving marks for?
-        $returnedWork = $returnedWorkMapper->findById($returnId);
+        /* Use the derived mapper and the derived feedbackId to delete any rubric pieces that were previously associated
+         * with it which essentially cleanses the slate. Although, I think you'd be better off deleting them immediately
+         * prior to saving, in case something died during the construction of whatever you were going to save. That
+         * would have left you in a half-baked state, deleting previous data but not persisting current data.
+         *
+         * TODO move this prior to saving
+         */
+        $this->indicatorMarkMapper->deleteFeedbackMarks($feedbackId, $rubricInstance, $mapper->getTable());
+        $this->capabilityMarkMapper->deleteFeedbackMarks($feedbackId, $rubricInstance, $mapper->getTable());
+
+        /* This feedback could be any of the learning activities' data model feedback schema, such as submission_return
+         * or reporting_feedback etc. so it's a bit sort-of-polymorphic. Conceptually they're all synonymous though.
+         */
+        $feedback = $mapper->findById($feedbackId);
 
         // Create list of cap/ind marks that will be saved
         $capabilityMarksToSave = $this->capabilityMarkMapper->createCollection();
@@ -1128,7 +1143,9 @@ class DataSource
             $capabilityModel = $this->capabilityMapper->findById($capabilityId);
 
             $capabilityMarksToSave[$capabilityId] = $capabilityMarkModel = $this->capabilityMarkMapper->createModel()
-                ->setSubmissionReturn($returnedWork)
+                ->setRubricInstance($rubricInstance)
+                ->setFeedbackId($feedback->getId())
+                ->setFeedbackTable($mapper->getTable())
                 ->setCapability($capabilityModel)
                 ->setValue($capabilityMark->getValue())
                 ->setHumanReadableValue($capabilityMark->getHumanReadableValue())
