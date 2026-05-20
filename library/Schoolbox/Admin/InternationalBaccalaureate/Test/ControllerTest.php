@@ -132,6 +132,238 @@ class ControllerTest extends TestCase
         );
     }
 
+    public function testSessionCompletePreparationTransitionsSelectedPreparationStudents(): void
+    {
+        $studentOne = $this->buildStudent(
+            456,
+            123,
+            RegistrationSessionStudentModel::STATUS_PREPARATION,
+            'Alex',
+            'Nguyen',
+            'S123'
+        );
+        $studentTwo = $this->buildStudent(
+            789,
+            234,
+            RegistrationSessionStudentModel::STATUS_PREPARATION,
+            'Sam',
+            'Patel',
+            'S234'
+        );
+        $studentThree = $this->buildStudent(
+            890,
+            345,
+            RegistrationSessionStudentModel::STATUS_PREPARATION,
+            'Jordan',
+            'Smith',
+            'S345'
+        );
+
+        $database = $this->createMock(IConnector::class);
+        $database
+            ->expects($this->once())
+            ->method('beginTransaction')
+            ->willReturn(true);
+        $database
+            ->expects($this->once())
+            ->method('commit');
+        $database
+            ->expects($this->never())
+            ->method('rollBack');
+
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->method('getDatabase')
+            ->willReturn($database);
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('findStudentsForSession')
+            ->with(12)
+            ->willReturn(new Collection([$studentOne, $studentTwo, $studentThree]));
+
+        $savedUserIds = [];
+        $registrationSessionStudentMapper
+            ->expects($this->exactly(2))
+            ->method('save')
+            ->with($this->callback(function (RegistrationSessionStudentModel $student) use (&$savedUserIds): bool {
+                $savedUserIds[] = $student->getUser()?->getId();
+                $this->assertSame(RegistrationSessionStudentModel::STATUS_UNCONFIRMED, $student->getStatus());
+
+                return true;
+            }));
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class)
+        );
+        $controller->setRequestPost(new Values([
+            'studentIds' => [123, '234', 234],
+        ]));
+
+        $controller->sessionCompletePreparation((new RegistrationSessionModel())->setId(12));
+
+        $this->assertSame([123, 234], $savedUserIds);
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(200, $response->getStatusCode());
+
+        $payload = json_decode((string) $response->getBody(), true);
+        $this->assertTrue($payload['success']);
+        $this->assertSame(2, $payload['transitionedCount']);
+        $this->assertSame(RegistrationSessionStudentModel::STATUS_PREPARATION, $studentThree->getStatus());
+    }
+
+    public function testSessionCompletePreparationRejectsInvalidStudentIds(): void
+    {
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('getDatabase');
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('findStudentsForSession');
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('save');
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class)
+        );
+        $controller->setRequestPost(new Values([
+            'studentIds' => [],
+        ]));
+
+        $controller->sessionCompletePreparation((new RegistrationSessionModel())->setId(12));
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(400, $response->getStatusCode());
+
+        $payload = json_decode((string) $response->getBody(), true);
+        $this->assertSame(400, $payload['status']);
+        $this->assertSame('Student IDs are required.', $payload['title']);
+    }
+
+    public function testSessionCompletePreparationRejectsStudentThatCannotBeFound(): void
+    {
+        $database = $this->createMock(IConnector::class);
+        $database
+            ->expects($this->never())
+            ->method('beginTransaction');
+        $database
+            ->expects($this->never())
+            ->method('commit');
+        $database
+            ->expects($this->never())
+            ->method('rollBack');
+
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->method('getDatabase')
+            ->willReturn($database);
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('findStudentsForSession')
+            ->with(12)
+            ->willReturn(new Collection([
+                $this->buildStudent(
+                    456,
+                    123,
+                    RegistrationSessionStudentModel::STATUS_PREPARATION,
+                    'Alex',
+                    'Nguyen',
+                    'S123'
+                ),
+            ]));
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('save');
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class)
+        );
+        $controller->setRequestPost(new Values([
+            'studentIds' => [999],
+        ]));
+
+        $controller->sessionCompletePreparation((new RegistrationSessionModel())->setId(12));
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(400, $response->getStatusCode());
+
+        $payload = json_decode((string) $response->getBody(), true);
+        $this->assertSame(400, $payload['status']);
+        $this->assertSame(
+            'One or more selected students could not be found in this registration session.',
+            $payload['title']
+        );
+    }
+
+    public function testSessionCompletePreparationRejectsStudentThatIsNotInPreparation(): void
+    {
+        $database = $this->createMock(IConnector::class);
+        $database
+            ->expects($this->never())
+            ->method('beginTransaction');
+        $database
+            ->expects($this->never())
+            ->method('commit');
+        $database
+            ->expects($this->never())
+            ->method('rollBack');
+
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->method('getDatabase')
+            ->willReturn($database);
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('findStudentsForSession')
+            ->with(12)
+            ->willReturn(new Collection([
+                $this->buildStudent(
+                    456,
+                    123,
+                    RegistrationSessionStudentModel::STATUS_CONFIRMED,
+                    'Alex',
+                    'Nguyen',
+                    'S123'
+                ),
+            ]));
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('save');
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class)
+        );
+        $controller->setRequestPost(new Values([
+            'studentIds' => [123],
+        ]));
+
+        $controller->sessionCompletePreparation((new RegistrationSessionModel())->setId(12));
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(400, $response->getStatusCode());
+
+        $payload = json_decode((string) $response->getBody(), true);
+        $this->assertSame(400, $payload['status']);
+        $this->assertSame(
+            'One or more selected student IDs belong to candidates who are already further down the process.',
+            $payload['title']
+        );
+    }
+
     public function testUpdateRegistrationSessionStudentSubjectLanguagesSavesOverrides(): void
     {
         $registrationSessionStudent = (new RegistrationSessionStudentModel())
