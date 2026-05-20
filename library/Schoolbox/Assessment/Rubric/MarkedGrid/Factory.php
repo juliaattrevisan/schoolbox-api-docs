@@ -148,7 +148,8 @@ class Factory
                 ->setHumanReadableValue(null)
                 ->setValue(null);
 
-            /* Self reflection feedbacks have no utilisation of capability marks.
+            /* Self reflection feedbacks have no utilisation of capability marks. "not self reflection" is probably not
+             * the right way to do this, but anyway
              */
             if (!$isSelfReflection) {
                 /* Check the post payload for the capability mark type values.
