@@ -5,4 +5,5 @@ export type RegistrationSession = {
     examSession: "May" | "November";
     createdAt: string;
     createdBy: string | null;
+    deleteEndpoint: string | null;
 };

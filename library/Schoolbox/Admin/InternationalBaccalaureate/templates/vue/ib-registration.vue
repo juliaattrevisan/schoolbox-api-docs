@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { apiRequest } from "@js/util/sbx/apiUtils";
+import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import CreateSessionModal from "./components/create-session-modal.vue";
 import type { RegistrationSession } from "../js/types/ibRegistrationTypes";
@@ -19,7 +20,10 @@ const DIPLOMA_SYSTEM_PURPOSE_ID = 1;
 const diplomaSessions = window.Vue.ref<RegistrationSession[]>([]);
 const isDiplomaLoading = window.Vue.ref<boolean>(true);
 const isDiplomaModalOpen = window.Vue.ref<boolean>(false);
-const localDiplomaSessionIds = window.Vue.ref<number[]>([]);
+
+const sessionPendingDelete = window.Vue.ref<RegistrationSession | null>(null);
+const isDeleteModalOpen = window.Vue.ref<boolean>(false);
+const isDeleting = window.Vue.ref<boolean>(false);
 
 /** Fetches sessions from the API and populates the DIPLOMA section. On failure, leaves the list empty (shows empty state). */
 async function loadDiplomaSessions(): Promise<void> {
@@ -40,21 +44,52 @@ async function loadDiplomaSessions(): Promise<void> {
 }
 
 /**
- * Appends a newly created session to the DIPLOMA list and tracks it as local-only for the delete button.
+ * Appends a newly created session to the DIPLOMA list.
  * @param session - The newly created registration session returned by the API
  */
 function onDiplomaSessionCreated(session: RegistrationSession): void {
     diplomaSessions.value = [...diplomaSessions.value, session];
-    localDiplomaSessionIds.value = [...localDiplomaSessionIds.value, session.id];
 }
 
 /**
- * Removes a locally-created session from the DIPLOMA list (client-side only).
- * @param sessionId - The ID of the session to remove
+ * Opens the delete confirmation modal for the given session.
+ * @param session - The session to delete
  */
-function removeDiplomaSession(sessionId: number): void {
-    diplomaSessions.value = diplomaSessions.value.filter((s) => s.id !== sessionId);
-    localDiplomaSessionIds.value = localDiplomaSessionIds.value.filter((id) => id !== sessionId);
+function openDeleteConfirm(session: RegistrationSession): void {
+    sessionPendingDelete.value = session;
+    isDeleteModalOpen.value = true;
+}
+
+/** Calls the delete API for the pending session, then removes it from the list on success. */
+async function confirmDelete(): Promise<void> {
+    const session = sessionPendingDelete.value;
+
+    if (!session?.deleteEndpoint) {
+        return;
+    }
+
+    isDeleting.value = true;
+
+    const response = await apiRequest<null>({
+        url: session.deleteEndpoint,
+        method: "DELETE",
+    });
+
+    isDeleting.value = false;
+
+    if (!response.success) {
+        const toast = window.sbProps.toastActivate("Failed to delete session");
+        toast.timeout({ text: "Delete failed", isSuccess: false });
+        isDeleteModalOpen.value = false;
+        sessionPendingDelete.value = null;
+        return;
+    }
+
+    const toast = window.sbProps.toastActivate("Deleting session...");
+    toast.timeout({ text: "Session deleted", isSuccess: true });
+    diplomaSessions.value = diplomaSessions.value.filter((s) => s.id !== session.id);
+    isDeleteModalOpen.value = false;
+    sessionPendingDelete.value = null;
 }
 
 const reportBaseUrl = window.Vue.computed<string | null>(() =>
@@ -132,11 +167,12 @@ window.Vue.onMounted((): void => {
                                     >
                                 </div>
                                 <button
-                                    v-if="localDiplomaSessionIds.includes(session.id)"
                                     type="button"
                                     class="sbx-icon-only-button"
-                                    :aria-label="`Remove session ${session.title}`"
-                                    @click="removeDiplomaSession(session.id)"
+                                    :aria-label="`Delete session ${session.title}`"
+                                    :disabled="session.deleteEndpoint === null"
+                                    :title="session.deleteEndpoint === null ? 'Cannot delete: session has registered students' : undefined"
+                                    @click="openDeleteConfirm(session)"
                                 >
                                     <sbx-icon name="delete"></sbx-icon>
                                 </button>
@@ -153,6 +189,31 @@ window.Vue.onMounted((): void => {
             :system-purpose-id="DIPLOMA_SYSTEM_PURPOSE_ID"
             @session-created="onDiplomaSessionCreated"
         />
+
+        <BasicModal v-model:is-open="isDeleteModalOpen" size="s" :show-close-button="true" :is-close-disabled="isDeleting">
+            <h2>Please Confirm</h2>
+            <p>Are you sure you want to delete "{{ sessionPendingDelete?.title }}"?</p>
+            <template #footer>
+                <div class="l-flex l-gap-xs f-no-margins" style="padding: 0 1.5rem 1.5rem">
+                    <button
+                        type="button"
+                        class="button alert l-flex__item--1"
+                        :disabled="isDeleting"
+                        @click="confirmDelete"
+                    >
+                        {{ isDeleting ? "Deleting..." : "Yes, delete" }}
+                    </button>
+                    <button
+                        type="button"
+                        class="button l-flex__item--1"
+                        :disabled="isDeleting"
+                        @click="isDeleteModalOpen = false"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </template>
+        </BasicModal>
     </div>
 </template>
 
@@ -160,6 +221,7 @@ window.Vue.onMounted((): void => {
 .session-list-box {
     background-color: white;
     border-radius: var(--sbx-config-box-roundness, 0);
+    box-shadow: var(--sbx-config-box-drop-shadow, 0 2px 5px rgba(0, 0, 0, 0.1));
     padding: 0 1rem;
 }
 
