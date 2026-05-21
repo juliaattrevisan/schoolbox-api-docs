@@ -1,0 +1,102 @@
+/**
+ * Container roundness config
+ * Applied to UI "containers" in Advanced UI
+ * Container = element on page background that typically has the --sbx-color-foreground-primary background color, such as islands, empty states, components, etc.
+ */
+
+:root {
+    --sbx-config-container-corner-radius: var(--sbx-border-radius-m);
+}
+
+body.sbx-body {
+    // Base containers
+    .island,
+    .component,
+    .island section,
+    .empty-state,
+    .empty-state-flex-centered,
+    .modal,
+    .modal-content,
+    .reveal-modal,
+    .tabs,
+    .accordion,
+    .accordion__item,
+    .filters-container,
+    .table,
+    .table-wrapper,
+    .calendar,
+    .calendar-container,
+    .v-card,
+    .c-card,
+    .c-island,
+    .fc,
+    .fc-event,
+    .swiper-horizontal,
+    .scrollable.show-for-medium-up,
+    .Schoolbox_Tile_Component_DashboardTileController .tileList .tile,
+    .row:has(> #filter_panel),
+    .c-header-search__results,
+    .side-nav,
+    .side-nav .flyout,
+    .cover-photo,
+    .cr-results-grid,
+    .introjs-whatsnewmodal,
+    .az-list li,
+    .az-error-list li,
+    .audience-grid li {
+        border-radius: var(--sbx-config-container-corner-radius);
+    }
+
+    // so the image at the top of the what's new modal respects the rounded corners
+    .introjs-whatsnewmodal {
+        overflow: hidden;
+    }
+
+    // this is to round an svg rect element
+    .highcharts-background {
+        rx: var(--sbx-config-container-corner-radius);
+        ry: var(--sbx-config-container-corner-radius);
+    }
+
+    // Top-only rounded elements
+    .component-titlebar:not(.meta),
+    .accordion dd:first-of-type > a,
+    .accordion .accordion-navigation:first-of-type > a,
+    .v-card .card-class-image,
+    .v-card > a .card-class-image,
+    .feed .subheader,
+    .form-group,
+    .tabs {
+        border-radius: var(--sbx-config-container-corner-radius) var(--sbx-config-container-corner-radius) 0 0;
+    }
+
+    // bottom only rounded elements
+    .reveal-modal .component-action section,
+    .VueTables__table-footer {
+        border-radius: 0 0 var(--sbx-config-container-corner-radius) var(--sbx-config-container-corner-radius);
+    }
+
+    // Component layout fixes
+    #component-layout .component-container .row > .island section:last-child {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+
+    // tables need to be rounded uniquely
+    table {
+        border-spacing: 0;
+        border-radius: var(--sbx-config-container-corner-radius);
+    }
+    thead tr:first-child th:first-child {
+        border-top-left-radius: var(--sbx-config-container-corner-radius);
+    }
+    thead tr:first-child th:last-child {
+        border-top-right-radius: var(--sbx-config-container-corner-radius);
+    }
+    tbody tr:last-child td:first-child {
+        border-bottom-left-radius: var(--sbx-config-container-corner-radius);
+    }
+    tbody tr:last-child td:last-child {
+        border-bottom-right-radius: var(--sbx-config-container-corner-radius);
+    }
+}
