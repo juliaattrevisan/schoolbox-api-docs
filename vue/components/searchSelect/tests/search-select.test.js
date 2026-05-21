@@ -58,15 +58,15 @@ test("selected items become scrollable when their height exceeds 133px", async (
     });
 
     expect(resizeObserverCallback).toEqual(expect.any(Function));
-    expect(wrapper.get('[data-test="ss-selected"]').classes()).not.toContain("ss-selected--scroll");
+    expect(wrapper.get('[data-test="ss-selected"]').classes()).not.toContain("sbx-tag-group--scroll");
 
     resizeObserverCallback([{ contentRect: { height: 133 } }]);
     await wrapper.vm.$nextTick();
-    expect(wrapper.get('[data-test="ss-selected"]').classes()).not.toContain("ss-selected--scroll");
+    expect(wrapper.get('[data-test="ss-selected"]').classes()).not.toContain("sbx-tag-group--scroll");
 
     resizeObserverCallback([{ contentRect: { height: 134 } }]);
     await wrapper.vm.$nextTick();
-    expect(wrapper.get('[data-test="ss-selected"]').classes()).toContain("ss-selected--scroll");
+    expect(wrapper.get('[data-test="ss-selected"]').classes()).toContain("sbx-tag-group--scroll");
 });
 
 test("search results can be added", async () => {
