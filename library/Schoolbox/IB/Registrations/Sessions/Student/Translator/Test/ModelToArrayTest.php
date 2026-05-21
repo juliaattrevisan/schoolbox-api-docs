@@ -49,6 +49,7 @@ class ModelToArrayTest extends TestCase
         $this->assertSame(
             [
                 'updateLanguages' => '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/123/languages',
+                'updateConfirmation' => '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/123/confirmation',
             ],
             $payload['_routes']
         );
@@ -174,6 +175,14 @@ class ModelToArrayTest extends TestCase
         $routeGenerator
             ->method('generate')
             ->willReturnCallback(static function (string $route, array $params): string {
+                if ($route === 'internationalBaccalaureate.updateRegistrationSessionStudentConfirmation') {
+                    return sprintf(
+                        '/adminv2/international-baccalaureate/registrations/sessions/%d/candidates/%d/confirmation',
+                        $params['sessionId'],
+                        $params['studentId']
+                    );
+                }
+
                 TestCase::assertSame('internationalBaccalaureate.updateRegistrationSessionStudentSubjectLanguages', $route);
 
                 return sprintf(
