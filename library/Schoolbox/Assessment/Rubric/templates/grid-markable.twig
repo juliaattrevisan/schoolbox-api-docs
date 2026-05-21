@@ -9,10 +9,10 @@
  # @param bool $blindMode                        Hides identifying information from instructors so they don't readily know who they're grading.
  # @param bool $studentView                      This decides which mark scheme to show: the learner's mark scheme (for self-grading) or the instructor's mark scheme
  #                                               (It would be used when learners view the marked grid which might show different mark scheme than instructors.)
- # @param bool $selfAssess                       Whether self-grading can occur on this response instance
+ # @param bool $selfAssess                       A bool corresponding to whether Self Assessment was enabled in the Due Work settings and can occur for this response instance
  # @param bool $selfReflect                      Whether self-reflection can occur on this response instance
  # @param User $learner                          The person who submitted the response instance
- # @param $selfAssessmentFeedback                "the self-assessed feedback, shouldst there be one'
+ # @param $selfAssessmentFeedback                "the self-assessed feedback, shouldst there be one"
  # @param Grid $rubricGrid                       A Grid instance, obtained via the Rubric DataSource retrieveOneGrid() method or similar.
  #                                               Represents the basic structure of a rubric_instance (caps/inds/descs/levels)
  # @param Grid $rubricMarkedGrid                 A Grid instance corresponding to an instructor-marked grid

@@ -1,29 +1,35 @@
+{#
+ # Self-Assessment fragment used in creating a Due Work response
+ #
+ # This fulfils the grading part of Self Assessment, known as Self-Grading, by providing a rubric grid(s) and the little
+ # combobox/comment ui for learners to grade their work.
+ #
+ # @param IAssessable $assessment            A fully hydrated learning activity instance
+ # @param bool $selfAssess                   A bool corresponding to whether Self Assessment was enabled in the Due Work settings and can occur for this response instance
+ # @param IFeedback $feedback                A feedback instance for Due Work
+ # @param Participant\Model $participant     A participant instance
+ # @param bool $showGroupTotal               A bool corresponding to whether Capability Mark Type was meaningfully set to something other than None
+ # @param bool $showRubricTotal              Shows the total value of the rubric grid's selected descriptors; shown to instructors and self-graders
+ # @param IFeedback $selfAssessmentFeedback  "the self-assessed feedback, shouldst there be one"
+ # @param bool $readonly                     A bool corresponding to whether a combobox is in readonly mode, such as when you revisit this screen but the academic period ended already
+ # @param array $errors                      A stack of Submission States, contrary to its naming which is misleading (I know, I know...)
+ #}
+
 <h2 class="subheader">
     {{ assessment.selfGradable ? locale.selfAssessment.proper : locale.selfReflection.proper }}
 </h2>
 
 {% set markScheme = assessment.markScheme %}
 
+{# If Self-Assessment was enabled and there was a meaningful mark scheme, allow learners to grade themselves #}
 {% set gradable = selfAssess and '' != markScheme.template %}
-
-{% set rubricText = ''  %}
-{% set selfAssessText = '' %}
-{% if assessment.useRubric %}
-    {% set rubricText = 'rubric and'  %}
-{% endif %}
-{% if selfAssess %}
-    {% set selfAssessText = 'assess and' %}
-{% endif %}
 
 {# Feedback form section #}
 <section id="self-assessment-feedback">
     {# Rubric #}
     {% if assessment.useRubric %}
         <fieldset class="content">
-            {% set rubricTemplate = readonly
-                ? 'grid.twig'
-                : 'grid-markable.twig'
-            %}
+            {% set rubricTemplate = readonly ? 'grid.twig' : 'grid-markable.twig' %}
 
             {% set rubricMarkedGrid = feedback is not null ? feedback.rubricMarkedGrid : null %}
 
