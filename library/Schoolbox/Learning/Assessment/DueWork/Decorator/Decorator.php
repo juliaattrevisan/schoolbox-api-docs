@@ -216,7 +216,7 @@ class Decorator implements DecoratorInterface
 
         /* These are the rubric instance identifiers that were posted to us from the ui
          */
-        $keepRubricInstanceIds = array_keys($this->getRubricData());
+        $keepRubricInstanceIds = array_keys($this->getRubricData() ?? []);
 
         /* If there are any rubric grids, we need to process each one for this assessment.
          * We also assign the assessment's maximum available marks as the summation of all the grids' maxima.
