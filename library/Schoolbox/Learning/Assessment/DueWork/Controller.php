@@ -1703,11 +1703,9 @@ class Controller extends Assessment\Controller
      */
     public function postManageSubmissions(IAssessable $assessment): void
     {
-        $postData = $this->requestPost->getArrayCopy();
-
-        /* By default, assume we're submitting now
-         */
-        $submittedAt = \Alaress_Date_Format::now();
+        $postData               = $this->requestPost->getArrayCopy();
+        $submittedNow           = Alaress_Date_Format::now();
+        $submissionTimeResolver = new SubmissionTimeResolver();
 
         /* Process the latest drafts from each of these user ids in $assessment and
          * forcibly submit them.
@@ -1726,18 +1724,11 @@ class Controller extends Assessment\Controller
                 continue;
             }
 
-            /* If the assessment was overdue, we need to micromanage submission times.
-             */
-            if ($assessment->isOverdue()) {
-                /* If the postData[draft][punctual] was selected,
-                 * set the submission time to be just before the due date.
-                 *
-                 * Otherwise, penalise the student and accept it whenever the teacher sent this payload.
-                 */
-                if ('true' === $postData['draft']['punctual']) {
-                    $submittedAt = $assessment->getDueAt()->addseconds(-1);
-                }
-            }
+            $submittedAt = $submissionTimeResolver->resolve(
+                $assessment,
+                'true' === ($postData['draft']['punctual'] ?? null),
+                $submittedNow
+            );
 
             $latestResponse->setSubmittedAt($submittedAt);
 
@@ -1749,14 +1740,11 @@ class Controller extends Assessment\Controller
         foreach ($postData['offline']['ids'] ?? [] as $studentId) {
             $userStub = $this->getUserMapper()->createModel()->setId((int)$studentId);
 
-            /* If the postData[offline][punctual] was selected,
-             * set the submission time to be just before the due date.
-             *
-             * Otherwise, penalise the student and accept it whenever the teacher sent this payload.
-             */
-            if ('true' === $postData['offline']['punctual']) {
-                $submittedAt = $assessment->getDueAt()->addseconds(-1);
-            }
+            $submittedAt = $submissionTimeResolver->resolve(
+                $assessment,
+                'true' === ($postData['offline']['punctual'] ?? null),
+                $submittedNow
+            );
 
             $this->persistAcknowledgementResponse($assessment, $userStub, $submittedAt);
         }
