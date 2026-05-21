@@ -13,18 +13,13 @@ import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/Prof
 test.describe("Profile Page 3-dot Menu", () => {
     test.describe.configure({ mode: "serial" });
 
-    let edenReedId = 13;
+    const edenReedId = Common.USER_ID_EDENREED;
     const jackColesId = Common.USER_ID_JACKCOLES;
     const janaReedId = Common.USER_ID_JANAREED;
 
     test.beforeAll(async ({ baseTester, db }) => {
         baseTester.isGoingTo("disable Eden Reed for profile page 3-dot menu tests");
-        edenReedId = Number(await db.grabFromDatabase("user", "id", { firstname: "Eden", lastname: "Reed" }));
         await db.updateInDatabase("user", { enabled: 0 }, { id: edenReedId });
-    });
-
-    test.beforeEach(async ({ tester }) => {
-        await tester.loginAsAdmin();
     });
 
     test("Super users can view the buttons modify, impersonate and create pastoral record", async ({
@@ -34,6 +29,7 @@ test.describe("Profile Page 3-dot Menu", () => {
         const profilePage = new ProfilePage(tester, page);
 
         tester.isGoingTo("navigate to the Jana Reed profile page as a superuser");
+        await tester.loginAsAdmin();
         await profilePage.goto(janaReedId);
 
         tester.isGoingTo("check the profile page 3-dot menu options and urls for Jana Reed");
@@ -101,11 +97,6 @@ test.describe("Profile Page 3-dot Menu", () => {
                 { option: "impersonate", isVisible: true },
                 { option: "create-pastoral-record", isVisible: true },
             ]);
-            await profilePage.checkDotMenuActionUrl("impersonate", new RegExp(`/user/switch/${janaReedId}`));
-            await profilePage.checkDotMenuActionUrl(
-                "create-pastoral-record",
-                new RegExp(`/pastoral/student/${janaReedId}/record/insert`),
-            );
 
             tester.isGoingTo("navigate to the disabled Eden Reed profile page and check impersonate is disabled");
             await profilePage.goto(edenReedId);

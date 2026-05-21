@@ -178,43 +178,29 @@ export default class ProfilePage {
     }
 
     /**
-     * Returns the profile page 3-dot menu button.
-     * @returns - The profile page 3-dot menu button
-     */
-    getDotMenuButton(): Locator {
-        return this.page.getByTestId(ProfilePage.DATA_TEST_PROFILE_DOT_BUTTON);
-    }
-
-    /**
-     * Returns the profile page 3-dot menu.
-     * @returns - The profile page 3-dot menu
-     */
-    getDotMenu(): Locator {
-        return this.page.getByTestId(ProfilePage.DATA_TEST_PROFILE_DOT_MENU);
-    }
-
-    /**
-     * Returns an action from the opened profile page 3-dotmenu by locating the data-test attribute
-     * @param actionDataTest - The data-test attribute value of the action
+     * Returns an action from the opened profile page 3-dot menu by locating the data-test attribute
+     * @param actionDataTest - The data-test attribute value of the action: modify, impersonate, create-pastoral-record
      * @returns - The profile page 3-dot menu action
      */
     getDotMenuAction(actionDataTest: string): Locator {
-        return this.getDotMenu().getByTestId(`user-profile-${actionDataTest}`);
+        return this.page
+            .getByTestId(ProfilePage.DATA_TEST_PROFILE_DOT_MENU)
+            .getByTestId(`user-profile-${actionDataTest}`);
     }
 
     /**
      * Opens the profile page 3-dot menu.
      */
     async openDotMenu(): Promise<void> {
-        await this.getDotMenuButton().click();
-        await expect(this.getDotMenu()).toBeVisible();
+        await this.page.getByTestId(ProfilePage.DATA_TEST_PROFILE_DOT_BUTTON).click();
+        await expect(this.page.getByTestId(ProfilePage.DATA_TEST_PROFILE_DOT_MENU)).toBeVisible();
     }
 
     /**
      * Checks the profile page 3-dot menu is not presented.
      */
     async checkDotMenuIsNotPresented(): Promise<void> {
-        await expect(this.getDotMenuButton()).toBeHidden();
+        await expect(this.page.getByTestId(ProfilePage.DATA_TEST_PROFILE_DOT_BUTTON)).toBeHidden();
     }
 
     /**
@@ -235,7 +221,7 @@ export default class ProfilePage {
 
     /**
      * Checks an action in the opened profile page 3-dot menu links to the expected url.
-     * @param actionName - The action name
+     * @param actionName - The action name: modify, impersonate, create-pastoral-record
      * @param expectedUrl - The expected href
      */
     async checkDotMenuActionUrl(actionName: string, expectedUrl: RegExp): Promise<void> {
