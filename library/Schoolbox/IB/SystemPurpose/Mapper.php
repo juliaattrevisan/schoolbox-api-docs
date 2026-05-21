@@ -57,7 +57,7 @@ class Mapper extends BaseMapper
     {
         return "
             SELECT {$this->getColumnString()},
-                   {$this->getJoinColumnString('category', 'c')}
+                   {$this->getJoinColumnString('category', 'c')},
                    {$this->getJoinColumnString('qualification', 'q')}
         ";
     }
