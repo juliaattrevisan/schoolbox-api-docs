@@ -38,7 +38,7 @@ SET
     );
 
 SET
-    @category_roundness = (
+    @category_corner_radius = (
         SELECT id
         FROM lu_skin_config_category
         WHERE
@@ -77,7 +77,7 @@ VALUES (@category_colours, 'Menu'),
     (@category_colours, 'Login'),
     (@category_colours, 'Form'),
     (@category_css, null),
-    (@category_roundness, null),
+    (@category_corner_radius, null),
     (@category_drop_shadow, null);
 
 SET
@@ -154,11 +154,11 @@ SET
     );
 
 SET
-    @subcategory_roundness = (
+    @subcategory_corner_radius = (
         SELECT id
         FROM lu_skin_config_subcategory
         WHERE
-            category_id = @category_roundness
+            category_id = @category_corner_radius
             AND name IS NULL
     );
 

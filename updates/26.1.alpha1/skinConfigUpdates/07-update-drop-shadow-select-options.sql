@@ -59,4 +59,4 @@ SET
         )
     )
 WHERE
-    name = 'skin_box_drop_shadow';
+    name = 'skin_container_drop_shadow';

@@ -1,7 +1,8 @@
 /**
- * Field roundness config
+ * Field corner radius config
  * Used to control border-radius of form and UI elements
- * Scoped to Advanced UI
+ * Field = element that users interact with to input or manipulate data, such as buttons, inputs, etc,
+ * pretty much all elements within a 'Container'
  */
 
 :root {

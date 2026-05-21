@@ -60,11 +60,11 @@ SET
     );
 
 SET
-    @category_roundness = (
+    @category_corner_radius = (
         SELECT id
         FROM lu_skin_config_category
         WHERE
-            name = 'Roundness'
+            name = 'Corner Radius'
     );
 
 SET
@@ -121,11 +121,11 @@ SET
     );
 
 SET
-    @subcategory_roundness = (
+    @subcategory_corner_radius = (
         SELECT id
         FROM lu_skin_config_subcategory
         WHERE
-            category_id = @category_roundness
+            category_id = @category_corner_radius
             AND name IS NULL
     );
 
@@ -408,7 +408,7 @@ VALUES (
         '{"customProperty":"--sbx-config-login-form-foreground","contrast":"--sbx-config-login-form-background"}'
     ),
     (
-        'skin_box_roundness',
+        'skin_container_corner_radius',
         'var(--sbx-border-radius-m)',
         'Box',
         'Add rounded corners to primary container elements.',
@@ -422,7 +422,7 @@ VALUES (
         '{"customProperty":"--sbx-config-container-corner-radius","select":[{"name":"none","value":"var(--sbx-border-radius-none)"},{"name":"Small","value":"var(--sbx-border-radius-s)"},{"name":"Medium","value":"var(--sbx-border-radius-m)"},{"name":"Large","value":"var(--sbx-border-radius-l)"}]}'
     ),
     (
-        'skin_field_roundness',
+        'skin_field_corner_radius',
         'var(--sbx-border-radius-s)',
         'Field',
         'Add rounded corners to elements like check boxes, buttons and labels.',
@@ -436,7 +436,7 @@ VALUES (
         '{"customProperty":"--sbx-config-field-corner-radius","select":[{"name":"none","value":"var(--sbx-border-radius-none)"},{"name":"Small","value":"var(--sbx-border-radius-s)"},{"name":"Medium","value":"var(--sbx-border-radius-m)"},{"name":"Large","value":"var(--sbx-border-radius-l)"}]}'
     ),
     (
-        'skin_box_drop_shadow',
+        'skin_container_drop_shadow',
         'var(--sbx-shadow-none)',
         'Box',
         'Add a drop shadow to primary container elements.',
@@ -570,25 +570,25 @@ VALUES (
             SELECT configID
             FROM config
             WHERE
-                name = 'skin_field_roundness'
+                name = 'skin_field_corner_radius'
         ),
-        @subcategory_roundness
+        @subcategory_corner_radius
     ),
     (
         (
             SELECT configID
             FROM config
             WHERE
-                name = 'skin_box_roundness'
+                name = 'skin_container_corner_radius'
         ),
-        @subcategory_roundness
+        @subcategory_corner_radius
     ),
     (
         (
             SELECT configID
             FROM config
             WHERE
-                name = 'skin_box_drop_shadow'
+                name = 'skin_container_drop_shadow'
         ),
         @subcategory_drop_shadow
     ),

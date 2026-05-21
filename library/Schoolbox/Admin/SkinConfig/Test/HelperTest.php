@@ -21,7 +21,7 @@ class HelperTest extends TestCase
     {
         $dropShadowConfig = (new Config())
             ->setId(100)
-            ->setName('skin_box_drop_shadow')
+            ->setName('skin_container_drop_shadow')
             ->setValue('none')
             ->setFieldId(ConfigMapper::FIELD_SELECT)
             ->setOptions((string) json_encode([

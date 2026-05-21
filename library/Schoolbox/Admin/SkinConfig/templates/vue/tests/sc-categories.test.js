@@ -17,7 +17,7 @@ function buildConfigs() {
                     options: [
                         {
                             id: 99,
-                            name: "skin_field_roundness",
+                            name: "skin_field_corner_radius",
                             value: "0.5rem",
                             title: "Field Roundness",
                             description: "Adjust the roundness of form fields.",
@@ -62,7 +62,7 @@ function buildConfigs() {
                     options: [
                         {
                             id: 100,
-                            name: "skin_box_drop_shadow",
+                            name: "skin_container_drop_shadow",
                             value: "var(--sbx-shadow-m)",
                             title: "Box Drop Shadow",
                             description: "Add a drop shadow to primary container elements.",
@@ -96,7 +96,7 @@ test("renders the Drop Shadow select options for Sonar configs", () => {
     expect(wrapper.text()).toContain("Drop Shadow");
     expect(wrapper.text()).toContain("Box Drop Shadow");
 
-    const select = wrapper.get('select[name="skin_box_drop_shadow"]');
+    const select = wrapper.get('select[name="skin_container_drop_shadow"]');
     expect(select.findAll("option").map((option) => option.text())).toEqual(["None", "Small", "Medium", "Large"]);
     expect(select.element.value).toBe("var(--sbx-shadow-m)");
 });
@@ -112,7 +112,7 @@ test("renders the Roundness select options for Sonar configs", () => {
     expect(wrapper.text()).toContain("Roundness");
     expect(wrapper.text()).toContain("Field Roundness");
 
-    const select = wrapper.get('select[name="skin_field_roundness"]');
+    const select = wrapper.get('select[name="skin_field_corner_radius"]');
     expect(select.findAll("option").map((option) => option.text())).toEqual(["None", "Small", "Medium", "Large"]);
     expect(select.element.value).toBe("0.5rem");
 });
@@ -125,7 +125,7 @@ test("emits preview refresh when the Drop Shadow selection changes", async () =>
         },
     });
 
-    await wrapper.get('select[name="skin_box_drop_shadow"]').setValue("var(--sbx-shadow-l)");
+    await wrapper.get('select[name="skin_container_drop_shadow"]').setValue("var(--sbx-shadow-l)");
 
     expect(wrapper.emitted("preview-refresh")).toHaveLength(1);
 });
@@ -138,7 +138,7 @@ test("emits preview refresh when the Roundness selection changes", async () => {
         },
     });
 
-    await wrapper.get('select[name="skin_field_roundness"]').setValue("0.75rem");
+    await wrapper.get('select[name="skin_field_corner_radius"]').setValue("0.75rem");
 
     expect(wrapper.emitted("preview-refresh")).toHaveLength(1);
 });
