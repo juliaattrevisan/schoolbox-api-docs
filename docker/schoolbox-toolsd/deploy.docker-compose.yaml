@@ -12,7 +12,6 @@ services:
         condition: service_healthy
     build:
       context: ./schoolbox-toolsd
-      dockerfile: deploy.Dockerfile
       args:
         PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
     env_file:
@@ -30,7 +29,6 @@ services:
         condition: service_healthy
     build:
       context: ./schoolbox-toolsd
-      dockerfile: deploy.Dockerfile
       args:
         PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
     env_file:
@@ -50,7 +48,6 @@ services:
         condition: service_healthy
     build:
       context: ./schoolbox-toolsd
-      dockerfile: deploy.Dockerfile
       args:
         PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
     env_file:
@@ -70,7 +67,6 @@ services:
         condition: service_healthy
     build:
       context: ./schoolbox-toolsd
-      dockerfile: deploy.Dockerfile
       args:
         PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
     env_file:
