@@ -1,0 +1,117 @@
+/**
+ * These are the styles pulled out of the <search-select> component,
+ * following the release of 26.1 (Sonar UI) they will be further broken
+ * down into the relevant style files
+ */
+
+.search-select {
+    &__results-container {
+        position: relative;
+        top: -1px; // to align the results with the bottom of the ss-query-input
+    }
+}
+
+.sbx-scroll-container {
+    border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
+    border-radius: var(--sbx-config-field-roundness, 0px);
+    max-height: 400px;
+    overflow: auto;
+    padding: var(--sbx-size-xs, var(--spacing-s));
+    width: 100%;
+    &--smaller {
+        max-height: 200px;
+    }
+}
+
+.sbx-checkbox-radio-group-scroll {
+    border: 0 !important; // important to override .mage > section > fieldset fieldset ~ fieldset
+    display: flex;
+    flex-direction: column;
+    gap: var(--sbx-size-xs, var(--spacing-s));
+    margin: 0;
+    padding: 0;
+    > legend {
+        border: 0;
+        font-size: var(--sbx-font-size-s, 0.8125rem);
+        font-weight: var(--sbx-font-weight-active, 600);
+        margin: 0;
+        padding: 0;
+    }
+    &__status {
+        background: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
+        font-size: var(--sbx-font-size-xs, 0.825rem);
+        font-style: italic;
+        margin: 0;
+    }
+    // temporary non Sonar UI fix to remove spacing between checkboxes and radios, which is currently being handled by the parent flex container, but is added by the base form styles
+    .checklist.sbx-checkbox-radio-container {
+        input[type="checkbox"] + label {
+            margin: 0 !important ; // foundation-fix: spacing is handled by parent flex
+        }
+    }
+}
+
+.sbx-checkbox-radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sbx-size-xs, var(--spacing-s));
+    margin: 0;
+}
+
+.ss-results-item {
+    input[type="checkbox"],
+    input[type="radio"],
+    label {
+        margin: 0;
+    }
+    // triggered when there's keyboard navigation linked to a ss-query-input
+    &--active {
+        input[type="checkbox"],
+        input[type="radio"] {
+            background: var(--sbx-config-color-active, none) !important;
+        }
+    }
+}
+
+.sbx-tag-group {
+    margin-bottom: var(--sbx-size-xs, var(--spacing-s));
+    // will be triggered when there's enough selected items to require scrolling
+    &--scroll {
+        margin-bottom: -1px; // to butt up against the search input border
+        max-height: 133px;
+    }
+}
+
+.sbx-tag {
+    background: var(--sbx-config-color-active, var(--body-background));
+    border-radius: var(--sbx-config-field-roundness, 0px);
+    color: var(--sbx-color-text-primary, #000);
+    font-size: var(--sbx-font-size-xs, 0.8125rem);
+    padding: var(--sbx-size-xxs, var(--spacing-s)) var(--sbx-size-xs, var(--spacing-s));
+    overflow: hidden;
+    white-space: nowrap;
+    &:has(.sbx-tag__remove-button) {
+        align-items: center;
+        display: flex;
+        gap: var(--sbx-size-xs, var(--spacing-s));
+    }
+    &__name-button {
+        margin: 0;
+        max-width: 30rem;
+        text-align: left;
+        text-overflow: ellipsis;
+    }
+    &__name-button,
+    &__remove-button {
+        background: none;
+        min-height: 0;
+        padding: 0;
+        &:hover {
+            background: none;
+        }
+        &:focus {
+            background: var(--sbx-config-color-active, var(--body-background));
+            outline: var(--sbx-border-width-normal, 1px) solid var(--sbx-config-color-accent, var(--form-border-color));
+        }
+    }
+}

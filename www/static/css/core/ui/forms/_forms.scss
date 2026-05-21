@@ -845,47 +845,6 @@ input[type="checkbox"].plain {
     margin-left: 2rem;
 }
 
-// Checklist Container
-.checklist.checklist-container {
-    padding: 0;
-    max-height: 13rem;
-    border: $fieldset-border-width $fieldset-border-style var(--sbx-config-color-accent, $input-border-color);
-    overflow-y: auto;
-
-    input[type="checkbox"]:not(.plain):not(:disabled) {
-        border: none;
-        display: none;
-
-        &:checked + label {
-            background: $content-ui-background;
-            &:hover {
-                background: css-lighten($content-ui-background, 3%);
-            }
-        }
-
-        + label {
-            border-bottom: 1px solid var(--sbx-config-color-accent, $input-border-color);
-            margin: 0;
-            padding: 0.5rem 0 0.5rem 2.5rem;
-            width: 100%;
-
-            &:after,
-            &:before {
-                margin: 0.5rem 0 0.5rem 0.5rem;
-            }
-
-            &:hover {
-                cursor: pointer;
-                background: $content-ui-background;
-            }
-        }
-    }
-
-    .checklist-wrapper {
-        position: relative;
-    }
-}
-
 .toggle-set {
     display: flex;
     justify-content: space-between;

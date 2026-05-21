@@ -165,9 +165,9 @@ body.sbx-body {
     // When a button sits next to an input (e.g. search bars)
     // We need to tweak the rounding of the corners so they align properly
     .input-group {
-        & > .button,
-        & > a,
-        & > button,
+        & > .button:not(:empty),
+        & > a:not(:empty),
+        & > button:not(:empty),
         & > button[class*="icon-"]:empty,
         & > a[class*="icon-"]:empty,
         & > button[class^="icon-"]:empty {

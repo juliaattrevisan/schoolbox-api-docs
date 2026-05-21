@@ -46,5 +46,3 @@ const saveText = window.Vue.computed(() => (props.savedSelected.length === 0 ? "
         </li>
     </ul>
 </template>
-
-<style scoped></style>

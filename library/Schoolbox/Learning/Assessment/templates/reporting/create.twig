@@ -188,30 +188,33 @@
 
     <div class="row{{supportingDataHideClass}}" data-collapsable="supporting-data" data-collapse-state="{{ supportingDataCollapseState }}">
         <div class="small-12 columns">
-            <label>Work Types</label>
-            <p class="meta">Select which work types will be presented as supporting data.</p>
-
-            <ul class="option-list checklist checklist-container" data-supporting-work-types>
-                <li>
-                    <input id="checkbox-work-type-all" type="checkbox">
-                    <label for="checkbox-work-type-all">Select All</label>
-                </li>
-                {% for workType in reporting.workTypes %}
-                    <li class="checklist-wrapper">
-                        <input
-                            id="checkbox-worktype-{{ workType.id }}"
-                            name="reporting[supporting][workTypes][]"
-                            type="checkbox"
-                            value="{{ workType.id }}"
-                            {% if workType.id in assessment.supportingDataWorkTypes.propertyValues('id') ?? [] %}
-                                checked="checked"
-                            {% endif %}
-                            data-checkbox-work-type
-                        />
-                        <label for="checkbox-worktype-{{ workType.id }}">{{ workType.name }}</label>
-                    </li>
-                {% endfor %}
-            </ul>
+            <fieldset class="sbx-checkbox-radio-group-scroll l-mar-m--bottom">
+                <legend>Work Types</legend>
+                <p class="meta f-no-margins">Select which work types will be presented as supporting data.</p>
+                <div class="sbx-scroll-container sbx-scroll-container--smaller">
+                    <ul class="sbx-checkbox-radio-group" data-supporting-work-types>
+                        <li class="ss-results-item checklist sbx-checkbox-radio-container">
+                            <input id="checkbox-work-type-all" type="checkbox" />
+                            <label for="checkbox-work-type-all">Select All</label>
+                        </li>
+                        {% for workType in reporting.workTypes %}
+                        <li class="ss-results-item checklist sbx-checkbox-radio-container">
+                            <input
+                                id="checkbox-worktype-{{ workType.id }}"
+                                name="reporting[supporting][workTypes][]"
+                                type="checkbox"
+                                value="{{ workType.id }}"
+                                {% if workType.id in assessment.supportingDataWorkTypes.propertyValues('id') ?? [] %}
+                                    checked="checked"
+                                {% endif %}
+                                data-checkbox-work-type
+                            />
+                            <label for="checkbox-worktype-{{ workType.id }}">{{ workType.name }}</label>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </fieldset>
         </div>
     </div>
 
