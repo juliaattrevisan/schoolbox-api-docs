@@ -95,7 +95,6 @@ export type ApiStudent = {
     missingFields: string[];
     _routes: {
         updateLanguages: string | null;
-        renotify: string | null;
     };
     ibGroupSubjects: {
         HL: ApiSubject[];

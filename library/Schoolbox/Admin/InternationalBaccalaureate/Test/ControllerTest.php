@@ -138,44 +138,6 @@ class ControllerTest extends TestCase
         );
     }
 
-    public function testRegistrationSessionStudentsIncludesRenotifyRouteForUnconfirmedStudents(): void
-    {
-        $registrationSessionMapper = $this->createStub(RegistrationSessionMapper::class);
-        $registrationSessionMapper
-            ->method('findById')
-            ->willReturn(new RegistrationSessionModel());
-
-        $registrationSessionStudentMapper = $this->createStub(RegistrationSessionStudentMapper::class);
-        $registrationSessionStudentMapper
-            ->method('findStudentsForSession')
-            ->willReturn(new Collection([
-                $this->buildStudent(456, 123, RegistrationSessionStudentModel::STATUS_UNCONFIRMED, 'Alex', 'Nguyen', 'S123'),
-            ]));
-
-        $externalUser = $this->createStub(\External_UserInterface::class);
-        $externalUser
-            ->method('getStudent')
-            ->willReturn(['StudentBirthDate' => '2009-04-12', 'StudentGender' => 'F']);
-
-        $controller = $this->buildController(
-            $registrationSessionMapper,
-            $registrationSessionStudentMapper,
-            $externalUser
-        );
-
-        $controller->getRegistrationSessionStudents(12);
-
-        $response = $controller->getResponse();
-        $this->assertNotNull($response);
-
-        $payload = json_decode((string) $response->getBody(), true);
-        $this->assertIsArray($payload);
-        $this->assertSame(
-            '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/renotify',
-            $payload['students'][RegistrationSessionStudentModel::STATUS_UNCONFIRMED][0]['_routes']['renotify']
-        );
-    }
-
     public function testRenotifyUnconfirmedTouchesStudentAndPropagatesUnconfirmedNotification(): void
     {
         $registrationSessionStudent = $this->buildStudent(

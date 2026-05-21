@@ -27,10 +27,12 @@ interface Props {
     candidatesEndpoint: string;
     candidateExportEndpoint: string;
     searchLanguagesEndpoint: string;
+    renotifyEndpoint: string;
     sessionTitle: string;
 }
 const props = defineProps<Props>();
 const updateLanguageStore = useIbReportUpdateLanguageStore();
+const renotifyEndpoint = props.renotifyEndpoint.trim() === "" ? null : props.renotifyEndpoint;
 
 const isLoading = window.Vue.ref<boolean>(true);
 const loadError = window.Vue.ref<string | null>(null);
@@ -60,9 +62,10 @@ function mapSubjectEntry(apiSubject: ApiSubject): SubjectEntry {
 /**
  * Maps a raw API student entry to the frontend StudentRow shape.
  * @param s The raw student from the API.
+ * @param studentRenotifyEndpoint The endpoint to use for renotifying this student.
  * @returns A StudentRow for use in the frontend.
  */
-function mapStudentRow(s: ApiStudent): StudentRow {
+function mapStudentRow(s: ApiStudent, studentRenotifyEndpoint: string | null = null): StudentRow {
     return {
         id: s.registrationSessionStudentId ?? s.userId,
         name: s.userName,
@@ -74,7 +77,7 @@ function mapStudentRow(s: ApiStudent): StudentRow {
             core: s.ibGroupSubjects.Core.map(mapSubjectEntry),
         },
         updateLanguageEndpoint: s._routes.updateLanguages,
-        renotifyEndpoint: s._routes.renotify,
+        renotifyEndpoint: studentRenotifyEndpoint,
     };
 }
 
@@ -102,12 +105,12 @@ async function loadCandidates(): Promise<void> {
             byKey[status.key] = students[String(status.value)] ?? [];
         }
 
-        preparation.value = (byKey["preparation"] ?? []).map(mapStudentRow);
-        unconfirmed.value = (byKey["unconfirmed"] ?? []).map(mapStudentRow);
-        confirmed.value = (byKey["confirmed"] ?? []).map(mapStudentRow);
-        inProgress.value = (byKey["inProgress"] ?? []).map(mapStudentRow);
-        failed.value = (byKey["failed"] ?? []).map(mapStudentRow);
-        registered.value = (byKey["registered"] ?? []).map(mapStudentRow);
+        preparation.value = (byKey["preparation"] ?? []).map((student) => mapStudentRow(student));
+        unconfirmed.value = (byKey["unconfirmed"] ?? []).map((student) => mapStudentRow(student, renotifyEndpoint));
+        confirmed.value = (byKey["confirmed"] ?? []).map((student) => mapStudentRow(student));
+        inProgress.value = (byKey["inProgress"] ?? []).map((student) => mapStudentRow(student));
+        failed.value = (byKey["failed"] ?? []).map((student) => mapStudentRow(student));
+        registered.value = (byKey["registered"] ?? []).map((student) => mapStudentRow(student));
     } catch (e) {
         console.error("Failed to load candidates", e);
         loadError.value = "Failed to load registration report.";

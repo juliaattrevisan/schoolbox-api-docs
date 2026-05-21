@@ -59,9 +59,10 @@ async function renotifyStudent(student: StudentRow): Promise<void> {
 /**
  * Whether the student currently has an in-flight renotify request.
  * @param student The student row.
+ * @returns True if the student is currently renotifying, false otherwise.
  */
 function isRenotifying(student: StudentRow): boolean {
-    return renotifyingStudentIds.value.has(student.id);
+    return renotifyingStudentIds.value.has(student.userId);
 }
 </script>
 

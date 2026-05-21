@@ -94,7 +94,6 @@ class ModelToArray
 
     private function buildUpdateConfirmationRoute(Model $student): ?string
     {
-
         $sessionId = $student->getRegistrationSession()?->getId();
         $studentId = $student->getUser()?->getId();
 
