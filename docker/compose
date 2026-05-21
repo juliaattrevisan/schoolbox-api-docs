@@ -51,8 +51,7 @@ case "${TOOLSD_BUILD_FROM_LOCAL}" in
         toolsd_compose_file="docker/schoolbox-toolsd/dev.docker-compose.yaml"
         ;;
     *)
-        # Currently, there's no prebuilt toolsd:
-        # don't include it at all if it is not set
+        toolsd_compose_file="docker/schoolbox-toolsd/deploy.docker-compose.yaml"
         ;;
 esac
 
@@ -64,10 +63,8 @@ args=(
     -f "${frankenphp_compose_file}" \
     -f "${schoolbox_cli_compose_file}" \
     -f "${taskd_compose_file}" \
+    -f "${toolsd_compose_file}" \
 )
-if [[ -n $toolsd_compose_file ]]; then
-    args+=(-f "${toolsd_compose_file}")
-fi
 
 # Build profiles
 case "${LTI_DEVKIT_ENABLE}" in
