@@ -263,7 +263,7 @@ Usage:
             var href        = $submitButton.data('href'),
                 data        = $optionInputs.serializeArray(),
                 decodedData = deserialize(data);
-            $submitButton.val($submitButton.data('working'));
+            $submitButton.text($submitButton.data('working'));
 
             disableInputs();
             hidePanel();
@@ -349,7 +349,7 @@ Usage:
          * selected filters.
          */
         function processFilterUpdateAlways() {
-            $submitButton.val($submitButton.data('value'));
+            $submitButton.text($submitButton.data('value'));
             hideFilterLoader();
             enableInputs();
             hideContentPlaceholder();
@@ -988,7 +988,7 @@ Usage:
                                data-href="{{ panel.route }}"
                                data-working="Submitting..."
                                data-test="panel-apply-filters-button"
-                            >Submit</button>
+                            >Apply filters</button>
                     </li>
                 </ul>
             </div>
