@@ -167,7 +167,7 @@ class Model
     /**
      * @return bool
      */
-    public function isCandidateConfirmed(): bool
+    public function getCandidateConfirmed(): bool
     {
         return $this->candidateConfirmed;
     }
@@ -221,7 +221,7 @@ class Model
     /**
      * @return bool
      */
-    public function isSubjectConfirmed(): bool
+    public function getSubjectConfirmed(): bool
     {
         return $this->subjectConfirmed;
     }

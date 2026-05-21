@@ -805,7 +805,7 @@ class ControllerTest extends TestCase
             ->expects($this->once())
             ->method('save')
             ->with($this->callback(function (RegistrationSessionStudentModel $student): bool {
-                $this->assertTrue($student->isCandidateConfirmed());
+                $this->assertTrue($student->getCandidateConfirmed());
                 $this->assertInstanceOf(
                     \Alaress_Date_Format::class,
                     $student->getCandidateConfirmedAt()
@@ -873,13 +873,13 @@ class ControllerTest extends TestCase
             ->expects($this->once())
             ->method('save')
             ->with($this->callback(function (RegistrationSessionStudentModel $student): bool {
-                $this->assertFalse($student->isSubjectConfirmed());
+                $this->assertFalse($student->getSubjectConfirmed());
                 $this->assertInstanceOf(
                     \Alaress_Date_Format::class,
                     $student->getSubjectConfirmedAt()
                 );
                 $this->assertSame(999, $student->getSubjectConfirmedBy()?->getId());
-                $this->assertFalse($student->isCandidateConfirmed());
+                $this->assertFalse($student->getCandidateConfirmed());
                 $this->assertNull($student->getCandidateConfirmedAt());
                 $this->assertNull($student->getCandidateConfirmedBy());
 
