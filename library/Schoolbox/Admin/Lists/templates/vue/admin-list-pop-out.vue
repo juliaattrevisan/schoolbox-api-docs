@@ -312,7 +312,7 @@ export default {
     top: 0px;
     width: 100%;
     border: 2px solid $form-border-color;
-    border-radius: var(--sbx-config-container-roundness, 0);
+    border-radius: var(--sbx-config-container-corner-radius, 0);
     padding: 1rem;
     background: var(--sbx-color-foreground-primary, #fff);
 }

@@ -59,7 +59,7 @@ function onRemoveSelected() {
 <style lang="scss" scoped>
 .selected-class {
     background: var(--sbx-config-color-active, var(--body-background));
-    border-radius: var(--sbx-config-field-roundness, 0px);
+    border-radius: var(--sbx-config-field-corner-radius, 0px);
     color: var(--sbx-color-text-primary, #000);
     display: flex;
     font-size: var(--sbx-font-size-xs, 0.8125rem);

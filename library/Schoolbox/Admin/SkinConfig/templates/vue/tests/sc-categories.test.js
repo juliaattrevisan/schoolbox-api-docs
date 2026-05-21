@@ -21,7 +21,7 @@ function buildConfigs() {
                             value: "0.5rem",
                             title: "Field Roundness",
                             description: "Adjust the roundness of form fields.",
-                            customProperty: "--sbx-config-field-roundness",
+                            customProperty: "--sbx-config-field-corner-radius",
                             contrast: null,
                             type: "select",
                             selectOptions: [

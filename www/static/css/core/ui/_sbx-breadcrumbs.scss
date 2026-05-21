@@ -53,7 +53,7 @@ body.sbx-body {
         & li a:focus-visible {
             outline: 1px solid var(--sbx-config-color-accent);
             outline-offset: 1px;
-            border-radius: var(--sbx-config-field-roundness);
+            border-radius: var(--sbx-config-field-corner-radius);
         }
     }
 }

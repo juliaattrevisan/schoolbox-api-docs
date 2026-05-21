@@ -14,13 +14,13 @@ body.sbx-body {
     .img-gallery img,
     img[src*="/portrait.php?"] {
         // All images inherit the configured field roundness for visual consistency.
-        border-radius: var(--sbx-config-field-roundness);
+        border-radius: var(--sbx-config-field-corner-radius);
     }
 
     .c-img:not(.c-img--round):has(> .c-img__wrapper > img) {
         .c-img__wrapper {
             // Larger wrapped images inherit the configured field roundness.
-            border-radius: var(--sbx-config-field-roundness);
+            border-radius: var(--sbx-config-field-corner-radius);
         }
     }
 

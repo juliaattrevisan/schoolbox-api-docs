@@ -5,7 +5,7 @@
  */
 
 :root {
-    --sbx-config-container-roundness: var(--sbx-border-radius-m);
+    --sbx-config-container-corner-radius: var(--sbx-border-radius-m);
 }
 
 body.sbx-body {
@@ -44,7 +44,7 @@ body.sbx-body {
     .az-list li,
     .az-error-list li,
     .audience-grid li {
-        border-radius: var(--sbx-config-container-roundness);
+        border-radius: var(--sbx-config-container-corner-radius);
     }
 
     // so the image at the top of the what's new modal respects the rounded corners
@@ -54,8 +54,8 @@ body.sbx-body {
 
     // this is to round an svg rect element
     .highcharts-background {
-        rx: var(--sbx-config-container-roundness);
-        ry: var(--sbx-config-container-roundness);
+        rx: var(--sbx-config-container-corner-radius);
+        ry: var(--sbx-config-container-corner-radius);
     }
 
     // Top-only rounded elements
@@ -67,13 +67,13 @@ body.sbx-body {
     .feed .subheader,
     .form-group,
     .tabs {
-        border-radius: var(--sbx-config-container-roundness) var(--sbx-config-container-roundness) 0 0;
+        border-radius: var(--sbx-config-container-corner-radius) var(--sbx-config-container-corner-radius) 0 0;
     }
 
     // bottom only rounded elements
     .reveal-modal .component-action section,
     .VueTables__table-footer {
-        border-radius: 0 0 var(--sbx-config-container-roundness) var(--sbx-config-container-roundness);
+        border-radius: 0 0 var(--sbx-config-container-corner-radius) var(--sbx-config-container-corner-radius);
     }
 
     // Component layout fixes
@@ -85,18 +85,18 @@ body.sbx-body {
     // tables need to be rounded uniquely
     table {
         border-spacing: 0;
-        border-radius: var(--sbx-config-container-roundness);
+        border-radius: var(--sbx-config-container-corner-radius);
     }
     thead tr:first-child th:first-child {
-        border-top-left-radius: var(--sbx-config-container-roundness);
+        border-top-left-radius: var(--sbx-config-container-corner-radius);
     }
     thead tr:first-child th:last-child {
-        border-top-right-radius: var(--sbx-config-container-roundness);
+        border-top-right-radius: var(--sbx-config-container-corner-radius);
     }
     tbody tr:last-child td:first-child {
-        border-bottom-left-radius: var(--sbx-config-container-roundness);
+        border-bottom-left-radius: var(--sbx-config-container-corner-radius);
     }
     tbody tr:last-child td:last-child {
-        border-bottom-right-radius: var(--sbx-config-container-roundness);
+        border-bottom-right-radius: var(--sbx-config-container-corner-radius);
     }
 }

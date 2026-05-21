@@ -26,7 +26,7 @@ body.sbx-body {
     .introjs-button {
         background: var(--sbx-config-color-accent);
         border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
-        border-radius: var(--sbx-config-field-roundness);
+        border-radius: var(--sbx-config-field-corner-radius);
         color: var(--sbx-config-color-accent-text);
         &:hover,
         &:active {
@@ -70,7 +70,7 @@ body.sbx-body {
     button.load-more {
         background: var(--sbx-color-foreground-primary);
         border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
-        border-radius: var(--sbx-config-field-roundness);
+        border-radius: var(--sbx-config-field-corner-radius);
         color: var(--sbx-config-color-accent);
         font-size: var(--sbx-font-size-s);
         text-transform: none;
@@ -174,12 +174,12 @@ body.sbx-body {
         & > button[class^="icon-"]:empty {
             border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
             border-left: none;
-            border-radius: 0 var(--sbx-config-field-roundness) var(--sbx-config-field-roundness) 0;
+            border-radius: 0 var(--sbx-config-field-corner-radius) var(--sbx-config-field-corner-radius) 0;
             line-height: 1;
             // this is the same as $small-only, which we can't currently import in this context
             @media only print, screen and (max-width: 40em) {
                 border-left: var(--sbx-border-width-normal);
-                border-radius: var(--sbx-config-field-roundness);
+                border-radius: var(--sbx-config-field-corner-radius);
             }
         }
         // Additional styles for button in input group
@@ -227,7 +227,7 @@ body.sbx-body {
     // FullCalendar button hover border radius fix
     .fc-event,
     .fc-event:hover {
-        border-radius: var(--sbx-config-field-roundness) !important;
+        border-radius: var(--sbx-config-field-corner-radius) !important;
     }
 
     // Add some gap otherwise the checkbox and text within these buttons are too close together

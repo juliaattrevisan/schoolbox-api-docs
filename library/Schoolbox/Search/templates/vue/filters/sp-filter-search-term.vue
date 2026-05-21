@@ -166,7 +166,7 @@ function onMouseOut(event: MouseEvent): void {
     &__button {
         align-items: center;
         background-color: var(--sbx-config-color-accent, var(--content-ui-submit-background));
-        border-radius: 0 var(--sbx-config-field-roundness) var(--sbx-config-field-roundness) 0;
+        border-radius: 0 var(--sbx-config-field-corner-radius) var(--sbx-config-field-corner-radius) 0;
         color: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground));
         display: flex;
         justify-content: center;

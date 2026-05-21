@@ -63,7 +63,7 @@
 /* CKEditor border radius follows Advanced UI field roundness */
 .sbx-body,
 .sbx-body .ck-body-wrapper {
-    --ck-border-radius: var(--sbx-config-field-roundness, 0);
+    --ck-border-radius: var(--sbx-config-field-corner-radius, 0);
 }
 
 /* Keep table insert grid buttons in the toolbar square */

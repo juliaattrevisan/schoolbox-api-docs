@@ -10,7 +10,7 @@
 
 .c-new-card {
     background-color: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
-    border-radius: var(--sbx-config-field-roundness, var(--roundness-cards));
+    border-radius: var(--sbx-config-field-corner-radius, var(--roundness-cards));
     line-height: var(--base-line-height);
     position: relative;
     text-align: start;

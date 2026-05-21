@@ -108,7 +108,7 @@ Long term they will reference the design colour tokens
 */
 .sbx-label {
     align-items: center;
-    border-radius: var(--sbx-config-field-roundness, 0);
+    border-radius: var(--sbx-config-field-corner-radius, 0);
     color: white;
     display: inline-flex;
     font-size: var(--sbx-font-size-xs, 0.75rem);

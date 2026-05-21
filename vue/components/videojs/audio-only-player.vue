@@ -246,7 +246,7 @@ export default {
         z-index: calc(var(--sbx-depth-default) + 1);
         background-color: black;
         border: 2px solid white;
-        border-radius: var(--sbx-config-field-roundness, 0);
+        border-radius: var(--sbx-config-field-corner-radius, 0);
         top: 50%;
         left: 50%;
         margin-left: -45px;

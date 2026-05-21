@@ -5,7 +5,7 @@
  */
 
 :root {
-    --sbx-config-field-roundness: var(--sbx-border-radius-s);
+    --sbx-config-field-corner-radius: var(--sbx-border-radius-s);
 }
 
 body.sbx-body {
@@ -53,11 +53,11 @@ body.sbx-body {
     .clr-field button,
     .article-files li,
     .masonry-placeholder {
-        border-radius: var(--sbx-config-field-roundness) !important;
+        border-radius: var(--sbx-config-field-corner-radius) !important;
     }
 
     // round just the bottom of the refine options input in the image generator modal
     .ac-prompt-actions {
-        border-radius: 0 0 var(--sbx-config-field-roundness) var(--sbx-config-field-roundness);
+        border-radius: 0 0 var(--sbx-config-field-corner-radius) var(--sbx-config-field-corner-radius);
     }
 }
