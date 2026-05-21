@@ -15,9 +15,9 @@ const updateLanguageStore = useIbReportUpdateLanguageStore();
             @submit.prevent="updateLanguageStore.save"
         >
             <h2>Update Language Selection</h2>
-            <p class="f-no-margins">{{ updateLanguageStore.activeStudent.name }}</p>
+            <p class="f-no-margins">Manually assigning languages for: {{ updateLanguageStore.activeStudent.name }}</p>
 
-            <div class="l-flex-col l-gap-s">
+            <div class="c-vert-scroll-container l-flex-col l-gap-s">
                 <div v-for="(row, index) in updateLanguageStore.subjectRows" :key="index">
                     <search-select
                         v-model:selected="row.selected"

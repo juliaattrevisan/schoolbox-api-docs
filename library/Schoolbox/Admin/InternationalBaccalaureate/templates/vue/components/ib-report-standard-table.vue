@@ -33,7 +33,14 @@ function openModal(student: StudentRow): void {
         </thead>
         <tbody>
             <tr v-for="student in students" :key="student.id">
-                <td><input type="checkbox" disabled :aria-label="`Select ${student.name}`" /></td>
+                <td class="checklist">
+                    <input
+                        :id="`select-${student.id}`"
+                        type="checkbox"
+                        disabled
+                        :aria-label="`Select ${student.name}`"
+                    /><label class="checkbox-label" :for="`select-${student.id}`"></label>
+                </td>
                 <td>{{ student.name }}</td>
                 <td>
                     <sbx-icon
