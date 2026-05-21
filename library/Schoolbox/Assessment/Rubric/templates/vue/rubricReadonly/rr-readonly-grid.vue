@@ -91,9 +91,9 @@ function findCapabilityMark(
 
                         <!-- Self-Assessment -->
                         <template v-if="props.selfAssessmentFeedback?.humanReadableMark">
-                            {{ props.selfAssessmentFeedback.humanReadableMark }}
+                            ({{ props.selfAssessmentFeedback.humanReadableMark }}
                             given in
-                            {{ locale.selfAssessment.singular() }}
+                            {{ locale.selfAssessment.singular() }})
                         </template>
                     </th>
                 </tr>

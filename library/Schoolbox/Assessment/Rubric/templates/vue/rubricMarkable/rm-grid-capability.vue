@@ -323,9 +323,9 @@ window.Vue.watch(
 
             <!-- Self-Assessment -->
             <p v-if="props.selfAssessmentCapabilityMark?.humanReadableMark" class="meta">
-                {{ props.selfAssessmentCapabilityMark.humanReadableMark }}
+                ({{ props.selfAssessmentCapabilityMark.humanReadableMark }}
                 given in
-                {{ locale.selfAssessment.singular() }}
+                {{ locale.selfAssessment.singular() }})
             </p>
         </th>
     </tr>
