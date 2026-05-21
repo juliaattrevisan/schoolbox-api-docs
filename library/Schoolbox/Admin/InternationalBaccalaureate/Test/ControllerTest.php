@@ -854,6 +854,153 @@ class ControllerTest extends TestCase
         ], $payload['updatedBy']);
     }
 
+    public function testUpdateRegistrationSessionStudentConfirmationSavesSubjectSectionState(): void
+    {
+        $registrationSessionStudent = (new RegistrationSessionStudentModel())
+            ->setId(456)
+            ->setUser((new User())->setId(234));
+
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('findOneByColumnList')
+            ->with([
+                'user_id' => 234,
+                'registration_session_id' => 12,
+            ])
+            ->willReturn($registrationSessionStudent);
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('save')
+            ->with($this->callback(function (RegistrationSessionStudentModel $student): bool {
+                $this->assertFalse($student->isSubjectConfirmed());
+                $this->assertInstanceOf(
+                    \Alaress_Date_Format::class,
+                    $student->getSubjectConfirmedAt()
+                );
+                $this->assertSame(999, $student->getSubjectConfirmedBy()?->getId());
+                $this->assertFalse($student->isCandidateConfirmed());
+                $this->assertNull($student->getCandidateConfirmedAt());
+                $this->assertNull($student->getCandidateConfirmedBy());
+
+                return true;
+            }));
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class),
+            currentUser: (new User())
+                ->setId(999)
+                ->setFirstname('Ibis')
+                ->setLastname('Coordinator')
+                ->setNameFormat($this->buildConfigLoader()->get(ConfigMapper::NAME_NAME_FORMAT))
+        );
+        $controller->setRequest(
+            (new HttpFactory())
+                ->createServerRequest(
+                    'PUT',
+                    '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/234/confirmation'
+                )
+                ->withParsedBody([
+                    'section' => 'subject',
+                    'confirmed' => false,
+                ])
+        );
+
+        $controller->updateRegistrationSessionStudentConfirmation(12, 234);
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(200, $response->getStatusCode());
+
+        $payload = json_decode((string) $response->getBody(), true);
+        $this->assertTrue($payload['success']);
+        $this->assertSame('subject', $payload['section']);
+        $this->assertFalse($payload['confirmed']);
+        $this->assertIsString($payload['updatedAt']);
+        $this->assertSame([
+            'id' => 999,
+            'name' => 'Ibis Coordinator',
+        ], $payload['updatedBy']);
+    }
+
+    public function testUpdateRegistrationSessionStudentConfirmationRejectsUnknownSection(): void
+    {
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('findOneByColumnList');
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('save');
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class)
+        );
+        $controller->setRequest(
+            (new HttpFactory())
+                ->createServerRequest(
+                    'PUT',
+                    '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/234/confirmation'
+                )
+                ->withParsedBody([
+                    'section' => 'unknown',
+                    'confirmed' => true,
+                ])
+        );
+
+        $controller->updateRegistrationSessionStudentConfirmation(12, 234);
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(400, $response->getStatusCode());
+
+        $payload = json_decode((string) $response->getBody(), true);
+        $this->assertFalse($payload['success']);
+        $this->assertSame('Invalid confirmation request data.', $payload['message']);
+    }
+
+    public function testUpdateRegistrationSessionStudentConfirmationRejectsNonBooleanConfirmed(): void
+    {
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('findOneByColumnList');
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('save');
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class)
+        );
+        $controller->setRequest(
+            (new HttpFactory())
+                ->createServerRequest(
+                    'PUT',
+                    '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/234/confirmation'
+                )
+                ->withParsedBody([
+                    'section' => 'candidate',
+                    'confirmed' => 'true',
+                ])
+        );
+
+        $controller->updateRegistrationSessionStudentConfirmation(12, 234);
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(400, $response->getStatusCode());
+
+        $payload = json_decode((string) $response->getBody(), true);
+        $this->assertFalse($payload['success']);
+        $this->assertSame('Invalid confirmation request data.', $payload['message']);
+    }
+
     private function buildController(
         RegistrationSessionMapper $registrationSessionMapper,
         RegistrationSessionStudentMapper $registrationSessionStudentMapper,
@@ -864,7 +1011,7 @@ class ControllerTest extends TestCase
         ?User $currentUser = null
     ): Controller {
         $registrationSessionStudentHelper = new RegistrationSessionStudentHelper();
-        $routeGenerator = $this->createMock(Generator::class);
+        $routeGenerator = $this->createStub(Generator::class);
         $routeGenerator
             ->method('generate')
             ->willReturnCallback(static function (string $route, array $params): string {
@@ -884,7 +1031,7 @@ class ControllerTest extends TestCase
                     $params['studentId']
                 );
             });
-        $authorizer = $this->createMock(Authorizer::class);
+        $authorizer = $this->createStub(Authorizer::class);
         $authorizer
             ->method('isPathAuthorizedForUser')
             ->willReturn(true);
