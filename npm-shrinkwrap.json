@@ -49,7 +49,7 @@
         "jquery-ui": "~1.14.2",
         "jquery-validation": "~1.22.1",
         "lightgallery": "~2.9.0",
-        "locutus": "^3.0.36",
+        "locutus": "~3.0.36",
         "mediaelement": "~7.1.0",
         "pinia": "~3.0.4",
         "qrcode.vue": "~3.8.0",
@@ -17941,7 +17941,7 @@
       "version": "1.15.6",
       "resolved": "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.15.6.tgz",
       "integrity": "sha512-wWN62YITEaOpSK584EZXJafH1AGpO8RVgElfkuXbTOrPX4fIfOyEpW/CsiNd8JdYrAoOvafRTOEnvsO++qCqFA==",
-      "devOptional": true,
+      "dev": true,
       "funding": [
         {
           "type": "individual",
@@ -42549,7 +42549,7 @@
       "version": "1.15.6",
       "resolved": "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.15.6.tgz",
       "integrity": "sha512-wWN62YITEaOpSK584EZXJafH1AGpO8RVgElfkuXbTOrPX4fIfOyEpW/CsiNd8JdYrAoOvafRTOEnvsO++qCqFA==",
-      "devOptional": true
+      "dev": true
     },
     "for-each": {
       "version": "0.3.5",
