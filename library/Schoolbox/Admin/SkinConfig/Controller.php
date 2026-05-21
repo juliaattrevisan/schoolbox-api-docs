@@ -178,7 +178,7 @@ class Controller extends ConfigController
     {
         $preferredOrder = [
             ConfigMapper::NAME_SKIN_CATEGORY_COLOURS,
-            ConfigMapper::NAME_SKIN_CATEGORY_ROUNDNESS,
+            ConfigMapper::NAME_SKIN_CATEGORY_CORNER_RADIUS,
             ConfigMapper::NAME_SKIN_CATEGORY_DROP_SHADOW,
             ConfigMapper::NAME_SKIN_CATEGORY_CSS,
         ];

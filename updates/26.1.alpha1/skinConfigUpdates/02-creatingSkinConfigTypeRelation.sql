@@ -10,7 +10,7 @@ INSERT INTO
     lu_skin_config_category (`name`)
 VALUES ('Colours'),
     ('Custom CSS'),
-    ('Roundness'),
+    ('Corner Radius'),
     ('Drop Shadow');
 
 CREATE TABLE lu_skin_config_subcategory (
@@ -42,7 +42,7 @@ SET
         SELECT id
         FROM lu_skin_config_category
         WHERE
-            name = 'Roundness'
+            name = 'Corner Radius'
     );
 
 SET
