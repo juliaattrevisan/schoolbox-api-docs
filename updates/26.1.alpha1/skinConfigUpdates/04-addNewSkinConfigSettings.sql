@@ -410,7 +410,7 @@ VALUES (
     (
         'skin_container_corner_radius',
         'var(--sbx-border-radius-m)',
-        'Box',
+        'Container',
         'Add rounded corners to primary container elements.',
         @config_select_field_id,
         @sonar_config_type_id,
@@ -419,7 +419,7 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 12,
-        '{"customProperty":"--sbx-config-container-corner-radius","select":[{"name":"none","value":"var(--sbx-border-radius-none)"},{"name":"Small","value":"var(--sbx-border-radius-s)"},{"name":"Medium","value":"var(--sbx-border-radius-m)"},{"name":"Large","value":"var(--sbx-border-radius-l)"}]}'
+        '{"customProperty":"--sbx-config-container-corner-radius","select":[{"name":"None","value":"var(--sbx-border-radius-none)"},{"name":"Small","value":"var(--sbx-border-radius-s)"},{"name":"Medium","value":"var(--sbx-border-radius-m)"},{"name":"Large","value":"var(--sbx-border-radius-l)"}]}'
     ),
     (
         'skin_field_corner_radius',
@@ -433,12 +433,12 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 13,
-        '{"customProperty":"--sbx-config-field-corner-radius","select":[{"name":"none","value":"var(--sbx-border-radius-none)"},{"name":"Small","value":"var(--sbx-border-radius-s)"},{"name":"Medium","value":"var(--sbx-border-radius-m)"},{"name":"Large","value":"var(--sbx-border-radius-l)"}]}'
+        '{"customProperty":"--sbx-config-field-corner-radius","select":[{"name":"None","value":"var(--sbx-border-radius-none)"},{"name":"Small","value":"var(--sbx-border-radius-s)"},{"name":"Medium","value":"var(--sbx-border-radius-m)"},{"name":"Large","value":"var(--sbx-border-radius-l)"}]}'
     ),
     (
         'skin_container_drop_shadow',
         'var(--sbx-shadow-none)',
-        'Box',
+        'Container',
         'Add a drop shadow to primary container elements.',
         @config_select_field_id,
         @sonar_config_type_id,

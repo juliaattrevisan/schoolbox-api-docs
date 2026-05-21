@@ -185,7 +185,7 @@ class Controller extends ConfigController
         $orderedCategories = [];
         foreach ($preferredOrder as $categoryName) {
             foreach ($categories as $displayName => $subcategoryMap) {
-                if (strtolower($displayName) !== $categoryName) {
+                if ($this->normaliseCategoryName($displayName) !== $this->normaliseCategoryName($categoryName)) {
                     continue;
                 }
 
@@ -194,6 +194,11 @@ class Controller extends ConfigController
             }
         }
         return $orderedCategories + $categories;
+    }
+
+    private function normaliseCategoryName(string $categoryName): string
+    {
+        return str_replace('_', ' ', strtolower($categoryName));
     }
 
     /**
