@@ -28,7 +28,7 @@ SET
         END,
         JSON_OBJECT(
             'customProperty',
-            '--sbx-config-box-drop-shadow',
+            '--sbx-config-container-drop-shadow',
             'select',
             JSON_ARRAY(
                 JSON_OBJECT(

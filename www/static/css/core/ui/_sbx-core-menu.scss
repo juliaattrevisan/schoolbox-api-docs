@@ -15,8 +15,8 @@ body.sbx-body {
 
         //bar /top menu
         .tab-bar {
-            border-radius: var(--sbx-config-box-roundness);
-            box-shadow: var(--sbx-config-box-drop-shadow);
+            border-radius: var(--sbx-config-container-roundness);
+            box-shadow: var(--sbx-config-container-drop-shadow);
         }
 
         // make the width of the menu items dynamic to better allow for varying text lengths
@@ -142,7 +142,7 @@ body.sbx-body {
 
         // Account dropdown
         #account-content {
-            border-radius: var(--sbx-config-box-roundness);
+            border-radius: var(--sbx-config-container-roundness);
 
             // separator between account options and switch user list
             & .separator {
@@ -253,7 +253,7 @@ body.sbx-body {
     // Left menu styles when menu is not open
     .off-canvas-wrap.move-right :not(.left-open) {
         & #left-menu {
-            border-radius: var(--sbx-config-box-roundness);
+            border-radius: var(--sbx-config-container-roundness);
             box-shadow: var(--sbx-shadow-m);
             left: 1rem;
             top: 1rem;
@@ -263,7 +263,7 @@ body.sbx-body {
     // Notifications menu styles when menu is not open
     .off-canvas-wrap.move-left :not(.right-open) {
         & #msgs {
-            border-radius: var(--sbx-config-box-roundness);
+            border-radius: var(--sbx-config-container-roundness);
             box-shadow: var(--sbx-shadow-m);
             right: 1rem;
             top: 1rem;
@@ -307,7 +307,7 @@ body.sbx-body {
         // to distinguish the pwa setup from the other parts
         .pwa-side-panel {
             background: var(--sbx-color-foreground-secondary);
-            border-radius: var(--sbx-config-box-roundness);
+            border-radius: var(--sbx-config-container-roundness);
             margin-bottom: var(--sbx-size-s);
         }
 
@@ -329,7 +329,7 @@ body.sbx-body {
 
     // side menu, like within the administration section and for news page
     .side-nav {
-        border-radius: var(--sbx-config-box-roundness);
+        border-radius: var(--sbx-config-container-roundness);
         overflow: hidden;
 
         & li {

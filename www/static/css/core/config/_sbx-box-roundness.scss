@@ -1,15 +1,15 @@
 /**
- * Box roundness config
- * Applied to UI "boxes" in Advanced UI
- * Box = element on page background that typically has the --sbx-color-foreground-primary background color, such as islands, empty states, components, etc.
+ * Container roundness config
+ * Applied to UI "containers" in Advanced UI
+ * Container = element on page background that typically has the --sbx-color-foreground-primary background color, such as islands, empty states, components, etc.
  */
 
 :root {
-    --sbx-config-box-roundness: var(--sbx-border-radius-m);
+    --sbx-config-container-roundness: var(--sbx-border-radius-m);
 }
 
 body.sbx-body {
-    //Base box surfaces
+    // Base containers
     .island,
     .component,
     .island section,
@@ -44,18 +44,18 @@ body.sbx-body {
     .az-list li,
     .az-error-list li,
     .audience-grid li {
-        border-radius: var(--sbx-config-box-roundness);
+        border-radius: var(--sbx-config-container-roundness);
     }
 
-    // so the image at the top of the whats new modal respects the rounded corners
+    // so the image at the top of the what's new modal respects the rounded corners
     .introjs-whatsnewmodal {
         overflow: hidden;
     }
 
     // this is to round an svg rect element
     .highcharts-background {
-        rx: var(--sbx-config-box-roundness);
-        ry: var(--sbx-config-box-roundness);
+        rx: var(--sbx-config-container-roundness);
+        ry: var(--sbx-config-container-roundness);
     }
 
     // Top-only rounded elements
@@ -67,13 +67,13 @@ body.sbx-body {
     .feed .subheader,
     .form-group,
     .tabs {
-        border-radius: var(--sbx-config-box-roundness) var(--sbx-config-box-roundness) 0 0;
+        border-radius: var(--sbx-config-container-roundness) var(--sbx-config-container-roundness) 0 0;
     }
 
     // bottom only rounded elements
     .reveal-modal .component-action section,
     .VueTables__table-footer {
-        border-radius: 0 0 var(--sbx-config-box-roundness) var(--sbx-config-box-roundness);
+        border-radius: 0 0 var(--sbx-config-container-roundness) var(--sbx-config-container-roundness);
     }
 
     // Component layout fixes
@@ -85,18 +85,18 @@ body.sbx-body {
     // tables need to be rounded uniquely
     table {
         border-spacing: 0;
-        border-radius: var(--sbx-config-box-roundness);
+        border-radius: var(--sbx-config-container-roundness);
     }
     thead tr:first-child th:first-child {
-        border-top-left-radius: var(--sbx-config-box-roundness);
+        border-top-left-radius: var(--sbx-config-container-roundness);
     }
     thead tr:first-child th:last-child {
-        border-top-right-radius: var(--sbx-config-box-roundness);
+        border-top-right-radius: var(--sbx-config-container-roundness);
     }
     tbody tr:last-child td:first-child {
-        border-bottom-left-radius: var(--sbx-config-box-roundness);
+        border-bottom-left-radius: var(--sbx-config-container-roundness);
     }
     tbody tr:last-child td:last-child {
-        border-bottom-right-radius: var(--sbx-config-box-roundness);
+        border-bottom-right-radius: var(--sbx-config-container-roundness);
     }
 }

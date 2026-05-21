@@ -25,7 +25,7 @@ class HelperTest extends TestCase
             ->setValue('none')
             ->setFieldId(ConfigMapper::FIELD_SELECT)
             ->setOptions((string) json_encode([
-                'customProperty' => '--sbx-config-box-drop-shadow',
+                'customProperty' => '--sbx-config-container-drop-shadow',
                 'select' => [
                     [
                         'name' => 'None',
@@ -70,7 +70,7 @@ class HelperTest extends TestCase
 
         $this->assertSame(
             'var(--sbx-shadow-m)',
-            $previewData['cssVariables']['--sbx-config-box-drop-shadow']
+            $previewData['cssVariables']['--sbx-config-container-drop-shadow']
         );
     }
 }

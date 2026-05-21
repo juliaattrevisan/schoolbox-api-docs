@@ -419,7 +419,7 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 12,
-        '{"customProperty":"--sbx-config-box-roundness","select":[{"name":"none","value":"var(--sbx-border-radius-none)"},{"name":"Small","value":"var(--sbx-border-radius-s)"},{"name":"Medium","value":"var(--sbx-border-radius-m)"},{"name":"Large","value":"var(--sbx-border-radius-l)"}]}'
+        '{"customProperty":"--sbx-config-container-roundness","select":[{"name":"none","value":"var(--sbx-border-radius-none)"},{"name":"Small","value":"var(--sbx-border-radius-s)"},{"name":"Medium","value":"var(--sbx-border-radius-m)"},{"name":"Large","value":"var(--sbx-border-radius-l)"}]}'
     ),
     (
         'skin_field_roundness',
@@ -447,7 +447,7 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 14,
-        '{"customProperty":"--sbx-config-box-drop-shadow","select":[{"name":"None","value":"var(--sbx-shadow-none)"},{"name":"Small","value":"var(--sbx-shadow-s)"},{"name":"Medium","value":"var(--sbx-shadow-m)"},{"name":"Large","value":"var(--sbx-shadow-l)"}]}'
+        '{"customProperty":"--sbx-config-container-drop-shadow","select":[{"name":"None","value":"var(--sbx-shadow-none)"},{"name":"Small","value":"var(--sbx-shadow-s)"},{"name":"Medium","value":"var(--sbx-shadow-m)"},{"name":"Large","value":"var(--sbx-shadow-l)"}]}'
     ),
     (
         'skin_sonar_custom_css',

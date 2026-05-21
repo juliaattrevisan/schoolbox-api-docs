@@ -66,7 +66,7 @@ function buildConfigs() {
                             value: "var(--sbx-shadow-m)",
                             title: "Box Drop Shadow",
                             description: "Add a drop shadow to primary container elements.",
-                            customProperty: "--sbx-config-box-drop-shadow",
+                            customProperty: "--sbx-config-container-drop-shadow",
                             contrast: null,
                             type: "select",
                             selectOptions: [
