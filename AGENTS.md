@@ -142,6 +142,11 @@ mariadb -h 127.0.0.1 -u schoolboxdocker -pabc123 schoolbox -e "SELECT ..."
 
 Run the relevant suite(s) for changed code before marking work done.
 
+When creating or updating Playwright acceptance tests, follow
+`.agents/skills/create-playwright-tests/SKILL.md` before writing the test. This includes reading the internal
+automation documentation, using the `sales` dataset, following Schoolbox test structure, verifying the changed test,
+and documenting new coverage in the Confluence Automation Tests coverage page.
+
 ---
 
 ## Code Standards
