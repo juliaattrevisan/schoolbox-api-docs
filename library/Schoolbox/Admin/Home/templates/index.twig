@@ -357,7 +357,9 @@
     <div class="admin-content">
         <div class="small-12 columns">
             <!-- Sonar UI Reminder -->
-            {% include '@adminHome/sonar-reminder.twig' %}
+            {% if showSonarReminder %}
+                {% include '@adminHome/sonar-reminder.twig' %}
+            {% endif %}
 
             <!-- Upgrade Reminder -->
             {% if showUpgradeReminder %}
