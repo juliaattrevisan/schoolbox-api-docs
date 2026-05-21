@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * SubmissionTimeResolverTest
+ *
+ * Tests the timestamp rules used by the bulk Manage Submissions workflow.
+ *
  * @copyright Copyright 2026, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
@@ -19,6 +23,10 @@ class SubmissionTimeResolverTest extends TestCase
 {
     private const DATE_FORMAT = Alaress_Date_Format::DATABASE_FORMAT;
 
+    /**
+     * Future submissions, and late submissions without the on-time override,
+     * should be recorded against the time the teacher submitted the bulk action.
+     */
     #[DataProvider('provideNowSubmissionCases')]
     public function testResolveUsesNowWhenOnTimeOverrideIsNotAvailable(
         Model $assessment,
@@ -33,11 +41,17 @@ class SubmissionTimeResolverTest extends TestCase
         self::assertSame($now->getDatabase(), $submittedAt->getDatabase());
     }
 
+    /**
+     * @return array<string, array{0: Model, 1: bool, 2: Alaress_Date_Format}>
+     */
     public static function provideNowSubmissionCases(): array
     {
         $now = self::date('2026-06-01 10:30:00');
 
         return [
+            /* Regression case for SA-22289: the hidden punctual checkbox posts
+             * true before the assessment is overdue.
+             */
             'future assessment with hidden punctual checkbox posted true' => [
                 self::buildAssessment(
                     '2026-05-30 09:00:00',
@@ -71,6 +85,10 @@ class SubmissionTimeResolverTest extends TestCase
         ];
     }
 
+    /**
+     * Once the on-time override is available, punctual submissions should be
+     * backdated to just before the formal due date.
+     */
     #[DataProvider('providePunctualOverrideCases')]
     public function testResolveUsesDueDateWhenOnTimeOverrideIsAvailable(
         Model $assessment,
@@ -85,6 +103,9 @@ class SubmissionTimeResolverTest extends TestCase
         self::assertSame($expected->getDatabase(), $submittedAt->getDatabase());
     }
 
+    /**
+     * @return array<string, array{0: Model, 1: Alaress_Date_Format}>
+     */
     public static function providePunctualOverrideCases(): array
     {
         return [
@@ -109,6 +130,10 @@ class SubmissionTimeResolverTest extends TestCase
         ];
     }
 
+    /**
+     * The resolver is called repeatedly during one bulk request, so it must not
+     * mutate the assessment's due date while calculating due-date-minus-one-second.
+     */
     public function testResolveDoesNotMutateAssessmentDueDate(): void
     {
         $assessment = self::buildAssessment(
