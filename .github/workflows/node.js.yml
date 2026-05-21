@@ -20,19 +20,6 @@ on:
       - "tsconfig.json"
       - "npm-shrinkwrap.json"
       - ".github/workflows/node.js.yml"
-  push:
-    branches: ["develop", "master"]
-    paths:
-      - "**.js"
-      - "**.ts"
-      - "**.vue"
-      - "**.scss"
-      - ".eslintignore"
-      - ".eslintrc.js"
-      - "package.json"
-      - "tsconfig.json"
-      - "npm-shrinkwrap.json"
-      - ".github/workflows/node.js.yml"
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
