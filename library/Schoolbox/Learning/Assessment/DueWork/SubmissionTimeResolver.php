@@ -10,6 +10,15 @@ namespace Schoolbox\Learning\Assessment\DueWork;
 use Alaress_Date_Format;
 use Schoolbox\Learning\Assessment\IAssessable;
 
+/**
+ * Resolves the submitted-at timestamp for teacher-managed bulk submissions.
+ *
+ * The Manage Submissions modal can post its hidden "submitted on time" checkbox
+ * before an assessment is actually overdue. This resolver keeps the backend
+ * authoritative: use the request time unless the due-date override is genuinely
+ * available, and clone the selected timestamp so the assessment dates are not
+ * mutated while saving multiple students.
+ */
 class SubmissionTimeResolver
 {
     public function resolve(
