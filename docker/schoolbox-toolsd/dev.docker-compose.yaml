@@ -17,9 +17,11 @@ services:
         required: true
       - path: ./../docker-toolsd.env
         required: false
-    command: [src/main.py, api, -p, '8080',
-              --tools-config, /usr/share/schoolbox/library/Schoolbox/ToolsDaemon/conf/tools.yaml,
-              --pools-config, /usr/share/schoolbox/library/Schoolbox/ToolsDaemon/conf/pools.yaml,
+    command: [
+      src/main.py, api,
+      -p, '8080',
+      --tools-config, /usr/share/schoolbox/library/Schoolbox/ToolsDaemon/conf/tools.yaml,
+      --pools-config, /usr/share/schoolbox/library/Schoolbox/ToolsDaemon/conf/pools.yaml,
     ]
     volumes:
       - code:/usr/share/schoolbox
@@ -42,10 +44,13 @@ services:
         required: true
       - path: ./../docker-toolsd.env
         required: false
-    command: [src/main.py, worker, -Q, default,
-              --tools-config, /usr/share/schoolbox/library/Schoolbox/ToolsDaemon/conf/tools.yaml,
-              --pools-config, /usr/share/schoolbox/library/Schoolbox/ToolsDaemon/conf/pools.yaml,
-              -vv]
+    command: [
+      src/main.py, worker,
+      -Q, default,
+      --tools-config, /usr/share/schoolbox/library/Schoolbox/ToolsDaemon/conf/tools.yaml,
+      --pools-config, /usr/share/schoolbox/library/Schoolbox/ToolsDaemon/conf/pools.yaml,
+      -vv,
+    ]
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/${PRIMARY_INSTANCE_ID}/storage
@@ -76,10 +81,13 @@ services:
         required: true
       - path: ./../docker-toolsd.env
         required: false
-    command: [src/main.py, worker, -Q, ups,
-              --tools-config, /usr/share/schoolbox/library/Schoolbox/ToolsDaemon/conf/tools.yaml,
-              --pools-config, /usr/share/schoolbox/library/Schoolbox/ToolsDaemon/conf/pools.yaml,
-              -vv]
+    command: [
+      src/main.py, worker,
+      -Q, ups,
+      --tools-config, /usr/share/schoolbox/library/Schoolbox/ToolsDaemon/conf/tools.yaml,
+      --pools-config, /usr/share/schoolbox/library/Schoolbox/ToolsDaemon/conf/pools.yaml,
+      -vv,
+    ]
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/${PRIMARY_INSTANCE_ID}/storage
