@@ -86,7 +86,7 @@ export type ApiSubject = {
  */
 export type ApiStudent = {
     userId: number;
-    registrationSessionStudentId: number;
+    registrationSessionStudentId: number | null;
     status: number;
     userName: string;
     hasMissingDetails: boolean;

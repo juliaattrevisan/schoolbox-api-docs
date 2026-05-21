@@ -63,7 +63,7 @@ function mapSubjectEntry(apiSubject: ApiSubject): SubjectEntry {
  */
 function mapStudentRow(s: ApiStudent): StudentRow {
     return {
-        id: s.registrationSessionStudentId,
+        id: s.registrationSessionStudentId ?? s.userId,
         name: s.userName,
         candidateDetailsStatus: s.hasMissingDetails ? "unconfirmed" : "confirmed",
         subjects: {
