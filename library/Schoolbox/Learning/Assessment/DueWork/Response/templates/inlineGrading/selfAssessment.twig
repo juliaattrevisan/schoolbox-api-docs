@@ -26,28 +26,37 @@
 
 {# Feedback form section #}
 <section id="self-assessment-feedback">
-    {# Rubric #}
-    {% if assessment.useRubric %}
-        <fieldset class="content">
+    <fieldset class="content">
+        {# Render each rubric grid in a giant stack, I guess: there isn't much of an alternative to the mega scroll #}
+        {% for rubricInstance in assessment.rubricInstances %}
+
             {% set rubricTemplate = readonly ? 'grid.twig' : 'grid-markable.twig' %}
 
-            {% set rubricMarkedGrid = feedback is not null ? feedback.rubricMarkedGrid : null %}
+            {# Marked Grids might not exist yet #}
+            {% set rubricMarkedGrid = null %}
+
+            {% if feedback is not null and feedback.rubricMarkedGrids[rubricInstance.id] is not null %}
+                {% set rubricMarkedGrid = feedback.rubricMarkedGrids[rubricInstance.id] %}
+            {% endif %}
 
             {% include '@rubric/' ~ rubricTemplate with {
-                rubricGrid: assessment.rubricGrid,
-                rubricMarkedGrid: feedback.rubricMarkedGrid ?? null,
-                learner: participant.user,
-                markVisibility: participant.assessable.isFeedbackVisibleToUser(USER),
-                showGroupTotal: showGroupTotal,
+                assessment: assessment,
+                rubricInstance: rubricInstance,
+                showGroupTotal: rubricInstance.isMarkPerCapability,
                 showRubricTotal: showRubricTotal,
+                markVisibility: participant.assessable.isFeedbackVisibleToUser(USER),
+                blindMode: false,
                 studentView: true,
-                selfAssessmentFeedback: selfAssessmentFeedback ?? null,
                 selfAssess: selfAssess,
                 selfReflect: selfReflect,
-                blindMode: false
+                learner: participant.user,
+                selfAssessmentFeedback: selfAssessmentFeedback ?? null,
+                rubricGrid: rubricInstance.grid,
+                rubricMarkedGrid: rubricMarkedGrid,
+                rubricSelfGradedGrid: selfAssessmentFeedback.rubricMarkedGrids[rubricInstance.id] ?? null
             } only %}
-        </fieldset>
-    {% endif %}
+        {% endfor %}
+    </fieldset>
 
     {# Grades input combobox #}
     {% if gradable %}
