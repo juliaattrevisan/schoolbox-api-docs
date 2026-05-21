@@ -64,10 +64,7 @@ class Csv
             return '';
         }
 
-        if (
-            preg_match(self::CSV_FORMULA_PREFIX_PATTERN, $normalisedValue) === 1
-            || in_array($normalisedValue[0], ["\t", "\n", "\r"], true)
-        ) {
+        if (preg_match(self::CSV_FORMULA_PREFIX_PATTERN, $normalisedValue) === 1) {
             // Prefix with an apostrophe so values such as =SUM(...) are
             // exported as literal text instead of executable formulas.
             return "'" . $normalisedValue;
