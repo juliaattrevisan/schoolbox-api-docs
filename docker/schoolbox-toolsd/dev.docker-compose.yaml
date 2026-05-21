@@ -10,8 +10,8 @@ services:
       redis-storage:
         condition: service_healthy
     build:
-      context: ./schoolbox-toolsd
-      dockerfile: dev.Dockerfile
+      context: ../../toolsd/server
+      dockerfile: schoolbox.Dockerfile
     env_file:
       - path: ./schoolbox-toolsd/default.env
         required: true
@@ -37,8 +37,8 @@ services:
       redis-storage:
         condition: service_healthy
     build:
-      context: ./schoolbox-toolsd
-      dockerfile: dev.Dockerfile
+      context: ../../toolsd/server
+      dockerfile: schoolbox.Dockerfile
     env_file:
       - path: ./schoolbox-toolsd/default.env
         required: true
@@ -74,8 +74,8 @@ services:
       redis-storage:
         condition: service_healthy
     build:
-      context: ./schoolbox-toolsd
-      dockerfile: dev.Dockerfile
+      context: ../../toolsd/server
+      dockerfile: schoolbox.Dockerfile
     env_file:
       - path: ./schoolbox-toolsd/default.env
         required: true
@@ -111,8 +111,8 @@ services:
       redis-storage:
         condition: service_healthy
     build:
-      context: ./schoolbox-toolsd
-      dockerfile: dev.Dockerfile
+      context: ../../toolsd/server
+      dockerfile: schoolbox.Dockerfile
     env_file:
       - path: ./schoolbox-toolsd/default.env
         required: true
