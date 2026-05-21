@@ -492,7 +492,13 @@ class Controller extends Base
         $rubricAssessmentList = [];
         if ($canSeeRubricGrade || $canSeeCapabilityGrade || $canSeeProgression) {
             $includeComparison = $viewContext->getMode() === ViewMode::STAFF || $viewee->getDisplayGradeGraph();
-            $longitudinalRubric   = $this->getLongitudinalRubricData($assessments, $viewee, $includeComparison, $subject);
+            $longitudinalRubric   = $this->getLongitudinalRubricData(
+                $assessments,
+                $viewee,
+                $effectiveViewer,
+                $includeComparison,
+                $subject
+            );
             $rubricAssessmentList = $longitudinalRubric['assessments'] ?? [];
             unset($longitudinalRubric['assessments']);
         }
@@ -656,6 +662,7 @@ class Controller extends Base
     /**
      * @param GenericCollection|IAssessable[] $assessments
      * @param User                            $student
+     * @param User                            $viewer
      * @param bool                            $includeComparison Include other students results for comparison
      * @param Folder\Model                    $folder
      * @return array
@@ -667,13 +674,13 @@ class Controller extends Base
     private function getLongitudinalRubricData(
         GenericCollection $assessments,
         User $student,
+        User $viewer,
         bool $includeComparison,
         Folder\Model $folder
     ): array {
-        // Filter to dueWork with marks visible to current user
-        $user = $this->getUser();
-        $dueWorksWithVisibleMarks = $assessments->filter(function (IAssessable $assessment) use ($user) {
-            return $assessment instanceof DueWork\Model && $assessment->isFeedbackVisibleToUser($user);
+        // Filter to dueWork with marks visible to the selected grades viewer.
+        $dueWorksWithVisibleMarks = $assessments->filter(function (IAssessable $assessment) use ($viewer) {
+            return $assessment instanceof DueWork\Model && $assessment->isFeedbackVisibleToUser($viewer);
         });
 
         /* Attempt to process statistics for Cohort aggregation for each capability/indicator/descriptor

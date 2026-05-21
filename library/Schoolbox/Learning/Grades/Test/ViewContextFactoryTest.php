@@ -66,6 +66,42 @@ class ViewContextFactoryTest extends TestCase
         self::assertTrue($context->getViewer()->isParentOf($student));
     }
 
+    public function testStudentRequesterIsForcedToStudentMode(): void
+    {
+        $student = $this->user(2, Role::STUDENT);
+
+        $context = (new ViewContextFactory($this->externalUser()))->create($student, $student, ViewMode::STAFF);
+
+        self::assertSame(ViewMode::STUDENT, $context->getMode());
+        self::assertSame($student, $context->getViewer());
+        self::assertFalse($context->canViewInstructorMarks());
+    }
+
+    public function testParentRequesterIsForcedToParentModeUsingCurrentParent(): void
+    {
+        $student = $this->user(2, Role::STUDENT);
+        $parent = $this->user(3, Role::PARENT);
+        $parent->setChildren((new GenericCollection(User::class))->setOffset($student->getId(), $student));
+
+        $context = (new ViewContextFactory($this->externalUser()))->create($parent, $student, ViewMode::STAFF);
+
+        self::assertSame(ViewMode::PARENT, $context->getMode());
+        self::assertSame($parent, $context->getViewer());
+        self::assertFalse($context->canViewInstructorMarks());
+    }
+
+    public function testSuperuserCanUseRequestedViewMode(): void
+    {
+        $superuser = $this->user(1, Role::STAFF)->setSuperuser(true);
+        $student = $this->user(2, Role::STUDENT);
+
+        $context = (new ViewContextFactory($this->externalUser()))->create($superuser, $student, ViewMode::STUDENT);
+
+        self::assertSame(ViewMode::STUDENT, $context->getMode());
+        self::assertSame($student, $context->getViewer());
+        self::assertFalse($context->canViewInstructorMarks());
+    }
+
     private function user(int $id, string $roleType): User
     {
         return (new User())

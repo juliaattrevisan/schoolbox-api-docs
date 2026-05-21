@@ -17,6 +17,14 @@ final class ViewContextFactory
 
     public function create(User $currentUser, User $student, ?string $requestedMode): ViewContext
     {
+        if (!$currentUser->getRole()->isStaff() && !$currentUser->isSuperuser()) {
+            if ($currentUser->getRole()->isParent()) {
+                return new ViewContext(ViewMode::PARENT, $currentUser, false);
+            }
+
+            return new ViewContext(ViewMode::STUDENT, $student, false);
+        }
+
         $mode = ViewMode::fromRequestValue($requestedMode);
 
         if ($mode === ViewMode::STUDENT) {
