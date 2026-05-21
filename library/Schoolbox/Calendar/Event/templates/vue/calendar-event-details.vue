@@ -659,7 +659,7 @@ export default {
                                 </div>
                                 <nav>
                                     <button
-                                        v-bind="canModify()"
+                                        v-if="canModify()"
                                         class="sbx-icon-only-button"
                                         @click.prevent="rsvpDelete(guest.id, guest.name)"
                                         title="Remove guest"
