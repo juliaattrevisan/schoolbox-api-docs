@@ -1351,14 +1351,18 @@ class Controller extends ConfigController
                 }
             }
 
+            $partial = $failed !== [] && $renotified !== [];
+            $success = $renotified !== [];
+
             $message = match (true) {
-                $failed !== [] && $renotified !== [] => 'Some students could not be renotified.',
+                $partial => 'Some students could not be renotified.',
                 $failed !== [] => 'No students were renotified.',
                 default => 'Student(s) renotified.',
             };
 
             $this->response = $this->responseAsJson([
-                'success' => $failed === [],
+                'success' => $success,
+                'partial' => $partial,
                 'message' => $message,
                 'renotified' => $renotified,
                 'failed' => $failed,

@@ -2,7 +2,7 @@
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import IbReportSubjectLabels from "./ib-report-subject-labels.vue";
 import { useIbReportUpdateLanguageStore } from "../store/ibReportUpdateLanguageStore";
-import type { StudentRow } from "../../js/types/ibReportTypes";
+import type { ApiRenotifyResponse, StudentRow } from "../../js/types/ibReportTypes";
 
 interface Props {
     students: StudentRow[];
@@ -32,20 +32,23 @@ async function renotifyStudent(student: StudentRow): Promise<void> {
     const toast = window.sbProps.toastActivate("Renotifying student...");
 
     try {
-        const response = await apiRequest<unknown>({
+        const response = (await apiRequest<ApiRenotifyResponse>({
             url: student.renotifyEndpoint,
             method: "POST",
             body: {
                 studentIds: [student.userId],
             },
-        });
+        })) as ApiRenotifyResponse;
 
         if (!response.success) {
             toast.timeout({ text: response.message ?? "Failed to renotify student.", isSuccess: false });
             return;
         }
 
-        toast.timeout({ text: "Student renotified." });
+        toast.timeout({
+            text: response.message ?? "Student(s) renotified.",
+            isSuccess: !response.partial,
+        });
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : "Failed to renotify student.";
         toast.timeout({ text: errorMessage, isSuccess: false });

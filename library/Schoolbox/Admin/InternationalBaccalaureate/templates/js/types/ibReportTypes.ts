@@ -120,3 +120,17 @@ export type ApiCandidatesResponse = {
     students: Record<string, ApiStudent[]>;
     statuses: ApiStatus[];
 };
+
+/**
+ * Raw response from the renotify endpoint.
+ */
+export type ApiRenotifyResponse = {
+    success: boolean;
+    partial: boolean;
+    message?: string;
+    renotified: number[];
+    failed: {
+        studentId: number;
+        message: string;
+    }[];
+};

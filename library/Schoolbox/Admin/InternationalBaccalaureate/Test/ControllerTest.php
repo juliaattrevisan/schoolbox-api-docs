@@ -190,6 +190,7 @@ class ControllerTest extends TestCase
 
         $payload = json_decode((string) $response->getBody(), true);
         $this->assertTrue($payload['success']);
+        $this->assertFalse($payload['partial']);
         $this->assertSame('Student(s) renotified.', $payload['message']);
         $this->assertSame([234], $payload['renotified']);
         $this->assertSame([], $payload['failed']);
@@ -278,6 +279,69 @@ class ControllerTest extends TestCase
         $this->assertSame(RegistrationSessionStudentModel::STATUS_PREPARATION, $studentThree->getStatus());
     }
 
+    public function testRenotifyUnconfirmedReportsPartialSuccess(): void
+    {
+        $unconfirmedStudent = $this->buildStudent(
+            456,
+            234,
+            RegistrationSessionStudentModel::STATUS_UNCONFIRMED,
+            'Sam',
+            'Patel',
+            'S234'
+        );
+
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('findByColumnList')
+            ->with([
+                'user_id' => [234, 345],
+                'registration_session_id' => 12,
+            ])
+            ->willReturn(new Collection([$unconfirmedStudent]));
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('propagate')
+            ->with(
+                $this->isInstanceOf(User::class),
+                BaseMapper::METHOD_UPDATE,
+                $unconfirmedStudent,
+                [
+                    'status' => [
+                        RegistrationSessionStudentModel::STATUS_UNCONFIRMED,
+                        RegistrationSessionStudentModel::STATUS_PREPARATION,
+                    ],
+                ]
+            );
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class)
+        );
+        $controller->setRequestPost(new Values([
+            'studentIds' => [234, 345],
+        ]));
+
+        $controller->renotifyUnconfirmed(12);
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(200, $response->getStatusCode());
+
+        $payload = json_decode((string) $response->getBody(), true);
+        $this->assertTrue($payload['success']);
+        $this->assertTrue($payload['partial']);
+        $this->assertSame('Some students could not be renotified.', $payload['message']);
+        $this->assertSame([234], $payload['renotified']);
+        $this->assertSame([
+            [
+                'studentId' => 345,
+                'message' => 'Candidate not found for this user in the registration session.',
+            ],
+        ], $payload['failed']);
+    }
+
     public function testSessionCompletePreparationRejectsInvalidStudentIds(): void
     {
         $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
@@ -346,6 +410,7 @@ class ControllerTest extends TestCase
 
         $payload = json_decode((string) $response->getBody(), true);
         $this->assertFalse($payload['success']);
+        $this->assertFalse($payload['partial']);
         $this->assertSame('No students were renotified.', $payload['message']);
         $this->assertSame([], $payload['renotified']);
         $this->assertSame([
@@ -394,6 +459,7 @@ class ControllerTest extends TestCase
 
         $payload = json_decode((string) $response->getBody(), true);
         $this->assertFalse($payload['success']);
+        $this->assertFalse($payload['partial']);
         $this->assertSame('No students were renotified.', $payload['message']);
         $this->assertSame([], $payload['renotified']);
         $this->assertSame([
