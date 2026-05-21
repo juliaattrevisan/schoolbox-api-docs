@@ -41,27 +41,17 @@
 
 {% set canSwitchViewMode = USER.role.isStaff %}
 {% set canViewInstructorMarks = viewContext.canViewInstructorMarks() %}
-<div class="row{% if canSwitchViewMode %} actions-small-2{% endif %}">
+<div class="row">
     <div class="small-12 columns">
         <h1>{{ locale.grades.properPlural }} for {{ subject.name }} - {{ student.fullName }}</h1>
 
-        {% if subject.teachers|length or canSwitchViewMode %}
+        {% if subject.teachers|length %}
         <ul class="meta">
-            {% if subject.teachers|length %}
-                <li><sbx-icon name="teacher" color="var(--sbx-color-text-secondary)"></sbx-icon>Teacher(s): {% for teacher in subject.teachers %}<a href="/search/user/{{ teacher.id }}" title="View Profile">{{ teacher.fullName }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</li>
-            {% endif %}
-            {% if canSwitchViewMode %}
-                <li data-grades-view-mode-meta class="icon-view">Viewing as {{ viewContext.getLabel() }}</li>
-            {% endif %}
+            <li><sbx-icon name="teacher" color="var(--sbx-color-text-secondary)"></sbx-icon>Teacher(s): {% for teacher in subject.teachers %}<a href="/search/user/{{ teacher.id }}" title="View Profile">{{ teacher.fullName }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</li>
         </ul>
         {% endif %}
-    </div>
-    {% if canSwitchViewMode %}
-        <nav>
-            <sbx-pop-out content-id="header-options" data-test="sbx-pop-out-header-options"></sbx-pop-out>
-        </nav>
-        <ul id="header-options" class="f-dropdown" data-dropdown-content>
-            {% set currentRouteBase = routeLookup('learningGrades.getGradesForSubject', {
+        {% if canSwitchViewMode %}
+            {% set currentRouteBase = routeLookup("learningGrades.getGradesForSubject", {
                 viewee: student,
                 userId: student.id,
                 term: term,
@@ -69,13 +59,14 @@
                 subject: subject,
                 subjectId: subject.id
             }) %}
-            {% include '@learningGrades/fragments/studentViewNavSwitcher.twig' with {
+            {% include "@learningGrades/fragments/studentViewNavSwitcher.twig" with {
                 viewContext: viewContext,
                 currentRouteBase: currentRouteBase
             } only %}
-        </ul>
-    {% endif %}
+        {% endif %}
+    </div>
 </div>
+
 
 <div class="row">
     <div class="small-12 medium-6 columns">

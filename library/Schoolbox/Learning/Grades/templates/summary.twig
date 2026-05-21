@@ -14,26 +14,29 @@
 
 {% set canSwitchViewMode = USER.role.isStaff %}
 {% set canViewInstructorMarks = viewContext.canViewInstructorMarks() %}
-<div class="row{% if canSwitchViewMode %} actions-small-2{% endif %}">
+<div class="row{% if customisationsRoute %} actions-small-2{% endif %}">
     <div class="small-12 columns">
         <h1>{{ locale.grades.properPlural }} for {{ term.title }}</h1>
 
         {% if canSwitchViewMode %}
-        <ul class="meta">
-            <li data-grades-view-mode-meta class="icon-view">Viewing as {{ viewContext.getLabel() }}</li>
-        </ul>
+            {% set currentRouteBase = routeLookup("learningGrades.getGrades", {viewee: student, userId: student.id, term: term, termCode: term.code}) %}
+            {% include "@learningGrades/fragments/studentViewNavSwitcher.twig" with {
+                viewContext: viewContext,
+                currentRouteBase: currentRouteBase
+            } only %}
         {% endif %}
     </div>
-    {% if canSwitchViewMode %}
+    {% if customisationsRoute %}
         <nav>
             <sbx-pop-out content-id="header-options" data-test="sbx-pop-out-header-options"></sbx-pop-out>
         </nav>
         <ul id="header-options" class="f-dropdown" data-dropdown-content>
-            {% set currentRouteBase = routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, term: term, termCode: term.code}) %}
-            {% include '@learningGrades/fragments/studentViewNavSwitcher.twig' with {
-                viewContext: viewContext,
-                currentRouteBase: currentRouteBase
-            } only %}
+            <li>
+                <a href="{{ customisationsRoute }}" class="sbx-button--has-icon" title="View Customisation Records" data-test="grades-view-customisations-menu">
+                    <sbx-icon name="group"></sbx-icon>
+                    View Customisation Records
+                </a>
+            </li>
         </ul>
     {% endif %}
 </div>
@@ -52,11 +55,6 @@
                     </div>
                 </li>
             </ul>
-            {% if customisationsRoute %}
-                <a class="button icon-view" href="{{ customisationsRoute }}" data-test="grades-view-customisations">
-                    View Customisations
-                </a>
-            {% endif %}
         </section>
     </div>
     <div class="small-12 medium-7 columns">

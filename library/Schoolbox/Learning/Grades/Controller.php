@@ -201,7 +201,10 @@ class Controller extends Base
             'yearUrl'          => $this->getYearUrl($viewee->getId()),
             'viewContext'      => $viewContext,
             'viewModeQuerySuffix' => $viewContext->getQuerySuffix(),
-            'customisationsRoute' => null,
+            'customisationsRoute' => $this->getRouteIfAuthorized(
+                'customisationRecord.viewRecordByStudent',
+                ['studentId' => $viewee->getId()],
+            ),
         ], '', 'grade');
     }
 
