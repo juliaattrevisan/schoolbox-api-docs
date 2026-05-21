@@ -315,6 +315,11 @@ class Controller extends Base
         /* Get a set of rubric instances that were mentioned in the post payload
          *
          * TODO somehow assert these were relevant to $feedback in some way to prevent cross-contamination
+         *  where you might accidentally update a rubric instance and its grid but it didn't belong to this
+         *  particular assessment instance at all. That'd be an accident, most likely
+         *
+         * TODO This can probably be cheapened by providing $assessment as an arg, saving you re-deriving the set of
+         *  rubric_instances and indexing them by their id.
          */
         $rubricInstanceIds = [];
         $rubricInstances = $this->rubricInstanceMapper->createCollection();

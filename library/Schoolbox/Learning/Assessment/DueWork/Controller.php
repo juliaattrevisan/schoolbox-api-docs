@@ -455,6 +455,7 @@ class Controller extends Assessment\Controller
             // Generate rubric marked grids for every feedback being displayed
             foreach ($participant->getAllFeedbacks() as $feedback) {
                 foreach ($assessment->getRubricInstances() as $rubricInstance) {
+
                     /* All feedbacks ought to be due work feedbacks and thus have rubric grid compatibility but we'll
                      * assert the Due Work feedback instances anyway, just in case there's a mix
                      *
@@ -1026,15 +1027,15 @@ class Controller extends Assessment\Controller
             }
         }
 
-        if ($feedback instanceof Feedback\Model) {
-            $feedback->setRubricMarkedGrid($this->rubricMapper->retrieveMarkedGrid($feedback));
-        }
+//        if ($feedback instanceof Feedback\Model) {
+//            $feedback->setRubricMarkedGrid($this->rubricMapper->retrieveMarkedGrid($feedback));
+//        }
 
         // Attach rubrics data
         $rubricMapper = RubricDataSource::getInstance();
-        if ($assessment->getUseRubric()) {
-            $assessment->setRubricGrid($rubricMapper->retrieveGrid($assessment, false));
-        }
+//        if ($assessment->getUseRubric()) {
+//            $assessment->setRubricGrid($rubricMapper->retrieveGrid($assessment, false));
+//        }
 
         /* Find all the records spawned by $participant
          *
@@ -1497,10 +1498,18 @@ class Controller extends Assessment\Controller
             $mostRecentFeedback = $participant->findMostRecentSelfAssessedFeedback();
             // Check whether the latest feedback has rubric data set.
             $hasRubric = isset($requestPost['rubric']);
+
+            /* TODO What was the point of this? It's already been decided by $hasRubric = isset($requestPost['rubric'])
+             *  and if there isn't a most recent feedback or its assessable is nonexistent or the assessable doesn't
+             *  have any rubric grids, then it's still already decided: none of this changes the outcome which is solely
+             *  dependent on the rubric node existing in $requestPost. The only time where it might have mattered is
+             *  when $requestPost never contained a rubric node.................but since when did that ever happen?
+             *  Anyway it doesn't seem to matter in 2026, we always get the rubric payload if it existed.
+             */
             if (
                 $mostRecentFeedback !== null
                 && $mostRecentFeedback->getAssessable() instanceof Model
-                && $mostRecentFeedback->getAssessable()->getUseRubric()
+                && $mostRecentFeedback->getAssessable()->getRubricInstances()->count()
             ) {
                 $hasRubric = true;
             }
@@ -1550,14 +1559,43 @@ class Controller extends Assessment\Controller
                 // Does this assessment use rubrics?
                 // Save the rubric if so, even if nothing is there.
                 if ($hasRubric) {
-                    $markedGrid = $factory->buildFromPostData(
-                        $this->rubricMapper->retrieveMarkedGrid($feedback),
-                        $requestPost['rubric'] ?? [],
-                    );
-                    $this->rubricMapper->persistMarkedGrid($markedGrid);
+                    /* Get a set of rubric instances that were mentioned in the post payload
+                     *
+                     * TODO somehow assert these were relevant to $feedback in some way to prevent cross-contamination
+                     *  where you might accidentally update a rubric instance and its grid but it didn't belong to this
+                     *  particular assessment instance at all. That'd be an accident, most likely
+                     */
+                    $rubricInstances = $assessment->getRubricInstances()->indexBy('id');
+
+                    /* Persist every rubric grid that was posted regardless of what descriptor(s) might have been chosen
+                     */
+                    foreach ($requestPost['rubric'] as $rubricInstanceId => $rubricJson) {
+                        $rubricData = json_decode($rubricJson, true);
+                        $rubricInstance = $rubricInstances[$rubricInstanceId] ?? null;
+
+                        /* This indicates that a rubric grid existed in the post payload but not $assessable at runtime
+                         * which suggests someone mutated $assessable at the same time as the $post was made, due to
+                         * multiplayer schoolbox or some other mutator executing. In this case we skip processing of
+                         * the rubric grid from $post; it doesn't exist in the $assessment anymore.
+                         */
+                        if (null === $rubricInstance) {
+                            continue;
+                        }
+
+                        $markedGrid = $factory->buildFromPostData(
+                            $this->rubricMapper->retrieveMarkedGrid($feedback, $rubricInstance),
+                            $rubricData,
+                        );
+
+                        $this->rubricMapper->persistMarkedGrid($markedGrid);
+
+                        /* Assign the grid back to the feedback's collection (a cyclic reference)
+                         */
+                        $feedback->getRubricMarkedGrids()->setOffset($rubricInstance->getId(), $markedGrid);
+                    }
 
                     // Update the feedback with the rubric marks
-                    $feedback->setRubricMarkedGrid($markedGrid);
+
                     $this->feedbackDataSource->save($feedback);
                     $response->setAllFeedback($response->getAllFeedback()->add($feedback));
                 }
