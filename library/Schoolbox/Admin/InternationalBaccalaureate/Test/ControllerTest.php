@@ -100,6 +100,7 @@ class ControllerTest extends TestCase
                     'hasMissingDetails' => false,
                     'missingFields' => [],
                     'session' => '',
+                    'qualification' => '',
                     'candidateDetails' => [
                         [
                             'key' => 'dateOfBirth',
@@ -186,6 +187,7 @@ class ControllerTest extends TestCase
                     'hasMissingDetails' => false,
                     'missingFields' => [],
                     'session' => '',
+                    'qualification' => '',
                     'candidateDetails' => [
                         [
                             'key' => 'dateOfBirth',
