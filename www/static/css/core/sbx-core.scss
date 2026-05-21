@@ -25,6 +25,6 @@
 @use "ui/sbx-calendar";
 @use "ui/sbx-homepage";
 
-@use "config/sbx-field-roundness";
-@use "config/sbx-box-roundness";
-@use "config/sbx-box-drop-shadow";
+@use "config/sbx-container-corner-radius";
+@use "config/sbx-field-corner-radius";
+@use "config/sbx-container-drop-shadow";
