@@ -7,7 +7,7 @@
 
 body.sbx-body {
     // Highchart fill - directly override the white background,
-    // for all except within then .pr-table-total-row as that is already set elsewhere
+    // for all except within the .pr-table-total-row, .pr-table-row as those are already set elsewhere
     tr:not(.pr-table-total-row, .pr-table-row) .highcharts-background {
         fill: var(--sbx-color-foreground-primary);
     }
