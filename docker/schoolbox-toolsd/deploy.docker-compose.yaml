@@ -19,7 +19,17 @@ services:
         required: true
       - path: ./../docker-toolsd.env
         required: false
-    command: [src/main.py, api, -p, '8080']
+    command: [
+      src/main.py, api,
+      -p, '8080',
+      --tools-config, /usr/share/schoolbox/library/Schoolbox/ToolsDaemon/conf/tools.yaml,
+      --pools-config, /usr/share/schoolbox/library/Schoolbox/ToolsDaemon/conf/pools.yaml,
+    ]
+    volumes:
+      - code:/usr/share/schoolbox
+    configs:
+      - source: toolsd
+        target: /conf/
 
   # The default Celery queue:
   # unless otherwise specified, jobs will be sent to this queue.
@@ -36,8 +46,26 @@ services:
         required: true
       - path: ./../docker-toolsd.env
         required: false
-    command: [src/main.py, worker, -Q, default, --tools-config, /conf/tools.yaml, --pools-config, /conf/pools.yaml, -vv]
+    command: [
+      src/main.py, worker,
+      -Q, default,
+      --tools-config, /usr/share/schoolbox/library/Schoolbox/ToolsDaemon/conf/tools.yaml,
+      --pools-config, /usr/share/schoolbox/library/Schoolbox/ToolsDaemon/conf/pools.yaml,
+      -vv,
+    ]
+    volumes:
+      - code:/usr/share/schoolbox
+      - storage:/var/lib/schoolbox/${PRIMARY_INSTANCE_ID}/storage
+      - storage2:/var/lib/schoolbox/${SECONDARY_INSTANCE_ID}/storage
     configs:
+      - source: frankenphp-php
+        target: /usr/local/etc/php/conf.d/01-base-settings.ini
+      - source: frankenphp-php-env
+        target: /usr/local/etc/php/conf.d/02-env-settings.ini
+      - source: schoolbox-cli-php
+        target: /usr/local/etc/php/conf.d/03-cli-settings.ini
+      - source: schoolbox
+        target: /etc/schoolbox
       - source: toolsd
         target: /conf/
 
@@ -55,8 +83,26 @@ services:
         required: true
       - path: ./../docker-toolsd.env
         required: false
-    command: [src/main.py, worker, -Q, ups, --tools-config, /conf/tools.yaml, --pools-config, /conf/pools.yaml, -vv]
+    command: [
+      src/main.py, worker,
+      -Q, ups,
+      --tools-config, /usr/share/schoolbox/library/Schoolbox/ToolsDaemon/conf/tools.yaml,
+      --pools-config, /usr/share/schoolbox/library/Schoolbox/ToolsDaemon/conf/pools.yaml,
+      -vv,
+    ]
+    volumes:
+      - code:/usr/share/schoolbox
+      - storage:/var/lib/schoolbox/${PRIMARY_INSTANCE_ID}/storage
+      - storage2:/var/lib/schoolbox/${SECONDARY_INSTANCE_ID}/storage
     configs:
+      - source: frankenphp-php
+        target: /usr/local/etc/php/conf.d/01-base-settings.ini
+      - source: frankenphp-php-env
+        target: /usr/local/etc/php/conf.d/02-env-settings.ini
+      - source: schoolbox-cli-php
+        target: /usr/local/etc/php/conf.d/03-cli-settings.ini
+      - source: schoolbox
+        target: /etc/schoolbox
       - source: toolsd
         target: /conf/
 
