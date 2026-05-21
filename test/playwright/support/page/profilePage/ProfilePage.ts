@@ -35,11 +35,7 @@ export default class ProfilePage {
 
     static readonly DATA_TEST_PROFILE_DOT_MENU = "profile-header-options";
 
-    static readonly DATA_TEST_MODIFY_USER = "user-profile-modify";
-
-    static readonly DATA_TEST_IMPERSONATE = "user-profile-impersonate";
-
-    static readonly DATA_TEST_CREATE_PASTORAL_RECORD = "user-profile-create-pastoral-record";
+    static readonly DATA_TEST_DOT_MENU_OPTIONS = "user-profile-{option}";
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
@@ -185,7 +181,7 @@ export default class ProfilePage {
     getDotMenuAction(actionDataTest: string): Locator {
         return this.page
             .getByTestId(ProfilePage.DATA_TEST_PROFILE_DOT_MENU)
-            .getByTestId(`user-profile-${actionDataTest}`);
+            .getByTestId(ProfilePage.DATA_TEST_DOT_MENU_OPTIONS.replace("{option}", actionDataTest));
     }
 
     /**
@@ -212,9 +208,13 @@ export default class ProfilePage {
     async checkDotMenuOptionsVisibility(options: { option: string; isVisible: boolean }[]): Promise<void> {
         for (const option of options) {
             if (option.isVisible) {
-                await expect(this.page.getByTestId(`user-profile-${option.option}`)).toBeVisible();
+                await expect(
+                    this.page.getByTestId(ProfilePage.DATA_TEST_DOT_MENU_OPTIONS.replace("{option}", option.option)),
+                ).toBeVisible();
             } else {
-                await expect(this.page.getByTestId(`user-profile-${option.option}`)).toBeHidden();
+                await expect(
+                    this.page.getByTestId(ProfilePage.DATA_TEST_DOT_MENU_OPTIONS.replace("{option}", option.option)),
+                ).toBeHidden();
             }
         }
     }
@@ -233,7 +233,12 @@ export default class ProfilePage {
      */
     async checkImpersonateIsDisabled(): Promise<void> {
         await this.openDotMenu();
-        await this.page.getByTestId("user-profile-impersonate-disabled").isVisible();
+        await expect(
+            this.page.getByTestId(ProfilePage.DATA_TEST_DOT_MENU_OPTIONS.replace("{option}", "impersonate-disabled")),
+        ).toBeVisible();
+        await expect(
+            this.page.getByTestId(ProfilePage.DATA_TEST_DOT_MENU_OPTIONS.replace("{option}", "impersonate-disabled")),
+        ).not.toHaveAttribute("href", /.*/);
     }
 
     /**

@@ -16,6 +16,7 @@ test.describe("Profile Page 3-dot Menu", () => {
     const edenReedId = Common.USER_ID_EDENREED;
     const jackColesId = Common.USER_ID_JACKCOLES;
     const janaReedId = Common.USER_ID_JANAREED;
+    const jenniReedUserName = `Ms ${Common.USER_JENNIREED}`;
 
     test.beforeAll(async ({ baseTester, db }) => {
         baseTester.isGoingTo("disable Eden Reed for profile page 3-dot menu tests");
@@ -118,7 +119,7 @@ test.describe("Profile Page 3-dot Menu", () => {
         await profilePage.checkDotMenuIsNotPresented();
 
         tester.isGoingTo("impersonate Jenni Reed and navigate to the Jana Reed profile page");
-        await tester.impersonateViaUserProfilePage("Ms Jenni Reed");
+        await tester.impersonateViaUserProfilePage(jenniReedUserName);
         await profilePage.goto(janaReedId);
         await profilePage.checkDotMenuIsNotPresented();
     });
