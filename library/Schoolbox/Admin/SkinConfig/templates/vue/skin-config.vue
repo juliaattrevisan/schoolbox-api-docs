@@ -130,6 +130,13 @@ async function onSaveSelected(): Promise<void> {
 
 <template>
     <div data-test="skin-config-container" class="l-flex-col l-gap-l l-pad-m--horiz">
+        <div class="alert-box warning f-no-margins">
+            <strong>Sonar UI is now available.</strong> We encourage you to enable it on your
+            <strong>Staging server</strong> now to review your custom CSS and skin settings before it becomes the
+            default experience in <strong>v26.2.</strong><br />
+            <br />
+            <a href="https://help.schoolbox.com.au/homepage/5808">Read the Transition Guide</a>
+        </div>
         <div v-if="loadError" data-test="skin-config-load-error">
             <request-error :further-info="loadError" />
         </div>
