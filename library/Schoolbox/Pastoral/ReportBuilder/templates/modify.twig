@@ -215,7 +215,7 @@
                                                 {% if hasSubTypes %}
                                                     <label for="type-{{ type.id }}" title="Select to reveal sub-types">
                                                         {{ type.name }}
-                                                        <sbx-icon data-pastoral-type-icon name="click-view" class="size-8"></sbx-icon>
+                                                        <sbx-icon data-pastoral-type-icon name="next" size="m" color="var(--sbx-config-color-accent, var(--content-ui-foreground))"></sbx-icon>
                                                     </label>
                                                 {% else %}
                                                     <label for="type-{{ type.id }}">
@@ -587,7 +587,7 @@
                     $(subCheckbox).prop('checked', true);
                 });
 
-                $(parentCheckbox).siblings("label").find('[data-pastoral-type-icon]').attr('name', 'dropdown');
+                $(parentCheckbox).siblings("label").find('[data-pastoral-type-icon]').attr('name', 'down-arrow');
             } else {
                 // ...hide the subtypes for this type
                 $subCheckboxes.each(function (index, subCheckbox) {
@@ -600,7 +600,7 @@
                     $(subCheckbox).prop('checked', false);
                 });
 
-                $(parentCheckbox).siblings("label").find('[data-pastoral-type-icon]').attr('name', 'click-view');
+                $(parentCheckbox).siblings("label").find('[data-pastoral-type-icon]').attr('name', 'next');
             }
 
         });
@@ -614,11 +614,11 @@
                 if ($subtypes.filter(":checked").length < 1) {
                     $(parentCheckbox).prop("checked", false);
                     $subtypes.parent(childGroupSelector).hide();
-                    $(parentCheckbox).siblings("label").find('[data-pastoral-type-icon]').attr('name', 'click-view');
+                    $(parentCheckbox).siblings("label").find('[data-pastoral-type-icon]').attr('name', 'next');
                 } else {
                     $(parentCheckbox).prop("checked", true);
                     $subtypes.parent(childGroupSelector).show();
-                    $(parentCheckbox).siblings("label").find('[data-pastoral-type-icon]').attr('name', 'dropdown');
+                    $(parentCheckbox).siblings("label").find('[data-pastoral-type-icon]').attr('name', 'down-arrow');
                 }
             });
         })
