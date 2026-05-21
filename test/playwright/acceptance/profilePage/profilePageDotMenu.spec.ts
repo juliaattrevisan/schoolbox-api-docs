@@ -16,7 +16,7 @@ test.describe("Profile Page 3-dot Menu", () => {
     const edenReedId = Common.USER_ID_EDENREED;
     const jackColesId = Common.USER_ID_JACKCOLES;
     const janaReedId = Common.USER_ID_JANAREED;
-    const jenniReedUserName = `Ms ${Common.USER_JENNIREED}`;
+    const jenniReedUserName = Common.USER_JENNIREED;
 
     test.beforeAll(async ({ baseTester, db }) => {
         baseTester.isGoingTo("disable Eden Reed for profile page 3-dot menu tests");
