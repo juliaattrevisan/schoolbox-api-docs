@@ -248,30 +248,36 @@ Data:
                 {% endfor %}
             </ul>
         {% endif %}
+
         {# Rubric goes here #}
         {# TODO: multi rubric - separate collapsers? there's a new "collapsible" option to somewhat deal with this later #}
-        {% if currentFeedback.rubricMarkedGrid %}
-            <div class="rubric-wrap {{ collapsed? 'hide' : '' }}"
-                 {% if hasCollapser %}
-                 data-collapse-state="{{ collapsed? 'collapsed' : 'expanded' }}"
-                 data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}"
-                 {% endif %}>
-                {% include '@rubric/grid.twig' with {
-                    rubricGrid:       currentFeedback.rubricMarkedGrid.grid,
-                    rubricMarkedGrid: currentFeedback.rubricMarkedGrid,
-                    learner: participant.user,
-                    markVisibility: currentFeedback.isSelfAssessment
-                    or participant.assessable.isFeedbackVisibleToUser(USER),
-                    showGroupTotal: showGroupTotal,
-                    showRubricTotal: showRubricTotal,
-                    self: false,
-                    studentView: true,
-                    selfAssess: selfAssess ?? false,
-                    selfReflect: selfReflect ?? false,
-                    selfAssessmentFeedback: selfAssessmentFeedback ?? null,
-                    collapsible: false
-                } only %}
-            </div>
+
+        {% if currentFeedback.rubricMarkedGrids.count %}
+            {% for rubricInstanceId, rubricMarkedGrid in currentFeedback.rubricMarkedGrids %}
+                <div class="rubric-wrap {{ collapsed? 'hide' : '' }}"
+                    {% if hasCollapser %}
+                        data-collapse-state="{{ collapsed? 'collapsed' : 'expanded' }}"
+                        data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}"
+                    {% endif %}
+                >
+                    {% include '@rubric/grid.twig' with {
+                        assessment: assessment,
+                        rubricInstance: rubricMarkedGrid.grid.rubricInstance,
+                        showGroupTotal: assessment.isSelfAssessable and rubricMarkedGrid.grid.rubricInstance.isMarkPerCapability,
+                        showRubricTotal: assessment.isSelfAssessable ?? false,
+                        markVisibility: currentFeedback.isSelfAssessment or participant.assessable.isFeedbackVisibleToUser(USER),
+                        studentView: true,
+                        selfAssess: assessment.isSelfAssessable ?? false,
+                        selfReflect: assessment.isSelfReflectableOnly ?? false,
+                        learner: participant.user,
+                        selfAssessmentFeedback: selfAssessmentFeedback ?? null,
+                        rubricGrid: rubricMarkedGrid.grid,
+                        rubricMarkedGrid: rubricMarkedGrid,
+                        rubricSelfGradedGrid: selfAssessmentFeedback.rubricMarkedGrids[rubricMarkedGrid.grid.rubricInstance.id] ?? null,
+                        collapsible: false
+                    } only %}
+                </div>
+            {% endfor %}
         {% endif %}
     </li>
 </ul>

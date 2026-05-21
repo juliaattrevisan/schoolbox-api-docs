@@ -1027,21 +1027,10 @@ class Controller extends Assessment\Controller
             }
         }
 
-//        if ($feedback instanceof Feedback\Model) {
-//            $feedback->setRubricMarkedGrid($this->rubricMapper->retrieveMarkedGrid($feedback));
-//        }
-
-        // Attach rubrics data
-        $rubricMapper = RubricDataSource::getInstance();
-//        if ($assessment->getUseRubric()) {
-//            $assessment->setRubricGrid($rubricMapper->retrieveGrid($assessment, false));
-//        }
-
         /* Find all the records spawned by $participant
          *
          * Order them by submitted time to find the most recent, and use that
          */
-
         $allResponses = $participant ? $participant->getAllResponses() : new Collection();
 
         /* Otherwise continue
@@ -1199,8 +1188,15 @@ class Controller extends Assessment\Controller
         $this->getSession()->getSegment(static::class)->set('errorMessage', null);
 
         // Are we self assessing or only self reflecting?
-        $selfReflect = $reviewRoute === ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION;
-        $selfAssess = $reviewRoute === ReturnedWork::REVIEW_ROUTE_SELF_GRADING;
+
+        /* TODO but...these are already derived directly from $assessment->isSelfReflectableOnly() (self reflection)
+         *  and $assessment->isSelfAssessable() (self grading) - you can already figure out the answer without needing
+         *  these extra $selfAssess and $selfReflect vars. I wonder why those were ever necessary...
+         */
+        /* TODO probably superfluous (and always was?)
+         */
+//        $selfReflect = $reviewRoute === ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION;
+//        $selfAssess = $reviewRoute === ReturnedWork::REVIEW_ROUTE_SELF_GRADING;
 
         if ($this->requestQuery->get(Redirect::RETURN_URL)) {
             $returnUrl = Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL));
@@ -1232,8 +1228,10 @@ class Controller extends Assessment\Controller
             'policy'         => $assessment->getEnablePolicy() ? $this->getConfigLoader()->get('lms_student_policy') : '', // only use the policy, if this assessment is showing the policy
             'errorMessage'   => $errorMessage,
             'readonly'       => $isInteractionLocked,
-            'selfReflect'    => $selfReflect,
-            'selfAssess'     => $selfAssess,
+            /* TODO probably superfluous (and always was?)
+             */
+//            'selfReflect'    => $selfReflect,
+//            'selfAssess'     => $selfAssess,
             'acceptsOnline'  => $acceptsOnlineSubmissions,
             'returnUrl'      => $returnUrl,
             'kamiSession'    => $kamiSession,
@@ -1241,8 +1239,10 @@ class Controller extends Assessment\Controller
             'editorTemplates' => $this->activityTemplateHelper !== null ? $this->activityTemplateHelper->getTemplatesForCategory() : [],
 
             /* Only show these things if the assessment is self-gradable */
-            'showGroupTotal'      => $selfAssess && ($assessment->getCapabilityMarkType() !== SubmissionBox\MarkType::SLUG_NONE),
-            'showRubricTotal'     => $selfAssess
+            /* TODO probably superfluous (and always was?)
+             */
+//            'showGroupTotal'      => $selfAssess && ($assessment->getCapabilityMarkType() !== SubmissionBox\MarkType::SLUG_NONE),
+//            'showRubricTotal'     => $selfAssess
         ];
 
         $this->response = $this->responseFromTemplate(

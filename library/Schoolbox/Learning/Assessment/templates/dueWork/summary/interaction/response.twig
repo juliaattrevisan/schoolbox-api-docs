@@ -98,8 +98,7 @@
 
                     {% set hasCollapser = currentFeedback.allFiles.count or currentFeedback.comment | length > 0 or currentFeedback.rubricMarkedGrid %}
 
-                    {# We pass the responseId as well, so that people can download annotated kami docs
-                     #}
+                    {# We pass the responseId as well, so that people can download annotated kami docs #}
                     {% include '@learningAssessment/dueWork/summary/interaction/feedback.twig' with {
                         currentFeedback: currentFeedback,
                         assessment: currentInteraction.assessable,
@@ -109,8 +108,6 @@
                         hasCollapser: hasCollapser,
                         collapsed: true,
                         deleteIcon: true,
-                        showRubricTotal: showRubricTotal and not currentFeedback.isSelfReflectionOnly,
-                        showGroupTotal: not currentFeedback.isSelfReflectionOnly and assessment.markPerCapability,
                     }
                     only %}
                 {% endfor %}
