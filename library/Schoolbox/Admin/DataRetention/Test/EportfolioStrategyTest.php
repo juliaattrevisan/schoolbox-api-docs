@@ -135,8 +135,6 @@ class EportfolioStrategyTest extends TestCase
                     'column' => $column,
                     'ids' => $ids,
                 ];
-
-                $this->recordDeleted($deletedIdsByTableName, $table, $ids);
             }
 
             /**
@@ -171,7 +169,6 @@ class EportfolioStrategyTest extends TestCase
                 }
 
                 $this->state->operations[] = $operation;
-                $this->recordDeleted($deletedIdsByTableName, $table, $ids);
             }
         };
 
