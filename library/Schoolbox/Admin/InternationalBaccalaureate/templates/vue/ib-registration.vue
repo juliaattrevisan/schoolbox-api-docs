@@ -171,7 +171,11 @@ window.Vue.onMounted((): void => {
                                     class="sbx-icon-only-button"
                                     :aria-label="`Delete session ${session.title}`"
                                     :disabled="session.deleteEndpoint === null"
-                                    :title="session.deleteEndpoint === null ? 'Cannot delete: session has registered students' : undefined"
+                                    :title="
+                                        session.deleteEndpoint === null
+                                            ? 'Cannot delete: session has registered students'
+                                            : undefined
+                                    "
                                     @click="openDeleteConfirm(session)"
                                 >
                                     <sbx-icon name="delete"></sbx-icon>
@@ -190,7 +194,12 @@ window.Vue.onMounted((): void => {
             @session-created="onDiplomaSessionCreated"
         />
 
-        <BasicModal v-model:is-open="isDeleteModalOpen" size="s" :show-close-button="true" :is-close-disabled="isDeleting">
+        <BasicModal
+            v-model:is-open="isDeleteModalOpen"
+            size="s"
+            :show-close-button="true"
+            :is-close-disabled="isDeleting"
+        >
             <h2>Please Confirm</h2>
             <p>Are you sure you want to delete "{{ sessionPendingDelete?.title }}"?</p>
             <template #footer>
