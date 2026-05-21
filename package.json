@@ -44,7 +44,7 @@
     "jquery-ui": "~1.14.2",
     "jquery-validation": "~1.22.1",
     "lightgallery": "~2.9.0",
-    "locutus": "~2.0.32",
+    "locutus": "~3.0.36",
     "mediaelement": "~7.1.0",
     "pinia": "~3.0.4",
     "qrcode.vue": "~3.8.0",
