@@ -117,7 +117,8 @@ $swipe-color-hover: $steel;
 
     // image title
     .meta {
-        background: var(--sbx-color-foreground-primary, rgba($black, 0.7));
+        background: rgba($black, 0.7);
+        background: color-mix(in srgb, var(--sbx-color-text-primary, rgba($black, 0.7)) 70%, transparent);
         color: var(--sbx-color-foreground-primary, $white);
         position: absolute;
         bottom: 0;
