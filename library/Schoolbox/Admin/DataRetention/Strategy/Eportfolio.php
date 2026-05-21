@@ -193,7 +193,7 @@ class Eportfolio extends Base
      * @see database table tree diagram in the class docblock.
      * @param list<array{table: string, id: int|string}> $chunk
      */
-    protected function deleteChunk(array $chunk): void
+    protected function deleteChunk(array $chunk): bool
     {
         $targetIds = $this->groupTargetIdsByTable($chunk);
         foreach ($targetIds as $table => $ids) {
@@ -288,6 +288,19 @@ class Eportfolio extends Base
         $this->deleteRowsByIds($deletedIdsByTableName, self::TABLE_EPORTFOLIO_PAGE, $pageIds, 'page_id');
 
         $this->logChunkResult($deletedIdsByTableName);
+
+        // was anything deleted, return true, else false...
+        foreach ($deletedIdsByTableName as $table => $ids) {
+            if (count($ids) === 0) {
+                continue;
+            }
+
+            // something was deleted, return early, we don't care how much was deleted, just something was...
+            return true;
+        }
+
+        // nothing was deleted, don't count this chunk
+        return false;
     }
 
     /**

@@ -107,11 +107,14 @@ abstract class Base implements IStrategy
             // begin transaction for the chunk
             $this->database->beginTransaction();
 
+            // did the chunk delete anything?
+            $deletedThings = false;
+
             try {
                 // log the chunk we are working on
                 $this->log->notice(sprintf("[%s/%s] Processing chunk", $chunkNum + 1, $chunkCount));
 
-                $this->deleteChunk($chunk);
+                $deletedThings = $this->deleteChunk($chunk);
 
                 if ($this->perform) {
                     // perform the transaction for the chunk
@@ -147,7 +150,13 @@ abstract class Base implements IStrategy
                     $this->log->notice(sprintf("Chunk loop limit of '%s' reached, stopping for now", $this->chunkLoops));
                     return;
                 }
-                $chunkLoop++;
+
+                if ($deletedThings) {
+                    $this->log->notice("Things were deleted in this chunk.");
+                    $chunkLoop++;
+                } else {
+                    $this->log->notice("No entries deleted in this chunk, not counting this to the chunk count");
+                }
             }
         }
 
@@ -220,11 +229,11 @@ abstract class Base implements IStrategy
      * Delete a chunk of entities and their related data,
      * this is transacted, and logged to assist with errors and debugging
      * @param array $chunk
-     * @return void
+     * @return bool (true, things were deleted, false, nothing was deleted, don't count this chunk as a loop iteration)
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      */
-    abstract protected function deleteChunk(array $chunk): void;
+    abstract protected function deleteChunk(array $chunk): bool;
 
     /**
      * Get the strategy name, this is used to identify the strategy in the command line tool, e.g. 'cmslog'

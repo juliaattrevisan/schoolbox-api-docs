@@ -111,11 +111,11 @@ class StudentSubmissions extends Base
     /**
      * @inheritDoc
      */
-    protected function deleteChunk(array $chunk): void
+    protected function deleteChunk(array $chunk): bool
     {
         $submissionIds = $this->normalizeIds(array_column($chunk, 'id'));
         if ($submissionIds === []) {
-            return;
+            return false;
         }
 
         $submissionFileIds = $this->normalizeIds($this->findSubmissionFileIds($submissionIds));
@@ -162,6 +162,7 @@ class StudentSubmissions extends Base
                 )
             );
         }
+        return true;
     }
 
     /**

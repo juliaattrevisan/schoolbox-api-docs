@@ -196,15 +196,15 @@ class EportfolioStrategyTest extends TestCase
      *
      * @param list<array{table: string, id: int|string}> $chunk
      */
-    private function deleteChunk(Eportfolio $strategy, array $chunk): void
+    private function deleteChunk(Eportfolio $strategy, array $chunk): bool
     {
         $deleteChunk = \Closure::bind(
-            fn(array $chunk): null => $this->deleteChunk($chunk),
+            fn(array $chunk): bool => $this->deleteChunk($chunk),
             $strategy,
             Eportfolio::class,
         );
 
-        $deleteChunk($chunk);
+        return $deleteChunk($chunk);
     }
 
     /**

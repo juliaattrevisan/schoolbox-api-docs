@@ -108,11 +108,11 @@ class Moments extends Base
      * Delete a chunk of moments and their related data,
      * this is transacted, and logged to assist with errors and debugging
      * @param array $chunk
-     * @return void
+     * @return bool
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      */
-    protected function deleteChunk(array $chunk): void
+    protected function deleteChunk(array $chunk): bool
     {
         // extract the ids and the discussion threads from the chunk
         $chunkIds            = array_column($chunk, 'id');
@@ -194,5 +194,7 @@ class Moments extends Base
                 )
             );
         }
+
+        return true;
     }
 }
