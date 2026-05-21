@@ -190,7 +190,7 @@ Usage:
                                 {# Marked Grids might not exist yet #}
                                 {% set rubricMarkedGrid = null %}
 
-                                {% if feedback is not null and feedback.rubricMarkedGrids[rubricInstance.id] is not null %}
+                                {% if feedback is not null and feedback.rubricMarkedGrids[rubricInstance.id] is defined and feedback.rubricMarkedGrids[rubricInstance.id] is not null %}
                                     {% set rubricMarkedGrid = feedback.rubricMarkedGrids[rubricInstance.id] %}
                                 {% endif %}
 
