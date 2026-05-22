@@ -13,8 +13,7 @@ use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$app = new class extends CliTool\App{
-
+$app = new class extends CliTool\App {
     private const P_INTERVAL = 'PT%dS';
     private const P_TIME     = '%dd %hh %im %ss';
     private const P_OUTPUT   = '%s TTL %s';
