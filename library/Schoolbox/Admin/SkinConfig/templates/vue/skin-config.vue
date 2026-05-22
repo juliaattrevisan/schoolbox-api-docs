@@ -132,8 +132,8 @@ async function onSaveSelected(): Promise<void> {
     <div data-test="skin-config-container" class="l-flex-col l-gap-l l-pad-m--horiz">
         <div class="alert-box warning f-no-margins">
             <strong>Sonar UI is now available.</strong> We encourage you to enable it on your
-            <strong>Staging server</strong> now to review your custom CSS and skin settings before it becomes the
-            default experience in <strong>v26.2.</strong><br />
+            <strong>Staging server</strong> now to review your skin settings and custom CSS before it becomes the only
+            option in <strong>v26.2.</strong><br />
             <br />
             <a href="https://help.schoolbox.com.au/homepage/5808">Read the Transition Guide</a>
         </div>
