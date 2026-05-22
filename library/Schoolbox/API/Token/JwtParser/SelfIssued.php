@@ -91,7 +91,7 @@ class SelfIssued extends InstanceIssued
         // Validate JTI for self-issued tokens
         if (!isset($claims[self::CLAIM_JTI])) {
             throw new Exception\InvalidIdentity(
-                sprintf('JWT must contain a "%s"', self::CLAIM_JTI)
+                sprintf('JWT must contain a "%s" claim', self::CLAIM_JTI)
             );
         }
         try {

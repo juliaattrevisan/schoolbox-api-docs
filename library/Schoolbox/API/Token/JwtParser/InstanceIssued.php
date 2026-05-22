@@ -93,10 +93,14 @@ abstract class InstanceIssued extends Base
             throw new Exception\InvalidIdentity(sprintf('JWT must contain a "%s" claim', $usernameClaim));
         }
         $username = $claims[$usernameClaim];
-        if (trim($username) === '') {
+        if (!is_scalar($username)) {
+            throw new Exception\InvalidIdentity(sprintf('JWT "%s" claim must be a scalar value', $usernameClaim));
+        }
+        $username = trim((string)$username);
+        if ($username === '') {
             throw new Exception\InvalidIdentity(sprintf('JWT "%s" claim must not be empty', $usernameClaim));
         }
-        return (string)$username;
+        return $username;
     }
 
     /**
