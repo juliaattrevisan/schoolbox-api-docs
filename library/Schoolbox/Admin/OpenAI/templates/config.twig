@@ -193,12 +193,14 @@
     <script type="application/javascript">
     (() => {
         // use a const feature as the container selector
-        const FEATURE               = '{{ feature.feature }}';
-        const featureEl             = document.querySelector(`[data-feature="${FEATURE}"]`);
-        const providerSelect        = featureEl.querySelector(`#${FEATURE}-provider-value`);
-        const modelSelect           = featureEl.querySelector(`#${FEATURE}-model-value`);
-        const reasoningEffortSelect = featureEl.querySelector(`#${FEATURE}-reasoning_effort-value`);
-        const textVerbositySelect   = featureEl.querySelector(`#${FEATURE}-text_verbosity-value`);
+        const REASONING_EFFORT_MODEL_OPTIONS = {{ reasoningEffortModelOptions | json_encode | raw }};
+        const TEXT_VERBOSITY_MODEL_OPTIONS   = {{ textVerbosityModelOptions | json_encode | raw }};
+        const FEATURE                        = '{{ feature.feature }}';
+        const featureEl                      = document.querySelector(`[data-feature="${FEATURE}"]`);
+        const providerSelect                 = featureEl.querySelector(`#${FEATURE}-provider-value`);
+        const modelSelect                    = featureEl.querySelector(`#${FEATURE}-model-value`);
+        const reasoningEffortSelect          = featureEl.querySelector(`#${FEATURE}-reasoning_effort-value`);
+        const textVerbositySelect            = featureEl.querySelector(`#${FEATURE}-text_verbosity-value`);
 
         /**
          * reusable function to show/hide fields based on provider
@@ -283,10 +285,10 @@
 
         // Disable reasoning levels which are incompatible with the model
         modelSelect.addEventListener('change', (event) => {
-            toggleOptions(window.REASONING_EFFORT_MODEL_OPTIONS[FEATURE], event.target.value, providerSelect.value, reasoningEffortSelect);
+            toggleOptions(REASONING_EFFORT_MODEL_OPTIONS[FEATURE], event.target.value, providerSelect.value, reasoningEffortSelect);
             selectFirstNonDisabledOption(reasoningEffortSelect);
 
-            toggleOptions(window.TEXT_VERBOSITY_MODEL_OPTIONS[FEATURE], event.target.value, providerSelect.value, textVerbositySelect);
+            toggleOptions(TEXT_VERBOSITY_MODEL_OPTIONS[FEATURE], event.target.value, providerSelect.value, textVerbositySelect);
             selectFirstNonDisabledOption(textVerbositySelect);
         });
 
@@ -294,18 +296,18 @@
         providerSelect.addEventListener('change', (event) => {
             toggleInputVisibility(event.target.value);
 
-            toggleOptions(window.REASONING_EFFORT_MODEL_OPTIONS[FEATURE], modelSelect.value, event.target.value, reasoningEffortSelect);
+            toggleOptions(REASONING_EFFORT_MODEL_OPTIONS[FEATURE], modelSelect.value, event.target.value, reasoningEffortSelect);
             selectFirstNonDisabledOption(reasoningEffortSelect);
 
-            toggleOptions(window.TEXT_VERBOSITY_MODEL_OPTIONS[FEATURE], modelSelect.value, event.target.value, textVerbositySelect);
+            toggleOptions(TEXT_VERBOSITY_MODEL_OPTIONS[FEATURE], modelSelect.value, event.target.value, textVerbositySelect);
             selectFirstNonDisabledOption(textVerbositySelect);
         });
 
         // on page load, show the current selected provider fields
         document.addEventListener('DOMContentLoaded', () => {
             toggleInputVisibility(providerSelect.value);
-            toggleOptions(window.REASONING_EFFORT_MODEL_OPTIONS[FEATURE], modelSelect.value, providerSelect.value, reasoningEffortSelect);
-            toggleOptions(window.TEXT_VERBOSITY_MODEL_OPTIONS[FEATURE], modelSelect.value, providerSelect.value, textVerbositySelect);
+            toggleOptions(REASONING_EFFORT_MODEL_OPTIONS[FEATURE], modelSelect.value, providerSelect.value, reasoningEffortSelect);
+            toggleOptions(TEXT_VERBOSITY_MODEL_OPTIONS[FEATURE], modelSelect.value, providerSelect.value, textVerbositySelect);
         });
     })();
     </script>

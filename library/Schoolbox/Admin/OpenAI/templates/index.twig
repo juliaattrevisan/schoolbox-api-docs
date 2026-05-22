@@ -20,7 +20,9 @@
                                     feature: feature,
                                     providers: providers,
                                     models: models,
-                                    fields: fields
+                                    fields: fields,
+                                    reasoningEffortModelOptions: reasoningEffortModelOptions,
+                                    textVerbosityModelOptions: textVerbosityModelOptions,
                                 } only %}
                             </div>
                         </fieldset>
@@ -42,8 +44,6 @@
 
 
         <script>
-            window.REASONING_EFFORT_MODEL_OPTIONS = {{ reasoningEffortModelOptions | json_encode | raw }};
-            window.TEXT_VERBOSITY_MODEL_OPTIONS   = {{ textVerbosityModelOptions | json_encode | raw }};
             $(function() {
                 const PROVIDER_OPENAI = '{{ providers.OpenAI }}';
                 const PROVIDER_AZURE = '{{ providers.Azure }}';
