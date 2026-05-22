@@ -51,18 +51,26 @@
          #
          # If this feedback has a rubric grid, show that
          #}
-        {% if feedback and "1" == options.workType[assessment.workType.id].rubrics and (feedback.rubricMarkedGrid ?? null) %}
-            <div class="rubric-wrap">
-                {% include '@rubric/grid.twig' with {
-                    rubricGrid:       feedback.rubricMarkedGrid.grid,
-                    rubricMarkedGrid: feedback.rubricMarkedGrid,
-                    learner: student,
-                    showGroupTotal: true,
-                    showRubricTotal: false,
-                    selfAssessmentFeedback: null,
-                    collapsible: false
-                } only %}
-            </div>
+        {% if feedback and "1" == options.workType[assessment.workType.id].rubrics and (feedback.rubricMarkedGrids.count ?? null) %}
+            {% for rubricInstanceId, rubricMarkedGrid in feedback.rubricMarkedGrids %}
+                <div class="rubric-wrap">
+                    {# Previously, showGroupTotal was hardcoded to true and showRubricTotal was hardcoded to false.
+                     # Don't know why
+                     #}
+                    {% include '@rubric/grid.twig' with {
+                        assessment: assessment,
+                        rubricInstance: rubricMarkedGrid.grid.rubricInstance,
+                        showGroupTotal: assessment.isSelfAssessable and rubricMarkedGrid.grid.rubricInstance.isMarkPerCapability,
+                        showRubricTotal: assessment.isSelfAssessable ?? false,
+                        learner: student,
+                        rubricGrid: rubricMarkedGrid.grid,
+                        rubricMarkedGrid: rubricMarkedGrid,
+                        rubricSelfGradedGrid: null,
+                        selfAssessmentFeedback: null,
+                        collapsible: false
+                    } only %}
+                </div>
+            {% endfor %}
         {% endif %}
     </div>
 {% endif %}
