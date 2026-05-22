@@ -940,12 +940,14 @@ class ListController extends Web\Controller\Base
         ) {
             preg_match('/(unit|project)-([0-9]+)/', $locationId, $match);
             try {
-                if (isset($match[1]) && $match[1] === 'unit') {
-                    return $this->unitSpecificationMapper->findById($match[2]);
-                } elseif (isset($match[1]) && $match[1] === 'project') {
-                    $project = $this->assessmentMapper->findById($match[2]);
-                    if ($project instanceof Project) {
-                        return $project;
+                if (isset($match[1])) {
+                    if ($match[1] === 'unit') {
+                        return $this->unitSpecificationMapper->findById($match[2]);
+                    } elseif ($match[1] === 'project') {
+                        $project = $this->assessmentMapper->findById($match[2]);
+                        if ($project instanceof Project) {
+                            return $project;
+                        }
                     }
                 }
             } catch (MapperException $e) {

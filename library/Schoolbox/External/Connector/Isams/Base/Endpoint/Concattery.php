@@ -41,18 +41,18 @@ class Concattery
             return '"' . str_replace("'", "'", $concat) . '"';
         }
 
-        /* Replace " with a concat equivalent
+        /* $hasDoubleQuotes must be true at this point
+         *
+         * Replace " with a concat equivalent
          * This supports mixed usages e.g. a string containing both " and '
+         *
+         * First, explode on double quotes
          */
-        if ($hasDoubleQuotes) {
-            /* First, explode on double quotes
-             */
-            $bits = explode('"', $concat);
+        $bits = explode('"', $concat);
 
-            /* Then implode on \'"\'
-             */
-            $concat = '"' . implode("\", '\"', \"", $bits) . '"';
-        }
+        /* Then implode on \'"\'
+         */
+        $concat = '"' . implode("\", '\"', \"", $bits) . '"';
 
         return "concat({$concat})";
     }
