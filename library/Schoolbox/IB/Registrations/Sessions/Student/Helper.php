@@ -59,13 +59,14 @@ class Helper
         return Model::STATUSES;
     }
 
-    public function buildUserName(string $firstName, string $lastName): string
+    /**
+     * @param string $givenName
+     * @param string $lastName
+     * @return string
+     */
+    public function buildUserName(string $givenName, string $lastName): string
     {
-        if ($firstName === '' || $lastName === '') {
-            return '';
-        }
-
-        return "{$firstName}, {$lastName}";
+        return "{$givenName}, {$lastName}";
     }
 
     /**
