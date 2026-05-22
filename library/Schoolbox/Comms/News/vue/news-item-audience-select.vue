@@ -738,11 +738,14 @@ export default {
                         </div>
                         <template v-if="!audienceIsReadOnly">
                             <nav>
-                                <a
-                                    class="icon-close size-8"
-                                    :title="'Remove ' + audienceBrick.nameLabel + ' from audience'"
+                                <button
+                                    class="sbx-icon-only-button"
+                                    :title="`Remove ${audienceBrick.nameLabel} from audience`"
+                                    :aria-label="`Remove ${audienceBrick.nameLabel} from audience`"
                                     @click="removeAudienceBrick(audienceBrick)"
-                                ></a>
+                                >
+                                    <sbx-icon name="close"></sbx-icon>
+                                </button>
                             </nav>
                         </template>
                     </div>
