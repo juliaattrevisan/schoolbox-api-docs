@@ -551,6 +551,15 @@ abstract class Kernel
             return Redis::getSignalQueueClientInstance();
         });
 
+        // Factory for creating Redis cache objects.
+        $di->set(
+            'redis.cacheFactory',
+            $di->lazyNew(
+                \Alaress\CacheFactory\Factory::class,
+                ['redis' => $di->lazyGet('redis.cache')],
+            )
+        );
+
         // Enable mappers to be injectable, but instantiated only when required
         $mapperFactory = new MapperFactory($di);
         $di->set('mapperFactory', $mapperFactory);
@@ -1850,16 +1859,7 @@ abstract class Kernel
         // Cache wrappers around HTTP clients
         $di->set(
             'httpClient.internalCache',
-            $di->lazy(
-                function () use ($di) {
-                    return new Psr16Cache(
-                        new RedisAdapter(
-                            $di->get('redis.cache'),
-                            'httpClient.' . INSTANCE_ID,
-                        )
-                    );
-                }
-            ),
+            $di->lazyGetCall('redis.cacheFactory', 'build', 'httpClient'),
         );
         $di->set(
             'httpClient.cache',
@@ -2280,60 +2280,24 @@ abstract class Kernel
         // requests.
         $di->set(
             'oidc.cache',
-            $di->lazy(
-                function () use ($di) {
-                    return new Psr16Cache(
-                        new RedisAdapter(
-                            $di->get('redis.cache'),
-                            CacheHelper::BASE_CLIENT_KEY . '.' . INSTANCE_ID,
-                        )
-                    );
-                }
-            )
+            $di->lazyGetCall('redis.cacheFactory', 'build', CacheHelper::BASE_CLIENT_KEY),
         );
 
         // ClickView homepage component cache for storing URL responses from the ClickView API
         $di->set(
             'component.homepage.clickview.cache',
-            $di->lazy(
-                function () use ($di) {
-                    return new Psr16Cache(
-                        new RedisAdapter(
-                            $di->get('redis.cache'),
-                            'component.homepage.clickview.' . INSTANCE_ID,
-                        )
-                    );
-                }
-            )
+            $di->lazyGetCall('redis.cacheFactory', 'build', 'component.homepage.clickview'),
         );
 
         $di->set(
             'paperly.cache',
-            $di->lazy(
-                function () use ($di) {
-                    return new Psr16Cache(
-                        new RedisAdapter(
-                            $di->get('redis.cache'),
-                            'paperly.' . INSTANCE_ID,
-                        )
-                    );
-                }
-            )
+            $di->lazyGetCall('redis.cacheFactory', 'build', 'paperly'),
         );
 
         //Differentiation profiles cache
         $di->set(
             'ai.response.cache',
-            $di->lazy(
-                function () use ($di) {
-                    return new Psr16Cache(
-                        new RedisAdapter(
-                            $di->get('redis.cache'),
-                            'differentiationProfiles.' . INSTANCE_ID,
-                        )
-                    );
-                }
-            )
+            $di->lazyGetCall('redis.cacheFactory', 'build', 'differentiationProfiles'),
         );
 
         // Filesystems

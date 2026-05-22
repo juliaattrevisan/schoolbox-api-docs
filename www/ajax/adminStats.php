@@ -479,8 +479,12 @@ switch ($_POST['module']) {
         }
         break;
     case 'cluster_info':
-        $cache = new \Alaress\Redis\Cache(
-            function () {
+        /** @var Alaress\CacheFactory\Factory $cacheFactory */
+        $cacheFactory = $kernel->get('redis.cacheFactory');
+        $cache        = $cacheFactory->build('clusterInfo');
+        $cacheData    = $cache->get('cluster_info');
+        if (!$cacheData) {
+            $getCacheData = function () {
                 $client = new Client(['curl' => Server::getInstance()->buildCurlOptions()]);
                 $irApiKey = exec('/usr/local/bin/schoolbox-instance-registry --api-key 2>/dev/null');
                 $irUrl = exec('/usr/local/bin/schoolbox-instance-registry --url 2>/dev/null');
@@ -525,20 +529,17 @@ switch ($_POST['module']) {
                     'cluster_name' => 'Unknown',
                     'light' => 'warning'
                 ];
-            },
-            $kernel->get('redis.cache'),
-            'cluster_info.' . INSTANCE_ID,
-            86400 // 1 day cache
-        );
-
-        try {
-            $cacheData = $cache->get('data');
-            $output['cluster_info_status'] = $cacheData['cluster_name'];
-            $output['cluster_info_light'] = $cacheData['light'];
-        } catch (Exception $e) {
-            $output['cluster_info_status'] = 'Unknown';
-            $output['cluster_info_light'] = 'warning';
+            };
+            try {
+                $cacheData = $getCacheData();
+                $cache->set('cluster_info', $cacheData, 86400);
+            } catch (Exception $e) {
+                $cacheData['cluster_name'] = 'Unknown';
+                $cacheData['light']        = 'warning';
+            }
         }
+        $output['cluster_info_status'] = $cacheData['cluster_name'];
+        $output['cluster_info_light'] = $cacheData['light'];
         break;
     default:
         break;

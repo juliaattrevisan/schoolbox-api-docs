@@ -13,6 +13,10 @@ use Alaress\Redis;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\SimpleCache\CacheInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 
 #[CoversMethod(Redis::class, 'cacheFunctionCall')]
 class CacheFunctionCallTest extends TestCase
@@ -23,40 +27,112 @@ class CacheFunctionCallTest extends TestCase
         ?string $cachedValue,
         mixed $uncompressedValue,
     ): void {
-        // Mock Redis client
-        $redis = new class (
-            $cachedValue,
-            $uncompressedValue,
-        ) extends Redis {
-            private array $cachedValues = [];
-            private bool $mustHit = false;
-            public function __construct(private ?string $cachedValue, private mixed $uncompressedValue)
-            {
+        /**
+         * Mock Redis client, which contains optional overrides for the
+         * * already-cached value
+         * * value to which the cached value uncompresses
+         */
+        $redis = new class ($cachedValue, $uncompressedValue) extends Redis
+        {
+            /**
+             * @var array<string, CacheInterface>
+             */
+            private array $caches = [];
+
+            /**
+             * Constructor
+             *
+             * @param string|null $cachedValueOverride       Optional override for cached value
+             * @param mixed       $uncompressedValueOverride Optional override for uncompressed value
+             */
+            public function __construct(
+                private ?string $cachedValueOverride,
+                private mixed $uncompressedValueOverride,
+            ) {
             }
+
+            /**
+             * Build a temporary cache, overriding the cached value if it's set.
+             *
+             * @param string $baseKey
+             * @return CacheInterface
+             */
+            protected function buildCache(string $baseKey): CacheInterface
+            {
+                $this->caches[$baseKey] ??= new class (
+                    new ArrayAdapter(),
+                    $this->cachedValueOverride,
+                ) extends Psr16Cache {
+                    /**
+                     * If true, this will raise an error if `get` misses.
+                     */
+                    private bool $mustHit = false;
+
+                    /**
+                     * Constructor
+                     *
+                     * @param CacheItemPoolInterface $pool                Internal PSR-6 cache
+                     * @param string|null            $cachedValueOverride Optional override for cached value
+                     */
+                    public function __construct(CacheItemPoolInterface $pool, private ?string $cachedValueOverride)
+                    {
+                        parent::__construct($pool);
+                    }
+
+                    /**
+                     * @inheritdoc
+                     */
+                    public function get($key, $default = null): mixed
+                    {
+                        if ($this->mustHit && !isset($this->cachedValueOverride) && !$this->has($key)) {
+                            throw new \OutOfBoundsException(sprintf('Key "%s" does not exist', $key));
+                        }
+                        // Need to call get before returning cachedValue, due to internals of Psr16Cache
+                        $result = parent::get($key, $default);
+                        return $this->cachedValueOverride ?? $result;
+                    }
+
+                    /**
+                     * Mark this cache as needing to hit on subsequent fetches:
+                     * if it does not, it will raise an error.
+                     *
+                     * @param bool $mustHit
+                     * @return $this
+                     */
+                    public function setMustHit(bool $mustHit): self
+                    {
+                        $this->mustHit = $mustHit;
+                        return $this;
+                    }
+                };
+                return $this->caches[$baseKey];
+            }
+
+            /**
+             * Return the overridden uncompressed value if set, or the
+             * calculated uncompressed value if not.
+             *
+             * @param string $value
+             * @return string|false
+             */
             protected function uncompressValue(string $value): string|false
             {
-                return $this->uncompressedValue ?? parent::uncompressValue($value);
+                return $this->uncompressedValueOverride ?? parent::uncompressValue($value);
             }
-            protected function fetchCachedValue(string $key): ?string
-            {
-                if (!array_key_exists($key, $this->cachedValues)) {
-                    if ($this->mustHit) {
-                        throw new \OutOfBoundsException(sprintf('Key "%s" does not exist', $key));
-                    }
-                    if (isset($this->cachedValue)) {
-                        $this->storeCachedValue($key, $this->cachedValue, null);
-                    }
-                    return $this->cachedValue;
-                }
-                return $this->cachedValues[$key];
-            }
-            protected function storeCachedValue(string $key, string $value, ?int $timeout): void
-            {
-                $this->cachedValues[$key] = $value;
-            }
+
+            /**
+             * Mark the internal cache as needing to hit on subsequent fetches:
+             * if it does not, it will raise an error.
+             *
+             * @param bool $mustHit
+             * @return $this
+             */
             public function setMustHit(bool $mustHit): self
             {
-                $this->mustHit = $mustHit;
+                foreach ($this->caches as $cache) {
+                    /** @phpstan-ignore-next-line - setMustHit is always set on the internal cache object */
+                    $cache->setMustHit($mustHit);
+                }
                 return $this;
             }
         };
