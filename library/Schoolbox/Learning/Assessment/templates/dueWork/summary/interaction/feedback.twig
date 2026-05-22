@@ -260,6 +260,7 @@ Data:
                         data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}"
                     {% endif %}
                 >
+                    {# TODO the showGroupTotal and showRubricTotal settings here might not be exactly right #}
                     {% include '@rubric/grid.twig' with {
                         assessment: assessment,
                         rubricInstance: rubricMarkedGrid.grid.rubricInstance,
