@@ -10,7 +10,7 @@ services:
       redis-storage:
         condition: service_healthy
     build:
-      context: ../../toolsd/server
+      context: ../../toolsd
       dockerfile: schoolbox.Dockerfile
     env_file:
       - path: ./schoolbox-toolsd/default.env
@@ -37,7 +37,7 @@ services:
       redis-storage:
         condition: service_healthy
     build:
-      context: ../../toolsd/server
+      context: ../../toolsd
       dockerfile: schoolbox.Dockerfile
     env_file:
       - path: ./schoolbox-toolsd/default.env
@@ -74,7 +74,7 @@ services:
       redis-storage:
         condition: service_healthy
     build:
-      context: ../../toolsd/server
+      context: ../../toolsd
       dockerfile: schoolbox.Dockerfile
     env_file:
       - path: ./schoolbox-toolsd/default.env
@@ -111,7 +111,7 @@ services:
       redis-storage:
         condition: service_healthy
     build:
-      context: ../../toolsd/server
+      context: ../../toolsd
       dockerfile: schoolbox.Dockerfile
     env_file:
       - path: ./schoolbox-toolsd/default.env
@@ -131,4 +131,4 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: ../../toolsd/server
+      device: ../../toolsd
