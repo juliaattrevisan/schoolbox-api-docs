@@ -799,12 +799,6 @@ parameters:
 			path: library/Component/Homepage/PodcastController.php
 
 		-
-			message: '#^Variable \$allRss might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: library/Component/Homepage/RSSController.php
-
-		-
 			message: '#^Variable \$rss might not be defined\.$#'
 			identifier: variable.undefined
 			count: 2
@@ -851,12 +845,6 @@ parameters:
 			identifier: assign.propertyType
 			count: 1
 			path: library/Component/Homepage/VideoController.php
-
-		-
-			message: '#^Variable \$matches might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: library/Component/Homepage/WolframController.php
 
 		-
 			message: '#^Variable \$url might not be defined\.$#'

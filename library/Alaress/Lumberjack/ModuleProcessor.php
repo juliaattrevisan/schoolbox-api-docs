@@ -32,7 +32,7 @@ class ModuleProcessor implements ProcessorInterface
     public function __invoke(LogRecord $record): LogRecord
     {
         $record->extra = array_merge(
-            $record->extra ?? [],
+            $record->extra,
             ['module' => $this->moduleName,],
         );
 

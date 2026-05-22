@@ -158,11 +158,6 @@ class TracedPdoStatement extends PDOStatement
 
     public function debugDumpParams(): ?bool
     {
-        /**
-         * @phpstan-ignore-next-line
-         *
-         * PDOStatement::debugDumpParams returns ?bool, not void as PHPStan is reporting
-         */
         return $this->statement->debugDumpParams();
     }
 
