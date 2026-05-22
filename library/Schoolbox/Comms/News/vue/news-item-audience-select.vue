@@ -743,6 +743,7 @@ export default {
                                     type="button"
                                     :title="`Remove ${audienceBrick.nameLabel} from audience`"
                                     :aria-label="`Remove ${audienceBrick.nameLabel} from audience`"
+                                    :data-test="`news-item-audience-select-remove-${audienceBrick.nameLabel}`"
                                     @click="removeAudienceBrick(audienceBrick)"
                                 >
                                     <sbx-icon name="close"></sbx-icon>

@@ -32,6 +32,8 @@ export default class Form {
 
     static readonly DATA_TEST_AUDIENCE_LIST_ITEM_LABEL = "news-item-audience-select-audience-list-item-label";
 
+    static readonly DATA_TEST_AUDIENCE_LIST_ITEM_REMOVE = "news-item-audience-select-remove-{nameLabel}";
+
     static readonly FORM_CREATE = "form#createForm";
 
     private filePath?: string;
@@ -314,11 +316,11 @@ export default class Form {
     }
 
     /**
-     * untick the checkboxes
-     * @param title - The checkboxes to untick
+     * remove an audience tag
+     * @param title - The title of the audience tag to remove
      */
     async removeAudience(title: string): Promise<void> {
-        await this.page.locator(`a[title="Remove ${title} from audience"]`).click();
+        await this.page.getByTestId(Form.DATA_TEST_AUDIENCE_LIST_ITEM_REMOVE.replace("{nameLabel}", title)).click();
     }
 
     /**
