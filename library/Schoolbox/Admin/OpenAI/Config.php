@@ -58,7 +58,7 @@ class Config
     ];
 
     public const string IMAGE_MODEL_DEFAULT = 'gpt-image-1';
-    public const array AI_IMAGE_MODELS = [
+    private const array AI_IMAGE_MODELS = [
         "gpt-image-1",
         "gpt-image-1-mini",
         "gpt-image-1.5",
@@ -66,7 +66,7 @@ class Config
     ];
 
     public const string OUTPUT_QUALITY_DEFAULT = 'low';
-    public const array OUTPUT_QUALITY_OPTIONS = [
+    private const array OUTPUT_QUALITY_OPTIONS = [
         'high',
         'medium',
         'low',
@@ -75,12 +75,12 @@ class Config
 
     public const string REASONING_EFFORT_DEFAULT = self::REASONING_EFFORT_OPTION_DEFAULT;
     public const string REASONING_EFFORT_OPTION_DEFAULT = 'default';
-    public const string REASONING_EFFORT_OPTION_NONE = 'none';
-    public const string REASONING_EFFORT_OPTION_MINIMAL = 'minimal';
-    public const string REASONING_EFFORT_OPTION_LOW = 'low';
-    public const string REASONING_EFFORT_OPTION_MEDIUM = 'medium';
-    public const string REASONING_EFFORT_OPTION_HIGH = 'high';
-    public const array REASONING_EFFORT_MODEL_OPTIONS = [
+    private const string REASONING_EFFORT_OPTION_NONE = 'none';
+    private const string REASONING_EFFORT_OPTION_MINIMAL = 'minimal';
+    private const string REASONING_EFFORT_OPTION_LOW = 'low';
+    private const string REASONING_EFFORT_OPTION_MEDIUM = 'medium';
+    private const string REASONING_EFFORT_OPTION_HIGH = 'high';
+    private const array REASONING_EFFORT_MODEL_OPTIONS = [
         "gpt-4o"       => [
             self::REASONING_EFFORT_OPTION_DEFAULT,
             self::REASONING_EFFORT_OPTION_NONE,
@@ -198,20 +198,20 @@ class Config
 
     public const string TEXT_VERBOSITY_DEFAULT = self::TEXT_VERBOSITY_OPTION_DEFAULT;
     public const string TEXT_VERBOSITY_OPTION_DEFAULT = 'default';
-    public const string TEXT_VERBOSITY_OPTION_LOW = 'low';
-    public const string TEXT_VERBOSITY_OPTION_MEDIUM = 'medium';
-    public const string TEXT_VERBOSITY_OPTION_HIGH = 'high';
-    public const array TEXT_VERBOSITY_OPTIONS = [
+    private const string TEXT_VERBOSITY_OPTION_LOW = 'low';
+    private const string TEXT_VERBOSITY_OPTION_MEDIUM = 'medium';
+    private const string TEXT_VERBOSITY_OPTION_HIGH = 'high';
+    private const array TEXT_VERBOSITY_OPTIONS = [
         self::TEXT_VERBOSITY_OPTION_DEFAULT,
         self::TEXT_VERBOSITY_OPTION_LOW,
         self::TEXT_VERBOSITY_OPTION_MEDIUM,
         self::TEXT_VERBOSITY_OPTION_HIGH,
     ];
-    public const array TEXT_VERBOSITY_OPTIONS_GPT4 = [
+    private const array TEXT_VERBOSITY_OPTIONS_GPT4 = [
         self::TEXT_VERBOSITY_OPTION_DEFAULT,
         self::TEXT_VERBOSITY_OPTION_MEDIUM,
     ];
-    public const array TEXT_VERBOSITY_OPTIONS_GPT5_CHAT = [
+    private const array TEXT_VERBOSITY_OPTIONS_GPT5_CHAT = [
         self::TEXT_VERBOSITY_OPTION_DEFAULT,
         self::TEXT_VERBOSITY_OPTION_MEDIUM,
     ];
