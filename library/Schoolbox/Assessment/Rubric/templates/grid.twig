@@ -22,10 +22,7 @@
             markedGrid: {{ (rubricMarkedGrid ? rubricMarkedGrid.toArray(USER, showPoints) : null)|json_encode }},
             selfAssessmentFeedback: {{ (selfAssessmentMarkedGrid ? selfAssessmentMarkedGrid.toArray(USER, showPoints) : null)|json_encode }}
         }]"
-        :assessment-mark-scheme="{
-            template: {{ rubricGrid.assessment.markScheme.template|json_encode }},
-            context: {{ rubricGrid.assessment.markScheme.generateContext|json_encode }}
-        }"
+        :assessment-mark-scheme="{{ rubricGrid.assessment.markScheme.generateContext|json_encode }}"
         :participant-id="{{ learner.id ?? 'null' }}"
         {# TODO: these are signs of likely permission issues #}
         {% if showRubricTotal ?? false %}show-rubric-total{% endif %}
