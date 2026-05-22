@@ -40,7 +40,7 @@ class Renderer extends AbstractRenderer
 
     /**
      * @param Config $config
-     * @return array<string>
+     * @return array<string, mixed>
      */
     protected function getData(Config $config): array
     {

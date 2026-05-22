@@ -58,7 +58,7 @@ class Component extends BaseComponent
      * input into this component's text input), concatenated into a single
      * string.
      *
-     * @return array|Filter\Selection\Model[]|string[]
+     * @return array
      */
     public function toContext(): array
     {

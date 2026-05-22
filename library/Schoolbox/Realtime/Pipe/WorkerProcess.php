@@ -197,7 +197,7 @@ class WorkerProcess extends AbstractProcess
      */
     private function getNotifier(callable $callback)
     {
-        if (is_array($callback) && isset($callback[0]) && $callback[0] instanceof ModuleNotifierInterface) {
+        if (is_array($callback) && $callback[0] instanceof ModuleNotifierInterface) {
             $notifierClassName = get_class($callback[0]);
 
             try {
