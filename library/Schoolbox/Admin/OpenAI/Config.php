@@ -73,7 +73,6 @@ class Config
         'auto',
     ];
 
-    public const string REASONING_EFFORT_DEFAULT = self::REASONING_EFFORT_OPTION_DEFAULT;
     public const string REASONING_EFFORT_OPTION_DEFAULT = 'default';
     private const string REASONING_EFFORT_OPTION_NONE = 'none';
     private const string REASONING_EFFORT_OPTION_MINIMAL = 'minimal';
@@ -196,7 +195,6 @@ class Config
         self::REASONING_EFFORT_OPTION_HIGH,
     ];
 
-    public const string TEXT_VERBOSITY_DEFAULT = self::TEXT_VERBOSITY_OPTION_DEFAULT;
     public const string TEXT_VERBOSITY_OPTION_DEFAULT = 'default';
     private const string TEXT_VERBOSITY_OPTION_LOW = 'low';
     private const string TEXT_VERBOSITY_OPTION_MEDIUM = 'medium';
