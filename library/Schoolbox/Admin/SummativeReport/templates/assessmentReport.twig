@@ -54,8 +54,12 @@
         {% if feedback and "1" == options.workType[assessment.workType.id].rubrics and (feedback.rubricMarkedGrids.count ?? null) %}
             {% for rubricInstanceId, rubricMarkedGrid in feedback.rubricMarkedGrids %}
                 <div class="rubric-wrap">
-                    {# Previously, showGroupTotal was hardcoded to true and showRubricTotal was hardcoded to false.
-                     # Don't know why
+                    {# showGroupTotal and showRubricTotal are vars that unilaterally decide whether the Capability Mark
+                     # value and Rubric Total value shows on the grid, regardless of the feedbacks or assessment setting
+                     # that you could potentially use to derive this outcome. It's so that you can arbitrarily decide
+                     # when and where each of these can be seen by a user. For example, in summative reports, you
+                     # always want to show the capability mark but never show the rubric total - even if the assessment
+                     # settings suggest you could.
                      #}
                     {% include '@rubric/grid.twig' with {
                         assessment: assessment,
