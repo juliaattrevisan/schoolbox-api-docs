@@ -164,7 +164,7 @@ async function onClickCell(): Promise<void> {
         student.value &&
         participant.value &&
         !participant.value.isExcluded &&
-        aImpl.value?._routes.student[student.value.id].postFeedback; // TODO: did I accidentally enable this for reporting??
+        aImpl.value?._routes.student[student.value.id].postFeedback;
 
     if (Date.now() - lastClick.value < DOUBLE_CLICK_INTERVAL && canAccessUpdateFeedback) {
         /**
