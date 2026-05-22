@@ -235,7 +235,10 @@ class Mapper extends BaseMapper
             $usersById[$user->getId()] = $user;
         }
 
-        $ibGroupSubjectsByUserId = $this->findIbGroupSubjectsForUsers($usersById);
+        $ibGroupSubjectsByUserId = $this->findIbGroupSubjectsForUsers(
+            $usersById,
+            $registrationSession->getSystemPurpose()->getId()
+        );
         $students = $this->createCollection();
 
         foreach ($rows as $row) {
@@ -349,9 +352,10 @@ class Mapper extends BaseMapper
 
     /**
      * @param array<int, User> $usersById
+     * @param int $systemPurposeId
      * @return array<int, GenericCollection>
      */
-    private function findIbGroupSubjectsForUsers(array $usersById): array
+    private function findIbGroupSubjectsForUsers(array $usersById, int $systemPurposeId): array
     {
         if (empty($usersById)) {
             return [];
@@ -369,7 +373,7 @@ class Mapper extends BaseMapper
         $rowsByClassCode = !empty($classCodes)
             ? $this->findIbGroupSubjectRowsByClassCode(array_values($classCodes))
             : [];
-        $coreRows = $this->findCoreIbGroupSubjectRows();
+        $coreRows = $this->findCoreIbGroupSubjectRows($systemPurposeId);
         $groupSubjectsByUserId = [];
 
         foreach (array_keys($usersById) as $userId) {
@@ -491,7 +495,7 @@ class Mapper extends BaseMapper
     /**
      * @return array<int, array<string, mixed>>
      */
-    private function findCoreIbGroupSubjectRows(): array
+    private function findCoreIbGroupSubjectRows(int $systemPurposeId): array
     {
         $statement = $this->getDatabase()->query(
             "
@@ -513,8 +517,9 @@ class Mapper extends BaseMapper
                     ON g.id = gs.group_id
                 INNER JOIN lu_ib_subjects s
                     ON s.id = gs.subject_id
-                LEFT JOIN ib_group_subject_languages gsl
+                INNER JOIN ib_group_subject_languages gsl
                     ON gsl.group_subject_id = gs.id
+                    AND gsl.system_purpose_id = :systemPurposeId
                 LEFT JOIN ib_group_subject_language_class_codes gslcc
                     ON gslcc.group_subject_language_id = gsl.id
                 LEFT JOIN folder_code fc
@@ -528,6 +533,7 @@ class Mapper extends BaseMapper
             ",
             [
                 'groupName' => self::CORE_GROUP_NAME,
+                'systemPurposeId' => $systemPurposeId,
             ]
         );
 
