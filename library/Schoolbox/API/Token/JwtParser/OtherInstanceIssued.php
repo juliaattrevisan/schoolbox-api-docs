@@ -26,7 +26,7 @@ use SensitiveParameter;
  * These JWTs are usually issued by following a school's "Visit Help" link: the
  * JWT will be accepted by the Help instance.
  */
-class OtherInstanceIssued extends Base
+class OtherInstanceIssued extends InstanceIssued
 {
     /**
      * Key for the instance ID custom JWT claim.
@@ -101,25 +101,13 @@ class OtherInstanceIssued extends Base
             (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY),
         );
 
-        // Now the JWT is decoded and verified:
-        // create a session for the user matching the email address in the JWT
-        $email = $claims[self::CLAIM_EMAIL] ?? null;
-        $this->log->debug(
-            sprintf(
-                'Verifying JWT claim %s "%s" exists and matches a user',
-                self::CLAIM_EMAIL,
-                $email,
-            )
-        );
-        if (!isset($email)) {
-            throw new Exception\InvalidIdentity(sprintf('JWT must contain an "%s" claim', self::CLAIM_EMAIL));
-        }
+        // Validate audience
+        $this->assertValidAudience($claims);
 
-        // The email must be valid too, or at least not blank
-        $email = (string)$email;
-        if (trim($email) === '') {
-            throw new Exception\InvalidIdentity(sprintf('JWT "%s" claim must not be empty', self::CLAIM_EMAIL));
-        }
+        // Now the JWT is decoded and verified:
+        // create a session for the user matching the email address in the JWT.
+        // Note that unlike the self-issued JWT, the JTI cannot be verified.
+        $email = $this->extractUsername($claims, self::CLAIM_EMAIL);
         return $this->findUser($email, self::CLAIM_EMAIL);
     }
 }
