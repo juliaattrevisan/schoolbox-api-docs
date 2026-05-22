@@ -2,8 +2,8 @@
  * Image overrides for Storybook UI Uplift
  * Scope: UI Uplift
  * Portraits at 48px and below render as circles.
- * Larger portraits inherit the configured field roundness.
- * Various other images rounded to match the configured field roundness for visual consistency.
+ * Larger portraits inherit the configured field corner radius.
+ * Various other images rounded to match the configured field corner radius for visual consistency.
  */
 
 body.sbx-body {
@@ -13,13 +13,13 @@ body.sbx-body {
     .banner img,
     .img-gallery img,
     img[src*="/portrait.php?"] {
-        // All images inherit the configured field roundness for visual consistency.
+        // All images inherit the configured field corner radius for visual consistency.
         border-radius: var(--sbx-config-field-corner-radius);
     }
 
     .c-img:not(.c-img--round):has(> .c-img__wrapper > img) {
         .c-img__wrapper {
-            // Larger wrapped images inherit the configured field roundness.
+            // Larger wrapped images inherit the configured field corner radius.
             border-radius: var(--sbx-config-field-corner-radius);
         }
     }
