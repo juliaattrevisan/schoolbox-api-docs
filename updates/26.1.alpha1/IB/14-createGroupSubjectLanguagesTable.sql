@@ -5,7 +5,8 @@ CREATE TABLE `ib_group_subject_languages`
     `language_id` INT(11) NOT NULL,
     `system_purpose_id` INT(11) DEFAULT NULL
         COMMENT 'For Core subjects only: references ib_system_purposes to allow per-qualification-type language configuration',
-    `system_purpose_unique_key` INT(11) GENERATED ALWAYS AS (COALESCE(`system_purpose_id`, 0)) VIRTUAL,
+    `system_purpose_unique_key` INT(11) GENERATED ALWAYS AS (COALESCE(`system_purpose_id`, 0)) VIRTUAL
+        COMMENT 'Generated column to allow unique constraint on (group_subject_id, language_id) for non-Core subjects while still allowing multiple entries for Core subjects with different system purpose',
     PRIMARY KEY (`id`),
     CONSTRAINT `fk_ib_group_subject_languages_group_subject`
         FOREIGN KEY (`group_subject_id`) REFERENCES `ib_group_subjects` (`id`) ON DELETE CASCADE,
