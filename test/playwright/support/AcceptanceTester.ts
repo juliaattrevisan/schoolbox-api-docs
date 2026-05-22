@@ -99,7 +99,7 @@ export default class AcceptanceTester extends BaseTester {
 
         this.isGoingTo("click the options button and impersonate the user");
         await this.page.getByTestId("sbx-pop-out-header-options-button").click();
-        await this.page.getByTestId("admin-user-modify-impersonate").click();
+        await this.page.getByTestId("user-profile-impersonate").click();
 
         await this.skipWhatsNewTour();
 

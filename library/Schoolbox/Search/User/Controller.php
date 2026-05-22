@@ -886,7 +886,7 @@ class Controller extends BaseController
                     'iconClass' => 'icon-staff-students',
                     'disabled' => $viewee->isDeleted() || !$viewee->getEnabled(),
                     'mouseoverText' => ($viewee->isDeleted() || !$viewee->getEnabled()) ? 'Account Disabled' : 'Login as user',
-                    'dataTest' => ($viewee->isDeleted() || !$viewee->getEnabled()) ? '' : 'admin-user-modify-impersonate'
+                    'dataTest' => ($viewee->isDeleted() || !$viewee->getEnabled()) ? '' : 'user-profile-impersonate'
                 ],
                 [
                     'title' => 'Create ' . $this->rosettaStone->translate('pastoral', false, true) . ' Record',
@@ -901,7 +901,7 @@ class Controller extends BaseController
                     'iconClass' => 'icon-pastoral',
                     'disabled' => false,
                     'mouseoverText' => 'Create Pastoral Record',
-                    'dataTest' => ''
+                    'dataTest' => 'user-profile-create-pastoral-record'
                 ]
             ],
             fn ($item) => $item['url'] !== false

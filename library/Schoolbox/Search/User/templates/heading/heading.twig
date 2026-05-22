@@ -24,13 +24,14 @@
         <nav>
             <sbx-pop-out content-id="header-options"></sbx-pop-out>
         </nav>
-        <ul class="f-dropdown" id="header-options" data-dropdown-content>
+        <ul class="f-dropdown" id="header-options" data-test="profile-header-options" data-dropdown-content>
             {% for linkInfo in linksInfo %}
                 <li>
                     {% if linkInfo.disabled %}
                         <a
                             class="{{ linkInfo.iconClass }} menu_disabled"
                             title="{{ linkInfo.mouseoverText }}"
+                            data-test="user-profile-impersonate-disabled"
                         >{{ linkInfo.title }}</a>
                     {% else %}
                         <a
