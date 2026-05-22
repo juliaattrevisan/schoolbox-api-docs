@@ -652,7 +652,8 @@ class Config
     /**
      * Build available reasoning effort levels for this feature.
      *
-     * This ensures the `minimal` level is stripped from the image feature.
+     * This ensures the `minimal` effort level is stripped from the image
+     * feature, because this effort is not supported when generating images.
      *
      * @param string $feature
      * @return array|array[]
