@@ -17,7 +17,7 @@ use Schoolbox\IConfigLoader;
 
 class HelperTest extends TestCase
 {
-    public function testBuildPreviewDataIncludesBoxDropShadowCssVariable(): void
+    public function testBuildPreviewDataIncludesDropShadowCssVariable(): void
     {
         $dropShadowConfig = (new Config())
             ->setId(100)
