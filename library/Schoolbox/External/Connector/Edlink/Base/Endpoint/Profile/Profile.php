@@ -641,13 +641,15 @@ class Profile implements IStrategy
                 return;
             }
 
-            $storage = $this->storageMapper->createModel();
-            $storage->setData($imageContent);
-
-            if ($this->perform) {
-                $this->storageMapper->save($storage);
-                $baseProfile->setPortrait($storage);
+            if (!$this->perform) {
+                return;
             }
+
+            $storage = $this->storageMapper->acceptStream(
+                $baseProfile->getExternalId() . '.jpg',
+                $imageContent
+            );
+            $baseProfile->setPortrait($storage);
         } catch (\Throwable $e) {
             $this->log->warning(sprintf(
                 'Could not download photo for %s: %s',
