@@ -740,6 +740,7 @@ export default {
                             <nav>
                                 <button
                                     class="sbx-icon-only-button"
+                                    type="button"
                                     :title="`Remove ${audienceBrick.nameLabel} from audience`"
                                     :aria-label="`Remove ${audienceBrick.nameLabel} from audience`"
                                     @click="removeAudienceBrick(audienceBrick)"
