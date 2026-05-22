@@ -388,8 +388,8 @@ button.submit {
 
 // a button with only SVG icons that displays inline with text
 .f-dropdown :is(a, button).sbx-button--has-icon {
-    display: flex;
     align-items: flex-start;
+    display: flex;
     gap: var(--spacing-s);
     justify-content: left;
 }
@@ -398,8 +398,8 @@ button.submit {
     line-height: 1;
 }
 .sbx-button--has-icon {
-    display: inline-flex;
     align-items: center;
+    display: inline-flex;
     gap: var(--spacing-s);
 }
 .button.sbx-button--has-icon {
