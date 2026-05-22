@@ -327,51 +327,6 @@ class Config
     public const string FIELD_TYPE_CHECKBOX = 'checkbox';
 
 
-    /* Predefined config structs: as you add more providers, don't forget to pile them in here
-     */
-
-    /**
-     * Common fields across all providers
-     */
-    public const array STRUCT_GENERAL = [
-        self::FIELD_AIKEY => [
-            'value' => '',
-        ],
-        self::FIELD_SYSTEM_PROMPT => [
-            'value' => '',
-        ],
-        self::FIELD_REASONING_EFFORT => [
-            'value' => '',
-        ],
-        self::FIELD_TEXT_VERBOSITY => [
-            'value' => '',
-        ],
-    ];
-
-
-    /**
-     * OpenAI-specific fields
-     */
-    public const array STRUCT_OPENAI = [
-        self::FIELD_MODEL => [
-            'value' => '', // -- select an option --
-        ],
-    ];
-
-
-    /**
-     * Azure-specific fields
-     */
-    public const array STRUCT_AZURE = [
-        self::FIELD_RESOURCE_NAME => [
-            'value' => '',
-        ],
-        self::FIELD_DEPLOYMENT_ID => [
-            'value' => '',
-        ],
-    ];
-
-
     /**
      * A set of all available fields to show in the ui
      */
@@ -390,6 +345,12 @@ class Config
 
     /**
      * Which form inputs exist for each AI provider?
+     *
+     * When adding new fields, add them here: and if necessary, set which
+     * section they occur within so they are restricted to that provider.
+     *
+     * Also, add a title and description within `manifest` in
+     * `templates/config.twig`.
      */
     public const array DEFAULT_FORM_INPUTS = [
         self::FIELD_PROVIDER      => [
