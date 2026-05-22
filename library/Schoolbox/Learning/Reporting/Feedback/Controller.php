@@ -282,8 +282,9 @@ class Controller extends Base
 
 
         /* This human readable mark is given by the instructor, from which we derive the normalised mark
-        */
-        $mark = trim((string)$post['mark']);
+         * This may be unset if the activity's instructor mark type is set to None
+         */
+        $mark = trim((string)($post['mark'] ?? ''));
 
         /* Default values
          * Note that $mark might be empty string at this point:
