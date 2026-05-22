@@ -53,7 +53,8 @@ RUN apt-get update && apt-get upgrade -y && \
         fileinfo \
         libxml \
         gd \
-        opcache && \
+        opcache \
+        ev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 

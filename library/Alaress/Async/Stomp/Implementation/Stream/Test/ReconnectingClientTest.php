@@ -24,6 +24,7 @@ use function React\Promise\resolve;
 
 #[CoversMethod(ReconnectingClient::class, 'connect')]
 #[CoversMethod(ReconnectingClient::class, 'onDisconnect')]
+#[CoversMethod(ReconnectingClient::class, 'stop')]
 class ReconnectingClientTest extends TestCase
 {
     /**
@@ -188,7 +189,7 @@ class ReconnectingClientTest extends TestCase
         $secondInner = $this->makeInnerClient();
         $secondInner->expects($this->once())
             ->method('subscribeWithAck')
-            ->with('sb.schedule', IClient::ACK_MODE_CLIENT_INDIVIDUAL, $this->isType('callable'));
+            ->with('sb.schedule', IClient::ACK_MODE_CLIENT_INDIVIDUAL, $this->isCallable());
 
         $callCount = 0;
         $clients   = [$firstInner, $secondInner];
@@ -417,5 +418,74 @@ class ReconnectingClientTest extends TestCase
 
         $this->expectException(MaxAttemptsExceededException::class);
         $timers[1][1]();    // fn2: scheduleReconnect(1) → jitter throws
+    }
+
+    /**
+     * Test that stop() sets the stopped flag, preventing scheduleReconnect()
+     * from adding new timers when a subsequent disconnect fires.
+     */
+    public function testStopPreventsReconnectTimerOnDisconnect(): void
+    {
+        $timers         = [];
+        $disconnectHook = fn () => null;
+
+        $inner  = $this->makeInnerClient($disconnectHook);
+        $loop   = $this->makeLoop($timers);
+        $jitter = $this->createMock(IJitter::class);
+
+        $client = new ReconnectingClient(fn () => $inner, $loop, $jitter);
+        $client->connect();
+
+        $this->invokeStop($client);
+
+        $disconnectHook();
+
+        $this->assertCount(0, $timers, 'stop() should prevent new reconnect timers from being scheduled');
+    }
+
+    /**
+     * Test that stop() cancels the pending reconnect timer when one exists.
+     */
+    public function testStopCancelsPendingReconnectTimer(): void
+    {
+        $disconnectHook = fn () => null;
+        $inner          = $this->makeInnerClient($disconnectHook);
+
+        $timer = $this->createMock(TimerInterface::class);
+
+        $loop = $this->createMock(LoopInterface::class);
+        $loop->method('addTimer')->willReturn($timer);
+        $loop->expects($this->once())->method('cancelTimer')->with($timer);
+
+        $jitter = $this->createMock(IJitter::class);
+        $jitter->method('calculateJitter')->willReturn(0.0);
+
+        $client = new ReconnectingClient(fn () => $inner, $loop, $jitter);
+        $client->connect();
+
+        $disconnectHook();           // scheduleReconnect → addTimer → pendingTimer set
+        $this->invokeStop($client);  // should cancelTimer($timer)
+    }
+
+    /**
+     * Test that stop() does not call cancelTimer when no reconnect timer is pending.
+     */
+    public function testStopDoesNotCancelTimerWhenNoneIsPending(): void
+    {
+        $inner = $this->makeInnerClient();
+
+        $loop = $this->createMock(LoopInterface::class);
+        $loop->expects($this->never())->method('cancelTimer');
+
+        $client = new ReconnectingClient(fn () => $inner, $loop, $this->createMock(IJitter::class));
+
+        $this->invokeStop($client);
+    }
+
+    private function invokeStop(ReconnectingClient $client): void
+    {
+        $method = (new \ReflectionClass($client))->getMethod('stop');
+        $method->setAccessible(true);
+        $method->invoke($client);
     }
 }
