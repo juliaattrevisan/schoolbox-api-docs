@@ -56,12 +56,6 @@ class Config
         "gpt-5.4-nano",
         "gpt-5.5",
     ];
-    public const array AI_MODELS_GPT4 = [
-        "gpt-4o",
-        "gpt-4o-mini",
-        "gpt-4.1",
-        "gpt-4.1-mini",
-    ];
 
     public const string IMAGE_MODEL_DEFAULT = 'gpt-image-1';
     public const array AI_IMAGE_MODELS = [
