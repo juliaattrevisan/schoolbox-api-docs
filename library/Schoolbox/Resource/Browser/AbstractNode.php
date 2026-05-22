@@ -145,8 +145,8 @@ abstract class AbstractNode implements NodeInterface
                 'name'       => $folder->getName(),
             );
 
-            /** @phpstan-ignore-next-line - somehow folder parent might not be set */
             for ($i = 0; (($folder->getParent()?->getId() ?? IFolder::ROOT_ID) > 0) && ($i < self::MAX_DEPTH); $i++) {
+                /** @phpstan-ignore-next-line - $folder->getParent shouldn't be null here, but I'm not sure of that */
                 $parentId      = $folder->getParent()?->getId();
                 $currentFolder = $this->getFolderLocator()->findById($parentId);
 
