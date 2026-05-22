@@ -13,10 +13,13 @@ use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as SchoolboxException;
 
+/**
+ * Configuration options for AI features.
+ */
 class Config
 {
     /**
-     * enabled AI features (to be configured as part of the text Gen settings)
+     * Enabled AI features (to be configured as part of the text Gen settings):
      * feature name => config name
      */
     public const array ALL_MODULES = [
@@ -29,12 +32,21 @@ class Config
         Helper::FEATURE_AI_MODERATION_AGENT             => ConfigMapper::NAME_AI_MODERATION_AGENT,
     ];
 
+    /**
+     * The AI providers which may be selected for an AI feature
+     * (including Helper::ENDPOINT_TYPE_OFF to disable a feature entirely).
+     */
     public const array PROVIDERS = [
         Helper::ENDPOINT_TYPE_OFF => Helper::ENDPOINT_TYPE_OFF,
         Helper::ENDPOINT_TYPE_OPENAI => Helper::ENDPOINT_TYPE_OPENAI,
         Helper::ENDPOINT_TYPE_AZURE => Helper::ENDPOINT_TYPE_AZURE,
     ];
 
+    /**
+     * The models which may be selected for an AI feature.
+     *
+     * Currently, these map to the text models which are provided by OpenAI.
+     */
     public const array AI_MODELS = [
         "gpt-4o",
         "gpt-4o-mini",
@@ -57,7 +69,16 @@ class Config
         "gpt-5.5",
     ];
 
+    /**
+     * The default image generation model.
+     */
     public const string IMAGE_MODEL_DEFAULT = 'gpt-image-1';
+
+    /**
+     * The models which may be selected for image generation.
+     *
+     * Currently, these map to the image models which are provided by OpenAI.
+     */
     private const array AI_IMAGE_MODELS = [
         "gpt-image-1",
         "gpt-image-1-mini",
@@ -65,7 +86,14 @@ class Config
         "gpt-image-2",
     ];
 
+    /**
+     * The default image output quality.
+     */
     public const string OUTPUT_QUALITY_DEFAULT = 'low';
+
+    /**
+     * Options for image output quality.
+     */
     private const array OUTPUT_QUALITY_OPTIONS = [
         'high',
         'medium',
@@ -73,12 +101,37 @@ class Config
         'auto',
     ];
 
+    /**
+     * Possible values for reasoning effort.
+     *
+     * @see https://developers.openai.com/api/docs/guides/reasoning
+     */
+    private const array REASONING_EFFORT_OPTIONS = [
+        self::REASONING_EFFORT_OPTION_DEFAULT,
+        self::REASONING_EFFORT_OPTION_NONE,
+        self::REASONING_EFFORT_OPTION_MINIMAL,
+        self::REASONING_EFFORT_OPTION_LOW,
+        self::REASONING_EFFORT_OPTION_MEDIUM,
+        self::REASONING_EFFORT_OPTION_HIGH,
+    ];
+
+    /**
+     * Default value for reasoning effort:
+     * made public so that other classes may use it.
+     */
     public const string REASONING_EFFORT_OPTION_DEFAULT = 'default';
     private const string REASONING_EFFORT_OPTION_NONE = 'none';
     private const string REASONING_EFFORT_OPTION_MINIMAL = 'minimal';
     private const string REASONING_EFFORT_OPTION_LOW = 'low';
     private const string REASONING_EFFORT_OPTION_MEDIUM = 'medium';
     private const string REASONING_EFFORT_OPTION_HIGH = 'high';
+
+    /**
+     * Mapping of supported AI models to allowed reasoning effort values.
+     *
+     * Use `$this->buildReasoningEffortModelOptions` to determine the actual
+     * list of allowed values, as this may differ by feature.
+     */
     private const array REASONING_EFFORT_MODEL_OPTIONS = [
         "gpt-4o"       => [
             self::REASONING_EFFORT_OPTION_DEFAULT,
@@ -186,34 +239,52 @@ class Config
             self::REASONING_EFFORT_OPTION_HIGH,
         ],
     ];
-    public const array REASONING_EFFORT_OPTIONS = [
-        self::REASONING_EFFORT_OPTION_DEFAULT,
-        self::REASONING_EFFORT_OPTION_NONE,
-        self::REASONING_EFFORT_OPTION_MINIMAL,
-        self::REASONING_EFFORT_OPTION_LOW,
-        self::REASONING_EFFORT_OPTION_MEDIUM,
-        self::REASONING_EFFORT_OPTION_HIGH,
-    ];
 
-    public const string TEXT_VERBOSITY_OPTION_DEFAULT = 'default';
-    private const string TEXT_VERBOSITY_OPTION_LOW = 'low';
-    private const string TEXT_VERBOSITY_OPTION_MEDIUM = 'medium';
-    private const string TEXT_VERBOSITY_OPTION_HIGH = 'high';
+    /**
+     * Possible values for text verbosity.
+     *
+     * From OpenAI docs:
+     * > Constrains the verbosity of the model’s response. Lower values will
+     * > result in more concise responses, while higher values will result in
+     * > more verbose responses. Currently supported values are low, medium,
+     * > and high.
+     */
     private const array TEXT_VERBOSITY_OPTIONS = [
         self::TEXT_VERBOSITY_OPTION_DEFAULT,
         self::TEXT_VERBOSITY_OPTION_LOW,
         self::TEXT_VERBOSITY_OPTION_MEDIUM,
         self::TEXT_VERBOSITY_OPTION_HIGH,
     ];
+
+    /**
+     * Possible values for text verbosity, for GPT-4 family models.
+     */
     private const array TEXT_VERBOSITY_OPTIONS_GPT4 = [
         self::TEXT_VERBOSITY_OPTION_DEFAULT,
         self::TEXT_VERBOSITY_OPTION_MEDIUM,
     ];
+
+    /**
+     * Possible values for text verbosity, for GPT-5 family models of the
+     * "chat" variant.
+     */
     private const array TEXT_VERBOSITY_OPTIONS_GPT5_CHAT = [
         self::TEXT_VERBOSITY_OPTION_DEFAULT,
         self::TEXT_VERBOSITY_OPTION_MEDIUM,
     ];
 
+    /**
+     * Default value for text verbosity:
+     * made public so that other classes may use it.
+     */
+    public const string TEXT_VERBOSITY_OPTION_DEFAULT = 'default';
+    private const string TEXT_VERBOSITY_OPTION_LOW = 'low';
+    private const string TEXT_VERBOSITY_OPTION_MEDIUM = 'medium';
+    private const string TEXT_VERBOSITY_OPTION_HIGH = 'high';
+
+    /**
+     * Mapping of supported AI models to allowed text verbosity values.
+     */
     public const array TEXT_VERBOSITY_MODEL_OPTIONS = [
         "gpt-4o"              => self::TEXT_VERBOSITY_OPTIONS_GPT4,
         "gpt-4o-mini"         => self::TEXT_VERBOSITY_OPTIONS_GPT4,
