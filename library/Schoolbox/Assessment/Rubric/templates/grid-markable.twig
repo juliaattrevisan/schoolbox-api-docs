@@ -5,8 +5,24 @@
  # It is shown to learners when they are self-grading, but predominantly used by instructors.
  #
  # 1. It displays the grid structure - capabilities, indicators, levels.
- # 2. It can display the marked grid, as determined by instructors; these show the instructor-selected descriptors as shaded cells.
- # 3. It can display the self-graded grid, as determined by learners; these show the learner-selected descriptors with a little profile picture of the learner.
+ # 2. It can display the marked grid, as determined by instructors; these show the instructor-selected descriptors as
+ #    shaded cells.
+ # 3. It can display the self-graded grid, as determined by learners; these show the learner-selected descriptors with a
+ #    little profile picture of the learner.
+ #
+ # ----
+ #
+ # $showGroupTotal, $showRubricTotal: these are legacy-named vars that specifically (and unilaterally) decode when
+ # capability marks and the rubric's overall total value (sum of its caps/descriptor selections) are rendered on-screen.
+ # While there's potential for deriving them from the assessment and rubric grid's settings, there are occasions where
+ # you literally don't care about that computation and want to arbitrarily decide an outcome.
+ #
+ # showGroupTotal and showRubricTotal are vars that unilaterally decide whether the Capability Mark
+ # value and Rubric Total value shows on the grid, regardless of the feedbacks or assessment setting
+ # that you could potentially use to derive this outcome. It's so that you can arbitrarily decide
+ # when and where each of these can be seen by a user. For example, in summative reports, you
+ # always want to show the capability mark but never show the rubric total - even if the assessment
+ # settings suggest you could.
  #
  # @param IAssessable $assessment                A learning activity instance
  # @param Rubric\Instance\Model $rubricInstance  The container containing rubric settings for this particular grid, and the grid itself.
