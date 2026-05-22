@@ -153,7 +153,16 @@ SET
         SELECT `value`
         FROM config
         WHERE
-            name = 'skin_colour_form_input_border_color'
+            name = 'skin_colour_content_ui_submit_background'
+        LIMIT 1
+    );
+
+SET
+    @value_skin_colour_accent_text = (
+        SELECT `value`
+        FROM config
+        WHERE
+            name = 'skin_colour_content_ui_submit_foreground'
         LIMIT 1
     );
 
@@ -325,7 +334,7 @@ VALUES (
     ),
     (
         'skin_colour_accent_text',
-        '#ffffff',
+        @value_skin_colour_accent_text,
         'Accent Text',
         'The text colour for when displayed over the Accent Colour.',
         @config_colour_field_id,
