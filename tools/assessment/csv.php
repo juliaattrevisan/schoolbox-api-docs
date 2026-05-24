@@ -53,11 +53,9 @@ HELP;
             exit;
         }
 
-        /**
-         * @var Filter\Filters\Assessment\IdFinder $idFinder
-         * @var Assessment\MapperProxy             $assessmentDataSource
-         */
-        $idFinder             = $this->getDi()->get('filters.assessmentIdFinder');
+        /** @var Filter\Filters\Assessment\IdFinder $idFinder */
+        $idFinder = $this->getDi()->get('filters.assessmentIdFinder');
+        /** @var Assessment\MapperProxy $assessmentDataSource */
         $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
 
         $exporter = new Exporter(

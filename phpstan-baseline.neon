@@ -5126,12 +5126,6 @@ parameters:
 			path: test/codeception/Support/Payload/GetTrait.php
 
 		-
-			message: '#^Variable \$assessmentDataSource in PHPDoc tag @var does not exist\.$#'
-			identifier: varTag.variableNotFound
-			count: 1
-			path: tools/assessment/csv.php
-
-		-
 			message: '#^Constant Schoolbox\\Application\\CliTool\\App@anonymous/tools/custom/wes/changeType\.php\:11\:\:ACCESS_LEVEL_PRIVATE is unused\.$#'
 			identifier: classConstant.unused
 			count: 1
