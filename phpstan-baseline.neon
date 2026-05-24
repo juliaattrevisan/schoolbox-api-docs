@@ -1099,12 +1099,6 @@ parameters:
 			path: library/External/Doublefirst/Timetable.php
 
 		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 1
-			path: library/External/Doublefirst/Timetable.php
-
-		-
 			message: '#^Call to function is_array\(\) with list\<array\{code\: mixed, name\: mixed, classType\: mixed, campusCode\: mixed\}\> will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
