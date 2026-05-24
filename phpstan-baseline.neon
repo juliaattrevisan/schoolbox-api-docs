@@ -3757,12 +3757,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/ListController.php
 
 		-
-			message: '#^Variable \$sortedAssessments in PHPDoc tag @var does not exist\.$#'
-			identifier: varTag.variableNotFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/ListController.php
-
-		-
 			message: '#^Dead catch \- OutOfBoundsException is never thrown in the try block\.$#'
 			identifier: catch.neverThrown
 			count: 1
