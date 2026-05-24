@@ -2263,12 +2263,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/Synergetic/Base/CommunityPortal.php
 
 		-
-			message: '#^PHPDoc tag @param references unknown parameter\: \$classificationCode$#'
-			identifier: parameter.notFound
-			count: 1
-			path: library/Schoolbox/External/Connector/Synergetic/Base/Document.php
-
-		-
 			message: '#^Method Schoolbox\\External\\Connector\\Synergetic\\Base\\Sync\:\:findAllParents\(\) should return array\<Schoolbox\\External\\Normalise\\User\\Guardian\> but returns Schoolbox\\Sync\\Iterator\\Guardian\.$#'
 			identifier: return.type
 			count: 1

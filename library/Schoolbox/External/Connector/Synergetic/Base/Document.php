@@ -69,7 +69,7 @@ class Document extends Base implements IDocument
      * @inheritdoc
      *
      * @param User  $student
-     * @param array $classificationCode
+     * @param array $classificationCodes
      *
      * @return array
      */
