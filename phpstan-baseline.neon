@@ -4711,12 +4711,6 @@ parameters:
 			path: library/Schoolbox/Resource/Folder/Model.php
 
 		-
-			message: '#^PHPDoc tag @param for parameter \$yearLevels with type \(iterable\<Schoolbox\\YearLevel\\Model\>&Schoolbox\\GenericCollection\)\|null is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: library/Schoolbox/Resource/Folder/Model.php
-
-		-
 			message: '#^Method Schoolbox\\Resource\\Folder\\NNIAN\:\:getInstance\(\) should return static\(Schoolbox\\Resource\\Folder\\NNIAN\) but returns Schoolbox\\Resource\\Folder\\NNIAN\.$#'
 			identifier: return.type
 			count: 1

@@ -672,7 +672,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
-     * @param GenericCollection|YearLevel\Model[]|null $yearLevels
+     * @param GenericCollection $yearLevels
      * @return $this
      * @throws TypeError
      */
