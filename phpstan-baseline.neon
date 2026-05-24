@@ -613,24 +613,6 @@ parameters:
 			path: library/Custom/Help/CourseParticipation/Handler.php
 
 		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\CampusMapper\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Custom/Help/CourseParticipation/Handler.php
-
-		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\RoleMapper\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Custom/Help/CourseParticipation/Handler.php
-
-		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\UserMapper\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Custom/Help/CourseParticipation/Handler.php
-
-		-
 			message: '#^Property Custom\\Help\\CourseParticipation\\Handler\:\:\$codeMapper \(Schoolbox\\Resource\\Folder\\Code\\Mapper\) does not accept Schoolbox\\Mapper\.$#'
 			identifier: assign.propertyType
 			count: 1
