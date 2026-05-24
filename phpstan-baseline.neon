@@ -1447,12 +1447,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Component/SubmissionBox/ReturnedWorkMapper.php
 
 		-
-			message: '#^Variable \$submissionMapper in PHPDoc tag @var does not exist\.$#'
-			identifier: varTag.variableNotFound
-			count: 1
-			path: library/Schoolbox/Assessment/Component/SubmissionBox/Submission/SingleFile/Mapper.php
-
-		-
 			message: '#^Method Schoolbox\\Assessment\\Component\\SubmissionBox\\Submission\\SubmissionMapper\:\:getSubmissionBoxMapper\(\) should return Schoolbox\\Assessment\\Component\\SubmissionBoxMapper but returns Schoolbox\\Mapper\.$#'
 			identifier: return.type
 			count: 1

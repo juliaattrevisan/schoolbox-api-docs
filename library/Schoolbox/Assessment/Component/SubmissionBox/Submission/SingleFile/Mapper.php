@@ -193,11 +193,9 @@ class Mapper extends BaseMapper
         $resultSet = $this->createCollection();
         $seen = [];
 
-        /**
-         * @var Kami\Mapper      $kamiMapper
-         * @var SubmissionMapper $submissionMapper
-         */
-        $kamiMapper       = $this->getJoinMapper('kami');
+        /** @var Kami\Mapper $kamiMapper */
+        $kamiMapper = $this->getJoinMapper('kami');
+        /** @var SubmissionMapper $submissionMapper */
         $submissionMapper = $this->getJoinMapper('submission');
 
         foreach ($statement as $row) {
