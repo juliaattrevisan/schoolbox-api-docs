@@ -1474,12 +1474,6 @@ parameters:
 			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\MapperFactory is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
 			identifier: varTag.nativeType
 			count: 1
-			path: library/Schoolbox/Admin/Settings/FieldType/SelectLookup/Test/RendererTest.php
-
-		-
-			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\MapperFactory is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 1
 			path: library/Schoolbox/Admin/Settings/FieldType/SelectMulti/Test/RendererTest.php
 
 		-

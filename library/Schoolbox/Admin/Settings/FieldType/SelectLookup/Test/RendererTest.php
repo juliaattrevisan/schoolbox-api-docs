@@ -186,7 +186,7 @@ class RendererTest extends TestCase
      */
     protected function buildFieldStrategyFactory(): FieldStrategyFactory
     {
-        /** @var MapperFactory|MockObject $mockMapperFactory */
+        /** @var MockObject $mockMapperFactory */
         $mockMapperFactory = $this->createMock(MapperFactory::class);
 
         $mockGradeMapper = $this->buildMockGradeMapper();
