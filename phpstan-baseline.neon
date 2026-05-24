@@ -1465,12 +1465,6 @@ parameters:
 			path: library/Schoolbox/Admin/Profile/Editor/Field/Controller.php
 
 		-
-			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\MapperFactory is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Admin/Settings/FieldType/SelectMulti/Test/RendererTest.php
-
-		-
 			message: '#^Property Schoolbox\\Admin\\Usage\\Controller\:\:\$errorMapper is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
