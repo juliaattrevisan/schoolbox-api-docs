@@ -1201,12 +1201,6 @@ parameters:
 			path: library/External/Synergetic/Timetable.php
 
 		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 1
-			path: library/External/Synergetic/Timetable.php
-
-		-
 			message: '#^Parameter \#1 \$dayNumber \(string\) of method External_Synergetic_Timetable\:\:getDayName\(\) should be compatible with parameter \$dayNumber \(int\) of method External_TimetableInterface\:\:getDayName\(\)$#'
 			identifier: method.childParameterType
 			count: 1
