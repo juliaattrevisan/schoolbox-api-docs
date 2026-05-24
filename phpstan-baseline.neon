@@ -1561,12 +1561,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Component/SubmissionBox/ReturnedWorkMapper.php
 
 		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\Assessment\\Component\\SubmissionBoxMapper\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Assessment/Component/SubmissionBox/ReturnedWorkMapper.php
-
-		-
 			message: '#^Variable \$submissionMapper in PHPDoc tag @var does not exist\.$#'
 			identifier: varTag.variableNotFound
 			count: 1
