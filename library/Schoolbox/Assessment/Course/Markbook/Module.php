@@ -112,7 +112,7 @@ class Module extends \Alaress\Module\Module
     }
 
     /**
-     * @return \Schoolbox\Mapper|CourseSpec\Mapper
+     * @return CourseSpec\Mapper
      * @throws \InvalidArgumentException If mapper class not found
      */
     private function getCourseSpecMapper(): CourseSpec\Mapper
