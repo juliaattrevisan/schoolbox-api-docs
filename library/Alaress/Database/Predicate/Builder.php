@@ -12,6 +12,7 @@ namespace Alaress\Database\Predicate;
 use Alaress\Database\Quoter\IQuoter;
 use Traversable;
 use Alaress_Date_Format;
+use RuntimeException;
 use UnderflowException;
 use TypeError;
 
@@ -226,9 +227,8 @@ class Builder implements IBuilder
      * @param string|ISqlFunc                      $columnName
      * @param string|int|float|Alaress_Date_Format $columnValue
      * @param string                               $operator
-     * @return Builder
+     * @return $this
      * @throws InvalidColumnException
-     * @throws TypeError If $columnValue is of invalid type. Use isNull() for matching NULL
      */
     private function addScalarPredicate(
         $columnName,
@@ -795,7 +795,7 @@ class Builder implements IBuilder
             $i++;
         }
         // Couldn't generate? Crash and burn
-        return false;
+        throw new RuntimeException('Unable to generate unique parameter alias.');
     }
 
 

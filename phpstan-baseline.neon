@@ -13,24 +13,6 @@ parameters:
 			path: library/Alaress/Application/Kernel.php
 
 		-
-			message: '#^Return type \(\$this\(Alaress\\Async\\AMQP\\AMQPConnector\)\) of method Alaress\\Async\\AMQP\\AMQPConnector\:\:bindQueue\(\) should be compatible with return type \(PhpAmqpLib\\Channel\\AMQPChannel\) of method Alaress\\Async\\AMQP\\AMQPInterface\:\:bindQueue\(\)$#'
-			identifier: method.childReturnType
-			count: 1
-			path: library/Alaress/Async/AMQP/AMQPConnector.php
-
-		-
-			message: '#^Return type \(\$this\(Alaress\\Async\\AMQP\\AMQPConnector\)\) of method Alaress\\Async\\AMQP\\AMQPConnector\:\:unbindExchange\(\) should be compatible with return type \(PhpAmqpLib\\Channel\\AMQPChannel\) of method Alaress\\Async\\AMQP\\AMQPInterface\:\:unbindExchange\(\)$#'
-			identifier: method.childReturnType
-			count: 1
-			path: library/Alaress/Async/AMQP/AMQPConnector.php
-
-		-
-			message: '#^Return type \(\$this\(Alaress\\Async\\AMQP\\AMQPConnector\)\) of method Alaress\\Async\\AMQP\\AMQPConnector\:\:unbindQueue\(\) should be compatible with return type \(PhpAmqpLib\\Channel\\AMQPChannel\) of method Alaress\\Async\\AMQP\\AMQPInterface\:\:unbindQueue\(\)$#'
-			identifier: method.childReturnType
-			count: 1
-			path: library/Alaress/Async/AMQP/AMQPConnector.php
-
-		-
 			message: '#^Method Alaress\\Database\\Broker\\Base\:\:prepareQuery\(\) should return Alaress\\Database\\Statement\\Query\\IQuery but returns Alaress\\Database\\Statement\\Query\\Base\.$#'
 			identifier: return.type
 			count: 1
@@ -43,76 +25,10 @@ parameters:
 			path: library/Alaress/Database/Broker/Sqlsrv/Broker.php
 
 		-
-			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: library/Alaress/Database/Connector/Base.php
-
-		-
 			message: '#^Method Alaress\\Database\\Connector\\Base\:\:getPort\(\) should return string but returns null\.$#'
 			identifier: return.type
 			count: 1
 			path: library/Alaress/Database/Connector/Base.php
-
-		-
-			message: '#^Method Alaress\\Database\\Predicate\\Builder\:\:addScalarPredicate\(\) has TypeError in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Alaress/Database/Predicate/Builder.php
-
-		-
-			message: '#^Method Alaress\\Database\\Predicate\\Builder\:\:equals\(\) should return \$this\(Alaress\\Database\\Predicate\\Builder\) but returns Alaress\\Database\\Predicate\\Builder\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Database/Predicate/Builder.php
-
-		-
-			message: '#^Method Alaress\\Database\\Predicate\\Builder\:\:getNonCollidingParamAlias\(\) should return string but returns false\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Database/Predicate/Builder.php
-
-		-
-			message: '#^Method Alaress\\Database\\Predicate\\Builder\:\:greaterThan\(\) should return \$this\(Alaress\\Database\\Predicate\\Builder\) but returns Alaress\\Database\\Predicate\\Builder\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Database/Predicate/Builder.php
-
-		-
-			message: '#^Method Alaress\\Database\\Predicate\\Builder\:\:greaterThanOrEqualTo\(\) should return \$this\(Alaress\\Database\\Predicate\\Builder\) but returns Alaress\\Database\\Predicate\\Builder\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Database/Predicate/Builder.php
-
-		-
-			message: '#^Method Alaress\\Database\\Predicate\\Builder\:\:lessThan\(\) should return \$this\(Alaress\\Database\\Predicate\\Builder\) but returns Alaress\\Database\\Predicate\\Builder\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Database/Predicate/Builder.php
-
-		-
-			message: '#^Method Alaress\\Database\\Predicate\\Builder\:\:lessThanOrEqualTo\(\) should return \$this\(Alaress\\Database\\Predicate\\Builder\) but returns Alaress\\Database\\Predicate\\Builder\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Database/Predicate/Builder.php
-
-		-
-			message: '#^Method Alaress\\Database\\Predicate\\Builder\:\:notEquals\(\) should return \$this\(Alaress\\Database\\Predicate\\Builder\) but returns Alaress\\Database\\Predicate\\Builder\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Database/Predicate/Builder.php
-
-		-
-			message: '#^Method Alaress\\Database\\Predicate\\Builder\:\:notRegex\(\) should return \$this\(Alaress\\Database\\Predicate\\Builder\) but returns Alaress\\Database\\Predicate\\Builder\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Database/Predicate/Builder.php
-
-		-
-			message: '#^Method Alaress\\Database\\Predicate\\Builder\:\:regex\(\) should return \$this\(Alaress\\Database\\Predicate\\Builder\) but returns Alaress\\Database\\Predicate\\Builder\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Database/Predicate/Builder.php
 
 		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
