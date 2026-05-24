@@ -4111,12 +4111,6 @@ parameters:
 			path: library/Schoolbox/Learning/Quiz/Attempt/Model.php
 
 		-
-			message: '#^Variable \$assess in PHPDoc tag @var does not exist\.$#'
-			identifier: varTag.variableNotFound
-			count: 3
-			path: library/Schoolbox/Learning/Quiz/Attempt/Notifier.php
-
-		-
 			message: '#^Property Schoolbox\\Learning\\Quiz\\Controller\:\:\$quizAnswerMapper is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1

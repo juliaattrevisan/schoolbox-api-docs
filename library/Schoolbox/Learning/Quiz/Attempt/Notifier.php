@@ -170,8 +170,8 @@ class Notifier extends AbstractModuleNotifier
         $bob      = new Builder();
 
         $assessId = $attempt->getQuiz()->getId();
-        /** @var Quiz $assess */
         try {
+            /** @var Quiz $assess */
             $assess = $this->quizMapper->findById($assessId);
             $category = $this->folderMapper->findById($assess->getCategory()->getId());
         } catch (BaseMapper\Exception\Deleted $e) {
@@ -216,8 +216,8 @@ class Notifier extends AbstractModuleNotifier
         $bob      = new Builder();
 
         $assessId = $attempt->getQuiz()->getId();
-        /** @var Quiz $assess */
         try {
+            /** @var Quiz $assess */
             $assess = $this->quizMapper->findById($assessId);
         } catch (BaseMapper\Exception $e) {
             return $envelope;
@@ -271,8 +271,8 @@ class Notifier extends AbstractModuleNotifier
         $envelope = new Envelope();
 
         $assessId = $attempt->getQuiz()->getId();
-        /** @var Quiz $assess */
         try {
+            /** @var Quiz $assess */
             $assess = $this->quizMapper->findById($assessId);
         } catch (BaseMapper\Exception $e) {
             return $envelope;
