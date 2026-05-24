@@ -170,8 +170,8 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         // list of user's to notify: parent ("user replied to your post") and siblings ("user ALSO replied to")
-        /** @var SocialStream_Post_Abstract $parent */
         try {
+            /** @var SocialStream_Post_Abstract $parent */
             $parent = $this->mapper->findById($post->getParentId());
         } catch (Mapper\Exception $e) {
             // this is a top-level post, so "replies" aren't relevant

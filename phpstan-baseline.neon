@@ -5030,12 +5030,6 @@ parameters:
 			path: library/SocialStream/PostMapper.php
 
 		-
-			message: '#^Variable \$parent in PHPDoc tag @var does not exist\.$#'
-			identifier: varTag.variableNotFound
-			count: 1
-			path: library/SocialStream/PostNotifier.php
-
-		-
 			message: '#^PHPDoc tag @var above a method has no effect\.$#'
 			identifier: varTag.misplaced
 			count: 1
