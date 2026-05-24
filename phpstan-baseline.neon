@@ -4723,12 +4723,6 @@ parameters:
 			path: library/Schoolbox/Resource/Folder/NNIAN.php
 
 		-
-			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\Resource\\Folder\\Mapper is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Resource/Folder/Test/NNIANTest.php
-
-		-
 			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\Resource\\Folder\\Code\\Mapper is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
 			identifier: varTag.nativeType
 			count: 1
