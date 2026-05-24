@@ -107,8 +107,8 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
         $envelope = new Envelope();
         $bob = new Builder();
 
-        /** @var Folder $cat */
         try {
+            /** @var Folder $cat */
             $cat = $this->catMapper->findById($post->getHomepageId());
         } catch (Mapper\Exception $e) {
             $this->log->warning("Failed to find folder with id: {$post->getHomepageId()} {$e->getMessage()}");
@@ -161,8 +161,8 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
         $envelope = new Envelope();
         $bob = new Builder();
 
-        /** @var Folder $cat */
         try {
+            /** @var Folder $cat */
             $cat = $this->catMapper->findById($post->getHomepageId());
         } catch (Mapper\Exception $e) {
             $this->log->warning("Failed to find folder with id: {$post->getHomepageId()} {$e->getMessage()}");
