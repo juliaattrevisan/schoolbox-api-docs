@@ -50,9 +50,9 @@ $app = new class extends CliTool\App {
 
                 default: // key has a TTL
                     $level = Monolog\Logger::INFO;
-                    $from  = new DateTime();
+                    $from  = new DateTimeImmutable();
                     $exp   = $from->diff(
-                        (clone $from)->add(new DateInterval(sprintf(self::P_INTERVAL, $ttl))),
+                        $from->add(new DateInterval(sprintf(self::P_INTERVAL, $ttl))),
                     )->format(self::P_TIME);
                     break;
             }
