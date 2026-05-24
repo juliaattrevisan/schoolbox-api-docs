@@ -2425,12 +2425,6 @@ parameters:
 			path: library/Schoolbox/Filter/Filters/Badge/CurriculumNode/Factory.php
 
 		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 1
-			path: library/Schoolbox/Fixtures/Component/ComponentDelegate.php
-
-		-
 			message: '#^Constant Schoolbox\\Fixtures\\Import\\Controller\:\:TYPE_DIVISION is unused\.$#'
 			identifier: classConstant.unused
 			count: 1
