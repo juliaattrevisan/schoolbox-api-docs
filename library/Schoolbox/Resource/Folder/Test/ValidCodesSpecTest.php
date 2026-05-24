@@ -207,7 +207,7 @@ class ValidCodesSpecTest extends TestCase
      */
     private function createSpec(int $countDbMatches): ValidCodesSpec
     {
-        /** @var Folder\Code\Mapper|MockObject $folderCodeMapper */
+        /** @var Folder\Code\Mapper&MockObject $folderCodeMapper */
         $folderCodeMapper = $this->createMock(Folder\Code\Mapper::class);
         $mockDatabase     = new MockConnector($this);
 
