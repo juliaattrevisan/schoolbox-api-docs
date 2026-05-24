@@ -79,7 +79,7 @@ class Config
      *
      * Currently, these map to the image models which are provided by OpenAI.
      */
-    private const array AI_IMAGE_MODELS = [
+    public const array AI_IMAGE_MODELS = [
         "gpt-image-1",
         "gpt-image-1-mini",
         "gpt-image-1.5",
