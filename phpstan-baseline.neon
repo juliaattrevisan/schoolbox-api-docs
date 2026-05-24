@@ -307,22 +307,10 @@ parameters:
 			path: library/Calendar/Event/Type/EventBase.php
 
 		-
-			message: '#^PHPDoc tag @var with type Calendar\\Event\\Type\\Day\\Event is not subtype of native type Calendar\\Event\\Type\\Fixtures\\Event\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Calendar/Event/Type/Fixtures/Renderer/Csv.php
-
-		-
 			message: '#^PHPDoc tag @var with type Calendar\\Event\\Type\\EventInterface is not subtype of native type Calendar\\Event\\Type\\Fixtures\\Event\.$#'
 			identifier: varTag.nativeType
 			count: 2
 			path: library/Calendar/Event/Type/Fixtures/Renderer/VObject.php
-
-		-
-			message: '#^PHPDoc tag @var with type Calendar\\Event\\Type\\Day\\Event is not subtype of native type Calendar\\Event\\Type\\SudsEvent\\Event\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Calendar/Event/Type/SudsEvent/Renderer/Csv.php
 
 		-
 			message: '#^PHPDoc tag @var with type Calendar\\Event\\Type\\EventInterface is not subtype of native type Calendar\\Event\\Type\\SudsEvent\\Event\.$#'
@@ -331,22 +319,10 @@ parameters:
 			path: library/Calendar/Event/Type/SudsEvent/Renderer/VObject.php
 
 		-
-			message: '#^PHPDoc tag @var with type Calendar\\Event\\Type\\Day\\Event is not subtype of native type Calendar\\Event\\Type\\SudsTimetable\\Event\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Calendar/Event/Type/SudsTimetable/Renderer/Csv.php
-
-		-
 			message: '#^PHPDoc tag @var with type Calendar\\Event\\Type\\EventInterface is not subtype of native type Calendar\\Event\\Type\\SudsTimetable\\Event\.$#'
 			identifier: varTag.nativeType
 			count: 2
 			path: library/Calendar/Event/Type/SudsTimetable/Renderer/VObject.php
-
-		-
-			message: '#^PHPDoc tag @var with type Calendar\\Event\\Type\\Day\\Event is not subtype of native type Calendar\\Event\\Type\\Timetable\\Event\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Calendar/Event/Type/Timetable/Renderer/Csv.php
 
 		-
 			message: '#^PHPDoc tag @var with type Calendar\\Event\\Type\\EventInterface is not subtype of native type Calendar\\Event\\Type\\Timetable\\Event\.$#'
