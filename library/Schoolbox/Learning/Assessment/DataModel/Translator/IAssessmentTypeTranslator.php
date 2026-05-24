@@ -23,7 +23,7 @@ interface IAssessmentTypeTranslator
 
 
     /**
-     * @var null|int $id
+     * @param null|int $id
      * @return IAssessable
      */
     public function createDomainObject(?int $id): IAssessable;

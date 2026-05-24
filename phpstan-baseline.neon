@@ -3373,12 +3373,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
 
 		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/IAssessmentTypeTranslator.php
-
-		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getAttachments\(\)\.$#'
 			identifier: method.notFound
 			count: 3
