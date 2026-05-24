@@ -1747,12 +1747,6 @@ parameters:
 			path: library/Schoolbox/Calendar/Relation/RoleMapper.php
 
 		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 1
-			path: library/Schoolbox/Collection.php
-
-		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 1

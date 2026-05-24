@@ -499,9 +499,8 @@ class Collection implements ICollection, Serializable, ArrayAccess
      *                                               [  'lastName'  => ['asc'],
      *                                                  'firstName' => ['asc', $callable],
      *                                                  'dob'       => 'desc',   ]
-     * @var   string|array $fields[]                 If value is string: Direction to sort. {'asc'|'desc'}
-     * @var   string       $fields[][1]              If value is array:  1st item is direction,
-     * @var   callable     $fields[][2]              2nd item is a compare function (optional)
+     * If value is string: Direction to sort. {'asc'|'desc'}
+     * If value is array: 1st item is direction, 2nd item is a compare function (optional)
      * @param bool         $maintainIndexAssociation Should we maintain key association?
      * @return $this
      */
