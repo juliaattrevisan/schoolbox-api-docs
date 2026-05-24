@@ -199,7 +199,7 @@ HELP;
                     $this->getLogger(),
                     $lock
                 ))->import();
-            } catch (\Throwable | \Alaress\Database\Exception $e) {
+            } catch (\Throwable $e) {
                 // stop the transaction
                 $db->rollBack();
                 // log the error

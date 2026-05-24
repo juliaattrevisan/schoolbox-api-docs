@@ -135,7 +135,7 @@ abstract class Component_ControllerAbstract
 
 
     /**
-     * @return Alaress\Authorizer\Authorizer|object
+     * @return Alaress\Authorizer\Authorizer
      * @throws RuntimeException
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */

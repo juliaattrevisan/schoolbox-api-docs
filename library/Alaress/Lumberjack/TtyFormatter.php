@@ -76,20 +76,18 @@ class TtyFormatter extends CliFormatter
 
         $left = [ $date ];
 
-        if (is_array($record->extra)) {
-            foreach ($record->extra as $key => $value) {
-                if (isset($map[$key])) {
-                    $value = sprintf($map[$key][1], $value);
-                    $key = $map[$key][0];
+        foreach ($record->extra as $key => $value) {
+            if (isset($map[$key])) {
+                $value = sprintf($map[$key][1], $value);
+                $key = $map[$key][0];
 
-                    if ($this->porcelain) {
-                        $left[] = "[$key:$value]";
-                    } else {
-                        $left[] = $value;
-                    }
+                if ($this->porcelain) {
+                    $left[] = "[$key:$value]";
                 } else {
-                    $left[] = "[$value]";
+                    $left[] = $value;
                 }
+            } else {
+                $left[] = "[$value]";
             }
         }
 

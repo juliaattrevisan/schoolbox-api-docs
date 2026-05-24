@@ -1223,11 +1223,10 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     /**
      * Extract the year of this date
      *
-     * @return int
+     * @return string
      */
     public function getYear()
     {
-        // TODO this is returning a string, not an int. Need to add cast here and remove cast from usages if appropriate.
         return $this->getUsingFormat('Y');
     }
 
@@ -1237,7 +1236,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      * @param bool $leadingZero True if leading zero is fetched, false if not
      *                          Defaults to false.
      *
-     * @return int
+     * @return string
      */
     public function getMonth($leadingZero = false)
     {
@@ -1250,7 +1249,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      * @param bool $leadingZero True if leading zero is fetched, false if not
      *                          Defaults to false.
      *
-     * @return int
+     * @return string
      */
     public function getDay($leadingZero = false)
     {
@@ -1274,7 +1273,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      * Extract the numeric representation of the day of the week, starting at 1
      * for Monday, through to 7 for Sunday.
      *
-     * @return int
+     * @return string
      */
     public function getWeekDayNumber()
     {
@@ -1287,7 +1286,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      * @param bool $leadingZero True if leading zero is fetched, false if not
      *                          Defaults to false.
      *
-     * @return int
+     * @return string
      */
     public function get12Hour($leadingZero = false)
     {
@@ -1300,7 +1299,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      * @param bool $leadingZero True if leading zero is fetched, false if not
      *                          Defaults to false.
      *
-     * @return int
+     * @return string
      */
     public function getHour($leadingZero = false)
     {
@@ -1313,7 +1312,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      *
      * @see $this->getHour()
      * @param bool $leadingZero
-     * @return int
+     * @return string
      */
     public function get24Hour($leadingZero = false)
     {
@@ -1326,7 +1325,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      * @param bool $leadingZero True if leading zero is fetched, false if not
      *                          Defaults to false.
      *
-     * @return int
+     * @return string
      */
     public function getMinute($leadingZero = false)
     {
@@ -1343,7 +1342,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      * @param bool $leadingZero True if leading zero is fetched, false if not
      *                          Defaults to false.
      *
-     * @return int
+     * @return string
      */
     public function getSecond($leadingZero = false)
     {

@@ -55,100 +55,16 @@ parameters:
 			path: library/Alaress/Database/Transactor/Test/TransactorTest.php
 
 		-
-			message: '#^Property Alaress\\Date\\DilatedClock\:\:\$offset \(int\) does not accept float\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: library/Alaress/Date/DilatedClock.php
-
-		-
-			message: '#^Property Alaress\\Date\\DilatedClock\:\:\$start \(int\) does not accept float\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: library/Alaress/Date/DilatedClock.php
-
-		-
-			message: '#^Method Alaress_Date_Format\:\:get12Hour\(\) should return int but returns string\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: '#^Method Alaress_Date_Format\:\:getDay\(\) should return int but returns string\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: '#^Method Alaress_Date_Format\:\:getHour\(\) should return int but returns string\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: '#^Method Alaress_Date_Format\:\:getMinute\(\) should return int but returns string\.$#'
-			identifier: return.type
-			count: 2
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: '#^Method Alaress_Date_Format\:\:getMonth\(\) should return int but returns string\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: '#^Method Alaress_Date_Format\:\:getSecond\(\) should return int but returns string\.$#'
-			identifier: return.type
-			count: 2
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: '#^Method Alaress_Date_Format\:\:getWeekDayNumber\(\) should return int but returns string\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: '#^Method Alaress_Date_Format\:\:getYear\(\) should return int but returns string\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Date/Format.php
-
-		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 6
 			path: library/Alaress/Date/Format.php
 
 		-
-			message: '#^Property DateInterval\:\:\$invert \(int\) does not accept bool\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: library/Alaress/Date/Interval.php
-
-		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 2
 			path: library/Alaress/Date/Interval.php
-
-		-
-			message: '#^Dead catch \- Symfony\\Component\\Lock\\Exception\\LockReleasingException is never thrown in the try block\.$#'
-			identifier: catch.neverThrown
-			count: 1
-			path: library/Alaress/Image/Processor/Manager.php
-
-		-
-			message: '#^Instanceof between null and Throwable will always evaluate to false\.$#'
-			identifier: instanceof.alwaysFalse
-			count: 1
-			path: library/Alaress/Jitter/Jitter.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$json with type mixed is not subtype of native type array\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: library/Alaress/Json/Decorator/PropertyDecorator.php
 
 		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
@@ -161,18 +77,6 @@ parameters:
 			identifier: method.notFound
 			count: 2
 			path: library/Alaress/Json/Decorator/Test/PropertyDecoratorTest.php
-
-		-
-			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: library/Alaress/Lumberjack/TtyFormatter.php
-
-		-
-			message: '#^Method Alaress\\OAuth2\\Client\\Provider\\Office365\:\:urlUserDetails\(\) should return string but returns null\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/OAuth2/Client/Provider/Office365.php
 
 		-
 			message: '#^Call to an undefined method DebugBar\\DataCollector\\DataCollectorInterface\:\:addMessage\(\)\.$#'
@@ -203,12 +107,6 @@ parameters:
 			identifier: new.static
 			count: 1
 			path: library/Alaress/Routing/Trie.php
-
-		-
-			message: '#^Method Alaress\\Rules\\Condition\:\:test\(\) should return bool but returns int\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Rules/Condition.php
 
 		-
 			message: '#^Call to an undefined method Predis\\ClientInterface\:\:transaction\(\)\.$#'
@@ -503,18 +401,6 @@ parameters:
 			identifier: property.onlyWritten
 			count: 1
 			path: library/Calendar/Layout/Full/Abstract.php
-
-		-
-			message: '#^Loose comparison using \=\= between 0 and 1 will always evaluate to false\.$#'
-			identifier: equal.alwaysFalse
-			count: 1
-			path: library/Component/Config/AssessmentTypes.php
-
-		-
-			message: '#^PHPDoc tag @return with type object is not subtype of native type Alaress\\Authorizer\\Authorizer\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Component/ControllerAbstract.php
 
 		-
 			message: '#^Method Component_Dashboard_ImageGalleryController\:\:getFileMapper\(\) is unused\.$#'
@@ -1145,12 +1031,6 @@ parameters:
 			identifier: assign.propertyType
 			count: 1
 			path: library/Evaluation/Question/Bank.php
-
-		-
-			message: '#^Dead catch \- Alaress\\Database\\Exception is never thrown in the try block\.$#'
-			identifier: catch.neverThrown
-			count: 1
-			path: library/External/Canvas/Importer/Cli/AnnouncementsTool.php
 
 		-
 			message: '#^Ternary operator condition is always true\.$#'

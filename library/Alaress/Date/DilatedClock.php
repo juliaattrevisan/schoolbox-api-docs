@@ -11,10 +11,10 @@ namespace Alaress\Date;
 
 class DilatedClock implements IClock
 {
-    /** @var int */
+    /** @var float */
     protected $start;
 
-    /** @var int */
+    /** @var float */
     protected $offset;
 
     /** @var float */
