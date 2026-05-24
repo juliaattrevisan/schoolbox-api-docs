@@ -2023,12 +2023,6 @@ parameters:
 			path: library/Schoolbox/Config/Loader.php
 
 		-
-			message: '#^PHPDoc tag @param for parameter \$name with type mixed is not subtype of native type string\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: library/Schoolbox/Config/Loader.php
-
-		-
 			message: '#^Static property Schoolbox\\Config\\Loader\:\:\$instance \(Schoolbox\\Config\\Loader\) in isset\(\) is not nullable\.$#'
 			identifier: isset.property
 			count: 1
