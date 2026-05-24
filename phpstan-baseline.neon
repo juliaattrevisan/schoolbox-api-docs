@@ -1609,18 +1609,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
 
 		-
-			message: '#^Method Schoolbox\\Assessment\\Course\\Import\\Module\:\:buildPreloadImport\(\) has InvalidArgumentException in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/Module.php
-
-		-
-			message: '#^Method Schoolbox\\Assessment\\Course\\Import\\Module\:\:buildPreloadImport\(\) has Schoolbox\\Application\\Exception\\NotFound in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/Module.php
-
-		-
 			message: '#^Method Schoolbox\\Assessment\\Course\\Markbook\\CourseMarkbook\:\:getAssessmentImplAverages\(\) should return array\<array\<float\>\> but returns array\<float\>\.$#'
 			identifier: return.type
 			count: 1
