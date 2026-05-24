@@ -26,13 +26,6 @@ class GuardianIterator extends Guardian
 
     /**
      * @param  array[] $preStack
-     * @var    int     $preStack[]['ID']            eg 80
-     * @var    string  $preStack[]['UserName']      eg "kblackmore80"
-     * @var    string  $preStack[]['Title']         eg "Mrs"
-     * @var    string  $preStack[]['FirstName']     eg "Keren"
-     * @var    string  $preStack[]['Surname']       eg "Blackmore"
-     * @var    string  $preStack[]['email']         eg "kezzbla@gmail.com"
-     * @var    int     $preStack[]['CampusID']      eg 1
      * @return Normalise\User\Guardian
      */
     public function buildFromStack(array $preStack)

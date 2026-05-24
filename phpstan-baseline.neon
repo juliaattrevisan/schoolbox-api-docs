@@ -2224,12 +2224,6 @@ parameters:
 			message: '#^PHPDoc tag @var above a method has no effect\.$#'
 			identifier: varTag.misplaced
 			count: 1
-			path: library/Schoolbox/External/Connector/Schoolpro/Base/GuardianIterator.php
-
-		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 1
 			path: library/Schoolbox/External/Connector/Schoolpro/Base/StaffIterator.php
 
 		-
