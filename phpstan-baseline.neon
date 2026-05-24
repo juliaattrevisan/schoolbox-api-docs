@@ -1549,12 +1549,6 @@ parameters:
 			path: library/Schoolbox/Application/CliTool/Composite.php
 
 		-
-			message: '#^PHPDoc tag @param for parameter \$forcePerform with type bool\|null is not subtype of native type bool\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: library/Schoolbox/Application/CliTool/Kernel.php
-
-		-
 			message: '#^Instanceof between Aura\\Di\\Container and Aura\\Di\\Container will always evaluate to true\.$#'
 			identifier: instanceof.alwaysTrue
 			count: 1
