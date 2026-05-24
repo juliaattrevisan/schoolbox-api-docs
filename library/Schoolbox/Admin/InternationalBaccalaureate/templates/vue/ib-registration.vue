@@ -166,20 +166,23 @@ window.Vue.onMounted((): void => {
                                         {{ new Date(session.createdAt).toLocaleTimeString() }}</small
                                     >
                                 </div>
-                                <button
-                                    type="button"
-                                    class="sbx-icon-only-button"
-                                    :aria-label="`Delete session ${session.title}`"
-                                    :disabled="session.deleteEndpoint === null"
+                                <span
                                     :title="
                                         session.deleteEndpoint === null
                                             ? 'Cannot delete: session has registered students'
                                             : undefined
                                     "
-                                    @click="openDeleteConfirm(session)"
                                 >
-                                    <sbx-icon name="delete"></sbx-icon>
-                                </button>
+                                    <button
+                                        type="button"
+                                        class="sbx-icon-only-button"
+                                        :aria-label="`Delete session ${session.title}`"
+                                        :disabled="session.deleteEndpoint === null"
+                                        @click="openDeleteConfirm(session)"
+                                    >
+                                        <sbx-icon name="delete"></sbx-icon>
+                                    </button>
+                                </span>
                             </div>
                         </li>
                     </ul>
