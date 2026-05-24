@@ -184,7 +184,7 @@ class Module extends BaseModule
 
 
     /**
-     * @return Mapper|Error\Mapper
+     * @return Error\Mapper
      * @throws InvalidArgumentException
      */
     private function getErrorMapper(): Error\Mapper
@@ -194,7 +194,7 @@ class Module extends BaseModule
 
 
     /**
-     * @return Mapper|News\Mapper
+     * @return News\Mapper
      * @throws \InvalidArgumentException If cannot find mapper class
      */
     private function getArticleMapper(): News\Mapper
@@ -204,7 +204,7 @@ class Module extends BaseModule
 
 
     /**
-     * @return News\Audience\Segment\StrategyFactory|object
+     * @return News\Audience\Segment\StrategyFactory
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     private function getStrategyFactory(): News\Audience\Segment\StrategyFactory
