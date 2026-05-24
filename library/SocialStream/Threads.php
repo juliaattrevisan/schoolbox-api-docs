@@ -221,7 +221,7 @@ class Threads
     /**
      * Generate ajax html
      *
-     * @var \SitePage $page
+     * @param \SitePage $page
      * @return $this
      */
     public function generate(\SitePage $page)

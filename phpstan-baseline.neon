@@ -5006,12 +5006,6 @@ parameters:
 			path: library/SocialStream/PostMapper.php
 
 		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 1
-			path: library/SocialStream/Threads.php
-
-		-
 			message: '#^Property SocialStream\\Threads\:\:\$tree \(array\) does not accept Schoolbox\\Collection\.$#'
 			identifier: assign.propertyType
 			count: 1
