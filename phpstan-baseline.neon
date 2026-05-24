@@ -1249,20 +1249,8 @@ parameters:
 			path: library/External/Tass/Api/Connector.php
 
 		-
-			message: '#^Method External\\Tass\\Api\\Connector\:\:assertValidResponse\(\) has External\\Tass\\Api\\Exception\\InvalidArg in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/External/Tass/Api/Connector.php
-
-		-
 			message: '#^Method External\\Tass\\Api\\Connector\:\:assertValidResponse\(\) returns void but does not have any side effects\.$#'
 			identifier: void.pure
-			count: 1
-			path: library/External/Tass/Api/Connector.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$date with type Alaress_Date_Format\|null is not subtype of native type Alaress_Date_Format\.$#'
-			identifier: parameter.phpDocType
 			count: 1
 			path: library/External/Tass/Api/Connector.php
 
