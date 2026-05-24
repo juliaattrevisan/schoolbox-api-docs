@@ -80,7 +80,6 @@ class Controller extends Base
          * @var array  $reports[]                    indexed by semester
          * @var array  $reports[][]                  indexed by reportId
          * @var array  $reports[][][]                associative array of report info.
-         * @var string $reports[][][]['description'] description
          */
         $reports = [];
         foreach ($resultIterator as $row) {

@@ -583,12 +583,6 @@ parameters:
 			path: library/Custom/Sk/NCEA/Controller.php
 
 		-
-			message: '#^PHPDoc tag @var with type string is not subtype of native type array\{\}\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Custom/Sk/OleReport/Controller.php
-
-		-
 			message: '#^Method EOTC\\ActivityLog\\Log\:\:getId\(\) should return string but returns int\.$#'
 			identifier: return.type
 			count: 1
