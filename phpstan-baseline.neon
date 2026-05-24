@@ -1597,24 +1597,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
 
 		-
-			message: '#^PHPDoc tag @param for parameter \$assessmentImpls with type Schoolbox\\GenericCollection\|Schoolbox\\Learning\\Assessment\\IAssessable is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$assessmentSpecs with type Schoolbox\\GenericCollection\|Schoolbox\\Learning\\Assessment\\IAssessable is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$unitImpls with type Schoolbox\\GenericCollection\|Schoolbox\\Learning\\Course\\DataModel\\Implementation\\Unit\\Model is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
-
-		-
 			message: '#^Property Schoolbox\\Assessment\\Course\\Import\\DataTransferObject\:\:\$unitImplementations \(array\<Schoolbox\\Learning\\Course\\DataModel\\Implementation\\Unit\\Model\>\|\(iterable\<Schoolbox\\Learning\\Course\\DataModel\\Implementation\\Unit\\Model\>&Schoolbox\\GenericCollection\)\) is never assigned array\<Schoolbox\\Learning\\Course\\DataModel\\Implementation\\Unit\\Model\> so it can be removed from the property type\.$#'
 			identifier: property.unusedType
 			count: 1

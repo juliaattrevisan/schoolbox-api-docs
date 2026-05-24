@@ -98,9 +98,9 @@ class DataTransferObject
      *
      * @param bool                                 $isImportModify
      * @param int[]|null[]                         $assessmentImplToSpecMap Maps extant Impl Ids to Spec Id (null if Impl created in UnitImpl)
-     * @param UnitImplementation|GenericCollection $unitImpls
-     * @param IAssessable|GenericCollection        $assessmentSpecs         Grouped by UnitSpecId
-     * @param IAssessable|GenericCollection        $assessmentImpls         Grouped by UnitSpecId
+     * @param GenericCollection                    $unitImpls
+     * @param GenericCollection                    $assessmentSpecs         Grouped by UnitSpecId
+     * @param GenericCollection                    $assessmentImpls         Grouped by UnitSpecId
      * @param AssessmentPair[]|GenericCollection   $assessmentPairs         Grouped by UnitSpecId
      * @param string|null                          $defaultDueTime          Adjust due date time to this, if set in H:i format
      * @throws \DomainException If an invalid assessment context is encountered, or invalid data detected.
