@@ -68,11 +68,9 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        /**
-         * @var UserMapper $userMapper
-         * @var TeamMapper $teamMapper
-         */
+        /** @var UserMapper $userMapper */
         $userMapper = $this->getJoinMapper('user');
+        /** @var TeamMapper $teamMapper */
         $teamMapper = $this->getJoinMapper('team');
 
         $collection = $this->createCollection();

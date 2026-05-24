@@ -2497,12 +2497,6 @@ parameters:
 			path: library/Schoolbox/Fixtures/Team/Metadata/Metadata.php
 
 		-
-			message: '#^Variable \$teamMapper in PHPDoc tag @var does not exist\.$#'
-			identifier: varTag.variableNotFound
-			count: 1
-			path: library/Schoolbox/Fixtures/Team/Position/Participant/Mapper.php
-
-		-
 			message: '#^Method Schoolbox\\Forum\\Post\:\:getThread\(\) should return Schoolbox\\Forum\\Thread but returns int\.$#'
 			identifier: return.type
 			count: 1
