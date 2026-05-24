@@ -427,7 +427,7 @@ class Connector
      * Returns the full timetable for the specified Teacher, or the daily timetable for the teacher on the specified date.
      *
      * @param string                   $teacherCode
-     * @param Alaress_Date_Format      $date
+     * @param Alaress_Date_Format|null $date
      * @return array<int|string, array<Models\StudentTimetable>> Should be TeacherTimetable, but StudentTimetable is actually used.
      * @throws Unauthorised If credentials are incorrect
      * @throws InvalidArg If method args are invalid
