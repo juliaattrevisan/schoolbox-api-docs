@@ -1447,18 +1447,6 @@ parameters:
 			path: library/Report/Login.php
 
 		-
-			message: '#^Method Schoolbox\\API\\Controller\:\:authenticateViaPostData\(\) has Schoolbox\\Application\\Exception\\AccountDisabled in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/API/Controller.php
-
-		-
-			message: '#^Method Schoolbox\\API\\Controller\:\:authenticateViaPostData\(\) has Schoolbox\\Application\\Exception\\NotFound in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/API/Controller.php
-
-		-
 			message: '#^If condition is always true\.$#'
 			identifier: if.alwaysTrue
 			count: 1
