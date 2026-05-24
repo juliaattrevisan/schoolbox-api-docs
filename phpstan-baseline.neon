@@ -4507,12 +4507,6 @@ parameters:
 			path: library/Schoolbox/Realtime/Schedule/Event/Event.php
 
 		-
-			message: '#^Method Schoolbox\\Realtime\\Schedule\\Event\\Event\:\:hydrate\(\) has TypeError in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Realtime/Schedule/Event/Event.php
-
-		-
 			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1

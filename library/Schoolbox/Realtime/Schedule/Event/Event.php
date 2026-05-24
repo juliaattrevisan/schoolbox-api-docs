@@ -171,7 +171,6 @@ class Event implements CrudEventInterface, JsonSerializable, Serializable
      * @return mixed
      * @throws Mapper\Exception
      * @throws Mapper\Exception\Deleted
-     * @throws \TypeError
      */
     private function hydrate(array $instanceData, Mapper $mapper)
     {
