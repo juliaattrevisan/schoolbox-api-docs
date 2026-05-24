@@ -28,14 +28,6 @@ class StaffIterator extends Staff
 
     /**
      * @param  array[] $preStack
-     * @var    int     $preStack[]['ID']            eg 123
-     * @var    string  $preStack[]['UserName']      eg "moxman"
-     * @var    string  $preStack[]['Title']         eg "Mrs"
-     * @var    string  $preStack[]['FirstName']     eg "Melanie"
-     * @var    string  $preStack[]['Surname']       eg "Oxman"
-     * @var    string  $preStack[]['StaffCategory'] eg "Teacher"
-     * @var    string  $preStack[]['email']         eg "moxman@cedars.nsw.edu.au"
-     * @var    int     $preStack[]['CampusID']      eg 1
      * @return Normalise\User\Staff
      */
     public function buildFromStack(array $preStack)

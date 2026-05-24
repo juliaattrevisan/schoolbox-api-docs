@@ -2221,12 +2221,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/Schooledge/Base/Sync.php
 
 		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolpro/Base/StaffIterator.php
-
-		-
 			message: '#^Method Schoolbox\\External\\Connector\\Schoolpro\\Base\\Sync\:\:findAllParents\(\) should return array\<Schoolbox\\External\\Normalise\\User\\Guardian\> but returns Schoolbox\\External\\Connector\\Schoolpro\\Base\\GuardianIterator\.$#'
 			identifier: return.type
 			count: 1
