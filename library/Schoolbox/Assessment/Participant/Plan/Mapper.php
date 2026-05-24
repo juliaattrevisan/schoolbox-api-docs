@@ -169,13 +169,11 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement): GenericCollection
     {
-        /**
-         * @var Participant\Mapper $participantMapper
-         * @var UserMapper $userMapper
-         */
+        /** @var Participant\Mapper $participantMapper */
         $participantMapper = $this->getJoinMapper('participants');
-        $userMapper        = $participantMapper->getJoinMapper('user');
-        $plans             = $this->createCollection();
+        /** @var UserMapper $userMapper */
+        $userMapper = $participantMapper->getJoinMapper('user');
+        $plans      = $this->createCollection();
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {

@@ -1513,12 +1513,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Course/Markbook/SortForCourseMarkbook.php
 
 		-
-			message: '#^Variable \$userMapper in PHPDoc tag @var does not exist\.$#'
-			identifier: varTag.variableNotFound
-			count: 1
-			path: library/Schoolbox/Assessment/Participant/Plan/Mapper.php
-
-		-
 			message: '#^Method Schoolbox\\Assessment\\Rubric\\DataModel\\Capability\\Mapper\:\:findForParent\(\) should return iterable\<Schoolbox\\Assessment\\Rubric\\DataModel\\Capability\\Model\>&Schoolbox\\GenericCollection but returns array\<Schoolbox\\Assessment\\Rubric\\DataModel\\Capability\\Model\>\.$#'
 			identifier: return.type
 			count: 1
