@@ -1981,18 +1981,6 @@ parameters:
 			path: library/Schoolbox/Comms/News/Moderation/Controller.php
 
 		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\Comms\\News\\Mapper\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Comms/News/Module.php
-
-		-
-			message: '#^PHPDoc tag @return with type object is not subtype of native type Schoolbox\\Comms\\News\\Audience\\Segment\\StrategyFactory\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Comms/News/Module.php
-
-		-
 			message: '#^Method Schoolbox\\Comms\\News\\Querystring\:\:toArray\(\) should return array\<string\|null\> but returns ArrayAccess\.$#'
 			identifier: return.type
 			count: 1
