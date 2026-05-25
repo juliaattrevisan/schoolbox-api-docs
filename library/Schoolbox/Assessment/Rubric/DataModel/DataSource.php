@@ -1831,8 +1831,10 @@ class DataSource
      * @param string $parentType
      *
      * @return array
-     * @var string   $indicators[rc.id]['grouping']
-     * @var string   $indicators[rc.id]['name']
+     *
+     * Return data:
+     * - string indicators[rc.id]['grouping']
+     * - string indicators[rc.id]['name']
      */
     public function getAvailableIndicators(array $parentIds, $parentType = CapabilityModel::PARENT_TYPE_CATEGORY)
     {
