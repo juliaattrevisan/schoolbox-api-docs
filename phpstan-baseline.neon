@@ -3703,12 +3703,6 @@ parameters:
 			path: library/Schoolbox/Learning/Authorizer/Rule/CanPreview.php
 
 		-
-			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\Resource\\Attachment\\Collector\\CollectorFactory is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 2
-			path: library/Schoolbox/Learning/Badge/Translator/ArrayToModel/Test/MutableFieldsOnlyTest.php
-
-		-
 			message: '#^PHPDoc tag @var above a method has no effect\.$#'
 			identifier: varTag.misplaced
 			count: 1
