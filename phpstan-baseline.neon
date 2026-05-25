@@ -3511,12 +3511,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DueWork/Response/ValidSelfAssessable.php
 
 		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Learning\\Assessment\\IAssessable is not subtype of native type Schoolbox\\Learning\\Assessment\\DueWork\\Model\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/ValidSelfAssessable.php
-
-		-
 			message: '#^PHPDoc tag @var with type Schoolbox\\Learning\\Assessment\\IFeedback is not subtype of native type null\.$#'
 			identifier: varTag.nativeType
 			count: 1
