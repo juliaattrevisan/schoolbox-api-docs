@@ -146,8 +146,8 @@ class ConfiguredDispatchStrategyBuilder
             'metrics' => sprintf("Metrics every %dms", $this->metricInterval),
             'queue'   => sprintf(
                 "Queue:    %s warn, %s max, %dms check interval",
-                $this->queueWarnSize ?: 'inf',
-                $this->queueMaxSize ?: 'inf',
+                $this->queueWarnSize ?: 'disabled',
+                $this->queueMaxSize ?: 'disabled',
                 $this->queueDelay,
             ),
             'worker'  => sprintf(
