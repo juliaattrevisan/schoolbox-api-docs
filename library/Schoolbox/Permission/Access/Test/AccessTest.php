@@ -1174,7 +1174,7 @@ class AccessTest extends TestCase
      * Returns a collection of roles, indexed by role.id
      *
      * @param array $roleData
-     * @return GenericCollection<Role>|Role[]
+     * @return GenericCollection
      * @throws UnexpectedValueException
      */
     private static function buildRoles(array $roleData): GenericCollection
