@@ -1259,7 +1259,6 @@ class Controller extends Base
                             'name' => $row[8]
                         ], $this->disableCache);
                     } catch (MapperException $e) {
-                        /** @var School $schoolHome */
                         $schoolHome = null;
                     }
 
@@ -1268,7 +1267,6 @@ class Controller extends Base
                             'name' => $row[9]
                         ], $this->disableCache);
                     } catch (MapperException $e) {
-                        /** @var School $schoolAway */
                         $schoolAway = null;
                     }
 

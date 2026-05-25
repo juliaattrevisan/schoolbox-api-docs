@@ -2305,12 +2305,6 @@ parameters:
 			path: library/Schoolbox/Fixtures/Import/Controller.php
 
 		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Fixtures\\School\\Model is not subtype of native type null\.$#'
-			identifier: varTag.nativeType
-			count: 2
-			path: library/Schoolbox/Fixtures/Import/Controller.php
-
-		-
 			message: '#^Empty array passed to foreach\.$#'
 			identifier: foreach.emptyArray
 			count: 1
