@@ -91,7 +91,16 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         // Since future triggers are cached using the JIT cache:
         // the max future trigger time must be <= the JIT's TTL.
         if ($maxFutureTriggerTime > 0) {
-            $maxFutureTriggerTime = min($maxFutureTriggerTime, RedisCache::EXPIRY_WINDOW);
+            if ($maxFutureTriggerTime > RedisCache::EXPIRY_WINDOW) {
+                $log->notice(
+                    sprintf(
+                        'maxFutureTriggerTime %ds is greater than cache expiry window of %ds: reducing to that value',
+                        $maxFutureTriggerTime,
+                        RedisCache::EXPIRY_WINDOW,
+                    ),
+                );
+                $maxFutureTriggerTime = RedisCache::EXPIRY_WINDOW;
+            }
         }
 
         $scheduler = new Scheduler(
