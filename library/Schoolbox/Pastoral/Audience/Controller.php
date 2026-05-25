@@ -326,7 +326,6 @@ class Controller extends Base
 
         $this->pastoralTypeMapper->getDatabase()->beginTransaction();
 
-        /** @var Pastoral\Type\TypeAbstract $currentType */
         $currentType = $currentType ?? $type;
         $isSubType   = $currentType instanceof Pastoral\SubType\Model;
 

@@ -3973,12 +3973,6 @@ parameters:
 			path: library/Schoolbox/Notif/StoredisLogger.php
 
 		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Pastoral\\Type\\TypeAbstract is not subtype of native type Schoolbox\\Pastoral\\SubType\\Model\|Schoolbox\\Pastoral\\Type\\Model\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Pastoral/Audience/Controller.php
-
-		-
 			message: '#^Instanceof between Schoolbox\\GenericCollection and Schoolbox\\Collection will always evaluate to true\.$#'
 			identifier: instanceof.alwaysTrue
 			count: 1
