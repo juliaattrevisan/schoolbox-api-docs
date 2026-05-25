@@ -3517,12 +3517,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Feedback/SubSource/AbstractSubSource.php
 
 		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Learning\\Assessment\\IFeedback is not subtype of native type null\.$#'
-			identifier: varTag.nativeType
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/FeedbackStrategy/FavourFloating.php
-
-		-
 			message: '#^PHPDoc tag @var with type Schoolbox\\Learning\\Assessment\\IResponse is not subtype of native type null\.$#'
 			identifier: varTag.nativeType
 			count: 1
