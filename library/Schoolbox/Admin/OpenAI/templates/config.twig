@@ -54,6 +54,7 @@
         const featureEl                      = document.querySelector(`[data-feature="${FEATURE}"]`);
         const providerSelect                 = featureEl.querySelector(`#${FEATURE}-provider-value`);
         const modelSelect                    = featureEl.querySelector(`#${FEATURE}-model-value`);
+        const azureDeploymentModelSelect     = featureEl.querySelector(`#${FEATURE}-deployment_model-value`);
         const reasoningEffortSelect          = featureEl.querySelector(`#${FEATURE}-reasoning_effort-value`);
         const textVerbositySelect            = featureEl.querySelector(`#${FEATURE}-text_verbosity-value`);
 
@@ -86,23 +87,16 @@
          *
          * @param baseOptions
          * @param model
-         * @param provider
          * @param selectEl
          */
-        function toggleOptions(baseOptions, model, provider, selectEl) {
+        function toggleOptions(baseOptions, model, selectEl) {
             if (!selectEl) {
                 return;
             }
             const modelOptions = baseOptions[model] ?? null;
             Array.from(selectEl.options).forEach(el => {
                 if (el.value !== null) {
-                    if (provider === 'OpenAI') {
-                        if (modelOptions !== null) {
-                            el.disabled = !modelOptions.includes(el.value);
-                        }
-                    } else {
-                        el.disabled = false;
-                    }
+                    el.disabled = !modelOptions.includes(el.value);
                 }
             });
         }
@@ -126,34 +120,60 @@
             }
         }
 
+        /**
+         * Set the availability of options, depending on what is selected in the
+         * model selector.
+         *
+         * @param modelSelector          The model selector: for OpenAI, the OpenAI Model selector; for Azure, the
+         *                               Azure deployment model selector.
+         * @param selectFirstNonDisabled Should the first non-disabled option be selected automatically?
+         *                               True if switching after page load, false on initial page load.
+         */
+        function setOptionAvailability(modelSelector, selectFirstNonDisabled) {
+            toggleOptions(REASONING_EFFORT_MODEL_OPTIONS[FEATURE], modelSelector.value, reasoningEffortSelect);
+            toggleOptions(TEXT_VERBOSITY_MODEL_OPTIONS[FEATURE], modelSelector.value, textVerbositySelect);
+
+            if (selectFirstNonDisabled) {
+                selectFirstNonDisabledOption(textVerbositySelect);
+                selectFirstNonDisabledOption(reasoningEffortSelect);
+            }
+        }
+
         // Disable reasoning levels which are incompatible with the model
         modelSelect.addEventListener('change', (event) => {
-            toggleOptions(REASONING_EFFORT_MODEL_OPTIONS[FEATURE], event.target.value, providerSelect.value, reasoningEffortSelect);
-            selectFirstNonDisabledOption(reasoningEffortSelect);
-
-            toggleOptions(TEXT_VERBOSITY_MODEL_OPTIONS[FEATURE], event.target.value, providerSelect.value, textVerbositySelect);
-            selectFirstNonDisabledOption(textVerbositySelect);
+            setOptionAvailability(event.target, true)
+        });
+        azureDeploymentModelSelect.addEventListener('change', (event) => {
+            setOptionAvailability(event.target, true)
         });
 
         // when changing the provider select, show/hide the relevant fields
         providerSelect.addEventListener('change', (event) => {
             toggleInputVisibility(event.target.value);
 
-            toggleOptions(REASONING_EFFORT_MODEL_OPTIONS[FEATURE], modelSelect.value, event.target.value, reasoningEffortSelect);
-            selectFirstNonDisabledOption(reasoningEffortSelect);
-
-            toggleOptions(TEXT_VERBOSITY_MODEL_OPTIONS[FEATURE], modelSelect.value, event.target.value, textVerbositySelect);
-            selectFirstNonDisabledOption(textVerbositySelect);
+            // Toggle options based on whichever model selector is visible:
+            // OpenAI's direct model selector, or Azure's deployment model
+            if (event.target.value === 'OpenAI') {
+                setOptionAvailability(modelSelect, true)
+            } else if (event.target.value === 'Azure') {
+                setOptionAvailability(azureDeploymentModelSelect, true)
+            }
         });
 
         // on page load, show the current selected provider fields
         document.addEventListener('DOMContentLoaded', () => {
             toggleInputVisibility(providerSelect.value);
-            toggleOptions(REASONING_EFFORT_MODEL_OPTIONS[FEATURE], modelSelect.value, providerSelect.value, reasoningEffortSelect);
-            toggleOptions(TEXT_VERBOSITY_MODEL_OPTIONS[FEATURE], modelSelect.value, providerSelect.value, textVerbositySelect);
-        });
 
-        // TODO change available verbosity/reasoning on change of Azure deployment model
+            // Toggle options based on whichever model selector is visible:
+            // OpenAI's direct model selector, or Azure's deployment model.
+            // Do not select the first non-disabled option, though:
+            // leave whatever is selected at first, selected.
+            if (providerSelect.value === 'OpenAI') {
+                setOptionAvailability(modelSelect, false)
+            } else if (providerSelect.value === 'Azure') {
+                setOptionAvailability(azureDeploymentModelSelect, false)
+            }
+        });
     })();
     </script>
 </div>
