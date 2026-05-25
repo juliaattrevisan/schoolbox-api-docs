@@ -4327,12 +4327,6 @@ parameters:
 			path: library/Schoolbox/Permission/Access/RoleAccessMapper.php
 
 		-
-			message: '#^PHPDoc tag @param for parameter \$roles with type array\<Schoolbox\\Role\>\|\(iterable\<Schoolbox\\Role\>&Schoolbox\\GenericCollection\) is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: library/Schoolbox/Permission/Access/Test/AccessTest.php
-
-		-
 			message: '#^PHPDoc tag @param for parameter \$users with type array\<Schoolbox\\User\>\|\(iterable\<Schoolbox\\User\>&Schoolbox\\GenericCollection\) is not subtype of native type Schoolbox\\GenericCollection\.$#'
 			identifier: parameter.phpDocType
 			count: 1

@@ -1196,8 +1196,8 @@ class AccessTest extends TestCase
     /**
      * Returns a collection of users, indexed by user.id
      *
-     * @param GenericCollection<Role>|Role[] $roles
-     * @param array                          $userData
+     * @param GenericCollection $roles
+     * @param array             $userData
      * @return GenericCollection<User>|User[]
      * @throws UnexpectedValueException
      */
