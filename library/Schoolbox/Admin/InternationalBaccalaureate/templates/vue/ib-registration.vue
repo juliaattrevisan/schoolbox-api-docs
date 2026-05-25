@@ -170,6 +170,7 @@ window.Vue.onMounted((): void => {
                                     type="button"
                                     class="sbx-icon-only-button"
                                     :aria-label="`Delete session ${session.title}`"
+                                    :title="`Delete session ${session.title}`"
                                     @click="openDeleteConfirm(session)"
                                 >
                                     <sbx-icon name="delete"></sbx-icon>
