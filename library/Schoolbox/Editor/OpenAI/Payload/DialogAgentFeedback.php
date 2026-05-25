@@ -82,18 +82,18 @@ class DialogAgentFeedback
     /**
      * Constructor.
      *
-     * @param string $openAiEndpoint
-     * @param string $openAiModel
-     * @param string $openAiDeploymentId
-     * @param string $featureSystemPrompt The system prompt from admin config
-     * @param string $reasoningEffort The reasoning effort level from admin config
-     * @param string $textVerbosity The text verbosity level from admin config
+     * @param string     $openAiEndpoint
+     * @param string     $openAiModel
+     * @param string     $azureDeploymentId
+     * @param string     $featureSystemPrompt The system prompt from admin config
+     * @param string     $reasoningEffort The reasoning effort level from admin config
+     * @param string     $textVerbosity The text verbosity level from admin config
      * @param Log\Mapper $aiLogMapper
      */
     public function __construct(
         private string $openAiEndpoint,
         private string $openAiModel,
-        private string $openAiDeploymentId,
+        private string $azureDeploymentId,
         private string $featureSystemPrompt,
         private string $reasoningEffort,
         private string $textVerbosity,
@@ -133,7 +133,7 @@ class DialogAgentFeedback
          */
         $model = $this->openAiModel;
         if (Helper::ENDPOINT_TYPE_AZURE === $this->openAiEndpoint) {
-            $model = $this->openAiDeploymentId;
+            $model = $this->azureDeploymentId;
         }
 
         $payload = [

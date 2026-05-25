@@ -93,19 +93,19 @@ class DifferentiationProfile
     /**
      * Constructor.
      *
-     * @param string $openAiEndpoint
-     * @param string $openAiModel
-     * @param string $openAiDeploymentId
-     * @param string $systemPrompt The system prompt from admin config
-     * @param string $reasoningEffort The reasoning effort level from admin config
-     * @param string $textVerbosity The text verbosity level from admin config
-     * @param string $documentContent
+     * @param string     $openAiEndpoint
+     * @param string     $openAiModel
+     * @param string     $azureDeploymentId
+     * @param string     $systemPrompt The system prompt from admin config
+     * @param string     $reasoningEffort The reasoning effort level from admin config
+     * @param string     $textVerbosity The text verbosity level from admin config
+     * @param string     $documentContent
      * @param Collection $enabledFields
      */
     public function __construct(
         private string $openAiEndpoint,
         private string $openAiModel,
-        private string $openAiDeploymentId,
+        private string $azureDeploymentId,
         private string $systemPrompt,
         private string $reasoningEffort,
         private string $textVerbosity,
@@ -121,7 +121,7 @@ class DifferentiationProfile
          */
         $model = $this->openAiModel;
         if (Helper::ENDPOINT_TYPE_AZURE === $this->openAiEndpoint) {
-            $model = $this->openAiDeploymentId;
+            $model = $this->azureDeploymentId;
         }
 
         $responseFormat = $this->getResponseFormat();
