@@ -3619,12 +3619,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Quiz/Feedback/MapperProxy.php
 
 		-
-			message: '#^PHPDoc tag @var with type array\<Schoolbox\\Learning\\Assessment\\Quiz\\Feedback\\Model\> is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Quiz/Feedback/MapperProxy.php
-
-		-
 			message: '#^Method Schoolbox\\Learning\\Assessment\\Quiz\\Model\:\:getAuthoritativeResponse\(\) should return Schoolbox\\Learning\\Assessment\\Quiz\\Attempt\\Model\|null but returns Schoolbox\\Learning\\Assessment\\IResponse\.$#'
 			identifier: return.type
 			count: 1
