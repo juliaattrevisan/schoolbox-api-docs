@@ -20,7 +20,7 @@
     }
 
     .s-placeholder {
-        background-color: var(--content-ui-selected);
+        background-color: var(--sbx-config-color-active, var(--content-ui-selected));
         height: 2.5rem !important;
         padding: 0;
     }
@@ -30,14 +30,14 @@
             padding: 0;
         }
 
-        border: 1px solid var(--body-background);
+        border: 1px solid var(--sbx-color-border, var(--body-background));
         margin-left: 0;
         margin-right: 0;
         margin-bottom: 1rem;
         position: relative;
 
         &:last-child {
-            border-bottom: 1px solid var(--body-background);
+            border-bottom: 1px solid var(--sbx-color-border, var(--body-background));
         }
 
         /* Sections are used because some other definition in the system is cascading its rules
@@ -53,7 +53,7 @@
 
         .s-topbar {
             align-items: center;
-            background-color: var(--body-background);
+            background-color: var(--sbx-color-border, var(--body-background));
             display: flex;
             justify-content: flex-end;
             width: 100%;
@@ -167,7 +167,7 @@
 .lpt-preview,
 .lp-display {
     > li {
-        border-bottom: 1px solid $gainsboro;
+        border-bottom: 1px solid var(--sbx-color-border, $gainsboro);
 
         // Necessary to fight layers of padding / inherited rules
         margin-left: -1rem;
@@ -175,7 +175,7 @@
 
         // Necessary to split off to fight other highly-specific rules being inherited
         &.not-visible-students:last-child {
-            border-bottom: 1px solid $gainsboro;
+            border-bottom: 1px solid var(--sbx-color-border, $gainsboro);
         }
 
         p.meta {
@@ -183,7 +183,7 @@
         }
 
         &.not-visible-students {
-            background-color: $vapor;
+            background-color: var(--sbx-color-foreground-secondary, $vapor);
         }
     }
 }
@@ -192,7 +192,7 @@
     margin-bottom: 1rem;
 
     & > li:first-child {
-        border-top: 1px solid $gainsboro;
+        border-top: 1px solid var(--sbx-color-border, $gainsboro);
     }
     //Fixes issue where numbers get cut off due to inherited list styling
     article ol {
@@ -209,11 +209,11 @@
     }
 
     > li.not-visible-students {
-        border-left: 1px solid $gainsboro;
-        border-right: 1px solid $gainsboro;
+        border-left: 1px solid var(--sbx-color-border, $gainsboro);
+        border-right: 1px solid var(--sbx-color-border, $gainsboro);
 
         &:first-child {
-            border-top: 1px solid $gainsboro;
+            border-top: 1px solid var(--sbx-color-border, $gainsboro);
         }
     }
 

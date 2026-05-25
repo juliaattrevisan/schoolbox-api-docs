@@ -51,17 +51,6 @@ export const Multiple: Story = {
     }),
 };
 
-export const Stretch: Story = {
-    render: () => ({
-        template: `
-<div class="l-flex-row l-gap-s">
-    <div class="sbx-tag l-flex__item--1">
-        <span class="sbx-tag__name-span">Community</span>
-    </div>
-</div>        `,
-    }),
-};
-
 export const WithButton: Story = {
     render: () => ({
         template: `

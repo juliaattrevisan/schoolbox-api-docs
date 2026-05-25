@@ -11,13 +11,16 @@ body.sbx-body {
     }
 
     // overrule the .fc-button-group styles that square the buttons depending on where they are placed
+    // these need to be important to override the styles in _calendar.scss
     .fc-button {
         border-radius: var(--sbx-config-field-roundness) !important;
+        margin: 0 !important;
+        padding: var(--sbx-size-xs) !important;
     }
 
     // remove the active colour hover state, should behave just like other secondary buttons with the slight filter change on hover
     .fc-button:hover:not(.fc-button-active) {
-        background: var(--sbx-color-foreground-primary) !important;
+        background: var(--sbx-config-color-active) !important;
     }
 
     // remove the active colour, as it's used for the current calendar, not the calendar button

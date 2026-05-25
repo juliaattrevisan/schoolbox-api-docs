@@ -41,14 +41,11 @@ function onRemoveSelected(): void {
 </script>
 
 <template>
-    <div
-        :class="`sbx-tag ${props.isSingleSelect ? 'l-flex__item--1' : ''}`"
-        :data-test="`ss-selected-item-container-${props.item.id}`"
-    >
+    <div class="sbx-tag" :data-test="`ss-selected-item-container-${props.item.id}`">
         <button
             v-if="props.canSelectItem"
             type="button"
-            :class="`sbx-tag__name-button ${props.isSingleSelect ? 'l-flex__item--1' : ''}`"
+            class="sbx-tag__name-button"
             :title="`View ${props.item.name}`"
             :aria-label="`View ${props.item.name}`"
             :disabled="isDisabled"

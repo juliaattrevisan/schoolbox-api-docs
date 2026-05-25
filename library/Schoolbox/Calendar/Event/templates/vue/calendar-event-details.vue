@@ -658,12 +658,15 @@ export default {
                                     </a>
                                 </div>
                                 <nav>
-                                    <a
-                                        class="icon-close no-text"
+                                    <button
                                         v-if="canModify()"
+                                        class="sbx-icon-only-button"
                                         @click.prevent="rsvpDelete(guest.id, guest.name)"
                                         title="Remove guest"
-                                    ></a>
+                                        aria-label="Remove guest"
+                                    >
+                                        <sbx-icon name="close" size="m"></sbx-icon>
+                                    </button>
                                 </nav>
                             </li>
                         </ul>
