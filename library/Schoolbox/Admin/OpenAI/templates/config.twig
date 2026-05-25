@@ -35,7 +35,7 @@
     {% endfor %}
 
     {% if advancedInputs is not empty %}
-        <fieldset>
+        <fieldset data-advanced-options>
             <legend>
                 <a href="#" class="icon-down-arrow" data-collapser="ai-feature-{{ feature.feature }}-advanced">Advanced Settings</a>
             </legend>
@@ -63,13 +63,20 @@
          */
         function toggleInputVisibility(provider) {
             // hide all fields
-            featureEl.querySelectorAll('[data-feature-openai]').forEach(el => el.style.display = 'none');
-            featureEl.querySelectorAll('[data-feature-azure]').forEach(el => el.style.display = 'none');
+            let openAiFeatures = featureEl.querySelectorAll('[data-feature-openai]'),
+                azureFeatures = featureEl.querySelectorAll('[data-feature-azure]'),
+                advancedOptions = featureEl.querySelectorAll('[data-advanced-options]');
+
+            openAiFeatures.forEach(el => el.style.display = 'none');
+            azureFeatures.forEach(el => el.style.display = 'none');
+            advancedOptions.forEach(el => el.style.display = 'none');
 
             if (provider === 'OpenAI') {
-                featureEl.querySelectorAll('[data-feature-openai]').forEach(el => el.style.display = 'block');
+                openAiFeatures.forEach(el => el.style.display = 'block');
+                advancedOptions.forEach(el => el.style.display = 'block');
             } else if (provider === 'Azure') {
-                featureEl.querySelectorAll('[data-feature-azure]').forEach(el => el.style.display = 'block');
+                azureFeatures.forEach(el => el.style.display = 'block');
+                advancedOptions.forEach(el => el.style.display = 'block');
             }
         }
 
