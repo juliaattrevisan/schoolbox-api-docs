@@ -17,6 +17,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Reporting\Feedback\Model as ReportingFeedback;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -764,16 +765,18 @@ class Factory
 
                 $feedback = $participant->getAuthoritativeFeedback($publishedOnly);
                 $rubric   = null;
-                if (
-                    $assessment instanceof DueWork
-                    && $feedback instanceof DueWorkFeedback
-                    && $assessment->getUseRubric()
-                ) {
-                    $rubric = $this->rubricMapper->retrieveMarkedGrid($feedback);
-                    // Install the marked grid into the feedback, so that it is
-                    // accessible by the lateral learning methods.
-                    $feedback->setRubricMarkedGrid($rubric);
+
+                /* Obtain all the marked rubric grids for an assessment via its set of rubric instances
+                 * There might be a faster way to do this which we can improve later.
+                 */
+                if ($feedback instanceof DueWorkFeedback) {
+                    foreach ($assessment->getRubricInstances() as $rubricInstance) {
+                        $rubric = $this->rubricMapper->retrieveMarkedGrid($feedback, $rubricInstance);
+
+                        $feedback->getRubricMarkedGrids()->setoffset($rubricInstance->getId(), $rubric);
+                    }
                 }
+
                 if ($feedback) {
                     $allGrades['a' . $assessment->getId()] = [
                         'assessment'  => $assessment,
