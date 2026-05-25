@@ -1221,8 +1221,8 @@ class AccessTest extends TestCase
     /**
      * Returns a mock UserAccessMapper with hard-coded method return values
      *
-     * @param GenericCollection<User>|User[] $users          Indexed by user.id
-     * @param array|null                     $userAccessData If specified, overrides default data
+     * @param GenericCollection $users          Indexed by user.id
+     * @param array|null       $userAccessData If specified, overrides default data
      * @return UserAccessMapper
      * @throws Framework\Exception
      */
