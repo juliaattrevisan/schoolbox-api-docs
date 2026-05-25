@@ -297,7 +297,7 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
 
 
     /**
-     * @return CourseSpec\Mapper|Mapper
+     * @return CourseSpec\Mapper
      * @throws InvalidArgumentException
      */
     private function getCourseSpecMapper(): CourseSpec\Mapper
