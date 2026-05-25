@@ -674,7 +674,9 @@ async function saveSubjectConfiguration(): Promise<void> {
                     </thead>
                     <tbody>
                         <template
-                            v-for="row in subjectRows.filter((r) => r.tableType === 'Diploma Programme Year 2 [Diploma]')"
+                            v-for="row in subjectRows.filter(
+                                (r) => r.tableType === 'Diploma Programme Year 2 [Diploma]',
+                            )"
                             :key="row.id"
                         >
                             <tr>
