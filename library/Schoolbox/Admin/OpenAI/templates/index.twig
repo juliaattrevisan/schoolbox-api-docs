@@ -13,18 +13,16 @@
                 <div class="small-12 medium-6 xlarge-4 columns island">
                     <h2 class="subheader">{{ feature.title }}</h2>
                     <section>
-                        <fieldset>
-                            <div id="ai_{{ feature.feature }}" class="columns">
-                                {# module specific config #}
-                                {% include '@adminOpenAi/config.twig' with {
-                                    feature: feature,
-                                    providers: providers,
-                                    models: models,
-                                    fields: fields,
-                                    reasoningEffortModelOptions: reasoningEffortModelOptions,
-                                    textVerbosityModelOptions: textVerbosityModelOptions,
-                                } only %}
-                            </div>
+                        <fieldset id="ai_{{ feature.feature }}" class="columns">
+                            {# module specific config #}
+                            {% include '@adminOpenAi/config.twig' with {
+                                feature: feature,
+                                providers: providers,
+                                models: models,
+                                fields: fields,
+                                reasoningEffortModelOptions: reasoningEffortModelOptions,
+                                textVerbosityModelOptions: textVerbosityModelOptions,
+                            } only %}
                         </fieldset>
                     </section>
                 </div>

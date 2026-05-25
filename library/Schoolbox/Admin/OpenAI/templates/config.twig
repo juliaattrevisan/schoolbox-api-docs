@@ -12,13 +12,36 @@
 
 
 <div data-feature="{{ feature.feature }}" data-test="ai-feature-{{ feature.feature }}">
+    {% set advancedInputs = '' %}
     {% for name, formInput in feature.formInputs %}
-        {% include '@adminOpenAi/formInput.twig' with {
-            name: name,
-            formInput: formInput,
-            feature: feature,
-        } only %}
+        {#
+         # Is this an advanced feature?
+         # If so, hide it in an advanced settings accordion.
+         #
+         # For now assume that all advanced settings are in the General section.
+         #}
+        {% set formInputHtml %}
+            {% include '@adminOpenAi/formInput.twig' with {
+                name: name,
+                formInput: formInput,
+                feature: feature,
+            } only %}
+        {% endset %}
+        {% if not (formInput.advanced ?? false) %}
+            {{ formInputHtml | raw }}
+        {% else %}
+            {% set advancedInputs = advancedInputs ~ formInputHtml %}
+        {% endif %}
     {% endfor %}
+
+    {% if advancedInputs is not empty %}
+        <section>
+            <h3>Advanced Settings</h3>
+            <fieldset class="columns" data-advanced>
+                {{ advancedInputs | raw }}
+            </fieldset>
+        </section>
+    {% endif %}
 
     <script type="application/javascript">
     (() => {
@@ -43,10 +66,8 @@
 
             if (provider === 'OpenAI') {
                 featureEl.querySelectorAll('[data-feature-openai]').forEach(el => el.style.display = 'block');
-                return;
             } else if (provider === 'Azure') {
                 featureEl.querySelectorAll('[data-feature-azure]').forEach(el => el.style.display = 'block');
-                return;
             }
         }
 
@@ -122,6 +143,8 @@
             toggleOptions(REASONING_EFFORT_MODEL_OPTIONS[FEATURE], modelSelect.value, providerSelect.value, reasoningEffortSelect);
             toggleOptions(TEXT_VERBOSITY_MODEL_OPTIONS[FEATURE], modelSelect.value, providerSelect.value, textVerbositySelect);
         });
+
+        // TODO change available verbosity/reasoning on change of Azure deployment model
     })();
     </script>
 </div>
