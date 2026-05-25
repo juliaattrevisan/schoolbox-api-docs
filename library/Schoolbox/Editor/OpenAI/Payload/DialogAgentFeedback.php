@@ -186,7 +186,11 @@ class DialogAgentFeedback
             'content' => $this->generateUserFeedPrompt($assessment, $response),
         ];
 
-        return new ModelParser()->filterPayload($payload, $this->openAiModel, $this->openAiEndpoint);
+        return new ModelParser()->filterPayload(
+            $payload,
+            $this->openAiModel ?: $this->azureDeploymentModel,
+            $this->openAiEndpoint,
+        );
     }
 
 

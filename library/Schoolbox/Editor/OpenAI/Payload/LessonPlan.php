@@ -338,7 +338,11 @@ class LessonPlan
             ]);
         }
 
-        return new ModelParser()->filterPayload($payload, $this->openAiModel, $this->openAiEndpoint);
+        return new ModelParser()->filterPayload(
+            $payload,
+            $this->openAiModel ?: $this->azureDeploymentModel,
+            $this->openAiEndpoint,
+        );
     }
 
 

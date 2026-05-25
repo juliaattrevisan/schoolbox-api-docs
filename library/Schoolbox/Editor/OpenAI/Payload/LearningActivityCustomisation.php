@@ -210,6 +210,10 @@ class LearningActivityCustomisation
             $payload['reasoning'] = ['effort' => $this->reasoningEffort];
         }
 
-        return new ModelParser()->filterPayload($payload, $model, $this->openAiEndpoint);
+        return new ModelParser()->filterPayload(
+            $payload,
+            $this->openAiModel ?: $this->azureDeploymentModel,
+            $this->openAiEndpoint,
+        );
     }
 }
