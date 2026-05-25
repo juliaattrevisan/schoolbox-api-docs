@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { apiRequest } from "@js/util/sbx/apiUtils";
+import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
@@ -70,32 +71,38 @@ async function confirmDelete(): Promise<void> {
     if (isDeleting.value) {
         return;
     }
-
     const session = sessionPendingDelete.value;
     if (!session?.deleteEndpoint) {
         return;
     }
     const toast = window.sbProps.toastActivate("Deleting session...");
-    isDeleting.value = true;
-
-    const response = await apiRequest<null>({
-        url: session.deleteEndpoint,
-        method: "DELETE",
-    });
-
-    if (!response.success) {
+    try {
+        isDeleting.value = true;
+        deleteError.value = null;
+        const response = await apiRequest({
+            url: session.deleteEndpoint,
+            method: "DELETE",
+        });
+        if (!response.success) {
+            throw new Error(response.message || "Failed to delete");
+        }
+        toast.timeout({ text: "Session deleted", isSuccess: true });
+        diplomaSessions.value = diplomaSessions.value.filter((s) => s.id !== session.id);
+        isDeleteModalOpen.value = false;
+        sessionPendingDelete.value = null;
+    } catch (error) {
+        // ignore abort errors, as the previous request was cancelled
+        if (isAbortError(error)) {
+            return;
+        }
+        if (error instanceof Error && hasErrorMessage(error)) {
+            deleteError.value = error.message;
+        }
         toast.timeout({ text: "Delete failed", isSuccess: false });
-        deleteError.value = "Delete failed";
+        console.error(error);
+    } finally {
         isDeleting.value = false;
-        return;
     }
-
-    toast.timeout({ text: "Session deleted", isSuccess: true });
-    diplomaSessions.value = diplomaSessions.value.filter((s) => s.id !== session.id);
-    isDeleteModalOpen.value = false;
-    sessionPendingDelete.value = null;
-    deleteError.value = null;
-    isDeleting.value = false;
 }
 
 const reportBaseUrl = window.Vue.computed<string | null>(() =>
