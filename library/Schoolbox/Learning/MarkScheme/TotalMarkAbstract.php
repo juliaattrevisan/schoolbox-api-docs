@@ -181,7 +181,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      */
 
     /**
-     * @param int|float|null $totalMark
+     * @param float|null $totalMark
      * @return $this
      * @throws RangeException
      */

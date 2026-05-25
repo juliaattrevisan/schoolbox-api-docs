@@ -3751,12 +3751,6 @@ parameters:
 			path: library/Schoolbox/Learning/MarkScheme/Test/AssessableTest.php
 
 		-
-			message: '#^PHPDoc tag @param for parameter \$totalMark with type float\|int\|null is not subtype of native type float\|null\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: library/Schoolbox/Learning/MarkScheme/TotalMarkAbstract.php
-
-		-
 			message: '#^Property Schoolbox\\Learning\\MarkScheme\\TotalMarkAbstract\:\:\$totalMark \(float\|int\|null\) is never assigned int so it can be removed from the property type\.$#'
 			identifier: property.unusedType
 			count: 1
