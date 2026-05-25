@@ -90,7 +90,7 @@ class Controller extends Base
             /* Then find out what sequence we need to inject a field
              * and add it to the stack in the right spot
              */
-            /** @var int|null $index - The index at which to insert the field */
+            /** @var int $index - The index at which to insert the field */
             $index = (int)($this->requestPost->get('index')) + 1;
 
             $stack = $fields->getAll();

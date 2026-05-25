@@ -1405,12 +1405,6 @@ parameters:
 			path: library/Schoolbox/Admin/Home/SamlCertHelper.php
 
 		-
-			message: '#^PHPDoc tag @var with type int\|null is not subtype of native type int\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Admin/Profile/Editor/Field/Controller.php
-
-		-
 			message: '#^Property Schoolbox\\Admin\\Usage\\Controller\:\:\$errorMapper is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
