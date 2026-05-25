@@ -105,12 +105,20 @@ class ModelParser
     }
 
     /**
-     * Perform some common filters on the payload, as appropriate for the model.
+     * Finalise the payload, by:
+     * * setting the actual model used by the payload
+     * * performing some common filters on the payload, as appropriate for the
+     *   model
      *
-     * These filters are not any guess as to what the payload _should_ be: they
-     * only keep the payload within the bounds of what will actually work.
+     * @param array  $payload              The data which would be sent to the AI provider.
+     * @param string $endpoint             The endpoint to which the payload will be sent.
+     * @param string $openAiModel          The model to use, if an OpenAI endpoint.
+     *                                     This will be used as both the payload model, and the model for filtering it.
+     * @param string $azureDeploymentId    The deployment ID to use, if an Azure endpoint.
+     *                                     This will be used as the payload model.
+     * @param string $azureDeploymentModel The model to use, if an Azure endpoint.
+     *                                     This will be used as the model to filter the payload.
      *
-     * @param array  $payload  The data which would be sent to the AI provider.
      * @param string $model    The name of the model to use.
      *                         For Azure, this is _not_ the deployment ID:
      *                         instead, it is the selected deployment model.
@@ -118,10 +126,21 @@ class ModelParser
      *                         Azure, but this is not enforceable.)
      * @return array
      */
-    public function filterPayload(array $payload, string $model): array
-    {
-        $version = $this->extractModelVersion($model);
-        $variant = $this->extractModelVariant($model);
+    public function finalise(
+        array $payload,
+        string $endpoint,
+        string $openAiModel,
+        string $azureDeploymentId,
+        string $azureDeploymentModel,
+    ): array {
+        // Set model in payload
+        $payloadModel     = $this->determinePayloadModel($endpoint, $openAiModel, $azureDeploymentId);
+        $payload['model'] = $payloadModel;
+
+        // Filter payload according to model
+        $filterModel = $this->determineFilterModel($endpoint, $openAiModel, $azureDeploymentModel);
+        $version     = $this->extractModelVersion($filterModel);
+        $variant     = $this->extractModelVariant($filterModel);
 
         // chat variants:
         // * all support only medium verbosity
