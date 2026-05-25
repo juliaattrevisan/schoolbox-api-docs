@@ -3523,12 +3523,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/IAssessable.php
 
 		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/IAssessable.php
-
-		-
 			message: '#^Instanceof between Schoolbox\\Learning\\AssessmentContext and Schoolbox\\Learning\\AssessmentContext will always evaluate to true\.$#'
 			identifier: instanceof.alwaysTrue
 			count: 1
