@@ -1405,7 +1405,7 @@ class AccessTest extends TestCase
      */
     private function getMockRoleAccessMapper(ObjectTree $folderTree, GenericCollection $roles, array $roleAccessData): RoleAccessMapper
     {
-        /** @var MockObject|RoleAccessMapper $roleAccessMapper */
+        /** @var MockObject&RoleAccessMapper $roleAccessMapper */
         $roleAccessMapper = $this->createMock(RoleAccessMapper::class);
 
         /**
