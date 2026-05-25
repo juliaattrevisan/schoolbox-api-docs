@@ -135,7 +135,7 @@ async function onSaveSelected(): Promise<void> {
             <strong>Staging server</strong> now to review your skin settings and custom CSS before it becomes the only
             option in <strong>v26.2.</strong><br />
             <br />
-            <a href="https://help.schoolbox.com.au/homepage/5808">Read the Transition Guide</a>
+            <a href="https://help.schoolbox.com.au/homepage/5808" target="_blank">Read the Transition Guide</a>
         </div>
         <div v-if="loadError" data-test="skin-config-load-error">
             <request-error :further-info="loadError" />
