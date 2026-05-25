@@ -2383,12 +2383,6 @@ parameters:
 			path: library/Schoolbox/InstanceRegistry/ApiClient.php
 
 		-
-			message: '#^PHPDoc tag @var with type Alaress_Date_Format is not subtype of native type null\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/AbstractAssessment.php
-
-		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 1
