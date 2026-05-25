@@ -232,7 +232,6 @@ class Controller extends Base
 
                 // Go through all the members the user saved in the group
 
-                /** @var int $memberId */
                 foreach ($memberIds as $memberId) {
                     if ($memberCurrent->getUser()->getId() == $memberId) {
                         // The user will wants this member

@@ -3997,12 +3997,6 @@ parameters:
 			path: library/Schoolbox/Pastoral/Controller.php
 
 		-
-			message: '#^PHPDoc tag @var with type int is not subtype of native type string\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Pastoral/Management/Controller.php
-
-		-
 			message: '#^Call to an undefined method Schoolbox\\ISoftDeletable\:\:getId\(\)\.$#'
 			identifier: method.notFound
 			count: 1
