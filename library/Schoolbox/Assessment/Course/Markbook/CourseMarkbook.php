@@ -427,13 +427,13 @@ class CourseMarkbook
      */
     public static function getFirstUnitImpl(CourseImplementation\Model $courseImpl): UnitImplementation\Model
     {
-        /** @var UnitImplementation\Model $firstUnitImpl */
         $firstUnitImpl = null;
         foreach ($courseImpl->getUnits() as $unitImpl) {
             if (!$firstUnitImpl || $unitImpl->getOpenDate()->lt($firstUnitImpl->getOpenDate())) {
                 $firstUnitImpl = $unitImpl;
             }
         }
+        /** @var UnitImplementation\Model $firstUnitImpl */
         return $firstUnitImpl;
     }
 
