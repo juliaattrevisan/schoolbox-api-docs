@@ -1513,12 +1513,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Rubric/DataModel/Descriptor/Mapper.php
 
 		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Assessment\\Rubric\\DataModel\\Level\\Model is not subtype of native type null\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/Descriptor/Mapper.php
-
-		-
 			message: '#^Method Schoolbox\\Assessment\\Rubric\\DataModel\\Indicator\\Mapper\:\:findForParent\(\) should return iterable\<Schoolbox\\Assessment\\Rubric\\DataModel\\Indicator\\Model\>&Schoolbox\\GenericCollection but returns array\<Schoolbox\\Assessment\\Rubric\\DataModel\\Indicator\\Model\>\.$#'
 			identifier: return.type
 			count: 1

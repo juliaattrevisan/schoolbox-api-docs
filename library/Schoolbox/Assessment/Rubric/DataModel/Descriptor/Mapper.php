@@ -144,7 +144,6 @@ class Mapper extends Schoolbox\Mapper
         $indicatorKey     = "c.{$indicatorMapper->getIdentifierColumn()}";
         $capabilityKey    = "g.{$capabilityMapper->getIdentifierColumn()}";
 
-        /** @var Level\Model $level */
         $level = null;
 
         /** @var Indicator\Model $indicator */
@@ -163,6 +162,7 @@ class Mapper extends Schoolbox\Mapper
                 $levels->setOffset($levelId, $levelMapper->hydrate($r, 'l')->setDescriptors($this->createCollection()));
             }
             $level = $levels->getOffset($levelId);
+            /** @var Level\Model $level */
 
             // First time we've encountered this indicator?
             if (!$indicators->getOffset($indicatorId)) {
