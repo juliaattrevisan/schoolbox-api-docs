@@ -3787,12 +3787,6 @@ parameters:
 			path: library/Schoolbox/Learning/Moment/Translator/ArrayToModel/AllFields.php
 
 		-
-			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\Resource\\Attachment\\Collector\\CollectorFactory is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 2
-			path: library/Schoolbox/Learning/Moment/Translator/ArrayToModel/Test/MutableFieldsOnlyTest.php
-
-		-
 			message: '#^Method Schoolbox\\Learning\\Quiz\\Attempt\\Mapper\:\:getQuizMapper\(\) should return Schoolbox\\Learning\\Quiz\\Mapper but returns Schoolbox\\Mapper\.$#'
 			identifier: return.type
 			count: 1
