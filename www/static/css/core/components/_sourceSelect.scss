@@ -13,7 +13,7 @@
     white-space: nowrap;
 
     sbx-icon {
-        color: var(--sbx-config-color-accent, #0066b0);
+        color: var(--sbx-config-color-accent, $content-ui-foreground);
         flex-shrink: 0;
     }
 
