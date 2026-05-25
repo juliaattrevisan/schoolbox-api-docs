@@ -455,7 +455,6 @@ class Controller extends Assessment\Controller
             // Generate rubric marked grids for every feedback being displayed
             foreach ($participant->getAllFeedbacks() as $feedback) {
                 foreach ($assessment->getRubricInstances() as $rubricInstance) {
-
                     /* All feedbacks ought to be due work feedbacks and thus have rubric grid compatibility but we'll
                      * assert the Due Work feedback instances anyway, just in case there's a mix
                      *
