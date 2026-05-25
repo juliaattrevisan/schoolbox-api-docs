@@ -307,7 +307,7 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
 
 
     /**
-     * @return CourseImpl\Mapper|Mapper
+     * @return CourseImpl\Mapper
      * @throws InvalidArgumentException
      */
     private function getCourseImplMapper(): CourseImpl\Mapper
