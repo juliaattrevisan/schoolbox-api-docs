@@ -205,26 +205,24 @@ window.Vue.onMounted((): void => {
         >
             <h2>Please Confirm</h2>
             <p>Are you sure you want to delete "{{ sessionPendingDelete?.title }}"?</p>
-            <template #footer>
-                <div class="l-flex l-gap-xs f-no-margins" style="padding: 0 1.5rem 1.5rem">
-                    <button
-                        type="button"
-                        class="button alert l-flex__item--1"
-                        :disabled="isDeleting"
-                        @click="confirmDelete"
-                    >
-                        {{ isDeleting ? "Deleting..." : "Yes, delete" }}
-                    </button>
-                    <button
-                        type="button"
-                        class="button l-flex__item--1"
-                        :disabled="isDeleting"
-                        @click="isDeleteModalOpen = false"
-                    >
-                        Cancel
-                    </button>
-                </div>
-            </template>
+            <div class="l-flex l-gap-xs f-no-margins">
+                <button
+                    type="button"
+                    class="button alert l-flex__item--1"
+                    :disabled="isDeleting"
+                    @click="confirmDelete"
+                >
+                    {{ isDeleting ? "Deleting..." : "Yes, delete" }}
+                </button>
+                <button
+                    type="button"
+                    class="button l-flex__item--1"
+                    :disabled="isDeleting"
+                    @click="isDeleteModalOpen = false"
+                >
+                    Cancel
+                </button>
+            </div>
         </BasicModal>
     </div>
 </template>
