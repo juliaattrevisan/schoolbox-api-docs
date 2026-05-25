@@ -2202,7 +2202,7 @@ abstract class Kernel
             $di->lazy(function () use ($di) {
                 /** @var IConfigLoader $config */
                 $config = $di->get('config');
-                /** @var ToolModel[] $ltiTools */
+                /** @var Collection|ToolModel[] $ltiTools */
                 $ltiTools = $di->get('lti.tools');
                 return new KeyChainRepositoryFactory($config)->build($ltiTools);
             })
@@ -2216,7 +2216,7 @@ abstract class Kernel
                 $generator = $di->get('router.generator');
                 /** @var KeyChainRepositoryInterface $keyChains */
                 $keyChains = $di->get('lti.keyChains');
-                /** @var ToolModel[] $ltiTools */
+                /** @var Collection|ToolModel[] $ltiTools */
                 $ltiTools = $di->get('lti.tools');
                 $registrationRepositoryFactory = new RegistrationRepositoryFactory(
                     $config,

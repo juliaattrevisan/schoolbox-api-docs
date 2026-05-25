@@ -7,12 +7,6 @@ parameters:
 			path: conf/ModuleLoader.php
 
 		-
-			message: '#^PHPDoc tag @var with type array\<Schoolbox\\LTI\\Provider\\Model\> is not subtype of native type object\.$#'
-			identifier: varTag.nativeType
-			count: 2
-			path: library/Alaress/Application/Kernel.php
-
-		-
 			message: '#^Method Alaress\\Database\\Broker\\Base\:\:prepareQuery\(\) should return Alaress\\Database\\Statement\\Query\\IQuery but returns Alaress\\Database\\Statement\\Query\\Base\.$#'
 			identifier: return.type
 			count: 1
