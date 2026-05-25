@@ -3793,12 +3793,6 @@ parameters:
 			path: library/Schoolbox/Learning/Quiz/Attempt/Mapper.php
 
 		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\Learning\\Quiz\\Mapper\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Attempt/Mapper.php
-
-		-
 			message: '#^Property Schoolbox\\Learning\\Quiz\\Attempt\\Model\:\:\$answers \(array\<Schoolbox\\Learning\\Quiz\\Attempt\\Answer\\Model\>\|\(iterable\<Schoolbox\\Learning\\Quiz\\Attempt\\Answer\\Model\>&Schoolbox\\GenericCollection\)\) is never assigned array\<Schoolbox\\Learning\\Quiz\\Attempt\\Answer\\Model\> so it can be removed from the property type\.$#'
 			identifier: property.unusedType
 			count: 1
