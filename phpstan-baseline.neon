@@ -1633,12 +1633,6 @@ parameters:
 			path: library/Schoolbox/Calendar/Event/Access.php
 
 		-
-			message: '#^PHPDoc tag @var with type array is not subtype of native type Alaress\\Web\\Request\\Values\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Calendar/Event/Validator.php
-
-		-
 			message: '#^Property Schoolbox\\Calendar\\EventLevel\:\:\$id \(int\) does not accept default value of type string\.$#'
 			identifier: property.defaultValue
 			count: 1
