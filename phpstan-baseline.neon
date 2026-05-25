@@ -4303,12 +4303,6 @@ parameters:
 			path: library/Schoolbox/Pastoral/Revision/Mapper.php
 
 		-
-			message: '#^PHPDoc tag @return with type iterable\<Schoolbox\\Pastoral\\Model\>&Schoolbox\\GenericCollection is incompatible with native type array\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Pastoral/Test/AccessLevelCensorTest.php
-
-		-
 			message: '#^Method Schoolbox\\Permission\\Access\\Access\:\:getInstance\(\) should return static\(Schoolbox\\Permission\\Access\\Access\) but returns Schoolbox\\Permission\\Access\\Access\.$#'
 			identifier: return.type
 			count: 1
