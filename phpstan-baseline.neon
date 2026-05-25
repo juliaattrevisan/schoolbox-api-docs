@@ -799,12 +799,6 @@ parameters:
 			path: library/Component/Homepage/PodcastController.php
 
 		-
-			message: '#^Variable \$allRss might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: library/Component/Homepage/RSSController.php
-
-		-
 			message: '#^Variable \$rss might not be defined\.$#'
 			identifier: variable.undefined
 			count: 2
@@ -851,12 +845,6 @@ parameters:
 			identifier: assign.propertyType
 			count: 1
 			path: library/Component/Homepage/VideoController.php
-
-		-
-			message: '#^Variable \$matches might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: library/Component/Homepage/WolframController.php
 
 		-
 			message: '#^Variable \$url might not be defined\.$#'
@@ -1873,24 +1861,6 @@ parameters:
 			path: library/Schoolbox/Admin/Profile/Editor/Field/Controller.php
 
 		-
-			message: '#^Method Schoolbox\\Admin\\Settings\\FieldType\\AbstractRenderer\:\:getData\(\) should return array\<string\> but returns array\<string, bool\|string\|null\>\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Admin/Settings/FieldType/AbstractRenderer.php
-
-		-
-			message: '#^Method Schoolbox\\Admin\\Settings\\FieldType\\Html\\Renderer\:\:getData\(\) should return array\<string\> but returns array\<bool\|Schoolbox\\Url\\Uri\|string\>\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Admin/Settings/FieldType/Html/Renderer.php
-
-		-
-			message: '#^Method Schoolbox\\Admin\\Settings\\FieldType\\Range\\Renderer\:\:getData\(\) should return array\<string\> but returns array\<float\|string\>\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Admin/Settings/FieldType/Range/Renderer.php
-
-		-
 			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\MapperFactory is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
 			identifier: varTag.nativeType
 			count: 1
@@ -1913,12 +1883,6 @@ parameters:
 			identifier: varTag.nativeType
 			count: 1
 			path: library/Schoolbox/Admin/Settings/FieldType/SelectLookup/Test/RendererTest.php
-
-		-
-			message: '#^Method Schoolbox\\Admin\\Settings\\FieldType\\SelectMulti\\Renderer\:\:getData\(\) should return array\<string\> but returns array\<bool\|string\>\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Admin/Settings/FieldType/SelectMulti/Renderer.php
 
 		-
 			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\MapperFactory is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
@@ -6107,12 +6071,6 @@ parameters:
 			identifier: function.alreadyNarrowedType
 			count: 1
 			path: tools/mq/list-redis.php
-
-		-
-			message: '#^Argument of an invalid type DateInterval supplied for foreach, only iterables are supported\.$#'
-			identifier: foreach.nonIterable
-			count: 1
-			path: tools/mq/reset-ttls.php
 
 		-
 			message: '#^Variable \$usersAdded in isset\(\) is never defined\.$#'

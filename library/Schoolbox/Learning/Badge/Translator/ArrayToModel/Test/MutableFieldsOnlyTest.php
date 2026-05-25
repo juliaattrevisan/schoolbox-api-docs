@@ -339,7 +339,7 @@ class MutableFieldsOnlyTest extends TestCase
      * @param IStorage|null $storage
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvokeCreateData')]
-    public function testInvokeCreate(array $input, Model $expected, ?Istorage $storage = null): void
+    public function testInvokeCreate(array $input, Model $expected, ?IStorage $storage = null): void
     {
         $converter = $this->createConverter($storage);
 
@@ -364,7 +364,7 @@ class MutableFieldsOnlyTest extends TestCase
         array $input,
         Model $existing,
         Model $expected,
-        ?Istorage $storage = null
+        ?IStorage $storage = null
     ): void {
         $converter = $this->createConverter($storage);
 

@@ -96,7 +96,7 @@ class Controller extends Base
         private MessageFactory $messageFactory,
         private Producer $messageProducer,
         private Participant\DataSource $participantDataSource,
-        private OpenAI\ClientFactory $aiClientFactory,
+        private OpenAi\ClientFactory $aiClientFactory,
         private AILogMapper $aiLogMapper,
         private DialogAgentDataModelMapper $dialogAgentDataModelMapper,
         private \Schoolbox\Admin\DialogAgent\Scenario\Criterion\Mapper $scenarioCriterionMapper,

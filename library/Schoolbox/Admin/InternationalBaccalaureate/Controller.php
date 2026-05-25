@@ -362,6 +362,7 @@ class Controller extends ConfigController
                     $systemPurposeId = $language->getSystemPurposeId();
                     $key = $languageId . '_' . ($systemPurposeId ?? 'null');
                     $languages[$key]['languageId'] = $languageId;
+                    /** @phpstan-ignore-next-line - language is nullable despite what PHPStan says */
                     $languages[$key]['languageName'] = $language->getLanguage()?->getName();
                     $languages[$key]['systemPurposeId'] = $systemPurposeId;
                     $languages[$key]['classCodes'] = [
@@ -578,8 +579,8 @@ class Controller extends ConfigController
                             'sessionId' => 0,
                         ]),
                         'reportBase' => $reportRoute !== null ? \dirname($reportRoute) : null,
-                    ]
-                ]
+                    ],
+                ],
             ]
         );
     }
@@ -656,7 +657,7 @@ class Controller extends ConfigController
             $this->response = $this->responseAsJson(
                 [
                     'success' => false,
-                    'message' => $e->getMessage()
+                    'message' => $e->getMessage(),
                 ]
             )->withStatus(500);
         }
