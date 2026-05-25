@@ -222,9 +222,9 @@ class Mapper extends BaseMapper
      * activities could return a data set.
      *
      * @param int $assessmentId
-     * @return array|null
+     * @return array
      */
-    private function findMarkedByAssessmentDueWork(int $assessmentId): ?array
+    private function findMarkedByAssessmentDueWork(int $assessmentId): array
     {
         $query = "
             SELECT sr.owner AS student_id
@@ -282,9 +282,9 @@ class Mapper extends BaseMapper
      * activities could return a data set.
      *
      * @param int $assessmentId
-     * @return array|null
+     * @return array
      */
-    private function findMarkedByAssessmentReporting(int $assessmentId): ?array
+    private function findMarkedByAssessmentReporting(int $assessmentId): array
     {
         $query = "
             SELECT rf.learner_id AS student_id
