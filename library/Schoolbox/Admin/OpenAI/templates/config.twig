@@ -37,8 +37,7 @@
     {% if advancedInputs is not empty %}
         <fieldset>
             <legend>
-                <a href="#" class="icon-down-arrow" data-collapser="ai-feature-{{ feature.feature }}-advanced"></a>
-                Advanced Settings
+                <a href="#" class="icon-down-arrow" data-collapser="ai-feature-{{ feature.feature }}-advanced">Advanced Settings</a>
             </legend>
             <section class="hide" data-collapsable="ai-feature-{{ feature.feature }}-advanced" data-collapse-state="collapsed">
                 {{ advancedInputs | raw }}
