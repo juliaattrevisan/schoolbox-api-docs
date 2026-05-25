@@ -82,6 +82,8 @@ class LessonPlanGeneration
             trim($this->config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
             trim($this->config[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
             trim($this->config[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'] ?? ''),
+            trim($this->config[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_REASONING_EFFORT]['value'] ?? '') ?: Config::REASONING_EFFORT_OPTION_DEFAULT,
+            trim($this->config[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_TEXT_VERBOSITY]['value'] ?? '') ?: Config::TEXT_VERBOSITY_OPTION_DEFAULT,
             $this->spellcheckLanguage,
             $this->curriculumNodeMapper,
         );
@@ -117,8 +119,10 @@ class LessonPlanGeneration
         // https://community.openai.com/t/json-returning-with-json/584818/6
         $data = json_decode($response->getBody()->getContents(), true);
 
-        /* The actual output we requested is in this chain of objects, for now assume it'll only ever be one */
-        $relevantData = $data['output'][0]['content'][0]['text'] ?? null;
+        // Some models may contain reasoning as their first output:
+        // need to check each output to see if it actually contains text.
+        // (For now, assume there's only one)
+        $relevantData = new ResponseParser()->extractContentText($data);
         if (!isset($relevantData)) {
             return [$data['output'] ?? null, 500];
         }

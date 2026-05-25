@@ -76,11 +76,7 @@ declare global {
             };
             editors: Partial<Record<string, SbxEditor>>;
             gradeGradientEnabled: boolean;
-            aiFeatures: Partial<{
-                [K in AiFeature]: K extends AiFeature.CHAT // only some features have model info
-                    ? { enabled: true; model: string } | { enabled: false }
-                    : { enabled: boolean };
-            }>;
+            aiFeatures: Record<AiFeature, { enabled: boolean }>;
             lightGallery: typeof lightGallery;
             lightGalleryInit: InitLightGallery;
             lightGalleries: Record<string, LightGallery | undefined>;

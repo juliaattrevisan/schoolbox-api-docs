@@ -13,10 +13,13 @@ use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as SchoolboxException;
 
+/**
+ * Configuration options for AI features.
+ */
 class Config
 {
     /**
-     * enabled AI features (to be configured as part of the text Gen settings)
+     * Enabled AI features (to be configured as part of the text Gen settings):
      * feature name => config name
      */
     public const array ALL_MODULES = [
@@ -29,25 +32,279 @@ class Config
         Helper::FEATURE_AI_MODERATION_AGENT             => ConfigMapper::NAME_AI_MODERATION_AGENT,
     ];
 
+    /**
+     * The AI providers which may be selected for an AI feature
+     * (including Helper::ENDPOINT_TYPE_OFF to disable a feature entirely).
+     */
     public const array PROVIDERS = [
         Helper::ENDPOINT_TYPE_OFF => Helper::ENDPOINT_TYPE_OFF,
         Helper::ENDPOINT_TYPE_OPENAI => Helper::ENDPOINT_TYPE_OPENAI,
         Helper::ENDPOINT_TYPE_AZURE => Helper::ENDPOINT_TYPE_AZURE,
     ];
 
+    /**
+     * The models which may be selected for an AI feature.
+     *
+     * Currently, these map to the text models which are provided by OpenAI.
+     */
     public const array AI_MODELS = [
         "gpt-4o",
         "gpt-4o-mini",
         "gpt-4.1",
         "gpt-4.1-mini",
+        "gpt-5",
+        "gpt-5-mini",
+        "gpt-5-nano",
+        "gpt-5-chat-latest",
+        "gpt-5.1",
+        "gpt-5.1-chat-latest",
+        "gpt-5.2",
+        "gpt-5.2-chat-latest",
+//        "gpt-5.2-pro",
+        "gpt-5.3-chat-latest",
+        "gpt-5.4",
+//        "gpt-5.4-pro",
+        "gpt-5.4-mini",
+        "gpt-5.4-nano",
+        "gpt-5.5",
     ];
 
+    /**
+     * The default image generation model.
+     */
+    public const string IMAGE_MODEL_DEFAULT = 'gpt-image-1';
+
+    /**
+     * The models which may be selected for image generation.
+     *
+     * Currently, these map to the image models which are provided by OpenAI.
+     */
+    public const array AI_IMAGE_MODELS = [
+        "gpt-image-1",
+        "gpt-image-1-mini",
+        "gpt-image-1.5",
+        "gpt-image-2",
+    ];
+
+    /**
+     * The default image output quality.
+     */
     public const string OUTPUT_QUALITY_DEFAULT = 'low';
-    public const array OUTPUT_QUALITY_OPTIONS = [
+
+    /**
+     * Options for image output quality.
+     */
+    private const array OUTPUT_QUALITY_OPTIONS = [
         'high',
         'medium',
         'low',
         'auto',
+    ];
+
+    /**
+     * Possible values for reasoning effort.
+     *
+     * @see https://developers.openai.com/api/docs/guides/reasoning
+     */
+    private const array REASONING_EFFORT_OPTIONS = [
+        self::REASONING_EFFORT_OPTION_DEFAULT,
+        self::REASONING_EFFORT_OPTION_NONE,
+        self::REASONING_EFFORT_OPTION_MINIMAL,
+        self::REASONING_EFFORT_OPTION_LOW,
+        self::REASONING_EFFORT_OPTION_MEDIUM,
+        self::REASONING_EFFORT_OPTION_HIGH,
+    ];
+
+    /**
+     * Default value for reasoning effort:
+     * made public so that other classes may use it.
+     */
+    public const string REASONING_EFFORT_OPTION_DEFAULT = 'default';
+    private const string REASONING_EFFORT_OPTION_NONE = 'none';
+    private const string REASONING_EFFORT_OPTION_MINIMAL = 'minimal';
+    private const string REASONING_EFFORT_OPTION_LOW = 'low';
+    private const string REASONING_EFFORT_OPTION_MEDIUM = 'medium';
+    private const string REASONING_EFFORT_OPTION_HIGH = 'high';
+
+    /**
+     * Mapping of supported AI models to allowed reasoning effort values.
+     *
+     * Use `$this->buildReasoningEffortModelOptions` to determine the actual
+     * list of allowed values, as this may differ by feature.
+     */
+    private const array REASONING_EFFORT_MODEL_OPTIONS = [
+        "gpt-4o"       => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_NONE,
+        ],
+        "gpt-4o-mini"  => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_NONE,
+        ],
+        "gpt-4.1"      => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_NONE,
+        ],
+        "gpt-4.1-mini" => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_NONE,
+        ],
+        "gpt-5"        => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_MINIMAL,
+            self::REASONING_EFFORT_OPTION_LOW,
+            self::REASONING_EFFORT_OPTION_MEDIUM,
+            self::REASONING_EFFORT_OPTION_HIGH,
+        ],
+        "gpt-5-mini"   => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_MINIMAL,
+            self::REASONING_EFFORT_OPTION_LOW,
+            self::REASONING_EFFORT_OPTION_MEDIUM,
+            self::REASONING_EFFORT_OPTION_HIGH,
+        ],
+        "gpt-5-nano"   => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_MINIMAL,
+            self::REASONING_EFFORT_OPTION_LOW,
+            self::REASONING_EFFORT_OPTION_MEDIUM,
+            self::REASONING_EFFORT_OPTION_HIGH,
+        ],
+        "gpt-5-chat-latest" => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_NONE,
+        ],
+        "gpt-5.1"      => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_NONE,
+            self::REASONING_EFFORT_OPTION_LOW,
+            self::REASONING_EFFORT_OPTION_MEDIUM,
+            self::REASONING_EFFORT_OPTION_HIGH,
+        ],
+        "gpt-5.1-chat-latest" => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_MEDIUM,
+        ],
+        "gpt-5.2"      => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_NONE,
+            self::REASONING_EFFORT_OPTION_LOW,
+            self::REASONING_EFFORT_OPTION_MEDIUM,
+            self::REASONING_EFFORT_OPTION_HIGH,
+        ],
+//        "gpt-5.2-pro"  => [
+//            self::REASONING_EFFORT_OPTION_DEFAULT,
+//            self::REASONING_EFFORT_OPTION_MEDIUM,
+//            self::REASONING_EFFORT_OPTION_HIGH,
+//        ],
+        "gpt-5.2-chat-latest" => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_MEDIUM,
+        ],
+        "gpt-5.3-chat-latest" => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_MEDIUM,
+        ],
+        "gpt-5.4"      => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_NONE,
+            self::REASONING_EFFORT_OPTION_LOW,
+            self::REASONING_EFFORT_OPTION_MEDIUM,
+            self::REASONING_EFFORT_OPTION_HIGH,
+        ],
+//        "gpt-5.4-pro"  => [
+//            self::REASONING_EFFORT_OPTION_DEFAULT,
+//            self::REASONING_EFFORT_OPTION_MEDIUM,
+//            self::REASONING_EFFORT_OPTION_HIGH,
+//        ],
+        "gpt-5.4-mini"   => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_NONE,
+            self::REASONING_EFFORT_OPTION_LOW,
+            self::REASONING_EFFORT_OPTION_MEDIUM,
+            self::REASONING_EFFORT_OPTION_HIGH,
+        ],
+        "gpt-5.4-nano"   => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_NONE,
+            self::REASONING_EFFORT_OPTION_LOW,
+            self::REASONING_EFFORT_OPTION_MEDIUM,
+            self::REASONING_EFFORT_OPTION_HIGH,
+        ],
+        "gpt-5.5"      => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_NONE,
+            self::REASONING_EFFORT_OPTION_LOW,
+            self::REASONING_EFFORT_OPTION_MEDIUM,
+            self::REASONING_EFFORT_OPTION_HIGH,
+        ],
+    ];
+
+    /**
+     * Possible values for text verbosity.
+     *
+     * From OpenAI docs:
+     * > Constrains the verbosity of the model’s response. Lower values will
+     * > result in more concise responses, while higher values will result in
+     * > more verbose responses. Currently supported values are low, medium,
+     * > and high.
+     */
+    private const array TEXT_VERBOSITY_OPTIONS = [
+        self::TEXT_VERBOSITY_OPTION_DEFAULT,
+        self::TEXT_VERBOSITY_OPTION_LOW,
+        self::TEXT_VERBOSITY_OPTION_MEDIUM,
+        self::TEXT_VERBOSITY_OPTION_HIGH,
+    ];
+
+    /**
+     * Possible values for text verbosity, for GPT-4 family models.
+     */
+    private const array TEXT_VERBOSITY_OPTIONS_GPT4 = [
+        self::TEXT_VERBOSITY_OPTION_DEFAULT,
+        self::TEXT_VERBOSITY_OPTION_MEDIUM,
+    ];
+
+    /**
+     * Possible values for text verbosity, for GPT-5 family models of the
+     * "chat" variant.
+     */
+    private const array TEXT_VERBOSITY_OPTIONS_GPT5_CHAT = [
+        self::TEXT_VERBOSITY_OPTION_DEFAULT,
+        self::TEXT_VERBOSITY_OPTION_MEDIUM,
+    ];
+
+    /**
+     * Default value for text verbosity:
+     * made public so that other classes may use it.
+     */
+    public const string TEXT_VERBOSITY_OPTION_DEFAULT = 'default';
+    private const string TEXT_VERBOSITY_OPTION_LOW = 'low';
+    private const string TEXT_VERBOSITY_OPTION_MEDIUM = 'medium';
+    private const string TEXT_VERBOSITY_OPTION_HIGH = 'high';
+
+    /**
+     * Mapping of supported AI models to allowed text verbosity values.
+     */
+    public const array TEXT_VERBOSITY_MODEL_OPTIONS = [
+        "gpt-4o"              => self::TEXT_VERBOSITY_OPTIONS_GPT4,
+        "gpt-4o-mini"         => self::TEXT_VERBOSITY_OPTIONS_GPT4,
+        "gpt-4.1"             => self::TEXT_VERBOSITY_OPTIONS_GPT4,
+        "gpt-4.1-mini"        => self::TEXT_VERBOSITY_OPTIONS_GPT4,
+        "gpt-5"               => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-5-mini"          => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-5-nano"          => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-5-chat-latest"   => self::TEXT_VERBOSITY_OPTIONS_GPT5_CHAT,
+        "gpt-5.1"             => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-5.1-chat-latest" => self::TEXT_VERBOSITY_OPTIONS_GPT5_CHAT,
+        "gpt-5.2"             => self::TEXT_VERBOSITY_OPTIONS,
+//        "gpt-5.2-pro"         => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-5.2-chat-latest" => self::TEXT_VERBOSITY_OPTIONS_GPT5_CHAT,
+        "gpt-5.3-chat-latest" => self::TEXT_VERBOSITY_OPTIONS_GPT5_CHAT,
+        "gpt-5.4"             => self::TEXT_VERBOSITY_OPTIONS,
+//        "gpt-5.4-pro"         => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-5.4-mini"          => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-5.4-nano"          => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-5.5"               => self::TEXT_VERBOSITY_OPTIONS,
     ];
 
     // field keys
@@ -59,51 +316,15 @@ class Config
     public const string FIELD_AI_MODERATION = 'ai_moderation';
     public const string FIELD_SYSTEM_PROMPT  = 'system_prompt';
     public const string FIELD_OUTPUT_QUALITY = 'output_quality';
+    public const string FIELD_IMAGE_MODEL = 'image_model';
+    public const string FIELD_REASONING_EFFORT = 'reasoning_effort';
+    public const string FIELD_TEXT_VERBOSITY = 'text_verbosity';
 
     // field types
     public const string FIELD_TYPE_SELECT   = 'select';
     public const string FIELD_TYPE_INPUT    = 'input';
     public const string FIELD_TYPE_TEXTAREA = 'textarea';
     public const string FIELD_TYPE_CHECKBOX = 'checkbox';
-
-
-    /* Predefined config structs: as you add more providers, don't forget to pile them in here
-     */
-
-    /**
-     * Common fields across all providers
-     */
-    public const array STRUCT_GENERAL = [
-        self::FIELD_AIKEY => [
-            'value' => '',
-        ],
-        self::FIELD_SYSTEM_PROMPT => [
-            'value' => '',
-        ],
-    ];
-
-
-    /**
-     * OpenAI-specific fields
-     */
-    public const array STRUCT_OPENAI = [
-        self::FIELD_MODEL => [
-            'value' => '', // -- select an option --
-        ],
-    ];
-
-
-    /**
-     * Azure-specific fields
-     */
-    public const array STRUCT_AZURE = [
-        self::FIELD_RESOURCE_NAME => [
-            'value' => '',
-        ],
-        self::FIELD_DEPLOYMENT_ID => [
-            'value' => '',
-        ],
-    ];
 
 
     /**
@@ -124,6 +345,12 @@ class Config
 
     /**
      * Which form inputs exist for each AI provider?
+     *
+     * When adding new fields, add them here: and if necessary, set which
+     * section they occur within so they are restricted to that provider.
+     *
+     * Also, add a title and description within `manifest` in
+     * `templates/config.twig`.
      */
     public const array DEFAULT_FORM_INPUTS = [
         self::FIELD_PROVIDER      => [
@@ -150,6 +377,16 @@ class Config
         ],
         self::FIELD_SYSTEM_PROMPT => [
             'type'    => self::FIELD_TYPE_TEXTAREA,
+            'section' => self::SECTION_GENERAL,
+        ],
+        self::FIELD_REASONING_EFFORT => [
+            'type'    => self::FIELD_TYPE_SELECT,
+            'options' => self::REASONING_EFFORT_OPTIONS,
+            'section' => self::SECTION_GENERAL,
+        ],
+        self::FIELD_TEXT_VERBOSITY => [
+            'type'    => self::FIELD_TYPE_SELECT,
+            'options' => self::TEXT_VERBOSITY_OPTIONS,
             'section' => self::SECTION_GENERAL,
         ],
     ];
@@ -418,11 +655,16 @@ class Config
 
         if ($feature === Helper::FEATURE_IMAGE) {
             // Image feature:
-            // * add output quality
+            // * add output quality and image model
             // * remove Azure option
             $formInputs[self::FIELD_OUTPUT_QUALITY] = [
                 'type'    => self::FIELD_TYPE_SELECT,
                 'options' => self::OUTPUT_QUALITY_OPTIONS,
+                'section' => self::SECTION_OPENAI,
+            ];
+            $formInputs[self::FIELD_IMAGE_MODEL] = [
+                'type'    => self::FIELD_TYPE_SELECT,
+                'options' => self::AI_IMAGE_MODELS,
                 'section' => self::SECTION_OPENAI,
             ];
             unset($formInputs[self::FIELD_PROVIDER]['options'][Helper::ENDPOINT_TYPE_AZURE]);
@@ -435,5 +677,23 @@ class Config
         }
 
         return $formInputs;
+    }
+
+    /**
+     * Build available reasoning effort levels for this feature.
+     *
+     * This ensures the `minimal` effort level is stripped from the image
+     * feature, because this effort is not supported when generating images.
+     *
+     * @param string $feature
+     * @return array|array[]
+     */
+    public function buildReasoningEffortModelOptions(string $feature): array
+    {
+        $options = self::REASONING_EFFORT_MODEL_OPTIONS;
+        if ($feature === Helper::FEATURE_IMAGE) {
+            $options = array_map(fn ($effortLevels) => array_values(array_diff($effortLevels, ['minimal'])), $options);
+        }
+        return $options;
     }
 }

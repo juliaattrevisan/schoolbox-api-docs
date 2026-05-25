@@ -2,6 +2,7 @@
 
 namespace Schoolbox\Editor\OpenAI\Payload;
 
+use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -118,6 +119,8 @@ class LearningActivityCustomisation
      * @param string      $openAiModel
      * @param string      $openAiDeploymentId
      * @param string      $systemPrompt
+     * @param string      $reasoningEffort The reasoning effort level from admin config
+     * @param string      $textVerbosity The text verbosity level from admin config
      * @param IAssessable $assessable
      * @param User        $student
      * @param Folder      $course
@@ -129,6 +132,8 @@ class LearningActivityCustomisation
         private string $openAiModel,
         private string $openAiDeploymentId,
         private string $systemPrompt,
+        private string $reasoningEffort,
+        private string $textVerbosity,
         private IAssessable $assessable,
         private User $student,
         private Folder $course,
@@ -191,9 +196,18 @@ class LearningActivityCustomisation
             ],
             'stream' => false,
             'text' => [
-                'format' => $responseFormat
+                'format' => $responseFormat,
             ],
         ];
-        return $payload;
+
+        if ($this->textVerbosity !== Config::TEXT_VERBOSITY_OPTION_DEFAULT) {
+            $payload['text']['verbosity'] = $this->textVerbosity;
+        }
+
+        if ($this->reasoningEffort !== Config::REASONING_EFFORT_OPTION_DEFAULT) {
+            $payload['reasoning'] = ['effort' => $this->reasoningEffort];
+        }
+
+        return new ModelParser()->filterPayload($payload, $model, $this->openAiEndpoint);
     }
 }

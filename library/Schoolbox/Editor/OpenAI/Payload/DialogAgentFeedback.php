@@ -2,6 +2,7 @@
 
 namespace Schoolbox\Editor\OpenAI\Payload;
 
+use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\Admin\DialogAgent\Scenario\Model as Scenario;
@@ -85,6 +86,8 @@ class DialogAgentFeedback
      * @param string $openAiModel
      * @param string $openAiDeploymentId
      * @param string $featureSystemPrompt The system prompt from admin config
+     * @param string $reasoningEffort The reasoning effort level from admin config
+     * @param string $textVerbosity The text verbosity level from admin config
      * @param Log\Mapper $aiLogMapper
      */
     public function __construct(
@@ -92,6 +95,8 @@ class DialogAgentFeedback
         private string $openAiModel,
         private string $openAiDeploymentId,
         private string $featureSystemPrompt,
+        private string $reasoningEffort,
+        private string $textVerbosity,
         private Log\Mapper $aiLogMapper,
     ) {
     }
@@ -151,6 +156,14 @@ class DialogAgentFeedback
             ],
         ];
 
+        if ($this->textVerbosity !== Config::TEXT_VERBOSITY_OPTION_DEFAULT) {
+            $payload['text']['verbosity'] = $this->textVerbosity;
+        }
+
+        if ($this->reasoningEffort !== Config::REASONING_EFFORT_OPTION_DEFAULT) {
+            $payload['reasoning'] = ['effort' => $this->reasoningEffort];
+        }
+
         /* Add in the overarching feature system prompt (from config) if available */
         if ('' !== trim($this->featureSystemPrompt)) {
             $payload['input'][] = [
@@ -171,7 +184,7 @@ class DialogAgentFeedback
             'content' => $this->generateUserFeedPrompt($assessment, $response),
         ];
 
-        return $payload;
+        return new ModelParser()->filterPayload($payload, $this->openAiModel, $this->openAiEndpoint);
     }
 
 

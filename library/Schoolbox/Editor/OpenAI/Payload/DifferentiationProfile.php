@@ -3,6 +3,7 @@
 namespace Schoolbox\Editor\OpenAI\Payload;
 
 use Schoolbox\Admin\DifferentiationProfiles\Model;
+use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Collection;
 use Schoolbox\Editor\OpenAI\Helper;
 
@@ -91,12 +92,23 @@ class DifferentiationProfile
 
     /**
      * Constructor.
+     *
+     * @param string $openAiEndpoint
+     * @param string $openAiModel
+     * @param string $openAiDeploymentId
+     * @param string $systemPrompt The system prompt from admin config
+     * @param string $reasoningEffort The reasoning effort level from admin config
+     * @param string $textVerbosity The text verbosity level from admin config
+     * @param string $documentContent
+     * @param Collection $enabledFields
      */
     public function __construct(
         private string $openAiEndpoint,
         private string $openAiModel,
         private string $openAiDeploymentId,
         private string $systemPrompt,
+        private string $reasoningEffort,
+        private string $textVerbosity,
         private string $documentContent,
         private Collection $enabledFields,
     ) {
@@ -142,10 +154,19 @@ class DifferentiationProfile
             ],
             'stream'            => false,
             'text'              => [
-                'format' => $responseFormat
+                'format' => $responseFormat,
             ],
         ];
-        return $payload;
+
+        if ($this->textVerbosity !== Config::TEXT_VERBOSITY_OPTION_DEFAULT) {
+            $payload['text']['verbosity'] = $this->textVerbosity;
+        }
+
+        if ($this->reasoningEffort !== Config::REASONING_EFFORT_OPTION_DEFAULT) {
+            $payload['reasoning'] = ['effort' => $this->reasoningEffort];
+        }
+
+        return new ModelParser()->filterPayload($payload, $model, $this->openAiEndpoint);
     }
 
     /**

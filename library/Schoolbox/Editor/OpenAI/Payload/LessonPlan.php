@@ -2,6 +2,7 @@
 
 namespace Schoolbox\Editor\OpenAI\Payload;
 
+use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Curriculum\Node\Mapper;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\GenericCollection;
@@ -128,6 +129,8 @@ class LessonPlan
      * @param string $openAiModel
      * @param string $openAiDeploymentId
      * @param string $textSystemPrompt
+     * @param string $reasoningEffort The reasoning effort level from admin config
+     * @param string $textVerbosity The text verbosity level from admin config
      * @param string $language
      * @param Mapper $curriculumNodeMapper
      */
@@ -136,6 +139,8 @@ class LessonPlan
         private string $openAiModel,
         private string $openAiDeploymentId,
         private string $textSystemPrompt,
+        private string $reasoningEffort,
+        private string $textVerbosity,
         private string $language,
         private \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper
     ) {
@@ -310,9 +315,17 @@ class LessonPlan
              */
             "stream" => false,
             'text' => [
-                'format' => $responseFormat
-            ]
+                'format' => $responseFormat,
+            ],
         ];
+
+        if ($this->textVerbosity !== Config::TEXT_VERBOSITY_OPTION_DEFAULT) {
+            $payload['text']['verbosity'] = $this->textVerbosity;
+        }
+
+        if ($this->reasoningEffort !== Config::REASONING_EFFORT_OPTION_DEFAULT) {
+            $payload['reasoning'] = ['effort' => $this->reasoningEffort];
+        }
 
         /* Add in the overarching text system prompt if available
          */
@@ -323,7 +336,7 @@ class LessonPlan
             ]);
         }
 
-        return $payload;
+        return new ModelParser()->filterPayload($payload, $this->openAiModel, $this->openAiEndpoint);
     }
 
 

@@ -88,6 +88,24 @@ class CkEditorTextChat
      */
     private function buildPayload(array $payload): array
     {
+        // Model depends on azure vs. OpenAI
+        $provider = $this->config[Config::FIELD_PROVIDER]['value'];
+        $payload['model'] = $provider === Helper::ENDPOINT_TYPE_AZURE
+            ? ($this->config[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? '')
+            : ($this->config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? '')
+        ;
+        $payload['stream'] = true;
+        $payload['max_completion_tokens'] = 10000;
+        $reasoningEffort = trim($this->config[Config::SECTION_GENERAL][Config::FIELD_REASONING_EFFORT]['value'] ?? '') ?: Config::REASONING_EFFORT_OPTION_DEFAULT;
+        if ($reasoningEffort !== Config::REASONING_EFFORT_OPTION_DEFAULT) {
+            $payload['reasoning_effort'] = $reasoningEffort;
+        }
+        $textVerbosity = trim($this->config[Config::SECTION_GENERAL][Config::FIELD_TEXT_VERBOSITY]['value'] ?? '') ?: Config::TEXT_VERBOSITY_OPTION_DEFAULT;
+        if ($textVerbosity !== Config::TEXT_VERBOSITY_OPTION_DEFAULT) {
+            $payload['verbosity'] = $textVerbosity;
+        }
+        $payload['temperature'] = 1;
+        $payload['top_p'] = 1;
         $payload['messages'] ??= [];
         $payload['stream_options'] = ['include_usage' => true];
         $systemPrompt = $this->config[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'] ?? '';
@@ -100,6 +118,15 @@ class CkEditorTextChat
                 ]
             );
         }
+
+        // GPT-5 doesn't support max_tokens at all, it is deprecated for other
+        // models
+        if (isset($payload['max_tokens'])) {
+            $maxTokens = $payload['max_tokens'];
+            unset($payload['max_tokens']);
+            $payload['max_completion_tokens'] = $maxTokens;
+        }
+
         return $payload;
     }
 

@@ -23,7 +23,14 @@ class Controller extends ConfigController
      */
     public function getIndex(): void
     {
-        $features = new Config()->fetchFeatures($this->getConfigMapper());
+        $config                      = new Config();
+        $features                    = $config->fetchFeatures($this->getConfigMapper());
+        $reasoningEffortModelOptions = [];
+        $textVerbosityModelOptions   = [];
+        foreach (array_keys($features) as $feature) {
+            $reasoningEffortModelOptions[$feature] = $config->buildReasoningEffortModelOptions($feature);
+            $textVerbosityModelOptions[$feature]   = Config::TEXT_VERBOSITY_MODEL_OPTIONS;
+        }
 
         $this->response = $this->responseFromTemplate('@adminOpenAi/index.twig', [
             'pageCurrent' => $this->routeGenerator->generate('adminOpenAi.getIndex'),
@@ -32,6 +39,8 @@ class Controller extends ConfigController
             'fields' => Config::FIELDS,
             'providers' => Config::PROVIDERS,
             'models' => Config::AI_MODELS,
+            'reasoningEffortModelOptions' => $reasoningEffortModelOptions,
+            'textVerbosityModelOptions' => $textVerbosityModelOptions,
         ], 'AI Services');
     }
 

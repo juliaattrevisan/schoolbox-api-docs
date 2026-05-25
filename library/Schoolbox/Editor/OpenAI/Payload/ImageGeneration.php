@@ -2,6 +2,9 @@
 
 namespace Schoolbox\Editor\OpenAI\Payload;
 
+use Schoolbox\Admin\OpenAI\Config;
+use Schoolbox\Editor\OpenAI\Helper;
+
 class ImageGeneration
 {
     /**
@@ -10,12 +13,6 @@ class ImageGeneration
     private const float TEMPERATURE = 0.7;
     private const float TOP_P = 0.9;
     private const int MAX_OUTPUT_TOKENS = 20000;
-
-
-    /**
-     * We always use this model for image generation, it's not configurable
-     */
-    public const string OPENAI_IMAGE_MODEL = 'gpt-image-1';
 
     private const int PARTIAL_IMAGE_QTY = 3;
     private const string IMAGE_OUTPUT_FORMAT = 'png';
@@ -34,7 +31,10 @@ class ImageGeneration
      */
     private const string PROMPT_SYSTEM_PERSONA = "
         You are an AI image generation tool.
-        Your only purpose is to create images based on the user's provided description.
+        Your only purpose is to create images based on the user's provided description:
+        but you will also generate a textual description of images which you create, in a separate output.
+        Do not leave the text output empty: the textual description is extremely important!
+        The text output should not contain technical terms such as color codes.
         You will not engage in conversation, answer questions, or perform any tasks other than image generation.
         The user does not need to specifically request an image
             - however they cannot request a different type of asset/media or task
@@ -84,13 +84,19 @@ class ImageGeneration
      * Constructor.
      *
      * @param string $textModel
+     * @param string $imageModel
      * @param string $systemPrompt
      * @param string $imageOutputQuality
+     * @param string $reasoningEffort The reasoning effort level from admin config
+     * @param string $textVerbosity The text verbosity level from admin config
      */
     public function __construct(
         private string $textModel,
+        private string $imageModel,
         private string $systemPrompt,
         private string $imageOutputQuality,
+        private string $reasoningEffort,
+        private string $textVerbosity,
     ) {
     }
 
@@ -131,7 +137,7 @@ class ImageGeneration
             'tools' => [
                 [
                     'type' => 'image_generation',
-                    'model' => self::OPENAI_IMAGE_MODEL,
+                    'model' => $this->imageModel,
                     'output_format' => self::IMAGE_OUTPUT_FORMAT,
                     'background' => 'auto',
                     'partial_images' => self::PARTIAL_IMAGE_QTY,
@@ -155,6 +161,14 @@ class ImageGeneration
                 ],
             ],
         ];
+
+        if ($this->textVerbosity !== Config::TEXT_VERBOSITY_OPTION_DEFAULT) {
+            $payload['text']['verbosity'] = $this->textVerbosity;
+        }
+
+        if ($this->reasoningEffort !== Config::REASONING_EFFORT_OPTION_DEFAULT) {
+            $payload['reasoning'] = ['effort' => $this->reasoningEffort];
+        }
 
         /** add prompt inputs if they are meaningful */
         $systemPrompt = strtr(self::PROMPT_SYSTEM_PERSONA, [
@@ -194,7 +208,9 @@ class ImageGeneration
             $payload['previous_response_id'] = $previousResponseId;
         }
 
-        return $payload;
+        // For now: image generation is supported only by OpenAI.
+        // This may change in the future.
+        return new ModelParser()->filterPayload($payload, $this->textModel, Helper::ENDPOINT_TYPE_OPENAI);
     }
 
     /**

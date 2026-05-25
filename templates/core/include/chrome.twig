@@ -145,21 +145,8 @@
             {% for feature, aiConfig in aiFeatures %}
                 {# TODO: why does this require you to know the data structure... It really should be a class with an ->isEnabled() method #}
                 {% set isEnabled = aiConfig.config.provider.value != 'Off' %}
-                {# selectively choose which features tell EVERY USER what model they are using
-                # The model is only needed for chat at the moment, it is the exception
-                #}
-                {% set featureModel = null %}
-                {% if feature in ['chat'] %}
-                    {% if aiConfig.config.provider.value == 'Azure' %}
-                        {% set featureModel = aiConfig.config.Azure.deployment_id.value ?? '' %}
-                    {% elseif aiConfig.config.provider.value == 'OpenAI' %}
-                        {% set featureModel = aiConfig.config.OpenAI.model.value ?? '' %}
-                    {% endif %}
-                {% endif %}
-
                 window.sbProps.aiFeatures["{{ feature }}"] = {
                     enabled: {{ isEnabled ? 'true' : 'false' }},
-                    {% if featureModel %}model: "{{ featureModel }}",{% endif %}
                 };
             {% endfor %}
         {% endif %}

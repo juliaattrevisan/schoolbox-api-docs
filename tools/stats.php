@@ -8,6 +8,7 @@
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Admin\OpenAI\Config as OpenAiConfig;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Permission\Access\UserAccess;
@@ -416,18 +417,6 @@ $app = new class extends CliTool\App {
             'openai_output_tokens_image' => 'SELECT SUM(output_tokens) FROM openai_log WHERE return_code = 200 AND feature = "image"',
             'openai_tokens_image' => 'SELECT SUM(output_tokens) + SUM(input_tokens) FROM openai_log WHERE return_code = 200 AND feature = "image"',
 
-            // old ai metrics (not recording the ai feature (chat, lessonplan, image))
-            'openai_model_gpt-4o' => "SELECT count(*) FROM openai_log WHERE (model like 'gpt-4o%' and model not like '%mini%')",
-            'openai_model_gpt-4o-mini' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4o-mini%'",
-            'openai_model_gpt-41' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4.1%' and model not like '%mini%'",
-            'openai_model_gpt-41-mini' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4.1-mini%'",
-            'openai_model_unknown' => "
-                SELECT count(*) FROM openai_log WHERE
-                not (model like 'gpt-4o%') AND
-                not (model like 'gpt-4.1%') AND
-                not (model like 'gpt-4o-mini%') AND
-                not (model like 'gpt-4.1-mini%')",
-
             // AI feature usage
             'openai_chat' => "SELECT count(*) FROM openai_log WHERE feature = 'chat'",
             'openai_lessonplan' => "SELECT count(*) FROM openai_log WHERE feature = 'lessonplan'",
@@ -443,6 +432,54 @@ $app = new class extends CliTool\App {
             'sonar_ui'  => "SELECT COUNT(*) FROM config WHERE name = 'advanced_ui_enabled' AND value = 1",
         ];
 
+        // Queries for finding OpenAI model usage.
+        // These were once referenced as queries for:
+        // "old ai metrics (not recording the ai feature (chat, lessonplan, image))",
+        // so it's uncertain how important they are.
+        foreach (OpenAiConfig::AI_MODELS as $model) {
+            // For models like `gpt-4o` with `mini` variants:
+            // need to exclude said variants.
+            $queryParts  = ['model LIKE ?'];
+            $queryParams = [$model . '%'];
+
+            // Need to exclude other models from this query,
+            // if the other model's name starts with this model's name:
+            // otherwise, `MODEL LIKE $model%' will match `$otherModel` too.
+            foreach (OpenAiConfig::AI_MODELS as $otherModel) {
+                if ($model !== $otherModel && str_starts_with($otherModel, $model)) {
+                    $queryParts[]  = 'model NOT LIKE ?';
+                    $queryParams[] = $otherModel . '%';
+                }
+            }
+
+            $queryList['openai_model_' . $model] = [
+                "SELECT COUNT(*) FROM openai_log WHERE " . implode(' AND ', $queryParts),
+                $queryParams,
+            ];
+        }
+
+        // Build the unknown model query
+        $queryList['openai_model_unknown'] = [
+            "SELECT COUNT(*) FROM openai_log WHERE " . implode(' AND ', array_map(fn ($model) => 'model NOT LIKE ?', OpenAiConfig::AI_MODELS)),
+            array_map(fn ($model) => $model . '%', OpenAiConfig::AI_MODELS),
+        ];
+
+        // Query image model usage
+        foreach (OpenAiConfig::AI_IMAGE_MODELS as $imageModel) {
+            $queryList['openai_image_model_' . $imageModel] = [
+                "SELECT COUNT(*) FROM openai_log WHERE feature = 'image' AND JSON_VALUE(prompt, '$.tools[0].model') = ?",
+                [$imageModel],
+            ];
+        }
+        $queryList['openai_image_model_unknown'] = [
+            sprintf(
+                "SELECT COUNT(*) FROM openai_log WHERE feature = 'image' AND COALESCE(JSON_VALUE(prompt, '$.tools[0].model'), '') NOT IN (%s)",
+                implode(',', array_fill(0, count(OpenAiConfig::AI_IMAGE_MODELS), '?')),
+            ),
+            OpenAiConfig::AI_IMAGE_MODELS,
+        ];
+
+
         $result['instance_id'] = INSTANCE_ID;
         $result['school_code'] = $config->get(ConfigMapper::NAME_SITE_SCHOOL_CODE);
         $result['type'] = $config->get('site_type');
@@ -453,8 +490,20 @@ $app = new class extends CliTool\App {
         $db->executeDirectly('SET MAX_STATEMENT_TIME=600');
 
         foreach ($queryList as $name => $query) {
-            $this->getLogger()->debug($query);
-            $statement = $db->executeQuery($query);
+            if (is_array($query)) {
+                [$query, $params] = $query;
+            } else {
+                $params = [];
+            }
+            $this->getLogger()->debug(
+                sprintf(
+                    '%s: %s%s',
+                    $name,
+                    $query,
+                    !empty($params) ? (' ' . json_encode($params)) : '',
+                ),
+            );
+            $statement = $db->executeQuery($query, $params);
             $result[$name] = (int)$statement->fetchColumn(0);
         }
 

@@ -45,7 +45,41 @@
     'output_quality': {
         'title': 'Output Quality',
         'description': 'Select which output quality you wish to use for image generation. A higher quality will improve the result of more complex images but will take longer to generate and use more credit.'
-    }
+    },
+    'image_model': {
+        'title': 'OpenAI Image Model',
+        'description': 'Select which model you wish to use for image generation. This is distinct from the OpenAI Model, which is used only to generate text.'
+    },
+    'text_verbosity': {
+        'title': 'Text Verbosity',
+        'description': 'Select the level of verbosity for the text you wish for this model to generate.',
+        'warnings': {
+            'Azure': '
+                <p>You must ensure this verbosity level is compatible with the model your deployment uses.</p>
+                <ul>
+                <li><b>GPT-4o, GPT-4.1</b>: default, medium</li>
+                <li><b>GPT-5, GPT-5.1, GPT-5.2</b>: any</li>
+                <li><b>GPT-5, GPT-5.1, GPT-5.2, GPT-5.3 chat</b>: default, medium</li>
+                </ul>
+            ',
+        },
+    },
+    'reasoning_effort': {
+        'title': 'Reasoning Effort',
+        'description': 'Select the level of effort you wish the model to take when reasoning about its response. More reasoning should lead to more accurate but slower responses.',
+        'warnings': {
+            'Azure': '
+                <p>You must ensure this effort level is compatible with the model your deployment uses.</p>
+                <ul>
+                <li><b>GPT-4o, GPT-4.1</b>: any</li>
+                <li><b>GPT-5</b>: minimal, low, medium, high (not default)</li>
+                <li><b>GPT-5.1, GPT-5.2</b>: default, none, low, medium, high</li>
+                <li><b>GPT-5 chat</b>: default</li>
+                <li><b>GPT-5.1, GPT-5.2, GPT-5.3 chat</b>: default, medium</li>
+                </ul>
+            ',
+        },
+    },
 } %}
 
 {# Each panel consists of various sections; each supported AI service (openAI, azure, et al) has its own section
@@ -145,19 +179,34 @@
                    data-test="ai-feature-option-input-{{ name }}"
             />
         {% endif %}
+
+        {% for sectionName, section in sections  %}
+            {% if (manifest[name].warnings[sectionName] ?? null) is not empty %}
+                <div data-alert {{ section.dataAttrs }} style="display: none" class="alert-box warning">
+                    {{ manifest[name].warnings[sectionName] | raw }}
+                </div>
+            {% endif %}
+        {% endfor %}
+
     {% endfor %}
 
     <script type="application/javascript">
     (() => {
         // use a const feature as the container selector
-        const FEATURE = '{{ feature.feature }}';
-        const featureEl = document.querySelector(`[data-feature="${FEATURE}"]`);
+        const REASONING_EFFORT_MODEL_OPTIONS = {{ reasoningEffortModelOptions | json_encode | raw }};
+        const TEXT_VERBOSITY_MODEL_OPTIONS   = {{ textVerbosityModelOptions | json_encode | raw }};
+        const FEATURE                        = '{{ feature.feature }}';
+        const featureEl                      = document.querySelector(`[data-feature="${FEATURE}"]`);
+        const providerSelect                 = featureEl.querySelector(`#${FEATURE}-provider-value`);
+        const modelSelect                    = featureEl.querySelector(`#${FEATURE}-model-value`);
+        const reasoningEffortSelect          = featureEl.querySelector(`#${FEATURE}-reasoning_effort-value`);
+        const textVerbositySelect            = featureEl.querySelector(`#${FEATURE}-text_verbosity-value`);
 
         /**
          * reusable function to show/hide fields based on provider
          * @param provider
          */
-        function showHide(provider) {
+        function toggleInputVisibility(provider) {
             // hide all fields
             featureEl.querySelectorAll('[data-feature-openai]').forEach(el => el.style.display = 'none');
             featureEl.querySelectorAll('[data-feature-azure]').forEach(el => el.style.display = 'none');
@@ -171,18 +220,94 @@
             }
         }
 
-        // on page load, show the current selected provider fields
-        document.addEventListener('DOMContentLoaded', () => {
-            const currentValue = featureEl.querySelector(`#${FEATURE}-provider-value`).value;
-            showHide(currentValue);
+        /**
+         * Reusable function for enabling/disabling options, based on the
+         * selected model and provider.
+         *
+         * @param baseOptions
+         * @param model
+         * @param provider
+         * @param selectEl
+         */
+        function toggleOptions(baseOptions, model, provider, selectEl) {
+            if (!selectEl) {
+                return;
+            }
+            const modelOptions = baseOptions[model] ?? null;
+            Array.from(selectEl.options).forEach(el => {
+                if (el.value !== null) {
+                    if (provider === 'OpenAI') {
+                        if (modelOptions !== null) {
+                            el.disabled = !modelOptions.includes(el.value);
+                        }
+                    } else {
+                        el.disabled = false;
+                    }
+                }
+            });
+        }
+
+        /**
+         * If the currently selected option in `selectEl` is now disabled:
+         * select the first option which is not disabled.
+         *
+         * @param selectEl
+         */
+        function selectFirstNonDisabledOption(selectEl) {
+            if (!selectEl) {
+                return;
+            }
+            const selectedAndDisabled = Array.from(selectEl.options).find(el => el.selected && el.disabled);
+            if (selectedAndDisabled) {
+                const firstEnabled = Array.from(selectEl.options).find(el => !el.disabled);
+                if (firstEnabled) {
+                    firstEnabled.selected = true;
+                }
+            }
+        }
+
+        // /**
+        //  * If the currently selected reasoning option is now disabled:
+        //  * select the first option which is not disabled.
+        //  */
+        // function selectFirstReasoningOptionIfSelectedDisabled() {
+        //     if (!reasoningEffortSelect) {
+        //         return;
+        //     }
+        //     const selectedAndDisabled = Array.from(reasoningEffortSelect.options).find(el => el.selected && el.disabled);
+        //     if (selectedAndDisabled) {
+        //         const firstEnabled = Array.from(reasoningEffortSelect.options).find(el => !el.disabled);
+        //         if (firstEnabled) {
+        //             firstEnabled.selected = true;
+        //         }
+        //     }
+        // }
+
+        // Disable reasoning levels which are incompatible with the model
+        modelSelect.addEventListener('change', (event) => {
+            toggleOptions(REASONING_EFFORT_MODEL_OPTIONS[FEATURE], event.target.value, providerSelect.value, reasoningEffortSelect);
+            selectFirstNonDisabledOption(reasoningEffortSelect);
+
+            toggleOptions(TEXT_VERBOSITY_MODEL_OPTIONS[FEATURE], event.target.value, providerSelect.value, textVerbositySelect);
+            selectFirstNonDisabledOption(textVerbositySelect);
         });
 
         // when changing the provider select, show/hide the relevant fields
-        featureEl.querySelector(`#${FEATURE}-provider-value`).addEventListener('change', (event) => {
-            const value = event.target.value;
+        providerSelect.addEventListener('change', (event) => {
+            toggleInputVisibility(event.target.value);
 
-            // show relevant fields
-            showHide(value);
+            toggleOptions(REASONING_EFFORT_MODEL_OPTIONS[FEATURE], modelSelect.value, event.target.value, reasoningEffortSelect);
+            selectFirstNonDisabledOption(reasoningEffortSelect);
+
+            toggleOptions(TEXT_VERBOSITY_MODEL_OPTIONS[FEATURE], modelSelect.value, event.target.value, textVerbositySelect);
+            selectFirstNonDisabledOption(textVerbositySelect);
+        });
+
+        // on page load, show the current selected provider fields
+        document.addEventListener('DOMContentLoaded', () => {
+            toggleInputVisibility(providerSelect.value);
+            toggleOptions(REASONING_EFFORT_MODEL_OPTIONS[FEATURE], modelSelect.value, providerSelect.value, reasoningEffortSelect);
+            toggleOptions(TEXT_VERBOSITY_MODEL_OPTIONS[FEATURE], modelSelect.value, providerSelect.value, textVerbositySelect);
         });
     })();
     </script>

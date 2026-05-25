@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Editor\OpenAI\Payload;
 
+use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Admin\DialogAgent\Scenario\Model as Scenario;
@@ -141,12 +142,16 @@ class DialogAgentConfigureFields
      * @param string $openAiModel
      * @param string $openAiDeploymentId
      * @param string $featureSystemPrompt The system prompt from admin config
+     * @param string $reasoningEffort The reasoning effort level from admin config
+     * @param string $textVerbosity The text verbosity level from admin config
      */
     public function __construct(
         private string $openAiEndpoint,
         private string $openAiModel,
         private string $openAiDeploymentId,
         private string $featureSystemPrompt,
+        private string $reasoningEffort,
+        private string $textVerbosity,
     ) {
     }
 
@@ -202,6 +207,14 @@ class DialogAgentConfigureFields
             ],
         ];
 
+        if ($this->textVerbosity !== Config::TEXT_VERBOSITY_OPTION_DEFAULT) {
+            $payload['text']['verbosity'] = $this->textVerbosity;
+        }
+
+        if ($this->reasoningEffort !== Config::REASONING_EFFORT_OPTION_DEFAULT) {
+            $payload['reasoning'] = ['effort' => $this->reasoningEffort];
+        }
+
         /* Add in the overarching feature system prompt (from config) if available */
         if ('' !== trim($this->featureSystemPrompt)) {
             $payload['input'][] = [
@@ -222,7 +235,7 @@ class DialogAgentConfigureFields
             'content' => $this->formatActivityContextPrompt($scenario, $assessment),
         ];
 
-        return $payload;
+        return new ModelParser()->filterPayload($payload, $this->openAiModel, $this->openAiEndpoint);
     }
 
 
