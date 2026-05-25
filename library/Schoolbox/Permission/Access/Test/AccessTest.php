@@ -1228,7 +1228,7 @@ class AccessTest extends TestCase
      */
     private function getMockUserAccessMapper(GenericCollection $users, ?array $userAccessData): UserAccessMapper
     {
-        /** @var MockObject|UserAccessMapper $userAccessMapper */
+        /** @var MockObject&UserAccessMapper $userAccessMapper */
         $userAccessMapper = $this->createMock(UserAccessMapper::class);
 
         /** @var UserAccess[][][][] $allUserAccess */
