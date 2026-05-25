@@ -153,7 +153,11 @@
                     {{ style }}
                     data-test="ai-feature-option-select-{{ name }}"
             >
-                <option value="" disabled>-- select an option --</option>
+                {% if formInput.allowUnselected ?? false %}
+                    <option value="">-- none selected --</option>
+                {% else %}
+                    <option value="" disabled>-- select an option --</option>
+                {% endif %}
                 {% for option in formInput.options %}
                     <option value="{{ option }}"{% if inputValue == option %} selected {% endif %}>{{ option }}</option>
                 {% endfor %}

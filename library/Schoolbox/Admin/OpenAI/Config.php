@@ -355,19 +355,21 @@ class Config
      * `templates/config.twig`.
      */
     public const array DEFAULT_FORM_INPUTS = [
-        self::FIELD_PROVIDER      => [
-            'type'    => self::FIELD_TYPE_SELECT,
-            'options' => self::PROVIDERS,
-            'section' => null,
+        self::FIELD_PROVIDER => [
+            'type'            => self::FIELD_TYPE_SELECT,
+            'options'         => self::PROVIDERS,
+            'section'         => null,
+            'allowUnselected' => false,
         ],
-        self::FIELD_AIKEY         => [
+        self::FIELD_AIKEY => [
             'type'    => self::FIELD_TYPE_INPUT,
             'section' => self::SECTION_GENERAL,
         ],
-        self::FIELD_MODEL         => [
-            'type'    => self::FIELD_TYPE_SELECT,
-            'options' => self::AI_MODELS,
-            'section' => self::SECTION_OPENAI,
+        self::FIELD_MODEL => [
+            'type'            => self::FIELD_TYPE_SELECT,
+            'options'         => self::AI_MODELS,
+            'section'         => self::SECTION_OPENAI,
+            'allowUnselected' => false,
         ],
         self::FIELD_RESOURCE_NAME => [
             'type'    => self::FIELD_TYPE_INPUT,
@@ -378,23 +380,26 @@ class Config
             'section' => self::SECTION_AZURE,
         ],
         self::FIELD_DEPLOYMENT_MODEL => [
-            'type'    => self::FIELD_TYPE_SELECT,
-            'options' => self::AI_MODELS,
-            'section' => self::SECTION_AZURE,
+            'type'            => self::FIELD_TYPE_SELECT,
+            'options'         => self::AI_MODELS,
+            'section'         => self::SECTION_AZURE,
+            'allowUnselected' => true,
         ],
         self::FIELD_SYSTEM_PROMPT => [
             'type'    => self::FIELD_TYPE_TEXTAREA,
             'section' => self::SECTION_GENERAL,
         ],
         self::FIELD_REASONING_EFFORT => [
-            'type'    => self::FIELD_TYPE_SELECT,
-            'options' => self::REASONING_EFFORT_OPTIONS,
-            'section' => self::SECTION_GENERAL,
+            'type'            => self::FIELD_TYPE_SELECT,
+            'options'         => self::REASONING_EFFORT_OPTIONS,
+            'section'         => self::SECTION_GENERAL,
+            'allowUnselected' => false,
         ],
         self::FIELD_TEXT_VERBOSITY => [
-            'type'    => self::FIELD_TYPE_SELECT,
-            'options' => self::TEXT_VERBOSITY_OPTIONS,
-            'section' => self::SECTION_GENERAL,
+            'type'            => self::FIELD_TYPE_SELECT,
+            'options'         => self::TEXT_VERBOSITY_OPTIONS,
+            'section'         => self::SECTION_GENERAL,
+            'allowUnselected' => false,
         ],
     ];
 
@@ -666,14 +671,16 @@ class Config
             // * add output quality and image model
             // * remove Azure option
             $formInputs[self::FIELD_OUTPUT_QUALITY] = [
-                'type'    => self::FIELD_TYPE_SELECT,
-                'options' => self::OUTPUT_QUALITY_OPTIONS,
-                'section' => self::SECTION_OPENAI,
+                'type'            => self::FIELD_TYPE_SELECT,
+                'options'         => self::OUTPUT_QUALITY_OPTIONS,
+                'section'         => self::SECTION_OPENAI,
+                'allowUnselected' => false,
             ];
-            $formInputs[self::FIELD_IMAGE_MODEL] = [
-                'type'    => self::FIELD_TYPE_SELECT,
-                'options' => self::AI_IMAGE_MODELS,
-                'section' => self::SECTION_OPENAI,
+            $formInputs[self::FIELD_IMAGE_MODEL]    = [
+                'type'            => self::FIELD_TYPE_SELECT,
+                'options'         => self::AI_IMAGE_MODELS,
+                'section'         => self::SECTION_OPENAI,
+                'allowUnselected' => false,
             ];
             unset($formInputs[self::FIELD_PROVIDER]['options'][Helper::ENDPOINT_TYPE_AZURE]);
         }
