@@ -493,7 +493,7 @@ EXAMPLES:
         $maxIdsStringLength   = min($maxIdFieldWidth, strlen('IDS'));
 
         // Need to iterate first to find widest value in each column
-        /** @var IMapper $mapperClass */
+        /** @var class-string<IMapper> $mapperClass */
         foreach ($deDuplicatedResults as $mapperClass => $models) {
             $count            = (string)count($models);
             $mapper           = $mapperClass::getInstance();
@@ -592,7 +592,7 @@ EXAMPLES:
 
         $firstLoop = true;
 
-        /** @var IMapper $mapperClass */
+        /** @var class-string<IMapper> $mapperClass */
         foreach ($deDuplicatedResults as $mapperClass => $models) {
             $firstModel = $models->first();
 
