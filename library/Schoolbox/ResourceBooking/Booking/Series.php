@@ -366,7 +366,6 @@ class Series
             // Set up bookings for related items
             $existingRelatedBookings = $this->getBookingMapper()->findRelatedBookings($booking->getId());
             foreach ($booking->getResource()->getRelatedResourceList() as $relatedResource) {
-                /** @var Booking $relatedBooking */
                 $relatedBooking = null;
                 foreach ($existingRelatedBookings as $existing) {
                     if ($existing->getResource()->getId() == $relatedResource->getId()) {

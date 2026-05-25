@@ -4765,12 +4765,6 @@ parameters:
 			path: library/Schoolbox/ResourceBooking/Booking/Controller.php
 
 		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\ResourceBooking\\Booking\\Model is not subtype of native type null\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Booking/Series.php
-
-		-
 			message: '#^Method Schoolbox\\ResourceBooking\\Item\\Model\:\:addModerator\(\) should return \$this\(Schoolbox\\ResourceBooking\\Item\\Model\) but returns iterable\<Schoolbox\\User\>&Schoolbox\\Collection\.$#'
 			identifier: return.type
 			count: 1
