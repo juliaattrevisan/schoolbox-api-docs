@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Reporting\Feedback;
 
-use Alaress\Authorizer\Failure\Forbidden;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -20,14 +19,9 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Learning\Authorizer\Rule\HasParticipant;
-use Schoolbox\Learning\Authorizer\Rule\IsImplementation;
-use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
-use Schoolbox\Learning\Authorizer\Rule\IsSpecification;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
