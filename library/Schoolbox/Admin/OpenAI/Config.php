@@ -352,7 +352,7 @@ class Config
      * section they occur within so they are restricted to that provider.
      *
      * Also, add a title and description within `manifest` in
-     * `templates/config.twig`.
+     * `templates/formInput.twig`.
      */
     public const array DEFAULT_FORM_INPUTS = [
         self::FIELD_PROVIDER => [
