@@ -1501,12 +1501,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Rubric/DataModel/DataSource.php
 
 		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Assessment\\Rubric\\DataModel\\Capability\\Model is not subtype of native type null\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/Descriptor/Mapper.php
-
-		-
 			message: '#^PHPDoc tag @var with type Schoolbox\\Assessment\\Rubric\\DataModel\\Indicator\\Model is not subtype of native type null\.$#'
 			identifier: varTag.nativeType
 			count: 1

@@ -149,7 +149,6 @@ class Mapper extends Schoolbox\Mapper
         /** @var Indicator\Model $indicator */
         $indicator = null;
 
-        /** @var Capability\Model $capability */
         $capability = null;
 
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
@@ -172,9 +171,9 @@ class Mapper extends Schoolbox\Mapper
                 }
 
                 // Set the capability as well
-                /** @var Capability\Model $capability */
                 /** @var Indicator\Model $indicator */
                 $capability     = $capabilities->getOffset($capabilityId);
+                /** @var Capability\Model $capability */
                 $indicator = $this->hydrateJoin($r, 'indicator', 'c');
                 $indicator->setCapability($capability);
                 $indicators->setOffset($indicatorId, $indicator);
