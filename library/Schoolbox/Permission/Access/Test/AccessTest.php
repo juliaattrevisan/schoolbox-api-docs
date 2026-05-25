@@ -1198,7 +1198,7 @@ class AccessTest extends TestCase
      *
      * @param GenericCollection $roles
      * @param array             $userData
-     * @return GenericCollection<User>|User[]
+     * @return GenericCollection
      * @throws UnexpectedValueException
      */
     private static function buildUsers(GenericCollection $roles, array $userData): GenericCollection

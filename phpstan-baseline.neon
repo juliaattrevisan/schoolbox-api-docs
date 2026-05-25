@@ -4327,12 +4327,6 @@ parameters:
 			path: library/Schoolbox/Permission/Access/RoleAccessMapper.php
 
 		-
-			message: '#^PHPDoc tag @return with type array\<Schoolbox\\User\>\|\(iterable\<Schoolbox\\User\>&Schoolbox\\GenericCollection\) is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Permission/Access/Test/AccessTest.php
-
-		-
 			message: '#^PHPDoc tag @var with type External_UserInterface\|PHPUnit\\Framework\\MockObject\\MockObject is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
 			identifier: varTag.nativeType
 			count: 1
