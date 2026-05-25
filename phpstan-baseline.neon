@@ -3451,12 +3451,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Task.php
 
 		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Assessment\\Component\\SubmissionBox\\Submission\\SingleFile\\Model is not subtype of native type string\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Controller.php
-
-		-
 			message: '#^Ternary operator condition is always true\.$#'
 			identifier: ternary.alwaysTrue
 			count: 1
