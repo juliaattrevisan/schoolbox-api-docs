@@ -307,7 +307,7 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
 <style lang="scss" scoped>
 .preview-container {
     border: 1px solid var(--sbx-color-border, #dcdcdc);
-    border-radius: var(--sbx-config-field-roundness, 0);
+    border-radius: var(--sbx-config-field-corner-radius, 0);
     padding: var(--spacing-m);
 }
 

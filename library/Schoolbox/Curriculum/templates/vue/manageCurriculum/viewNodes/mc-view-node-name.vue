@@ -127,7 +127,7 @@ async function onNameSelected(): Promise<void> {
 
 .button-name {
     background: none;
-    border-radius: var(--sbx-config-field-roundness, 0);
+    border-radius: var(--sbx-config-field-corner-radius, 0);
     font-size: 1rem;
     margin: 0;
     min-height: 42px;

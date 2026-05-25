@@ -17,15 +17,15 @@ use Schoolbox\IConfigLoader;
 
 class HelperTest extends TestCase
 {
-    public function testBuildPreviewDataIncludesBoxDropShadowCssVariable(): void
+    public function testBuildPreviewDataIncludesDropShadowCssVariable(): void
     {
         $dropShadowConfig = (new Config())
             ->setId(100)
-            ->setName('skin_box_drop_shadow')
+            ->setName('skin_container_drop_shadow')
             ->setValue('none')
             ->setFieldId(ConfigMapper::FIELD_SELECT)
             ->setOptions((string) json_encode([
-                'customProperty' => '--sbx-config-box-drop-shadow',
+                'customProperty' => '--sbx-config-container-drop-shadow',
                 'select' => [
                     [
                         'name' => 'None',
@@ -70,7 +70,7 @@ class HelperTest extends TestCase
 
         $this->assertSame(
             'var(--sbx-shadow-m)',
-            $previewData['cssVariables']['--sbx-config-box-drop-shadow']
+            $previewData['cssVariables']['--sbx-config-container-drop-shadow']
         );
     }
 }

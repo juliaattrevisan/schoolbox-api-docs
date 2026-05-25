@@ -81,7 +81,7 @@ export default {
 .device-options {
     background: rgba(43, 51, 63, 0.85);
     border: 2px solid var(--sbx-color-foreground-primary, white);
-    border-radius: var(--sbx-config-field-roundness, 0);
+    border-radius: var(--sbx-config-field-corner-radius, 0);
     color: var(--sbx-color-foreground-primary, white);
     left: 10px;
     max-width: 50%;

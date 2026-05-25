@@ -136,7 +136,7 @@ window.Vue.onMounted(() => {
     align-self: start; /* https://moderncss.dev/css-button-styling-guide/#gotcha-child-of-flex-columns */
     background: none;
     border: none;
-    border-radius: var(--sbx-config-field-roundness, 0);
+    border-radius: var(--sbx-config-field-corner-radius, 0);
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     cursor: pointer;
     display: inline-flex;
@@ -208,7 +208,7 @@ window.Vue.onMounted(() => {
 .sbx-button--component-action.sbx-body {
     background: var(--sbx-color-foreground-primary);
     border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
-    border-radius: var(--sbx-config-field-roundness);
+    border-radius: var(--sbx-config-field-corner-radius);
     color: var(--sbx-config-color-accent);
     font-size: var(--sbx-font-size-s);
     font-weight: var(--sbx-font-weight-normal);

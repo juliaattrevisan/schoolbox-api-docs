@@ -15,8 +15,8 @@ body.sbx-body {
 
         //bar /top menu
         .tab-bar {
-            border-radius: var(--sbx-config-box-roundness);
-            box-shadow: var(--sbx-config-box-drop-shadow);
+            border-radius: var(--sbx-config-container-corner-radius);
+            box-shadow: var(--sbx-config-container-drop-shadow);
         }
 
         // make the width of the menu items dynamic to better allow for varying text lengths
@@ -48,7 +48,7 @@ body.sbx-body {
         #header-search-input,
         #notifications #header-search-input {
             & button {
-                border-radius: var(--sbx-config-field-roundness);
+                border-radius: var(--sbx-config-field-corner-radius);
             }
         }
 
@@ -66,10 +66,10 @@ body.sbx-body {
             width: 3rem;
             top: 50%;
             transform: translateY(-50%);
-            border-radius: var(--sbx-config-field-roundness);
+            border-radius: var(--sbx-config-field-corner-radius);
             overflow: hidden;
             & img {
-                border-radius: var(--sbx-config-field-roundness);
+                border-radius: var(--sbx-config-field-corner-radius);
             }
         }
 
@@ -90,7 +90,7 @@ body.sbx-body {
             & #notification-toggle {
                 align-items: center;
                 background: var(--sbx-config-color-menu-primary);
-                border-radius: var(--sbx-config-field-roundness);
+                border-radius: var(--sbx-config-field-corner-radius);
                 display: flex;
                 height: 2rem;
                 justify-content: center;
@@ -142,7 +142,7 @@ body.sbx-body {
 
         // Account dropdown
         #account-content {
-            border-radius: var(--sbx-config-box-roundness);
+            border-radius: var(--sbx-config-container-corner-radius);
 
             // separator between account options and switch user list
             & .separator {
@@ -156,7 +156,7 @@ body.sbx-body {
             .profile-options-mobile {
                 a {
                     color: var(--sbx-config-color-accent);
-                    border-radius: var(--sbx-config-field-roundness);
+                    border-radius: var(--sbx-config-field-corner-radius);
                     &:hover {
                         background: var(--sbx-config-color-active);
                     }
@@ -172,11 +172,11 @@ body.sbx-body {
             .switch-user {
                 // switch user list
                 li.user {
-                    border-radius: var(--sbx-config-field-roundness);
+                    border-radius: var(--sbx-config-field-corner-radius);
                     padding-block: var(--sbx-size-s);
                     padding-inline: var(--sbx-size-s);
                     & img {
-                        border-radius: var(--sbx-config-field-roundness);
+                        border-radius: var(--sbx-config-field-corner-radius);
                     }
                     & p {
                         color: var(--sbx-config-color-accent);
@@ -224,7 +224,7 @@ body.sbx-body {
         }
         a {
             color: var(--sbx-config-color-accent);
-            border-radius: var(--sbx-config-field-roundness);
+            border-radius: var(--sbx-config-field-corner-radius);
             font-size: var(--sbx-font-size-xs);
             &:hover {
                 background: var(--sbx-config-color-active);
@@ -234,7 +234,7 @@ body.sbx-body {
         .side-menu-heading-link {
             // background: var(--sbx-color-foreground-secondary);
             border-bottom: 1px solid var(--sbx-color-border);
-            border-radius: var(--sbx-config-field-roundness);
+            border-radius: var(--sbx-config-field-corner-radius);
             font-size: var(--sbx-font-size-s);
             font-weight: var(--sbx-font-weight-active);
         }
@@ -253,7 +253,7 @@ body.sbx-body {
     // Left menu styles when menu is not open
     .off-canvas-wrap.move-right :not(.left-open) {
         & #left-menu {
-            border-radius: var(--sbx-config-box-roundness);
+            border-radius: var(--sbx-config-container-corner-radius);
             box-shadow: var(--sbx-shadow-m);
             left: 1rem;
             top: 1rem;
@@ -263,7 +263,7 @@ body.sbx-body {
     // Notifications menu styles when menu is not open
     .off-canvas-wrap.move-left :not(.right-open) {
         & #msgs {
-            border-radius: var(--sbx-config-box-roundness);
+            border-radius: var(--sbx-config-container-corner-radius);
             box-shadow: var(--sbx-shadow-m);
             right: 1rem;
             top: 1rem;
@@ -307,7 +307,7 @@ body.sbx-body {
         // to distinguish the pwa setup from the other parts
         .pwa-side-panel {
             background: var(--sbx-color-foreground-secondary);
-            border-radius: var(--sbx-config-box-roundness);
+            border-radius: var(--sbx-config-container-corner-radius);
             margin-bottom: var(--sbx-size-s);
         }
 
@@ -329,7 +329,7 @@ body.sbx-body {
 
     // side menu, like within the administration section and for news page
     .side-nav {
-        border-radius: var(--sbx-config-box-roundness);
+        border-radius: var(--sbx-config-container-corner-radius);
         overflow: hidden;
 
         & li {

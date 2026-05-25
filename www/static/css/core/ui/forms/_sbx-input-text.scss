@@ -28,7 +28,7 @@ body.sbx-body {
     .c-filter-search-term input[type="text"].c-filter-search-term__field {
         background-color: var(--sbx-color-foreground-primary);
         border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
-        border-radius: var(--sbx-config-field-roundness);
+        border-radius: var(--sbx-config-field-corner-radius);
         color: var(--sbx-color-text-primary);
         line-height: 1;
         width: 100%;
@@ -62,17 +62,17 @@ body.sbx-body {
     .input-group:has(a, button) {
         input,
         .selectize-input {
-            border-radius: var(--sbx-config-field-roundness) 0 0 var(--sbx-config-field-roundness);
+            border-radius: var(--sbx-config-field-corner-radius) 0 0 var(--sbx-config-field-corner-radius);
             // this is the same as $small-only, which we can't currently import in this context
             @media only print, screen and (max-width: 40em) {
-                border-radius: var(--sbx-config-field-roundness);
+                border-radius: var(--sbx-config-field-corner-radius);
             }
         }
     }
 
     // Search page search term field, which sits inline with a button, similar to an .input-group
     .c-filter-search-term input[type="text"].c-filter-search-term__field {
-        border-radius: var(--sbx-config-field-roundness) 0 0 var(--sbx-config-field-roundness);
+        border-radius: var(--sbx-config-field-corner-radius) 0 0 var(--sbx-config-field-corner-radius);
     }
 
     // Give a bit more padding to selectize items due to the increase in font-size

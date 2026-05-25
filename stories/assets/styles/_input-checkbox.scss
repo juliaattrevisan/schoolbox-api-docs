@@ -7,7 +7,7 @@
     appearance: none; // Remove most all native input styles
     background-color: var(--sbx-color-foreground-primary); // For iOS < 15
     border: var(--sbx-size-form-element-border-width) solid var(--sbx-config-color-accent);
-    border-radius: var(--sbx-config-field-roundness);
+    border-radius: var(--sbx-config-field-corner-radius);
     color: var(--sbx-config-color-accent);
     cursor: pointer;
     display: grid;
@@ -67,5 +67,5 @@
 }
 .sbx-input-checkbox.error {
     border: var(--sbx-size-form-element-border-width) solid var(--sbx-color-alert);
-    border-radius: var(--sbx-config-field-roundness);
+    border-radius: var(--sbx-config-field-corner-radius);
 }

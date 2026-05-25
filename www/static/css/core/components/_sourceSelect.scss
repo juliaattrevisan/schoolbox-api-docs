@@ -2,7 +2,7 @@
  */
 .source-select {
     @include form-element;
-    border-radius: var(--sbx-config-field-roundness);
+    border-radius: var(--sbx-config-field-corner-radius);
     color: var(--sbx-config-color-accent, $content-ui-foreground);
     font-weight: normal;
     min-height: $global-button-input-height;

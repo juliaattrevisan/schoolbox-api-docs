@@ -5,7 +5,7 @@
  */
 
 :root {
-    --sbx-config-box-drop-shadow: var(--sbx-shadow-none);
+    --sbx-config-container-drop-shadow: var(--sbx-shadow-none);
 }
 
 body.sbx-body {
@@ -19,7 +19,7 @@ body.sbx-body {
     .scrollable,
     .cover-photo,
     .cr-results-grid {
-        box-shadow: var(--sbx-config-box-drop-shadow);
+        box-shadow: var(--sbx-config-container-drop-shadow);
     }
 
     // Undo unintended shadows on some elements, typically when the elements are
@@ -40,7 +40,7 @@ body.sbx-body {
         .VueTables__wrapper,
         .filters,
         .VueTables__table-footer {
-            box-shadow: var(--sbx-config-box-drop-shadow);
+            box-shadow: var(--sbx-config-container-drop-shadow);
         }
     }
 }

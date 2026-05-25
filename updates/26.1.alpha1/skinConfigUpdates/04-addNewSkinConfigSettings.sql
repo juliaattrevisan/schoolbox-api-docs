@@ -60,11 +60,11 @@ SET
     );
 
 SET
-    @category_roundness = (
+    @category_corner_radius = (
         SELECT id
         FROM lu_skin_config_category
         WHERE
-            name = 'Roundness'
+            name = 'Corner Radius'
     );
 
 SET
@@ -121,11 +121,11 @@ SET
     );
 
 SET
-    @subcategory_roundness = (
+    @subcategory_corner_radius = (
         SELECT id
         FROM lu_skin_config_subcategory
         WHERE
-            category_id = @category_roundness
+            category_id = @category_corner_radius
             AND name IS NULL
     );
 
@@ -153,7 +153,16 @@ SET
         SELECT `value`
         FROM config
         WHERE
-            name = 'skin_colour_form_input_border_color'
+            name = 'skin_colour_content_ui_submit_background'
+        LIMIT 1
+    );
+
+SET
+    @value_skin_colour_accent_text = (
+        SELECT `value`
+        FROM config
+        WHERE
+            name = 'skin_colour_content_ui_submit_foreground'
         LIMIT 1
     );
 
@@ -325,7 +334,7 @@ VALUES (
     ),
     (
         'skin_colour_accent_text',
-        '#ffffff',
+        @value_skin_colour_accent_text,
         'Accent Text',
         'The text colour for when displayed over the Accent Colour.',
         @config_colour_field_id,
@@ -408,9 +417,9 @@ VALUES (
         '{"customProperty":"--sbx-config-login-form-foreground","contrast":"--sbx-config-login-form-background"}'
     ),
     (
-        'skin_box_roundness',
+        'skin_container_corner_radius',
         'var(--sbx-border-radius-m)',
-        'Box',
+        'Container',
         'Add rounded corners to primary container elements.',
         @config_select_field_id,
         @sonar_config_type_id,
@@ -419,10 +428,10 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 12,
-        '{"customProperty":"--sbx-config-box-roundness","select":[{"name":"none","value":"var(--sbx-border-radius-none)"},{"name":"Small","value":"var(--sbx-border-radius-s)"},{"name":"Medium","value":"var(--sbx-border-radius-m)"},{"name":"Large","value":"var(--sbx-border-radius-l)"}]}'
+        '{"customProperty":"--sbx-config-container-corner-radius","select":[{"name":"None","value":"var(--sbx-border-radius-none)"},{"name":"Small","value":"var(--sbx-border-radius-s)"},{"name":"Medium","value":"var(--sbx-border-radius-m)"},{"name":"Large","value":"var(--sbx-border-radius-l)"}]}'
     ),
     (
-        'skin_field_roundness',
+        'skin_field_corner_radius',
         'var(--sbx-border-radius-s)',
         'Field',
         'Add rounded corners to elements like check boxes, buttons and labels.',
@@ -433,12 +442,12 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 13,
-        '{"customProperty":"--sbx-config-field-roundness","select":[{"name":"none","value":"var(--sbx-border-radius-none)"},{"name":"Small","value":"var(--sbx-border-radius-s)"},{"name":"Medium","value":"var(--sbx-border-radius-m)"},{"name":"Large","value":"var(--sbx-border-radius-l)"}]}'
+        '{"customProperty":"--sbx-config-field-corner-radius","select":[{"name":"None","value":"var(--sbx-border-radius-none)"},{"name":"Small","value":"var(--sbx-border-radius-s)"},{"name":"Medium","value":"var(--sbx-border-radius-m)"},{"name":"Large","value":"var(--sbx-border-radius-l)"}]}'
     ),
     (
-        'skin_box_drop_shadow',
+        'skin_container_drop_shadow',
         'var(--sbx-shadow-none)',
-        'Box',
+        'Container',
         'Add a drop shadow to primary container elements.',
         @config_select_field_id,
         @sonar_config_type_id,
@@ -447,7 +456,7 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 14,
-        '{"customProperty":"--sbx-config-box-drop-shadow","select":[{"name":"None","value":"var(--sbx-shadow-none)"},{"name":"Small","value":"var(--sbx-shadow-s)"},{"name":"Medium","value":"var(--sbx-shadow-m)"},{"name":"Large","value":"var(--sbx-shadow-l)"}]}'
+        '{"customProperty":"--sbx-config-container-drop-shadow","select":[{"name":"None","value":"var(--sbx-shadow-none)"},{"name":"Small","value":"var(--sbx-shadow-s)"},{"name":"Medium","value":"var(--sbx-shadow-m)"},{"name":"Large","value":"var(--sbx-shadow-l)"}]}'
     ),
     (
         'skin_sonar_custom_css',
@@ -570,25 +579,25 @@ VALUES (
             SELECT configID
             FROM config
             WHERE
-                name = 'skin_field_roundness'
+                name = 'skin_field_corner_radius'
         ),
-        @subcategory_roundness
+        @subcategory_corner_radius
     ),
     (
         (
             SELECT configID
             FROM config
             WHERE
-                name = 'skin_box_roundness'
+                name = 'skin_container_corner_radius'
         ),
-        @subcategory_roundness
+        @subcategory_corner_radius
     ),
     (
         (
             SELECT configID
             FROM config
             WHERE
-                name = 'skin_box_drop_shadow'
+                name = 'skin_container_drop_shadow'
         ),
         @subcategory_drop_shadow
     ),

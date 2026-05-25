@@ -178,14 +178,14 @@ class Controller extends ConfigController
     {
         $preferredOrder = [
             ConfigMapper::NAME_SKIN_CATEGORY_COLOURS,
-            ConfigMapper::NAME_SKIN_CATEGORY_ROUNDNESS,
+            ConfigMapper::NAME_SKIN_CATEGORY_CORNER_RADIUS,
             ConfigMapper::NAME_SKIN_CATEGORY_DROP_SHADOW,
             ConfigMapper::NAME_SKIN_CATEGORY_CSS,
         ];
         $orderedCategories = [];
         foreach ($preferredOrder as $categoryName) {
             foreach ($categories as $displayName => $subcategoryMap) {
-                if (strtolower($displayName) !== $categoryName) {
+                if ($this->normaliseCategoryName($displayName) !== $this->normaliseCategoryName($categoryName)) {
                     continue;
                 }
 
@@ -194,6 +194,11 @@ class Controller extends ConfigController
             }
         }
         return $orderedCategories + $categories;
+    }
+
+    private function normaliseCategoryName(string $categoryName): string
+    {
+        return str_replace('_', ' ', strtolower($categoryName));
     }
 
     /**

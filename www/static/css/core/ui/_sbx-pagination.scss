@@ -19,7 +19,7 @@ body.sbx-body {
             button {
                 background: var(--sbx-color-foreground-primary);
                 border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
-                border-radius: var(--sbx-config-field-roundness);
+                border-radius: var(--sbx-config-field-corner-radius);
                 color: var(--sbx-config-color-accent);
                 padding-block: 0.4rem;
                 padding-inline: 0.8rem;

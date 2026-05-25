@@ -397,7 +397,7 @@ class ConfigMapper extends Mapper
      */
     public const string NAME_SKIN_CATEGORY_COLOURS = 'colours';
     public const string NAME_SKIN_CATEGORY_CSS = 'custom css';
-    public const string NAME_SKIN_CATEGORY_ROUNDNESS = 'roundness';
+    public const string NAME_SKIN_CATEGORY_CORNER_RADIUS = 'corner_radius';
     public const string NAME_SKIN_CATEGORY_DROP_SHADOW = 'drop shadow';
 
     /* Skin Config Sub-Categories
