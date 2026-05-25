@@ -137,27 +137,10 @@ class DialogAgentChat
         ?string $previousResponseId = null,
         ?string $differentiationProfile = null,
     ): array {
-        /**
-         * OpenAI uses the model name from our ui.
-         * Azure uses the Deployment ID instead.
-         * Disgusting.
-         */
-        $payloadModel    = $this->openAiModel;
-        $validationModel = $this->openAiModel;
-
-        // ... but, we need the actual model in the Azure deployment
-        // (or what we've been told it is) in order to filter the payload.
-        if (Helper::ENDPOINT_TYPE_AZURE === $this->openAiEndpoint) {
-            $payloadModel    = $this->azureDeploymentId;
-            $validationModel = $this->azureDeploymentModel;
-        }
-
         /* See https://platform.openai.com/docs/api-reference/responses/create */
         $payload = [
             /* An ordered list of instructions for OpenAi */
             'input' => [],
-            /* Which variant of OpenAI to use (text model) */
-            'model' => $payloadModel,
             /* A kind of OpenAI currency to use in this request */
             "max_output_tokens" => self::MAX_OUTPUT_TOKENS,
             /**

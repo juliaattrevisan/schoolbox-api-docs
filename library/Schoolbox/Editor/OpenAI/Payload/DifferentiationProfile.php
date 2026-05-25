@@ -118,19 +118,6 @@ class DifferentiationProfile
 
     public function generate(): array
     {
-        /* OpenAI uses the model name from our ui.
-         * Azure uses the Deployment ID instead.
-         */
-        $payloadModel    = $this->openAiModel;
-        $validationModel = $this->openAiModel;
-
-        // ... but, we need the actual model in the Azure deployment
-        // (or what we've been told it is) in order to filter the payload.
-        if (Helper::ENDPOINT_TYPE_AZURE === $this->openAiEndpoint) {
-            $payloadModel    = $this->azureDeploymentId;
-            $validationModel = $this->azureDeploymentModel;
-        }
-
         $responseFormat = $this->getResponseFormat();
 
         /* Replacing the token with the config setting defined prompt
@@ -145,7 +132,6 @@ class DifferentiationProfile
         $userPrompt = $this->generateUserPrompt();
 
         $payload = [
-            'model'             => $payloadModel,
             'temperature'       => self::TEMPERATURE,
             'top_p'             => self::TOP_P,
             'max_output_tokens' => self::MAX_OUTPUT_TOKENS,

@@ -124,10 +124,6 @@ class ImageGeneration
             /* An ordered list of instructions for OpenAi
              */
             'input' => [],
-            /* Which variant of OpenAI to use (text model)
-             * This is different to the image model, since we also need a text model to do responses
-             */
-            'model' => $this->textModel,
             /* Make the image generation tool available and force it to be used
              * since we're asking the AI to reject non-image requests, sometimes it shouldn't be forced - hence this is removed for now
              */
