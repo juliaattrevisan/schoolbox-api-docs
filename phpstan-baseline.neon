@@ -3517,12 +3517,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Feedback/SubSource/AbstractSubSource.php
 
 		-
-			message: '#^PHPDoc tag @param for parameter \$gradeGroup with type Schoolbox\\Assessment\\Component\\SubmissionBox\\GradeLevel\\Group\\Model\|null is not subtype of native type Schoolbox\\Assessment\\Component\\SubmissionBox\\GradeLevel\\Group\\Model\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/IAssessable.php
-
-		-
 			message: '#^Instanceof between Schoolbox\\Learning\\AssessmentContext and Schoolbox\\Learning\\AssessmentContext will always evaluate to true\.$#'
 			identifier: instanceof.alwaysTrue
 			count: 1

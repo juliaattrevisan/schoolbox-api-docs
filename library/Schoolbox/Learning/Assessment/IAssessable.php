@@ -809,7 +809,7 @@ interface IAssessable extends ISoftDeletable
     /**
      * Must allow nulls (eg for Tasks and Quiz, which for the moment cannot have LetterGrade MarkTypes)
      *
-     * @param GradeGroup|null $gradeGroup
+     * @param GradeGroup $gradeGroup
      * @return static
      */
     public function setGradeGroup(GradeGroup $gradeGroup);
