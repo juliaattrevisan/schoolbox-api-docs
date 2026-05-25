@@ -4303,12 +4303,6 @@ parameters:
 			path: library/Schoolbox/Resource/Folder/Code/Mapper.php
 
 		-
-			message: '#^PHPDoc tag @param references unknown parameter\: \$classList$#'
-			identifier: parameter.notFound
-			count: 1
-			path: library/Schoolbox/Resource/Folder/Component/Dashboard/GroupController.php
-
-		-
 			message: '#^Parameter \#3 \$previous \(null\) of method Schoolbox\\Resource\\Folder\\Log\\Mapper\:\:raiseNotification\(\) should be compatible with parameter \$previous \(object\) of method Schoolbox\\Mapper\:\:raiseNotification\(\)$#'
 			identifier: method.childParameterType
 			count: 1
