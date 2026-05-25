@@ -182,7 +182,7 @@ class ControllerTest extends TestCase
             'studentIds' => [234],
         ]));
 
-        $controller->renotifyUnconfirmed(12);
+        $controller->renotifyUnconfirmed((new RegistrationSessionModel())->setId(12));
 
         $response = $controller->getResponse();
         $this->assertNotNull($response);
@@ -323,7 +323,7 @@ class ControllerTest extends TestCase
             'studentIds' => [234, 345],
         ]));
 
-        $controller->renotifyUnconfirmed(12);
+        $controller->renotifyUnconfirmed((new RegistrationSessionModel())->setId(12));
 
         $response = $controller->getResponse();
         $this->assertNotNull($response);
@@ -402,7 +402,7 @@ class ControllerTest extends TestCase
             'studentIds' => [234],
         ]));
 
-        $controller->renotifyUnconfirmed(12);
+        $controller->renotifyUnconfirmed((new RegistrationSessionModel())->setId(12));
 
         $response = $controller->getResponse();
         $this->assertNotNull($response);
@@ -451,7 +451,7 @@ class ControllerTest extends TestCase
             'studentIds' => [234],
         ]));
 
-        $controller->renotifyUnconfirmed(12);
+        $controller->renotifyUnconfirmed((new RegistrationSessionModel())->setId(12));
 
         $response = $controller->getResponse();
         $this->assertNotNull($response);
