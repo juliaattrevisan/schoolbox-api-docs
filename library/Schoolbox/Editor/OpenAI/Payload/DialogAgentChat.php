@@ -233,7 +233,6 @@ class DialogAgentChat
         return new ModelParser()->filterPayload(
             $payload,
             $this->openAiModel ?: $this->azureDeploymentModel,
-            $this->openAiEndpoint,
         );
     }
 

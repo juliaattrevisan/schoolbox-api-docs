@@ -213,7 +213,6 @@ class ImageGeneration
         return new ModelParser()->filterPayload(
             $payload,
             $this->textModel,
-            Helper::ENDPOINT_TYPE_OPENAI,
         );
     }
 

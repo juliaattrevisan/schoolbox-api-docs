@@ -38,22 +38,15 @@ class ModelParser
     /**
      * Extract the version number from the model string.
      *
-     * If using Azure, `$model` is an arbitrary deployment ID which maps to an
-     * unknowable model: thus no assumption can be made about model version.
-     *
-     * If using OpenAI, assumes that the model string is either:
+     * Assumes that the model string is either:
      * * `gpt-${version}`
      * * `gpt-${version}-${variant}`
      *
      * @param string $model
-     * @param string $endpoint
      * @return string|null
      */
-    public function extractModelVersion(string $model, string $endpoint): ?string
+    public function extractModelVersion(string $model): ?string
     {
-        if ($endpoint === Helper::ENDPOINT_TYPE_AZURE) {
-            return null;
-        }
         $parts = explode('-', $model, 3);
         return $parts[1] ?? null;
     }
@@ -61,22 +54,15 @@ class ModelParser
     /**
      * Extract the variant from the model string.
      *
-     * If using Azure, `$model` is an arbitrary deployment ID which maps to an
-     * unknowable model: thus no assumption can be made about model variant.
-     *
-     * If using OpenAI, assumes that the model string is either:
+     * Assumes that the model string is either:
      * * `gpt-${version}`
      * * `gpt-${version}-${variant}`
      *
      * @param string $model
-     * @param string $endpoint
      * @return string|null
      */
-    public function extractModelVariant(string $model, string $endpoint): ?string
+    public function extractModelVariant(string $model): ?string
     {
-        if ($endpoint === Helper::ENDPOINT_TYPE_AZURE) {
-            return null;
-        }
         $parts = explode('-', $model, 3);
         return $parts[2] ?? null;
     }
@@ -89,13 +75,16 @@ class ModelParser
      *
      * @param array  $payload  The data which would be sent to the AI provider.
      * @param string $model    The name of the model to use.
-     * @param string $endpoint The endpoint type (e.g. `Helper::ENDPOINT_TYPE_AZURE`). Filtering is skipped for Azure.
+     *                         For Azure, this is _not_ the deployment ID:
+     *                         instead, it is the selected deployment model.
+     *                         (This value _should_ match the model deployed in
+     *                         Azure, but this is not enforceable.)
      * @return array
      */
-    public function filterPayload(array $payload, string $model, string $endpoint): array
+    public function filterPayload(array $payload, string $model): array
     {
-        $version = $this->extractModelVersion($model, $endpoint);
-        $variant = $this->extractModelVariant($model, $endpoint);
+        $version = $this->extractModelVersion($model);
+        $variant = $this->extractModelVariant($model);
 
         // chat variants:
         // * all support only medium verbosity

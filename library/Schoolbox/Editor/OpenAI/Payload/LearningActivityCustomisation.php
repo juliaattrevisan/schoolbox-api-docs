@@ -213,7 +213,6 @@ class LearningActivityCustomisation
         return new ModelParser()->filterPayload(
             $payload,
             $this->openAiModel ?: $this->azureDeploymentModel,
-            $this->openAiEndpoint,
         );
     }
 }
