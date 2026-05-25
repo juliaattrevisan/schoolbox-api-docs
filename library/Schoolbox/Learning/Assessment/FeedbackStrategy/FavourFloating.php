@@ -59,7 +59,6 @@ class FavourFloating implements IFeedbackTraversalStrategy
             return $mostRecentFloatingFeedback;
         }
 
-        /** @var IResponse $latestResponseWithFeedback */
         $latestResponseWithFeedback = null;
 
         foreach ($participant->getAllResponses() as $response) {
