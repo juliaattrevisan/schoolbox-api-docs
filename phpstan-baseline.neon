@@ -949,70 +949,16 @@ parameters:
 			path: library/External/Canvas/Sync/DataRestorer.php
 
 		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Mapper is not subtype of native type \$this\(External\\Canvas\\Sync\\ImportStage\\CourseAssessmentAbstract\)\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/CourseAssessmentAbstract.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Mapper is not subtype of native type \$this\(External\\Canvas\\Sync\\ImportStage\\CourseAssignments\)\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/CourseAssignments.php
-
-		-
 			message: '#^Property External\\Canvas\\Sync\\ImportStage\\CourseAssignments\:\:\$accountBridge is unused\.$#'
 			identifier: property.unused
 			count: 1
 			path: library/External/Canvas/Sync/ImportStage/CourseAssignments.php
 
 		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Mapper is not subtype of native type \$this\(External\\Canvas\\Sync\\ImportStage\\CourseQuiz\)\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/CourseQuiz.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Mapper is not subtype of native type \$this\(External\\Canvas\\Sync\\ImportStage\\QuizSubmission\)\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/QuizSubmission.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Mapper is not subtype of native type \$this\(External\\Canvas\\Sync\\ImportStage\\SectionAssessmentAbstract\)\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/SectionAssessmentAbstract.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Mapper is not subtype of native type \$this\(External\\Canvas\\Sync\\ImportStage\\SectionAssignment\)\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/SectionAssignment.php
-
-		-
 			message: '#^Method External\\Canvas\\Sync\\ImportStage\\SectionQuiz\:\:findAssessableImpl\(\) should return Schoolbox\\Assessment\\Component\\SubmissionBox\|null but returns Schoolbox\\Learning\\Quiz\\Model\.$#'
 			identifier: return.type
 			count: 1
 			path: library/External/Canvas/Sync/ImportStage/SectionQuiz.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Mapper is not subtype of native type \$this\(External\\Canvas\\Sync\\ImportStage\\SectionQuiz\)\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/SectionQuiz.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Mapper is not subtype of native type \$this\(External\\Canvas\\Sync\\ImportStage\\Submission\)\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/Submission.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Mapper is not subtype of native type \$this\(External\\Canvas\\Sync\\ImportStage\\SubmissionAbstract\)\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/SubmissionAbstract.php
 
 		-
 			message: '#^Property External_Doublefirst_Class\:\:\$externalUser is never read, only written\.$#'
