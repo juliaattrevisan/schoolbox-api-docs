@@ -312,7 +312,7 @@ class Controller extends Base\Base
      * @api /course/unitspecs/{id}/sequence
      * @since 165
      *
-     * @var int[] $_POST['sequence'] AssessmentIds, indexed by sequence
+     * POST sequence is an int[] of assessment IDs, indexed by sequence.
      */
     public function saveAssessmentSequence()
     {
@@ -431,9 +431,10 @@ class Controller extends Base\Base
      * @api   POST /course/new
      * @since 160
      *
-     * @var string   $_POST['name']             name to give to new course's folder
-     * @var int      $_POST['parent']           id of the folder to create the new course's folder under
-     * @var string[] $_POST['curriculumCodes']  1st item is comma-separated integers. Saves to 'curriculum_node_for_category' table
+     * POST parameters:
+     * - string name Name to give to new course's folder
+     * - int parent ID of the folder to create the new course's folder under
+     * - string[] curriculumCodes 1st item is comma-separated integers. Saves to 'curriculum_node_for_category' table
      *
      * @throws Application\Exception\Exception
      * @throws BaseMapper\DefinitionException
@@ -588,11 +589,12 @@ class Controller extends Base\Base
      * @since 160
      *
      * @param CourseSpecification $courseSpec
-     * @var string   $_POST['name'] indexed by unitSpec.id
-     * @var int      $_POST['parent'] indexed by unitSpec.id
-     * @var string[] $_POST['curriculumCodes']  1st item is comma-separated integers. Saves to 'curriculum_node_for_category' table
-     * @var array[]  $_POST['unit'] indexed by unitSpec.id
-     * @var string   $_POST[unitSpecId]['name']
+     * POST parameters:
+     * - string name Indexed by unitSpec.id
+     * - int parent Indexed by unitSpec.id
+     * - string[] curriculumCodes 1st item is comma-separated integers. Saves to 'curriculum_node_for_category' table
+     * - array[] unit Indexed by unitSpec.id
+     * - string unit[unitSpecId]['name']
      * @throws BaseMapper\DefinitionException
      * @throws Base\Exception
      * @throws Deleted
@@ -798,10 +800,10 @@ class Controller extends Base\Base
      * @api   GET /course/list
      * @since 160
      *
-     * @var string[] $_GET                       AJAX GET params
-     * @var string   $_GET['encodedReturnUrl']   For URL generation
-     * @var int      $_GET['folder']             Folder.id for URL generation
-     * @var int      $_GET['component']          ComponentInstance.id for URL generation
+     * GET parameters:
+     * - string encodedReturnUrl For URL generation
+     * - int folder Folder.id for URL generation
+     * - int component ComponentInstance.id for URL generation
      *
      * @throws BaseMapper\DefinitionException
      * @throws Deleted
@@ -873,14 +875,14 @@ class Controller extends Base\Base
      * @api   GET /course/list/ajax
      * @since 160
      *
-     * @var string[] $_GET                       AJAX GET params
-     * @var string   $_GET['search']             Search string submitted by user
-     * @var string   $_GET['encodedReturnUrl']   For URL generation
-     * @var bool     $_GET['hasAdd']
-     * @var bool     $_GET['hasTot']
-     * @var bool     $_GET['linkToUnits']
-     * @var int      $_GET['folder']
-     * @var int      $_GET['component']
+     * GET parameters:
+     * - string search Search string submitted by user
+     * - string encodedReturnUrl For URL generation
+     * - bool hasAdd
+     * - bool hasTot
+     * - bool linkToUnits
+     * - int folder
+     * - int component
      * @throws BaseMapper\DefinitionException
      * @throws Deleted
      * @throws MapperException
@@ -955,8 +957,9 @@ class Controller extends Base\Base
      * @return array
      * @throws \DomainException
      * @throws \OverflowException
-     *@var Folder[]               $data        ['lineage']
-     * @var CourseSpecification[] $data        ['courses']
+     * Return data:
+     * - Folder[] lineage
+     * - CourseSpecification[] courses
      */
     protected function getCourseData(?string $searchParam = null): array
     {

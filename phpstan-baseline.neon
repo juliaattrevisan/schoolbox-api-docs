@@ -1447,12 +1447,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Component/SubmissionBox/Submission/SubmissionMapper.php
 
 		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 6
-			path: library/Schoolbox/Assessment/Course/Controller.php
-
-		-
 			message: '#^Instanceof between Schoolbox\\Learning\\Course\\DataModel\\Implementation\\Model and Schoolbox\\Learning\\Course\\DataModel\\Implementation\\Model will always evaluate to true\.$#'
 			identifier: instanceof.alwaysTrue
 			count: 1
