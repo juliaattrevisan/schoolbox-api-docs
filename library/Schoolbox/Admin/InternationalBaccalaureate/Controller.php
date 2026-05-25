@@ -639,7 +639,16 @@ class Controller extends ConfigController
                     continue;
                 }
 
-                $sessionsBySystemPurpose[$systemPurpose->getId()][] = $session->jsonSerialize();
+                $deleteRoute = $this->getRouteIfAuthorized('internationalBaccalaureate.deleteRegistrationSession', [
+                    'sessionId' => $session->getId(),
+                ]) ?: null;
+                $hasRegistered = $this->registrationSessionStudentMapper->hasRegisteredStudents($session->getId());
+                $deleteEndpoint = ($deleteRoute !== null && !$hasRegistered) ? $deleteRoute : null;
+
+                $sessionsBySystemPurpose[$systemPurpose->getId()][] = array_merge(
+                    $session->jsonSerialize(),
+                    ['deleteEndpoint' => $deleteEndpoint]
+                );
             }
 
             $this->response = $this->responseAsJson($sessionsBySystemPurpose);
@@ -741,8 +750,15 @@ class Controller extends ConfigController
                 return;
             }
 
+            $deleteRoute = $this->getRouteIfAuthorized('internationalBaccalaureate.deleteRegistrationSession', [
+                'sessionId' => $createdSession->getId(),
+            ]) ?: null;
+
             $this->response = $this
-                ->responseAsJson($createdSession->jsonSerialize())
+                ->responseAsJson(array_merge(
+                    $createdSession->jsonSerialize(),
+                    ['deleteEndpoint' => $deleteRoute]
+                ))
                 ->withStatus(201);
         } catch (Exception $e) {
             $this->response = $this->responseAsJson([
@@ -760,6 +776,14 @@ class Controller extends ConfigController
     public function deleteRegistrationSession(RegistrationSessionModel $registrationSession): void
     {
         try {
+            if ($this->registrationSessionStudentMapper->hasRegisteredStudents($registrationSession->getId())) {
+                $this->response = $this->responseAsJson([
+                    'success' => false,
+                    'message' => 'Cannot delete a registration session that has registered students.',
+                ])->withStatus(409);
+                return;
+            }
+
             $registrationSession->setDeletedBy($this->getUser());
 
             $this->registrationSessionMapper->save($registrationSession);
