@@ -3547,12 +3547,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Participant.php
 
 		-
-			message: '#^PHPDoc tag @param for parameter \$participants with type Schoolbox\\GenericCollection\|Schoolbox\\Learning\\Assessment\\Participant is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Plan.php
-
-		-
 			message: '#^Method Schoolbox\\Learning\\Assessment\\Project\:\:cloneForCopy\(\) should return static\(Schoolbox\\Learning\\Assessment\\Project\) but returns Schoolbox\\Learning\\Assessment\\Project\.$#'
 			identifier: return.type
 			count: 1
