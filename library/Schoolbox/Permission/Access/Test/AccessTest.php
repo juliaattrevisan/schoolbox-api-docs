@@ -1319,7 +1319,7 @@ class AccessTest extends TestCase
      */
     private function getMockFolderCodeMapper(ObjectTree $folderTree, array $folderCodeData): Folder\Code\Mapper
     {
-        /** @var MockObject|Folder\Code\Mapper $folderCodeMapper */
+        /** @var MockObject&Folder\Code\Mapper $folderCodeMapper */
         $folderCodeMapper = $this->createMock(Folder\Code\Mapper::class);
 
         /** @var Folder\Model $folder */
