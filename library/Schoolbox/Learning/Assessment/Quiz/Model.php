@@ -255,7 +255,6 @@ class Model extends AbstractAssessment
     {
         $this->assertSameAssessment($participant);
 
-        /** @var Attempt\Model $latestAttempt */
         $latestAttempt = null;
         foreach ($participant->getAllResponses() as $attempt) {
             // Skip responses that are not submitted yet (ie still in progress)
@@ -278,6 +277,7 @@ class Model extends AbstractAssessment
                 $latestAttempt = $attempt;
             }
         }
+        /** @var Attempt\Model|null $latestAttempt */
         return $latestAttempt;
     }
 

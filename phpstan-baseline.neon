@@ -3625,12 +3625,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Quiz/Model.php
 
 		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Learning\\Assessment\\Quiz\\Attempt\\Model is not subtype of native type null\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Quiz/Model.php
-
-		-
 			message: '#^Method Schoolbox\\Learning\\Assessment\\Summator\\Average\:\:calculateTotalWeight\(\) should return int but returns null\.$#'
 			identifier: return.type
 			count: 1
