@@ -1269,9 +1269,10 @@ class Controller extends ConfigController
      *
      * @api POST /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/candidates/renotify
      */
-    public function renotifyUnconfirmed(int $sessionId): void
+    public function renotifyUnconfirmed(RegistrationSessionModel $registrationSession): void
     {
         $post = $this->requestPost;
+        $sessionId = $registrationSession->getId();
         $studentIds = $post->get('studentIds');
 
         if (!is_array($studentIds)) {
