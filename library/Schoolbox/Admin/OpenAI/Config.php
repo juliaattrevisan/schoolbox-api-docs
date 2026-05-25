@@ -394,12 +394,14 @@ class Config
             'options'         => self::REASONING_EFFORT_OPTIONS,
             'section'         => self::SECTION_GENERAL,
             'allowUnselected' => false,
+            'advanced'        => true,
         ],
         self::FIELD_TEXT_VERBOSITY => [
             'type'            => self::FIELD_TYPE_SELECT,
             'options'         => self::TEXT_VERBOSITY_OPTIONS,
             'section'         => self::SECTION_GENERAL,
             'allowUnselected' => false,
+            'advanced'        => true,
         ],
     ];
 
