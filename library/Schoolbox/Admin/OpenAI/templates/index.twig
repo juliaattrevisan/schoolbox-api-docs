@@ -43,6 +43,9 @@
 
         <script>
             $(function() {
+                // Set up collapsers for advanced options
+                $('[data-collapser]').collapsable();
+
                 const PROVIDER_OPENAI = '{{ providers.OpenAI }}';
                 const PROVIDER_AZURE = '{{ providers.Azure }}';
 

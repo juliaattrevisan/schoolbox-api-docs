@@ -35,12 +35,15 @@
     {% endfor %}
 
     {% if advancedInputs is not empty %}
-        <section>
-            <h3>Advanced Settings</h3>
-            <fieldset class="columns" data-advanced>
+        <fieldset>
+            <legend>
+                <a href="#" class="icon-down-arrow" data-collapser="ai-feature-{{ feature.feature }}-advanced"></a>
+                Advanced Settings
+            </legend>
+            <section class="hide" data-collapsable="ai-feature-{{ feature.feature }}-advanced" data-collapse-state="collapsed">
                 {{ advancedInputs | raw }}
-            </fieldset>
-        </section>
+            </section>
+        </fieldset>
     {% endif %}
 
     <script type="application/javascript">
