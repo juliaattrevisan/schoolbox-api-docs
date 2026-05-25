@@ -312,6 +312,7 @@ class Config
     public const string FIELD_AIKEY = 'ai_key';
     public const string FIELD_RESOURCE_NAME = 'resource_name';
     public const string FIELD_DEPLOYMENT_ID = 'deployment_id';
+    public const string FIELD_DEPLOYMENT_MODEL = 'deployment_model';
     public const string FIELD_MODEL = 'model';
     public const string FIELD_AI_MODERATION = 'ai_moderation';
     public const string FIELD_SYSTEM_PROMPT  = 'system_prompt';
@@ -335,6 +336,7 @@ class Config
         self::FIELD_AIKEY => self::FIELD_AIKEY,
         self::FIELD_RESOURCE_NAME => self::FIELD_RESOURCE_NAME,
         self::FIELD_DEPLOYMENT_ID => self::FIELD_DEPLOYMENT_ID,
+        self::FIELD_DEPLOYMENT_MODEL => self::FIELD_DEPLOYMENT_MODEL,
         self::FIELD_MODEL => self::FIELD_MODEL,
         self::FIELD_SYSTEM_PROMPT => self::FIELD_SYSTEM_PROMPT,
     ];
@@ -373,6 +375,11 @@ class Config
         ],
         self::FIELD_DEPLOYMENT_ID => [
             'type'    => self::FIELD_TYPE_INPUT,
+            'section' => self::SECTION_AZURE,
+        ],
+        self::FIELD_DEPLOYMENT_MODEL => [
+            'type'    => self::FIELD_TYPE_SELECT,
+            'options' => self::AI_MODELS,
             'section' => self::SECTION_AZURE,
         ],
         self::FIELD_SYSTEM_PROMPT => [
@@ -569,7 +576,8 @@ class Config
      *    },
      *    Azure: array{
      *      resource_name: array{value: string},
-     *      deployment_id: array{value: string}
+     *      deployment_id: array{value: string},
+     *      deployment_model: array{value: string},
      *    }
      *  }|null
      * @throws \JsonException
