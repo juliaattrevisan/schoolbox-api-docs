@@ -55,34 +55,6 @@ class Module extends BaseModule
             new HasParticipant(),
         );
 
-        // TODO: verify this check, it's derived from Due Work, but i'm not entirely sure if reporting has special considerations needed like $lmsStaff...
-        $canGiveFeedbackForAssessment = new Rule\Any(
-            new Rule\IsSuperuser(),
-            // feedback route is accessible for both spec and impl assessments
-            new Rule\All(
-                $lmsStaff,
-                new Rule\Any(
-                    // Implementation assessment use the old logic, user must have write access homepage, and the assessment is not locked (due in an archived term)
-                    new Rule\All(
-                        new IsImplementation(),
-                        // User must have write access to the folder the assessment is in
-                        new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function ($params) {
-                            /** @var IAssessable $assessable */
-                            $assessable = $params['assessment'];
-                            if ($assessable instanceof IAssessable) {
-                                return $assessable->getContext()->getFolder()->getId();
-                            }
-                            throw new Forbidden('User does not have homepage access');
-                        }, $this->getAccess()),
-                        new IsInteractionUnLocked(new LockedChecker($this->getTermMapper()))
-                    ),
-                    // Specification assessments, you need to have write access to all homepages using the spec (but more complex than can be done here)
-                    new IsSpecification(),
-                    // offload the perm check for spec assessments to the controller... we should be hitting the filters
-                ),
-            )
-        );
-
         $preloadAssessment = function (array $params) {
             return $this->preloadAssessment($params);
         };
@@ -95,7 +67,7 @@ class Module extends BaseModule
         $this->register('GET', '/{assessmentId}/{learnerId}/feedback{/feedbackId:\d+}', 'getParticularFeedback', $lmsStaff, $preloadParticipant);
         $this->register('POST', '/{assessmentId}/{learnerId}/feedback{/feedbackId:\d+}', 'postParticularFeedback', $lmsStaff, $preloadParticipant);
         $this->register('POST', '/{assessmentId}/{learnerId}/feedback/publish', 'postPublishFeedback', $lmsStaff, $preloadParticipant);
-        $this->register('POST', '/{assessmentId}/feedbacks', 'postParticipantFeedbacks', $canGiveFeedbackForAssessment, $preloadAssessment);
+        $this->register('POST', '/{assessmentId}/feedbacks', 'postParticipantFeedbacks', $lmsStaff, $preloadAssessment);
     }
 
 

@@ -381,6 +381,10 @@ class Controller extends Base
      *
      * This is a dueWork/reporting-only route
      *
+     * Reporting only supports implementations, for now (for specs we need to properly
+     * consider the differences in permissions for reporting activities, for implementations
+     * the route checks are enough to verify you have access to $assessment)
+     *
      * @param Reporting\Model $assessment
      * @throws MapperException
      * @throws MapperException\Deleted
@@ -393,54 +397,13 @@ class Controller extends Base
         $results = [];
         $projectCache = (new Project\ResultCache\ResultCache($this->projectResultCacheMapper));
 
-        /* if this is a spec assessment, we want all implementation children assessments,
-         * with hydrated participants so we can publish all the users quickly and easily.
-         *
-         * we should be using filters, so we aren't hydrating all participation for all current assessments
-         * but we can hydrate only students for assessments that are still active, and we have write access to.
-        */
-        $aImpls = new GenericCollection(Reporting\Model::class);
-        if ($assessment->isSpecification()) {
-            $lockChecker = (new LockedChecker($this->termMapper));
-            $user = $this->getUser();
-            $access = $this->access;
-
-            // only fetch implementation assessments that are 'not locked' (i.e. not in archived terms)
-            $aImpls = $this->assessmentDataSource
-                ->findAllImplementationsBySpecificationId($assessment->getId())
-                ->filter(
-                    function (Reporting\Model $aImpl) use ($lockChecker, $access, $user) {
-                        if ($lockChecker->isLockedForInteractions($aImpl)) {
-                            // exit early if the assessment is locked
-                            return false;
-                        }
-
-                        // ensure the current user has write+ access to the homepage (See Rule\HasHomepageAccess)
-                        try {
-                            $permission = $access->getFolderAccess($user, $aImpl->getBaseContext()->getFolder()->getId());
-                        } catch (MapperException $e) {
-                            // exit early
-                            return false;
-                        }
-                        return $permission >= UserAccess::ACCESS_WRITE;
-                    }
-                )
-                ->indexBy('id');
-
-            // hydrate participants
-            $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($aImpls, null, true);
-        } else {
-            $aImpls->add($assessment)->indexBy('id');
-        }
-
         foreach ($draftFeedbackIds as $draftFeedbackId) {
-            // Verify that this feedback is for this assessment / find the relevant implementation for this feedback
+            // Verify that this feedback is for this assessment
             $feedback = $this->feedbackDataMapper->findById($draftFeedbackId);
             $publishSuccess   = false;
 
-            $aImpl = $aImpls->getBy('id', $feedback->getReporting()->getAssessmentModel()->getId());
-            if (!$aImpl) {
-                $results[$draftFeedbackId] = ['publishSuccess' => false, 'error' => 'Assessment not found'];
+            if ($feedback->getReporting()->getAssessmentModel()->getId() !== $assessment->getId()) {
+                $results[$draftFeedbackId] = ['publishSuccess' => false, 'error' => 'Feedback not for this assessment'];
                 continue;
             }
 
@@ -452,7 +415,7 @@ class Controller extends Base
 
                 /* Update project result cache when Publish All is used
                  */
-                $projectCache->refresh($this->assessmentDataSource, $aImpl, $feedback->getLearner());
+                $projectCache->refresh($this->assessmentDataSource, $assessment, $feedback->getLearner());
             } catch (\PDOException | \DomainException | \InvalidArgumentException | \LogicException | \UnexpectedValueException $e) {
                 // TODO: ^ do we reallllly need to catch all of those? surely we want to know about some of this stuff
                 $publishSuccess = false;
