@@ -336,8 +336,8 @@ class FactoryTest extends TestCase
 
     /**
      * @return array<array{0: Project, 1: class-string}>
-     * @var Project     $projects [][0]
-     * @var IMarkScheme $projects [][1]
+     *
+     * Return rows contain the project at index 0 and the mark scheme class-string at index 1.
      * @throws InvalidArgumentException If $slug is not recognised
      */
     public static function providerProjectMarkTypeValid(): array
