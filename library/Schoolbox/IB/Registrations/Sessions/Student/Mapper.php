@@ -53,6 +53,12 @@ class Mapper extends BaseMapper
         $this->joins('registration_session_id', SessionMapper::class, 'id', null, null, 'registrationSession', 'registrationSession');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->uses('status', self::TYPE_INTEGER);
+        $this->uses('candidate_confirmed', self::TYPE_BOOLEAN, null, 'candidateConfirmed');
+        $this->uses('candidate_confirmed_at', self::TYPE_DATETIME, null, 'candidateConfirmedAt');
+        $this->joins('candidate_confirmed_by', UserMapper::class, 'id', null, null, 'candidateConfirmedBy', 'candidateConfirmedBy');
+        $this->uses('subject_confirmed', self::TYPE_BOOLEAN, null, 'subjectConfirmed');
+        $this->uses('subject_confirmed_at', self::TYPE_DATETIME, null, 'subjectConfirmedAt');
+        $this->joins('subject_confirmed_by', UserMapper::class, 'id', null, null, 'subjectConfirmedBy', 'subjectConfirmedBy');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
     }
@@ -70,7 +76,9 @@ class Mapper extends BaseMapper
                    {$this->getJoinColumnString('registrationSession.createdBy', 'uc')},
                    {$this->getJoinColumnString('registrationSession.updatedBy', 'uu')},
                    {$this->getJoinColumnString('registrationSession.deletedBy', 'ud')},
-                   {$this->getJoinColumnString('user', 'u')}
+                   {$this->getJoinColumnString('user', 'u')},
+                   {$this->getJoinColumnString('candidateConfirmedBy', 'ucc')},
+                   {$this->getJoinColumnString('subjectConfirmedBy', 'usc')}
         ";
     }
 
@@ -88,6 +96,8 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('registrationSession.updatedBy', 'rs', 'uu')}
             LEFT JOIN {$this->getJoinSql('registrationSession.deletedBy', 'rs', 'ud')}
             INNER JOIN {$this->getJoinSql('user', '', 'u')}
+            LEFT JOIN {$this->getJoinSql('candidateConfirmedBy', '', 'ucc')}
+            LEFT JOIN {$this->getJoinSql('subjectConfirmedBy', '', 'usc')}
         ";
     }
 
@@ -103,6 +113,10 @@ class Mapper extends BaseMapper
         $sessionMapper = $this->getJoinMapper('registrationSession');
         /** @var UserMapper $userMapper */
         $userMapper = $this->getJoinMapper('user');
+        /** @var UserMapper $candidateConfirmedByMapper */
+        $candidateConfirmedByMapper = $this->getJoinMapper('candidateConfirmedBy');
+        /** @var UserMapper $subjectConfirmedByMapper */
+        $subjectConfirmedByMapper = $this->getJoinMapper('subjectConfirmedBy');
         $students = $this->createCollection();
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
@@ -144,6 +158,17 @@ class Mapper extends BaseMapper
 
                 if ($user) {
                     $student->setUser($user);
+                }
+
+                $candidateConfirmedBy = $candidateConfirmedByMapper->hydrate($row, 'ucc');
+                $subjectConfirmedBy = $subjectConfirmedByMapper->hydrate($row, 'usc');
+
+                if ($candidateConfirmedBy) {
+                    $student->setCandidateConfirmedBy($candidateConfirmedBy);
+                }
+
+                if ($subjectConfirmedBy) {
+                    $student->setSubjectConfirmedBy($subjectConfirmedBy);
                 }
 
                 $students[$student->getId()] = $student;

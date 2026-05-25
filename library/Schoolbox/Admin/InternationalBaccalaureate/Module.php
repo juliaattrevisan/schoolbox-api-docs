@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\InternationalBaccalaureate;
 
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -31,6 +32,7 @@ use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
+use Schoolbox\User;
 
 class Module extends BaseModule
 {
@@ -47,6 +49,19 @@ class Module extends BaseModule
                 new Rule\IsSuperuser(),
                 new Rule\HasServicePermission(UserAccess::SERVICE_IB_COORDINATOR, UserAccess::ACCESS_FULL)
             )
+        );
+        /* IB Coordinator access is required to confirm details, but students can also confirm their own details.
+         */
+        $ruleIBConfirmingDetailsPerms = new Rule\Any(
+            $ruleIBCoordinatorAccess,
+            new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Callback(function (array $params, User $user) {
+                    if (!$user->getRole()->isStudent() || $user->getId() !== (int)$params['studentId']) {
+                        throw new Unauthorized('You are not authorized to view this page.');
+                    }
+                })
+            ),
         );
         $preloadRegistrationSession = function ($params) {
             return $this->preloadRegistrationSession($params);
@@ -73,6 +88,7 @@ class Module extends BaseModule
         /* Transition between states
          */
         $this->register('POST', '/registrations/sessions/{sessionId:\\d+}/complete-preparation', 'sessionCompletePreparation', $ruleIBCoordinatorAccess, $preloadRegistrationSession);
+        $this->register('PUT', '/registrations/sessions/{sessionId:\\d+}/candidates/{studentId:\\d+}/confirmation', 'updateRegistrationSessionStudentConfirmation', $ruleIBConfirmingDetailsPerms);
     }
 
     /**

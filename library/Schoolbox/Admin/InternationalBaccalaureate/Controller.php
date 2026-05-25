@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\InternationalBaccalaureate;
 
+use Alaress_Date_Format;
 use Alaress\Database\Predicate;
 use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
@@ -53,6 +54,12 @@ class Controller extends ConfigController
     /* Maximum academic year length
      */
     private const int REGISTRATION_SESSION_ACADEMIC_YEAR_MAX_LENGTH = 4;
+    private const string CONFIRMATION_SECTION_CANDIDATE = 'candidate';
+    private const string CONFIRMATION_SECTION_SUBJECT = 'subject';
+    private const array CONFIRMATION_SECTIONS = [
+        self::CONFIRMATION_SECTION_CANDIDATE,
+        self::CONFIRMATION_SECTION_SUBJECT,
+    ];
 
     public function __construct(
         ConfigMapper $configMapper,
@@ -139,10 +146,7 @@ class Controller extends ConfigController
         $encodedCursor = $this->requestQuery->get('cursor');
 
         if (null === $limit) {
-            $problem = (new ApiProblem('Limit must be a positive integer'))
-                ->setStatus(400)
-                ->asArray();
-            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            $this->sendJsonError('Limit must be a positive integer', 400);
             return;
         }
 
@@ -154,10 +158,7 @@ class Controller extends ConfigController
             );
             $results = $cursor->retrieveResults($encodedCursor);
         } catch (Exception | \ValueError $e) {
-            $problem = (new ApiProblem($e->getMessage()))
-                ->setStatus(400)
-                ->asArray();
-            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            $this->sendJsonError($e->getMessage(), 400);
             return;
         }
 
@@ -200,10 +201,7 @@ class Controller extends ConfigController
             );
             $results = $cursor->retrieveResults($encodedCursor);
         } catch (Exception | \ValueError $e) {
-            $problem = (new ApiProblem($e->getMessage()))
-                ->setStatus(400)
-                ->asArray();
-            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            $this->sendJsonError($e->getMessage(), 400);
             return;
         }
 
@@ -389,7 +387,7 @@ class Controller extends ConfigController
 
             $this->response = $this->responseAsJson($subjects);
         } catch (Exception $e) {
-            $this->response = $this->responseAsJson(['error' => $e->getMessage()])->withStatus(500);
+            $this->sendJsonError($e->getMessage(), 500);
         }
     }
 
@@ -425,7 +423,7 @@ class Controller extends ConfigController
         }
 
         if (!isset($data['key']) || !isset($data['value'])) {
-            $this->response = $this->responseAsJson(['success' => false, 'message' => 'Invalid request data'])->withStatus(400);
+            $this->sendJsonError('Invalid request data', 400);
             return;
         }
 
@@ -446,7 +444,7 @@ class Controller extends ConfigController
         $subjectLanguages = is_array($data['subjectLanguages'] ?? null) ? $data['subjectLanguages'] : null;
 
         if ($categoryId <= 0 || $subjectLanguages === null) {
-            $this->response = $this->responseAsJson(['success' => false, 'message' => 'Invalid subject language request data'])->withStatus(400);
+            $this->sendJsonError('Invalid subject language request data', 400);
             return;
         }
 
@@ -458,7 +456,7 @@ class Controller extends ConfigController
             );
 
             if (empty($groupSubjectIds)) {
-                $this->response = $this->responseAsJson(['success' => false, 'message' => 'No group subjects found for category'])->withStatus(400);
+                $this->sendJsonError('No group subjects found for category', 400);
                 return;
             }
 
@@ -506,7 +504,7 @@ class Controller extends ConfigController
 
             $this->response = $this->responseAsJson(['success' => true, 'message' => 'Configuration saved successfully']);
         } catch (Exception $e) {
-            $this->response = $this->responseAsJson(['success' => false, 'message' => $e->getMessage()])->withStatus(500);
+            $this->sendJsonError($e->getMessage(), 500);
         }
     }
 
@@ -1005,7 +1003,7 @@ class Controller extends ConfigController
      */
     public function sessionCompletePreparation(RegistrationSessionModel $registrationSession): void
     {
-        $post = $this->requestPost;
+        $post       = $this->requestPost;
         $studentIds = $post->get('studentIds');
 
         try {
@@ -1015,11 +1013,11 @@ class Controller extends ConfigController
             return;
         }
 
-        $database = $this->registrationSessionStudentMapper->getDatabase();
+        $database           = $this->registrationSessionStudentMapper->getDatabase();
         $transactionStarted = false;
 
         try {
-            $students = $this->registrationSessionStudentMapper->findStudentsForSession((int) $registrationSession->getId());
+            $students             = $this->registrationSessionStudentMapper->findStudentsForSession((int)$registrationSession->getId());
             $studentsToTransition = $this->resolvePreparationStudentsForTransition($students, $studentIds);
 
             $transactionStarted = $database->beginTransaction();
@@ -1033,9 +1031,9 @@ class Controller extends ConfigController
             $transactionStarted = false;
 
             $this->response = $this->responseAsJson([
-                'success' => true,
-                'transitionedCount' => count($studentsToTransition),
-            ]);
+                                                        'success'           => true,
+                                                        'transitionedCount' => count($studentsToTransition),
+                                                    ]);
         } catch (\InvalidArgumentException $e) {
             if ($transactionStarted) {
                 $database->rollBack();
@@ -1045,6 +1043,60 @@ class Controller extends ConfigController
             if ($transactionStarted) {
                 $database->rollBack();
             }
+            $this->sendJsonError('Something has gone wrong. Please try again later.', 500);
+        }
+    }
+
+    /**
+     *  Update a candidate or subject details confirmation checkbox for a registration session student.
+     *
+     * @api PUT /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/candidates/{studentId}/confirmation
+     */
+    public function updateRegistrationSessionStudentConfirmation(
+        int $sessionId,
+        int $studentId
+    ): void {
+        $payload = new Values($this->request->getParsedBody() ?? []);
+        $section = $payload->get('section');
+        $confirmed = $payload->get('confirmed');
+
+        if (!in_array($section, self::CONFIRMATION_SECTIONS, true) || !is_bool($confirmed)) {
+            $this->sendJsonError('Invalid confirmation request data.', 400);
+            return;
+        }
+
+        try {
+            $registrationSessionStudent = $this->persistRegistrationSessionStudent($sessionId, $studentId);
+            $updatedAt = Alaress_Date_Format::now();
+            $updatedBy = $this->getUser();
+
+            if ($section === self::CONFIRMATION_SECTION_CANDIDATE) {
+                $registrationSessionStudent
+                    ->setCandidateConfirmed($confirmed)
+                    ->setCandidateConfirmedAt($updatedAt)
+                    ->setCandidateConfirmedBy($updatedBy);
+            } else {
+                $registrationSessionStudent
+                    ->setSubjectConfirmed($confirmed)
+                    ->setSubjectConfirmedAt($updatedAt)
+                    ->setSubjectConfirmedBy($updatedBy);
+            }
+
+            $this->registrationSessionStudentMapper->save($registrationSessionStudent);
+
+            $this->response = $this->responseAsJson([
+                'success' => true,
+                'section' => $section,
+                'confirmed' => $confirmed,
+                'updatedAt' => $updatedAt,
+                'updatedBy' => [
+                    'id' => $updatedBy->getId(),
+                    'name' => $updatedBy->getFullName(),
+                ],
+            ]);
+        } catch (MapperNotFound) {
+            $this->sendJsonError('Candidate not found for this user in the registration session.', 404);
+        } catch (Exception $e) {
             $this->sendJsonError('Something has gone wrong. Please try again later.', 500);
         }
     }

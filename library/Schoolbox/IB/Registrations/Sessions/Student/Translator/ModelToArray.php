@@ -68,6 +68,7 @@ class ModelToArray
             'ibGroupSubjects' => $this->helper->buildIbGroupSubjects($student->getIbGroupSubjects()),
             '_routes' => [
                 'updateLanguages' => $this->buildUpdateLanguagesRoute($student),
+                'updateConfirmation' => $this->buildUpdateConfirmationRoute($student),
             ],
         ];
     }
@@ -83,6 +84,24 @@ class ModelToArray
 
         return $this->getRouteIfAuthorized(
             'internationalBaccalaureate.updateRegistrationSessionStudentSubjectLanguages',
+            [
+                'sessionId' => $sessionId,
+                'studentId' => $studentId,
+            ]
+        );
+    }
+
+    private function buildUpdateConfirmationRoute(Model $student): ?string
+    {
+        $sessionId = $student->getRegistrationSession()?->getId();
+        $studentId = $student->getUser()?->getId();
+
+        if ($sessionId === null || $studentId === null) {
+            return null;
+        }
+
+        return $this->getRouteIfAuthorized(
+            'internationalBaccalaureate.updateRegistrationSessionStudentConfirmation',
             [
                 'sessionId' => $sessionId,
                 'studentId' => $studentId,
