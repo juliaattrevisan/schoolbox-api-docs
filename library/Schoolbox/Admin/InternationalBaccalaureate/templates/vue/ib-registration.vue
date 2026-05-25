@@ -63,11 +63,10 @@ function openDeleteConfirm(session: RegistrationSession): void {
 /** Calls the delete API for the pending session, then removes it from the list on success. */
 async function confirmDelete(): Promise<void> {
     const session = sessionPendingDelete.value;
-
     if (!session?.deleteEndpoint) {
         return;
     }
-
+    const toast = window.sbProps.toastActivate("Deleting session...");
     isDeleting.value = true;
 
     const response = await apiRequest<null>({
@@ -75,21 +74,19 @@ async function confirmDelete(): Promise<void> {
         method: "DELETE",
     });
 
-    isDeleting.value = false;
-
     if (!response.success) {
-        const toast = window.sbProps.toastActivate("Failed to delete session");
         toast.timeout({ text: "Delete failed", isSuccess: false });
         isDeleteModalOpen.value = false;
         sessionPendingDelete.value = null;
+        isDeleting.value = false;
         return;
     }
 
-    const toast = window.sbProps.toastActivate("Deleting session...");
     toast.timeout({ text: "Session deleted", isSuccess: true });
     diplomaSessions.value = diplomaSessions.value.filter((s) => s.id !== session.id);
     isDeleteModalOpen.value = false;
     sessionPendingDelete.value = null;
+    isDeleting.value = false;
 }
 
 const reportBaseUrl = window.Vue.computed<string | null>(() =>
