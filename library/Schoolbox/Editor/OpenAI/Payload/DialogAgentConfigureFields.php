@@ -226,7 +226,7 @@ class DialogAgentConfigureFields
             'content' => $this->formatActivityContextPrompt($scenario, $assessment),
         ];
 
-        return new ModelParser()->finalise(
+        return new PayloadFinaliser()->finalise(
             $payload,
             $this->openAiEndpoint,
             $this->openAiModel,

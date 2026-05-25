@@ -12,98 +12,20 @@ namespace Schoolbox\Editor\OpenAI\Payload;
 use Schoolbox\Editor\OpenAI\Helper;
 
 /**
- * Helper for parsing a model string into its constituent parts:
- * * model name
- * * version number
- * * variant
+ * Helper for finalising a payload to be sent to an OpenAI-compatible API.
+ *
+ * This may:
+ * * set the `model` parameter of the payload, depending on whether it's an
+ *   OpenAI or Azure endpoint: note that the `model` for Azure is the deployment
+ *   name
+ * * set the payload's `text.verbosity` or `reasoning.effort` parameters,
+ *   depending on the model value: for Azure, this is a separate deployment
+ *   model setting
+ * * set or unset the sampling parameters `temperature` or `top_p`: if reasoning
+ *   effort is set, then these will be unset
  */
-class ModelParser
+class PayloadFinaliser
 {
-    /**
-     * Extract the name from the model string.
-     *
-     * Assumes that the model string is either:
-     * * `gpt-${version}`
-     * * `gpt-${version}-${variant}`
-     *
-     * @param string $model
-     * @return string|null
-     */
-    public function extractModelName(string $model): ?string
-    {
-        $parts = explode('-', $model, 3);
-        return $parts[0] ?? null;
-    }
-
-    /**
-     * Extract the version number from the model string.
-     *
-     * Assumes that the model string is either:
-     * * `gpt-${version}`
-     * * `gpt-${version}-${variant}`
-     *
-     * @param string $model
-     * @return string|null
-     */
-    public function extractModelVersion(string $model): ?string
-    {
-        $parts = explode('-', $model, 3);
-        return $parts[1] ?? null;
-    }
-
-    /**
-     * Extract the variant from the model string.
-     *
-     * Assumes that the model string is either:
-     * * `gpt-${version}`
-     * * `gpt-${version}-${variant}`
-     *
-     * @param string $model
-     * @return string|null
-     */
-    public function extractModelVariant(string $model): ?string
-    {
-        $parts = explode('-', $model, 3);
-        return $parts[2] ?? null;
-    }
-
-    /**
-     * Determine the model value to pass in the payload to the OpenAI API call.
-     *
-     * If `$endpoint` is an Azure endpoint, use the `$azureDeploymentId`:
-     * otherwise, use `$openAiModel`.
-     *
-     * @param string $endpoint
-     * @param string $openAiModel
-     * @param string $azureDeploymentId
-     * @return string
-     */
-    public function determinePayloadModel(string $endpoint, string $openAiModel, string $azureDeploymentId): string
-    {
-        return $endpoint === Helper::ENDPOINT_TYPE_AZURE
-            ? $azureDeploymentId
-            : $openAiModel;
-    }
-
-    /**
-     * Determine the model value to use so that the payload may be filtered in
-     * `filterPayload`.
-     *
-     * If `$endpoint` is an Azure endpoint, use the `$azureDeploymentModel`:
-     * otherwise, use `$openAiModel`.
-     *
-     * @param string $endpoint
-     * @param string $openAiModel
-     * @param string $azureDeploymentModel
-     * @return string
-     */
-    public function determineFilterModel(string $endpoint, string $openAiModel, string $azureDeploymentModel): string
-    {
-        return $endpoint === Helper::ENDPOINT_TYPE_AZURE
-            ? $azureDeploymentModel
-            : $openAiModel;
-    }
-
     /**
      * Finalise the payload, by:
      * * setting the actual model used by the payload
@@ -118,12 +40,6 @@ class ModelParser
      *                                     This will be used as the payload model.
      * @param string $azureDeploymentModel The model to use, if an Azure endpoint.
      *                                     This will be used as the model to filter the payload.
-     *
-     * @param string $model    The name of the model to use.
-     *                         For Azure, this is _not_ the deployment ID:
-     *                         instead, it is the selected deployment model.
-     *                         (This value _should_ match the model deployed in
-     *                         Azure, but this is not enforceable.)
      * @return array
      */
     public function finalise(
@@ -221,5 +137,74 @@ class ModelParser
             }
         }
         return $payload;
+    }
+
+    /**
+     * Extract the version number from the model string.
+     *
+     * Assumes that the model string is either:
+     * * `gpt-${version}`
+     * * `gpt-${version}-${variant}`
+     *
+     * @param string $model
+     * @return string|null
+     */
+    private function extractModelVersion(string $model): ?string
+    {
+        $parts = explode('-', $model, 3);
+        return $parts[1] ?? null;
+    }
+
+    /**
+     * Extract the variant from the model string.
+     *
+     * Assumes that the model string is either:
+     * * `gpt-${version}`
+     * * `gpt-${version}-${variant}`
+     *
+     * @param string $model
+     * @return string|null
+     */
+    private function extractModelVariant(string $model): ?string
+    {
+        $parts = explode('-', $model, 3);
+        return $parts[2] ?? null;
+    }
+
+    /**
+     * Determine the model value to pass in the payload to the OpenAI API call.
+     *
+     * If `$endpoint` is an Azure endpoint, use the `$azureDeploymentId`:
+     * otherwise, use `$openAiModel`.
+     *
+     * @param string $endpoint
+     * @param string $openAiModel
+     * @param string $azureDeploymentId
+     * @return string
+     */
+    private function determinePayloadModel(string $endpoint, string $openAiModel, string $azureDeploymentId): string
+    {
+        return $endpoint === Helper::ENDPOINT_TYPE_AZURE
+            ? $azureDeploymentId
+            : $openAiModel;
+    }
+
+    /**
+     * Determine the model value to use so that the payload may be filtered in
+     * `filterPayload`.
+     *
+     * If `$endpoint` is an Azure endpoint, use the `$azureDeploymentModel`:
+     * otherwise, use `$openAiModel`.
+     *
+     * @param string $endpoint
+     * @param string $openAiModel
+     * @param string $azureDeploymentModel
+     * @return string
+     */
+    private function determineFilterModel(string $endpoint, string $openAiModel, string $azureDeploymentModel): string
+    {
+        return $endpoint === Helper::ENDPOINT_TYPE_AZURE
+            ? $azureDeploymentModel
+            : $openAiModel;
     }
 }

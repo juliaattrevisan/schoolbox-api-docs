@@ -206,7 +206,7 @@ class ImageGeneration
 
         // For now: image generation is supported only by OpenAI.
         // This may change in the future.
-        return new ModelParser()->finalise(
+        return new PayloadFinaliser()->finalise(
             $payload,
             Helper::ENDPOINT_TYPE_OPENAI,
             $this->textModel,

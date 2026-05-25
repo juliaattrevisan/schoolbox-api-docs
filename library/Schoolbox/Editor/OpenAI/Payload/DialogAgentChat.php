@@ -217,7 +217,7 @@ class DialogAgentChat
             $payload['previous_response_id'] = $previousResponseId;
         }
 
-        return new ModelParser()->finalise(
+        return new PayloadFinaliser()->finalise(
             $payload,
             $this->openAiEndpoint,
             $this->openAiModel,

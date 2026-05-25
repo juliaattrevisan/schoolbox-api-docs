@@ -201,7 +201,7 @@ class LearningActivityCustomisation
             $payload['reasoning'] = ['effort' => $this->reasoningEffort];
         }
 
-        return new ModelParser()->finalise(
+        return new PayloadFinaliser()->finalise(
             $payload,
             $this->openAiEndpoint,
             $this->openAiModel,
