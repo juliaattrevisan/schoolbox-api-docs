@@ -137,7 +137,7 @@ class Component_Definition
         'Component_Homepage_BreadcrumbController' => '#ff7c00',
         'Component_Homepage_FileListController' => '#0066af',
         'Component_Homepage_FolderListController' => '#ffd100',
-        'Component_Homepage_ManageFolderController' => 'var(--sbx-config-color-accent, #999999)',
+        'Component_Homepage_ManageFolderController' => '#ffd100',
         'Component_Homepage_LinkListController' => '#007fff',
         'Component_Homepage_FeedController' => '#0066af',
         'Component_Homepage_PinterestController' => '#bf1e2d',

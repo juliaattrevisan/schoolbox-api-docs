@@ -76,6 +76,7 @@
         dzone = azone.find(opt.dropzoneSelector).html("");
 
         var renderDropzoneIcon = function () {
+            dzone.removeClass(opt.iconClass);
             dzone.find("sbx-icon[data-attach-icon]").remove();
             $("<sbx-icon></sbx-icon>")
                 .attr("data-attach-icon", "true")
