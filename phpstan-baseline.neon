@@ -1483,12 +1483,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Course/Markbook/CourseMarkbook.php
 
 		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Learning\\Course\\DataModel\\Implementation\\Unit\\Model is not subtype of native type null\.$#'
-			identifier: varTag.nativeType
-			count: 2
-			path: library/Schoolbox/Assessment/Course/Markbook/SortForCourseMarkbook.php
-
-		-
 			message: '#^Method Schoolbox\\Assessment\\Rubric\\DataModel\\Capability\\Mapper\:\:findForParent\(\) should return iterable\<Schoolbox\\Assessment\\Rubric\\DataModel\\Capability\\Model\>&Schoolbox\\GenericCollection but returns array\<Schoolbox\\Assessment\\Rubric\\DataModel\\Capability\\Model\>\.$#'
 			identifier: return.type
 			count: 1
