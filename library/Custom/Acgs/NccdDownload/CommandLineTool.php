@@ -429,7 +429,7 @@ class CommandLineTool extends App
         foreach ($assessment->getAllParticipants() as $participant) {
             $participantFiles = [];
             foreach ($participant->getSubmittedResponses() as $response) {
-                /** @var array<string, array{storage: DueWorkResponseFile, filename: string, filemtime: int}> $participantFiles */
+                /** @var array<string, array{storage: DueWorkResponseFile, filename: string, filemtime: int, comment: string|null}> $participantFiles */
                 if ($response instanceof DueWorkResponse) {
                     if ($response->getAllFiles()->count()) {
                         $feedback = $participant->findMostRecentInstructorGivenPublishedFeedback();
