@@ -275,7 +275,7 @@ function handleDrop(event: DragEvent): void {
             @dragend="isOverDropZone = false"
         >
             <div class="dzone">
-                <sbx-icon class="icon-attach" name="attach" size="l"></sbx-icon>
+                <sbx-icon class="icon-attach" name="attach"></sbx-icon>
                 <span>
                     {{ props.placeholder || `Click or drag here to attach ${props.multiple ? "files" : "a file"}` }}
                 </span>

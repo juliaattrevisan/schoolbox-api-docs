@@ -128,7 +128,7 @@ export default {
                 <p class="meta">
                     <span>
                         <template v-if="article.sticky"
-                            ><sbx-icon class="icon-pin" name="pin" size="l"></sbx-icon>Pinned by
+                            ><sbx-icon class="icon-pin" name="pin"></sbx-icon>Pinned by
                         </template>
                         <template v-else>By </template>
                         <a

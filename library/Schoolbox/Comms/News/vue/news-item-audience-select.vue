@@ -795,11 +795,7 @@ export default {
                             class="button-block"
                             @click="changePage(audienceOption)"
                         >
-                            <sbx-icon
-                                :class="'icon-' + audienceOption.icon"
-                                :name="audienceOption.icon"
-                                size="l"
-                            ></sbx-icon>
+                            <sbx-icon :class="'icon-' + audienceOption.icon" :name="audienceOption.icon"></sbx-icon>
                             {{ audienceOption.namePlural }}
                         </button>
                     </div>

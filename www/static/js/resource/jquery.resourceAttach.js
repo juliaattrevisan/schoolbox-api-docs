@@ -140,7 +140,7 @@
                 var mk =
                         opt.fallbackButtonMarkup ||
                         '<a href="#" data-attach-fallback class="button">' +
-                            '<sbx-icon name="attach" size="l" class="icon-attach"></sbx-icon>' +
+                            '<sbx-icon name="attach" class="icon-attach"></sbx-icon>' +
                             opt.dictDefaultMessage +
                             "</a>",
                     btn = $(mk);
