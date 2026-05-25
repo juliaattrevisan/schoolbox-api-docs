@@ -42,8 +42,8 @@ const isModalOpen = window.Vue.ref(false); // to open/close the exporting to csv
                 <div class="switch f-no-margins">
                     <input id="onlyShowGapsToggle" v-model="filtersStore.onlyShowGaps" type="checkbox" />
                     <label for="onlyShowGapsToggle" data-test="cc-report-filters-gaps-toggle">
-                        <span class="icon-approve"></span>
-                        <span class="icon-cancel"></span>
+                        <span><sbx-icon name="approve" size="m" color="currentColor"></sbx-icon></span>
+                        <span><sbx-icon name="close" size="m" color="currentColor"></sbx-icon></span>
                     </label>
                 </div>
             </div>
@@ -52,8 +52,8 @@ const isModalOpen = window.Vue.ref(false); // to open/close the exporting to csv
                 <div class="switch f-no-margins">
                     <input id="showDisabledOutcomesToggle" v-model="filtersStore.showDisabled" type="checkbox" />
                     <label for="showDisabledOutcomesToggle" data-test="cc-report-filters-disabled-toggle">
-                        <span class="icon-approve"></span>
-                        <span class="icon-cancel"></span>
+                        <span><sbx-icon name="approve" size="m" color="currentColor"></sbx-icon></span>
+                        <span><sbx-icon name="close" size="m" color="currentColor"></sbx-icon></span>
                     </label>
                 </div>
             </div>

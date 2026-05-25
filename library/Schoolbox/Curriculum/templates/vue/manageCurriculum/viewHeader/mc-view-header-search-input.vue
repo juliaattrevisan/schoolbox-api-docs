@@ -101,8 +101,8 @@ function onClearSearchSelected(): void {
                 :disabled="props.isDisabled"
             />
             <label for="show-only-enabled" data-test="show-only-enabled">
-                <span class="icon-approve"></span>
-                <span class="icon-cancel"></span>
+                <span><sbx-icon name="approve" size="m" color="currentColor"></sbx-icon></span>
+                <span><sbx-icon name="close" size="m" color="currentColor"></sbx-icon></span>
             </label>
         </div>
     </div>

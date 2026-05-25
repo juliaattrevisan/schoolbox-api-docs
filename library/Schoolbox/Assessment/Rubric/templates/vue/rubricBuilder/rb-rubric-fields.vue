@@ -107,8 +107,8 @@ window.Vue.onMounted(() => {
                         data-rubric-use-mark-range-toggle
                     />
                     <label :for="`rubric-${props.rubricId}-useMarkRange`">
-                        <span class="icon-approve"></span>
-                        <span class="icon-cancel"></span>
+                        <span><sbx-icon name="approve" size="m" color="currentColor"></sbx-icon></span>
+                        <span><sbx-icon name="close" size="m" color="currentColor"></sbx-icon></span>
                     </label>
                 </div>
             </div>
