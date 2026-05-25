@@ -3703,12 +3703,6 @@ parameters:
 			path: library/Schoolbox/Learning/Authorizer/Rule/CanPreview.php
 
 		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 1
-			path: library/Schoolbox/Learning/Classes/ClassList.php
-
-		-
 			message: '#^Method Schoolbox\\Learning\\Component\\Dashboard\\ClassController\:\:execute\(\) should return true but returns false\.$#'
 			identifier: return.type
 			count: 1
