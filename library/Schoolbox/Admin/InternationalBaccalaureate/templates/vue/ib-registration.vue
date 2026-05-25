@@ -228,9 +228,9 @@ window.Vue.onMounted((): void => {
 
 <style scoped>
 .session-list-box {
-    background-color: white;
+    background-color: var(--sbx-color-foreground-primary, white);
     border-radius: var(--sbx-config-box-roundness, 0);
-    box-shadow: var(--sbx-config-box-drop-shadow, 0 2px 5px rgba(0, 0, 0, 0.1));
+    box-shadow: var(--sbx-config-box-drop-shadow, none);
     padding: 0 1rem;
 }
 
