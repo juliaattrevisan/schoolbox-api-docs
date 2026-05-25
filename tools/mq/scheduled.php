@@ -71,10 +71,30 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $postman = new Postman($log, $subscriptionCache, $loop, $flags, INSTANCE_ID, $redis);
 
         // Relevant config options to scheduled:
-        $stratBuilder         = new ConfiguredDispatchStrategyBuilder(new ConfigurationReader($configFile)->readConfig());
-        $strat                = $stratBuilder->build($flags);
-        $maxFutureTriggerTime = $strat->getMaxFutureTriggerTime();
-        $scheduler            = new Scheduler(
+        $stratBuilder           = new ConfiguredDispatchStrategyBuilder(new ConfigurationReader($configFile)->readConfig());
+        $strat                  = $stratBuilder->build($flags);
+        $maxFutureTriggerTimeMs = $strat->getMaxFutureTriggerTime();
+
+        // Convert max future trigger time from ms to s, rounding up:
+        $maxFutureTriggerTime = intdiv($maxFutureTriggerTimeMs, 1000);
+        if ($maxFutureTriggerTimeMs % 1000 !== 0) {
+            $maxFutureTriggerTime += 1;
+            $log->notice(
+                sprintf(
+                    'maxFutureTriggerTime value %dms is not a whole second value: rounding up to %ds',
+                    $maxFutureTriggerTimeMs,
+                    $maxFutureTriggerTime,
+                ),
+            );
+        }
+
+        // Since future triggers are cached using the JIT cache:
+        // the max future trigger time must be <= the JIT's TTL.
+        if ($maxFutureTriggerTime > 0) {
+            $maxFutureTriggerTime = min($maxFutureTriggerTime, RedisCache::EXPIRY_WINDOW);
+        }
+
+        $scheduler = new Scheduler(
             $loop,
             $strat,
             $log,
@@ -82,12 +102,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
             $conf,
             $postman,
             INSTANCE_ID,
-            // Since future triggers are cached using the JIT cache, the max
-            // future trigger time must be <= the JIT's TTL.
-            // maxFutureTriggerTime is configured in ms but the Scheduler expects seconds.
-            $maxFutureTriggerTime > 0
-                ? min(intdiv($maxFutureTriggerTime, 1000), RedisCache::EXPIRY_WINDOW)
-                : 0,
+            $maxFutureTriggerTime,
         );
 
         // Summarise strategy
