@@ -4765,12 +4765,6 @@ parameters:
 			path: library/Schoolbox/Resource/Test/CategoryMapperTest.php
 
 		-
-			message: '#^PHPDoc tag @var with type Alaress\\Authorizer\\Authorizer\|PHPUnit\\Framework\\MockObject\\MockObject is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Resource/Textbox/Translator/Test/ModelToArrayTest.php
-
-		-
 			message: '#^Instanceof between DateTime and DateTime will always evaluate to true\.$#'
 			identifier: instanceof.alwaysTrue
 			count: 1
