@@ -452,9 +452,11 @@ class CohortAnalysis
      * indexed by unit SPECIFICATION.
      *
      * @return mixed[] Indexed by UnitSpec.ID
-     * @var UnitSpecification return['unit']
-     * @var float return['mostAdvancedStudent']
-     * @var float return['classCompletions']
+     *
+     * Return data:
+     * - UnitSpecification unit
+     * - float mostAdvancedStudent
+     * - float classCompletions
      */
     public function getProgressByUnit(): array
     {
@@ -499,8 +501,10 @@ class CohortAnalysis
      *   - proportion of activities completed by ALL participants
      *
      * @return float[]
-     * @var float return['mostAdvancedStudent']
-     * @var float return['classCompletions']
+     *
+     * Return data:
+     * - float mostAdvancedStudent
+     * - float classCompletions
      */
     public function getOverallProgress(): array
     {
@@ -578,9 +582,11 @@ class CohortAnalysis
      *
      * @param bool $filterBySubmissionType
      * @return mixed[][]
-     * @var mixed[] $results [$assessmentId]
-     * @var User    $results [$assessmentId][$userId]['user']
-     * @var float   $results [$assessmentId][$userId]['grade']
+     *
+     * Return data:
+     * - mixed[] results[assessmentId]
+     * - User results[assessmentId][userId]['user']
+     * - float results[assessmentId][userId]['grade']
      */
     public function getAssessmentMarks(bool $filterBySubmissionType): array
     {
@@ -658,9 +664,11 @@ class CohortAnalysis
      *
      * @throws MapperException
      * @return array Indexed by User.ID
-     * @var User  return[user.id]['user']
-     * @var int   return[user.id]['hits']
-     * @var float return[user.id]['average']
+     *
+     * Return data:
+     * - User user
+     * - int hits
+     * - float average
      */
     public function getEffort()
     {
