@@ -47,7 +47,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      */
     public function buildEnabledKeyConverters($page): GenericCollection
     {
-        /** @var Page\Model[] $pageFilters */
+        /** @var GenericCollection|Page\Model[] $pageFilters */
         $pageFilters          = $this->buildPageFilters($page, enabledOnly: true, userConfigurableOnly: false);
 
         $keyConverters        = $this->createKeyConverterCollection();

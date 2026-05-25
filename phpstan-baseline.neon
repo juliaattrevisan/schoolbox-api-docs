@@ -2227,12 +2227,6 @@ parameters:
 			path: library/Schoolbox/External/Normalise/User/Staff.php
 
 		-
-			message: '#^PHPDoc tag @var with type array\<Schoolbox\\Filter\\Page\\Model\> is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Filter/AbstractFactoryFactory.php
-
-		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 1
