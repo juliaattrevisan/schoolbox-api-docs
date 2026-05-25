@@ -146,7 +146,6 @@ class Mapper extends Schoolbox\Mapper
 
         $level = null;
 
-        /** @var Indicator\Model $indicator */
         $indicator = null;
 
         $capability = null;
@@ -171,14 +170,15 @@ class Mapper extends Schoolbox\Mapper
                 }
 
                 // Set the capability as well
-                /** @var Indicator\Model $indicator */
                 $capability     = $capabilities->getOffset($capabilityId);
                 /** @var Capability\Model $capability */
                 $indicator = $this->hydrateJoin($r, 'indicator', 'c');
+                /** @var Indicator\Model $indicator */
                 $indicator->setCapability($capability);
                 $indicators->setOffset($indicatorId, $indicator);
             }
             $indicator = $indicators->getOffset($indicatorId);
+            /** @var Indicator\Model $indicator */
 
             $descriptor = $this->hydrate($r);
             $descriptors->setOffset($descriptor->getId(), $descriptor);
