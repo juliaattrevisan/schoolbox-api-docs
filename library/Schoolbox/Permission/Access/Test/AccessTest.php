@@ -1361,7 +1361,7 @@ class AccessTest extends TestCase
      */
     private function getMockExternalUserInterface(array $externalUserData): External_UserInterface
     {
-        /** @var MockObject|External_UserInterface $externalUserInterface */
+        /** @var MockObject&External_UserInterface $externalUserInterface */
         $externalUserInterface = $this->createMock(External_UserInterface::class);
 
         $subjectLists = [];
