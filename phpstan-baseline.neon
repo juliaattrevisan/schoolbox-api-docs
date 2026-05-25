@@ -3877,12 +3877,6 @@ parameters:
 			path: library/Schoolbox/Mapper/Performance/DevMonitor.php
 
 		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\IMapper is not subtype of native type string\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
-
-		-
 			message: '#^Property Schoolbox\\Mapper\\RecursiveUndeleter\:\:\$logger \(Alaress\\Lumberjack\\Logger\) does not accept Psr\\Log\\LoggerInterface\.$#'
 			identifier: assign.propertyType
 			count: 1
