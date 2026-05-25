@@ -327,7 +327,7 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
 
 
     /**
-     * @return Project\Mapper|Mapper
+     * @return Project\Mapper
      * @throws InvalidArgumentException
      */
     private function getProjectMapper(): Project\Mapper
