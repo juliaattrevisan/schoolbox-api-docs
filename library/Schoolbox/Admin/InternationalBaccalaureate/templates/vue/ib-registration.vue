@@ -60,7 +60,9 @@ function openDeleteConfirm(session: RegistrationSession): void {
     isDeleteModalOpen.value = true;
 }
 
-/** Calls the delete API for the pending session, then removes it from the list on success. */
+/**
+ * Calls the delete API for the pending session, then removes it from the list on success.
+ */
 async function confirmDelete(): Promise<void> {
     const session = sessionPendingDelete.value;
     if (!session?.deleteEndpoint) {
@@ -163,23 +165,15 @@ window.Vue.onMounted((): void => {
                                         {{ new Date(session.createdAt).toLocaleTimeString() }}</small
                                     >
                                 </div>
-                                <span
-                                    :title="
-                                        session.deleteEndpoint === null
-                                            ? 'Cannot delete: session has registered students'
-                                            : undefined
-                                    "
+                                <button
+                                    v-if="session.deleteEndpoint"
+                                    type="button"
+                                    class="sbx-icon-only-button"
+                                    :aria-label="`Delete session ${session.title}`"
+                                    @click="openDeleteConfirm(session)"
                                 >
-                                    <button
-                                        type="button"
-                                        class="sbx-icon-only-button"
-                                        :aria-label="`Delete session ${session.title}`"
-                                        :disabled="session.deleteEndpoint === null"
-                                        @click="openDeleteConfirm(session)"
-                                    >
-                                        <sbx-icon name="delete"></sbx-icon>
-                                    </button>
-                                </span>
+                                    <sbx-icon name="delete"></sbx-icon>
+                                </button>
                             </div>
                         </li>
                     </ul>
