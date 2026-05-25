@@ -2320,12 +2320,6 @@ parameters:
 			message: '#^PHPDoc tag @param for parameter \$folders with type iterable\<Schoolbox\\Resource\\Folder\\Model\>&Schoolbox\\Collection is not subtype of native type Schoolbox\\GenericCollection\.$#'
 			identifier: parameter.phpDocType
 			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/Folder/Component.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$folders with type iterable\<Schoolbox\\Resource\\Folder\\Model\>&Schoolbox\\Collection is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: parameter.phpDocType
-			count: 1
 			path: library/Schoolbox/Filter/Filters/Assessment/Folder/CourseImports/Component.php
 
 		-
