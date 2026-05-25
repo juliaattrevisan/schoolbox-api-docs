@@ -4327,12 +4327,6 @@ parameters:
 			path: library/Schoolbox/Permission/Access/RoleAccessMapper.php
 
 		-
-			message: '#^PHPDoc tag @return contains generic type Alaress\\DataStructures\\ObjectTree\<Schoolbox\\Resource\\Folder\\Model\> but class Alaress\\DataStructures\\ObjectTree is not generic\.$#'
-			identifier: generics.notGeneric
-			count: 1
-			path: library/Schoolbox/Permission/Access/Test/AccessTest.php
-
-		-
 			message: '#^PHPDoc tag @return with type array\<Schoolbox\\Role\>\|\(iterable\<Schoolbox\\Role\>&Schoolbox\\GenericCollection\) is not subtype of native type Schoolbox\\GenericCollection\.$#'
 			identifier: return.phpDocType
 			count: 1

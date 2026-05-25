@@ -1129,7 +1129,7 @@ class AccessTest extends TestCase
      * Builds and returns a folder tree
      *
      * @param array $folderData
-     * @return ObjectTree<Folder\Model>
+     * @return ObjectTree
      */
     private static function buildFolderTree(array $folderData): ObjectTree
     {
