@@ -1729,12 +1729,6 @@ parameters:
 			path: library/Schoolbox/Comms/News/Audience/Segment/Translator.php
 
 		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\L10n\\RosettaStone is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Comms/News/Audience/Test/ValidSegmentTest.php
-
-		-
 			message: '#^Property Schoolbox\\Comms\\News\\Audience\\Validation\\Factory\:\:\$validRelationships \(iterable\<Schoolbox\\Comms\\News\\Audience\\Segment\\IStrategy\>&Schoolbox\\GenericCollection\) does not accept array\<array\<string\>\>\.$#'
 			identifier: assign.propertyType
 			count: 1
