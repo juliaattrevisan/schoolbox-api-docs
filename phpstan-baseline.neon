@@ -2329,12 +2329,6 @@ parameters:
 			path: library/Schoolbox/Fixtures/Team/Helper/Translator.php
 
 		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Collection is not subtype of native type array\{user\: mixed, positions\: Schoolbox\\Collection\}\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Fixtures/Team/Metadata/Metadata.php
-
-		-
 			message: '#^Method Schoolbox\\Forum\\Post\:\:getThread\(\) should return Schoolbox\\Forum\\Thread but returns int\.$#'
 			identifier: return.type
 			count: 1

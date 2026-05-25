@@ -119,7 +119,6 @@ class Metadata
                     }
 
                     if ($currentPosition->getUser()->getId() == $currentPlayer->getUser()->getId()) {
-                        /** @var Collection $item ['positions'] */
                         $item['positions']->add($playerPosition);
                     }
                 }
