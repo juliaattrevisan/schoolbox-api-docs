@@ -1729,12 +1729,6 @@ parameters:
 			path: library/Schoolbox/Comms/News/Audience/Segment/Translator.php
 
 		-
-			message: '#^PHPDoc tag @var with type array\<Schoolbox\\Comms\\News\\Audience\\Segment\\ISimpleStrategy\> is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Comms/News/Audience/Segment/Translator.php
-
-		-
 			message: '#^PHPDoc tag @var with type Alaress\\Database\\Connector\\IConnector is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
 			identifier: varTag.nativeType
 			count: 1
