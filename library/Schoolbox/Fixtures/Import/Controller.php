@@ -1240,7 +1240,6 @@ class Controller extends Base
                             'division_id' => $division->getId()
                         ], $this->disableCache);
                     } catch (MapperException $e) {
-                        /** @var Team $teamHome */
                         $teamHome = null;
                     }
 
@@ -1250,7 +1249,6 @@ class Controller extends Base
                             'division_id' => $division->getId()
                         ], $this->disableCache);
                     } catch (MapperException $e) {
-                        /** @var Team $teamAway */
                         $teamAway = null;
                     }
 
