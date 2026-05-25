@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
+import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import CreateSessionModal from "./components/create-session-modal.vue";
 import type { RegistrationSession } from "../js/types/ibRegistrationTypes";
@@ -24,6 +25,7 @@ const isDiplomaModalOpen = window.Vue.ref<boolean>(false);
 const sessionPendingDelete = window.Vue.ref<RegistrationSession | null>(null);
 const isDeleteModalOpen = window.Vue.ref<boolean>(false);
 const isDeleting = window.Vue.ref<boolean>(false);
+const deleteError = window.Vue.ref<string | null>(null);
 
 /** Fetches sessions from the API and populates the DIPLOMA section. On failure, leaves the list empty (shows empty state). */
 async function loadDiplomaSessions(): Promise<void> {
@@ -64,6 +66,11 @@ function openDeleteConfirm(session: RegistrationSession): void {
  * Calls the delete API for the pending session, then removes it from the list on success.
  */
 async function confirmDelete(): Promise<void> {
+    // Prevent multiple clicks
+    if (isDeleting.value) {
+        return;
+    }
+
     const session = sessionPendingDelete.value;
     if (!session?.deleteEndpoint) {
         return;
@@ -78,8 +85,7 @@ async function confirmDelete(): Promise<void> {
 
     if (!response.success) {
         toast.timeout({ text: "Delete failed", isSuccess: false });
-        isDeleteModalOpen.value = false;
-        sessionPendingDelete.value = null;
+        deleteError.value = "Delete failed";
         isDeleting.value = false;
         return;
     }
@@ -88,6 +94,7 @@ async function confirmDelete(): Promise<void> {
     diplomaSessions.value = diplomaSessions.value.filter((s) => s.id !== session.id);
     isDeleteModalOpen.value = false;
     sessionPendingDelete.value = null;
+    deleteError.value = null;
     isDeleting.value = false;
 }
 
@@ -195,26 +202,19 @@ window.Vue.onMounted((): void => {
             :show-close-button="true"
             :is-close-disabled="isDeleting"
         >
-            <h2>Please Confirm</h2>
-            <p>Are you sure you want to delete "{{ sessionPendingDelete?.title }}"?</p>
-            <div class="l-flex l-gap-xs f-no-margins">
-                <button
-                    type="button"
-                    class="button alert l-flex__item--1"
-                    :disabled="isDeleting"
-                    @click="confirmDelete"
-                >
-                    {{ isDeleting ? "Deleting..." : "Yes, delete" }}
-                </button>
-                <button
-                    type="button"
-                    class="button l-flex__item--1"
-                    :disabled="isDeleting"
-                    @click="isDeleteModalOpen = false"
-                >
-                    Cancel
-                </button>
-            </div>
+            <form class="l-flex-col l-gap-s f-no-margins">
+                <h2>Please Confirm</h2>
+                <p>Are you sure you want to delete "{{ sessionPendingDelete?.title }}"?</p>
+                <request-error v-if="deleteError" :further-info="deleteError" />
+                <div class="l-flex l-gap-xs f-no-margins">
+                    <button type="button" class="button alert l-flex__item--1" @click="confirmDelete">
+                        {{ isDeleting ? "Deleting..." : "Delete" }}
+                    </button>
+                    <button type="button" class="button l-flex__item--1" @click="isDeleteModalOpen = false">
+                        Cancel
+                    </button>
+                </div>
+            </form>
         </BasicModal>
     </div>
 </template>
