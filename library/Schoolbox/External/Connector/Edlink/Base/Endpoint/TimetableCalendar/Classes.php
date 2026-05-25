@@ -603,6 +603,7 @@ class Classes implements IStrategy
             ->setTitle($className)
             ->setDetail(null)
             ->setCode($classCode)
+            ->setDay($occ['start_at']->getUsingFormat('l'))
             ->setPeriod($occ['period_name'])
             ->setStartAt($occ['start_at'])
             ->setFinishAt($occ['finish_at'])
