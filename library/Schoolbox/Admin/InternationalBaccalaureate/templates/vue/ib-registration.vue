@@ -211,7 +211,7 @@ window.Vue.onMounted((): void => {
         >
             <form class="l-flex-col l-gap-s f-no-margins">
                 <h2>Please Confirm</h2>
-                <p>Are you sure you want to delete "{{ sessionPendingDelete?.title }}"?</p>
+                <p>Are you sure you want to delete this session?</p>
                 <request-error v-if="deleteError" :further-info="deleteError" />
                 <div class="l-flex l-gap-xs f-no-margins">
                     <button type="button" class="button alert l-flex__item--1" @click="confirmDelete">
