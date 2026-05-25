@@ -959,8 +959,8 @@ class ControllerTest extends TestCase
         $this->assertSame(400, $response->getStatusCode());
 
         $payload = json_decode((string) $response->getBody(), true);
-        $this->assertFalse($payload['success']);
-        $this->assertSame('Invalid confirmation request data.', $payload['message']);
+        $this->assertSame(400, $payload['status']);
+        $this->assertSame('Invalid confirmation request data.', $payload['title']);
     }
 
     public function testUpdateRegistrationSessionStudentConfirmationRejectsNonBooleanConfirmed(): void
@@ -997,8 +997,8 @@ class ControllerTest extends TestCase
         $this->assertSame(400, $response->getStatusCode());
 
         $payload = json_decode((string) $response->getBody(), true);
-        $this->assertFalse($payload['success']);
-        $this->assertSame('Invalid confirmation request data.', $payload['message']);
+        $this->assertSame(400, $payload['status']);
+        $this->assertSame('Invalid confirmation request data.', $payload['title']);
     }
 
     private function buildController(

@@ -146,10 +146,7 @@ class Controller extends ConfigController
         $encodedCursor = $this->requestQuery->get('cursor');
 
         if (null === $limit) {
-            $problem = (new ApiProblem('Limit must be a positive integer'))
-                ->setStatus(400)
-                ->asArray();
-            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            $this->sendJsonError('Limit must be a positive integer', 400);
             return;
         }
 
@@ -161,10 +158,7 @@ class Controller extends ConfigController
             );
             $results = $cursor->retrieveResults($encodedCursor);
         } catch (Exception | \ValueError $e) {
-            $problem = (new ApiProblem($e->getMessage()))
-                ->setStatus(400)
-                ->asArray();
-            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            $this->sendJsonError($e->getMessage(), 400);
             return;
         }
 
@@ -207,10 +201,7 @@ class Controller extends ConfigController
             );
             $results = $cursor->retrieveResults($encodedCursor);
         } catch (Exception | \ValueError $e) {
-            $problem = (new ApiProblem($e->getMessage()))
-                ->setStatus(400)
-                ->asArray();
-            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            $this->sendJsonError($e->getMessage(), 400);
             return;
         }
 
@@ -395,7 +386,7 @@ class Controller extends ConfigController
 
             $this->response = $this->responseAsJson($subjects);
         } catch (Exception $e) {
-            $this->response = $this->responseAsJson(['error' => $e->getMessage()])->withStatus(500);
+            $this->sendJsonError($e->getMessage(), 500);
         }
     }
 
@@ -431,7 +422,7 @@ class Controller extends ConfigController
         }
 
         if (!isset($data['key']) || !isset($data['value'])) {
-            $this->response = $this->responseAsJson(['success' => false, 'message' => 'Invalid request data'])->withStatus(400);
+            $this->sendJsonError('Invalid request data', 400);
             return;
         }
 
@@ -452,7 +443,7 @@ class Controller extends ConfigController
         $subjectLanguages = is_array($data['subjectLanguages'] ?? null) ? $data['subjectLanguages'] : null;
 
         if ($categoryId <= 0 || $subjectLanguages === null) {
-            $this->response = $this->responseAsJson(['success' => false, 'message' => 'Invalid subject language request data'])->withStatus(400);
+            $this->sendJsonError('Invalid subject language request data', 400);
             return;
         }
 
@@ -464,7 +455,7 @@ class Controller extends ConfigController
             );
 
             if (empty($groupSubjectIds)) {
-                $this->response = $this->responseAsJson(['success' => false, 'message' => 'No group subjects found for category'])->withStatus(400);
+                $this->sendJsonError('No group subjects found for category', 400);
                 return;
             }
 
@@ -512,7 +503,7 @@ class Controller extends ConfigController
 
             $this->response = $this->responseAsJson(['success' => true, 'message' => 'Configuration saved successfully']);
         } catch (Exception $e) {
-            $this->response = $this->responseAsJson(['success' => false, 'message' => $e->getMessage()])->withStatus(500);
+            $this->sendJsonError($e->getMessage(), 500);
         }
     }
 
@@ -1045,10 +1036,7 @@ class Controller extends ConfigController
         $confirmed = $payload->get('confirmed');
 
         if (!in_array($section, self::CONFIRMATION_SECTIONS, true) || !is_bool($confirmed)) {
-            $this->response = $this->responseAsJson([
-                'success' => false,
-                'message' => 'Invalid confirmation request data.',
-            ])->withStatus(400);
+            $this->sendJsonError('Invalid confirmation request data.', 400);
             return;
         }
 
@@ -1082,15 +1070,9 @@ class Controller extends ConfigController
                 ],
             ]);
         } catch (MapperNotFound) {
-            $this->response = $this->responseAsJson([
-                'success' => false,
-                'message' => 'Candidate not found for this user in the registration session.',
-            ])->withStatus(404);
+            $this->sendJsonError('Candidate not found for this user in the registration session.', 404);
         } catch (Exception $e) {
-            $this->response = $this->responseAsJson([
-                'success' => false,
-                'message' => 'Something has gone wrong. Please try again later.',
-            ])->withStatus(500);
+            $this->sendJsonError('Something has gone wrong. Please try again later.', 500);
         }
     }
 
