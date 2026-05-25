@@ -142,10 +142,14 @@ class DialogAgentChat
          * Azure uses the Deployment ID instead.
          * Disgusting.
          */
-        $model = $this->openAiModel;
+        $payloadModel    = $this->openAiModel;
+        $validationModel = $this->openAiModel;
 
+        // ... but, we need the actual model in the Azure deployment
+        // (or what we've been told it is) in order to filter the payload.
         if (Helper::ENDPOINT_TYPE_AZURE === $this->openAiEndpoint) {
-            $model = $this->azureDeploymentId;
+            $payloadModel    = $this->azureDeploymentId;
+            $validationModel = $this->azureDeploymentModel;
         }
 
         /* See https://platform.openai.com/docs/api-reference/responses/create */
@@ -153,7 +157,7 @@ class DialogAgentChat
             /* An ordered list of instructions for OpenAi */
             'input' => [],
             /* Which variant of OpenAI to use (text model) */
-            'model' => $model,
+            'model' => $payloadModel,
             /* A kind of OpenAI currency to use in this request */
             "max_output_tokens" => self::MAX_OUTPUT_TOKENS,
             /**
@@ -230,10 +234,7 @@ class DialogAgentChat
             $payload['previous_response_id'] = $previousResponseId;
         }
 
-        return new ModelParser()->filterPayload(
-            $payload,
-            $this->openAiModel ?: $this->azureDeploymentModel,
-        );
+        return new ModelParser()->filterPayload($payload, $validationModel);
     }
 
 

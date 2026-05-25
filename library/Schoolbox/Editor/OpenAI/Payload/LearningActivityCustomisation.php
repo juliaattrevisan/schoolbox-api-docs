@@ -151,9 +151,14 @@ class LearningActivityCustomisation
         /* OpenAI uses the model name from our ui.
          * Azure uses the Deployment ID instead.
          */
-        $model = $this->openAiModel;
+        $payloadModel    = $this->openAiModel;
+        $validationModel = $this->openAiModel;
+
+        // ... but, we need the actual model in the Azure deployment
+        // (or what we've been told it is) in order to filter the payload.
         if (Helper::ENDPOINT_TYPE_AZURE === $this->openAiEndpoint) {
-            $model = $this->azureDeploymentId;
+            $payloadModel    = $this->azureDeploymentId;
+            $validationModel = $this->azureDeploymentModel;
         }
 
         /* Replacing the token with the config setting defined prompt
@@ -182,7 +187,7 @@ class LearningActivityCustomisation
         ));
 
         $payload = [
-            'model' => $model,
+            'model' => $payloadModel,
             'temperature' => self::TEMPERATURE,
             'top_p' => self::TOP_P,
             'max_output_tokens' => self::MAX_OUTPUT_TOKENS,
@@ -210,9 +215,6 @@ class LearningActivityCustomisation
             $payload['reasoning'] = ['effort' => $this->reasoningEffort];
         }
 
-        return new ModelParser()->filterPayload(
-            $payload,
-            $this->openAiModel ?: $this->azureDeploymentModel,
-        );
+        return new ModelParser()->filterPayload($payload, $validationModel);
     }
 }

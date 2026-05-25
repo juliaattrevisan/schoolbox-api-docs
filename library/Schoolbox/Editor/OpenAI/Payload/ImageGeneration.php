@@ -210,10 +210,7 @@ class ImageGeneration
 
         // For now: image generation is supported only by OpenAI.
         // This may change in the future.
-        return new ModelParser()->filterPayload(
-            $payload,
-            $this->textModel,
-        );
+        return new ModelParser()->filterPayload($payload, $this->textModel);
     }
 
     /**
