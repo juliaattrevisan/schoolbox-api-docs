@@ -3583,12 +3583,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Quiz/Attempt/MapperProxy.php
 
 		-
-			message: '#^PHPDoc tag @var with type array\<Schoolbox\\Learning\\Assessment\\Quiz\\Attempt\\Model\> is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Quiz/Attempt/MapperProxy.php
-
-		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getLearnosityReference\(\)\.$#'
 			identifier: method.notFound
 			count: 1
