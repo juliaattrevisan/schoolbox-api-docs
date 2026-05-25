@@ -287,7 +287,7 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
 
 
     /**
-     * @return WorkType\Mapper|Mapper
+     * @return WorkType\Mapper
      * @throws InvalidArgumentException
      */
     private function getWorkTypeMapper(): WorkType\Mapper
