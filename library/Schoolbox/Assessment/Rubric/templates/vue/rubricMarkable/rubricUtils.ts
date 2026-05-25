@@ -6,7 +6,7 @@ import type { MarkScheme } from "@schoolboxLibrary/Learning/MarkScheme/templates
  * Turn a specified value into a percentage of the max marks for a capability or rubric total mark
  * @param value value
  * @param maxValue the max
- * @returns pecentage, or null if value is not a number and can't be converted to a number
+ * @returns percentage, or null if value is not a number and can't be converted to a number
  */
 export function getPercentage(value: string | number | null, maxValue: number): number | null {
     const floatValue = parseFloat(String(value)); // yikes.
@@ -39,21 +39,11 @@ export function applyMarkScheme(
     value: string | null;
     humanReadableMark: string | null;
 } {
-    // TODO mega mystery
-    // rubric-markable.vue:188
-    // const { humanReadableMark } = applyMarkScheme(scaledMark, props.rubric.derivedMaxValue, props.assessmentMarkScheme);
-    //
-    // This props.assessmentMarkScheme has a different structure than props.capabilityMarkScheme in rm-grid-capability.vue:226
-    //
-    // The latter is inside a .context; the former is not.
-    //
-    // This forces you to check in two place: markScheme.mode and markScheme.context.mode
-    // SURELY there was meant to be one synonymous struct for both, right...?
-    if ((markScheme.mode ?? markScheme.context.mode) === MarkTypeSlug.NONE) {
+    if (markScheme.mode === MarkTypeSlug.NONE) {
         return { value: null, humanReadableMark: null };
     }
 
-    if ((markScheme.mode ?? markScheme.context.mode) === MarkTypeSlug.TOTAL) {
+    if (markScheme.mode === MarkTypeSlug.TOTAL) {
         const stringValue = value !== null ? String(value) : null;
         return {
             value: stringValue,
@@ -64,14 +54,14 @@ export function applyMarkScheme(
     // turn whatever the value currently is into a percentage
     const percentage = getPercentage(value, maxValue ?? 0);
 
-    if ((markScheme.mode ?? markScheme.context.mode) === MarkTypeSlug.PERCENT) {
+    if (markScheme.mode === MarkTypeSlug.PERCENT) {
         return {
             value: percentage !== null ? percentage.toString() : null,
             humanReadableMark: percentage !== null ? `${percentage}%` : null,
         };
     }
 
-    if ((markScheme.mode ?? markScheme.context.mode) === MarkTypeSlug.LETTER) {
+    if (markScheme.mode === MarkTypeSlug.LETTER) {
         const grades = markScheme.conf;
         if (percentage === null) {
             return { value: null, humanReadableMark: null };
