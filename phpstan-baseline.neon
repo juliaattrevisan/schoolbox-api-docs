@@ -3709,12 +3709,6 @@ parameters:
 			path: library/Schoolbox/Learning/Component/Dashboard/ClassController.php
 
 		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 2
-			path: library/Schoolbox/Learning/Controller.php
-
-		-
 			message: '#^Method Schoolbox\\Learning\\Course\\DataModel\\Implementation\\Mapper\:\:findAllByCourseSpecificationId\(\) should return iterable\<Schoolbox\\Learning\\Course\\DataModel\\Implementation\\Model\>&Schoolbox\\Collection but returns iterable\<Schoolbox\\Learning\\Course\\DataModel\\AbstractCourse\>&Schoolbox\\GenericCollection\.$#'
 			identifier: return.type
 			count: 1

@@ -121,7 +121,9 @@ class Controller extends Base
      * @since 165
      * @param User                   $viewee The user whose pending assessments we are viewing.
      * @param Filter\IFactoryFactory $filterFactoryFactory
-     * @var array[]                  $_GET   . Comma-separated keys, indexed by filter.id. Eg '1=&2=weighted&3=1,2,3' (1 => [], 2 => [weighted], 3 => [1,2,3])
+     *
+     * GET parameters are comma-separated keys, indexed by filter.id.
+     * For example, `1=&2=weighted&3=1,2,3` maps to `1 => [], 2 => [weighted], 3 => [1,2,3]`.
      * @throws RouteNotFound
      * @throws InvalidArgumentException
      * @throws DomainException      If filter factoryFactory has not defined the entity it is filtering
@@ -156,7 +158,8 @@ class Controller extends Base
      * @since 165
      * @param User                   $viewee The user whose pending assessments we are viewing.
      * @param Filter\IFactoryFactory $filterFactoryFactory
-     * @var  string[][]              $_POST  ['filter_selection'] Indexed by filter.id, then concrete key
+     *
+     * POST filter_selection is indexed by filter.id, then concrete key.
      * @throws LogicException
      * @throws DomainException
      * @throws OutOfRangeException
