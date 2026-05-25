@@ -2317,12 +2317,6 @@ parameters:
 			path: library/Schoolbox/Filter/Controller.php
 
 		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\Assessment\\Term\\Mapper\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/FactoryFactory.php
-
-		-
 			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\Learning\\Assessment\\DataModel\\Project\\Mapper\.$#'
 			identifier: return.phpDocType
 			count: 1

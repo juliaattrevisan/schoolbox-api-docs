@@ -277,7 +277,7 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
 
 
     /**
-     * @return Term\Mapper|Mapper
+     * @return Term\Mapper
      * @throws InvalidArgumentException
      */
     private function getTermMapper(): Term\Mapper
