@@ -48,10 +48,14 @@ class Module extends BaseModule
     protected function registerRoutes(): void
     {
         /* LMS-friendly Staff can see the form
+         * Check for participants to avoid showing the feedback pages when it'll go nowhere useful
          */
-        $lmsStaff = new Rule\All(
+        $canGiveFeedbackForAssessment = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\HasRolePermission(Role::PERMISSION_VIEW_STUDENT_GRADES, Role::STAFF),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasRolePermission(Role::PERMISSION_VIEW_STUDENT_GRADES, Role::STAFF),
+            ),
             new HasParticipant(),
         );
 
@@ -63,11 +67,11 @@ class Module extends BaseModule
             return $this->preloadParticipant($params);
         };
 
-        $this->register('GET', '/{assessmentId}/feedback/view', 'getFirstParticipantFeedback', $lmsStaff, $preloadAssessment);
-        $this->register('GET', '/{assessmentId}/{learnerId}/feedback{/feedbackId:\d+}', 'getParticularFeedback', $lmsStaff, $preloadParticipant);
-        $this->register('POST', '/{assessmentId}/{learnerId}/feedback{/feedbackId:\d+}', 'postParticularFeedback', $lmsStaff, $preloadParticipant);
-        $this->register('POST', '/{assessmentId}/{learnerId}/feedback/publish', 'postPublishFeedback', $lmsStaff, $preloadParticipant);
-        $this->register('POST', '/{assessmentId}/feedbacks', 'postParticipantFeedbacks', $lmsStaff, $preloadAssessment);
+        $this->register('GET', '/{assessmentId}/feedback/view', 'getFirstParticipantFeedback', $canGiveFeedbackForAssessment, $preloadAssessment);
+        $this->register('GET', '/{assessmentId}/{learnerId}/feedback{/feedbackId:\d+}', 'getParticularFeedback', $canGiveFeedbackForAssessment, $preloadParticipant);
+        $this->register('POST', '/{assessmentId}/{learnerId}/feedback{/feedbackId:\d+}', 'postParticularFeedback', $canGiveFeedbackForAssessment, $preloadParticipant);
+        $this->register('POST', '/{assessmentId}/{learnerId}/feedback/publish', 'postPublishFeedback', $canGiveFeedbackForAssessment, $preloadParticipant);
+        $this->register('POST', '/{assessmentId}/feedbacks', 'postParticipantFeedbacks', $canGiveFeedbackForAssessment, $preloadAssessment);
     }
 
 
