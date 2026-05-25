@@ -15,7 +15,7 @@ import type {
  * Diploma Programme Year 2 (DIPLOMA) = 1, Diploma Course (COURSE) = 3.
  */
 const CORE_SECTION_SYSTEM_PURPOSE_ID: Record<string, number> = {
-    "Diploma Program Year 2 [Diploma]": 1,
+    "Diploma Programme Year 2 [Diploma]": 1,
     "Diploma Course [Course]": 3,
 };
 
@@ -232,7 +232,7 @@ function buildRowsForSubject(subjectData: IBSubject, index: number, tableType?: 
 function initializeSubjectRows(): void {
     if (isCoreCategory.value) {
         const diplomaRows = props.ibSubjects.flatMap((subjectData, index) =>
-            buildRowsForSubject(subjectData, index, "Diploma Program Year 2 [Diploma]"),
+            buildRowsForSubject(subjectData, index, "Diploma Programme Year 2 [Diploma]"),
         );
         const courseRows = props.ibSubjects.flatMap((subjectData, index) =>
             buildRowsForSubject(subjectData, index, "Diploma Course [Course]"),
@@ -664,7 +664,7 @@ async function saveSubjectConfiguration(): Promise<void> {
 
         <div v-else>
             <template v-if="isCoreCategory">
-                <h3>Diploma Program Year 2 [Diploma]</h3>
+                <h3>Diploma Programme Year 2 [Diploma]</h3>
                 <table class="tiger-stripe">
                     <thead>
                         <tr>
@@ -674,7 +674,9 @@ async function saveSubjectConfiguration(): Promise<void> {
                     </thead>
                     <tbody>
                         <template
-                            v-for="row in subjectRows.filter((r) => r.tableType === 'Diploma Program Year 2 [Diploma]')"
+                            v-for="row in subjectRows.filter(
+                                (r) => r.tableType === 'Diploma Programme Year 2 [Diploma]',
+                            )"
                             :key="row.id"
                         >
                             <tr>

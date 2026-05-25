@@ -117,7 +117,7 @@ window.Vue.onMounted((): void => {
 <template>
     <div class="small-12 island l-flex-col l-gap-m">
         <!-- ── DIPLOMA SECTION ───────────────────────────────────────────────
-             Hardcoded: Student Registration Information for Diploma Program Year 2.
+             Hardcoded: Student Registration Information for Diploma Programme Year 2.
              Future sections are added below as additional hardcoded blocks,
              each with its own reactive state (sessions, loading, error, modal).
              Empty state: entire section collapses into a single card (no external heading).
@@ -127,7 +127,7 @@ window.Vue.onMounted((): void => {
 
         <template v-else>
             <empty-state v-if="diplomaSessions.length === 0" icon="icon-add">
-                <p>Student Registration Information for Diploma Program Year 2 [DIPLOMA]</p>
+                <p>Student Registration Information for Diploma Programme Year 2 [DIPLOMA]</p>
                 <p>
                     No registration sessions exist.
                     <button
@@ -145,14 +145,14 @@ window.Vue.onMounted((): void => {
             <template v-else>
                 <div class="l-flex l-flex--align-center l-flex--justify-space f-no-margins">
                     <h2 class="subheader f-no-margins">
-                        Student Registration Information for Diploma Program Year 2 [DIPLOMA]
+                        Student Registration Information for Diploma Programme Year 2 [DIPLOMA]
                     </h2>
                     <button
                         type="button"
                         class="sbx-icon-only-button"
                         style="font-size: 1.5rem; line-height: 1"
                         data-test="ib-registration-diploma-add"
-                        aria-label="Create new Diploma Program Year 2 examination session"
+                        aria-label="Create new Diploma Programme Year 2 examination session"
                         @click.prevent="isDiplomaModalOpen = true"
                     >
                         +
