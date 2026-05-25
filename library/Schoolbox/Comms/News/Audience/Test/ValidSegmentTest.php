@@ -48,7 +48,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        /** @var IConnector $mockConnector */
+        /** @var IConnector&PHPUnit\Framework\MockObject\MockObject $mockConnector */
         $mockConnector = $this->createMock(IConnector::class);
         /** @var RosettaStone $rosettaStone */
         $rosettaStone = $this->createMock(RosettaStone::class);
