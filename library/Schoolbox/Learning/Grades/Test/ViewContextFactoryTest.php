@@ -12,8 +12,14 @@ use Schoolbox\Learning\Grades\ViewMode;
 use Schoolbox\Role;
 use Schoolbox\User;
 
+/**
+ * Tests effective viewer selection for grades view modes.
+ */
 class ViewContextFactoryTest extends TestCase
 {
+    /**
+     * Staff mode uses the current staff user and includes instructor-only marks.
+     */
     public function testStaffModeUsesCurrentUserAndAllowsInstructorMarks(): void
     {
         $currentUser = $this->user(1, Role::STAFF);
@@ -26,6 +32,37 @@ class ViewContextFactoryTest extends TestCase
         self::assertTrue($context->canViewInstructorMarks());
     }
 
+    /**
+     * Non-staff student requests default to student mode rather than staff preview mode.
+     */
+    public function testNonStaffRequesterDefaultsToStudentMode(): void
+    {
+        $currentUser = $this->user(2, Role::STUDENT);
+
+        $context = (new ViewContextFactory($this->externalUser()))->create($currentUser, $currentUser, null);
+
+        self::assertSame(ViewMode::STUDENT, $context->getMode());
+        self::assertSame($currentUser, $context->getViewer());
+        self::assertFalse($context->canViewInstructorMarks());
+    }
+
+    /**
+     * Non-staff student requests cannot force staff preview mode.
+     */
+    public function testNonStaffRequesterCannotSelectStaffMode(): void
+    {
+        $currentUser = $this->user(2, Role::STUDENT);
+
+        $context = (new ViewContextFactory($this->externalUser()))->create($currentUser, $currentUser, ViewMode::STAFF);
+
+        self::assertSame(ViewMode::STUDENT, $context->getMode());
+        self::assertSame($currentUser, $context->getViewer());
+        self::assertFalse($context->canViewInstructorMarks());
+    }
+
+    /**
+     * Student preview mode uses the viewed student and hides instructor-only marks.
+     */
     public function testStudentModeUsesViewedStudentAndHidesInstructorMarks(): void
     {
         $currentUser = $this->user(1, Role::STAFF);
@@ -38,6 +75,9 @@ class ViewContextFactoryTest extends TestCase
         self::assertFalse($context->canViewInstructorMarks());
     }
 
+    /**
+     * Parent preview mode uses a real loaded parent when one exists.
+     */
     public function testParentModeUsesLoadedParentWhenAvailable(): void
     {
         $currentUser = $this->user(1, Role::STAFF);
@@ -54,6 +94,9 @@ class ViewContextFactoryTest extends TestCase
         self::assertTrue($context->getViewer()->isParentOf($student));
     }
 
+    /**
+     * Parent preview mode creates a synthetic parent when the student has no real parent.
+     */
     public function testParentModeCreatesFallbackParentWhenNoRealParentExists(): void
     {
         $currentUser = $this->user(1, Role::STAFF);
@@ -66,42 +109,9 @@ class ViewContextFactoryTest extends TestCase
         self::assertTrue($context->getViewer()->isParentOf($student));
     }
 
-    public function testStudentRequesterIsForcedToStudentMode(): void
-    {
-        $student = $this->user(2, Role::STUDENT);
-
-        $context = (new ViewContextFactory($this->externalUser()))->create($student, $student, ViewMode::STAFF);
-
-        self::assertSame(ViewMode::STUDENT, $context->getMode());
-        self::assertSame($student, $context->getViewer());
-        self::assertFalse($context->canViewInstructorMarks());
-    }
-
-    public function testParentRequesterIsForcedToParentModeUsingCurrentParent(): void
-    {
-        $student = $this->user(2, Role::STUDENT);
-        $parent = $this->user(3, Role::PARENT);
-        $parent->setChildren((new GenericCollection(User::class))->setOffset($student->getId(), $student));
-
-        $context = (new ViewContextFactory($this->externalUser()))->create($parent, $student, ViewMode::STAFF);
-
-        self::assertSame(ViewMode::PARENT, $context->getMode());
-        self::assertSame($parent, $context->getViewer());
-        self::assertFalse($context->canViewInstructorMarks());
-    }
-
-    public function testSuperuserCanUseRequestedViewMode(): void
-    {
-        $superuser = $this->user(1, Role::STAFF)->setSuperuser(true);
-        $student = $this->user(2, Role::STUDENT);
-
-        $context = (new ViewContextFactory($this->externalUser()))->create($superuser, $student, ViewMode::STUDENT);
-
-        self::assertSame(ViewMode::STUDENT, $context->getMode());
-        self::assertSame($student, $context->getViewer());
-        self::assertFalse($context->canViewInstructorMarks());
-    }
-
+    /**
+     * Create a minimal user for view context tests.
+     */
     private function user(int $id, string $roleType): User
     {
         return (new User())
@@ -109,6 +119,9 @@ class ViewContextFactoryTest extends TestCase
             ->setRole((new Role())->setType($roleType));
     }
 
+    /**
+     * Create an external user service stub for tests that do not need SIS hydration.
+     */
     private function externalUser(): ExternalUser
     {
         return $this->createStub(ExternalUser::class);

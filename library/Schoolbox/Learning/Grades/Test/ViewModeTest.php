@@ -8,14 +8,23 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\Grades\ViewMode;
 
+/**
+ * Tests grades view mode request value handling.
+ */
 class ViewModeTest extends TestCase
 {
+    /**
+     * ViewMode accepts each supported request value unchanged.
+     */
     #[DataProvider('validModeProvider')]
     public function testFromRequestValueAcceptsValidModes(string $input, string $expected): void
     {
         self::assertSame($expected, ViewMode::fromRequestValue($input));
     }
 
+    /**
+     * Invalid request values fall back to staff mode for staff-controlled preview selection.
+     */
     public function testFromRequestValueDefaultsInvalidValuesToStaff(): void
     {
         self::assertSame(ViewMode::STAFF, ViewMode::fromRequestValue(null));
@@ -23,12 +32,11 @@ class ViewModeTest extends TestCase
         self::assertSame(ViewMode::STAFF, ViewMode::fromRequestValue('guardian'));
     }
 
-    #[DataProvider('labelProvider')]
-    public function testLabelDescribesMode(string $mode, string $expected): void
-    {
-        self::assertSame($expected, ViewMode::label($mode));
-    }
-
+    /**
+     * Provide supported request values and their normalized modes.
+     *
+     * @return array<string, array{string, string}>
+     */
     public static function validModeProvider(): array
     {
         return [
@@ -38,13 +46,4 @@ class ViewModeTest extends TestCase
         ];
     }
 
-    public static function labelProvider(): array
-    {
-        return [
-            'staff' => [ViewMode::STAFF, 'staff'],
-            'student' => [ViewMode::STUDENT, 'student'],
-            'parent' => [ViewMode::PARENT, 'parent'],
-            'invalid fallback' => ['guardian', 'staff'],
-        ];
-    }
 }

@@ -179,7 +179,7 @@ class Controller extends Base
         $filteredWorkTypes = WorkType\Mapper::getInstance()->findByColumn('show_on_grades_page', 1);
         $assessmentTasks   = (
             ($filteredWorkTypes->count() > 0) ?
-            $gradeHelper->filterAssessments($effectiveViewer, $assessments, $filteredWorkTypes, null) :
+            $gradeHelper->filterAssessments($effectiveViewer, $assessments, $filteredWorkTypes) :
             new Collection()
         );
 
@@ -199,12 +199,10 @@ class Controller extends Base
             'mailHandle'       => $this->getSession()->get('mailhandle'),
             'currentUser'      => $this->getUser(),
             'yearUrl'          => $this->getYearUrl($viewee->getId()),
-            'viewContext'      => $viewContext,
+            'viewContext'         => $viewContext,
+            'viewModes'           => ViewMode::values(),
             'viewModeQuerySuffix' => $viewContext->getQuerySuffix(),
-            'customisationsRoute' => $this->getRouteIfAuthorized(
-                'customisationRecord.viewRecordByStudent',
-                ['studentId' => $viewee->getId()],
-            ),
+            'customisationsRoute' => null,
         ], '', 'grade');
     }
 
@@ -301,7 +299,8 @@ class Controller extends Base
                 'markbook'           => $markbook,
                 'conversation'       => $conversation,
                 'yearUrl'            => $yearUrl,
-                'viewContext'        => $viewContext,
+                'viewContext'         => $viewContext,
+                'viewModes'           => ViewMode::values(),
                 'viewModeQuerySuffix' => $viewContext->getQuerySuffix(),
             ],
             "Grades for {$subject->getTitle()}",
@@ -382,19 +381,7 @@ class Controller extends Base
         $assessments = $this
             ->findByFiltersWithParticipants($filters, $viewee, $hasPermissionsAndSettings)
             ->filter(function (IAssessable $a) use ($visibility, $effectiveViewer) {
-                $viewer = $effectiveViewer;
-                if ($visibility->isVisibleToUser($a, $viewer, true)) {
-                    return true;
-                }
-                if ($viewer->getRole()->isParent() && $viewer->getChildren() !== null) {
-                    //only if the $viewer is parent should we hit the external db and grab the children
-                    foreach ($viewer->getChildren() as $child) {
-                        if ($visibility->isVisibleToUser($a, $child, true)) {
-                            return true;
-                        }
-                    }
-                }
-                return false;
+                return $visibility->isVisibleToUser($a, $effectiveViewer, true);
             });
 
         // Only show the "send to showcase" trophy button to teachers and students, not parents
@@ -492,13 +479,7 @@ class Controller extends Base
         $rubricAssessmentList = [];
         if ($canSeeRubricGrade || $canSeeCapabilityGrade || $canSeeProgression) {
             $includeComparison = $viewContext->getMode() === ViewMode::STAFF || $viewee->getDisplayGradeGraph();
-            $longitudinalRubric   = $this->getLongitudinalRubricData(
-                $assessments,
-                $viewee,
-                $effectiveViewer,
-                $includeComparison,
-                $subject
-            );
+            $longitudinalRubric   = $this->getLongitudinalRubricData($assessments, $viewee, $effectiveViewer, $includeComparison, $subject);
             $rubricAssessmentList = $longitudinalRubric['assessments'] ?? [];
             unset($longitudinalRubric['assessments']);
         }
@@ -662,7 +643,7 @@ class Controller extends Base
     /**
      * @param GenericCollection|IAssessable[] $assessments
      * @param User                            $student
-     * @param User                            $viewer
+     * @param User                            $viewer            Effective viewer for feedback visibility checks
      * @param bool                            $includeComparison Include other students results for comparison
      * @param Folder\Model                    $folder
      * @return array
@@ -678,7 +659,7 @@ class Controller extends Base
         bool $includeComparison,
         Folder\Model $folder
     ): array {
-        // Filter to dueWork with marks visible to the selected grades viewer.
+        // Filter to dueWork with marks visible to the selected view mode.
         $dueWorksWithVisibleMarks = $assessments->filter(function (IAssessable $assessment) use ($viewer) {
             return $assessment instanceof DueWork\Model && $assessment->isFeedbackVisibleToUser($viewer);
         });

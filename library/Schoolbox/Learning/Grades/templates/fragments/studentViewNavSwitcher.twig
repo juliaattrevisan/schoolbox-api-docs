@@ -1,11 +1,13 @@
-{# Server-side grades view selector. Expects viewContext and currentRouteBase. #}
-<div class="l-flex-row l-flex--align-center l-gap-s">
-    <span data-grades-view-mode-label>Viewing feedback as</span>
-    <ul class="sub-nav" data-grades-view-mode-switcher>
-{% for mode in ["staff", "student", "parent"] %}
-    <li class="{% if viewContext.getMode() == mode %}active{% endif %}">
-        <a href="{{ currentRouteBase }}?viewMode={{ mode }}" data-grades-view-mode="{{ mode }}">{{ mode|capitalize }}</a>
+{# Server-side grades view selector. Expects viewContext, viewModes and currentRouteBase. #}
+<li class="separator">Viewing as {{ viewContext.getLabel() }}</li>
+{% for mode in viewModes %}
+    <li>
+        {% if viewContext.getMode() == mode %}
+            <span class="icon-view" aria-current="page">View as {{ mode|capitalize }}</span>
+        {% else %}
+            <a class="icon-view" href="{{ currentRouteBase }}?viewMode={{ mode }}" data-grades-view-mode="{{ mode }}">
+                View as {{ mode|capitalize }}
+            </a>
+        {% endif %}
     </li>
 {% endfor %}
-</ul>
-</div>

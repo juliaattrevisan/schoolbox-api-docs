@@ -28,7 +28,7 @@
                 folderId: '{{ subject.id }}'
             }
         });
-        $('[data-print]').on('click', function () {
+        $('[data-print]').click(function () {
             window.print();
             $('#container').highcharts().reflow();
         });
@@ -41,17 +41,27 @@
 
 {% set canSwitchViewMode = USER.role.isStaff %}
 {% set canViewInstructorMarks = viewContext.canViewInstructorMarks() %}
-<div class="row">
+<div class="row{% if canSwitchViewMode %} actions-small-2{% endif %}">
     <div class="small-12 columns">
         <h1>{{ locale.grades.properPlural }} for {{ subject.name }} - {{ student.fullName }}</h1>
 
-        {% if subject.teachers|length %}
+        {% if subject.teachers|length or canSwitchViewMode %}
         <ul class="meta">
-            <li><sbx-icon name="teacher" color="var(--sbx-color-text-secondary)"></sbx-icon>Teacher(s): {% for teacher in subject.teachers %}<a href="/search/user/{{ teacher.id }}" title="View Profile">{{ teacher.fullName }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</li>
+            {% if subject.teachers|length %}
+                <li class="icon-teacher">Teacher(s): {% for teacher in subject.teachers %}<a href="/search/user/{{ teacher.id }}" title="View Profile">{{ teacher.fullName }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</li>
+            {% endif %}
+            {% if canSwitchViewMode %}
+                <li data-grades-view-mode-meta class="icon-view">Viewing as {{ viewContext.getLabel() }}</li>
+            {% endif %}
         </ul>
         {% endif %}
-        {% if canSwitchViewMode %}
-            {% set currentRouteBase = routeLookup("learningGrades.getGradesForSubject", {
+    </div>
+    {% if canSwitchViewMode %}
+        <nav>
+            <sbx-pop-out content-id="header-options" data-test="sbx-pop-out-header-options"></sbx-pop-out>
+        </nav>
+        <ul id="header-options" class="f-dropdown" data-dropdown-content aria-label="Grades view mode options">
+            {% set currentRouteBase = routeLookup('learningGrades.getGradesForSubject', {
                 viewee: student,
                 userId: student.id,
                 term: term,
@@ -59,14 +69,14 @@
                 subject: subject,
                 subjectId: subject.id
             }) %}
-            {% include "@learningGrades/fragments/studentViewNavSwitcher.twig" with {
+            {% include '@learningGrades/fragments/studentViewNavSwitcher.twig' with {
                 viewContext: viewContext,
+                viewModes: viewModes,
                 currentRouteBase: currentRouteBase
             } only %}
-        {% endif %}
-    </div>
+        </ul>
+    {% endif %}
 </div>
-
 
 <div class="row">
     <div class="small-12 medium-6 columns">
@@ -191,13 +201,8 @@
                                 </div>
                                 <nav>
                                     {% if isCommenter %}
-                                        <a class="sbx-icon-only-button no-text"
-                                           title="Delete"
-                                           data-comment-delete
-                                           aria-label="Delete">
-                                            <sbx-icon name="delete"></sbx-icon>
-                                        </a>
-                                        <a title="Modify" data-comment-modify class="sbx-icon-only-button"><sbx-icon name="modify"></sbx-icon></a>
+                                        <a class="icon-delete" title="Delete" data-comment-delete></a>
+                                        <a class="icon-modify" title="Modify" data-comment-modify></a>
                                     {% endif %}
                                 </nav>
                                 <article>
@@ -218,7 +223,7 @@
     <div class="row">
         <div class="small-12 island">
             <div class="empty-state">
-                <sbx-icon name="due-work" size="2.5rem"></sbx-icon>
+                <i class="icon-due-work"></i>
                 <p>There are no {{ locale.grades.plural }} available for {{ subject.name }} for this {{ locale.term }}.</p>
             </div>
         </div>
