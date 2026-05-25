@@ -96,6 +96,7 @@ class DifferentiationProfile
      * @param string     $openAiEndpoint
      * @param string     $openAiModel
      * @param string     $azureDeploymentId
+     * @param string     $azureDeploymentModel
      * @param string     $systemPrompt The system prompt from admin config
      * @param string     $reasoningEffort The reasoning effort level from admin config
      * @param string     $textVerbosity The text verbosity level from admin config
@@ -106,6 +107,7 @@ class DifferentiationProfile
         private string $openAiEndpoint,
         private string $openAiModel,
         private string $azureDeploymentId,
+        private string $azureDeploymentModel,
         private string $systemPrompt,
         private string $reasoningEffort,
         private string $textVerbosity,

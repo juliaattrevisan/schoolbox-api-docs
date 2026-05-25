@@ -128,6 +128,7 @@ class LessonPlan
      * @param string $openAiEndpoint
      * @param string $openAiModel
      * @param string $azureDeploymentId
+     * @param string $azureDeploymentModel
      * @param string $textSystemPrompt
      * @param string $reasoningEffort The reasoning effort level from admin config
      * @param string $textVerbosity The text verbosity level from admin config
@@ -138,6 +139,7 @@ class LessonPlan
         private string $openAiEndpoint,
         private string $openAiModel,
         private string $azureDeploymentId,
+        private string $azureDeploymentModel,
         private string $textSystemPrompt,
         private string $reasoningEffort,
         private string $textVerbosity,
