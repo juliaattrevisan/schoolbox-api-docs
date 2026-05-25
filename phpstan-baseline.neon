@@ -4105,12 +4105,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DueWork/Decorator/CourseManagedDecorator.php
 
 		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getUseRubric\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Controller.php
-
-		-
 			message: '#^Instanceof between Schoolbox\\Learning\\Assessment\\DueWork\\Feedback\\Model and Schoolbox\\Learning\\Assessment\\DueWork\\Feedback\\Model will always evaluate to true\.$#'
 			identifier: instanceof.alwaysTrue
 			count: 1
