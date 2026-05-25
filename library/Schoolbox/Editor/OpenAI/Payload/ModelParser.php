@@ -68,6 +68,43 @@ class ModelParser
     }
 
     /**
+     * Determine the model value to pass in the payload to the OpenAI API call.
+     *
+     * If `$endpoint` is an Azure endpoint, use the `$azureDeploymentId`:
+     * otherwise, use `$openAiModel`.
+     *
+     * @param string $endpoint
+     * @param string $openAiModel
+     * @param string $azureDeploymentId
+     * @return string
+     */
+    public function determinePayloadModel(string $endpoint, string $openAiModel, string $azureDeploymentId): string
+    {
+        return $endpoint === Helper::ENDPOINT_TYPE_AZURE
+            ? $azureDeploymentId
+            : $openAiModel;
+    }
+
+    /**
+     * Determine the model value to use so that the payload may be filtered in
+     * `filterPayload`.
+     *
+     * If `$endpoint` is an Azure endpoint, use the `$azureDeploymentModel`:
+     * otherwise, use `$openAiModel`.
+     *
+     * @param string $endpoint
+     * @param string $openAiModel
+     * @param string $azureDeploymentModel
+     * @return string
+     */
+    public function determineFilterModel(string $endpoint, string $openAiModel, string $azureDeploymentModel): string
+    {
+        return $endpoint === Helper::ENDPOINT_TYPE_AZURE
+            ? $azureDeploymentModel
+            : $openAiModel;
+    }
+
+    /**
      * Perform some common filters on the payload, as appropriate for the model.
      *
      * These filters are not any guess as to what the payload _should_ be: they
