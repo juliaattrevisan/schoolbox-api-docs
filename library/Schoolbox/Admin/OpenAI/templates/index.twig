@@ -46,57 +46,6 @@
                 // Set up collapsers for advanced options
                 $('[data-collapser]').collapsable();
 
-                const PROVIDER_OPENAI = '{{ providers.OpenAI }}';
-                const PROVIDER_AZURE = '{{ providers.Azure }}';
-
-                /* Image credentials
-                 */
-                const imageContainer = $('#imageSettingsContainer');
-                const imageProvider = $('#openai_image_endpoint-field');
-                const imageKey = $('#openai_image_key-field').parent('div');
-                const imageModel = $('#openai_image_model-field').parent('div');
-                const imageAzureResourceName = $('#openai_image_azure_resource_name-field').parent('div');
-                const imageAzureDeploymentId = $('#openai_image_azure_deployment_id-field').parent('div');
-                const imageOutputQuality = $('#openai_image_output_quality-field').parent('div');
-                const imageSystemPrompt = $('#openai_image_system_prompt-field').parent('div');
-
-                imageProvider.on('change', function (event) {
-                    event.preventDefault();
-                    init(imageContainer, imageProvider, imageKey, imageModel, imageAzureResourceName, imageAzureDeploymentId, imageOutputQuality, imageSystemPrompt);
-                });
-
-                init(imageContainer, imageProvider, imageKey, imageModel, imageAzureResourceName, imageAzureDeploymentId, imageOutputQuality, imageSystemPrompt);
-
-                /**
-                 *  Hide everything if you haven't chosen a provider yet
-                 */
-                function init(container, provider, key, model, azureResourceName, azureDeploymentId, outputQuality, systemPrompt) {
-                    if ('{{ providers.Off }}' === provider.val() || '' === provider.val()) {
-                        key.hide();
-                        model.hide();
-                        azureResourceName.hide();
-                        azureDeploymentId.hide();
-                        outputQuality.hide();
-                        systemPrompt.hide();
-                    } else if (PROVIDER_OPENAI === provider.val()) {
-                        key.show();
-                        model.show();
-                        azureResourceName.hide();
-                        azureDeploymentId.hide();
-                        outputQuality.show();
-                        systemPrompt.show();
-                    } else if (PROVIDER_AZURE === provider.val()) {
-                        key.show();
-                        model.hide();
-                        azureResourceName.show();
-                        azureDeploymentId.show();
-                        outputQuality.show();
-                        systemPrompt.show();
-                    }
-
-                    container.show();
-                }
-
                 $('#{{ formId }}').on('submit', function (event) {
                     event.preventDefault();
                     submitSettings();
