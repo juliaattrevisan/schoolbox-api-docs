@@ -3706,12 +3706,6 @@ parameters:
 			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\Resource\\Attachment\\Collector\\CollectorFactory is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
 			identifier: varTag.nativeType
 			count: 2
-			path: library/Schoolbox/Learning/Badge/Translator/ArrayToModel/Test/AllFieldsTest.php
-
-		-
-			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\Resource\\Attachment\\Collector\\CollectorFactory is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 2
 			path: library/Schoolbox/Learning/Badge/Translator/ArrayToModel/Test/MutableFieldsOnlyTest.php
 
 		-
