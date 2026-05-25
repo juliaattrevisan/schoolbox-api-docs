@@ -175,7 +175,6 @@ class Classes implements IStrategy
         private IApi $api,
         private PeopleIds $peopleIds,
         private \Schoolbox\External\Event\Mapper $eventMapper,
-        private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
         private ClassEntryMapper $classEntryMapper,
         private ClassInvolvementMapper $classInvolvementMapper,
         private Alaress_Date_Format $fromDate,

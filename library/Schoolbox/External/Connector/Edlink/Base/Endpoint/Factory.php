@@ -169,7 +169,6 @@ class Factory
                     $api,
                     $peopleIds,
                     $this->eventMapper,
-                    $this->overridesMapper,
                     $this->classEntryMapper,
                     $this->classInvolvementMapper,
                     $fromDate,
