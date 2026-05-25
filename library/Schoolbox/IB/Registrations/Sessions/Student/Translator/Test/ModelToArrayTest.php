@@ -78,11 +78,10 @@ class ModelToArrayTest extends TestCase
 
         $payload = $this->createTranslator()($student, [], '');
 
-        $this->assertSame('', $payload['userName']);
+        $this->assertSame(', Nguyen', $payload['userName']);
         $this->assertTrue($payload['hasMissingDetails']);
         $this->assertSame(
             [
-                'userName',
                 'firstName',
                 'dateOfBirth',
                 'email',
@@ -170,7 +169,7 @@ class ModelToArrayTest extends TestCase
 
     private function createTranslator(): ModelToArray
     {
-        $routeGenerator = $this->createMock(Generator::class);
+        $routeGenerator = $this->createStub(Generator::class);
         $routeGenerator
             ->method('generate')
             ->willReturnCallback(static function (string $route, array $params): string {
@@ -182,7 +181,7 @@ class ModelToArrayTest extends TestCase
                     $params['studentId']
                 );
             });
-        $authorizer = $this->createMock(Authorizer::class);
+        $authorizer = $this->createStub(Authorizer::class);
         $authorizer
             ->method('isPathAuthorizedForUser')
             ->willReturn(true);

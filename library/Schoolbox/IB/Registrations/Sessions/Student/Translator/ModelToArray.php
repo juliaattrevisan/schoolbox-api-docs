@@ -38,16 +38,16 @@ class ModelToArray
     {
         $user = $student->getUser();
 
-        $firstName = $this->helper->normalise($user?->getFirstname());
+        $givenName = $this->helper->normalise($user?->getGivenName());
         $lastName = $this->helper->normalise($user?->getLastname());
         $languageCodes = $this->helper->extractCodes($user?->getLanguageCollection());
         $nationalityCodes = $this->helper->extractCodes($user?->getNationalityCollection());
         $dateOfBirth = $this->helper->formatDateOfBirth($externalStudent['StudentBirthDate'] ?? null);
-        $userName = $this->helper->buildUserName($firstName, $lastName);
+        $userName = $this->helper->buildUserName($givenName, $lastName);
 
         $requiredDetails = [
             'userName' => $userName,
-            'firstName' => $firstName,
+            'firstName' => $givenName,
             'lastName' => $lastName,
             'dateOfBirth' => $dateOfBirth,
             'email' => $this->helper->normalise($user?->getEmail()),
