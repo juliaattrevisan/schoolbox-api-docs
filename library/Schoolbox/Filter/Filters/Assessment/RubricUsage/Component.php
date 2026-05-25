@@ -65,7 +65,7 @@ class Component extends Filter\BaseComponent
      * @param null|GenericCollection|Filter\Selection\Model[] $urlOverrides
      * @param Filter\Selection\Mapper                         $filterSelectionMapper
      * @param Codec                                           $codec
-     * @param null|GenericCollection|CapabilityModel[]        $capabilities
+     * @param GenericCollection|CapabilityModel[]             $capabilities
      * @param bool                                            $showCapabilities
      * @param bool                                            $showIndicators
      * @throws InvalidArgumentException If neither $capabilities or $indicators are supplied
