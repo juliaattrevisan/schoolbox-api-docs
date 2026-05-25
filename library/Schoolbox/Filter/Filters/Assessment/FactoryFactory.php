@@ -317,7 +317,7 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
 
 
     /**
-     * @return UnitSpec\Mapper|Mapper
+     * @return UnitSpec\Mapper
      * @throws InvalidArgumentException
      */
     private function getUnitSpecMapper(): UnitSpec\Mapper
