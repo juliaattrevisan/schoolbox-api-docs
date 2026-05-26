@@ -147,7 +147,7 @@ class Component extends Filter\BaseComponent
     public function toContext(): array
     {
         return array_merge(parent::toContext(), [
-            'keyNone'          => DEFINITION::KEY_NONE,
+            'keyNone'          => Definition::KEY_NONE,
             'capabilities'     => $this->contextData,
             'showCapabilities' => $this->showCapabilities,
             'showIndicators'   => $this->showIndicators,

@@ -2197,12 +2197,6 @@ parameters:
 			path: library/Schoolbox/Filter/Filters/Assessment/NullableContext/Factory.php
 
 		-
-			message: '#^Class Schoolbox\\Filter\\Filters\\Assessment\\RubricUsage\\Definition referenced with incorrect case\: Schoolbox\\Filter\\Filters\\Assessment\\RubricUsage\\DEFINITION\.$#'
-			identifier: class.nameCase
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/RubricUsage/Component.php
-
-		-
 			message: '#^Property Schoolbox\\Filter\\Filters\\Assessment\\Term\\KeyConverter\:\:\$termIds \(iterable\<int\>&Schoolbox\\GenericCollection\) does not accept iterable\<int\>&Schoolbox\\Collection\.$#'
 			identifier: assign.propertyType
 			count: 1
