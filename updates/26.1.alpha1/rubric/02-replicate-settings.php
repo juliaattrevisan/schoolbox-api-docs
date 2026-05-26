@@ -99,10 +99,15 @@ HELP;
 
         /* Find all the submission_boxes that:
          *    - have a truthy use_rubric value
-         *    - are still alive (deleted_at is null)
          *    - are connected to a still-alive assessment (in the odd circumstance that we had bad data)
          *
          * According to jeztek, the default weight should be 100.
+         *
+         * This disregards soft-deleted submission boxes because we don't know whether an assessment is going to be
+         * undeleted or not; we have to assume it's possible for any deleted submission box to be restored at some
+         * point in time and that its rubrics could/should come with. It means we'll be seeding data for potential
+         * trash. I actually encountered this problem during development where a deleted assessment *didn't* have its
+         * rubric instances which caused miscellaneous errors in the most basic workflow.
          */
         $statement = $this->getDatabaseInternal()->prepare("
             SELECT 
