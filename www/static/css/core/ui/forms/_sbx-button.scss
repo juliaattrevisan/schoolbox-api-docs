@@ -55,6 +55,7 @@ body.sbx-body {
      */
     button:not([class]):not(:empty),
     .button,
+    .sbx-button,
     .flex-list.buttons a,
     .flex-list.buttons button,
     .sub-nav li a,
@@ -107,6 +108,7 @@ body.sbx-body {
     // currently only used for the 'View more' buttons in Unit planner/ Manage DP page
     .sbx-button--smaller {
         font-size: var(--sbx-font-size-xs);
+        padding: var(--sbx-size-xxs);
     }
 
     // A horizontal list of buttons, adding some gap between them
