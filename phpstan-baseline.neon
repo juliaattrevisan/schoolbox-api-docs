@@ -1657,12 +1657,6 @@ parameters:
 			path: library/Schoolbox/Comms/News/Audience/Segment/Transactor.php
 
 		-
-			message: '#^Call to an undefined method Schoolbox\\Comms\\News\\Audience\\Segment\\IStrategy\:\:getTranslateSql\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Comms/News/Audience/Segment/Translator.php
-
-		-
 			message: '#^Property Schoolbox\\Comms\\News\\Audience\\Validation\\Factory\:\:\$validRelationships \(iterable\<Schoolbox\\Comms\\News\\Audience\\Segment\\IStrategy\>&Schoolbox\\GenericCollection\) does not accept array\<array\<string\>\>\.$#'
 			identifier: assign.propertyType
 			count: 1
@@ -3499,18 +3493,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Project/Controller.php
 
 		-
-			message: '#^Cannot call method add\(\) on array\<Schoolbox\\Learning\\Assessment\\Quiz\\Attempt\\Model\>\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Quiz/Attempt/MapperProxy.php
-
-		-
-			message: '#^Method Schoolbox\\Learning\\Assessment\\Quiz\\Attempt\\MapperProxy\:\:transformModels\(\) should return iterable\<Schoolbox\\Learning\\Assessment\\Quiz\\Attempt\\Model\>&Schoolbox\\GenericCollection but returns array\<Schoolbox\\Learning\\Assessment\\Quiz\\Attempt\\Model\>\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Quiz/Attempt/MapperProxy.php
-
-		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getLearnosityReference\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -3533,24 +3515,6 @@ parameters:
 			identifier: property.onlyWritten
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Quiz/Controller.php
-
-		-
-			message: '#^Cannot call method add\(\) on array\<Schoolbox\\Learning\\Assessment\\Quiz\\Feedback\\Model\>\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Quiz/Feedback/MapperProxy.php
-
-		-
-			message: '#^Method Schoolbox\\Learning\\Assessment\\Quiz\\Feedback\\MapperProxy\:\:transformModels\(\) should return iterable\<Schoolbox\\Learning\\Assessment\\Quiz\\Feedback\\Model\>&Schoolbox\\GenericCollection but returns array\<Schoolbox\\Learning\\Assessment\\Quiz\\Feedback\\Model\>\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Quiz/Feedback/MapperProxy.php
-
-		-
-			message: '#^Method Schoolbox\\Learning\\Assessment\\Quiz\\Model\:\:getAuthoritativeResponse\(\) should return Schoolbox\\Learning\\Assessment\\Quiz\\Attempt\\Model\|null but returns Schoolbox\\Learning\\Assessment\\IResponse\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Quiz/Model.php
 
 		-
 			message: '#^Method Schoolbox\\Learning\\Assessment\\Summator\\Average\:\:calculateTotalWeight\(\) should return int but returns null\.$#'
@@ -3843,24 +3807,6 @@ parameters:
 		-
 			message: '#^Method Schoolbox\\Notif\\MQ\\Test\\MockAMQPConnector\:\:readFromQueue\(\) should return PhpAmqpLib\\Message\\AMQPMessage but returns null\.$#'
 			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Notif/MQ/Test/MockAMQPConnector.php
-
-		-
-			message: '#^Return type \(\$this\(Schoolbox\\Notif\\MQ\\Test\\MockAMQPConnector\)\) of method Schoolbox\\Notif\\MQ\\Test\\MockAMQPConnector\:\:bindQueue\(\) should be compatible with return type \(PhpAmqpLib\\Channel\\AMQPChannel\) of method Alaress\\Async\\AMQP\\AMQPInterface\:\:bindQueue\(\)$#'
-			identifier: method.childReturnType
-			count: 1
-			path: library/Schoolbox/Notif/MQ/Test/MockAMQPConnector.php
-
-		-
-			message: '#^Return type \(\$this\(Schoolbox\\Notif\\MQ\\Test\\MockAMQPConnector\)\) of method Schoolbox\\Notif\\MQ\\Test\\MockAMQPConnector\:\:unbindExchange\(\) should be compatible with return type \(PhpAmqpLib\\Channel\\AMQPChannel\) of method Alaress\\Async\\AMQP\\AMQPInterface\:\:unbindExchange\(\)$#'
-			identifier: method.childReturnType
-			count: 1
-			path: library/Schoolbox/Notif/MQ/Test/MockAMQPConnector.php
-
-		-
-			message: '#^Return type \(\$this\(Schoolbox\\Notif\\MQ\\Test\\MockAMQPConnector\)\) of method Schoolbox\\Notif\\MQ\\Test\\MockAMQPConnector\:\:unbindQueue\(\) should be compatible with return type \(PhpAmqpLib\\Channel\\AMQPChannel\) of method Alaress\\Async\\AMQP\\AMQPInterface\:\:unbindQueue\(\)$#'
-			identifier: method.childReturnType
 			count: 1
 			path: library/Schoolbox/Notif/MQ/Test/MockAMQPConnector.php
 
