@@ -144,16 +144,14 @@
 }
 
 // default styling for a vertically scrollable container, typically used within a modal
-.c-vert-scroll-container {
+.sbx-vert-scroll-container {
+    border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
+    border-radius: var(--sbx-config-field-corner-radius, 0);
     max-height: 400px;
     overflow-x: hidden;
     overflow-y: auto;
+    padding: var(--sbx-size-xs, var(--spacing-s));
     position: relative;
-    &--with-border {
-        border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
-        border-radius: var(--sbx-config-field-corner-radius, 0);
-        padding: var(--sbx-size-xs, var(--spacing-s));
-    }
 }
 
 .c-max-width {
