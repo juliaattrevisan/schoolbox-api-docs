@@ -1062,10 +1062,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param GenericCollection<\Schoolbox\Assessment\Rubric\Instance\Model>|null $rubricInstances
+     * @param GenericCollection<\Schoolbox\Assessment\Rubric\Instance\Model> $rubricInstances
      * @return $this
      */
-    public function setRubricInstances(?GenericCollection $rubricInstances): self
+    public function setRubricInstances(GenericCollection $rubricInstances): self
     {
         $rubricInstances->assertCollectionOf(\Schoolbox\Assessment\Rubric\Instance\Model::class);
         $this->rubricInstances = $rubricInstances;
