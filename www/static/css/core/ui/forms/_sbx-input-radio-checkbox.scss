@@ -6,6 +6,7 @@
 @use "sbx-form";
 
 body.sbx-body {
+    // Base radio button styles
     input[type="radio"] {
         -webkit-appearance: none; // Add if not using autoprefixer
         appearance: none; // Remove most all native input styles
@@ -23,17 +24,8 @@ body.sbx-body {
         position: static !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
         width: 1.5rem !important; // ^foundation-fixes^ - won't need !important once _forms.scss is removed
 
-        &:hover:not(:disabled) {
-            // We don't want the hover effect on input elements, as there's potential for reduced contrast on elements
-            background: var(
-                --sbx-color-foreground-primary
-            ) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
-            color: var(
-                --sbx-color-text-primary
-            ) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
-            border-color: var(
-                --sbx-config-color-accent
-            ) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
+        &:hover:not(:disabled):not([readonly]) {
+            background: var(--sbx-config-color-active);
         }
 
         &::before {
@@ -94,16 +86,13 @@ body.sbx-body {
         color: var(--sbx-config-color-accent);
         padding: var(--sbx-size-m);
     }
-
     input[type="radio"]:checked + .block {
         background-color: var(--sbx-config-color-accent);
         color: var(--sbx-config-color-accent-text);
     }
-
     input[type="radio"] + .block :is(i, sbx-icon) {
         color: var(--sbx-config-color-accent);
     }
-
     input[type="radio"]:checked + .block :is(i, sbx-icon) {
         color: var(--sbx-config-color-accent-text);
     }
@@ -114,7 +103,7 @@ body.sbx-body {
         color: var(--sbx-config-color-accent-text);
     }
 
-    /* Base */
+    // Base checkbox
     input[type="checkbox"],
     .VueTables input[type="checkbox"] {
         -webkit-appearance: none;
@@ -134,14 +123,11 @@ body.sbx-body {
         position: static;
         width: 1.5rem;
 
-        &:hover:not(:disabled):not(:read-only) {
-            // no reduced contrast on hover
-            background-color: var(--sbx-color-foreground-primary);
-            border-color: var(--sbx-config-color-accent);
-            color: var(--sbx-color-text-primary);
+        &:hover:not(:disabled):not([readonly]) {
+            background: var(--sbx-config-color-active);
         }
 
-        /* tick mark */
+        // tick mark
         &::before {
             background-color: CanvasText;
             box-shadow: inset 1rem 1rem var(--sbx-config-color-accent);
@@ -158,7 +144,7 @@ body.sbx-body {
             transform: scale(1);
         }
 
-        /* focus / disabled use shared mixins like text input */
+        // focus / disabled use shared mixins like text input
         &:focus {
             @include sbx-form.form-input-focus;
         }
@@ -187,15 +173,7 @@ body.sbx-body {
         }
     }
 
-    /* Highlights the checkbox/radio when the adjacent label is hovered */
-    label:hover + input[type="checkbox"]:not(:disabled):not([readonly]),
-    label:hover + input[type="radio"]:not(:disabled):not([readonly]),
-    input[type="checkbox"]:hover:not(:disabled):not([readonly]),
-    input[type="radio"]:hover:not(:disabled):not([readonly]) {
-        background: var(--sbx-config-color-active);
-    }
-
-    /* indeterminate state */
+    // indeterminate state
     .indeterminate[type="checkbox"]::before {
         clip-path: polygon(100% 35%, 100% 60%, 0% 60%, 0% 35%);
         transform: scale(1);
