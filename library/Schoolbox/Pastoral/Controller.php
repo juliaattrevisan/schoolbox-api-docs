@@ -56,6 +56,7 @@ use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Pastoral\Flag\Cursor;
 
 class Controller extends Base
 {
@@ -290,63 +291,38 @@ class Controller extends Base
      */
     public function getFlag(User $student): void
     {
-        /**
-         * This is a quick pull to copy/paste based on getStudent,
-         * but it'll need to be done properly with the cursor in: SA-21304
-         */
-
         $get = $this->requestQuery;
 
         $user = $this->getUser();
 
-        $typeId    = (isset($get['type']) && is_numeric($get['type'])) ? (int)$get['type'] : null;
-        $subtypeId = (isset($get['subtype']) && is_numeric($get['subtype'])) ? (int)$get['subtype'] : null;
+        $typeId = $get->getInt('type');
+        $subtypeId = $get->getInt('subtype');
+        $limit = $get->getInt('limit', Cursor::LIMIT_DEFAULT);
+        $encodedCursor = $get->get('cursor');
 
-        $records = $this->pastoralDataSource->findRecords($user, $student, $typeId, $subtypeId, null, null, null, false);
-
-        $data = $records->map($this->pastoralTranslator)->reindex();
+        $cursor = new Cursor(
+            $this->pastoralDataSource,
+            $user,
+            $student,
+            $typeId,
+            $subtypeId,
+            false,
+            $limit,
+        );
+        $records = $cursor->retrieveResults($encodedCursor);
 
         $this->response = $this->responseAsJson([
             'data'     => [
-                'results' => $data,
+                'results' => $records->map($this->pastoralTranslator),
             ],
             'metadata' => [
-                'count'  => count($data),
+                'count'  => $cursor->retrieveResultCount(),
                 'cursor' => [
-                    'next'    => null,
-                    'current' => null,
+                    'current' => $cursor->current($records),
+                    'next'    => $cursor->next($records),
                 ],
             ],
         ]);
-
-        /**
-         * This was an initial attempt to use the class report cursor
-         * but I'm parking now as it'll be revisited in: SA-21304
-         */
-
-        // $cursor  = new Cursor(
-        //     $this->pastoralDataSource,
-        //     $this->getUser(),
-        //     $student,
-        //     [],
-        //     'created',
-        //     10,
-        // );
-
-        // $records = $cursor->retrieveResults('');
-
-        // $this->response = $this->responseAsJson([
-        //     'data'     => [
-        //         'results' => $records->map($this->pastoralTranslator),
-        //     ],
-        //     'metadata' => [
-        //         'count'  => $cursor->retrieveResultCount(),
-        //         'cursor' => [
-        //             'current' => $cursor->current($records),
-        //             'next'    => $cursor->next($records),
-        //         ],
-        //     ],
-        // ]);
     }
 
     /**
