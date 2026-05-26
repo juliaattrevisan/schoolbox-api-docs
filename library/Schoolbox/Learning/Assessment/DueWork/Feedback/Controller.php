@@ -334,9 +334,10 @@ class Controller extends Base
         }
 
         /* There's some random workflow where you end up here without having a $post array: this comes from the
-         * konami code of making a rubric in inline grader, then making a floating feedback in the due work status
-         * screen where the latter was supposed to inherit the settings of the former. You have to handle that case
-         * specially, or lose the grid settings (wild!)
+         * konami code of marking a rubric in inline grader, then making a floating feedback in the due work status
+         * screen where the latter was supposed to inherit the selections of the former. You have to handle that case
+         * specially, or lose the grid selections entirely (wild!) because it made a whole new feedback (that's what
+         * floating feedback really is) but didn't yoink across the previous feedback's rubric selections.
          */
         if (isset($post['rubric']) && is_array($post['rubric'])) {
             /* Process each rubric json payload into a marked grid
