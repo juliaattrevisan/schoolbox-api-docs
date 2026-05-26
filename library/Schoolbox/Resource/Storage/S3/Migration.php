@@ -268,10 +268,14 @@ class Migration extends CliTool\App
                         $childCountFilesInS3++;
                     }
                 }
-                file_put_contents($tempFile, json_encode([
+                $written = file_put_contents($tempFile, json_encode([
                     'filesInS3'   => $childCountFilesInS3,
                     'failedPaths' => $this->failedPaths,
                 ]));
+                if ($written === false) {
+                    $this->getLogger()->error("Worker {$workerIndex}: failed to write results to temp file, parent will retry this chunk");
+                    exit(1);
+                }
                 $this->getLogger()->notice(sprintf(
                     "Worker %d complete — storage: %d, transcode: %d, data: %s, failed: %d",
                     $workerIndex,
