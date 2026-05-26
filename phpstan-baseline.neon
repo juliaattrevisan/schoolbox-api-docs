@@ -1351,12 +1351,6 @@ parameters:
 			path: library/Schoolbox/Admin/Usage/Graph/GlobalUsers/TotalPayload.php
 
 		-
-			message: '#^Anonymous function has an unused use \$di\.$#'
-			identifier: closure.unusedUse
-			count: 1
-			path: library/Schoolbox/Application/BasicRequest/Kernel.php
-
-		-
 			message: '#^Variable \$e might not be defined\.$#'
 			identifier: variable.undefined
 			count: 1
