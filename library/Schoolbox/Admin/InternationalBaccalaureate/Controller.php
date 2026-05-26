@@ -42,6 +42,7 @@ use Schoolbox\IB\Registrations\Sessions\Student\Subject\Language\Mapper as Regis
 use Schoolbox\IB\Registrations\Sessions\Student\Translator\ModelToArray as RegistrationSessionStudentModelToArray;
 use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Language\Model as LanguageModel;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception\NotFound as MapperNotFound;
 use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 use Schoolbox\Resource\Folder\Code\Model as FolderCodeModel;
@@ -611,6 +612,7 @@ class Controller extends ConfigController
                     'candidateExportEndpoint' => $this->getRouteIfAuthorized('internationalBaccalaureate.exportRegistrationSessionStudentsCsv', ['sessionId' => $sessionId]),
                     'searchLanguages' => $this->getRouteIfAuthorized('internationalBaccalaureate.searchLanguages'),
                     'completePreparation' => $this->getRouteIfAuthorized('internationalBaccalaureate.sessionCompletePreparation', ['sessionId' => $sessionId]),
+                    'renotifyUnconfirmed' => $this->getRouteIfAuthorized('internationalBaccalaureate.renotifyUnconfirmed', ['sessionId' => $sessionId]),
                 ],
                 'sessionTitle' => $session->jsonSerialize()['title'],
             ]
@@ -1255,10 +1257,121 @@ class Controller extends ConfigController
                 );
             }
 
-            $studentKey = $student->getUser()?->getId() ?? $student->getId() ?? $studentId;
+            $studentKey                        = $student->getUser()?->getId() ?? $student->getId() ?? $studentId;
             $studentsToTransition[$studentKey] = $student;
         }
 
         return array_values($studentsToTransition);
+    }
+
+    /**
+     * Re-send the unconfirmed registration details notification to a student.
+     *
+     * @api POST /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/candidates/renotify
+     */
+    public function renotifyUnconfirmed(RegistrationSessionModel $registrationSession): void
+    {
+        $post = $this->requestPost;
+        $sessionId = $registrationSession->getId();
+        $studentIds = $post->get('studentIds');
+
+        if (!is_array($studentIds)) {
+            $this->sendJsonError('Invalid request data', 400);
+            return;
+        }
+
+        $studentIds = array_values(array_unique(array_filter(
+            array_map('intval', $studentIds),
+            static fn(int $studentId): bool => $studentId > 0
+        )));
+
+        if ($studentIds === []) {
+            $this->sendJsonError('Invalid request data', 400);
+            return;
+        }
+
+        try {
+            $registrationSessionStudents = $this->registrationSessionStudentMapper->findByColumnList([
+                'user_id' => $studentIds,
+                'registration_session_id' => $sessionId,
+            ]);
+            $registrationSessionStudentsByUserId = [];
+
+            foreach ($registrationSessionStudents as $registrationSessionStudent) {
+                if (!$registrationSessionStudent instanceof RegistrationSessionStudentModel) {
+                    continue;
+                }
+
+                $userId = $registrationSessionStudent->getUser()?->getId();
+
+                if ($userId !== null) {
+                    $registrationSessionStudentsByUserId[$userId] = $registrationSessionStudent;
+                }
+            }
+
+            $renotified = [];
+            $failed = [];
+            $registrationSessionStudentsToRenotify = [];
+
+            foreach ($studentIds as $studentId) {
+                $registrationSessionStudent = $registrationSessionStudentsByUserId[$studentId] ?? null;
+
+                if (!$registrationSessionStudent instanceof RegistrationSessionStudentModel) {
+                    $failed[] = [
+                        'studentId' => $studentId,
+                        'message' => 'Candidate not found for this user in the registration session.',
+                    ];
+                    continue;
+                }
+
+                if ($registrationSessionStudent->getStatus() !== RegistrationSessionStudentModel::STATUS_UNCONFIRMED) {
+                    $failed[] = [
+                        'studentId' => $studentId,
+                        'message' => 'Candidate is not awaiting confirmation.',
+                    ];
+                    continue;
+                }
+
+                $renotified[] = $studentId;
+                $registrationSessionStudentsToRenotify[] = $registrationSessionStudent;
+            }
+
+            if ($registrationSessionStudentsToRenotify !== []) {
+                foreach ($registrationSessionStudentsToRenotify as $registrationSessionStudent) {
+                    $this->registrationSessionStudentMapper->propagate(
+                        $this->getUser(),
+                        BaseMapper::METHOD_UPDATE,
+                        $registrationSessionStudent,
+                        [
+                            'status' => [
+                                RegistrationSessionStudentModel::STATUS_UNCONFIRMED,
+                                RegistrationSessionStudentModel::STATUS_PREPARATION,
+                            ],
+                        ]
+                    );
+                }
+            }
+
+            $partial = $failed !== [] && $renotified !== [];
+            $success = $renotified !== [];
+
+            $message = match (true) {
+                $partial => 'Some students could not be renotified.',
+                $failed !== [] => 'No students were renotified.',
+                default => 'Student(s) renotified.',
+            };
+
+            $this->response = $this->responseAsJson([
+                'success' => $success,
+                'partial' => $partial,
+                'message' => $message,
+                'renotified' => $renotified,
+                'failed' => $failed,
+            ]);
+        } catch (MapperNotFound) {
+            $this->sendJsonError('Candidate not found for this user in the registration session.', 404);
+        } catch (Exception) {
+            $this->sendJsonError('Something has gone wrong. Please try again later.', 500);
+        }
     }
 }

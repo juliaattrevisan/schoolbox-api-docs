@@ -50,6 +50,7 @@ class ModelToArrayTest extends TestCase
             [
                 'updateLanguages' => '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/123/languages',
                 'updateConfirmation' => '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/123/confirmation',
+                'renotify' => null,
             ],
             $payload['_routes']
         );
@@ -168,6 +169,23 @@ class ModelToArrayTest extends TestCase
         );
     }
 
+    public function testBuildsSessionLevelRenotifyRouteForUnconfirmedStudent(): void
+    {
+        $payload = $this->createTranslator()(
+            $this->buildStudent()->setStatus(RegistrationSessionStudentModel::STATUS_UNCONFIRMED),
+            [
+                'StudentBirthDate' => '2009-04-12',
+                'StudentGender' => 'F',
+            ],
+            'Example School'
+        );
+
+        $this->assertSame(
+            '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/renotify',
+            $payload['_routes']['renotify']
+        );
+    }
+
     private function createTranslator(): ModelToArray
     {
         $routeGenerator = $this->createStub(Generator::class);
@@ -179,6 +197,13 @@ class ModelToArrayTest extends TestCase
                         '/adminv2/international-baccalaureate/registrations/sessions/%d/candidates/%d/confirmation',
                         $params['sessionId'],
                         $params['studentId']
+                    );
+                }
+
+                if ($route === 'internationalBaccalaureate.renotifyUnconfirmed') {
+                    return sprintf(
+                        '/adminv2/international-baccalaureate/registrations/sessions/%d/candidates/renotify',
+                        $params['sessionId'],
                     );
                 }
 
