@@ -45,5 +45,4 @@ class ViewModeTest extends TestCase
             'parent' => ['parent', ViewMode::PARENT],
         ];
     }
-
 }
