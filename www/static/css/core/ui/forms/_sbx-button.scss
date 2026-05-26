@@ -74,6 +74,7 @@ body.sbx-body {
         border-radius: var(--sbx-config-field-corner-radius);
         color: var(--sbx-config-color-accent);
         font-size: var(--sbx-font-size-s);
+        font-weight: var(--sbx-font-weight-normal);
         text-transform: none;
         &:hover,
         &:active {
