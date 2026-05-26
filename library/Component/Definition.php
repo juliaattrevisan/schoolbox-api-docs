@@ -83,71 +83,6 @@ class Component_Definition
         'Schoolbox_Intellischool_Component_Homepage_Controller' => 'intellischool',
     ];
 
-    /**
-     * Palette icon colours keyed by the legacy masonry CSS class.
-     *
-     * These values mirror the legacy homepage palette colours so sbx-icon can
-     * render the same appearance without depending on pseudo-element styling.
-     *
-     * @var array<string, string>
-     */
-    private const PALETTE_ICON_COLOR_MAP = [
-        'Schoolbox_Blog_Homepage_Component_Controller' => '#00e28e',
-        'Schoolbox_Calendar_Component_Homepage_Controller' => '#bf1e2d',
-        'Component_Homepage_CountdownController' => '#c1009e',
-        'Schoolbox_Comms_News_Component_Homepage_Controller' => '#ff0000',
-        'Schoolbox_Fixtures_Component_Homepage_Controller' => '#ff7c00',
-        'Schoolbox_Resource_Textbox_Component_Homepage_Controller' => '#00e28e',
-        'Schoolbox_Tile_Component_HomepageTileController' => '#ff7c00',
-        'Component_Homepage_ChatController' => '#00e28e',
-        'Component_Homepage_EtherpadController' => '#c1009e',
-        'Component_Homepage_ForumListController' => '#6800af',
-        'Schoolbox_Resource_GoogleFile_Component_Homepage_Controller' => '#3369e8',
-        'Component_Homepage_ManagersController' => '#ff4972',
-        'Component_Homepage_MembersController' => '#ff4972',
-        'Component_Homepage_PollController' => '#009eb2',
-        'Component_Homepage_SocialStreamController' => '#ff4972',
-        'Component_Homepage_SurveyController' => '#c1009e',
-        'Component_Homepage_WikiController' => '#0066af',
-        'Component_Homepage_ClassListController' => '#ffd100',
-        'Component_Homepage_ManageClassController' => '#ffd100',
-        'Component_Homepage_TeachersController' => '#72c600',
-        'Schoolbox_Learning_Assessment_Component_Homepage_Builder_Controller' => '#cce200',
-        'Schoolbox_Learning_Assessment_Component_Homepage_Outline_Controller' => '#1c9e1c',
-        'Schoolbox_Curriculum_Component_CurriculumDetailsController' => '#6800af',
-        'Schoolbox_Curriculum_Component_CurriculumOverviewController' => '#007fff',
-        'Schoolbox_Learning_Assessment_DialogAgent_Component_Homepage_Controller' => '#22aa66',
-        'Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller' => '#c1009e',
-        'Schoolbox_Learning_Component_Homepage_LearningMomentsController' => '#0080ff',
-        'Component_Homepage_DropBoxController' => '#00e28e',
-        'Schoolbox_Learning_Assessment_Quiz_Component_Homepage_Controller' => '#ff4972',
-        'Component_Homepage_RubricController' => '#00aded',
-        'Schoolbox_Learning_Assessment_Task_Component_Homepage_Controller' => '#ffd100',
-        'Schoolbox_Learning_Component_Homepage_CurrentLessonPlanController' => '#c1009e',
-        'Component_Homepage_AudioController' => '#cce200',
-        'Component_Homepage_ClickviewController' => '#ff7c00',
-        'Schoolbox_LTI_Component_Homepage_Controller' => '#f36c23',
-        'Schoolbox_Learning_Assessment_Lti_Component_Homepage_Controller' => '#f36c23',
-        'Schoolbox_Geosnapshot_Component_Homepage_Controller' => '#ff0072',
-        'Component_Homepage_ImageController' => '#6800af',
-        'Component_Homepage_ImageGalleryController' => '#72c600',
-        'Component_Homepage_SlideshowController' => '#ff4972',
-        'Component_Homepage_RandImageController' => '#ff0000',
-        'Component_Homepage_VideoController' => '#00e28e',
-        'Component_Homepage_BreadcrumbController' => '#ff7c00',
-        'Component_Homepage_FileListController' => '#0066af',
-        'Component_Homepage_FolderListController' => '#ffd100',
-        'Component_Homepage_ManageFolderController' => '#ffd100',
-        'Component_Homepage_LinkListController' => '#007fff',
-        'Component_Homepage_FeedController' => '#0066af',
-        'Component_Homepage_PinterestController' => '#bf1e2d',
-        'Component_Homepage_PodcastController' => '#6800af',
-        'Component_Homepage_RSSController' => '#ff7c00',
-        'Schoolbox_Twitter_Component_Homepage_Controller' => '#00aded',
-        'Component_Homepage_WolframController' => '#bf1e2d',
-        'Schoolbox_Intellischool_Component_Homepage_Controller' => '#2e2861',
-    ];
-
     /** @var int $id */
     protected $id;
 
@@ -258,14 +193,6 @@ class Component_Definition
     public function getPaletteIconName(): string
     {
         return self::PALETTE_ICON_NAME_MAP[$this->getCssClass()] ?? 'components';
-    }
-
-    /**
-     * Gets the sbx-icon colour for palette rendering.
-     */
-    public function getPaletteIconColor(): string
-    {
-        return self::PALETTE_ICON_COLOR_MAP[$this->getCssClass()] ?? 'currentColor';
     }
 
     // Getters & Setters

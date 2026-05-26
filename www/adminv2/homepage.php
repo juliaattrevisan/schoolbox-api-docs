@@ -161,7 +161,6 @@ foreach ($groupedCollection as $category => $categoryDefinitions) {
             'COMPONENT_DESCRIPTION'    => $definition->getDescription(),
             'COMPONENT_CLASS'          => $definition->getCssClass(),
             'COMPONENT_ICON'           => $definition->getPaletteIconName(),
-            'COMPONENT_ICON_COLOR'     => $definition->getPaletteIconColor(),
             'COMPONENT_MULTIPLE_STATE' => $multiState,
             'COMPONENT_NAME'           => $definition->getName(),
             'COMPONENT_CATEGORY_NAME'  => $definition->getComponentCategoryName(),
