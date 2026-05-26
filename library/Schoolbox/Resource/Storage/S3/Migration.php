@@ -612,6 +612,9 @@ class Migration extends CliTool\App
     private function isDirectoryEmpty(string $dir): bool
     {
         $handle = opendir($dir);
+        if ($handle === false) {
+            return false;
+        }
         while (false !== ($entry = readdir($handle))) {
             if ($entry !== "." && $entry !== "..") {
                 closedir($handle);
