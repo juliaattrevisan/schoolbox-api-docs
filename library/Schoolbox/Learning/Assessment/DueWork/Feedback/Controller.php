@@ -328,6 +328,9 @@ class Controller extends Base
             $rubricInstanceIds[] = $rubricInstanceId;
         }
 
+        /* These are the rubric instances we know about, according to db contents; anything outside this set is perhaps
+         * not valid data
+         */
         if (\count($rubricInstanceIds)) {
             $rubricInstances = $this->rubricInstanceMapper->findByColumn('id', $rubricInstanceIds)->indexBy('id');
         }
@@ -336,7 +339,20 @@ class Controller extends Base
          * This array node might not even exist
          */
         foreach ($post['rubric'] ?? [] as $rubricInstanceId => $rubricJson) {
+            /* TODO there are a few places where we presume json_decode to have succeeded. Under most normal usages this
+             *  should be true, but we should wrap up these decodes with some better error handling and validation.
+             *  Not sure if the frontend really accepts errors from it in a convenient manner atm though.
+             */
             $rubricData = json_decode($rubricJson, true);
+
+            /* $post payload mentions a rubric instance id that doesn't exist in our schema at runtime; someone might
+             * have removed it, or it's an invalid payload somehow. I guess we skip those and only process data for
+             * rubric instance that we know about. I'm not sure how or why we'd encounter this in the wild under most
+             * normal circumstances.
+             */
+            if (!isset($rubricInstances[$rubricInstanceId])) {
+                continue;
+            }
 
             $markedGrid = $factory->buildFromPostData(
                 $this->rubricMapper->retrieveMarkedGrid($feedback, $rubricInstances[$rubricInstanceId]),
