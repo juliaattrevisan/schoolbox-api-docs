@@ -292,7 +292,9 @@ class Migration extends CliTool\App
         }
 
         foreach ($pids as $workerIndex => $pid) {
-            pcntl_waitpid($pid, $status);
+            do {
+                $ret = pcntl_waitpid($pid, $status);
+            } while ($ret === -1 && pcntl_get_last_error() === PCNTL_EINTR);
             $workerFailed = false;
             if (pcntl_wifsignaled($status)) {
                 $this->getLogger()->error("Worker $workerIndex killed by signal " . pcntl_wtermsig($status) . ", retrying its chunk serially");
