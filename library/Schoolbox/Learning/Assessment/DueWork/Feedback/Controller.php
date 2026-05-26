@@ -305,10 +305,6 @@ class Controller extends Base
      */
     protected function processRubric(Participant $participant, array $post, IFeedback $feedback): bool
     {
-        if (!$participant->getAssessable() instanceof DueWork\Model) {
-            return false;
-        }
-
         // Presumably $feedback has been saved already?
         $factory = new \Schoolbox\Assessment\Rubric\MarkedGrid\Factory();
 
