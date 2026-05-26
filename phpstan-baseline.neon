@@ -1294,12 +1294,6 @@ parameters:
 			message: '#^Call to function array_merge\(\) on a separate line has no effect\.$#'
 			identifier: function.resultUnused
 			count: 1
-			path: library/Report/Group.php
-
-		-
-			message: '#^Call to function array_merge\(\) on a separate line has no effect\.$#'
-			identifier: function.resultUnused
-			count: 1
 			path: library/Report/Login.php
 
 		-
