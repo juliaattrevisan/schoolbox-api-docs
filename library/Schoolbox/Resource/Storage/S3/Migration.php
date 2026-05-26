@@ -190,6 +190,9 @@ class Migration extends CliTool\App
             $this->getLogger()->notice(sprintf("Data transferred:           %s", $this->byteFormat::bytesToString($this->countBytesUploaded)));
         } else {
             $this->getLogger()->notice("Upload counts available in worker logs above");
+            $countFailed = count($this->failedPaths);
+            $message = "Count failed uploads:       {$countFailed}";
+            $countFailed ? $this->getLogger()->error($message) : $this->getLogger()->notice($message);
         }
         if (!$this->quiet) {
             $this->getLogger()->notice(sprintf("Storage before transfer:    %s", $this->byteFormat::bytesToString($storageBeforeTransfer)));
