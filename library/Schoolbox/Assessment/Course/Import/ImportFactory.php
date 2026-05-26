@@ -1029,13 +1029,7 @@ class ImportFactory
             // We can only modify a single Course Import at a time.
             $courseImpls[$courseImpl->getFolder()->getId()] = $courseImpl;
 
-            // Load UnitImplementations
-            $courseImpl->setUnits($this->unitImplementationMapper->findAllByCourseId($courseImpl->getId()));
-
-            // Load IAssessables
-            foreach ($courseImpl->getUnits() as $unitImpl) {
-                $unitImpl->setAssessables($this->assessmentMapperProxy->findAllByUnitImplementationIds([$unitImpl->getId()]));
-            }
+            $this->loadCourseImplementationUnits($courseImpl);
 
             //Save unit criteria to class page
             $classFolderId = $classFolders->first()->getId();
@@ -1337,6 +1331,34 @@ class ImportFactory
             $folder     = new Folder();
             $folder->setName($row['folder_name']);
             $unitSpecCache[$unitSpecId]->setFolder($folder);
+        }
+    }
+
+    /**
+     * Loads implementation units for a given course implementation.
+     *
+     * @param CourseImplementation $courseImpl The course implementation for which the units need to be loaded.
+     * @return void
+     */
+    public function loadCourseImplementationUnits(CourseImplementation $courseImpl): void
+    {
+        if (!$courseImpl->getId()) {
+            return;
+        }
+
+        // Load UnitImplementations
+        $courseImpl->setUnits($this->unitImplementationMapper->findAllByCourseId($courseImpl->getId()));
+
+        $units = $this->assessmentMapperProxy
+            ->findAllByUnitImplementationIds($courseImpl->getUnits()->keys())
+            ->groupByCallback(function (IAssessable $assessmentImpl) {
+                return $assessmentImpl->getContext()->getId();
+            });
+
+        // Load IAssessables
+        foreach ($courseImpl->getUnits() as $unitImpl) {
+            $assess = $units->getOffset($unitImpl->getId()) ?? $this->assessmentMapperProxy->createCollection();
+            $unitImpl->setAssessables($assess);
         }
     }
 }

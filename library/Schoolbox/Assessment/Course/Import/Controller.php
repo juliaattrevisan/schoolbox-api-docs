@@ -964,8 +964,11 @@ class Controller extends Base\Base
             }
         }
 
+        /* Reload units and their assessments after deletion callbacks have mutated
+         * the previously hydrated import graph.
+         */
         if ($courseImplWithDeletedUnits) {
-            $this->reloadCourseImplementationUnits($courseImplWithDeletedUnits);
+            $this->importFactory->loadCourseImplementationUnits($courseImplWithDeletedUnits);
         }
 
         // Create any un-imported UnitImpls from corresponding UnitSpec
@@ -1058,26 +1061,5 @@ class Controller extends Base\Base
             }
         }
         return false;
-    }
-
-
-    /**
-     * Reload units and their assessments after deletion callbacks have mutated
-     * the previously hydrated import graph.
-     *
-     * @param CourseImplementation\Model $courseImpl
-     * @throws MapperException
-     */
-    private function reloadCourseImplementationUnits(CourseImplementation\Model $courseImpl): void
-    {
-        if (!$courseImpl->getId()) {
-            return;
-        }
-
-        $courseImpl->setUnits($this->unitImplementationMapper->findAllByCourseId($courseImpl->getId()));
-
-        foreach ($courseImpl->getUnits() as $unitImpl) {
-            $unitImpl->setAssessables($this->assessmentMapperProxy->findAllByUnitImplementationIds([$unitImpl->getId()]));
-        }
     }
 }
