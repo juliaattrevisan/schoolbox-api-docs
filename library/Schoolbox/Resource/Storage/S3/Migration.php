@@ -149,10 +149,13 @@ class Migration extends CliTool\App
         $this->getLogger()->notice("Fetching storage models from database, this may take a while on large datasets...");
         $files    = $this->getDatabaseInternal()->executeQuery("SELECT hash, filename, ext FROM storage")->fetchAll(\PDO::FETCH_ASSOC);
         $countAll = count($files);
+        if ($this->workerCount > 1 && !function_exists('pcntl_fork')) {
+            $this->getLogger()->warning("pcntl extension not available, falling back to serial migration");
+            $this->workerCount = 1;
+        }
         if ($this->workerCount > 1) {
             $countFilesInS3 = $this->migrateFilesParallel($files, $countAll);
-        }
-        if ($this->workerCount <= 1) {
+        } else {
             foreach ($files as $file) {
                 $count++;
                 $baseName = "{$file['filename']}.{$file['ext']}";
@@ -219,12 +222,6 @@ class Migration extends CliTool\App
     private function migrateFilesParallel(array $files, int $countAll): int
     {
         if ($countAll === 0) {
-            return 0;
-        }
-
-        if (!function_exists('pcntl_fork')) {
-            $this->getLogger()->warning("pcntl extension not available, falling back to serial migration");
-            $this->workerCount = 1;
             return 0;
         }
 
