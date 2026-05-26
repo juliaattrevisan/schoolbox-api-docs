@@ -179,7 +179,7 @@ class Controller extends Base
         $filteredWorkTypes = WorkType\Mapper::getInstance()->findByColumn('show_on_grades_page', 1);
         $assessmentTasks   = (
             ($filteredWorkTypes->count() > 0) ?
-            $gradeHelper->filterAssessments($effectiveViewer, $assessments, $filteredWorkTypes) :
+            $gradeHelper->filterAssessments($effectiveViewer, $assessments, $filteredWorkTypes, null) :
             new Collection()
         );
 

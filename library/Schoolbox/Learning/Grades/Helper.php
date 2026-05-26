@@ -18,7 +18,6 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Lti\Model as Lti;
 use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Learning\Assessment\Reporting\Model as Reporting;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Learning\Markbook\SortForMarkbook;
@@ -135,11 +134,7 @@ class Helper
     }
 
     /**
-     * Filter assessments with given work types and activity types.
-     *
-     * Note that this method is used in both the Grades page data set and Summative Report data set generation which is
-     * an unfortunate coupling. You can use $activityTypes contextually to decide which activity types (due work, quiz,
-     * reporting, etc) are allowed. If null, we'll use the default ones which basically exclude Tasks.
+     * Filter assessments by work type and optional activity type.
      *
      * @param User $viewer
      * @param Collection $assessments
@@ -148,7 +143,7 @@ class Helper
      * @return Collection
      * @throws MapperException
      */
-    public function filterAssessments(User $viewer, Collection $assessments, Collection $workTypes, ?array $activityTypes): Collection
+    public function filterAssessments(User $viewer, Collection $assessments, Collection $workTypes, ?array $activityTypes = null): Collection
     {
         $visibility                  = new Visibility($this->access);
         $workTypeAssessmentsByFolder = new Collection();
@@ -163,7 +158,7 @@ class Helper
             Quiz::class,
             Lti::class,
             DialogAgent::class,
-            Reporting::class
+            'Schoolbox\\Learning\\Assessment\\Reporting\\Model'
         ];
 
         foreach ($assessments as $folderId => $folderAssessments) {
