@@ -297,7 +297,7 @@ class Controller extends Base
 
         $typeId = $get->getInt('type');
         $subtypeId = $get->getInt('subtype');
-        $limit = $get->getInt('limit', Cursor::LIMIT_DEFAULT);
+        $limit = $get->getInt('limit') ?? Cursor::LIMIT_DEFAULT;
         $encodedCursor = $get->get('cursor');
 
         $cursor = new Cursor(
