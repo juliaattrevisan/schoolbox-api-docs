@@ -606,6 +606,7 @@ class Migration extends CliTool\App
             }
             $this->getLogger()->debug("Removing directory '$dirname'");
             if (!@rmdir($dirname)) {
+                $this->getLogger()->warning("Cannot remove directory '$dirname': rmdir failed unexpectedly");
                 break;
             }
             if ($dirname === $this->storageDir) {
