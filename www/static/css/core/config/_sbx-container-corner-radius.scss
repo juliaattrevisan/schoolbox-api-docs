@@ -99,4 +99,21 @@ body.sbx-body {
     tbody tr:last-child td:last-child {
         border-bottom-right-radius: var(--sbx-config-container-corner-radius);
     }
+
+    // utility classes for rounding containers that don't fit the above selectors
+    .l-c-cr {
+        border-radius: var(--sbx-config-container-corner-radius);
+    }
+
+    // to only round the top
+    .l-c-cr-top {
+        border-top-left-radius: var(--sbx-config-container-corner-radius);
+        border-top-right-radius: var(--sbx-config-container-corner-radius);
+    }
+
+    // to only round the bottom
+    .l-c-cr-bottom {
+        border-bottom-left-radius: var(--sbx-config-container-corner-radius);
+        border-bottom-right-radius: var(--sbx-config-container-corner-radius);
+    }
 }
