@@ -305,7 +305,6 @@ class Controller extends Base
      */
     protected function processRubric(Participant $participant, array $post, IFeedback $feedback): bool
     {
-        // Presumably $feedback has been saved already?
         $factory = new \Schoolbox\Assessment\Rubric\MarkedGrid\Factory();
 
         /* Get a set of rubric instances that were mentioned in the post payload
