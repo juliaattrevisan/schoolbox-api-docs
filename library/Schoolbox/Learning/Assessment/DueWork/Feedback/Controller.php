@@ -139,14 +139,8 @@ class Controller extends Base
             // Try to process a rubric.
             // If there was none, copy it from the last feedback
             if (!$this->processRubric($participant, $post, $feedback)) {
-                if (
-                    $feedback instanceof DueWork\Feedback\Model
-                    && $mostRecentFeedback instanceof DueWork\Feedback\Model
-                    && $assessment instanceof DueWork\Model
-                    && $assessment->getUseRubric()
-                    && $feedback->getId() != $mostRecentFeedback->getId()
-                ) {
-                    $this->rubricMapper->copySelections($mostRecentFeedback->getId(), $feedback->getId());
+                if ($assessment->getRubricInstances()->count() && $feedback->getId() != $mostRecentFeedback->getId()) {
+                    $this->rubricMapper->copySelections($mostRecentFeedback, $feedback);
                 }
             }
 
@@ -159,13 +153,22 @@ class Controller extends Base
                 (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->assessmentDataSource, $assessment, $student);
             }
         } catch (RangeException | InvalidArgumentException $e) {
-            $this->sendError('Invalid mark provided: ' . $e->getMessage());
+            $this->sendError(sprintf(
+                'Invalid mark provided: %s',
+                $e->getMessage()
+            ));
             return;
         } catch (MapperException $e) {
-            $this->sendError('Invalid mark provided');
+            $this->sendError(sprintf(
+                'Invalid mark provided: %s',
+                $e->getMessage()
+            ));
             return;
         } catch (PDOException $e) {
-            $this->sendError('Unable to save results');
+            $this->sendError(sprintf(
+                'Unable to save results: %s',
+                $e->getMessage()
+            ));
             return;
         }
     }
@@ -330,31 +333,40 @@ class Controller extends Base
             $rubricInstances = $this->rubricInstanceMapper->findByColumn('id', $rubricInstanceIds)->indexBy('id');
         }
 
-        /* Process each rubric json payload into a marked grid
-         * This array node might not even exist
+        /* There's some random workflow where you end up here without having a $post array: this comes from the
+         * konami code of making a rubric in inline grader, then making a floating feedback in the due work status
+         * screen where the latter was supposed to inherit the settings of the former. You have to handle that case
+         * specially, or lose the grid settings (wild!)
          */
-        foreach ($post['rubric'] ?? [] as $rubricInstanceId => $rubricJson) {
-            /* TODO there are a few places where we presume json_decode to have succeeded. Under most normal usages this
-             *  should be true, but we should wrap up these decodes with some better error handling and validation.
-             *  Not sure if the frontend really accepts errors from it in a convenient manner atm though.
+        if (isset($post['rubric']) && is_array($post['rubric'])) {
+            /* Process each rubric json payload into a marked grid
+             * This array node might not even exist
              */
-            $rubricData = json_decode($rubricJson, true);
+            foreach ($post['rubric'] as $rubricInstanceId => $rubricJson) {
+                /* TODO there are a few places where we presume json_decode to have succeeded. Under most normal usages this
+                 *  should be true, but we should wrap up these decodes with some better error handling and validation.
+                 *  Not sure if the frontend really accepts errors from it in a convenient manner atm though.
+                 */
+                $rubricData = json_decode($rubricJson, true);
 
-            /* $post payload mentions a rubric instance id that doesn't exist in our schema at runtime; someone might
-             * have removed it, or it's an invalid payload somehow. I guess we skip those and only process data for
-             * rubric instance that we know about. I'm not sure how or why we'd encounter this in the wild under most
-             * normal circumstances.
-             */
-            if (!isset($rubricInstances[$rubricInstanceId])) {
-                continue;
+                /* $post payload mentions a rubric instance id that doesn't exist in our schema at runtime; someone might
+                 * have removed it, or it's an invalid payload somehow. I guess we skip those and only process data for
+                 * rubric instance that we know about. I'm not sure how or why we'd encounter this in the wild under most
+                 * normal circumstances.
+                 */
+                if (!isset($rubricInstances[$rubricInstanceId])) {
+                    continue;
+                }
+
+                $markedGrid = $factory->buildFromPostData(
+                    $this->rubricMapper->retrieveMarkedGrid($feedback, $rubricInstances[$rubricInstanceId]),
+                    $rubricData
+                );
+
+                $this->rubricMapper->persistMarkedGrid($markedGrid);
             }
 
-            $markedGrid = $factory->buildFromPostData(
-                $this->rubricMapper->retrieveMarkedGrid($feedback, $rubricInstances[$rubricInstanceId]),
-                $rubricData
-            );
-
-            $this->rubricMapper->persistMarkedGrid($markedGrid);
+            return true;
         }
 
         // If from inline grader, save empty marks
@@ -363,14 +375,17 @@ class Controller extends Base
 //        if (
 //            array_key_exists('fromInlineGrader', $post) &&
 //            $post['fromInlineGrader'] &&
-//            $feedback->getAssessable()->getUseRubric()
+//            $feedback->getAssessable()->getRubricInstances()->count()
 //        ) {
-//            $markedGrid = $factory->buildFromPostData(
-//                $this->rubricMapper->retrieveMarkedGrid($feedback),
-//                []
-//            );
+//            foreach ($feedback->getAssessable()->getRubricInstances() as $rubricInstance) {
+//                $markedGrid = $factory->buildFromPostData(
+//                    $this->rubricMapper->retrieveMarkedGrid($feedback, $rubricInstance),
+//                    []
+//                );
 //
-//            $this->rubricMapper->persistMarkedGrid($markedGrid);
+//                $this->rubricMapper->persistMarkedGrid($markedGrid);
+//            }
+//
 //            return true;
 //        }
 

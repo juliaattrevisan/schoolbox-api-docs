@@ -1446,25 +1446,43 @@ class DataSource
     /**
      * Copies the selected descriptors from one submission return to another.
      *
-     * @param int $sourceReturnId
-     * @param int $destinationReturnId
-     * @throws \Schoolbox\Mapper\Exception
+     * @param IFeedback $sourceFeedback
+     * @param IFeedback $destinationFeedback
+     * @throws MapperException
      */
-    public function copySelections(int $sourceReturnId, int $destinationReturnId)
+    public function copySelections(IFeedback $sourceFeedback, IFeedback $destinationFeedback)
     {
-        // Don't do anything if the source and dest are the same
-        if ($sourceReturnId === $destinationReturnId) {
+        $sourceId = $sourceFeedback->getId();
+        $sourceMapper = FeedbackMeta::from(get_class($sourceFeedback))->translate();
+        $sourceTable = $sourceMapper->getTable();
+
+        $destinationId = $destinationFeedback->getId();
+        $destinationMapper = FeedbackMeta::from(get_class($destinationFeedback))->translate();
+        $destinationTable = $destinationMapper->getTable();
+
+        /* Avoid transplanting rubric selections from one activity's feedback to another - this is probably an accident
+         * at the moment. If it happens, it's not a conscious choice on my part
+         */
+        if ($sourceTable !== $destinationTable) {
+            /* Trying to transplant rubric data from one learning activity's feedback to some different learning activity
+             * which is currently unintended. I guess we just leave
+             */
             return;
         }
 
-        /* TODO this has to be agnostic to submission returns and due work in general.
+        /* Don't do anything if the source and dest are the same and are the same feedback
          */
-        $sourceDescriptorMarks = $this->indicatorMarkMapper->findByColumn('c.return_id', $sourceReturnId);
+        if ($sourceId === $destinationId) {
+            return;
+        }
+
+        $sourceDescriptorMarks = $this->indicatorMarkMapper->findByColumnList([
+            'cm.feedback_id' => $sourceId,
+            'cm.feedback_table' => $sourceTable,
+        ]);
 
         $destinationCapabilityMarks = $this->capabilityMarkMapper->createCollection();
         $destinationDescriptorMarks = $this->indicatorMarkMapper->createCollection();
-
-        $destinationReturn          = SubmissionBox\ReturnedWorkMapper::getInstance()->createModel($destinationReturnId);
 
         foreach ($sourceDescriptorMarks as $sourceDescriptor) {
             // Is this capability marks set?
@@ -1474,8 +1492,10 @@ class DataSource
 
             if (!$destinationCapabilityMarks[$capabilityId]) {
                 $destinationCapabilityMarks[$capabilityId] = $this->capabilityMarkMapper->createModel()
+                    ->setRubricInstance($sourceCapabilityMark->getRubricInstance())
+                    ->setFeedbackId($destinationId)
+                    ->setFeedbackTable($destinationTable)
                     ->setCapability($capability)
-                    ->setSubmissionReturn($destinationReturn)
                     ->setValue($sourceCapabilityMark->getValue())
                     ->setHumanReadableValue($sourceCapabilityMark->getHumanReadableValue())
                     ->setValid($sourceCapabilityMark->isValid());
@@ -1485,9 +1505,6 @@ class DataSource
                 $this->indicatorMarkMapper->createModel()
                     ->setCapabilityMark($destinationCapabilityMarks[$capabilityId])
                     ->setDescriptor($sourceDescriptor->getDescriptor())
-                    /* TODO For some reason this was disabled when I got here, but idk why
-                     */
-                //                    ->setSubmissionReturn($destinationReturn)
                     ->setValue($sourceDescriptor->getValue())
                     ->setValid($sourceDescriptor->isValid())
             );
