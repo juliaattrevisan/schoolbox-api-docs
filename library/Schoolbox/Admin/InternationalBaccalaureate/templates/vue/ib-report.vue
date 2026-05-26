@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { apiRequest } from "@js/util/sbx/apiUtils";
+import { useSelectedList } from "@schoolboxVue/composables/form/useSelectedList";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import IbReportSection from "./components/ib-report-section.vue";
 import IbReportStandardTable from "./components/ib-report-standard-table.vue";
@@ -11,7 +12,6 @@ import IbReportActionDrawer from "./components/ib-report-action-drawer.vue";
 import { useIbReportUpdateLanguageStore } from "./store/ibReportUpdateLanguageStore";
 import type {
     StudentRow,
-    SubjectGroup,
     FailedRow,
     InProgressRow,
     RegisteredRow,
@@ -42,7 +42,7 @@ const inProgress = window.Vue.ref<InProgressRow[]>([]);
 const failed = window.Vue.ref<FailedRow[]>([]);
 const registered = window.Vue.ref<RegisteredRow[]>([]);
 
-const selectedStudentIds = window.Vue.ref<Set<number>>(new Set());
+const { selectedList } = useSelectedList(preparation);
 const isCompleting = window.Vue.ref<boolean>(false);
 
 /**
@@ -68,7 +68,11 @@ function mapSubjectEntry(apiSubject: ApiSubject): SubjectEntry {
  * @param studentRenotifyEndpoint The endpoint to use for renotifying this student.
  * @returns A StudentRow for use in the frontend.
  */
-function mapStudentRow(s: ApiStudent, stage: StudentRow["stage"], studentRenotifyEndpoint: string | null = null): StudentRow {
+function mapStudentRow(
+    s: ApiStudent,
+    stage: StudentRow["stage"],
+    studentRenotifyEndpoint: string | null = null,
+): StudentRow {
     return {
         id: s.registrationSessionStudentId ?? s.userId,
         name: s.userName,
@@ -126,45 +130,15 @@ async function loadCandidates(): Promise<void> {
 updateLanguageStore.init(props.searchLanguagesEndpoint, preparation, unconfirmed, confirmed, failed);
 
 /**
- * Toggles the selection state of a student by id.
- * Creates a new Set on every change to ensure Vue reactivity.
- * @param studentId The id of the student to toggle.
- */
-function toggleSelection(studentId: number): void {
-    const next = new Set(selectedStudentIds.value);
-    if (next.has(studentId)) {
-        next.delete(studentId);
-    } else {
-        next.add(studentId);
-    }
-    selectedStudentIds.value = next;
-}
-
-/**
  * Clears the current student selection.
  */
 function clearSelection(): void {
-    selectedStudentIds.value = new Set();
-}
-
-/**
- * Patches the subjects of a student in local state after a language save.
- * @param studentId The id of the updated student.
- * @param updatedSubjects The new subject group with updated language selections.
- */
-function onStudentUpdated(studentId: number, updatedSubjects: SubjectGroup): void {
-    for (const list of [preparation, unconfirmed, confirmed]) {
-        const idx = list.value.findIndex((s) => s.id === studentId);
-        if (idx !== -1) {
-            list.value[idx] = { ...list.value[idx], subjects: updatedSubjects };
-            return;
-        }
-    }
+    selectedList.value = [];
 }
 
 /**
  * Submits the given student ids to the complete-preparation endpoint,
- * removes them from the preparation list on success, and shows a toast notification.
+ * moves them from Preparation to Unconfirmed on success, and shows a toast notification.
  * @param studentIds The ids of the students to mark as preparation-complete.
  */
 async function handleCompletePreparation(studentIds: number[]): Promise<void> {
@@ -186,8 +160,11 @@ async function handleCompletePreparation(studentIds: number[]): Promise<void> {
         }
 
         const removedIds = new Set(studentIds);
+        const completedStudents = preparation.value
+            .filter((s) => removedIds.has(s.id))
+            .map((s) => ({ ...s, stage: "unconfirmed" as const }));
         preparation.value = preparation.value.filter((s) => !removedIds.has(s.id));
-        clearSelection();
+        unconfirmed.value = [...completedStudents, ...unconfirmed.value];
         toast.timeout({
             text: `Preparation completed for ${studentIds.length} student${studentIds.length === 1 ? "" : "s"}.`,
         });
@@ -225,12 +202,10 @@ window.Vue.onMounted((): void => {
         <div v-else class="l-flex-col l-gap-s">
             <ib-report-section title="Preparation" :count="preparation.length">
                 <ib-report-standard-table
+                    v-model:selected-list="selectedList"
                     :students="preparation"
                     :search-languages-endpoint="props.searchLanguagesEndpoint"
-                    :selected-student-ids="selectedStudentIds"
-                    @toggle-selection="toggleSelection"
                     @complete-preparation-single="(id) => handleCompletePreparation([id])"
-                    @student-updated="onStudentUpdated"
                 />
             </ib-report-section>
 
@@ -238,7 +213,6 @@ window.Vue.onMounted((): void => {
                 <ib-report-standard-table
                     :students="unconfirmed"
                     :search-languages-endpoint="props.searchLanguagesEndpoint"
-                    @student-updated="onStudentUpdated"
                 />
             </ib-report-section>
 
@@ -246,7 +220,6 @@ window.Vue.onMounted((): void => {
                 <ib-report-standard-table
                     :students="confirmed"
                     :search-languages-endpoint="props.searchLanguagesEndpoint"
-                    @student-updated="onStudentUpdated"
                 />
             </ib-report-section>
 
@@ -265,13 +238,12 @@ window.Vue.onMounted((): void => {
 
         <div id="ib-report-pop-out-container"></div>
 
-        <ib-update-language-modal @student-updated="onStudentUpdated" />
+        <ib-update-language-modal />
 
         <ib-report-action-drawer
-            v-if="selectedStudentIds.size > 0"
-            :selected-count="selectedStudentIds.size"
+            :selected-count="selectedList.length"
             :is-loading="isCompleting"
-            @complete-preparation="handleCompletePreparation([...selectedStudentIds])"
+            @complete-preparation="handleCompletePreparation(selectedList.map((s) => s.id))"
             @clear-selection="clearSelection"
         />
     </div>

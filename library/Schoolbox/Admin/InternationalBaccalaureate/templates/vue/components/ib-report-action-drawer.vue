@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
+
 interface Props {
     selectedCount: number;
     isLoading: boolean;
@@ -12,46 +14,43 @@ defineEmits<{
 </script>
 
 <template>
-    <div class="ib-action-drawer">
-        <span class="ib-action-drawer__count">
-            {{ selectedCount }} student{{ selectedCount === 1 ? "" : "s" }} selected
+    <bottom-drawer :show-drawer="selectedCount > 0">
+        <span class="selected-count">
+            <em>{{ selectedCount }} student{{ selectedCount === 1 ? "" : "s" }} selected</em>
         </span>
-        <button type="button" class="button secondary small" @click="$emit('clearSelection')">Clear</button>
-        <button type="button" class="button small" :disabled="isLoading" @click="$emit('completePreparation')">
+        <button type="button" class="button-clear" @click="$emit('clearSelection')">Clear</button>
+        <button
+            type="button"
+            class="button small sbx-button--has-icon"
+            :disabled="isLoading"
+            @click="$emit('completePreparation')"
+        >
+            <sbx-icon name="notifications-hollow"></sbx-icon>
             Complete Preparation
         </button>
         <button
             type="button"
-            class="button small ib-action-drawer__submit-btn"
+            class="button small sbx-button--has-icon"
             disabled
             aria-disabled="true"
             title="Coming soon"
         >
             Submit to IB
         </button>
-    </div>
+    </bottom-drawer>
 </template>
 
 <style scoped>
-.ib-action-drawer {
-    position: sticky;
-    bottom: 0;
-    background: var(--sbx-color-surface, #fff);
-    border-top: 1px solid var(--sbx-color-border, #ddd);
-    padding: 0.75rem 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
-    z-index: 10;
+.selected-count {
+    display: inline-block;
+    margin-right: 0.5rem;
 }
 
-.ib-action-drawer__count {
-    flex: 1;
-}
-
-.ib-action-drawer__submit-btn {
-    opacity: 0.5;
-    cursor: not-allowed;
+.button-clear {
+    background: none;
+    display: inline-block;
+    font-size: 0.8rem;
+    padding: 0;
+    vertical-align: baseline;
 }
 </style>

@@ -7,14 +7,15 @@ import type { ApiRenotifyResponse, StudentRow } from "../../js/types/ibReportTyp
 interface Props {
     students: StudentRow[];
     searchLanguagesEndpoint: string;
-    selectedStudentIds?: Set<number>;
 }
-const props = defineProps<Props>();
+defineProps<Props>();
+
+const selectedList = defineModel<StudentRow[]>("selectedList", { default: () => [] });
+
 const updateLanguageStore = useIbReportUpdateLanguageStore();
 const renotifyingStudentIds = window.Vue.ref<Set<number>>(new Set());
 
 const emit = defineEmits<{
-    toggleSelection: [studentId: number];
     completePreparationSingle: [studentId: number];
 }>();
 
@@ -94,11 +95,11 @@ function isRenotifying(student: StudentRow): boolean {
                 <td class="checklist">
                     <input
                         :id="`select-${student.id}`"
+                        v-model="selectedList"
                         type="checkbox"
+                        :value="student"
                         :disabled="student.stage !== 'preparation'"
-                        :checked="props.selectedStudentIds?.has(student.id) ?? false"
                         :aria-label="`Select ${student.name}`"
-                        @change="emit('toggleSelection', student.id)"
                     /><label class="checkbox-label" :for="`select-${student.id}`"></label>
                 </td>
                 <td>{{ student.name }}</td>
@@ -147,9 +148,13 @@ function isRenotifying(student: StudentRow): boolean {
                             </button>
                         </li>
                         <li v-if="student.stage === 'preparation'">
-                            <a href="#" @click.prevent="emit('completePreparationSingle', student.id)">
+                            <button
+                                class="sbx-button--has-icon"
+                                @click.prevent="emit('completePreparationSingle', student.id)"
+                            >
+                                <sbx-icon name="notifications-hollow"></sbx-icon>
                                 Complete Preparation
-                            </a>
+                            </button>
                         </li>
                     </ul>
                 </td>
