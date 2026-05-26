@@ -57,7 +57,8 @@ body.sbx-body {
 
     // Neutral labels - overridden as they currently implement Sass methods which are not compatible with CSS variables
     .neutral.label,
-    .label--moment-draft {
+    .label--moment-draft,
+    .result-rubric-label {
         background-color: var(--sbx-color-foreground-secondary);
         color: var(--sbx-color-text-secondary);
     }
