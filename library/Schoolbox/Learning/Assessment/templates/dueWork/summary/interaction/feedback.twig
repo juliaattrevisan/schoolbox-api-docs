@@ -269,7 +269,7 @@ Data:
                         markVisibility: currentFeedback.isSelfAssessment or participant.assessable.isFeedbackVisibleToUser(USER),
                         studentView: true,
                         selfAssess: assessment.isSelfAssessable ?? false,
-                        selfReflect: assessment.isSelfReflectableOnly ?? false,
+                        selfReflect: assessment.isSelfReflectionOnly ?? false,
                         learner: participant.user,
                         selfAssessmentFeedback: selfAssessmentFeedback ?? null,
                         rubricGrid: rubricMarkedGrid.grid,

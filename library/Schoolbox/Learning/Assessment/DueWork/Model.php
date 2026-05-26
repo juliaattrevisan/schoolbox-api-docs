@@ -1095,7 +1095,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
      * @return bool
      * @throws UnexpectedValueException If property is not set
      */
-    public function isSelfReflectableOnly(): bool
+    public function isSelfReflectionOnly(): bool
     {
         if (null === $this->selfReviewability) {
             throw new UnexpectedValueException('Property not set');

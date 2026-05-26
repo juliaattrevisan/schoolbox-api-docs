@@ -1008,7 +1008,7 @@ class Controller extends Assessment\Controller
         $participant = $assessment->getParticipantIfExtant($student);
 
         $reviewRoute = ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
-        if ($assessment->isSelfReflectableOnly()) {
+        if ($assessment->isSelfReflectionOnly()) {
             $reviewRoute = ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION;
         } elseif ($assessment->isSelfAssessable()) {
             $reviewRoute = ReturnedWork::REVIEW_ROUTE_SELF_GRADING;
@@ -1188,7 +1188,7 @@ class Controller extends Assessment\Controller
 
         // Are we self assessing or only self reflecting?
 
-        /* TODO but...these are already derived directly from $assessment->isSelfReflectableOnly() (self reflection)
+        /* TODO but...these are already derived directly from $assessment->isSelfReflectionOnly() (self reflection)
          *  and $assessment->isSelfAssessable() (self grading) - you can already figure out the answer without needing
          *  these extra $selfAssess and $selfReflect vars. I wonder why those were ever necessary...
          */
@@ -1466,7 +1466,7 @@ class Controller extends Assessment\Controller
 
         // Check whether we are self-assessing, or only self-reflecting; default is the instructor route, which is neither
         $reviewRoute = ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
-        if ($assessment->isSelfReflectableOnly()) {
+        if ($assessment->isSelfReflectionOnly()) {
             $reviewRoute = ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION;
         } elseif ($assessment->isSelfAssessable()) {
             $reviewRoute = ReturnedWork::REVIEW_ROUTE_SELF_GRADING;

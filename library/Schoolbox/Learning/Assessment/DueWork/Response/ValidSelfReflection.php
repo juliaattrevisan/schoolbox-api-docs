@@ -28,9 +28,9 @@ class ValidSelfReflection extends ValidSelfAssessable
      * @return bool
      * @throws UnexpectedValueException If due-work model is not hydrated
      */
-    protected function isSelfReflectableOnly(Participant $participant): bool
+    protected function isSelfReflectionOnly(Participant $participant): bool
     {
-        return $this->getDueWork($participant)->isSelfReflectableOnly();
+        return $this->getDueWork($participant)->isSelfReflectionOnly();
     }
 
     /**
@@ -50,7 +50,7 @@ class ValidSelfReflection extends ValidSelfAssessable
          */
         if ($this->isDueWork($participant)) {
             return $this->isViewingOwnParticipation($user, $participant)
-                && $this->isSelfReflectableOnly($participant);
+                && $this->isSelfReflectionOnly($participant);
         }
 
         return false;
