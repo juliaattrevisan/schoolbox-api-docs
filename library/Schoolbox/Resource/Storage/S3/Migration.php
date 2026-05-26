@@ -232,7 +232,16 @@ class Migration extends CliTool\App
 
         foreach ($chunks as $workerIndex => $chunk) {
             $tempFile = tempnam(sys_get_temp_dir(), 's3mig_');
-            $pid      = pcntl_fork();
+            if ($tempFile === false) {
+                $this->getLogger()->error("Failed to create temp file for worker $workerIndex, processing its chunk serially in parent");
+                foreach ($chunk as $file) {
+                    if ($this->migrateFile($file['hash'])) {
+                        $countFilesInS3++;
+                    }
+                }
+                continue;
+            }
+            $pid = pcntl_fork();
             if ($pid === -1) {
                 $this->getLogger()->error("Failed to fork worker $workerIndex, processing its chunk serially in parent");
                 foreach ($chunk as $file) {
