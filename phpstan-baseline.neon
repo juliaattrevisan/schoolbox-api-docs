@@ -2287,12 +2287,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Calendar/Events/Controller.php
 
 		-
-			message: '#^Expression "\$test\(\$input\)" on a separate line does not do anything\.$#'
-			identifier: expr.resultUnused
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Calendar/Test/ValidationTest.php
-
-		-
 			message: '#^If condition is always true\.$#'
 			identifier: if.alwaysTrue
 			count: 1

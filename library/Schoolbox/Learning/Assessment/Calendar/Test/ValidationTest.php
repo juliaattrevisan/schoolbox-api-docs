@@ -110,7 +110,8 @@ class ValidationTest extends TestCase
         $test = function (int $b) {
             return $b + 1;
         };
-        $test($input);
+        $result = $test($input);
+        $this->addToAssertionCount(1);
     }
 
 
