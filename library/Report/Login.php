@@ -110,7 +110,6 @@ class Report_Login extends Report_Abstract implements Report_IReport
 
     public function addFields($fields)
     {
-        array_merge($this->fields, $fields);
     }
 
     public function getFields()

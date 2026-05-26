@@ -1291,12 +1291,6 @@ parameters:
 			path: library/Report/Boarder.php
 
 		-
-			message: '#^Call to function array_merge\(\) on a separate line has no effect\.$#'
-			identifier: function.resultUnused
-			count: 1
-			path: library/Report/Login.php
-
-		-
 			message: '#^If condition is always true\.$#'
 			identifier: if.alwaysTrue
 			count: 1
