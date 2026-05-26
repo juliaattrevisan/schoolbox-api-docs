@@ -70,6 +70,11 @@ body.sbx-body {
         text-transform: none;
     }
 
+    // Capitalize service status labels to avoid inconsistent capitalization in content entry
+    #service-status-list .label {
+        text-transform: capitalize;
+    }
+
     table.rubric th[colspan] {
         font-weight: var(--sbx-font-weight-heading);
         padding: 10px;
