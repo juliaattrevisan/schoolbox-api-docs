@@ -45,6 +45,12 @@ const registered = window.Vue.ref<RegisteredRow[]>([]);
 const selectedStudentIds = window.Vue.ref<Set<number>>(new Set());
 const isCompleting = window.Vue.ref<boolean>(false);
 
+/**
+ * Maps a raw API subject entry to the frontend SubjectEntry shape.
+ * Takes the first language when multiple are configured.
+ * @param apiSubject The raw subject from the API.
+ * @returns A SubjectEntry for use in the frontend.
+ */
 function mapSubjectEntry(apiSubject: ApiSubject): SubjectEntry {
     const lang = apiSubject.languages[0] ?? null;
     return {
@@ -55,6 +61,13 @@ function mapSubjectEntry(apiSubject: ApiSubject): SubjectEntry {
     };
 }
 
+/**
+ * Maps a raw API student entry to the frontend StudentRow shape.
+ * @param s The raw student from the API.
+ * @param stage The pipeline stage this student belongs to.
+ * @param studentRenotifyEndpoint The endpoint to use for renotifying this student.
+ * @returns A StudentRow for use in the frontend.
+ */
 function mapStudentRow(s: ApiStudent, stage: StudentRow["stage"], studentRenotifyEndpoint: string | null = null): StudentRow {
     return {
         id: s.registrationSessionStudentId ?? s.userId,
@@ -72,6 +85,9 @@ function mapStudentRow(s: ApiStudent, stage: StudentRow["stage"], studentRenotif
     };
 }
 
+/**
+ * Fetches all candidate data from the API and populates section arrays.
+ */
 async function loadCandidates(): Promise<void> {
     isLoading.value = true;
     loadError.value = null;
@@ -109,6 +125,11 @@ async function loadCandidates(): Promise<void> {
 
 updateLanguageStore.init(props.searchLanguagesEndpoint, preparation, unconfirmed, confirmed, failed);
 
+/**
+ * Toggles the selection state of a student by id.
+ * Creates a new Set on every change to ensure Vue reactivity.
+ * @param studentId The id of the student to toggle.
+ */
 function toggleSelection(studentId: number): void {
     const next = new Set(selectedStudentIds.value);
     if (next.has(studentId)) {
@@ -119,10 +140,18 @@ function toggleSelection(studentId: number): void {
     selectedStudentIds.value = next;
 }
 
+/**
+ * Clears the current student selection.
+ */
 function clearSelection(): void {
     selectedStudentIds.value = new Set();
 }
 
+/**
+ * Patches the subjects of a student in local state after a language save.
+ * @param studentId The id of the updated student.
+ * @param updatedSubjects The new subject group with updated language selections.
+ */
 function onStudentUpdated(studentId: number, updatedSubjects: SubjectGroup): void {
     for (const list of [preparation, unconfirmed, confirmed]) {
         const idx = list.value.findIndex((s) => s.id === studentId);
@@ -133,6 +162,11 @@ function onStudentUpdated(studentId: number, updatedSubjects: SubjectGroup): voi
     }
 }
 
+/**
+ * Submits the given student ids to the complete-preparation endpoint,
+ * removes them from the preparation list on success, and shows a toast notification.
+ * @param studentIds The ids of the students to mark as preparation-complete.
+ */
 async function handleCompletePreparation(studentIds: number[]): Promise<void> {
     if (isCompleting.value) return;
     isCompleting.value = true;
