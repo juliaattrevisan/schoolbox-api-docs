@@ -4304,12 +4304,6 @@ parameters:
 
 
 		-
-			message: '#^Anonymous function has an unused use \$key\.$#'
-			identifier: closure.unusedUse
-			count: 1
-			path: library/Schoolbox/Sync/Grammar/Tokenizer.php
-
-		-
 			message: '#^Property Schoolbox\\Sync\\Hydrator\\Custom\\AddParentToStudentClasses\:\:\$campusMapper is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
