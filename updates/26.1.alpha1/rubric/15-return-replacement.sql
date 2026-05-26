@@ -29,7 +29,7 @@ SET
     feedback_id = sr.id;
 
 -- Add a foreign key where possible
-ALTER TABLE rubric_level
+ALTER TABLE rubric_capability_mark
 ADD CONSTRAINT fk_rcm_ri FOREIGN KEY (rubric_instance_id)
 REFERENCES rubric_instance (id);
 
