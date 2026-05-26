@@ -22,6 +22,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as MarkbookAdapter;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage;
 
 /**
@@ -236,15 +237,22 @@ class SubmissionBoxMapper extends BaseMapper
      *
      * @param SubmissionBox $dueWork
      * @return bool
+     * @throws Exception
      */
     public function softDeleteRubricLevels(SubmissionBox $dueWork): bool
     {
         /* Find the rubric levels associated with any of the rubric instances used by this submission box's assessment,
          * and delete those rubric levels.
+         *
+         * I suppose this is the equivalent for multiple grids: delete all the levels associated with all the rubric
+         * instances that were in this $dueWork.
          */
         $rubricInstanceMapper = \Schoolbox\Assessment\Rubric\Instance\Mapper::getInstance();
+        $rubricLevelMapper = RubricLevelMapper::getInstance();
 
-        $rubricInstanceMapper->deleteByColumn('assessment_id', $dueWork->getAssessmentModel()->getId());
+        $rubricInstanceIds = $rubricInstanceMapper->findByColumn('assessment_id', $dueWork->getAssessmentModel()->getId())->indexBy('id')->keys();
+
+        $rubricLevelMapper->deleteByColumn('rubric_instance_id', $rubricInstanceIds);
 
         return true;
     }
