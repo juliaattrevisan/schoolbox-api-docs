@@ -37,5 +37,5 @@ interface ISelfAssessable extends IAssessable
      * @return bool
      * @throws UnexpectedValueException If model property is not hydrated
      */
-    public function isSelfGrading(): bool;
+    public function isSelfGradable(): bool;
 }
