@@ -1285,12 +1285,6 @@ parameters:
 			path: library/Report/Abstract.php
 
 		-
-			message: '#^Call to function array_merge\(\) on a separate line has no effect\.$#'
-			identifier: function.resultUnused
-			count: 1
-			path: library/Report/Activity.php
-
-		-
 			message: '#^Call to an undefined method External_UserInterface\:\:getStudentBoarderContactListExtended\(\)\.$#'
 			identifier: method.notFound
 			count: 1
