@@ -3763,12 +3763,6 @@ parameters:
 			path: library/Schoolbox/Mapper/AbstractMapperProxy.php
 
 		-
-			message: '#^Expression "true" on a separate line does not do anything\.$#'
-			identifier: expr.resultUnused
-			count: 1
-			path: library/Schoolbox/Mapper/Performance/DevMonitor.php
-
-		-
 			message: '#^Property Schoolbox\\Mapper\\RecursiveUndeleter\:\:\$logger \(Alaress\\Lumberjack\\Logger\) does not accept Psr\\Log\\LoggerInterface\.$#'
 			identifier: assign.propertyType
 			count: 1
