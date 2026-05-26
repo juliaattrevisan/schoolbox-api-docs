@@ -53,7 +53,7 @@ body.sbx-body {
     /**
      * Secondary buttons, which are considered all other buttons
      */
-    button:not([class]),
+    button:not([class]):not(:empty),
     .button,
     .flex-list.buttons a,
     .flex-list.buttons button,
