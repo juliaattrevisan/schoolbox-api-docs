@@ -107,8 +107,8 @@ class PayloadFinaliser
             }
         }
 
-        // GPT 5.1, 5.2 and 5.4 default to `none` for reasoning effort
-        if (in_array($version, ['5.1', '5.2', '5.4']) && isset($payload['reasoning'])) {
+        // GPT 5.1, 5.2, 5.4 and 5.5 default to `none` for reasoning effort
+        if (in_array($version, ['5.1', '5.2', '5.4', '5.5']) && isset($payload['reasoning'])) {
             $reasoningEffort = $payload['reasoning']['effort'] ?? 'none';
             // Also don't support `minimal` reasoning
             if ($reasoningEffort === 'minimal') {
