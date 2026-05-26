@@ -143,7 +143,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private $quizFeedbackMapper;
 
     /**
-     * @var WorkTypeMapper;
+     * @var WorkTypeMapper
      */
     private $workTypeMapper;
 
@@ -339,8 +339,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                     // Get a hydrated worktype object.
                     $previousWorkType = $this->workTypeMapper->findById($diff['assessment']['workType'][1]);
                     $previousAudienceVisibility = [
-                        'learners' => $previousWorkType?->isVisibleToLearners() ?? true,
-                        'parents' => $previousWorkType?->isVisibleToParents() ?? true,
+                        'learners' => $previousWorkType->isVisibleToLearners() ?? true,
+                        'parents' => $previousWorkType->isVisibleToParents() ?? true,
                     ];
                 } else {
                     $previousAudienceVisibility = ['learners' => true, 'parents' => true];

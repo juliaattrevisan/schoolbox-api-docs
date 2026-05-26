@@ -62,7 +62,7 @@ class Eportfolio
     private TemplateMapper $templateMapper;
 
     /**
-     * @var GenericCollection|Template[];
+     * @var GenericCollection|Template[]
      */
     private GenericCollection $allTemplates;
 

@@ -235,18 +235,6 @@ class Zone
         return $this;
     }
 
-
-    /**
-     * Clear the mime filter
-     * @return self
-     */
-    public function clearMimeFilter()
-    {
-        $this->mimeFilter = null;
-        return $this;
-    }
-
-
     /**
      * @param bool $multi
      * @return self
@@ -338,13 +326,6 @@ class Zone
 
         // wrap in quotes
         $filter = "'$this->mimeFilter'";
-
-        if ($this->mimeFilter === null) {
-            $filter = 'null';
-        } elseif ($this->mimeFilter === false) {
-            $filter = 'false';
-        }
-
 
         $context = [
             'title'      => $this->text['modalTitle'],

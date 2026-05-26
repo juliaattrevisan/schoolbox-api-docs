@@ -34,7 +34,7 @@ class GuzzleTracingMiddleware
      *                             tracing headers to the outgoing request.
      * @param Tracer       $tracer The trace container: stack changes are added
      *                             to this.
-     * @return Closure(RequestInterface, array)
+     * @return Closure(RequestInterface, array): mixed
      */
     public static function trace(HubInterface $hub, Tracer $tracer): Closure
     {

@@ -13,11 +13,11 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\AssessmentType;
-use Schoolbox\Learning\DialogAgent\ValidDialogAgentEnabled;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Search\Api\SearchFilter;
 use Schoolbox\Search\Api\Database\ResultType;
 use Schoolbox\UserMapper;
+use Twig\Error\Error;
 
 class Controller extends Base
 {
@@ -53,8 +53,9 @@ class Controller extends Base
      *
      * @return void
      * @throws NotFound
-     * @throws Error*@since 23.1
-     * @api GET /search
+     * @throws Error
+     * @since 23.1
+     * @api   GET /search
      */
     public function search(): void
     {

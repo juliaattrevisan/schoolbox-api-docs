@@ -1035,7 +1035,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     /**
      * Resets the date to end of the ISO-8601 week (Sunday) and time to 23:59:59
      *
-     * @return $this;
+     * @return $this
      */
     public function endOfWeek()
     {

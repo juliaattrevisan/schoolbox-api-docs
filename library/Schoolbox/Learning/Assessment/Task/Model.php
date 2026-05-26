@@ -392,7 +392,7 @@ class Model extends AbstractAssessment
 
     /**
      * @param boolean $isSelfAssessable
-     * @return $this;
+     * @return $this
      */
     public function setIsSelfAssessable($isSelfAssessable)
     {
@@ -410,7 +410,7 @@ class Model extends AbstractAssessment
 
     /**
      * @param string $url
-     * @return $this;
+     * @return $this
      */
     public function setUrl($url)
     {

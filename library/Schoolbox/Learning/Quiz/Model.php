@@ -323,7 +323,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
         $this->id = null;
 
         // Clear Attempts
-        $this->attempts = null;
+        $this->attempts = new GenericCollection(QuizAttempt::class);
 
         // Clone Sections to clear their IDs, so subsequent save is INSERT instead of UPDATE
         if ($this->sections !== null) {

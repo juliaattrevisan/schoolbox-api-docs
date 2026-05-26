@@ -10,6 +10,7 @@
 namespace Alaress\OAuth2\Client\Provider;
 
 use League\OAuth2\Client\Provider\AbstractProvider;
+use League\OAuth2\Client\Provider\GenericResourceOwner;
 use League\OAuth2\Client\Token\AccessToken;
 use Psr\Http\Message\ResponseInterface;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -103,6 +104,6 @@ class Office365 extends AbstractProvider
 
     protected function createResourceOwner(array $response, #[SensitiveParameter] AccessToken $token)
     {
-        // TODO: Implement createResourceOwner() method.
+        return new GenericResourceOwner($response, $token->getResourceOwnerId());
     }
 }

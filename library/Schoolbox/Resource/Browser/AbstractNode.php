@@ -351,8 +351,9 @@ abstract class AbstractNode implements NodeInterface
     protected function setFolderLocator(FolderLocatorInterface $locator)
     {
         $this->folderLocator = $locator;
-    }
 
+        return $this;
+    }
 
     /**
      * @return FolderLocatorInterface

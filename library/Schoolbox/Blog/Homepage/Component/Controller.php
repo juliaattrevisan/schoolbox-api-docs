@@ -111,22 +111,22 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
 
     /**
-     * @var BlogMapper;
+     * @var BlogMapper
      */
     protected $blogMapper;
 
     /**
-     * @var UserMapper;
+     * @var UserMapper
      */
     protected $userMapper;
 
     /**
-     * @var BlogCommentMapper;
+     * @var BlogCommentMapper
      */
     protected $blogCommentMapper;
 
     /**
-     * @var BlogImageMapper;
+     * @var BlogImageMapper
      */
     protected $blogImageMapper;
 

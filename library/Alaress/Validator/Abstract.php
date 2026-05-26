@@ -31,7 +31,6 @@ abstract class Alaress_Validator_Abstract implements Alaress_Validator_Validator
      *
      * @param mixed $value
      *
-     * @return bool
      */
     public function setValue($value)
     {

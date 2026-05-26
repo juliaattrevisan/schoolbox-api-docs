@@ -294,7 +294,7 @@ class Model implements ISoftDeletable, Sequential, ValueLabelInterface
 
     /**
      * @param bool $lmsCohortComparison
-     * @return static`
+     * @return static
      */
     public function setLmsCohortComparison(bool $lmsCohortComparison): self
     {

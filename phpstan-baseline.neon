@@ -31,24 +31,6 @@ parameters:
 			path: library/Alaress/Async/AMQP/AMQPConnector.php
 
 		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 1
-			path: library/Alaress/Async/AMQP/Bunny/BunnyControl.php
-
-		-
-			message: '#^Method Alaress\\Async\\Notification\\Cloud\\Google\\GCM\:\:propagate\(\) should return bool but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: library/Alaress/Async/Notification/Cloud/Google/GCM.php
-
-		-
-			message: '#^PHPDoc tag @throws with type PHPUnit_Framework_AssertionFailedError is not subtype of Throwable$#'
-			identifier: throws.notThrowable
-			count: 1
-			path: library/Alaress/Async/Test/Subscription.php
-
-		-
 			message: '#^Method Alaress\\Database\\Broker\\Base\:\:prepareQuery\(\) should return Alaress\\Database\\Statement\\Query\\IQuery but returns Alaress\\Database\\Statement\\Query\\Base\.$#'
 			identifier: return.type
 			count: 1
@@ -217,12 +199,6 @@ parameters:
 			path: library/Alaress/Date/Format.php
 
 		-
-			message: '#^PHPDoc tag @return has invalid value \(\$this;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 112 on line 4$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Alaress/Date/Format.php
-
-		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 6
@@ -241,18 +217,6 @@ parameters:
 			path: library/Alaress/Date/Interval.php
 
 		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 7
-			path: library/Alaress/Date/Test/LaravelDatetimeAlaressDateRelativeTest.php
-
-		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 1
-			path: library/Alaress/Date/Test/LaravelTimestampAlaressDateRelativeTest.php
-
-		-
 			message: '#^Dead catch \- Symfony\\Component\\Lock\\Exception\\LockReleasingException is never thrown in the try block\.$#'
 			identifier: catch.neverThrown
 			count: 1
@@ -261,12 +225,6 @@ parameters:
 		-
 			message: '#^Instanceof between null and Throwable will always evaluate to false\.$#'
 			identifier: instanceof.alwaysFalse
-			count: 1
-			path: library/Alaress/Jitter/Jitter.php
-
-		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
 			count: 1
 			path: library/Alaress/Jitter/Jitter.php
 
@@ -293,12 +251,6 @@ parameters:
 			identifier: function.alreadyNarrowedType
 			count: 1
 			path: library/Alaress/Lumberjack/TtyFormatter.php
-
-		-
-			message: '#^Method Alaress\\OAuth2\\Client\\Provider\\Office365\:\:createResourceOwner\(\) should return League\\OAuth2\\Client\\Provider\\ResourceOwnerInterface but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: library/Alaress/OAuth2/Client/Provider/Office365.php
 
 		-
 			message: '#^Method Alaress\\OAuth2\\Client\\Provider\\Office365\:\:urlUserDetails\(\) should return string but returns null\.$#'
@@ -329,18 +281,6 @@ parameters:
 			identifier: method.childParameterType
 			count: 1
 			path: library/Alaress/Routing/ByUserRouter.php
-
-		-
-			message: '#^PHPDoc tag @throws with type InvalidArgumentException\|OutOfBoundsException\|PHPUnit_Framework_AssertionFailedError is not subtype of Throwable$#'
-			identifier: throws.notThrowable
-			count: 1
-			path: library/Alaress/Routing/Test/RouterTest.php
-
-		-
-			message: '#^PHPDoc tag @throws with type InvalidArgumentException\|PHPUnit_Framework_Exception is not subtype of Throwable$#'
-			identifier: throws.notThrowable
-			count: 1
-			path: library/Alaress/Routing/Test/RouterTest.php
 
 		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
@@ -379,24 +319,6 @@ parameters:
 			path: library/Alaress/Scheduler/Trigger/CancelTrigger.php
 
 		-
-			message: '#^PHPDoc tag @return has invalid value \(Closure\(RequestInterface, array\)\)\: Unexpected token "\(", expected TOKEN_HORIZONTAL_WS at offset 401 on line 9$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Alaress/Sentry/Tracing/GuzzleTracingMiddleware.php
-
-		-
-			message: '#^Method Alaress\\Session\\BaseSessionSegment\:\:clear\(\) should return null but return statement is missing\.$#'
-			identifier: return.missing
-			count: 2
-			path: library/Alaress/Session/BaseSessionSegment.php
-
-		-
-			message: '#^Method Alaress\\Session\\BaseSessionSegment\:\:load\(\) should return null but return statement is missing\.$#'
-			identifier: return.missing
-			count: 2
-			path: library/Alaress/Session/BaseSessionSegment.php
-
-		-
 			message: '#^Call to an undefined method Aura\\Session\\Phpfunc\:\:session_id\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -419,30 +341,6 @@ parameters:
 			identifier: method.alreadyNarrowedType
 			count: 2
 			path: library/Alaress/Test/RelativeUrlTest.php
-
-		-
-			message: '#^Method Alaress_Validator_Abstract\:\:setValue\(\) should return bool but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: library/Alaress/Validator/Abstract.php
-
-		-
-			message: '#^Property Alaress\\WorkerCrew\\Transaction\\AbstractTransaction\:\:\$timer \(React\\EventLoop\\TimerInterface\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 2
-			path: library/Alaress/WorkerCrew/Transaction/AbstractTransaction.php
-
-		-
-			message: '#^Property Alaress\\WorkerCrew\\Transaction\\AbstractTransaction\:\:\$timer \(React\\EventLoop\\TimerInterface\) in isset\(\) is not nullable\.$#'
-			identifier: isset.property
-			count: 3
-			path: library/Alaress/WorkerCrew/Transaction/AbstractTransaction.php
-
-		-
-			message: '#^Property Alaress\\WorkerCrew\\Worker\\AbstractProcess\:\:\$timeout \(React\\EventLoop\\TimerInterface\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: library/Alaress/WorkerCrew/Worker/AbstractProcess.php
 
 		-
 			message: '#^Call to function unset\(\) contains undefined variable \$e\.$#'
@@ -499,12 +397,6 @@ parameters:
 			path: library/Assess/Import/Xml.php
 
 		-
-			message: '#^Method Calendar\:\:delete\(\) should return bool but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: library/Calendar.php
-
-		-
 			message: '#^Access to an undefined property Sabre\\VObject\\Component\\VEvent\:\:\$CATEGORIES\.$#'
 			identifier: property.notFound
 			count: 1
@@ -557,12 +449,6 @@ parameters:
 			identifier: method.notFound
 			count: 1
 			path: library/Calendar/Api/EventType/ResourceBooking/Moderation/Default.php
-
-		-
-			message: '#^PHPDoc tag @var has invalid value \(Access;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 22 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Calendar/Api/EventType/Timetable/ExternalConstrained/Default.php
 
 		-
 			message: '#^Call to function is_object\(\) with Alaress_Date_Format will always evaluate to true\.$#'
@@ -837,12 +723,6 @@ parameters:
 		-
 			message: '#^Call to an undefined method Schoolbox\\Resource\\File\\IFile\:\:getTitle\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: library/Component/Homepage/VideoController.php
-
-		-
-			message: '#^Property Component_Homepage_VideoController\:\:\$defaultVideo \(Schoolbox\\Video\\ResourceVideo\) does not accept null\.$#'
-			identifier: assign.propertyType
 			count: 1
 			path: library/Component/Homepage/VideoController.php
 
@@ -1177,12 +1057,6 @@ parameters:
 			path: library/Eportfolio.php
 
 		-
-			message: '#^PHPDoc tag @var has invalid value \(GenericCollection\|Template\[\];\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 44 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Eportfolio.php
-
-		-
 			message: '#^Property Eportfolio\\Page\:\:\$permissions \(array\<Eportfolio\\Permission\>\|\(iterable\<Eportfolio\\Permission\>&Schoolbox\\GenericCollection\)\) is never assigned array\<Eportfolio\\Permission\> so it can be removed from the property type\.$#'
 			identifier: property.unusedType
 			count: 1
@@ -1357,10 +1231,22 @@ parameters:
 			path: library/Evaluation/Question/Bank.php
 
 		-
+			message: '#^Dead catch \- Alaress\\Database\\Exception is never thrown in the try block\.$#'
+			identifier: catch.neverThrown
+			count: 1
+			path: library/External/Canvas/Importer/Cli/AnnouncementsTool.php
+
+		-
 			message: '#^Ternary operator condition is always true\.$#'
 			identifier: ternary.alwaysTrue
 			count: 1
 			path: library/External/Canvas/Sync/CliImporter.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between non\-empty\-string and '''' will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: library/External/Canvas/Sync/DataRestorer.php
 
 		-
 			message: '#^PHPDoc tag @var with type Schoolbox\\Mapper is not subtype of native type \$this\(External\\Canvas\\Sync\\ImportStage\\CourseAssessmentAbstract\)\.$#'
@@ -1903,18 +1789,6 @@ parameters:
 			path: library/Schoolbox/Admin/Usage/Graph/GlobalUsers/TotalPayload.php
 
 		-
-			message: '#^PHPDoc tag @var has invalid value \(CMSLogMapper;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 28 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Admin/User/Controller.php
-
-		-
-			message: '#^PHPDoc tag @var has invalid value \(UserLogMapper;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 29 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Admin/User/Controller.php
-
-		-
 			message: '#^Anonymous function has an unused use \$di\.$#'
 			identifier: closure.unusedUse
 			count: 1
@@ -1937,12 +1811,6 @@ parameters:
 			identifier: instanceof.alwaysTrue
 			count: 1
 			path: library/Schoolbox/Application/WebKernelAbstract.php
-
-		-
-			message: '#^PHPDoc tag @var has invalid value \(SubmissionBox\\Submission\\Submission\|null;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 119 on line 4$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Assessment/Component/SubmissionBox/ReturnedWork.php
 
 		-
 			message: '#^Method Schoolbox\\Assessment\\Component\\SubmissionBox\\ReturnedWorkMapper\:\:getSubmissionBoxMapper\(\) should return Schoolbox\\Assessment\\Component\\SubmissionBoxMapper but returns Schoolbox\\Mapper\.$#'
@@ -2077,12 +1945,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Participant/Plan/Mapper.php
 
 		-
-			message: '#^PHPDoc tag @var has invalid value \(WorkTypeMapper;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 30 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Assessment/Participant/Plan/Notifier.php
-
-		-
 			message: '#^Method Schoolbox\\Assessment\\Rubric\\DataModel\\Capability\\Mapper\:\:findForParent\(\) should return iterable\<Schoolbox\\Assessment\\Rubric\\DataModel\\Capability\\Model\>&Schoolbox\\GenericCollection but returns array\<Schoolbox\\Assessment\\Rubric\\DataModel\\Capability\\Model\>\.$#'
 			identifier: return.type
 			count: 1
@@ -2197,48 +2059,6 @@ parameters:
 			path: library/Schoolbox/Blog/Eportfolio/Comment/Notifier.php
 
 		-
-			message: '#^PHPDoc tag @var has invalid value \(EportfolioBlogCommentMapper;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 43 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Blog/Eportfolio/Component/Controller.php
-
-		-
-			message: '#^PHPDoc tag @var has invalid value \(EportfolioBlogImageMapper;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 41 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Blog/Eportfolio/Component/Controller.php
-
-		-
-			message: '#^PHPDoc tag @var has invalid value \(EportfolioBlogMapper;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 36 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Blog/Eportfolio/Component/Controller.php
-
-		-
-			message: '#^PHPDoc tag @var has invalid value \(UserMapper;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 26 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Blog/Eportfolio/Component/Controller.php
-
-		-
-			message: '#^PHPDoc tag @var has invalid value \(EportfolioBlogCommentMapper;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 43 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Blog/Eportfolio/Post/Controller.php
-
-		-
-			message: '#^PHPDoc tag @var has invalid value \(EportfolioBlogMapper;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 36 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Blog/Eportfolio/Post/Controller.php
-
-		-
-			message: '#^PHPDoc tag @var has invalid value \(FileMapper;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 26 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Blog/Eportfolio/Post/Controller.php
-
-		-
 			message: '#^Call to function is_numeric\(\) with int will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -2255,54 +2075,6 @@ parameters:
 			identifier: method.childReturnType
 			count: 1
 			path: library/Schoolbox/Blog/Homepage/Comment/Mapper.php
-
-		-
-			message: '#^PHPDoc tag @var has invalid value \(BlogCommentMapper;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 33 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Component/Controller.php
-
-		-
-			message: '#^PHPDoc tag @var has invalid value \(BlogImageMapper;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 31 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Component/Controller.php
-
-		-
-			message: '#^PHPDoc tag @var has invalid value \(BlogMapper;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 26 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Component/Controller.php
-
-		-
-			message: '#^PHPDoc tag @var has invalid value \(UserMapper;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 26 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Component/Controller.php
-
-		-
-			message: '#^PHPDoc tag @var has invalid value \(BlogCommentMapper;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 33 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Post/Controller.php
-
-		-
-			message: '#^PHPDoc tag @var has invalid value \(BlogMapper;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 26 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Post/Controller.php
-
-		-
-			message: '#^PHPDoc tag @var has invalid value \(FileMapper;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 26 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Post/Controller.php
-
-		-
-			message: '#^PHPDoc tag @var has invalid value \(FolderMapper;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 28 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Post/Controller.php
 
 		-
 			message: '#^Return type \(iterable\<Schoolbox\\Blog\\Homepage\\Post\\Model\>&Schoolbox\\Collection\) of method Schoolbox\\Blog\\Homepage\\Post\\Mapper\:\:findForFeed\(\) should be compatible with return type \(iterable\<Alaress\\Async\\Notification\\Instance\\Instance\>&Schoolbox\\Collection\) of method Schoolbox\\Feed\\FeedableMapperInterface\:\:findForFeed\(\)$#'
@@ -2331,12 +2103,6 @@ parameters:
 		-
 			message: '#^Method Schoolbox\\Calendar\\Event\:\:getRoleCollection\(\) should return iterable\<Schoolbox\\Calendar\\Relation\\Role\>&Schoolbox\\Collection but returns iterable\<Schoolbox\\Role\>&Schoolbox\\Collection\.$#'
 			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Calendar/Event.php
-
-		-
-			message: '#^PHPDoc tag @return has invalid value \(\$this;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 63 on line 3$#'
-			identifier: phpDoc.parseError
 			count: 1
 			path: library/Schoolbox/Calendar/Event.php
 
@@ -2431,22 +2197,10 @@ parameters:
 			path: library/Schoolbox/Column/Model.php
 
 		-
-			message: '#^PHPDoc tag @var has invalid value \(News\\Model\(\)\)\: Unexpected token "\(", expected TOKEN_HORIZONTAL_WS at offset 19 on line 1$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Comms/News/Audience/Complex/Model.php
-
-		-
 			message: '#^Method Schoolbox\\Comms\\News\\Audience\\Mapper\:\:getInstance\(\) should return static\(Schoolbox\\Comms\\News\\Audience\\Mapper\) but returns Schoolbox\\Comms\\News\\Audience\\Mapper\.$#'
 			identifier: return.type
 			count: 1
 			path: library/Schoolbox/Comms/News/Audience/Mapper.php
-
-		-
-			message: '#^PHPDoc tag @var has invalid value \(News\\Model\(\)\)\: Unexpected token "\(", expected TOKEN_HORIZONTAL_WS at offset 19 on line 1$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Comms/News/Audience/Model.php
 
 		-
 			message: '#^Parameter \#1 \$users \(iterable\<Schoolbox\\Comms\\News\\Audience\\Segment\\Strategy\\User\>&Schoolbox\\GenericCollection\) of method Schoolbox\\Comms\\News\\Audience\\Segment\\Strategy\\User\:\:getValues\(\) should be compatible with parameter \$users \(iterable\<Schoolbox\\User\>&Schoolbox\\GenericCollection\) of method Schoolbox\\Comms\\News\\Audience\\Segment\\ISimpleStrategy\:\:getValues\(\)$#'
@@ -2477,12 +2231,6 @@ parameters:
 			identifier: varTag.nativeType
 			count: 1
 			path: library/Schoolbox/Comms/News/Audience/Segment/Translator.php
-
-		-
-			message: '#^PHPDoc tag @var has invalid value \(News\\Model\(\)\)\: Unexpected token "\(", expected TOKEN_HORIZONTAL_WS at offset 19 on line 1$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Comms/News/Audience/Simple/Model.php
 
 		-
 			message: '#^PHPDoc tag @var with type Alaress\\Database\\Connector\\IConnector is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
@@ -2626,18 +2374,6 @@ parameters:
 			message: '#^PHPDoc tag @param for parameter \$name with type mixed is not subtype of native type string\.$#'
 			identifier: parameter.phpDocType
 			count: 1
-			path: library/Schoolbox/Config/Loader.php
-
-		-
-			message: '#^Static property Schoolbox\\Config\\Loader\:\:\$allConfigs \(array\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: library/Schoolbox/Config/Loader.php
-
-		-
-			message: '#^Static property Schoolbox\\Config\\Loader\:\:\$allConfigs \(array\) in isset\(\) is not nullable\.$#'
-			identifier: isset.property
-			count: 3
 			path: library/Schoolbox/Config/Loader.php
 
 		-
@@ -3017,12 +2753,6 @@ parameters:
 			identifier: return.type
 			count: 1
 			path: library/Schoolbox/External/Importer/User/Hydrator/ToggleField.php
-
-		-
-			message: '#^PHPDoc tag @var has invalid value \(\\External_User\(\)\)\: Unexpected token "\(", expected TOKEN_HORIZONTAL_WS at offset 91 on line 4$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/External/Mapper.php
 
 		-
 			message: '#^Call to an undefined method External_UserInterface\:\:getStudentBoarderContactListExtended\(\)\.$#'
@@ -4567,12 +4297,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Participant.php
 
 		-
-			message: '#^Property Schoolbox\\Learning\\Assessment\\ParticipantStatistics\:\:\$cacheCountAssessments \(int\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/ParticipantStatistics.php
-
-		-
 			message: '#^PHPDoc tag @param for parameter \$participants with type Schoolbox\\GenericCollection\|Schoolbox\\Learning\\Assessment\\Participant is not subtype of native type Schoolbox\\GenericCollection\.$#'
 			identifier: parameter.phpDocType
 			count: 1
@@ -4681,12 +4405,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Summator/Average.php
 
 		-
-			message: '#^Property Schoolbox\\Learning\\Assessment\\Summator\\Average\:\:\$sum \(float\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Summator/Average.php
-
-		-
 			message: '#^Method Schoolbox\\Learning\\Assessment\\Summator\\Count\:\:calculateTotalWeight\(\) should return int but returns null\.$#'
 			identifier: return.type
 			count: 1
@@ -4733,18 +4451,6 @@ parameters:
 			identifier: notEqual.alwaysTrue
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Task/Feedback/MapperProxy.php
-
-		-
-			message: '#^PHPDoc tag @return has invalid value \(\$this;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 50 on line 3$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Task/Model.php
-
-		-
-			message: '#^PHPDoc tag @return has invalid value \(\$this;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 64 on line 3$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Task/Model.php
 
 		-
 			message: '#^Strict comparison using \=\=\= between null and int will always evaluate to false\.$#'
@@ -4833,18 +4539,6 @@ parameters:
 		-
 			message: '#^Method Schoolbox\\Learning\\InlineGrader\\Kami\\Test\\ConnectorTest\:\:providerInvalidSiteSchoolCode\(\) should return array\<string\|null\> but returns array\<int, list\<string\|null\>\>\.$#'
 			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Learning/InlineGrader/Kami/Test/ConnectorTest.php
-
-		-
-			message: '#^PHPDoc tag @throws with type PHPUnit_Framework_AssertionFailedError is not subtype of Throwable$#'
-			identifier: throws.notThrowable
-			count: 2
-			path: library/Schoolbox/Learning/InlineGrader/Kami/Test/ConnectorTest.php
-
-		-
-			message: '#^PHPDoc tag @throws with type PHPUnit_Framework_AssertionFailedError\|Schoolbox\\Learning\\InlineGrader\\Kami\\Exception\\ResponseDecodeException is not subtype of Throwable$#'
-			identifier: throws.notThrowable
 			count: 1
 			path: library/Schoolbox/Learning/InlineGrader/Kami/Test/ConnectorTest.php
 
@@ -4963,12 +4657,6 @@ parameters:
 			path: library/Schoolbox/Learning/Quiz/Controller.php
 
 		-
-			message: '#^Property Schoolbox\\Learning\\Quiz\\Model\:\:\$attempts \(array\<Schoolbox\\Learning\\Quiz\\Attempt\\Model\>\|\(iterable\<Schoolbox\\Learning\\Quiz\\Attempt\\Model\>&Schoolbox\\GenericCollection\)\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Model.php
-
-		-
 			message: '#^Property Schoolbox\\Learning\\Quiz\\Model\:\:\$attempts \(array\<Schoolbox\\Learning\\Quiz\\Attempt\\Model\>\|\(iterable\<Schoolbox\\Learning\\Quiz\\Attempt\\Model\>&Schoolbox\\GenericCollection\)\) is never assigned array\<Schoolbox\\Learning\\Quiz\\Attempt\\Model\> so it can be removed from the property type\.$#'
 			identifier: property.unusedType
 			count: 1
@@ -4985,12 +4673,6 @@ parameters:
 			identifier: property.unusedType
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Section/Model.php
-
-		-
-			message: '#^Property Schoolbox\\Learning\\Quiz\\Section\\Question\\Solution\\Model\:\:\$question \(Schoolbox\\Learning\\Quiz\\Section\\Question\\Model\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Section/Question/Solution/Model.php
 
 		-
 			message: '#^Constant Schoolbox\\Learning\\Turnitin\\ValidFile\:\:MIN_TURNITIN_TEXT_LENGTH is unused\.$#'
@@ -5467,12 +5149,6 @@ parameters:
 			path: library/Schoolbox/Resource/Attachment/Zone.php
 
 		-
-			message: '#^Property Schoolbox\\Resource\\Attachment\\Zone\:\:\$mimeFilter \(string\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: library/Schoolbox/Resource/Attachment/Zone.php
-
-		-
 			message: '#^Call to an undefined method Schoolbox\\ISoftDeletable\:\:getParent\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -5489,18 +5165,6 @@ parameters:
 			identifier: method.notFound
 			count: 1
 			path: library/Schoolbox/Resource/Browser/AbstractNode.php
-
-		-
-			message: '#^Method Schoolbox\\Resource\\Browser\\AbstractNode\:\:setFolderLocator\(\) should return Schoolbox\\Resource\\Browser\\AbstractNode but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: library/Schoolbox/Resource/Browser/AbstractNode.php
-
-		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 3
-			path: library/Schoolbox/Resource/Browser/AbstractTreeBuilder.php
 
 		-
 			message: '#^Parameter \#1 \$nodeId \(string\) of method Schoolbox\\Resource\\Browser\\Office365\\Locator\:\:findByFolderId\(\) should be compatible with parameter \$nodeId \(int\) of method Schoolbox\\Resource\\File\\ILocator\:\:findByFolderId\(\)$#'
@@ -5707,12 +5371,6 @@ parameters:
 			path: library/Schoolbox/Search/Api/Database/ResultType/Page/Hydrator.php
 
 		-
-			message: '#^PHPDoc tag @throws has invalid value \(Error\*@since 23\.1\)\: Unexpected token "\*", expected TOKEN_HORIZONTAL_WS at offset 120 on line 6$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Search/Controller.php
-
-		-
 			message: '#^Property Schoolbox\\Statistics\\DataSource\:\:\$folderMapper is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
@@ -5754,11 +5412,6 @@ parameters:
 			count: 1
 			path: library/Schoolbox/Sync/Grammar/Ruleset.php
 
-		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 1
-			path: library/Schoolbox/Sync/Grammar/Test/UserRulesetTest.php
 
 		-
 			message: '#^Anonymous function has an unused use \$key\.$#'
@@ -5801,30 +5454,6 @@ parameters:
 			identifier: method.notFound
 			count: 1
 			path: library/Schoolbox/Test/SoftDeleteTest.php
-
-		-
-			message: '#^PHPDoc tag @return has invalid value \(\$this;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 46 on line 3$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Test/TestModel.php
-
-		-
-			message: '#^PHPDoc tag @return has invalid value \(\$this;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 51 on line 3$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Test/TestModel.php
-
-		-
-			message: '#^PHPDoc tag @return has invalid value \(\$this;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 55 on line 3$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Test/TestModel.php
-
-		-
-			message: '#^PHPDoc tag @return has invalid value \(\$this;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 57 on line 3$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/Test/TestModel.php
 
 		-
 			message: '#^Method Schoolbox\\Tile\\Component\\DashboardTileController\:\:execute\(\) should return true but returns false\.$#'
@@ -5885,12 +5514,6 @@ parameters:
 			identifier: method.childReturnType
 			count: 1
 			path: library/Schoolbox/Wiki/WikiMapper.php
-
-		-
-			message: '#^PHPDoc tag @return has invalid value \(static`\)\: Unexpected token "`", expected TOKEN_HORIZONTAL_WS at offset 65 on line 3$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Schoolbox/YearLevel/Model.php
 
 		-
 			message: '#^Method SocialStream\\Authenticator\:\:getNewPost\(\) should return SocialStream_Post_Abstract but returns null\.$#'
@@ -6007,12 +5630,6 @@ parameters:
 			path: library/Survey/Import/Xml.php
 
 		-
-			message: '#^PHPDoc tag @var has invalid value \(string\. The hostname according to config\)\: Unexpected token "\.", expected TOKEN_HORIZONTAL_WS at offset 15 on line 1$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: library/Url.php
-
-		-
 			message: '#^Return type \(void\) of method Wiki\:\:update\(\) should be compatible with return type \(bool\) of method DeprecatedModel\:\:update\(\)$#'
 			identifier: method.childReturnType
 			count: 1
@@ -6055,12 +5672,6 @@ parameters:
 			path: tools/custom/wes/changeType.php
 
 		-
-			message: '#^PHPDoc tag @var has invalid value \(Pastoral\\Attachment\\Mapper;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 35 on line 1$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: tools/custom/wgs/pastoral-import.php
-
-		-
 			message: '#^Constant Schoolbox\\Application\\CliTool\\App@anonymous/tools/mq/list\-redis\-routes\.php\:21\:\:TTL_NOT_SET is unused\.$#'
 			identifier: classConstant.unused
 			count: 1
@@ -6077,15 +5688,3 @@ parameters:
 			identifier: isset.variable
 			count: 1
 			path: tools/parentClassAccess.php
-
-		-
-			message: '#^Dead catch - Alaress\\Database\\Exception is never thrown in the try block.$#'
-			identifier: catch.neverThrown
-			count: 1
-			path: library/External/Canvas/Importer/Cli/AnnouncementsTool.php
-
-		-
-			message: '#^Strict comparison using \=\=\= between non-empty-string and '''' will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
-			count: 1
-			path: library/External/Canvas/Sync/DataRestorer.php
