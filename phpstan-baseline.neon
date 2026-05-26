@@ -145,12 +145,6 @@ parameters:
 			path: library/Alaress/Submarine.php
 
 		-
-			message: '#^Call to function unset\(\) contains undefined variable \$e\.$#'
-			identifier: unset.variable
-			count: 3
-			path: library/Alaress/WorkerCrew/Worker/IO/WrappedReadableResourceStream.php
-
-		-
 			message: '#^Return type \(Alaress\\WorkerCrew\\Worker\\Worker\) of method Alaress\\WorkerCrew\\Worker\\WorkerArray\:\:getPidWhere\(\) should be compatible with return type \(int\) of method Alaress\\WorkerCrew\\Worker\\WorkerBundleInterface\:\:getPidWhere\(\)$#'
 			identifier: method.childReturnType
 			count: 1
