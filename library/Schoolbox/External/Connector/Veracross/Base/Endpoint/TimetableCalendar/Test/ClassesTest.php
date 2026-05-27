@@ -26,8 +26,14 @@ use Schoolbox\External\Event\Overrides\Model as OverrideModel;
 
 require_once dirname(__DIR__) . '/Classes.php';
 
+/**
+ * Tests for Veracross timetable class import behaviour.
+ */
 class ClassesTest extends TestCase
 {
+    /**
+     * Ensure primary teacher involvement is persisted as event-specific staff overrides.
+     */
     public function testApplyTeacherInvolvementCreatesStaffOverridesForEvent(): void
     {
         $event = (new EventModel())
