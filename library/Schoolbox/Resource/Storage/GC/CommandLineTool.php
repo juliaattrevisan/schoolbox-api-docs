@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\GC;
 
+use Alaress\CacheFactory\Factory;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
@@ -281,6 +282,9 @@ HELP;
             maxTime: $maxTime,
             thresholdDate: $thresholdDate,
         );
+
+        /** @var Factory $cacheFactory */
+        $cacheFactory = $this->getDi()->get('redis.cacheFactory');
         $gc = $gc
             ->addCheck(new Check\ForeignKeyRelation($db, $logger, SQL_db, $mapper->getTable()))
             ->addCheck(new Check\CharacterField($db, $logger, SQL_db))
@@ -291,12 +295,7 @@ HELP;
                     $logger,
                     $mapper->getTable(),
                     $this->getDi()->get('filesystem.storageProxy'),
-                    new Psr16Cache(
-                        new RedisAdapter(
-                            $this->getDi()->get('redis.cache'),
-                            Check\Storage::CACHE_NAMESPACE . '.' . INSTANCE_ID,
-                        ),
-                    ),
+                    $cacheFactory->build(Check\Storage::CACHE_NAMESPACE),
                 ),
             )
         ;
