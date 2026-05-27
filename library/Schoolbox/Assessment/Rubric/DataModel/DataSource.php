@@ -678,12 +678,10 @@ class DataSource
      * @param bool $cloneNewRubric if true, it should then return a copy of the rubric grid
      *                             without the identifier, and can be used to create a clone assessment
      *
-     * @phpstan-ignore-next-line
-     * @return Grid
+     * @return Grid|null
      * @throws MapperException
      */
-    /* @phpstan-ignore-next-line */
-    public function retrieveGrid(DueWorkModel $assessment, bool $getUsages, bool $cloneNewRubric = false): Grid
+    public function retrieveGrid(DueWorkModel $assessment, bool $getUsages, bool $cloneNewRubric = false): ?Grid
     {
         /* TODO this place will snap loudly by intent
          *  This will probably become retrieveGrids(), iteratively fetching each grid of an $assessment and returning
@@ -697,7 +695,6 @@ class DataSource
          *
          * return $stack;
          */
-        /* @phpstan-ignore-next-line */
     }
 
 
