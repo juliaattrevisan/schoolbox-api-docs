@@ -13,6 +13,8 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use League\Flysystem\FilesystemException;
 use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\CacheInterface;
+use Psr\SimpleCache\InvalidArgumentException;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Model;
 
@@ -55,13 +57,15 @@ class Storage implements Check
      * @param IConnector      $db         Database connection
      * @param LoggerInterface $logger     Logger
      * @param string          $table      The table which stores storage records.
-     * @param FilesystemProxy $filesystem The filesystem from which files are read.
+     * @param FilesystemProxy $filesystem The filesystem from which the files within storage records are read.
+     * @param CacheInterface  $hashCache  A cache for the hashes found within files.
      */
     public function __construct(
         private IConnector $db,
         private LoggerInterface $logger,
         private string $table,
         private FilesystemProxy $filesystem,
+        private CacheInterface $hashCache,
     ) {
     }
 
@@ -144,6 +148,21 @@ class Storage implements Check
 
         // Load storage file content
         foreach ($storageFiles as $hash => $_) {
+            try {
+                $cachedHashes = $this->hashCache->get($hash);
+            } catch (InvalidArgumentException $e) {
+                $this->logger->warning(
+                    sprintf('. could not get cache for storage file "%s": reading from storage file', $hash),
+                    ['exception' => $e],
+                );
+                $cachedHashes = null;
+            }
+            if (is_array($cachedHashes)) {
+                $this->logger->debug(sprintf('. reusing cached hashes for storage file %s...', $hash));
+                $hashIndex += $cachedHashes;
+                continue;
+            }
+
             $columnHashes = [];
             $this->logger->debug(sprintf('. finding hashes within content of storage file: %s...', $hash));
             try {
@@ -163,6 +182,16 @@ class Storage implements Check
             }
             $this->logger->debug(sprintf('.. %d unique hashes found in storage file', count($columnHashes)));
             $hashIndex += $columnHashes;
+
+            $this->logger->debug('.. caching hashes for storage file');
+            try {
+                $this->hashCache->set($hash, $columnHashes);
+            } catch (InvalidArgumentException $e) {
+                $this->logger->warning(
+                    sprintf('. could not set cache for storage file "%s": ignoring', $hash),
+                    ['exception' => $e],
+                );
+            }
         }
         $this->logger->info(sprintf('. %d unique hashes found across all storage files', count($hashIndex)));
         return $hashIndex;
