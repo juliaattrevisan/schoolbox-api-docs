@@ -95,8 +95,10 @@ class Replicator
         $this->assessmentMapperProxy->save($newAssessment, $newOwner);
         $destinationContext->getAssessables()->add($newAssessment);
 
-        // Copy DueWork Rubrics
-        $this->replicateDueWorkRubric($source, $newAssessment, $destinationContext);
+        /* Clone out all the rubric grids associated with $source
+         * Add more replications for other learning activities that support rubrics such as Reporting etc.
+         */
+        $this->replicateRubricGrids($source, $newAssessment, $destinationContext);
 
         // Copy Quiz Sections/Questions/Solutions
         $this->replicateQuizConstituents($source, $newAssessment, $newOwner);
@@ -186,11 +188,8 @@ class Replicator
      * @return void
      * @throws MapperException
      */
-    private function replicateDueWorkRubric(IAssessable $source, IAssessable $destination, AssessmentContext $destinationContext): void
+    private function replicateRubricGrids(IAssessable $source, IAssessable $destination, AssessmentContext $destinationContext): void
     {
-        if (!($source instanceof DueWork && $destination instanceof DueWork)) {
-            return;
-        }
-        $this->rubricMapper->copyRubric($source->getId(), $destination->getId(), $destinationContext);
+        $this->rubricMapper->copyRubric($source, $destination, $destinationContext);
     }
 }
