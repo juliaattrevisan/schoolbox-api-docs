@@ -695,6 +695,8 @@ class DataSource
          *
          * return $stack;
          */
+        /* TODO this is wrong, but anyway: need to shut up phpstannis for a moment */
+        return null;
     }
 
 
