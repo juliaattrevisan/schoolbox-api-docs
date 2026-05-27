@@ -71,4 +71,3 @@ FROM
             AND ri.deleted_at IS NULL
     ) rubricSummary
 ORDER BY assessment_id, rubric_instance_id, capability_sequence, capability_id, indicator_sequence, indicator_id;
-

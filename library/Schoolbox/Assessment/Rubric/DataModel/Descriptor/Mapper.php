@@ -114,7 +114,7 @@ class Mapper extends Schoolbox\Mapper
     protected function getSelectString()
     {
         return "
-            SELECT  
+            SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('level', 'l')},
                 {$this->getJoinColumnString('indicator', 'i')},

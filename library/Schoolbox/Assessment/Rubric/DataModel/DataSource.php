@@ -2105,8 +2105,8 @@ class DataSource
         $whereClause = implode(' AND ', $pb->getWhere());
 
         $stmt = $this->database->prepare("
-            SELECT 
-                rc.name AS grouping, 
+            SELECT
+                rc.name AS grouping,
                 ri.id, ri.name
             FROM rubric_indicator ri
             JOIN rubric_capability rc ON rc.id = ri.rubric_capability_id AND rc.deleted_at IS NULL

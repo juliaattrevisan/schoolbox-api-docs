@@ -110,5 +110,3 @@ MODIFY _submission_box_id INT UNSIGNED NULL;
 
 ALTER TABLE rubric_level
 MODIFY _box_id INT UNSIGNED NULL;
-
-

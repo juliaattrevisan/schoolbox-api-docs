@@ -81,4 +81,3 @@ FROM
           AND (rcm.valid IS TRUE OR rim.valid IS TRUE)
 ) rubricSummary
 ORDER BY assessment_id, student_id, feedback_date, capability_sequence, capability_id, indicator_sequence, indicator_id
-

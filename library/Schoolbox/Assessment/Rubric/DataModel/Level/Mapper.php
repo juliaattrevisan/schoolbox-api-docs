@@ -78,7 +78,7 @@ class Mapper extends BaseMapper
     protected function getSelectString()
     {
         return "
-            SELECT 
+            SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('rubricInstance', 'ri')}
         ";
