@@ -36,6 +36,16 @@ $font-family-icon: var(--sbx-icon-font-family);
     }
 }
 
+sbx-icon[class^="icon-"],
+sbx-icon[class*=" icon-"] {
+    color: var(--sbx-color-text-secondary, $body-foreground);
+    margin-right: 10px;
+
+    &:before {
+        content: none;
+    }
+}
+
 .icon [class^="icon-"],
 .icon [class*=" icon-"] {
     &:before {

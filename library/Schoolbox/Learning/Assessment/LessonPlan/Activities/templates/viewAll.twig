@@ -74,7 +74,7 @@
                                     <div class="actions-small-1">
                                         <div class="list-item">
                                             <div class="card small-12">
-                                                <span class="icon-unit"></span>
+                                                <sbx-icon class="icon-unit" name="unit"></sbx-icon>
                                                 <h3>
                                                     {% if unit.isBeforeOpenDate==false or readOnly == false %}
                                                         {% if unit.specification.folder.id in accessibleFolderIds %}
@@ -163,12 +163,12 @@
                                                     {% set route = viewRoute.viewRoute(assessment, USER) %}
                                                     {% if route %}
                                                         <a title="{{ title }}" href="{{ route }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="title">
-                                                            <span class="icon-lesson-plan"></span>
+                                                            <sbx-icon class="icon-lesson-plan" name="lesson-plan"></sbx-icon>
                                                             <p class="{% if (dateStart and dateEnd) and assessment.dueAt > dateStart and assessment.dueAt < dateEnd %}active-lesson-plan{% endif %}">{{ assessment.title }}</p>
                                                         </a>
                                                     {% else %}
                                                         <div title="{{ title }}" class="title">
-                                                            <span class="icon-lesson-plan"></span>
+                                                            <sbx-icon class="icon-lesson-plan" name="lesson-plan"></sbx-icon>
                                                             <p class="{% if (dateStart and dateEnd) and assessment.dueAt > dateStart and assessment.dueAt < dateEnd %}active-lesson-plan{% endif %}">{{ assessment.title }}</p>
                                                         </div>
                                                     {% endif %}
@@ -177,7 +177,7 @@
                                                     </p>
                                                     {% if "staff" == assessment.visibility %}
                                                     <p class="meta">
-                                                        <span class="icon-eye-hollow"></span>Not visible to students
+                                                        <sbx-icon class="icon-eye-hollow" name="view"></sbx-icon>Not visible to students
                                                     </p>
                                                     {% endif %}
                                                 </div>
