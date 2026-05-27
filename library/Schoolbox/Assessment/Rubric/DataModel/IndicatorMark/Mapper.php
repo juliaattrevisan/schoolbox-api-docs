@@ -232,8 +232,8 @@ class Mapper extends BaseMapper
             INNER JOIN submission_box sb ON sr.box_id = sb.id
             INNER JOIN (
                 -- find most recent feedback (including drafts)
-                SELECT 
-                    sr.owner, 
+                SELECT
+                    sr.owner,
                     MAX(sr.updated_at) AS max_updated_at
                 FROM submission_return sr
                 INNER JOIN submission_box sb on sr.box_id = sb.id
@@ -292,8 +292,8 @@ class Mapper extends BaseMapper
             INNER JOIN reporting r ON rf.reporting_id = r.id
             INNER JOIN (
                 -- find most recent feedback (including drafts)
-                SELECT 
-                    rf.learner_id, 
+                SELECT
+                    rf.learner_id,
                     MAX(rf.updated_at) AS max_updated_at
                 FROM reporting_feedback rf
                 INNER JOIN reporting r ON rf.reporting_id = r.id
