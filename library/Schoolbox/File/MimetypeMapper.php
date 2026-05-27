@@ -62,6 +62,10 @@ class MimetypeMapper extends Schoolbox\Mapper
      */
     public function getByFilename($filename)
     {
+        if (null === $filename) {
+            throw new Exception("No mime found for extension ''.", Exception::CODE_MIMETYPE_NOT_FOUND);
+        }
+
         // Copied from AllowedFile methods getExtension() and getMimetype()
         $extension = pathinfo($filename, PATHINFO_EXTENSION);
         $query = "
