@@ -70,6 +70,31 @@ class Config
     ];
 
     /**
+     * Recommended models for each feature, split by text and image generation.
+     */
+    public const array RECOMMENDED_MODELS = [
+        Helper::FEATURE_CHAT                            => [
+            'text' => ['gpt-5.4-nano'],
+        ],
+        Helper::FEATURE_LESSONPLAN                      => [
+            'text' => ['gpt-5.4-nano'],
+        ],
+        Helper::FEATURE_DIFFERENTIATION                 => [
+            'text' => ['gpt-5.4-nano'],
+        ],
+        Helper::FEATURE_DIALOGAGENT                     => [
+            'text' => ['gpt-5.3-chat-latest'],
+        ],
+        Helper::FEATURE_IMAGE                           => [
+            'text'  => ['gpt-5.4-nano'],
+            'image' => ['gpt-image-1.5'],
+        ],
+        Helper::FEATURE_LEARNING_ACTIVITY_CUSTOMISATION => [
+            'text' => ['gpt-5.4-nano'],
+        ],
+    ];
+
+    /**
      * The default image generation model.
      */
     public const string IMAGE_MODEL_DEFAULT = 'gpt-image-1';
