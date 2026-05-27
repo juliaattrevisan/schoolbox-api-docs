@@ -2068,34 +2068,35 @@ class DataSource
     }
 
     /**
-     * Deletes all traces of a rubric from the due work identified by `$assessmentId`.
+     * Deletes all traces of a rubric from $assessment.
      *
      * This includes:
      *     - capability and indicator usages
      *     - levels
      *     - descriptors on levels
      *
-     * @param int $assessmentId
+     * @param IAssessable $assessment
      * @return void
      * @throws Deleted
      * @throws MapperException
      */
-    public function deleteRubric(int $assessmentId): void
+    public function deleteRubric(IAssessable $assessment): void
     {
-        $boxMapper = SubmissionBoxMapper::getInstance();
-        $box = $boxMapper->findOneByColumn('assessment_id', $assessmentId);
-
-        /* TODO Replace with a grid identifier (rubric instance id).
+        /*  Replace with a grid identifier (rubric instance id).
          *  You can probably provide the instance identifier instead of $assessmentId, but it might be worthwhile to
          *  have both, so you can check that rubric_instance_id is indeed related to $assessmentId as a safety assertion
          */
-        $this->capabilityUsageMapper->deleteByColumn('submission_box_id', $box->getId());
-        $this->indicatorUsageMapper->deleteByColumn('submission_box_id', $box->getId());
+        foreach ($assessment->getRubricInstances() as $rubricInstance) {
+            $this->capabilityUsageMapper->deleteByColumn('rubric_instance_id', $rubricInstance->getId());
+            $this->indicatorUsageMapper->deleteByColumn('rubric_instance_id', $rubricInstance->getId());
 
-        $levels = $this->levelMapper->findByColumn('box_id', $box->getId());
-        $this->levelMapper->delete($levels);
+            /* We need this to delete the levels' descriptors.
+             */
+            $levels = $this->levelMapper->findByColumn('rubric_instance_id', $rubricInstance->getId());
 
-        $this->descriptorMapper->deleteByColumn('level_id', $levels->getPropertyValues('id'));
+            $this->levelMapper->delete($levels);
+            $this->descriptorMapper->deleteByColumn('level_id', $levels->getPropertyValues('id'));
+        }
     }
 
 

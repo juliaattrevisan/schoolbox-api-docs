@@ -19,6 +19,7 @@ use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
 use Schoolbox\User;
@@ -98,7 +99,7 @@ class Overwriter
         $this->preprocessQuiz($source, $destination);
 
         // Delete quiz constituents and rubric
-        $this->deleteDueWorkRubric($updatedDestination);
+        $this->deleteRubricGrids($updatedDestination);
 
         /* Remove this quiz from Learnosity entirely,
          * and orphan it intentionally into an archived state
@@ -109,7 +110,7 @@ class Overwriter
         $this->assessmentMapperProxy->save($updatedDestination, $newOwner);
 
         // Copy DueWork Rubrics
-        $this->replicateDueWorkRubric($source, $updatedDestination);
+        $this->replicateRubricGrids($source, $updatedDestination);
 
         // Copy Quiz Sections/Questions/Solutions
         $this->replicateQuizConstituents($source, $updatedDestination, $newOwner);
@@ -235,12 +236,9 @@ class Overwriter
      * @return void
      * @throws MapperException
      */
-    private function replicateDueWorkRubric(IAssessable $source, IAssessable $destination): void
+    private function replicateRubricGrids(IAssessable $source, IAssessable $destination): void
     {
-        if (!($source instanceof DueWork && $destination instanceof DueWork)) {
-            return;
-        }
-        $this->rubricMapper->copyRubric($source->getId(), $destination->getId(), $destination->getContext());
+        $this->rubricMapper->copyRubric($source, $destination, $destination->getContext());
     }
 
     /**
@@ -249,12 +247,11 @@ class Overwriter
      *
      * @param IAssessable $assessment
      * @return void
+     * @throws MapperException
+     * @throws Deleted
      */
-    private function deleteDueWorkRubric(IAssessable $assessment): void
+    private function deleteRubricGrids(IAssessable $assessment): void
     {
-        if (!$assessment instanceof DueWork) {
-            return;
-        }
-        $this->rubricMapper->deleteRubric($assessment->getId());
+        $this->rubricMapper->deleteRubric($assessment);
     }
 }
