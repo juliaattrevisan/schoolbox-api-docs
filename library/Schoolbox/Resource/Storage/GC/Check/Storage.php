@@ -52,6 +52,11 @@ class Storage implements Check
     private const array STORAGE_FILE_EXTENSIONS = ['htm', 'html'];
 
     /**
+     * A suggested namespace for `$this->hashCache`.
+     */
+    public const string CACHE_NAMESPACE = 'storageHashes';
+
+    /**
      * Constructor
      *
      * @param IConnector      $db         Database connection
@@ -59,6 +64,9 @@ class Storage implements Check
      * @param string          $table      The table which stores storage records.
      * @param FilesystemProxy $filesystem The filesystem from which the files within storage records are read.
      * @param CacheInterface  $hashCache  A cache for the hashes found within files.
+     *                                    The hashes within a file at a particular storage hash may be cached
+     *                                    indefinitely, because changing the file's content will create a new storage
+     *                                    hash.
      */
     public function __construct(
         private IConnector $db,
