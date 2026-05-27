@@ -641,8 +641,6 @@ class Controller extends Assessment\Controller
         ];
 
         if ($assessment->getUseRubric()) {
-            /* @phpstan-ignore-next-line */
-            /* TODO replace when retrieveGrid gets fully deprecated/phased out */
             $rubricGrid = $this->rubricMapper->retrieveGrid($assessment, false);
             $assessment = $this->participantMapper->loadParticipationIntoAssessment($assessment);
 
@@ -683,8 +681,6 @@ class Controller extends Assessment\Controller
             throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_PAGE_NOT_FOUND);
         }
 
-        /* @phpstan-ignore-next-line */
-        /* TODO replace when retrieveGrid gets fully deprecated/phased out */
         $rubricGrid = $this->rubricMapper->retrieveGrid($assessment, false);
         $assessment = $this->participantMapper->loadParticipationIntoAssessment($assessment);
 
