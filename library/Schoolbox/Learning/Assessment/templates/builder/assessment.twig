@@ -53,7 +53,13 @@ Usage:
                 returnUrl: RETURN_URL.current,
             } only %}
 
-            <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" data-action="delete-assessment" data-test="builder-delete-activity-{{ assessment.id }}" class="sbx-button--has-icon"><sbx-icon name="delete"></sbx-icon>Delete</a></li>
+            {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {
+                assessmentId: assessment.id,
+                assessment: assessment
+            }) %}
+            {% if deleteRoute %}
+                <li><a href="{{ deleteRoute }}?{{ returnUrlName }}={{ returnUrl }}" data-action="delete-assessment" data-test="builder-delete-activity-{{ assessment.id }}" class="sbx-button--has-icon"><sbx-icon name="delete"></sbx-icon>Delete</a></li>
+            {% endif %}
         </ul>
         <div data-reveal class="reveal-modal" id="export-modal-{{ assessment.id }}"></div>
     </div>
