@@ -283,6 +283,7 @@ HELP;
             ->addCheck(new Check\ForeignKeyRelation($db, $logger, SQL_db, $mapper->getTable()))
             ->addCheck(new Check\CharacterField($db, $logger, SQL_db))
             ->addCheck(new Check\HashIndexedTextField($db, $logger, SQL_db, $mapper->getTable()))
+            ->addCheck(new Check\Storage($db, $logger, $mapper->getTable(), $this->getDi()->get('filesystem.storageProxy')))
         ;
 
         // Purge, throwing a lock exception if not held

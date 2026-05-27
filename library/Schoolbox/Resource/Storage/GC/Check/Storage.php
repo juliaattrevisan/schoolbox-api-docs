@@ -111,7 +111,7 @@ class Storage implements Check
         foreach (self::STORAGE_FILE_COLUMNS as $table => $columns) {
             foreach ($columns as $column) {
                 $this->logger->debug(
-                    sprintf('Loading storage hashes for column %s.%s (HTML content only)...', $table, $column),
+                    sprintf('Loading storage files for column %s.%s (HTML content only)...', $table, $column),
                 );
                 $query = $this->db->prepareQuery("
                     SELECT DISTINCT s.hash
@@ -120,13 +120,13 @@ class Storage implements Check
                     WHERE s.ext IN ('htm', 'html')
                 ");
                 $query->execute();
-                $this->logger->debug(sprintf('. %d unique storage hashes found', $query->rowCount()));
-                foreach ($query->fetchColumn() as $hash) {
+                $this->logger->debug(sprintf('. %d unique storage files found', $query->rowCount()));
+                foreach ($query->fetchColumnArray('hash') as $hash) {
                     $storageFiles[$hash] = true;
                 }
             }
         }
-        $this->logger->notice(sprintf('Finding hashes within %d unique storage files...', count($storageFiles)));
+        $this->logger->info(sprintf('Finding hashes within content of %d unique storage files...', count($storageFiles)));
 
         // Load storage file content
         foreach ($storageFiles as $hash => $_) {
@@ -147,9 +147,10 @@ class Storage implements Check
                     $columnHashes[strtolower($match)] = true;
                 }
             }
-            $this->logger->debug(sprintf('.. %d hashes found', count($columnHashes)));
+            $this->logger->debug(sprintf('.. %d unique hashes found in storage file', count($columnHashes)));
             $hashIndex += $columnHashes;
         }
+        $this->logger->info(sprintf('. %d unique hashes found across all storage files', count($hashIndex)));
         return $hashIndex;
     }
 }
