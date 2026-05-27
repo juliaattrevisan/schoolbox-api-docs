@@ -191,6 +191,7 @@ class Factory
                     $this->eventMapper,
                     $this->classEntryMapper,
                     $this->classInvolvementMapper,
+                    $this->overridesMapper,
                     $from,
                     $to
                 ))

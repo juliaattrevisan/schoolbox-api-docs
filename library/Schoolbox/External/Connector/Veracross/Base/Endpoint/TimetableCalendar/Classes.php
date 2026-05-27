@@ -103,6 +103,7 @@ class Classes implements IStrategy
      * @param Mapper $eventMapper
      * @param ClassEntryMapper $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
+     * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      * @param \Alaress_Date_Format $fromDate
      * @param \Alaress_Date_Format $toDate
      */
@@ -115,6 +116,7 @@ class Classes implements IStrategy
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private ClassEntryMapper $classEntryMapper,
         private ClassInvolvementMapper $classInvolvementMapper,
+        private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
         private \Alaress_Date_Format $fromDate,
         private \Alaress_Date_Format $toDate
     ) {
@@ -537,7 +539,56 @@ class Classes implements IStrategy
             $event->getFinishAt()->getDatabase()
         ));
 
-        $this->saveEnrolment($event, $classEntry, $name, $teacherExternalId);
+        $this->saveInvolvement($event, $classEntry, $name, $teacherExternalId);
+    }
+
+    /**
+     * Save staff involvement as an override so the teacher is included in this event's staff payload.
+     *
+     * @param Model      $event
+     * @param ClassEntry $classEntry
+     * @param string     $name
+     * @param string     $externalId
+     *
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function saveInvolvement(
+        Model $event,
+        ClassEntry $classEntry,
+        string $name,
+        string $externalId
+    ): void {
+        $this->saveEnrolment($event, $classEntry, $name, $externalId);
+
+        $this->log->debug(sprintf(
+            'Creating new class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
+            $externalId,
+            $name,
+            $event->getTitle(),
+            $event->getDay(),
+            $event->getPeriod(),
+            $event->getStartAt()->getDatabase(),
+            $event->getFinishAt()->getDatabase()
+        ));
+
+        $clearOverride = $this->overridesMapper->createModel()
+            ->setEventId($event->getId())
+            ->setExternalId(null)
+            ->setAction(\Schoolbox\External\Event\Overrides\Model::CLEAR_STAFF)
+            ->setSequence(1);
+
+        $involvementOverride = $this->overridesMapper->createModel()
+            ->setEventId($event->getId())
+            ->setExternalId($externalId)
+            ->setAction(\Schoolbox\External\Event\Overrides\Model::ADD)
+            ->setSequence(2);
+
+        if ($this->perform) {
+            $this->overridesMapper->save($clearOverride);
+            $this->overridesMapper->save($involvementOverride);
+        }
     }
 
     /**
