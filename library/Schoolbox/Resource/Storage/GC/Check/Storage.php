@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Resource\Storage\GC\Check;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Predicate\Builder;
 use League\Flysystem\FilesystemException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Resource\Storage\FilesystemProxy;
@@ -42,6 +43,11 @@ class Storage implements Check
     private const array STORAGE_FILE_COLUMNS = [
         'student_submission_file' => ['hash'],
     ];
+
+    /**
+     * Only storage files with one of these extensions will be checked.
+     */
+    private const array STORAGE_FILE_EXTENSIONS = ['htm', 'html'];
 
     /**
      * Constructor
@@ -111,15 +117,23 @@ class Storage implements Check
         foreach (self::STORAGE_FILE_COLUMNS as $table => $columns) {
             foreach ($columns as $column) {
                 $this->logger->debug(
-                    sprintf('Loading storage files for column %s.%s (HTML content only)...', $table, $column),
+                    sprintf(
+                        'Loading storage files for column %s.%s, with extensions: %s...',
+                        $table,
+                        $column,
+                        implode(', ', self::STORAGE_FILE_EXTENSIONS),
+                    ),
                 );
-                $query = $this->db->prepareQuery("
-                    SELECT DISTINCT s.hash
-                    FROM {$quoter->quoteIdentifier($table)} t
-                    INNER JOIN {$quoter->quoteIdentifier($this->table)} s ON t.{$quoter->quoteIdentifier($column)} = s.hash
-                    WHERE s.ext IN ('htm', 'html')
-                ");
-                $query->execute();
+                $query = $this->db->prepareQuery(
+                    "
+                        SELECT DISTINCT s.hash
+                        FROM {$quoter->quoteIdentifier($table)} t
+                        INNER JOIN {$quoter->quoteIdentifier($this->table)} s ON t.{$quoter->quoteIdentifier($column)} = s.hash
+                        WHERE s.ext IN
+                    "
+                    . Builder::getArrayPlaceholders(self::STORAGE_FILE_EXTENSIONS, 'ext')
+                );
+                $query->execute(Builder::getArrayParameters(self::STORAGE_FILE_EXTENSIONS, 'ext'));
                 $this->logger->debug(sprintf('. %d unique storage files found', $query->rowCount()));
                 foreach ($query->fetchColumnArray('hash') as $hash) {
                     $storageFiles[$hash] = true;
