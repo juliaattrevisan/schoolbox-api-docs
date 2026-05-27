@@ -744,7 +744,7 @@ class Config
             // Set recommended vs. all options for image model too
             $splitOptions = $this->splitOptions(
                 self::AI_IMAGE_MODELS,
-                self::RECOMMENDED_MODELS[$feature]['image'] ?? [],
+                self::RECOMMENDED_MODELS[$feature]['image'],
             );
             $formInputs[self::FIELD_IMAGE_MODEL]    = [
                 'type'               => self::FIELD_TYPE_SELECT,
