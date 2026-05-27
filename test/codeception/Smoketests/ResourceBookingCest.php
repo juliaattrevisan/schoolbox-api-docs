@@ -185,7 +185,9 @@ class ResourceBookingCest
             false,
             ModerationType\Model::TYPE_MANAGED
         );
-        $pendingResource->addModerator(\Schoolbox\UserMapper::getInstance()->findById(2));
+        $reportUser = \Schoolbox\UserMapper::getInstance()->findByUsername('alaress');
+        $i->assertNotNull($reportUser, 'Report user exists in the test dataset');
+        $pendingResource->addModerator($reportUser);
         ResourceBooking\Item\Mapper::getInstance()->save($pendingResource);
 
         $approvedResource = $this->createCapacityTestResource(
@@ -208,10 +210,11 @@ class ResourceBookingCest
             $approvedResource,
             'Capacity report approved booking',
             date('d/m/Y g:ia', strtotime('2077-02-01 12:00:00')),
-            date('d/m/Y g:ia', strtotime('2077-02-01 13:00:00'))
+            date('d/m/Y g:ia', strtotime('2077-02-01 13:00:00')),
+            2
         );
 
-        $i->impersonateUser(2);
+        $i->impersonateUser($reportUser->getId());
         $i->sendGET('/resource-booking/report?start=01%2F02%2F2077&end=01%2F02%2F2077&category%5B%5D=3&clashesOnly=0&classes=0');
 
         $i->seeResponseCodeIs(200);
@@ -260,7 +263,7 @@ class ResourceBookingCest
             . preg_quote($approvedBooking->getName(), '~')
             . '.*?'
             . preg_quote($approvedResource->getName(), '~')
-            . '.*?<td>\s*1\s*</td>'
+            . '.*?<td>\s*2\s*</td>'
             . '.*?'
             . preg_quote('Approved', '~')
             . '.*?<td>\s*&nbsp;\s*</td>'
@@ -1301,13 +1304,15 @@ class ResourceBookingCest
         ResourceBooking\Item\Model $resource,
         string $titlePrefix,
         string $startDate,
-        string $endDate
+        string $endDate,
+        int $quantity = 1
     ): ResourceBooking\Booking\Model {
         $bookingMapper = ResourceBooking\Booking\Mapper::getInstance();
         $bookingName = $titlePrefix . ' ' . microtime(true);
         $payload = new Payload\ResourceBooking\Resource\BookItem($resource, $bookingName);
         $payload->setStartDate($startDate);
         $payload->setEndDate($endDate);
+        $payload->setFormParam('quantity', (string)$quantity);
 
         $i->sendRequest($payload);
         $i->seeResponseCodeIs(200);

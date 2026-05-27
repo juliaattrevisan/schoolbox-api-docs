@@ -1909,7 +1909,8 @@ class Controller extends Base
                 $booking->getResource(),
                 $newBookingStart->getDateTimeObject(), // We need a different kind of date object.
                 $newBookingEnd->getDateTimeObject(), // We need a different kind of date object.
-                $booking
+                $booking,
+                $booking->getQuantity()
             );
 
             // As noted above, the booking start/end datetimes only need to be updated if they are non-null.

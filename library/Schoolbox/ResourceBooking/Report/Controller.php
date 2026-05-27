@@ -214,7 +214,6 @@ class Controller extends Base
             [
                 'categoryList'     => $categoryList,
                 'eventList'        => $eventList,
-                'bookingQuantity'  => CapacityAllocation::BOOKING_QUANTITY,
                 'search'           => [
                     'start'        => $start,
                     'end'          => $end,

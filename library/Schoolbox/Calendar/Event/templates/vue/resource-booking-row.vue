@@ -69,6 +69,9 @@ const isQuantityValid = window.Vue.computed(() => {
 const isFormSubmittable = window.Vue.computed(() => {
     return !isProcessing.value && isQuantityValid.value && (!props.eventSeriesId || efficacy.value !== "");
 });
+const isFormDeletable = window.Vue.computed(() => {
+    return !isProcessing.value && (!props.eventSeriesId || efficacy.value !== "");
+});
 
 /**
  * Open or close the 'edit booking' drawer.
@@ -134,6 +137,10 @@ async function postEditBookingForm(): Promise<void> {
  * Post the 'Delete Booking' form.
  */
 async function postDeleteBookingForm(): Promise<void> {
+    if (!isFormDeletable.value) {
+        return;
+    }
+
     isProcessing.value = true;
 
     const toast = window.sbProps.toastActivate("Deleting...");

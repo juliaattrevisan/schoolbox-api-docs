@@ -566,13 +566,20 @@ class Validation
     }
 
     /**
-     * Validates whether a booking for this resource has booking conflicts or timetable room blockers.
+     * Validates whether a proposed booking period conflicts with resource or room availability.
      *
-     * @param Item\Model $resource
-     * @param DateTime   $startDate
-     * @param DateTime   $endDate
-     * @param Model|null $existingBooking
-     * @return array
+     * The booking being validated has not necessarily been saved yet. Existing approved
+     * bookings are loaded from the database and compared with the proposed period. When
+     * an existing booking is supplied during an update, it represents the stored version
+     * of the proposed booking and is excluded from the conflict set so the booking does
+     * not conflict with itself.
+     *
+     * @param Item\Model $resource Resource being booked.
+     * @param DateTime $startDate Proposed booking start.
+     * @param DateTime $endDate Proposed booking end.
+     * @param Model|null $existingBooking Stored version of the proposed booking when updating an existing booking.
+     * @param int $quantity Quantity requested by the proposed booking.
+     * @return array Validation errors keyed by period field and date.
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
      */
@@ -593,7 +600,21 @@ class Validation
     }
 
     /**
-     * @param array<int, array{startDatetime: Alaress_Date_Format, endDatetime: Alaress_Date_Format, quantity?: int}> $additionalApprovedPeriods
+     * Validates clashes while also considering approved periods that have not been persisted yet.
+     *
+     * Recurring booking validation checks a series one period at a time. A period that
+     * passed validation earlier in the loop is not yet in the database, so it will not
+     * be returned by the conflict query for later periods in the same series. The
+     * additional approved periods parameter carries those soft-approved allocations
+     * forward so later periods count them against capacity.
+     *
+     * @param Item\Model $resource Resource being booked.
+     * @param DateTime $startDate Proposed booking start.
+     * @param DateTime $endDate Proposed booking end.
+     * @param Model|null $existingBooking Stored version of the proposed booking when updating an existing booking.
+     * @param array<int, array{startDatetime: Alaress_Date_Format, endDatetime: Alaress_Date_Format, quantity?: int}> $additionalApprovedPeriods Soft-approved periods from the current validation loop.
+     * @param int $quantity Quantity requested by the proposed booking.
+     * @return array Validation errors keyed by period field and date.
      */
     private function validateForClashesWithAdditionalApprovedPeriods(
         Item\Model $resource,
@@ -644,8 +665,13 @@ class Validation
     }
 
     /**
-     * @param iterable<Model> $bookings
-     * @return array<int, array{startDatetime: Alaress_Date_Format, endDatetime: Alaress_Date_Format, quantity: int}>
+     * Converts booking models into capacity allocation periods.
+     *
+     * Booking-specific start and end times are used when present. Bookings that do not
+     * override their period use the event start and end times instead.
+     *
+     * @param iterable<Model> $bookings Bookings to convert into allocation periods.
+     * @return array<int, array{startDatetime: Alaress_Date_Format, endDatetime: Alaress_Date_Format, quantity: int}> Allocation periods for capacity checks.
      */
     private function getAllocationPeriodsForBookings(iterable $bookings): array
     {
@@ -668,6 +694,20 @@ class Validation
         return $periods;
     }
 
+    /**
+     * Returns the resource to use for capacity checks while editing an existing booking.
+     *
+     * If an administrator lowers a resource capacity after a booking was approved, a
+     * later edit that keeps or reduces the original quantity should not fail solely
+     * because the stored booking already exceeds the new capacity. In that case this
+     * method clones the resource and temporarily raises its effective capacity to the
+     * existing booking quantity for this validation only.
+     *
+     * @param Item\Model $resource Resource being booked.
+     * @param int $quantity Quantity requested by the proposed booking.
+     * @param Model|null $existingBooking Stored version of the proposed booking when updating an existing booking.
+     * @return Item\Model Original resource, or a clone with adjusted capacity for validation.
+     */
     private function getResourceWithEffectiveCapacity(
         Item\Model $resource,
         int $quantity,
@@ -1393,61 +1433,68 @@ class Validation
 
     /**
      * Return the status to be set for a new booking that does not clash with any existing booking.
-     * Note bookings that clash with existing bookings should be given status 'pending'.
+     * Note bookings that clash with existing bookings should be given status pending.
      *
-     * @param BookingModel $booking
-     * @param User $user
-     * @return int
+     * This must stay consistent with resourceEventBookingWouldConsumeCapacityWithoutClash()
+     * and newResourceBookingWouldConsumeCapacityWithoutClash(). A non-clashing booking consumes
+     * capacity when it would be approved immediately: open resources, or moderated resources
+     * where the current user moderates the resource and authored the booking.
+     *
+     * @param BookingModel $booking Booking being assigned a non-clashing status.
+     * @param User $user Current user creating or updating the booking.
+     * @return int Booking status ID for the non-clashing booking.
      */
     private function getStatusIdForNonClashBooking(
         BookingModel $booking,
         User $user,
     ): int {
-        $resource = $booking->getResource();
-        $event = $booking->getEvent();
-
-        // What about the resource? If it's an open resource, confirm the booking immediately.
-        if ($resource->getModerationType()->getId() === BookingModerationTypeModel::TYPE_OPEN) {
-            return BookingStatusModel::STATUS_APPROVED;
-        }
-
-        if (
-            $resource->isUserModerator($user)
-            && (int)$event->getAuthor()->getId() === (int)$user->getId()
-        ) {
-            /* If you're a Moderator and can moderate this request,
-             * and you created the booking in the first place,
-             * set it to Approved - otherwise you'll end up approving your own request anyway
-             */
-            return BookingStatusModel::STATUS_APPROVED;
-        }
-
-        return BookingStatusModel::STATUS_PENDING;
+        return (
+            $this->nonClashingBookingWouldBeApproved(
+                $booking->getResource(),
+                $booking->getEvent()->getAuthor(),
+                $user,
+            )
+            ? BookingStatusModel::STATUS_APPROVED
+            : BookingStatusModel::STATUS_PENDING
+        );
     }
 
+    /**
+     * Returns whether an existing event-backed booking would consume capacity when it does not clash.
+     *
+     * This mirrors getStatusIdForNonClashBooking(): only bookings that would be approved immediately
+     * should be counted as soft-approved capacity allocations during validation.
+     */
     private function resourceEventBookingWouldConsumeCapacityWithoutClash(
         BookingItemModel $resource,
         ?Event $event
     ): bool {
-        $moderationType = $resource->getModerationType();
-        if (
-            $moderationType === null
-            || $moderationType->getId() === BookingModerationTypeModel::TYPE_OPEN
-        ) {
-            return true;
-        }
-
-        $author = $event?->getAuthor();
-        return (
-            $author !== null
-            && $resource->isUserModerator($this->user)
-            && (int)$author->getId() === (int)$this->user->getId()
-        );
+        return $this->nonClashingBookingWouldBeApproved($resource, $event?->getAuthor(), $this->user);
     }
 
+    /**
+     * Returns whether a new resource booking would consume capacity when it does not clash.
+     *
+     * This path validates resource-booking form submissions before the event model exists, so the
+     * current user is the only possible author available here. Event-backed bookings must use
+     * resourceEventBookingWouldConsumeCapacityWithoutClash() so moderator bookings on behalf of
+     * another author are not counted as approved capacity.
+     */
     private function newResourceBookingWouldConsumeCapacityWithoutClash(
         BookingItemModel $resource,
         bool $overrideValidation
+    ): bool {
+        return $this->nonClashingBookingWouldBeApproved($resource, $this->user, $this->user, $overrideValidation);
+    }
+
+    /**
+     * Returns whether a non-clashing booking would be approved immediately for capacity purposes.
+     */
+    private function nonClashingBookingWouldBeApproved(
+        BookingItemModel $resource,
+        ?User $author,
+        User $user,
+        bool $overrideValidation = false,
     ): bool {
         if ($overrideValidation) {
             return true;
@@ -1461,7 +1508,11 @@ class Validation
             return true;
         }
 
-        return $resource->isUserModerator($this->user);
+        return (
+            $author !== null
+            && $resource->isUserModerator($user)
+            && (int)$author->getId() === (int)$user->getId()
+        );
     }
 
     /**
