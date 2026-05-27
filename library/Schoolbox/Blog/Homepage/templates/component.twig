@@ -7,8 +7,9 @@
         $('[data-interaction="deletecomment"]').on('click', function(event) {
 
             event.preventDefault();
-            var commentId = $(event.target).attr('data-comment-id');
-            var blogId = $(event.target).attr('data-blog-id');
+            var deleteButton = $(event.currentTarget);
+            var commentId = deleteButton.attr('data-comment-id');
+            var blogId = deleteButton.attr('data-blog-id');
             var commentCount = $('#component{{ componentInstanceId }}-commentCount-' + blogId).attr('data-numcomments');
 
             $(this).confirmDialog({
@@ -19,7 +20,7 @@
                     .done(function() {
                         // Remove from list after AJAX returns
 
-                        $(event.target).closest('li').remove();
+                        deleteButton.closest('li').remove();
 
                         // Update comment count
 

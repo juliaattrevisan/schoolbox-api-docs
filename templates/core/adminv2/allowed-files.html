@@ -102,11 +102,11 @@
         // row action buttons
         $(document).on('click', '[data-interaction-delete]', function (event) {
             event.preventDefault();
+            var deleteId = event.currentTarget.getAttribute('data-interaction-delete');
             $(this).confirmDialog({
                 text: "Are you sure you want to delete?",
                 confirmLabel: 'Delete',
-                confirmEvent: function(element) {
-                    var deleteId = event.target.getAttribute('data-interaction-delete');
+                confirmEvent: function() {
                     window.location.href = '/adminv2/allowed-fileForm.php?delete=' + deleteId
                 }
             });
