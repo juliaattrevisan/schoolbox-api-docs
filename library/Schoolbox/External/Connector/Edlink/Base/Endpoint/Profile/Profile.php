@@ -47,7 +47,6 @@ class Profile implements IStrategy
     private const ROLE_STUDENT = 'student';
     private const ROLE_TEACHER = 'teacher';
     private const ROLE_ADMINISTRATOR = 'administrator';
-    private const ROLE_OBSERVER = 'observer';
 
     /**
      * Staff category constants matching Schoolbox convention
@@ -115,7 +114,8 @@ class Profile implements IStrategy
     {
         /* Import people (students and staff)
          */
-        if ($this->validStrats->isStudentStratEnabled()
+        if (
+            $this->validStrats->isStudentStratEnabled()
             || $this->validStrats->isFamiliesStratEnabled()
             || $this->validStrats->isStaffStratEnabled()
         ) {
@@ -173,13 +173,15 @@ class Profile implements IStrategy
 
                 /* A person can have multiple roles; process each applicable one
                  */
-                if (\in_array(self::ROLE_STUDENT, $roles, true)
+                if (
+                    \in_array(self::ROLE_STUDENT, $roles, true)
                     && ($this->validStrats->isStudentStratEnabled() || $this->validStrats->isFamiliesStratEnabled())
                 ) {
                     $this->importStudent($person, $externalId);
                 }
 
-                if ((\in_array(self::ROLE_TEACHER, $roles, true) || \in_array(self::ROLE_ADMINISTRATOR, $roles, true))
+                if (
+                    (\in_array(self::ROLE_TEACHER, $roles, true) || \in_array(self::ROLE_ADMINISTRATOR, $roles, true))
                     && $this->validStrats->isStaffStratEnabled()
                 ) {
                     $this->importStaff($person, $externalId, $roles);
