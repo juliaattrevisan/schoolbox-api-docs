@@ -19,6 +19,7 @@ use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as DescriptorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model as DescriptorModel;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
 
@@ -198,18 +199,25 @@ class Mapper extends BaseMapper
      *
      * Includes draft feedback. This is to align with the feedback that is rendered on the QuickMark (aka DueWork Status) page.
      *
-     * @param int $assessmentId
+     * @param IAssessable $assessment
      * @return bool[]
      * @throws PDOException
      */
-    public function findMarkedByAssessment(int $assessmentId): array
+    public function findMarkedByAssessment(IAssessable $assessment): array
     {
         /* Sadly, append more learning activity's treatments to this stack
          */
-        $dueWorkRubrics = $this->findMarkedByAssessmentDueWork($assessmentId);
-        $reportingRubrics = $this->findMarkedByAssessmentReporting($assessmentId);
+        if ($assessment instanceof \Schoolbox\Learning\Assessment\DueWork\Model) {
+            return $this->findMarkedByAssessmentDueWork($assessment->getId());
+        }
 
-        return array_merge($dueWorkRubrics, $reportingRubrics);
+        if ($assessment instanceof \Schoolbox\Learning\Assessment\Reporting\Model) {
+            return $this->findMarkedByAssessmentReporting($assessment->getId());
+        }
+
+        /* Empty set by default: nobody's affected, I guess, for assessments that don't support rubrics.
+         */
+        return [];
     }
 
 

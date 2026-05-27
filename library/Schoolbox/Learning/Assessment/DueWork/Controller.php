@@ -356,7 +356,7 @@ class Controller extends Assessment\Controller
             'aImpls'           => $aImpls,
             // Only display download link if there are actually files to download
             'download'          => $this->hasDownloadableSubmissionFiles($assessment),
-            'rubricMarks'       => RubricIndicatorMarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
+            'rubricMarks'       => RubricIndicatorMarkMapper::getInstance()->findMarkedByAssessment($assessment),
             'allInteractionsLocked' => $interactionLockedCount === count($aImpls),
             'selfReflect'       => false,
             'selfAssess'        => false,
