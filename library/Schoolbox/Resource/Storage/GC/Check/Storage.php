@@ -166,7 +166,13 @@ class Storage implements Check
                 $cachedHashes = null;
             }
             if (is_array($cachedHashes)) {
-                $this->logger->debug(sprintf('. reusing cached hashes for storage file %s...', $hash));
+                $this->logger->debug(
+                    sprintf(
+                        '. reusing %d cached hashes for storage file %s...',
+                        count($cachedHashes),
+                        $hash,
+                    ),
+                );
                 $hashIndex += $cachedHashes;
                 continue;
             }
