@@ -111,32 +111,33 @@ class Storage implements Check
         foreach (self::STORAGE_FILE_COLUMNS as $table => $columns) {
             foreach ($columns as $column) {
                 $this->logger->debug(
-                    sprintf('Loading storage hashes for HTML files for column %s.%s...', $table, $column),
+                    sprintf('Loading storage hashes for column %s.%s (HTML content only)...', $table, $column),
                 );
                 $query = $this->db->prepareQuery("
-                    SELECT s.hash
+                    SELECT DISTINCT s.hash
                     FROM {$quoter->quoteIdentifier($table)} t
                     INNER JOIN {$quoter->quoteIdentifier($this->table)} s ON t.{$quoter->quoteIdentifier($column)} = s.hash
                     WHERE s.ext IN ('htm', 'html')
                 ");
                 $query->execute();
-                $this->logger->debug(sprintf('. %d hashes found', $query->rowCount()));
+                $this->logger->debug(sprintf('. %d unique storage hashes found', $query->rowCount()));
                 foreach ($query->fetchColumn() as $hash) {
                     $storageFiles[$hash] = true;
                 }
             }
         }
-        $this->logger->debug(sprintf('%d unique hashes found', count($storageFiles)));
+        $this->logger->notice(sprintf('Finding hashes within %d unique storage files...', count($storageFiles)));
 
         // Load storage file content
         foreach ($storageFiles as $hash => $_) {
             $columnHashes = [];
+            $this->logger->debug(sprintf('. finding hashes within content of storage file: %s...', $hash));
             try {
                 $fileContent = $this->filesystem->read(new Model()->setHash($hash));
             } catch (FilesystemException $e) {
                 // This file didn't exist after all: skip it
                 $this->logger->warning(
-                    sprintf('Storage file with hash "%s" could not be read: perhaps it does not exist', $hash),
+                    sprintf('. storage file "%s" could not be read: perhaps it does not exist', $hash),
                     ['exception' => $e],
                 );
                 continue;
@@ -146,81 +147,9 @@ class Storage implements Check
                     $columnHashes[strtolower($match)] = true;
                 }
             }
+            $this->logger->debug(sprintf('.. %d hashes found', count($columnHashes)));
             $hashIndex += $columnHashes;
         }
-        $this->logger->debug(sprintf('.. %d hashes found', count($hashIndex)));
         return $hashIndex;
-
-
-//        $tableColumnList = $this->buildTableColumnList();
-//        foreach ($tableColumnList as $table => $columnsData) {
-//            if (str_starts_with($table, '_')) {
-//                $this->logger->debug(sprintf('Skipping deprecated table: %s', $table));
-//                continue;
-//            }
-//
-//            $countQuery = $this->db->executeQuery(
-//                "SELECT COUNT(*) FROM {$this->db->getQuoter()->quoteIdentifier($table)}",
-//            );
-//            $count = (int)$countQuery->fetchColumn();
-//            if ($count <= 0) {
-//                $this->logger->debug(sprintf('Skipping empty table: %s...', $table));
-//                continue;
-//            }
-//
-//            // Extract data length from the first column:
-//            // it will be the same for all columns
-//            $dataLength = $columnsData[0]['extra']['search_data_length'] ?? null;
-//            $this->logger->debug(
-//                sprintf(
-//                    'Building hash index for %d rows in table: %s (size: %s)...',
-//                    $count,
-//                    $table,
-//                    isset($dataLength)
-//                        ? Alaress_Byte_Format::bytesToString($dataLength, renderIec: true)
-//                        : 'unknown',
-//                )
-//            );
-//            $columns = [];
-//            foreach ($columnsData as $columnData) {
-//                foreach ($columnData['columns'] as $column) {
-//                    if (str_starts_with($column, '_')) {
-//                        $this->logger->debug(sprintf('. skipping deprecated column: %s', $column));
-//                        continue;
-//                    }
-//                    $columns[] = $column;
-//                }
-//            }
-//
-//            if (empty($columns)) {
-//                $this->logger->debug(sprintf('. skipping table with no text columns: %s...', $table));
-//                continue;
-//            }
-//
-//            // Now, build the hash index for all columns
-//            foreach ($columns as $column) {
-//                $this->logger->debug(sprintf('. building hash index for column: %s...', $column));
-//                $query = $this->db->prepareQuery("
-//                    SET STATEMENT max_statement_time = 0 FOR
-//                    SELECT {$this->db->getQuoter()->quoteIdentifier($column)} c
-//                    FROM {$this->db->getQuoter()->quoteIdentifier($table)}
-//                    WHERE {$this->db->getQuoter()->quoteIdentifier($column)} IS NOT NULL
-//                ");
-//
-//                $query->execute();
-//                $columnHashes = [];
-//                foreach ($query as $row) {
-//                    $value = $row['c'];
-//                    if (preg_match_all(self::HASH_REGEXP, $value, $matches)) {
-//                        foreach ($matches[0] as $match) {
-//                            $columnHashes[strtolower($match)] = true;
-//                        }
-//                    }
-//                }
-//                $this->logger->debug(sprintf('.. %d hashes found', count($columnHashes)));
-//                $hashIndex += $columnHashes;
-//            }
-//        }
-//        return $hashIndex;
     }
 }
