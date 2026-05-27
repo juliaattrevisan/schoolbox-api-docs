@@ -57,6 +57,11 @@ class Storage implements Check
     public const string CACHE_NAMESPACE = 'storageHashes';
 
     /**
+     * Cache hashes for 30 days.
+     */
+    private const int CACHE_TTL = 30 * 24 * 60 * 60;
+
+    /**
      * Constructor
      *
      * @param IConnector      $db         Database connection
@@ -199,7 +204,7 @@ class Storage implements Check
 
             $this->logger->debug('.. caching hashes for storage file');
             try {
-                $this->hashCache->set($hash, $columnHashes);
+                $this->hashCache->set($hash, $columnHashes, self::CACHE_TTL);
             } catch (InvalidArgumentException $e) {
                 $this->logger->warning(
                     sprintf('. could not set cache for storage file "%s": ignoring', $hash),
