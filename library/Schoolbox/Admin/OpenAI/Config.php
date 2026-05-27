@@ -97,7 +97,7 @@ class Config
     /**
      * The default image generation model.
      */
-    public const string IMAGE_MODEL_DEFAULT = 'gpt-image-1';
+    public const string IMAGE_MODEL_DEFAULT = 'gpt-image-1.5';
 
     /**
      * The models which may be selected for image generation.
