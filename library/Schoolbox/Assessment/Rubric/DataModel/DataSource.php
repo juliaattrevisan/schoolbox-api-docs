@@ -695,6 +695,7 @@ class DataSource
          *
          * return $stack;
          */
+        /* @phpstan-ignore-next-line */
     }
 
 

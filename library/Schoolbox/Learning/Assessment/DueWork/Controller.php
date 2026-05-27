@@ -764,8 +764,10 @@ class Controller extends Assessment\Controller
             }
 
             try {
+                /* @phpstan-ignore-next-line */
                 $markedGridLatest = $latestFeedback ? $this->rubricMapper->retrieveMarkedGrid($latestFeedback) : null;
                 // if no published feedback default to empty
+                /* @phpstan-ignore-next-line */
                 $markedGridPublished = $publishedFeedback ? $this->rubricMapper->retrieveMarkedGrid($publishedFeedback) : null;
             } catch (MapperException) {
                 // can't really do anything
