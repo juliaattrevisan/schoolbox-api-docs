@@ -379,7 +379,7 @@ class Config
      * Also, add a title and description within `manifest` in
      * `templates/formInput.twig`.
      */
-    public const array DEFAULT_FORM_INPUTS = [
+    private const array DEFAULT_FORM_INPUTS = [
         self::FIELD_PROVIDER => [
             'type'            => self::FIELD_TYPE_SELECT,
             'options'         => self::PROVIDERS,
@@ -685,6 +685,13 @@ class Config
     private function buildFormInputs(string $feature): array
     {
         $formInputs = self::DEFAULT_FORM_INPUTS;
+
+        // Set recommended vs. all options
+        $modelOptions = $formInputs[self::FIELD_MODEL]['options'];
+        $recommendedModelOptions = self::RECOMMENDED_MODELS[$feature]['text'] ?? [];
+        $formInputs[self::FIELD_MODEL]['recommendedOptions'] = $recommendedModelOptions;
+        $formInputs[self::FIELD_MODEL]['options']            = array_diff($modelOptions, $recommendedModelOptions);
+
         if (\in_array($feature, Helper::FEATURES_WITH_AI_MODERATION, true)) {
             // Any feature with AI moderation support gets a config for it
             $formInputs[self::FIELD_AI_MODERATION] = [
