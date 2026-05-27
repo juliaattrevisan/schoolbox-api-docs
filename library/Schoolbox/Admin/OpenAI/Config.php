@@ -92,6 +92,9 @@ class Config
         Helper::FEATURE_LEARNING_ACTIVITY_CUSTOMISATION => [
             'text' => ['gpt-5.4-nano'],
         ],
+        Helper::FEATURE_AI_MODERATION_AGENT             => [
+            'text' => ['gpt-5.4-nano'],
+        ],
     ];
 
     /**
