@@ -677,6 +677,21 @@ class Config
     }
 
     /**
+     * Split options into recommended and other options
+     *
+     * @param array<string> $options         All available options
+     * @param array<string> $recommendations A subset of `$options` which is recommended for use
+     * @return array{recommended: array<string>, others: array<string>}
+     */
+    private function splitOptions(array $options, array $recommendations): array
+    {
+        return [
+            'recommended' => $recommendations,
+            'others'      => array_diff($options, $recommendations),
+        ];
+    }
+
+    /**
      * Build form inputs for this feature.
      *
      * @param string $feature
@@ -686,11 +701,23 @@ class Config
     {
         $formInputs = self::DEFAULT_FORM_INPUTS;
 
-        // Set recommended vs. all options
-        $modelOptions = $formInputs[self::FIELD_MODEL]['options'];
-        $recommendedModelOptions = self::RECOMMENDED_MODELS[$feature]['text'] ?? [];
-        $formInputs[self::FIELD_MODEL]['recommendedOptions'] = $recommendedModelOptions;
-        $formInputs[self::FIELD_MODEL]['options']            = array_diff($modelOptions, $recommendedModelOptions);
+        // Set recommended vs. all models
+        $splitOptions = $this->splitOptions(
+            $formInputs[self::FIELD_MODEL]['options'],
+            self::RECOMMENDED_MODELS[$feature]['text'] ?? [],
+        );
+        $formInputs[self::FIELD_MODEL]['recommendedOptions'] = $splitOptions['recommended'];
+        $formInputs[self::FIELD_MODEL]['options']            = $splitOptions['others'];
+
+        // Set recommended vs. all for Azure deployment models too:
+        // whilst this setting must follow their deployment, it might inform
+        // users that they should deploy a recommended model.
+        $splitOptions = $this->splitOptions(
+            $formInputs[self::FIELD_DEPLOYMENT_MODEL]['options'],
+            self::RECOMMENDED_MODELS[$feature]['text'] ?? [],
+        );
+        $formInputs[self::FIELD_DEPLOYMENT_MODEL]['recommendedOptions'] = $splitOptions['recommended'];
+        $formInputs[self::FIELD_DEPLOYMENT_MODEL]['options']            = $splitOptions['others'];
 
         if (\in_array($feature, Helper::FEATURES_WITH_AI_MODERATION, true)) {
             // Any feature with AI moderation support gets a config for it
@@ -710,11 +737,18 @@ class Config
                 'section'         => self::SECTION_OPENAI,
                 'allowUnselected' => false,
             ];
+
+            // Set recommended vs. all options for image model too
+            $splitOptions = $this->splitOptions(
+                self::AI_IMAGE_MODELS,
+                self::RECOMMENDED_MODELS[$feature]['image'] ?? [],
+            );
             $formInputs[self::FIELD_IMAGE_MODEL]    = [
-                'type'            => self::FIELD_TYPE_SELECT,
-                'options'         => self::AI_IMAGE_MODELS,
-                'section'         => self::SECTION_OPENAI,
-                'allowUnselected' => false,
+                'type'               => self::FIELD_TYPE_SELECT,
+                'recommendedOptions' => $splitOptions['recommended'],
+                'options'            => $splitOptions['others'],
+                'section'            => self::SECTION_OPENAI,
+                'allowUnselected'    => false,
             ];
             unset($formInputs[self::FIELD_PROVIDER]['options'][Helper::ENDPOINT_TYPE_AZURE]);
         }
