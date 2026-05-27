@@ -304,13 +304,6 @@ $app = new class extends CliTool\App {
             'curriculum_assessment_lti' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN lti_assessment la ON la.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL',
             'curriculum_assessment_lesson_plan' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN lesson_plan lp ON lp.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND lp.deleted_at IS NULL',
             'curriculum_assessment_dialog_agent' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN dialog_agent da ON da.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND da.deleted_at IS NULL',
-            /* This should be excluded until the v26.1 release.
-            'curriculum_assessment_reporting' => 'SELECT count(*) FROM curriculum_node
-                                                  JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id
-                                                  JOIN assessment a ON a.id = cnfa.assessment_id
-                                                  JOIN reporting r ON r.assessment_id = a.id
-                                                  WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND r.deleted_at IS NULL',
-            */
             'curriculum_rubric_indicator'   => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_rubric_indicator cnfri on curriculum_node.id = cnfri.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
             'curriculum_rubric_capability'  => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_rubric_capability cnfrc on curriculum_node.id = cnfrc.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
             'curriculum_folder'             => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_category cnfc on curriculum_node.id = cnfc.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
