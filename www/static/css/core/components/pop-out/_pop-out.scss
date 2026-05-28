@@ -1,11 +1,11 @@
 // To match the typical background colour of the dropdown content
 // and better visually connect the button to the content
 button.c-button[aria-expanded="true"] {
-    background-color: var(--content-ui-background);
+    background-color: var(--sbx-config-color-active, var(--content-ui-background));
     opacity: 1;
     &:hover,
     &:active {
-        background-color: var(--content-ui-background);
+        background-color: var(--sbx-config-color-active, var(--content-ui-background));
     }
     &:focus {
         &:not([disabled]) {
@@ -31,7 +31,7 @@ button.f-match-existing-icon-only-styles {
     }
     &:focus {
         &:not([disabled]) {
-            box-shadow: 0 0 0 2px currentColor;
+            box-shadow: 0 0 0 2px var(--sbx-config-color-active, var(--content-ui-background));
         }
     }
 }
