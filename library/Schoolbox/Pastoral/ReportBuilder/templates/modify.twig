@@ -215,7 +215,7 @@
                                                 {% if hasSubTypes %}
                                                     <label for="type-{{ type.id }}" title="Select to reveal sub-types">
                                                         {{ type.name }}
-                                                        <sbx-icon data-pastoral-type-icon name="down-arrow" size="m" color="var(--sbx-config-color-accent, var(--content-ui-foreground))"></sbx-icon>
+                                                        <sbx-icon data-pastoral-type-icon name="next" size="m" color="var(--sbx-config-color-accent, var(--content-ui-foreground))"></sbx-icon>
                                                     </label>
                                                 {% else %}
                                                     <label for="type-{{ type.id }}">
@@ -560,15 +560,21 @@
         var childCheckboxSelector = "input[data-check-subtype]";
         var childGroupSelector = "[data-pastoral-subtype]";
 
+        function updatePastoralTypeIcon(parentCheckbox, isExpanded) {
+            $(parentCheckbox).siblings("label").find('[data-pastoral-type-icon]').attr('name', isExpanded ? 'down-arrow' : 'next');
+        }
+
         // Initial setup: if any parent types are already checked (from saved data), show their subtypes
         // otherwise hide the subtypes to save space
         $(parentCheckboxSelector).each(function (index, parentCheckbox) {
             if ($(parentCheckbox).is(':checked')) {
                 // ...show the subtypes for this type
                 $(parentCheckbox).siblings(childGroupSelector).show();
+                updatePastoralTypeIcon(parentCheckbox, true);
             } else {
                 // Hide subtypes by default to reduce vertical scrolling
                 $(parentCheckbox).siblings(childGroupSelector).hide();
+                updatePastoralTypeIcon(parentCheckbox, false);
             }
         });
 
@@ -587,7 +593,7 @@
                     $(subCheckbox).prop('checked', true);
                 });
 
-                $(parentCheckbox).siblings("label").find('[data-pastoral-type-icon]').attr('name', 'down-arrow');
+                updatePastoralTypeIcon(parentCheckbox, true);
             } else {
                 // ...hide the subtypes for this type
                 $subCheckboxes.each(function (index, subCheckbox) {
@@ -600,7 +606,7 @@
                     $(subCheckbox).prop('checked', false);
                 });
 
-                $(parentCheckbox).siblings("label").find('[data-pastoral-type-icon]').attr('name', 'next');
+                updatePastoralTypeIcon(parentCheckbox, false);
             }
 
         });
@@ -613,12 +619,12 @@
             $subtypes.on('change', function () {
                 if ($subtypes.filter(":checked").length < 1) {
                     $(parentCheckbox).prop("checked", false);
-                    $subtypes.parent(childGroupSelector).hide();
-                    $(parentCheckbox).siblings("label").find('[data-pastoral-type-icon]').attr('name', 'next');
+                    $(parentCheckbox).siblings(childGroupSelector).hide();
+                    updatePastoralTypeIcon(parentCheckbox, false);
                 } else {
                     $(parentCheckbox).prop("checked", true);
-                    $subtypes.parent(childGroupSelector).show();
-                    $(parentCheckbox).siblings("label").find('[data-pastoral-type-icon]').attr('name', 'down-arrow');
+                    $(parentCheckbox).siblings(childGroupSelector).show();
+                    updatePastoralTypeIcon(parentCheckbox, true);
                 }
             });
         })
