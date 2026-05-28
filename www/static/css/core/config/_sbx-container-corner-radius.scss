@@ -43,12 +43,14 @@ body.sbx-body {
     .introjs-whatsnewmodal,
     .az-list li,
     .az-error-list li,
-    .audience-grid li {
+    .audience-grid li,
+    .attachment-browser-container {
         border-radius: var(--sbx-config-container-corner-radius);
     }
 
-    // so the image at the top of the what's new modal respects the rounded corners
-    .introjs-whatsnewmodal {
+    // when we need to ensure the border radius is applied correctly to the content,
+    .introjs-whatsnewmodal,
+    .attachment-browser-container {
         overflow: hidden;
     }
 
