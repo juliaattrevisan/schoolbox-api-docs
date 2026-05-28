@@ -29,6 +29,7 @@ use Schoolbox\Assessment\Rubric\Grid\Level;
 use Schoolbox\Assessment\Rubric\Grid\Translator\ModelToArray as RubricGridTranslator;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Storage\Model as File;
@@ -92,20 +93,38 @@ class Controller extends BaseController
 
         /* We need to specify a rubric instance now, to which we're adding.
          */
-        $rubricInstanceId = $post->get('rubricId');
+        $rubricInstanceId = $post->getInt('rubricId', 0);
 
-        if (!$rubricInstanceId) {
+        if ($rubricInstanceId === null || $rubricInstanceId === 0) {
             $this->sendJSONError('Must supply a rubric instance Id');
             return;
         }
 
-        /* If your rubric instance suddenly went away e.g. via some other user/tab
-         */
-        try {
-            $rubricInstance = $this->rubricInstanceMapper->findById($rubricInstanceId);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            $this->sendJSONError('Rubric instance not found');
-            return;
+        if ($rubricInstanceId < 0) {
+            $assessment = (new DueWork())->setId(0);
+            $rubricInstance = $this->rubricInstanceMapper->createModel()
+                ->setId($rubricInstanceId)
+                ->setAssessmentModel(
+                    (new AssessmentModel())->setId($assessment->getId())
+                );
+        } else {
+            /* If your rubric instance suddenly went away e.g. via some other user/tab
+             */
+            try {
+                $rubricInstance = $this->rubricInstanceMapper->findById($rubricInstanceId);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $this->sendJSONError('Rubric instance not found');
+                return;
+            }
+
+            $assessmentId = $rubricInstance->getAssessmentModel()->getId();
+
+            try {
+                $assessment = $this->assessmentDataSource->findById($assessmentId);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $this->sendJSONError('Learning activity not found (it might have been deleted)');
+                return;
+            }
         }
 
         // Build a rubric grid
@@ -127,15 +146,6 @@ class Controller extends BaseController
          * I guess we might as well take this opportunity to enforce the existence of $assessment since multiplayer
          * schoolbox might cause it to not be available anymore...and, thus obtain the $assessment we needed.
          */
-        $assessmentId = $rubricInstance->getAssessmentModel()->getId();
-
-        try {
-            $assessment = $this->assessmentDataSource->findById($assessmentId);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            $this->sendJSONError('Learning activity not found (it might have been deleted)');
-            return;
-        }
-
         $rubricGrid = new Grid(
             $assessment,
             $rubricInstance,

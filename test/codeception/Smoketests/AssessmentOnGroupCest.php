@@ -118,9 +118,6 @@ class AssessmentOnGroupCest
      */
     public function createAssessmentWithRubric(IntegrationTester $i): void
     {
-        // TODO: currently the assessment API is broken for duework (rubric restructure SA-21770)
-        $i->markTestSkipped("skipping, createAssessmentWithRubric (duework rubric restructure SA-21770)");
-
         #GIVEN
         $timestamp  = time();
         $groupPage = $this->createHomepage($i, 'Testing Create Assessments with rubric on Group Page at ' . $timestamp);
@@ -201,9 +198,6 @@ class AssessmentOnGroupCest
      */
     public function markAssessmentWithRubric(IntegrationTester $i): void
     {
-        // TODO: currently the assessment API is broken for duework (rubric restructure SA-21770)
-        $i->markTestSkipped("skipping, markAssessmentWithRubric (duework rubric restructure SA-21770)");
-
         #GIVEN
         $timestamp  = time();
         $groupPage = $this->createHomepage($i, 'Testing Mark Assessment with rubric on Group Page at ' . $timestamp);
