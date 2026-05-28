@@ -52,7 +52,7 @@ window.Vue.watch(bottom, (isAtBottom) => {
     if (isAtBottom && payload.value && payload.value.metadata && payload.value.metadata.cursor.next !== null) {
         const nextUrl = new URL(url.value, window.location.origin);
         nextUrl.searchParams.set(SearchParam.CURSOR as string, payload.value.metadata.cursor.next);
-        url.value = `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`;
+        url.value = nextUrl.toString();
     }
 });
 </script>
