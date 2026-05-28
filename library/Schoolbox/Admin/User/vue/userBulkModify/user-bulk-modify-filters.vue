@@ -83,7 +83,7 @@ export default {
     <div class="filters">
         <div class="filters__column">
             <label>Campuses</label>
-            <select @change="onCampusChange($event)">
+            <select @change="onCampusChange($event)" data-test="bulk-user-modify-campus-filter">
                 <option value="">Any</option>
                 <option v-for="campus in campuses" :value="campus.name" :key="campus.id">
                     {{ campus.name }}
@@ -92,7 +92,7 @@ export default {
         </div>
         <div class="filters__column">
             <label>Role</label>
-            <select @change="onRoleChange($event)">
+            <select @change="onRoleChange($event)" data-test="bulk-user-modify-role-filter">
                 <option value="">Any</option>
                 <option v-for="role in roles" :value="role.name" :key="role.id">
                     {{ role.name }}
@@ -101,7 +101,7 @@ export default {
         </div>
         <div class="filters__column">
             <label>Year Level</label>
-            <select @change="onYearChange($event)">
+            <select @change="onYearChange($event)" data-test="bulk-user-modify-year-filter">
                 <option value="">Any</option>
                 <option value="null">Not set</option>
                 <option v-for="yearLevel in yearLevels" :value="yearLevel.name" :key="yearLevel.id">
@@ -111,7 +111,7 @@ export default {
         </div>
         <div class="filters__column">
             <label>Token</label>
-            <select @change="onTokenChange($event)">
+            <select @change="onTokenChange($event)" data-test="bulk-user-modify-token-filter">
                 <option value="">Any</option>
                 <option value="1">Set</option>
                 <option value="0">Not set</option>
@@ -119,7 +119,7 @@ export default {
         </div>
         <div v-if="eportfolioEnabled" class="filters__column">
             <label>ePortfolio</label>
-            <select @change="onEportfolioChange($event)">
+            <select @change="onEportfolioChange($event)" data-test="bulk-user-modify-eportfolio-filter">
                 <option value="">Any</option>
                 <option value="1">Enabled</option>
                 <option value="0">Disabled</option>
