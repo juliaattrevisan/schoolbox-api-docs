@@ -42,6 +42,7 @@ class ApiAssessmentCest
     public function run(ApiTester $i): void
     {
 //      TODO: readd this, currently the assessment API is broken for duework (rubric restructure SA-21770)
+        $i->markTestSkipped("Assessment API is broken (duework rubric restructure SA-21770)");
 
 //        $users = $i->getUsers();
 //        foreach ($users as $user) {
