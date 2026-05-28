@@ -548,13 +548,13 @@ export default {
     }
     .VueTables__row td:not(.VueTables__select-row) {
         border-bottom: none;
-        border-top: 1px solid var(--body-background);
+        border-top: 1px solid var(--sbx-color-border, var(--body-background));
         display: inline-block;
         width: 50%;
     }
     .VueTables__row td.VueTables__select-row {
         border-bottom: none;
-        border-top: 2px solid var(--body-background);
+        border-top: 2px solid var(--sbx-color-border, var(--body-background));
         display: block;
         width: 100%;
     }

@@ -39,6 +39,6 @@ function getDate(): string {
 
 <style scoped>
 .item:not(:last-child) {
-    border-bottom: 1px solid var(--body-background);
+    border-bottom: 1px solid var(--sbx-color-border, var(--body-background));
 }
 </style>

@@ -168,7 +168,7 @@ window.Vue.onUnmounted(async () => {
 
 <style lang="scss" scoped>
 .comment-container {
-    border-top: 2px solid var(--body-background);
+    border-top: 2px solid var(--sbx-color-border, var(--body-background));
 }
 
 .save-container {

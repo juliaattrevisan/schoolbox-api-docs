@@ -637,7 +637,7 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
 
 /* Added border between each question in an item */
 .lrn-author-widget-wrapper.lrn-author-widget-loaded.lrn-author-widget-draggable {
-    border-bottom: 1px solid var(--body-background) !important;
+    border-bottom: 1px solid var(--sbx-color-border, var(--body-background)) !important;
 }
 
 /* Fixed checkbox icon and alignment */
