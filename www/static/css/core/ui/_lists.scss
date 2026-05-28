@@ -441,6 +441,7 @@ ul.meta {
         padding-left: $meta-indent;
 
         &:has(sbx-icon) {
+            align-items: start;
             display: flex;
             gap: var(--spacing-s);
             padding-left: 0;
