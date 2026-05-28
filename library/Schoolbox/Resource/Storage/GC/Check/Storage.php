@@ -57,9 +57,9 @@ class Storage implements Check
     public const string CACHE_NAMESPACE = 'storageHashes';
 
     /**
-     * Cache hashes for 30 days.
+     * A suggested amount of time to cache hashes found within storage files.
      */
-    private const int CACHE_TTL = 30 * 24 * 60 * 60;
+    public const int CACHE_TTL = 90 * 24 * 60 * 60;
 
     /**
      * Constructor
@@ -69,9 +69,10 @@ class Storage implements Check
      * @param string          $table      The table which stores storage records.
      * @param FilesystemProxy $filesystem The filesystem from which the files within storage records are read.
      * @param CacheInterface  $hashCache  A cache for the hashes found within files.
-     *                                    The hashes within a file at a particular storage hash may be cached
-     *                                    indefinitely, because changing the file's content will create a new storage
-     *                                    hash.
+     *                                    The hashes within a file at a particular storage hash may be cached, because
+     *                                    changing the file's content will create a new storage hash: thus the hashes
+     *                                    will never change.
+     * @param int|null        $cacheTtl   The amount of time to cache hashes for, or null to cache indefinitely.
      */
     public function __construct(
         private IConnector $db,
@@ -79,6 +80,7 @@ class Storage implements Check
         private string $table,
         private FilesystemProxy $filesystem,
         private CacheInterface $hashCache,
+        private ?int $cacheTtl,
     ) {
     }
 
@@ -204,7 +206,7 @@ class Storage implements Check
 
             $this->logger->debug('.. caching hashes for storage file');
             try {
-                $this->hashCache->set($hash, $columnHashes, self::CACHE_TTL);
+                $this->hashCache->set($hash, $columnHashes, $this->cacheTtl);
             } catch (InvalidArgumentException $e) {
                 $this->logger->warning(
                     sprintf('. could not set cache for storage file "%s": ignoring', $hash),

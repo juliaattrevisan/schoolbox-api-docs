@@ -296,6 +296,7 @@ HELP;
                     $mapper->getTable(),
                     $this->getDi()->get('filesystem.storageProxy'),
                     $cacheFactory->build(Check\Storage::CACHE_NAMESPACE),
+                    Check\Storage::CACHE_TTL,
                 ),
             )
         ;
