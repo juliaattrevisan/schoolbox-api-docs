@@ -1789,11 +1789,11 @@ class DataSource
 
 
     /**
-     * Copies a Rubric from source DueWork to destination DueWork.
+     * Copies a Rubric from source assessment to destination assessment.
      *
      * Overall logic is to build the source rubric object graph, then clone and clear all IDs.
      *
-     * If during traversal we detect that the destination folder already has a indicator with the same
+     * If during traversal we detect that the destination folder already has an indicator with the same
      * name, we use the destination indicator ID to avoid insertion of a duplicate.
      *
      * Logically:
@@ -1802,295 +1802,301 @@ class DataSource
      * * Indicator only copied from src folder to dst folder (if not already present on dst)
      * * Usages are copied from srcBox + srcIndicator to dstBox + dstIndicator
      *
-     * @param int $sourceAssessmentId
-     * @param int $destinationAssessmentId
+     * @param IAssessable $sourceAssessment
+     * @param IAssessable $destinationAssessment
      * @param AssessmentContext $destinationContext
      * @return bool Whether a new Rubric was created.
-     * @throws MapperException
      * @throws Deleted
+     * @throws MapperException
      */
-    public function copyRubric(int $sourceAssessmentId, int $destinationAssessmentId, AssessmentContext $destinationContext): bool
+    public function copyRubric(IAssessable $sourceAssessment, IAssessable $destinationAssessment, AssessmentContext $destinationContext): bool
     {
         // TODO extract this entire monstrosity elsewhere
 
-        // Get required mappers
-        $boxMapper = SubmissionBoxMapper::getInstance();
+        $assessmentDataModelMapper = \Schoolbox\Learning\Assessment\DataModel\Mapper::getInstance();
 
-        $sourceBox = $boxMapper->findOneByColumn('assessment_id', $sourceAssessmentId);
-
-        /** @var GenericCollection<LevelModel> $srcLevels */
-        $srcLevels = $this->levelMapper->findByColumn('box_id', $sourceBox->getId())->indexBy('id');
-
-        /* TODO Iterate through a set of assocaited grids
-         *  An assessment can have multiple grids associated with it; you'll have to clone each one-by-one, making
-         *  this into a gigantic loop
+        /* Clone out each grid one at a time by traversing $sourceAssessment's set of rubric instances
          */
-//        if (! $sourceBox->getUseRubric()) {
-//            // No rubric? Can't work with that - die.
-//            return false;
-//        }
+        foreach ($sourceAssessment->getRubricInstances() as $rubricInstance) {
+            $dstFolder = $destinationContext->getFolder();
 
-        $dstBox = $boxMapper->findOneByColumn('assessment_id', $destinationAssessmentId);
-        $dstBox->getAssessmentModel()->setContextFolder($destinationContext->getFolder());
+            /** @var GenericCollection<LevelModel> $srcLevels */
+            $srcLevels = $this->levelMapper->findByColumn('rubric_instance_id', $rubricInstance->getId())->indexBy('id');
 
-        $dstFolder = $dstBox->getAssessmentModel()->getContextFolder();
+            /* Set up a stub rubric instance for the destination submission box
+             *
+             * TODO Technical Uplift Candidate
+             *  This is such a strange in-situ hydration/construction idea, idk why I'm doing it. There must be a more
+             *  convenient way to set this up (@armatronic I'm probably braindead atm, there's probably an obvious answer)
+             */
+            $assessmentModel = $assessmentDataModelMapper->createModel()
+                ->setId($destinationAssessment->getId());
 
-        /* Set up a stub rubric instance for the destination submission box
-         */
-        $destinationRubricInstance = $this->rubricInstanceMapper->createModel()
-            ->setAssessmentModel($dstBox->getAssessmentModel());
+            /* Dupe out this whole thing - I don't want to itemise every cloned field
+             */
+            $destinationRubricInstance = (clone $rubricInstance);
 
-        $this->rubricInstanceMapper->save($destinationRubricInstance);
+            /* Then customise it for the destination
+             */
+            $destinationRubricInstance
+                ->setId(null)
+                ->setAssessmentModel($assessmentModel);
 
-        // Cannot mutate identity of objects returned from mappers.
-        // Index all these collections by source version ID, even though the object will be destination version.
-        /** @var GenericCollection<LevelModel> $dstLevels */
-        $dstLevels = $this->levelMapper->createCollection();
+            /* Persist it so it has an actual primary key identifier
+             */
+            $this->rubricInstanceMapper->save($destinationRubricInstance);
 
-        /** @var GenericCollection<DescriptorModel> $dstDescriptors */
-        $dstDescriptors = $this->descriptorMapper->createCollection();
+            // Cannot mutate identity of objects returned from mappers.
+            // Index all these collections by source version ID, even though the object will be destination version.
+            /** @var GenericCollection<LevelModel> $dstLevels */
+            $dstLevels = $this->levelMapper->createCollection();
 
-        /** @var GenericCollection<CapabilityModel> $dstCapabilities */
-        $dstCapabilities = $this->capabilityMapper->createCollection();
+            /** @var GenericCollection<DescriptorModel> $dstDescriptors */
+            $dstDescriptors = $this->descriptorMapper->createCollection();
 
-        /** @var GenericCollection<IndicatorModel> $dstIndicators */
-        $dstIndicators = $this->indicatorMapper->createCollection();
+            /** @var GenericCollection<CapabilityModel> $dstCapabilities */
+            $dstCapabilities = $this->capabilityMapper->createCollection();
 
-        /** @var GenericCollection<CapabilityUsageModel> $dstCapabilityUsages */
-        $dstCapabilityUsages = $this->capabilityUsageMapper->createCollection();
+            /** @var GenericCollection<IndicatorModel> $dstIndicators */
+            $dstIndicators = $this->indicatorMapper->createCollection();
 
-        /** @var GenericCollection<IndicatorUsageModel> $dstIndicatorUsages */
-        $dstIndicatorUsages = $this->indicatorUsageMapper->createCollection();
+            /** @var GenericCollection<CapabilityUsageModel> $dstCapabilityUsages */
+            $dstCapabilityUsages = $this->capabilityUsageMapper->createCollection();
 
-        // Copy Levels
-        foreach ($srcLevels as $srcLevel) {
-            $dstLevel = clone $srcLevel;
+            /** @var GenericCollection<IndicatorUsageModel> $dstIndicatorUsages */
+            $dstIndicatorUsages = $this->indicatorUsageMapper->createCollection();
 
-            $dstLevel->setId(null)
-                ->setRubricInstance($destinationRubricInstance)
-                ->setDescriptors($this->descriptorMapper->createCollection());
+            // Copy Levels
+            foreach ($srcLevels as $srcLevel) {
+                $dstLevel = clone $srcLevel;
 
-            $dstLevels->setOffset($srcLevel->getId(), $dstLevel);
-        }
+                $dstLevel->setId(null)
+                    ->setRubricInstance($destinationRubricInstance)
+                    ->setDescriptors($this->descriptorMapper->createCollection());
 
-        // Get Source Descriptors
-        /** @var GenericCollection<DescriptorModel> $srcDescriptors */
-        $srcDescriptors = $this->descriptorMapper->findByColumn('level_id', $srcLevels->getPropertyValues('id'))->indexBy('id');
+                $dstLevels->setOffset($srcLevel->getId(), $dstLevel);
+            }
 
-        if ($srcDescriptors->count() === 0) {
-            // no descriptors are set for source assessment
-            return false;
-        }
+            // Get Source Descriptors
+            /** @var GenericCollection<DescriptorModel> $srcDescriptors */
+            $srcDescriptors = $this->descriptorMapper->findByColumn('level_id', $srcLevels->getPropertyValues('id'))->indexBy('id');
 
-        $srcIndicators   = $this->indicatorMapper->createCollection();
-        $srcCapabilities = $this->capabilityMapper->createCollection();
+            if ($srcDescriptors->count() === 0) {
+                // no descriptors are set for source assessment
+                continue;
+            }
 
-        /* Get existing destination indicators.
-         *
-         * If during destination object graph build, we detect that a source descriptor
-         * already exists on destination, use the destination version instead of creating a new indicator
-         */
-        /** @var DescriptorModel $firstSrcDescriptor */
-        $firstSrcDescriptor = $srcDescriptors->first();
-        $parentType         = $firstSrcDescriptor->getIndicator()->getCapability()->getParentType();
+            $srcIndicators   = $this->indicatorMapper->createCollection();
+            $srcCapabilities = $this->capabilityMapper->createCollection();
 
-        $existingIndicators = $this->indicatorMapper->findForParent(
-            $dstFolder->getId(),
-            $parentType,
-        );
+            /* Get existing destination indicators.
+             *
+             * If during destination object graph build, we detect that a source descriptor
+             * already exists on destination, use the destination version instead of creating a new indicator
+             */
+            /** @var DescriptorModel $firstSrcDescriptor */
+            $firstSrcDescriptor = $srcDescriptors->first();
+            $parentType         = $firstSrcDescriptor->getIndicator()->getCapability()->getParentType();
 
-        // If the rubric is being duped into a unit spec:
-        // also fetch the list of course-level capabilities and indicators
-        $unitSpecs = $this->descriptorMapper->findByColumn('folder_id', $dstFolder->getId());
-
-        /** @var UnitSpecification|null $unitSpec */
-        $unitSpec = $unitSpecs->first();
-
-        if ($unitSpec) {
-            $existingIndicators = $existingIndicators->merge(
-                $this->indicatorMapper->findForParent(
-                    $unitSpec->getFolder()->getParent()->getId(),
-                    $parentType,
-                )
+            $existingIndicators = $this->indicatorMapper->findForParent(
+                $dstFolder->getId(),
+                $parentType,
             );
-        }
 
-        // Convert to 2-D arrays, indexed by 'capability' then 'name', so we can later find duplicates.
-        /** @var IndicatorModel[][] $existingIndicatorMap */
-        $existingIndicatorMap = [];
+            // If the rubric is being duped into a unit spec:
+            // also fetch the list of course-level capabilities and indicators
+            $unitSpecs = $this->unitSpecificationMapper->findByColumn('folder_id', $dstFolder->getId());
 
-        /** @var CapabilityModel[] $existingCapabilityMap */
-        $existingCapabilityMap = [];
+            /** @var UnitSpecification|null $unitSpec */
+            $unitSpec = $unitSpecs->first();
 
-        foreach ($existingIndicators as $existingIndicator) {
-            $capabilityName                                        = Util::normalizeName($existingIndicator->getCapability()->getName());
-            $indicatorName                                         = Util::normalizeName($existingIndicator->getName());
-            $existingIndicatorMap[$capabilityName][$indicatorName] = $existingIndicator;
-            $existingCapabilityMap[$capabilityName]                = $existingIndicator->getCapability();
-        }
-
-        // Build new Rubric for destination box
-        foreach ($srcDescriptors as $srcDescriptor) {
-            // Copy source capability, or reuse existing
-            $srcCapabilityId = $srcDescriptor->getIndicator()->getCapability()->getId();
-
-            if (!$srcCapabilities->getOffset($srcCapabilityId)) {
-                $srcCapability = $srcDescriptor->getIndicator()->getCapability();
-                $srcCapabilities->setOffset($srcCapabilityId, $srcCapability);
+            if ($unitSpec) {
+                $existingIndicators = $existingIndicators->merge(
+                    $this->indicatorMapper->findForParent(
+                        $unitSpec->getFolder()->getParent()->getId(),
+                        $parentType,
+                    )
+                );
             }
 
-            // Copy source indicator or re-use existing indicator
-            $srcIndicatorId = $srcDescriptor->getIndicator()->getId();
+            // Convert to 2-D arrays, indexed by 'capability' then 'name', so we can later find duplicates.
+            /** @var IndicatorModel[][] $existingIndicatorMap */
+            $existingIndicatorMap = [];
 
-            if (!$srcIndicators->getOffset($srcIndicatorId)) {
-                $srcIndicator = $srcDescriptor->getIndicator();
-                $srcIndicators->setOffset($srcIndicatorId, $srcIndicator);
+            /** @var CapabilityModel[] $existingCapabilityMap */
+            $existingCapabilityMap = [];
+
+            foreach ($existingIndicators as $existingIndicator) {
+                $capabilityName                                        = Util::normalizeName($existingIndicator->getCapability()->getName());
+                $indicatorName                                         = Util::normalizeName($existingIndicator->getName());
+                $existingIndicatorMap[$capabilityName][$indicatorName] = $existingIndicator;
+                $existingCapabilityMap[$capabilityName]                = $existingIndicator->getCapability();
             }
 
-            // Does this indicator already exist on destination folder ?
-            $duplicateCapability = false;
-            $duplicateIndicator  = false;
-            $capabilityName      = Util::normalizeName($srcCapabilities->getOffset($srcCapabilityId)->getName());
-            $indicatorName       = Util::normalizeName($srcIndicators->getOffset($srcIndicatorId)->getName());
+            // Build new Rubric for destination box
+            foreach ($srcDescriptors as $srcDescriptor) {
+                // Copy source capability, or reuse existing
+                $srcCapabilityId = $srcDescriptor->getIndicator()->getCapability()->getId();
 
-            if (array_key_exists($capabilityName, $existingCapabilityMap)) {
-                $duplicateCapability = true;
-
-                if (array_key_exists($indicatorName, $existingIndicatorMap[$capabilityName])) {
-                    $duplicateIndicator = true;
+                if (!$srcCapabilities->getOffset($srcCapabilityId)) {
+                    $srcCapability = $srcDescriptor->getIndicator()->getCapability();
+                    $srcCapabilities->setOffset($srcCapabilityId, $srcCapability);
                 }
+
+                // Copy source indicator or re-use existing indicator
+                $srcIndicatorId = $srcDescriptor->getIndicator()->getId();
+
+                if (!$srcIndicators->getOffset($srcIndicatorId)) {
+                    $srcIndicator = $srcDescriptor->getIndicator();
+                    $srcIndicators->setOffset($srcIndicatorId, $srcIndicator);
+                }
+
+                // Does this indicator already exist on destination folder ?
+                $duplicateCapability = false;
+                $duplicateIndicator  = false;
+                $capabilityName      = Util::normalizeName($srcCapabilities->getOffset($srcCapabilityId)->getName());
+                $indicatorName       = Util::normalizeName($srcIndicators->getOffset($srcIndicatorId)->getName());
+
+                if (array_key_exists($capabilityName, $existingCapabilityMap)) {
+                    $duplicateCapability = true;
+
+                    if (array_key_exists($indicatorName, $existingIndicatorMap[$capabilityName])) {
+                        $duplicateIndicator = true;
+                    }
+                }
+
+                // Did we find an existing capability with the same name?
+                if ($duplicateCapability) {
+                    $dstCapability = $existingCapabilityMap[$capabilityName];
+                } else {
+                    // hydrate to get curriculum nodes
+                    $srcCapability = $this->capabilityMapper->findById($srcDescriptor->getIndicator()->getCapability()->getId());
+
+                    $dstCapability = clone $srcCapability;
+
+                    $dstCapability->setId(null)
+                        ->setParentId($dstFolder->getId());
+
+                    $existingCapabilityMap[$capabilityName] = $dstCapability;
+                }
+
+                $dstCapabilities->setOffset($srcCapabilityId, $dstCapability);
+
+                // Did we find an existing indicator with the same name?
+                if ($duplicateIndicator) {
+                    $dstIndicator = $existingIndicatorMap[$capabilityName][$indicatorName];
+                } else {
+                    // hydrate to get curriculum nodes
+                    $srcIndicator = $this->indicatorMapper->findById($srcDescriptor->getIndicator()->getId());
+
+                    $dstIndicator = clone $srcIndicator;
+
+                    $dstIndicator->setId(null)
+                        ->setCapability($dstCapability);
+
+                    $existingIndicatorMap[$capabilityName][$indicatorName] = $dstIndicator;
+                }
+
+                $dstIndicators->setOffset($srcIndicatorId, $dstIndicator);
+
+                // Descriptor
+                $dstDescriptor = clone $srcDescriptor;
+
+                $dstDescriptor->setId(null);
+                $dstDescriptors->setOffset($srcDescriptor->getId(), $dstDescriptor);
+
+                // Link Descriptor + Level
+                /** @var LevelModel $dstLevel */
+                $dstLevel = $dstLevels->getOffset($srcDescriptor->getLevel()->getId());
+                $dstDescriptor->setLevel($dstLevel);
+
+                $dstLevel->getDescriptors()->setOffset($srcDescriptor->getId(), $dstDescriptor);
+
+                // Link Descriptor + indicator
+                $dstDescriptor->setIndicator($dstIndicators->getOffset($srcIndicatorId));
             }
 
-            // Did we find an existing capability with the same name?
-            if ($duplicateCapability) {
-                $dstCapability = $existingCapabilityMap[$capabilityName];
-            } else {
-                // hydrate to get curriculum nodes
-                $srcCapability = $this->capabilityMapper->findById($srcDescriptor->getIndicator()->getCapability()->getId());
+            // Get Source Usages
+            /** @var GenericCollection<CapabilityUsageModel> $srcCapabilityUsages */
+            $srcCapabilityUsages = $this->capabilityUsageMapper->findByColumnList([
+                'rubric_capability_id' => $srcCapabilities->getPropertyValues('id'),
+                'rubric_instance_id' => $rubricInstance->getId(),
+            ]);
 
-                $dstCapability = clone $srcCapability;
+            /** @var GenericCollection<IndicatorUsageModel> $srcIndicatorUsages */
+            $srcIndicatorUsages = $this->indicatorUsageMapper->findByColumnList([
+                'rubric_indicator_id' => $srcIndicators->getPropertyValues('id'),
+                'rubric_instance_id' => $rubricInstance->getId(),
+            ]);
 
-                $dstCapability->setId(null)
-                    ->setParentId($dstFolder->getId());
+            // Copy capability Usages
+            foreach ($srcCapabilityUsages as $srcCapabilityUsage) {
+                /** @var CapabilityModel $dstCapability */
+                $dstCapability = $dstCapabilities->getOffset($srcCapabilityUsage->getCapability()->getId());
 
-                $existingCapabilityMap[$capabilityName] = $dstCapability;
+                $dstCapabilityUsage = clone $srcCapabilityUsage;
+
+                $dstCapabilityUsage->setCapability($dstCapability)
+                    ->setRubricInstance($destinationRubricInstance);
+
+                $dstCapabilityUsages->add($dstCapabilityUsage);
             }
 
-            $dstCapabilities->setOffset($srcCapabilityId, $dstCapability);
+            // Copy indicator usages
+            foreach ($srcIndicatorUsages as $srcIndicatorUsage) {
+                /** @var IndicatorModel $dstIndicator */
+                $dstIndicator = $dstIndicators->getOffset($srcIndicatorUsage->getIndicator()->getId());
 
-            // Did we find an existing indicator with the same name?
-            if ($duplicateIndicator) {
-                $dstIndicator = $existingIndicatorMap[$capabilityName][$indicatorName];
-            } else {
-                // hydrate to get curriculum nodes
-                $srcIndicator = $this->indicatorMapper->findById($srcDescriptor->getIndicator()->getId());
+                $dstIndicatorUsage = clone $srcIndicatorUsage;
 
-                $dstIndicator = clone $srcIndicator;
+                $dstIndicatorUsage->setIndicator($dstIndicator)
+                    ->setRubricInstance($destinationRubricInstance);
 
-                $dstIndicator->setId(null)
-                    ->setCapability($dstCapability);
-
-                $existingIndicatorMap[$capabilityName][$indicatorName] = $dstIndicator;
+                $dstIndicatorUsages->add($dstIndicatorUsage);
             }
 
-            $dstIndicators->setOffset($srcIndicatorId, $dstIndicator);
-
-            // Descriptor
-            $dstDescriptor = clone $srcDescriptor;
-
-            $dstDescriptor->setId(null);
-            $dstDescriptors->setOffset($srcDescriptor->getId(), $dstDescriptor);
-
-            // Link Descriptor + Level
-            /** @var LevelModel $dstLevel */
-            $dstLevel = $dstLevels->getOffset($srcDescriptor->getLevel()->getId());
-            $dstDescriptor->setLevel($dstLevel);
-
-            $dstLevel->getDescriptors()->setOffset($srcDescriptor->getId(), $dstDescriptor);
-
-            // Link Descriptor + indicator
-            $dstDescriptor->setIndicator($dstIndicators->getOffset($srcIndicatorId));
+            // Save (order is important to ensure IDs are assigned to parents b4 saving children)
+            $this->levelMapper->save($dstLevels);
+            $this->capabilityMapper->save($dstCapabilities);
+            $this->indicatorMapper->save($dstIndicators);
+            $this->descriptorMapper->save($dstDescriptors);
+            $this->capabilityUsageMapper->save($dstCapabilityUsages);
+            $this->indicatorUsageMapper->save($dstIndicatorUsages);
         }
-
-        // Get Source Usages
-        /** @var GenericCollection<CapabilityUsageModel> $srcCapabilityUsages */
-        $srcCapabilityUsages = $this->capabilityUsageMapper->findByColumnList([
-            'rubric_capability_id' => $srcCapabilities->getPropertyValues('id'),
-            'submission_box_id'    => $sourceBox->getId(),
-        ]);
-
-        /** @var GenericCollection<IndicatorUsageModel> $srcIndicatorUsages */
-        $srcIndicatorUsages = $this->indicatorUsageMapper->findByColumnList([
-            'rubric_indicator_id' => $srcIndicators->getPropertyValues('id'),
-            'submission_box_id'   => $sourceBox->getId(),
-        ]);
-
-        // Copy capability Usages
-        foreach ($srcCapabilityUsages as $srcCapabilityUsage) {
-            /** @var CapabilityModel $dstCapability */
-            $dstCapability = $dstCapabilities->getOffset($srcCapabilityUsage->getCapability()->getId());
-
-            $dstCapabilityUsage = clone $srcCapabilityUsage;
-
-            $dstCapabilityUsage->setCapability($dstCapability)
-                ->setRubricInstance($destinationRubricInstance);
-
-            $dstCapabilityUsages->add($dstCapabilityUsage);
-        }
-
-        // Copy indicator usages
-        foreach ($srcIndicatorUsages as $srcIndicatorUsage) {
-            /** @var IndicatorModel $dstIndicator */
-            $dstIndicator = $dstIndicators->getOffset($srcIndicatorUsage->getIndicator()->getId());
-
-            $dstIndicatorUsage = clone $srcIndicatorUsage;
-
-            $dstIndicatorUsage->setIndicator($dstIndicator)
-                ->setRubricInstance($destinationRubricInstance);
-
-            $dstIndicatorUsages->add($dstIndicatorUsage);
-        }
-
-        // Save (order is important to ensure IDs are assigned to parents b4 saving children)
-        $this->levelMapper->save($dstLevels);
-        $this->capabilityMapper->save($dstCapabilities);
-        $this->indicatorMapper->save($dstIndicators);
-        $this->descriptorMapper->save($dstDescriptors);
-        $this->capabilityUsageMapper->save($dstCapabilityUsages);
-        $this->indicatorUsageMapper->save($dstIndicatorUsages);
 
         return true;
     }
 
     /**
-     * Deletes all traces of a rubric from the due work identified by `$assessmentId`.
+     * Deletes all traces of a rubric from $assessment.
      *
      * This includes:
      *     - capability and indicator usages
      *     - levels
      *     - descriptors on levels
      *
-     * @param int $assessmentId
+     * @param IAssessable $assessment
      * @return void
      * @throws Deleted
      * @throws MapperException
      */
-    public function deleteRubric(int $assessmentId): void
+    public function deleteRubric(IAssessable $assessment): void
     {
-        $boxMapper = SubmissionBoxMapper::getInstance();
-        $box = $boxMapper->findOneByColumn('assessment_id', $assessmentId);
-
-        /* TODO Replace with a grid identifier (rubric instance id).
+        /*  Replace with a grid identifier (rubric instance id).
          *  You can probably provide the instance identifier instead of $assessmentId, but it might be worthwhile to
          *  have both, so you can check that rubric_instance_id is indeed related to $assessmentId as a safety assertion
          */
-        $this->capabilityUsageMapper->deleteByColumn('submission_box_id', $box->getId());
-        $this->indicatorUsageMapper->deleteByColumn('submission_box_id', $box->getId());
+        foreach ($assessment->getRubricInstances() as $rubricInstance) {
+            $this->capabilityUsageMapper->deleteByColumn('rubric_instance_id', $rubricInstance->getId());
+            $this->indicatorUsageMapper->deleteByColumn('rubric_instance_id', $rubricInstance->getId());
 
-        $levels = $this->levelMapper->findByColumn('box_id', $box->getId());
-        $this->levelMapper->delete($levels);
+            /* We need this to delete the levels' descriptors.
+             */
+            $levels = $this->levelMapper->findByColumn('rubric_instance_id', $rubricInstance->getId());
 
-        $this->descriptorMapper->deleteByColumn('level_id', $levels->getPropertyValues('id'));
+            $this->levelMapper->delete($levels);
+            $this->descriptorMapper->deleteByColumn('level_id', $levels->getPropertyValues('id'));
+        }
     }
 
 
