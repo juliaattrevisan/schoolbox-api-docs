@@ -21,7 +21,7 @@ export default class Folders {
 
     static readonly DATA_TEST_LIMIT_SELECT = "component-config-size-select";
 
-    static readonly SELECTOR_CARD_IMAGE = `div[class="card-class-image"]`;
+    static readonly DATA_TEST_CARD_IMAGE = "folder-component-card-image";
 
     static readonly DATA_TEST_SORT_SELECT = "component-config-sort-select";
 
@@ -158,7 +158,7 @@ export default class Folders {
      * @returns The number of visible folder card images.
      */
     public static async getAllCardImages(component: Locator): Promise<number> {
-        return component.locator(Folders.SELECTOR_CARD_IMAGE).count();
+        return component.getByTestId(Folders.DATA_TEST_CARD_IMAGE).count();
     }
 
     /**
