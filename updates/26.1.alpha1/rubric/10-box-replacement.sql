@@ -13,8 +13,7 @@ UPDATE rubric_capability_usage rcu
 INNER JOIN submission_box sb ON rcu._submission_box_id = sb.id
 INNER JOIN rubric_instance ri ON sb.assessment_id = ri.assessment_id
 INNER JOIN assessment a ON sb.assessment_id = a.id
-SET rcu.rubric_instance_id = ri.id
-WHERE sb.use_rubric = 1;
+SET rcu.rubric_instance_id = ri.id;
 
 
 -- Rubric Indicator Usage
@@ -32,8 +31,7 @@ UPDATE rubric_indicator_usage riu
 INNER JOIN submission_box sb ON riu._submission_box_id = sb.id
 INNER JOIN rubric_instance ri ON sb.assessment_id = ri.assessment_id
 INNER JOIN assessment a ON sb.assessment_id = a.id
-SET riu.rubric_instance_id = ri.id
-WHERE sb.use_rubric = 1;
+SET riu.rubric_instance_id = ri.id;
 
 
 -- Rubric Level
@@ -50,8 +48,7 @@ UPDATE rubric_level rl
 INNER JOIN submission_box sb ON rl._box_id = sb.id
 INNER JOIN rubric_instance ri ON sb.assessment_id = ri.assessment_id
 INNER JOIN assessment a ON sb.assessment_id = a.id
-SET rl.rubric_instance_id = ri.id
-WHERE sb.use_rubric = 1;
+SET rl.rubric_instance_id = ri.id;
 
 
 -- Foreign Keys for everything

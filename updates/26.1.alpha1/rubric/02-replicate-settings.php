@@ -119,7 +119,6 @@ HELP;
                 sb.rubric_mark_range
             FROM submission_box sb
             INNER JOIN assessment a on sb.assessment_id = a.id
-            WHERE sb.use_rubric = 1
         ");
 
         $statement->execute();
@@ -256,7 +255,7 @@ HELP;
             FROM submission_box sb
             INNER JOIN assessment a ON sb.assessment_id = a.id
             LEFT JOIN rubric_instance ri ON sb.assessment_id = ri.assessment_id 
-            WHERE sb.use_rubric = 1 AND
+            WHERE
             (
                 ri.id IS NULL
                 OR NOT (sb.rubric_capability_mark_type_id <=> ri.rubric_capability_mark_type_id)
