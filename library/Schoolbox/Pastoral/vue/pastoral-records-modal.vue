@@ -49,12 +49,10 @@ const { arrivedState } = useScroll(modalResultsEl, {
 
 const { bottom } = toRefs(arrivedState);
 window.Vue.watch(bottom, (isAtBottom) => {
-    if (isAtBottom && payload.value && payload.value.metadata.cursor.next !== null) {
-        const newUrl = new URL(url.value, window.location.origin);
-        const searchParams = new URLSearchParams();
-        searchParams.set(SearchParam.CURSOR as string, payload.value.metadata.cursor.next);
-        newUrl.search = searchParams.toString();
-        url.value = newUrl.toString();
+    if (isAtBottom && payload.value && payload.value.metadata && payload.value.metadata.cursor.next !== null) {
+        const nextUrl = new URL(url.value, window.location.origin);
+        nextUrl.searchParams.set(SearchParam.CURSOR as string, payload.value.metadata.cursor.next);
+        url.value = `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`;
     }
 });
 </script>
