@@ -943,6 +943,10 @@ class Controller extends Base\Base
 
         // Delete de-selected Units and Assessments
 
+        // If unit deletion callbacks run, the loaded course graph can contain
+        // mutated/deleted assessables. Reload once after all deletions are done.
+        $courseImplWithDeletedUnits = null;
+
         // For each Class we are importing the Course to:
         foreach ($courseImpls as $classFolderId => $courseImpl) {
             // Traverse pre-existing course import, deleting any unitImpls not in POST
@@ -955,8 +959,16 @@ class Controller extends Base\Base
                 if (!array_key_exists($unitSpec->getId(), $unitImplData)) {
                     // Delete the unitImpl. Cascading the delete to subsidiary IAssessables
                     $this->unitImplementationMapper->delete($unitImpl);
+                    $courseImplWithDeletedUnits = $courseImpl;
                 }
             }
+        }
+
+        /* Reload units and their assessments after deletion callbacks have mutated
+         * the previously hydrated import graph.
+         */
+        if ($courseImplWithDeletedUnits) {
+            $this->importFactory->loadCourseImplementationUnits($courseImplWithDeletedUnits);
         }
 
         // Create any un-imported UnitImpls from corresponding UnitSpec
