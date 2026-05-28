@@ -1087,7 +1087,12 @@ class Helper
             from ((((`v_rubric` `vr`
                 join `submission_box` `sb`on (`vr`.`assessment_id` = `sb`.`assessment_id`))
                 join `submission_return` `sr` on (`sb`.`id` = `sr`.`box_id`))
-                join `rubric_capability_mark` `rcm` on (`rcm`.`return_id` = `sr`.`id` and `rcm`.`rubric_capability_id` =`vr`.`capability_id`))
+                join `rubric_capability_mark` `rcm` on (
+                    `rcm`.`feedback_table` = 'submission_return'
+                    and `rcm`.`feedback_id` = `sr`.`id`
+                    and `rcm`.`rubric_instance_id` = `vr`.`rubric_instance_id`
+                    and `rcm`.`rubric_capability_id` = `vr`.`capability_id`
+                ))
                 left join `v_rubric_indicator_mark_extend` `rim` on (`rim`.`rubric_indicator_id` = `vr`.`indicator_id` and `rcm`.`id` = `rim`.`rubric_capability_mark_id`))
                 LEFT JOIN `rubric_descriptor` `rd` on (`rim`.`descriptor_id` = `rd`.`id` and `rd`.`deleted_at` is null)
                 LEFT JOIN `rubric_level` `rl` on (
