@@ -198,11 +198,11 @@
                                         <li>
                                             <div class="pastoral-types">
                                                 <input id="type-{{ type.id }}"
-                                                       name="types[]"
-                                                       value="{{ type.id }}"
-                                                       type="checkbox"
-                                                       {% for typeSelected in (report.types ?? []) | filter(typeSelected => typeSelected.id == type.id ) %}checked{% endfor %}
-                                                       data-check-type
+                                                    name="types[]"
+                                                    value="{{ type.id }}"
+                                                    type="checkbox"
+                                                    {% for typeSelected in (report.types ?? []) | filter(typeSelected => typeSelected.id == type.id ) %}checked{% endfor %}
+                                                    data-check-type
                                                 >
 
                                                 {% set hasSubTypes = false %}
@@ -215,14 +215,13 @@
                                                 {% if hasSubTypes %}
                                                     <label for="type-{{ type.id }}" title="Select to reveal sub-types">
                                                         {{ type.name }}
-                                                        <sbx-icon data-pastoral-type-icon name="next" size="m" color="var(--sbx-config-color-accent, var(--content-ui-foreground))"></sbx-icon>
+                                                        <sbx-icon data-pastoral-type-icon name="down-arrow" size="m" color="var(--sbx-config-color-accent, var(--content-ui-foreground))"></sbx-icon>
                                                     </label>
                                                 {% else %}
                                                     <label for="type-{{ type.id }}">
                                                         {{ type.name }}
                                                     </label>
                                                 {% endif %}
-
                                                 <div class="checklist" data-pastoral-subtype>
                                                     <ul class="option-list">
                                                         {% for subtype in subTypes %}
@@ -561,7 +560,7 @@
         var childGroupSelector = "[data-pastoral-subtype]";
 
         function updatePastoralTypeIcon(parentCheckbox, isExpanded) {
-            $(parentCheckbox).siblings("label").find('[data-pastoral-type-icon]').attr('name', isExpanded ? 'down-arrow' : 'next');
+            $(parentCheckbox).siblings("label").find('[data-pastoral-type-icon]').attr('name', isExpanded ? 'up-arrow' : 'down-arrow');
         }
 
         // Initial setup: if any parent types are already checked (from saved data), show their subtypes
