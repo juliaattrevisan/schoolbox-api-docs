@@ -8,7 +8,7 @@
         margin-left: 0 !important;
     }
     .divider {
-        border-bottom: 2px solid #ededed;
+        border-bottom: 2px solid var(--sbx-color-border, #ededed);
 
         &:last-child {
             border: 0;
@@ -18,14 +18,14 @@
    * Also, the Goals feed via the Goals tab on student profile
    */
     .goals-achievements {
-        .awards > div {
-            border-bottom: 2px solid #ededed;
+        .awards > div:not(:last-child) {
+            border-bottom: 2px solid var(--sbx-color-border, #ededed);
         }
     }
     .classes-groups {
         .v-card {
             flex: 1 0 300px;
-            border: 1px solid #ededed;
+            border: 1px solid var(--sbx-color-border, #ededed);
             margin: 0 1rem 1rem 0;
             max-width: 300px;
             padding: 0;

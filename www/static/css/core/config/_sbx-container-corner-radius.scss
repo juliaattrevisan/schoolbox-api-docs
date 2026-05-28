@@ -50,7 +50,8 @@ body.sbx-body {
 
     // when we need to ensure the border radius is applied correctly to the content,
     .introjs-whatsnewmodal,
-    .attachment-browser-container {
+    .attachment-browser-container,
+    #activity-feed {
         overflow: hidden;
     }
 
@@ -109,13 +110,17 @@ body.sbx-body {
 
     // to only round the top
     .l-c-cr-top {
-        border-top-left-radius: var(--sbx-config-container-corner-radius);
-        border-top-right-radius: var(--sbx-config-container-corner-radius);
+        border-bottom-left-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        border-top-left-radius: var(--sbx-config-container-corner-radius) !important;
+        border-top-right-radius: var(--sbx-config-container-corner-radius) !important;
     }
 
     // to only round the bottom
     .l-c-cr-bottom {
-        border-bottom-left-radius: var(--sbx-config-container-corner-radius);
-        border-bottom-right-radius: var(--sbx-config-container-corner-radius);
+        border-bottom-left-radius: var(--sbx-config-container-corner-radius) !important;
+        border-bottom-right-radius: var(--sbx-config-container-corner-radius) !important;
+        border-top-left-radius: 0 !important;
+        border-top-right-radius: 0 !important;
     }
 }

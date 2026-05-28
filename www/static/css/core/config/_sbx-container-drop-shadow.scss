@@ -18,7 +18,8 @@ body.sbx-body {
     .side-nav,
     .scrollable,
     .cover-photo,
-    .cr-results-grid {
+    .cr-results-grid,
+    #activity-feed {
         box-shadow: var(--sbx-config-container-drop-shadow);
     }
 
@@ -30,7 +31,8 @@ body.sbx-body {
     #permissions .scrollable,
     .sortable .empty-state,
     .content-overlay .empty-state-flex-centered,
-    .off-canvas-list section {
+    .off-canvas-list section,
+    #activity-feed section {
         box-shadow: none;
     }
 
