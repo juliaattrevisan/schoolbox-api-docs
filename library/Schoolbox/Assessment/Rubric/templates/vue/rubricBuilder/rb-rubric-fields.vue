@@ -56,7 +56,13 @@ window.Vue.onMounted(() => {
                 >
                     ?
                 </span>
-                <input v-model.lazy="rubricTitle" type="text" :name="`rubric-${props.rubricId}-title`" maxlength="255" required />
+                <input
+                    v-model.lazy="rubricTitle"
+                    type="text"
+                    :name="`rubric-${props.rubricId}-title`"
+                    maxlength="255"
+                    required
+                />
             </label>
         </div>
     </div>
