@@ -260,7 +260,7 @@ async function postDeleteBookingForm(): Promise<void> {
                     >
                         Save
                     </button>
-                    <button :disabled="!isFormSubmittable" @click.prevent="postDeleteBookingForm">Delete</button>
+                    <button :disabled="!isFormDeletable" @click.prevent="postDeleteBookingForm">Delete</button>
                 </section>
             </div>
         </form>
