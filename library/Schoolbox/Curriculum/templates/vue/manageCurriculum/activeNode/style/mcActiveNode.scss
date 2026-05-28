@@ -1,6 +1,6 @@
 .node-container {
-    border-bottom: 1px solid var(--content-ui-background);
-    border-top: 1px solid var(--content-ui-background);
+    border-bottom: 1px solid var(--sbx-color-border, var(--content-ui-background));
+    border-top: 1px solid var(--sbx-color-border, var(--content-ui-background));
     margin: -1px 0 0 0; //-1px so it butts up against the node border above
     position: relative;
     z-index: var(--sbx-depth-default);

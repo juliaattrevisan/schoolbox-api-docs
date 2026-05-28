@@ -32,7 +32,8 @@ body.sbx-body {
     .sortable .empty-state,
     .content-overlay .empty-state-flex-centered,
     .off-canvas-list section,
-    #activity-feed section {
+    #activity-feed section,
+    .c-island .scrollable {
         box-shadow: none;
     }
 
