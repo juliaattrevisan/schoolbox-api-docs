@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\ToolsDaemon;
 
+use Psr\Http\Message\UriInterface;
+
 /**
  * A struct which encapsulates a request to run a job.
  */
@@ -27,12 +29,14 @@ readonly class JobRequest
      * @param array<string, string>|null $environment  Any environment variables to pass to the tool.
      *                                                 A tool's definition will define its required and allowed
      *                                                 environment variables.
+     * @param UriInterface|null          $webhook      If provided: a webhook URL to call once the tool has run.
      */
     public function __construct(
         public string $tool,
         public array $options,
         public ?string $instanceId = null,
         public ?array $environment = null,
+        public ?UriInterface $webhook = null,
     ) {
     }
 
@@ -44,7 +48,7 @@ readonly class JobRequest
      */
     public function withTool(string $tool): self
     {
-        return new self($tool, $this->options, $this->instanceId, $this->environment);
+        return new self($tool, $this->options, $this->instanceId, $this->environment, $this->webhook);
     }
 
     /**
@@ -55,7 +59,7 @@ readonly class JobRequest
      */
     public function withOptions(array $options): self
     {
-        return new self($this->tool, $options, $this->instanceId, $this->environment);
+        return new self($this->tool, $options, $this->instanceId, $this->environment, $this->webhook);
     }
 
     /**
@@ -66,7 +70,7 @@ readonly class JobRequest
      */
     public function withInstanceId(?string $instanceId): self
     {
-        return new self($this->tool, $this->options, $instanceId, $this->environment);
+        return new self($this->tool, $this->options, $instanceId, $this->environment, $this->webhook);
     }
 
     /**
@@ -77,9 +81,25 @@ readonly class JobRequest
      */
     public function withEnvironment(?array $environment): self
     {
-        return new self($this->tool, $this->options, $this->instanceId, $environment);
+        return new self($this->tool, $this->options, $this->instanceId, $environment, $this->webhook);
     }
 
+    /**
+     * Create a new job request with a different webhook.
+     *
+     * @param UriInterface|null $webhook
+     * @return self
+     */
+    public function withWebhook(?UriInterface $webhook): self
+    {
+        return new self($this->tool, $this->options, $this->instanceId, $this->environment, $webhook);
+    }
+
+    /**
+     * Convert this request to a tools daemon payload.
+     *
+     * @return array
+     */
     public function toPayload(): array
     {
         $payload = [
@@ -91,6 +111,9 @@ readonly class JobRequest
         }
         if (isset($this->environment)) {
             $payload['environment'] = $this->environment;
+        }
+        if (isset($this->webhook)) {
+            $payload['webhook'] = $this->webhook->__toString();
         }
         return $payload;
     }
