@@ -161,13 +161,13 @@ if (googleFiles !== null) {
 
     $(`#component${componentId} [data-action="delete"]`).on("click", function (event) {
         event.preventDefault();
-        const $trigger = $(event.currentTarget);
+        const $deleteButton = $(event.currentTarget);
         $(this).confirmDialog({
             text: "Are you sure you want to delete this google file?",
             confirmLabel: "Delete",
             confirmEvent: function () {
                 $.ajax({
-                    url: $trigger.attr("href"),
+                    url: $deleteButton.attr("href"),
                     type: "DELETE",
                     success: function (result) {
                         window.location.href = `/homepage/${folderId}`;
