@@ -71,9 +71,12 @@ $app = new class extends CliTool\App
 Replicate settings for rubric grids
 
 This clones out settings for each submission_box's rubric settings into rubric_instance, mapping submission_box.id to
-its corresponding assessment_id. Capability settings are simply copied into rubric_instance accordingly. use_rubric is
-used to decide which submission boxes get their settings cloned: anything with a falsey use_rubric value will be ignored
-under the premise that you didn't want rubrics there (even if it had rubric settings) because you turned it off
+its corresponding assessment_id. Capability settings are simply copied into rubric_instance accordingly. 
+
+The use_rubric column is ignored because in sales data set we found that rubric_capability_usage held usages for a
+submission box that presently doesn't use rubrics, but once upon a time DID use rubrics. These rows weren't given
+rubric_instance_ids and failed a primary key change. That means we seed everything even if users don't use it:
+the database schema cares a lot.
 
 This tool is intended to be a one-use-only as part of an upgrade path and always runs in perform mode.
 
@@ -98,7 +101,6 @@ HELP;
         $this->getLogger()->info('Cloning submission_box rubric settings into rubric_instance...');
 
         /* Find all the submission_boxes that:
-         *    - have a truthy use_rubric value
          *    - are connected to a still-alive assessment (in the odd circumstance that we had bad data)
          *
          * According to jeztek, the default weight should be 100.
