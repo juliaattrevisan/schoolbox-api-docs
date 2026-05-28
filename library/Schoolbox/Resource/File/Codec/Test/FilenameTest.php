@@ -20,7 +20,7 @@ use PHPUnit\Framework\TestCase;
 use Schoolbox\Resource\File\Codec\Filename;
 
 /**
- * Validation test
+ * Ensures filenames don't exceed $maxlength chars and asserts the removal of nonprintable chars.
  */
 class FilenameTest extends TestCase
 {
