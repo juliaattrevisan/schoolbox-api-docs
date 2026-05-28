@@ -185,7 +185,7 @@ acPromptEventBus.on(({ retryRequest }) => {
             @keydown.enter.exact.prevent="sendRequest"
         ></textarea>
     </label>
-    <div class="ac-prompt-actions actions-small-1 l-mar-s--bottom">
+    <div class="ac-prompt-actions actions-small-1 l-mar-s--bottom l-c-cr-bottom">
         <div class="list-item">
             <select
                 v-for="(attr, index) in props.promptAttributes"
