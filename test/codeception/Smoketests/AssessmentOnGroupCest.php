@@ -34,6 +34,7 @@ class AssessmentOnGroupCest
      *
      * @param IntegrationTester $i
      */
+    // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     public function _before(IntegrationTester $i): void
     {
         $i->loginAdmin();
