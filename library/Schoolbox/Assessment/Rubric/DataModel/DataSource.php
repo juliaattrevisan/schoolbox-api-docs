@@ -1687,15 +1687,16 @@ class DataSource
                 FROM rubric_capability_mark rcm
                 INNER JOIN rubric_capability      rc ON rcm.rubric_capability_id = rc.id
                 INNER JOIN rubric_indicator       ri ON ri.rubric_capability_id = rc.id
-                INNER JOIN submission_return      sr ON rcm.return_id = sr.id
+                INNER JOIN submission_return      sr ON rcm.feedback_table = 'submission_return' AND rcm.feedback_id = sr.id
                 INNER JOIN submission_box         sb ON sr.box_id = sb.id
+                INNER JOIN rubric_instance       rinst ON rcm.rubric_instance_id = rinst.id
                 -- Join rubric_indicator_usage to remove indicators indicators that aren't part of the submission
-                INNER JOIN rubric_indicator_usage riu ON riu.rubric_indicator_id = ri.id AND riu.submission_box_id = sb.id
-                INNER JOIN assessment             a ON sb.assessment_id = a.id
+                INNER JOIN rubric_indicator_usage riu ON riu.rubric_indicator_id = ri.id AND riu.rubric_instance_id = rcm.rubric_instance_id
+                INNER JOIN assessment             a ON sb.assessment_id = a.id AND rinst.assessment_id = a.id
                 -- Check for rubric_indicator_mark_id match to avoid duplicate results after the join
                 LEFT JOIN v_rubric_indicator_mark_extend  rim ON rcm.id = rim.rubric_capability_mark_id AND rim.rubric_indicator_id = ri.id
                 LEFT JOIN rubric_descriptor       rd ON rim.descriptor_id = rd.id
-                LEFT JOIN rubric_level            rl ON rd.level_id = rl.id
+                LEFT JOIN rubric_level            rl ON rd.level_id = rl.id AND rl.rubric_instance_id = rcm.rubric_instance_id
                 WHERE {$where}
                 AND rc.deleted_at IS NULL
                 AND ri.deleted_at IS NULL
@@ -1749,7 +1750,7 @@ class DataSource
                 INNER JOIN rubric_capability       rc ON rcm.rubric_capability_id = rc.id
                 INNER JOIN rubric_descriptor       rd ON rim.descriptor_id = rd.id
                 INNER JOIN rubric_indicator        ri ON rd.rubric_indicator_id = ri.id
-                INNER JOIN submission_return       sr ON rcm.return_id = sr.id
+                INNER JOIN submission_return       sr ON rcm.feedback_table = 'submission_return' AND rcm.feedback_id = sr.id
                 INNER JOIN submission_box          sb ON sr.box_id = sb.id
                 INNER JOIN assessment               a ON sb.assessment_id = a.id
                 WHERE {$where}
@@ -2158,9 +2159,10 @@ class DataSource
             FROM submission_return sr
             INNER JOIN user                      u ON sr.owner = u.id
             INNER JOIN submission_box           sb ON sr.box_id = sb.id
-            INNER JOIN rubric_capability_usage rcu ON sb.id = rcu.submission_box_id
-            INNER JOIN rubric_capability        rc ON rgu.rubric_capability_id = rc.id
             INNER JOIN assessment                a ON sb.assessment_id = a.id
+            INNER JOIN rubric_instance           rinst ON rinst.assessment_id = a.id
+            INNER JOIN rubric_capability_usage   rcu ON rinst.id = rcu.rubric_instance_id
+            INNER JOIN rubric_capability         rc ON rcu.rubric_capability_id = rc.id
             WHERE {$where}
             ORDER BY sr.published_at
         ");
@@ -2209,10 +2211,10 @@ class DataSource
             FROM rubric_indicator        ri
             JOIN rubric_capability       rc ON rc.id = ri.rubric_capability_id AND rc.deleted_at IS NULL
             JOIN rubric_indicator_usage riu ON ri.id = riu.rubric_indicator_id
-            JOIN submission_box          sb ON riu.submission_box_id = sb.id
-            JOIN assessment               a ON sb.assessment_id = a.id
+            JOIN rubric_instance        rinst ON riu.rubric_instance_id = rinst.id
+            JOIN assessment             a ON rinst.assessment_id = a.id
             WHERE {$where}
-            ORDER BY riu.submission_box_id, ri.id
+            ORDER BY a.id, ri.id
         ");
 
         $maxMarksStatement->execute($pb->getParams());
@@ -2253,9 +2255,10 @@ class DataSource
             INNER JOIN rubric_capability       rc ON rcm.rubric_capability_id = rc.id
             INNER JOIN rubric_descriptor       rd ON rim.descriptor_id = rd.id
             INNER JOIN rubric_indicator        ri ON rd.rubric_indicator_id = ri.id
-            INNER JOIN submission_return       sr ON rcm.return_id = sr.id
+            INNER JOIN submission_return       sr ON rcm.feedback_table = 'submission_return' AND rcm.feedback_id = sr.id
             INNER JOIN submission_box          sb ON sr.box_id = sb.id
-            INNER JOIN assessment               a ON sb.assessment_id = a.id
+            INNER JOIN rubric_instance         rinst ON rcm.rubric_instance_id = rinst.id
+            INNER JOIN assessment              a ON sb.assessment_id = a.id AND rinst.assessment_id = a.id
             WHERE {$where}
             ORDER BY rc.name, ri.name, a.due_date DESC;
         ");

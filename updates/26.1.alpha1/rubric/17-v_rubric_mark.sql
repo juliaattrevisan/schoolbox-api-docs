@@ -39,6 +39,9 @@ FROM
         INNER JOIN submission_return sr ON sb.id = sr.box_id
         INNER JOIN rubric_instance ON vr.rubric_instance_id = rubric_instance.id
         INNER JOIN rubric_capability_mark rcm ON vr.rubric_instance_id = rcm.rubric_instance_id
+            AND rcm.feedback_table = 'submission_return'
+            AND rcm.feedback_id = sr.id
+            AND rcm.rubric_capability_id = vr.capability_id
         LEFT JOIN v_rubric_indicator_mark_extend rim ON rim.rubric_capability_mark_id = rcm.id
         WHERE sr.deleted_at IS NULL
           AND sr.published_at IS NOT NULL
@@ -75,6 +78,9 @@ FROM
         INNER JOIN reporting_feedback rf ON r.id = rf.reporting_id
         INNER JOIN rubric_instance ON vr.rubric_instance_id = rubric_instance.id
         INNER JOIN rubric_capability_mark rcm ON vr.rubric_instance_id = rcm.rubric_instance_id
+            AND rcm.feedback_table = 'reporting_feedback'
+            AND rcm.feedback_id = rf.id
+            AND rcm.rubric_capability_id = vr.capability_id
         LEFT JOIN v_rubric_indicator_mark_extend rim ON rim.rubric_capability_mark_id = rcm.id
         WHERE rf.deleted_at IS NULL
           AND rf.published_at IS NOT NULL

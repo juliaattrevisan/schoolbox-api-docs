@@ -291,7 +291,7 @@ class Progression
                 ri.name AS indicator_name,
                 a.id AS assessment_id,
                 a.title AS assessment_title,
-                sb.rubric_capability_mark_type_id,
+                rinst.rubric_capability_mark_type_id,
                 sb.mark_type,
                 rl.name as level,
                 rd.description,
@@ -301,13 +301,14 @@ class Progression
             INNER JOIN rubric_capability_mark  rcm ON rim.rubric_capability_mark_id = rcm.id
             INNER JOIN rubric_capability       rc  ON rcm.rubric_capability_id = rc.id
             INNER JOIN rubric_descriptor       rd  ON rim.descriptor_id = rd.id
-            INNER JOIN rubric_level            rl  ON rd.level_id = rl.id
+            INNER JOIN rubric_level            rl  ON rd.level_id = rl.id AND rl.rubric_instance_id = rcm.rubric_instance_id
             INNER JOIN rubric_indicator        ri  ON rd.rubric_indicator_id = ri.id
-            INNER JOIN submission_return       sr  ON rcm.return_id = sr.id
+            INNER JOIN submission_return       sr  ON rcm.feedback_table = 'submission_return' AND rcm.feedback_id = sr.id
             INNER JOIN submission_box          sb  ON sr.box_id = sb.id
-            INNER JOIN rubric_capability_usage rcu ON rc.id = rcu.rubric_capability_id AND rcu.submission_box_id = sb.id
-            INNER JOIN rubric_indicator_usage  riu ON ri.id = riu.rubric_indicator_id AND riu.submission_box_id = sb.id
-            INNER JOIN assessment              a   ON sb.assessment_id = a.id
+            INNER JOIN rubric_instance         rinst ON rcm.rubric_instance_id = rinst.id
+            INNER JOIN rubric_capability_usage rcu ON rc.id = rcu.rubric_capability_id AND rcu.rubric_instance_id = rcm.rubric_instance_id
+            INNER JOIN rubric_indicator_usage  riu ON ri.id = riu.rubric_indicator_id AND riu.rubric_instance_id = rcm.rubric_instance_id
+            INNER JOIN assessment              a   ON sb.assessment_id = a.id AND rinst.assessment_id = a.id
             WHERE {$where}
             ORDER BY a.due_date ASC;
         ", $pb->getParams());
@@ -436,9 +437,10 @@ class Progression
             INNER JOIN rubric_capability       rc ON rcm.rubric_capability_id = rc.id
             INNER JOIN rubric_descriptor       rd ON rim.descriptor_id = rd.id
             INNER JOIN rubric_indicator        ri ON rd.rubric_indicator_id = ri.id
-            INNER JOIN submission_return       sr ON rcm.return_id = sr.id
+            INNER JOIN submission_return       sr ON rcm.feedback_table = 'submission_return' AND rcm.feedback_id = sr.id
             INNER JOIN submission_box          sb ON sr.box_id = sb.id
-            INNER JOIN assessment               a ON sb.assessment_id = a.id
+            INNER JOIN rubric_instance         rinst ON rcm.rubric_instance_id = rinst.id
+            INNER JOIN assessment              a ON sb.assessment_id = a.id AND rinst.assessment_id = a.id
             WHERE {$where}
             ORDER BY a.due_date ASC;
         ", $pb->getParams());
