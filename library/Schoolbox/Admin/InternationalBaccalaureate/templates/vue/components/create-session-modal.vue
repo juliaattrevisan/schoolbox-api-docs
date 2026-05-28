@@ -118,7 +118,7 @@ async function onSubmit(): Promise<void> {
 
             <fieldset class="radiolist clear-fieldset">
                 <legend class="required">Examination Session</legend>
-                <ul class="option-list l-flex-row l-gap-s f-no-margins">
+                <ul class="option-list l-flex-row l-gap-l f-no-margins">
                     <li>
                         <input
                             id="may"

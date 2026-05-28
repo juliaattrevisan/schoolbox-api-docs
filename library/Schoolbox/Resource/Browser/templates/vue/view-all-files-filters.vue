@@ -75,7 +75,7 @@ export default {
     <div class="filters">
         <div class="checklist">
             <label class="title">Filter to:</label>
-            <ul class="option-list l-flex-row l-gap-s">
+            <ul class="option-list l-flex-row l-gap-l">
                 <li>
                     <input
                         type="checkbox"

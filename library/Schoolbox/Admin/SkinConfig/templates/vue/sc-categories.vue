@@ -173,7 +173,7 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
                         <div class="small-12 medium-4 large-3">
                             <div class="checklist l-flex-col l-gap-s">
                                 <label class="title">Filter</label>
-                                <ul class="option-list l-flex-row l-gap-s">
+                                <ul class="option-list l-flex-row l-gap-l">
                                     <li data-v-40e5173a="">
                                         <input id="waiting-list" type="checkbox" checked />
                                         <label for="waiting-list">Waiting List</label>
