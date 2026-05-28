@@ -161,12 +161,13 @@ if (googleFiles !== null) {
 
     $(`#component${componentId} [data-action="delete"]`).on("click", function (event) {
         event.preventDefault();
+        const $trigger = $(event.currentTarget);
         $(this).confirmDialog({
             text: "Are you sure you want to delete this google file?",
             confirmLabel: "Delete",
             confirmEvent: function () {
                 $.ajax({
-                    url: $(event.target).attr("href"),
+                    url: $trigger.attr("href"),
                     type: "DELETE",
                     success: function (result) {
                         window.location.href = `/homepage/${folderId}`;
@@ -192,10 +193,11 @@ if (googleFiles !== null) {
     });
 
     $(`#component${componentId} [data-action="permission"]`).on("click", function (event) {
-        const editLevel = $(event.target).data("edit-level");
-        const commentLevel = $(event.target).data("comment-level");
+        const $trigger = $(event.currentTarget);
+        const editLevel = $trigger.data("edit-level");
+        const commentLevel = $trigger.data("comment-level");
         $("#gfile-edit-" + editLevel).prop("checked", true);
         $("#gfile-comment-" + commentLevel).prop("checked", true);
-        $("#gfile-google-ids").val(JSON.stringify([{ id: $(event.target).data("id") }]));
+        $("#gfile-google-ids").val(JSON.stringify([{ id: $trigger.data("id") }]));
     });
 }
