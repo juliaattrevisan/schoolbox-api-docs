@@ -71,9 +71,9 @@ $app = new class extends CliTool\App
 Replicate settings for rubric grids
 
 This clones out settings for each submission_box's rubric settings into rubric_instance, mapping submission_box.id to
-its corresponding assessment_id. Capability settings are simply copied into rubric_instance accordingly. use_rubric and existing rubric data are
-used to decide which submission boxes get their settings cloned: boxes with historical rubric rows are included
-even when use_rubric is false so those rows can be mapped to rubric_instance
+its corresponding assessment_id. Capability settings are simply copied into rubric_instance accordingly. use_rubric is
+used to decide which submission boxes get their settings cloned: anything with a falsey use_rubric value will be ignored
+under the premise that you didn't want rubrics there (even if it had rubric settings) because you turned it off
 
 This tool is intended to be a one-use-only as part of an upgrade path and always runs in perform mode.
 
@@ -98,7 +98,7 @@ HELP;
         $this->getLogger()->info('Cloning submission_box rubric settings into rubric_instance...');
 
         /* Find all the submission_boxes that:
-         *    - have a truthy use_rubric value or historical rubric data
+         *    - have a truthy use_rubric value
          *    - are connected to a still-alive assessment (in the odd circumstance that we had bad data)
          *
          * According to jeztek, the default weight should be 100.
@@ -120,27 +120,6 @@ HELP;
             FROM submission_box sb
             INNER JOIN assessment a on sb.assessment_id = a.id
             WHERE sb.use_rubric = 1
-                OR EXISTS (
-                    SELECT 1
-                    FROM rubric_capability_usage rcu
-                    WHERE rcu.submission_box_id = sb.id
-                )
-                OR EXISTS (
-                    SELECT 1
-                    FROM rubric_indicator_usage riu
-                    WHERE riu.submission_box_id = sb.id
-                )
-                OR EXISTS (
-                    SELECT 1
-                    FROM rubric_level rl
-                    WHERE rl.box_id = sb.id
-                )
-                OR EXISTS (
-                    SELECT 1
-                    FROM submission_return sr
-                    INNER JOIN rubric_capability_mark rcm ON rcm.return_id = sr.id
-                    WHERE sr.box_id = sb.id
-                )
         ");
 
         $statement->execute();

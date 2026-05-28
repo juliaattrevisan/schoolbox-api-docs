@@ -793,7 +793,7 @@ class ListController extends Web\Controller\Base
              */
             $db->rollback();
             // cast
-            throw new DomainException($e->getMessage(), (int)$e->getCode(), $e);
+            throw new DomainException($e->getMessage(), $e->getCode(), $e);
         }
 
         // If we're here the assessment must have saved properly.

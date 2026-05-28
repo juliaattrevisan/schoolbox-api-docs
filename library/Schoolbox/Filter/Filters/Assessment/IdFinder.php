@@ -681,10 +681,7 @@ class IdFinder extends Filter\AbstractIdFinder
             // We need to examine, usage, how should we join?
             $otherAssessmentTypes = $aTypes && ($aTypes->count() > 1 || !$aTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK));
             $joinType             = $otherAssessmentTypes ? 'LEFT' : 'INNER';
-            $join                 = "
-                $joinType JOIN rubric_instance ri_rubric_usage ON $dueWorkAlias.assessment_id = ri_rubric_usage.assessment_id
-                $joinType JOIN rubric_capability_usage rgu ON ri_rubric_usage.id = rgu.rubric_instance_id
-            ";
+            $join                 = "$joinType JOIN rubric_capability_usage rgu ON $dueWorkAlias.id = rgu.submission_box_id";
         }
 
         $pb    = $this->getMapper()->getPredicateBuilder();
