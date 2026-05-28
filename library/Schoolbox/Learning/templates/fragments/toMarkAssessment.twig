@@ -38,9 +38,11 @@
     <div class="content collapsible">
         <div class="card small-8 medium-6 no-pad">
             {#- Dessicator -#}
-            <span data-collapser="to-mark-{{ assessment.id }}" class="icon-down-arrow"></span>
+            <span data-collapser="to-mark-{{ assessment.id }}" class="assessment-card-collapser">
+                <sbx-icon name="down-arrow" size="m" color="var(--sbx-color-text-secondary, var(--body-foreground))"></sbx-icon>
+            </span>
             {% if assessmentIconName %}
-                <sbx-icon class="assessment-card-icon" name="{{ assessmentIconName }}" size="l"></sbx-icon>
+                <sbx-icon class="assessment-card-icon" name="{{ assessmentIconName }}" size="l" color="var(--sbx-color-text-secondary, var(--body-foreground))"></sbx-icon>
             {% endif %}
             <div class="card-content">
                 <h3>

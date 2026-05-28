@@ -68,8 +68,10 @@
     <div class="content collapsible">
         <div class="card small-8 medium-6 columns no-pad">
             {#- Dessicator -#}
-            <span data-collapser="to-chase-{{ assessment.id }}" class="icon-down-arrow"></span>
-            <sbx-icon class="assessment-card-icon" name="{{ icon.renderName(assessment)|trim }}" size="l"></sbx-icon>
+            <span data-collapser="to-chase-{{ assessment.id }}" class="assessment-card-collapser">
+                <sbx-icon name="down-arrow" size="m" color="var(--sbx-color-text-secondary, var(--body-foreground))"></sbx-icon>
+            </span>
+            <sbx-icon class="assessment-card-icon" name="{{ icon.renderName(assessment)|trim }}" size="l" color="var(--sbx-color-text-secondary, var(--body-foreground))"></sbx-icon>
             <div class="card-content">
                 <h3>
                     {#- Dessicator -#}
