@@ -215,13 +215,19 @@ class Mapper extends BaseMapper
                 return null;
             }
 
-            $student->setUser($user);
-            $student->setIbGroupSubjects(
-                $this->findIbGroupSubjectsForUsers(
+            $systemPurposeId = $student->getRegistrationSession()?->getSystemPurpose()?->getId();
+            $ibGroupSubjectsByUserId = $systemPurposeId
+                ? $this->findIbGroupSubjectsForUsers(
                     [
                         $user->getId() => $user,
-                    ]
-                )[$user->getId()] ?? new GenericCollection(GroupSubjectModel::class)
+                    ],
+                    $systemPurposeId
+                )
+                : [];
+
+            $student->setUser($user);
+            $student->setIbGroupSubjects(
+                $ibGroupSubjectsByUserId[$user->getId()] ?? new GenericCollection(GroupSubjectModel::class)
             );
 
             $this->applySubjectLanguageOverrides(new GenericCollection(Model::class, [$student]));
