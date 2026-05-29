@@ -6,10 +6,18 @@ import type { ApiRenotifyResponse, StudentRow } from "../../js/types/ibReportTyp
 
 interface Props {
     students: StudentRow[];
+    searchLanguagesEndpoint: string;
 }
 defineProps<Props>();
+
+const selectedList = defineModel<StudentRow[]>("selectedList", { default: () => [] });
+
 const updateLanguageStore = useIbReportUpdateLanguageStore();
 const renotifyingStudentIds = window.Vue.ref<Set<number>>(new Set());
+
+const emit = defineEmits<{
+    completePreparationSingle: [studentId: number];
+}>();
 
 /**
  * Opens the update language modal for the given student.
@@ -87,8 +95,10 @@ function isRenotifying(student: StudentRow): boolean {
                 <td class="checklist">
                     <input
                         :id="`select-${student.id}`"
+                        v-model="selectedList"
                         type="checkbox"
-                        disabled
+                        :value="student"
+                        :disabled="student.stage !== 'preparation'"
                         :aria-label="`Select ${student.name}`"
                     /><label class="checkbox-label" :for="`select-${student.id}`"></label>
                 </td>
@@ -135,6 +145,15 @@ function isRenotifying(student: StudentRow): boolean {
                             >
                                 <sbx-icon name="notifications-hollow"></sbx-icon>
                                 Renotify student
+                            </button>
+                        </li>
+                        <li v-if="student.stage === 'preparation'">
+                            <button
+                                class="sbx-button--has-icon"
+                                @click.prevent="emit('completePreparationSingle', student.id)"
+                            >
+                                <sbx-icon name="notifications-hollow"></sbx-icon>
+                                Complete Preparation
                             </button>
                         </li>
                     </ul>

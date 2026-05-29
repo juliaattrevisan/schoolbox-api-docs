@@ -1,9 +1,6 @@
 <script setup lang="ts">
-/**
- * Root page component for the Diploma Programme Year 2 registration report.
- * Loads candidate data from the API and renders each registration section.
- */
 import { apiRequest } from "@js/util/sbx/apiUtils";
+import { useSelectedList } from "@schoolboxVue/composables/form/useSelectedList";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import IbReportSection from "./components/ib-report-section.vue";
 import IbReportStandardTable from "./components/ib-report-standard-table.vue";
@@ -11,6 +8,7 @@ import IbReportFailedTable from "./components/ib-report-failed-table.vue";
 import IbReportInProgressTable from "./components/ib-report-in-progress-table.vue";
 import IbReportRegisteredTable from "./components/ib-report-registered-table.vue";
 import IbUpdateLanguageModal from "./components/ib-update-language-modal.vue";
+import IbReportActionDrawer from "./components/ib-report-action-drawer.vue";
 import { useIbReportUpdateLanguageStore } from "./store/ibReportUpdateLanguageStore";
 import type {
     StudentRow,
@@ -28,6 +26,7 @@ interface Props {
     candidateExportEndpoint: string;
     searchLanguagesEndpoint: string;
     renotifyEndpoint: string;
+    completePreparationEndpoint: string;
     sessionTitle: string;
 }
 const props = defineProps<Props>();
@@ -42,6 +41,9 @@ const confirmed = window.Vue.ref<StudentRow[]>([]);
 const inProgress = window.Vue.ref<InProgressRow[]>([]);
 const failed = window.Vue.ref<FailedRow[]>([]);
 const registered = window.Vue.ref<RegisteredRow[]>([]);
+
+const { selectedList } = useSelectedList(preparation);
+const isCompleting = window.Vue.ref<boolean>(false);
 
 /**
  * Maps a raw API subject entry to the frontend SubjectEntry shape.
@@ -62,10 +64,15 @@ function mapSubjectEntry(apiSubject: ApiSubject): SubjectEntry {
 /**
  * Maps a raw API student entry to the frontend StudentRow shape.
  * @param s The raw student from the API.
+ * @param stage The pipeline stage this student belongs to.
  * @param studentRenotifyEndpoint The endpoint to use for renotifying this student.
  * @returns A StudentRow for use in the frontend.
  */
-function mapStudentRow(s: ApiStudent, studentRenotifyEndpoint: string | null = null): StudentRow {
+function mapStudentRow(
+    s: ApiStudent,
+    stage: StudentRow["stage"],
+    studentRenotifyEndpoint: string | null = null,
+): StudentRow {
     return {
         id: s.registrationSessionStudentId ?? s.userId,
         name: s.userName,
@@ -78,6 +85,7 @@ function mapStudentRow(s: ApiStudent, studentRenotifyEndpoint: string | null = n
         },
         updateLanguageEndpoint: s._routes.updateLanguages,
         renotifyEndpoint: studentRenotifyEndpoint,
+        stage,
     };
 }
 
@@ -105,12 +113,12 @@ async function loadCandidates(): Promise<void> {
             byKey[status.key] = students[String(status.value)] ?? [];
         }
 
-        preparation.value = (byKey["preparation"] ?? []).map((student) => mapStudentRow(student));
-        unconfirmed.value = (byKey["unconfirmed"] ?? []).map((student) => mapStudentRow(student, renotifyEndpoint));
-        confirmed.value = (byKey["confirmed"] ?? []).map((student) => mapStudentRow(student));
-        inProgress.value = (byKey["inProgress"] ?? []).map((student) => mapStudentRow(student));
-        failed.value = (byKey["failed"] ?? []).map((student) => mapStudentRow(student));
-        registered.value = (byKey["registered"] ?? []).map((student) => mapStudentRow(student));
+        preparation.value = (byKey["preparation"] ?? []).map((s) => mapStudentRow(s, "preparation"));
+        unconfirmed.value = (byKey["unconfirmed"] ?? []).map((s) => mapStudentRow(s, "unconfirmed", renotifyEndpoint));
+        confirmed.value = (byKey["confirmed"] ?? []).map((s) => mapStudentRow(s, "confirmed"));
+        inProgress.value = (byKey["inProgress"] ?? []).map((s) => mapStudentRow(s, "inProgress"));
+        failed.value = (byKey["failed"] ?? []).map((s) => mapStudentRow(s, "failed") as FailedRow);
+        registered.value = (byKey["registered"] ?? []).map((s) => mapStudentRow(s, "registered") as RegisteredRow);
     } catch (e) {
         console.error("Failed to load candidates", e);
         loadError.value = "Failed to load registration report.";
@@ -120,6 +128,46 @@ async function loadCandidates(): Promise<void> {
 }
 
 updateLanguageStore.init(props.searchLanguagesEndpoint, preparation, unconfirmed, confirmed, failed);
+
+/**
+ * Submits the given student ids to the complete-preparation endpoint,
+ * moves them from Preparation to Unconfirmed on success, and shows a toast notification.
+ * @param studentIds The ids of the students to mark as preparation-complete.
+ */
+async function handleCompletePreparation(studentIds: number[]): Promise<void> {
+    if (isCompleting.value) return;
+    isCompleting.value = true;
+
+    const toast = window.sbProps.toastActivate("Completing preparation...");
+
+    try {
+        const response = await apiRequest<{ success: boolean; message?: string }, { studentIds: number[] }>({
+            url: props.completePreparationEndpoint,
+            method: "POST",
+            body: { studentIds },
+        });
+
+        if (!response.success) {
+            toast.timeout({ text: response.message ?? "Failed to complete preparation.", isSuccess: false });
+            return;
+        }
+
+        const removedIds = new Set(studentIds);
+        const completedStudents = preparation.value
+            .filter((s) => removedIds.has(s.id))
+            .map((s) => ({ ...s, stage: "unconfirmed" as const }));
+        preparation.value = preparation.value.filter((s) => !removedIds.has(s.id));
+        unconfirmed.value = [...completedStudents, ...unconfirmed.value];
+        toast.timeout({
+            text: `Preparation completed for ${studentIds.length} student${studentIds.length === 1 ? "" : "s"}.`,
+        });
+    } catch (e) {
+        console.error("Failed to complete preparation", e);
+        toast.timeout({ text: "Failed to complete preparation.", isSuccess: false });
+    } finally {
+        isCompleting.value = false;
+    }
+}
 
 window.Vue.onMounted((): void => {
     void loadCandidates();
@@ -146,15 +194,26 @@ window.Vue.onMounted((): void => {
 
         <div v-else class="l-flex-col l-gap-s">
             <ib-report-section title="Preparation" :count="preparation.length">
-                <ib-report-standard-table :students="preparation" />
+                <ib-report-standard-table
+                    v-model:selected-list="selectedList"
+                    :students="preparation"
+                    :search-languages-endpoint="props.searchLanguagesEndpoint"
+                    @complete-preparation-single="(id) => handleCompletePreparation([id])"
+                />
             </ib-report-section>
 
             <ib-report-section title="Students with unconfirmed details" :count="unconfirmed.length">
-                <ib-report-standard-table :students="unconfirmed" />
+                <ib-report-standard-table
+                    :students="unconfirmed"
+                    :search-languages-endpoint="props.searchLanguagesEndpoint"
+                />
             </ib-report-section>
 
             <ib-report-section title="Students with confirmed details ready for submission" :count="confirmed.length">
-                <ib-report-standard-table :students="confirmed" />
+                <ib-report-standard-table
+                    :students="confirmed"
+                    :search-languages-endpoint="props.searchLanguagesEndpoint"
+                />
             </ib-report-section>
 
             <ib-report-section title="In progress" :count="inProgress.length">
@@ -173,5 +232,11 @@ window.Vue.onMounted((): void => {
         <div id="ib-report-pop-out-container"></div>
 
         <ib-update-language-modal />
+
+        <ib-report-action-drawer
+            v-model:selected-list="selectedList"
+            :is-loading="isCompleting"
+            @complete-preparation="handleCompletePreparation(selectedList.map((s) => s.id))"
+        />
     </div>
 </template>
