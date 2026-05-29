@@ -65,26 +65,32 @@
 
         a {
             min-height: 6rem;
-            padding-right: 1rem;
-            display: block;
+            padding: 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
             color: inherit;
 
             p {
-                padding-bottom: 1rem;
+                padding-bottom: 0;
+                margin-bottom: 0;
             }
         }
 
         h3 {
-            padding-top: 0.75rem;
+            padding-top: 0;
+            margin-bottom: 0.25rem;
         }
 
+        sbx-icon,
         .size-64 {
-            margin: 1rem;
             padding: 0;
+            flex: 0 0 auto;
+        }
 
-            @media #{$small-up} {
-                margin-right: 2rem;
-            }
+        .card-copy {
+            flex: 1 1 auto;
+            min-width: 0;
         }
     }
 }
