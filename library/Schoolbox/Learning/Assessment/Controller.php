@@ -1754,10 +1754,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     private function populateLtiAssessmentGuid(Lti\Model $assessment): void
     {
-        // Use Learnosity's GUID generator for better or worse,
-        // because it's used as the GUID generator when setting the
-        // Learnosity reference where this is used.
-        // Consider replacing with Ramsey UUID?
-        $assessment->setGuid($assessment->getGuid() ?? Uuid::generate());
+        $assessment->setGuid($assessment->getGuid() ?? \Ramsey\Uuid\Uuid::uuid7()->toString());
     }
 }
