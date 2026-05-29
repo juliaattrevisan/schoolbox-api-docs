@@ -146,19 +146,29 @@ class NotifierTest extends TestCase implements TriggerBundleInterface
         );
 
         $message = reset($messages);
+        $payload = $message->jsonSerialize();
         self::assertSame(
             '/search/user/' . self::STUDENT_ID,
-            $message->jsonSerialize()['href']
+            $payload['href']
         );
         self::assertSame(
-            ':staff has requested you to confirm your IB Registration details.',
-            $message->jsonSerialize()['title']['text']
+            ':staff has requested you to confirm your :details.',
+            $payload['title']['text']
         );
         self::assertSame(
             'Test Staff',
-            $message->jsonSerialize()['title']['params']['staff']->jsonSerialize()['text']
+            $payload['title']['params']['staff']->jsonSerialize()['text']
         );
-        $metaTime = $message->jsonSerialize()['meta']['time'];
+        self::assertSame(
+            [
+                'text' => 'IB Registration details',
+                'href' => '/search/user/' . self::STUDENT_ID,
+                'mode' => 0,
+                'time' => 0,
+            ],
+            $payload['title']['params']['details']->jsonSerialize()
+        );
+        $metaTime = $payload['meta']['time'];
         self::assertIsInt($metaTime);
         self::assertGreaterThanOrEqual($before, $metaTime);
         self::assertLessThanOrEqual(Alaress_Date_Format::now()->getUnixTimeStamp(), $metaTime);
