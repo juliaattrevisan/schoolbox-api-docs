@@ -97,7 +97,7 @@ function retryResponse(): void {
             <div v-if="isResponseComplete" class="ac-feed-message-portrait">
                 <div class="c-img c-img--round c-img--xs">
                     <div class="c-img__wrapper">
-                        <div class="icon" :class="`icon-${props.agentIcon}`"></div>
+                        <sbx-icon :name="props.agentIcon" size="m"></sbx-icon>
                     </div>
                 </div>
             </div>
