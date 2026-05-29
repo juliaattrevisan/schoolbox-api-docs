@@ -43,6 +43,8 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
             "strikethrough",
             "removeFormat",
             "|",
+            "alignment",
+            "|",
             ...getToolbarAI(config),
             "|",
             "link",
@@ -60,6 +62,9 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
             "strikethrough",
             "blockQuote",
             "removeFormat",
+            "|",
+            "alignment",
+            "|",
             // If using the COMMENT_AI toolbar, add the AI commands and assistant in the right spot
             ...(config.toolbar === EditorToolbar.COMMENT_AI ? getToolbarAI(config) : []),
             "|",
