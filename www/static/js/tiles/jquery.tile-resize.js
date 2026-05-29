@@ -137,9 +137,34 @@
                 return;
             }
 
+            /** @type {(HTMLUListElement & { tileListRowGap?: { tileListWidth: number, columnGapPercentage: number, rowGap: string } }) | undefined} */
+            const tileList = $tileListUl.get(0);
+
+            if (tileList === undefined) {
+                return;
+            }
+
+            const rowGap = `${(tileListWidth * columnGapPercentage) / 100}px`;
+            const cachedRowGap = tileList.tileListRowGap;
+
+            if (
+                cachedRowGap !== undefined &&
+                cachedRowGap.tileListWidth === tileListWidth &&
+                cachedRowGap.columnGapPercentage === columnGapPercentage &&
+                cachedRowGap.rowGap === rowGap
+            ) {
+                return;
+            }
+
             $tileListUl.css({
-                rowGap: String((tileListWidth * columnGapPercentage) / 100) + "px",
+                rowGap,
             });
+
+            tileList.tileListRowGap = {
+                tileListWidth,
+                columnGapPercentage,
+                rowGap,
+            };
         }
     };
 })(jQuery);
