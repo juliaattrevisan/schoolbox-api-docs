@@ -272,6 +272,9 @@ $tiles-add-background-hover: #aeff83;
 ul.tileList {
     background: var(--sbx-config-color-body-background, var(--body-background));
 
+    display: flex;
+    flex-wrap: wrap;
+
     // Get rid of spacing between tiles
     word-spacing: 0;
     line-height: 0;
