@@ -66,7 +66,7 @@ class Notifier extends AbstractModuleNotifier
         $instance = (new Builder())
             ->setTitle(self::PATTERN_UNCONFIRMED_TITLE)
             ->setParam('staff', new Param($effector->getFullName()))
-            ->setParam('details', new Param('IB Registration details.'))
+            ->setParam('details', new Param('IB Registration details.', $href, Param::STACKING_REPLACE))
             ->setIcon($this->getUserIcon($effector))
             ->setHref($href)
             ->setNamespace($this->getSlug())
