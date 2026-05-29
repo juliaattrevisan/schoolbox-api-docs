@@ -825,6 +825,11 @@ input[type="radio"] {
             background-color: $hover-background-color;
         }
 
+        sbx-icon {
+            margin-right: 0;
+            vertical-align: middle;
+        }
+
         [class^="icon-"]:before {
             padding-right: 0;
         }
@@ -834,7 +839,8 @@ input[type="radio"] {
         + #{$label-selector} {
             background-color: $active-color;
             color: $active-text-color;
-            [class^="icon-"] {
+            [class^="icon-"],
+            sbx-icon {
                 color: $active-text-color;
             }
         }
