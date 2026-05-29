@@ -71,7 +71,7 @@ class ModelToArray
             'qualification' => $this->helper->normalise($student->getRegistrationSession()?->getSystemPurpose()?->getQualification()?->getName()),
             'candidateDetails' => $this->buildCandidateDetails(
                 [
-                    'firstName' => $firstName,
+                    'firstName' => $givenName,
                     'lastName' => $lastName,
                     'dateOfBirth' => $dateOfBirth,
                     'email' => $this->helper->normalise($user?->getEmail()),
