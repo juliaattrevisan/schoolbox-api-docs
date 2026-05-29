@@ -55,4 +55,14 @@ defineEmits<{
     padding: 0;
     vertical-align: baseline;
 }
+
+@media (max-width: 768px) {
+    .flex-container {
+        flex-direction: column;
+    }
+
+    .l-flex__item--1-auto {
+        flex: 1 1 100%;
+    }
+}
 </style>
