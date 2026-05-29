@@ -129,12 +129,12 @@ set labelDisplayNames = {
                                                {% if perm[1] | slice(0, 2) | upper in role.mask %}checked="checked"{% endif %}
                                         />
                                         <label for="opt-{{ source.id }}-{{ role.id }}-{{ level }}" title="{{ labelDisplayNames[perm[1]] }}" class="input-toggle">
-                                            <span class="icon-{{ iconClassnames[perm[1]] }}"></span>
+                                            <sbx-icon name="{{ iconClassnames[perm[1]] }}" size="l" color="currentColor"></sbx-icon>
                                         </label>
                                     </span>
                                     {% if level == 1 %}
                                         <span>
-                                            <span class="icon-add size-8"></span>
+                                            <sbx-icon name="add" size="s" color="currentColor"></sbx-icon>
                                         </span>
                                     {% endif %}
                                 {% endfor %}

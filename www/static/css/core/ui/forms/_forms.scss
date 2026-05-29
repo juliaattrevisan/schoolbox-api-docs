@@ -775,6 +775,10 @@ td {
 input[type="radio"] {
     + .block {
         @extend .button-block;
+
+        :is(i, sbx-icon) {
+            padding-right: 1rem;
+        }
     }
     &:checked + .block {
         background-color: var(--sbx-config-color-accent, $content-ui-foreground);
