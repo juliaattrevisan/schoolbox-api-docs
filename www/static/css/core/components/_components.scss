@@ -398,7 +398,7 @@ ul.tileList {
 }
 
 /* As we've blended in the background of the tiles with the background colour,
- * we don't want the bottom padding on the last fieldset in the layout form,
+ * we don't want the bottom padding on the last fieldset in the layout form.
  */
 form[data-role="layoutForm"] section fieldset:last-of-type {
     padding-bottom: 0;
