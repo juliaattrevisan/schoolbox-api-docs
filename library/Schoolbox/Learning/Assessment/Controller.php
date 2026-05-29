@@ -294,7 +294,14 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $assessment->setLearnosityReference(Uuid::generate());
         }
 
-        $this->populateLtiAssessmentGuid($type, $assessment);
+        // Unfortunately each different type of assessment needs to be handled
+        // uniquely in this method, because type is passed in the query string.
+        if (
+            AssessmentType::TYPE_LTI_ASSESSMENT === $type
+            && $assessment instanceof \Schoolbox\Learning\Assessment\Lti\Model
+        ) {
+            $this->populateLtiAssessmentGuid($assessment);
+        }
 
         // create a dynamic plan on the assessment to get started
         $assessment->getPlans()->add((new Plan($assessment))->setIsDynamic(\Schoolbox\Assessment\Participant\Plan\Mapper::PLAN_TYPE_DYNAMIC));
@@ -668,6 +675,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $data['editorTemplates'] = $this->editorTemplateHelper !== null
             ? $this->editorTemplateHelper->getTemplatesForCategory()
             : [];
+
+        // LTI assessments need a GUID backfilled
+        if ($assessment instanceof \Schoolbox\Learning\Assessment\Lti\Model) {
+            $this->populateLtiAssessmentGuid($assessment);
+        }
 
         /* Redirection urls
          */
@@ -1739,25 +1751,16 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * If the assessment is an LTI assessment, and it doesn't have a GUID
      * already: populate it.
      *
-     * (Unfortunately each different type of assessment needs to be handled
-     * uniquely in this controller, because type is passed in the query string.)
-     *
-     * @param mixed       $type
-     * @param IAssessable $assessment
+     * @param \Schoolbox\Learning\Assessment\Lti\Model $assessment
      * @return void
      * @throws \Exception
      */
-    private function populateLtiAssessmentGuid(mixed $type, IAssessable $assessment): void
+    private function populateLtiAssessmentGuid(\Schoolbox\Learning\Assessment\Lti\Model $assessment): void
     {
-        if (
-            AssessmentType::TYPE_LTI_ASSESSMENT === $type
-            && $assessment instanceof \Schoolbox\Learning\Assessment\Lti\Model
-        ) {
-            // Use Learnosity's GUID generator for better or worse,
-            // because it's used as the GUID generator when setting the
-            // Learnosity reference where this is used.
-            // Consider replacing with Ramsey UUID?
-            $assessment->setGuid($assessment->getGuid() ?? Uuid::generate());
-        }
+        // Use Learnosity's GUID generator for better or worse,
+        // because it's used as the GUID generator when setting the
+        // Learnosity reference where this is used.
+        // Consider replacing with Ramsey UUID?
+        $assessment->setGuid($assessment->getGuid() ?? Uuid::generate());
     }
 }
