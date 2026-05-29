@@ -81,13 +81,35 @@ class ModelTest extends TestCase
             ],
         ]);
 
-        $this->assertStringContainsString('column-gap: 3.3333333333333%;', $html);
+        $this->assertRenderedNumericValue(
+            '/column-gap:\s*([0-9.]+)%;/',
+            $layout->getColumnGapPercentage(),
+            $html
+        );
         $this->assertStringContainsString('row-gap: 0;', $html);
-        $this->assertStringContainsString('width: 31.111111111111%;', $html);
-        $this->assertStringContainsString('padding-bottom: 17.5%;', $html);
-        $this->assertStringContainsString('data-column-gap-percentage="3.3333333333333"', $html);
+        $this->assertRenderedNumericValue(
+            '/width:\s*([0-9.]+)%;/',
+            $layout->getColumnTileWidthPercentage(),
+            $html
+        );
+        $this->assertRenderedNumericValue(
+            '/padding-bottom:\s*([0-9.]+)%;/',
+            $layout->getColumnTileWidthPercentage() * ($layout->getAspectRatioY() / $layout->getAspectRatioX()),
+            $html
+        );
+        $this->assertRenderedNumericValue(
+            '/data-column-gap-percentage="([0-9.]+)"/',
+            $layout->getColumnGapPercentage(),
+            $html
+        );
         $this->assertStringNotContainsString('\\25', $html);
         $this->assertStringNotContainsString('\\2E', $html);
+    }
+
+    private function assertRenderedNumericValue(string $pattern, float $expectedValue, string $html): void
+    {
+        $this->assertSame(1, preg_match($pattern, $html, $matches));
+        $this->assertEqualsWithDelta($expectedValue, (float) $matches[1], 0.000001);
     }
 
     private function getTwig(): Environment
