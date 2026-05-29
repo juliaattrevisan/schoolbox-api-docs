@@ -30,12 +30,12 @@
                                     </a>
                                     <div class="card-content classes groups actions-small-1">
                                         <div class="list-item">
-                                            <h3><a href="/homepage/{FOLDER_ID}" title="{FOLDER_NAME}">{FOLDER_NAME}</a></h3>
+                                            <h3><a href="/homepage/{FOLDER_ID}" title="{FOLDER_NAME}" data-test="folder-component-title">{FOLDER_NAME}</a></h3>
                                         </div>
 
                                         <!-- BEGIN modify_folder -->
                                         <nav>
-                                            <a href="/resource/folder/{FOLDER_ID}/modify" title="Modify" class="sbx-icon-only-button"><sbx-icon name="modify"></sbx-icon></a>
+                                            <a href="/resource/folder/{FOLDER_ID}/modify" title="Modify" class="sbx-icon-only-button" data-test="folder-component-modify-{FOLDER_NAME}"><sbx-icon name="modify"></sbx-icon></a>
                                         </nav>
                                         <!-- END modify_folder -->
                                     </div>
@@ -51,7 +51,7 @@
                             <li class="actions-small-1">
                                 <div class="list-item">
                                     <div class="compact card small-12">
-                                        <a href="/homepage/{FOLDER_ID}/" title="{FOLDER_NAME}">
+                                        <a href="/homepage/{FOLDER_ID}/" title="{FOLDER_NAME}" data-test="folder-component-title">
                                             <div class="icon-{FOLDER_ICON}"></div>
                                             <h3>{FOLDER_NAME}</h3>
                                         </a>
@@ -59,7 +59,7 @@
                                 </div>
                                 <nav>
                                     <!-- BEGIN modify_folder -->
-                                    <a href="/resource/folder/{FOLDER_ID}/modify" title="Modify" class="sbx-icon-only-button"><sbx-icon name="modify"></sbx-icon></a>
+                                    <a href="/resource/folder/{FOLDER_ID}/modify" title="Modify" class="sbx-icon-only-button" data-test="folder-component-modify-{FOLDER_NAME}"><sbx-icon name="modify"></sbx-icon></a>
                                     <!-- END modify_folder -->
                                 </nav>
                             </li>
@@ -72,7 +72,7 @@
                         <div class="row">
                             <div class="component-action">
                                 <section>
-                                    <a href="/resource/folder/{FOLDER_CAT_ID}/create" class="button">Add Folder</a>
+                                    <a href="/resource/folder/{FOLDER_CAT_ID}/create" class="button" data-test="folder-component-add-folder-button">Add Folder</a>
                                 </section>
                             </div>
                         </div>
