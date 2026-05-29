@@ -25,7 +25,7 @@ class Notifier extends AbstractModuleNotifier
 {
     protected $slug = NSMapper::NS_IB_REGISTRATION;
     public const string TRIGGER_UNCONFIRMED = 'unconfirmed';
-    private const string PATTERN_UNCONFIRMED_TITLE = ':staff has requested you to confirm your :details';
+    private const string PATTERN_UNCONFIRMED_TITLE = ':staff has requested you to confirm your :details.';
     private const string PATTERN_STUDENT_PROFILE_HREF = '/search/user/%d';
 
     protected function getSlug(): string
@@ -66,7 +66,7 @@ class Notifier extends AbstractModuleNotifier
         $instance = (new Builder())
             ->setTitle(self::PATTERN_UNCONFIRMED_TITLE)
             ->setParam('staff', new Param($effector->getFullName()))
-            ->setParam('details', new Param('IB Registration details.', $href, Param::STACKING_REPLACE))
+            ->setParam('details', new Param('IB Registration details', $href, Param::STACKING_REPLACE))
             ->setIcon($this->getUserIcon($effector))
             ->setHref($href)
             ->setNamespace($this->getSlug())
