@@ -296,10 +296,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         // Unfortunately each different type of assessment needs to be handled
         // uniquely in this method, because type is passed in the query string.
-        if (
-            AssessmentType::TYPE_LTI_ASSESSMENT === $type
-            && $assessment instanceof \Schoolbox\Learning\Assessment\Lti\Model
-        ) {
+        if (AssessmentType::TYPE_LTI_ASSESSMENT === $type && $assessment instanceof Lti\Model) {
             $this->populateLtiAssessmentGuid($assessment);
         }
 
@@ -677,7 +674,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             : [];
 
         // LTI assessments need a GUID backfilled
-        if ($assessment instanceof \Schoolbox\Learning\Assessment\Lti\Model) {
+        if ($assessment instanceof Lti\Model) {
             $this->populateLtiAssessmentGuid($assessment);
         }
 
@@ -1751,11 +1748,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * If the assessment is an LTI assessment, and it doesn't have a GUID
      * already: populate it.
      *
-     * @param \Schoolbox\Learning\Assessment\Lti\Model $assessment
+     * @param Lti\Model $assessment
      * @return void
-     * @throws \Exception
+     * @throws \Exception if for whatever reason the generator throws one?
      */
-    private function populateLtiAssessmentGuid(\Schoolbox\Learning\Assessment\Lti\Model $assessment): void
+    private function populateLtiAssessmentGuid(Lti\Model $assessment): void
     {
         // Use Learnosity's GUID generator for better or worse,
         // because it's used as the GUID generator when setting the
