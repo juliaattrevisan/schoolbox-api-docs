@@ -19,10 +19,10 @@ const props = defineProps<Props>();
     <ul :id="props.contentId" class="f-dropdown" data-dropdown-content>
         <li v-for="(activityType, key) in sbProps.assessmentTypes" :key="key">
             <a
-                :class="`icon-${activityType.icon}`"
+                class="sbx-button--has-icon"
                 :href="getReturnUrl(`${props.createRoute}?type=${key}`)"
                 :data-test="`unit-planner-create-${key}-${$props.contentId}`"
-                >{{ activityType.name }}
+                ><sbx-icon :name="activityType.icon" color="currentColor" size="m"></sbx-icon>{{ activityType.name }}
             </a>
         </li>
     </ul>
