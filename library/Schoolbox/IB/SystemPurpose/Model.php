@@ -12,6 +12,7 @@ namespace Schoolbox\IB\SystemPurpose;
 
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\IB\Category\Model as CategoryModel;
+use Schoolbox\IB\Qualification\Model as QualificationModel;
 
 /**
  * Class Model
@@ -33,6 +34,11 @@ class Model
      * @var string|null
      */
     private ?string $name = null;
+
+    /**
+     * @var QualificationModel|null
+     */
+    private ?QualificationModel $qualification = null;
 
     /**
      * @return CategoryModel|null
@@ -67,6 +73,17 @@ class Model
     public function setName(?string $name): self
     {
         $this->name = $name;
+        return $this;
+    }
+
+    public function getQualification(): ?QualificationModel
+    {
+        return $this->qualification;
+    }
+
+    public function setQualification(?QualificationModel $qualification): self
+    {
+        $this->qualification = $qualification;
         return $this;
     }
 }

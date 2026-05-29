@@ -73,6 +73,7 @@ class Mapper extends BaseMapper
                    {$this->getJoinColumnString('registrationSession', 'rs')},
                    {$this->getJoinColumnString('registrationSession.systemPurpose', 'sp')},
                    {$this->getJoinColumnString('registrationSession.systemPurpose.category', 'c')},
+                   {$this->getJoinColumnString('registrationSession.systemPurpose.qualification', 'q')},
                    {$this->getJoinColumnString('registrationSession.createdBy', 'uc')},
                    {$this->getJoinColumnString('registrationSession.updatedBy', 'uu')},
                    {$this->getJoinColumnString('registrationSession.deletedBy', 'ud')},
@@ -92,6 +93,7 @@ class Mapper extends BaseMapper
             INNER JOIN {$this->getJoinSql('registrationSession', '', 'rs')}
             LEFT JOIN {$this->getJoinSql('registrationSession.systemPurpose', 'rs', 'sp')}
             LEFT JOIN {$this->getJoinSql('registrationSession.systemPurpose.category', 'sp', 'c')}
+            LEFT JOIN {$this->getJoinSql('registrationSession.systemPurpose.qualification', 'sp', 'q')}
             LEFT JOIN {$this->getJoinSql('registrationSession.createdBy', 'rs', 'uc')}
             LEFT JOIN {$this->getJoinSql('registrationSession.updatedBy', 'rs', 'uu')}
             LEFT JOIN {$this->getJoinSql('registrationSession.deletedBy', 'rs', 'ud')}
@@ -126,11 +128,15 @@ class Mapper extends BaseMapper
                 $session = $sessionMapper->hydrate($row, 'rs');
 
                 if ($session) {
+                    /** @var \Schoolbox\IB\SystemPurpose\Model $systemPurpose */
                     $systemPurpose = $sessionMapper->getJoinMapper('systemPurpose')->hydrate($row, 'sp');
 
                     if ($systemPurpose) {
+                        $systemPurpose->setQualification(
+                            $sessionMapper->getJoinMapper('systemPurpose.qualification')->hydrate($row, 'q')
+                        );
                         $systemPurpose->setCategory(
-                            $sessionMapper->getJoinMapper('systemPurpose')->getJoinMapper('category')->hydrate($row, 'c')
+                            $sessionMapper->getJoinMapper('systemPurpose.category')->hydrate($row, 'c')
                         );
                         $session->setSystemPurpose($systemPurpose);
                     }
@@ -176,6 +182,60 @@ class Mapper extends BaseMapper
         }
 
         return $students;
+    }
+
+    /**
+     * Find the registration candidate that is ready for student verification.
+     *
+     * @param User $user
+     * @return Model|null
+     * @throws BaseMapper\DefinitionException
+     * @throws BaseMapper\Exception
+     */
+    public function findUnconfirmedForUser(User $user): ?Model
+    {
+        if (!$user->getId()) {
+            return null;
+        }
+
+        try {
+            $pb = $this->getPredicateBuilder();
+            $pb->equals('user_id', $user->getId());
+            $pb->equals('status', Model::STATUS_UNCONFIRMED);
+
+            $student = $this->findOneByPredicates($pb, [
+                'order' => [
+                    'updated_at' => 'DESC',
+                    'id'         => 'DESC',
+                ],
+                'limit' => 1,
+            ]);
+
+            if (!$student instanceof Model) {
+                return null;
+            }
+
+            $systemPurposeId = $student->getRegistrationSession()?->getSystemPurpose()?->getId();
+            $ibGroupSubjectsByUserId = $systemPurposeId
+                ? $this->findIbGroupSubjectsForUsers(
+                    [
+                        $user->getId() => $user,
+                    ],
+                    $systemPurposeId
+                )
+                : [];
+
+            $student->setUser($user);
+            $student->setIbGroupSubjects(
+                $ibGroupSubjectsByUserId[$user->getId()] ?? new GenericCollection(GroupSubjectModel::class)
+            );
+
+            $this->applySubjectLanguageOverrides(new GenericCollection(Model::class, [$student]));
+
+            return $student;
+        } catch (BaseMapper\Exception\NotFound) {
+            return null;
+        }
     }
 
     /**

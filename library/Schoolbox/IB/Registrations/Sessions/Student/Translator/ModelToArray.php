@@ -16,6 +16,8 @@ use Alaress\Authorizer\GetRouteIfAuthorized;
 use Aura\Router\Generator;
 use Schoolbox\IB\Registrations\Sessions\Student\Helper;
 use Schoolbox\IB\Registrations\Sessions\Student\Model;
+use Schoolbox\Language\Model as LanguageModel;
+use Schoolbox\Nationality\Model as NationalityModel;
 use Schoolbox\User;
 
 class ModelToArray
@@ -65,6 +67,23 @@ class ModelToArray
             'userName' => $userName,
             'hasMissingDetails' => $missingFields !== [],
             'missingFields' => $missingFields,
+            'session' => $this->buildSession($student),
+            'qualification' => $this->helper->normalise($student->getRegistrationSession()?->getSystemPurpose()?->getQualification()?->getName()),
+            'candidateDetails' => $this->buildCandidateDetails(
+                [
+                    'firstName' => $givenName,
+                    'lastName' => $lastName,
+                    'dateOfBirth' => $dateOfBirth,
+                    'email' => $this->helper->normalise($user?->getEmail()),
+                    'gender' => $this->helper->normalise($externalStudent['StudentGender'] ?? null),
+                    'language1' => $this->formatCodeModel($user?->getLanguageCollection()->reindex()->getOffset(0)),
+                    'language2' => $this->formatCodeModel($user?->getLanguageCollection()->reindex()->getOffset(1)),
+                    'nationality1' => $this->formatCodeModel($user?->getNationalityCollection()?->reindex()->getOffset(0)),
+                    'nationality2' => $this->formatCodeModel($user?->getNationalityCollection()?->reindex()->getOffset(1)),
+                    'referenceCode' => '-',
+                ],
+                $missingFields
+            ),
             'ibGroupSubjects' => $this->helper->buildIbGroupSubjects($student->getIbGroupSubjects()),
             '_routes' => [
                 'updateLanguages' => $this->buildUpdateLanguagesRoute($student),
@@ -72,6 +91,82 @@ class ModelToArray
                 'renotify' => $this->buildRenotifyRoute($student),
             ],
         ];
+    }
+
+    private function buildSession(Model $student): string
+    {
+        $registrationSession = $student->getRegistrationSession();
+        $examSession = $this->helper->normalise($registrationSession?->getExamSession());
+        $academicYear = $this->helper->normalise($registrationSession?->getAcademicYear());
+
+        if ($examSession === '' && $academicYear === '') {
+            return '';
+        }
+
+        return trim("{$examSession} {$academicYear}");
+    }
+
+    /**
+     * @param array<string, string> $details
+     * @param string[] $missingFields
+     * @return array<int, array{key: string, label: string, value: string, isMissing: bool}>
+     */
+    private function buildCandidateDetails(array $details, array $missingFields): array
+    {
+        $labels = [
+            'dateOfBirth' => 'Date of Birth',
+            'email' => 'Email',
+            'firstName' => 'First Name',
+            'lastName' => 'Last Name',
+            'gender' => 'Gender',
+            'language1' => 'Language 1',
+            'language2' => 'Language 2 (not required)',
+            'nationality1' => 'Nationality 1',
+            'nationality2' => 'Nationality 2 (not required)',
+            'referenceCode' => 'Reference Code',
+        ];
+        $requiredFieldsByDetail = [
+            'referenceCode' => 'userName',
+        ];
+        $optionalFields = [
+            'language2' => true,
+            'nationality2' => true,
+        ];
+        $missingLookup = array_fill_keys($missingFields, true);
+        $candidateDetails = [];
+
+        foreach ($labels as $key => $label) {
+            $value = $details[$key] ?? '';
+            $requiredField = $requiredFieldsByDetail[$key] ?? $key;
+            $isMissing = isset($missingLookup[$requiredField]);
+
+            $candidateDetails[] = [
+                'key' => $key,
+                'label' => $label,
+                'value' => $value !== '' ? $value : (isset($optionalFields[$key]) ? 'Not provided' : 'Missing'),
+                'isMissing' => $isMissing,
+            ];
+        }
+
+        return $candidateDetails;
+    }
+
+    private function formatCodeModel(mixed $model): string
+    {
+        if (!$model instanceof LanguageModel && !$model instanceof NationalityModel) {
+            return '';
+        }
+
+        $name = $this->helper->normalise($model->getName());
+        $code = $this->helper->normalise($model->getCode());
+
+        if ($name === '' && $code === '') {
+            return '';
+        }
+
+        return $name !== '' && $code !== ''
+            ? "{$name} ({$code})"
+            : $name . $code;
     }
 
     private function buildUpdateLanguagesRoute(Model $student): ?string

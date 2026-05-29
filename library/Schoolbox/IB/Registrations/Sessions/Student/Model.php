@@ -14,7 +14,9 @@ use Alaress_Date_Format;
 use Schoolbox\GenericCollection;
 use Schoolbox\IB\Group\Subject\Model as GroupSubjectModel;
 use Schoolbox\IB\Registrations\Sessions\Model as SessionModel;
+use Schoolbox\IModel;
 use Schoolbox\Mapper\Traits\Model as ModelTraits;
+use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\User;
 
 /**
@@ -22,11 +24,12 @@ use Schoolbox\User;
  *
  * @package Schoolbox\IB\Registrations\Sessions\Student
  */
-class Model
+class Model implements IModel
 {
     use ModelTraits\Id;
     use ModelTraits\CreatedAtDate;
     use ModelTraits\UpdatedAtDate;
+    use CreateCollection;
 
     public const int STATUS_PREPARATION = 0;
     public const int STATUS_UNCONFIRMED = 1;

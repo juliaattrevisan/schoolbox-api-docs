@@ -37,6 +37,7 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('category_id', CategoryMapper::class, 'id', null, null, 'category', 'category');
         $this->uses('name', self::TYPE_STRING);
+        $this->joinsReverseSingle('system_purpose_id', \Schoolbox\IB\Qualification\Mapper::class, 'qualification', 'qualification');
     }
 
     /**
@@ -56,7 +57,8 @@ class Mapper extends BaseMapper
     {
         return "
             SELECT {$this->getColumnString()},
-                   {$this->getJoinColumnString('category', 'c')}
+                   {$this->getJoinColumnString('category', 'c')},
+                   {$this->getJoinColumnString('qualification', 'q')}
         ";
     }
 
@@ -68,6 +70,7 @@ class Mapper extends BaseMapper
         return "
             FROM      {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('category', '', 'c')}
+            INNER JOIN {$this->getJoinSql('qualification', '', 'q')}
         ";
     }
 
@@ -81,12 +84,14 @@ class Mapper extends BaseMapper
     {
         /** @var CategoryMapper $categoryMapper */
         $categoryMapper = $this->getJoinMapper('category');
+        $qualificationMapper = $this->getJoinMapper('qualification');
         $systemPurposes = $this->createCollection();
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $systemPurpose = $this->hydrate($row);
 
             if ($systemPurpose) {
+                $systemPurpose->setQualification($qualificationMapper->hydrate($row, 'q'));
                 $systemPurpose->setCategory($categoryMapper->hydrate($row, 'c'));
                 $systemPurposes[$systemPurpose->getId()] = $systemPurpose;
             }
