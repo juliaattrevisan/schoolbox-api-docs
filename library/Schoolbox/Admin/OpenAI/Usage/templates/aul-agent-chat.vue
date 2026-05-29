@@ -94,6 +94,7 @@ const agentIcon = window.Vue.computed(() => {
     <ac-feed
         :feed="sessionFeed"
         :allow-selection="false"
+        max-height="85vh"
         error-prefix="There was a problem retrieving the response."
         :agent-icon="agentIcon"
         show-timestamps
