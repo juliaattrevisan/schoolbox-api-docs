@@ -130,13 +130,6 @@ async function loadCandidates(): Promise<void> {
 updateLanguageStore.init(props.searchLanguagesEndpoint, preparation, unconfirmed, confirmed, failed);
 
 /**
- * Clears the current student selection.
- */
-function clearSelection(): void {
-    selectedList.value = [];
-}
-
-/**
  * Submits the given student ids to the complete-preparation endpoint,
  * moves them from Preparation to Unconfirmed on success, and shows a toast notification.
  * @param studentIds The ids of the students to mark as preparation-complete.
@@ -241,10 +234,9 @@ window.Vue.onMounted((): void => {
         <ib-update-language-modal />
 
         <ib-report-action-drawer
-            :selected-count="selectedList.length"
+            v-model:selected-list="selectedList"
             :is-loading="isCompleting"
             @complete-preparation="handleCompletePreparation(selectedList.map((s) => s.id))"
-            @clear-selection="clearSelection"
         />
     </div>
 </template>

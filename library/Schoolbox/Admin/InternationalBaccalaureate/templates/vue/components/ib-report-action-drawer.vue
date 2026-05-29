@@ -1,24 +1,32 @@
 <script setup lang="ts">
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
+import type { StudentRow } from "../../js/types/ibReportTypes";
 
 interface Props {
-    selectedCount: number;
     isLoading: boolean;
 }
 defineProps<Props>();
 
+const selectedList = defineModel<StudentRow[]>("selectedList", { default: () => [] });
+
 defineEmits<{
     completePreparation: [];
-    clearSelection: [];
 }>();
+
+/**
+ * Clear the selection
+ */
+function clearSelection(): void {
+    selectedList.value = [];
+}
 </script>
 
 <template>
-    <bottom-drawer :show-drawer="selectedCount > 0">
+    <bottom-drawer :show-drawer="selectedList.length > 0">
         <span class="selected-count">
-            <em>{{ selectedCount }} student{{ selectedCount === 1 ? "" : "s" }} selected</em>
+            <em>{{ selectedList.length }} selected</em>
         </span>
-        <button type="button" class="button-clear" @click="$emit('clearSelection')">Clear</button>
+        <button class="button-clear" @click.prevent="clearSelection">Clear selection</button>
         <div class="l-flex-row l-flex--justify l-gap-xs">
             <button
                 type="button"
