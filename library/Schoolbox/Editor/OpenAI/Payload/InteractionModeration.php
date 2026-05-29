@@ -209,7 +209,6 @@ class InteractionModeration
                 ],
             ],
             'required' => [
-                "alert",
                 "overall_risk_level",
                 "summary",
                 "categories",
