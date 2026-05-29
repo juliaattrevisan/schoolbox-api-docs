@@ -19,24 +19,26 @@ defineEmits<{
             <em>{{ selectedCount }} student{{ selectedCount === 1 ? "" : "s" }} selected</em>
         </span>
         <button type="button" class="button-clear" @click="$emit('clearSelection')">Clear</button>
-        <button
-            type="button"
-            class="button small sbx-button--has-icon"
-            :disabled="isLoading"
-            @click="$emit('completePreparation')"
-        >
-            <sbx-icon name="notifications-hollow"></sbx-icon>
-            Complete Preparation
-        </button>
-        <button
-            type="button"
-            class="button small sbx-button--has-icon"
-            disabled
-            aria-disabled="true"
-            title="Coming soon"
-        >
-            Submit to IB
-        </button>
+        <div class="l-flex-row l-flex--justify l-gap-xs">
+            <button
+                type="button"
+                class="button sbx-button--has-icon l-flex__item--1-auto"
+                :disabled="isLoading"
+                @click="$emit('completePreparation')"
+            >
+                <sbx-icon name="notifications-hollow"></sbx-icon>
+                Complete Preparation
+            </button>
+            <button
+                type="button"
+                class="button sbx-button--has-icon l-flex__item--1-auto"
+                disabled
+                aria-disabled="true"
+                title="Coming soon"
+            >
+                Submit to IB
+            </button>
+        </div>
     </bottom-drawer>
 </template>
 
