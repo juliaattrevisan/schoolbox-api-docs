@@ -274,6 +274,7 @@ ul.tileList {
 
     display: flex;
     flex-wrap: wrap;
+    gap: 0;
 
     // Get rid of spacing between tiles
     word-spacing: 0;

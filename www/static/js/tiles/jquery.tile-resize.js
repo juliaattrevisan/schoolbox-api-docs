@@ -8,6 +8,8 @@
             const tile = this;
             const $tile = $(tile);
 
+            setTileListRowGap(tile);
+
             // Using padding-bottom percentage to provide appropriate height for tiles causes display
             // issues due to Chrome bug. Refer to: https://github.com/alaress/schoolbox/pull/28566.
             // To resolve we need to instead set a rounded height and remove the padding-bottom.
@@ -113,6 +115,31 @@
             }
 
             return aspectRatio;
+        }
+
+        /**
+         * Percentage row gaps are resolved against the tile list height in flex layouts, and the tile list has
+         * an automatic height. Calculate the matching vertical gap from the tile list width instead.
+         *
+         * @param { HTMLElement } tile
+         */
+        function setTileListRowGap(tile) {
+            const $tileListUl = $(tile).parent("[data-tile-list]");
+            const columnGapPercentage = Number($tileListUl.attr("data-column-gap-percentage"));
+
+            if (!Number.isFinite(columnGapPercentage)) {
+                return;
+            }
+
+            const tileListWidth = $tileListUl.width();
+
+            if (tileListWidth === 0) {
+                return;
+            }
+
+            $tileListUl.css({
+                rowGap: String((tileListWidth * columnGapPercentage) / 100) + "px",
+            });
         }
     };
 })(jQuery);
