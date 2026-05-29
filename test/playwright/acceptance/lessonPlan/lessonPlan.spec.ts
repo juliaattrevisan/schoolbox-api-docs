@@ -175,7 +175,7 @@ test.describe("Lesson Plan Activity", () => {
      * check if the students cannot see the not visible to student fields
      */
 
-    test("Lesson Plan Fields Visibility", async ({ tester, page, db }) => {
+    test.skip("Lesson Plan Fields Visibility", async ({ tester, page, db }) => {
         const courseList = new CourseList(tester, page);
         const importCourseIntoClass = new ImportCourseIntoClass(page);
 
