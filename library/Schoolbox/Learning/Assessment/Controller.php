@@ -296,11 +296,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         // Unfortunately each different type of assessment needs to be handled
         // uniquely in this method, because type is passed in the query string.
-        if (AssessmentType::TYPE_LTI_ASSESSMENT === $type && $assessment instanceof \Schoolbox\Learning\Assessment\Lti\Model) {
-            // Use Learnosity's GUID generator for better or worse,
-            // because it's used above.
-            // Consider replacing with Ramsey UUID?
-            $assessment->setGuid($assessment->getGuid() ?? Uuid::generate());
+        if (AssessmentType::TYPE_LTI_ASSESSMENT === $type && $assessment instanceof Lti\Model) {
+            $this->populateLtiAssessmentGuid($assessment);
         }
 
         // create a dynamic plan on the assessment to get started
@@ -675,6 +672,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $data['editorTemplates'] = $this->editorTemplateHelper !== null
             ? $this->editorTemplateHelper->getTemplatesForCategory()
             : [];
+
+        // LTI assessments need a GUID backfilled
+        if ($assessment instanceof Lti\Model) {
+            $this->populateLtiAssessmentGuid($assessment);
+        }
 
         /* Redirection urls
          */
@@ -1740,5 +1742,18 @@ abstract class Controller extends ListController implements IAssessmentControlle
     public function getClassStatusChunk(IAssessable $assessmentSpec, IAssessable $assessmentImpl): void
     {
         throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+    }
+
+    /**
+     * If the assessment is an LTI assessment, and it doesn't have a GUID
+     * already: populate it.
+     *
+     * @param Lti\Model $assessment
+     * @return void
+     * @throws \Exception if for whatever reason the generator throws one?
+     */
+    private function populateLtiAssessmentGuid(Lti\Model $assessment): void
+    {
+        $assessment->setGuid($assessment->getGuid() ?? \Ramsey\Uuid\Uuid::uuid7()->toString());
     }
 }
