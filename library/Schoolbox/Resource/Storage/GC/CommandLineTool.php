@@ -9,12 +9,15 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\GC;
 
+use Alaress\CacheFactory\Factory;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Transform\Mapper as StorageTransformMapper;
+use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\Lock\LockInterface;
 
 /**
@@ -279,10 +282,23 @@ HELP;
             maxTime: $maxTime,
             thresholdDate: $thresholdDate,
         );
+
+        /** @var Factory $cacheFactory */
+        $cacheFactory = $this->getDi()->get('redis.cacheFactory');
         $gc = $gc
             ->addCheck(new Check\ForeignKeyRelation($db, $logger, SQL_db, $mapper->getTable()))
             ->addCheck(new Check\CharacterField($db, $logger, SQL_db))
             ->addCheck(new Check\HashIndexedTextField($db, $logger, SQL_db, $mapper->getTable()))
+            ->addCheck(
+                new Check\Storage(
+                    $db,
+                    $logger,
+                    $mapper->getTable(),
+                    $this->getDi()->get('filesystem.storageProxy'),
+                    $cacheFactory->build(Check\Storage::CACHE_NAMESPACE),
+                    Check\Storage::CACHE_TTL,
+                ),
+            )
         ;
 
         // Purge, throwing a lock exception if not held
