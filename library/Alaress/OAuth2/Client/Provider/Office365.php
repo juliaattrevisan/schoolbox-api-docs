@@ -104,6 +104,6 @@ class Office365 extends AbstractProvider
 
     protected function createResourceOwner(array $response, #[SensitiveParameter] AccessToken $token)
     {
-        return new GenericResourceOwner($response, 'id');
+        return new GenericResourceOwner($response, $token->getResourceOwnerId());
     }
 }

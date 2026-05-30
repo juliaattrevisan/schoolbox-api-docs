@@ -232,7 +232,7 @@ export default class Homepage {
      * @param icon - The icon to check
      */
     async checkComponentIcon(icon: string): Promise<void> {
-        await expect(this.page.locator(`span.size-32.icon-masonry.icon-masonry-${icon}`)).toBeVisible();
+        await expect(this.page.locator(`sbx-icon.icon-masonry.icon-masonry-${icon}`)).toBeVisible();
     }
 
     /**

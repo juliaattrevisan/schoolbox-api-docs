@@ -43,6 +43,12 @@ $app = new class extends CliTool\App
 
 
     /**
+     * Existing rubric grids get this weight value at time of seeding
+     */
+    private const float DEFAULT_WEIGHT = 100.0;
+
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
@@ -93,20 +99,27 @@ HELP;
 
         /* Find all the submission_boxes that:
          *    - have a truthy use_rubric value
-         *    - are still alive (deleted_at is null)
          *    - are connected to a still-alive assessment (in the odd circumstance that we had bad data)
+         *
+         * According to jeztek, the default weight should be 100.
+         *
+         * This disregards soft-deleted submission boxes because we don't know whether an assessment is going to be
+         * undeleted or not; we have to assume it's possible for any deleted submission box to be restored at some
+         * point in time and that its rubrics could/should come with. It means we'll be seeding data for potential
+         * trash. I actually encountered this problem during development where a deleted assessment *didn't* have its
+         * rubric instances which caused miscellaneous errors in the most basic workflow.
          */
         $statement = $this->getDatabaseInternal()->prepare("
             SELECT 
                 sb.id, 
                 sb.assessment_id,
+                a.title,
                 sb.rubric_capability_mark_type_id,
                 sb.rubric_capability_grade_group_id,
                 sb.rubric_mark_range
             FROM submission_box sb
             INNER JOIN assessment a on sb.assessment_id = a.id
-            WHERE a.deleted_at IS NULL
-            AND sb.use_rubric = 1
+            WHERE sb.use_rubric = 1
         ");
 
         $statement->execute();
@@ -120,6 +133,8 @@ HELP;
         $insertStatement = $this->getDatabaseInternal()->prepare("
             INSERT INTO rubric_instance (
                 assessment_id,
+                title,
+                weight,
                 rubric_capability_mark_type_id,
                 rubric_capability_grade_group_id,
                 rubric_mark_range,
@@ -127,6 +142,8 @@ HELP;
                 updated_at
             ) VALUES (
                 :assessmentId,
+                :title,
+                :weight,
                 :rubricCapabilityMarkTypeId,
                 :rubricCapabilityGradeGroupId,
                 :rubricMarkRange,
@@ -142,6 +159,8 @@ HELP;
         $start = microtime(true);
 
         /* For each record in that result set, insert a new row into rubric_instance so that we:
+         *    - save a default title
+         *    - save a default weight
          *    - save the rubric capability mark type setting
          *    - save the rubric capability grade group setting
          *    - save the mark range boolean setting
@@ -152,6 +171,8 @@ HELP;
 
             $insertStatement->execute([
                 'assessmentId' => $row['assessment_id'],
+                'title' => $row['title'],
+                'weight' => self::DEFAULT_WEIGHT,
                 'rubricCapabilityMarkTypeId' => $row['rubric_capability_mark_type_id'],
                 'rubricCapabilityGradeGroupId' => $row['rubric_capability_grade_group_id'],
                 'rubricMarkRange' => $row['rubric_mark_range'],
@@ -160,9 +181,11 @@ HELP;
             ]);
 
             $this->getLogger()->debug(sprintf(
-                'Submission box %s (assessment %s) had these rubric settings: mark type %s, grade group %s, use mark range %s',
+                'Submission box %s (assessment %s) had these rubric settings: title "%s", weight %s, mark type %s, grade group %s, use mark range %s',
                 $row['id'],
                 $row['assessment_id'],
+                $row['title'],
+                self::DEFAULT_WEIGHT,
                 $row['rubric_capability_mark_type_id'] ?: 'none',
                 $row['rubric_capability_grade_group_id'] ?: 'none',
                 $row['rubric_mark_range']
@@ -233,7 +256,7 @@ HELP;
             FROM submission_box sb
             INNER JOIN assessment a ON sb.assessment_id = a.id
             LEFT JOIN rubric_instance ri ON sb.assessment_id = ri.assessment_id 
-            WHERE a.deleted_at IS NULL AND sb.use_rubric = 1 AND
+            WHERE sb.use_rubric = 1 AND
             (
                 ri.id IS NULL
                 OR NOT (sb.rubric_capability_mark_type_id <=> ri.rubric_capability_mark_type_id)

@@ -19,17 +19,19 @@ use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as DescriptorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model as DescriptorModel;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception;
 
 /**
- * Class DescriptorMarkMapper
+ * Class IndicatorMarkMapper
  *
  * @package Schoolbox\Assessment\Rubric\DataModel
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model createModel($idValue = null)
- * @method GenericCollection|Model[] createCollection($contents = [])
- * @method GenericCollection|Model[] findByColumnList($columnList, $options = array())
- * @method GenericCollection|Model[] findByColumn($columnName, $columnValue, $options = [])
+ * @method GenericCollection<Model> createCollection($contents = [])
+ * @method GenericCollection<Model> findByColumnList($columnList, $options = array())
+ * @method GenericCollection<Model> findByColumn($columnName, $columnValue, $options = [])
  */
 class Mapper extends BaseMapper
 {
@@ -80,8 +82,8 @@ class Mapper extends BaseMapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('capability_mark', 'g')},
-                {$this->getJoinColumnString('capability_mark.submission_return', 'r')},
+                {$this->getJoinColumnString('capability_mark', 'cm')},
+                {$this->getJoinColumnString('capability_mark.rubricInstance', 'ri')},
                 {$this->getJoinColumnString('descriptor', 'd')}
         ";
     }
@@ -94,8 +96,8 @@ class Mapper extends BaseMapper
     {
         return "
             FROM {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('capability_mark', '', 'g')}
-            LEFT JOIN {$this->getJoinSql('capability_mark.submission_return', 'g', 'r')}
+            LEFT JOIN {$this->getJoinSql('capability_mark', '', 'cm')}
+            LEFT JOIN {$this->getJoinSql('capability_mark.rubricInstance', 'cm', 'ri')}
             LEFT JOIN {$this->getJoinSql('descriptor', '', 'd')}
         ";
     }
@@ -103,37 +105,55 @@ class Mapper extends BaseMapper
 
     /**
      * @param PDOStatement $statement
-     * @return Collection|Model[]
+     * @return Collection<Model>
+     * @throws Exception
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
         /** @var CapabilityMarkMapper $capabilityMarkMapper */
         $capabilityMarkMapper = $this->getJoinMapper('capability_mark');
-        /** @var ReturnedWorkMapper $submissionReturnMapper */
-        $submissionReturnMapper = $this->getJoinMapper('capability_mark.submission_return');
+
+        /** @var \Schoolbox\Assessment\Rubric\Instance\Mapper $rubricInstanceMapper */
+        $rubricInstanceMapper = $this->getJoinMapper('capability_mark.rubricInstance');
+
         $marks = $this->createCollection();
         $descriptors = $this->getJoinMapper('descriptor')->createCollection();
 
         $descriptorKey = "d.{$this->getJoinMapper('descriptor')->getIdentifierColumn()}";
 
-        while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $descriptorId = $r[$descriptorKey];
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            /* Set up a capability mark instance along with its rubric instance...instance (ugh)
+             */
+            $capabilityMark = $capabilityMarkMapper->hydrate($row, 'cm');
+            $rubricInstance = $rubricInstanceMapper->hydrate($row, 'ri');
+
+            $capabilityMark->setRubricInstance($rubricInstance);
+
+            /* Hydrate descriptor if it wasn't previously discovered
+             */
+            $descriptorId = $row[$descriptorKey];
+
             if (!$descriptors->offsetExists($descriptorId)) {
                 // Descriptor can be null?
-                $descriptor = $this->hydrateJoin($r, 'descriptor', 'd');
+                /* Potentially occurs in old/broken data somewhere, maybe
+                 */
+                $descriptor = $this->hydrateJoin($row, 'descriptor', 'd');
+
                 if ($descriptor) {
                     $descriptors->setOffset($descriptorId, $descriptor);
                 }
             }
+
             /** @var DescriptorModel $descriptor */
             $descriptor = $descriptors->getOffset($descriptorId);
 
-            $capabilityMark = $capabilityMarkMapper->hydrate($r, 'g');
-            $capabilityMark->setSubmissionReturn($submissionReturnMapper->hydrate($r, 'r'));
+            /* Set up an indicator mark instance and assemble all its constituents
+             * Note that in some undocumented circumstance, $descriptor might actually be null
+             */
+            $mark = $this->hydrate($row)
+                ->setCapabilityMark($capabilityMark)
+                ->setDescriptor($descriptor);
 
-            $mark = $this->hydrate($r);
-            $mark->setCapabilityMark($capabilityMark);
-            $mark->setDescriptor($descriptor);
             $marks->add($mark);
         }
 
@@ -143,21 +163,31 @@ class Mapper extends BaseMapper
     /**
      * This will HARD-DELETE all previously given marks with the feedback.
      *
-     * @param int $returnId
+     * @param int $feedbackId
+     * @param \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance
+     * @param string $feedbackTable
      * @return int
      */
-    public function deleteFeedbackMarks($returnId): int
+    public function deleteFeedbackMarks(int $feedbackId, \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance, string $feedbackTable): int
     {
+        /* Removes all indicator marks associated with a particular feedback, across all rubric grids/instances.
+         * Note the polymorphic (feedback_id, feedback_table) usage here.
+         */
         $query = "
-            DELETE     rdm
-            FROM       rubric_indicator_mark rdm
-            INNER JOIN rubric_capability_mark rgm on rdm.rubric_capability_mark_id = rgm.id
-            WHERE      rgm.return_id = :return_id;
+            DELETE     rim
+            FROM       {$this->getTable()} rim
+            INNER JOIN rubric_capability_mark rcm on rim.rubric_capability_mark_id = rcm.id
+            WHERE      rcm.feedback_id = :feedbackId
+            AND        rcm.feedback_table = :feedbackTable
+            AND        rcm.rubric_instance_id = :rubricInstanceId
         ";
 
         $statement = $this->database->prepare($query);
+
         $statement->execute([
-            'return_id' => $returnId,
+            'feedbackId' => $feedbackId,
+            'feedbackTable' => $feedbackTable,
+            'rubricInstanceId' => $rubricInstance->getId(),
         ]);
 
         return $statement->rowCount();
@@ -169,28 +199,59 @@ class Mapper extends BaseMapper
      *
      * Includes draft feedback. This is to align with the feedback that is rendered on the QuickMark (aka DueWork Status) page.
      *
-     * @param int $assessment_id
+     * @param IAssessable $assessment
      * @return bool[]
      * @throws PDOException
      */
-    public function findMarkedByAssessment($assessment_id): array
+    public function findMarkedByAssessment(IAssessable $assessment): array
+    {
+        /* Sadly, append more learning activity's treatments to this stack
+         */
+        if ($assessment instanceof \Schoolbox\Learning\Assessment\DueWork\Model) {
+            return $this->findMarkedByAssessmentDueWork($assessment->getId());
+        }
+
+        if ($assessment instanceof \Schoolbox\Learning\Assessment\Reporting\Model) {
+            return $this->findMarkedByAssessmentReporting($assessment->getId());
+        }
+
+        /* Empty set by default: nobody's affected, I guess, for assessments that don't support rubrics.
+         */
+        return [];
+    }
+
+
+    /**
+     * Find the set of student ids whose most recent feedback also had rubric marks associated with $assessmentId.
+     * This includes feedbacks which are drafts too.
+     *
+     * This method finds the Due Work feedbacks due to the somewhat-polymorphic schema of rubric_capability_mark and the
+     * idiosyncratic nature of the activity's feedback table. With the advent of agnostic rubrics any of the learning
+     * activities could return a data set.
+     *
+     * @param int $assessmentId
+     * @return array
+     */
+    private function findMarkedByAssessmentDueWork(int $assessmentId): array
     {
         $query = "
             SELECT sr.owner AS student_id
             FROM submission_return sr
-            JOIN submission_box sb ON sr.box_id = sb.id
-            JOIN (
+            INNER JOIN submission_box sb ON sr.box_id = sb.id
+            INNER JOIN (
                 -- find most recent feedback (including drafts)
-                SELECT sr.owner, MAX(sr.updated_at) AS max_updated_at
+                SELECT
+                    sr.owner,
+                    MAX(sr.updated_at) AS max_updated_at
                 FROM submission_return sr
-                JOIN submission_box sb on sr.box_id = sb.id
+                INNER JOIN submission_box sb on sr.box_id = sb.id
                 WHERE
-                      sb.assessment_id = :assessment_id_1 AND
-                      sr.review_route = :review_route_1 AND
-                      sr.deleted_at IS NULL
+                    sb.assessment_id = :assessment_id_1 AND
+                    sr.review_route = :review_route_1 AND
+                    sr.deleted_at IS NULL
                 GROUP BY sr.owner
             ) t1 ON t1.owner = sr.owner AND t1.max_updated_at = sr.updated_at
-            JOIN rubric_capability_mark rcm ON sr.id = rcm.return_id
+            INNER JOIN rubric_capability_mark rcm ON sr.id = rcm.feedback_id AND rcm.feedback_table = :feedbackTable
             WHERE
                 sb.assessment_id = :assessment_id_2 AND
                 sr.review_route = :review_route_2 AND
@@ -199,17 +260,78 @@ class Mapper extends BaseMapper
             GROUP BY sr.owner
         ";
         $stmt  = $this->database->prepare($query);
+
         $stmt->execute([
-            'assessment_id_1' => $assessment_id,
-            'assessment_id_2' => $assessment_id,
+            'assessment_id_1' => $assessmentId,
+            'assessment_id_2' => $assessmentId,
             'review_route_1'  => ReturnedWork::REVIEW_ROUTE_INSTRUCTOR,
             'review_route_2'  => ReturnedWork::REVIEW_ROUTE_INSTRUCTOR,
+            'feedbackTable' => ReturnedWorkMapper::getInstance()->getTable()
         ]);
-        $rowset      = $stmt->fetchAll();
+
+        $rowset = $stmt->fetchAll();
         $rubricMarks = [];
+
         foreach ($rowset as $row) {
             $rubricMarks[$row['student_id']] = true;
         }
+
+        return $rubricMarks;
+    }
+
+
+
+    /**
+     * Find the set of student ids whose most recent feedback also had rubric marks associated with $assessmentId.
+     * This includes feedbacks which are drafts too.
+     *
+     * This method finds the Reporting feedbacks due to the somewhat-polymorphic schema of rubric_capability_mark and the
+     * idiosyncratic nature of the activity's feedback table. With the advent of agnostic rubrics any of the learning
+     * activities could return a data set.
+     *
+     * @param int $assessmentId
+     * @return array
+     */
+    private function findMarkedByAssessmentReporting(int $assessmentId): array
+    {
+        $query = "
+            SELECT rf.learner_id AS student_id
+            FROM reporting_feedback rf
+            INNER JOIN reporting r ON rf.reporting_id = r.id
+            INNER JOIN (
+                -- find most recent feedback (including drafts)
+                SELECT
+                    rf.learner_id,
+                    MAX(rf.updated_at) AS max_updated_at
+                FROM reporting_feedback rf
+                INNER JOIN reporting r ON rf.reporting_id = r.id
+                WHERE
+                    r.assessment_id = :assessment_id_1 AND
+                    rf.deleted_at IS NULL
+                GROUP BY rf.learner_id
+            ) t1 ON t1.learner_id = rf.learner_id AND t1.max_updated_at = rf.updated_at
+            INNER JOIN rubric_capability_mark rcm ON rf.id = rcm.feedback_id AND rcm.feedback_table = :feedbackTable
+            WHERE
+                r.assessment_id = :assessment_id_2 AND
+                rf.deleted_at IS NULL AND
+                rcm.valid = 1
+            GROUP BY rf.learner_id
+        ";
+        $stmt  = $this->database->prepare($query);
+
+        $stmt->execute([
+            'assessment_id_1' => $assessmentId,
+            'assessment_id_2' => $assessmentId,
+            'feedbackTable' => \Schoolbox\Learning\Assessment\DataModel\Reporting\Feedback\Mapper::getInstance()->getTable()
+        ]);
+
+        $rowset = $stmt->fetchAll();
+        $rubricMarks = [];
+
+        foreach ($rowset as $row) {
+            $rubricMarks[$row['student_id']] = true;
+        }
+
         return $rubricMarks;
     }
 
@@ -222,7 +344,7 @@ class Mapper extends BaseMapper
      * @param object $previous
      * @return bool
      */
-    protected function raiseNotification($object, $verb, $previous = null)
+    protected function raiseNotification($object, $verb, $previous = null): bool
     {
         return true;
     }

@@ -41,6 +41,7 @@ class NSMapper extends Mapper
     const NS_EVIDENCE_COMMENT        = 'moment_comment';
     const NS_BADGE                   = 'badge';
     public const string NS_DIALOG_AGENT = 'dialog_agent';
+    public const string NS_IB_REGISTRATION = 'ib_registration';
 
 
     /**

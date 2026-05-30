@@ -39,7 +39,7 @@ class ValidSelfReflectionWithResponse extends ValidSelfReflection
          */
         if ($this->isDueWork($participant)) {
             return $this->isViewingOwnParticipation($user, $participant)
-                && $this->isSelfReflectableOnly($participant)
+                && $this->isSelfReflectionOnly($participant)
                 && $this->hasDraftResponse($participant);
         }
 

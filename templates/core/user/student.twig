@@ -332,6 +332,7 @@
                     case '#tab-classes':
                     case '#tab-groups':
                     case '#tab-contacts':
+                    case '#tab-registration':
                         $.fn.scrollToTop({
                             scrollOnInit: true,
                             scrollTo: '[data-tab]',
@@ -747,6 +748,89 @@
                 {% endif %}
             {% endif %}
 
+            {% if 'registration' in possibleTabNames %}
+                <div class="content no-pad {% if activeTab == 'registration' %}active{% endif %}" id="tab-registration">
+                    <section class="content">
+                        {% if registrationPayload %}
+                        <h1>{{ registrationPayload.qualification }}</h1>
+                        <div class="alert-box">
+                            If any of the details below are incorrect or if you have any questions, please speak with the DP Co-Ordinator.
+                        </div>
+                        <section>
+                            <h2>Candidate details</h2>
+                            <div class="row">
+                                <dl>
+                                    {% for detail in registrationPayload.candidateDetails %}
+                                        <dt class="small-12 medium-4 columns"><b>{{ detail.label }}</b></dt>
+                                        <dd class="small-12 medium-8 columns">{{ detail.value }}</dd>
+                                    {% endfor %}
+                                </dl>
+                            </div>
+                        </section>
+                        <section>
+                            <h2>Subject details</h2>
+                            {% set subjectGroups = {
+                                'HL': 'Higher Level',
+                                'SL': 'Standard Level',
+                                'Core': 'Core',
+                            } %}
+                            {% set totalSubjects =
+                                registrationPayload.ibGroupSubjects.HL|length
+                                + registrationPayload.ibGroupSubjects.SL|length
+                                + registrationPayload.ibGroupSubjects.Core|length
+                            %}
+                            {% if totalSubjects %}
+                                {% set registrationSession = registrationPayload.session is defined ? registrationPayload.session : '' %}
+                                <table>
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">Group</th>
+                                        <th scope="col">Subject Name</th>
+                                        <th scope="col">Level</th>
+                                        <th scope="col">Language</th>
+                                        <th scope="col">Session</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for groupKey, groupLabel in subjectGroups %}
+                                            {% set groupSubjects = registrationPayload.ibGroupSubjects[groupKey] %}
+                                            {% for subject in groupSubjects %}
+                                                {% set groupName = subject.group is defined and subject.group ? subject.group : groupLabel %}
+                                                {% set level = subject.level == 'Core' ? '' : subject.level %}
+                                                {% if subject.languages|length %}
+                                                    {% for language in subject.languages %}
+                                                        <tr>
+                                                            <td>{{ groupName }}</td>
+                                                            <td>{{ subject.subject }}</td>
+                                                            <td>{{ level }}</td>
+                                                            <td>{{ language.languageName ?: 'Missing' }}</td>
+                                                            <td>{{ registrationSession }}</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <tr>
+                                                        <td>{{ groupName }}</td>
+                                                        <td>{{ subject.subject }}</td>
+                                                        <td>{{ level }}</td>
+                                                        <td><span class="alert label">Missing</span></td>
+                                                        <td>{{ registrationSession }}</td>
+                                                    </tr>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                {% else %}
+                                    <p>No subjects are available for this registration.</p>
+                                {% endif %}
+                                {% else %}
+                                    <p>No registration details are available.</p>
+                                {% endif %}
+                            </section>
+                    </section>
+                </div>
+            {% endif %}
+
             {% if 'contacts' in possibleTabNames %}
                 {# Only show this tab if there's any content here:
                  # Viewee must allow you to see their main contacts,
@@ -975,7 +1059,7 @@
 {# TODO: Where to pus this?
  # https://stackoverflow.com/questions/23569705/zurb-foundation-prevent-empty-column-collapsing-to-zero-width
  # https://foundation.zurb.com/forum/posts/22995-empty-column
- #}
+#}
 <style type="text/css">
     .columns, .column {
         min-height: 1px;

@@ -138,14 +138,18 @@ class MarkedGridTest extends TestCase
         $capability2->getIndicators()[$indicator3->getId()] = $indicator3;
         $capability2->getIndicators()[$indicator4->getId()] = $indicator4;
 
+        $rubricInstance = new \Schoolbox\Assessment\Rubric\Instance\Model()
+            ->setId(117)
+            ->setCapabilityMarkType($capabilityMarkType);
+
         // Add caps to row set
         $rowSet->getCapabilities()[$capability1->getId()] = $capability1;
         $rowSet->getCapabilities()[$capability2->getId()] = $capability2;
 
 
         // Build a grid that uses the row set
-        $dueWork = (new DueWork())->setCapabilityMarkType($capabilityMarkType);
-        $grid    = new Grid\Grid($dueWork, $rowSet);
+        $dueWork = new DueWork();
+        $grid    = new Grid\Grid($dueWork, $rubricInstance, $rowSet);
 
         // Build and add levels
         $level1                              = (new Grid\Level())->setId(1)->setName('0');
@@ -170,7 +174,7 @@ class MarkedGridTest extends TestCase
         // Build descriptors, add to indicators
         $descriptorValue = 0;
         foreach ($grid->getLevels() as $levelId => $level) {
-            $descriptor                                  = (new Grid\Descriptor())
+            $descriptor = (new Grid\Descriptor())
                 ->setId($levelId)
                 ->setDescription((string)$descriptorValue)
                 ->setMinValue((float)$descriptorValue)

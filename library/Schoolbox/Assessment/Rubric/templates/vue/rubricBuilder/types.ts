@@ -1,5 +1,7 @@
 import type { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 
+// TODO: refine these along with types.ts, the assessment API, etc
+
 /**
  * @see /library/Schoolbox/Assessment/Rubric/Grid/Translator/ModelToArray.php
  */

@@ -779,6 +779,15 @@ class ListController extends Web\Controller\Base
              */
             throw $e;
         } catch (\Exception $e) {
+            /* TODO Technical Uplift Candidate
+             *  This \Exception catch also catches db errors, such as this (message, code) outcome described below.
+             *  It breaks the DomainException interface that expects a http status code
+             *    message: SQLSTATE[HY000]: General error: 1364 Field '_box_id' doesn't have a default value
+             *    code:    HY000
+             *
+             *  TODO (continued) This causes a type mismatch error:
+             *   Exception::__construct(): Argument #2 ($code) must be of type int, string given
+             */
             $db->rollback();
             // cast
             throw new DomainException($e->getMessage(), $e->getCode(), $e);
@@ -1510,7 +1519,9 @@ class ListController extends Web\Controller\Base
             'humanReadable' => null,
             'rubric' => null,
             'resubmissionRequired' => null,
-            'rubricMarkedGrid' => null,
+            /* TODO For some reason, this was added, but I don't think it gets used
+             */
+//            'rubricMarkedGrid' => null,
             'responseWithKamiDocs' => null,
             'fileCount' => null,
             'humanReadableInstructorMark' => null,
@@ -1584,9 +1595,11 @@ class ListController extends Web\Controller\Base
                 if ($latestFeedback instanceof \Schoolbox\Learning\Assessment\DueWork\Feedback\Model) {
                     /** @var \Schoolbox\Learning\Assessment\DueWork\Feedback\Model $latestFeedback  */
                     /** @var \Schoolbox\Learning\Assessment\DueWork\Model $assessment */
-                    $feedback['rubric'] = $assessment->getUseRubric();
+                    $feedback['rubric'] = (bool)$assessment->getRubricInstances()->count();
                     $feedback['resubmissionRequired'] = $latestFeedback->getResubmissionRequired();
-                    $feedback['rubricMarkedGrid'] = $latestFeedback->getRubricMarkedGrid();
+                    /* TODO For some reason, this was added, but I don't think it gets used
+                     */
+                    // $feedback['rubricMarkedGrid'] = $latestFeedback->getRubricMarkedGrid();
                     $feedback['responseWithKamiDocs'] = $latestFeedback->hasResponseWithKamiDocs();
                     $feedback['fileCount'] = $latestFeedback->getAllFiles()->count();
                     $feedback['humanReadableInstructorMark'] = $latestFeedback->getHumanReadableInstructorMark();

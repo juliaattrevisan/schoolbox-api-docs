@@ -34,6 +34,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\Reporting\Feedback\Model as ReportingFeedback;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as ImplementationMapper;
@@ -1189,6 +1190,7 @@ class Controller extends ConfigController
     public function collateFeedbacks(Collection $folderAssessments, User $student, User $viewer, array $workTypeOptions): Collection
     {
         $feedbacks = new Collection();
+
         foreach ($folderAssessments as $folderId => $assessments) {
             /** @var IAssessable $assessment */
             foreach ($assessments as $assessment) {
@@ -1196,24 +1198,32 @@ class Controller extends ConfigController
                     $feedbacks->offsetSet($assessment->getId(), null);
                     continue;
                 }
+
                 $participant = $assessment->getParticipantIfExtant($student);
+
                 if (!$participant) {
                     continue;
                 }
+
                 $feedback = $participant->findMostRecentInstructorGivenPublishedFeedback();
-                if (
-                    "1" === $workTypeOptions[$assessment->getWorkType()->getId()]['rubrics']
-                    && $assessment instanceof DueWork
-                    && $feedback instanceof DueWorkFeedback
-                    && $assessment->getUseRubric()
-                ) {
+
+                if ("1" === $workTypeOptions[$assessment->getWorkType()->getId()]['rubrics']) {
                     try {
-                        $rubric = $this->rubricDataSource->retrieveMarkedGrid($feedback);
+                        /* Obtain all the marked rubric grids for an assessment via its set of rubric instances
+                         * There might be a faster way to do this which we can improve later.
+                         */
+                        if ($feedback instanceof DueWorkFeedback || $feedback instanceof ReportingFeedback) {
+                            foreach ($assessment->getRubricInstances() as $rubricInstance) {
+                                $rubric = $this->rubricDataSource->retrieveMarkedGrid($feedback, $rubricInstance);
+
+                                $feedback->getRubricMarkedGrids()->setoffset($rubricInstance->getId(), $rubric);
+                            }
+                        }
                     } catch (MapperException $e) {
                         continue;
                     }
-                    $feedback->setRubricMarkedGrid($rubric);
                 }
+
                 $feedbacks->offsetSet($assessment->getId(), $feedback);
             }
         }

@@ -25,7 +25,7 @@ use Schoolbox\Mapper\Exception as MapperException;
  * @package Schoolbox\Assessment\Rubric\DataModel
  * @method Model createModel($idValue = null)
  * @method Model findById($id)
- * @method Model[] findByColumnList($columnList, $options = array())
+ * @method GenericCollection<Model> findByColumnList($columnList, $options = array())
  * @method Model findOneByColumnList($columnList, $order = [], $options = [])
  */
 class Mapper extends BaseMapper
@@ -70,7 +70,7 @@ class Mapper extends BaseMapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('capability', 'g')}
+                {$this->getJoinColumnString('capability', 'c')}
         ";
     }
 
@@ -82,7 +82,7 @@ class Mapper extends BaseMapper
     {
         return "
             FROM {$this->getTable()}
-            INNER JOIN {$this->getJoinSql('capability', '', 'g', true)}
+            INNER JOIN {$this->getJoinSql('capability', '', 'c', true)}
         ";
     }
 
@@ -92,24 +92,26 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement): GenericCollection
     {
-        $capabilityIds        = [];
+        $capabilityIds = [];
 
         /** @var CapabilityMapper $capabilityMapper */
-        $capabilityMapper     = $this->getJoinMapper('capability');
+        $capabilityMapper = $this->getJoinMapper('capability');
 
         /** @var NodeMapper $curriculumNodeMapper */
         $curriculumNodeMapper = $this->getJoinMapper('curriculum_node_for_rubric_indicator');
 
-        /** @var GenericCollection|Model[] $collection */
-        $collection           = $this->createCollection();
+        /** @var GenericCollection<Model> $collection */
+        $collection = $this->createCollection();
 
         foreach ($statement as $row) {
             /** @var Model $crit */
             $crit = $this->hydrate($row);
-            if ($row['g.id']) {
-                $capabilityIds[] = $row['g.id'];
-                $crit->setCapability($capabilityMapper->hydrate($row, 'g'));
+
+            if ($row['c.id']) {
+                $capabilityIds[] = $row['c.id'];
+                $crit->setCapability($capabilityMapper->hydrate($row, 'c'));
             }
+
             $collection[$crit->getId()] = $crit;
         }
 
@@ -119,17 +121,20 @@ class Mapper extends BaseMapper
             'curriculum_node_for_rubric_indicator',
             $collection->keys()
         );
+
         $capabilityNodes = $curriculumNodeMapper->findForOtherMapper(
             $capabilityMapper,
             'curriculum_node_for_rubric_capability',
             $capabilityIds
         );
+
         foreach ($collection as $indicator) {
             if (isset($indicatorNodes[$indicator->getId()])) {
                 $indicator->setCurriculumNodes($indicatorNodes[$indicator->getId()]);
             } else {
                 $indicator->setCurriculumNodes($curriculumNodeMapper->createCollection());
             }
+
             if (isset($capabilityNodes[$indicator->getCapability()->getId()])) {
                 $indicator->getCapability()->setCurriculumNodes($capabilityNodes[$indicator->getCapability()->getId()]);
             } else {
@@ -146,8 +151,9 @@ class Mapper extends BaseMapper
      *
      * @param Model $indicator
      * @return bool
+     * @throws MapperException
      */
-    public function softDeleteDescriptors(Model $indicator)
+    public function softDeleteDescriptors(Model $indicator): bool
     {
         DescriptorMapper::getInstance()->deleteByColumn('rubric_indicator_id', $indicator->getId());
         return true;
@@ -164,12 +170,14 @@ class Mapper extends BaseMapper
      * @return bool
      * @throws MapperException
      */
-    public function deleteCapability(Model $indicator)
+    public function deleteCapability(Model $indicator): bool
     {
         $remaining = $this->countByColumn('rubric_capability_id', $indicator->getCapability()->getId());
+
         if (0 === $remaining) {
             $this->getJoinMapper('capability')->delete($indicator->getCapability());
         }
+
         return true;
     }
 
@@ -182,11 +190,12 @@ class Mapper extends BaseMapper
      * @param Model $indicator
      * @return bool
      */
-    public function restoreCapability(Model $indicator)
+    public function restoreCapability(Model $indicator): bool
     {
         if ($indicator->getCapability()->isDeleted()) {
             $this->getJoinMapper('capability')->restoreSoftDeleted($indicator->getCapability());
         }
+
         return true;
     }
 
@@ -205,7 +214,9 @@ class Mapper extends BaseMapper
         $usages      = $usageMapper->findByColumn('rubric_indicator_id', $indicator->getId());
         $usageMapper->delete($usages);
         foreach ($usages as $usage) {
-            $usageMapper->toggleUseRubric($usage);
+            /* TODO Deleting a grid probably makes this redundant
+             */
+//            $usageMapper->toggleUseRubric($usage);
         }
     }
 
@@ -237,6 +248,7 @@ class Mapper extends BaseMapper
         // Check this name isn't in use
         $existingNames  = $this->findScalarByPredicates('name', $pb);
         $normalizedName = Util::normalizeName($object->getName());
+
         foreach ($existingNames as $existingName) {
             if (Util::normalizeName($existingName) === $normalizedName) {
                 throw new MapperException(
@@ -256,18 +268,18 @@ class Mapper extends BaseMapper
      * @param string    $parentType One of the `CapabilityModel::PARENT_TYPE_*`
      *                              constants
      * @param bool      $cache      If false, bypass result cache
-     * @return GenericCollection|Model[]
+     * @return GenericCollection<Model>
      */
     public function findForParent($parentId, string $parentType, bool $cache = true): GenericCollection
     {
         return $this->findByColumnList(
             [
-                'g.parent_id'   => $parentId,
-                'g.parent_type' => $parentType,
-                'g.deleted_at'  => null,
+                'c.parent_id'   => $parentId,
+                'c.parent_type' => $parentType,
+                'c.deleted_at'  => null,
             ],
             [
-                'order' => ['g.name' => 'ASC', 'name' => 'ASC'],
+                'order' => ['c.name' => 'ASC', 'name' => 'ASC'],
                 'cache' => $cache,
             ]
         );
@@ -278,9 +290,8 @@ class Mapper extends BaseMapper
      * Find all indicators for a folder.
      *
      * @param int|int[] $folderId The folder ID (or list thereof) to find for
-     * @param bool      $cache    If false, bypass result cache
-     * @return GenericCollection|Model[]
-     * @throws MapperException
+     * @param bool $cache If false, bypass result cache
+     * @return GenericCollection<Model>
      */
     public function findForFolder($folderId, bool $cache = true): GenericCollection
     {
@@ -302,15 +313,17 @@ class Mapper extends BaseMapper
      */
     public function findOneForParentByKey(int $parentId, string $parentType, string $name, string $capabilityName, bool $cache = true): ?Model
     {
-        $indicators               = $this->findByColumnList(
+        $indicators = $this->findByColumnList(
             [
-                'g.parent_type' => $parentType,
-                'g.parent_id'   => $parentId,
+                'c.parent_type' => $parentType,
+                'c.parent_id'   => $parentId,
             ],
             ['cache' => $cache,]
         );
+
         $normalizedCapabilityName = Util::normalizeName($capabilityName);
         $normalizedIndicatorName  = Util::normalizeName($name);
+
         foreach ($indicators as $indicator) {
             /** @var Model $indicator */
             if (
@@ -320,6 +333,7 @@ class Mapper extends BaseMapper
                 return $indicator;
             }
         }
+
         return null;
     }
 
@@ -372,6 +386,7 @@ class Mapper extends BaseMapper
     ): Model {
         // Try to find an indicator with the "same" name and capability name
         $existing = $this->findOneForParentByKey($parentId, $parentType, $name, $capabilityName, $cache);
+
         if ($existing) {
             // Found
             return $existing;
@@ -387,13 +402,16 @@ class Mapper extends BaseMapper
             $nodeMapper               = $this->getJoinMapper('curriculum_node_for_rubric_indicator');
             $indicatorCurriculumNodes = $nodeMapper->createCollection();
         }
+
         // Get a capability under which this indicator should be created
         $capability = $capabilityMapper->findOrCreateOneForParentByName($parentId, $parentType, $capabilityName, $cache, $capabilityCurriculumNodes);
         $indicator  = $this->createModel()
-                           ->setCapability($capability)
-                           ->setName($name)
-                           ->setCurriculumNodes($indicatorCurriculumNodes);
+            ->setCapability($capability)
+            ->setName($name)
+            ->setCurriculumNodes($indicatorCurriculumNodes);
+
         $this->save($indicator);
+
         return $indicator;
     }
 
@@ -441,7 +459,7 @@ class Mapper extends BaseMapper
      * @param object $previous
      * @return bool
      */
-    protected function raiseNotification($object, $verb, $previous = null)
+    protected function raiseNotification($object, $verb, $previous = null): bool
     {
         return true;
     }

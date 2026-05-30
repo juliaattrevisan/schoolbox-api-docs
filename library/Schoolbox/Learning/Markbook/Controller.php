@@ -225,10 +225,7 @@ class Controller extends Base
                             'weight'         => $aImpl->getWeight(),
                             'projectId'      => $parentProject?->getId(),
                             'writable'       => $this->isAssessmentMarkable($this->getUser(), $aImpl, $terms),
-                            'instructorMarkScheme' => [
-                                'template' => $instructorMarkScheme?->getTemplate(),
-                                'context'  => $instructorMarkScheme?->generateContext(),
-                            ],
+                            'instructorMarkScheme' => $instructorMarkScheme?->generateContext(),
                             'participants'   => $markbook->getStudents()->map(
                                 function (User $student) use ($aImpl, $markbook) {
                                     $participant = $aImpl->getParticipantIfExtant($student, false);

@@ -132,7 +132,7 @@ window.Vue.onMounted(() => {
             </loading-cards>
         </div>
         <div v-else-if="participant && aiResponse" class="l-flex-col l-gap-s f-no-margins">
-            <div class="c-vert-scroll-container l-flex-col l-gap-s">
+            <div class="sbx-vert-scroll-container l-flex-col l-gap-s">
                 <div class="l-flex-col l-gap-s f-no-margins">
                     <div class="l-flex-col l-gap-xs f-no-margins">
                         <h3>

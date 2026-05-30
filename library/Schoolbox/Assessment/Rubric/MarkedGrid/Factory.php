@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\MarkedGrid;
 
-use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+use Schoolbox\Learning\Assessment\ISelfAssessableFeedback;
 
 /**
  * Factory for building `MarkedGrid` objects.
@@ -20,28 +20,116 @@ class Factory
      * Build a rubric's marked grid from POST data.
      *
      * @param MarkedGrid $markedGrid A grid (which already contains an assessment and rowset)
-     * @param array      $postData
+     * @param array $postData An array corresponding to the construction of a particular grid
      * @return MarkedGrid
      * @throws \InvalidArgumentException if a bad capability mark is found
      */
     public function buildFromPostData(MarkedGrid $markedGrid, array $postData): MarkedGrid
     {
-        // TODO mark schemes still need to be in the grid, not marked grid
-        $markSchemeFactory = new \Schoolbox\Learning\MarkScheme\Factory();
-        $postDescriptors   = $postData['descriptors'] ?? [];
-        $postCapabilities  = $postData['groups']      ?? [];
+        /* $postData is the stuff in a particular grid, like this:
 
+            Array
+            (
+                [humanReadableMark] => 30.77%
+                [normalisedMark] => 30.77
+                [capabilities] => Array
+                    (
+                        [19] => Array
+                            (
+                                [humanReadableMark] => 100%
+                                [value] => 100
+                                [scaledMark] => 4
+                            )
+
+                        [20] => Array
+                            (
+                                [humanReadableMark] => 50%
+                                [value] => 50
+                                [scaledMark] => 4
+                            )
+
+                        [24] => Array
+                            (
+                                [humanReadableMark] =>
+                                [value] =>
+                                [scaledMark] =>
+                            )
+
+                    )
+
+                [indicators] => Array
+                    (
+                        [37] => Array
+                            (
+                                [value] => 4
+                                [descriptorId] => 211
+                            )
+
+                        [38] => Array
+                            (
+                                [value] => 4
+                                [descriptorId] => 212
+                            )
+
+                        [39] => Array
+                            (
+                                [value] =>
+                                [descriptorId] =>
+                            )
+
+                        [44] => Array
+                            (
+                                [value] =>
+                                [descriptorId] =>
+                            )
+
+                        [45] => Array
+                            (
+                                [value] =>
+                                [descriptorId] =>
+                            )
+
+                        [46] => Array
+                            (
+                                [value] =>
+                                [descriptorId] =>
+                            )
+
+                        [47] => Array
+                            (
+                                [value] =>
+                                [descriptorId] =>
+                            )
+
+                    )
+            )
+         */
+
+        /* This is the state of the rubric grid as it was posted to us. Each grid's selections are contained in one big
+         * json-encoded grid payload - we have to decode it so we can find out what was selected
+         *
+         * Anecdotally, it turns out that "scaledMark" means the value of the descriptor that was chosen, converted by
+         * whatever the Capability Mark Type requires. For example, a chosen descriptor will be represented as a
+         * percentage of the maximum descriptor value if Percentage was chosen as a capablity mark type.
+         */
+
+        // TODO mark schemes still need to be in the grid, not marked grid
+        /* TODO What does that even mean??
+         */
+        $markSchemeFactory = new \Schoolbox\Learning\MarkScheme\Factory();
 
         // Is this a self-reflection?
         // Don't even save capability/indicator mark values
         $feedback         = $markedGrid->getFeedback();
-        $isSelfReflection = $feedback instanceof DueWorkFeedback && $feedback->isSelfReflectionOnly();
-
+        $isSelfReflection = $feedback instanceof ISelfAssessableFeedback && $feedback->isSelfReflectionOnly();
 
         // Set marks for all the capabilities and indicators
         foreach ($markedGrid->getGrid()->getCapabilityUsages() as $capabilityUsage) {
+            $capabilityId = $capabilityUsage->getCapability()->getId();
+
             // Add the cap mark if it wasn't in the marked grid already
             $capabilityMark = $markedGrid->retrieveCapabilityMark($capabilityUsage);
+
             if (!$capabilityMark) {
                 $capabilityMark = new CapabilityMark(
                     $capabilityUsage,
@@ -50,55 +138,58 @@ class Factory
                         $capabilityUsage->getMaxValue(),
                     )
                 );
+
                 $markedGrid->getCapabilityMarks()->add($capabilityMark);
             }
 
+            /* The Capability Mark initial state is null until otherwise determined, I guess, from the post payload
+             * that is sent back per grid. At this point a $capabilityMark is presumed to always exist, since it was
+             * either retrieved from the $markedGrid or spawned anew and added to $markedGrid.
+             */
+            $capabilityMark
+                ->setHumanReadableValue(null)
+                ->setValue(null);
 
-            // Set its value
-            $capabilityId = $capabilityUsage->getCapability()->getId();
+            /* Self reflection feedbacks have no utilisation of capability marks. "not self reflection" is probably not
+             * the right way to do this, but anyway
+             */
+            if (!$isSelfReflection) {
+                /* Check the post payload for the capability mark type values.
+                 */
+                $capabilityMarkHumanReadable = $postData['capabilities'][$capabilityId]['humanReadableMark'] ?? null;
 
-            // If mark per cap is off, this will be empty as no capability data gets posted
-            if ($postCapabilities) {
-                // This is the literal string the user entered into the capability mark input field
-                $capabilityCustomMarkInput = $isSelfReflection
-                    ? null
-                    : ($postCapabilities[$capabilityId]['customMark'] ?? null);
+                /* This seems unused because there's a backend converter that reverse-engineers a numeric value from the
+                 * human-readable input someone provided via the ui
+                 */
+                //$capabilityMarkValue = $post['capabilities'][$capabilityId]['value'] ?? null;
 
-                //if null that is a valid entry
-                if ($capabilityCustomMarkInput === '') {
-                    $capabilityCustomMarkInput = null;
-                }
-
-                // Validate the input string first
-                $capMarkSpec = new ValidCapabilityMark($capabilityMark->getMarkScheme());
-                if ($capMarkSpec->isSatisfiedBy($capabilityCustomMarkInput)) {
-                    // Set the capability mark's values:
-                    // human-readable: whatever was passed in the form
-                    // standard value: calculated based on the human-readable value
+                /* Check whether the capability mark's human readable string is a valid input; if it is, assign its
+                 * values to the $capabilityMark instance.
+                 */
+                if ((new ValidCapabilityMark($capabilityMark->getMarkScheme()))->isSatisfiedBy($capabilityMarkHumanReadable)) {
                     $capabilityMark
-                        ->setHumanReadableValue($capabilityMark->convertFormInputToHumanReadableValue($capabilityCustomMarkInput))
-                        ->setValue($capabilityMark->convertFormInputToValue($capabilityCustomMarkInput));
+                        ->setHumanReadableValue($capabilityMark->convertFormInputToHumanReadableValue($capabilityMarkHumanReadable))
+                        ->setValue($capabilityMark->convertFormInputToValue($capabilityMarkHumanReadable));
                 } else {
                     throw new \InvalidArgumentException("Capability mark must be between 0 and " . $capabilityMark->getCapabilityUsage()->getMaxValue());
                 }
-            } else {
-                // If mark per cap is off, set capability mark to null; the model knows how to handle this.
-                $capabilityMark
-                    ->setHumanReadableValue(null)
-                    ->setValue(null);
             }
 
             // Set marks for indicators
             foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
+                $indicatorId = $indicatorUsage->getIndicator()->getId();
+
                 $indicatorMarkValue = null;
                 $selectedDescriptor = null;
+
                 foreach ($indicatorUsage->getDescriptors() as $descriptor) {
-                    $descriptorId = $descriptor->getId();
+                    $descriptorId = (int)$descriptor->getId();
 
                     // Find which descriptor was actually selected
-                    $isDescriptorSelected = !empty($postDescriptors[$descriptorId]['selected']);
+                    $isDescriptorSelected = (int)$postData['indicators'][$indicatorId]['descriptorId'] == $descriptorId;
+
                     if ($isDescriptorSelected) {
-                        $indicatorMarkValue = $postDescriptors[$descriptorId]['value'] ?? $descriptor->getMaxValue();
+                        $indicatorMarkValue = $postData['indicators'][$indicatorId]['value'] ?? $descriptor->getMaxValue();
                         $selectedDescriptor = $descriptor;
                         break;
                     }
@@ -106,16 +197,19 @@ class Factory
 
                 // Add the indicator mark, and set its descriptor/value
                 $indicatorMark = $markedGrid->retrieveIndicatorMark($indicatorUsage);
+
                 if (!$indicatorMark) {
                     $indicatorMark = new IndicatorMark($indicatorUsage);
                     $capabilityMark->getIndicatorMarks()->add($indicatorMark);
                 }
 
                 $indicatorMark->setDescriptor($selectedDescriptor);
+
                 if ($isSelfReflection) {
                     $indicatorMark->setValue(null);
                 } else {
                     $indicatorMarkSpec = new ValidIndicatorMark($selectedDescriptor);
+
                     if ($indicatorMarkSpec->isSatisfiedBy($indicatorMarkValue)) {
                         $indicatorMark->setValue(
                             filter_var(
@@ -134,6 +228,7 @@ class Factory
                         } else {
                             $message = "Indicator mark must be null";
                         }
+
                         throw new \InvalidArgumentException($message);
                     }
                 }

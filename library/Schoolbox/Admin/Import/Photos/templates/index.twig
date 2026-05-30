@@ -3,15 +3,16 @@
     $(function() {
         $('[data-delete]').on('click', function(event) {
             event.preventDefault();
+            var deleteButton = $(event.currentTarget);
 
             $(this).confirmDialog({
                 text: 'Are you sure you want to remove this user\'s photo?',
                 confirmEvent: function() {
                     $.post('/adminv2/import/photos/delete', {
-                        id: $(event.target).attr('data-delete')
+                        id: deleteButton.attr('data-delete')
                     })
                         .done(function() {
-                            $(event.target).closest('li').remove();
+                            deleteButton.closest('li').remove();
                         });
                 }
             });

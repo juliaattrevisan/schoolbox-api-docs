@@ -188,9 +188,12 @@ class Hydrator extends BaseHydrator
                         $searchResultContextHtml = $fieldContentHtmlMatchingKeyword;
                     } else {
                         // The keyword was not found in any field content visible to the user.
-                        $searchResultContextHtml = $this->consistentlyFormatLessonPlanFieldContent(
-                            $assessment->getFields()->first(),
-                        );
+                        // Fall back to the first field the viewer may read, so the result context does not expose
+                        // staff-only content to students.
+                        $searchResultContextHtml = $this->getFirstVisibleLessonPlanFieldContentHtml(
+                            $assessment,
+                            $viewer,
+                        ) ?? '';
                     }
 
                     $searchResultContext = $this->htmlToText($searchResultContextHtml);
@@ -300,7 +303,7 @@ class Hydrator extends BaseHydrator
 
         // Find visible content that contains the search keyword.
         foreach ($lessonPlan->getFields() as $field) {
-            if ($treatViewerAsStudent && $field->getVisibility() !== 'student') {
+            if (!$this->isLessonPlanFieldVisibleToViewer($field, $treatViewerAsStudent)) {
                 // No visible content here.
                 continue;
             }
@@ -318,6 +321,49 @@ class Hydrator extends BaseHydrator
         }
 
         return $fieldContentHtmlToReturn;
+    }
+
+    /**
+     * Return the first lesson plan field that is visible to the viewer, formatted for result context.
+     *
+     * This is used when the indexed lesson plan matched the search term, but no viewer-visible field contained that
+     * term. In that case, the result still needs context, but must not fall back to a staff-only field for students.
+     *
+     * @param Model $lessonPlan Lesson plan whose fields are being searched.
+     * @param User  $viewer     User viewing the search result.
+     * @return string|null
+     */
+    private function getFirstVisibleLessonPlanFieldContentHtml(
+        Assessment\LessonPlan\Model $lessonPlan,
+        User $viewer
+    ): ?string {
+        // Lesson plan field visibility distinguishes staff-only fields from fields shown to students. For this check,
+        // superusers follow staff visibility rules.
+        $treatViewerAsStudent = !($viewer->isSuperuser() || $viewer->getRole()->isStaff());
+
+        foreach ($lessonPlan->getFields() as $field) {
+            if ($this->isLessonPlanFieldVisibleToViewer($field, $treatViewerAsStudent)) {
+                return $this->consistentlyFormatLessonPlanFieldContent($field);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Return whether a lesson plan field may be used as search result context for the viewer.
+     *
+     * Staff and superusers may see all fields. Other users may only see fields marked as student-visible.
+     *
+     * @param Assessment\DataModel\LessonPlan\Field\Model $field                Field to check.
+     * @param bool                                       $treatViewerAsStudent Whether to apply student visibility.
+     * @return bool
+     */
+    private function isLessonPlanFieldVisibleToViewer(
+        Assessment\DataModel\LessonPlan\Field\Model $field,
+        bool $treatViewerAsStudent
+    ): bool {
+        return !$treatViewerAsStudent || $field->getVisibility() === 'student';
     }
 
     /**

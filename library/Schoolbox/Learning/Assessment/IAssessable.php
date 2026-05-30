@@ -919,6 +919,22 @@ interface IAssessable extends ISoftDeletable
 
 
     /**
+     * @return GenericCollection<\Schoolbox\Assessment\Rubric\Instance\Model>|null
+     */
+    public function getRubricInstances(): ?GenericCollection;
+
+
+    /**
+     * This variant of a setters also checks/asserts the contents of $rubricInstances supplied here to ensure they're
+     * the same type as what it originally was.
+     *
+     * @param GenericCollection<\Schoolbox\Assessment\Rubric\Instance\Model>|null $rubricInstances
+     * @return $this
+     */
+    public function setRubricInstances(?GenericCollection $rubricInstances): self;
+
+
+    /**
      * A collection of Curriculum Nodes
      *
      * @return Node\Model[]|GenericCollection

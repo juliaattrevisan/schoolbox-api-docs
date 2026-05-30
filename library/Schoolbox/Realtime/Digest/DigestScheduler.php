@@ -12,7 +12,7 @@ use Alaress\Date\IClock;
 use Alaress\Scheduler\CronScheduler;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\WorkerCrew\Pool;
-use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
+use Alaress\WorkerCrew\Pooling\DispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -141,7 +141,7 @@ class DigestScheduler extends CronScheduler
      */
     protected function getMethod()
     {
-        return DefaultDispatchStrategy::TASK_DIGEST;
+        return DispatchStrategy::TASK_DIGEST;
     }
 
 

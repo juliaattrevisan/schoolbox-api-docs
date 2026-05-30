@@ -28,9 +28,12 @@ export type CandidateDetailsStatus = "confirmed" | "unconfirmed";
 export type StudentRow = {
     id: number;
     name: string;
+    userId: number;
     candidateDetailsStatus: CandidateDetailsStatus;
     subjects: SubjectGroup;
     updateLanguageEndpoint: string | null;
+    renotifyEndpoint: string | null;
+    stage: "preparation" | "unconfirmed" | "confirmed" | "inProgress" | "failed" | "registered";
 };
 
 /**
@@ -117,4 +120,18 @@ export type ApiCandidatesResponse = {
     success: true;
     students: Record<string, ApiStudent[]>;
     statuses: ApiStatus[];
+};
+
+/**
+ * Raw response from the renotify endpoint.
+ */
+export type ApiRenotifyResponse = {
+    success: boolean;
+    partial: boolean;
+    message?: string;
+    renotified: number[];
+    failed: {
+        studentId: number;
+        message: string;
+    }[];
 };

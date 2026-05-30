@@ -9,7 +9,6 @@ namespace Schoolbox\Assessment\Rubric\DataModel\CapabilityMark;
 
 use PDO;
 use PDOStatement;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as CapabilityMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
@@ -19,8 +18,8 @@ use Schoolbox\Mapper as BaseMapper;
  *
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model createModel($idValue = null)
- * @method GenericCollection|Model[] createCollection($contents = [])
- * @method GenericCollection|Model[] findByColumnList($columnList, $options = [])
+ * @method GenericCollection<Model> createCollection($contents = [])
+ * @method GenericCollection<Model> findByColumnList($columnList, $options = [])
  */
 class Mapper extends BaseMapper
 {
@@ -34,15 +33,9 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('human_readable_value', self::TYPE_STRING);
         $this->uses('value', self::TYPE_DECIMAL);
-        $this->joins(
-            'return_id',
-            ReturnedWorkMapper::class,
-            'id',
-            self::TYPE_MODEL,
-            null,
-            'submissionReturn',
-            'submission_return'
-        );
+        $this->uses('feedback_id', self::TYPE_INTEGER);
+        $this->uses('feedback_table', self::TYPE_STRING);
+
         $this->joins(
             'rubric_capability_id',
             CapabilityMapper::class,
@@ -51,6 +44,16 @@ class Mapper extends BaseMapper
             null,
             'capability',
             'capability'
+        );
+
+        $this->joins(
+            'rubric_instance_id',
+            \Schoolbox\Assessment\Rubric\Instance\Mapper::class,
+            'id',
+            null,
+            null,
+            'rubricInstance',
+            'rubricInstance'
         );
 
         // This is NOT a soft-delete column, but effectively has the same
@@ -68,7 +71,7 @@ class Mapper extends BaseMapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('submission_return', 'r')}
+                {$this->getJoinColumnString('rubricInstance', 'ri')}
         ";
     }
 
@@ -80,25 +83,38 @@ class Mapper extends BaseMapper
     {
         return "
             FROM {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('submission_return', '', 'r')}
+            INNER JOIN {$this->getJoinSql('rubricInstance', '', 'ri', true)}
         ";
     }
 
 
     /**
      * @param PDOStatement $statement
-     * @return Model[]|GenericCollection
+     * @return GenericCollection<Model>
      * @throws BaseMapper\Exception
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        /** @var ReturnedWorkMapper $submissionReturnMapper */
-        $submissionReturnMapper = $this->getJoinMapper('submission_return');
-        $marks                  = $this->createCollection();
+        $marks = $this->createCollection();
 
-        while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $mark = $this->hydrate($r);
-            $mark->setSubmissionReturn($submissionReturnMapper->hydrate($r, 'r'));
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            /* As far as I can tell, the submission_return instance (and any other feedback instances) aren't actually
+             * meaningful beyond the loading/saving of its identifier; they probably weren't even needed at all. Now
+             * that we have a somewhat-polymorphic (feedback_id, feedback_table) tuple idea we probably need to do that
+             * in business logic anyway or risk a massive mega-left-join onto every possible feedback table.
+             *
+             * Maybe you'll need to do that when we expand usages beyond due works
+             */
+            $mark = $this->hydrate($row);
+
+            /* We need the rubric instance to know -which grid- in (feedback_id, feedback_table) has this particular
+             * capability mark
+             */
+            /** @var \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance */
+            $rubricInstance = $this->hydrateJoin($row, 'rubricInstance', 'ri');
+
+            $mark->setRubricInstance($rubricInstance);
+
             $marks->add($mark);
         }
 
@@ -109,16 +125,29 @@ class Mapper extends BaseMapper
     /**
      * This will HARD-DELETE all previously given marks with the feedback.
      *
-     * @param int $returnId
+     * @param int $feedbackId
+     * @param \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance
+     * @param string $feedbackTable
      * @return int
      */
-    public function deleteFeedbackMarks($returnId): int
+    public function deleteFeedbackMarks(int $feedbackId, \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance, string $feedbackTable): int
     {
-        $query = "DELETE FROM rubric_capability_mark WHERE return_id = :return_id";
+        /* Removes all capability marks associated with a particular feedback, across all rubric grids/instances.
+         * Note the polymorphic (feedback_id, feedback_table) usage here.
+         */
+        $query = "
+            DELETE FROM {$this->getTable()} rcm
+            WHERE rcm.feedback_id = :feedbackId
+            AND rcm.feedback_table = :feedbackTable
+            AND rcm.rubric_instance_id = :rubricInstanceId
+        ";
 
         $statement = $this->database->prepare($query);
+
         $statement->execute([
-            'return_id' => $returnId,
+            'feedbackId' => $feedbackId,
+            'feedbackTable' => $feedbackTable,
+            'rubricInstanceId' => $rubricInstance->getId(),
         ]);
 
         return $statement->rowCount();

@@ -19,7 +19,7 @@ use Alaress\Redis\Async\Event\IEvent;
 use Alaress\Redis\Async\Event\Message;
 use Alaress\Redis\Async\EventListener;
 use Alaress\Scheduler\AbstractScheduler;
-use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
+use Alaress\WorkerCrew\Pooling\DispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress_Date_Format;
 use DateTime;
@@ -97,7 +97,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
      */
     protected function getMethod()
     {
-        return DefaultDispatchStrategy::TASK_MOBILE;
+        return DispatchStrategy::TASK_MOBILE;
     }
 
     /**

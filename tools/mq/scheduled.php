@@ -15,7 +15,8 @@ use Alaress\Redis\Async;
 use Alaress\Async\Notification\Postman;
 use Alaress\Date\Clock;
 use Alaress\Scheduler\Cache\RedisCache;
-use Alaress\Sentry\Tracing\Tracer;
+use Alaress\WorkerCrew\Pooling\ConfigurationReader;
+use Alaress\WorkerCrew\Pooling\ConfiguredDispatchStrategyBuilder;
 use Predis\ClientInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -26,15 +27,22 @@ use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Routing;
 use Schoolbox\Realtime\Schedule\Broker;
 use Schoolbox\Realtime\Schedule\Scheduler;
-use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Daemon\Kernel('Schedule', [Daemon\Kernel::OPTION_ERRORS => E_ALL,]);
+$kernel = new Daemon\Kernel(
+    'Schedule',
+    [
+        Daemon\Kernel::OPTION_ERRORS         => E_ALL,
+        Daemon\Kernel::OPTION_APP_SHORT_OPTS => 'c:',
+    ],
+);
 
 // CREATE SCHEDULER APP
 $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) use (&$scheduler): void {
+    $configFile = $opts['c'] ?? (SITE_root . '/tools/mq/scheduled.conf');
+
     /** @var Notif $notif */
     $notif = $di->get('notif');
 
@@ -62,7 +70,39 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
 
         $postman = new Postman($log, $subscriptionCache, $loop, $flags, INSTANCE_ID, $redis);
 
-        $strat     = new DefaultDispatchStrategy($flags);
+        // Relevant config options to scheduled:
+        $stratBuilder           = new ConfiguredDispatchStrategyBuilder(new ConfigurationReader($configFile)->readConfig());
+        $strat                  = $stratBuilder->build($flags);
+        $maxFutureTriggerTimeMs = $strat->getMaxFutureTriggerTime();
+
+        // Convert max future trigger time from ms to s, rounding up:
+        $maxFutureTriggerTime = intdiv($maxFutureTriggerTimeMs, 1000);
+        if ($maxFutureTriggerTimeMs % 1000 !== 0) {
+            $maxFutureTriggerTime += 1;
+            $log->notice(
+                sprintf(
+                    'maxFutureTriggerTime value %dms is not a whole second value: rounding up to %ds',
+                    $maxFutureTriggerTimeMs,
+                    $maxFutureTriggerTime,
+                ),
+            );
+        }
+
+        // Since future triggers are cached using the JIT cache:
+        // the max future trigger time must be <= the JIT's TTL.
+        if ($maxFutureTriggerTime > 0) {
+            if ($maxFutureTriggerTime > RedisCache::EXPIRY_WINDOW) {
+                $log->notice(
+                    sprintf(
+                        'maxFutureTriggerTime %ds is greater than cache expiry window of %ds: reducing to that value',
+                        $maxFutureTriggerTime,
+                        RedisCache::EXPIRY_WINDOW,
+                    ),
+                );
+                $maxFutureTriggerTime = RedisCache::EXPIRY_WINDOW;
+            }
+        }
+
         $scheduler = new Scheduler(
             $loop,
             $strat,
@@ -71,10 +111,12 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
             $conf,
             $postman,
             INSTANCE_ID,
-            // Since future triggers are cached using the JIT cache, the max
-            // future trigger time must be <= the JIT's TTL.
-            min(Scheduler::DEFAULT_MAX_FUTURE_TRIGGER_TIME, RedisCache::EXPIRY_WINDOW),
+            $maxFutureTriggerTime,
         );
+
+        // Summarise strategy
+        $delim = \array_key_exists(Daemon\Kernel::OPT_LONG_PORCELAIN, $opts) ? ' ' : "\n    ";
+        $log->info(implode($delim, ['Using strategy:'] + $stratBuilder->summarise()), ['char' => '+']);
 
         // restoring from redis cache
         $jit = new RedisCache($redis, $log, INSTANCE_ID);

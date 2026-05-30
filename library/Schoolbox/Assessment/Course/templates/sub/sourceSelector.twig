@@ -28,9 +28,8 @@
 
                 // selector takes the name, input takes the ID
                 $selector
-                    .addClass('icon-folder')
-                    .text($selection.data('label'))
                     .removeClass('placeholder');
+                $selector.find('[data-course-parent-selector-label]').text($selection.data('label'));
                 $input.val($selection.data('selection'));
 
                 //Hacky way to remove error message - could not find alternative
@@ -54,8 +53,9 @@
 
 <a data-course-parent-selector data-source="parent"
    title="Click to change the {{ locale.faculty }} / {{ locale.subject }} this course belongs to"
-   class="source-select icon-folder {% if not courseSpec %}placeholder{% endif %}"
+    class="source-select {% if not courseSpec %}placeholder{% endif %}"
    href="#" >
-   {{ courseSpec ? courseSpec.folder.parent.name : '(Click to select)' }}
+    <sbx-icon name="folder"></sbx-icon>
+    <span data-course-parent-selector-label>{{ courseSpec ? courseSpec.folder.parent.name : '(Click to select)' }}</span>
 </a>
 <input class="hide" name="parent" id="parent" value="{{ courseSpec ? courseSpec.folder.parent.id : '' }}" />

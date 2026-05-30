@@ -14,11 +14,18 @@ use Scrub;
 
 class ModelToArray
 {
+    /**
+     * Returns an (id, name) tuple that represents an indicator in a scalar format, translating any markdown that might
+     * have existed there
+     *
+     * @param Model $indicator
+     * @return array
+     */
     public function __invoke(Model $indicator): array
     {
         return [
-            'id'            => $indicator->getId(),
-            'name'          => Scrub::markdown($indicator->getName()),
-            ];
+            'id' => $indicator->getId(),
+            'name' => Scrub::markdown($indicator->getName()),
+        ];
     }
 }

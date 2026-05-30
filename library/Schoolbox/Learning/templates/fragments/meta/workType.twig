@@ -2,7 +2,7 @@
 
 {% if assessment.isSelfGradable ?? false %}
     {% set selfReflectSuffix = ' includes ' ~ locale.selfAssessment.proper %}
-{% elseif assessment.isSelfReflectableOnly ?? false %}
+{% elseif assessment.isSelfReflectionOnly ?? false %}
     {% set selfReflectSuffix = ' includes ' ~ locale.selfReflection.proper %}
 {% else %}
     {% set selfReflectSuffix = '' %}

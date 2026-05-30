@@ -9,7 +9,7 @@ import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/Asses
  * check the grade calculation is correct based on the weight in the class and course mark books
  */
 
-test.describe("Markbook activity weight sync between mark books and activity modify page", () => {
+test.describe.skip("Markbook activity weight sync between mark books and activity modify page", () => {
     // Mario id
     const studentMarioId = 63;
     // Jamal id

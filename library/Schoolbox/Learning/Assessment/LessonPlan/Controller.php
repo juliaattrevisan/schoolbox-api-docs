@@ -14,6 +14,7 @@ use Aura\Router\Exception\RouteNotFound;
 use Closure;
 use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
@@ -47,6 +48,8 @@ use Twig\Error\Error;
 class Controller extends Assessment\Controller
 {
     /**
+     * Constructor.
+     *
      * @param UserMapper $userMapper
      * @param ErrorMapper $errorMapper
      * @param AssessmentMapperProxy $assessmentMapper
@@ -54,6 +57,8 @@ class Controller extends Assessment\Controller
      * @param Access $access
      * @param Transactor $transactor
      * @param BreadcrumbFactory $bakery
+     * @param \Schoolbox\Assessment\Rubric\DataModel\Result\Mapper $resultSetMapper
+     * @param RubricDataSource $rubricMapper
      * @param Term\Mapper $termMapper
      * @param Participant\DataSource $participantDataSource
      * @param CourseSpecification\Mapper $courseSpecificationMapper
@@ -77,6 +82,8 @@ class Controller extends Assessment\Controller
         Access $access,
         Transactor $transactor,
         BreadcrumbFactory $bakery,
+        protected \Schoolbox\Assessment\Rubric\DataModel\Result\Mapper $resultSetMapper,
+        protected \Schoolbox\Assessment\Rubric\DataModel\DataSource $rubricMapper,
         Term\Mapper $termMapper,
         Participant\DataSource $participantDataSource,
         CourseSpecification\Mapper $courseSpecificationMapper,
@@ -100,6 +107,8 @@ class Controller extends Assessment\Controller
             $access,
             $transactor,
             $bakery,
+            $resultSetMapper,
+            $rubricMapper,
             $termMapper,
             $participantDataSource,
             $courseSpecificationMapper,

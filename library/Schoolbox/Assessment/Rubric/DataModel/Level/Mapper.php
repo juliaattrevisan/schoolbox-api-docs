@@ -10,10 +10,9 @@
 namespace Schoolbox\Assessment\Rubric\DataModel\Level;
 
 use PDOStatement;
-use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception;
 
 /**
  * Class LevelMapper
@@ -22,8 +21,8 @@ use Schoolbox\Mapper as BaseMapper;
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model createModel($idValue = null)
  * @method Model findById($id)
- * @method Collection|Model[] findByColumn($columnName, $columnValue, $options = array())
- * @method Collection|Model[] findByColumnList($columnList, $options = array())
+ * @method GenericCollection<Model> findByColumn($columnName, $columnValue, $options = array())
+ * @method GenericCollection<Model> findByColumnList($columnList, $options = array())
  */
 class Mapper extends BaseMapper
 {
@@ -35,29 +34,40 @@ class Mapper extends BaseMapper
     protected function mapping()
     {
         $this->hasModel(Model::class);
-
         $this->hasTable('rubric_level');
-
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
         $this->uses('sequence', self::TYPE_INTEGER);
 
-        $this->joins('box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox', 'box');
+        $this->joins(
+            'rubric_instance_id',
+            \Schoolbox\Assessment\Rubric\Instance\Mapper::class,
+            'id',
+            null,
+            null,
+            'rubricInstance',
+            'rubricInstance'
+        );
+
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
-        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateBoxIdNotChanged']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateRubricInstanceNotChanged']);
     }
 
 
     /**
-     * Verify this level belongs to the same box it always belonged to.
+     * Verify this level belongs to the same rubric instance it always belonged to.
+     *
+     * TODO I'm not really sure what was meant by this, there's no documentation as to why this is illegal/undesirable
+     *  but according to SA-7670 something went awry when importing a rubric csv, causing data loss; no associated PR.
+     *  Anyway I'm going to assume that submission box can be replaced conceptually by a rubric instance as usual.
      *
      * @param Model $level
      * @return bool
      */
-    public function validateBoxIdNotChanged(Model $level): bool
+    public function validateRubricInstanceNotChanged(Model $level): bool
     {
-        $this->assertJoinedModelNotChanged($level, 'box', 'Rubric levels may not be transferred between due works');
+        $this->assertJoinedModelNotChanged($level, 'rubricInstance', 'Rubric levels may not be transferred between rubric instances');
         return true;
     }
 
@@ -68,8 +78,9 @@ class Mapper extends BaseMapper
     protected function getSelectString()
     {
         return "
-            SELECT {$this->getColumnString()},
-                   {$this->getJoinColumnString('box', 'b')}
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('rubricInstance', 'ri')}
         ";
     }
 
@@ -81,29 +92,32 @@ class Mapper extends BaseMapper
     {
         return "
             FROM {$this->getTable()}
-            INNER JOIN {$this->getJoinSql('box', null, 'b', true)}
+            INNER JOIN {$this->getJoinSql('rubricInstance', '', 'ri', true)}
         ";
     }
 
 
     /**
      * @param PDOStatement $statement
-     * @return Collection
+     * @return GenericCollection
+     * @throws Exception
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $c = $this->createCollection();
+        $collection = $this->createCollection();
 
-        while ($r = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $model = $this->hydrate($r);
-            /** @var SubmissionBox $box */
-            $box = $this->hydrateJoin($r, 'box', 'b');
-            $model->setSubmissionBox($box);
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $model = $this->hydrate($row);
 
-            $c->add($model);
+            /** @var \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance */
+            $rubricInstance = $this->hydrateJoin($row, 'rubricInstance', 'ri');
+
+            $model->setRubricInstance($rubricInstance);
+
+            $collection->add($model);
         }
 
-        return $c;
+        return $collection;
     }
 
 
@@ -115,7 +129,7 @@ class Mapper extends BaseMapper
      * @param object $previous
      * @return bool
      */
-    protected function raiseNotification($object, $verb, $previous = null)
+    protected function raiseNotification($object, $verb, $previous = null): bool
     {
         return true;
     }

@@ -16,7 +16,7 @@ import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import type { GradeScheme } from "@schoolboxLibrary/Learning/Assessment/templates/fragments/vue/mark-type.vue";
 import type { RubricGrid, ResultSet } from "./types";
 import RbRubricFields from "./rb-rubric-fields.vue";
-import RbRubricGrid from "./rb-rubric-grid.vue";
+import RbEditableGrid from "./rb-editable-grid.vue";
 import RbRubricDownload from "./rb-rubric-download.vue";
 import { apiRequest } from "@js/util/sbx/apiUtils";
 
@@ -37,7 +37,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const rubricGrids = window.Vue.ref(cloneDeep(props.rubricGridsPayload)); // local mutable copy
-const initialGridIds = props.rubricGridsPayload.map((grid) => grid.id); // so that imported rubrics can expand by default
+const initialRubricIds = props.rubricGridsPayload.map((grid) => grid.id); // so that imported rubrics can expand by default
 
 /**
  * Calculates the assessment's total weight from the rubric grids
@@ -65,7 +65,7 @@ const allRubricsSum = window.Vue.computed(() => {
             }
         }
 
-        let weightMultiplier = 1;
+        let weightMultiplier = 0;
         if (totalRubricWeight.value > 0) {
             // rubrics with no weights don't contribute to the total if weighted rubrics are present
             weightMultiplier = (rubric.weight ?? 0) / totalRubricWeight.value;
@@ -186,11 +186,14 @@ async function importRubric(data: unknown): Promise<void> {
     toast.timeout({ text: "Rubric imported", isSuccess: true });
 
     // TODO: for now this will just add a new rubric, it possibly needs to do more...
-    // TODO: temp override the ID, currently it will conflict with the assessment ID if a rubric already exists
-    rubricGrids.value.push({
-        ...response.data.rubricGrid,
-        id: Math.min(...rubricGrids.value.map((grid) => grid.id), 0) - 1, // negative ID represents a new rubric that hasn't been persisted yet
-    });
+    const newRubric = response.data.rubricGrid;
+    if (newRubric.id === null || newRubric.id < 0) {
+        // negative ID represents a new rubric that hasn't been persisted yet
+        newRubric.id = Math.min(...rubricGrids.value.map((grid) => grid.id), 0) - 1;
+    }
+
+    rubricGrids.value.push(newRubric);
+
     showRubricCreate.value = false;
 }
 
@@ -268,7 +271,7 @@ const rubricRows = window.Vue.computed(() => {
         data-rubric-builder-row
     >
         <fieldset-collapsible
-            :initially-expanded="rubric.id === 'create' || rubric.id < 0 || !initialGridIds.includes(rubric.id)"
+            :initially-expanded="rubric.id === 'create' || rubric.id < 0 || !initialRubricIds.includes(rubric.id)"
         >
             <template #legend>
                 Rubric {{ index + 1 }}
@@ -289,7 +292,7 @@ const rubricRows = window.Vue.computed(() => {
                     :rubric-id="rubric.id"
                 />
 
-                <rb-rubric-grid
+                <rb-editable-grid
                     v-model:rubric-grid-levels="rubric.levels"
                     v-model:rubric-grid-capabilities="rubric.capabilities"
                     :rubric="rubric"

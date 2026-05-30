@@ -137,8 +137,5 @@
     "lint": "npx eslint --max-warnings=0 --concurrency=2 --ext .ts,.vue .",
     "prettier:check": "npx prettier --check \"**/*.{js,ts,vue,mdx,css,scss}\"",
     "prettier:write": "npx prettier --write \"**/*.{js,ts,vue,mdx,css,scss}\""
-  },
-  "msw": {
-    "workerDirectory": "stories/assets"
   }
 }

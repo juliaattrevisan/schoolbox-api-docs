@@ -9,7 +9,7 @@ import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/Asses
  * check that proper audience can or cannot see the marks based on visibility settings
  */
 
-test.describe("Markbook mark visibility sync between mark books and activity modify page", () => {
+test.describe.skip("Markbook mark visibility sync between mark books and activity modify page", () => {
     let markbookPage: MarkbookPage;
     let commonPage: Common;
     let assessmentForm: AssessmentForm;

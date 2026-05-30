@@ -4,14 +4,14 @@
     </li>
     <!-- BEGIN breadcrumb -->
     <li class="{BREADCRUMB_CLASS}" data-breadcrumb>
-        <a href='#' rel='{BREADCRUMB_CATEGORY_ID}'>{BREADCRUMB_NAME}</a>
+        <a href='#' rel='{BREADCRUMB_CATEGORY_ID}' data-test="breadcrumb-name-{BREADCRUMB_NAME}">{BREADCRUMB_NAME}</a>
     </li>
     <!-- END breadcrumb -->
 </ul>
 <ul class="resource-list">
     <!-- BEGIN node_category -->
     <li data-node-category class="resource">
-        <a href="#" rel="{NODE_CATEGORY_ID}" title="{NODE_CATEGORY_NAME}" class="icon-{NODE_CATEGORY_TYPE}">
+        <a href="#" rel="{NODE_CATEGORY_ID}" title="{NODE_CATEGORY_NAME}" class="icon-{NODE_CATEGORY_TYPE}" data-test="node-name-{NODE_CATEGORY_NAME}">
             {NODE_CATEGORY_NAME}
         </a>
     </li>

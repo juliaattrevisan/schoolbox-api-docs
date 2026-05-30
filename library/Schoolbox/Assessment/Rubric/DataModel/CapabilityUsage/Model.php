@@ -9,39 +9,43 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage;
 
-use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
 
 /**
- * Model for usage of a rubric capability on a due work.
+ * Model for usage of a rubric capability
  */
 class Model
 {
-    /** @var int */
-    public const SEQUENCE_BASE = 1; // Capability sequence is 1-based, not 0-based
+    /**
+     * Capability sequence is 1-based, not 0-based
+     *
+     * TODO why does this matter tho? The machine doesn't care, so a human must - somewhere...but why?????
+     */
+    public const int SEQUENCE_BASE = 1;
+
 
     /**
      * @var CapabilityModel
      */
-    private $capability;
+    private CapabilityModel $capability;
 
 
     /**
-     * @var SubmissionBox
+     * @var null|\Schoolbox\Assessment\Rubric\Instance\Model
      */
-    private $submissionBox;
+    private ?\Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance;
 
 
     /**
      * @var float|null
      */
-    private $maxValue;
+    private ?float $maxValue;
 
 
     /**
      * @var int
      */
-    private $sequence;
+    private int $sequence;
 
 
     /**
@@ -65,21 +69,21 @@ class Model
 
 
     /**
-     * @return SubmissionBox
+     * @return null|\Schoolbox\Assessment\Rubric\Instance\Model
      */
-    public function getSubmissionBox(): SubmissionBox
+    public function getRubricInstance(): ?\Schoolbox\Assessment\Rubric\Instance\Model
     {
-        return $this->submissionBox;
+        return $this->rubricInstance;
     }
 
 
     /**
-     * @param SubmissionBox $submissionBox
-     * @return static
+     * @param null|\Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance
+     * @return $this
      */
-    public function setSubmissionBox(SubmissionBox $submissionBox): self
+    public function setRubricInstance(?\Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance): self
     {
-        $this->submissionBox = $submissionBox;
+        $this->rubricInstance = $rubricInstance;
         return $this;
     }
 

@@ -4,11 +4,24 @@
     @include form-element;
     border-radius: var(--sbx-config-field-corner-radius);
     color: var(--sbx-config-color-accent, $content-ui-foreground);
+    display: flex;
+    gap: 0.5rem;
     font-weight: normal;
     min-height: $global-button-input-height;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    sbx-icon {
+        color: var(--sbx-config-color-accent, $content-ui-foreground);
+        flex-shrink: 0;
+    }
+
+    [data-course-parent-selector-label] {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
     &:hover {
         background-color: $input-hover-bg-color;
     }
@@ -24,6 +37,11 @@
 
     &.placeholder {
         color: var(--sbx-config-color-accent, $aluminum);
+
+        sbx-icon {
+            color: var(--sbx-config-color-accent, $aluminum);
+        }
+
         &.icon-folder:before {
             color: var(--sbx-config-color-accent, $aluminum);
         }

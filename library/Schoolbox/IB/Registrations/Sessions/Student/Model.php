@@ -10,10 +10,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\IB\Registrations\Sessions\Student;
 
+use Alaress_Date_Format;
 use Schoolbox\GenericCollection;
 use Schoolbox\IB\Group\Subject\Model as GroupSubjectModel;
 use Schoolbox\IB\Registrations\Sessions\Model as SessionModel;
+use Schoolbox\IModel;
 use Schoolbox\Mapper\Traits\Model as ModelTraits;
+use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\User;
 
 /**
@@ -21,11 +24,12 @@ use Schoolbox\User;
  *
  * @package Schoolbox\IB\Registrations\Sessions\Student
  */
-class Model
+class Model implements IModel
 {
     use ModelTraits\Id;
     use ModelTraits\CreatedAtDate;
     use ModelTraits\UpdatedAtDate;
+    use CreateCollection;
 
     public const int STATUS_PREPARATION = 0;
     public const int STATUS_UNCONFIRMED = 1;
@@ -72,6 +76,42 @@ class Model
      * @var int
      */
     private int $status = self::STATUS_PREPARATION;
+
+    /**
+     * Candidate details confirmation state
+     * @var bool
+     */
+    private bool $candidateConfirmed = false;
+
+    /**
+     * Candidate details confirmation state update date
+     * @var Alaress_Date_Format|null
+     */
+    private ?Alaress_Date_Format $candidateConfirmedAt = null;
+
+    /**
+     * User who last updated the candidate details confirmation state
+     * @var User|null
+     */
+    private ?User $candidateConfirmedBy = null;
+
+    /**
+     * Subject details confirmation state
+     * @var bool
+     */
+    private bool $subjectConfirmed = false;
+
+    /**
+     * Subject details confirmation state update date
+     * @var Alaress_Date_Format|null
+     */
+    private ?Alaress_Date_Format $subjectConfirmedAt = null;
+
+    /**
+     * User who last updated the subject details confirmation state
+     * @var User|null
+     */
+    private ?User $subjectConfirmedBy = null;
 
     /**
      * Registration session this student belongs to
@@ -124,6 +164,114 @@ class Model
     public function setStatus(int $status): self
     {
         $this->status = $status;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getCandidateConfirmed(): bool
+    {
+        return $this->candidateConfirmed;
+    }
+
+    /**
+     * @param bool $candidateConfirmed
+     * @return self
+     */
+    public function setCandidateConfirmed(bool $candidateConfirmed): self
+    {
+        $this->candidateConfirmed = $candidateConfirmed;
+        return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format|null
+     */
+    public function getCandidateConfirmedAt(): ?Alaress_Date_Format
+    {
+        return $this->candidateConfirmedAt;
+    }
+
+    /**
+     * @param Alaress_Date_Format|null $candidateConfirmedAt
+     * @return self
+     */
+    public function setCandidateConfirmedAt(?Alaress_Date_Format $candidateConfirmedAt): self
+    {
+        $this->candidateConfirmedAt = $candidateConfirmedAt;
+        return $this;
+    }
+
+    /**
+     * @return User|null
+     */
+    public function getCandidateConfirmedBy(): ?User
+    {
+        return $this->candidateConfirmedBy;
+    }
+
+    /**
+     * @param User|null $candidateConfirmedBy
+     * @return self
+     */
+    public function setCandidateConfirmedBy(?User $candidateConfirmedBy): self
+    {
+        $this->candidateConfirmedBy = $candidateConfirmedBy;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getSubjectConfirmed(): bool
+    {
+        return $this->subjectConfirmed;
+    }
+
+    /**
+     * @param bool $subjectConfirmed
+     * @return self
+     */
+    public function setSubjectConfirmed(bool $subjectConfirmed): self
+    {
+        $this->subjectConfirmed = $subjectConfirmed;
+        return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format|null
+     */
+    public function getSubjectConfirmedAt(): ?Alaress_Date_Format
+    {
+        return $this->subjectConfirmedAt;
+    }
+
+    /**
+     * @param Alaress_Date_Format|null $subjectConfirmedAt
+     * @return self
+     */
+    public function setSubjectConfirmedAt(?Alaress_Date_Format $subjectConfirmedAt): self
+    {
+        $this->subjectConfirmedAt = $subjectConfirmedAt;
+        return $this;
+    }
+
+    /**
+     * @return User|null
+     */
+    public function getSubjectConfirmedBy(): ?User
+    {
+        return $this->subjectConfirmedBy;
+    }
+
+    /**
+     * @param User|null $subjectConfirmedBy
+     * @return self
+     */
+    public function setSubjectConfirmedBy(?User $subjectConfirmedBy): self
+    {
+        $this->subjectConfirmedBy = $subjectConfirmedBy;
         return $this;
     }
 

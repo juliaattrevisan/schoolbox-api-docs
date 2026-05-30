@@ -288,18 +288,23 @@ class Controller extends Base
         ];
 
         /* Rubrics data
-        */
+         */
         $rubricMapper = RubricDataSource::getInstance();
-        if ($assessment->getUseRubric()) {
-            $assessment->setRubricGrid($rubricMapper->retrieveGrid($assessment, false));
-            if ($feedback instanceof Feedback) {
-                $feedback->setRubricMarkedGrid($rubricMapper->retrieveMarkedGrid($feedback));
+
+        /* Find the instructor-given rubric data for each rubric instance
+         */
+        if ($feedback instanceof Feedback) {
+            foreach ($assessment->getRubricInstances() as $rubricInstance) {
+                $feedback->getRubricMarkedGrids()->setOffset($rubricInstance->getId(), $rubricMapper->retrieveMarkedGrid($feedback, $rubricInstance));
             }
         }
 
-        // Self-assessment rubric data
-        if ($selfAssessmentFeedback instanceof Feedback && $assessment->getUseRubric()) {
-            $selfAssessmentFeedback->setRubricMarkedGrid($rubricMapper->retrieveMarkedGrid($selfAssessmentFeedback));
+        /* Find the learner-given rubric data for each rubric instance
+         */
+        if ($selfAssessmentFeedback instanceof Feedback) {
+            foreach ($assessment->getRubricInstances() as $rubricInstance) {
+                $selfAssessmentFeedback->getRubricMarkedGrids()->setOffset($rubricInstance->getId(), $rubricMapper->retrieveMarkedGrid($selfAssessmentFeedback, $rubricInstance));
+            }
         }
 
         $this->response = $this->responseFromTemplate('@learningDueWorkResponse/inlineGrading/standard.twig', $data);

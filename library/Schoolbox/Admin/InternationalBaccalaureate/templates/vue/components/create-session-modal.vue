@@ -93,7 +93,7 @@ async function onSubmit(): Promise<void> {
     <BasicModal v-model:is-open="isOpen" :has-background-click="true" size="s">
         <form class="l-flex-col l-gap-m f-no-margins" @submit.prevent="onSubmit">
             <h2>Create New Examination Session</h2>
-            <p>Configuring registration for Diploma Program Year 2 [DIPLOMA]</p>
+            <p>Configuring registration for Diploma Programme Year 2 [DIPLOMA]</p>
 
             <div class="alert-box" role="alert">
                 If incorrect students appear on the following report, please update the students' qualification.

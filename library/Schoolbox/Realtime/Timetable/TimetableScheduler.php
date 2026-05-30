@@ -12,7 +12,7 @@ namespace Schoolbox\Realtime\Timetable;
 use Alaress\Date\IClock;
 use Alaress\Scheduler\CronScheduler;
 use Alaress\Scheduler\Trigger\TriggerInterface;
-use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
+use Alaress\WorkerCrew\Pooling\DispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -119,7 +119,7 @@ class TimetableScheduler extends CronScheduler
      */
     protected function getMethod()
     {
-        return DefaultDispatchStrategy::TASK_TIMETABLE;
+        return DispatchStrategy::TASK_TIMETABLE;
     }
 
 

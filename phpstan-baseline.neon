@@ -1381,12 +1381,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Course/Markbook/CourseMarkbook.php
 
 		-
-			message: '#^Method Schoolbox\\Assessment\\Rubric\\DataModel\\Capability\\Mapper\:\:findForParent\(\) should return iterable\<Schoolbox\\Assessment\\Rubric\\DataModel\\Capability\\Model\>&Schoolbox\\GenericCollection but returns array\<Schoolbox\\Assessment\\Rubric\\DataModel\\Capability\\Model\>\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/Capability/Mapper.php
-
-		-
 			message: '#^Method Schoolbox\\Assessment\\Rubric\\DataModel\\DataSource\:\:getInstance\(\) should return static\(Schoolbox\\Assessment\\Rubric\\DataModel\\DataSource\) but returns Schoolbox\\Assessment\\Rubric\\DataModel\\DataSource\.$#'
 			identifier: return.type
 			count: 1
@@ -1397,36 +1391,6 @@ parameters:
 			identifier: new.static
 			count: 1
 			path: library/Schoolbox/Assessment/Rubric/DataModel/DataSource.php
-
-		-
-			message: '#^Method Schoolbox\\Assessment\\Rubric\\DataModel\\Indicator\\Mapper\:\:findForParent\(\) should return iterable\<Schoolbox\\Assessment\\Rubric\\DataModel\\Indicator\\Model\>&Schoolbox\\GenericCollection but returns array\<Schoolbox\\Assessment\\Rubric\\DataModel\\Indicator\\Model\>\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/Indicator/Mapper.php
-
-		-
-			message: '#^Method Schoolbox\\Assessment\\Rubric\\DataModel\\Result\\Model\:\:getLabel\(\) should return int but returns string\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/Result/Model.php
-
-		-
-			message: '#^Method Schoolbox\\Assessment\\Rubric\\DataModel\\Result\\Model\:\:getValue\(\) should return string but returns int\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/Result/Model.php
-
-		-
-			message: '#^Instanceof between Schoolbox\\Learning\\Assessment\\DueWork\\Model and Schoolbox\\Learning\\Assessment\\DueWork\\Model will always evaluate to true\.$#'
-			identifier: instanceof.alwaysTrue
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/Grid/Exporter/ArrayExporter.php
-
-		-
-			message: '#^Instanceof between Schoolbox\\Learning\\Assessment\\DueWork\\Model and Schoolbox\\Learning\\Assessment\\DueWork\\Model will always evaluate to true\.$#'
-			identifier: instanceof.alwaysTrue
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/Grid/Factory.php
 
 		-
 			message: '#^Property Schoolbox\\Assessment\\Rubric\\Grid\\Importer\\GenericImporter\:\:\$capabilities \(array\) in isset\(\) is not nullable\.$#'
@@ -3341,24 +3305,6 @@ parameters:
 			identifier: property.onlyWritten
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Decorator/CourseManagedDecorator.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getUseRubric\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Controller.php
-
-		-
-			message: '#^Instanceof between Schoolbox\\Learning\\Assessment\\DueWork\\Feedback\\Model and Schoolbox\\Learning\\Assessment\\DueWork\\Feedback\\Model will always evaluate to true\.$#'
-			identifier: instanceof.alwaysTrue
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Controller.php
-
-		-
-			message: '#^Instanceof between Schoolbox\\Learning\\Assessment\\DueWork\\Model and Schoolbox\\Learning\\Assessment\\DueWork\\Model will always evaluate to true\.$#'
-			identifier: instanceof.alwaysTrue
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Controller.php
 
 		-
 			message: '#^Property Schoolbox\\Learning\\Assessment\\DueWork\\Feedback\\Factory\:\:\$dueWorkFeedbackDataSource \(Schoolbox\\Learning\\Assessment\\Feedback\\SubSource\\DueWork\) does not accept Schoolbox\\Learning\\Assessment\\Feedback\\IFeedbackDataSource\.$#'

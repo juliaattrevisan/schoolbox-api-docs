@@ -13,6 +13,7 @@ namespace Schoolbox\Assessment\Rubric\Instance;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 
@@ -36,6 +37,8 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasTable('rubric_instance');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('title', self::TYPE_STRING);
+        $this->uses('weight', self::TYPE_DECIMAL);
         $this->uses('rubric_mark_range', self::TYPE_BOOLEAN, null, 'markedUsingRange');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
@@ -159,5 +162,32 @@ class Mapper extends \Schoolbox\Mapper
         }
 
         return $stack;
+    }
+
+
+    /**
+     * Soft-deletes rubric instances that were associated with $assessment->getId(), but aren't needed anymore.
+     * This is effectively the result of a diff between rubric instances we added, modified and deleted.
+     * We remove everything associated with $assessment->getId() that *isn't* in $preserve
+     *
+     * @param IAssessable $assessment
+     * @param array $preserve A set of rubric_instance.id values that we wanted to keep
+     * @return void
+     */
+    public function removeFromAssessment(IAssessable $assessment, array $preserve): void
+    {
+        $pb = $this->getPredicateBuilder()
+            ->notIn('id', $preserve);
+
+        $where = $pb->getWhere()[0];
+
+        $this->getDatabase()->executeQuery("
+            UPDATE {$this->getTable()}
+            SET deleted_at = NOW()
+            WHERE assessment_id = :assessmentId
+            AND {$where}
+        ", array_merge($pb->getParams(), [
+            'assessmentId' => $assessment->getId(),
+        ]));
     }
 }

@@ -1,156 +1,64 @@
 {##
- # This template must support both an empty and a marked grid.
+ # Grid (readonly variant)
  #
- # Parameters:
- # * rubricGrid:              the base rubric grid object
- # * rubricMarkedGrid:        the marked rubric grid, shouldst there be one
- # * selfAssessmentFeedback:  the self-assessed feedback, shouldst there be one
- # * markVisibility:          ? Should be inferred from grid's assessment (assessment.isVisibleTo(USER))
- # * showRubricTotal:         ? Whether to show the totals at the bottom of overall rubric
- #                              This is false for student views, but true for staff views
- # * showGroupTotal:          ? Whether to show group totals at the bottom of each capability, can be inferred from
-                                    (assessment.markPerCapability)
- # * showDescriptorValue:     ? Whether points should be shown alongside descriptors, note there is also a config setting
-                                that also controls this, false for self-reflections
+ # This displays multiple data points on a single grid in a readonly manner (you can't select descriptors etc here)
+ # It purely displays the results given to learners.
+ #
+ # 1. It displays the grid structure - capabilities, indicators, levels.
+ # 2. It can display the marked grid, as determined by instructors; these show the instructor-selected descriptors as
+ #    shaded cells.
+ # 3. It can display the self-graded grid, as determined by learners; these show the learner-selected descriptors with a
+ #    little profile picture of the learner.
+ #
+ # ----
+ #
+ # $showGroupTotal, $showRubricTotal: these are legacy-named vars that specifically (and unilaterally) decode when
+ # capability marks and the rubric's overall total value (sum of its caps/descriptor selections) are rendered on-screen.
+ # While there's potential for deriving them from the assessment and rubric grid's settings, there are occasions where
+ # you literally don't care about that computation and want to arbitrarily decide an outcome.
+ #
+ # showGroupTotal and showRubricTotal are vars that unilaterally decide whether the Capability Mark
+ # value and Rubric Total value shows on the grid, regardless of the feedbacks or assessment setting
+ # that you could potentially use to derive this outcome. It's so that you can arbitrarily decide
+ # when and where each of these can be seen by a user. For example, in summative reports, you
+ # always want to show the capability mark but never show the rubric total - even if the assessment
+ # settings suggest you could.
+ #
+ # @param IAssessable $assessment                A learning activity instance
+ # @param Rubric\Instance\Model $rubricInstance  The container containing rubric settings for this particular grid, and the grid itself.
+ # @param bool $showGroupTotal                   Corresponds to whether mark-per-capability is enabled for this particular grid (ie. Capability Mark Type was used meaningfully)
+ # @param bool $showRubricTotal                  Shows the total value of the rubric grid's selected descriptors; shown to instructors and self-graders
+ # @param bool $markVisibility                   Whether this feedback is visible to the current user.
+ # @param bool $studentView                      This decides which mark scheme to show: the learner's mark scheme (for self-grading) or the instructor's mark scheme
+ #                                               (It would be used when learners view the marked grid which might show different mark scheme than instructors.)
+ # @param bool $selfAssess                       A bool corresponding to whether Self Assessment was enabled in the Due Work settings and can occur for this response instance
+ # @param bool $selfReflect                      Whether self-reflection can occur on this response instance
+ # @param User $learner                          The person who submitted the response instance
+ # @param IFeedback $selfAssessmentFeedback      "the self-assessed feedback, shouldst there be one"
+ # @param Grid $rubricGrid                       A Grid instance, obtained via the Rubric DataSource retrieveOneGrid() method or similar.
+ #                                               Represents the basic structure of a rubric_instance (caps/inds/descs/levels)
+ # @param Grid $rubricMarkedGrid                 A Grid instance corresponding to an instructor-marked grid
+ # @param Grid $rubricSelfGradedGrid             A Grid instance corresponding to a learner-marked grid
  #}
 
-{% set markType = rubricGrid.assessment.markScheme.generateContext %}
-{% set showSummaryTotal = showRubricTotal and rubricMarkedGrid and markType.mode != "none" %}
-{% set showSummaryCapability = showGroupTotal and rubricMarkedGrid and rubricGrid.assessment.isMarkPerCapability %}
-<div class="scrollable">
-    <table class="rb markable">
-    {% set hasLevels = '' %}
-    {% for level in rubricGrid.levels %}
-        {% set hasLevels = hasLevels ~ level.name %}
-    {% endfor %}
-    {% if hasLevels | length %}
-    <thead>
-    <tr>
-        <th colspan="2"  scope="row">&nbsp;</th>
-        {% for level in rubricGrid.levels %}
-        <th scope="col" class="markdown">{{ level.name | markdown }}</th>
-        {% endfor %}
-    </tr>
-    </thead>
-    {% endif %}
-    <tbody>
+{# TODO This is actually a year-level config option too
+ # This should be derived first from the year level's setting, then falling back to the system setting
+ #}
+{% set showPoints = config.rubric_show_points %}
 
-    {% for groupIndex, groupUsage in rubricGrid.capabilityUsages %}
-
-        {# Only show capability summary if there's something to actually show #}
-        {% set capabilityMark               = rubricMarkedGrid ? rubricMarkedGrid.retrieveCapabilityMark(groupUsage) : null %}
-        {% set selfAssessmentCapabilityMark = (selfAssessmentFeedback.isSelfGrading ?? false)
-            ? selfAssessmentFeedback.rubricMarkedGrid.retrieveCapabilityMark(groupUsage) : null %}
-        {% set showSummaryForThisCapability =
-            (selfAssessmentCapabilityMark and selfAssessmentCapabilityMark.humanReadableValue)
-            or (showSummaryCapability and capabilityMark and capabilityMark.humanReadableValue) %}
-        {% set rowspan                      = groupUsage.indicatorUsages|length + (showSummaryForThisCapability ? 1 : 0) %}
-
-        {% for critIndex, critUsage in groupUsage.indicatorUsages %}
-            <tr>
-                {# yay html tables... -_-; #}
-                {% if rowspan %}
-                    <th class="rb-group-name markdown"  rowspan="{{ rowspan }}">{{ groupUsage.capability.name | markdown }}</th>
-                    {% set rowspan = 0 %}
-                {% endif %}
-
-                <th class="rb-criterion-name markdown">{{ critUsage.indicator.name | markdown }}</th>
-
-                {% set indicatorMark = rubricMarkedGrid
-                    ? rubricMarkedGrid.retrieveIndicatorMark(critUsage)
-                    : null %}
-                {% set indicatorMarkDescriptor = indicatorMark
-                    ? indicatorMark.descriptor
-                    : null %}
-                {% set selfAssessmentIndicatorMark = selfAssessmentFeedback is defined and selfAssessmentFeedback
-                    ? selfAssessmentFeedback.rubricMarkedGrid.retrieveIndicatorMark(critUsage)
-                    : null %}
-
-                {% for levelIndex, level in rubricGrid.levels %}
-
-                    {% set descriptor = critUsage.retrieveDescriptor(levelIndex) %}
-
-                    {% if descriptor %}
-
-                        {# Self-Assessment #}
-                        {% set isDescriptorSelected = indicatorMarkDescriptor == descriptor %}
-                        {% set isMarkDisplayed      = isDescriptorSelected and rubricGrid.assessment.isFeedbackVisibleToUser(USER) %}
-
-                        <td data-header="{{ level.name }}" {% if isMarkDisplayed %}class="rb-selected"{% endif %}>
-                            <div>
-                                {# This container displays rubric levels for the mobile view. #}
-                                <div class="hide-for-large-up l-pad-m hide-on-print"></p><b>{{ level.name | markdown }}</b></p></div>
-                                <span class="rb-description markdown">
-                                    {# Self-Assessment #}
-                                    {% if selfAssessmentIndicatorMark and selfAssessmentIndicatorMark.descriptor.id == descriptor.id %}
-                                        <img class="rb-self-reflection-choice"
-                                             src="/portrait.php?id={{ learner.id }}&amp;size=square32"
-                                             title="{% if selfAssessmentFeedback.isSelfGrading %}({{ selfAssessmentIndicatorMark.value }}) {{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
-                                    {% endif %}
-                                    {{- descriptor.description | markdown -}}
-                                </span>
-                                {% if descriptor.hasValue and config.rubric_show_points and rubricGrid.showDescriptorValue and showDescriptorValue %}
-                                    <span class="rb-value used" >
-                                        {% if rubricGrid.useMarkRange and descriptor.hasRange %}
-                                            {% if isMarkDisplayed %}
-                                                <span class="range-selection-value">{{ indicatorMark.value }}</span>
-                                            {% endif %}
-                                            <span class="range {% if isMarkDisplayed %}selected{% endif %}">
-                                                {{ descriptor.retrieveLeftValue }}–{{ descriptor.retrieveRightValue }}
-                                            </span>
-                                        {% else %}
-                                            {{ descriptor.maxValue }}
-                                        {% endif %}
-                                    </span>
-                                {% endif %}
-                            </div>
-                        </td>
-
-                    {% else %}
-                        <td class="rb-blank hide-for-medium-down">&nbsp;</td>
-                    {% endif %}
-
-                {% endfor %}
-            </tr>
-        {% endfor %}
-
-        {# Capability mark: needs to be rendered in human-readable form, use the assessment's mark scheme to do so #}
-        {% if showSummaryForThisCapability %}
-            <tr>
-                {# Capability Mark spans the following columns:
-                 #     + N descriptors (equivalent to N levels)
-                 #     + Indicator cell (always 1 cell)
-                 #         = N + 1 cells colspan
-                 #
-                 # (It does not span the capability cell itself)
-                 #}
-                <th class="rb-group-summary" colspan="{{ rubricGrid.levels|length + 1 }}">
-                    {{ capabilityMark.humanReadableValue ?? '' }}
-
-                    {# Self-Assessment #}
-                    {% if selfAssessmentCapabilityMark and selfAssessmentCapabilityMark.humanReadableValue %}
-                        ({{ selfAssessmentCapabilityMark.humanReadableValue }} given in {{ locale.selfAssessment }})
-                    {% endif %}
-                </th>
-            </tr>
-        {% endif %}
-
-    {% endfor %}
-
-    {# Overall mark #}
-    {% if showSummaryTotal %}
-        <tr>
-            <th class="rb-final-summary" colspan="{{ rubricGrid.levels|length + 2 }}">
-                {{ rubricMarkedGrid.retrieveHumanReadableMark }}
-
-                {# Self-Assessment: only show the mark if it's self graded, as if it's self-reflect only they never marked themselves #}
-                {% if selfAssessmentFeedback and selfAssessmentFeedback.isSelfGrading and selfAssessmentFeedback.humanReadableMark %}
-                    ({{ selfAssessmentFeedback.humanReadableMark }} given in {{ locale.selfAssessment }})
-                {% endif %}
-            </th>
-        </tr>
-    {% endif %}
-    </tbody>
-
-</table>
+<div data-vue-app="rubric-readonly">
+    <rubric-readonly
+        :rubric-marked-grids-payload="[{
+            rubric: {{ rubricGrid.toArray(showPoints)|json_encode }},
+            markedGrid: {{ (rubricMarkedGrid ? rubricMarkedGrid.toArray(USER, showPoints) : null)|json_encode }},
+            selfAssessmentFeedback: {{ (rubricSelfGradedGrid ? rubricSelfGradedGrid.toArray(USER, showPoints) : null)|json_encode }}
+        }]"
+        :assessment-mark-scheme="{{ rubricGrid.assessment.markScheme.generateContext|json_encode }}"
+        :participant-id="{{ learner.id ?? 'null' }}"
+        {# TODO: these are signs of likely permission issues #}
+        {% if showRubricTotal ?? false %}show-rubric-total{% endif %}
+        {% if showGroupTotal ?? false %}show-group-total{% endif %}
+        {% if collapsible ?? false %}collapsible{% endif %}
+    />
 </div>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/rubricReadonly.js?v={{ config.site_version }}"></script>

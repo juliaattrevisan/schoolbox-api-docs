@@ -18,6 +18,19 @@
     }
     .flatpickr-input {
         padding: 0 !important;
+
+        &.fc-button {
+            align-items: center;
+            display: inline-flex;
+            justify-content: center;
+            padding: 0.5rem 0.875rem !important;
+
+            sbx-icon {
+                color: currentColor;
+                display: inline-flex;
+            }
+        }
+
         a {
             margin: 0;
             padding: 0.5rem 0.875rem !important;
