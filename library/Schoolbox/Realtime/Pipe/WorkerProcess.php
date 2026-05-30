@@ -10,7 +10,7 @@
 namespace Schoolbox\Realtime\Pipe;
 
 use Alaress\Async\Notification\Instance\InstanceBundle;
-use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
+use Alaress\WorkerCrew\Pooling\DispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\Worker\AbstractProcess;
 use Alaress\WorkerCrew\Worker\PipeWriter;
@@ -71,12 +71,12 @@ class WorkerProcess extends AbstractProcess
         try {
             switch ($command) {
                 // retrieve messages
-                case DefaultDispatchStrategy::TASK_FETCH:
+                case DispatchStrategy::TASK_FETCH:
                     [$instanceId, $userId, $count] = $args;
                     return $this->fetch($instanceId, $userId, $count);
 
                 // publish messages
-                case DefaultDispatchStrategy::TASK_PUBLISH:
+                case DispatchStrategy::TASK_PUBLISH:
                     $data = unserialize($args[0]);
                     if (!(is_array($data) && count($data) === 4)) {
                         throw new RuntimeException('Data should be array(4); is ' . gettype($data) . '(' . count($data) . ')');
@@ -85,8 +85,8 @@ class WorkerProcess extends AbstractProcess
                     return $this->publish($callback, $model, $user, $diff);
 
                 // digest or alert messages
-                case DefaultDispatchStrategy::TASK_DIGEST:
-                case DefaultDispatchStrategy::TASK_TIMETABLE:
+                case DispatchStrategy::TASK_DIGEST:
+                case DispatchStrategy::TASK_TIMETABLE:
                     $data = unserialize($args[0]);
                     if (!(is_array($data) && count($data) >= 2)) {
                         throw new RuntimeException('Data should be array(2+); is ' . gettype($data) . '(' . count($data) . ')');

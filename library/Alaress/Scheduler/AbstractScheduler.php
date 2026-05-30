@@ -20,7 +20,7 @@ use Alaress\Scheduler\Trigger\CancelTrigger;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\WorkerCrew\Dispatcher;
 use Alaress\WorkerCrew\DispatcherInterface;
-use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
+use Alaress\WorkerCrew\Pooling\DispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
 use Alaress_Date_Format;
@@ -74,7 +74,10 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
      * @param int|null                  $maxFutureTriggerTime The max seconds in the future to trigger a notification in
      *                                                        `scheduleNotification`:
      *                                                        if the notification is further in the future than this: it
-     *                                                        is ignored, and will presumably be sent later.
+     *                                                        is ignored, and the trigger is cached instead so that it
+     *                                                        is restored next time the daemon is restarted.
+     *                                                        If null or zero: always schedule the trigger no matter how
+     *                                                        far in the future.
      */
     public function __construct(
         private LoopInterface $loop,
@@ -171,7 +174,7 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
 
         // Don't schedule this trigger if it's more than a configured amount of
         // time in advance.
-        if (isset($this->maxFutureTriggerTime) && $interval > $this->maxFutureTriggerTime) {
+        if (($this->maxFutureTriggerTime ?? 0) > 0 && $interval > $this->maxFutureTriggerTime) {
             $this->log->info(
                 sprintf(
                     "[AbstractScheduler] Trigger with timestamp too far in the future, not dispatching: %s %s (timestamp: %s, max time: %s)",
@@ -429,7 +432,7 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
 
         // If this is handling ExternalException from a worker, most likely that this is caused by
         // SIS connector outage. Hence, rescheduling it.
-        if ($identifier instanceof TriggerInterface && $command === DefaultDispatchStrategy::TASK_PUBLISH) {
+        if ($identifier instanceof TriggerInterface && $command === DispatchStrategy::TASK_PUBLISH) {
             $this->log->warning("[AbstractScheduler] Rescheduling '{$identifier->getEventObjectId()} - {$identifier->getLabel()}' in " . self::RETRY_TIME, ['char' => '-']);
             $this->schedule($identifier, $this->timerCallback($identifier), true, self::RETRY_TIME);
         }

@@ -7,6 +7,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Alaress\WorkerCrew\Pooling;
 
 use Alaress\WorkerCrew\IPC\AlaressIPCProtocol;
@@ -14,68 +16,80 @@ use Alaress\WorkerCrew\IPC\ProtocolInterface;
 use Alaress\WorkerCrew\Worker\Worker;
 use Alaress\WorkerCrew\Worker\WorkerArray;
 use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
-use Exception;
 use InvalidArgumentException;
 use OutOfBoundsException;
 use PDOException;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
-class DefaultDispatchStrategy implements DispatchStrategyInterface
+class DispatchStrategy implements DispatchStrategyInterface
 {
-    const MIN_WORKERS  = 1;
-    const MAX_WORKERS  = 6;
-    const MAX_FLYWHEEL = 0;
+    public const int MIN_WORKERS  = 1;
+    public const int MAX_WORKERS  = 6;
+    public const int MAX_FLYWHEEL = 0;
 
-    const QUEUE_DELAY     = 1;
-    const QUEUE_SIZE_WARN = PHP_INT_MAX;
-    const QUEUE_SIZE_MAX  = PHP_INT_MAX;
+    public const int QUEUE_DELAY     = 1;
+    public const int QUEUE_SIZE_WARN = PHP_INT_MAX;
+    public const int QUEUE_SIZE_MAX  = PHP_INT_MAX;
 
-    const IDLE_TIMEOUT = 60000; // 1 minute
+    public const int IDLE_TIMEOUT = 60000; // 1 minute
 
-    const MAX_REQUESTS_PER_WORKER = 0; // 0 = unlimited
+    public const int MAX_REQUESTS_PER_WORKER = 0; // 0 = unlimited
 
-    const WORKER_SOFT_TIMEOUT  = 300000; // 5 minutes
-    const WORKER_HARD_TIMEOUT  = 1200000; // 20 minutes
-    const WORKER_WRITE_TIMEOUT = 5000; // 5 seconds
+    public const int MAX_FUTURE_TRIGGER_TIME = 0; // 0 = unlimited
 
-    const TASK_FETCH     = 'fetch';
-    const TASK_PUBLISH   = 'publish';
-    const TASK_DIGEST    = 'digest';
-    const TASK_TIMETABLE = 'timetable';
-    const TASK_MOBILE    = 'mobile';
+    public const int WORKER_SOFT_TIMEOUT  = 300000; // 5 minutes
+    public const int WORKER_HARD_TIMEOUT  = 1200000; // 20 minutes
+    public const int WORKER_WRITE_TIMEOUT = 5000; // 5 seconds
 
-    const METRIC_INTERVAL = 60000;
+    public const string TASK_FETCH     = 'fetch';
+    public const string TASK_PUBLISH   = 'publish';
+    public const string TASK_DIGEST    = 'digest';
+    public const string TASK_TIMETABLE = 'timetable';
+    public const string TASK_MOBILE    = 'mobile';
 
-    protected $flywheelSpins;
+    public const int METRIC_INTERVAL = 60000;
 
-
-    /** @var AlaressIPCProtocol */
-    protected $protocol;
-
-
-    /** @var string */
-    protected $flags;
-
+    protected int $flywheelSpins;
 
     /**
+     * The protocol used for communication between the worker pool process,
+     * and its workers.
+     */
+    protected AlaressIPCProtocol $protocol;
+
+    /**
+     * @param int    $minWorkers
+     * @param int    $maxWorkers
+     * @param int    $maxFlywheel
+     * @param int    $queueDelay
+     * @param int    $queueWarnSize
+     * @param int    $queueMaxSize
+     * @param int    $idleTimeout
+     * @param int    $workerTimeoutSoft
+     * @param int    $workerTimeoutHard
      * @param string $flags
+     * @param int    $maxRequestsPerWorker
+     * @param int    $maxFutureTriggerTime
      */
-    public function __construct($flags = '')
-    {
-        $this->flywheelSpins = self::MAX_FLYWHEEL;
+    public function __construct(
+        private int $minWorkers = DispatchStrategy::MIN_WORKERS,
+        private int $maxWorkers = DispatchStrategy::MAX_WORKERS,
+        private int $maxFlywheel = DispatchStrategy::MAX_FLYWHEEL,
+        private int $queueDelay = DispatchStrategy::QUEUE_DELAY,
+        private int $queueWarnSize = DispatchStrategy::QUEUE_SIZE_WARN,
+        private int $queueMaxSize = DispatchStrategy::QUEUE_SIZE_MAX,
+        private int $idleTimeout = DispatchStrategy::IDLE_TIMEOUT,
+        private int $workerTimeoutSoft = DispatchStrategy::WORKER_SOFT_TIMEOUT,
+        private int $workerTimeoutHard = DispatchStrategy::WORKER_HARD_TIMEOUT,
+        private string $flags = '',
+        private int $maxRequestsPerWorker = DispatchStrategy::MAX_REQUESTS_PER_WORKER,
+        private int $maxFutureTriggerTime = DispatchStrategy::MAX_FUTURE_TRIGGER_TIME,
+        private int $workerWriteTimeout = DispatchStrategy::WORKER_WRITE_TIMEOUT,
+        private int $metricInterval = DispatchStrategy::METRIC_INTERVAL,
+    ) {
+        $this->flywheelSpins = $maxFlywheel;
         $this->protocol      = new AlaressIPCProtocol();
-        $this->flags         = $flags;
-    }
-
-
-    /**
-     * Get the name of the strategy currently being used
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return 'Default';
     }
 
 
@@ -84,7 +98,7 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
      *
      * @return ProtocolInterface
      */
-    public function getProtocol()
+    public function getProtocol(): ProtocolInterface
     {
         return $this->protocol;
     }
@@ -95,7 +109,7 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
      *
      * @return string
      */
-    public function getCommand()
+    public function getCommand(): string
     {
         return SITE_root . "/tools/socket/worker.php";
     }
@@ -107,7 +121,7 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
      * @param WorkerBundleInterface $workers
      * @return bool
      */
-    public function canAccept($workers)
+    public function canAccept(WorkerBundleInterface $workers): bool
     {
         return $this->getAvailableWorker($workers, 0) != -1;
     }
@@ -123,23 +137,22 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
      * @param int                   $remainingTaskCount
      * @return int
      */
-    public function getAvailableWorker($workers, $remainingTaskCount)
+    public function getAvailableWorker(WorkerBundleInterface $workers, int $remainingTaskCount): int
     {
         // if we haven't got the min number of workers, favour starting a new one
-        if ($workers->countWhere(~(Worker::ENDED | Worker::ERROR)) < self::MIN_WORKERS) {
+        if ($workers->count() < $this->minWorkers) {
             return 0;
         }
 
         // if a worker is free, yes we can accept
         try {
-            $free = $workers->getPidWhere(Worker::READY);
-            return $free;
+            return $workers->getPidWhere(Worker::READY);
         } catch (OutOfBoundsException $e) {
             // ok, so there's none of those
         }
 
         // if number of workers THAT ARE NOT ENDED OR ERRORED is below the cap, spawn a new one
-        if ($workers->countWhere(~(Worker::ENDED | Worker::ERROR)) < self::MAX_WORKERS) {
+        if ($workers->countWhere(~(Worker::ENDED & Worker::ERROR)) < $this->maxWorkers) {
             return 0;
         }
 
@@ -152,9 +165,9 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
      *
      * @return array
      */
-    public function getSupportedActions()
+    public function getSupportedActions(): array
     {
-        return array(self::TASK_FETCH, self::TASK_PUBLISH, self::TASK_DIGEST, self::TASK_TIMETABLE);
+        return [self::TASK_FETCH, self::TASK_PUBLISH, self::TASK_DIGEST, self::TASK_TIMETABLE];
     }
 
 
@@ -163,7 +176,7 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
      *
      * @return string
      */
-    public function getFlags()
+    public function getFlags(): string
     {
         return $this->flags;
     }
@@ -175,7 +188,7 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
      * @param string $data
      * @return int
      */
-    public function checkState($data)
+    public function checkState(string $data): int
     {
         // no data: this pipe is closed
         if (strlen($data) == 0) {
@@ -209,7 +222,7 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
      * @param mixed  $arguments
      * @return string
      */
-    public function composeTaskString($command, $arguments)
+    public function composeTaskString(string $command, mixed $arguments): string
     {
         return $this->protocol->prepareCommand($command, $arguments);
     }
@@ -219,10 +232,10 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
      * Separate the given parameter into an array of two elements: command and args.
      *
      * @param string $taskString
-     * @throws InvalidArgumentException
      * @return array
+     *@throws InvalidArgumentException
      */
-    public function decomposeTaskString($taskString)
+    public function decomposeTaskString(string $taskString): array
     {
         $xpl = $this->protocol->rebuild($taskString);
         if (count($xpl) != 2) {
@@ -238,7 +251,7 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
      * @param mixed $data
      * @return string
      */
-    public function encodeRecord($data)
+    public function encodeRecord(mixed $data): string
     {
         return $this->protocol->flatten($data);
     }
@@ -250,7 +263,7 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
      * @param string $data
      * @return array
      */
-    public function decodeRecords($data)
+    public function decodeRecords(string $data): array
     {
         return $this->protocol->rebuild($data);
     }
@@ -261,9 +274,9 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
      *
      * @return int
      */
-    public function getQueueDelay()
+    public function getQueueDelay(): int
     {
-        return self::QUEUE_DELAY;
+        return $this->queueDelay;
     }
 
 
@@ -272,9 +285,9 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
      *
      * @return int
      */
-    public function getWarningQueueLength()
+    public function getWarningQueueLength(): int
     {
-        return self::QUEUE_SIZE_WARN;
+        return $this->queueWarnSize;
     }
 
 
@@ -283,9 +296,9 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
      *
      * @return int
      */
-    public function getMaxQueueLength()
+    public function getMaxQueueLength(): int
     {
-        return self::QUEUE_SIZE_MAX;
+        return $this->queueMaxSize;
     }
 
 
@@ -295,12 +308,12 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
      *
      * @return bool
      */
-    public function canDispatcherFlywheel()
+    public function canDispatcherFlywheel(): bool
     {
         if ($this->flywheelSpins-- > 0) {
             return true;
         }
-        $this->flywheelSpins = self::MAX_FLYWHEEL;
+        $this->flywheelSpins = $this->maxFlywheel;
         return false;
     }
 
@@ -310,9 +323,9 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
      *
      * @return int
      */
-    public function getWorkerIdleTimeout()
+    public function getWorkerIdleTimeout(): int
     {
-        return self::IDLE_TIMEOUT;
+        return $this->idleTimeout;
     }
 
 
@@ -321,7 +334,7 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
      *
      * @return WorkerBundleInterface
      */
-    public function newWorkerBundle()
+    public function newWorkerBundle(): WorkerBundleInterface
     {
         return new WorkerArray($this->protocol);
     }
@@ -333,19 +346,19 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
      * @param WorkerBundleInterface $workers
      * @return void
      */
-    public function cleanup($workers)
+    public function cleanup(WorkerBundleInterface $workers): void
     {
         $workers->detachWhere(Worker::ENDED);
     }
 
 
     /**
-     * @param Exception       $exception
+     * @param Throwable      $exception
      * @param LoggerInterface $log
-     * @throws PDOException
      * @return void
+     * @throws PDOException
      */
-    public function handleException($exception, $log)
+    public function handleException(Throwable $exception, LoggerInterface $log): void
     {
         $log->critical(sprintf("Exception during dispatch - %s: %s", get_class($exception), $exception->getMessage()), ['exception' => $exception]);
 
@@ -362,9 +375,9 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
      * @param bool $hard
      * @return int
      */
-    public function getWorkerExecutionTimeout($hard = true)
+    public function getWorkerExecutionTimeout(bool $hard = true): int
     {
-        return $hard ? self::WORKER_HARD_TIMEOUT : self::WORKER_SOFT_TIMEOUT;
+        return $hard ? $this->workerTimeoutHard : $this->workerTimeoutSoft;
     }
 
 
@@ -375,28 +388,33 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
      */
     public function getMaxRequestsPerWorker(): int
     {
-        return static::MAX_REQUESTS_PER_WORKER;
+        return $this->maxRequestsPerWorker;
     }
 
 
     /**
-     * Returns the maximum time in milliseconds to wait for a worker to accept a write before killing it
-     *
+     * @return int
+     */
+    public function getMaxFutureTriggerTime(): int
+    {
+        return $this->maxFutureTriggerTime;
+    }
+
+
+    /**
      * @return int
      */
     public function getWorkerWriteTimeout(): int
     {
-        return static::WORKER_WRITE_TIMEOUT;
+        return $this->workerWriteTimeout;
     }
 
 
     /**
-     * The interval (in seconds) at which daemon metrics should be reported.
-     *
      * @return int
      */
     public function getMetricInterval(): int
     {
-        return static::METRIC_INTERVAL;
+        return $this->metricInterval;
     }
 }
