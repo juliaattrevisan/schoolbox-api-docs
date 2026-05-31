@@ -174,7 +174,7 @@ class Mapper extends Schoolbox\Mapper
                 // Set the capability as well
                 $capability = $capabilities->getOffset($capabilityId);
                 /** @var Capability\Model $capability */
-              
+
                 $indicator = $this->hydrateJoin($row, 'indicator', 'i');
                 /** @var Indicator\Model $indicator */
 
