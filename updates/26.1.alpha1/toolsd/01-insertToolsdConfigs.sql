@@ -1,6 +1,6 @@
 SELECT @fieldId  := id FROM lu_config_field WHERE field = 'uri';
 SELECT @typeId   := id FROM lu_config_type WHERE type = 'Resources';
-SELECT @sequence := sequence FROM config WHERE type_id = @typeId AND module = 'settings';
+SELECT @sequence := COALESCE(MAX(sequence), 0) FROM config WHERE type_id = @typeId AND module = 'settings';
 INSERT INTO config SET
     name        = 'toolsd_host',
     value       = '',
