@@ -79,8 +79,10 @@ class HelpPrinter implements OptionPrinter
         // Attempt to calculate screen width if not provided
         $screenWidth = $this->screenWidth;
         if (!isset($screenWidth)) {
-            exec('tput cols', $output);
-            $screenWidth = filter_var($output[0], FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+            exec('tput cols 2>/dev/null', $output, $resultCode);
+            if ($resultCode === 0 && isset($output[0])) {
+                $screenWidth = filter_var($output[0], FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+            }
         }
         if (!isset($screenWidth)) {
             $screenWidth = self::FALLBACK_SCREEN_WIDTH;
