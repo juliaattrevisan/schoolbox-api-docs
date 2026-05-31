@@ -76,7 +76,7 @@ readonly class JobRequest
     /**
      * Create a new job request with different environment variables.
      *
-     * @param array{string, string}|null $environment
+     * @param array<string, string>|null $environment
      * @return self
      */
     public function withEnvironment(?array $environment): self
