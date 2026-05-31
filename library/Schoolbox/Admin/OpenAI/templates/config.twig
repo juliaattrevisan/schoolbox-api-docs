@@ -93,10 +93,19 @@
             if (!selectEl) {
                 return;
             }
-            const modelOptions = baseOptions[model] ?? null;
+
+            // If the selected model has options for selectEl:
+            // enable/disable accordingly, otherwise enable them all
+            // (except any options with no value: these are not selectable)
+            const modelOptions = baseOptions[model] ?? null,
+                  hasOptions = Array.isArray(modelOptions);
             Array.from(selectEl.options).forEach(el => {
                 if (el.value !== null) {
-                    el.disabled = !modelOptions.includes(el.value);
+                    if (!hasOptions) {
+                        el.disabled = false;
+                    } else {
+                        el.disabled = !modelOptions.includes(el.value);
+                    }
                 }
             });
         }
