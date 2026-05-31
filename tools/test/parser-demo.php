@@ -61,7 +61,8 @@ $kernel = new CliTool\Kernel(new class extends CliTool\BaseApp {
     }
 
     /**
-     * This app has no perform mode support.
+     * This demo app supports perform mode: though being a demo, it does not
+     * actually perform anything.
      */
     protected function hasPerformMode(): bool
     {
