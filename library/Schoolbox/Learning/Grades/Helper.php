@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Lti\Model as Lti;
 use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Reporting\Model as Reporting;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Learning\Markbook\SortForMarkbook;
@@ -158,7 +159,7 @@ class Helper
             Quiz::class,
             Lti::class,
             DialogAgent::class,
-            'Schoolbox\\Learning\\Assessment\\Reporting\\Model'
+            Reporting::class
         ];
 
         foreach ($assessments as $folderId => $folderAssessments) {

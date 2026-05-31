@@ -4,7 +4,8 @@
  # Params:
  # * assessment:  IAssessable - The assessment object
  # * student:     User        - The user record for the student
- # * canViewInstructorMarks: bool - Whether the user can view instructor marks
+ # * canViewInstructorMarks: bool        - Whether the user can view instructor marks
+ # * viewContext:            ViewContext - Selected view mode and effective viewer
  #}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 {% import '@learning/macro/urgency.twig' as urgency %}

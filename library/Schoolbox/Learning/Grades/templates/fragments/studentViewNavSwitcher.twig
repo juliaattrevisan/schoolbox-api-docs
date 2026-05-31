@@ -1,5 +1,5 @@
 {# Server-side grades view selector. Expects viewContext, viewModes and currentRouteBase. #}
-<li class="separator">Viewing as {{ viewContext.getLabel() }}</li>
+<li class="separator">Viewing as {{ viewContext.getMode() }}</li>
 {% for mode in viewModes %}
     <li>
         {% if viewContext.getMode() == mode %}

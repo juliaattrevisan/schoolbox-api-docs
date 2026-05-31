@@ -13,6 +13,8 @@ final class ViewContext
 {
     /**
      * @param string $mode One of the ViewMode constants.
+     * @param User $viewer User whose visibility rules should apply.
+     * @param bool $canViewInstructorMarks Whether instructor-only marks should be available.
      */
     public function __construct(
         private readonly string $mode,
@@ -43,14 +45,6 @@ final class ViewContext
     public function canViewInstructorMarks(): bool
     {
         return $this->canViewInstructorMarks;
-    }
-
-    /**
-     * Return a human-readable label for the selected view mode.
-     */
-    public function getLabel(): string
-    {
-        return $this->mode;
     }
 
     /**

@@ -76,14 +76,13 @@ class ViewContextFactoryTest extends TestCase
     }
 
     /**
-     * Parent preview mode uses a real loaded parent when one exists.
+     * Parent preview mode uses a real loaded parent when one exists and hydrates that parent's children.
      */
     public function testParentModeUsesLoadedParentWhenAvailable(): void
     {
         $currentUser = $this->user(1, Role::STAFF);
         $student = $this->user(2, Role::STUDENT);
         $parent = $this->user(3, Role::PARENT);
-        $parent->setChildren((new GenericCollection(User::class))->setOffset($student->getId(), $student));
         $student->setParents((new GenericCollection(User::class))->setOffset($parent->getId(), $parent));
 
         $context = (new ViewContextFactory($this->externalUser()))->create($currentUser, $student, ViewMode::PARENT);
@@ -91,6 +90,7 @@ class ViewContextFactoryTest extends TestCase
         self::assertSame(ViewMode::PARENT, $context->getMode());
         self::assertSame($parent, $context->getViewer());
         self::assertFalse($context->canViewInstructorMarks());
+        self::assertSame($student, $context->getViewer()->getChildren()->getOffset($student->getId()));
         self::assertTrue($context->getViewer()->isParentOf($student));
     }
 
@@ -111,6 +111,9 @@ class ViewContextFactoryTest extends TestCase
 
     /**
      * Create a minimal user for view context tests.
+     *
+     * @param int $id User identifier to assign.
+     * @param string $roleType Role type to assign.
      */
     private function user(int $id, string $roleType): User
     {

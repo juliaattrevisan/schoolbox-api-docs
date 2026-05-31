@@ -10,6 +10,9 @@
         'folders'                Folder\Model[]      All folders where this student has interactions for current term
         'markbook'               Markbook            Unfiltered markbook for student, term + folder
         'conversation'           Conversation
+        'viewContext'            ViewContext         Selected view mode and effective viewer
+        'viewModes'              string[]            Supported view modes in display order
+        'viewModeQuerySuffix'    string              Query suffix that preserves the selected view mode
 #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learning/macro/urgency.twig' as urgency %}
@@ -28,7 +31,7 @@
                 folderId: '{{ subject.id }}'
             }
         });
-        $('[data-print]').click(function () {
+        $('[data-print]').on('click', function () {
             window.print();
             $('#container').highcharts().reflow();
         });
@@ -48,10 +51,10 @@
         {% if subject.teachers|length or canSwitchViewMode %}
         <ul class="meta">
             {% if subject.teachers|length %}
-                <li class="icon-teacher">Teacher(s): {% for teacher in subject.teachers %}<a href="/search/user/{{ teacher.id }}" title="View Profile">{{ teacher.fullName }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</li>
+                <li><sbx-icon name="teacher" color="var(--sbx-color-text-secondary)"></sbx-icon>Teacher(s): {% for teacher in subject.teachers %}<a href="/search/user/{{ teacher.id }}" title="View Profile">{{ teacher.fullName }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</li>
             {% endif %}
             {% if canSwitchViewMode %}
-                <li data-grades-view-mode-meta class="icon-view">Viewing as {{ viewContext.getLabel() }}</li>
+                <li data-grades-view-mode-meta class="icon-view">Viewing as {{ viewContext.getMode() }}</li>
             {% endif %}
         </ul>
         {% endif %}
@@ -201,8 +204,13 @@
                                 </div>
                                 <nav>
                                     {% if isCommenter %}
-                                        <a class="icon-delete" title="Delete" data-comment-delete></a>
-                                        <a class="icon-modify" title="Modify" data-comment-modify></a>
+                                        <a class="sbx-icon-only-button no-text"
+                                           title="Delete"
+                                           data-comment-delete
+                                           aria-label="Delete">
+                                            <sbx-icon name="delete"></sbx-icon>
+                                        </a>
+                                        <a title="Modify" data-comment-modify class="sbx-icon-only-button"><sbx-icon name="modify"></sbx-icon></a>
                                     {% endif %}
                                 </nav>
                                 <article>
@@ -223,7 +231,7 @@
     <div class="row">
         <div class="small-12 island">
             <div class="empty-state">
-                <i class="icon-due-work"></i>
+                <sbx-icon name="due-work" size="2.5rem"></sbx-icon>
                 <p>There are no {{ locale.grades.plural }} available for {{ subject.name }} for this {{ locale.term }}.</p>
             </div>
         </div>

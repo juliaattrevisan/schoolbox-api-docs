@@ -5,6 +5,9 @@
     folders:    GenericCollection|Folder\Model[] - Classes/Groups where the current student has responses or feedback for the current term
     markbooks:  GenericCollection|MarkBook[]     - Indexed by folder.id, each composed of the assessments for that folder and term
     mailHandle: string                           - Prefix for sending mail
+    viewContext: ViewContext                     - Selected view mode and effective viewer
+    viewModes:   string[]                        - Supported view modes in display order
+    viewModeQuerySuffix: string                  - Query suffix that preserves the selected view mode
 #}
 
 {% import '@learning/macro/urgency.twig' as urgency %}
@@ -20,7 +23,7 @@
 
         {% if canSwitchViewMode %}
         <ul class="meta">
-            <li data-grades-view-mode-meta class="icon-view">Viewing as {{ viewContext.getLabel() }}</li>
+            <li data-grades-view-mode-meta class="icon-view">Viewing as {{ viewContext.getMode() }}</li>
         </ul>
         {% endif %}
     </div>
@@ -53,11 +56,6 @@
                     </div>
                 </li>
             </ul>
-            {% if customisationsRoute %}
-                <a class="button icon-view" href="{{ customisationsRoute }}" data-test="grades-view-customisations">
-                    View Customisations
-                </a>
-            {% endif %}
         </section>
     </div>
     <div class="small-12 medium-7 columns">
@@ -124,7 +122,7 @@
                             </div>
                         </div>
                         <nav>
-                            <a href="{{ mailHandle }}{{ teacher.email }}" class="icon-email" title="Mail"></a>
+                            <a href="{{ mailHandle }}{{ teacher.email }}" title="Mail" class="sbx-icon-only-button"><sbx-icon name="email"></sbx-icon></a>
                         </nav>
                     </li>
                     {% endfor %}
@@ -157,7 +155,7 @@
     <div class="row">
         <div class="small-12 island">
             <div class="empty-state">
-                <i class="icon-due-work"></i>
+                <sbx-icon name="due-work" size="2.5rem"></sbx-icon>
                 <p>There are no {{ locale.grades.plural }} to view for this {{ locale.term }}.</p>
             </div>
         </div>

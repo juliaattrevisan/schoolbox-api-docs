@@ -15,6 +15,9 @@ class ViewModeTest extends TestCase
 {
     /**
      * ViewMode accepts each supported request value unchanged.
+     *
+     * @param string $input Request value to normalize.
+     * @param string $expected Expected ViewMode constant.
      */
     #[DataProvider('validModeProvider')]
     public function testFromRequestValueAcceptsValidModes(string $input, string $expected): void

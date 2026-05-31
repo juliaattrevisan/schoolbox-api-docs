@@ -15,9 +15,7 @@ export default class GradesPage {
 
     static readonly DATA_TEST_JELLY_TOT = "sbx-pop-out-header-options-button";
 
-    static readonly SELECTOR_VIEW_MODE_LABEL = "[data-grades-view-mode-label]";
-
-    static readonly SELECTOR_VIEW_MODE_SWITCHER = "[data-grades-view-mode-switcher]";
+    static readonly SELECTOR_VIEW_MODE_META = "[data-grades-view-mode-meta]";
 
     static readonly SELECTOR_ASSESSMENT = ".activity-list li.assessment";
 
@@ -47,26 +45,24 @@ export default class GradesPage {
         await subject.click();
     }
 
+    /**
+     * click the jelly tot
+     */
+    async clickJellyTot(): Promise<void> {
+        await this.page.getByTestId(GradesPage.DATA_TEST_JELLY_TOT).click();
+    }
+
     async viewAs(mode: "staff" | "student" | "parent"): Promise<void> {
+        await this.clickJellyTot();
         await this.page.locator(`[data-grades-view-mode="${mode}"]`).click();
     }
 
     async expectGradesViewMode(mode: "staff" | "student" | "parent"): Promise<void> {
-        const switcher = this.page.locator(GradesPage.SELECTOR_VIEW_MODE_SWITCHER);
-
-        await expect(this.page.locator(GradesPage.SELECTOR_VIEW_MODE_LABEL)).toHaveText("Viewing feedback as");
-        await expect(switcher.locator(`[data-grades-view-mode="${mode}"]`).locator("..")).toHaveClass(/active/);
-        await expect(this.page.locator("[data-grades-view-mode-meta]")).toHaveCount(0);
-    }
-
-    async openHeaderMenu(): Promise<void> {
-        await this.page.getByTestId(GradesPage.DATA_TEST_JELLY_TOT).click();
-    }
-
-    async expectCustomisationRecordsOnlyInHeaderMenu(): Promise<void> {
-        await expect(this.page.getByTestId("grades-view-customisations")).toHaveCount(0);
-        await this.openHeaderMenu();
-        await expect(this.page.getByTestId("grades-view-customisations-menu")).toBeVisible();
+        await expect(this.page.locator(GradesPage.SELECTOR_VIEW_MODE_META)).toContainText(`Viewing as ${mode}`);
+        await expect(this.page.locator(`[data-grades-view-mode="${mode}"]`)).toHaveCount(0);
+        await expect(this.page.locator("#header-options [aria-current='page']")).toContainText(
+            `View as ${mode.charAt(0).toUpperCase()}${mode.slice(1)}`,
+        );
     }
 
     /**

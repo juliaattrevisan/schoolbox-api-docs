@@ -15,6 +15,8 @@ final class ViewMode
 
     /**
      * Return a supported view mode for a request value, defaulting to staff mode for invalid values.
+     *
+     * @param null|string $value Requested view mode value.
      */
     public static function fromRequestValue(?string $value): string
     {

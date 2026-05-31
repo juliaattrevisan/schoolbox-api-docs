@@ -23,6 +23,10 @@ final class ViewContextFactory
 
     /**
      * Create a view context, allowing only staff users to select alternate preview modes.
+     *
+     * @param User $currentUser User making the request.
+     * @param User $student Student whose grades are being viewed.
+     * @param null|string $requestedMode Requested view mode from the query string.
      */
     public function create(User $currentUser, User $student, ?string $requestedMode): ViewContext
     {
@@ -49,6 +53,8 @@ final class ViewContextFactory
 
     /**
      * Return a representative parent viewer for the student, creating a synthetic parent when none exists.
+     *
+     * @param User $student Student whose parent-visible grades are being previewed.
      */
     private function resolveParentViewer(User $student): User
     {
@@ -58,6 +64,8 @@ final class ViewContextFactory
         if ($parents !== null && $parents->count() > 0) {
             $parent = $parents->first();
             if ($parent instanceof User) {
+                $parent->setChildren((new GenericCollection(User::class))->setOffset($student->getId(), $student));
+
                 return $parent;
             }
         }
