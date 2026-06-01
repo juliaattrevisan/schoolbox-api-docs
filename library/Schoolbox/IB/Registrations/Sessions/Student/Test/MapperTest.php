@@ -42,6 +42,15 @@ class MapperTest extends TestCase
         ));
     }
 
+    public function testMapperProvidesActiveRegistrationLookupByUser(): void
+    {
+        // @phpstan-ignore-next-line - This contract test intentionally asserts the public mapper API exists.
+        $this->assertTrue(method_exists(
+            Mapper::class,
+            'findActiveRegistrationForUser'
+        ));
+    }
+
     public function testApplySubjectLanguageOverridesReplacesDefaultLanguagesForPersistedStudents(): void
     {
         $student = (new RegistrationSessionStudentModel())
