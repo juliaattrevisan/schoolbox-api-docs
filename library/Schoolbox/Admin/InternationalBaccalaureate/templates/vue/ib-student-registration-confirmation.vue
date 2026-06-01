@@ -65,12 +65,7 @@ async function toggle(value: boolean): Promise<void> {
 <template>
     <div class="ib-registration-section-confirm">
         <label class="ib-registration-section-confirm__label">
-            <input
-                v-model="confirmed"
-                type="checkbox"
-                :disabled="isSaving"
-                @change="toggle(confirmed)"
-            />
+            <input v-model="confirmed" type="checkbox" :disabled="isSaving" @change="toggle(confirmed)" />
             {{ labelText }}
         </label>
         <p v-if="confirmedBy && confirmedAt" class="ib-registration-section-confirm__meta">
