@@ -22,7 +22,6 @@ use Schoolbox\Filter\Codec;
 use Schoolbox\Filter\Filters\Assessment\AssessmentType\Definition as AssessmentTypeDefinition;
 use Schoolbox\GenericCollection;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\Visibility;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -705,114 +704,15 @@ class Controller extends Base
      */
     private function buildMarkbook(array $assessmentIds, FolderModel $folder): Markbook
     {
-        $start = microtime(true);
-
-        $feedbackFolders = new FeedbackFolders(
-            $this->getDi()->get('databaseInternal'),
-            $this->getDi()->get('externalClass'),
-            \Schoolbox\UserMapper::getInstance(), // TODO inject this from wherever you implement later
-        );
-
-        // toggle the stats
-        $overallStatistics = false;
-
         // Fetch assessments & participants
         if (empty($assessmentIds)) {
             $assessments = $this->assessmentMapperProxy->createCollection();
         } else {
-            /* Find data between these date ranges
-             */
-            $from = new \Alaress_Date_Format('2025-01-01 00:00:00', 'Y-m-d H:i:s');
-            $to = new \Alaress_Date_Format('2026-11-07 00:00:00', 'Y-m-d H:i:s');
-
-            /* Default settings:
-             */
-
             // load the folder's info
-//            $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview(
-//                folderId: $folder->getId(),
-//                users: null,
-//                options: [ 'ids' => $assessmentIds ]
-//            );
-
-            /* Reporting Activity
-             * Note that the first arg to findAllByFolderIdForReview() can actually be a set of folder ids
-             */
-
             $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview(
-                /* For the students in $folder, find all the folders where they had a published feedback
-                 */
-                folderId: $feedbackFolders->findForFolder($folder, $from, $to),
-                /* For the $studentIds provided, find all the folders where they had a published feedback
-                 */
-                //                (new FeedbackFolders($this->getDi()->get('databaseInternal'), $this->getDi()->get('externalClass')))
-                //                    ->findForStudents($studentIds, $from, $to),
-                /* Instead of the FeedbackFolders, you can slam together your own list of folders arbitrarily
-                 * I found these manually
-                 */
-                // folderId: [
-                //                     $folder->getId(),  // typically 80, 9ENGA
-                //                     78, // 9SPANISHA
-                //                     189, // 9MATA
-                //                     85, // 9PDHC
-                //                     190, // 9MYPA
-                //                     97, // 3TR
-                //                     93, // 3AC
-                //                     92, // 3IB
-                //                     95, // 3IBSPA
-                //                     96, // 3IBVA
-                //                     250, // ELCB
-                //                 ],
-                /* This was thought to limit it to one student, but it doesn't help much; it just finds assessments
-                 * this student did, which still ends up hydrating what every other student in that assessment too,
-                 * by virtue of the swamp.
-                 *
-                 * student: \Schoolbox\UserMapper::getInstance()->findById(13),
-                 */
-                /* Only hydrate these particular participants and their feedbacks, if specified: otherwise swamp hydrates
-                 * everyone who participated in each $assessment which might be more than you need.
-                 */
-                users: $feedbackFolders->findStudents($folder),
-                /* Somewhat experimental:
-                 * Don't need any response instances. You get some mixed results here, since the markbook infers states:
-                 * a response existing, but no feedback given yet, is shown as a hyphen - ...but if a response doesn't
-                 * exist, the markbook shows "Pending" under the assumption you never submitted anything.
-                 */
-                includeResponses: true,
-                /* There's this somewhat obscure "options to pass to findByColumList" but there's actually a few
-                 * rarely-used, rarely-encountered ideas here: ref. convertOptionsToPredicateBuilder() in the
-                 * Assessment MapperProxy:1790. You get there via findAllByFolderIdForReview() and it has a plethora of
-                 * date range filters, term-based filters, etc. deep in the swamp where you'd never look.
-                 */
-                options: [
-                    'due_after' => $from,
-                    'due_before' => $to,
-                    'type' => [
-                        AssessmentType::TYPE_DUE_WORK,
-                        AssessmentType::TYPE_QUIZ,
-                        AssessmentType::TYPE_PROJECT,
-                        AssessmentType::TYPE_LTI_ASSESSMENT
-                    ],
-                    'work_type' => [
-                        1, // Formative Assessment Task
-                        2, // Summative Assessment Task
-                        3, // Learning Activity
-                        4, // Homework Task
-                        5, // Observation
-                        6, // Lesson Planning
-                        7, // Reporting
-                        8, // Unknown (maybe deleted)
-                        9, // Approach To Learning
-                    ],
-                    /* If both are provided, assessment ids and curriculum nodes execute an intersect: this results in
-                     * all the assessment ids provided that -also- are associated with any of the curric codes specified
-                     */
-                //                    'ids' => [391],
-                //                    'curriculum_codes' => [
-                //                        'AC9SAS09',
-                //                        'GC-FA-a'
-                //                    ]
-                ],
+               folderId: $folder->getId(),
+               users: null,
+               options: ['ids' => $assessmentIds],
             );
         }
 
@@ -820,38 +720,8 @@ class Controller extends Base
         $markSchemeFactory = new Factory($this->getConfigLoader());
         $overallMarkScheme = $markSchemeFactory->spawnForFolder($folder, $this->getUser()->getRole()->isStaff());
 
-        $markbook = new Markbook(
-            assessments: $assessments,
-            defaultMarkScheme: $overallMarkScheme,
-            viewingUser: $this->getUser(),
-            /* Ignore processing weight, mean, stdev, min, max, etc. statistics. This appears in an accordion thing on
-             * the markbook page. Setting this to false zeroes out the data, ignoring its normal calculation algorithms
-             */
-            overallStatistics: $overallStatistics,
-            /* Use this to reduce $assessments to only returning a row for these guy(s)
-             * findAllByFolderIdForReview() doesn't really support individual participants across multiple folders.
-             * It goes into a different orthogonal method
-             * Plus, this isn't the usual use case afaik: you're operating on your entire class of students at a time,
-             * mostly: not an individual. Nevertheless, you can operate on a reduced set by using this reductive.
-             */
-            studentIds: null,
-            curriculumCodes: null,
-            folderIds: null,
-        );
-
+        $markbook = new Markbook($assessments, $overallMarkScheme, $this->getUser());
         $markbook->sortAssessables();
-        $end = microtime(true);
-
-        /* Temporary timing experiment: unfiltered, for 10 homepages, markbook takes:
-         * float(2.780165910720825) to build
-         *
-         * When filtered to use due dates, types and work types, the markbook takes:
-         * float(0.5908069610595703) to build (4 times faster?)
-         *
-         * When filtered to also use a curric code, the markbook takes:
-         * float(0.085470199584961) to build
-         */
-        $_SESSION['mbdur'] =  $end - $start;
 
         return $markbook;
     }
