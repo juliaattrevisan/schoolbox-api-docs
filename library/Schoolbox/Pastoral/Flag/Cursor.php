@@ -16,9 +16,11 @@ use Alaress_Date_Format;
 use DateTimeInterface;
 use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use Schoolbox\Pastoral\DataSource;
 use Schoolbox\Pastoral\Model;
+use Schoolbox\Pastoral\Attachment\Model as AttachmentModel;
 use Schoolbox\User;
 use ValueError;
 
@@ -113,7 +115,7 @@ class Cursor implements ICursor
      */
     public function retrieveResults(?string $encodedCursor): Collection
     {
-        return $this->dataSource
+        $results = $this->dataSource
             ->findRecordsByPredicates(
                 $this->currentUser,
                 $this->student,
@@ -127,6 +129,33 @@ class Cursor implements ICursor
                 ],
             )
             ->reindex();
+
+
+        /** @var \Schoolbox\Pastoral\Tag\Mapper $pastoralTagMapper */
+        $pastoralTagMapper = $this->dataSource->getPastoralMapper()->getJoinMapper('tags');
+        /** @var \Schoolbox\Pastoral\Attachment\Mapper $pastoralAttachmentMapper */
+        $pastoralAttachmentMapper = $this->dataSource->getPastoralMapper()->getJoinMapper('attachments');
+
+        /* Fetch attachments for all retrieved pastoral records in a single query, and group by pastoral ID for easy hydration.
+         */
+        $attachmentPb = $pastoralAttachmentMapper->getPredicateBuilder();
+        $attachments = $pastoralAttachmentMapper->findByPredicates(
+            $attachmentPb->in('pastoral_id', Collection::arrayColumn($results, 'id'))
+        )->groupByCallback(
+            function (AttachmentModel $attachment) {
+                return $attachment->getPastoral()->getId();
+            }
+        );
+
+        /* Hydrate tags and attachments for each pastoral record. Attachments are set to an empty collection if no attachments exist for a given record, to avoid null checks in the frontend.
+         */
+        $results->map(function (Model $record) use ($pastoralTagMapper, $attachments) {
+            $record->setTags($pastoralTagMapper->findForRecord($record));
+            $record->setAttachments($attachments->getOffset($record->getId()) ?? new GenericCollection(AttachmentModel::class));
+            return $record;
+        });
+
+        return $results;
     }
 
     /**
