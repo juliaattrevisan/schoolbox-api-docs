@@ -326,6 +326,18 @@ class Redis
     }
 
     /**
+     * Clear ALL cache results for the given base key.
+     *
+     * @param string $baseKey The base of the key which results are stored in.
+     * @return bool Was the cache cleared?
+     */
+    public function clearCache(string $baseKey): bool
+    {
+        $cache = $this->buildCache($baseKey);
+        return $cache->clear();
+    }
+
+    /**
      * Build the cache key for inserting and returning cached data.
      *
      * @param mixed $params A parameter to pass to $callback. This is also used

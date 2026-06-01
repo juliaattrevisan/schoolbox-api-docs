@@ -270,6 +270,7 @@ class Controller extends ConfigController
         }
 
         if ($reloadRouteDaemon || $reloadScheduleDaemon || $reloadMobileDaemon) {
+            // TODO inject this
             $redisClient = Redis::getSignalQueueClientInstance();
             if ($redisClient && $reloadRouteDaemon) {
                 $redisClient->publish('scheduled.' . INSTANCE_ID . '.reload', '');
@@ -282,6 +283,7 @@ class Controller extends ConfigController
             }
         }
         if ($rebuildModules) {
+            // TODO send this and anything else which uses post-output callbacks to toolsd
             $this->postOutputCallbacks[] = $this->buildRebuildModuleCacheCallback();
             // After everything else: reload the route table
             $this->response = $this->responseEmpty();
@@ -290,7 +292,26 @@ class Controller extends ConfigController
             $this->oidcCache->clear();
         }
         if ($clearExternalCache) {
-            // Need to clear ALL external cache methods
+            // Need to clear ALL external cache methods:
+            // assume any public method on the external DB interfaces may be
+            // cached.
+            $interfaces = [
+                [\External_UserInterface::class, \External_User::class],
+                [\External_ClassInterface::class, \External_Class::class],
+                [\External_TimetableInterface::class, \External_Timetable::class],
+            ];
+            // TODO inject this
+            $cacheInstance = Redis::getCacheInstance();
+            foreach ($interfaces as [$interface, $class]) {
+                $reflection = new \ReflectionClass($interface);
+                foreach ($reflection->getMethods() as $method) {
+                    if ($method->isPublic()) {
+                        // Create a cache object for this method, and clear it
+                        $namespace = $class . '.' . $method->getName();
+                        $cacheInstance->clearCache($namespace);
+                    }
+                }
+            }
         }
 
         $this->response = $this->redirectAfterPost($this->getRouteUrlFromTypeLabel($typeLabel));
