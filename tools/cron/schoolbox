@@ -150,7 +150,7 @@ MAILTO="ist+cron@schoolbox.com.au"
 
 # Data retention, nightly at 1am
 # clean old data things, then let the garbage collector do the rest
-1 1 * * * www-data /usr/local/bin/jitter 300 php /usr/share/schoolbox/tools/schema/data-retention.php -vvvp >> /var/log/schoolbox/data-retention.log 2>&1
+1 1 * * * www-data /usr/local/bin/jitter 300 php /usr/share/schoolbox/tools/dataRetention/process.php -vvvp >> /var/log/schoolbox/data-retention.log 2>&1
 
 # Garbage collection: every morning at around 2:00, I suppose?
 # Start logging in ultra-verbose mode for now, so the log contains exactly what was deleted.
