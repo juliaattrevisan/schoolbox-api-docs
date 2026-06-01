@@ -97,6 +97,18 @@
 }
 
 #allDivisions {
+    .actions-small-1 > .expander.sbx-icon-only-button {
+        &::before {
+            content: none;
+        }
+    }
+
+    [data-team] .card.compact > div {
+        sbx-icon {
+            margin-right: var(--spacing-s);
+        }
+    }
+
     .actions-small-1 > .card.list-item > a {
         align-items: flex-start;
         color: inherit;
