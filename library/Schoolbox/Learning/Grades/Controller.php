@@ -168,17 +168,7 @@ class Controller extends Base
             $markSchemeFactory
         );
 
-        $currentUser = $this->getUser();
-        if ($currentUser->getRole()->isStaff()) {
-            $viewMode               = ViewMode::fromRequestValue($this->requestQuery->get('viewMode'));
-            $effectiveViewer        = $this->getEffectiveViewer($currentUser, $viewee, $viewMode);
-            $canViewInstructorMarks = $viewMode === ViewMode::STAFF;
-        } else {
-            $viewMode               = '';
-            $effectiveViewer        = $currentUser;
-            $canViewInstructorMarks = false;
-        }
-
+        [$viewMode, $effectiveViewer, $canViewInstructorMarks] = $this->getViewModeVariables($viewee);
         [$folders, $markbooks, $assessments] = $gradeHelper->generateGrades($effectiveViewer, $viewee, $term);
 
         $filteredWorkTypes = WorkType\Mapper::getInstance()->findByColumn('show_on_grades_page', 1);
@@ -211,6 +201,27 @@ class Controller extends Base
             'viewModeQuerySuffix'    => $viewMode !== '' ? '?viewMode=' . rawurlencode($viewMode) : '',
             'customisationsRoute' => null,
         ], '', 'grade');
+    }
+
+    /**
+     * @param User $viewee
+     * @return array
+     */
+    private function getViewModeVariables(User $viewee): array
+    {
+        $currentUser = $this->getUser();
+
+        if ($currentUser->getRole()->isStaff()) {
+            $viewMode               = ViewMode::fromRequestValue($this->requestQuery->get('viewMode'));
+            $effectiveViewer        = $this->getEffectiveViewer($currentUser, $viewee, $viewMode);
+            $canViewInstructorMarks = $viewMode === ViewMode::STAFF;
+        } else {
+            $viewMode               = '';
+            $effectiveViewer        = $currentUser;
+            $canViewInstructorMarks = false;
+        }
+
+        return [$viewMode, $effectiveViewer, $canViewInstructorMarks];
     }
 
     /**
@@ -279,17 +290,8 @@ class Controller extends Base
      */
     public function getGradesForSubject(User $viewee, Term\Model $term, Folder\Model $subject): void
     {
-        $page        = FilterPage\Model::PAGE_GRADES;
-        $currentUser = $this->getUser();
-        if ($currentUser->getRole()->isStaff()) {
-            $viewMode               = ViewMode::fromRequestValue($this->requestQuery->get('viewMode'));
-            $effectiveViewer        = $this->getEffectiveViewer($currentUser, $viewee, $viewMode);
-            $canViewInstructorMarks = $viewMode === ViewMode::STAFF;
-        } else {
-            $viewMode               = '';
-            $effectiveViewer        = $currentUser;
-            $canViewInstructorMarks = false;
-        }
+        $page = FilterPage\Model::PAGE_GRADES;
+        [$viewMode, $effectiveViewer, $canViewInstructorMarks] = $this->getViewModeVariables($viewee);
         $viewModeQuerySuffix = $viewMode !== '' ? '?viewMode=' . rawurlencode($viewMode) : '';
 
         $route       = $this->routeGenerator->generate('learningGrades.postReport', [
@@ -386,18 +388,9 @@ class Controller extends Base
      */
     public function postReport(User $viewee, Term\Model $term, Folder\Model $subject): void
     {
-        $request         = $this->requestPost->get('filter_selection') ?: [];
-        $page            = FilterPage\Model::PAGE_GRADES;
-        $currentUser = $this->getUser();
-        if ($currentUser->getRole()->isStaff()) {
-            $viewMode               = ViewMode::fromRequestValue($this->requestQuery->get('viewMode'));
-            $effectiveViewer        = $this->getEffectiveViewer($currentUser, $viewee, $viewMode);
-            $canViewInstructorMarks = $viewMode === ViewMode::STAFF;
-        } else {
-            $viewMode               = '';
-            $effectiveViewer        = $currentUser;
-            $canViewInstructorMarks = false;
-        }
+        $request = $this->requestPost->get('filter_selection') ?: [];
+        $page = FilterPage\Model::PAGE_GRADES;
+        [$viewMode, $effectiveViewer, $canViewInstructorMarks] = $this->getViewModeVariables($viewee);
 
         /* @var RosettaStone $l10n */
         $l10n = $this->getDi()->get('l10n');
