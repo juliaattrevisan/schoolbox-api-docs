@@ -330,26 +330,6 @@ class Controller extends ConfigController
                 // do something
                 throw $e;
             }
-//            // Need to clear ALL external cache methods:
-//            // assume any public method on the external DB interfaces may be
-//            // cached.
-//            $interfaces = [
-//                [\External_UserInterface::class, \External_User::class],
-//                [\External_ClassInterface::class, \External_Class::class],
-//                [\External_TimetableInterface::class, \External_Timetable::class],
-//            ];
-//            // TODO inject this, or just send it to toolsd?
-//            $cacheInstance = Redis::getCacheInstance();
-//            foreach ($interfaces as [$interface, $class]) {
-//                $reflection = new \ReflectionClass($interface);
-//                foreach ($reflection->getMethods() as $method) {
-//                    if ($method->isPublic()) {
-//                        // Create a cache object for this method, and clear it
-//                        $namespace = $class . '.' . $method->getName();
-//                        $cacheInstance->clearCache($namespace);
-//                    }
-//                }
-//            }
         }
 
         $this->response = $this->redirectAfterPost($this->getRouteUrlFromTypeLabel($typeLabel));
