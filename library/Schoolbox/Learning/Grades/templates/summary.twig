@@ -10,6 +10,7 @@
     effectiveViewer: User                        - The user whose feedback visibility rules apply
     canViewInstructorMarks: bool                 - Whether instructor-only marks should be rendered
     viewModeQuerySuffix: string                  - Query suffix that preserves the selected view mode
+    customisationsRoute: string|null             - Route to the student's customisation record, or null if the viewer may not see it
 #}
 
 {% import '@learning/macro/urgency.twig' as urgency %}
@@ -18,7 +19,8 @@
 {{ bread.crumbs(['Learning', routeLookup('learning.getClasses')], [locale.grades.properPlural]) }}
 
 {% set canSwitchViewMode = USER.role.isStaff %}
-<div class="row{% if canSwitchViewMode %} actions-small-2{% endif %}">
+{% set showHeaderOptions = canSwitchViewMode or customisationsRoute %}
+<div class="row{% if showHeaderOptions %} actions-small-2{% endif %}">
     <div class="small-12 columns">
         <h1>{{ locale.grades.properPlural }} for {{ term.title }}</h1>
 
@@ -28,17 +30,27 @@
         </ul>
         {% endif %}
     </div>
-    {% if canSwitchViewMode %}
+    {% if showHeaderOptions %}
         <nav>
             <sbx-pop-out content-id="header-options" data-test="sbx-pop-out-header-options"></sbx-pop-out>
         </nav>
-        <ul id="header-options" class="f-dropdown" data-dropdown-content aria-label="Grades view mode options">
-            {% set currentRouteBase = routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, term: term, termCode: term.code}) %}
-            {% include '@learningGrades/fragments/viewModeNavSwitcher.twig' with {
-                viewMode: viewMode,
-                viewModes: viewModes,
-                currentRouteBase: currentRouteBase
-            } only %}
+        <ul id="header-options" class="f-dropdown" data-dropdown-content aria-label="Grades options">
+            {% if canSwitchViewMode %}
+                {% set currentRouteBase = routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, term: term, termCode: term.code}) %}
+                {% include '@learningGrades/fragments/viewModeNavSwitcher.twig' with {
+                    viewMode: viewMode,
+                    viewModes: viewModes,
+                    currentRouteBase: currentRouteBase
+                } only %}
+            {% endif %}
+            {% if customisationsRoute %}
+                <li>
+                    <a href="{{ customisationsRoute }}" class="sbx-button--has-icon" title="View Customisations" data-test="grades-view-customisations">
+                        <sbx-icon name="group"></sbx-icon>
+                        View Customisations
+                    </a>
+                </li>
+            {% endif %}
         </ul>
     {% endif %}
 </div>

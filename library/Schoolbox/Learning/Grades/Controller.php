@@ -157,6 +157,7 @@ class Controller extends Base
      * @return void
      * @throws TwigError
      * @throws MapperException
+     * @throws RouteNotFound If unable to generate the customisation record route
      */
     private function getCustomGrades(User $viewee, Term\Model $term, ?string $selectedYear = null): void
     {
@@ -199,7 +200,10 @@ class Controller extends Base
             'viewModeQuerySuffix'    => $viewMode !== '' ? '?viewMode=' . rawurlencode($viewMode) : '',
             'effectiveViewer'        => $effectiveViewer,
             'canViewInstructorMarks' => $canViewInstructorMarks,
-            'customisationsRoute'    => null,
+            'customisationsRoute'    => $this->getRouteIfAuthorized(
+                'customisationRecord.viewRecordByStudent',
+                ['studentId' => $viewee->getId()]
+            ) ?: null,
         ], '', 'grade');
     }
 
