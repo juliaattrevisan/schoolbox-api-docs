@@ -1084,15 +1084,25 @@ class Controller extends ConfigController
                     ->setSubjectConfirmedBy($updatedBy);
             }
 
+            $bothConfirmed = $registrationSessionStudent->getCandidateConfirmed()
+                && $registrationSessionStudent->getSubjectConfirmed();
+
+            $registrationSessionStudent->setStatus(
+                $bothConfirmed
+                    ? RegistrationSessionStudentModel::STATUS_CONFIRMED
+                    : RegistrationSessionStudentModel::STATUS_UNCONFIRMED
+            );
+
             $this->registrationSessionStudentMapper->save($registrationSessionStudent);
 
             $this->response = $this->responseAsJson([
-                'success' => true,
-                'section' => $section,
-                'confirmed' => $confirmed,
-                'updatedAt' => $updatedAt,
-                'updatedBy' => [
-                    'id' => $updatedBy->getId(),
+                'success'            => true,
+                'section'            => $section,
+                'confirmed'          => $confirmed,
+                'confirmationStatus' => $bothConfirmed ? 'confirmed' : 'unconfirmed',
+                'updatedAt'          => $updatedAt->getDateTimeObject()->format('d M Y g:ia'),
+                'updatedBy'          => [
+                    'id'   => $updatedBy->getId(),
                     'name' => $updatedBy->getFullName(),
                 ],
             ]);
