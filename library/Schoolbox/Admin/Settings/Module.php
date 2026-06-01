@@ -130,6 +130,7 @@ class Module extends \Alaress\Module\Module
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
             $this->injector->get('moduleCache.rebuilder'),
             $this->injector->get('oidc.cache'),
+            $this->injector->get('toolsDaemon.client'),
         );
     }
 }

@@ -9,10 +9,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Settings;
 
+use Alaress\Module\Cache\Rebuilder;
 use Alaress\Redis;
 use Alaress_Byte_Format;
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
+use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Config\Config;
@@ -21,11 +23,31 @@ use Schoolbox\Error\Mapper;
 use Schoolbox\GenericCollection;
 use Alaress\Database\Predicate;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\ToolsDaemon;
 use Schoolbox\User;
 use Twig\Error\Error;
 
 class Controller extends ConfigController
 {
+    /**
+     * Constructor
+     *
+     * @param ConfigMapper         $configMapper
+     * @param FieldStrategyFactory $fieldStrategyFactory
+     * @param Rebuilder            $rebuilder
+     * @param CacheInterface       $oidcCache
+     * @param ToolsDaemon\Client   $toolsDaemonClient
+     */
+    public function __construct(
+        ConfigMapper $configMapper,
+        FieldStrategyFactory $fieldStrategyFactory,
+        Rebuilder $rebuilder,
+        CacheInterface $oidcCache,
+        private ToolsDaemon\Client $toolsDaemonClient,
+    ) {
+        parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder, $oidcCache);
+    }
+
     /**
      * Renders an admin settings page for settings with the specified type
      *
@@ -302,26 +324,32 @@ class Controller extends ConfigController
             $this->oidcCache->clear();
         }
         if ($clearExternalCache) {
-            // Need to clear ALL external cache methods:
-            // assume any public method on the external DB interfaces may be
-            // cached.
-            $interfaces = [
-                [\External_UserInterface::class, \External_User::class],
-                [\External_ClassInterface::class, \External_Class::class],
-                [\External_TimetableInterface::class, \External_Timetable::class],
-            ];
-            // TODO inject this, or just send it to toolsd?
-            $cacheInstance = Redis::getCacheInstance();
-            foreach ($interfaces as [$interface, $class]) {
-                $reflection = new \ReflectionClass($interface);
-                foreach ($reflection->getMethods() as $method) {
-                    if ($method->isPublic()) {
-                        // Create a cache object for this method, and clear it
-                        $namespace = $class . '.' . $method->getName();
-                        $cacheInstance->clearCache($namespace);
-                    }
-                }
+            try {
+                $jobId = $this->toolsDaemonClient->run(new ToolsDaemon\JobRequest('clearExternalCache', instanceId: INSTANCE_ID));
+            } catch (ToolsDaemon\ClientException $e) {
+                // do something
+                throw $e;
             }
+//            // Need to clear ALL external cache methods:
+//            // assume any public method on the external DB interfaces may be
+//            // cached.
+//            $interfaces = [
+//                [\External_UserInterface::class, \External_User::class],
+//                [\External_ClassInterface::class, \External_Class::class],
+//                [\External_TimetableInterface::class, \External_Timetable::class],
+//            ];
+//            // TODO inject this, or just send it to toolsd?
+//            $cacheInstance = Redis::getCacheInstance();
+//            foreach ($interfaces as [$interface, $class]) {
+//                $reflection = new \ReflectionClass($interface);
+//                foreach ($reflection->getMethods() as $method) {
+//                    if ($method->isPublic()) {
+//                        // Create a cache object for this method, and clear it
+//                        $namespace = $class . '.' . $method->getName();
+//                        $cacheInstance->clearCache($namespace);
+//                    }
+//                }
+//            }
         }
 
         $this->response = $this->redirectAfterPost($this->getRouteUrlFromTypeLabel($typeLabel));
