@@ -304,6 +304,7 @@ class Controller extends Base
         $encodedCursor = $get->get('cursor');
 
         $cursor = new Cursor(
+            $this->getConfigLoader(),
             $this->pastoralDataSource,
             $user,
             $student,

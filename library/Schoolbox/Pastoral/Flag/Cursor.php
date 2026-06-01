@@ -16,7 +16,9 @@ use Alaress_Date_Format;
 use DateTimeInterface;
 use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
 use Schoolbox\Pastoral\DataSource;
 use Schoolbox\Pastoral\Model;
@@ -38,6 +40,7 @@ class Cursor implements ICursor
     /**
      * Constructor
      *
+     * @param IConfigLoader $configLoader Schoolbox config loader
      * @param DataSource $dataSource   Pastoral data source
      * @param User       $currentUser  The user for whom results should be censored
      * @param User       $student      The student to fetch results for
@@ -47,6 +50,7 @@ class Cursor implements ICursor
      * @param int        $limit        The max number of results to fetch
      */
     public function __construct(
+        private IConfigLoader $configLoader,
         private DataSource $dataSource,
         private User $currentUser,
         private User $student,
@@ -140,6 +144,10 @@ class Cursor implements ICursor
         $pastoralTagMapper = $this->dataSource->getPastoralMapper()->getJoinMapper('tags');
         /** @var \Schoolbox\Pastoral\Attachment\Mapper $pastoralAttachmentMapper */
         $pastoralAttachmentMapper = $this->dataSource->getPastoralMapper()->getJoinMapper('attachments');
+        /** @var \Schoolbox\Pastoral\RecordAction\Mapper $pastoralRecordActionMapper */
+        $pastoralRecordActionMapper = $this->dataSource->getPastoralMapper()->getJoinMapper('recordActions');
+        /** @var \Schoolbox\Pastoral\Comment\Mapper $pastoralCommentMapper */
+        $pastoralCommentMapper = $this->dataSource->getPastoralMapper()->getJoinMapper('comments');
 
         /* Fetch attachments for all retrieved pastoral records in a single query, and group by pastoral ID for easy hydration.
          */
@@ -154,9 +162,18 @@ class Cursor implements ICursor
 
         /* Hydrate tags and attachments for each pastoral record. Attachments are set to an empty collection if no attachments exist for a given record, to avoid null checks in the frontend.
          */
-        $results->map(function (Model $record) use ($pastoralTagMapper, $attachments) {
+        $results->map(function (Model $record) use ($pastoralTagMapper, $pastoralCommentMapper, $pastoralRecordActionMapper, $attachments) {
+            $recordId = $record->getId();
             $record->setTags($pastoralTagMapper->findForRecord($record));
-            $record->setAttachments($attachments->getOffset($record->getId()) ?? new GenericCollection(AttachmentModel::class));
+            $record->setAttachments($attachments->getOffset($recordId) ?? new GenericCollection(AttachmentModel::class));
+            $record->setComments($pastoralCommentMapper->findByColumn('pastoral_id', $recordId, [
+                'order' => [
+                    'created_at' => 'desc'
+                ]
+            ]));
+            if ($this->configLoader->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
+                $record->setRecordActions($pastoralRecordActionMapper->findByColumn('pastoral_id', $recordId));
+            }
             return $record;
         });
 
