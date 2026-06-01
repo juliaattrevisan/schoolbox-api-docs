@@ -999,6 +999,7 @@ class Controller extends ConfigController
     {
         $post       = $this->requestPost;
         $studentIds = $post->get('studentIds');
+        $studentsToTransition = [];
 
         try {
             $studentIds = $this->normalisePreparationStudentIds($studentIds);
@@ -1023,7 +1024,21 @@ class Controller extends ConfigController
 
             $database->commit();
             $transactionStarted = false;
+        } catch (\InvalidArgumentException $e) {
+            if ($transactionStarted) {
+                $database->rollBack();
+            }
+            $this->sendJsonError($e->getMessage(), 400);
+            return;
+        } catch (Exception) {
+            if ($transactionStarted) {
+                $database->rollBack();
+            }
+            $this->sendJsonError('Something has gone wrong. Please try again later.', 500);
+            return;
+        }
 
+        try {
             foreach ($studentsToTransition as $student) {
                 $this->registrationSessionStudentMapper->propagate(
                     $this->getUser(),
@@ -1037,22 +1052,16 @@ class Controller extends ConfigController
                     ]
                 );
             }
+        } catch (Exception) {
+            //Ignore exceptions from notifications, as the transition has already been completed and can be retried later if needed
+        }
 
-            $this->response = $this->responseAsJson([
+        $this->response = $this->responseAsJson(
+            [
                 'success' => true,
                 'transitionedCount' => count($studentsToTransition),
-            ]);
-        } catch (\InvalidArgumentException $e) {
-            if ($transactionStarted) {
-                $database->rollBack();
-            }
-            $this->sendJsonError($e->getMessage(), 400);
-        } catch (Exception) {
-            if ($transactionStarted) {
-                $database->rollBack();
-            }
-            $this->sendJsonError('Something has gone wrong. Please try again later.', 500);
-        }
+            ]
+        );
     }
 
     /**
