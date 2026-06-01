@@ -209,6 +209,7 @@ module.exports = {
         ibConfiguration: "./library/Schoolbox/Admin/InternationalBaccalaureate/templates/vue/ibConfiguration.ts",
         ibRegistration: "./library/Schoolbox/Admin/InternationalBaccalaureate/templates/vue/ibRegistration.ts",
         ibReport: "./library/Schoolbox/Admin/InternationalBaccalaureate/templates/vue/ibReport.ts",
+        ibStudentRegistrationConfirmation: "./library/Schoolbox/Admin/InternationalBaccalaureate/templates/vue/ibStudentRegistrationConfirmation.ts",
         aiUsageLog: "./library/Schoolbox/Admin/OpenAI/Usage/templates/aiUsageLog.ts",
         adminDifferentiationProfiles:
             "./library/Schoolbox/Admin/DifferentiationProfiles/templates/vue/adminDifferentiationProfiles.ts",

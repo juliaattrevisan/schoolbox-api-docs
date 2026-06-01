@@ -2,81 +2,60 @@
 import { apiRequest } from "@js/util/sbx/apiUtils";
 
 interface Props {
+    section: "candidate" | "subject";
     updateConfirmationEndpoint: string;
-    initialCandidateConfirmed: boolean;
-    initialSubjectConfirmed: boolean;
-    initialCandidateConfirmedBy: string;
-    initialCandidateConfirmedAt: string;
-    initialSubjectConfirmedBy: string;
-    initialSubjectConfirmedAt: string;
-    initialConfirmationStatus: string;
+    initialConfirmed: boolean;
+    initialConfirmedBy: string;
+    initialConfirmedAt: string;
 }
-
-type UpdateConfirmationResponse = {
-    success: boolean;
-    confirmationStatus: string;
-    updatedAt: string;
-    updatedBy: { name: string };
-    message?: string;
-};
 
 const props = defineProps<Props>();
 
-const candidateConfirmed = window.Vue.ref<boolean>(props.initialCandidateConfirmed);
-const subjectConfirmed = window.Vue.ref<boolean>(props.initialSubjectConfirmed);
-const candidateConfirmedBy = window.Vue.ref<string>(props.initialCandidateConfirmedBy);
-const candidateConfirmedAt = window.Vue.ref<string>(props.initialCandidateConfirmedAt);
-const subjectConfirmedBy = window.Vue.ref<string>(props.initialSubjectConfirmedBy);
-const subjectConfirmedAt = window.Vue.ref<string>(props.initialSubjectConfirmedAt);
-const confirmationStatus = window.Vue.ref<string>(props.initialConfirmationStatus);
+const confirmed = window.Vue.ref<boolean>(props.initialConfirmed);
+const confirmedBy = window.Vue.ref<string>(props.initialConfirmedBy);
+const confirmedAt = window.Vue.ref<string>(props.initialConfirmedAt);
 const isSaving = window.Vue.ref<boolean>(false);
 
-const isLocked = window.Vue.computed(() => confirmationStatus.value === "confirmed");
+const labelText =
+    props.section === "candidate"
+        ? "I confirm my candidate details are correct."
+        : "I confirm my subject details are correct.";
 
 /**
- * Sends a PUT request to toggle the confirmed state of the given section.
- * Reverts the checkbox on failure and shows a toast error.
- * @param section - The section to toggle ("candidate" or "subject")
- * @param value - The new confirmed state
+ * Send the confirmation toggle to the backend and update local state.
+ * @param value The new confirmed value.
  */
-async function toggleSection(section: "candidate" | "subject", value: boolean): Promise<void> {
+async function toggle(value: boolean): Promise<void> {
     isSaving.value = true;
     const toast = window.sbProps.toastActivate("Saving...");
 
     try {
-        const response = (await apiRequest<UpdateConfirmationResponse>({
+        type ConfirmResponse = {
+            confirmationStatus: string;
+            updatedAt: string;
+            updatedBy: { name: string };
+            message?: string;
+        };
+        const raw = await apiRequest<ConfirmResponse, { section: string; confirmed: boolean }>({
             url: props.updateConfirmationEndpoint,
             method: "PUT",
-            body: { section, confirmed: value },
-        })) as UpdateConfirmationResponse;
+            body: { section: props.section, confirmed: value },
+        });
 
-        if (!response.success) {
-            toast.timeout({ text: response.message ?? "Failed to save confirmation.", isSuccess: false });
-            if (section === "candidate") {
-                candidateConfirmed.value = !value;
-            } else {
-                subjectConfirmed.value = !value;
-            }
+        if (!raw.success) {
+            confirmed.value = !value;
+            toast.timeout({ text: raw.message ?? "Failed to save confirmation.", isSuccess: false });
             return;
         }
 
-        confirmationStatus.value = response.confirmationStatus;
+        const data = raw.data;
+        confirmedBy.value = data.updatedBy.name;
+        confirmedAt.value = data.updatedAt;
 
-        if (section === "candidate") {
-            candidateConfirmedBy.value = response.updatedBy.name;
-            candidateConfirmedAt.value = response.updatedAt;
-        } else {
-            subjectConfirmedBy.value = response.updatedBy.name;
-            subjectConfirmedAt.value = response.updatedAt;
-        }
         toast.timeout({ text: "Confirmation saved." });
     } catch {
+        confirmed.value = !value;
         toast.timeout({ text: "Failed to save confirmation. Please try again.", isSuccess: false });
-        if (section === "candidate") {
-            candidateConfirmed.value = !value;
-        } else {
-            subjectConfirmed.value = !value;
-        }
     } finally {
         isSaving.value = false;
     }
@@ -84,48 +63,28 @@ async function toggleSection(section: "candidate" | "subject", value: boolean): 
 </script>
 
 <template>
-    <div class="ib-registration-confirmation">
-        <div class="ib-registration-confirmation__section">
-            <label class="ib-registration-confirmation__label">
-                <input
-                    v-model="candidateConfirmed"
-                    type="checkbox"
-                    :disabled="isLocked || isSaving"
-                    @change="toggleSection('candidate', candidateConfirmed)"
-                />
-                I confirm my candidate details are correct.
-            </label>
-            <p v-if="candidateConfirmedBy && candidateConfirmedAt" class="ib-registration-confirmation__meta">
-                Last updated by {{ candidateConfirmedBy }} on {{ candidateConfirmedAt }}
-            </p>
-        </div>
-
-        <div class="ib-registration-confirmation__section">
-            <label class="ib-registration-confirmation__label">
-                <input
-                    v-model="subjectConfirmed"
-                    type="checkbox"
-                    :disabled="isLocked || isSaving"
-                    @change="toggleSection('subject', subjectConfirmed)"
-                />
-                I confirm my subject details are correct.
-            </label>
-            <p v-if="subjectConfirmedBy && subjectConfirmedAt" class="ib-registration-confirmation__meta">
-                Last updated by {{ subjectConfirmedBy }} on {{ subjectConfirmedAt }}
-            </p>
-        </div>
+    <div class="ib-registration-section-confirm">
+        <label class="ib-registration-section-confirm__label">
+            <input
+                v-model="confirmed"
+                type="checkbox"
+                :disabled="isSaving"
+                @change="toggle(confirmed)"
+            />
+            {{ labelText }}
+        </label>
+        <p v-if="confirmedBy && confirmedAt" class="ib-registration-section-confirm__meta">
+            Last updated by {{ confirmedBy }} on {{ confirmedAt }}
+        </p>
     </div>
 </template>
 
 <style scoped>
-.ib-registration-confirmation {
-    margin-top: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+.ib-registration-section-confirm {
+    margin-top: 0.75rem;
 }
 
-.ib-registration-confirmation__label {
+.ib-registration-section-confirm__label {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -133,11 +92,11 @@ async function toggleSection(section: "candidate" | "subject", value: boolean): 
     cursor: pointer;
 }
 
-.ib-registration-confirmation__label input[type="checkbox"]:disabled {
+.ib-registration-section-confirm__label input[type="checkbox"]:disabled {
     cursor: not-allowed;
 }
 
-.ib-registration-confirmation__meta {
+.ib-registration-section-confirm__meta {
     margin: 0.25rem 0 0 1.5rem;
     font-size: 0.85rem;
     color: #666;
