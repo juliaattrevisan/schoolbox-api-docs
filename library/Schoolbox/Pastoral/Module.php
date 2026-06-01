@@ -23,6 +23,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\Attachment\Model as PastoralAttachment;
+use Schoolbox\Pastoral\Attachment\Translator\ModelToArray as PastoralAttachmentTranslator;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use Schoolbox\Pastoral\Authorizer\Rule\IsCommentOwner;
 use Schoolbox\Pastoral\Authorizer\Rule\IsInAudience;
@@ -30,6 +31,7 @@ use Schoolbox\Pastoral\Authorizer\Rule\IsOwner;
 use Schoolbox\Pastoral\Authorizer\Rule\IsCommentAllowed;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
+use Schoolbox\Pastoral\ReportBuilder\Translator\ModelToArray as ReportBuilderTranslator;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
@@ -39,6 +41,7 @@ use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Storage;
+use Schoolbox\Resource\Storage\Translator\ModelToArray as StorageTranslator;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -272,6 +275,13 @@ class Module extends BaseModule
             $this->injector->get('sentry'),
         );
 
+        $attachmentTranslator = new PastoralAttachmentTranslator(
+            $this->injector->get('router.generator'),
+            $this->injector->get('authorizer'),
+            $this->injector->get('user'),
+            new StorageTranslator(new PrefixGenerator($this->getConfig())),
+        );
+
         return new Controller(
             $this->injector->get('config'),
             $this->injector->get('pastoralDataSource'),
@@ -311,6 +321,15 @@ class Module extends BaseModule
             ),
             $pastoralRecordProcessor,
             $this->getMapperFactory()->get(PastoralMapper::class),
+            new ReportBuilderTranslator(
+                new User\Translator\Author\ModelToArray(),
+                $commentTranslator,
+                $attachmentTranslator,
+                $this->getRouter()->getGenerator(),
+                $this->injector->get('authorizer'),
+                $this->injector->get('user'),
+                new ScrubAdapter(),
+            ),
         );
     }
 

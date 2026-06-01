@@ -9,7 +9,7 @@ import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import PastoralRecord from "@schoolboxLibrary/Pastoral/vue/pastoral-record.vue";
 import PrEmpty from "./pr-empty.vue";
 import PrGeneratePrint from "./pr-generate-print.vue";
-import { useLoadRecords } from "./composable/useLoadRecords";
+import { useLoadRecords } from "@schoolboxLibrary/Pastoral/vue/composable/useLoadRecords";
 import { usePrintRecords } from "./composable/usePrintRecords";
 import { ViewUrlParam, type Tab } from "../js/types/pastoralReportTypes";
 
