@@ -274,7 +274,7 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 1,
-        '{"customProperty":"--sbx-config-color-menu-background","contrast":"--sbx-config-color-menu-foreground"}'
+        '{"customProperty":"--sbx-config-color-menu-background","contrast":"--sbx-config-color-menu-foreground", "alpha": false}'
     ),
     (
         'skin_colour_menu_foreground',
@@ -288,7 +288,7 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 2,
-        '{"customProperty":"--sbx-config-color-menu-foreground","contrast":"--sbx-config-color-menu-background"}'
+        '{"customProperty":"--sbx-config-color-menu-foreground","contrast":"--sbx-config-color-menu-background", "alpha": false}'
     ),
     (
         'skin_colour_menu_hover',
@@ -302,7 +302,7 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 3,
-        '{"customProperty":"--sbx-config-color-menu-hover","contrast":"--sbx-config-color-menu-foreground"}'
+        '{"customProperty":"--sbx-config-color-menu-hover","contrast":"--sbx-config-color-menu-foreground", "alpha": false}'
     ),
     (
         'skin_colour_body_background',
@@ -316,7 +316,7 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 4,
-        '{"customProperty":"--sbx-config-color-body-background","contrast":"--sbx-color-text-primary"}'
+        '{"customProperty":"--sbx-config-color-body-background","contrast":"--sbx-color-text-primary", "alpha": false}'
     ),
     (
         'skin_colour_accent',
@@ -330,7 +330,7 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 5,
-        '{"customProperty":"--sbx-config-color-accent","contrast":"--sbx-color-foreground-primary"}'
+        '{"customProperty":"--sbx-config-color-accent","contrast":"--sbx-color-foreground-primary", "alpha": false}'
     ),
     (
         'skin_colour_accent_text',
@@ -344,7 +344,7 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 6,
-        '{"customProperty":"--sbx-config-color-accent-text","contrast":"--sbx-config-color-accent"}'
+        '{"customProperty":"--sbx-config-color-accent-text","contrast":"--sbx-config-color-accent", "alpha": false}'
     ),
     (
         'skin_colour_active',
@@ -358,7 +358,7 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 7,
-        '{"customProperty":"--sbx-config-color-active","contrast":"--sbx-config-color-accent"}'
+        '{"customProperty":"--sbx-config-color-active","contrast":"--sbx-config-color-accent", "alpha": false}'
     ),
     (
         'skin_colour_component_heading_background',
@@ -372,7 +372,7 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 8,
-        '{"customProperty":"--sbx-config-color-component-heading-background","contrast":"--sbx-config-color-component-heading-text"}'
+        '{"customProperty":"--sbx-config-color-component-heading-background","contrast":"--sbx-config-color-component-heading-text", "alpha": false}'
     ),
     (
         'skin_colour_component_heading_text',
@@ -386,7 +386,7 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 9,
-        '{"customProperty":"--sbx-config-color-component-heading-text","contrast":"--sbx-config-color-component-heading-background"}'
+        '{"customProperty":"--sbx-config-color-component-heading-text","contrast":"--sbx-config-color-component-heading-background", "alpha": false}'
     ),
     (
         'skin_colour_sonar_login_background',
@@ -400,7 +400,7 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 10,
-        '{"customProperty":"--sbx-config-login-form-background","contrast":"--sbx-config-login-form-foreground"}'
+        '{"customProperty":"--sbx-config-login-form-background","contrast":"--sbx-config-login-form-foreground", "alpha": true}'
     ),
     (
         'skin_colour_sonar_login_foreground',
@@ -414,7 +414,7 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 11,
-        '{"customProperty":"--sbx-config-login-form-foreground","contrast":"--sbx-config-login-form-background"}'
+        '{"customProperty":"--sbx-config-login-form-foreground","contrast":"--sbx-config-login-form-background", "alpha": false}'
     ),
     (
         'skin_container_corner_radius',
