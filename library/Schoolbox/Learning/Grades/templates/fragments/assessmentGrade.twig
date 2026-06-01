@@ -4,15 +4,15 @@
  # Params:
  # * assessment:  IAssessable - The assessment object
  # * student:     User        - The user record for the student
- # * canViewInstructorMarks: bool        - Whether the user can view instructor marks
- # * viewContext:            ViewContext - Selected view mode and effective viewer
+ # * canViewInstructorMarks: bool - Whether the user can view instructor marks
+ # * effectiveViewer:        User - The user whose feedback visibility rules apply
  #}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 {% import '@learning/macro/urgency.twig' as urgency %}
 {% import '@learningAssessment/project/macro/icon.twig' as icon %}
 
 {% set participant = assessment ? assessment.participantIfExtant(student) : null %}
-{% set gradesViewer = viewContext is defined ? viewContext.viewer : USER %}
+{% set gradesViewer = effectiveViewer ?? USER %}
 
 {# Lesson Plans do not appear in the Grades page
  # cos nothing to do about Responses or Feedbacks
