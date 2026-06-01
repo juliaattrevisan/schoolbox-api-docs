@@ -138,6 +138,7 @@ class Controller extends ConfigController
                     'description'    => $config->getDescription(),
                     'customProperty' => $this->getCustomProperty($decodedOptions),
                     'contrast'       => $this->getContrastProperty($decodedOptions),
+                    'hasAlpha'       => $this->getHasAlpha($decodedOptions),
                     'type'           => $this->getOptionType($config, $fieldMap),
                     'selectOptions'  => $this->getSelectOptions($decodedOptions),
                     'editable'       => $config->getEditable(),
@@ -304,6 +305,18 @@ class Controller extends ConfigController
     private function getContrastProperty(array $decodedOptions): ?string
     {
         return $this->getStringOptionValue($decodedOptions, 'contrast');
+    }
+
+    /**
+     * Extract the colour picker alpha-channel setting from config options metadata.
+     *
+     * @param array<string, mixed> $decodedOptions
+     */
+    private function getHasAlpha(array $decodedOptions): ?bool
+    {
+        $optionValue = $decodedOptions['hasAlpha'] ?? null;
+
+        return is_bool($optionValue) ? $optionValue : null;
     }
 
     /**
