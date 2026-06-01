@@ -22,6 +22,7 @@ export type SkinConfigOption = {
     description: string | null;
     customProperty: string | null;
     contrast: string | null;
+    hasAlpha: boolean | null;
     type: "checkbox" | "colour" | "select" | "textarea";
     selectOptions?: SkinConfigSelectOption[];
     editable: boolean;
