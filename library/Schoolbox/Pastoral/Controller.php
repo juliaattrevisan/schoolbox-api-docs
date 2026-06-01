@@ -42,6 +42,7 @@ use Schoolbox\Pastoral\Group\Member\Model as PastoralGroupMember;
 use Schoolbox\Pastoral\Group\Model as PastoralGroup;
 use Schoolbox\Pastoral\Model as PastoralModel;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
+use Schoolbox\Pastoral\ReportBuilder\Translator\ModelToArray as ReportBuilderTranslator;
 use Schoolbox\Pastoral\Revision\DataSource as PastoralRevisionDataSource;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
@@ -96,6 +97,7 @@ class Controller extends Base
      * @param \Schoolbox\External\User        $externalUser
      * @param RecordProcessor                 $recordProcessor
      * @param PastoralMapper                  $pastoralMapper
+     * @param ReportBuilderTranslator         $reportBuilderTranslator
      */
     public function __construct(
         private IConfigLoader $config,
@@ -123,6 +125,7 @@ class Controller extends Base
         private \Schoolbox\External\User $externalUser,
         private RecordProcessor $recordProcessor,
         private PastoralMapper $pastoralMapper,
+        private ReportBuilderTranslator $reportBuilderTranslator,
     ) {
     }
 
@@ -313,7 +316,7 @@ class Controller extends Base
 
         $this->response = $this->responseAsJson([
             'data'     => [
-                'results' => $records->map($this->pastoralTranslator),
+                'results' => $records->map($this->reportBuilderTranslator),
             ],
             'metadata' => [
                 'count'  => $cursor->retrieveResultCount(),
