@@ -85,6 +85,16 @@ class ModelToArray
                 $missingFields
             ),
             'ibGroupSubjects' => $this->helper->buildIbGroupSubjects($student->getIbGroupSubjects()),
+            'candidateConfirmed'   => $student->getCandidateConfirmed(),
+            'subjectConfirmed'     => $student->getSubjectConfirmed(),
+            'candidateConfirmedAt' => $student->getCandidateConfirmedAt()?->getDateTimeObject()->format('d M Y g:ia'),
+            'subjectConfirmedAt'   => $student->getSubjectConfirmedAt()?->getDateTimeObject()->format('d M Y g:ia'),
+            'candidateConfirmedBy' => $student->getCandidateConfirmedBy()?->getFullName(),
+            'subjectConfirmedBy'   => $student->getSubjectConfirmedBy()?->getFullName(),
+            'confirmationStatus'   => match ($student->getStatus()) {
+                Model::STATUS_CONFIRMED => 'confirmed',
+                default                 => 'unconfirmed',
+            },
             '_routes' => [
                 'updateLanguages' => $this->buildUpdateLanguagesRoute($student),
                 'updateConfirmation' => $this->buildUpdateConfirmationRoute($student),

@@ -128,6 +128,41 @@ class ModelToArrayTest extends TestCase
             ],
             $payload['ibGroupSubjects']
         );
+        $this->assertFalse($payload['candidateConfirmed']);
+        $this->assertFalse($payload['subjectConfirmed']);
+        $this->assertNull($payload['candidateConfirmedAt']);
+        $this->assertNull($payload['subjectConfirmedAt']);
+        $this->assertNull($payload['candidateConfirmedBy']);
+        $this->assertNull($payload['subjectConfirmedBy']);
+        $this->assertSame('confirmed', $payload['confirmationStatus']);
+    }
+
+    public function testBuildsConfirmationStateWhenBothSectionsConfirmed(): void
+    {
+        $candidateAt = \Alaress_Date_Format::newDatabaseDate('2026-06-01 10:30:00');
+        $subjectAt   = \Alaress_Date_Format::newDatabaseDate('2026-06-01 11:45:00');
+        $confirmingUser = (new \Schoolbox\User())
+            ->setFirstname('Jana')
+            ->setLastname('Reed')
+            ->setNameFormat('{firstname}, {lastname}');
+
+        $student = $this->buildStudent()
+            ->setCandidateConfirmed(true)
+            ->setCandidateConfirmedAt($candidateAt)
+            ->setCandidateConfirmedBy($confirmingUser)
+            ->setSubjectConfirmed(true)
+            ->setSubjectConfirmedAt($subjectAt)
+            ->setSubjectConfirmedBy($confirmingUser);
+
+        $payload = $this->createTranslator()($student, [], '');
+
+        $this->assertTrue($payload['candidateConfirmed']);
+        $this->assertTrue($payload['subjectConfirmed']);
+        $this->assertSame('01 Jun 2026 10:30am', $payload['candidateConfirmedAt']);
+        $this->assertSame('01 Jun 2026 11:45am', $payload['subjectConfirmedAt']);
+        $this->assertSame('Jana, Reed', $payload['candidateConfirmedBy']);
+        $this->assertSame('Jana, Reed', $payload['subjectConfirmedBy']);
+        $this->assertSame('confirmed', $payload['confirmationStatus']);
     }
 
     public function testBuildsMissingFieldsForIncompletePayload(): void
