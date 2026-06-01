@@ -88,14 +88,15 @@ REFERENCES rubric_instance (id);
 -- That's because these tables retained rubric usages even for deleted assessments; presumably, this is for the occasion
 -- where the school wanted to restore these assessments, rubrics and all.
 --
--- We didn't seed rubric_instance with data from use_rubric=0 assessments. These rows could/should be deleted once we
+-- We seeded rubric_instance with data from use_rubric=0 assessments. These rows could still contain relationships with
+-- rows in rubric_capability_usage even if the assessment no longer needed it. These rows could/should be deleted once we
 -- are sure that nobody cares for them anymore (I expect this should be the case given they're related to assessments
 -- that no longer functionally exist; the data retention tool that eventually deletes assessments should also eventually
 -- delete rubric usages associated with them, perhaps)
 --
--- Alternatively, seed the rubric_instance table even for deleted assessments under the assumption that one day they
--- could be restored for a raft of reasons (we don't know why they were deleted in the first place)
-
+-- We've left it as an exercise for the teachers to decide, but maybe we could simulate a deletion by soft-deleting the
+-- rubric_instance we just made, to emulate existing behaviour.
+--
 
 -- Maybe controversial: update foreign keys and int unsigned.
 --
