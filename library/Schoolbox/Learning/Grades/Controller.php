@@ -295,8 +295,6 @@ class Controller extends Base
                 'conversation'       => $conversation,
                 'yearUrl'            => $yearUrl,
                 'viewMode'               => $viewMode,
-                'effectiveViewer'        => $effectiveViewer,
-                'canViewInstructorMarks' => $canViewInstructorMarks,
                 'viewModes'              => ViewMode::values(),
                 'viewModeQuerySuffix'    => $viewModeQuerySuffix,
             ],
