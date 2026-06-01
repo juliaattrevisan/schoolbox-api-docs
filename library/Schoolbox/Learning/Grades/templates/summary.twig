@@ -34,7 +34,7 @@
         </nav>
         <ul id="header-options" class="f-dropdown" data-dropdown-content aria-label="Grades view mode options">
             {% set currentRouteBase = routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, term: term, termCode: term.code}) %}
-            {% include '@learningGrades/fragments/studentViewNavSwitcher.twig' with {
+            {% include '@learningGrades/fragments/viewModeNavSwitcher.twig' with {
                 viewMode: viewMode,
                 viewModes: viewModes,
                 currentRouteBase: currentRouteBase
