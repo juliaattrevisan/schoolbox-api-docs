@@ -12,7 +12,6 @@
 {% import '@learningAssessment/project/macro/icon.twig' as icon %}
 
 {% set participant = assessment ? assessment.participantIfExtant(student) : null %}
-{% set gradesViewer = effectiveViewer ?? USER %}
 
 {# Lesson Plans do not appear in the Grades page
  # cos nothing to do about Responses or Feedbacks
@@ -29,7 +28,7 @@
             <a class="grades-assessment-link" href="{{ summaryRoute }}{{ returnUrlSuffix is defined ? returnUrlSuffix : '' }}">
                 <sbx-icon class="grades-assessment-link__icon" name="{{ icon.renderName(assessment)|trim }}" color="var(--sbx-color-text-secondary)"></sbx-icon>
                 <p>{{ assessment.title }}
-                    {% if participant and USER.role.isStaff and participant.plan.isStatic %}
+                    {% if participant and effectiveViewer.role.isStaff and participant.plan.isStatic %}
                         <span class="individualisation has-tip tip-top" data-tooltip title="{{ participant.plan.name}} ({{ participant.plan.duedate.short}})">i</span>
                     {% endif %}
                 </p>
@@ -59,7 +58,7 @@
         </p>
     </div>
 
-    {% if participant and assessment.isFeedbackVisibleToUser(gradesViewer) %}
+    {% if participant and assessment.isFeedbackVisibleToUser(effectiveViewer) %}
         {% if assessment is task %}
             {% include '@learningAssessment/fragments/progressTick.twig' with {
                 assessment: assessment,
@@ -87,8 +86,8 @@
         {% endif %}
     {% endif %}
 </div>
-{% if participant and assessment.isFeedbackVisibleToUser(gradesViewer) %}
-    {% set feedback = participant.findAuthoritativeVisibleFeedback(gradesViewer) %}
+{% if participant and assessment.isFeedbackVisibleToUser(effectiveViewer) %}
+    {% set feedback = participant.findAuthoritativeVisibleFeedback(effectiveViewer) %}
     {% if feedback and feedback.comment   %}
         <div class="content">
             <blockquote>{{ feedback.comment | purify }}</blockquote>
