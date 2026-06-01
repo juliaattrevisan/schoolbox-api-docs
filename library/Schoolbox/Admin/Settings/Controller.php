@@ -262,7 +262,17 @@ class Controller extends ConfigController
                     $clearOidcCache = true;
                 }
                 if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_EXTERNAL_CACHE, true)) {
-                    $clearExternalCache = true;
+                    // If the timeout changed, only clear the cache if the timeout was reduced:
+                    // * if it has increased, then nothing which was valid will become invalid
+                    // * if it has reduced, then clear everything: PHP's cache interface does not allow setting the TTL
+                    //   of individual cache objects.
+                    if ($name === ConfigMapper::NAME_EXTERNAL_CACHE_TIMEOUT) {
+                        if ((int)$existingConfig->getValue() < (int)$newValue) {
+                            $clearExternalCache = true;
+                        }
+                    } else {
+                        $clearExternalCache = true;
+                    }
                 }
                 $existingConfig->setValue(trim((string)$newValue));
                 $this->getConfigMapper()->save($existingConfig);
@@ -300,7 +310,7 @@ class Controller extends ConfigController
                 [\External_ClassInterface::class, \External_Class::class],
                 [\External_TimetableInterface::class, \External_Timetable::class],
             ];
-            // TODO inject this
+            // TODO inject this, or just send it to toolsd?
             $cacheInstance = Redis::getCacheInstance();
             foreach ($interfaces as [$interface, $class]) {
                 $reflection = new \ReflectionClass($interface);
