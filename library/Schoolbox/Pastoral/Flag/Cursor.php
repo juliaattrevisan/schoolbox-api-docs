@@ -130,6 +130,11 @@ class Cursor implements ICursor
             )
             ->reindex();
 
+        /* If no results are returned, we can skip the hydration step.
+         */
+        if ($results->count() === 0) {
+            return $results;
+        }
 
         /** @var \Schoolbox\Pastoral\Tag\Mapper $pastoralTagMapper */
         $pastoralTagMapper = $this->dataSource->getPastoralMapper()->getJoinMapper('tags');
