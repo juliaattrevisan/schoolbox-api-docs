@@ -57,12 +57,16 @@ export default class GradesPage {
         await this.page.locator(`[data-grades-view-mode="${mode}"]`).click();
     }
 
+    /**
+     * Check the current grades view mode label and selected navigation item.
+     * @param mode - The expected grades view mode
+     */
     async expectGradesViewMode(mode: "staff" | "student" | "parent"): Promise<void> {
-        await expect(this.page.locator(GradesPage.SELECTOR_VIEW_MODE_META)).toContainText(`Viewing as ${mode}`);
+        const label = `${mode.charAt(0).toUpperCase()}${mode.slice(1)}`;
+
+        await expect(this.page.locator(GradesPage.SELECTOR_VIEW_MODE_META)).toContainText(`Viewing as ${label}`);
         await expect(this.page.locator(`[data-grades-view-mode="${mode}"]`)).toHaveCount(0);
-        await expect(this.page.locator("#header-options [aria-current='page']")).toContainText(
-            `View as ${mode.charAt(0).toUpperCase()}${mode.slice(1)}`,
-        );
+        await expect(this.page.locator("#header-options [aria-current='page']")).toContainText(`View as ${label}`);
     }
 
     /**
