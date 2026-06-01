@@ -64,9 +64,14 @@
 </div>
 
 <div id="reporting-markbook-container" class="marksheet-wrapper row">
+    {% set routeGetStatusData = routeLookupIfAuthorized(
+        'learningReporting.getStatus',
+        {assessmentId: assessment.id, assessment: assessment}
+    ) %}
+
     <reporting-markbook
         {% if editorTemplates is defined %}:editor-templates="{{ editorTemplates|json_encode }}"{% endif %}
-        route-get-status-data="TODO"
+        route-get-status-data="{{ routeGetStatusData }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/submissions/jquery.combobox.js?v={{ config.site_version }}"></script>
