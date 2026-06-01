@@ -70,9 +70,37 @@ class Config
     ];
 
     /**
+     * Recommended models for each feature, split by text and image generation.
+     */
+    public const array RECOMMENDED_MODELS = [
+        Helper::FEATURE_CHAT                            => [
+            'text' => ['gpt-5.4-nano'],
+        ],
+        Helper::FEATURE_LESSONPLAN                      => [
+            'text' => ['gpt-5.4-nano'],
+        ],
+        Helper::FEATURE_DIFFERENTIATION                 => [
+            'text' => ['gpt-5.4-nano'],
+        ],
+        Helper::FEATURE_DIALOGAGENT                     => [
+            'text' => ['gpt-5.3-chat-latest'],
+        ],
+        Helper::FEATURE_IMAGE                           => [
+            'text'  => ['gpt-5.4-nano'],
+            'image' => ['gpt-image-1.5'],
+        ],
+        Helper::FEATURE_LEARNING_ACTIVITY_CUSTOMISATION => [
+            'text' => ['gpt-5.4-nano'],
+        ],
+        Helper::FEATURE_AI_MODERATION_AGENT             => [
+            'text' => ['gpt-5.4-nano'],
+        ],
+    ];
+
+    /**
      * The default image generation model.
      */
-    public const string IMAGE_MODEL_DEFAULT = 'gpt-image-1';
+    public const string IMAGE_MODEL_DEFAULT = 'gpt-image-1.5';
 
     /**
      * The models which may be selected for image generation.
@@ -354,7 +382,7 @@ class Config
      * Also, add a title and description within `manifest` in
      * `templates/formInput.twig`.
      */
-    public const array DEFAULT_FORM_INPUTS = [
+    private const array DEFAULT_FORM_INPUTS = [
         self::FIELD_PROVIDER => [
             'type'            => self::FIELD_TYPE_SELECT,
             'options'         => self::PROVIDERS,
@@ -652,6 +680,21 @@ class Config
     }
 
     /**
+     * Split options into recommended and other options
+     *
+     * @param array<string> $options         All available options
+     * @param array<string> $recommendations A subset of `$options` which is recommended for use
+     * @return array{recommended: array<string>, others: array<string>}
+     */
+    private function splitOptions(array $options, array $recommendations): array
+    {
+        return [
+            'recommended' => $recommendations,
+            'others'      => array_diff($options, $recommendations),
+        ];
+    }
+
+    /**
      * Build form inputs for this feature.
      *
      * @param string $feature
@@ -660,6 +703,25 @@ class Config
     private function buildFormInputs(string $feature): array
     {
         $formInputs = self::DEFAULT_FORM_INPUTS;
+
+        // Set recommended vs. all models
+        $splitOptions = $this->splitOptions(
+            $formInputs[self::FIELD_MODEL]['options'],
+            self::RECOMMENDED_MODELS[$feature]['text'] ?? [],
+        );
+        $formInputs[self::FIELD_MODEL]['recommendedOptions'] = $splitOptions['recommended'];
+        $formInputs[self::FIELD_MODEL]['options']            = $splitOptions['others'];
+
+        // Set recommended vs. all for Azure deployment models too:
+        // whilst this setting must follow their deployment, it might inform
+        // users that they should deploy a recommended model.
+        $splitOptions = $this->splitOptions(
+            $formInputs[self::FIELD_DEPLOYMENT_MODEL]['options'],
+            self::RECOMMENDED_MODELS[$feature]['text'] ?? [],
+        );
+        $formInputs[self::FIELD_DEPLOYMENT_MODEL]['recommendedOptions'] = $splitOptions['recommended'];
+        $formInputs[self::FIELD_DEPLOYMENT_MODEL]['options']            = $splitOptions['others'];
+
         if (\in_array($feature, Helper::FEATURES_WITH_AI_MODERATION, true)) {
             // Any feature with AI moderation support gets a config for it
             $formInputs[self::FIELD_AI_MODERATION] = [
@@ -678,11 +740,18 @@ class Config
                 'section'         => self::SECTION_OPENAI,
                 'allowUnselected' => false,
             ];
+
+            // Set recommended vs. all options for image model too
+            $splitOptions = $this->splitOptions(
+                self::AI_IMAGE_MODELS,
+                self::RECOMMENDED_MODELS[$feature]['image'],
+            );
             $formInputs[self::FIELD_IMAGE_MODEL]    = [
-                'type'            => self::FIELD_TYPE_SELECT,
-                'options'         => self::AI_IMAGE_MODELS,
-                'section'         => self::SECTION_OPENAI,
-                'allowUnselected' => false,
+                'type'               => self::FIELD_TYPE_SELECT,
+                'recommendedOptions' => $splitOptions['recommended'],
+                'options'            => $splitOptions['others'],
+                'section'            => self::SECTION_OPENAI,
+                'allowUnselected'    => false,
             ];
             unset($formInputs[self::FIELD_PROVIDER]['options'][Helper::ENDPOINT_TYPE_AZURE]);
         }

@@ -122,9 +122,31 @@
         {% else %}
             <option value="" disabled>-- select an option --</option>
         {% endif %}
-        {% for option in formInput.options %}
-            <option value="{{ option }}"{% if inputValue == option %} selected {% endif %}>{{ option }}</option>
+
+        {# Render both recommended and all options if possible #}
+        {% set recommendedOptions = '' %}
+        {% for option in formInput.recommendedOptions ?? [] %}
+            {% set recommendedOptions %}
+                {{ recommendedOptions }}
+                <option value="{{ option }}"{% if inputValue == option %} selected {% endif %}>{{ option }}</option>
+            {% endset %}
         {% endfor %}
+
+        {% set otherOptions = '' %}
+        {% for option in formInput.options ?? [] %}
+            {% set otherOptions %}
+                {{ otherOptions }}
+                <option value="{{ option }}"{% if inputValue == option %} selected {% endif %}>{{ option }}</option>
+            {% endset %}
+        {% endfor %}
+
+        {% if not (otherOptions is empty or recommendedOptions is empty) %}
+            <optgroup label="Recommended">{{ recommendedOptions }}</optgroup>
+            <optgroup label="Other">{{ otherOptions }}</optgroup>
+        {% else %}
+            {{ recommendedOptions }}
+            {{ otherOptions }}
+        {% endif %}
     </select>
 {% elseif type == 'checkbox' %}
     <div class="switch" {{ dataAttrs }} {{ style }}>
