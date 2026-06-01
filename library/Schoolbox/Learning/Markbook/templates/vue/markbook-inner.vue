@@ -45,6 +45,23 @@ window.Vue.onMounted(() => {
     // Set the initial height, and update it again when the DOM is fully loaded to ensure the footer is included
     updateContainerHeight();
     window.addEventListener("DOMContentLoaded", updateContainerHeight, { once: true });
+
+    /**
+     * Ensure tooltips are reflowed when the markbook is changed
+     */
+    window.Vue.watch(
+        () => [mbStore.showDisplayMarks, mbStore.showDrafts],
+        () => {
+            if (document.readyState !== "complete") {
+                // If the document isn't ready, we can't reflow tooltips yet
+                return;
+            }
+
+            // When a setting is added after the page is loaded, we need to tell foundation to fix the tooltips
+            window.jQuery(document).foundation("tooltip", "reflow");
+        },
+        { immediate: true },
+    );
 });
 
 window.Vue.onUnmounted(() => {

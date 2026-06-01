@@ -63,8 +63,12 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="small-12 columns">
-        Mega markbook goes here, after poc; other supporting data, forms, etc.
-    </div>
+<div id="reporting-markbook-container" class="marksheet-wrapper row">
+    <reporting-markbook
+        {% if editorTemplates is defined %}:editor-templates="{{ editorTemplates|json_encode }}"{% endif %}
+        route-get-status-data="TODO"
+    />
 </div>
+<script src="{{ CDN_PREFIX }}/js/submissions/jquery.combobox.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/reportingMarkbook.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>

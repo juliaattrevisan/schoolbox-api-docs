@@ -166,6 +166,8 @@ module.exports = {
         viewDifferentiationProfile:
             "./library/Schoolbox/Search/User/templates/field/differentiationProfile/vue/viewDifferentiationProfile.ts",
         customisationRecords: "./library/Schoolbox/CustomisationRecord/templates/vue/customisationRecords.ts",
+        reportingMarkbook:
+            "./library/Schoolbox/Learning/Assessment/templates/reporting/vue/markbook/reportingMarkbook.ts",
 
         // Assessment
         unitPlanner: "./library/Schoolbox/Assessment/Course/Plan/templates/vue/unitPlanner.ts",

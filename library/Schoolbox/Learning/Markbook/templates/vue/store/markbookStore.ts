@@ -2,7 +2,6 @@ import { defineStore } from "pinia";
 import { useEventBus } from "@vueuse/core";
 import type { EventBusKey } from "@vueuse/core";
 import type { Template } from "@js/editor/types/editorTypes";
-import { listenForFilterLoad, listenForFilterLoading } from "@schoolboxLibrary/Filter/templates/ts/filterEvent";
 import type {
     Markbook,
     MarkbookActivity,
@@ -47,7 +46,7 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
     });
 
     /**
-     * When we start loading new markbood data, we reset the data to null to show the loading state
+     * When we start loading new markbook data, we reset the data to null to show the loading state
      */
     function onLoading(): void {
         data.value = null; // Reset the data to show loading state
@@ -65,15 +64,9 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
 
     /**
      * Initialise the store
-     * @param filterKey - The key of the filter to listen for loading events
      * @param $editorTemplates - The editor templates to use
      */
-    function init(filterKey: string, $editorTemplates: Template[]): void {
-        /**
-         * Listen to the filter overlords which control what we show and when we show it
-         */
-        listenForFilterLoading(filterKey, onLoading);
-        listenForFilterLoad<Markbook>(filterKey, (detail) => onMarkbookLoaded(detail.content));
+    function init($editorTemplates: Template[]): void {
         editorTemplates.value = $editorTemplates;
     }
 
@@ -241,6 +234,8 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
     return {
         init,
         data,
+        onLoading,
+        onMarkbookLoaded,
         isDegraded,
         showDisplayMarks,
         showDrafts,

@@ -1,37 +1,30 @@
 <script setup lang="ts">
 import type { Template } from "@js/editor/types/editorTypes";
+import { listenForFilterLoad, listenForFilterLoading } from "@schoolboxLibrary/Filter/templates/ts/filterEvent";
 import { useMarkbookStore } from "./store/markbookStore";
+import type { Markbook } from "./types/payload";
 import MarkbookInner from "./markbook-inner.vue";
 import MarkbookPopout from "./markbook-popout.vue";
 
 interface Props {
     type: "course" | "class";
     filterEventKey: string;
-    editorTemplates: Template[];
+    editorTemplates?: Template[];
 }
 
 const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
 
 window.Vue.onMounted(() => {
-    mbStore.init(props.filterEventKey, props.editorTemplates);
+    mbStore.init(props.editorTemplates ?? []);
 
     /**
-     * Ensure tooltips are reflowed when the markbook is changed
+     * Listen to the filter overlords which control what we show and when we show it
      */
-    window.Vue.watch(
-        () => [mbStore.showDisplayMarks, mbStore.showDrafts],
-        () => {
-            if (document.readyState !== "complete") {
-                // If the document isn't ready, we can't reflow tooltips yet
-                return;
-            }
+    listenForFilterLoading(props.filterEventKey, mbStore.onLoading);
 
-            // When a setting is added after the page is loaded, we need to tell foundation to fix the tooltips
-            window.jQuery(document).foundation("tooltip", "reflow");
-        },
-        { immediate: true },
-    );
+    mbStore.onLoading();
+    listenForFilterLoad<Markbook>(props.filterEventKey, (detail) => mbStore.onMarkbookLoaded(detail.content));
 });
 </script>
 
