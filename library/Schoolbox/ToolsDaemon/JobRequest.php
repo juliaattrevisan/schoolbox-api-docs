@@ -33,7 +33,7 @@ readonly class JobRequest
      */
     public function __construct(
         public string $tool,
-        public array $options,
+        public array $options = [],
         public ?string $instanceId = null,
         public ?array $environment = null,
         public ?UriInterface $webhook = null,
