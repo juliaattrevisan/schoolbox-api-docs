@@ -572,6 +572,7 @@ class Controller extends Base
     }
 
     /**
+     * Derive and return variables pertaining to view mode.
      * @param User $viewee
      * @return array
      */
