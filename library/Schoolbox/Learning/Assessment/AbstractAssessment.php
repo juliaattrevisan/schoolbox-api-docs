@@ -834,7 +834,6 @@ abstract class AbstractAssessment implements IAssessable
      */
     protected function assertDateSequence(array $dates): void
     {
-        /** @var Alaress_Date_Format $previousAdf */
         $previousAdf   = null;
         $previousLabel = '';
 

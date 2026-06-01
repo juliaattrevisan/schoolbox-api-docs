@@ -1140,7 +1140,6 @@ class Controller extends Assessment\Controller
                             ->setKamiDocumentId($kamiFile)
                             ->setStatusDone();
                         $this->kamiMapper->save($kamiModel);
-                        /** @var SubmissionFile $kamiFile */
                         $kamiSubmissionFile = $this->submissionFileMapper->createModel()
                             ->setFilename($worksheetName)
                             ->setKami($kamiModel)

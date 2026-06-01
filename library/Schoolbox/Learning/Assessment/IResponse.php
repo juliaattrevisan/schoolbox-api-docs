@@ -61,7 +61,7 @@ interface IResponse
      */
 
     /**
-     * @var int
+     * @return int
      */
     public function getId();
 

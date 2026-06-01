@@ -98,7 +98,6 @@ class WrappedReadableResourceStream implements Listenable, ReadableStreamInterfa
                 foreach ($this->listenerStore as $listener) {
                     $listener->streamClosed(new StreamEvent($stream));
                 }
-                unset($e);
             }
         );
 
@@ -108,7 +107,6 @@ class WrappedReadableResourceStream implements Listenable, ReadableStreamInterfa
                 foreach ($this->listenerStore as $listener) {
                     $listener->errorOccurred(new StreamEvent($stream, $error));
                 }
-                unset($e);
             }
         );
 
@@ -118,7 +116,6 @@ class WrappedReadableResourceStream implements Listenable, ReadableStreamInterfa
                 foreach ($this->listenerStore as $listener) {
                     $listener->streamDrained(new StreamEvent(null));
                 }
-                unset($e);
             }
         );
 

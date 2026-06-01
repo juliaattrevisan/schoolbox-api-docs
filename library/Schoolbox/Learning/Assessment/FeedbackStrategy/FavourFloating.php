@@ -43,7 +43,6 @@ class FavourFloating implements IFeedbackTraversalStrategy
      */
     public function getMostRecentFeedback(Participant $participant, $publishedOnly)
     {
-        /** @var IFeedback $mostRecentFloatingFeedback */
         $mostRecentFloatingFeedback = null;
 
         foreach ($participant->getAllFeedbacks() as $feedback) {
@@ -60,7 +59,6 @@ class FavourFloating implements IFeedbackTraversalStrategy
             return $mostRecentFloatingFeedback;
         }
 
-        /** @var IResponse $latestResponseWithFeedback */
         $latestResponseWithFeedback = null;
 
         foreach ($participant->getAllResponses() as $response) {
@@ -85,7 +83,6 @@ class FavourFloating implements IFeedbackTraversalStrategy
             return null;
         }
 
-        /** @var IFeedback $mostRecentLinkedFeedback */
         $mostRecentLinkedFeedback = null;
 
         foreach ($latestResponseWithFeedback->getAllFeedback() as $feedback) {

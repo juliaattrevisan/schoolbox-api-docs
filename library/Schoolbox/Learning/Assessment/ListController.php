@@ -383,11 +383,8 @@ class ListController extends Web\Controller\Base
      */
     public function postReorderAssessments(AssessmentContext $context)
     {
-        /**
-         * @var IAssessable[] $allAssessments
-         * @var IAssessable[] $sortedAssessments
-         */
-        $allAssessments    = $this->getAssessmentMapper()->findAllByContext($context)->indexBy('id');
+        /** @var IAssessable[] $allAssessments */
+        $allAssessments = $this->getAssessmentMapper()->findAllByContext($context)->indexBy('id');
         $sortedAssessments = new GenericCollection(IAssessable::class);
         foreach ($this->requestPost->get('id', []) as $assessmentId) {
             if (isset($allAssessments[$assessmentId])) {

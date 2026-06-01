@@ -48,9 +48,9 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        /** @var IConnector $mockConnector */
+        /** @var IConnector&PHPUnit\Framework\MockObject\MockObject $mockConnector */
         $mockConnector = $this->createMock(IConnector::class);
-        /** @var RosettaStone $rosettaStone */
+        /** @var RosettaStone&PHPUnit\Framework\MockObject\MockObject $rosettaStone */
         $rosettaStone = $this->createMock(RosettaStone::class);
 
         // Ensure the relationship is valid for the segment's entity type

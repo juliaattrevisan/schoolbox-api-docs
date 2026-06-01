@@ -389,13 +389,13 @@ class MutableFieldsOnlyTest extends TestCase
             $collectorMock = $this->createMock(Collector::class);
             $collectorMock->method('getFirst')->willReturn($storage);
 
-            /** @var CollectorFactory|MockObject $collectorFactoryMock */
+            /** @var CollectorFactory&MockObject $collectorFactoryMock */
             $collectorFactoryMock = $this->createMock(CollectorFactory::class);
             $collectorFactoryMock->method('build')->willReturn($collectorMock);
             return new MutableFieldsOnly($collectorFactoryMock);
         }
 
-        /** @var CollectorFactory|MockObject $collectorFactoryMock */
+        /** @var CollectorFactory&MockObject $collectorFactoryMock */
         $collectorFactoryMock = $this->createMock(CollectorFactory::class);
         return new MutableFieldsOnly($collectorFactoryMock);
     }

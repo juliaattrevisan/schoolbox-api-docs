@@ -194,8 +194,6 @@ class Module extends \Alaress\Module\Module
      * Return a function to preload objects for the import route
      *
      * @return callable
-     * @throws \InvalidArgumentException
-     * @throws \Schoolbox\Application\Exception\NotFound
      *
      */
     private function buildPreloadImport(): callable

@@ -57,7 +57,7 @@ class RelativeUrlTest extends TestCase
     {
         $siteHost = 'www.example.com';
         new Url($url, $siteHost);
-        $this->assertTrue(true);
+        $this->addToAssertionCount(1);
     }
 
     /**
@@ -68,7 +68,7 @@ class RelativeUrlTest extends TestCase
     {
         $url = "http://google.com";
         new Url($url, $siteHost);
-        $this->assertTrue(true);
+        $this->addToAssertionCount(1);
     }
 
     public function testNoSiteHostExplicit()

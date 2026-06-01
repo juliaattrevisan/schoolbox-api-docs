@@ -46,8 +46,9 @@ trait ModelSaveTrait
         // These mapper methods are not public, so need to use a closure to bypass encapsulation.
         $collection       = $mapper->getModelAsCollection($model);
         $populateFunction = function () use ($collection, $populateTimestamps): ICollection {
-            /** @var Mapper $newThis */
             $newThis = $this;
+            /** @var Mapper $newThis */
+            /** @phpstan-ignore-next-line - $newThis is bound to a Mapper object, see call() below */
             if ($populateTimestamps) {
                 $collection = $newThis->populateSaveTimestamps($collection);
             }

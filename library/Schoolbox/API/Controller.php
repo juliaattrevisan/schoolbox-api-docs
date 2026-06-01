@@ -329,9 +329,7 @@ class Controller extends Base
      * @param string $username
      * @param string $password
      * @return User The authenticated user (only if auth was successful)
-     * @throws SchoolboxNotFoundException        if the user doesn't exist
      * @throws SchoolboxAccessDeniedException    if the password is incorrect
-     * @throws SchoolboxAccountDisabledException if the account is disabled
      */
     private function authenticateViaPostData(string $username, #[SensitiveParameter] string $password): User
     {

@@ -50,7 +50,6 @@ trait VObjectTrait
      */
     public function render(): string
     {
-        /** @var EventInterface $event */
         $event = $this->event;
 
         // Output event times as UTC,
@@ -99,6 +98,7 @@ trait VObjectTrait
                 // Function getTitleForResourceBookingExport() should only be used for exports of
                 // resource booking calendar items, in exports from the resource booking section.
                 // Note ExportType::RESOURCES is from the main calendar, so is not included below.
+                /** @phpstan-ignore-next-line - $event may be a ResourceBookingEvent in some circumstances */
                 $event instanceof ResourceBookingEvent &&
                 in_array($this->getExportType(), [ExportType::RESOURCE, ExportType::RESOURCE_CATEGORY], true)
                 ? $event->getTitleForResourceBookingExport()
@@ -115,7 +115,6 @@ trait VObjectTrait
      */
     protected function getCategories(): string
     {
-        /** @var EventInterface $event */
         $event = $this->event;
         return $event->getEventType();
     }

@@ -123,7 +123,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
      */
     protected function transformModels(Collection $mapperModels)
     {
-        /** @var DomainObject[] $quizResponses */
+        /** @var GenericCollection|DomainObject[] $quizResponses */
         $quizResponses = new GenericCollection(DomainObject::class);
 
         $ids = [];

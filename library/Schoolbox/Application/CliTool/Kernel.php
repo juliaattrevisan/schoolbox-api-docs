@@ -105,7 +105,7 @@ class Kernel extends CliKernelAbstract
     /**
      * Run the app
      *
-     * @param null|bool $forcePerform Allow invoking script to force the App to run in 'perform' mode
+     * @param bool $forcePerform Allow invoking script to force the App to run in 'perform' mode
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function runApp(bool $forcePerform = false): void

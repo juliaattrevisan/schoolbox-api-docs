@@ -63,7 +63,7 @@ class ComponentDelegate
     /**
      * Delegate constructor.
      *
-     * @var IConnector $database
+     * @param IConnector $database
      */
     public function __construct(IConnector $database)
     {

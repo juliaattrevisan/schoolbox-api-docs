@@ -184,11 +184,9 @@ class Exporter
 
         // Order assessments by folder code
         $sortFunction = function (IAssessable $left, IAssessable $right) {
-            /**
-             * @var Folder\Code\Model $leftFolderCode
-             * @var Folder\Code\Model $rightFolderCode
-             */
-            $leftFolderCode  = $left->getBaseContext()->getFolder()->getCodes()->first();
+            /** @var Folder\Code\Model $leftFolderCode */
+            $leftFolderCode = $left->getBaseContext()->getFolder()->getCodes()->first();
+            /** @var Folder\Code\Model $rightFolderCode */
             $rightFolderCode = $right->getBaseContext()->getFolder()->getCodes()->first();
             return strcmp($leftFolderCode->getCode(), $rightFolderCode->getCode());
         };

@@ -388,7 +388,7 @@ class SubmissionMapper extends BaseMapper
 
 
     /**
-     * @return BaseMapper|SubmissionBoxMapper
+     * @return SubmissionBoxMapper
      * @throws BaseMapper\DefinitionException
      */
     private function getSubmissionBoxMapper(): SubmissionBoxMapper

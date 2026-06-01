@@ -7,30 +7,6 @@ parameters:
 			path: conf/ModuleLoader.php
 
 		-
-			message: '#^PHPDoc tag @var with type array\<Schoolbox\\LTI\\Provider\\Model\> is not subtype of native type object\.$#'
-			identifier: varTag.nativeType
-			count: 2
-			path: library/Alaress/Application/Kernel.php
-
-		-
-			message: '#^Return type \(\$this\(Alaress\\Async\\AMQP\\AMQPConnector\)\) of method Alaress\\Async\\AMQP\\AMQPConnector\:\:bindQueue\(\) should be compatible with return type \(PhpAmqpLib\\Channel\\AMQPChannel\) of method Alaress\\Async\\AMQP\\AMQPInterface\:\:bindQueue\(\)$#'
-			identifier: method.childReturnType
-			count: 1
-			path: library/Alaress/Async/AMQP/AMQPConnector.php
-
-		-
-			message: '#^Return type \(\$this\(Alaress\\Async\\AMQP\\AMQPConnector\)\) of method Alaress\\Async\\AMQP\\AMQPConnector\:\:unbindExchange\(\) should be compatible with return type \(PhpAmqpLib\\Channel\\AMQPChannel\) of method Alaress\\Async\\AMQP\\AMQPInterface\:\:unbindExchange\(\)$#'
-			identifier: method.childReturnType
-			count: 1
-			path: library/Alaress/Async/AMQP/AMQPConnector.php
-
-		-
-			message: '#^Return type \(\$this\(Alaress\\Async\\AMQP\\AMQPConnector\)\) of method Alaress\\Async\\AMQP\\AMQPConnector\:\:unbindQueue\(\) should be compatible with return type \(PhpAmqpLib\\Channel\\AMQPChannel\) of method Alaress\\Async\\AMQP\\AMQPInterface\:\:unbindQueue\(\)$#'
-			identifier: method.childReturnType
-			count: 1
-			path: library/Alaress/Async/AMQP/AMQPConnector.php
-
-		-
 			message: '#^Method Alaress\\Database\\Broker\\Base\:\:prepareQuery\(\) should return Alaress\\Database\\Statement\\Query\\IQuery but returns Alaress\\Database\\Statement\\Query\\Base\.$#'
 			identifier: return.type
 			count: 1
@@ -43,76 +19,10 @@ parameters:
 			path: library/Alaress/Database/Broker/Sqlsrv/Broker.php
 
 		-
-			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: library/Alaress/Database/Connector/Base.php
-
-		-
 			message: '#^Method Alaress\\Database\\Connector\\Base\:\:getPort\(\) should return string but returns null\.$#'
 			identifier: return.type
 			count: 1
 			path: library/Alaress/Database/Connector/Base.php
-
-		-
-			message: '#^Method Alaress\\Database\\Predicate\\Builder\:\:addScalarPredicate\(\) has TypeError in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Alaress/Database/Predicate/Builder.php
-
-		-
-			message: '#^Method Alaress\\Database\\Predicate\\Builder\:\:equals\(\) should return \$this\(Alaress\\Database\\Predicate\\Builder\) but returns Alaress\\Database\\Predicate\\Builder\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Database/Predicate/Builder.php
-
-		-
-			message: '#^Method Alaress\\Database\\Predicate\\Builder\:\:getNonCollidingParamAlias\(\) should return string but returns false\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Database/Predicate/Builder.php
-
-		-
-			message: '#^Method Alaress\\Database\\Predicate\\Builder\:\:greaterThan\(\) should return \$this\(Alaress\\Database\\Predicate\\Builder\) but returns Alaress\\Database\\Predicate\\Builder\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Database/Predicate/Builder.php
-
-		-
-			message: '#^Method Alaress\\Database\\Predicate\\Builder\:\:greaterThanOrEqualTo\(\) should return \$this\(Alaress\\Database\\Predicate\\Builder\) but returns Alaress\\Database\\Predicate\\Builder\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Database/Predicate/Builder.php
-
-		-
-			message: '#^Method Alaress\\Database\\Predicate\\Builder\:\:lessThan\(\) should return \$this\(Alaress\\Database\\Predicate\\Builder\) but returns Alaress\\Database\\Predicate\\Builder\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Database/Predicate/Builder.php
-
-		-
-			message: '#^Method Alaress\\Database\\Predicate\\Builder\:\:lessThanOrEqualTo\(\) should return \$this\(Alaress\\Database\\Predicate\\Builder\) but returns Alaress\\Database\\Predicate\\Builder\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Database/Predicate/Builder.php
-
-		-
-			message: '#^Method Alaress\\Database\\Predicate\\Builder\:\:notEquals\(\) should return \$this\(Alaress\\Database\\Predicate\\Builder\) but returns Alaress\\Database\\Predicate\\Builder\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Database/Predicate/Builder.php
-
-		-
-			message: '#^Method Alaress\\Database\\Predicate\\Builder\:\:notRegex\(\) should return \$this\(Alaress\\Database\\Predicate\\Builder\) but returns Alaress\\Database\\Predicate\\Builder\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Database/Predicate/Builder.php
-
-		-
-			message: '#^Method Alaress\\Database\\Predicate\\Builder\:\:regex\(\) should return \$this\(Alaress\\Database\\Predicate\\Builder\) but returns Alaress\\Database\\Predicate\\Builder\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Database/Predicate/Builder.php
 
 		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
@@ -139,100 +49,16 @@ parameters:
 			path: library/Alaress/Database/Transactor/Test/TransactorTest.php
 
 		-
-			message: '#^Property Alaress\\Date\\DilatedClock\:\:\$offset \(int\) does not accept float\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: library/Alaress/Date/DilatedClock.php
-
-		-
-			message: '#^Property Alaress\\Date\\DilatedClock\:\:\$start \(int\) does not accept float\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: library/Alaress/Date/DilatedClock.php
-
-		-
-			message: '#^Method Alaress_Date_Format\:\:get12Hour\(\) should return int but returns string\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: '#^Method Alaress_Date_Format\:\:getDay\(\) should return int but returns string\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: '#^Method Alaress_Date_Format\:\:getHour\(\) should return int but returns string\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: '#^Method Alaress_Date_Format\:\:getMinute\(\) should return int but returns string\.$#'
-			identifier: return.type
-			count: 2
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: '#^Method Alaress_Date_Format\:\:getMonth\(\) should return int but returns string\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: '#^Method Alaress_Date_Format\:\:getSecond\(\) should return int but returns string\.$#'
-			identifier: return.type
-			count: 2
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: '#^Method Alaress_Date_Format\:\:getWeekDayNumber\(\) should return int but returns string\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: '#^Method Alaress_Date_Format\:\:getYear\(\) should return int but returns string\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Date/Format.php
-
-		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 6
 			path: library/Alaress/Date/Format.php
 
 		-
-			message: '#^Property DateInterval\:\:\$invert \(int\) does not accept bool\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: library/Alaress/Date/Interval.php
-
-		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 2
 			path: library/Alaress/Date/Interval.php
-
-		-
-			message: '#^Dead catch \- Symfony\\Component\\Lock\\Exception\\LockReleasingException is never thrown in the try block\.$#'
-			identifier: catch.neverThrown
-			count: 1
-			path: library/Alaress/Image/Processor/Manager.php
-
-		-
-			message: '#^Instanceof between null and Throwable will always evaluate to false\.$#'
-			identifier: instanceof.alwaysFalse
-			count: 1
-			path: library/Alaress/Jitter/Jitter.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$json with type mixed is not subtype of native type array\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: library/Alaress/Json/Decorator/PropertyDecorator.php
 
 		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
@@ -245,18 +71,6 @@ parameters:
 			identifier: method.notFound
 			count: 2
 			path: library/Alaress/Json/Decorator/Test/PropertyDecoratorTest.php
-
-		-
-			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: library/Alaress/Lumberjack/TtyFormatter.php
-
-		-
-			message: '#^Method Alaress\\OAuth2\\Client\\Provider\\Office365\:\:urlUserDetails\(\) should return string but returns null\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/OAuth2/Client/Provider/Office365.php
 
 		-
 			message: '#^Call to an undefined method DebugBar\\DataCollector\\DataCollectorInterface\:\:addMessage\(\)\.$#'
@@ -287,12 +101,6 @@ parameters:
 			identifier: new.static
 			count: 1
 			path: library/Alaress/Routing/Trie.php
-
-		-
-			message: '#^Method Alaress\\Rules\\Condition\:\:test\(\) should return bool but returns int\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Rules/Condition.php
 
 		-
 			message: '#^Call to an undefined method Predis\\ClientInterface\:\:transaction\(\)\.$#'
@@ -335,18 +143,6 @@ parameters:
 			identifier: constructor.unusedParameter
 			count: 1
 			path: library/Alaress/Submarine.php
-
-		-
-			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true will always evaluate to true\.$#'
-			identifier: method.alreadyNarrowedType
-			count: 2
-			path: library/Alaress/Test/RelativeUrlTest.php
-
-		-
-			message: '#^Call to function unset\(\) contains undefined variable \$e\.$#'
-			identifier: unset.variable
-			count: 3
-			path: library/Alaress/WorkerCrew/Worker/IO/WrappedReadableResourceStream.php
 
 		-
 			message: '#^Return type \(Alaress\\WorkerCrew\\Worker\\Worker\) of method Alaress\\WorkerCrew\\Worker\\WorkerArray\:\:getPidWhere\(\) should be compatible with return type \(int\) of method Alaress\\WorkerCrew\\Worker\\WorkerBundleInterface\:\:getPidWhere\(\)$#'
@@ -493,54 +289,6 @@ parameters:
 			path: library/Calendar/Event/Type/EventBase.php
 
 		-
-			message: '#^PHPDoc tag @var with type Calendar\\Event\\Type\\Day\\Event is not subtype of native type Calendar\\Event\\Type\\Fixtures\\Event\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Calendar/Event/Type/Fixtures/Renderer/Csv.php
-
-		-
-			message: '#^PHPDoc tag @var with type Calendar\\Event\\Type\\EventInterface is not subtype of native type Calendar\\Event\\Type\\Fixtures\\Event\.$#'
-			identifier: varTag.nativeType
-			count: 2
-			path: library/Calendar/Event/Type/Fixtures/Renderer/VObject.php
-
-		-
-			message: '#^PHPDoc tag @var with type Calendar\\Event\\Type\\Day\\Event is not subtype of native type Calendar\\Event\\Type\\SudsEvent\\Event\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Calendar/Event/Type/SudsEvent/Renderer/Csv.php
-
-		-
-			message: '#^PHPDoc tag @var with type Calendar\\Event\\Type\\EventInterface is not subtype of native type Calendar\\Event\\Type\\SudsEvent\\Event\.$#'
-			identifier: varTag.nativeType
-			count: 2
-			path: library/Calendar/Event/Type/SudsEvent/Renderer/VObject.php
-
-		-
-			message: '#^PHPDoc tag @var with type Calendar\\Event\\Type\\Day\\Event is not subtype of native type Calendar\\Event\\Type\\SudsTimetable\\Event\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Calendar/Event/Type/SudsTimetable/Renderer/Csv.php
-
-		-
-			message: '#^PHPDoc tag @var with type Calendar\\Event\\Type\\EventInterface is not subtype of native type Calendar\\Event\\Type\\SudsTimetable\\Event\.$#'
-			identifier: varTag.nativeType
-			count: 2
-			path: library/Calendar/Event/Type/SudsTimetable/Renderer/VObject.php
-
-		-
-			message: '#^PHPDoc tag @var with type Calendar\\Event\\Type\\Day\\Event is not subtype of native type Calendar\\Event\\Type\\Timetable\\Event\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Calendar/Event/Type/Timetable/Renderer/Csv.php
-
-		-
-			message: '#^PHPDoc tag @var with type Calendar\\Event\\Type\\EventInterface is not subtype of native type Calendar\\Event\\Type\\Timetable\\Event\.$#'
-			identifier: varTag.nativeType
-			count: 2
-			path: library/Calendar/Event/Type/Timetable/Renderer/VObject.php
-
-		-
 			message: '#^Access to an undefined property Sabre\\VObject\\Component\\VEvent\:\:\$CATEGORIES\.$#'
 			identifier: property.notFound
 			count: 1
@@ -587,18 +335,6 @@ parameters:
 			identifier: property.onlyWritten
 			count: 1
 			path: library/Calendar/Layout/Full/Abstract.php
-
-		-
-			message: '#^Loose comparison using \=\= between 0 and 1 will always evaluate to false\.$#'
-			identifier: equal.alwaysFalse
-			count: 1
-			path: library/Component/Config/AssessmentTypes.php
-
-		-
-			message: '#^PHPDoc tag @return with type object is not subtype of native type Alaress\\Authorizer\\Authorizer\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Component/ControllerAbstract.php
 
 		-
 			message: '#^Method Component_Dashboard_ImageGalleryController\:\:getFileMapper\(\) is unused\.$#'
@@ -733,12 +469,6 @@ parameters:
 			path: library/Component/Homepage/WolframController.php
 
 		-
-			message: '#^PHPDoc tag @var with type array\<string, array\{storage\: Schoolbox\\Assessment\\Component\\SubmissionBox\\Submission\\SingleFile\\Model, filename\: string, filemtime\: int\}\> is not subtype of native type array\<array\{storage\: mixed, filename\: mixed, filemtime\: int, comment\: mixed\}\>\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Custom/Acgs/NccdDownload/CommandLineTool.php
-
-		-
 			message: '#^Property Custom\\Dsfg\\AchievementReport\\Base\:\:\$currentYear \(string\) does not accept default value of type int\.$#'
 			identifier: property.defaultValue
 			count: 1
@@ -787,24 +517,6 @@ parameters:
 			path: library/Custom/Help/CourseParticipation/Controller.php
 
 		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\CampusMapper\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Custom/Help/CourseParticipation/Controller.php
-
-		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\RoleMapper\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Custom/Help/CourseParticipation/Controller.php
-
-		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\UserMapper\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Custom/Help/CourseParticipation/Controller.php
-
-		-
 			message: '#^Property Custom\\Help\\CourseParticipation\\Controller\:\:\$codeMapper \(Schoolbox\\Resource\\Folder\\Code\\Mapper\) does not accept Schoolbox\\Mapper\.$#'
 			identifier: assign.propertyType
 			count: 1
@@ -829,24 +541,6 @@ parameters:
 			path: library/Custom/Help/CourseParticipation/Handler.php
 
 		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\CampusMapper\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Custom/Help/CourseParticipation/Handler.php
-
-		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\RoleMapper\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Custom/Help/CourseParticipation/Handler.php
-
-		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\UserMapper\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Custom/Help/CourseParticipation/Handler.php
-
-		-
 			message: '#^Property Custom\\Help\\CourseParticipation\\Handler\:\:\$codeMapper \(Schoolbox\\Resource\\Folder\\Code\\Mapper\) does not accept Schoolbox\\Mapper\.$#'
 			identifier: assign.propertyType
 			count: 1
@@ -863,12 +557,6 @@ parameters:
 			identifier: property.onlyWritten
 			count: 1
 			path: library/Custom/Sk/NCEA/Controller.php
-
-		-
-			message: '#^PHPDoc tag @var with type string is not subtype of native type array\{\}\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Custom/Sk/OleReport/Controller.php
 
 		-
 			message: '#^Method EOTC\\ActivityLog\\Log\:\:getId\(\) should return string but returns int\.$#'
@@ -1231,12 +919,6 @@ parameters:
 			path: library/Evaluation/Question/Bank.php
 
 		-
-			message: '#^Dead catch \- Alaress\\Database\\Exception is never thrown in the try block\.$#'
-			identifier: catch.neverThrown
-			count: 1
-			path: library/External/Canvas/Importer/Cli/AnnouncementsTool.php
-
-		-
 			message: '#^Ternary operator condition is always true\.$#'
 			identifier: ternary.alwaysTrue
 			count: 1
@@ -1249,70 +931,16 @@ parameters:
 			path: library/External/Canvas/Sync/DataRestorer.php
 
 		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Mapper is not subtype of native type \$this\(External\\Canvas\\Sync\\ImportStage\\CourseAssessmentAbstract\)\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/CourseAssessmentAbstract.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Mapper is not subtype of native type \$this\(External\\Canvas\\Sync\\ImportStage\\CourseAssignments\)\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/CourseAssignments.php
-
-		-
 			message: '#^Property External\\Canvas\\Sync\\ImportStage\\CourseAssignments\:\:\$accountBridge is unused\.$#'
 			identifier: property.unused
 			count: 1
 			path: library/External/Canvas/Sync/ImportStage/CourseAssignments.php
 
 		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Mapper is not subtype of native type \$this\(External\\Canvas\\Sync\\ImportStage\\CourseQuiz\)\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/CourseQuiz.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Mapper is not subtype of native type \$this\(External\\Canvas\\Sync\\ImportStage\\QuizSubmission\)\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/QuizSubmission.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Mapper is not subtype of native type \$this\(External\\Canvas\\Sync\\ImportStage\\SectionAssessmentAbstract\)\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/SectionAssessmentAbstract.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Mapper is not subtype of native type \$this\(External\\Canvas\\Sync\\ImportStage\\SectionAssignment\)\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/SectionAssignment.php
-
-		-
 			message: '#^Method External\\Canvas\\Sync\\ImportStage\\SectionQuiz\:\:findAssessableImpl\(\) should return Schoolbox\\Assessment\\Component\\SubmissionBox\|null but returns Schoolbox\\Learning\\Quiz\\Model\.$#'
 			identifier: return.type
 			count: 1
 			path: library/External/Canvas/Sync/ImportStage/SectionQuiz.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Mapper is not subtype of native type \$this\(External\\Canvas\\Sync\\ImportStage\\SectionQuiz\)\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/SectionQuiz.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Mapper is not subtype of native type \$this\(External\\Canvas\\Sync\\ImportStage\\Submission\)\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/Submission.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Mapper is not subtype of native type \$this\(External\\Canvas\\Sync\\ImportStage\\SubmissionAbstract\)\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/SubmissionAbstract.php
 
 		-
 			message: '#^Property External_Doublefirst_Class\:\:\$externalUser is never read, only written\.$#'
@@ -1335,12 +963,6 @@ parameters:
 		-
 			message: '#^Method External_Doublefirst_Timetable\:\:setDatabase\(\) is unused\.$#'
 			identifier: method.unused
-			count: 1
-			path: library/External/Doublefirst/Timetable.php
-
-		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
 			count: 1
 			path: library/External/Doublefirst/Timetable.php
 
@@ -1447,12 +1069,6 @@ parameters:
 			path: library/External/Synergetic/Timetable.php
 
 		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 1
-			path: library/External/Synergetic/Timetable.php
-
-		-
 			message: '#^Parameter \#1 \$dayNumber \(string\) of method External_Synergetic_Timetable\:\:getDayName\(\) should be compatible with parameter \$dayNumber \(int\) of method External_TimetableInterface\:\:getDayName\(\)$#'
 			identifier: method.childParameterType
 			count: 1
@@ -1489,20 +1105,8 @@ parameters:
 			path: library/External/Tass/Api/Connector.php
 
 		-
-			message: '#^Method External\\Tass\\Api\\Connector\:\:assertValidResponse\(\) has External\\Tass\\Api\\Exception\\InvalidArg in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/External/Tass/Api/Connector.php
-
-		-
 			message: '#^Method External\\Tass\\Api\\Connector\:\:assertValidResponse\(\) returns void but does not have any side effects\.$#'
 			identifier: void.pure
-			count: 1
-			path: library/External/Tass/Api/Connector.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$date with type Alaress_Date_Format\|null is not subtype of native type Alaress_Date_Format\.$#'
-			identifier: parameter.phpDocType
 			count: 1
 			path: library/External/Tass/Api/Connector.php
 
@@ -1535,12 +1139,6 @@ parameters:
 			identifier: function.alreadyNarrowedType
 			count: 4
 			path: library/External/Tass/User.php
-
-		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 1
-			path: library/External/UserInterface.php
 
 		-
 			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
@@ -1675,40 +1273,10 @@ parameters:
 			path: library/Report/Abstract.php
 
 		-
-			message: '#^Call to function array_merge\(\) on a separate line has no effect\.$#'
-			identifier: function.resultUnused
-			count: 1
-			path: library/Report/Activity.php
-
-		-
 			message: '#^Call to an undefined method External_UserInterface\:\:getStudentBoarderContactListExtended\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: library/Report/Boarder.php
-
-		-
-			message: '#^Call to function array_merge\(\) on a separate line has no effect\.$#'
-			identifier: function.resultUnused
-			count: 1
-			path: library/Report/Group.php
-
-		-
-			message: '#^Call to function array_merge\(\) on a separate line has no effect\.$#'
-			identifier: function.resultUnused
-			count: 1
-			path: library/Report/Login.php
-
-		-
-			message: '#^Method Schoolbox\\API\\Controller\:\:authenticateViaPostData\(\) has Schoolbox\\Application\\Exception\\AccountDisabled in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/API/Controller.php
-
-		-
-			message: '#^Method Schoolbox\\API\\Controller\:\:authenticateViaPostData\(\) has Schoolbox\\Application\\Exception\\NotFound in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/API/Controller.php
 
 		-
 			message: '#^If condition is always true\.$#'
@@ -1741,42 +1309,6 @@ parameters:
 			path: library/Schoolbox/Admin/Home/SamlCertHelper.php
 
 		-
-			message: '#^PHPDoc tag @var with type int\|null is not subtype of native type int\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Admin/Profile/Editor/Field/Controller.php
-
-		-
-			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\MapperFactory is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Admin/Settings/FieldType/Select/Test/RendererTest.php
-
-		-
-			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\MapperFactory is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Admin/Settings/FieldType/SelectKey/Test/RendererTest.php
-
-		-
-			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\Assessment\\Component\\SubmissionBox\\GradeLevel\\Group\\Mapper is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Admin/Settings/FieldType/SelectLookup/Test/RendererTest.php
-
-		-
-			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\MapperFactory is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Admin/Settings/FieldType/SelectLookup/Test/RendererTest.php
-
-		-
-			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\MapperFactory is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Admin/Settings/FieldType/SelectMulti/Test/RendererTest.php
-
-		-
 			message: '#^Property Schoolbox\\Admin\\Usage\\Controller\:\:\$errorMapper is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
@@ -1789,22 +1321,10 @@ parameters:
 			path: library/Schoolbox/Admin/Usage/Graph/GlobalUsers/TotalPayload.php
 
 		-
-			message: '#^Anonymous function has an unused use \$di\.$#'
-			identifier: closure.unusedUse
-			count: 1
-			path: library/Schoolbox/Application/BasicRequest/Kernel.php
-
-		-
 			message: '#^Variable \$e might not be defined\.$#'
 			identifier: variable.undefined
 			count: 1
 			path: library/Schoolbox/Application/CliTool/Composite.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$forcePerform with type bool\|null is not subtype of native type bool\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: library/Schoolbox/Application/CliTool/Kernel.php
 
 		-
 			message: '#^Instanceof between Aura\\Di\\Container and Aura\\Di\\Container will always evaluate to true\.$#'
@@ -1819,34 +1339,10 @@ parameters:
 			path: library/Schoolbox/Assessment/Component/SubmissionBox/ReturnedWorkMapper.php
 
 		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\Assessment\\Component\\SubmissionBoxMapper\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Assessment/Component/SubmissionBox/ReturnedWorkMapper.php
-
-		-
-			message: '#^Variable \$submissionMapper in PHPDoc tag @var does not exist\.$#'
-			identifier: varTag.variableNotFound
-			count: 1
-			path: library/Schoolbox/Assessment/Component/SubmissionBox/Submission/SingleFile/Mapper.php
-
-		-
 			message: '#^Method Schoolbox\\Assessment\\Component\\SubmissionBox\\Submission\\SubmissionMapper\:\:getSubmissionBoxMapper\(\) should return Schoolbox\\Assessment\\Component\\SubmissionBoxMapper but returns Schoolbox\\Mapper\.$#'
 			identifier: return.type
 			count: 1
 			path: library/Schoolbox/Assessment/Component/SubmissionBox/Submission/SubmissionMapper.php
-
-		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\Assessment\\Component\\SubmissionBoxMapper\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Assessment/Component/SubmissionBox/Submission/SubmissionMapper.php
-
-		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 6
-			path: library/Schoolbox/Assessment/Course/Controller.php
 
 		-
 			message: '#^Instanceof between Schoolbox\\Learning\\Course\\DataModel\\Implementation\\Model and Schoolbox\\Learning\\Course\\DataModel\\Implementation\\Model will always evaluate to true\.$#'
@@ -1855,32 +1351,8 @@ parameters:
 			path: library/Schoolbox/Assessment/Course/Import/Controller.php
 
 		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 5
-			path: library/Schoolbox/Assessment/Course/Import/Controller.php
-
-		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getAssessables\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$assessmentImpls with type Schoolbox\\GenericCollection\|Schoolbox\\Learning\\Assessment\\IAssessable is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$assessmentSpecs with type Schoolbox\\GenericCollection\|Schoolbox\\Learning\\Assessment\\IAssessable is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$unitImpls with type Schoolbox\\GenericCollection\|Schoolbox\\Learning\\Course\\DataModel\\Implementation\\Unit\\Model is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: parameter.phpDocType
 			count: 1
 			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
 
@@ -1897,18 +1369,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
 
 		-
-			message: '#^Method Schoolbox\\Assessment\\Course\\Import\\Module\:\:buildPreloadImport\(\) has InvalidArgumentException in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/Module.php
-
-		-
-			message: '#^Method Schoolbox\\Assessment\\Course\\Import\\Module\:\:buildPreloadImport\(\) has Schoolbox\\Application\\Exception\\NotFound in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/Module.php
-
-		-
 			message: '#^Method Schoolbox\\Assessment\\Course\\Markbook\\CourseMarkbook\:\:getAssessmentImplAverages\(\) should return array\<array\<float\>\> but returns array\<float\>\.$#'
 			identifier: return.type
 			count: 1
@@ -1921,38 +1381,8 @@ parameters:
 			path: library/Schoolbox/Assessment/Course/Markbook/CourseMarkbook.php
 
 		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Learning\\Course\\DataModel\\Implementation\\Unit\\Model is not subtype of native type null\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Markbook/CourseMarkbook.php
-
-		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\Learning\\Course\\DataModel\\Specification\\Mapper\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Markbook/Module.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Learning\\Course\\DataModel\\Implementation\\Unit\\Model is not subtype of native type null\.$#'
-			identifier: varTag.nativeType
-			count: 2
-			path: library/Schoolbox/Assessment/Course/Markbook/SortForCourseMarkbook.php
-
-		-
-			message: '#^Variable \$userMapper in PHPDoc tag @var does not exist\.$#'
-			identifier: varTag.variableNotFound
-			count: 1
-			path: library/Schoolbox/Assessment/Participant/Plan/Mapper.php
-
-		-
 			message: '#^Method Schoolbox\\Assessment\\Rubric\\DataModel\\DataSource\:\:getInstance\(\) should return static\(Schoolbox\\Assessment\\Rubric\\DataModel\\DataSource\) but returns Schoolbox\\Assessment\\Rubric\\DataModel\\DataSource\.$#'
 			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/DataSource.php
-
-		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
 			count: 1
 			path: library/Schoolbox/Assessment/Rubric/DataModel/DataSource.php
 
@@ -2065,12 +1495,6 @@ parameters:
 			path: library/Schoolbox/Calendar/Event/Access.php
 
 		-
-			message: '#^PHPDoc tag @var with type array is not subtype of native type Alaress\\Web\\Request\\Values\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Calendar/Event/Validator.php
-
-		-
 			message: '#^Property Schoolbox\\Calendar\\EventLevel\:\:\$id \(int\) does not accept default value of type string\.$#'
 			identifier: property.defaultValue
 			count: 1
@@ -2125,12 +1549,6 @@ parameters:
 			path: library/Schoolbox/Calendar/Relation/RoleMapper.php
 
 		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 1
-			path: library/Schoolbox/Collection.php
-
-		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 1
@@ -2165,30 +1583,6 @@ parameters:
 			identifier: if.alwaysFalse
 			count: 1
 			path: library/Schoolbox/Comms/News/Audience/Segment/Transactor.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Comms\\News\\Audience\\Segment\\IStrategy\:\:getTranslateSql\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Comms/News/Audience/Segment/Translator.php
-
-		-
-			message: '#^PHPDoc tag @var with type array\<Schoolbox\\Comms\\News\\Audience\\Segment\\ISimpleStrategy\> is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Comms/News/Audience/Segment/Translator.php
-
-		-
-			message: '#^PHPDoc tag @var with type Alaress\\Database\\Connector\\IConnector is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Comms/News/Audience/Test/ValidSegmentTest.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\L10n\\RosettaStone is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Comms/News/Audience/Test/ValidSegmentTest.php
 
 		-
 			message: '#^Property Schoolbox\\Comms\\News\\Audience\\Validation\\Factory\:\:\$validRelationships \(iterable\<Schoolbox\\Comms\\News\\Audience\\Segment\\IStrategy\>&Schoolbox\\GenericCollection\) does not accept array\<array\<string\>\>\.$#'
@@ -2233,36 +1627,6 @@ parameters:
 			path: library/Schoolbox/Comms/News/Moderation/Controller.php
 
 		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\Comms\\News\\Mapper\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Comms/News/Moderation/Module.php
-
-		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\Error\\Mapper\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Comms/News/Moderation/Module.php
-
-		-
-			message: '#^PHPDoc tag @return with type object is not subtype of native type Schoolbox\\Comms\\News\\Audience\\Segment\\StrategyFactory\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Comms/News/Moderation/Module.php
-
-		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\Comms\\News\\Mapper\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Comms/News/Module.php
-
-		-
-			message: '#^PHPDoc tag @return with type object is not subtype of native type Schoolbox\\Comms\\News\\Audience\\Segment\\StrategyFactory\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Comms/News/Module.php
-
-		-
 			message: '#^Method Schoolbox\\Comms\\News\\Querystring\:\:toArray\(\) should return array\<string\|null\> but returns ArrayAccess\.$#'
 			identifier: return.type
 			count: 1
@@ -2279,18 +1643,6 @@ parameters:
 			identifier: variable.undefined
 			count: 1
 			path: library/Schoolbox/Comms/News/Statistics/Interactions.php
-
-		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\Comms\\News\\Mapper\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Comms/News/Statistics/Module.php
-
-		-
-			message: '#^PHPDoc tag @return with type object is not subtype of native type Schoolbox\\Comms\\News\\Audience\\Segment\\StrategyFactory\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Comms/News/Statistics/Module.php
 
 		-
 			message: '#^Property Schoolbox\\Comms\\News\\Statistics\\Test\\Obama\:\:\$acceptedBy is never read, only written\.$#'
@@ -2313,12 +1665,6 @@ parameters:
 		-
 			message: '#^Method Schoolbox\\Config\\Loader\:\:getInstance\(\) should return static\(Schoolbox\\Config\\Loader\) but returns Schoolbox\\Config\\Loader\.$#'
 			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Config/Loader.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$name with type mixed is not subtype of native type string\.$#'
-			identifier: parameter.phpDocType
 			count: 1
 			path: library/Schoolbox/Config/Loader.php
 
@@ -2521,18 +1867,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/Schooledge/Base/Sync.php
 
 		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolpro/Base/GuardianIterator.php
-
-		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolpro/Base/StaffIterator.php
-
-		-
 			message: '#^Method Schoolbox\\External\\Connector\\Schoolpro\\Base\\Sync\:\:findAllParents\(\) should return array\<Schoolbox\\External\\Normalise\\User\\Guardian\> but returns Schoolbox\\External\\Connector\\Schoolpro\\Base\\GuardianIterator\.$#'
 			identifier: return.type
 			count: 1
@@ -2573,12 +1907,6 @@ parameters:
 			identifier: return.type
 			count: 1
 			path: library/Schoolbox/External/Connector/Synergetic/Base/CommunityPortal.php
-
-		-
-			message: '#^PHPDoc tag @param references unknown parameter\: \$classificationCode$#'
-			identifier: parameter.notFound
-			count: 1
-			path: library/Schoolbox/External/Connector/Synergetic/Base/Document.php
 
 		-
 			message: '#^Method Schoolbox\\External\\Connector\\Synergetic\\Base\\Sync\:\:findAllParents\(\) should return array\<Schoolbox\\External\\Normalise\\User\\Guardian\> but returns Schoolbox\\Sync\\Iterator\\Guardian\.$#'
@@ -2755,12 +2083,6 @@ parameters:
 			path: library/Schoolbox/External/Normalise/User/Staff.php
 
 		-
-			message: '#^PHPDoc tag @var with type array\<Schoolbox\\Filter\\Page\\Model\> is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Filter/AbstractFactoryFactory.php
-
-		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 1
@@ -2771,54 +2093,6 @@ parameters:
 			identifier: property.onlyWritten
 			count: 1
 			path: library/Schoolbox/Filter/Controller.php
-
-		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\Assessment\\Term\\Mapper\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/FactoryFactory.php
-
-		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\Learning\\Assessment\\DataModel\\Project\\Mapper\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/FactoryFactory.php
-
-		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\Learning\\Assessment\\WorkType\\Mapper\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/FactoryFactory.php
-
-		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\Learning\\Course\\DataModel\\Implementation\\Mapper\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/FactoryFactory.php
-
-		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\Learning\\Course\\DataModel\\Specification\\Mapper\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/FactoryFactory.php
-
-		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\Learning\\Course\\DataModel\\Specification\\Unit\\Mapper\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/FactoryFactory.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$folders with type iterable\<Schoolbox\\Resource\\Folder\\Model\>&Schoolbox\\Collection is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/Folder/Component.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$folders with type iterable\<Schoolbox\\Resource\\Folder\\Model\>&Schoolbox\\Collection is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/Folder/CourseImports/Component.php
 
 		-
 			message: '#^Property Schoolbox\\Filter\\Filters\\Assessment\\Folder\\KeyConverter\:\:\$folderIds is unused\.$#'
@@ -2851,18 +2125,6 @@ parameters:
 			path: library/Schoolbox/Filter/Filters/Assessment/NullableContext/Factory.php
 
 		-
-			message: '#^Class Schoolbox\\Filter\\Filters\\Assessment\\RubricUsage\\Definition referenced with incorrect case\: Schoolbox\\Filter\\Filters\\Assessment\\RubricUsage\\DEFINITION\.$#'
-			identifier: class.nameCase
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/RubricUsage/Component.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$capabilities with type \(iterable\<Schoolbox\\Assessment\\Rubric\\DataModel\\Capability\\Model\>&Schoolbox\\GenericCollection\)\|null is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/RubricUsage/Component.php
-
-		-
 			message: '#^Property Schoolbox\\Filter\\Filters\\Assessment\\Term\\KeyConverter\:\:\$termIds \(iterable\<int\>&Schoolbox\\GenericCollection\) does not accept iterable\<int\>&Schoolbox\\Collection\.$#'
 			identifier: assign.propertyType
 			count: 1
@@ -2873,12 +2135,6 @@ parameters:
 			identifier: property.onlyWritten
 			count: 1
 			path: library/Schoolbox/Filter/Filters/Badge/CurriculumNode/Factory.php
-
-		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 1
-			path: library/Schoolbox/Fixtures/Component/ComponentDelegate.php
 
 		-
 			message: '#^Constant Schoolbox\\Fixtures\\Import\\Controller\:\:TYPE_DIVISION is unused\.$#'
@@ -2896,18 +2152,6 @@ parameters:
 			message: '#^Negated boolean expression is always true\.$#'
 			identifier: booleanNot.alwaysTrue
 			count: 1
-			path: library/Schoolbox/Fixtures/Import/Controller.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Fixtures\\School\\Model is not subtype of native type null\.$#'
-			identifier: varTag.nativeType
-			count: 2
-			path: library/Schoolbox/Fixtures/Import/Controller.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Fixtures\\Team\\Model is not subtype of native type null\.$#'
-			identifier: varTag.nativeType
-			count: 2
 			path: library/Schoolbox/Fixtures/Import/Controller.php
 
 		-
@@ -2933,18 +2177,6 @@ parameters:
 			identifier: return.type
 			count: 1
 			path: library/Schoolbox/Fixtures/Team/Helper/Translator.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Collection is not subtype of native type array\{user\: mixed, positions\: Schoolbox\\Collection\}\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Fixtures/Team/Metadata/Metadata.php
-
-		-
-			message: '#^Variable \$teamMapper in PHPDoc tag @var does not exist\.$#'
-			identifier: varTag.variableNotFound
-			count: 1
-			path: library/Schoolbox/Fixtures/Team/Position/Participant/Mapper.php
 
 		-
 			message: '#^Method Schoolbox\\Forum\\Post\:\:getThread\(\) should return Schoolbox\\Forum\\Thread but returns int\.$#'
@@ -3001,18 +2233,6 @@ parameters:
 			path: library/Schoolbox/InstanceRegistry/ApiClient.php
 
 		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 4
-			path: library/Schoolbox/Learning/Analytics/CohortAnalysis.php
-
-		-
-			message: '#^PHPDoc tag @var with type Alaress_Date_Format is not subtype of native type null\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/AbstractAssessment.php
-
-		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 1
@@ -3023,12 +2243,6 @@ parameters:
 			identifier: property.onlyWritten
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Calendar/Events/Controller.php
-
-		-
-			message: '#^Expression "\$test\(\$input\)" on a separate line does not do anything\.$#'
-			identifier: expr.resultUnused
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Calendar/Test/ValidationTest.php
 
 		-
 			message: '#^If condition is always true\.$#'
@@ -3823,12 +3037,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
 
 		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/IAssessmentTypeTranslator.php
-
-		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getAttachments\(\)\.$#'
 			identifier: method.notFound
 			count: 3
@@ -4087,12 +3295,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Task.php
 
 		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Assessment\\Component\\SubmissionBox\\Submission\\SingleFile\\Model is not subtype of native type string\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Controller.php
-
-		-
 			message: '#^Ternary operator condition is always true\.$#'
 			identifier: ternary.alwaysTrue
 			count: 1
@@ -4129,74 +3331,14 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DueWork/Response/ValidSelfAssessable.php
 
 		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Learning\\Assessment\\IAssessable is not subtype of native type Schoolbox\\Learning\\Assessment\\DueWork\\Model\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/ValidSelfAssessable.php
-
-		-
-			message: '#^Variable \$rightFolderCode in PHPDoc tag @var does not exist\.$#'
-			identifier: varTag.variableNotFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Exporter/Exporter.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Learning\\Assessment\\IFeedback is not subtype of native type null\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Feedback/DataSource.php
-
-		-
 			message: '#^Method Schoolbox\\Learning\\Assessment\\Feedback\\SubSource\\AbstractSubSource\:\:createModel\(\) should return Schoolbox\\Learning\\Assessment\\IFeedback but returns null\.$#'
 			identifier: return.type
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Feedback/SubSource/AbstractSubSource.php
 
 		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Learning\\Assessment\\IFeedback is not subtype of native type null\.$#'
-			identifier: varTag.nativeType
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/FeedbackStrategy/FavourFloating.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Learning\\Assessment\\IResponse is not subtype of native type null\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/FeedbackStrategy/FavourFloating.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Learning\\Assessment\\IFeedback is not subtype of native type null\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/FeedbackStrategy/NoFavour.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$gradeGroup with type Schoolbox\\Assessment\\Component\\SubmissionBox\\GradeLevel\\Group\\Model\|null is not subtype of native type Schoolbox\\Assessment\\Component\\SubmissionBox\\GradeLevel\\Group\\Model\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/IAssessable.php
-
-		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/IAssessable.php
-
-		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/IResponse.php
-
-		-
 			message: '#^Instanceof between Schoolbox\\Learning\\AssessmentContext and Schoolbox\\Learning\\AssessmentContext will always evaluate to true\.$#'
 			identifier: instanceof.alwaysTrue
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/ListController.php
-
-		-
-			message: '#^Variable \$sortedAssessments in PHPDoc tag @var does not exist\.$#'
-			identifier: varTag.variableNotFound
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/ListController.php
 
@@ -4225,12 +3367,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Participant.php
 
 		-
-			message: '#^PHPDoc tag @param for parameter \$participants with type Schoolbox\\GenericCollection\|Schoolbox\\Learning\\Assessment\\Participant is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Plan.php
-
-		-
 			message: '#^Method Schoolbox\\Learning\\Assessment\\Project\:\:cloneForCopy\(\) should return static\(Schoolbox\\Learning\\Assessment\\Project\) but returns Schoolbox\\Learning\\Assessment\\Project\.$#'
 			identifier: return.type
 			count: 1
@@ -4255,24 +3391,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Project/Controller.php
 
 		-
-			message: '#^Cannot call method add\(\) on array\<Schoolbox\\Learning\\Assessment\\Quiz\\Attempt\\Model\>\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Quiz/Attempt/MapperProxy.php
-
-		-
-			message: '#^Method Schoolbox\\Learning\\Assessment\\Quiz\\Attempt\\MapperProxy\:\:transformModels\(\) should return iterable\<Schoolbox\\Learning\\Assessment\\Quiz\\Attempt\\Model\>&Schoolbox\\GenericCollection but returns array\<Schoolbox\\Learning\\Assessment\\Quiz\\Attempt\\Model\>\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Quiz/Attempt/MapperProxy.php
-
-		-
-			message: '#^PHPDoc tag @var with type array\<Schoolbox\\Learning\\Assessment\\Quiz\\Attempt\\Model\> is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Quiz/Attempt/MapperProxy.php
-
-		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getLearnosityReference\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -4295,36 +3413,6 @@ parameters:
 			identifier: property.onlyWritten
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Quiz/Controller.php
-
-		-
-			message: '#^Cannot call method add\(\) on array\<Schoolbox\\Learning\\Assessment\\Quiz\\Feedback\\Model\>\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Quiz/Feedback/MapperProxy.php
-
-		-
-			message: '#^Method Schoolbox\\Learning\\Assessment\\Quiz\\Feedback\\MapperProxy\:\:transformModels\(\) should return iterable\<Schoolbox\\Learning\\Assessment\\Quiz\\Feedback\\Model\>&Schoolbox\\GenericCollection but returns array\<Schoolbox\\Learning\\Assessment\\Quiz\\Feedback\\Model\>\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Quiz/Feedback/MapperProxy.php
-
-		-
-			message: '#^PHPDoc tag @var with type array\<Schoolbox\\Learning\\Assessment\\Quiz\\Feedback\\Model\> is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Quiz/Feedback/MapperProxy.php
-
-		-
-			message: '#^Method Schoolbox\\Learning\\Assessment\\Quiz\\Model\:\:getAuthoritativeResponse\(\) should return Schoolbox\\Learning\\Assessment\\Quiz\\Attempt\\Model\|null but returns Schoolbox\\Learning\\Assessment\\IResponse\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Quiz/Model.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Learning\\Assessment\\Quiz\\Attempt\\Model is not subtype of native type null\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Quiz/Model.php
 
 		-
 			message: '#^Method Schoolbox\\Learning\\Assessment\\Summator\\Average\:\:calculateTotalWeight\(\) should return int but returns null\.$#'
@@ -4405,34 +3493,10 @@ parameters:
 			path: library/Schoolbox/Learning/Authorizer/Rule/CanPreview.php
 
 		-
-			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\Resource\\Attachment\\Collector\\CollectorFactory is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 2
-			path: library/Schoolbox/Learning/Badge/Translator/ArrayToModel/Test/AllFieldsTest.php
-
-		-
-			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\Resource\\Attachment\\Collector\\CollectorFactory is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 2
-			path: library/Schoolbox/Learning/Badge/Translator/ArrayToModel/Test/MutableFieldsOnlyTest.php
-
-		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 1
-			path: library/Schoolbox/Learning/Classes/ClassList.php
-
-		-
 			message: '#^Method Schoolbox\\Learning\\Component\\Dashboard\\ClassController\:\:execute\(\) should return true but returns false\.$#'
 			identifier: return.type
 			count: 1
 			path: library/Schoolbox/Learning/Component/Dashboard/ClassController.php
-
-		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 2
-			path: library/Schoolbox/Learning/Controller.php
 
 		-
 			message: '#^Method Schoolbox\\Learning\\Course\\DataModel\\Implementation\\Mapper\:\:findAllByCourseSpecificationId\(\) should return iterable\<Schoolbox\\Learning\\Course\\DataModel\\Implementation\\Model\>&Schoolbox\\Collection but returns iterable\<Schoolbox\\Learning\\Course\\DataModel\\AbstractCourse\>&Schoolbox\\GenericCollection\.$#'
@@ -4477,18 +3541,6 @@ parameters:
 			path: library/Schoolbox/Learning/MarkScheme/Test/AssessableTest.php
 
 		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 1
-			path: library/Schoolbox/Learning/MarkScheme/Test/FactoryTest.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$totalMark with type float\|int\|null is not subtype of native type float\|null\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: library/Schoolbox/Learning/MarkScheme/TotalMarkAbstract.php
-
-		-
 			message: '#^Property Schoolbox\\Learning\\MarkScheme\\TotalMarkAbstract\:\:\$totalMark \(float\|int\|null\) is never assigned int so it can be removed from the property type\.$#'
 			identifier: property.unusedType
 			count: 1
@@ -4525,26 +3577,8 @@ parameters:
 			path: library/Schoolbox/Learning/Moment/Translator/ArrayToModel/AllFields.php
 
 		-
-			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\Resource\\Attachment\\Collector\\CollectorFactory is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 2
-			path: library/Schoolbox/Learning/Moment/Translator/ArrayToModel/Test/AllFieldsTest.php
-
-		-
-			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\Resource\\Attachment\\Collector\\CollectorFactory is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 2
-			path: library/Schoolbox/Learning/Moment/Translator/ArrayToModel/Test/MutableFieldsOnlyTest.php
-
-		-
 			message: '#^Method Schoolbox\\Learning\\Quiz\\Attempt\\Mapper\:\:getQuizMapper\(\) should return Schoolbox\\Learning\\Quiz\\Mapper but returns Schoolbox\\Mapper\.$#'
 			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Attempt/Mapper.php
-
-		-
-			message: '#^PHPDoc tag @return with type Schoolbox\\Mapper is not subtype of native type Schoolbox\\Learning\\Quiz\\Mapper\.$#'
-			identifier: return.phpDocType
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Attempt/Mapper.php
 
@@ -4553,12 +3587,6 @@ parameters:
 			identifier: property.unusedType
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Attempt/Model.php
-
-		-
-			message: '#^Variable \$assess in PHPDoc tag @var does not exist\.$#'
-			identifier: varTag.variableNotFound
-			count: 3
-			path: library/Schoolbox/Learning/Quiz/Attempt/Notifier.php
 
 		-
 			message: '#^Property Schoolbox\\Learning\\Quiz\\Controller\:\:\$quizAnswerMapper is never read, only written\.$#'
@@ -4621,12 +3649,6 @@ parameters:
 			path: library/Schoolbox/LearningAnalytics/Controller.php
 
 		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 1
-			path: library/Schoolbox/LearningAnalytics/Module.php
-
-		-
 			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -4651,18 +3673,6 @@ parameters:
 			path: library/Schoolbox/Mapper/AbstractMapperProxy.php
 
 		-
-			message: '#^Expression "true" on a separate line does not do anything\.$#'
-			identifier: expr.resultUnused
-			count: 1
-			path: library/Schoolbox/Mapper/Performance/DevMonitor.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\IMapper is not subtype of native type string\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
-
-		-
 			message: '#^Property Schoolbox\\Mapper\\RecursiveUndeleter\:\:\$logger \(Alaress\\Lumberjack\\Logger\) does not accept Psr\\Log\\LoggerInterface\.$#'
 			identifier: assign.propertyType
 			count: 1
@@ -4672,12 +3682,6 @@ parameters:
 			message: '#^Cannot call static method getInstance\(\) on \(int\|string\)\.$#'
 			identifier: staticMethod.nonObject
 			count: 1
-			path: library/Schoolbox/Mapper/RecursiveUndeleterCli.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\IMapper is not subtype of native type \(int\|string\)\.$#'
-			identifier: varTag.nativeType
-			count: 2
 			path: library/Schoolbox/Mapper/RecursiveUndeleterCli.php
 
 		-
@@ -4695,24 +3699,6 @@ parameters:
 		-
 			message: '#^Method Schoolbox\\Notif\\MQ\\Test\\MockAMQPConnector\:\:readFromQueue\(\) should return PhpAmqpLib\\Message\\AMQPMessage but returns null\.$#'
 			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Notif/MQ/Test/MockAMQPConnector.php
-
-		-
-			message: '#^Return type \(\$this\(Schoolbox\\Notif\\MQ\\Test\\MockAMQPConnector\)\) of method Schoolbox\\Notif\\MQ\\Test\\MockAMQPConnector\:\:bindQueue\(\) should be compatible with return type \(PhpAmqpLib\\Channel\\AMQPChannel\) of method Alaress\\Async\\AMQP\\AMQPInterface\:\:bindQueue\(\)$#'
-			identifier: method.childReturnType
-			count: 1
-			path: library/Schoolbox/Notif/MQ/Test/MockAMQPConnector.php
-
-		-
-			message: '#^Return type \(\$this\(Schoolbox\\Notif\\MQ\\Test\\MockAMQPConnector\)\) of method Schoolbox\\Notif\\MQ\\Test\\MockAMQPConnector\:\:unbindExchange\(\) should be compatible with return type \(PhpAmqpLib\\Channel\\AMQPChannel\) of method Alaress\\Async\\AMQP\\AMQPInterface\:\:unbindExchange\(\)$#'
-			identifier: method.childReturnType
-			count: 1
-			path: library/Schoolbox/Notif/MQ/Test/MockAMQPConnector.php
-
-		-
-			message: '#^Return type \(\$this\(Schoolbox\\Notif\\MQ\\Test\\MockAMQPConnector\)\) of method Schoolbox\\Notif\\MQ\\Test\\MockAMQPConnector\:\:unbindQueue\(\) should be compatible with return type \(PhpAmqpLib\\Channel\\AMQPChannel\) of method Alaress\\Async\\AMQP\\AMQPInterface\:\:unbindQueue\(\)$#'
-			identifier: method.childReturnType
 			count: 1
 			path: library/Schoolbox/Notif/MQ/Test/MockAMQPConnector.php
 
@@ -4753,40 +3739,16 @@ parameters:
 			path: library/Schoolbox/Notif/StoredisLogger.php
 
 		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Pastoral\\Type\\TypeAbstract is not subtype of native type Schoolbox\\Pastoral\\SubType\\Model\|Schoolbox\\Pastoral\\Type\\Model\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Pastoral/Audience/Controller.php
-
-		-
-			message: '#^PHPDoc tag @var with type Alaress\\Authorizer\\Authorizer\|PHPUnit\\Framework\\MockObject\\MockObject is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Pastoral/Comment/Translator/Test/ModelToArrayTest.php
-
-		-
 			message: '#^Instanceof between Schoolbox\\GenericCollection and Schoolbox\\Collection will always evaluate to true\.$#'
 			identifier: instanceof.alwaysTrue
 			count: 1
 			path: library/Schoolbox/Pastoral/Controller.php
 
 		-
-			message: '#^PHPDoc tag @var with type int is not subtype of native type string\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Pastoral/Management/Controller.php
-
-		-
 			message: '#^Call to an undefined method Schoolbox\\ISoftDeletable\:\:getId\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: library/Schoolbox/Pastoral/Revision/Mapper.php
-
-		-
-			message: '#^PHPDoc tag @return with type iterable\<Schoolbox\\Pastoral\\Model\>&Schoolbox\\GenericCollection is incompatible with native type array\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Pastoral/Test/AccessLevelCensorTest.php
 
 		-
 			message: '#^Method Schoolbox\\Permission\\Access\\Access\:\:getInstance\(\) should return static\(Schoolbox\\Permission\\Access\\Access\) but returns Schoolbox\\Permission\\Access\\Access\.$#'
@@ -4811,66 +3773,6 @@ parameters:
 			identifier: method.childParameterType
 			count: 1
 			path: library/Schoolbox/Permission/Access/RoleAccessMapper.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$roles with type array\<Schoolbox\\Role\>\|\(iterable\<Schoolbox\\Role\>&Schoolbox\\GenericCollection\) is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: library/Schoolbox/Permission/Access/Test/AccessTest.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$users with type array\<Schoolbox\\User\>\|\(iterable\<Schoolbox\\User\>&Schoolbox\\GenericCollection\) is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: library/Schoolbox/Permission/Access/Test/AccessTest.php
-
-		-
-			message: '#^PHPDoc tag @return contains generic type Alaress\\DataStructures\\ObjectTree\<Schoolbox\\Resource\\Folder\\Model\> but class Alaress\\DataStructures\\ObjectTree is not generic\.$#'
-			identifier: generics.notGeneric
-			count: 1
-			path: library/Schoolbox/Permission/Access/Test/AccessTest.php
-
-		-
-			message: '#^PHPDoc tag @return with type array\<Schoolbox\\Role\>\|\(iterable\<Schoolbox\\Role\>&Schoolbox\\GenericCollection\) is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Permission/Access/Test/AccessTest.php
-
-		-
-			message: '#^PHPDoc tag @return with type array\<Schoolbox\\User\>\|\(iterable\<Schoolbox\\User\>&Schoolbox\\GenericCollection\) is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: library/Schoolbox/Permission/Access/Test/AccessTest.php
-
-		-
-			message: '#^PHPDoc tag @var with type External_UserInterface\|PHPUnit\\Framework\\MockObject\\MockObject is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Permission/Access/Test/AccessTest.php
-
-		-
-			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\Permission\\Access\\RoleAccessMapper is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Permission/Access/Test/AccessTest.php
-
-		-
-			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\Permission\\Access\\UserAccessMapper is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Permission/Access/Test/AccessTest.php
-
-		-
-			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\Resource\\Folder\\Code\\Mapper is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Permission/Access/Test/AccessTest.php
-
-		-
-			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\Resource\\Folder\\Mapper is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Permission/Access/Test/AccessTest.php
 
 		-
 			message: '#^Property Schoolbox\\Picker\\DateTime\\Controller\:\:\$userMapper is never read, only written\.$#'
@@ -4977,12 +3879,6 @@ parameters:
 		-
 			message: '#^Dead catch \- TypeError is never thrown in the try block\.$#'
 			identifier: catch.neverThrown
-			count: 1
-			path: library/Schoolbox/Realtime/Schedule/Event/Event.php
-
-		-
-			message: '#^Method Schoolbox\\Realtime\\Schedule\\Event\\Event\:\:hydrate\(\) has TypeError in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
 			count: 1
 			path: library/Schoolbox/Realtime/Schedule/Event/Event.php
 
@@ -5155,12 +4051,6 @@ parameters:
 			path: library/Schoolbox/Resource/Folder/Code/Mapper.php
 
 		-
-			message: '#^PHPDoc tag @param references unknown parameter\: \$classList$#'
-			identifier: parameter.notFound
-			count: 1
-			path: library/Schoolbox/Resource/Folder/Component/Dashboard/GroupController.php
-
-		-
 			message: '#^Parameter \#3 \$previous \(null\) of method Schoolbox\\Resource\\Folder\\Log\\Mapper\:\:raiseNotification\(\) should be compatible with parameter \$previous \(object\) of method Schoolbox\\Mapper\:\:raiseNotification\(\)$#'
 			identifier: method.childParameterType
 			count: 1
@@ -5191,12 +4081,6 @@ parameters:
 			path: library/Schoolbox/Resource/Folder/Model.php
 
 		-
-			message: '#^PHPDoc tag @param for parameter \$yearLevels with type \(iterable\<Schoolbox\\YearLevel\\Model\>&Schoolbox\\GenericCollection\)\|null is not subtype of native type Schoolbox\\GenericCollection\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: library/Schoolbox/Resource/Folder/Model.php
-
-		-
 			message: '#^Method Schoolbox\\Resource\\Folder\\NNIAN\:\:getInstance\(\) should return static\(Schoolbox\\Resource\\Folder\\NNIAN\) but returns Schoolbox\\Resource\\Folder\\NNIAN\.$#'
 			identifier: return.type
 			count: 1
@@ -5207,18 +4091,6 @@ parameters:
 			identifier: new.static
 			count: 1
 			path: library/Schoolbox/Resource/Folder/NNIAN.php
-
-		-
-			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\Resource\\Folder\\Mapper is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Resource/Folder/Test/NNIANTest.php
-
-		-
-			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\Resource\\Folder\\Code\\Mapper is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Resource/Folder/Test/ValidCodesSpecTest.php
 
 		-
 			message: '#^Method Schoolbox\\Resource\\Link\:\:getHidden\(\) should return bool but returns int\.$#'
@@ -5263,22 +4135,10 @@ parameters:
 			path: library/Schoolbox/Resource/Test/CategoryMapperTest.php
 
 		-
-			message: '#^PHPDoc tag @var with type Alaress\\Authorizer\\Authorizer\|PHPUnit\\Framework\\MockObject\\MockObject is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Resource/Textbox/Translator/Test/ModelToArrayTest.php
-
-		-
 			message: '#^Instanceof between DateTime and DateTime will always evaluate to true\.$#'
 			identifier: instanceof.alwaysTrue
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Booking/Controller.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\ResourceBooking\\Booking\\Model is not subtype of native type null\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Booking/Series.php
 
 		-
 			message: '#^Method Schoolbox\\ResourceBooking\\Item\\Model\:\:addModerator\(\) should return \$this\(Schoolbox\\ResourceBooking\\Item\\Model\) but returns iterable\<Schoolbox\\User\>&Schoolbox\\Collection\.$#'
@@ -5340,12 +4200,6 @@ parameters:
 			count: 1
 			path: library/Schoolbox/Sync/Grammar/Ruleset.php
 
-
-		-
-			message: '#^Anonymous function has an unused use \$key\.$#'
-			identifier: closure.unusedUse
-			count: 1
-			path: library/Schoolbox/Sync/Grammar/Tokenizer.php
 
 		-
 			message: '#^Property Schoolbox\\Sync\\Hydrator\\Custom\\AddParentToStudentClasses\:\:\$campusMapper is never read, only written\.$#'
@@ -5480,24 +4334,6 @@ parameters:
 			path: library/SocialStream/PostMapper.php
 
 		-
-			message: '#^Variable \$cat in PHPDoc tag @var does not exist\.$#'
-			identifier: varTag.variableNotFound
-			count: 2
-			path: library/SocialStream/PostNotifier.php
-
-		-
-			message: '#^Variable \$parent in PHPDoc tag @var does not exist\.$#'
-			identifier: varTag.variableNotFound
-			count: 1
-			path: library/SocialStream/PostNotifier.php
-
-		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 1
-			path: library/SocialStream/Threads.php
-
-		-
 			message: '#^Property SocialStream\\Threads\:\:\$tree \(array\) does not accept Schoolbox\\Collection\.$#'
 			identifier: assign.propertyType
 			count: 1
@@ -5574,12 +4410,6 @@ parameters:
 			identifier: trait.unused
 			count: 1
 			path: test/codeception/Support/Payload/GetTrait.php
-
-		-
-			message: '#^Variable \$assessmentDataSource in PHPDoc tag @var does not exist\.$#'
-			identifier: varTag.variableNotFound
-			count: 1
-			path: tools/assessment/csv.php
 
 		-
 			message: '#^Constant Schoolbox\\Application\\CliTool\\App@anonymous/tools/custom/wes/changeType\.php\:11\:\:ACCESS_LEVEL_PRIVATE is unused\.$#'

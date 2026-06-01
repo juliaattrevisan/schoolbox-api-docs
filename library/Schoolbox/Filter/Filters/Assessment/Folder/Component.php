@@ -32,7 +32,7 @@ class Component extends Filter\BaseComponent
      * @param null|GenericCollection|Filter\Selection\Model[] $userSelections
      * @param null|GenericCollection|Filter\Selection\Model[] $urlOverrides
      * @param Filter\Selection\Mapper                         $filterSelectionMapper
-     * @param Collection|GenericCollection|Folder\Model[]     $folders Indexed by folder.id
+     * @param GenericCollection|Folder\Model[]                $folders Indexed by folder.id
      * @throws \InvalidArgumentException If neither $userSelections or $urlOverrides are supplied
      */
     public function __construct(

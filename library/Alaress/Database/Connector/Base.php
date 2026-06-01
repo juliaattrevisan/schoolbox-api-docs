@@ -649,7 +649,7 @@ class Base implements IConnector
      */
     public function insert(string $table, array $array): bool
     {
-        if (!($table && is_array($array))) {
+        if (!$table) {
             return false;
         }
 

@@ -49,7 +49,7 @@ class Office365 extends AbstractProvider
      * 'https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token='.$token
      *
      * @param AccessToken $token
-     * @return string
+     * @return null
      */
     public function urlUserDetails(#[SensitiveParameter] AccessToken $token)
     {
