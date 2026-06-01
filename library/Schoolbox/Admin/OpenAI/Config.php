@@ -312,6 +312,7 @@ class Config
     public const string FIELD_AIKEY = 'ai_key';
     public const string FIELD_RESOURCE_NAME = 'resource_name';
     public const string FIELD_DEPLOYMENT_ID = 'deployment_id';
+    public const string FIELD_DEPLOYMENT_MODEL = 'deployment_model';
     public const string FIELD_MODEL = 'model';
     public const string FIELD_AI_MODERATION = 'ai_moderation';
     public const string FIELD_SYSTEM_PROMPT  = 'system_prompt';
@@ -335,6 +336,7 @@ class Config
         self::FIELD_AIKEY => self::FIELD_AIKEY,
         self::FIELD_RESOURCE_NAME => self::FIELD_RESOURCE_NAME,
         self::FIELD_DEPLOYMENT_ID => self::FIELD_DEPLOYMENT_ID,
+        self::FIELD_DEPLOYMENT_MODEL => self::FIELD_DEPLOYMENT_MODEL,
         self::FIELD_MODEL => self::FIELD_MODEL,
         self::FIELD_SYSTEM_PROMPT => self::FIELD_SYSTEM_PROMPT,
     ];
@@ -350,22 +352,24 @@ class Config
      * section they occur within so they are restricted to that provider.
      *
      * Also, add a title and description within `manifest` in
-     * `templates/config.twig`.
+     * `templates/formInput.twig`.
      */
     public const array DEFAULT_FORM_INPUTS = [
-        self::FIELD_PROVIDER      => [
-            'type'    => self::FIELD_TYPE_SELECT,
-            'options' => self::PROVIDERS,
-            'section' => null,
+        self::FIELD_PROVIDER => [
+            'type'            => self::FIELD_TYPE_SELECT,
+            'options'         => self::PROVIDERS,
+            'section'         => null,
+            'allowUnselected' => false,
         ],
-        self::FIELD_AIKEY         => [
+        self::FIELD_AIKEY => [
             'type'    => self::FIELD_TYPE_INPUT,
             'section' => self::SECTION_GENERAL,
         ],
-        self::FIELD_MODEL         => [
-            'type'    => self::FIELD_TYPE_SELECT,
-            'options' => self::AI_MODELS,
-            'section' => self::SECTION_OPENAI,
+        self::FIELD_MODEL => [
+            'type'            => self::FIELD_TYPE_SELECT,
+            'options'         => self::AI_MODELS,
+            'section'         => self::SECTION_OPENAI,
+            'allowUnselected' => false,
         ],
         self::FIELD_RESOURCE_NAME => [
             'type'    => self::FIELD_TYPE_INPUT,
@@ -375,19 +379,29 @@ class Config
             'type'    => self::FIELD_TYPE_INPUT,
             'section' => self::SECTION_AZURE,
         ],
+        self::FIELD_DEPLOYMENT_MODEL => [
+            'type'            => self::FIELD_TYPE_SELECT,
+            'options'         => self::AI_MODELS,
+            'section'         => self::SECTION_AZURE,
+            'allowUnselected' => true,
+        ],
         self::FIELD_SYSTEM_PROMPT => [
             'type'    => self::FIELD_TYPE_TEXTAREA,
             'section' => self::SECTION_GENERAL,
         ],
         self::FIELD_REASONING_EFFORT => [
-            'type'    => self::FIELD_TYPE_SELECT,
-            'options' => self::REASONING_EFFORT_OPTIONS,
-            'section' => self::SECTION_GENERAL,
+            'type'            => self::FIELD_TYPE_SELECT,
+            'options'         => self::REASONING_EFFORT_OPTIONS,
+            'section'         => self::SECTION_GENERAL,
+            'allowUnselected' => false,
+            'advanced'        => true,
         ],
         self::FIELD_TEXT_VERBOSITY => [
-            'type'    => self::FIELD_TYPE_SELECT,
-            'options' => self::TEXT_VERBOSITY_OPTIONS,
-            'section' => self::SECTION_GENERAL,
+            'type'            => self::FIELD_TYPE_SELECT,
+            'options'         => self::TEXT_VERBOSITY_OPTIONS,
+            'section'         => self::SECTION_GENERAL,
+            'allowUnselected' => false,
+            'advanced'        => true,
         ],
     ];
 
@@ -569,7 +583,8 @@ class Config
      *    },
      *    Azure: array{
      *      resource_name: array{value: string},
-     *      deployment_id: array{value: string}
+     *      deployment_id: array{value: string},
+     *      deployment_model: array{value: string},
      *    }
      *  }|null
      * @throws \JsonException
@@ -658,14 +673,16 @@ class Config
             // * add output quality and image model
             // * remove Azure option
             $formInputs[self::FIELD_OUTPUT_QUALITY] = [
-                'type'    => self::FIELD_TYPE_SELECT,
-                'options' => self::OUTPUT_QUALITY_OPTIONS,
-                'section' => self::SECTION_OPENAI,
+                'type'            => self::FIELD_TYPE_SELECT,
+                'options'         => self::OUTPUT_QUALITY_OPTIONS,
+                'section'         => self::SECTION_OPENAI,
+                'allowUnselected' => false,
             ];
-            $formInputs[self::FIELD_IMAGE_MODEL] = [
-                'type'    => self::FIELD_TYPE_SELECT,
-                'options' => self::AI_IMAGE_MODELS,
-                'section' => self::SECTION_OPENAI,
+            $formInputs[self::FIELD_IMAGE_MODEL]    = [
+                'type'            => self::FIELD_TYPE_SELECT,
+                'options'         => self::AI_IMAGE_MODELS,
+                'section'         => self::SECTION_OPENAI,
+                'allowUnselected' => false,
             ];
             unset($formInputs[self::FIELD_PROVIDER]['options'][Helper::ENDPOINT_TYPE_AZURE]);
         }

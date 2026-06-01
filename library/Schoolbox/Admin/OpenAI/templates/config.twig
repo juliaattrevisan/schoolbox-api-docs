@@ -10,185 +10,40 @@
  # @param array $feature  A set of configurations per-feature with their own values and representations
  #}
 
-{# A set of (name, (title/description)) tuples for easy-to-read indexing here
- # Also, when you add a new thing, it's easier to see where
- #}
-{% set manifest = {
-    'provider': {
-        'title': 'Provider',
-        'description': 'Select which provider you will use for this AI service; choose "Off" to disable this feature.'
-    },
-    'ai_key': {
-        'title': 'OpenAI API Key',
-        'description': 'This is your secure key for authorising GPT based AI assistant services. The key can be created at https://openai.com/ or in Azure.'
-    },
-    'model': {
-        'title': 'OpenAI Model',
-        'description': 'Select which model you wish to use for your OpenAI service.'
-    },
-    'resource_name': {
-        'title': 'Azure OpenAI Resource Name',
-        'description': 'The name of your Azure OpenAI Resource.'
-    },
-    'deployment_id': {
-        'title': 'Azure OpenAI Deployment ID',
-        'description': 'The deployment name you chose when you deployed the model in Azure.'
-    },
-    'ai_moderation': {
-        'title': 'Enable AI Moderation',
-        'description': 'Recommended. AI messages are checked by Schoolbox AI moderation before posting. Failed messages are blocked. Content is processed by a third-party AI service outside school control.'
-    },
-    'system_prompt': {
-        'title': 'Generation System Prompt',
-        'description': 'Provide some additional instructions to shape what the AI service generates for requests.'
-    },
-    'output_quality': {
-        'title': 'Output Quality',
-        'description': 'Select which output quality you wish to use for image generation. A higher quality will improve the result of more complex images but will take longer to generate and use more credit.'
-    },
-    'image_model': {
-        'title': 'OpenAI Image Model',
-        'description': 'Select which model you wish to use for image generation. This is distinct from the OpenAI Model, which is used only to generate text.'
-    },
-    'text_verbosity': {
-        'title': 'Text Verbosity',
-        'description': 'Select the level of verbosity for the text you wish for this model to generate.',
-        'warnings': {
-            'Azure': '
-                <p>You must ensure this verbosity level is compatible with the model your deployment uses.</p>
-                <ul>
-                <li><b>GPT-4o, GPT-4.1</b>: default, medium</li>
-                <li><b>GPT-5, GPT-5.1, GPT-5.2</b>: any</li>
-                <li><b>GPT-5, GPT-5.1, GPT-5.2, GPT-5.3 chat</b>: default, medium</li>
-                </ul>
-            ',
-        },
-    },
-    'reasoning_effort': {
-        'title': 'Reasoning Effort',
-        'description': 'Select the level of effort you wish the model to take when reasoning about its response. More reasoning should lead to more accurate but slower responses.',
-        'warnings': {
-            'Azure': '
-                <p>You must ensure this effort level is compatible with the model your deployment uses.</p>
-                <ul>
-                <li><b>GPT-4o, GPT-4.1</b>: any</li>
-                <li><b>GPT-5</b>: minimal, low, medium, high (not default)</li>
-                <li><b>GPT-5.1, GPT-5.2</b>: default, none, low, medium, high</li>
-                <li><b>GPT-5 chat</b>: default</li>
-                <li><b>GPT-5.1, GPT-5.2, GPT-5.3 chat</b>: default, medium</li>
-                </ul>
-            ',
-        },
-    },
-} %}
-
-{# Each panel consists of various sections; each supported AI service (openAI, azure, et al) has its own section
- # but there is a "general" section for universal ideas (such as provider). When you add a new AI service, you can chuck
- # it at the bottom of this list along with its corresponding attributes
- #}
-{% set sections = {
-    'general': {
-        'dataAttrs': 'data-feature-openai data-feature-azure',
-        'style': 'display:none'
-    },
-    'OpenAI': {
-        'dataAttrs': 'data-feature-openai',
-        'style': 'display:none'
-    },
-    'Azure': {
-        'dataAttrs': 'data-feature-azure',
-        'style': 'display:none'
-    }
-} %}
 
 <div data-feature="{{ feature.feature }}" data-test="ai-feature-{{ feature.feature }}">
+    {% set advancedInputs = '' %}
     {% for name, formInput in feature.formInputs %}
-        {% set section = formInput.section ?? null %}
-
-        {# "provider" doesn't belong in a section and has its own treatment... #}
-        {% if section is null %}
-            {% set inputName %}[{{ feature.feature }}][{{ name }}][value]{% endset %}
-            {% set inputValue %}{{ feature.config[name].value ?? '' }}{% endset %}
+        {#
+         # Is this an advanced feature?
+         # If so, hide it in an advanced settings accordion.
+         #
+         # For now assume that all advanced settings are in the General section.
+         #}
+        {% set formInputHtml %}
+            {% include '@adminOpenAi/formInput.twig' with {
+                name: name,
+                formInput: formInput,
+                feature: feature,
+            } only %}
+        {% endset %}
+        {% if not (formInput.advanced ?? false) %}
+            {{ formInputHtml | raw }}
         {% else %}
-            {% set inputName %}[{{ feature.feature }}][{{ section }}][{{ name }}][value]{% endset %}
-            {% set inputValue %}{{ feature.config[section][name].value ?? '' }}{% endset %}
+            {% set advancedInputs = advancedInputs ~ formInputHtml %}
         {% endif %}
-
-        {# Output depends on formInput.field #}
-        {% set type = formInput.type %}
-
-        {# As does style and attributes #}
-        {% set dataAttrs = sections[section].dataAttrs ?? '' %}
-        {% set style = sections[section].style ?? '' %}
-
-        {# Generate label and description from a lookup here, instead of in PHP code #}
-        {% set title = manifest[name].title ?? 'No title - please add one' %}
-        {% set description = manifest[name].description ?? 'No description - please add one' %}
-
-        <label id="{{ feature.feature }}-{{ name }}-label"
-               for="{{ feature.feature }}-{{ name }}-value"
-               {{ dataAttrs }}
-               {{ style }}
-        >
-            <span>{{ title }}</span>
-            <span data-tooltip class="has-tip tip-top hint" data-allow-html='true' title='{{ description }}'>?</span>
-        </label>
-
-        {% if type == 'textarea' %}
-            <textarea id="{{ feature.feature }}-{{ name }}-value"
-                      name="{{ inputName }}"
-                      rows="5"
-                      {{ dataAttrs }}
-                      {{ style }}
-                      data-test="ai-feature-option-textarea-{{ name }}"
-            >{{ inputValue }}</textarea>
-        {% elseif type == 'select' %}
-            <select id="{{ feature.feature }}-{{ name }}-value"
-                    name="{{ inputName }}"
-                    {{ dataAttrs }}
-                    {{ style }}
-                    data-test="ai-feature-option-select-{{ name }}"
-            >
-                <option value="" disabled>-- select an option --</option>
-                {% for option in formInput.options %}
-                    <option value="{{ option }}"{% if inputValue == option %} selected {% endif %}>{{ option }}</option>
-                {% endfor %}
-            </select>
-        {% elseif type == 'checkbox' %}
-            <div class="switch" {{ dataAttrs }} {{ style }}>
-                <input
-                    id="{{ feature.feature }}-{{ name }}-value"
-                    type="checkbox"
-                    name="{{ inputName }}"
-                    value="1"
-                    {% if inputValue %}checked{% endif %}
-                    data-test="ai-feature-option-checkbox-{{ name }}"
-                >
-                <label for="{{ feature.feature }}-{{ name }}-value">
-                    <span>On</span>
-                    <span>Off</span>
-                </label>
-            </div>
-        {% else %}
-            <input id="{{ feature.feature }}-{{ name }}-value"
-                   type="text"
-                   name="{{ inputName }}"
-                   value="{{ inputValue }}"
-                   {{ dataAttrs }}
-                   style="display:none"
-                   data-test="ai-feature-option-input-{{ name }}"
-            />
-        {% endif %}
-
-        {% for sectionName, section in sections  %}
-            {% if (manifest[name].warnings[sectionName] ?? null) is not empty %}
-                <div data-alert {{ section.dataAttrs }} style="display: none" class="alert-box warning">
-                    {{ manifest[name].warnings[sectionName] | raw }}
-                </div>
-            {% endif %}
-        {% endfor %}
-
     {% endfor %}
+
+    {% if advancedInputs is not empty %}
+        <fieldset data-advanced-options>
+            <legend>
+                <a href="#" class="icon-down-arrow" data-collapser="ai-feature-{{ feature.feature }}-advanced">Advanced Settings</a>
+            </legend>
+            <section class="hide" data-collapsable="ai-feature-{{ feature.feature }}-advanced" data-collapse-state="collapsed">
+                {{ advancedInputs | raw }}
+            </section>
+        </fieldset>
+    {% endif %}
 
     <script type="application/javascript">
     (() => {
@@ -199,6 +54,7 @@
         const featureEl                      = document.querySelector(`[data-feature="${FEATURE}"]`);
         const providerSelect                 = featureEl.querySelector(`#${FEATURE}-provider-value`);
         const modelSelect                    = featureEl.querySelector(`#${FEATURE}-model-value`);
+        const azureDeploymentModelSelect     = featureEl.querySelector(`#${FEATURE}-deployment_model-value`);
         const reasoningEffortSelect          = featureEl.querySelector(`#${FEATURE}-reasoning_effort-value`);
         const textVerbositySelect            = featureEl.querySelector(`#${FEATURE}-text_verbosity-value`);
 
@@ -208,15 +64,20 @@
          */
         function toggleInputVisibility(provider) {
             // hide all fields
-            featureEl.querySelectorAll('[data-feature-openai]').forEach(el => el.style.display = 'none');
-            featureEl.querySelectorAll('[data-feature-azure]').forEach(el => el.style.display = 'none');
+            let openAiFeatures = featureEl.querySelectorAll('[data-feature-openai]'),
+                azureFeatures = featureEl.querySelectorAll('[data-feature-azure]'),
+                advancedOptions = featureEl.querySelectorAll('[data-advanced-options]');
+
+            openAiFeatures.forEach(el => el.style.display = 'none');
+            azureFeatures.forEach(el => el.style.display = 'none');
+            advancedOptions.forEach(el => el.style.display = 'none');
 
             if (provider === 'OpenAI') {
-                featureEl.querySelectorAll('[data-feature-openai]').forEach(el => el.style.display = 'block');
-                return;
+                openAiFeatures.forEach(el => el.style.display = 'block');
+                advancedOptions.forEach(el => el.style.display = 'block');
             } else if (provider === 'Azure') {
-                featureEl.querySelectorAll('[data-feature-azure]').forEach(el => el.style.display = 'block');
-                return;
+                azureFeatures.forEach(el => el.style.display = 'block');
+                advancedOptions.forEach(el => el.style.display = 'block');
             }
         }
 
@@ -226,22 +87,24 @@
          *
          * @param baseOptions
          * @param model
-         * @param provider
          * @param selectEl
          */
-        function toggleOptions(baseOptions, model, provider, selectEl) {
+        function toggleOptions(baseOptions, model, selectEl) {
             if (!selectEl) {
                 return;
             }
-            const modelOptions = baseOptions[model] ?? null;
+
+            // If the selected model has options for selectEl:
+            // enable/disable accordingly, otherwise enable them all
+            // (except any options with no value: these are not selectable)
+            const modelOptions = baseOptions[model] ?? null,
+                  hasOptions = Array.isArray(modelOptions);
             Array.from(selectEl.options).forEach(el => {
                 if (el.value !== null) {
-                    if (provider === 'OpenAI') {
-                        if (modelOptions !== null) {
-                            el.disabled = !modelOptions.includes(el.value);
-                        }
-                    } else {
+                    if (!hasOptions) {
                         el.disabled = false;
+                    } else {
+                        el.disabled = !modelOptions.includes(el.value);
                     }
                 }
             });
@@ -266,48 +129,59 @@
             }
         }
 
-        // /**
-        //  * If the currently selected reasoning option is now disabled:
-        //  * select the first option which is not disabled.
-        //  */
-        // function selectFirstReasoningOptionIfSelectedDisabled() {
-        //     if (!reasoningEffortSelect) {
-        //         return;
-        //     }
-        //     const selectedAndDisabled = Array.from(reasoningEffortSelect.options).find(el => el.selected && el.disabled);
-        //     if (selectedAndDisabled) {
-        //         const firstEnabled = Array.from(reasoningEffortSelect.options).find(el => !el.disabled);
-        //         if (firstEnabled) {
-        //             firstEnabled.selected = true;
-        //         }
-        //     }
-        // }
+        /**
+         * Set the availability of options, depending on what is selected in the
+         * model selector.
+         *
+         * @param modelSelector          The model selector: for OpenAI, the OpenAI Model selector; for Azure, the
+         *                               Azure deployment model selector.
+         * @param selectFirstNonDisabled Should the first non-disabled option be selected automatically?
+         *                               True if switching after page load, false on initial page load.
+         */
+        function setOptionAvailability(modelSelector, selectFirstNonDisabled) {
+            toggleOptions(REASONING_EFFORT_MODEL_OPTIONS[FEATURE], modelSelector.value, reasoningEffortSelect);
+            toggleOptions(TEXT_VERBOSITY_MODEL_OPTIONS[FEATURE], modelSelector.value, textVerbositySelect);
+
+            if (selectFirstNonDisabled) {
+                selectFirstNonDisabledOption(textVerbositySelect);
+                selectFirstNonDisabledOption(reasoningEffortSelect);
+            }
+        }
 
         // Disable reasoning levels which are incompatible with the model
         modelSelect.addEventListener('change', (event) => {
-            toggleOptions(REASONING_EFFORT_MODEL_OPTIONS[FEATURE], event.target.value, providerSelect.value, reasoningEffortSelect);
-            selectFirstNonDisabledOption(reasoningEffortSelect);
-
-            toggleOptions(TEXT_VERBOSITY_MODEL_OPTIONS[FEATURE], event.target.value, providerSelect.value, textVerbositySelect);
-            selectFirstNonDisabledOption(textVerbositySelect);
+            setOptionAvailability(event.target, true)
+        });
+        azureDeploymentModelSelect.addEventListener('change', (event) => {
+            setOptionAvailability(event.target, true)
         });
 
         // when changing the provider select, show/hide the relevant fields
         providerSelect.addEventListener('change', (event) => {
             toggleInputVisibility(event.target.value);
 
-            toggleOptions(REASONING_EFFORT_MODEL_OPTIONS[FEATURE], modelSelect.value, event.target.value, reasoningEffortSelect);
-            selectFirstNonDisabledOption(reasoningEffortSelect);
-
-            toggleOptions(TEXT_VERBOSITY_MODEL_OPTIONS[FEATURE], modelSelect.value, event.target.value, textVerbositySelect);
-            selectFirstNonDisabledOption(textVerbositySelect);
+            // Toggle options based on whichever model selector is visible:
+            // OpenAI's direct model selector, or Azure's deployment model
+            if (event.target.value === 'OpenAI') {
+                setOptionAvailability(modelSelect, true)
+            } else if (event.target.value === 'Azure') {
+                setOptionAvailability(azureDeploymentModelSelect, true)
+            }
         });
 
         // on page load, show the current selected provider fields
         document.addEventListener('DOMContentLoaded', () => {
             toggleInputVisibility(providerSelect.value);
-            toggleOptions(REASONING_EFFORT_MODEL_OPTIONS[FEATURE], modelSelect.value, providerSelect.value, reasoningEffortSelect);
-            toggleOptions(TEXT_VERBOSITY_MODEL_OPTIONS[FEATURE], modelSelect.value, providerSelect.value, textVerbositySelect);
+
+            // Toggle options based on whichever model selector is visible:
+            // OpenAI's direct model selector, or Azure's deployment model.
+            // Do not select the first non-disabled option, though:
+            // leave whatever is selected at first, selected.
+            if (providerSelect.value === 'OpenAI') {
+                setOptionAvailability(modelSelect, false)
+            } else if (providerSelect.value === 'Azure') {
+                setOptionAvailability(azureDeploymentModelSelect, false)
+            }
         });
     })();
     </script>

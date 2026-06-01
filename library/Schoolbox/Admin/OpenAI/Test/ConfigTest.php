@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\OpenAI\test;
+namespace Schoolbox\Admin\OpenAI\Test;
 
 use JsonException;
 use PHPUnit\Framework\TestCase;
@@ -88,8 +88,9 @@ class ConfigTest extends TestCase
                 Config::FIELD_SYSTEM_PROMPT => ['value' => 'sp'],
             ],
             Helper::ENDPOINT_TYPE_AZURE => [
-                Config::FIELD_RESOURCE_NAME => ['value' => ''],
-                Config::FIELD_DEPLOYMENT_ID => ['value' => ''],
+                Config::FIELD_RESOURCE_NAME    => ['value' => ''],
+                Config::FIELD_DEPLOYMENT_ID    => ['value' => ''],
+                Config::FIELD_DEPLOYMENT_MODEL => ['value' => ''],
             ],
         ];
 
@@ -156,8 +157,9 @@ class ConfigTest extends TestCase
                 Config::FIELD_MODEL => ['value' => 'gpt-4o'],
             ],
             Helper::ENDPOINT_TYPE_AZURE => [
-                Config::FIELD_RESOURCE_NAME => ['value' => ''],
-                Config::FIELD_DEPLOYMENT_ID => ['value' => ''],
+                Config::FIELD_RESOURCE_NAME    => ['value' => ''],
+                Config::FIELD_DEPLOYMENT_ID    => ['value' => ''],
+                Config::FIELD_DEPLOYMENT_MODEL => ['value' => ''],
             ],
         ];
 
@@ -230,8 +232,9 @@ class ConfigTest extends TestCase
                 Config::FIELD_MODEL => ['value' => ''],
             ],
             Helper::ENDPOINT_TYPE_AZURE => [
-                Config::FIELD_RESOURCE_NAME => ['value' => 'azure-resource'],
-                Config::FIELD_DEPLOYMENT_ID => ['value' => 'deployment-456'],
+                Config::FIELD_RESOURCE_NAME    => ['value' => 'azure-resource'],
+                Config::FIELD_DEPLOYMENT_ID    => ['value' => 'deployment-456'],
+                Config::FIELD_DEPLOYMENT_MODEL => ['value' => 'gpt-5.5'],
             ],
         ];
 
@@ -261,8 +264,9 @@ class ConfigTest extends TestCase
             ],
             // Helper::ENDPOINT_TYPE_OPENAI is intentionally omitted
             Helper::ENDPOINT_TYPE_AZURE => [
-                Config::FIELD_RESOURCE_NAME => ['value' => ''],
-                Config::FIELD_DEPLOYMENT_ID => ['value' => ''],
+                Config::FIELD_RESOURCE_NAME    => ['value' => ''],
+                Config::FIELD_DEPLOYMENT_ID    => ['value' => ''],
+                Config::FIELD_DEPLOYMENT_MODEL => ['value' => ''],
             ],
         ];
 
@@ -290,9 +294,10 @@ class ConfigTest extends TestCase
                 Config::FIELD_MODEL => ['value' => ''],
             ],
             Helper::ENDPOINT_TYPE_AZURE => [
-                Config::FIELD_RESOURCE_NAME => ['value' => ''],
-                Config::FIELD_DEPLOYMENT_ID => ['value' => ''],
-                'extra_field' => ['value' => 'should not be here']
+                Config::FIELD_RESOURCE_NAME    => ['value' => ''],
+                Config::FIELD_DEPLOYMENT_ID    => ['value' => ''],
+                Config::FIELD_DEPLOYMENT_MODEL => ['value' => ''],
+                'extra_field'                  => ['value' => 'should not be here']
             ],
         ];
 

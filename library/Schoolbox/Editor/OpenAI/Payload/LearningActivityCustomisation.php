@@ -117,7 +117,8 @@ class LearningActivityCustomisation
     /**
      * @param string      $openAiEndpoint
      * @param string      $openAiModel
-     * @param string      $openAiDeploymentId
+     * @param string      $azureDeploymentId
+     * @param string      $azureDeploymentModel
      * @param string      $systemPrompt
      * @param string      $reasoningEffort The reasoning effort level from admin config
      * @param string      $textVerbosity The text verbosity level from admin config
@@ -130,7 +131,8 @@ class LearningActivityCustomisation
     public function __construct(
         private string $openAiEndpoint,
         private string $openAiModel,
-        private string $openAiDeploymentId,
+        private string $azureDeploymentId,
+        private string $azureDeploymentModel,
         private string $systemPrompt,
         private string $reasoningEffort,
         private string $textVerbosity,
@@ -145,14 +147,6 @@ class LearningActivityCustomisation
     public function generate(): array
     {
         $responseFormat = self::RESPONSE_FORMAT;
-
-        /* OpenAI uses the model name from our ui.
-         * Azure uses the Deployment ID instead.
-         */
-        $model = $this->openAiModel;
-        if (Helper::ENDPOINT_TYPE_AZURE === $this->openAiEndpoint) {
-            $model = $this->openAiDeploymentId;
-        }
 
         /* Replacing the token with the config setting defined prompt
          */
@@ -180,7 +174,6 @@ class LearningActivityCustomisation
         ));
 
         $payload = [
-            'model' => $model,
             'temperature' => self::TEMPERATURE,
             'top_p' => self::TOP_P,
             'max_output_tokens' => self::MAX_OUTPUT_TOKENS,
@@ -208,6 +201,12 @@ class LearningActivityCustomisation
             $payload['reasoning'] = ['effort' => $this->reasoningEffort];
         }
 
-        return new ModelParser()->filterPayload($payload, $model, $this->openAiEndpoint);
+        return new PayloadFinaliser()->finalise(
+            $payload,
+            $this->openAiEndpoint,
+            $this->openAiModel,
+            $this->azureDeploymentId,
+            $this->azureDeploymentModel,
+        );
     }
 }
