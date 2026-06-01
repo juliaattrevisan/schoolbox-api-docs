@@ -384,6 +384,29 @@ class ControllerTest extends TestCase
                 return true;
             }));
 
+        $propagatedUserIds = [];
+        $registrationSessionStudentMapper
+            ->expects($this->exactly(2))
+            ->method('propagate')
+            ->willReturnCallback(function (
+                User $user,
+                string $method,
+                RegistrationSessionStudentModel $student,
+                array $diff
+            ) use (&$propagatedUserIds): void {
+                $this->assertInstanceOf(User::class, $user);
+                $this->assertSame(BaseMapper::METHOD_UPDATE, $method);
+                $this->assertSame(RegistrationSessionStudentModel::STATUS_UNCONFIRMED, $student->getStatus());
+                $this->assertSame([
+                    'status' => [
+                        RegistrationSessionStudentModel::STATUS_UNCONFIRMED,
+                        RegistrationSessionStudentModel::STATUS_PREPARATION,
+                    ],
+                ], $diff);
+
+                $propagatedUserIds[] = $student->getUser()?->getId();
+            });
+
         $controller = $this->buildController(
             $this->createStub(RegistrationSessionMapper::class),
             $registrationSessionStudentMapper,
@@ -396,6 +419,7 @@ class ControllerTest extends TestCase
         $controller->sessionCompletePreparation((new RegistrationSessionModel())->setId(12));
 
         $this->assertSame([123, 234], $savedUserIds);
+        $this->assertSame([123, 234], $propagatedUserIds);
 
         $response = $controller->getResponse();
         $this->assertNotNull($response);
@@ -720,8 +744,9 @@ class ControllerTest extends TestCase
             ->setId(456)
             ->setUser((new User())->setId(234));
 
-        $registrationSessionStudentMapper = $this->createStub(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
         $registrationSessionStudentMapper
+            ->expects($this->once())
             ->method('findOneByColumnList')
             ->with([
                 'user_id' => 234,
@@ -729,8 +754,9 @@ class ControllerTest extends TestCase
             ])
             ->willReturn($registrationSessionStudent);
 
-        $groupSubjectMapper = $this->createStub(IBGroupSubjectMapper::class);
+        $groupSubjectMapper = $this->createMock(IBGroupSubjectMapper::class);
         $groupSubjectMapper
+            ->expects($this->once())
             ->method('findByColumn')
             ->with('id', [123, 124, 125])
             ->willReturn(new GenericCollection(IBGroupSubjectModel::class, [
@@ -739,8 +765,9 @@ class ControllerTest extends TestCase
                 (new IBGroupSubjectModel())->setId(125),
             ]));
 
-        $languageMapper = $this->createStub(LanguageMapper::class);
+        $languageMapper = $this->createMock(LanguageMapper::class);
         $languageMapper
+            ->expects($this->once())
             ->method('findByColumn')
             ->with('id', [45, 46])
             ->willReturn(new GenericCollection(LanguageModel::class, [
@@ -874,16 +901,18 @@ class ControllerTest extends TestCase
             }))
             ->willReturn([456]);
 
-        $groupSubjectMapper = $this->createStub(IBGroupSubjectMapper::class);
+        $groupSubjectMapper = $this->createMock(IBGroupSubjectMapper::class);
         $groupSubjectMapper
+            ->expects($this->once())
             ->method('findByColumn')
             ->with('id', [123])
             ->willReturn(new GenericCollection(IBGroupSubjectModel::class, [
                 (new IBGroupSubjectModel())->setId(123),
             ]));
 
-        $languageMapper = $this->createStub(LanguageMapper::class);
+        $languageMapper = $this->createMock(LanguageMapper::class);
         $languageMapper
+            ->expects($this->once())
             ->method('findByColumn')
             ->with('id', [45])
             ->willReturn(new GenericCollection(LanguageModel::class, [
@@ -1023,16 +1052,18 @@ class ControllerTest extends TestCase
             ->method('findOneByColumnList')
             ->willReturn($registrationSessionStudent);
 
-        $groupSubjectMapper = $this->createStub(IBGroupSubjectMapper::class);
+        $groupSubjectMapper = $this->createMock(IBGroupSubjectMapper::class);
         $groupSubjectMapper
+            ->expects($this->once())
             ->method('findByColumn')
             ->with('id', [123])
             ->willReturn(new GenericCollection(IBGroupSubjectModel::class, [
                 (new IBGroupSubjectModel())->setId(123),
             ]));
 
-        $languageMapper = $this->createStub(LanguageMapper::class);
+        $languageMapper = $this->createMock(LanguageMapper::class);
         $languageMapper
+            ->expects($this->once())
             ->method('findByColumn')
             ->with('id', [45])
             ->willReturn(new GenericCollection(LanguageModel::class, [
