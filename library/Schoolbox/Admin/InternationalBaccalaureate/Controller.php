@@ -1079,15 +1079,32 @@ class Controller extends ConfigController
         $transactionStarted = false;
 
         try {
-            $allStudents     = $this->registrationSessionStudentMapper->findStudentsForSession((int) $registrationSession->getId());
-            $studentsToReset = [];
+            $allStudents        = $this->registrationSessionStudentMapper->findStudentsForSession((int) $registrationSession->getId());
+            $studentsByAnyId    = [];
 
             foreach ($allStudents as $student) {
+                if ($student->getId() !== null) {
+                    $studentsByAnyId[(int) $student->getId()] = $student;
+                }
+
+                if ($student->getUser()?->getId() !== null) {
+                    $studentsByAnyId[(int) $student->getUser()->getId()] = $student;
+                }
+            }
+
+            $seen            = [];
+            $studentsToReset = [];
+
+            foreach ($studentIds as $studentId) {
+                $student = $studentsByAnyId[$studentId] ?? null;
+
                 if (
-                    in_array($student->getId(), $studentIds, true)
+                    $student !== null
+                    && !isset($seen[$student->getId()])
                     && in_array($student->getStatus(), $eligibleStatuses, true)
                 ) {
-                    $studentsToReset[] = $student;
+                    $seen[$student->getId()] = true;
+                    $studentsToReset[]       = $student;
                 }
             }
 
