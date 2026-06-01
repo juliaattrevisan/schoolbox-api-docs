@@ -550,8 +550,6 @@ class Controller extends Base
          * Only staff can view instructor marks in the grade report
          * This avoids a student gaining write+ access to a page (becoming an "instructor") then seeing the marks
          */
-        // $canViewInstructorMarks was resolved at the top of this method alongside the view mode.
-
         $this->response = $this->responseAsJson([
             'status'  => 200,
             'content' => $this->responseFromTemplateUnthemed('@learningGrades/gradesInner.twig', [
