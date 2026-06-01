@@ -46,6 +46,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Mapper;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Twig\Error\Error as TwigError;
 use TypeError;
@@ -204,6 +205,53 @@ class Controller extends Base
             'viewModeQuerySuffix' => $viewContext->getQuerySuffix(),
             'customisationsRoute' => null,
         ], '', 'grade');
+    }
+
+    /**
+     * Resolve the user whose visibility rules apply for the given staff-selected view mode.
+     *
+     * Only valid when $currentUser is a staff member. Non-staff requests do not select a
+     * mode and should use $currentUser as the effective viewer directly.
+     *
+     * @param string $mode One of the ViewMode constants. Callers must pre-validate the
+     *                     requested value via ViewMode::fromRequestValue().
+     * @throws InvalidArgumentException If called for a non-staff user or given an unknown mode.
+     */
+    private function getEffectiveViewer(User $currentUser, User $student, string $mode): User
+    {
+        if (!$currentUser->getRole()->isStaff()) {
+            throw new InvalidArgumentException(
+                'getEffectiveViewer() should only be called for staff users.'
+            );
+        }
+
+        switch ($mode) {
+            case ViewMode::STAFF:
+                return $currentUser;
+
+            case ViewMode::STUDENT:
+                return $student;
+
+            case ViewMode::PARENT:
+                $this->externalUser->loadParents([$student]);
+                $parents = $student->getParents();
+                $parent  = ($parents !== null && $parents->count() > 0 && $parents->first() instanceof User)
+                    ? $parents->first()
+                    : (new User())->setId(0)->setRole((new Role())->setType(Role::PARENT));
+
+                // Parents returned by $student->getParents() are not returned with their children
+                // hydrated, and the synthetic parent has none. Set the student as the child of the
+                // parent so downstream visibility checks that walk $parent->getChildren() work in
+                // both the real-parent and synthetic-parent branches.
+                $parent->setChildren(
+                    (new GenericCollection(User::class))->setOffset($student->getId(), $student)
+                );
+
+                return $parent;
+
+            default:
+                throw new InvalidArgumentException("Unexpected value '$mode' for \$mode.");
+        }
     }
 
     /**
