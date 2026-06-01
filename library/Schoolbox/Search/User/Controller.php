@@ -281,7 +281,7 @@ class Controller extends BaseController
         /* Profile Tabs
          */
         $tabs = $this->tabMapper->findRenderable($student, $this->getUser());
-        $registrationSessionStudent = $this->registrationSessionStudentMapper->findUnconfirmedForUser($student);
+        $registrationSessionStudent = $this->registrationSessionStudentMapper->findActiveRegistrationForUser($student);
         $registrationPayload = $registrationSessionStudent instanceof RegistrationSessionStudentModel
             ? call_user_func(
                 $this->registrationSessionStudentModelToArray,
