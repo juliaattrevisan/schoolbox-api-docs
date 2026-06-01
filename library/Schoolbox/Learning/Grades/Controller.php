@@ -178,7 +178,6 @@ class Controller extends Base
             $effectiveViewer        = $currentUser;
             $canViewInstructorMarks = false;
         }
-        $viewModeQuerySuffix = $viewMode !== '' ? '?viewMode=' . rawurlencode($viewMode) : '';
 
         [$folders, $markbooks, $assessments] = $gradeHelper->generateGrades($effectiveViewer, $viewee, $term);
 
@@ -209,7 +208,7 @@ class Controller extends Base
             'effectiveViewer'        => $effectiveViewer,
             'canViewInstructorMarks' => $canViewInstructorMarks,
             'viewModes'              => ViewMode::values(),
-            'viewModeQuerySuffix'    => $viewModeQuerySuffix,
+            'viewModeQuerySuffix'    => $viewMode !== '' ? '?viewMode=' . rawurlencode($viewMode) : '',
             'customisationsRoute' => null,
         ], '', 'grade');
     }
