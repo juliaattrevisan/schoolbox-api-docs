@@ -129,17 +129,19 @@
                         <div class="card small-12 list-item">
                             <a href="{{ routeLookup('sportsfixturesDivision.getLobby', { entityId: division.id }) }}" title="Go to {{ division.name }} lobby">
                                 <sbx-icon name="division"></sbx-icon>
-                                <h3>{{ division.name }}</h3>
+                                <div class="card-copy">
+                                    <h3>{{ division.name }}</h3>
+                                    <p class="meta">
+                                        {%- if teamCount == 1 -%}
+                                            One team
+                                        {%- elseif teamCount -%}
+                                            {{ teamCount }} teams
+                                        {%- else -%}
+                                            No teams
+                                        {%- endif -%}
+                                    </p>
+                                </div>
                             </a>
-                            <p class="meta">
-                                {%- if teamCount == 1 -%}
-                                    One team
-                                {%- elseif teamCount -%}
-                                    {{ teamCount }} teams
-                                {%- else -%}
-                                    No teams
-                                {%- endif -%}
-                            </p>
                         </div>
                         <nav>
                             <sbx-pop-out content-id="division-{{ division.id }}-dropdown"></sbx-pop-out>

@@ -78,6 +78,7 @@
         }
 
         h3 {
+            color: var(--sbx-config-color-accent, var(--content-ui-foreground));
             padding-top: 0;
             margin-bottom: 0.25rem;
         }
@@ -97,18 +98,34 @@
 
 #allDivisions {
     .actions-small-1 > .card.list-item > a {
-        align-items: center;
+        align-items: flex-start;
         color: inherit;
         display: flex;
         gap: var(--spacing-s);
 
+        .card-copy {
+            display: flex;
+            flex: 1 1 auto;
+            flex-direction: column;
+            min-width: 0;
+        }
+
         h3 {
+            color: var(--sbx-config-color-accent, var(--content-ui-foreground));
+            margin: 0;
+        }
+
+        .meta {
+            color: var(--sbx-color-text-secondary, $body-foreground);
             margin-bottom: 0;
         }
 
         sbx-icon {
+            color: var(--sbx-color-text-secondary, $body-foreground);
+            display: flex;
             flex: 0 0 auto;
             line-height: 1;
+            margin-top: 3px;
         }
     }
 
