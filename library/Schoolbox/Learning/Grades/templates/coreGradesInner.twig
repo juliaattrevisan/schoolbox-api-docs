@@ -10,7 +10,7 @@
         'canSeeGraph'            bool
         'canSeeInstructorMarks'  bool
         'canViewInstructorMarks' bool             Whether instructor-only marks should be rendered.
-        'viewContext'            ViewContext      Selected view mode and effective viewer.
+        'effectiveViewer'        User             The user whose feedback visibility rules apply.
         'graph'                  array
         'returnUrlSuffix'        string
         'conversationsPerFolder' Conversation[]   Conversations of selected folders, indexed by folder.id
@@ -107,7 +107,7 @@
                                         assessment:  assessment.assessment,
                                         student:     student,
                                         canViewInstructorMarks: canViewInstructorMarks,
-                                        viewContext: viewContext
+                                        effectiveViewer: effectiveViewer
                                     } only %}
                                     <ul>
                                         {% for projectAssessment in assessment.assessments %}
@@ -116,7 +116,7 @@
                                                 assessment:  projectAssessment,
                                                 student:     student,
                                                 canViewInstructorMarks: canViewInstructorMarks,
-                                                viewContext: viewContext
+                                                effectiveViewer: effectiveViewer
                                             } only %}
                                         </li>
                                         {% endfor %}
@@ -128,7 +128,7 @@
                                         assessment:  assessment.assessment,
                                         student:     student,
                                         canViewInstructorMarks: canViewInstructorMarks,
-                                        viewContext: viewContext
+                                        effectiveViewer: effectiveViewer
                                     } only %}
                                 </li>
                                 {% endif %}

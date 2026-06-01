@@ -10,7 +10,9 @@
         'folders'                Folder\Model[]      All folders where this student has interactions for current term
         'markbook'               Markbook            Unfiltered markbook for student, term + folder
         'conversation'           Conversation
-        'viewContext'            ViewContext         Selected view mode and effective viewer
+        'viewMode'               string              Selected grades view mode
+        'effectiveViewer'        User                The user whose feedback visibility rules apply
+        'canViewInstructorMarks' bool                Whether instructor-only marks should be rendered
         'viewModes'              string[]            Supported view modes in display order
         'viewModeQuerySuffix'    string              Query suffix that preserves the selected view mode
 #}
@@ -43,7 +45,6 @@
 {{ bread.crumbs(['Learning', '/learning/classes'], [locale.grades.properPlural, routeLookup('learningGrades.getGrades', {userId: student.id, termCode: term.code}) ~ viewModeQuerySuffix], [subject.name]) }}
 
 {% set canSwitchViewMode = USER.role.isStaff %}
-{% set canViewInstructorMarks = viewContext.canViewInstructorMarks() %}
 <div class="row{% if canSwitchViewMode %} actions-small-2{% endif %}">
     <div class="small-12 columns">
         <h1>{{ locale.grades.properPlural }} for {{ subject.name }} - {{ student.fullName }}</h1>
@@ -54,7 +55,7 @@
                 <li><sbx-icon name="teacher" color="var(--sbx-color-text-secondary)"></sbx-icon>Teacher(s): {% for teacher in subject.teachers %}<a href="/search/user/{{ teacher.id }}" title="View Profile">{{ teacher.fullName }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</li>
             {% endif %}
             {% if canSwitchViewMode %}
-                <li data-grades-view-mode-meta class="icon-view">Viewing as {{ viewContext.getMode() }}</li>
+                <li data-grades-view-mode-meta class="icon-view">Viewing as {{ viewMode|capitalize }}</li>
             {% endif %}
         </ul>
         {% endif %}
@@ -73,7 +74,7 @@
                 subjectId: subject.id
             }) %}
             {% include '@learningGrades/fragments/studentViewNavSwitcher.twig' with {
-                viewContext: viewContext,
+                viewMode: viewMode,
                 viewModes: viewModes,
                 currentRouteBase: currentRouteBase
             } only %}

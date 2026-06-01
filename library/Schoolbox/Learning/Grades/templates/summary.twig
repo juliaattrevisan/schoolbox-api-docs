@@ -5,7 +5,9 @@
     folders:    GenericCollection|Folder\Model[] - Classes/Groups where the current student has responses or feedback for the current term
     markbooks:  GenericCollection|MarkBook[]     - Indexed by folder.id, each composed of the assessments for that folder and term
     mailHandle: string                           - Prefix for sending mail
-    viewContext: ViewContext                     - Selected view mode and effective viewer
+    viewMode:        string                      - Selected grades view mode
+    effectiveViewer: User                        - The user whose feedback visibility rules apply
+    canViewInstructorMarks: bool                 - Whether instructor-only marks should be rendered
     viewModes:   string[]                        - Supported view modes in display order
     viewModeQuerySuffix: string                  - Query suffix that preserves the selected view mode
 #}
@@ -16,14 +18,13 @@
 {{ bread.crumbs(['Learning', routeLookup('learning.getClasses')], [locale.grades.properPlural]) }}
 
 {% set canSwitchViewMode = USER.role.isStaff %}
-{% set canViewInstructorMarks = viewContext.canViewInstructorMarks() %}
 <div class="row{% if canSwitchViewMode %} actions-small-2{% endif %}">
     <div class="small-12 columns">
         <h1>{{ locale.grades.properPlural }} for {{ term.title }}</h1>
 
         {% if canSwitchViewMode %}
         <ul class="meta">
-            <li data-grades-view-mode-meta class="icon-view">Viewing as {{ viewContext.getMode() }}</li>
+            <li data-grades-view-mode-meta class="icon-view">Viewing as {{ viewMode|capitalize }}</li>
         </ul>
         {% endif %}
     </div>
@@ -34,7 +35,7 @@
         <ul id="header-options" class="f-dropdown" data-dropdown-content aria-label="Grades view mode options">
             {% set currentRouteBase = routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, term: term, termCode: term.code}) %}
             {% include '@learningGrades/fragments/studentViewNavSwitcher.twig' with {
-                viewContext: viewContext,
+                viewMode: viewMode,
                 viewModes: viewModes,
                 currentRouteBase: currentRouteBase
             } only %}
@@ -135,7 +136,7 @@
                                         assessment:  assessment,
                                         student:     student,
                                         canViewInstructorMarks: canViewInstructorMarks,
-                                        viewContext: viewContext
+                                        effectiveViewer: effectiveViewer
                                     } only %}
                                 </li>
                             {% endfor %}
