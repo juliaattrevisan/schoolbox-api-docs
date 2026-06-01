@@ -61,10 +61,16 @@ class Helper
      * @param User $viewer
      * @param User $viewee
      * @param Term $term
+     * @param bool|null $useStaffMarkScheme Whether the overall mark scheme should be spawned in staff
+     *                                      mode. When null, this is derived per-folder from whether
+     *                                      $viewer is an instructor of that folder.
+     *                                      Callers that use a view mode (e.g. the Grades summary) should
+     *                                      pass an explicit value to ensure the 'view as staff/student/parent'
+     *                                      feature works as expected.
      * @return array
      * @throws MapperException
      */
-    public function generateGrades(User $viewer, User $viewee, Term $term)
+    public function generateGrades(User $viewer, User $viewee, Term $term, ?bool $useStaffMarkScheme = null): array
     {
         // Add folders with response or feedback
         $folders = $this->folderMapper->findFoldersWithInteractionsForStudent($viewee, $term);
@@ -113,7 +119,7 @@ class Helper
             if ($assessment instanceof IAssessable) {
                 $overallMarkScheme = $this->markSchemeFactory->spawnForFolder(
                     $folders->offsetGet($folderId),
-                    $this->access->isInstructor($viewer, $assessment->getBaseContext()->getFolder())
+                    $useStaffMarkScheme ?? $this->access->isInstructor($viewer, $assessment->getBaseContext()->getFolder())
                 );
                 $markbooks->setOffset($folderId, new Markbook($assessments, $overallMarkScheme, $viewer));
             }

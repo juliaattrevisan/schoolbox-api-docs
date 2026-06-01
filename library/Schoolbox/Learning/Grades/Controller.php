@@ -170,7 +170,12 @@ class Controller extends Base
         );
 
         [$viewMode, $effectiveViewer, $canViewInstructorMarks] = $this->getViewModeVariables($viewee);
-        [$folders, $markbooks, $assessments] = $gradeHelper->generateGrades($effectiveViewer, $viewee, $term);
+        [$folders, $markbooks, $assessments] = $gradeHelper->generateGrades(
+            $effectiveViewer,
+            $viewee,
+            $term,
+            $canViewInstructorMarks
+        );
 
         $filteredWorkTypes = WorkType\Mapper::getInstance()->findByColumn('show_on_grades_page', 1);
         $assessmentTasks   = (
