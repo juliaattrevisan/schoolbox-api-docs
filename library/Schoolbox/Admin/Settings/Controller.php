@@ -289,7 +289,7 @@ class Controller extends ConfigController
                     // * if it has reduced, then clear everything: PHP's cache interface does not allow setting the TTL
                     //   of individual cache objects.
                     if ($name === ConfigMapper::NAME_EXTERNAL_CACHE_TIMEOUT) {
-                        if ((int)$existingConfig->getValue() < (int)$newValue) {
+                        if ((int)$newValue < (int)$existingConfig->getValue()) {
                             $clearExternalCache = true;
                         }
                     } else {
