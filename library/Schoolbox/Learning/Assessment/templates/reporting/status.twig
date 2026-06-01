@@ -63,7 +63,7 @@
     </div>
 </div>
 
-<div id="reporting-markbook-container" class="marksheet-wrapper row">
+<div id="reporting-markbook-container" class="marksheet-wrapper row" data-markbook-outer-container>
     {% set routeGetStatusData = routeLookupIfAuthorized(
         'learningReporting.getStatus',
         {assessmentId: assessment.id, assessment: assessment}

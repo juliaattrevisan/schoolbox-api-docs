@@ -40,7 +40,13 @@ window.Vue.onMounted(() => {
     // Initialize the ResizeObserver
     resizeObserver.value = new ResizeObserver(updateContainerHeight);
     resizeObserver.value.observe(document.querySelector("#container")!);
-    resizeObserver.value.observe(document.querySelector("#markbook-outer-container")!);
+
+    const outerContainer = activityHeaderDropdownEl.value?.closest("[data-markbook-outer-container]");
+    if (outerContainer) {
+        resizeObserver.value.observe(outerContainer);
+    } else {
+        console.warn("missing [data-markbook-outer-container] element");
+    }
 
     // Set the initial height, and update it again when the DOM is fully loaded to ensure the footer is included
     updateContainerHeight();
