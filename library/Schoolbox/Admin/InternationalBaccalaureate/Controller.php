@@ -1067,8 +1067,19 @@ class Controller extends ConfigController
             return;
         }
 
+        $confirmationEligibleStatuses = [
+            RegistrationSessionStudentModel::STATUS_UNCONFIRMED,
+            RegistrationSessionStudentModel::STATUS_CONFIRMED,
+        ];
+
         try {
             $registrationSessionStudent = $this->persistRegistrationSessionStudent($sessionId, $studentId);
+
+            if (!in_array($registrationSessionStudent->getStatus(), $confirmationEligibleStatuses, true)) {
+                $this->sendJsonError('Candidate is not in a state that allows confirmation changes.', 409);
+                return;
+            }
+
             $updatedAt = Alaress_Date_Format::now();
             $updatedBy = $this->getUser();
 

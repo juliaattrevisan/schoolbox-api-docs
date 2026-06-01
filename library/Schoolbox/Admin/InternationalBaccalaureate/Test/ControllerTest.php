@@ -168,6 +168,13 @@ class ControllerTest extends TestCase
                         'SL' => [],
                         'Core' => [],
                     ],
+                    'candidateConfirmed'   => false,
+                    'subjectConfirmed'     => false,
+                    'candidateConfirmedAt' => null,
+                    'subjectConfirmedAt'   => null,
+                    'candidateConfirmedBy' => null,
+                    'subjectConfirmedBy'   => null,
+                    'confirmationStatus'   => 'confirmed',
                     '_routes' => [
                         'updateLanguages' => '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/123/languages',
                         'updateConfirmation' => '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/123/confirmation',
@@ -255,6 +262,13 @@ class ControllerTest extends TestCase
                         'SL' => [],
                         'Core' => [],
                     ],
+                    'candidateConfirmed'   => false,
+                    'subjectConfirmed'     => false,
+                    'candidateConfirmedAt' => null,
+                    'subjectConfirmedAt'   => null,
+                    'candidateConfirmedBy' => null,
+                    'subjectConfirmedBy'   => null,
+                    'confirmationStatus'   => 'unconfirmed',
                     '_routes' => [
                         'updateLanguages' => '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/234/languages',
                         'updateConfirmation' => '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/234/confirmation',
@@ -1137,7 +1151,8 @@ class ControllerTest extends TestCase
     {
         $registrationSessionStudent = (new RegistrationSessionStudentModel())
             ->setId(456)
-            ->setUser((new User())->setId(234));
+            ->setUser((new User())->setId(234))
+            ->setStatus(RegistrationSessionStudentModel::STATUS_UNCONFIRMED);
 
         $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
         $registrationSessionStudentMapper
@@ -1207,7 +1222,8 @@ class ControllerTest extends TestCase
     {
         $registrationSessionStudent = (new RegistrationSessionStudentModel())
             ->setId(456)
-            ->setUser((new User())->setId(234));
+            ->setUser((new User())->setId(234))
+            ->setStatus(RegistrationSessionStudentModel::STATUS_UNCONFIRMED);
 
         $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
         $registrationSessionStudentMapper
@@ -1281,6 +1297,7 @@ class ControllerTest extends TestCase
         $registrationSessionStudent = (new RegistrationSessionStudentModel())
             ->setId(456)
             ->setUser((new User())->setId(234))
+            ->setStatus(RegistrationSessionStudentModel::STATUS_UNCONFIRMED)
             ->setCandidateConfirmed(true);  // candidate already confirmed
 
         $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
@@ -1459,6 +1476,46 @@ class ControllerTest extends TestCase
         $payload = json_decode((string) $response->getBody(), true);
         $this->assertSame(400, $payload['status']);
         $this->assertSame('Invalid confirmation request data.', $payload['title']);
+    }
+
+    public function testUpdateRegistrationSessionStudentConfirmationRejectsLaterWorkflowStates(): void
+    {
+        $registrationSessionStudent = (new RegistrationSessionStudentModel())
+            ->setId(456)
+            ->setUser((new User())->setId(234))
+            ->setStatus(RegistrationSessionStudentModel::STATUS_FAILED);
+
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('findOneByColumnList')
+            ->willReturn($registrationSessionStudent);
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('save');
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class)
+        );
+        $controller->setRequest(
+            (new HttpFactory())
+                ->createServerRequest(
+                    'PUT',
+                    '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/234/confirmation'
+                )
+                ->withParsedBody([
+                    'section'   => 'candidate',
+                    'confirmed' => true,
+                ])
+        );
+
+        $controller->updateRegistrationSessionStudentConfirmation(12, 234);
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(409, $response->getStatusCode());
     }
 
     private function buildController(
