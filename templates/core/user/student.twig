@@ -766,6 +766,16 @@
                                     {% endfor %}
                                 </dl>
                             </div>
+                            {% if registrationPayload._routes.updateConfirmation is defined and registrationPayload._routes.updateConfirmation %}
+                            <div
+                                id="ib-candidate-confirmation"
+                                data-update-confirmation-endpoint="{{ registrationPayload._routes.updateConfirmation }}"
+                                data-confirmed="{{ registrationPayload.candidateConfirmed ? 'true' : 'false' }}"
+                                data-confirmed-by="{{ registrationPayload.candidateConfirmedBy ?? '' }}"
+                                data-confirmed-at="{{ registrationPayload.candidateConfirmedAt ?? '' }}"
+                                data-confirmation-status="{{ registrationPayload.confirmationStatus ?? 'unconfirmed' }}"
+                            ></div>
+                            {% endif %}
                         </section>
                         <section>
                             <h2>Subject details</h2>
@@ -823,12 +833,26 @@
                                 {% else %}
                                     <p>No subjects are available for this registration.</p>
                                 {% endif %}
+                            {% if registrationPayload._routes.updateConfirmation is defined and registrationPayload._routes.updateConfirmation %}
+                            <div
+                                id="ib-subject-confirmation"
+                                data-update-confirmation-endpoint="{{ registrationPayload._routes.updateConfirmation }}"
+                                data-confirmed="{{ registrationPayload.subjectConfirmed ? 'true' : 'false' }}"
+                                data-confirmed-by="{{ registrationPayload.subjectConfirmedBy ?? '' }}"
+                                data-confirmed-at="{{ registrationPayload.subjectConfirmedAt ?? '' }}"
+                                data-confirmation-status="{{ registrationPayload.confirmationStatus ?? 'unconfirmed' }}"
+                            ></div>
+                            {% endif %}
                                 {% else %}
                                     <p>No registration details are available.</p>
                                 {% endif %}
                             </section>
+
                     </section>
                 </div>
+            {% endif %}
+            {% if 'registration' in possibleTabNames %}
+            <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/ibStudentRegistrationConfirmation.js?v={{ config.site_version }}"></script>
             {% endif %}
 
             {% if 'contacts' in possibleTabNames %}
