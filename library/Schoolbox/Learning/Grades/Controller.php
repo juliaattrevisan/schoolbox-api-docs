@@ -385,7 +385,8 @@ class Controller extends Base
             $subject,
             $viewMode === ViewMode::STAFF
         );
-        $filteredMarkbook = (new Markbook($assessments, $overallMarkScheme, $effectiveViewer))->sortAssessables(new AssessmentComparator($viewee));
+        $filteredMarkbook = new Markbook($assessments, $overallMarkScheme, $effectiveViewer)
+            ->sortAssessables(new AssessmentComparator($viewee));
 
         /* If the config option lms_cohort_comparison is set,
          * instantiate a new CohortMarks instance
