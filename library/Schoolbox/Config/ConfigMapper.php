@@ -129,6 +129,7 @@ class ConfigMapper extends Mapper
     public const string NAME_EXTERNAL_DB_PASSWORD       = 'external_db_passwd';
     public const string NAME_EXTERNAL_DB_NAME           = 'external_db_db';
     public const string NAME_EXTERNAL_DB_ENCRYPTION     = 'external_db_encryption';
+    public const string NAME_EXTERNAL_CACHE_TIMEOUT     = 'external_cache_timeout';
 
     public const string NAME_ALLOW_STUDENT_CLASS_ACCESS = 'allow_student_class_access';
     public const string NAME_LMS_RESUBMIT_WINDOW        = 'lms_resubmit_window';
@@ -611,6 +612,15 @@ class ConfigMapper extends Mapper
         self::NAME_OAUTH_ENABLE_SSO,
         //        self::NAME_OAUTH_SSO_IP_BLACKLIST,
         //        self::NAME_OAUTH_SSO_IP_WHITELIST,
+    ];
+
+    /**
+     * Config settings which affect the external cache.
+     *
+     * If any of these settings change: invalidate the external cache.
+     */
+    public const array SETTINGS_AFFECTING_EXTERNAL_CACHE = [
+        self::NAME_EXTERNAL_CACHE_TIMEOUT,
     ];
 
     /**

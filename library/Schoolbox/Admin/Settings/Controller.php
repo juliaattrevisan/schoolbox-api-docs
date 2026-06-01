@@ -225,6 +225,7 @@ class Controller extends ConfigController
         $reloadMobileDaemon   = false;
         $rebuildModules       = false;
         $clearOidcCache       = false;
+        $clearExternalCache   = false;
 
         foreach ($postedValues as $name => $value) {
             $existingConfig  = $existingConfigs[$name];
@@ -260,6 +261,9 @@ class Controller extends ConfigController
                 if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_OAUTH, true)) {
                     $clearOidcCache = true;
                 }
+                if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_EXTERNAL_CACHE, true)) {
+                    $clearExternalCache = true;
+                }
                 $existingConfig->setValue(trim((string)$newValue));
                 $this->getConfigMapper()->save($existingConfig);
             }
@@ -284,6 +288,9 @@ class Controller extends ConfigController
         }
         if ($clearOidcCache) {
             $this->oidcCache->clear();
+        }
+        if ($clearExternalCache) {
+            // Need to clear ALL external cache methods
         }
 
         $this->response = $this->redirectAfterPost($this->getRouteUrlFromTypeLabel($typeLabel));
