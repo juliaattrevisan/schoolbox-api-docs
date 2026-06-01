@@ -321,122 +321,209 @@ $masonry-drop-background: $input-focus-bg-color;
 }
 
 // Dashboard masonry icons
+.icon-masonry-Component_Dashboard_ActivityController {
+.icon-masonry.icon-masonry-Component_Dashboard_ActivityController {
+    color: $icon-color-homepage-activity;
+}
 .icon-masonry-Component_Dashboard_ActivityController:before {
     @extend .icon-info;
-    color: $icon-color-homepage-activity;
+}
+.icon-masonry-Component_Dashboard_HomepageNewsController {
+.icon-masonry.icon-masonry-Component_Dashboard_HomepageNewsController {
+    color: $icon-color-homepage-news;
 }
 .icon-masonry-Component_Dashboard_HomepageNewsController:before {
     @extend .icon-report;
-    color: $icon-color-homepage-news;
+}
+.icon-masonry-Schoolbox_Calendar_Component_Dashboard_Controller {
+.icon-masonry.icon-masonry-Schoolbox_Calendar_Component_Dashboard_Controller {
+    color: $icon-color-calendar;
 }
 .icon-masonry-Schoolbox_Calendar_Component_Dashboard_Controller:before {
     @extend .icon-calendar;
-    color: $icon-color-calendar;
+}
+.icon-masonry-Component_Dashboard_ChildSubjectController {
+.icon-masonry.icon-masonry-Component_Dashboard_ChildSubjectController {
+    color: $icon-color-child-subject;
 }
 .icon-masonry-Component_Dashboard_ChildSubjectController:before {
     @extend .icon-group;
-    color: $icon-color-child-subject;
+}
+.icon-masonry-Component_Dashboard_GreetingController {
+.icon-masonry.icon-masonry-Component_Dashboard_GreetingController {
+    color: $icon-color-greeting;
 }
 .icon-masonry-Component_Dashboard_GreetingController:before {
     @extend .icon-chat;
-    color: $icon-color-greeting;
+}
+.icon-masonry-Schoolbox_Comms_News_Component_Dashboard_Controller {
+.icon-masonry.icon-masonry-Schoolbox_Comms_News_Component_Dashboard_Controller {
+    color: $icon-color-news;
 }
 .icon-masonry-Schoolbox_Comms_News_Component_Dashboard_Controller:before {
     @extend .icon-news;
-    color: $icon-color-news;
+}
+.icon-masonry-Component_Dashboard_ImageGalleryController {
+.icon-masonry.icon-masonry-Component_Dashboard_ImageGalleryController {
+    color: $icon-color-image-gallery;
 }
 .icon-masonry-Component_Dashboard_ImageGalleryController:before {
     @extend .icon-image-gallery;
-    color: $icon-color-image-gallery;
+}
+.icon-masonry-Component_Dashboard_NewsController {
+.icon-masonry.icon-masonry-Component_Dashboard_NewsController {
+    color: $icon-color-news;
 }
 .icon-masonry-Component_Dashboard_NewsController:before {
     @extend .icon-news;
-    color: $icon-color-news;
+}
+.icon-masonry-Component_Dashboard_RecentSubmissionsController {
+.icon-masonry.icon-masonry-Component_Dashboard_RecentSubmissionsController {
+    color: $icon-color-due-work;
 }
 .icon-masonry-Component_Dashboard_RecentSubmissionsController:before {
     @extend .icon-due-work;
-    color: $icon-color-due-work;
+}
+.icon-masonry-Component_Dashboard_RssController {
+.icon-masonry.icon-masonry-Component_Dashboard_RssController {
+    color: $icon-color-rss-feed;
 }
 .icon-masonry-Component_Dashboard_RssController:before {
     @extend .icon-rss;
-    color: $icon-color-rss-feed;
+}
+.icon-masonry-Component_Dashboard_SlideshowController {
+.icon-masonry.icon-masonry-Component_Dashboard_SlideshowController {
+    color: $icon-color-image-slideshow;
 }
 .icon-masonry-Component_Dashboard_SlideshowController:before {
     @extend .icon-image-slideshow;
-    color: $icon-color-image-slideshow;
+}
+.icon-masonry-Component_Dashboard_SubjectController {
+.icon-masonry.icon-masonry-Component_Dashboard_SubjectController {
+    color: $icon-color-subject-list;
 }
 .icon-masonry-Component_Dashboard_SubjectController:before {
     @extend .icon-class-list;
-    color: $icon-color-subject-list;
+}
+.icon-masonry-Component_Dashboard_TextboxController {
+.icon-masonry.icon-masonry-Component_Dashboard_TextboxController {
+    color: $icon-color-text-box;
 }
 .icon-masonry-Component_Dashboard_TextboxController:before {
     @extend .icon-textbox;
-    color: $icon-color-text-box;
+}
+.icon-masonry-Component_Dashboard_TimetableController {
+.icon-masonry.icon-masonry-Component_Dashboard_TimetableController {
+    color: $icon-color-timetable;
 }
 .icon-masonry-Component_Dashboard_TimetableController:before {
     @extend .icon-timetable;
-    color: $icon-color-timetable;
+}
+.icon-masonry-Schoolbox_Twitter_Component_Dashboard_Controller {
+.icon-masonry.icon-masonry-Schoolbox_Twitter_Component_Dashboard_Controller {
+    color: $icon-color-twitter;
 }
 .icon-masonry-Schoolbox_Twitter_Component_Dashboard_Controller:before {
     @extend .icon-twitter;
-    color: $icon-color-twitter;
+}
+.icon-masonry-Schoolbox_Learning_Component_Dashboard_UpcomingWorkController {
+.icon-masonry.icon-masonry-Schoolbox_Learning_Component_Dashboard_UpcomingWorkController {
+    color: $icon-color-due-work;
 }
 .icon-masonry-Schoolbox_Learning_Component_Dashboard_UpcomingWorkController:before {
     @extend .icon-due-work;
-    color: $icon-color-due-work;
+}
+.icon-masonry-Component_Dashboard_VideoController {
+.icon-masonry.icon-masonry-Component_Dashboard_VideoController {
+    color: $icon-color-video-player;
 }
 .icon-masonry-Component_Dashboard_VideoController:before {
     @extend .icon-video;
-    color: $icon-color-video-player;
+}
+.icon-masonry-Schoolbox_Weather_Component_Dashboard_Controller {
+.icon-masonry.icon-masonry-Schoolbox_Weather_Component_Dashboard_Controller {
+    color: $icon-color-weather;
 }
 .icon-masonry-Schoolbox_Weather_Component_Dashboard_Controller:before {
     @extend .icon-weather;
-    color: $icon-color-weather;
+}
+.icon-masonry-Schoolbox_ResourceBooking_Booking_Component_ResourceManagement {
+.icon-masonry.icon-masonry-Schoolbox_ResourceBooking_Booking_Component_ResourceManagement {
+    color: $icon-color-resource-management;
 }
 .icon-masonry-Schoolbox_ResourceBooking_Booking_Component_ResourceManagement:before {
     @extend .icon-resource-booking;
-    color: $icon-color-resource-management;
+}
+.icon-masonry-Schoolbox_Tile_Component_DashboardTileController {
+.icon-masonry.icon-masonry-Schoolbox_Tile_Component_DashboardTileController {
+    color: $icon-color-tiles;
 }
 .icon-masonry-Schoolbox_Tile_Component_DashboardTileController:before {
     @extend .icon-tiles;
-    color: $icon-color-tiles;
+}
+.icon-masonry-Schoolbox_Fixtures_Component_Dashboard_Controller {
+.icon-masonry.icon-masonry-Schoolbox_Fixtures_Component_Dashboard_Controller {
+    color: $icon-color-sport;
 }
 .icon-masonry-Schoolbox_Fixtures_Component_Dashboard_Controller:before {
     @extend .icon-sport;
-    color: $icon-color-sport;
+}
+.icon-masonry-Schoolbox_Learning_Component_Dashboard_ClassController {
+.icon-masonry.icon-masonry-Schoolbox_Learning_Component_Dashboard_ClassController {
+    color: $icon-color-class-teachers;
 }
 .icon-masonry-Schoolbox_Learning_Component_Dashboard_ClassController:before {
     @extend .icon-teacher;
-    color: $icon-color-class-teachers;
+}
+.icon-masonry-Schoolbox_Resource_Folder_Component_Dashboard_GroupController {
+.icon-masonry.icon-masonry-Schoolbox_Resource_Folder_Component_Dashboard_GroupController {
+    color: $icon-color-group;
 }
 .icon-masonry-Schoolbox_Resource_Folder_Component_Dashboard_GroupController:before {
     @extend .icon-group;
-    color: $icon-color-group;
+}
+.icon-masonry-Schoolbox_Learning_Moment_StudentToolkit_Component_Dashboard_Controller {
+.icon-masonry.icon-masonry-Schoolbox_Learning_Moment_StudentToolkit_Component_Dashboard_Controller {
+    color: $icon-color-student-toolkit;
 }
 .icon-masonry-Schoolbox_Learning_Moment_StudentToolkit_Component_Dashboard_Controller:before {
     @extend .icon-favourite;
-    color: $icon-color-student-toolkit;
+}
+.icon-masonry-Schoolbox_Geosnapshot_Component_Dashboard_Controller {
+.icon-masonry.icon-masonry-Schoolbox_Geosnapshot_Component_Dashboard_Controller {
+    color: $icon-color-geosnapshot;
 }
 .icon-masonry-Schoolbox_Geosnapshot_Component_Dashboard_Controller:before {
     @extend .icon-geosnapshot;
-    color: $icon-color-geosnapshot;
+}
+.icon-masonry-Schoolbox_Intellischool_Component_Dashboard_Controller {
+.icon-masonry.icon-masonry-Schoolbox_Intellischool_Component_Dashboard_Controller {
+    color: $icon-color-intellischool;
 }
 .icon-masonry-Schoolbox_Intellischool_Component_Dashboard_Controller:before {
     @extend .icon-intellischool;
-    color: $icon-color-intellischool;
 }
 
-.icon-masonry-Component_Dashboard_CanvasAssignmentsController:before {
-    @extend .icon-canvas-lms;
+.icon-masonry-Component_Dashboard_CanvasAssignmentsController {
+.icon-masonry.icon-masonry-Component_Dashboard_CanvasAssignmentsController {
     color: $icon-color-canvas-lms;
 }
-
-.icon-masonry-Schoolbox_Learning_Component_Dashboard_CurrentLessonPlanController:before {
-    @extend .icon-lesson-plan;
-    color: $icon-color-lesson-plan;
+.icon-masonry-Component_Dashboard_CanvasAssignmentsController:before {
+    @extend .icon-canvas-lms;
 }
 
+.icon-masonry-Schoolbox_Learning_Component_Dashboard_CurrentLessonPlanController {
+.icon-masonry.icon-masonry-Schoolbox_Learning_Component_Dashboard_CurrentLessonPlanController {
+    color: $icon-color-lesson-plan;
+}
+.icon-masonry-Schoolbox_Learning_Component_Dashboard_CurrentLessonPlanController:before {
+    @extend .icon-lesson-plan;
+}
+
+.icon-masonry-Schoolbox_Paperly_Component_Dashboard_Controller {
+.icon-masonry.icon-masonry-Schoolbox_Paperly_Component_Dashboard_Controller {
+    color: $icon-color-paperly;
+}
 .icon-masonry-Schoolbox_Paperly_Component_Dashboard_Controller:before {
     @extend .icon-paperly;
-    color: $icon-color-paperly;
 }
