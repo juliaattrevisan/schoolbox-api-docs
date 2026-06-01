@@ -170,7 +170,9 @@
                         }
 
                         // because outerHtml doesn't exist as a thing -_-
-                        html = ["<", tag, ">", $item.html(), "</", tag, ">"].join("");
+                        html = ["<", tag, " class='sbx-checkbox-radio-container'>", $item.html(), "</", tag, ">"].join(
+                            "",
+                        );
 
                         return html;
                     })
@@ -228,7 +230,7 @@
                  */
                 if (0 === $selectAllCheckbox.length && bulky.list.find("input").length > 0) {
                     bulky.list.before(
-                        "<div>" +
+                        "<div class='sbx-checkbox-radio-container'>" +
                             "<input id='data-bulky-select-all-checkbox-" +
                             opt.checkboxPrefix +
                             "' type='checkbox' />" +

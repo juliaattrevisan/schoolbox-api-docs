@@ -4,14 +4,8 @@
     view the entire list
 */
 
-/* Default icon font = legacy schoolbox */
 :root {
     --sbx-icon-font-family: "schoolbox";
-}
-
-/* When SBX uplift is enabled, use the new icon font */
-body.sbx-body {
-    --sbx-icon-font-family: "sbx-icons";
 }
 
 /* Make the SCSS icon variable use the runtime CSS variable */

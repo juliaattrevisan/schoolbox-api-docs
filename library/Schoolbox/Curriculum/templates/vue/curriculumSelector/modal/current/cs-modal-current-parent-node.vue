@@ -77,7 +77,7 @@ function onExpandSelected(): void {
 
 <style lang="scss" scoped>
 .node:not(:last-child) {
-    border-bottom: 1px solid var(--body-background); /* don't add borders on the last nodes for better readability */
+    border-bottom: 1px solid var(--sbx-color-border, var(--body-background)); /* don't add borders on the last nodes for better readability */
 }
 
 .checklist {

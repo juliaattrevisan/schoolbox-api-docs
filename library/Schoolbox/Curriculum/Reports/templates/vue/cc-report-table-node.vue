@@ -269,16 +269,16 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
 
 <style lang="scss" scoped>
 tr:hover {
-    background-color: #f4f3f3; /* to help legibility */
+    background-color: var(--sbx-pr-table-row-hover-colour, #f4f3f3) !important; /* to help legibility */
 }
 
 .name-cell {
-    background-color: white;
+    background-color: var(--sbx-color-foreground-primary, white);
     left: 0;
     position: sticky;
     z-index: calc(var(--sbx-depth-ui-sticky) - 1);
     &:hover {
-        background-color: #f4f3f3; /* to help legibility */
+        background-color: var(--sbx-pr-table-row-hover-colour, #f4f3f3) !important; /* to help legibility */
     }
     @media (max-width: 1000px) {
         position: static; // prevent the cell from sticking on smaller screens
@@ -302,7 +302,7 @@ tr:hover {
     text-align: left;
     width: 100%;
     &:hover {
-        background: var(--accent-background);
+        background: var(--sbx-config-color-active, var(--accent-background));
     }
 }
 </style>
