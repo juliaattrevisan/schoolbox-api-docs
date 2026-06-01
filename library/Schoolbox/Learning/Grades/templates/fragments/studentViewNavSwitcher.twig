@@ -1,8 +1,8 @@
-{# Server-side grades view selector. Expects viewContext, viewModes and currentRouteBase. #}
-<li class="separator">Viewing as {{ viewContext.getMode() }}</li>
+{# Server-side grades view selector. Expects viewMode, viewModes and currentRouteBase. #}
+<li class="separator">Viewing as {{ viewMode|capitalize }}</li>
 {% for mode in viewModes %}
     <li>
-        {% if viewContext.getMode() == mode %}
+        {% if viewMode == mode %}
             <span class="icon-view" aria-current="page">View as {{ mode|capitalize }}</span>
         {% else %}
             <a class="icon-view" href="{{ currentRouteBase }}?viewMode={{ mode }}" data-grades-view-mode="{{ mode }}">
