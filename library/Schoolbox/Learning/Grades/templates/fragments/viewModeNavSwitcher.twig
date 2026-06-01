@@ -3,7 +3,7 @@
 {% for mode in viewModes %}
     <li>
         {% if viewMode == mode %}
-            <span class="icon-view" aria-current="page">View as {{ mode|capitalize }}</span>
+            <a class="icon-view menu_disabled" aria-current="page">View as {{ mode|capitalize }}</a>
         {% else %}
             <a class="icon-view" href="{{ currentRouteBase }}?viewMode={{ mode }}" data-grades-view-mode="{{ mode }}">
                 View as {{ mode|capitalize }}
