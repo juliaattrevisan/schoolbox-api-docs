@@ -79,7 +79,7 @@ function onAddToDescription(): void {
         v-if="
             props.differentiationEnabled &&
             sbProps.aiFeatures.learningactivitycustomisation?.enabled &&
-            props.participant._links.differentiationProfile
+            props.participant._links?.differentiationProfile
         "
         class="button f-no-margins sbx-button--has-icon"
         type="button"
