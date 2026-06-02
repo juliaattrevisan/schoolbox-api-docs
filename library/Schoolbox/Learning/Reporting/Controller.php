@@ -14,10 +14,8 @@ use Alaress\Web\Controller\Base;
 use Alaress\HTMLPurifier\IPurifier;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use Schoolbox\Learning\Assessment\Feedback\Visibility;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\DialogAgent;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -384,7 +382,7 @@ class Controller extends Base
                 ),
                 'courseImport.getImport' => null, /* not relevant on the class markbook */
             ],
-            'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get(ConfigMapper::NAME_SUBMISSION_VISIBILITY_MAX)),
+            'availableVisibilities' => [], /* not relevant on the reporting markbook */
             'submissionErrorStates' => $this->stateMapper->findAll()->map(fn(State $state) => [
                 'id' => $state->getId(),
                 'name' => $state->getDisplayAs(),

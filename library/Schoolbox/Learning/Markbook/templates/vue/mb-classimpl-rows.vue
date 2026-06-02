@@ -112,8 +112,9 @@ const orderedClassImplStudents = window.Vue.computed(() => {
             />
         </template>
 
-        <!-- Visibility Controls -->
+        <!-- Visibility Controls - Course/Class Markbook only -->
         <mb-class-statistic-row
+            v-if="[MarkbookType.CLASS, MarkbookType.COURSE].includes(props.type)"
             :class-impl="classImpl"
             label="Visibility"
             stats-key="markVisibility"
