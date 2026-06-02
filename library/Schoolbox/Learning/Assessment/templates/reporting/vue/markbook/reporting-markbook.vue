@@ -14,7 +14,7 @@ import MarkbookInner from "@schoolboxLibrary/Learning/Markbook/templates/vue/mar
 import MarkbookPopout from "@schoolboxLibrary/Learning/Markbook/templates/vue/markbook-popout.vue";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
-import RmbFilters from "./rmb-filters.vue";
+// import RmbFilters from "./rmb-filters.vue";
 
 interface Props {
     editorTemplates?: Template[];
@@ -24,10 +24,10 @@ interface Props {
 const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
 
-// TODO: implement filters
-const filters = window.Vue.ref<Record<ReportingFeedbackStatus, boolean>>(
-    fromEntriesOf(Object.values(ReportingFeedbackStatus).map((status) => [status, true])),
-);
+// TODO: implement filters (out of scope for now according to SA-22474's AC)
+// const filters = window.Vue.ref<Record<ReportingFeedbackStatus, boolean>>(
+//     fromEntriesOf(Object.values(ReportingFeedbackStatus).map((status) => [status, true])),
+// );
 
 const loadError = window.Vue.ref<string | null>(null);
 
@@ -71,9 +71,10 @@ window.Vue.onMounted(async () => {
         </div>
 
         <!-- Status filters -->
-        <div class="small-12 large-8 columns text-right">
+        <!-- TODO: implement filters (out of scope for now according to SA-22474's AC) -->
+        <!-- <div class="small-12 large-8 columns text-right">
             <rmb-filters v-model:filters="filters" />
-        </div>
+        </div> -->
     </div>
 
     <!-- Search -->
