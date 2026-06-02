@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Template } from "@js/editor/types/editorTypes";
 import { listenForFilterLoad, listenForFilterLoading } from "@schoolboxLibrary/Filter/templates/ts/filterEvent";
+import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import { useMarkbookStore } from "./store/markbookStore";
 import type { Markbook } from "./types/payload";
 import MarkbookInner from "./markbook-inner.vue";
@@ -29,11 +30,7 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <div v-if="mbStore.data === null" class="markbook-loader small-12 island">
-        <section class="content">
-            <div class="loader"></div>
-        </section>
-    </div>
+    <loading-table v-if="mbStore.data === null" />
     <div v-else-if="mbStore.data.classImpls.length === 0" class="empty-state">
         <sbx-icon name="curriculum" size="2.5rem"></sbx-icon>
         <p>
@@ -54,11 +51,3 @@ window.Vue.onMounted(() => {
 
     <markbook-popout />
 </template>
-
-<style scoped>
-/* getting around some chaotic other styles for the loader to stay in the right place */
-.markbook-loader {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-}
-</style>

@@ -10,6 +10,7 @@ import type { Markbook } from "@schoolboxLibrary/Learning/Markbook/templates/vue
 import MarkbookInner from "@schoolboxLibrary/Learning/Markbook/templates/vue/markbook-inner.vue";
 import MarkbookPopout from "@schoolboxLibrary/Learning/Markbook/templates/vue/markbook-popout.vue";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
+import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 
 interface Props {
     editorTemplates?: Template[];
@@ -55,20 +56,8 @@ window.Vue.onMounted(async () => {
 
 <template>
     <request-error v-if="loadError" :further-info="loadError" />
-    <div v-else-if="mbStore.data === null" class="markbook-loader small-12 island">
-        <section class="content">
-            <div class="loader"></div>
-        </section>
-    </div>
+    <loading-table v-else-if="mbStore.data === null" />
     <markbook-inner v-else type="class" />
 
     <markbook-popout />
 </template>
-
-<style scoped>
-/* getting around some chaotic other styles for the loader to stay in the right place */
-.markbook-loader {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-}
-</style>
