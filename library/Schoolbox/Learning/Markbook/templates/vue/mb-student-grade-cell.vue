@@ -270,7 +270,8 @@ const plaintextComments = window.Vue.computed(() => {
         class="student-grade-cell"
         :class="{
             excluded: !participant || participant.isExcluded,
-            'is-selected': isSelectedPopout || isSelectedFeedback,
+            'is-selected':
+                isSelectedFeedback || (isSelectedPopout && mbStore.popoutSelectedCell?.referenceElement === cellEl),
         }"
         :data-test="`markbook-cell-${assessment.id}-${student.id}`"
         :data-pop-out-menu="hasPopOutMenu || undefined"
@@ -336,7 +337,9 @@ const plaintextComments = window.Vue.computed(() => {
         class="mb-student-grade-cell-comment"
         :class="{
             excluded: !participant || participant.isExcluded,
-            'is-selected': isSelectedPopout || isSelectedFeedback,
+            'is-selected':
+                isSelectedFeedback ||
+                (isSelectedPopout && mbStore.popoutSelectedCell?.referenceElement === commentCellEl),
         }"
         :data-test="`markbook-cell-${assessment.id}-${student.id}-comment`"
         :data-pop-out-menu="hasPopOutMenu || undefined"
