@@ -373,14 +373,8 @@ class Controller extends Base
                 ],
             ]],
             '_routes' => [
-                'exportReport' => $this->routeGenerator->generate(
-                    'learningMarkbook.getMarkbookExportForClass',
-                    [
-                        'folder'   => $folder,
-                        'folderId' => $folder->getId(),
-                    ]
-                ),
-                'courseImport.getImport' => null, /* not relevant on the class markbook */
+                'exportReport' => null, /* not relevant on the reporting markbook */
+                'courseImport.getImport' => null, /* not relevant on the reporting markbook */
             ],
             'availableVisibilities' => [], /* not relevant on the reporting markbook */
             'submissionErrorStates' => $this->stateMapper->findAll()->map(fn(State $state) => [

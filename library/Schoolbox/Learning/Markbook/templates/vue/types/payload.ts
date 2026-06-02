@@ -164,7 +164,9 @@ export interface Markbook {
     classImpls: MarkbookClassImpl[];
     /** Relevant routes */
     _routes: {
+        /* class/course markbook only */
         exportReport: string | null;
+        /* course markbook only */
         "courseImport.getImport": string | null;
     };
     /** A list of available visibilities, currently only used on the class markbook */
