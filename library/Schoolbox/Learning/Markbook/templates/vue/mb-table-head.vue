@@ -40,22 +40,24 @@ const mbStore = useMarkbookStore();
             <th class="fixed-left transparent"></th>
             <th class="fixed-left white"></th>
             <th v-if="mbStore.data.rank !== null" class="white"></th>
-            <th
-                v-for="group in mbStore.activityGroups"
-                :key="group.unitSpec?.id"
-                class="unit-title"
-                :class="{
-                    /* avoid wide reporting markbook solely due to these headers */
-                    'unit-title--clip': props.type === MarkbookType.REPORTING,
-                }"
-                :title="
-                    group.unitSpec?.title ??
-                    `These ${locale.activity.plural()} are not part of a ${locale.unit.singular()}`
-                "
-                :colspan="group.activities.length"
-            >
-                {{ group.unitSpec?.title ?? "" }}
-            </th>
+            <template v-for="group in mbStore.activityGroups" :key="group.id">
+                <th v-if="group.splitComments" :colspan="group.activities.length * 2" class="white"></th>
+                <th
+                    v-else
+                    class="unit-title"
+                    :class="{
+                        /* avoid wide reporting markbook solely due to these headers */
+                        'unit-title--clip': props.type === MarkbookType.REPORTING,
+                    }"
+                    :title="
+                        group.unitSpec?.title ??
+                        `These ${locale.activity.plural()} are not part of a ${locale.unit.singular()}`
+                    "
+                    :colspan="group.activities.length"
+                >
+                    {{ group.unitSpec?.title ?? "" }}
+                </th>
+            </template>
         </tr>
 
         <template v-if="props.type === MarkbookType.CLASS">

@@ -35,16 +35,31 @@ async function onTitleClick(): Promise<void> {
     activityHeaderSelection.value = props.activity;
     await onButtonSelected();
 }
+
+/**
+ * A markbook column is faded if the selected feedback cell exists
+ * and isn't for the current column (activity)
+ */
+const isFaded = window.Vue.computed(() => {
+    if (mbStore.feedbackSelectedCell === null) {
+        return false;
+    }
+
+    return mbStore.feedbackSelectedCell.activityId !== props.activity.id;
+});
 </script>
 
 <template>
-    <th
-        :data-test="`markbook-assessment-${props.activity.id}`"
-        :class="{
-            'markbook-faded':
-                mbStore.feedbackSelectedCell && mbStore.feedbackSelectedCell.activityId !== props.activity.id,
-        }"
-    >
+    <template v-if="props.activity.splitComments">
+        <th :class="{ 'markbook-faded': isFaded }">
+            <div><span>Mark</span></div>
+        </th>
+        <th :class="{ 'markbook-faded': isFaded }">
+            <div><span>Comment</span></div>
+        </th>
+    </template>
+
+    <th v-else :data-test="`markbook-assessment-${props.activity.id}`" :class="{ 'markbook-faded': isFaded }">
         <div ref="referenceEl">
             <!-- A teacher clicking an assessment from the markbook is most likely interested in seeing more granular results -->
             <span>

@@ -68,11 +68,22 @@ class Controller extends Base
 
         $markbook = $this->buildMarkbook($folder);
 
+        /* Reporting Markbook specific behaviour:
+         * Since the reporting activity won't be within the markbook's assessments,
+         * manually add it on the end so that the markbook can render the special
+         * feedback cells for it at the far right of the table.
+         *
+         * NOTE: this does mean you can't trust all the data in $markbook anymore to include this last special assessment...
+         * We likely don't want to add it earlier as Markbook would then include it within the overall stats calculations
+         */
+        $markbookAssessments = $markbook->getAssessments()->shallowClone();
+        $markbookAssessments->add($assessment);
+
         $data = [
             /* Only show class ranking if the config allows it. It seemingly ranks based on Student Weighted Average.
              */
             'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $markbook->getRanking() : null,
-            'assessments' => $markbook->getAssessments()->reindex()->map(function (IAssessable $assessment, $sequence) {
+            'assessments' => $markbookAssessments->reindex()->map(function (IAssessable $markbookAssessment, $sequence) use ($assessment) {
                 $unitAssessmentsTranslator = new UnitAssessments(
                     $this->routeGenerator,
                     $this->getAuthorizer(),
@@ -81,33 +92,37 @@ class Controller extends Base
                 );
 
                 $unitSpec = null;
-                $base = $assessment->getBaseContext();
+                $base = $markbookAssessment->getBaseContext();
                 if ($base instanceof \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model) {
                     // Implementation
                     $unitSpec = $base->getSpecification();
                 }
 
                 return [
-                    'id'              => $assessment->getId(),
-                    'title'           => $assessment->getTitle(),
-                    'typeName'        => $assessment->getTypeName(),
-                    'assessmentType'  => $assessment->getFamilyName(),
+                    'id'              => $markbookAssessment->getId(),
+                    'title'           => $markbookAssessment->getTitle(),
+                    'typeName'        => $markbookAssessment->getTypeName(),
+                    'assessmentType'  => $markbookAssessment->getFamilyName(),
                     'sequence'        => $sequence,
                     'unitSpec'        => $unitSpec !== null ? [
                         /* for rendering the unit bars at the top of the page */
                         'id'    => $unitSpec->getId(),
                         'title' => $unitSpec->getTitle(),
                     ] : null,
+                    /* special reporting markbook specific flag.
+                     * true for the reporting activity that should have its marks/comments shown at the end of the table
+                     */
+                    'splitComments' => $markbookAssessment->getId() === $assessment->getId(),
                     /* the reporting markbook doesn't need any of the below, as this is always an implementation... I think? */
-                    'isSpecification' => $assessment->isSpecification(),
+                    'isSpecification' => $markbookAssessment->isSpecification(),
                     'stats'           => null,
-                    '_links'          => $unitAssessmentsTranslator->getLinks($assessment, true),
+                    '_links'          => $unitAssessmentsTranslator->getLinks($markbookAssessment, true),
                     '_routes'         => [
                         // TODO: nothing on the reporting markbook is markable *except* for the reporting activity itself, although that renders differently....
                         'postFeedbacks' => null,
                     ],
                 ];
-            })->indexByCallback(fn(array $assessment) => $assessment['id']),
+            })->indexByCallback(fn(array $markbookAssessment) => $markbookAssessment['id']),
             /**
              * A "class implementation" is a course/class markbook-specific term.
              * Since the class markbook can contain non-unit assessments, this is a generalised term to allow
@@ -121,7 +136,7 @@ class Controller extends Base
                     'id'    => $folder->getFolder()->getId(),
                     'title' => $folder->getFolder()->getTitle(),
                 ],
-                'assessments' => $markbook->getAssessments()->indexBy('id')->map(function (IAssessable $aImpl) use ($markbook) {
+                'assessments' => $markbookAssessments->indexBy('id')->map(function (IAssessable $aImpl) use ($markbook) {
                     /** Only due work has the concept of "instructorMarkScheme", others just use markScheme for now */
                     $instructorMarkScheme = ($aImpl instanceof DueWork\Model || $aImpl instanceof Reporting\Model)
                         ? $aImpl->getInstructorMarkScheme()

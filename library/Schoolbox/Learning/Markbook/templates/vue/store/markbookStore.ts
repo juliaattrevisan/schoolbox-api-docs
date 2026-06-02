@@ -89,21 +89,52 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         });
 
         const groups: {
+            id: number;
             unitSpec: MarkbookActivity["unitSpec"];
             activities: MarkbookActivity[];
+            /**
+             * Whether to show a separate comments column for each activity within this group,
+             * it will force the activity to the far right and not show regular headers for the group.
+             *
+             * NOTE: this is only designed to look reasonable for the single reporting activity
+             * that shows up on the reporting markbook representing the status page's current activity.
+             */
+            splitComments: boolean;
         }[] = [];
 
         assessments.forEach((activity) => {
+            // each group needs a unique ID for vue rendering, use the unit spec ID where possible or fall back to a new negative one
+            const minGroupId = Math.min(...groups.map((g) => g.id), 0);
+
+            if (activity.splitComments) {
+                // The target reporting assessment should be in its own group at the very end, separate from everything else.
+                // *yeah this is a bit jank, but it avoids having to do a lot of other special cases elsewhere*
+                groups.push({
+                    id: minGroupId,
+                    unitSpec: null,
+                    activities: [activity],
+                    splitComments: true,
+                });
+                return;
+            }
+
             let group = groups.find((g) => g.unitSpec?.id === activity.unitSpec?.id);
             if (!group) {
                 group = {
+                    id: activity.unitSpec?.id ?? minGroupId - 1,
                     unitSpec: activity.unitSpec,
                     activities: [],
+                    splitComments: false,
                 };
                 groups.push(group);
             }
 
             group.activities.push(activity);
+        });
+
+        // ensure any groups with splitComments are at the end
+        groups.sort((a, b) => {
+            return (a.splitComments ? 1 : 0) - (b.splitComments ? 1 : 0);
         });
 
         return groups;

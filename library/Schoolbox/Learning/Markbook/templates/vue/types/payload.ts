@@ -20,6 +20,11 @@ export type MarkbookActivity = Pick<Activity, "id" | "title" | "assessmentType">
         title: string;
     } | null;
     sequence: number;
+    /**
+     * special reporting markbook specific flag.
+     * true for the reporting activity that should have its marks/comments shown at the end of the table
+     */
+    splitComments: boolean;
     /** stats and the summary link are currently only relevant for specs */
     isSpecification: boolean;
     stats: {

@@ -326,6 +326,35 @@ const plaintextComments = window.Vue.computed(() => {
         </template>
     </td>
     <td v-else class="na"></td>
+
+    <!-- Reporting Markbook: Split comments field for the reporting activity being viewed -->
+    <td
+        v-if="mbStore.data && classImpl && assessment && student && assessment.splitComments"
+        class="mb-reporting-current-comment-cell"
+    >
+        <template v-if="participant === null || participant.isExcluded"></template>
+
+        <!-- eslint-disable vue/no-v-html -- scrubbed in the backend -->
+        <span
+            v-else-if="mbStore.showDrafts && participant.marks.draft.responseId !== null"
+            class="meta"
+            v-html="participant.marks.published.comment"
+        />
+        <!-- eslint-enable vue/no-v-html -->
+        <!-- eslint-disable vue/no-v-html -- scrubbed in the backend -->
+        <span
+            v-else-if="participant.marks.published.responseId !== null"
+            v-html="participant.marks.published.comment"
+        />
+        <!-- eslint-enable vue/no-v-html -->
+
+        <span v-else>–</span>
+    </td>
 </template>
 
-<style scoped></style>
+<style scoped>
+.mb-reporting-current-comment-cell {
+    min-width: 40rem;
+    white-space: normal !important;
+}
+</style>

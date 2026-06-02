@@ -48,13 +48,7 @@ mbStore.feedbackDrawerEventBus.on(({ drawerRect }) => {
 </script>
 
 <template>
-    <tr
-        v-if="mbStore.data !== null"
-        ref="studentRowRef"
-        :class="{
-            'markbook-faded': isFaded,
-        }"
-    >
+    <tr v-if="mbStore.data !== null" ref="studentRowRef" :class="{ 'markbook-faded': isFaded }">
         <th class="profile-cell fixed-left white">
             <div class="c-card">
                 <div class="l-flex-row l-gap-m l-pad-s">
