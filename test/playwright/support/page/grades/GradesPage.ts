@@ -45,6 +45,13 @@ export default class GradesPage {
         // The switcher is a radio group at the top-left of the page; selecting a mode triggers a
         // full navigation (window.location.href) to the same route with ?viewMode=<mode>. Wait for
         // that navigation to settle so callers observe the reloaded, server-rendered page.
+        //
+        // Clicking the label of an already-checked radio fires no `change` event, so no navigation
+        // occurs. Short-circuit in that case to keep viewAs() idempotent and avoid waiting on a
+        // navigation that will never happen (e.g. the initial load defaults to staff with no param).
+        if (await this.page.locator(`#grades-view-mode-${mode}`).isChecked()) {
+            return;
+        }
         await this.page.locator(`label[for="grades-view-mode-${mode}"]`).click();
         await this.page.waitForURL(new RegExp(`[?&]viewMode=${mode}(?:&|$)`));
     }
