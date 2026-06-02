@@ -15,7 +15,6 @@ use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
@@ -26,8 +25,6 @@ use Schoolbox\Learning\Assessment\Reporting;
 use Schoolbox\Learning\Assessment\Reporting\Model;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Twig\Error\Error;
 
@@ -47,7 +44,6 @@ class Controller extends Base
         private \Schoolbox\Learning\Assessment\DataModel\Reporting\Feedback\Mapper $feedbackDataMapper,
         private AssessmentDataSource $assessmentDataSource,
         private Project\ResultCache\Mapper $projectResultCacheMapper,
-        private Access $access,
     ) {
         /* TODO Technical Uplift Candidate
          *  StateMapper.

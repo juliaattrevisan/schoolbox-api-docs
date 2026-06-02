@@ -172,7 +172,6 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\Reporting\Feedback\Mapper::class),
             $this->injector->get('assessmentDataSource'),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::class),
-            $this->getAccess(),
         );
     }
 
