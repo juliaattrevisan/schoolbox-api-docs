@@ -21,11 +21,11 @@ readonly class JobRequest
      *
      * @param string                     $tool         The tool to run: must match the name of a tool defined in the
      *                                                 tools daemon's configuration file.
-     * @param array<string>              $options      A list of options to pass to the tool: these will be passed as
-     *                                                 additional command-line parameters to the tool.
      * @param string|null                $instanceId   If provided: run the tool in the context of this instance.
      *                                                 A tool's definition will either mandate an instance ID, or
      *                                                 prohibit one.
+     * @param array<string>              $options      A list of options to pass to the tool: these will be passed as
+     *                                                 additional command-line parameters to the tool.
      * @param array<string, string>|null $environment  Any environment variables to pass to the tool.
      *                                                 A tool's definition will define its required and allowed
      *                                                 environment variables.
@@ -33,8 +33,8 @@ readonly class JobRequest
      */
     public function __construct(
         public string $tool,
-        public array $options = [],
         public ?string $instanceId = null,
+        public array $options = [],
         public ?array $environment = null,
         public ?UriInterface $webhook = null,
     ) {
