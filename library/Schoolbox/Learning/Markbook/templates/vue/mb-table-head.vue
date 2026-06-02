@@ -5,6 +5,7 @@ import { MarkbookType } from "./types/types";
 import MbTableHeadActivity from "./mb-table-head-activity.vue";
 import MbClassAverageHeader from "./mb-class-average-header.vue";
 import { assertUnreachable } from "@js/util/errorUtils";
+import type { MarkbookActivity } from "./types/payload";
 
 interface Props {
     type: MarkbookType;
@@ -25,6 +26,29 @@ const fadedGroupIds = window.Vue.computed(() => {
         .filter((group) => !group.activities.some((activity) => activity.id === activityId))
         .map((group) => group.id);
 });
+
+/**
+ * Count visible columns for an activity group.
+ * @param activities The activities in the group
+ * @returns The number of visible columns
+ */
+function getGroupColspan(activities: MarkbookActivity[]): number {
+    let total = 0;
+
+    for (const activity of activities) {
+        if (activity.splitComments) {
+            // using splitComments, columns depend on the visibility of each part
+            const visibility = mbStore.getSplitColumnVisibility(activity);
+            if (visibility.mark) total += 1;
+            if (visibility.comment) total += 1;
+        } else {
+            // not using splitComments, so just one column for the activity
+            total += 1;
+        }
+    }
+
+    return total;
+}
 </script>
 
 <template>
@@ -59,13 +83,13 @@ const fadedGroupIds = window.Vue.computed(() => {
             ></th>
             <template v-for="group in mbStore.activityGroups" :key="group.id">
                 <th
-                    v-if="group.splitComments"
-                    :colspan="group.activities.length * 2"
+                    v-if="group.splitComments && getGroupColspan(group.activities) > 0"
+                    :colspan="getGroupColspan(group.activities)"
                     class="white"
                     :class="{ 'markbook-faded': fadedGroupIds.includes(group.id) }"
                 ></th>
                 <th
-                    v-else
+                    v-else-if="getGroupColspan(group.activities) > 0"
                     class="unit-title"
                     :class="{
                         'markbook-faded': fadedGroupIds.includes(group.id),
@@ -76,7 +100,7 @@ const fadedGroupIds = window.Vue.computed(() => {
                         group.unitSpec?.title ??
                         `These ${locale.activity.plural()} are not part of a ${locale.unit.singular()}`
                     "
-                    :colspan="group.activities.length"
+                    :colspan="getGroupColspan(group.activities)"
                 >
                     {{ group.unitSpec?.title ?? "" }}
                 </th>

@@ -47,14 +47,16 @@ const isFaded = window.Vue.computed(() => {
 
     return mbStore.feedbackSelectedCell.activityId !== props.activity.id;
 });
+
+const splitColumnVisibility = window.Vue.computed(() => mbStore.getSplitColumnVisibility(props.activity));
 </script>
 
 <template>
     <template v-if="props.activity.splitComments">
-        <th :class="{ 'markbook-faded': isFaded }">
+        <th v-if="splitColumnVisibility.mark" :class="{ 'markbook-faded': isFaded }">
             <div><span>Mark</span></div>
         </th>
-        <th :class="{ 'markbook-faded': isFaded }">
+        <th v-if="splitColumnVisibility.comment" :class="{ 'markbook-faded': isFaded }">
             <div><span>Comment</span></div>
         </th>
     </template>

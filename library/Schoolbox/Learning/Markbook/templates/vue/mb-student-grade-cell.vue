@@ -53,6 +53,11 @@ const participant = window.Vue.computed(() => {
     return aImpl.value.participants[student.value.id] || null;
 });
 
+const canGiveFeedbackMarks = window.Vue.computed(
+    () => aImpl.value && aImpl.value.instructorMarkScheme.mode !== MarkTypeSlug.NONE,
+);
+const canGiveFeedbackComments = window.Vue.computed(() => aImpl.value && aImpl.value.feedbackCommentsEnable);
+
 /**
  * To determine whether the pop-out menu should be available for this cell
  */
@@ -197,7 +202,7 @@ async function onClickCell(referenceElement: HTMLTableCellElement | null): Promi
         mbStore.popoutSelectedCell = null;
 
         /* you must have the ability to either enter a mark or a comment (reporting can disable both at once) */
-        if (aImpl.value.feedbackCommentsEnable || aImpl.value.instructorMarkScheme.mode !== MarkTypeSlug.NONE) {
+        if (canGiveFeedbackMarks.value || canGiveFeedbackComments.value) {
             mbStore.setFeedbackSelectedCell(selectedFeedbackInfo);
         }
 
@@ -265,7 +270,9 @@ const plaintextComments = window.Vue.computed(() => {
 
 <template>
     <td
-        v-if="mbStore.data && classImpl && assessment && student"
+        v-if="
+            mbStore.data && classImpl && assessment && student && !(assessment.splitComments && !canGiveFeedbackMarks)
+        "
         ref="cellRef"
         class="student-grade-cell"
         :class="{
@@ -332,7 +339,7 @@ const plaintextComments = window.Vue.computed(() => {
 
     <!-- Reporting Markbook: Split comments field for the reporting activity being viewed -->
     <td
-        v-if="mbStore.data && classImpl && assessment && student && assessment.splitComments"
+        v-if="mbStore.data && classImpl && assessment && student && assessment.splitComments && canGiveFeedbackComments"
         ref="commentCellRef"
         class="mb-student-grade-cell-comment"
         :class="{

@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { useEventBus } from "@vueuse/core";
 import type { EventBusKey } from "@vueuse/core";
 import type { Template } from "@js/editor/types/editorTypes";
+import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 import type {
     Markbook,
     MarkbookActivity,
@@ -287,6 +288,27 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         Object.assign(participant.marks.published, participant.extraInfo.marks.published);
     }
 
+    /**
+     * Whether an activity using "splitComments" mode should show the mark and/or comments columns
+     * @param activity - The activity to check
+     * @returns whether to show the mark and comment columns
+     */
+    function getSplitColumnVisibility(activity: MarkbookActivity): { mark: boolean; comment: boolean } {
+        if (!activity.splitComments) {
+            return { mark: false, comment: false };
+        }
+
+        const classImpls = data.value?.classImpls ?? [];
+        const activityImpls = classImpls
+            .map((classImpl) => classImpl.assessments[activity.id])
+            .filter((aImpl) => aImpl !== undefined && aImpl !== null);
+
+        return {
+            mark: activityImpls.some((aImpl) => aImpl.instructorMarkScheme.mode !== MarkTypeSlug.NONE),
+            comment: activityImpls.some((aImpl) => aImpl.feedbackCommentsEnable),
+        };
+    }
+
     return {
         init,
         data,
@@ -313,5 +335,6 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         setFeedbackSelectedCell,
         feedbackDrawerEventBus,
         updateExtraInfo,
+        getSplitColumnVisibility,
     };
 });
