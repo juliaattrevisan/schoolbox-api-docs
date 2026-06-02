@@ -119,8 +119,8 @@ class IdFinder extends Filter\AbstractIdFinder
         $rubricUsages   = $completeFilters[RubricUsage\Definition::class];
         $markPerCap     = $completeFilters[MarkPerCap\Definition::class];
 
-        $dueWorkAlias                                             = 'dw';
-        [$aTypeJoin, $aTypeWhere]                                 = $this->getClauseAType($aTypes, $rubricUsages, $markPerCap, $dueWorkAlias);
+        $dueWorkAlias                                             = 'sb';
+        [$aTypeJoin, $aTypeWhere]                                 = $this->getClauseAType($aTypes, $rubricUsages, $markPerCap);
         [$rubricUsageJoin, $rubricUsageWhere, $rubricUsageParams] = $this->getClauseRubricUsage($rubricUsages, $aTypes, $dueWorkAlias);
         [$markPerCapWhere, $markPerCapParams]                     = $this->getClauseMarkPerCapability($markPerCap, $dueWorkAlias);
         [$temporalWhere, $temporalParams, $participantPlanJoin]   = $this->getClauseTemporalState($temporalStates);
@@ -139,6 +139,7 @@ class IdFinder extends Filter\AbstractIdFinder
             $termDJoin,
             $termCJoin,
         ];
+//        new \Alaress_Probe($nonContextJoins);
         $nonContextJoin = implode("\n", $nonContextJoins);
 
         // Build the non-context WHERE clauses.
@@ -155,6 +156,7 @@ class IdFinder extends Filter\AbstractIdFinder
             $deletedWhere,
             $yearLevelWhere,
         ];
+//        new \Alaress_Probe($nonContextWhereClauses);;
         $nonContextWhereClause = implode(' AND ', $nonContextWhereClauses);
 
         // Merge all the params
@@ -284,7 +286,7 @@ class IdFinder extends Filter\AbstractIdFinder
                     ";
             }
         }
-
+//new \Alaress_Probe($subQueries);
         return [implode("\n\n\tUNION\n\n", $subQueries), $params];
     }
 
@@ -534,7 +536,7 @@ class IdFinder extends Filter\AbstractIdFinder
      * @return mixed[]
      * @throws InvalidColumnException
      */
-    private function getClauseAType(?Collection $aTypes, ?Collection $rubricUsages, ?Collection $markPerCap, string $dueWorkAlias): array
+    private function getClauseAType(?Collection $aTypes, ?Collection $rubricUsages, ?Collection $markPerCap): array
     {
         // Are we not filtering by assessment type, have no cap/Ind usage, and no markPerCap considerations?
         if (null === $aTypes && null === $rubricUsages && null === $markPerCap) {
@@ -545,29 +547,13 @@ class IdFinder extends Filter\AbstractIdFinder
         // We do need to JOIN to assessment type table/s. Start building JOIN and WHERE clause.
         $joinClause = '';
 
-        // Do we need to JOIN to `submission_box`?
-        $joinToSubBox = ($aTypes && $aTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK)) || $rubricUsages || $markPerCap;
-
-        // Are we only joining to a single assessment type table?
-        $oneJoinOnly =
-            ($aTypes && $aTypes->count() === 1 && !$rubricUsages && !$markPerCap) ||                             // Just 1 of [project/quiz/assess/subBox]
-            (!$aTypes && ($rubricUsages || $markPerCap)) ||                                                      // Just subBox due to rubricUsage || markPerCap
-            ($aTypes && $aTypes->count() === 1 && $aTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK));  // Just [subBox], others don't matter here
-
-
-        // If we are only fetching 1 of the assessment types, we can INNER JOIN, otherwise we must LEFT JOIN and add WHERE clause
-        if ($oneJoinOnly) {
-            $joinType = 'INNER';
-            $builder  = null;
-        } else {
-            $joinType = 'LEFT';
-            $builder  = $this->getMapper()->getPredicateBuilder();
-        }
+        $joinType = 'LEFT';
+        $builder  = $this->getMapper()->getPredicateBuilder();
 
         // Task
         if ($aTypes && $aTypes->keyExists(AssessmentType\Definition::KEY_TASK)) {
             $joinClause .= "
-                $joinType JOIN task tk           ON tk.assessment_id = a.id
+                $joinType JOIN task tk ON tk.assessment_id = a.id
             ";
             if ($builder) {
                 $builder->notNull('tk.id');
@@ -577,7 +563,7 @@ class IdFinder extends Filter\AbstractIdFinder
         // Quiz
         if ($aTypes && $aTypes->keyExists(AssessmentType\Definition::KEY_QUIZ)) {
             $joinClause .= "
-                $joinType JOIN assess qz         ON qz.assessment_id = a.id
+                $joinType JOIN assess qz ON qz.assessment_id = a.id
             ";
             if ($builder) {
                 $builder->notNull('qz.assess_id');
@@ -585,12 +571,12 @@ class IdFinder extends Filter\AbstractIdFinder
         }
 
         // DueWork
-        if ($joinToSubBox) {
+        if ($aTypes && $aTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK)) {
             $joinClause .= "
-                $joinType JOIN submission_box $dueWorkAlias ON $dueWorkAlias.assessment_id = a.id
+                $joinType JOIN submission_box sb ON sb.assessment_id = a.id
             ";
             if ($builder) {
-                $builder->notNull("$dueWorkAlias.id");
+                $builder->notNull("sb.id");
             }
         }
 
@@ -646,7 +632,11 @@ class IdFinder extends Filter\AbstractIdFinder
             }
         }
 
-        return [$joinClause, $builder ? '(' . implode(' OR ', $builder->getWhere()) . ')' : 'TRUE'];
+        if (count($builder->getWhere())) {
+            return [$joinClause, '(' . implode(' OR ', $builder->getWhere()) . ')'];
+        }
+
+        return [$joinClause, 'TRUE'];
     }
 
 
@@ -678,10 +668,13 @@ class IdFinder extends Filter\AbstractIdFinder
             // No need to join to usage, we can just examine the `submission_box.use_rubric` column.
             $join = '';
         } else {
-            // We need to examine, usage, how should we join?
-            $otherAssessmentTypes = $aTypes && ($aTypes->count() > 1 || !$aTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK));
-            $joinType             = $otherAssessmentTypes ? 'LEFT' : 'INNER';
-            $join                 = "$joinType JOIN rubric_capability_usage rgu ON $dueWorkAlias.id = rgu.submission_box_id";
+            /* A non-NONE rubric filter was chosen; we have to inspect every possible place that might have used a
+             * capability or indicator, not just submission boxes
+             */
+            $join = "
+                INNER JOIN rubric_instance ON rubric_instance.assessment_id = a.id AND rubric_instance.deleted_at IS NULL
+                INNER JOIN rubric_capability_usage rcu ON rubric_instance.id = rcu.rubric_instance_id
+            ";
         }
 
         $pb    = $this->getMapper()->getPredicateBuilder();
@@ -691,17 +684,17 @@ class IdFinder extends Filter\AbstractIdFinder
 
         foreach ($rubricUsages as $rubricUsage) {
             if ($rubricUsage === RubricUsage\Definition::KEY_NONE) {
-                $pb->isFalse("$dueWorkAlias.use_rubric");
-            } else {
-                // This assumes that if an assessment is using an indicator, it is using the indicator's capability.
-                // Hence we can just JOIN to capability usage
-                [$capId] = $codex->decode($rubricUsage);
-                $capabilityIds[] = $capId;
+                continue;
             }
+
+            // This assumes that if an assessment is using an indicator, it is using the indicator's capability.
+            // Hence we can just JOIN to capability usage
+            [$capId] = $codex->decode($rubricUsage);
+            $capabilityIds[] = $capId;
         }
 
         foreach (array_unique($capabilityIds) as $uniqueCapId) {
-            $pb->equals('rgu.rubric_capability_id', $uniqueCapId);
+            $pb->equals('rcu.rubric_capability_id', $uniqueCapId);
         }
 
         return [$join, '(' . implode(' OR ', $pb->getWhere()) . ')', $pb->getParams()];
@@ -731,19 +724,22 @@ class IdFinder extends Filter\AbstractIdFinder
 
         $pb = $this->getMapper()->getPredicateBuilder();
 
-        if ($markPerCapability->keyExists(MarkPerCap\Definition::KEY_NONE)) {
-            // Not a DueWork
-            $pb->isNull("$dueWorkAlias.id");
-
-            // DueWork not using rubric
-            $pb->isFalse("$dueWorkAlias.use_rubric");
-        }
+        /* TODO How to do this? Assessments not using a rubric is denoted by the existence of zero rubric instances
+         *  rather than an explicit boolean value now
+         */
+//        if ($markPerCapability->keyExists(MarkPerCap\Definition::KEY_NONE)) {
+//            // Not a DueWork
+//            $pb->isNull("$dueWorkAlias.id");
+//
+//            // DueWork not using rubric
+//            $pb->isFalse("$dueWorkAlias.use_rubric");
+//        }
 
         if ($markPerCapability->keyExists(MarkPerCap\Definition::KEY_ON)) {
-            $pb->notEquals("$dueWorkAlias.rubric_capability_mark_type_id", MarkType::TYPE_NONE);
+            $pb->notEquals("rubric_instance.rubric_capability_mark_type_id", MarkType::TYPE_NONE);
         }
         if ($markPerCapability->keyExists(MarkPerCap\Definition::KEY_OFF)) {
-            $pb->equals("$dueWorkAlias.rubric_capability_mark_type_id", MarkType::TYPE_NONE);
+            $pb->equals("rubric_instance.rubric_capability_mark_type_id", MarkType::TYPE_NONE);
         }
 
         return ['(' . implode(' OR ', $pb->getWhere()) . ')', $pb->getParams()];
