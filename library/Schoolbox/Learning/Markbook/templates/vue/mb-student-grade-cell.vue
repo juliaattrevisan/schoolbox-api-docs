@@ -266,13 +266,23 @@ const plaintextComments = window.Vue.computed(() => {
 
     return comments;
 });
+
+// show the marks column if splitComments is disabled or if the user can give feedback marks
+const showMarksColumn = window.Vue.computed(() => {
+    if (assessment.value === null) return false;
+    return !assessment.value.splitComments || canGiveFeedbackMarks.value;
+});
+
+// show the comments column if splitComments is enabled and the user can give feedback comments
+const showCommentsColumn = window.Vue.computed(() => {
+    if (assessment.value === null) return false;
+    return assessment.value.splitComments && canGiveFeedbackComments.value;
+});
 </script>
 
 <template>
     <td
-        v-if="
-            mbStore.data && classImpl && assessment && student && !(assessment.splitComments && !canGiveFeedbackMarks)
-        "
+        v-if="mbStore.data && classImpl && assessment && student && showMarksColumn"
         ref="cellRef"
         class="student-grade-cell"
         :class="{
@@ -335,11 +345,11 @@ const plaintextComments = window.Vue.computed(() => {
             </span>
         </template>
     </td>
-    <td v-else class="na"></td>
+    <td v-else-if="showMarksColumn" class="na"></td>
 
     <!-- Reporting Markbook: Split comments field for the reporting activity being viewed -->
     <td
-        v-if="mbStore.data && classImpl && assessment && student && assessment.splitComments && canGiveFeedbackComments"
+        v-if="mbStore.data && classImpl && assessment && student && showCommentsColumn"
         ref="commentCellRef"
         class="mb-student-grade-cell-comment"
         :class="{
@@ -370,6 +380,7 @@ const plaintextComments = window.Vue.computed(() => {
 
         <span v-else>–</span>
     </td>
+    <td v-else-if="showCommentsColumn" class="na"></td>
 </template>
 
 <style scoped>
