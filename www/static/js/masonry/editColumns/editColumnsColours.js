@@ -80,6 +80,7 @@ function initColourPickers() {
                 detail: {
                     el: `#${colourPicker.id}`,
                     clearButton: true,
+                    alpha: false,
                 },
             }),
         );
