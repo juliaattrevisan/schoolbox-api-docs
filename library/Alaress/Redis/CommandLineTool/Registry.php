@@ -36,13 +36,22 @@ class Registry
         // Cache-only patterns go here
         Redis::INSTANCE_CACHE   => [
             // Scrub
+            '^fc\\.scrub\\.html\\.' . self::INSTANCE_ID_MATCH,
+            '^fc\\.htmlAbsoluteUri\\.html\\.' . self::INSTANCE_ID_MATCH,
+            // Old keys
             '^fc:' . self::INSTANCE_ID_MATCH . ':scrub.html:',
             '^fc:' . self::INSTANCE_ID_MATCH . ':scrub.htmlAbsoluteUri:',
 
             // Verso API
+            '^fc\\.verso_api\\.' . self::INSTANCE_ID_MATCH,
+            // Old keys
             '^fc:' . self::INSTANCE_ID_MATCH . ':verso_api:',
 
             // External
+            '^fc\\.External_Class\\.\\w+\\.' . self::INSTANCE_ID_MATCH,
+            '^fc\\.External_Timetable\\.\\w+\\.' . self::INSTANCE_ID_MATCH,
+            '^fc\\.External_User\\.\\w+\\.' . self::INSTANCE_ID_MATCH,
+            // Old keys
             '^fc:' . self::INSTANCE_ID_MATCH . ':External_',
 
             // vCal cache
@@ -71,6 +80,8 @@ class Registry
             'paperly\\.' . self::INSTANCE_ID_MATCH . ':paperly_dashboard_user',
 
             // Storage cache
+            '^fc\\.system_usage_\w+\\.' . self::INSTANCE_ID_MATCH,
+            // Old keys
             '^fc:' . self::INSTANCE_ID_MATCH . ':system_usage_',
 
             // HTTP client cache
