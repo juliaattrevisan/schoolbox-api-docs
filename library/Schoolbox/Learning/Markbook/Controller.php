@@ -710,9 +710,9 @@ class Controller extends Base
         } else {
             // load the folder's info
             $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview(
-               folderId: $folder->getId(),
-               users: null,
-               options: ['ids' => $assessmentIds],
+                folderId: $folder->getId(),
+                users: null,
+                options: ['ids' => $assessmentIds],
             );
         }
 
