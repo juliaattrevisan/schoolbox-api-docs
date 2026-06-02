@@ -63,31 +63,18 @@ class Registry
             //   oAuth/OIDC provider
             CacheHelper::BASE_CLIENT_KEY . '\\.' . self::INSTANCE_ID_MATCH . ':' . IsamsCacheHelper::REGISTERS_CACHE_KEY,
             CacheHelper::BASE_CLIENT_KEY . '\\.' . self::INSTANCE_ID_MATCH . ':',
-            // Old keys: will eventually be removed
-            CacheHelper::BASE_CLIENT_KEY . ':' . self::INSTANCE_ID_MATCH . ':isams_registers',
-            CacheHelper::BASE_CLIENT_KEY . ':' . self::INSTANCE_ID_MATCH . ':' . self::SET_KEY,
-            CacheHelper::BASE_CLIENT_KEY . ':' . self::INSTANCE_ID_MATCH . ':',
 
             // ClickView (Homepage Component) cache
             'component\\.homepage\\.clickview\\.' . self::INSTANCE_ID_MATCH . ':',
-            // Old key
-            'component.homepage.clickview:' . self::INSTANCE_ID_MATCH . ':' . self::SET_KEY,
-            'component.homepage.clickview:' . self::INSTANCE_ID_MATCH . ':',
 
             // Paperly cache
             'paperly\\.' . self::INSTANCE_ID_MATCH . ':paperly_dashboard_user',
-            // Old key
-            'paperly' . ':' . self::INSTANCE_ID_MATCH . ':paperly_dashboard_user',
-            'paperly' . ':' . self::INSTANCE_ID_MATCH . ':' . self::SET_KEY,
 
             // Storage cache
             '^fc:' . self::INSTANCE_ID_MATCH . ':system_usage_',
 
             // HTTP client cache
             'httpClient\\.' . self::INSTANCE_ID_MATCH . ':',
-            // Old key
-            'httpClient:' . self::INSTANCE_ID_MATCH . ':' . self::SET_KEY,
-            'httpClient:' . self::INSTANCE_ID_MATCH . ':',
 
             // Storage hashes within storage file content:
             // used so that storage file content does not need to be looked up
@@ -133,9 +120,6 @@ class Registry
 
             // Access tokens for LTI assessments
             '^accessToken\\.' . self::INSTANCE_ID_MATCH . ':.+',
-            // Old key
-            '^accessToken:' . self::INSTANCE_ID_MATCH . ':' . self::SET_KEY,
-            '^accessToken:' . self::INSTANCE_ID_MATCH . ':.+',
 
             // Etherpad patterns
             '^pad:g\.',
@@ -159,9 +143,6 @@ class Registry
             // * nonces
             // * refresh tokens
             CacheHelper::BASE_SERVER_KEY . '\\.' . self::INSTANCE_ID_MATCH . ':',
-            // Old keys
-            CacheHelper::BASE_SERVER_KEY . ':' . self::INSTANCE_ID_MATCH . ':' . self::SET_KEY,
-            CacheHelper::BASE_SERVER_KEY . ':' . self::INSTANCE_ID_MATCH . ':',
         ],
         // Queue patterns go here
         // (Note that queue is the same instance as cache, so it's not an issue
