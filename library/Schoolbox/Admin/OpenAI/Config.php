@@ -70,6 +70,17 @@ class Config
     ];
 
     /**
+     * These models are in the GPT-4 family: they might not support all
+     * settings for verbosity and reasoning for all features.
+     */
+    private const array GPT4_MODELS = [
+        "gpt-4o",
+        "gpt-4o-mini",
+        "gpt-4.1",
+        "gpt-4.1-mini",
+    ];
+
+    /**
      * Recommended models for each feature, split by text and image generation.
      */
     public const array RECOMMENDED_MODELS = [
@@ -768,8 +779,11 @@ class Config
     /**
      * Build available reasoning effort levels for this feature.
      *
-     * This ensures the `minimal` effort level is stripped from the image
-     * feature, because this effort is not supported when generating images.
+     * This ensures that:
+     * * the `minimal` effort level is stripped from the image feature, because
+     *   this effort is not supported when generating images
+     * * the `none` effort level is stripped from the chat feature for GPT-4
+     *   family models, because it's not supported in that feature
      *
      * @param string $feature
      * @return array|array[]
@@ -779,6 +793,13 @@ class Config
         $options = self::REASONING_EFFORT_MODEL_OPTIONS;
         if ($feature === Helper::FEATURE_IMAGE) {
             $options = array_map(fn ($effortLevels) => array_values(array_diff($effortLevels, ['minimal'])), $options);
+        }
+        if ($feature === Helper::FEATURE_CHAT) {
+            foreach ($options as $model => $effortLevels) {
+                if (in_array($model, self::GPT4_MODELS, true)) {
+                    $options[$model] = array_values(array_diff($effortLevels, [self::REASONING_EFFORT_OPTION_NONE]));
+                }
+            }
         }
         return $options;
     }
