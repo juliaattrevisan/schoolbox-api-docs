@@ -36,14 +36,14 @@ class Controller extends ConfigController
      * @param FieldStrategyFactory $fieldStrategyFactory
      * @param Rebuilder            $rebuilder
      * @param CacheInterface       $oidcCache
-     * @param ToolsDaemon\Client   $toolsDaemonClient
+     * @param ToolsDaemon\IClient  $toolsDaemonClient
      */
     public function __construct(
         ConfigMapper $configMapper,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
         CacheInterface $oidcCache,
-        private ToolsDaemon\Client $toolsDaemonClient,
+        private ToolsDaemon\IClient $toolsDaemonClient,
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder, $oidcCache);
     }
@@ -328,8 +328,11 @@ class Controller extends ConfigController
                 // Don't need to wait for toolsd to run the job
                 $this->toolsDaemonClient->run(new ToolsDaemon\JobRequest('clearExternalCache', INSTANCE_ID));
             } catch (ToolsDaemon\ClientException $e) {
-                // do something
-                throw $e;
+                // log an error to stdout, but continue?
+                $this->spawnLogger('toolsd.' . INSTANCE_ID)->warning(
+                    sprintf('Tools daemon request failed (message: %s)', $e->getMessage()),
+                    ['exception' => $e],
+                );
             }
         }
 
