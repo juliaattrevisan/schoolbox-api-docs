@@ -78,7 +78,7 @@ tools:
 
   # A simple tool which actually ties into Schoolbox.
   refreshBindingCache:
-    command: /usr/share/schoolbox/tools/notif/route/refresh-binding-cache.php
+    command: tools/notif/route/refresh-binding-cache.php
     options:
       allowed: [-v]
     requiresInstanceId: true
@@ -94,8 +94,7 @@ tools:
 
   # A tool for clearing external caches.
   clearExternalCache:
-    # TODO try to remove need for /usr/share/schoolbox prefix
-    command: /usr/share/schoolbox/tools/cache/clear-external-cache.php
+    command: tools/cache/clear-external-cache.php
     options:
       allowed: [-v]
     requiresInstanceId: true
