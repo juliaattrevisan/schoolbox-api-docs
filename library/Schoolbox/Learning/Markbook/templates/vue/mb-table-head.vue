@@ -44,6 +44,10 @@ const mbStore = useMarkbookStore();
                 v-for="group in mbStore.activityGroups"
                 :key="group.unitSpec?.id"
                 class="unit-title"
+                :class="{
+                    /* avoid wide reporting markbook solely due to these headers */
+                    'unit-title--clip': props.type === MarkbookType.REPORTING,
+                }"
                 :title="
                     group.unitSpec?.title ??
                     `These ${locale.activity.plural()} are not part of a ${locale.unit.singular()}`
@@ -66,4 +70,10 @@ const mbStore = useMarkbookStore();
     </thead>
 </template>
 
-<style scoped></style>
+<style scoped>
+.unit-title--clip {
+    max-width: 4rem;
+    overflow: clip;
+    text-overflow: ellipsis;
+}
+</style>
