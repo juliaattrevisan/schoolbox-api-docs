@@ -10,6 +10,7 @@
     effectiveViewer: User                        - The user whose feedback visibility rules apply
     canViewInstructorMarks: bool                 - Whether instructor-only marks should be rendered
     viewModeQuerySuffix: string                  - Query suffix that preserves the selected view mode
+    currentRouteBase: string                     - Base URL of the current page, used by the view-mode switcher
     customisationsRoute: string|null             - Route to the student's customisation record, or null if the viewer may not see it
 #}
 
@@ -36,7 +37,6 @@
         </nav>
         <ul id="header-options" class="f-dropdown" data-dropdown-content aria-label="Grades options">
             {% if canSwitchViewMode %}
-                {% set currentRouteBase = routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, term: term, termCode: term.code}) %}
                 {% include '@learningGrades/fragments/viewModeNavSwitcher.twig' with {
                     viewMode: viewMode,
                     viewModes: viewModes,

@@ -184,6 +184,20 @@ class Controller extends Base
             new Collection()
         );
 
+        /* Base URL for the view-mode switcher. It must round-trip to the same route that served this
+         * page so the switcher preserves context. A year summary uses a fake term whose code is not
+         * loadable by the term route, so for that case link back to the year route instead.
+         */
+        $currentRouteBase = $selectedYear !== null
+            ? $this->routeGenerator->generate('learningGrades.getGradesYear', [
+                'userId' => $viewee->getId(),
+                'year'   => $selectedYear,
+            ])
+            : $this->routeGenerator->generate('learningGrades.getGrades', [
+                'userId'   => $viewee->getId(),
+                'termCode' => $term->getCode(),
+            ]);
+
         /* A list of Terms to choose from
          *
          * If we're in an extraordinary Term right now, provide that as an option
@@ -205,6 +219,7 @@ class Controller extends Base
             'viewModeQuerySuffix'    => $viewMode !== '' ? '?viewMode=' . rawurlencode($viewMode) : '',
             'effectiveViewer'        => $effectiveViewer,
             'canViewInstructorMarks' => $canViewInstructorMarks,
+            'currentRouteBase'       => $currentRouteBase,
             'customisationsRoute'    => $this->getRouteIfAuthorized(
                 'customisationRecord.viewRecordByStudent',
                 ['studentId' => $viewee->getId()]
