@@ -205,7 +205,7 @@ where:
 
 ### Point release notes
 
-When preparing point release notes, follow `docs/release-notes/point-release-notes.md`.
+When preparing point release notes, use the `point-release-notes` skill in `.agents/skills/point-release-notes/SKILL.md`.
 
 ---
 

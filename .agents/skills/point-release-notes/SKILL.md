@@ -1,3 +1,8 @@
+---
+name: point-release-notes
+description: Use when preparing Schoolbox point release notes from Jira release reports, release versions, or fix-version issue lists.
+---
+
 # Point Release Notes
 
 Use this pathway when preparing Schoolbox point release notes from a Jira release report.
