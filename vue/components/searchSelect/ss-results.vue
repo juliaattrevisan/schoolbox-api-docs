@@ -187,11 +187,11 @@ window.Vue.watch(
                     @hover="onHover"
                 />
             </ul>
-            <p v-if="props.hasError" class="ss-results__status alert">
+            <p v-if="props.hasError" class="sbx-scroll-container__status alert">
                 Sorry, there was an unknown error retrieving your search results. Please try again and contact your
                 support if the problem persists.
             </p>
-            <p v-if="props.isLoadingMore" class="ss-results__status">Loading more results....</p>
+            <p v-if="props.isLoadingMore" class="sbx-scroll-container__status">Loading more results....</p>
         </div>
     </fieldset>
 </template>
