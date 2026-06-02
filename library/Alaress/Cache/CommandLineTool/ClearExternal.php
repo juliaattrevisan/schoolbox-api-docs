@@ -56,12 +56,7 @@ class ClearExternal extends App
         $failureCount  = 0;
         foreach (self::INTERFACES as $interface => $class) {
             $logger->notice(sprintf('Clearing cache for interface "%s", class "%s"', $interface, $class));
-            try {
-                $reflection = new ReflectionClass($interface);
-            } catch (ReflectionException $e) {
-                $logger->warning(sprintf('Interface "%s" does not exist: skipping', $interface), ['exception' => $e]);
-                continue;
-            }
+            $reflection = new ReflectionClass($interface);
             $interfaceSuccessCount = 0;
             $interfaceFailureCount = 0;
             foreach ($reflection->getMethods() as $method) {
