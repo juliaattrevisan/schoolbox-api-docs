@@ -793,7 +793,7 @@ export default {
                             </td>
                             <td class="show-for-medium-up" v-if="differentiationEnabled">
                                 <button
-                                    v-if="student._links.differentiationProfile"
+                                    v-if="student._links?.differentiationProfile"
                                     class="button sbx-button--has-icon"
                                     type="button"
                                     :data-test="`class-list-${student.id}-view-differentiation-profile`"
