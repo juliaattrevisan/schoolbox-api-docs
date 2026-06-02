@@ -42,8 +42,11 @@ export default class GradesPage {
     }
 
     async viewAs(mode: "staff" | "student" | "parent"): Promise<void> {
-        // The switcher is a radio group at the top-left of the page; selecting a mode navigates to it.
+        // The switcher is a radio group at the top-left of the page; selecting a mode triggers a
+        // full navigation (window.location.href) to the same route with ?viewMode=<mode>. Wait for
+        // that navigation to settle so callers observe the reloaded, server-rendered page.
         await this.page.locator(`label[for="grades-view-mode-${mode}"]`).click();
+        await this.page.waitForURL(new RegExp(`[?&]viewMode=${mode}(?:&|$)`));
     }
 
     /**
