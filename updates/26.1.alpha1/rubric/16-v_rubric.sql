@@ -38,6 +38,7 @@ FROM
         WHERE a.deleted_at IS NULL
             AND rc.deleted_at IS NULL
             AND ri.deleted_at IS NULL
+            AND rubric_instance.deleted_at IS NULL
 
         UNION
 
@@ -69,5 +70,6 @@ FROM
         WHERE a.deleted_at IS NULL
             AND rc.deleted_at IS NULL
             AND ri.deleted_at IS NULL
+            AND rubric_instance.deleted_at IS NULL
     ) rubricSummary
 ORDER BY assessment_id, rubric_instance_id, capability_sequence, capability_id, indicator_sequence, indicator_id;

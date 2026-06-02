@@ -43,6 +43,7 @@ FROM
         WHERE sr.deleted_at IS NULL
           AND sr.published_at IS NOT NULL
           AND (rcm.valid IS TRUE OR rim.valid IS TRUE)
+          AND rubric_instance.deleted_at IS NULL
 
         UNION
 
@@ -79,5 +80,6 @@ FROM
         WHERE rf.deleted_at IS NULL
           AND rf.published_at IS NOT NULL
           AND (rcm.valid IS TRUE OR rim.valid IS TRUE)
+          AND rubric_instance.deleted_at IS NULL
 ) rubricSummary
 ORDER BY assessment_id, student_id, feedback_date, capability_sequence, capability_id, indicator_sequence, indicator_id
