@@ -11,6 +11,7 @@ import {
     ACTIVITY_TYPE_QUIZ,
     ACTIVITY_TYPE_REPORTING,
 } from "@schoolboxAssessment/Types/assessmentTypes";
+import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 import { useMarkbookStore } from "./store/markbookStore";
 
 interface Props {
@@ -194,7 +195,7 @@ async function onClickCell(): Promise<void> {
         mbStore.popoutSelectedCell = null;
 
         /* you must have the ability to either enter a mark or a comment (reporting can disable both at once) */
-        if (aImpl.value.feedbackCommentsEnable || aImpl.value.instructorMarkScheme.template.length > 0) {
+        if (aImpl.value.feedbackCommentsEnable || aImpl.value.instructorMarkScheme.mode !== MarkTypeSlug.NONE) {
             mbStore.setFeedbackSelectedCell(selectedFeedbackInfo);
         }
 

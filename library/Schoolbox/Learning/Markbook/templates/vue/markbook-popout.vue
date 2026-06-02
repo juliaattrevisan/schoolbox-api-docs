@@ -16,6 +16,7 @@ import {
     ACTIVITY_TYPE_DIALOG_AGENT,
     ACTIVITY_TYPE_REPORTING,
 } from "@schoolboxAssessment/Types/assessmentTypes";
+import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import { usePopOut } from "@schoolboxVue/composables/popOut/usePopOut";
 import SmallCard from "@schoolboxVue/components/card/small-card.vue";
@@ -435,7 +436,7 @@ const canUpdateFeedback = window.Vue.computed(() => {
     }
 
     /* you must have the ability to either enter a mark or a comment (reporting can disable both at once) */
-    if (!aImpl.feedbackCommentsEnable && aImpl.instructorMarkScheme.template.length === 0) {
+    if (!aImpl.feedbackCommentsEnable && aImpl.instructorMarkScheme.mode === MarkTypeSlug.NONE) {
         return false;
     }
 
