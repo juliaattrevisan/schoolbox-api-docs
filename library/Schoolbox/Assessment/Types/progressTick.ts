@@ -14,6 +14,10 @@
  * - in-progress            The learner has started but not yet submitted
  * - submitted              The response has been submitted
  * - requires-assistance    The learner is requesting assistance
+ *
+ * For Reporting, these represent:
+ * - pending        Marking required
+ * - reviewed       Reviewed
  */
 export enum ProgressTickClass {
     INCOMPLETE = "incomplete", // default/fallback state

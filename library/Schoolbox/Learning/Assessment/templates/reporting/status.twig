@@ -45,24 +45,6 @@
     </ul>
 </div>
 
-<div class="row">
-    <div class="small-12 large-4 columns">
-        <ul class="meta">
-            {% include '@learning/fragments/meta/dueDate.twig' %}
-            {% include '@learning/fragments/meta/workType.twig' %}
-            {% if assessment.isimplementation %}
-                {% import '@learning/macro/markVisibilityMeta.twig' as markVisibilityMeta %}
-
-                {{ markVisibilityMeta.markVisibilityMeta(assessment, true) }}
-
-                {% if readonly ?? false %}
-                    <li><sbx-icon name="archive" color="var(--sbx-color-text-secondary)"></sbx-icon> {{ locale.term.proper }} has been archived</li>
-                {% endif %}
-            {% endif %}
-        </ul>
-    </div>
-</div>
-
 <div id="reporting-markbook-container" class="marksheet-wrapper row" data-markbook-outer-container>
     {% set routeGetStatusData = routeLookupIfAuthorized(
         'learningReporting.getStatus',
@@ -72,7 +54,23 @@
     <reporting-markbook
         {% if editorTemplates is defined %}:editor-templates="{{ editorTemplates|json_encode }}"{% endif %}
         route-get-status-data="{{ routeGetStatusData }}"
-    />
+    >
+        <template #meta>
+            <ul class="meta">
+                {% include '@learning/fragments/meta/dueDate.twig' %}
+                {% include '@learning/fragments/meta/workType.twig' %}
+                {% if assessment.isimplementation %}
+                    {% import '@learning/macro/markVisibilityMeta.twig' as markVisibilityMeta %}
+
+                    {{ markVisibilityMeta.markVisibilityMeta(assessment, true) }}
+
+                    {% if readonly ?? false %}
+                        <li><sbx-icon name="archive" color="var(--sbx-color-text-secondary)"></sbx-icon> {{ locale.term.proper }} has been archived</li>
+                    {% endif %}
+                {% endif %}
+            </ul>
+        </template>
+    </reporting-markbook>
 </div>
 <script src="{{ CDN_PREFIX }}/js/submissions/jquery.combobox.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/reportingMarkbook.js?v={{ config.site_version }}"></script>

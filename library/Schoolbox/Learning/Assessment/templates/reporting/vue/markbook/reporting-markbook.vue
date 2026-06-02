@@ -5,6 +5,8 @@
 
 import type { Template } from "@js/editor/types/editorTypes";
 import { apiRequest } from "@js/util/sbx/apiUtils";
+import { fromEntriesOf } from "@js/util/arrayUtils";
+import { ReportingFeedbackStatus } from "@schoolboxAssessment/Types/reporting";
 import { useMarkbookStore } from "@schoolboxLibrary/Learning/Markbook/templates/vue/store/markbookStore";
 import type { Markbook } from "@schoolboxLibrary/Learning/Markbook/templates/vue/types/payload";
 import { MarkbookType } from "@schoolboxLibrary/Learning/Markbook/templates/vue/types/types";
@@ -12,6 +14,7 @@ import MarkbookInner from "@schoolboxLibrary/Learning/Markbook/templates/vue/mar
 import MarkbookPopout from "@schoolboxLibrary/Learning/Markbook/templates/vue/markbook-popout.vue";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
+import RmbFilters from "./rmb-filters.vue";
 
 interface Props {
     editorTemplates?: Template[];
@@ -20,6 +23,13 @@ interface Props {
 
 const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
+
+// TODO: implement participantSearchFilter
+const participantSearchFilter = window.Vue.ref<string>("");
+// TODO: implement filters
+const filters = window.Vue.ref<Record<ReportingFeedbackStatus, boolean>>(
+    fromEntriesOf(Object.values(ReportingFeedbackStatus).map((status) => [status, true])),
+);
 
 const loadError = window.Vue.ref<string | null>(null);
 
@@ -56,6 +66,25 @@ window.Vue.onMounted(async () => {
 </script>
 
 <template>
+    <div class="row">
+        <!-- Metadata about the activity -->
+        <div class="small-12 large-4 columns">
+            <slot name="meta"></slot>
+        </div>
+
+        <!-- Status filters -->
+        <div class="small-12 large-8 columns text-right">
+            <rmb-filters v-model:filters="filters" />
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div class="row">
+        <div class="small-12 columns">
+            <input v-model="participantSearchFilter" type="search" placeholder="Search for a student" />
+        </div>
+    </div>
+
     <request-error v-if="loadError" :further-info="loadError" />
     <loading-table v-else-if="mbStore.data === null" />
     <markbook-inner v-else :type="MarkbookType.REPORTING" />
