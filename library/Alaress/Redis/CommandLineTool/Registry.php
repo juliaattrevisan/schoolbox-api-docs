@@ -58,6 +58,8 @@ class Registry
             '^fc\\.findTeachersForClassCode\\.' . self::INSTANCE_ID_MATCH,
 
             // vCal cache
+            "^vcal\\." . self::INSTANCE_ID_MATCH . ":[0-9a-f]{64}",
+            // Old keys
             "^vcal:" . self::INSTANCE_ID_MATCH . ":[0-9a-f]{64}",
 
             // Locks
