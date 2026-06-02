@@ -158,7 +158,7 @@ class Module extends BaseModule
         $bakery = new BreadcrumbFactory(
             $this->getRouter()->getGenerator(),
             $this->getAuthorizer(),
-            $this->getMapperFactory()->get(Access::class),
+            $this->getAccess(),
         );
 
         return new Controller(
