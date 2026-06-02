@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { useMarkbookStore } from "./store/markbookStore";
 import type { MarkbookActivity } from "./types/payload";
+import { MarkbookType } from "./types/types";
 import MbTableHead from "./mb-table-head.vue";
 import MbFeedback from "./mb-feedback.vue";
 import MbClassimplRows from "./mb-classimpl-rows.vue";
 import MbTableHeadActivityDropdown from "./mb-table-head-activity-dropdown.vue";
 
 interface Props {
-    type: "course" | "class";
+    type: MarkbookType;
 }
 
 const props = defineProps<Props>();
@@ -175,7 +176,11 @@ const exportReportRoute = window.Vue.computed(() => {
         <table class="diagonal-headings-table marksheet">
             <mb-table-head :type="props.type" />
             <tbody>
-                <tr v-if="props.type === 'course'" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }">
+                <!-- Course Average Row - Course Markbook Only -->
+                <tr
+                    v-if="props.type === MarkbookType.COURSE"
+                    :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }"
+                >
                     <th class="course-row class-row-heading fixed-left">
                         Course Average
                         <span data-tooltip class="hint has-tip tip-top" title="Average student cohort mark">?</span>
@@ -195,6 +200,7 @@ const exportReportRoute = window.Vue.computed(() => {
                     </template>
                 </tr>
 
+                <!-- All class impl rows -->
                 <mb-classimpl-rows
                     v-for="(_, classImplId) in mbStore.data.classImpls"
                     :key="classImplId"

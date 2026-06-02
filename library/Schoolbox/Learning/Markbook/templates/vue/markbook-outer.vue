@@ -4,11 +4,13 @@ import { listenForFilterLoad, listenForFilterLoading } from "@schoolboxLibrary/F
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import { useMarkbookStore } from "./store/markbookStore";
 import type { Markbook } from "./types/payload";
+import type { MarkbookType } from "./types/types";
 import MarkbookInner from "./markbook-inner.vue";
 import MarkbookPopout from "./markbook-popout.vue";
 
 interface Props {
-    type: "course" | "class";
+    /** The target markbook rendering type, specifically either the course or class markbook (ones which use filters) */
+    type: MarkbookType;
     filterEventKey: string;
     editorTemplates?: Template[];
 }
@@ -39,7 +41,7 @@ window.Vue.onMounted(() => {
                 v-if="mbStore.data._routes['courseImport.getImport']"
                 :href="mbStore.data._routes['courseImport.getImport']"
             >
-                Import this course </a
+                Import this course</a
             >.
         </p>
     </div>

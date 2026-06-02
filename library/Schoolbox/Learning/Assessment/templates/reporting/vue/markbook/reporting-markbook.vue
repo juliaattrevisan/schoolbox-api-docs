@@ -7,6 +7,7 @@ import type { Template } from "@js/editor/types/editorTypes";
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import { useMarkbookStore } from "@schoolboxLibrary/Learning/Markbook/templates/vue/store/markbookStore";
 import type { Markbook } from "@schoolboxLibrary/Learning/Markbook/templates/vue/types/payload";
+import { MarkbookType } from "@schoolboxLibrary/Learning/Markbook/templates/vue/types/types";
 import MarkbookInner from "@schoolboxLibrary/Learning/Markbook/templates/vue/markbook-inner.vue";
 import MarkbookPopout from "@schoolboxLibrary/Learning/Markbook/templates/vue/markbook-popout.vue";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
@@ -57,7 +58,7 @@ window.Vue.onMounted(async () => {
 <template>
     <request-error v-if="loadError" :further-info="loadError" />
     <loading-table v-else-if="mbStore.data === null" />
-    <markbook-inner v-else type="class" />
+    <markbook-inner v-else :type="MarkbookType.REPORTING" />
 
     <markbook-popout />
 </template>

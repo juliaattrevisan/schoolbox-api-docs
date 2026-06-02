@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import locale from "@js/terminology/rosettaStone";
 import { useMarkbookStore } from "./store/markbookStore";
+import { MarkbookType } from "./types/types";
 import MbTableHeadActivity from "./mb-table-head-activity.vue";
 import MbClassAverageHeader from "./mb-class-average-header.vue";
 
 interface Props {
-    type: "course" | "class";
+    type: MarkbookType;
 }
 
 const props = defineProps<Props>();
@@ -21,7 +22,7 @@ const mbStore = useMarkbookStore();
             </th>
             <th v-if="mbStore.data.rank !== null" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }">
                 <div>
-                    <span>{{ props.type === "class" ? "Class" : "Course" }} Ranking</span>
+                    <span>{{ props.type === MarkbookType.CLASS ? "Class" : "Course" }} Ranking</span>
                 </div>
             </th>
             <mb-table-head-activity
@@ -49,7 +50,7 @@ const mbStore = useMarkbookStore();
             </th>
         </tr>
 
-        <template v-if="props.type === 'class'">
+        <template v-if="props.type === MarkbookType.CLASS">
             <!-- NB; This won't look correct if there are multiple classImpls.
               -- Currently that will never happen since this is restricted to the class markbook -->
             <mb-class-average-header
