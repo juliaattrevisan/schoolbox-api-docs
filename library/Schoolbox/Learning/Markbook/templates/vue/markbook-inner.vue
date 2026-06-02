@@ -110,7 +110,7 @@ const exportReportRoute = window.Vue.computed(() => {
 </script>
 
 <template>
-    <div v-if="mbStore.data" :class="{ 'actions-small-1': exportReportRoute !== null }">
+    <div class="l-flex l-flex-row l-flex--align-end l-flex--justify-end l-gap-m">
         <div class="legend">
             <div class="indicators">
                 <p class="meta"><span class="legend-indicator indicator-none"></span>Unmarked</p>
@@ -137,20 +137,18 @@ const exportReportRoute = window.Vue.computed(() => {
             <input id="show-drafts" v-model="mbStore.showDrafts" type="checkbox" />
             <label for="show-drafts">Show Drafts</label>
         </div>
-        <template v-if="exportReportRoute">
-            <nav>
-                <sbx-pop-out content-id="header-options"></sbx-pop-out>
-            </nav>
-            <ul id="header-options" class="f-dropdown" data-dropdown-content>
-                <li class="separator">Report</li>
-                <li>
-                    <a :href="exportReportRoute" class="sbx-button--has-icon"
-                        ><sbx-icon name="download"></sbx-icon> Download Spreadsheet
-                    </a>
-                </li>
-            </ul>
-        </template>
+        <nav v-if="exportReportRoute">
+            <sbx-pop-out content-id="header-options"></sbx-pop-out>
+        </nav>
     </div>
+    <ul v-if="exportReportRoute" id="header-options" class="f-dropdown" data-dropdown-content>
+        <li class="separator">Report</li>
+        <li>
+            <a :href="exportReportRoute" class="sbx-button--has-icon"
+                ><sbx-icon name="download"></sbx-icon> Download Spreadsheet
+            </a>
+        </li>
+    </ul>
 
     <div v-if="mbStore.isDegraded">
         <div class="small-12 column list-item">
