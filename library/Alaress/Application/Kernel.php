@@ -65,6 +65,7 @@ use Psr\Log\NullLogger;
 use Psr\SimpleCache\CacheInterface;
 use Ramsey\Uuid\Uuid;
 use RuntimeException;
+use Schoolbox\Admin\InternationalBaccalaureate\MsgIdGenerator;
 use Schoolbox\Admin\Navigation\Renderer as AdminNavigationRenderer;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\API\Token\JwtParser;
@@ -2486,7 +2487,20 @@ abstract class Kernel
                     );
                     return $factory->build();
                 },
-            ),
+            )
+        );
+
+        // IB client factory
+        $di->set(
+            'ib.clientFactory',
+            $di->lazyNew(
+                \Schoolbox\Admin\InternationalBaccalaureate\ClientFactory::class,
+                [
+                    'config'     => $di->lazyGet('config'),
+                    'httpClient' => $di->lazyGet('httpClient'),
+                    'msgIdGenerator' => new MsgIdGenerator(),
+                ]
+            )
         );
 
         return $di;
