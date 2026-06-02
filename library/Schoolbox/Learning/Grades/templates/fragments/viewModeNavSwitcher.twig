@@ -1,13 +1,28 @@
-{# Server-side grades view selector. Expects viewMode, viewModes and currentRouteBase. #}
-<li class="separator">Viewing as {{ viewMode|capitalize }}</li>
-{% for mode in viewModes %}
-    <li>
-        {% if viewMode == mode %}
-            <a class="icon-view menu_disabled" aria-current="page">View as {{ mode|capitalize }}</a>
-        {% else %}
-            <a class="icon-view" href="{{ currentRouteBase }}?viewMode={{ mode }}" data-grades-view-mode="{{ mode }}">
-                View as {{ mode|capitalize }}
-            </a>
-        {% endif %}
-    </li>
-{% endfor %}
+{# Server-side grades view selector, rendered as a standard radio group.
+ # Selecting a mode navigates to the same route with the chosen viewMode (mirrors the
+ # navigation convention used by semesterSelector.twig).
+ # Expects viewMode, viewModes and currentRouteBase. #}
+<div class="grades-view-mode-switcher l-flex l-flex-row l-flex--align-center l-gap-m" data-grades-view-mode-switcher>
+    <span class="grades-view-mode-switcher__label">Viewing feedback as</span>
+    {% for mode in viewModes %}
+        <span class="sbx-checkbox-radio-container">
+            <input type="radio"
+                   name="viewMode"
+                   id="grades-view-mode-{{ mode }}"
+                   value="{{ mode }}"
+                   data-grades-view-mode="{{ mode }}"
+                   data-href="{{ currentRouteBase }}?viewMode={{ mode }}"
+                   {% if viewMode == mode %}checked{% endif %}>
+            <label for="grades-view-mode-{{ mode }}">{{ mode|capitalize }}</label>
+        </span>
+    {% endfor %}
+</div>
+<script type="text/javascript">
+    $(function () {
+        $('[data-grades-view-mode-switcher] [data-grades-view-mode]').on('change', function () {
+            if (this.checked) {
+                window.location.href = $(this).data('href');
+            }
+        });
+    });
+</script>

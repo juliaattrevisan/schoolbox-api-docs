@@ -13,10 +13,6 @@ export default class GradesPage {
 
     static readonly DATA_TEST_GRADES_SUBJECT_HEADING = "grades-subject-heading";
 
-    static readonly DATA_TEST_JELLY_TOT = "sbx-pop-out-header-options-button";
-
-    static readonly SELECTOR_VIEW_MODE_META = "[data-grades-view-mode-meta]";
-
     static readonly SELECTOR_ASSESSMENT = ".activity-list li.assessment";
 
     static readonly SELECTOR_LEARNER_OR_INSTRUCTOR_MARK =
@@ -45,28 +41,17 @@ export default class GradesPage {
         await subject.click();
     }
 
-    /**
-     * click the jelly tot
-     */
-    async clickJellyTot(): Promise<void> {
-        await this.page.getByTestId(GradesPage.DATA_TEST_JELLY_TOT).click();
-    }
-
     async viewAs(mode: "staff" | "student" | "parent"): Promise<void> {
-        await this.clickJellyTot();
-        await this.page.locator(`[data-grades-view-mode="${mode}"]`).click();
+        // The switcher is a radio group at the top-left of the page; selecting a mode navigates to it.
+        await this.page.locator(`label[for="grades-view-mode-${mode}"]`).click();
     }
 
     /**
-     * Check the current grades view mode label and selected navigation item.
+     * Check the current grades view mode is selected in the radio switcher.
      * @param mode - The expected grades view mode
      */
     async expectGradesViewMode(mode: "staff" | "student" | "parent"): Promise<void> {
-        const label = `${mode.charAt(0).toUpperCase()}${mode.slice(1)}`;
-
-        await expect(this.page.locator(GradesPage.SELECTOR_VIEW_MODE_META)).toContainText(`Viewing as ${label}`);
-        await expect(this.page.locator(`[data-grades-view-mode="${mode}"]`)).toHaveCount(0);
-        await expect(this.page.locator("#header-options [aria-current='page']")).toContainText(`View as ${label}`);
+        await expect(this.page.locator(`[data-grades-view-mode="${mode}"]`)).toBeChecked();
     }
 
     /**

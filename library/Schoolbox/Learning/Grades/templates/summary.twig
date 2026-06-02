@@ -20,15 +20,17 @@
 {{ bread.crumbs(['Learning', routeLookup('learning.getClasses')], [locale.grades.properPlural]) }}
 
 {% set canSwitchViewMode = USER.role.isStaff %}
-{% set showHeaderOptions = canSwitchViewMode or customisationsRoute %}
+{% set showHeaderOptions = customisationsRoute %}
 <div class="row{% if showHeaderOptions %} actions-small-2{% endif %}">
     <div class="small-12 columns">
         <h1>{{ locale.grades.properPlural }} for {{ term.title }}</h1>
 
         {% if canSwitchViewMode %}
-        <ul class="meta">
-            <li data-grades-view-mode-meta class="icon-view">Viewing as {{ viewMode|capitalize }}</li>
-        </ul>
+            {% include '@learningGrades/fragments/viewModeNavSwitcher.twig' with {
+                viewMode: viewMode,
+                viewModes: viewModes,
+                currentRouteBase: currentRouteBase
+            } only %}
         {% endif %}
     </div>
     {% if showHeaderOptions %}
@@ -36,13 +38,6 @@
             <sbx-pop-out content-id="header-options" data-test="sbx-pop-out-header-options"></sbx-pop-out>
         </nav>
         <ul id="header-options" class="f-dropdown" data-dropdown-content aria-label="Grades options">
-            {% if canSwitchViewMode %}
-                {% include '@learningGrades/fragments/viewModeNavSwitcher.twig' with {
-                    viewMode: viewMode,
-                    viewModes: viewModes,
-                    currentRouteBase: currentRouteBase
-                } only %}
-            {% endif %}
             {% if customisationsRoute %}
                 <li>
                     <a href="{{ customisationsRoute }}" class="sbx-button--has-icon" title="View Customisations" data-test="grades-view-customisations">
