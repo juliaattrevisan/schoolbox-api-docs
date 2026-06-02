@@ -431,7 +431,7 @@ class Redis
     protected function buildCache(string $baseKey): CacheInterface
     {
         $this->cacheFactory ??= new Factory($this->client);
-        return $this->cacheFactory->build($baseKey);
+        return $this->cacheFactory->build(self::FUNCTION_CALL_CACHE_PREFIX . '.' . $baseKey);
     }
 
     /**
