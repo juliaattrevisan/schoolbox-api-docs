@@ -54,6 +54,9 @@ class Registry
             // Old keys
             '^fc:' . self::INSTANCE_ID_MATCH . ':External_',
 
+            // Teachers for class code
+            '^fc\\.findTeachersForClassCode\\.' . self::INSTANCE_ID_MATCH,
+
             // vCal cache
             "^vcal:" . self::INSTANCE_ID_MATCH . ":[0-9a-f]{64}",
 
