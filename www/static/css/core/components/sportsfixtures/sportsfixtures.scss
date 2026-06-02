@@ -78,7 +78,7 @@
         }
 
         h3 {
-            color: var(--sbx-config-color-accent, var(--content-ui-foreground));
+            color: inherit;
             padding-top: 0;
             margin-bottom: 0.25rem;
         }
