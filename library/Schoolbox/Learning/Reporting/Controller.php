@@ -194,7 +194,7 @@ class Controller extends Base
                             : true,
                         'instructorMarkScheme' => $instructorMarkScheme?->generateContext(),
                         'participants'   => $markbook->getStudents()->map(
-                            function (User $student) use ($aImpl, $markbook) {
+                            function (User $student) use ($aImpl, $markbook, $assessment) {
                                 $participant = $aImpl->getParticipantIfExtant($student, false);
                                 if ($participant === null) {
                                     return null;
@@ -212,7 +212,11 @@ class Controller extends Base
                                     $progressTick = $unitAssessmentsTranslator->getProgressTick($aImpl, $participant);
                                 }
 
-                                $draftMark = isset($markbook->getHasDraft()[$aImpl->getId()][$student->getId()]);
+                                /* I *assume* this is for optimisation / to avoid running getAuthoritativeFeedback(false)
+                                 * unless needed, but since $assessment (the reporting activity) isn't part of $markbook,
+                                 * it would never be true here... so just bypass that if it matches $assessment I suppose
+                                 */
+                                $draftMark = isset($markbook->getHasDraft()[$aImpl->getId()][$student->getId()]) || $aImpl->getId() === $assessment->getId();
 
                                 /** This basically matches the logic inside library/Schoolbox/Learning/Assessment/ListController.php:getInfo */
                                 $authoritativeFeedback = $participant->getAuthoritativeFeedback(true);
