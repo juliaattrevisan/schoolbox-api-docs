@@ -438,15 +438,7 @@ class Mapper extends BaseMapper
      */
     private function buildNameSearchPredicate(Builder $pb, array $nameSearch): Builder
     {
-        $studentIds = array_values(array_filter(
-            $nameSearch,
-            static fn($value): bool => $value !== Definition::KEY_ALL
-        ));
-
-        if (!empty($studentIds)) {
-            $pb->in('p.student_id', $studentIds);
-        }
-
+        $pb->in('p.student_id', $nameSearch);
         return $pb;
     }
 
