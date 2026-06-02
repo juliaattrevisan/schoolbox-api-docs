@@ -73,12 +73,16 @@ class Component extends BaseComponent
         $context['userSelectionIds'] = $users->map(function (User $user) {
             $name = $user->getFullName() . ' - ';
 
+            /* Appending year level if exists with terminology
+             */
             if ($user->getYear()) {
                 $name .= $user->getYear()->getLongName(
                     $this->l10n->translate('year', false, true)
                 ) . ', ';
             }
 
+            /* Appending campus if exists, support multiple campuses
+             */
             if ($user->getCampusCollection()) {
                 $campusNames = $user->getCampusCollection()->map(function ($campus) {
                     return $campus->getName() . ' Student';
@@ -87,6 +91,8 @@ class Component extends BaseComponent
                 $name .= implode(', ', $campusNames);
             }
 
+            /* Appending external ID if exists
+             */
             if ($user->getExternalId()) {
                 $name .= ' (' . $user->getExternalId() . ')';
             }
