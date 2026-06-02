@@ -5,6 +5,8 @@
 
 import type { Template } from "@js/editor/types/editorTypes";
 import { apiRequest } from "@js/util/sbx/apiUtils";
+import type { Node } from "@schoolboxCurriculum/types/Node";
+import CurriculumCodes from "@schoolboxCurriculum/vue/curriculumCodes/curriculum-codes.vue";
 import { useMarkbookStore } from "@schoolboxLibrary/Learning/Markbook/templates/vue/store/markbookStore";
 import type { Markbook } from "@schoolboxLibrary/Learning/Markbook/templates/vue/types/payload";
 import { MarkbookType } from "@schoolboxLibrary/Learning/Markbook/templates/vue/types/types";
@@ -17,6 +19,7 @@ import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 interface Props {
     editorTemplates?: Template[];
     routeGetStatusData?: string | null;
+    supportingDataCurriculumNodes: Node[];
 }
 
 const props = defineProps<Props>();
@@ -81,6 +84,11 @@ window.Vue.onMounted(async () => {
             <input v-model="mbStore.participantSearchFilter" type="search" placeholder="Search for a student" />
         </div>
     </div>
+
+    <p v-if="props.supportingDataCurriculumNodes.length" class="meta l-flex-row l-gap-xs">
+        Showing data associated to curriculum codes:
+        <curriculum-codes :nodes="props.supportingDataCurriculumNodes" />
+    </p>
 
     <request-error v-if="loadError" :further-info="loadError" />
     <loading-table v-else-if="mbStore.data === null" />

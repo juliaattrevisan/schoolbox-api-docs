@@ -54,6 +54,7 @@
     <reporting-markbook
         {% if editorTemplates is defined %}:editor-templates="{{ editorTemplates|json_encode }}"{% endif %}
         route-get-status-data="{{ routeGetStatusData }}"
+        :supporting-data-curriculum-nodes="{{ assessment.supportingDataCurriculumNodes.reindex|json_encode }}"
     >
         <template #meta>
             <ul class="meta">
