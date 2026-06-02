@@ -19,6 +19,7 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
     const showDisplayMarks = window.Vue.ref(false);
     const showDrafts = window.Vue.ref(false);
     const showAverages = window.Vue.ref(false);
+    const participantSearchFilter = window.Vue.ref("");
 
     const isPopoutLoading = window.Vue.ref(false);
     const popoutLoadError = window.Vue.ref(false);
@@ -137,10 +138,34 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
      * @returns ordered students
      */
     function orderedClassImplStudents(classImpl: MarkbookClassImpl): MarkbookClassImpl["students"][number][] {
-        // alphabetical order by lastName then givenName
-        return Object.values(classImpl.students).sort(
-            (a, b) => a.lastName.localeCompare(b.lastName) || a.givenName.localeCompare(b.givenName),
-        );
+        let students = Object.values(classImpl.students);
+
+        // apply filters (if any)
+        const filteredStudents = students.filter((student) => {
+            // TODO: status filter probably goes here
+
+            const searchTerm = participantSearchFilter.value.trim().toLowerCase();
+            if (searchTerm.length) {
+                const possibleNames = [student.givenName, student.lastName].filter(
+                    (name) => name !== null && name !== undefined,
+                );
+
+                if (!possibleNames.some((name) => name.toLowerCase().includes(searchTerm))) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+
+        // use filtered students, unless everyone got filtered out
+        // TODO: probably add an empty state instead of this, but empty states seem to cause chaos in the table, so let's avoid that for now
+        if (filteredStudents.length > 0) {
+            students = filteredStudents;
+        }
+
+        // sort in alphabetical order by lastName then givenName
+        return students.sort((a, b) => a.lastName.localeCompare(b.lastName) || a.givenName.localeCompare(b.givenName));
     }
 
     /**
@@ -240,6 +265,7 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         showDisplayMarks,
         showDrafts,
         showAverages,
+        participantSearchFilter,
         activityGroups,
         orderedActivities,
         orderedClassImplActivities,

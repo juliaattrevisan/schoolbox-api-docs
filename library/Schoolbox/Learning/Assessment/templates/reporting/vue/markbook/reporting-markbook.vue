@@ -24,8 +24,6 @@ interface Props {
 const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
 
-// TODO: implement participantSearchFilter
-const participantSearchFilter = window.Vue.ref<string>("");
 // TODO: implement filters
 const filters = window.Vue.ref<Record<ReportingFeedbackStatus, boolean>>(
     fromEntriesOf(Object.values(ReportingFeedbackStatus).map((status) => [status, true])),
@@ -81,7 +79,7 @@ window.Vue.onMounted(async () => {
     <!-- Search -->
     <div class="row">
         <div class="small-12 columns">
-            <input v-model="participantSearchFilter" type="search" placeholder="Search for a student" />
+            <input v-model="mbStore.participantSearchFilter" type="search" placeholder="Search for a student" />
         </div>
     </div>
 
