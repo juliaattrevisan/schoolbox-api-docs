@@ -148,7 +148,7 @@ class Controller extends Base
                     'id'    => $folder->getFolder()->getId(),
                     'title' => $folder->getFolder()->getTitle(),
                 ],
-                'assessments' => $markbookAssessments->indexBy('id')->map(function (IAssessable $aImpl) use ($markbook) {
+                'assessments' => $markbookAssessments->indexBy('id')->map(function (IAssessable $aImpl) use ($markbook, $assessment) {
                     /** Only due work & reporting have the concept of "instructorMarkScheme", others just use markScheme for now */
                     $instructorMarkScheme = ($aImpl instanceof DueWork\Model || $aImpl instanceof Reporting\Model)
                         ? $aImpl->getInstructorMarkScheme()
@@ -186,8 +186,8 @@ class Controller extends Base
                         'courseManaged'  => $aImpl->getCourseManaged(),
                         // 'weight'         => $aImpl->getWeight(), /* not relevant on the reporting markbook */
                         'projectId'      => $parentProject?->getId(),
-                        // TODO: nothing on the reporting markbook is markable *except* for the reporting activity itself, although that renders differently....
-                        'writable'       => false,
+                        // nothing on the reporting markbook is markable *except* for the reporting activity itself
+                        'writable'       => $aImpl->getId() === $assessment->getId(),
                         /* feedback comments are enabled by default, unless a reporting activity opted out of them */
                         'feedbackCommentsEnable' => $aImpl instanceof Reporting\Model
                             ? $aImpl->getFeedbackCommentsEnable()

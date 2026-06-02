@@ -148,15 +148,17 @@ function formatMark(mark: NonNullable<typeof participant.value>["marks"]["publis
 }
 
 const cellEl = window.Vue.useTemplateRef<HTMLTableCellElement>("cellRef");
+const commentCellEl = window.Vue.useTemplateRef<HTMLTableCellElement>("commentCellRef");
 
 const DOUBLE_CLICK_INTERVAL = 500; // ms
 const lastClick = window.Vue.ref<number>(0);
 
 /**
  * When the user clicks the cell, open the pop-out menu if available, otherwise do nothing
+ * @param referenceElement The element to anchor the pop-out to
  */
-async function onClickCell(): Promise<void> {
-    if (!hasPopOutMenu.value || !cellEl.value) {
+async function onClickCell(referenceElement: HTMLTableCellElement | null): Promise<void> {
+    if (!hasPopOutMenu.value || referenceElement === null) {
         return; // must have access to the pop-out and a mounted cell element
     }
 
@@ -206,7 +208,7 @@ async function onClickCell(): Promise<void> {
         classImplId: props.classImplId,
         studentId: props.studentId,
         activityId: props.assessmentId,
-        referenceElement: cellEl.value,
+        referenceElement,
     };
 
     lastClick.value = Date.now();
@@ -272,7 +274,7 @@ const plaintextComments = window.Vue.computed(() => {
         }"
         :data-test="`markbook-cell-${assessment.id}-${student.id}`"
         :data-pop-out-menu="hasPopOutMenu || undefined"
-        @click="onClickCell"
+        @click="onClickCell(cellEl)"
     >
         <template v-if="participant === null || participant.isExcluded"></template>
         <div v-else-if="participant.progressTick" style="display: flex; justify-content: center">
@@ -330,7 +332,15 @@ const plaintextComments = window.Vue.computed(() => {
     <!-- Reporting Markbook: Split comments field for the reporting activity being viewed -->
     <td
         v-if="mbStore.data && classImpl && assessment && student && assessment.splitComments"
-        class="mb-reporting-current-comment-cell"
+        ref="commentCellRef"
+        class="mb-student-grade-cell-comment"
+        :class="{
+            excluded: !participant || participant.isExcluded,
+            'is-selected': isSelectedPopout || isSelectedFeedback,
+        }"
+        :data-test="`markbook-cell-${assessment.id}-${student.id}-comment`"
+        :data-pop-out-menu="hasPopOutMenu || undefined"
+        @click="onClickCell(commentCellEl)"
     >
         <template v-if="participant === null || participant.isExcluded"></template>
 
@@ -353,7 +363,7 @@ const plaintextComments = window.Vue.computed(() => {
 </template>
 
 <style scoped>
-.mb-reporting-current-comment-cell {
+.mb-student-grade-cell-comment {
     min-width: 40rem;
     white-space: normal !important;
 }
