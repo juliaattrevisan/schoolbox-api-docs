@@ -511,6 +511,7 @@ class Controller extends Base
                 $usagePb->in('vrm.indicator_id', $selectedIndicators);
             }
             $outerPb->any($usagePb);
+            $outerPb->isNull('rubric_instance.deleted_at');
         }
 
         $outerWhere = implode(' AND ', $outerPb->getWhere());
@@ -548,6 +549,7 @@ class Controller extends Base
                     vrm.assessment_id = latest_feedback.assessment_id AND
                     vrm.student_id    = latest_feedback.owner
                 INNER JOIN user u ON vrm.student_id = u.id
+                INNER JOIN rubric_instance ON vrm.rubric_instance_id = rubric_instance.id
                 WHERE {$outerWhere}
                 ORDER BY vrm.student_id, vrm.assessment_id, vrm.capability_id, vrm.indicator_id
             ",
@@ -671,6 +673,7 @@ class Controller extends Base
                 $usagePb->in('vrm.indicator_id', $selectedIndicators);
             }
             $outerPb->any($usagePb);
+            $outerPb->isNull('rubric_instance.deleted_at');
         }
 
         $outerWhere = implode(' AND ', $outerPb->getWhere());
@@ -709,6 +712,7 @@ class Controller extends Base
                     vrm.assessment_id = latest_feedback.assessment_id AND
                     vrm.student_id    = latest_feedback.owner AND
                     vrm.feedback_date is null
+                INNER JOIN rubric_instance ON vrm.rubric_instance_id = rubric_instance.id
                 INNER JOIN user u ON vrm.student_id = u.id
                 WHERE {$outerWhere}
                 ORDER BY vrm.student_id, vrm.assessment_id, vrm.capability_id, vrm.indicator_id
