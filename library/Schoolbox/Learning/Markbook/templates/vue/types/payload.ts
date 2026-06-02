@@ -70,6 +70,7 @@ export type MarkbookClassImplActivityParticipant = {
 export type MarkbookClassImplActivity = {
     id: number;
     participants: Partial<Record<ParticipantId, MarkbookClassImplActivityParticipant>>;
+    /* activity impl stats are only relevant for the class/course markbooks */
     stats: {
         mean?: string | null;
         draftMean?: string | null;
@@ -80,15 +81,15 @@ export type MarkbookClassImplActivity = {
         max?: string | null;
         maxNormalised?: number | null;
         count?: number | null;
-        quartile1: number | null;
-        quartile2: number | null;
-        quartile3: number | null;
+        quartile1?: number | null;
+        quartile2?: number | null;
+        quartile3?: number | null;
         weight?: number | null;
         weightInProject?: number | null;
-        sdNormalized: number | null;
+        sdNormalized?: number | null;
         weightPercent?: number | null;
         projectWeightPercent?: number | null;
-        markVisibility: string;
+        markVisibility?: string;
     };
     _routes: {
         "learningAssessment.getStatus": string;

@@ -98,15 +98,13 @@ class Controller extends Base
                         'id'    => $unitSpec->getId(),
                         'title' => $unitSpec->getTitle(),
                     ] : null,
-                    /* the class markbook doesn't need any of the below, as this is always an implementation */
+                    /* the reporting markbook doesn't need any of the below, as this is always an implementation... I think? */
                     'isSpecification' => $assessment->isSpecification(),
                     'stats'           => null,
                     '_links'          => $unitAssessmentsTranslator->getLinks($assessment, true),
                     '_routes'         => [
-                        'postFeedbacks' => $this->getRouteIfAuthorized(
-                            'learningDueWorkFeedback.postParticipantFeedbacks',
-                            ['assessment' => $assessment, 'assessmentId' => $assessment->getId()]
-                        ),
+                        // TODO: nothing on the reporting markbook is markable *except* for the reporting activity itself, although that renders differently....
+                        'postFeedbacks' => null,
                     ],
                 ];
             })->indexByCallback(fn(array $assessment) => $assessment['id']),
@@ -159,7 +157,7 @@ class Controller extends Base
                         'id'             => $aImpl->getId(),
                         'markVisibility' => $aImpl->getMarkVisibility(),
                         'courseManaged'  => $aImpl->getCourseManaged(),
-                        'weight'         => $aImpl->getWeight(),
+                        // 'weight'         => $aImpl->getWeight(), /* not relevant on the reporting markbook */
                         'projectId'      => $parentProject?->getId(),
                         // TODO: nothing on the reporting markbook is markable *except* for the reporting activity itself, although that renders differently....
                         'writable'       => false,
@@ -249,10 +247,7 @@ class Controller extends Base
                                 ];
                             }
                         ),
-                        'stats'          => array_merge(
-                            $markbook->getAssessmentStatistics()[$aImpl->getId()] ?? [],
-                            [ 'markVisibility' => $aImpl->getMarkVisibility() ]
-                        ),
+                        'stats'          => new \stdClass(), /* not relevant on the reporting markbook */
                         '_routes'        => [
                             'learningAssessment.getStatus' => $this->routeGenerator->generate(
                                 'learningAssessment.getStatus',
@@ -365,12 +360,7 @@ class Controller extends Base
                     ]
                 ]),
                 /* overall stats for the entire class */
-                'stats' => [
-                    'normalisedMean' => $markbook->getNormalisedMean(),
-                    'draftNormalisedMean' => $markbook->getDraftNormalisedMean(),
-                    'weightedMean' => $markbook->getWeightedMean(),
-                    'draftWeightedMean' => $markbook->getDraftWeightedMean(),
-                ],
+                'stats' => null, /* not relevant on the reporting markbook */
             ]],
             '_routes' => [
                 'exportReport' => null, /* not relevant on the reporting markbook */
