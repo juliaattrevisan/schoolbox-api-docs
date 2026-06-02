@@ -93,7 +93,29 @@ class Helper
             ->filter(function (IAssessable $a) use ($viewee) {
                 return $a->isPublished($viewee) && $a->isParticipant($viewee);
             });
-        $assessmentsPerFolder = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection(collection: $assessmentsPerFolder, users: null, removeExcluded: false, assumeParticipation: false)
+        $assessmentsPerFolder = $this->assessmentMapperProxy
+            ->loadParticipantsIntoAssessmentCollection(
+                collection: $assessmentsPerFolder,
+            );
+
+        /* Apply work-type / activity-audience visibility for the *viewer*.
+         *
+         * The set above is bounded to the student's (viewee's) published participations. This pass
+         * additionally applies Visibility::isVisibleToUser for the viewer, so the Grades summary's
+         * 'view as student/parent' hides activities whose work type excludes that role
+         * (is_visible_to_learners / is_visible_to_parents) - matching the subject report page
+         * (Controller::postReport), which already filters its markbook this way.
+         *
+         * For a staff viewer this is a no-op: the staff branch of isVisibleToUser returns true for
+         * every activity, so real staff and the Summative Report caller are unaffected. showClosed is
+         * true to mirror the subject report and preserve the summary's listing of closed-but-published
+         * activities.
+         */
+        $visibility           = new Visibility($this->access);
+        $assessmentsPerFolder = $assessmentsPerFolder
+            ->filter(function (IAssessable $a) use ($visibility, $viewer) {
+                return $visibility->isVisibleToUser($a, $viewer, true);
+            })
             ->groupByCallback(function (IAssessable $assessment) {
                 return $assessment->getBaseContext()->getFolder()->getId();
             });
