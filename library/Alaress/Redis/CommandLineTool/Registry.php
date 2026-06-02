@@ -65,9 +65,6 @@ class Registry
             // Locks
             '^lock:' . self::INSTANCE_ID_MATCH . ':',
 
-            // Atlas API?
-            '^atlasApi:' . self::INSTANCE_ID_MATCH . '.',
-
             // Aura route and module caches
             'routeCache:' . self::INSTANCE_ID_MATCH,
             'moduleCache:' . self::INSTANCE_ID_MATCH,
