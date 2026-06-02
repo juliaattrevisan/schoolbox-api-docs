@@ -32,7 +32,7 @@ function checkSavedConfigs(value: SkinConfigData): SkinConfigData {
                 const color = tinycolor(option.value);
                 if (color.getAlpha() < 1) {
                     option.value = color.setAlpha(1).toRgbString();
-                    console.warn(option.value);
+                    hasInvalidColours.value = true;
                 }
             }
         });
@@ -40,6 +40,7 @@ function checkSavedConfigs(value: SkinConfigData): SkinConfigData {
     return clonedConfigs;
 }
 
+const hasInvalidColours = window.Vue.ref(false); // to trigger a save on mount if there are invalid colours that need correcting
 const checkedConfigs = checkSavedConfigs(props.configs);
 const isProcessing = window.Vue.ref(false);
 const loadError = window.Vue.ref<string | null>(null);
@@ -155,6 +156,16 @@ async function onSaveSelected(): Promise<void> {
         isProcessing.value = false;
     }
 }
+
+/**
+ * Save immediately to ensure any invalid colours are
+ * corrected and saved values are consistent with the form state
+ */
+window.Vue.onMounted(() => {
+    if (editableConfigs.value.toggle.enabled && hasInvalidColours.value) {
+        void onSaveSelected();
+    }
+});
 </script>
 
 <template>
