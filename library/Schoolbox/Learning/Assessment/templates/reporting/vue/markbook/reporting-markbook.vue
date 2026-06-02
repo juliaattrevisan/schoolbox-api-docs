@@ -5,8 +5,6 @@
 
 import type { Template } from "@js/editor/types/editorTypes";
 import { apiRequest } from "@js/util/sbx/apiUtils";
-import { fromEntriesOf } from "@js/util/arrayUtils";
-import { ReportingFeedbackStatus } from "@schoolboxAssessment/Types/reporting";
 import { useMarkbookStore } from "@schoolboxLibrary/Learning/Markbook/templates/vue/store/markbookStore";
 import type { Markbook } from "@schoolboxLibrary/Learning/Markbook/templates/vue/types/payload";
 import { MarkbookType } from "@schoolboxLibrary/Learning/Markbook/templates/vue/types/types";
