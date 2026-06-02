@@ -12,6 +12,19 @@ interface Props {
 
 const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
+
+const fadedGroupIds = window.Vue.computed(() => {
+    // When there's no selected feedback cell, no groups should be faded
+    if (!mbStore.feedbackSelectedCell) {
+        return [];
+    }
+
+    // otherwise, fade any group that isn't part of the selected activity's group
+    const activityId = mbStore.feedbackSelectedCell.activityId;
+    return mbStore.activityGroups
+        .filter((group) => !group.activities.some((activity) => activity.id === activityId))
+        .map((group) => group.id);
+});
 </script>
 
 <template>
@@ -36,16 +49,26 @@ const mbStore = useMarkbookStore();
             />
         </tr>
 
-        <tr class="course-headers" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }">
-            <th class="fixed-left transparent"></th>
-            <th class="fixed-left white"></th>
-            <th v-if="mbStore.data.rank !== null" class="white"></th>
+        <tr class="course-headers">
+            <th class="fixed-left transparent" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }"></th>
+            <th class="fixed-left white" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }"></th>
+            <th
+                v-if="mbStore.data.rank !== null"
+                class="white"
+                :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }"
+            ></th>
             <template v-for="group in mbStore.activityGroups" :key="group.id">
-                <th v-if="group.splitComments" :colspan="group.activities.length * 2" class="white"></th>
+                <th
+                    v-if="group.splitComments"
+                    :colspan="group.activities.length * 2"
+                    class="white"
+                    :class="{ 'markbook-faded': fadedGroupIds.includes(group.id) }"
+                ></th>
                 <th
                     v-else
                     class="unit-title"
                     :class="{
+                        'markbook-faded': fadedGroupIds.includes(group.id),
                         /* avoid wide reporting markbook solely due to these headers */
                         'unit-title--clip': props.type === MarkbookType.REPORTING,
                     }"
