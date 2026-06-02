@@ -4,6 +4,7 @@ import { useMarkbookStore } from "./store/markbookStore";
 import { MarkbookType } from "./types/types";
 import MbTableHeadActivity from "./mb-table-head-activity.vue";
 import MbClassAverageHeader from "./mb-class-average-header.vue";
+import { assertUnreachable } from "@js/util/errorUtils";
 
 interface Props {
     type: MarkbookType;
@@ -22,7 +23,10 @@ const mbStore = useMarkbookStore();
             </th>
             <th v-if="mbStore.data.rank !== null" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }">
                 <div>
-                    <span>{{ props.type === MarkbookType.CLASS ? "Class" : "Course" }} Ranking</span>
+                    <span v-if="props.type === MarkbookType.CLASS">Class Ranking</span>
+                    <span v-else-if="props.type === MarkbookType.COURSE">Course Ranking</span>
+                    <span v-else-if="props.type === MarkbookType.REPORTING">Rank</span>
+                    <template v-else-if="assertUnreachable(props.type)"></template>
                 </div>
             </th>
             <mb-table-head-activity
