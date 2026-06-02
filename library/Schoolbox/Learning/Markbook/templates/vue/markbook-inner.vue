@@ -166,10 +166,7 @@ const exportReportRoute = window.Vue.computed(() => {
         v-if="mbStore.data"
         ref="tableContainerRef"
         class="diagonal-headings-table-container small-12 island"
-        :style="{
-            '--markbook-height-offset': `${markbookHeightOffset}px`,
-            marginBottom: mbStore.feedbackSelectedCell !== null ? FEEDBACK_DRAWER_HEIGHT : '0px',
-        }"
+        :style="{ '--markbook-height-offset': `${markbookHeightOffset}px` }"
     >
         <table class="diagonal-headings-table marksheet">
             <mb-table-head :type="props.type" />
