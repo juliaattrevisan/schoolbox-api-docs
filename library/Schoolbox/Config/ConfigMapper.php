@@ -58,6 +58,9 @@ class ConfigMapper extends Mapper
     public const string NAME_IB_ENABLED     = 'ib_enabled';
     public const string NAME_IB_SCHOOL_NAME = 'ib_school_name';
     public const string NAME_IB_SCHOOL_CODE = 'ib_school_code';
+    public const string NAME_IBIS_ENDPOINT = 'ibis_endpoint';
+    public const string NAME_IBIS_APP_ID = 'ibis_app_id';
+    public const string NAME_IBIS_SECRET_KEY = 'ibis_secret_key';
 
     // Field enum (kinda)
     public const int FIELD_INPUT         =  1;
