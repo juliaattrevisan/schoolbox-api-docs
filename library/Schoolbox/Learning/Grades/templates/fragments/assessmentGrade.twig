@@ -62,7 +62,8 @@
         {% if assessment is task %}
             {% include '@learningAssessment/fragments/progressTick.twig' with {
                 assessment: assessment,
-                student:    student
+                student:    student,
+                viewer:     effectiveViewer
             } only %}
         {% else %}
             {# learners and instructors can view the display mark, only instructors can see the instructor mark #}

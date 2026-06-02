@@ -321,6 +321,7 @@ class Controller extends Base
                 'viewMode'            => $viewMode,
                 'viewModes'           => ViewMode::values(),
                 'viewModeQuerySuffix' => $viewModeQuerySuffix,
+                'effectiveViewer'     => $effectiveViewer,
             ],
             "Grades for {$subject->getTitle()}",
             'grade'

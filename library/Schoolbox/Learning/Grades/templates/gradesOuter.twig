@@ -17,6 +17,10 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learning/macro/urgency.twig' as urgency %}
 
+{# True when a staff member is viewing as a student/parent. In that case the comment form is
+ # rendered as that role would see it, but left read-only for the impersonating viewer. #}
+{% set isImpersonating = USER.id != effectiveViewer.id %}
+
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.all-work.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/highchartsMore.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/reportCardBoxplot.js?v={{ config.site_version }}"></script>
@@ -24,13 +28,16 @@
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/eportfolio/jquery.eportfolio.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
     $(function () {
-        // Set up comment abilities: post
+        // Set up comment abilities: post.
+        // Skipped while impersonating so the comment form stays read-only (no editor, no handlers).
+        {% if not isImpersonating %}
         $.fn.allWork.commentSetup({
             data: {
                 studentId: '{{ student.id }}',
                 folderId: '{{ subject.id }}'
             }
         });
+        {% endif %}
         $('[data-print]').on('click', function () {
             window.print();
             $('#container').highcharts().reflow();
@@ -129,47 +136,54 @@
 
     <div id="{{ reportContentId }}"></div>
 
-    {% set comments   = conversation.getVisibleComments(USER) %}
-    {% set canComment = conversation.canComment(USER) %}
+    {% set comments   = conversation.getVisibleComments(effectiveViewer) %}
+    {% set canComment = conversation.canComment(effectiveViewer) %}
 
     {% if comments|length or canComment %}
         <div class="row">
             <div class="small-12 columns">
                 <h2 class="subheader">Comments</h2>
+                {% if isImpersonating %}
+                    <p class="meta">Viewing as {{ viewMode|capitalize }} &mdash; comments are read-only in this view.</p>
+                {% endif %}
             </div>
 
             {% if canComment %}
             <script type="text/javascript" src='{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}'></script>
-            <div class="small-12 island">
+            <div class="small-12 island"{% if isImpersonating %} title="Comments are read-only while viewing as {{ viewMode|capitalize }}."{% endif %}>
                 <form id="create-comment" data-comment-form action="/ajax/comment.php" method="post">
                     <section class="content">
                         <input type="hidden" name="studentId" value="{{ student.id }}"/>
                         <input type="hidden" name="categoryId" value="{{ subject.id }}"/>
-                        <textarea id="create-comment-{{ student.id }}" name="comment" rows="3"></textarea>
+                        <textarea id="create-comment-{{ student.id }}" name="comment" rows="3"{% if isImpersonating %} disabled{% endif %}></textarea>
                         <div class="row">
-                            {% if USER.role.isStaff %}
+                            {% if effectiveViewer.role.isStaff %}
                                 <div class="small-3 medium-3 column">
-                                    <input id="vis-student" type="checkbox" name="visibility[student]" value="1" />
+                                    <input id="vis-student" type="checkbox" name="visibility[student]" value="1"{% if isImpersonating %} disabled{% endif %} />
                                     <label for="vis-student" class="checkbox-label">Visible To Student</label>
                                 </div>
                                 <div class="small-3 medium-3 column">
-                                    <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" checked />
+                                    <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" checked{% if isImpersonating %} disabled{% endif %} />
                                     <label for="vis-parent" class="checkbox-label">Visible To Parents</label>
                                 </div>
-                            {% elseif USER.role.isStudent %}
+                            {% elseif effectiveViewer.role.isStudent %}
                                 <div class="small-3 medium-3 column">
-                                    <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" checked />
+                                    <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" checked{% if isImpersonating %} disabled{% endif %} />
                                     <label for="vis-parent" class="checkbox-label">Visible To Parents</label>
                                 </div>
-                            {% elseif USER.role.isParent %}
+                            {% elseif effectiveViewer.role.isParent %}
                                 <div class="small-3 medium-3 column">
-                                    <input id="vis-student" type="checkbox" name="visibility[student]" value="1" />
+                                    <input id="vis-student" type="checkbox" name="visibility[student]" value="1"{% if isImpersonating %} disabled{% endif %} />
                                     <label for="vis-student" class="checkbox-label">Visible To Student</label>
                                 </div>
                             {% endif %}
                         </div>
                     </section>
-                    <a class="button submit" data-comment-post="new">Post comment</a>
+                    {% if isImpersonating %}
+                        <a class="button submit disabled" aria-disabled="true">Post comment</a>
+                    {% else %}
+                        <a class="button submit" data-comment-post="new">Post comment</a>
+                    {% endif %}
                 </form>
             </div>
             {% endif %}
@@ -202,7 +216,7 @@
                                     </div>
                                 </div>
                                 <nav>
-                                    {% if isCommenter %}
+                                    {% if isCommenter and not isImpersonating %}
                                         <a class="sbx-icon-only-button no-text"
                                            title="Delete"
                                            data-comment-delete
