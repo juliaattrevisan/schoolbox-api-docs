@@ -386,6 +386,8 @@ class Controller extends Base
                 vr.assessment_mark_type                      AS assessment_mark_type,
                 vr.assessment_grade_group_id                 AS assessment_grade_group_id,
                 vr.assessment_weight                         AS assessment_weight,
+                rubric_instance.id                           AS rubric_instance_id,
+                rubric_instance.title                        AS rubric_title,
                 vr.capability_id                             AS capability_id,
                 vr.capability_name                           AS capability_name,
                 vr.capability_max_value                      AS capability_max_value,
@@ -393,68 +395,104 @@ class Controller extends Base
                 vr.indicator_name                            AS indicator_name,
                 vr.indicator_max_value                       AS indicator_max_value
             FROM v_rubric vr
+            INNER JOIN rubric_instance ON vr.rubric_instance_id = rubric_instance.id
             WHERE {$whereClause}
             ORDER BY
                 vr.assessment_id,
+                vr.rubric_instance_id,
                 vr.capability_sequence,
                 vr.capability_id,
                 vr.indicator_sequence,
                 vr.indicator_id
         ";
+
         $stmt = $this->internalDb->prepareQuery($sql, $pb->getParams());
 
-        $capabilities = [];
-        $indicators   = [];
-
-        $lastObservedAssessmentId = null;
-        $lastObservedCapabilityId = null;
-        $decimalHydrator          = new Decimal();
-        $integerHydrator          = new Integer();
+        $decimalHydrator = new Decimal();
+        $integerHydrator = new Integer();
 
         foreach ($stmt->getIterator() as $row) {
-            if ($lastObservedAssessmentId !== $row['assessment_id']) {
-                // Has the assessment we're looking at changed? Reset the capabilities
-                $capabilities = [];
-            }
-
-            if ($lastObservedCapabilityId !== $row['capability_id'] || $lastObservedAssessmentId !== $row['assessment_id']) {
-                // Has the capability we're looking at changed? Reset the indicators
-                $indicators = [];
-            }
-
-            if ($selectedIndicators === null || in_array((int)$row['indicator_id'], $selectedIndicators, true)) {
-                $indicators[$row['indicator_id']] = [
-                    'name' => $row['indicator_name'],
+            /* First time seeing this assessment id - set up a container struct
+             * We should only need to do this once per assessment
+             */
+            if (!isset($assessments[$row['assessment_id']])) {
+                $assessments[$row['assessment_id']] = [
+                    'name' => $row['assessment_name'],
+                    'statusLink' => $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $row['assessment_id']]),
+                    'maxMark' => $row['assessment_max_mark'],
+                    'markType' => $row['assessment_mark_type'],
+                    'weight' => $integerHydrator->hydrate($row['assessment_weight']),
+                    /* gridData is a struct containing capability and indicators, grouped by assessment and rubric
+                     * instance ids, like this:
+                     *
+                     * gridData => [
+                     *         rubric instance id => [
+                     *             rubric instance settings, like
+                     *                 - is mark per capability
+                     *                 - capability mark type id
+                     *                 - capability grade group id
+                     *             capabilities (capability data) => [
+                     *                 capability mark type info
+                     *                 indicators (indicator data) => [
+                     *                 ]
+                     *             ]
+                     *         ]
+                     *     ]
+                     * ]
+                     */
+                    'gridData' => []
                 ];
             }
 
-            $capabilityMaxValue                  = $decimalHydrator->hydrate($row['capability_max_value']);
-            $capabilities[$row['capability_id']] = [
-                'name'         => $row['capability_name'],
-                'indicators'   => $indicators,
-                'show'         => $capabilityMaxValue && ($selectedCapabilities === null || in_array((int)$row['capability_id'], $selectedCapabilities, true)),
-            ];
-            ;
-            // Stuff everything about the assessment into an array
-            $assessments[$row['assessment_id']] = [
-                'name'           => $row['assessment_name'],
-                'statusLink'     => $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $row['assessment_id']]),
-                'maxMark'        => $row['assessment_max_mark'],
-                'markType'       => $row['assessment_mark_type'],
-                'weight'         => $integerHydrator->hydrate($row['assessment_weight']),
-                'capabilities'   => $capabilities,
-            ];
+            /* Set up this rubric instance container just once
+             */
+            if (!isset($assessments[$row['assessment_id']]['gridData'][$row['rubric_instance_id']])) {
+                $assessments[$row['assessment_id']]['gridData'][$row['rubric_instance_id']] = [
+                    'title' => $row['rubric_title'],
+                    'capabilities' => []
+                ];
+            }
 
-            $lastObservedAssessmentId = $row['assessment_id'];
-            $lastObservedCapabilityId = $row['capability_id'];
+            /* Set up this capability container just once
+             */
+            if (!isset($assessments[$row['assessment_id']]['gridData'][$row['rubric_instance_id']]['capabilities'][$row['capability_id']])) {
+                /* Why is this even needed? Some reduction of $row['capability_max_value'] must result in something
+                 * falsy (such as bad data) but idk what we saw in the wild to reinforce this theory.
+                 */
+                $capabilityMaxValue = $decimalHydrator->hydrate($row['capability_max_value']);
+
+                $assessments[$row['assessment_id']]['gridData'][$row['rubric_instance_id']]['capabilities'][$row['capability_id']] = [
+                    'name' => $row['capability_name'],
+                    /* TODO find out what this means
+                     */
+                    'show' => $capabilityMaxValue && ($selectedCapabilities === null || in_array((int)$row['capability_id'], $selectedCapabilities, true)),
+                    'indicators' => [],
+                ];
+            }
+
+            /* Check whether the indicator was in the filter selections. If it was chosen, or if none of the filters
+             * were chosen, then we need to include it in that stack. As per andyland filters, filtering nothing means
+             * include everything.
+             */
+            if ($selectedIndicators === null || in_array((int)$row['indicator_id'], $selectedIndicators, true)) {
+                if (!isset($assessments[$row['assessment_id']]['gridData'][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']])) {
+                    $assessments[$row['assessment_id']]['gridData'][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']] = [
+                        'name' => $row['indicator_name'],
+                    ];
+                }
+            }
         }
 
+        /* Apparently assessments are sorted alphabetically rather than by due date, which is a bit interesting: most of
+         * the time we sort by due date.
+         */
         uasort(
             $assessments,
             static function (array $a, array $b): int {
                 return strnatcmp($a['name'], $b['name']);
             }
         );
+
         return $assessments;
     }
 
