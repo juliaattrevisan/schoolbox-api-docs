@@ -8,9 +8,8 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Socs\Fixtures;
+namespace Schoolbox\Socs\Fixtures\Lookup;
 
-use Schoolbox\Clipboard\Hierarchy\Lookup\Person;
 
 class PersonLookup extends Person
 {

@@ -11,11 +11,12 @@ declare(strict_types=1);
 namespace Schoolbox\Socs\Fixtures;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\Fixtures\Coach\Mapper as CoachMapper;
 use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
 use Schoolbox\Fixtures\Matchup\Model as MatchupModel;
-use Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
 use Schoolbox\Fixtures\Team\Coach\Mapper as TeamCoachMapper;
-use Schoolbox\Fixtures\Coach\Mapper as CoachMapper;
+use Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
+use Schoolbox\Socs\Fixtures\Lookup\PersonLookup;
 use Schoolbox\Socs\HttpClient;
 use Schoolbox\Socs\IStrategy;
 use Schoolbox\UserMapper;
