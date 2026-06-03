@@ -1,4 +1,4 @@
-# Note NULL values are allowed in most string columns (other than ai_session_id) to match openai_log schema.
+-- Note NULL values are allowed in most string columns (other than ai_session_id) to match openai_log schema.
 CREATE TABLE `ai_session_log` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `ai_session_id` char(36) NOT NULL,
