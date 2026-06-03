@@ -524,7 +524,9 @@ class Controller extends Base
                     u.firstname                        AS student_firstname,
                     u.preferred_name                   AS student_preferred_name,
                     u.lastname                         AS student_lastname,
+                    vrm.rubric_instance_id             AS rubric_instance_id,
                     vrm.capability_id                  AS capability_id,
+                    vrm.capability_name                AS capability_name,
                     vrm.capability_mark                AS capability_mark,
                     vrm.capability_human_readable_mark AS capability_human_readable_mark,
                     vrm.capability_max_value           AS capability_max_value,
@@ -532,6 +534,7 @@ class Controller extends Base
                     vrm.capability_grade_group_id      AS capability_grade_group_id,
                     vrm.descriptor_name                AS descriptor_name,
                     vrm.indicator_id                   AS indicator_id,
+                    vrm.indicator_name                 AS indicator_name,
                     vrm.indicator_mark                 AS indicator_mark,
                     vrm.indicator_max_value            AS indicator_max_value
                 FROM (
@@ -556,72 +559,96 @@ class Controller extends Base
             array_merge($innerPb->getParams(), $outerPb->getParams()),
         );
 
-        $assessmentsForStudent = [];
-        $capabilityMarks       = [];
-        $indicatorMarks        = [];
-
-        $lastObservedAssessmentId = null;
-        $lastObservedCapabilityId = null;
-        $lastObservedStudentId    = null;
-
         foreach ($getAuthoritativeMarksQuery->getIterator() as $i => $row) {
-            if ($lastObservedStudentId !== $row['student_id']) {
-                // Has the student we're looking at changed? Reset the list of assessments for them
-                $assessmentsForStudent = [];
-            }
-
-            if ($lastObservedAssessmentId !== $row['assessment_id']) {
-                // Has the assessment we're looking at changed? Reset the capabilities
-                $capabilityMarks = [];
-            }
-
-            if ($lastObservedCapabilityId !== $row['capability_id']) {
-                // Has the capability we're looking at changed? Reset the indicators
-                $indicatorMarks = [];
-            }
-
-            if ($selectedIndicators === null || in_array((int)$row['indicator_id'], $selectedIndicators, true)) {
-                $indicatorMarks[$row['indicator_id']] = [
-                    'databaseMark'           => $row['indicator_mark'],
-                    'maxMark'                => $row['indicator_max_value'],
-                    'selectedDescriptorText' => $row['descriptor_name'],
+            /* Set up a student node if it didn't already exist; we only need to set it up once
+             */
+            if (!isset($row['student_id'])) {
+                $students[$row['student_id']] = [
+                    'firstname' => $row['student_firstname'],
+                    'preferred_name' => $row['student_preferred_name'],
+                    'lastname' => $row['student_lastname'],
+                    'profileLink' => sprintf(
+                        '/search/user/%s',
+                        $row['student_id']
+                    ),
+                    /* gridData is a struct containing capability and indicator marks, grouped by assessment and rubric
+                     * instance ids, like this:
+                     *
+                     * gridData => [
+                     *     assessment id => [
+                     *         rubric instance id => [
+                     *             rubric instance settings, like
+                     *                 - is mark per capability
+                     *                 - capability mark type id
+                     *                 - capability grade group id
+                     *             capabilities (capability data) => [
+                     *                 capability mark type info
+                     *                 capability mark values if relevant to this grid's settings
+                     *                 indicators (indicator data) => [
+                     *                     database marks
+                     *                     max marks
+                     *                     selected descriptor text
+                     *                 ]
+                     *             ]
+                     *         ]
+                     *     ]
+                     * ]
+                     */
+                    'gridData' => []
                 ];
             }
 
-            $capData = [
-                'indicators' => $indicatorMarks,
-            ];
-            $isMarkPerCapability = $assessments[$row['assessment_id']]['isMarkPerCapability'] ?? false;
-            if ($assessments[$row['assessment_id']]['capabilities'][$row['capability_id']]['show']) {
-                $capData['databaseMark']      = $isMarkPerCapability ? $row['capability_mark'] : null;
-                $capData['humanReadableMark'] = $isMarkPerCapability ? $row['capability_human_readable_mark'] : null;
-                $capData['maxMark']           = $row['capability_max_value'];
-
-                /* Capabilities' Mark Type and Grade Group can be represented differently to
-                 * their Assessments' Mark Type and Grade Group
-                 */
-                $capData['capabilityMarkTypeId'] = $row['capability_mark_type_id'];
-                $capData['capabilityGradeGroupId'] = $row['capability_grade_group_id'];
+            /* Remember settings for the rubric instance that we're encountering, such as the rubric instance's mark per
+             * capability setting, etc. if it hasn't already been set. We only need to set it up once.
+             */
+            if (!isset($students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']])) {
+                $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']] = [
+                    'isMarkPerCapability' => null,
+                    /* Capabilities' Mark Type and Grade Group can be represented differently to their Assessments'
+                     * Mark Type and Grade Group
+                     */
+                    'capabilityMarkTypeId' => $row['capability_mark_type_id'],
+                    'capabilityGradeGroupId' => $row['capability_grade_group_id'],
+                    /* Capability Mark values. This would be relevant if you chose a Capability Mark Type to be
+                     * something other than NONE such as Percent, Letter Grade, Total Mark, etc.
+                     */
+                    'capabilities' => [
+                        /* This contains the descriptors that were selected for each indicator and exists per
+                         * capability: it's here for illustrative purposes and commented out for this reason
+                         */
+                        // 'indicators' => []
+                    ],
+                ];
             }
-            $capabilityMarks[$row['capability_id']] = $capData;
 
-            $assessmentsForStudent[$row['assessment_id']] = [
-                'capabilities' => $capabilityMarks,
-            ];
+            /* Remember capability mark type output per grid: we only need to set this up once per capability
+             */
+            if (!isset($students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']])) {
+                $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']] = [
+                    'name' => $row['capability_name'],
+                    'databaseMark' => $row['capability_mark'], // TODO depend on isMarkPerCapability
+                    'humanReadableMark' => $row['capability_human_readable_mark'], // TODO depend on isMarkPerCapability
+                    'maxMark' => $row['capability_max_value'],
+                    'indicators' => []
+                ];
+            }
 
-            // Stuff everything about the students marks into an array
-            $students[$row['student_id']] = [
-                'firstname'      => $row['student_firstname'],
-                'preferred_name' => $row['student_preferred_name'],
-                'lastname'       => $row['student_lastname'],
-                'assessmentsPublished'    => $assessmentsForStudent,
-                'profileLink'    => '/search/user/' . $row['student_id'],
-            ];
-
-            $lastObservedAssessmentId = $row['assessment_id'];
-            $lastObservedCapabilityId = $row['capability_id'];
-            $lastObservedStudentId    = $row['student_id'];
+            /* Check whether the indicator was in the filter selections. If it was chosen, or if none of the filters
+             * were chosen, then we need to include it in that stack. As per andyland filters, filtering nothing means
+             * include everything.
+             */
+            if ($selectedIndicators === null || in_array((int)$row['indicator_id'], $selectedIndicators, true)) {
+                if (!isset($students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']])) {
+                    $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']] = [
+                        'name' => $row['indicator_name'],
+                        'databaseMark' => $row['indicator_mark'],
+                        'maxMark' => $row['indicator_max_value'],
+                        'selectedDescriptorText' => $row['descriptor_name'],
+                    ];
+                }
+            }
         }
+new \Alaress_Probe($students);
         return $students;
     }
 
