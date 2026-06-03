@@ -460,20 +460,9 @@ class Cursor implements ICursor
             return [null, []]; // This indicates that the query should not be run because we know that no results will be returned.
         }
 
-        // Determine mark visibility.
-        if ($this->viewer->getRole()->isStaff()) {
-            $visibilities = array_keys(IAssessable::MARK_VISIBILITY_STRINGS);
-        } elseif ($this->viewer->getRole()->isStudent()) {
-            $visibilities = [IAssessable::MARK_VISIBILITY_STUDENT, IAssessable::MARK_VISIBILITY_PARENT_STUDENT];
-        } elseif ($this->viewer->getRole()->isParent()) {
-            $visibilities = [IAssessable::MARK_VISIBILITY_PARENT, IAssessable::MARK_VISIBILITY_PARENT_STUDENT];
-        } else {
-            throw new UnexpectedValueException('Unexpected User: ' . $this->viewer->getId());
-        }
-
         $visibilityPredicate = $this->database
             ->buildPredicateBuilder('')
-            ->in('submission_box.mark_visibility', $visibilities);
+            ->in('submission_box.mark_visibility', $this->getMarkVisibilitiesForViewer());
 
         $query = 'SELECT ';
         $params = [];
@@ -511,7 +500,6 @@ class Cursor implements ICursor
         return [$query, $params];
     }
 
-
     /**
      * Returns query to get quiz feedback.
      *
@@ -533,25 +521,9 @@ class Cursor implements ICursor
             return [null, []]; // This indicates that the query should not be run because we know that no results will be returned.
         }
 
-        // Determine mark visibility.
-        if ($this->viewer->getRole()->isStaff()) {
-            $visibilities = [
-                IAssessable::MARK_VISIBILITY_PRIVATE,
-                IAssessable::MARK_VISIBILITY_STUDENT,
-                IAssessable::MARK_VISIBILITY_PARENT,
-                IAssessable::MARK_VISIBILITY_PARENT_STUDENT,
-            ];
-        } elseif ($this->viewer->getRole()->isStudent()) {
-            $visibilities = [IAssessable::MARK_VISIBILITY_STUDENT, IAssessable::MARK_VISIBILITY_PARENT_STUDENT];
-        } elseif ($this->viewer->getRole()->isParent()) {
-            $visibilities = [IAssessable::MARK_VISIBILITY_PARENT, IAssessable::MARK_VISIBILITY_PARENT_STUDENT];
-        } else {
-            throw new UnexpectedValueException('Unexpected User: ' . $this->viewer->getId());
-        }
-
         $visibilityPredicate = $this->database
             ->buildPredicateBuilder('')
-            ->in('assess.mark_visibility', $visibilities);
+            ->in('assess.mark_visibility', $this->getMarkVisibilitiesForViewer());
 
         $query = 'SELECT ';
         $params = [];
@@ -588,6 +560,30 @@ class Cursor implements ICursor
         return [$query, $params];
     }
 
+    /**
+     * @return array
+     */
+    private function getMarkVisibilitiesForViewer(): array
+    {
+        if ($this->viewer->getRole()->isStaff()) {
+            // Return all visibilities.
+            return array_keys(IAssessable::MARK_VISIBILITY_STRINGS);
+        }
+
+        if ($this->viewer->getRole()->isStudent()) {
+            // Return all visibilities containing 'student'.
+            return [IAssessable::MARK_VISIBILITY_STUDENT, IAssessable::MARK_VISIBILITY_PARENT_STUDENT];
+        }
+
+        if ($this->viewer->getRole()->isParent()) {
+            // Return all visibilities containing 'parent'.
+            return [IAssessable::MARK_VISIBILITY_PARENT, IAssessable::MARK_VISIBILITY_PARENT_STUDENT];
+        }
+
+        throw new UnexpectedValueException(
+            "Viewer with userId {$this->viewer->getId()} does not fit expected categories."
+        );
+    }
 
     /**
      * Validate that parameter 'filter' meets the API spec: https://api.schoolbox.com.au/#post-/api/register/-provider-
