@@ -491,7 +491,7 @@ class Controller extends Base
             return $assessments;
         }
 
-        $innerPb    = (new Database\Predicate\Builder($this->internalDb->getQuoter(), ''))
+        $innerPb = (new Database\Predicate\Builder($this->internalDb->getQuoter(), ''))
             ->isNull('sr.deleted_at')
             ->notNull('sr.published_at')
             ->equals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
@@ -511,7 +511,6 @@ class Controller extends Base
                 $usagePb->in('vrm.indicator_id', $selectedIndicators);
             }
             $outerPb->any($usagePb);
-            $outerPb->isNull('rubric_instance.deleted_at');
         }
 
         $outerWhere = implode(' AND ', $outerPb->getWhere());
@@ -551,9 +550,10 @@ class Controller extends Base
                     vrm.feedback_date = latest_feedback.max_published_at AND
                     vrm.assessment_id = latest_feedback.assessment_id AND
                     vrm.student_id    = latest_feedback.owner
-                INNER JOIN user u ON vrm.student_id = u.id
                 INNER JOIN rubric_instance ON vrm.rubric_instance_id = rubric_instance.id
+                INNER JOIN user u ON vrm.student_id = u.id
                 WHERE {$outerWhere}
+                AND rubric_instance.deleted_at IS NULL
                 ORDER BY vrm.student_id, vrm.assessment_id, vrm.capability_id, vrm.indicator_id
             ",
             array_merge($innerPb->getParams(), $outerPb->getParams()),
