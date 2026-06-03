@@ -15,6 +15,7 @@ use InvalidArgumentException;
 
 class RegisterCandidatesRequest
 {
+    private const int MSG_ID_LENGTH = 96;
     private const array REQUIRED_CANDIDATE_FIELDS = [
         'date_of_birth',
         'firstname',
@@ -38,8 +39,8 @@ class RegisterCandidatesRequest
         if ($this->appId === '') {
             throw new InvalidArgumentException('IBIS app ID is required.');
         }
-        if (strlen($this->msgId) !== 96 || !ctype_xdigit($this->msgId)) {
-            throw new InvalidArgumentException('IBIS msgID must be a 96-character hexadecimal string.');
+        if (strlen($this->msgId) !== self::MSG_ID_LENGTH || !ctype_xdigit($this->msgId)) {
+            throw new InvalidArgumentException(sprintf('IBIS msgID must be a %d-character hexadecimal string.', self::MSG_ID_LENGTH));
         }
         if ($this->schoolCode === '') {
             throw new InvalidArgumentException('IBIS school code is required.');
