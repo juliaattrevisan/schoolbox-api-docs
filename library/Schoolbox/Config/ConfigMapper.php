@@ -615,16 +615,24 @@ class ConfigMapper extends Mapper
     ];
 
     /**
-     * Config settings which affect the external cache.
+     * Config settings which affect the external cache's content.
      *
      * If any of these settings change: invalidate the external cache.
      */
-    public const array SETTINGS_AFFECTING_EXTERNAL_CACHE = [
+    public const array SETTINGS_AFFECTING_EXTERNAL_CACHE_CONTENT = [
         self::NAME_EXTERNAL_TYPE,
         self::NAME_EXTERNAL_DB_HOST,
         self::NAME_EXTERNAL_DB_USER,
         self::NAME_EXTERNAL_DB_PASSWORD,
         self::NAME_EXTERNAL_DB_NAME,
+    ];
+
+    /**
+     * Config settings which affect the external cache's TTL.
+     *
+     * If any of these settings change: change the TTL of the external cache.
+     */
+    public const array SETTINGS_AFFECTING_EXTERNAL_CACHE_TTL = [
         self::NAME_EXTERNAL_CACHE_TIMEOUT,
     ];
 

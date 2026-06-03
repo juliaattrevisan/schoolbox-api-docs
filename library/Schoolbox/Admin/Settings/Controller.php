@@ -248,6 +248,7 @@ class Controller extends ConfigController
         $rebuildModules       = false;
         $clearOidcCache       = false;
         $clearExternalCache   = false;
+        $setExternalCacheTtl  = false;
 
         foreach ($postedValues as $name => $value) {
             $existingConfig  = $existingConfigs[$name];
@@ -283,18 +284,11 @@ class Controller extends ConfigController
                 if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_OAUTH, true)) {
                     $clearOidcCache = true;
                 }
-                if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_EXTERNAL_CACHE, true)) {
-                    // If the timeout changed, only clear the cache if the timeout was reduced:
-                    // * if it has increased, then nothing which was valid will become invalid
-                    // * if it has reduced, then clear everything: PHP's cache interface does not allow setting the TTL
-                    //   of individual cache objects.
-                    if ($name === ConfigMapper::NAME_EXTERNAL_CACHE_TIMEOUT) {
-                        if ((int)$newValue < (int)$existingConfig->getValue()) {
-                            $clearExternalCache = true;
-                        }
-                    } else {
-                        $clearExternalCache = true;
-                    }
+                if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_EXTERNAL_CACHE_CONTENT, true)) {
+                    $clearExternalCache = true;
+                }
+                if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_EXTERNAL_CACHE_TTL, true)) {
+                    $setExternalCacheTtl = true;
                 }
                 $existingConfig->setValue(trim((string)$newValue));
                 $this->getConfigMapper()->save($existingConfig);
@@ -324,6 +318,18 @@ class Controller extends ConfigController
             $this->oidcCache->clear();
         }
         if ($clearExternalCache) {
+            try {
+                // Don't need to wait for toolsd to run the job
+                $this->toolsDaemonClient->run(new ToolsDaemon\JobRequest('clearExternalCache', INSTANCE_ID));
+            } catch (ToolsDaemon\ClientException $e) {
+                // log an error to stdout, but continue?
+                $this->spawnLogger('toolsd.' . INSTANCE_ID)->warning(
+                    sprintf('Tools daemon request failed (message: %s)', $e->getMessage()),
+                    ['exception' => $e],
+                );
+            }
+        }
+        if ($setExternalCacheTtl) {
             try {
                 // Don't need to wait for toolsd to run the job
                 $this->toolsDaemonClient->run(new ToolsDaemon\JobRequest('setExternalCacheTtl', INSTANCE_ID));
