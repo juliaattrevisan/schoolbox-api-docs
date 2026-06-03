@@ -101,6 +101,15 @@ tools:
     idempotent: true
     pool: default
 
+  # A tool for resetting the external TTL of caches.
+  setExternalCacheTtl:
+    command: tools/redis/setExternalTTL.php
+    options:
+      allowed: [-v]
+    requiresInstanceId: true
+    idempotent: true
+    pool: default
+
 #  # A real-world tool definition:
 #  # in this case, a UPS run triggered from the admin UI
 #  ups:

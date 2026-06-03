@@ -326,7 +326,7 @@ class Controller extends ConfigController
         if ($clearExternalCache) {
             try {
                 // Don't need to wait for toolsd to run the job
-                $this->toolsDaemonClient->run(new ToolsDaemon\JobRequest('clearExternalCache', INSTANCE_ID));
+                $this->toolsDaemonClient->run(new ToolsDaemon\JobRequest('setExternalCacheTtl', INSTANCE_ID));
             } catch (ToolsDaemon\ClientException $e) {
                 // log an error to stdout, but continue?
                 $this->spawnLogger('toolsd.' . INSTANCE_ID)->warning(
