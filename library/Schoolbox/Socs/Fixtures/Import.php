@@ -58,8 +58,10 @@ class Import implements IStrategy
     {
         $season = $this->registry->recallSeason();
 
-        $startDate = \Alaress_Date_Format::now()->addDays(self::FROM)->getUsingFormat('j M Y');
-        $endDate = \Alaress_Date_Format::now()->addDays(self::TO)->getUsingFormat('j M Y');
+        // Standard Fixture Feed date format (https://help.socscms.com/Page.asp?ID=276&CatID=13)
+        $dateFormat = 'j M Y';
+        $startDate = \Alaress_Date_Format::now()->addDays(self::FROM)->getUsingFormat($dateFormat);
+        $endDate = \Alaress_Date_Format::now()->addDays(self::TO)->getUsingFormat($dateFormat);
 
         $this->log->info(sprintf('Downloading SOCS fixtures from %s to %s', $startDate, $endDate));
 
