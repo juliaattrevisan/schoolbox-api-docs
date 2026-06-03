@@ -126,6 +126,14 @@ $modules: () !default;
         &[class^="icon-"]:before {
             padding: 0 0.25rem;
         }
+
+        > sbx-icon {
+            align-items: center;
+            display: inline-flex;
+            line-height: normal;
+            padding: 0 0.25rem;
+            vertical-align: middle;
+        }
     }
     input:checked + label span {
         &:first-child {

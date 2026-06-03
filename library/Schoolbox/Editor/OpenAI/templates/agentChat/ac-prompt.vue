@@ -211,13 +211,15 @@ acPromptEventBus.on(({ retryRequest }) => {
         </div>
         <nav>
             <a
-                class="icon-send"
+                class="ac-prompt-send"
                 href="#"
                 :title="props.promptButtonTitle"
                 :disabled="isSubmitDisabled || undefined"
                 data-test="ac-prompt-send-button"
                 @click.prevent="sendRequest"
-            ></a>
+            >
+                <sbx-icon name="send" size="l"></sbx-icon>
+            </a>
         </nav>
     </div>
 </template>
@@ -243,16 +245,11 @@ acPromptEventBus.on(({ retryRequest }) => {
         }
     }
 
-    /* a custom icon that isn't from the sbx font for now hence these are some rather specific margins
-     * to align the icon, we should probably just add it to our actual icons... */
-    .icon-send {
+    .ac-prompt-send {
+        align-items: center;
+        display: inline-flex;
         height: 2.5rem;
-
-        &::before {
-            content: "➤";
-            font-size: 1.5rem;
-            line-height: 2.25rem;
-        }
+        margin-right: 0.5rem;
     }
 }
 </style>

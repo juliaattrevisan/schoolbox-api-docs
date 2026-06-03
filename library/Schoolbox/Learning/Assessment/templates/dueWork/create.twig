@@ -62,8 +62,8 @@
             <div class="switch">
                 <input name="courseManaged" id="courseManaged" type="checkbox" {% if assessment.courseManaged %}checked="checked"{% endif %} {% if not courseManaged.isMutable %}disabled{% endif %}/>
                 <label for="courseManaged">
-                    <span class="icon-approve"></span>
-                    <span class="icon-cancel"></span>
+                    <span><sbx-icon name="approve" size="m" color="currentColor"></sbx-icon></span>
+                    <span><sbx-icon name="close" size="m" color="currentColor"></sbx-icon></span>
                 </label>
             </div>
         </div>
@@ -204,8 +204,8 @@
                 <div class="switch">
                     <input name="enablePolicy" id="declaration" type="checkbox" {% if assessment.getEnablePolicy %}checked="checked"{% endif %} {% if courseManaged.isReadonly %}disabled{% endif %} />
                     <label for="declaration">
-                        <span class="icon-approve"></span>
-                        <span class="icon-cancel"></span>
+                        <span><sbx-icon name="approve" size="m" color="currentColor"></sbx-icon></span>
+                        <span><sbx-icon name="close" size="m" color="currentColor"></sbx-icon></span>
                     </label>
                 </div>
                 <div data-reveal="" role="dialog" id="policyDialog" class="reveal-modal" aria-hidden="true" style="display: none; top: 100px; opacity: 1; visibility: hidden;">
