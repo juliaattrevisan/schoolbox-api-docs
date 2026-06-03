@@ -45,8 +45,7 @@ class Widgets
      */
     public static function getAvailableOptions(): array
     {
-        $configLoader = ConfigLoader::getInstance();
-
+        $configLoader  = ConfigLoader::getInstance();
         $allowStudents = (bool)$configLoader->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_STUDENTS);
         $allowParents  = (bool)$configLoader->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_PARENTS);
         $available     = \Schoolbox\Learning\Assessment\Feedback\Visibility::getAvailableVisibilities($allowStudents, $allowParents);
