@@ -55,30 +55,30 @@ class Generic extends Full
         if ($markVisibility === null) {
             // Use the default value from the mark_visibility field of the relevant database table.
             $assessment = $this->participant->getAssessable();
-            if ($assessment instanceof Project) {
+            $markVisibility = match (true) {
                 // The default value of database column project.mark_visibility is 'staffAndStudent'.
-                $markVisibility = IAssessable::MARK_VISIBILITY_STUDENT;
-            } elseif ($assessment instanceof DueWork\Model) {
+                $assessment instanceof Project => IAssessable::MARK_VISIBILITY_STUDENT,
+
                 // The default value of database column submission_box.mark_visibility is 'staffOnly'.
-                $markVisibility = IAssessable::MARK_VISIBILITY_PRIVATE;
-            } elseif ($assessment instanceof Task\Model) {
+                $assessment instanceof DueWork\Model => IAssessable::MARK_VISIBILITY_PRIVATE,
+
                 // Table `task` has no mark_visibility column, which makes sense because
                 // Task\Model->getMarkVisibility() always returns MARK_VISIBILITY_PARENT_STUDENT.
                 // So this case should never execute.  Handle it anyway for completeness.
-                $markVisibility = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
-            } elseif ($assessment instanceof Quiz\Model) {
+                $assessment instanceof Task\Model => IAssessable::MARK_VISIBILITY_PARENT_STUDENT,
+
                 // The default value of database column assess.mark_visibility is 'staffAndStudent'.
-                $markVisibility = IAssessable::MARK_VISIBILITY_STUDENT;
-            } elseif ($assessment instanceof Lti\Model) {
+                $assessment instanceof Quiz\Model => IAssessable::MARK_VISIBILITY_STUDENT,
+
                 // The default value of database column lti_assessment.mark_visibility is null.  Assume 'staffOnly'.
-                $markVisibility = IAssessable::MARK_VISIBILITY_PRIVATE;
-            } elseif ($assessment instanceof LessonPlan\Model) {
+                $assessment instanceof Lti\Model => IAssessable::MARK_VISIBILITY_PRIVATE,
+
                 // The default value of database column lesson_plan.visibility is undefined.  Assume 'staffOnly'.
-                $markVisibility = IAssessable::MARK_VISIBILITY_PRIVATE;
-            } else {
+                $assessment instanceof LessonPlan\Model => IAssessable::MARK_VISIBILITY_PRIVATE,
+
                 // This should never execute, but handle it for completeness.
-                $markVisibility = IAssessable::MARK_VISIBILITY_PRIVATE;
-            }
+                default => IAssessable::MARK_VISIBILITY_PRIVATE,
+            };
         }
 
         $isFeedbackVisible = in_array($markVisibility, $allowedVisibilities, true);
