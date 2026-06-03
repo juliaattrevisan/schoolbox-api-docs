@@ -523,7 +523,8 @@ class Controller extends Base
                     u.firstname                        AS student_firstname,
                     u.preferred_name                   AS student_preferred_name,
                     u.lastname                         AS student_lastname,
-                    vrm.rubric_instance_id             AS rubric_instance_id,
+                    rubric_instance.id                 AS rubric_instance_id,
+                    rubric_instance.title              AS rubric_title,
                     vrm.capability_id                  AS capability_id,
                     vrm.capability_name                AS capability_name,
                     vrm.capability_mark                AS capability_mark,
@@ -603,6 +604,9 @@ class Controller extends Base
              */
             if (!isset($students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']])) {
                 $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']] = [
+                    /* Obviously so you can see which grid is which, by its name, on the user interface
+                     */
+                    'title' => $row['rubric_title'],
                     'isMarkPerCapability' => null,
                     /* Capabilities' Mark Type and Grade Group can be represented differently to their Assessments'
                      * Mark Type and Grade Group
