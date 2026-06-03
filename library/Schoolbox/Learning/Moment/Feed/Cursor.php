@@ -462,12 +462,7 @@ class Cursor implements ICursor
 
         // Determine mark visibility.
         if ($this->viewer->getRole()->isStaff()) {
-            $visibilities = [
-                IAssessable::MARK_VISIBILITY_PRIVATE,
-                IAssessable::MARK_VISIBILITY_STUDENT,
-                IAssessable::MARK_VISIBILITY_PARENT,
-                IAssessable::MARK_VISIBILITY_PARENT_STUDENT,
-            ];
+            $visibilities = array_keys(IAssessable::MARK_VISIBILITY_STRINGS);
         } elseif ($this->viewer->getRole()->isStudent()) {
             $visibilities = [IAssessable::MARK_VISIBILITY_STUDENT, IAssessable::MARK_VISIBILITY_PARENT_STUDENT];
         } elseif ($this->viewer->getRole()->isParent()) {
