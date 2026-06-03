@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Timeline;
 
 use Closure;
+use LogicException;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
@@ -77,7 +78,9 @@ class Generic extends Full
                 $assessment instanceof LessonPlan\Model => IAssessable::MARK_VISIBILITY_PRIVATE,
 
                 // This should never execute, but handle it for completeness.
-                default => IAssessable::MARK_VISIBILITY_PRIVATE,
+                default => throw new LogicException(
+                    'Unhandled assessment type with null mark visibility: ' . $assessment::class
+                )
             };
         }
 
