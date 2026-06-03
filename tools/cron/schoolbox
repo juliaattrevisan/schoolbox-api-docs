@@ -171,5 +171,7 @@ MAILTO="ist+cron@schoolbox.com.au"
 # import canvas data daily 7am
 0 7 * * * www-data /usr/local/bin/jitter 3600 php /usr/share/schoolbox/tools/canvas/import.php -p >> /var/log/schoolbox/canvas-data-sync.log 2>&1
 
+# International Baccalaureate Candidates
+*/1 * * * * www-data php /usr/share/schoolbox/tools/international-baccalaureate/register-candidates.php -vvv -p >> /var/log/schoolbox/ib-candidates.log 2>&1
 
 # End of file - do not delete
