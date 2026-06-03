@@ -19,6 +19,7 @@ use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\Lti;
 use Schoolbox\Learning\Assessment\LessonPlan;
 use Schoolbox\Learning\Assessment\Quiz;
+use Schoolbox\Learning\Assessment\Reporting;
 
 /**
  * Generic timeline builder.
@@ -58,24 +59,23 @@ class Generic extends Full
             $assessment = $this->participant->getAssessable();
             $markVisibility = match (true) {
                 // The default value of database column project.mark_visibility is 'staffAndStudent'.
-                $assessment instanceof Project => IAssessable::MARK_VISIBILITY_STUDENT,
-
-                // The default value of database column submission_box.mark_visibility is 'staffOnly'.
-                $assessment instanceof DueWork\Model => IAssessable::MARK_VISIBILITY_PRIVATE,
+                // The default value of database column assess.mark_visibility is 'staffAndStudent'.
+                $assessment instanceof Project    => IAssessable::MARK_VISIBILITY_STUDENT,
+                $assessment instanceof Quiz\Model => IAssessable::MARK_VISIBILITY_STUDENT,
 
                 // Table `task` has no mark_visibility column, which makes sense because
                 // Task\Model->getMarkVisibility() always returns MARK_VISIBILITY_PARENT_STUDENT.
                 // So this case should never execute.  Handle it anyway for completeness.
                 $assessment instanceof Task\Model => IAssessable::MARK_VISIBILITY_PARENT_STUDENT,
 
-                // The default value of database column assess.mark_visibility is 'staffAndStudent'.
-                $assessment instanceof Quiz\Model => IAssessable::MARK_VISIBILITY_STUDENT,
-
+                // The default value of database column submission_box.mark_visibility is 'staffOnly'.
                 // The default value of database column lti_assessment.mark_visibility is null.  Assume 'staffOnly'.
-                $assessment instanceof Lti\Model => IAssessable::MARK_VISIBILITY_PRIVATE,
-
                 // The default value of database column lesson_plan.visibility is undefined.  Assume 'staffOnly'.
+                // The default value of database column reporting.mark_visibility is null.  Assume 'staffOnly'.
+                $assessment instanceof DueWork\Model    => IAssessable::MARK_VISIBILITY_PRIVATE,
+                $assessment instanceof Lti\Model        => IAssessable::MARK_VISIBILITY_PRIVATE,
                 $assessment instanceof LessonPlan\Model => IAssessable::MARK_VISIBILITY_PRIVATE,
+                $assessment instanceof Reporting\Model  => IAssessable::MARK_VISIBILITY_PRIVATE,
 
                 // This should never execute, but handle it for completeness.
                 default => throw new LogicException(
