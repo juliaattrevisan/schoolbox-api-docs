@@ -118,7 +118,7 @@ class Registry
             $season = $this->seasonMapper->createModel();
             $this->logger->debug(sprintf(
                 'Creating new SOCS season %s',
-                $season->getName(),
+                self::SOCS_FIXTURES,
             ));
         }
 
@@ -165,7 +165,7 @@ class Registry
         } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var SportModel $sport */
             $sport = $this->sportMapper->createModel();
-            $this->logger->debug(sprintf('Creating new SOCS sport %s', $sport->getName()));
+            $this->logger->debug(sprintf('Creating new SOCS sport %s', $sportName));
         }
 
         // update updated at, we have seen this, we need to record it
@@ -217,7 +217,7 @@ class Registry
         } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var DivisionModel $division */
             $division = $this->divisionMapper->createModel();
-            $this->logger->debug(sprintf('Creating new SOCS division %s', $division->getName()));
+            $this->logger->debug(sprintf('Creating new SOCS division %s', $divisionName));
         }
 
         // update updated at, we have seen this, we need to record it
@@ -275,7 +275,7 @@ class Registry
         } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var TeamModel $team */
             $team = $this->teamMapper->createModel();
-            $this->logger->debug(sprintf('Creating new SOCS team %s', $team->getName()));
+            $this->logger->debug(sprintf('Creating new SOCS team %s', $teamName));
         }
 
         // update updated at, we have seen this, we need to record it
@@ -321,7 +321,7 @@ class Registry
         } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var VenueModel $venue */
             $venue = $this->venueMapper->createModel();
-            $this->logger->debug(sprintf('Creating new SOCS venue %s', $venue->getName()));
+            $this->logger->debug(sprintf('Creating new SOCS venue %s', $venueName));
         }
 
         // update updated at, we have seen this, we need to record it
@@ -366,7 +366,7 @@ class Registry
         } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var SchoolModel $school */
             $school = $this->schoolMapper->createModel();
-            $this->logger->debug(sprintf('Creating new SOCS school %s', $school->getName()));
+            $this->logger->debug(sprintf('Creating new SOCS school %s', $schoolName));
         }
 
         // update updated at, we have seen this, we need to record it
