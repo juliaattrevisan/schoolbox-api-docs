@@ -34,7 +34,7 @@ export default class UserBulkModify {
 
     static readonly COLUMN_EPORTFOLIO = 9;
 
-    static readonly SELECTOR_INPUT_SEARCH = 'input[placeholder="Search for users..."]';
+    static readonly SELECTOR_INPUT_SEARCH = "Filter";
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
@@ -64,7 +64,7 @@ export default class UserBulkModify {
      */
     async searchUsers(searchText: string): Promise<void> {
         this.tester.isGoingTo(`Search for users using "${searchText}"`);
-        const searchInput = this.page.locator(UserBulkModify.SELECTOR_INPUT_SEARCH);
+        const searchInput = this.page.getByLabel(UserBulkModify.SELECTOR_INPUT_SEARCH);
         await searchInput.click();
         await searchInput.clear();
         await searchInput.fill(searchText);
@@ -75,7 +75,7 @@ export default class UserBulkModify {
      */
     async clearSearch(): Promise<void> {
         this.tester.isGoingTo("Clear the users search input");
-        const searchInput = this.page.locator(UserBulkModify.SELECTOR_INPUT_SEARCH);
+        const searchInput = this.page.getByLabel(UserBulkModify.SELECTOR_INPUT_SEARCH);
         await searchInput.click();
         await searchInput.clear();
     }
