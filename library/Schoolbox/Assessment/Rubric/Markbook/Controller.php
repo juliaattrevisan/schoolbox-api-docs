@@ -390,7 +390,6 @@ class Controller extends Base
                 vr.capability_max_value                      AS capability_max_value,
                 vr.capability_mark_type_id                   AS capability_mark_type_id,
                 vr.capability_grade_group_id                 AS capability_grade_group_id,
-                IF(vr.capability_mark_type_id = :none, 0, 1) AS assessment_is_mark_per_capability,
                 vr.indicator_id                              AS indicator_id,
                 vr.indicator_name                            AS indicator_name,
                 vr.indicator_max_value                       AS indicator_max_value
@@ -403,7 +402,7 @@ class Controller extends Base
                 vr.indicator_sequence,
                 vr.indicator_id
         ";
-        $stmt = $this->internalDb->prepareQuery($sql, ['none' => MarkType::TYPE_NONE] + $pb->getParams());
+        $stmt = $this->internalDb->prepareQuery($sql, $pb->getParams());
 
         $capabilities = [];
         $indicators   = [];
@@ -445,7 +444,6 @@ class Controller extends Base
                 'markType'       => $row['assessment_mark_type'],
                 'capabilityMarkTypeId'     => $row['capability_mark_type_id'],
                 'capabilityGradeGroupId'   => $row['capability_grade_group_id'],
-                'isMarkPerCapability' => $row['assessment_is_mark_per_capability'],
                 'weight'         => $integerHydrator->hydrate($row['assessment_weight']),
                 'capabilities'   => $capabilities,
             ];
@@ -525,6 +523,7 @@ class Controller extends Base
                     u.lastname                         AS student_lastname,
                     rubric_instance.id                 AS rubric_instance_id,
                     rubric_instance.title              AS rubric_title,
+                    rubric_instance.rubric_capability_mark_type_id AS rubric_capability_mark_type_id,
                     vrm.capability_id                  AS capability_id,
                     vrm.capability_name                AS capability_name,
                     vrm.capability_mark                AS capability_mark,
@@ -607,7 +606,7 @@ class Controller extends Base
                     /* Obviously so you can see which grid is which, by its name, on the user interface
                      */
                     'title' => $row['rubric_title'],
-                    'isMarkPerCapability' => null,
+                    'isMarkPerCapability' => MarkType::SLUG_NONE === MarkType::idToSlug($row['rubric_capability_mark_type_id']),
                     /* Capabilities' Mark Type and Grade Group can be represented differently to their Assessments'
                      * Mark Type and Grade Group
                      */
@@ -628,10 +627,12 @@ class Controller extends Base
             /* Remember capability mark type output per grid: we only need to set this up once per capability
              */
             if (!isset($students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']])) {
+                $isMarkPerCapability = $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['isMarkPerCapability'];
+
                 $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']] = [
                     'name' => $row['capability_name'],
-                    'databaseMark' => $row['capability_mark'], // TODO depend on isMarkPerCapability
-                    'humanReadableMark' => $row['capability_human_readable_mark'], // TODO depend on isMarkPerCapability
+                    'databaseMark' => $isMarkPerCapability ? $row['capability_mark'] : null,
+                    'humanReadableMark' => $isMarkPerCapability ? $row['capability_human_readable_mark'] : null,
                     'maxMark' => $row['capability_max_value'],
                     'indicators' => []
                 ];
@@ -652,7 +653,9 @@ class Controller extends Base
                 }
             }
         }
+new \Alaress_Probe($assessments[38]);
 new \Alaress_Probe($students);
+die();
         return $students;
     }
 
