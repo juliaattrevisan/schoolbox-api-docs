@@ -38,162 +38,171 @@
                 <div class="diagonal-headings-table-container small-12 island" data-diagonal-headings-table-container>
                     <table id="rubric-marksheet" class="diagonal-headings-table marksheet">
                         <thead>
-                        <tr class="rotate-headers" data-headers>
-                            <th class="fixed-left"><div></div></th> {# -+ NOTE: Combining these two cells with colspan=2 complicates styling. #}
-                            <th class="fixed-left"><div></div></th> {# /        Therefore they are best left separate. #}
-                            {% for studentId, student in students %}
-                                <th>
-                                    <div>
-                                        <span>
-                                            <a href="{{ student.profileLink }}">
-                                                {{ student.lastname ~ ', ' ~ student.firstname }}
-                                            </a>
-                                        </span>
-                                    </div>
-                                </th>
-                            {% endfor %}
-                        </tr>
+                            <tr class="rotate-headers" data-headers>
+                                <th class="fixed-left"><div></div></th> {# -+ NOTE: Combining these two cells with colspan=2 complicates styling. #}
+                                <th class="fixed-left"><div></div></th> {# /        Therefore they are best left separate. #}
+                                {% for studentId, student in students %}
+                                    <th>
+                                        <div>
+                                            <span>
+                                                <a href="{{ student.profileLink }}">
+                                                    {{ student.lastname ~ ', ' ~ student.firstname }}
+                                                </a>
+                                            </span>
+                                        </div>
+                                    </th>
+                                {% endfor %}
+                            </tr>
                         </thead>
-
                         <tbody>
-                        {% for assessmentId, assessment in assessments %}
+                            {% for assessmentId, assessment in assessments %}
+                                {# Every rubric grid needs to be built separately #}
+                                {% for rubricInstanceId, rubricGridData in assessment.gridData %}
+                                    {% set rowSpan = 0 %}
+
+                                    {% for capabilityId, capability in rubricGridData.capabilities %}
+                                        {% set rowSpan = rowSpan + 1 + capability.indicators | length %}
+                                    {% endfor %}
+
+                                    {% for capabilityId, capability in rubricGridData.capabilities %}
+                                        <tr class="capability-row">
+                                            {# Only render the (assessment title, rubric title) tuple once
+                                             # TODO Maybe there's a nicer way to set this up that doesn't involve repeating
+                                             # the assessment title for each grid
+                                             #}
+                                            {% if loop.index0 == 0 %}
+                                                <th class="fixed-left white assessment" title="{{ assessment.name }}" rowspan="{{ rowSpan }}">
+                                                    <a href="{{ assessment.statusLink }}">{{ assessment.name }}</a><br />
+                                                    {{ rubricGridData.title }}
+                                                </th>
+                                            {% endif %}
+
+                                            {# Class 'second-child' needed so that cells are styled correctly when the cell to the left spans mulitple rows. #}
+                                            <th class="fixed-left second-child white capability">{{ capability.name | markdown }}</th>
+
+                                            {% for studentId, student in students %}
+                                                {% if not capability.show or not rubricGridData.isMarkPerCapability %}
+                                                    <td class="excluded"></td>
+                                                {% elseif studentId in (exclusions[assessmentId] ?? []) %}
+                                                    <td class="excluded" title="Excluded from assessment"></td>
+                                                {% else %}
+                                                    {% set capabilityMark = student.assessmentsPublished[assessmentId].capabilities[capabilityId].humanReadableMark ?? null %}
+                                                    {% set normalisedCapabilityMark = student.assessmentsPublished[assessmentId].capabilities[capabilityId].normalisedMark ?? null %}
+                                                    {% set summaryLink = student.assessments[assessmentId].summaryLink %}
+                                                    {% set gradientClass = urgency.marks(normalisedCapabilityMark) %}
+                                                    {# Latest Marks #}
+                                                    {% set latestCapabilityMark = student.assessmentsLatest[assessmentId].capabilities[capabilityId].humanReadableMark ?? null %}
+                                                    {% set latestNormalisedCapabilityMark = student.assessmentsLatest[assessmentId].capabilities[capabilityId].normalisedMark ?? null %}
+                                                    {% set latestGradientClass = urgency.marks(latestNormalisedCapabilityMark) %}
+                                                    <td class="mark">
+                                                        <a href="{{ summaryLink }}"
+                                                           {% if latestCapabilityMark %}data-actual-mark{% endif %}
+                                                           class="{{ gradientClass }} {% if capabilityMark is null %}no-mark{% endif %}"
+                                                        >{{ capabilityMark|default('–') }}</a>
+                                                        {% if latestCapabilityMark %}
+                                                            <a href="{{ summaryLink }}"
+                                                               data-draft-mark
+                                                               class="meta {% if latestCapabilityMark is null %}no-mark{% endif %}"
+                                                            >{{ latestCapabilityMark|default('–') }}</a>
+                                                        {% endif %}
+                                                    </td>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </tr>
+
+
+                                        {% for indicatorId, indicator in capability.indicators %}
+                                            <tr class="indicator-row">
+                                                {# Class 'second-child' needed so that cells are styled correctly when the cell to the left spans mulitple rows. #}
+                                                <th class="fixed-left second-child white indicator">{{ indicator.name | markdown }}</th>
+
+                                                {% for studentId, student in students %}
+
+                                                    {% if studentId in (exclusions[assessmentId] ?? []) %}
+                                                        <th class="fixed-left excluded" title="Excluded from assessment"></th>
+                                                    {% else %}
+                                                        {% set indicatorMark           = student.assessmentsPublished[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark ?? null %}
+                                                        {% set normalisedIndicatorMark = student.assessmentsPublished[assessmentId].capabilities[capabilityId].indicators[indicatorId].normalisedMark ?? null %}
+                                                        {% set descriptorText          = student.assessmentsPublished[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText ?? null %}
+                                                        {% set summaryLink             = student.assessments[assessmentId].summaryLink %}
+                                                        {% set gradientClass           = urgency.marks(normalisedIndicatorMark) %}
+                                                        {% set renderedIndicatorMark   = descriptorText ? indicatorMark|default('✓') : indicatorMark|default('–') %}
+                                                        {# Latest Marks #}
+                                                        {% set latestIndicatorMark           = student.assessmentsLatest[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark ?? null %}
+                                                        {% set latestNormalisedIndicatorMark = student.assessmentsLatest[assessmentId].capabilities[capabilityId].indicators[indicatorId].normalisedMark ?? null %}
+                                                        {% set latestDescriptorText          = student.assessmentsLatest[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText ?? null %}
+                                                        {% set latestGradientClass           = urgency.marks(latestNormalisedIndicatorMark) %}
+                                                        {% set latestRenderedIndicatorMark   = latestDescriptorText ? latestIndicatorMark|default('✓') : latestIndicatorMark|default('–') %}
+
+                                                        <td class="mark">
+                                                            <a href="{{ summaryLink }}"
+                                                                    {% if descriptorText %} title="{{ descriptorText }}"{% endif %}
+                                                                    {% if latestIndicatorMark %}data-actual-mark{% endif %}
+                                                               class="{{ gradientClass }} {% if indicatorMark is null %}no-mark{% endif %}"
+                                                            >{{ renderedIndicatorMark }}</a>
+                                                            {% if latestIndicatorMark %}
+                                                                <a href="{{ summaryLink }}"
+                                                                   {% if latestDescriptorText %} title="{{ latestDescriptorText }}"{% endif %}
+                                                                   data-draft-mark
+                                                                   class=meta {% if latestIndicatorMark is null %}no-mark{% endif %}"
+                                                                >{{ latestRenderedIndicatorMark }}</a>
+                                                            {% endif %}
+                                                        </td>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                    {% endfor %}
+                                {% endfor %}
+                            {% endfor %}
 
                             {% set rowSpan = 0 %}
-                            {% for capabilityId, capability in assessment.capabilities %}
-                                {% set rowSpan = rowSpan + 1 + capability.indicators | length %}
+                            {% for capabilityId, capabilityData in overall %}
+                                {% set rowSpan = rowSpan + 1 + capabilityData.indicators | length %}
                             {% endfor %}
 
-                            {% for capabilityId, capability in assessment.capabilities %}
-                                <tr class="capability-row">
+                            {% for capabilityId, capabilityData in overall %}
+                                <tr class="capability-row summated{% if loop.index0 == 0 %} first-summated{% endif %}">
                                     {% if loop.index0 == 0 %}
-                                        <th class="fixed-left white assessment" title="{{ assessment.name }}" rowspan="{{ rowSpan }}">
-                                            <a href="{{ assessment.statusLink }}">{{ assessment.name }}</a>
-                                        </th>
+                                        <th class="fixed-left overall" rowspan="{{ rowSpan }}">Overall</th>
                                     {% endif %}
                                     {# Class 'second-child' needed so that cells are styled correctly when the cell to the left spans mulitple rows. #}
-                                    <th class="fixed-left second-child white capability">{{ capability.name | markdown }}</th>
+                                    <th class="fixed-left white second-child capability">{{ capabilityData.name | markdown }}</th>
 
-                                    {% for studentId, student in students %}
-                                        {% if not capability.show or not assessment.isMarkPerCapability %}
-                                            <td class="excluded"></td>
-                                        {% elseif studentId in (exclusions[assessmentId] ?? []) %}
-                                            <td class="excluded" title="Excluded from assessment"></td>
-                                        {% else %}
-                                            {% set capabilityMark           = student.assessmentsPublished[assessmentId].capabilities[capabilityId].humanReadableMark ?? null %}
-                                            {% set normalisedCapabilityMark = student.assessmentsPublished[assessmentId].capabilities[capabilityId].normalisedMark ?? null %}
-                                            {% set summaryLink              = student.assessments[assessmentId].summaryLink %}
-                                            {% set gradientClass            = urgency.marks(normalisedCapabilityMark) %}
-                                            {# Latest Marks #}
-                                            {% set latestCapabilityMark           = student.assessmentsLatest[assessmentId].capabilities[capabilityId].humanReadableMark ?? null %}
-                                            {% set latestNormalisedCapabilityMark = student.assessmentsLatest[assessmentId].capabilities[capabilityId].normalisedMark ?? null %}
-                                            {% set latestGradientClass                  = urgency.marks(latestNormalisedCapabilityMark) %}
+                                    {% for studentId, studentData in students %}
+                                        {% if capabilityData.show %}
                                             <td class="mark">
-                                                <a href="{{ summaryLink }}"
-                                            {% if latestCapabilityMark %}data-actual-mark{% endif %}
-                                                   class="{{ gradientClass }} {% if capabilityMark is null %}no-mark{% endif %}"
-                                                >{{ capabilityMark|default('–') }}</a>
-                                                {% if latestCapabilityMark %}
-                                                <a href="{{ summaryLink }}"
-                                                   data-draft-mark
-                                                   class="meta {% if latestCapabilityMark is null %}no-mark{% endif %}"
-                                                >{{ latestCapabilityMark|default('–') }}</a>
+                                            {% set gradientClass = urgency.marks(capabilityData.marks[studentId].normalised ?? null) %}
+                                            {% set draftGradientClass = urgency.marks(capabilityData.marks[studentId].latestNormalised ?? null) %}
+                                            <a href="#" {% if draftGradientClass %}data-actual-mark{% endif %} class="{% if gradientClass %} {{ gradientClass }}{% endif %}">{{ capabilityData.marks[studentId].humanReadable|default('–') }}</a>
+                                            {% if draftGradientClass %}
+                                            <a href="#" data-draft-mark class="meta">{{ capabilityData.marks[studentId].latestHumanReadable|default('–') }}</a>
                                                 {% endif %}
                                             </td>
+                                        {% else %}
+                                            <td class="excluded"></td>
                                         {% endif %}
                                     {% endfor %}
                                 </tr>
 
-                                {% for indicatorId, indicator in capability.indicators %}
-                                    <tr class="indicator-row">
+                                {% for indicatorId, indicatorData in capabilityData.indicators %}
+                                    <tr class="indicator-row summated">
                                         {# Class 'second-child' needed so that cells are styled correctly when the cell to the left spans mulitple rows. #}
-                                        <th class="fixed-left second-child white indicator">{{ indicator.name | markdown }}</th>
-
-                                        {% for studentId, student in students %}
-
-                                            {% if studentId in (exclusions[assessmentId] ?? []) %}
-                                                <th class="fixed-left excluded" title="Excluded from assessment"></th>
-                                            {% else %}
-                                                {% set indicatorMark           = student.assessmentsPublished[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark ?? null %}
-                                                {% set normalisedIndicatorMark = student.assessmentsPublished[assessmentId].capabilities[capabilityId].indicators[indicatorId].normalisedMark ?? null %}
-                                                {% set descriptorText          = student.assessmentsPublished[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText ?? null %}
-                                                {% set summaryLink             = student.assessments[assessmentId].summaryLink %}
-                                                {% set gradientClass           = urgency.marks(normalisedIndicatorMark) %}
-                                                {% set renderedIndicatorMark   = descriptorText ? indicatorMark|default('✓') : indicatorMark|default('–') %}
-                                                {# Latest Marks #}
-                                                {% set latestIndicatorMark           = student.assessmentsLatest[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark ?? null %}
-                                                {% set latestNormalisedIndicatorMark = student.assessmentsLatest[assessmentId].capabilities[capabilityId].indicators[indicatorId].normalisedMark ?? null %}
-                                                {% set latestDescriptorText          = student.assessmentsLatest[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText ?? null %}
-                                                {% set latestGradientClass           = urgency.marks(latestNormalisedIndicatorMark) %}
-                                                {% set latestRenderedIndicatorMark   = latestDescriptorText ? latestIndicatorMark|default('✓') : latestIndicatorMark|default('–') %}
-
-                                                <td class="mark">
-                                                    <a href="{{ summaryLink }}"
-                                                       {% if descriptorText %} title="{{ descriptorText }}"{% endif %}
-                                                {% if latestIndicatorMark %}data-actual-mark{% endif %}
-                                                       class="{{ gradientClass }} {% if indicatorMark is null %}no-mark{% endif %}"
-                                                    >{{ renderedIndicatorMark }}</a>
-                                                {% if latestIndicatorMark %}
-                                                    <a href="{{ summaryLink }}"
-                                                       {% if latestDescriptorText %} title="{{ latestDescriptorText }}"{% endif %}
-                                                       data-draft-mark
-                                                       class=meta {% if latestIndicatorMark is null %}no-mark{% endif %}"
-                                                    >{{ latestRenderedIndicatorMark }}</a>
-                                                {% endif %}
-                                                </td>
+                                        <th class="fixed-left second-child white indicator">{{ indicatorData.name | markdown }}</th>
+                                        {% for studentId, studentData in students %}
+                                            <td class="mark">
+                                                {% set gradientClass = urgency.marks(indicatorData.marks[studentId].normalised ?? '') %}
+                                                {% set draftGradientClass = urgency.marks(indicatorData.marks[studentId].latestNormalised ?? '') %}
+                                            <a href="#" {% if draftGradientClass %}data-actual-mark{% endif %} class="{% if gradientClass %} {{ gradientClass }}{% endif %}">{{ indicatorData.marks[studentId].humanReadable|default('–') }}</a>
+                                            {% if draftGradientClass %}
+                                            <a href="#" data-draft-mark class="meta">{{ indicatorData.marks[studentId].latestHumanReadable|default('–') }}</a>
                                             {% endif %}
+                                            </td>
+
                                         {% endfor %}
                                     </tr>
                                 {% endfor %}
                             {% endfor %}
-                        {% endfor %}
-
-                        {% set rowSpan = 0 %}
-                        {% for capabilityId, capabilityData in overall %}
-                            {% set rowSpan = rowSpan + 1 + capabilityData.indicators | length %}
-                        {% endfor %}
-
-                        {% for capabilityId, capabilityData in overall %}
-                            <tr class="capability-row summated{% if loop.index0 == 0 %} first-summated{% endif %}">
-                                {% if loop.index0 == 0 %}
-                                    <th class="fixed-left overall" rowspan="{{ rowSpan }}">Overall</th>
-                                {% endif %}
-                                {# Class 'second-child' needed so that cells are styled correctly when the cell to the left spans mulitple rows. #}
-                                <th class="fixed-left white second-child capability">{{ capabilityData.name | markdown }}</th>
-
-                                {% for studentId, studentData in students %}
-                                    {% if capabilityData.show %}
-                                        <td class="mark">
-                                        {% set gradientClass = urgency.marks(capabilityData.marks[studentId].normalised ?? null) %}
-                                        {% set draftGradientClass = urgency.marks(capabilityData.marks[studentId].latestNormalised ?? null) %}
-                                        <a href="#" {% if draftGradientClass %}data-actual-mark{% endif %} class="{% if gradientClass %} {{ gradientClass }}{% endif %}">{{ capabilityData.marks[studentId].humanReadable|default('–') }}</a>
-                                        {% if draftGradientClass %}
-                                        <a href="#" data-draft-mark class="meta">{{ capabilityData.marks[studentId].latestHumanReadable|default('–') }}</a>
-                                            {% endif %}
-                                        </td>
-                                    {% else %}
-                                        <td class="excluded"></td>
-                                    {% endif %}
-                                {% endfor %}
-                            </tr>
-
-                            {% for indicatorId, indicatorData in capabilityData.indicators %}
-                                <tr class="indicator-row summated">
-                                    {# Class 'second-child' needed so that cells are styled correctly when the cell to the left spans mulitple rows. #}
-                                    <th class="fixed-left second-child white indicator">{{ indicatorData.name | markdown }}</th>
-                                    {% for studentId, studentData in students %}
-                                        <td class="mark">
-                                            {% set gradientClass = urgency.marks(indicatorData.marks[studentId].normalised ?? '') %}
-                                            {% set draftGradientClass = urgency.marks(indicatorData.marks[studentId].latestNormalised ?? '') %}
-                                        <a href="#" {% if draftGradientClass %}data-actual-mark{% endif %} class="{% if gradientClass %} {{ gradientClass }}{% endif %}">{{ indicatorData.marks[studentId].humanReadable|default('–') }}</a>
-                                        {% if draftGradientClass %}
-                                        <a href="#" data-draft-mark class="meta">{{ indicatorData.marks[studentId].latestHumanReadable|default('–') }}</a>
-                                        {% endif %}
-                                        </td>
-
-                                    {% endfor %}
-                                </tr>
-                            {% endfor %}
-                        {% endfor %}
                         </tbody>
                     </table>
                 </div>

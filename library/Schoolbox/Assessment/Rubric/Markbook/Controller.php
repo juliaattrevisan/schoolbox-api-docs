@@ -695,9 +695,9 @@ class Controller extends Base
                 }
             }
         }
-new \Alaress_Probe($assessments[38]);
-new \Alaress_Probe($students);
-die();
+//new \Alaress_Probe($assessments[38]);
+//new \Alaress_Probe($students);
+//die();
         return $students;
     }
 
@@ -1133,6 +1133,9 @@ die();
     private function aggregateMarks(array $assessments, array $linkedMarks): array
     {
         $overallMarks = [];
+/* TODO replace
+ */
+return $overallMarks;
 
         foreach ($assessments as $assessmentId => $assessmentData) {
             $assessmentWeight = $assessmentData['weight'];
@@ -1295,11 +1298,16 @@ die();
         $databaseMarks = $this->retrieveDatabaseMarks($assessments, $selectedCapabilities, $selectedIndicators);
         $databaseMarks = $this->retrieveDatabaseDraftMarks($assessments, $selectedCapabilities, $selectedIndicators, $databaseMarks);
 
-        $derivedMarks  = $this->collateHumanReadableMarks($databaseMarks, $assessments);
-        $studentMarks  = $this->insertFolderMembers($derivedMarks, $folder);
-        $exclusions    = $this->getExclusions($assessmentIds);
-        $linkedMarks   = $this->insertSummaryPageLinks($studentMarks, $assessmentIds, $exclusions);
-        $overallMarks  = $this->buildOverallMarks($assessments, $linkedMarks, $folder);
+        /* TODO work out whatever this was
+         */
+        $exclusions = [];
+        $linkedMarks = [];
+        $overallMarks = [];
+//        $derivedMarks  = $this->collateHumanReadableMarks($databaseMarks, $assessments);
+//        $studentMarks  = $this->insertFolderMembers($derivedMarks, $folder);
+//        $exclusions    = $this->getExclusions($assessmentIds);
+//        $linkedMarks   = $this->insertSummaryPageLinks($studentMarks, $assessmentIds, $exclusions);
+//        $overallMarks  = $this->buildOverallMarks($assessments, $linkedMarks, $folder);
         return [$assessments, $exclusions, $linkedMarks, $overallMarks];
     }
 }
