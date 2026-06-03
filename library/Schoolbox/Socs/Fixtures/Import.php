@@ -73,6 +73,7 @@ class Import implements IStrategy
             $this->log->info('SOCS fixtures is importing humans attached to fixtures; only fetching 7 days');
             /**
              * From the SOCS docs:
+             * https://help.socscms.com/Page.asp?CatID=13&ID=276
              * * The standard fixture calendar can also include published team sheets by adding the “TS=1” querystring to the feed URL as follows:
              * * Note: if team sheets are included the feed will only show fixtures for the previous and next 7 days regardless of any date ranges defined.
              * * [feedurl]&TS=1
