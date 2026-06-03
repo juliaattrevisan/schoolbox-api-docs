@@ -16,6 +16,9 @@
 #  * submission_access = 2
 #    => submission_access = staffStudentAndParent
 
+-- Note the labels on the options must match those in the consts defined in IAssessable.php.
+-- Only numerical values are expected here, but cases have been added for the new enum values
+-- in case this is SQL is ever run again for whatever reason.
 UPDATE config
 SET `value` = CASE `value`
         WHEN '0' THEN 'staffOnly'
@@ -23,8 +26,9 @@ SET `value` = CASE `value`
         WHEN '2' THEN 'staffStudentAndParent'
         WHEN 'staffOnly' THEN 'staffOnly'
         WHEN 'staffAndStudent' THEN 'staffAndStudent'
+        WHEN 'staffAndParent' THEN 'staffAndParent'
         WHEN 'staffStudentAndParent' THEN 'staffStudentAndParent'
         ELSE 'staffOnly'
     END,
-    `options` = 'staffOnly;Staff Only:staffAndStudent;Staff and Students:staffStudentAndParent;Staff, Students and their Parents'
+    `options` = 'staffOnly;Staff Only:staffAndStudent;Staff & Student:staffAndParent;Staff & Parent:staffStudentAndParent;Staff, Student & Parent'
 WHERE `name` = 'submission_access';
