@@ -117,10 +117,8 @@ class Registry
             /** @var SeasonModel $season */
             $season = $this->seasonMapper->createModel();
             $this->logger->debug(sprintf(
-                'Creating new SOCS season %s %s-%s',
+                'Creating new SOCS season %s',
                 $season->getName(),
-                $season->getStart()->getDatabase(),
-                $season->getEnd()->getDatabase()
             ));
         }
 
