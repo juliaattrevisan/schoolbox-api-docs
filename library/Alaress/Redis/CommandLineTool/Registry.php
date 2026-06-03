@@ -47,8 +47,12 @@ class Registry
             // Old keys
             '^fc:' . self::INSTANCE_ID_MATCH . ':External_',
 
-            // Teachers for class code
+            // Cached function calls for timetable users, as called in
+            // `\Schoolbox\External\Event\TimetableUsers`
             '^fc\\.findTeachersForClassCode\\.' . self::INSTANCE_ID_MATCH,
+            '^fc\\.findClassCodesForUser\\.' . self::INSTANCE_ID_MATCH,
+            '^fc\\.findCommonOverrides\\.' . self::INSTANCE_ID_MATCH,
+            '^fc\\.findForUser\\.' . self::INSTANCE_ID_MATCH,
 
             // vCal cache
             "^vcal\\." . self::INSTANCE_ID_MATCH . ":[0-9a-f]{64}",
