@@ -325,12 +325,24 @@ class Import implements IStrategy
                     $this->coachMapper->save($coach);
                 }
 
-                $this->log->info(sprintf(
-                    'Created SOCS coach %s (%s) for schoolbox user %d',
-                    $coachName,
-                    $externalId,
-                    $userId
-                ));
+                if (null === $userId) {
+                    $this->log->info(
+                        sprintf(
+                            'Created SOCS coach %s with no schoolbox user for external id (%s)',
+                            $coachName,
+                            $externalId,
+                        )
+                    );
+                } else {
+                    $this->log->info(
+                        sprintf(
+                            'Created SOCS coach %s (%s) for schoolbox user %d',
+                            $coachName,
+                            $externalId,
+                            $userId
+                        )
+                    );
+                }
             }
 
             try {
