@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Rubric\Markbook;
 
 use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Predicate\Builder;
 use Alaress\Web\Controller\Base;
 use Aura\Router;
 use DomainException;
@@ -485,13 +486,12 @@ class Controller extends Base
             return $assessments;
         }
 
-        $innerPb = (new Database\Predicate\Builder($this->internalDb->getQuoter(), ''))
-            ->isNull('sr.deleted_at')
-            ->notNull('sr.published_at')
-            ->equals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
-            ->in('sb.assessment_id', array_keys($assessments));
+        /* Effectively a safe shortcut to an IN() clause
+         */
+        $assessmentIds = array_keys($assessments);
 
-        $innerWhere = implode(' AND ', $innerPb->getWhere());
+        $assessmentsPlaceholder = Builder::getArrayPlaceholders($assessmentIds, 'assessmentIds');
+        $assessmentsParameters = Builder::getArrayParameters($assessmentIds, 'assessmentIds');
 
         $outerPb = (new Database\Predicate\Builder($this->internalDb->getQuoter(), ''))
             ->equals('vrm.feedback_type', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
@@ -509,8 +509,7 @@ class Controller extends Base
 
         $outerWhere = implode(' AND ', $outerPb->getWhere());
 
-        $getAuthoritativeMarksQuery = $this->internalDb->prepareQuery(
-            "
+        $getAuthoritativeMarksQuery = $this->internalDb->prepareQuery("
                 SELECT
                     vrm.assessment_id                  AS assessment_id,
                     vrm.student_id                     AS student_id,
@@ -539,7 +538,10 @@ class Controller extends Base
                         MAX(sr.published_at) AS max_published_at
                     FROM submission_return sr
                     INNER JOIN submission_box sb on sr.box_id = sb.id
-                    WHERE {$innerWhere}
+                    WHERE sr.deleted_at IS NULL
+                    AND sr.published_at IS NOT NULL
+                    AND sr.review_route = :reviewRoute
+                    AND sb.assessment_id IN {$assessmentsPlaceholder}
                     GROUP BY sb.assessment_id, sr.owner
                 ) latest_feedback
                 INNER JOIN v_rubric_mark vrm ON
@@ -552,7 +554,13 @@ class Controller extends Base
                 AND rubric_instance.deleted_at IS NULL
                 ORDER BY vrm.student_id, vrm.assessment_id, vrm.capability_id, vrm.indicator_id
             ",
-            array_merge($innerPb->getParams(), $outerPb->getParams()),
+            array_merge(
+                $assessmentsParameters,
+                $outerPb->getParams(),
+                [
+                    'reviewRoute' => ReturnedWork::REVIEW_ROUTE_INSTRUCTOR
+                ]
+            ),
         );
 
         foreach ($getAuthoritativeMarksQuery->getIterator() as $i => $row) {
