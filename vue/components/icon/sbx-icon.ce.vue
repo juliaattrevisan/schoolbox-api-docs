@@ -29,7 +29,7 @@ const sizeMap: Record<string, string> = {
     m: "1rem",
     l: "1.5rem",
     xl: "2rem",
-    xxl: "4rem",
+    xxl: "3rem",
 };
 
 /**
