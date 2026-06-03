@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace Assess\Import\Parser;
 
+use DomainException;
+use Schoolbox\Learning\Assessment\IAssessable;
+
 /**
  * v26.1 quiz variations — mark_visibility is now exported as a string.
  *
@@ -20,10 +23,20 @@ class V261 extends V170
 {
     /**
      * @return string
+     * @throws DomainException
      */
     public function getMarkVisibility(): string
     {
-        // Value is a valid IAssessable::MARK_VISIBILITY_* constant written by the 26.1+ exporter.
-        return (string) $this->getXml()->markvisibility;
+        // Value should be an IAssessable::MARK_VISIBILITY_* constant written by the 26.1+ exporter.
+        $markVisibility = trim((string) $this->getXml()->markvisibility);
+
+        if (array_key_exists($markVisibility, IAssessable::MARK_VISIBILITY_STRINGS)) {
+            return $markVisibility;
+        }
+
+        throw new DomainException(
+            "Invalid mark visibility value '$markVisibility' in quiz import XML. Expected one of: " .
+            implode(', ', array_keys(IAssessable::MARK_VISIBILITY_STRINGS)) . '.'
+        );
     }
 }
