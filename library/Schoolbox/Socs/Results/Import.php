@@ -17,6 +17,7 @@ use Schoolbox\Fixtures\Matchup\Model as MatchupModel;
 use Schoolbox\Fixtures\Result\Mapper as ResultMapper;
 use Schoolbox\Fixtures\Result\Model as ResultModel;
 use Schoolbox\Fixtures\Team\Model as TeamModel;
+use Schoolbox\Socs\Fixtures\Registry;
 use Schoolbox\Socs\HttpClient;
 use Schoolbox\Socs\IStrategy;
 use Symfony\Component\Lock\LockInterface;
@@ -27,8 +28,6 @@ use Symfony\Component\Lock\LockInterface;
 class Import implements IStrategy
 {
     private const string RESULTS_PATH = 'results.ashx';
-
-    private const string EXTERNAL_ID_PREFIX = 'socs:';
 
     /**
      * SOCS - Standard Fixture Feed
@@ -90,7 +89,7 @@ class Import implements IStrategy
                 continue;
             }
 
-            $externalId = self::EXTERNAL_ID_PREFIX . $eventId;
+            $externalId = Registry::EXTERNAL_ID_PREFIX . $eventId;
 
             try {
                 /** @var MatchupModel $matchup */

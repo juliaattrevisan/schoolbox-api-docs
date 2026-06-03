@@ -28,8 +28,6 @@ class Import implements IStrategy
 {
     private const string FIXTURES_PATH = 'fixturecalendar.ashx';
 
-    private const string EXTERNAL_ID_PREFIX = 'socs:';
-
     /**
      * SOCS - Standard Fixture Feed
      * the api system defaults to, and this ensures we fetch data for the previous 30 days and next 100 days.
@@ -146,7 +144,7 @@ class Import implements IStrategy
                 continue;
             }
 
-            $externalId = self::EXTERNAL_ID_PREFIX . $eventId;
+            $externalId = Registry::EXTERNAL_ID_PREFIX . $eventId;
 
             try {
                 /** @var MatchupModel $matchup */

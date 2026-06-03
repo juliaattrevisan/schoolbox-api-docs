@@ -59,7 +59,9 @@ class Registry
      */
     private array $schools = [];
 
-    private const string EXTERNAL_ID_PREFIX = 'socs:';
+    public const string EXTERNAL_ID_PREFIX = 'socs:';
+
+    public const SOCS_FIXTURES = 'SOCS Fixtures';
 
     public function __construct(
         private LoggerInterface $logger,
@@ -85,8 +87,6 @@ class Registry
             return $this->season;
         }
 
-        $seasonName = 'SOCS Fixtures';
-
         /**
          * use getStartOfSchoolYear which uses the `start_of_school_year` from admin config, to assist in northern
          * hemisphere schools whose school year may be july/june.
@@ -98,7 +98,7 @@ class Registry
 
         try {
             /** @var SeasonModel $season */
-            $season = $this->seasonMapper->findOneByColumn('name', $seasonName);
+            $season = $this->seasonMapper->findOneByColumn('name', self::SOCS_FIXTURES);
 
             $this->logger->debug(sprintf(
                 'Reusing existing SOCS season %s %s-%s',
@@ -127,7 +127,7 @@ class Registry
         // update updated at, we have seen this, we need to record it
         // the season name and dates in case they have changed since the last import run
         $season->setUpdatedAt(\Alaress_Date_Format::now())
-            ->setName($seasonName)
+            ->setName(self::SOCS_FIXTURES)
             ->setStart($start)
             ->setEnd($end);
 

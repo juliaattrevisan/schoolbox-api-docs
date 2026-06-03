@@ -13,6 +13,7 @@ namespace Schoolbox\Socs\Teams;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Fixtures\Season\Mapper as SeasonMapper;
 use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
+use Schoolbox\Socs\Fixtures\Registry;
 use Schoolbox\Socs\IStrategy;
 use Symfony\Component\Lock\LockInterface;
 
@@ -53,7 +54,7 @@ class Prepare implements IStrategy
         $this->lock->refresh();
 
         try {
-            $season = $this->seasonMapper->findOneByColumn('name', 'SOCS Fixtures');
+            $season = $this->seasonMapper->findOneByColumn('name', Registry::SOCS_FIXTURES);
         } catch (\Schoolbox\Mapper\Exception $e) {
             $this->log->info('No SOCS Fixtures season found; skipping teams prepare.');
             return;
