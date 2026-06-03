@@ -388,8 +388,6 @@ class Controller extends Base
                 vr.capability_id                             AS capability_id,
                 vr.capability_name                           AS capability_name,
                 vr.capability_max_value                      AS capability_max_value,
-                vr.capability_mark_type_id                   AS capability_mark_type_id,
-                vr.capability_grade_group_id                 AS capability_grade_group_id,
                 vr.indicator_id                              AS indicator_id,
                 vr.indicator_name                            AS indicator_name,
                 vr.indicator_max_value                       AS indicator_max_value
@@ -442,8 +440,6 @@ class Controller extends Base
                 'statusLink'     => $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $row['assessment_id']]),
                 'maxMark'        => $row['assessment_max_mark'],
                 'markType'       => $row['assessment_mark_type'],
-                'capabilityMarkTypeId'     => $row['capability_mark_type_id'],
-                'capabilityGradeGroupId'   => $row['capability_grade_group_id'],
                 'weight'         => $integerHydrator->hydrate($row['assessment_weight']),
                 'capabilities'   => $capabilities,
             ];
