@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Socs\Fixtures\Lookup;
 
-
 class PersonLookup extends Person
 {
     /**
