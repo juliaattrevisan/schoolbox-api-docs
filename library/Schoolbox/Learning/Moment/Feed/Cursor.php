@@ -469,11 +469,9 @@ class Cursor implements ICursor
                 IAssessable::MARK_VISIBILITY_PARENT_STUDENT,
             ];
         } elseif ($this->viewer->getRole()->isStudent()) {
-            $visibilities   = [IAssessable::MARK_VISIBILITY_STUDENT, IAssessable::MARK_VISIBILITY_PARENT_STUDENT];
-            $filterWorkType = true;
+            $visibilities = [IAssessable::MARK_VISIBILITY_STUDENT, IAssessable::MARK_VISIBILITY_PARENT_STUDENT];
         } elseif ($this->viewer->getRole()->isParent()) {
-            $visibilities   = [IAssessable::MARK_VISIBILITY_PARENT, IAssessable::MARK_VISIBILITY_PARENT_STUDENT];
-            $filterWorkType = true;
+            $visibilities = [IAssessable::MARK_VISIBILITY_PARENT, IAssessable::MARK_VISIBILITY_PARENT_STUDENT];
         } else {
             throw new UnexpectedValueException('Unexpected User: ' . $this->viewer->getId());
         }
@@ -549,11 +547,9 @@ class Cursor implements ICursor
                 IAssessable::MARK_VISIBILITY_PARENT_STUDENT,
             ];
         } elseif ($this->viewer->getRole()->isStudent()) {
-            $visibilities   = [IAssessable::MARK_VISIBILITY_STUDENT, IAssessable::MARK_VISIBILITY_PARENT_STUDENT];
-            $filterWorkType = true;
+            $visibilities = [IAssessable::MARK_VISIBILITY_STUDENT, IAssessable::MARK_VISIBILITY_PARENT_STUDENT];
         } elseif ($this->viewer->getRole()->isParent()) {
-            $visibilities   = [IAssessable::MARK_VISIBILITY_PARENT, IAssessable::MARK_VISIBILITY_PARENT_STUDENT];
-            $filterWorkType = true;
+            $visibilities = [IAssessable::MARK_VISIBILITY_PARENT, IAssessable::MARK_VISIBILITY_PARENT_STUDENT];
         } else {
             throw new UnexpectedValueException('Unexpected User: ' . $this->viewer->getId());
         }
