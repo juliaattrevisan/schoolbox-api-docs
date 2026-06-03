@@ -109,7 +109,9 @@ class Registry
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             /** @var SeasonModel $season */
             $season = $e->getDeletedObject();
-            $this->seasonMapper->restoreSoftDeleted($season);
+            if ($this->perform) {
+                $this->seasonMapper->restoreSoftDeleted($season);
+            }
             $this->logger->debug(sprintf('Resurrecting previously-deleted SOCS season %s', $season->getName()));
         } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var SeasonModel $season */
@@ -158,7 +160,9 @@ class Registry
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             /** @var SportModel $sport */
             $sport = $e->getDeletedObject();
-            $this->sportMapper->restoreSoftDeleted($sport);
+            if ($this->perform) {
+                $this->sportMapper->restoreSoftDeleted($sport);
+            }
             $this->logger->debug(sprintf('Resurrecting previously-deleted SOCS sport %s', $sport->getName()));
         } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var SportModel $sport */
@@ -208,7 +212,9 @@ class Registry
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             /** @var DivisionModel $division */
             $division = $e->getDeletedObject();
-            $this->divisionMapper->restoreSoftDeleted($division);
+            if ($this->perform) {
+                $this->divisionMapper->restoreSoftDeleted($division);
+            }
             $this->logger->debug(sprintf('Resurrecting previously-deleted SOCS division %s', $division->getName()));
         } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var DivisionModel $division */
@@ -264,7 +270,9 @@ class Registry
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             /** @var TeamModel $team */
             $team = $e->getDeletedObject();
-            $this->teamMapper->restoreSoftDeleted($team);
+            if ($this->perform) {
+                $this->teamMapper->restoreSoftDeleted($team);
+            }
             $this->logger->debug(sprintf('Resurrecting previously-deleted SOCS team %s', $team->getName()));
         } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var TeamModel $team */
@@ -308,7 +316,9 @@ class Registry
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             /** @var VenueModel $venue */
             $venue = $e->getDeletedObject();
-            $this->venueMapper->restoreSoftDeleted($venue);
+            if ($this->perform) {
+                $this->venueMapper->restoreSoftDeleted($venue);
+            }
             $this->logger->debug(sprintf('Resurrecting previously-deleted SOCS venue %s', $venue->getName()));
         } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var VenueModel $venue */
@@ -351,7 +361,9 @@ class Registry
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             /** @var SchoolModel $school */
             $school = $e->getDeletedObject();
-            $this->schoolMapper->restoreSoftDeleted($school);
+            if ($this->perform) {
+                $this->schoolMapper->restoreSoftDeleted($school);
+            }
             $this->logger->debug(sprintf('Resurrecting previously-deleted SOCS school %s', $school->getName()));
         } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var SchoolModel $school */
