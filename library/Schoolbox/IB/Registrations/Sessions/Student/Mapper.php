@@ -461,6 +461,110 @@ class Mapper extends BaseMapper
         return (int) $statement->fetchColumn() > 0;
     }
 
+    /**
+     * Find candidates waiting to be submitted to IBIS.
+     *
+     * @param int $limit
+     * @return GenericCollection|Model[]
+     * @throws BaseMapper\DefinitionException
+     * @throws BaseMapper\Exception
+     * @throws Predicate\InvalidColumnException
+     */
+    public function findPendingCandidateRegistrations(int $limit): GenericCollection
+    {
+        if ($limit <= 0) {
+            return $this->createCollection();
+        }
+
+        $pb = $this->getPredicateBuilder();
+        $pb->equals('status', Model::STATUS_IN_PROGRESS);
+
+        $students = $this->findByPredicates($pb, [
+            'order' => [
+                'updated_at' => 'ASC',
+                'id' => 'ASC',
+            ],
+            'limit' => $limit,
+        ]);
+
+        if ($students->count() === 0) {
+            return $students;
+        }
+
+        /** @var UserMapper $userMapper */
+        $userMapper = $this->getJoinMapper('user');
+        $userIds = [];
+        $systemPurposeIdsByUserId = [];
+
+        foreach ($students as $student) {
+            if (!$student instanceof Model || !$student->getUser()?->getId()) {
+                continue;
+            }
+
+            $userId = $student->getUser()->getId();
+            $userIds[$userId] = $userId;
+
+            $systemPurposeId = $student->getRegistrationSession()?->getSystemPurpose()?->getId();
+            if ($systemPurposeId !== null) {
+                $systemPurposeIdsByUserId[$userId] = $systemPurposeId;
+            }
+        }
+
+        if ($userIds === []) {
+            return $students;
+        }
+
+        $users = $userMapper->findByPredicates(
+            $userMapper->getPredicateBuilder()->in('id', array_values($userIds))
+        );
+        $usersById = [];
+
+        foreach ($users as $user) {
+            $usersById[$user->getId()] = $user;
+        }
+
+        $groupSubjectsBySystemPurposeAndUserId = [];
+
+        foreach (array_unique($systemPurposeIdsByUserId) as $systemPurposeId) {
+            $usersForSystemPurpose = [];
+
+            foreach ($systemPurposeIdsByUserId as $userId => $studentSystemPurposeId) {
+                if ($studentSystemPurposeId === $systemPurposeId && isset($usersById[$userId])) {
+                    $usersForSystemPurpose[$userId] = $usersById[$userId];
+                }
+            }
+
+            $groupSubjectsBySystemPurposeAndUserId[$systemPurposeId] = $this->findIbGroupSubjectsForUsers(
+                $usersForSystemPurpose,
+                $systemPurposeId
+            );
+        }
+
+        foreach ($students as $student) {
+            if (!$student instanceof Model || !$student->getUser()?->getId()) {
+                continue;
+            }
+
+            $userId = $student->getUser()->getId();
+            $systemPurposeId = $student->getRegistrationSession()?->getSystemPurpose()?->getId();
+
+            if (isset($usersById[$userId])) {
+                $student->setUser($usersById[$userId]);
+            }
+
+            if ($systemPurposeId !== null) {
+                $student->setIbGroupSubjects(
+                    $groupSubjectsBySystemPurposeAndUserId[$systemPurposeId][$userId]
+                        ?? new GenericCollection(GroupSubjectModel::class)
+                );
+            }
+        }
+
+        $this->applySubjectLanguageOverrides($students);
+
+        return $students;
+    }
+
     protected function getSubjectLanguageMapper(): SubjectLanguageMapper
     {
         return SubjectLanguageMapper::getInstance();
