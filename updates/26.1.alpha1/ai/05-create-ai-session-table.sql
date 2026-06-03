@@ -1,6 +1,6 @@
-# Notes:
-#  * Indexes have been added for the `feature` and `created_at` columns as well as `created_by` because I figure
-#    all those columns will be commonly used in queries.
+-- Notes:
+--  * Indexes have been added for the `feature` and `created_at` columns as well as `created_by` because I figure
+--    all those columns will be commonly used in queries.
 CREATE TABLE `ai_session` (
     `id` char(36) NOT NULL,
     `feature` enum('chat','lessonplan','image','differentiation','dialogagent','learningactivitycustomisation', 'aimoderationagent') NOT NULL,
