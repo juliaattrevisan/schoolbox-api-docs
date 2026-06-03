@@ -17,13 +17,6 @@ use Schoolbox\Resource\Storage\GC\Check\Storage;
 class Registry
 {
     /**
-     * Set key for old cache
-     *
-     * @deprecated This will eventually be removed
-     */
-    private const SET_KEY = '__set';
-
-    /**
      * Template var for instance ID: this will match any instance ID in a Redis
      * key.
      */
