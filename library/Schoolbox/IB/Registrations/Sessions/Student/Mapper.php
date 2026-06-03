@@ -197,53 +197,14 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Find the registration candidate that is ready for student verification.
+     * Find the registration candidate that has completed the preparation phase.
      *
      * @param User $user
      * @return Model|null
      * @throws BaseMapper\DefinitionException
      * @throws BaseMapper\Exception
      */
-    public function findUnconfirmedForUser(User $user): ?Model
-    {
-        if (!$user->getId()) {
-            return null;
-        }
-
-        try {
-            $pb = $this->getPredicateBuilder();
-            $pb->equals('user_id', $user->getId());
-            $pb->equals('status', Model::STATUS_UNCONFIRMED);
-
-            $student = $this->findOneByPredicates($pb, [
-                'order' => [
-                    'updated_at' => 'DESC',
-                    'id'         => 'DESC',
-                ],
-                'limit' => 1,
-            ]);
-
-            if (!$student instanceof Model) {
-                return null;
-            }
-
-            return $this->enrichStudentForUser($student, $user);
-        } catch (BaseMapper\Exception\NotFound) {
-            return null;
-        }
-    }
-
-    /**
-     * Find the most recent active registration session student record for the given user,
-     * where "active" means the student is awaiting confirmation (Unconfirmed) or has
-     * already confirmed (Confirmed).
-     *
-     * @param User $user
-     * @return Model|null
-     * @throws BaseMapper\DefinitionException
-     * @throws BaseMapper\Exception
-     */
-    public function findActiveRegistrationForUser(User $user): ?Model
+    public function findCompletedPreparationForUser(User $user): ?Model
     {
         if (!$user->getId()) {
             return null;

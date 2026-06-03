@@ -33,21 +33,12 @@ class MapperTest extends TestCase
         ));
     }
 
-    public function testMapperProvidesUnconfirmedRegistrationLookupByUser(): void
+    public function testMapperProvidesCompletedPreparationRegistrationLookupByUser(): void
     {
         // @phpstan-ignore-next-line - This contract test intentionally asserts the public mapper API exists.
         $this->assertTrue(method_exists(
             Mapper::class,
-            'findUnconfirmedForUser'
-        ));
-    }
-
-    public function testMapperProvidesActiveRegistrationLookupByUser(): void
-    {
-        // @phpstan-ignore-next-line - This contract test intentionally asserts the public mapper API exists.
-        $this->assertTrue(method_exists(
-            Mapper::class,
-            'findActiveRegistrationForUser'
+            'findCompletedPreparationForUser'
         ));
     }
 
