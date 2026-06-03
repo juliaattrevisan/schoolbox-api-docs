@@ -25,15 +25,17 @@ export function initPostToMyLinks() {
  * Save the settings to the DB
  */
 async function postLink() {
+    const heading = getDecodedHeading();
+
     try {
         await fetch(getMasonryConfig().postToMyLinks.updateUrl, {
             method: "POST",
-            body: getFormData(),
+            body: getFormData(heading),
         });
     } catch (error) {
         console.warn(error);
     } finally {
-        displayLinkOnPage();
+        displayLinkOnPage(heading);
     }
 }
 
@@ -42,20 +44,20 @@ async function postLink() {
  *
  * @returns { FormData }
  */
-function getFormData() {
+function getFormData(heading) {
     const formData = new FormData();
     formData.append("url", getMasonryConfig().postToMyLinks.url);
-    formData.append("description", getMasonryConfig().postToMyLinks.heading);
+    formData.append("description", heading);
     return formData;
 }
 
 /**
  * Add the link to the side panel
  */
-function displayLinkOnPage() {
+function displayLinkOnPage(heading) {
     const link = document.createElement("a");
     link.setAttribute("href", getMasonryConfig().postToMyLinks.url);
-    link.innerText = getMasonryConfig().postToMyLinks.heading;
+    link.innerText = heading;
 
     const linkListItem = document.createElement("li");
     linkListItem.appendChild(link);
@@ -66,4 +68,18 @@ function displayLinkOnPage() {
     // Remove the postToMyLinks button
     const postToMyLinksBtn = document.querySelector(getMasonryConfig().postToMyLinks.selector);
     postToMyLinksBtn.parentNode.removeChild(postToMyLinksBtn);
+}
+
+function getDecodedHeading() {
+    const textarea = document.createElement("textarea");
+    let heading = getMasonryConfig().postToMyLinks.heading;
+    let decodedHeading;
+
+    do {
+        decodedHeading = heading;
+        textarea.innerHTML = decodedHeading;
+        heading = textarea.value;
+    } while (heading !== decodedHeading);
+
+    return heading;
 }
