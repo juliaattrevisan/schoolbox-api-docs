@@ -351,7 +351,13 @@ class Controller extends Base
 
 
     /**
-     * Fetch assessment data, and return it indexed by assessment ID
+     * Create a hash lookup of assessment details along with the rubric grid structure (caps, indicators) that were used
+     * in each grid in each assessment. The lookup contains assessment weighting and links etc. common to all students
+     * who undertook the assessment.
+     *
+     * The feedback grids for each student should align with the structure defined here: anything outside the set would
+     * have been either bad data or invalidated data due to the grid changing structure midway through students doing
+     * the assessment.
      *
      * @param int[]      $assessmentIds
      * @param null|array $selectedCapabilities Null if rubricUsage filter not enabled for page
@@ -726,7 +732,7 @@ class Controller extends Base
                         'normalisedMark' => $normalisedMark,
                         'humanReadableMark' => $humanReadableMark,
                     ],
-                    /* Normalised and human readable marks from the most recent feedback: these would typically be draft
+                    /* Normalised and human-readable marks from the most recent feedback: these would typically be draft
                      * marks, but could end up being the same as the Published ones by sheer coincidence.
                      */
                     'latest' => [
