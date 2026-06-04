@@ -38,10 +38,9 @@ window.Vue.watch(
         if (selectedDetailsNodeId === UNSET_ID) {
             return;
         }
-
-        curriculumStore.selectedDetailsNodeId = selectedDetailsNodeId;
+        curriculumStore.openDetailsModal(props.unit.folderId, selectedDetailsNodeId);
         await window.Vue.nextTick();
-        folderNodesStore().selectedDetailsNodeId = UNSET_ID;
+        folderNodesStore().selectedDetailsNodeId = UNSET_ID; // reset the selected details node id in the folder nodes store, so that if we click on the same node again it will open up the details modal again
     },
 );
 

@@ -37,7 +37,11 @@ function onDetailsModalClosed(): void {
         :starting-node-id="store.startingNodeId"
         :has-tabs="store.currentNodesStore.hasNodes"
     />
-    <curriculum-details-modal :selected-node-id="store.selectedDetailsNodeId" @closed="onDetailsModalClosed" />
+    <curriculum-details-modal
+        :selected-node-id="store.selectedDetailsNodeId"
+        :folder-id="store.selectedDetailsFolderId"
+        @closed="onDetailsModalClosed"
+    />
 </template>
 
 <style scoped></style>

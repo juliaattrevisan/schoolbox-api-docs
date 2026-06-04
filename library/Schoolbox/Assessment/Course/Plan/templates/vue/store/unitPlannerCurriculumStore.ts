@@ -22,6 +22,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
     const currentNodesStore = useCurrentNodesStore(); // to load the nodes linked to the unit
     const modalStore = useModalStore(); // to open the modal
     const startingNodeId = window.Vue.ref<number>(UNSET_ID); // to open the modal at a specific node
+    const selectedDetailsFolderId = window.Vue.ref<number>(UNSET_ID); // to open the curriculum details modal for a specific folder
     const selectedDetailsNodeId = window.Vue.ref<number>(UNSET_ID); // when changed will trigger the curriculum-details-modal to open
     let currentFolderId: number | null = null; // to target the appropriate folderNodesStore.selectedNodes when updating via the curriculum modal
     let currentComponentId: number | null = null; // to target the appropriate folderNodesStore.selectedNodes when updating via the curriculum modal
@@ -54,6 +55,16 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
             void folderNodesStore().updateNodes(selectedNodesStore.nodes);
         },
     );
+
+    /**
+     *
+     * @param folderId - the unit folderId to target
+     * @param nodeId - the nodeId to open the modal at
+     */
+    function openDetailsModal(folderId: number, nodeId: number): void {
+        selectedDetailsFolderId.value = folderId; // set the folder id to open the details modal for
+        selectedDetailsNodeId.value = nodeId; // set the node id to open the details modal for
+    }
 
     /**
      * To open the curriculum selector modal, targeting the relevant folderNodesStore
@@ -181,7 +192,9 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
         selectorStore,
         currentNodesStore,
         startingNodeId,
+        selectedDetailsFolderId,
         selectedDetailsNodeId,
+        openDetailsModal,
         openCurriculumSelectorModal,
         getComponent,
         createComponent,
