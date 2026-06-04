@@ -362,7 +362,6 @@ export function getLearningActivityUsages(usages: Usage[], folderId?: number): U
         return getSpecificUsages(usages, ActivityTypes.LEARNING_ACTIVITY);
     }
     // otherwise we only return learning activity usages linked to the specified folder id
-    console.warn(folderId);
     return usages.filter(
         (usage) => usage.discriminator === ActivityTypes.LEARNING_ACTIVITY && usage.object.unit.folder?.id === folderId,
     );
