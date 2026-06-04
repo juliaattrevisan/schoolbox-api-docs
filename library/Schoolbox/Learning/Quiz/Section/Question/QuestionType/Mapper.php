@@ -27,7 +27,7 @@ class Mapper extends BaseMapper
         $this->uses('moodle', self::TYPE_STRING);
         $this->uses('automated_marking', self::TYPE_BOOL_ENUM);
         $this->uses('availability', self::TYPE_STRING);
-        $this->uses('has_legend', self::TYPE_BOOLEAN);
-        $this->uses('has_config', self::TYPE_BOOLEAN);
+        $this->uses('has_legend', self::TYPE_BOOL_ENUM);
+        $this->uses('has_config', self::TYPE_BOOL_ENUM);
     }
 }
