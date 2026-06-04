@@ -16,7 +16,7 @@ interface Props {
     depth: number; // to gradually add more marginLeft to indicate node level depth
     isProcessing: boolean; // whether we are currently loading the node usage
     hasLoadError: boolean; // whether there was an error loading the node usage
-    folderId?: number; // to display the usage specific to a folder (unit)
+    folderId?: number; // to display the usage specific to a folder (unit), and currently only show the learning activities linked to that unit
 }
 
 const props = defineProps<Props>();
@@ -36,29 +36,27 @@ function onRefreshSelected(): void {
 }
 
 /**
- * Whether we should show the usage lists
+ * If there's a folder ID, we specifically check the learning activities linked to that folder, otherwise we check if there's any usage at all
  * @returns { boolean }
  */
 const hasUsage = window.Vue.computed(() => {
-    return props.node.usage && props.node.usage.length > 0;
+    const folderId = props.folderId;
+    if (folderId !== undefined && folderId !== UNSET_ID) {
+        return getLearningActivityUsages(props.node.usage ?? [], folderId).length > 0;
+    }
+    return Boolean(props.node.usage?.length);
 });
 
 /**
- * To only show usages only linked specifically to a unit
- * @returns { boolean }
+ * To only show usages linked specifically to a unit
+ * @returns { Array }
  */
-const isUnitOnly = window.Vue.computed(() => {
-    return props.folderId !== undefined && props.folderId !== UNSET_ID;
-});
-
-/**
- * Whether to show only the usages linked to a unit, or all usages
- * @returns { boolean }
- */
-const hasUnitOnlyUsages = window.Vue.computed(() => {
-    return (
-        isUnitOnly.value && getLearningActivityUsages(props.node.usage as Usage[], props.folderId as number).length > 0
-    );
+const unitLearningActivityUsages = window.Vue.computed(() => {
+    const folderId = props.folderId;
+    if (folderId === undefined || folderId === UNSET_ID) {
+        return [];
+    }
+    return getLearningActivityUsages(props.node.usage ?? [], folderId);
 });
 
 /**
@@ -66,11 +64,8 @@ const hasUnitOnlyUsages = window.Vue.computed(() => {
  * @returns { string }
  */
 const title = window.Vue.computed(() => {
-    if (hasUnitOnlyUsages.value) {
-        const learningActivityUsages = getLearningActivityUsages(props.node.usage as Usage[], props.folderId as number);
-        return `Usage within ${learningActivityUsages[0].object.unit.title}`;
-    }
-    return "Total Usage";
+    const firstUsage = unitLearningActivityUsages.value[0];
+    return firstUsage ? `Usage within ${firstUsage.object.unit.title}` : "Total Usage";
 });
 
 /**
@@ -88,8 +83,8 @@ type ActiveUsageType = {
  */
 const activeUsages = window.Vue.computed(() => {
     const usages: ActiveUsageType[] = [];
-    if (hasUnitOnlyUsages.value) {
-        const learningActivityUsages = getLearningActivityUsages(props.node.usage as Usage[], props.folderId as number);
+    const learningActivityUsages = unitLearningActivityUsages.value;
+    if (learningActivityUsages.length > 0) {
         usages.push({
             title: `Learning ${locale.activity.properPlural()}`,
             count: learningActivityUsages.length,
@@ -101,28 +96,28 @@ const activeUsages = window.Vue.computed(() => {
         usages.push({
             title: "Courses",
             count: props.node._usageCounts.course,
-            usages: getSpecificUsages(props.node.usage as Usage[], ActivityTypes.COURSE),
+            usages: getSpecificUsages(props.node.usage ?? [], ActivityTypes.COURSE),
         });
     }
     if (props.node._usageCounts.unit > 0) {
         usages.push({
             title: locale.unit.properPlural(),
             count: props.node._usageCounts.unit,
-            usages: getSpecificUsages(props.node.usage as Usage[], ActivityTypes.UNIT),
+            usages: getSpecificUsages(props.node.usage ?? [], ActivityTypes.UNIT),
         });
     }
     if (props.node._usageCounts.assessment > 0) {
         usages.push({
             title: `Learning ${locale.activity.properPlural()}`,
             count: props.node._usageCounts.assessment,
-            usages: getSpecificUsages(props.node.usage as Usage[], ActivityTypes.LEARNING_ACTIVITY),
+            usages: getSpecificUsages(props.node.usage ?? [], ActivityTypes.LEARNING_ACTIVITY),
         });
     }
     if (props.node._usageCounts.badge > 0) {
         usages.push({
             title: "Badges",
             count: props.node._usageCounts.badge,
-            usages: getSpecificUsages(props.node.usage as Usage[], ActivityTypes.BADGE),
+            usages: getSpecificUsages(props.node.usage ?? [], ActivityTypes.BADGE),
         });
     }
     return usages;
