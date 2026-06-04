@@ -4,6 +4,7 @@
  * This component handles displaying the configuration options, tracking changes, and saving updates to the backend.
  */
 
+import tinycolor from "tinycolor2";
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import type { Routes, SkinConfigData } from "../js/types/skinConfigTypes";
@@ -17,15 +18,44 @@ const props = defineProps<{
     configs: SkinConfigData;
 }>();
 
+/**
+ * Run through the SkinConfigData.sonar.Colours array and ensure
+ * any colours that are hasAlpha: false, are not stored with an alpha value.
+ * @param value The current Skin Config payload.
+ * @returns A deep-cloned, modified Skin Config payload.
+ */
+function checkSavedConfigs(value: SkinConfigData): SkinConfigData {
+    const clonedConfigs = JSON.parse(JSON.stringify(value)) as SkinConfigData;
+    Object.values(clonedConfigs.sonar.Colours).forEach((subcategory) => {
+        subcategory.options.forEach((option) => {
+            if (option.hasAlpha === false && typeof option.value === "string") {
+                const color = tinycolor(option.value);
+                if (color.getAlpha() < 1) {
+                    option.value = color.setAlpha(1).toRgbString();
+                    hasInvalidColours.value = true;
+                }
+            }
+        });
+    });
+    return clonedConfigs;
+}
+
+const hasInvalidColours = window.Vue.ref(false); // to trigger a save on mount if there are invalid colours that need correcting
+const checkedConfigs = checkSavedConfigs(props.configs);
 const isProcessing = window.Vue.ref(false);
 const loadError = window.Vue.ref<string | null>(null);
 const saveText = window.Vue.computed(() => (isProcessing.value ? "Saving..." : "Save"));
-const { configs, hasUnsavedChanges, initialiseColourPickers, resetToSavedState, markCurrentAsSaved } =
-    useSkinConfigState(props.configs, isProcessing, () => {
-        schedulePreviewRefresh();
-    });
-const { colourErrors, hasColourErrors } = useSkinConfigContrastValidation(configs);
-const { schedulePreviewRefresh } = useSkinPreview(configs, props.routes.preview);
+const {
+    configs: editableConfigs,
+    hasUnsavedChanges,
+    initialiseColourPickers,
+    resetToSavedState,
+    markCurrentAsSaved,
+} = useSkinConfigState(checkedConfigs, isProcessing, () => {
+    schedulePreviewRefresh();
+});
+const { colourErrors, hasColourErrors } = useSkinConfigContrastValidation(editableConfigs);
+const { schedulePreviewRefresh } = useSkinPreview(editableConfigs, props.routes.preview);
 
 /**
  * Scroll to the highest colour field label with a validation error on the page.
@@ -51,7 +81,7 @@ async function onToggleChanged(): Promise<void> {
     if (isProcessing.value) {
         return;
     }
-    const previousToggleEnabled = !configs.value.toggle.enabled;
+    const previousToggleEnabled = !editableConfigs.value.toggle.enabled;
     const toast = window.sbProps.toastActivate("Saving...");
     try {
         isProcessing.value = true;
@@ -61,7 +91,7 @@ async function onToggleChanged(): Promise<void> {
             method: "POST",
             body: {
                 configs: {
-                    toggle: configs.value.toggle,
+                    toggle: editableConfigs.value.toggle,
                 },
             },
         });
@@ -70,7 +100,7 @@ async function onToggleChanged(): Promise<void> {
         }
         window.location.reload();
     } catch (error) {
-        configs.value.toggle.enabled = previousToggleEnabled;
+        editableConfigs.value.toggle.enabled = previousToggleEnabled;
         const errorMessage = error instanceof Error ? error.message : "There was an unexpected error";
         loadError.value = errorMessage;
         toast.timeout({ text: errorMessage, isSuccess: false });
@@ -97,7 +127,7 @@ async function onSaveSelected(): Promise<void> {
         return;
     }
 
-    if (configs.value.toggle.enabled && hasColourErrors.value) {
+    if (editableConfigs.value.toggle.enabled && hasColourErrors.value) {
         await scrollToHighestColourError();
         return;
     }
@@ -110,7 +140,7 @@ async function onSaveSelected(): Promise<void> {
             url: props.routes.post,
             method: "POST",
             body: {
-                configs: configs.value,
+                configs: editableConfigs.value,
             },
         });
         if (!response.success) {
@@ -126,6 +156,16 @@ async function onSaveSelected(): Promise<void> {
         isProcessing.value = false;
     }
 }
+
+/**
+ * Save immediately to ensure any invalid colours are
+ * corrected and saved values are consistent with the form state
+ */
+window.Vue.onMounted(() => {
+    if (editableConfigs.value.toggle.enabled && hasInvalidColours.value) {
+        void onSaveSelected();
+    }
+});
 </script>
 
 <template>
@@ -143,19 +183,19 @@ async function onSaveSelected(): Promise<void> {
         <form method="post" class="l-flex-col l-gap-l skin-config-form" @submit.prevent="onSaveSelected">
             <div class="c-island l-pad-m">
                 <label id="skin-config-toggle" class="inline-block" for="skin-config-toggle-field">
-                    <span>{{ configs.toggle.title }}</span>
+                    <span>{{ editableConfigs.toggle.title }}</span>
                     <span
-                        v-if="configs.toggle.description"
+                        v-if="editableConfigs.toggle.description"
                         data-tooltip
                         class="hint has-tip tip-bottom"
-                        :title="configs.toggle.description"
+                        :title="editableConfigs.toggle.description"
                         >?</span
                     >
                 </label>
                 <div class="switch f-no-margins">
                     <input
                         id="skin-config-toggle-field"
-                        v-model="configs.toggle.enabled"
+                        v-model="editableConfigs.toggle.enabled"
                         type="checkbox"
                         name="advanced_ui_enabled"
                         autocomplete="off"
@@ -169,7 +209,11 @@ async function onSaveSelected(): Promise<void> {
                     </label>
                 </div>
             </div>
-            <sc-categories :configs="configs" :colour-errors="colourErrors" @preview-refresh="schedulePreviewRefresh" />
+            <sc-categories
+                :configs="editableConfigs"
+                :colour-errors="colourErrors"
+                @preview-refresh="schedulePreviewRefresh"
+            />
             <div class="l-flex l-flex--justify l-gap-xs">
                 <button v-if="hasUnsavedChanges" type="button" class="button l-flex__item--1" @click="onUndoChanges">
                     Undo Changes
