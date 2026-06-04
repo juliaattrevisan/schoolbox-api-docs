@@ -103,13 +103,16 @@ function onSelect(): void {
 }
 
 .usage__title-container {
+    display: flex;
+    flex-direction: column;
     flex: 1 1 auto;
-    padding: 0.25rem 0.5rem;
+    padding: var(--sbx-size-xxs, 0.25rem) var(--sbx-size-xs, 0.5rem);
+    gap: var(--sbx-size-xxs, 0.25rem);
     p {
         display: -webkit-box;
         font-size: var(--sbx-font-size-xs, 0.75rem);
         line-height: 1rem;
-        margin-bottom: 0.25rem;
+        margin: 0;
         overflow: hidden;
         white-space: normal;
         -webkit-line-clamp: 3; // clamp the lines to a max of three, cutting off the rest: https://css-tricks.com/almanac/properties/l/line-clamp/
