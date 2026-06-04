@@ -35,4 +35,3 @@ UPDATE `lti_assessment` SET `mark_visibility` = CASE `_mark_visibility`
 END WHERE `_mark_visibility` IS NOT NULL;
 
 # No UPDATE command is required for the reporting table, because since it is created in this version, it will not contain any old data to update.
-
