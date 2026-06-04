@@ -111,6 +111,7 @@ function onSelect(): void {
     p {
         display: -webkit-box;
         font-size: var(--sbx-font-size-xs, 0.75rem);
+        line-clamp: 3;
         line-height: 1rem;
         margin: 0;
         overflow: hidden;
