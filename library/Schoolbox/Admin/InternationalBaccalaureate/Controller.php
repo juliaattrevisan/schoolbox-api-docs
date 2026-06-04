@@ -605,6 +605,7 @@ class Controller extends ConfigController
                     'searchLanguages' => $this->getRouteIfAuthorized('internationalBaccalaureate.searchLanguages'),
                     'completePreparation' => $this->getRouteIfAuthorized('internationalBaccalaureate.sessionCompletePreparation', ['sessionId' => $sessionId]),
                     'renotifyUnconfirmed' => $this->getRouteIfAuthorized('internationalBaccalaureate.renotifyUnconfirmed', ['sessionId' => $sessionId]),
+                    'resetDetails' => $this->getRouteIfAuthorized('internationalBaccalaureate.sessionResetDetails', ['sessionId' => $sessionId]),
                 ],
                 'sessionTitle' => $registrationSession->jsonSerialize()['title'],
             ]
@@ -1062,6 +1063,99 @@ class Controller extends ConfigController
                 'transitionedCount' => count($studentsToTransition),
             ]
         );
+    }
+
+    /**
+     * Resets the given eligible students back to Preparation, clearing their language overrides.
+     * Eligible statuses: Unconfirmed, Confirmed, Failed.
+     *
+     * @return void
+     * @api POST /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/reset-details
+     */
+    public function sessionResetDetails(RegistrationSessionModel $registrationSession): void
+    {
+        $post       = $this->requestPost;
+        $studentIds = $post->get('studentIds');
+
+        try {
+            $studentIds = $this->normalisePreparationStudentIds($studentIds);
+        } catch (\InvalidArgumentException $e) {
+            $this->sendJsonError($e->getMessage(), 400);
+            return;
+        }
+
+        $eligibleStatuses = [
+            RegistrationSessionStudentModel::STATUS_UNCONFIRMED,
+            RegistrationSessionStudentModel::STATUS_CONFIRMED,
+            RegistrationSessionStudentModel::STATUS_FAILED,
+        ];
+
+        $database           = $this->registrationSessionStudentMapper->getDatabase();
+        $transactionStarted = false;
+
+        try {
+            $allStudents        = $this->registrationSessionStudentMapper->findStudentsForSession((int) $registrationSession->getId());
+            $studentsByAnyId    = [];
+
+            foreach ($allStudents as $student) {
+                if ($student->getId() !== null) {
+                    $studentsByAnyId[(int) $student->getId()] = $student;
+                }
+
+                if ($student->getUser()?->getId() !== null) {
+                    $studentsByAnyId[(int) $student->getUser()->getId()] = $student;
+                }
+            }
+
+            $seen            = [];
+            $studentsToReset = [];
+
+            foreach ($studentIds as $studentId) {
+                $student = $studentsByAnyId[$studentId] ?? null;
+
+                if (
+                    $student !== null
+                    && !isset($seen[$student->getId()])
+                    && in_array($student->getStatus(), $eligibleStatuses, true)
+                ) {
+                    $seen[$student->getId()] = true;
+                    $studentsToReset[]       = $student;
+                }
+            }
+
+            if ($studentsToReset === []) {
+                $this->sendJsonError('No eligible students found for reset.', 400);
+                return;
+            }
+
+            $transactionStarted = $database->beginTransaction();
+
+            $resetIds = array_map(fn($s) => (int) $s->getId(), $studentsToReset);
+            /* Removing the subject language overrides for the given students when resetting their details.
+             */
+            $this->registrationSessionStudentSubjectLanguageMapper->deleteByColumn(
+                'registration_session_student_id',
+                $resetIds
+            );
+
+            foreach ($studentsToReset as $student) {
+                $student->setStatus(RegistrationSessionStudentModel::STATUS_PREPARATION);
+                $this->registrationSessionStudentMapper->save($student);
+            }
+
+            $database->commit();
+            $transactionStarted = false;
+
+            $this->response = $this->responseAsJson([
+                'success'           => true,
+                'transitionedCount' => count($studentsToReset),
+            ]);
+        } catch (Exception) {
+            if ($transactionStarted) {
+                $database->rollBack();
+            }
+            $this->sendJsonError('Something has gone wrong. Please try again later.', 500);
+        }
     }
 
     /**

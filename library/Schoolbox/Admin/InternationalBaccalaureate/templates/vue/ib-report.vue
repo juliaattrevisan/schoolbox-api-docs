@@ -9,6 +9,7 @@ import IbReportInProgressTable from "./components/ib-report-in-progress-table.vu
 import IbReportRegisteredTable from "./components/ib-report-registered-table.vue";
 import IbUpdateLanguageModal from "./components/ib-update-language-modal.vue";
 import IbReportActionDrawer from "./components/ib-report-action-drawer.vue";
+import IbResetDetailsModal from "./components/ib-reset-details-modal.vue";
 import { useIbReportUpdateLanguageStore } from "./store/ibReportUpdateLanguageStore";
 import type {
     StudentRow,
@@ -27,6 +28,7 @@ interface Props {
     searchLanguagesEndpoint: string;
     renotifyEndpoint: string;
     completePreparationEndpoint: string;
+    resetDetailsEndpoint: string;
     sessionTitle: string;
 }
 const props = defineProps<Props>();
@@ -42,8 +44,53 @@ const inProgress = window.Vue.ref<InProgressRow[]>([]);
 const failed = window.Vue.ref<FailedRow[]>([]);
 const registered = window.Vue.ref<RegisteredRow[]>([]);
 
-const { selectedList } = useSelectedList(preparation);
+const { selectedList: preparationSelected } = useSelectedList(preparation);
+const { selectedList: unconfirmedSelected } = useSelectedList(unconfirmed);
+const { selectedList: confirmedSelected } = useSelectedList(confirmed);
+const { selectedList: failedSelected } = useSelectedList(failed);
+
+const activeSelectionSection = window.Vue.computed<StudentRow["stage"] | null>(() => {
+    if (preparationSelected.value.length > 0) return "preparation";
+    if (unconfirmedSelected.value.length > 0) return "unconfirmed";
+    if (confirmedSelected.value.length > 0) return "confirmed";
+    if (failedSelected.value.length > 0) return "failed";
+    return null;
+});
+
+// Enforce mutual exclusivity: selecting from one section clears all others
+window.Vue.watch(preparationSelected, (newVal) => {
+    if (newVal.length > 0) {
+        unconfirmedSelected.value = [];
+        confirmedSelected.value = [];
+        failedSelected.value = [];
+    }
+});
+window.Vue.watch(unconfirmedSelected, (newVal) => {
+    if (newVal.length > 0) {
+        preparationSelected.value = [];
+        confirmedSelected.value = [];
+        failedSelected.value = [];
+    }
+});
+window.Vue.watch(confirmedSelected, (newVal) => {
+    if (newVal.length > 0) {
+        preparationSelected.value = [];
+        unconfirmedSelected.value = [];
+        failedSelected.value = [];
+    }
+});
+window.Vue.watch(failedSelected, (newVal) => {
+    if (newVal.length > 0) {
+        preparationSelected.value = [];
+        unconfirmedSelected.value = [];
+        confirmedSelected.value = [];
+    }
+});
+
 const isCompleting = window.Vue.ref<boolean>(false);
+const isResetting = window.Vue.ref<boolean>(false);
+const resetModalOpen = window.Vue.ref<boolean>(false);
+const studentsToReset = window.Vue.ref<Pick<StudentRow, "id" | "userId" | "name">[]>([]);
 
 /**
  * Maps a raw API subject entry to the frontend SubjectEntry shape.
@@ -130,6 +177,16 @@ async function loadCandidates(): Promise<void> {
 updateLanguageStore.init(props.searchLanguagesEndpoint, preparation, unconfirmed, confirmed, failed);
 
 /**
+ * Clears the current student selection across all sections.
+ */
+function clearSelection(): void {
+    preparationSelected.value = [];
+    unconfirmedSelected.value = [];
+    confirmedSelected.value = [];
+    failedSelected.value = [];
+}
+
+/**
  * Submits the given student ids to the complete-preparation endpoint,
  * moves them from Preparation to Unconfirmed on success, and shows a toast notification.
  * @param studentIds The ids of the students to mark as preparation-complete.
@@ -158,6 +215,7 @@ async function handleCompletePreparation(studentIds: number[]): Promise<void> {
             .map((s) => ({ ...s, stage: "unconfirmed" as const }));
         preparation.value = preparation.value.filter((s) => !removedIds.has(s.id));
         unconfirmed.value = [...completedStudents, ...unconfirmed.value];
+        clearSelection();
         toast.timeout({
             text: `Preparation completed for ${studentIds.length} student${studentIds.length === 1 ? "" : "s"}.`,
         });
@@ -166,6 +224,63 @@ async function handleCompletePreparation(studentIds: number[]): Promise<void> {
         toast.timeout({ text: "Failed to complete preparation.", isSuccess: false });
     } finally {
         isCompleting.value = false;
+    }
+}
+
+/**
+ * Opens the reset-details confirmation modal for the given student IDs.
+ * @param studentIds The ids to reset.
+ */
+function promptResetDetails(studentIds: number[]): void {
+    const allStudents = [...unconfirmed.value, ...confirmed.value, ...failed.value];
+    studentsToReset.value = allStudents
+        .filter((s) => studentIds.includes(s.id))
+        .map((s) => ({ id: s.id, userId: s.userId, name: s.name }));
+    if (studentsToReset.value.length === 0) return;
+    resetModalOpen.value = true;
+}
+
+/**
+ * Submits the reset-details request for the students in `studentsToReset`,
+ * removes them from their section arrays on success, reloads all candidates,
+ * and shows a toast notification.
+ */
+async function handleResetDetails(): Promise<void> {
+    if (studentsToReset.value.length === 0) return;
+    if (isResetting.value) return;
+    isResetting.value = true;
+    resetModalOpen.value = false;
+
+    const studentIds = studentsToReset.value.map((s) => s.id);
+    const toast = window.sbProps.toastActivate("Resetting details...");
+
+    try {
+        const response = await apiRequest<{ success: boolean; message?: string }, { studentIds: number[] }>({
+            url: props.resetDetailsEndpoint,
+            method: "POST",
+            body: { studentIds },
+        });
+
+        if (!response.success) {
+            toast.timeout({ text: response.message ?? "Failed to reset details.", isSuccess: false });
+            return;
+        }
+
+        const removedIds = new Set(studentIds);
+        unconfirmed.value = unconfirmed.value.filter((s) => !removedIds.has(s.id));
+        confirmed.value = confirmed.value.filter((s) => !removedIds.has(s.id));
+        failed.value = failed.value.filter((s) => !removedIds.has(s.id));
+        clearSelection();
+        void loadCandidates();
+        toast.timeout({
+            text: `Details reset for ${studentIds.length} student${studentIds.length === 1 ? "" : "s"}.`,
+        });
+    } catch (e) {
+        console.error("Failed to reset details", e);
+        toast.timeout({ text: "Failed to reset details.", isSuccess: false });
+    } finally {
+        isResetting.value = false;
+        studentsToReset.value = [];
     }
 }
 
@@ -195,24 +310,35 @@ window.Vue.onMounted((): void => {
         <div v-else class="l-flex-col l-gap-s">
             <ib-report-section title="Preparation" :count="preparation.length">
                 <ib-report-standard-table
-                    v-model:selected-list="selectedList"
+                    v-model:selected-list="preparationSelected"
                     :students="preparation"
                     :search-languages-endpoint="props.searchLanguagesEndpoint"
+                    section="preparation"
+                    :active-selection-section="activeSelectionSection"
                     @complete-preparation-single="(id) => handleCompletePreparation([id])"
+                    @reset-details-single="(id) => promptResetDetails([id])"
                 />
             </ib-report-section>
 
             <ib-report-section title="Students with unconfirmed details" :count="unconfirmed.length">
                 <ib-report-standard-table
+                    v-model:selected-list="unconfirmedSelected"
                     :students="unconfirmed"
                     :search-languages-endpoint="props.searchLanguagesEndpoint"
+                    section="unconfirmed"
+                    :active-selection-section="activeSelectionSection"
+                    @reset-details-single="(id) => promptResetDetails([id])"
                 />
             </ib-report-section>
 
             <ib-report-section title="Students with confirmed details ready for submission" :count="confirmed.length">
                 <ib-report-standard-table
+                    v-model:selected-list="confirmedSelected"
                     :students="confirmed"
                     :search-languages-endpoint="props.searchLanguagesEndpoint"
+                    section="confirmed"
+                    :active-selection-section="activeSelectionSection"
+                    @reset-details-single="(id) => promptResetDetails([id])"
                 />
             </ib-report-section>
 
@@ -221,7 +347,12 @@ window.Vue.onMounted((): void => {
             </ib-report-section>
 
             <ib-report-section title="Failed registrations" :count="failed.length">
-                <ib-report-failed-table :students="failed" />
+                <ib-report-failed-table
+                    v-model:selected-list="failedSelected"
+                    :students="failed"
+                    :active-selection-section="activeSelectionSection"
+                    @reset-details-single="(id) => promptResetDetails([id])"
+                />
             </ib-report-section>
 
             <ib-report-section title="Registered" :count="registered.length">
@@ -233,10 +364,28 @@ window.Vue.onMounted((): void => {
 
         <ib-update-language-modal />
 
+        <ib-reset-details-modal
+            v-model:is-open="resetModalOpen"
+            :students="studentsToReset"
+            :is-loading="isResetting"
+            @confirm="handleResetDetails"
+            @cancel="resetModalOpen = false"
+        />
+
         <ib-report-action-drawer
-            v-model:selected-list="selectedList"
-            :is-loading="isCompleting"
-            @complete-preparation="handleCompletePreparation(selectedList.map((s) => s.id))"
+            :selected-count="
+                preparationSelected.length +
+                unconfirmedSelected.length +
+                confirmedSelected.length +
+                failedSelected.length
+            "
+            :is-loading="isCompleting || isResetting"
+            :active-section="activeSelectionSection"
+            @complete-preparation="handleCompletePreparation(preparationSelected.map((s) => s.id))"
+            @reset-details="
+                promptResetDetails([...unconfirmedSelected, ...confirmedSelected, ...failedSelected].map((s) => s.id))
+            "
+            @clear-selection="clearSelection"
         />
     </div>
 </template>
