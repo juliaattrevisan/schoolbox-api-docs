@@ -52,6 +52,18 @@ const isUnitOnly = window.Vue.computed(() => {
 });
 
 /**
+ * To only show usages only linked specifically to a unit
+ * @returns { string }
+ */
+const title = window.Vue.computed(() => {
+    const learningActivityUsages = getLearningActivityUsages(props.node.usage as Usage[], props.folderId);
+    if (isUnitOnly.value && learningActivityUsages.length > 0) {
+        return `Usage within ${learningActivityUsages[0].object.unit.title}`;
+    }
+    return "Total Usage";
+});
+
+/**
  * An activity to display in the usage list
  */
 type ActiveUsageType = {
@@ -66,8 +78,8 @@ type ActiveUsageType = {
  */
 const activeUsages = window.Vue.computed(() => {
     const usages: ActiveUsageType[] = [];
-    if (isUnitOnly.value && props.node._usageCounts.assessment > 0) {
-        const learningActivityUsages = getLearningActivityUsages(props.node.usage as Usage[], props.folderId);
+    const learningActivityUsages = getLearningActivityUsages(props.node.usage as Usage[], props.folderId);
+    if (isUnitOnly.value && learningActivityUsages.length > 0) {
         usages.push({
             title: `Learning ${locale.activity.properPlural()}`,
             count: learningActivityUsages.length,
@@ -130,7 +142,7 @@ const hasContent = window.Vue.computed(() => hasUsage.value || props.node.descri
             <fieldset class="content">
                 <node-usage-details-description :node="props.node" />
                 <div v-if="hasUsage" class="usage-list-container">
-                    <h2 class="">Total Usage</h2>
+                    <h2>{{ title }}</h2>
                     <div v-for="activeUsage in activeUsages" :key="activeUsage.title">
                         <h4>{{ activeUsage.title }} ({{ activeUsage.count }})</h4>
                         <ul class="usage-list">

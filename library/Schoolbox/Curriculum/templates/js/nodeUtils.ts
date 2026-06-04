@@ -351,20 +351,24 @@ export function getSpecificUsages(usages: Usage[], type: ActivityTypes): Usage[]
 }
 
 /**
- * To only return the usages of the specified type
+ * To only return learning activity usages linked to the specified folder id
  * @param usages - the usages
  * @param folderId - the folder id to check for
  * @returns - the usages of the specified type
  */
-export function getLearningActivityUsages(usages: Usage[], folderId?: number): Usage[] {
-    // if no folder id is provided, we just return all learning activity usages
-    if (folderId === undefined) {
-        return getSpecificUsages(usages, ActivityTypes.LEARNING_ACTIVITY);
-    }
-    // otherwise we only return learning activity usages linked to the specified folder id
+export function getLearningActivityUsages(
+    usages: Usage[],
+    folderId: number,
+): {
+    discriminator: ActivityTypes.LEARNING_ACTIVITY;
+    object: LearningActivityUsageObject;
+}[] {
     return usages.filter(
         (usage) => usage.discriminator === ActivityTypes.LEARNING_ACTIVITY && usage.object.unit.folder?.id === folderId,
-    );
+    ) as {
+        discriminator: ActivityTypes.LEARNING_ACTIVITY;
+        object: LearningActivityUsageObject;
+    }[];
 }
 
 /**
