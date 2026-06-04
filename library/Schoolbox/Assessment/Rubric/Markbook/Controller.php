@@ -732,6 +732,7 @@ class Controller extends Base
                     'published' => [
                         'normalisedMark' => $normalisedMark,
                         'humanReadableMark' => $humanReadableMark,
+                        'selectedDescriptorText' => $row['descriptor_name'],
                     ],
                     /* Normalised and human-readable marks from the most recent feedback: these would typically be draft
                      * marks, but could end up being the same as the Published ones by sheer coincidence.
@@ -739,6 +740,7 @@ class Controller extends Base
                     'draft' => [
                         'normalisedMark' => null,
                         'humanReadableMark' => null,
+                        'selectedDescriptorText' => null,
                     ],
                     'indicators' => []
                 ];
@@ -765,6 +767,7 @@ class Controller extends Base
                         'published' => [
                             'normalisedMark' => $normalisedMark,
                             'humanReadableMark' => $humanReadableMark,
+                            'selectedDescriptorText' => $row['descriptor_name'],
                         ],
                         /* Normalised and human readable marks from the most recent feedback: these would typically be draft
                          * marks, but could end up being the same as the Published ones by sheer coincidence.
@@ -772,8 +775,8 @@ class Controller extends Base
                         'draft' => [
                             'normalisedMark' => null,
                             'humanReadableMark' => null,
+                            'selectedDescriptorText' => null,
                         ],
-                        'selectedDescriptorText' => $row['descriptor_name'],
                     ];
                 }
             }
@@ -878,7 +881,7 @@ class Controller extends Base
                     vrm.updated_date = latest_draft_feedback.max_updated_at AND
                     vrm.assessment_id = latest_draft_feedback.assessment_id AND
                     vrm.student_id    = latest_draft_feedback.owner AND
-                    vrm.feedback_date is null
+                    vrm.feedback_date IS NULL
                 INNER JOIN rubric_instance ON vrm.rubric_instance_id = rubric_instance.id
                 INNER JOIN user u ON vrm.student_id = u.id
                 WHERE {$outerWhere}
@@ -904,6 +907,99 @@ class Controller extends Base
          *  hash lookup so we can skip repeatedly calculating the same data
          */
         foreach ($getAuthoritativeMarksQuery->getIterator() as $i => $row) {
+            /* Set up a student node if it didn't already exist; we only need to set it up once
+             */
+            if (!isset($students[$row['student_id']])) {
+                $students[$row['student_id']] = [
+                    'firstname' => $row['student_firstname'],
+                    'preferred_name' => $row['student_preferred_name'],
+                    'lastname' => $row['student_lastname'],
+                    'profileLink' => sprintf(
+                        '/search/user/%s',
+                        $row['student_id']
+                    ),
+                    /* gridData is a struct containing capability and indicator marks, grouped by assessment and rubric
+                     * instance ids, like this:
+                     *
+                     * gridData => [
+                     *     assessment id => [
+                     *         rubric instance id => [
+                     *             rubric instance settings, like
+                     *                 - is mark per capability
+                     *                 - capability mark type id
+                     *                 - capability grade group id
+                     *             capabilities (capability data) => [
+                     *                 capability mark type info
+                     *                 capability mark values if relevant to this grid's settings
+                     *                 indicators (indicator data) => [
+                     *                     database marks
+                     *                     max marks
+                     *                     selected descriptor text
+                     *                 ]
+                     *             ]
+                     *         ]
+                     *     ]
+                     * ]
+                     */
+                    'gridData' => []
+                ];
+            }
+
+            /* Remember settings for the rubric instance that we're encountering, such as the rubric instance's mark per
+             * capability setting, etc. if it hasn't already been set. We only need to set it up once.
+             */
+            if (!isset($students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']])) {
+                $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']] = [
+                    /* Obviously so you can see which grid is which, by its name, on the user interface
+                     */
+                    'title' => $row['rubric_title'],
+                    /* Mark Per Capability is used when the capability mark type is set to something other than None
+                     * Be careful of this fact, cos it's easy to === instead of !== if you're not paying attention
+                     */
+                    'isMarkPerCapability' => MarkType::SLUG_NONE !== MarkType::idToSlug($row['rubric_capability_mark_type_id']),
+                    /* Capabilities' Mark Type and Grade Group can be represented differently to their Assessments'
+                     * Mark Type and Grade Group
+                     */
+                    'capabilityMarkTypeId' => $row['capability_mark_type_id'],
+                    'capabilityGradeGroupId' => $row['capability_grade_group_id'],
+                    /* Capability Mark values. This would be relevant if you chose a Capability Mark Type to be
+                     * something other than NONE such as Percent, Letter Grade, Total Mark, etc.
+                     */
+                    'capabilities' => [
+                        /* This contains the descriptors that were selected for each indicator and exists per
+                         * capability: it's here for illustrative purposes and commented out for this reason
+                         */
+                        // 'indicators' => []
+                    ],
+                ];
+            }
+
+            /* Remember capability mark type output per grid: we only need to set this up once per capability
+             * Establish this node in the hash lookup if it didn't already exist: this occurs when there is no prior
+             * published feedback (only a draft feedback exists)
+             */
+            if (!isset($students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']])) {
+                $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']] = [
+                    'name' => $row['capability_name'],
+                    /* Published normalised and human-readable marks from the authoritative feedback
+                     */
+                    'published' => [
+                        'normalisedMark' => null,
+                        'humanReadableMark' => null,
+                        'selectedDescriptorText' => null,
+                    ],
+                    /* Normalised and human-readable marks from the most recent feedback: these would typically be draft
+                     * marks, but could end up being the same as the Published ones by sheer coincidence.
+                     */
+                    'draft' => [
+                        'normalisedMark' => null,
+                        'humanReadableMark' => null,
+                        'selectedDescriptorText' => null,
+                    ],
+                    'indicators' => []
+                ];
+            }
+
             $isMarkPerCapability = $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['isMarkPerCapability'];
 
             /* Calculate normalised and human readable marks if relevant: depends on $isMarkPerCapability being true
@@ -924,8 +1020,6 @@ class Controller extends Base
                 $humanReadableMark = $row['capability_human_readable_mark'];
             }
 
-            /* Update with draft values. These should be safely drop-in-place since draft marks is a subset of all marks.
-             */
             $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['draft'] = [
                 'normalisedMark' => $normalisedMark,
                 'humanReadableMark' => $humanReadableMark,
@@ -936,6 +1030,30 @@ class Controller extends Base
              * include everything.
              */
             if ($selectedIndicators === null || in_array((int)$row['indicator_id'], $selectedIndicators, true)) {
+                /* Establish this node in the hash lookup if it didn't already exist: this occurs when there is no prior
+                 * published feedback (only a draft feedback exists)
+                 */
+                if (!isset($students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']])) {
+                    $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']] = [
+                        'name' => $row['indicator_name'],
+                        /* Published normalised and human-readable marks from the authoritative feedback
+                         */
+                        'published' => [
+                            'normalisedMark' => null,
+                            'humanReadableMark' => null,
+                            'selectedDescriptorText' => null,
+                        ],
+                        /* Normalised and human-readable marks from the most recent feedback: these would typically be draft
+                         * marks, but could end up being the same as the Published ones by sheer coincidence.
+                         */
+                        'draft' => [
+                            'normalisedMark' => null,
+                            'humanReadableMark' => null,
+                            'selectedDescriptorText' => null,
+                        ],
+                    ];
+                }
+
                 $marks = $this->generateMarkTuple(
                     $this->decimalHydrator->hydrate($row['indicator_mark'] ?? null),
                     $this->decimalHydrator->hydrate($row['indicator_max_value'] ?? null),
@@ -944,11 +1062,10 @@ class Controller extends Base
                 $normalisedMark = $marks['normalisedMark'];
                 $humanReadableMark = $marks['humanReadableMark'];
 
-                /* Update with draft values. These should be safely drop-in-place since draft marks is a subset of all marks.
-                 */
                 $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['draft'] = [
                     'normalisedMark' => $normalisedMark,
                     'humanReadableMark' => $humanReadableMark,
+                    'selectedDescriptorText' => $row['descriptor_name']
                 ];
             }
         }

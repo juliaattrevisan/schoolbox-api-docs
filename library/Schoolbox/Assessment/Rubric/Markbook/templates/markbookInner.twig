@@ -173,47 +173,45 @@
                                                          # I wonder what they even do: there's no obvious javascript here, so must be elsewhere
                                                          #}
                                                         {% set publishedMarks = student.gridData[assessmentId][rubricInstanceId].capabilities[capabilityId].indicators[indicatorId].published ?? null %}
-
-                                                        {# Colour the human readable mark using the normalised mark #}
-                                                        {% set gradientClass = urgency.marks(publishedMarks.normalisedMark ?? null) %}
-
-                                                        {# Indicator marks have two formats: a tick appears when you selected a descriptor that doesn't have points;
-                                                         # Alternatively render the descriptor's value;
-                                                         # Even more alternatively, render a hyphen if the indicator never received a meaningful value
-                                                         #}
-                                                        {% set descriptorText = student.gridData[assessmentId][rubricInstanceId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText ?? null %}
-                                                        {% set renderedIndicatorMark = descriptorText ? publishedMarks.humanReadableMark|default('✓') : publishedMarks.humanReadableMark|default('–') %}
+                                                        {% set draftMarks = student.gridData[assessmentId][rubricInstanceId].capabilities[capabilityId].indicators[indicatorId].draft ?? null %}
 
                                                         <td class="mark">
-                                                            <a href="{{ summaryLink }}"
-{#                                                                {% if descriptorText %} title="{{ descriptorText }}"{% endif %}#}
-{#                                                                {% if latestIndicatorMark %}data-actual-mark{% endif %}#}
-                                                                class="{{ gradientClass }} {% if (publishedMarks.humanReadableMark ?? null) is null %}no-mark{% endif %}"
-                                                            >{{ renderedIndicatorMark }}</a>
+                                                            {# Published marks render first; draft marks render adjacently #}
+                                                            {% if publishedMarks is not null %}
+                                                                {# Colour the human readable mark using the normalised mark #}
+                                                                {% set gradientClass = urgency.marks(publishedMarks.normalisedMark ?? null) %}
 
-{#                                                            {% if latestIndicatorMark %}#}
-{#                                                                <a href="{{ summaryLink }}"#}
-{#                                                                {% if latestDescriptorText %} title="{{ latestDescriptorText }}"{% endif %}#}
-{#                                                                data-draft-mark#}
-{#                                                                class=meta {% if latestIndicatorMark is null %}no-mark{% endif %}"#}
-{#                                                                >{{ latestRenderedIndicatorMark }}</a>#}
-{#                                                            {% endif %}#}
+                                                                {# Indicator marks have two formats: a tick appears when you selected a descriptor that doesn't have points;
+                                                                 # Alternatively render the descriptor's value;
+                                                                 # Even more alternatively, render a hyphen if the indicator never received a meaningful value
+                                                                 #}
+                                                                {% set descriptorText = publishedMarks.selectedDescriptorText ?? null %}
+                                                                {% set renderedIndicatorMark = descriptorText ? publishedMarks.humanReadableMark|default('✓') : publishedMarks.humanReadableMark|default('–') %}
+                                                                    <a href="{{ summaryLink }}"
+                                                                        {% if descriptorText %} title="{{ descriptorText }}"{% endif %}
+                                                                        class="{{ gradientClass }} {% if (publishedMarks.humanReadableMark ?? null) is null %}no-mark{% endif %}"
+                                                                    >{{ renderedIndicatorMark }}</a>
+                                                            {% endif %}
+
+                                                            {# Draft marks are rendered adjacently; a javascript presumably toggles their visibility somehow #}
+                                                            {# TODO find out how #}
+                                                            {% if draftMarks is not null %}
+                                                                {# Colour the human readable mark using the normalised mark #}
+                                                                {% set gradientClass = urgency.marks(draftMarks.normalisedMark ?? null) %}
+
+                                                                {# Indicator marks have two formats: a tick appears when you selected a descriptor that doesn't have points;
+                                                                 # Alternatively render the descriptor's value;
+                                                                 # Even more alternatively, render a hyphen if the indicator never received a meaningful value
+                                                                 #}
+                                                                {% set descriptorText = draftMarks.selectedDescriptorText ?? null %}
+
+                                                                {% set renderedIndicatorMark = descriptorText ? draftMarks.humanReadableMark|default('✓') : draftMarks.humanReadableMark|default('–') %}
+                                                                <a href="{{ summaryLink }}"
+                                                                    {% if descriptorText %} title="{{ descriptorText }}"{% endif %}
+                                                                    class="{{ gradientClass }} {% if (draftMarks.humanReadableMark ?? null) is null %}no-mark{% endif %}"
+                                                                >{{ renderedIndicatorMark }}</a>
+                                                            {% endif %}
                                                         </td>
-
-{#                                                        {% set indicatorMark           = student.assessmentsPublished[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark ?? null %}#}
-{#                                                        {% set normalisedIndicatorMark = student.assessmentsPublished[assessmentId].capabilities[capabilityId].indicators[indicatorId].normalisedMark ?? null %}#}
-{#                                                        {% set descriptorText          = student.assessmentsPublished[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText ?? null %}#}
-{#                                                        {% set summaryLink             = student.assessments[assessmentId].summaryLink %}#}
-{#                                                        {% set gradientClass           = urgency.marks(normalisedIndicatorMark) %}#}
-{#                                                        {% set renderedIndicatorMark   = descriptorText ? indicatorMark|default('✓') : indicatorMark|default('–') %}#}
-{#                                                        #}{# Latest Marks #}
-{#                                                        {% set latestIndicatorMark           = student.assessmentsLatest[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark ?? null %}#}
-{#                                                        {% set latestNormalisedIndicatorMark = student.assessmentsLatest[assessmentId].capabilities[capabilityId].indicators[indicatorId].normalisedMark ?? null %}#}
-{#                                                        {% set latestDescriptorText          = student.assessmentsLatest[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText ?? null %}#}
-{#                                                        {% set latestGradientClass           = urgency.marks(latestNormalisedIndicatorMark) %}#}
-{#                                                        {% set latestRenderedIndicatorMark   = latestDescriptorText ? latestIndicatorMark|default('✓') : latestIndicatorMark|default('–') %}#}
-
-
                                                     {% endif %}
                                                 {% endfor %}
                                             </tr>
@@ -222,6 +220,8 @@
                                 {% endfor %}
                             {% endfor %}
 
+
+                            {# Overall Aggregation part #}
                             {% set rowSpan = 0 %}
                             {% for capabilityId, capabilityData in overall %}
                                 {% set rowSpan = rowSpan + 1 + capabilityData.indicators | length %}

@@ -36,9 +36,12 @@ FROM
         INNER JOIN submission_box sb ON vr.assessment_id = sb.assessment_id
         INNER JOIN submission_return sr ON sb.id = sr.box_id
         INNER JOIN rubric_capability_mark rcm ON vr.rubric_instance_id = rcm.rubric_instance_id
+            AND `rcm`.`rubric_capability_id` =`vr`.`capability_id`
+            AND rcm.feedback_id = sr.id
+            AND rcm.feedback_table = 'submission_return'
         INNER JOIN v_rubric_indicator_mark_extend rim ON rim.rubric_capability_mark_id = rcm.id
+            AND rim.rubric_indicator_id = vr.indicator_id
         WHERE sr.deleted_at IS NULL
-          AND sr.published_at IS NOT NULL
           AND (rcm.valid IS TRUE OR rim.valid IS TRUE)
 
         UNION
@@ -72,9 +75,12 @@ FROM
         INNER JOIN reporting r ON vr.assessment_id = r.assessment_id
         INNER JOIN reporting_feedback rf ON r.id = rf.reporting_id
         INNER JOIN rubric_capability_mark rcm ON vr.rubric_instance_id = rcm.rubric_instance_id
+            AND `rcm`.`rubric_capability_id` =`vr`.`capability_id`
+            AND rcm.feedback_id = rf.id
+            AND rcm.feedback_table = 'reporting_feedback'
         INNER JOIN v_rubric_indicator_mark_extend rim ON rim.rubric_capability_mark_id = rcm.id
+            AND rim.rubric_indicator_id = vr.indicator_id
         WHERE rf.deleted_at IS NULL
-          AND rf.published_at IS NOT NULL
           AND (rcm.valid IS TRUE OR rim.valid IS TRUE)
 ) rubricSummary
-ORDER BY assessment_id, student_id, updated_date, capability_sequence, capability_id, indicator_sequence, indicator_id
+ORDER BY assessment_id, student_id, updated_date DESC, capability_sequence, capability_id, indicator_sequence, indicator_id
