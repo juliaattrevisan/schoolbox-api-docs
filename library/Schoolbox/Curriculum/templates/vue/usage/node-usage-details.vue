@@ -6,7 +6,7 @@
 import locale from "@js/terminology/rosettaStone";
 import type { Node, Usage } from "@schoolboxCurriculum/types/Node";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
-import { getSpecificUsages } from "@schoolboxCurriculum/js/nodeUtils";
+import { getSpecificUsages, UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import NodeUsageDetailsDescription from "./node-usage-details-description.vue";
 import NodeUsageDetailsItem from "./node-usage-details-item.vue";
@@ -16,6 +16,7 @@ interface Props {
     depth: number; // to gradually add more marginLeft to indicate node level depth
     isProcessing: boolean; // whether we are currently loading the node usage
     hasLoadError: boolean; // whether there was an error loading the node usage
+    folderId: number; // to display the usage specific to a folder (unit)
 }
 
 const props = defineProps<Props>();
@@ -40,6 +41,14 @@ function onRefreshSelected(): void {
  */
 const hasUsage = window.Vue.computed(() => {
     return props.node.usage && props.node.usage.length > 0;
+});
+
+/**
+ * To only show usages only linked specifically to a unit
+ * @returns { boolean }
+ */
+const isUnitOnly = window.Vue.computed(() => {
+    return props.folderId !== UNSET_ID;
 });
 
 /**
