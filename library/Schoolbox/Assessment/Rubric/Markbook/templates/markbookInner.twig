@@ -99,9 +99,7 @@
                                                         <td class="excluded" title="Excluded from assessment"></td>
                                                     {% else %}
                                                         <td class="mark">
-                                                            {# TODO Are these data vars meaningful? They're maybe superfluous
-                                                             # I wonder what they even do: there's no obvious javascript here, so must be elsewhere
-                                                             #}
+                                                            {# Shortcuts to marks of various types #}
                                                             {% set publishedMarks = student.gridData[assessmentId][rubricInstanceId].capabilities[capabilityId].published %}
                                                             {% set draftMarks = student.gridData[assessmentId][rubricInstanceId].capabilities[capabilityId].draft %}
 
@@ -148,9 +146,7 @@
                                                          #}
                                                         {% set summaryLink = student.assessments[assessmentId].summaryLink %}
 
-                                                        {# TODO Are these data vars meaningful? They're maybe superfluous
-                                                         # I wonder what they even do: there's no obvious javascript here, so must be elsewhere
-                                                         #}
+                                                        {# Shortcuts to marks of various types #}
                                                         {% set publishedMarks = student.gridData[assessmentId][rubricInstanceId].capabilities[capabilityId].indicators[indicatorId].published ?? null %}
                                                         {% set draftMarks = student.gridData[assessmentId][rubricInstanceId].capabilities[capabilityId].indicators[indicatorId].draft ?? null %}
 
