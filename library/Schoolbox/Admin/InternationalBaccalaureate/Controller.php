@@ -1116,6 +1116,8 @@ class Controller extends ConfigController
             $transactionStarted = $database->beginTransaction();
 
             $resetIds = array_map(fn($s) => (int) $s->getId(), $studentsToReset);
+            /* Removing the subject language overrides for the given students when resetting their details.
+             */
             $this->registrationSessionStudentSubjectLanguageMapper->deleteByColumn(
                 'registration_session_student_id',
                 $resetIds
