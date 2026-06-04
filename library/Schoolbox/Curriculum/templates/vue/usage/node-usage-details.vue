@@ -67,10 +67,11 @@ type ActiveUsageType = {
 const activeUsages = window.Vue.computed(() => {
     const usages: ActiveUsageType[] = [];
     if (isUnitOnly.value && props.node._usageCounts.assessment > 0) {
+        const learningActivityUsages = getLearningActivityUsages(props.node.usage as Usage[], props.folderId);
         usages.push({
             title: `Learning ${locale.activity.properPlural()}`,
-            count: props.node._usageCounts.assessment,
-            usages: getLearningActivityUsages(props.node.usage as Usage[], props.folderId),
+            count: learningActivityUsages.length,
+            usages: learningActivityUsages,
         });
         return usages;
     }
