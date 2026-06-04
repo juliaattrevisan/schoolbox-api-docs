@@ -158,7 +158,9 @@ class Reporting implements IStrategy
          */
         $feedback
             ->setPublishedBy($creator->getId())
-            ->setPublishedAt($adf);
+            ->setCreatedAt($adf)
+            ->setPublishedAt($adf)
+            ->setUpdatedAt($adf);
 
         if ($this->perform) {
             $this->feedbackDataSource->save($feedback);
