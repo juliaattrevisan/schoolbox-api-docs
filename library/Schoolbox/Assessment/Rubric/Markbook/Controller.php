@@ -614,11 +614,11 @@ class Controller extends Base
                     AND sr.review_route = :reviewRoute
                     AND sb.assessment_id IN {$assessmentsPlaceholder}
                     GROUP BY sb.assessment_id, sr.owner
-                ) latest_feedback
+                ) latest_published_feedback
                 INNER JOIN v_rubric_mark vrm ON
-                    vrm.feedback_date = latest_feedback.max_published_at AND
-                    vrm.assessment_id = latest_feedback.assessment_id AND
-                    vrm.student_id    = latest_feedback.owner
+                    vrm.feedback_date = latest_published_feedback.max_published_at AND
+                    vrm.assessment_id = latest_published_feedback.assessment_id AND
+                    vrm.student_id    = latest_published_feedback.owner
                 INNER JOIN rubric_instance ON vrm.rubric_instance_id = rubric_instance.id
                 INNER JOIN user u ON vrm.student_id = u.id
                 WHERE {$outerWhere}
@@ -736,7 +736,7 @@ class Controller extends Base
                     /* Normalised and human-readable marks from the most recent feedback: these would typically be draft
                      * marks, but could end up being the same as the Published ones by sheer coincidence.
                      */
-                    'latest' => [
+                    'draft' => [
                         'normalisedMark' => null,
                         'humanReadableMark' => null,
                     ],
@@ -769,7 +769,7 @@ class Controller extends Base
                         /* Normalised and human readable marks from the most recent feedback: these would typically be draft
                          * marks, but could end up being the same as the Published ones by sheer coincidence.
                          */
-                        'latest' => [
+                        'draft' => [
                             'normalisedMark' => null,
                             'humanReadableMark' => null,
                         ],
@@ -784,7 +784,7 @@ class Controller extends Base
 
     /**
      * Synonymously with how retrieveDatabaseMarks() worked, but it takes the result of that method and fills in the
-     * latest marks for capabilities and indicators using an almost-identical query, basically appending extra data to
+     * draft marks for capabilities and indicators using an almost-identical query, basically appending extra data to
      * the result of retrieveDatabaseMarks().
      *
      * v_most_recent_rubric_mark view is used instead of v_rubric_mark. Joining two views is probably a costly affair,
@@ -870,15 +870,14 @@ class Controller extends Base
                     FROM submission_return sr
                     INNER JOIN submission_box sb on sr.box_id = sb.id
                     WHERE sr.deleted_at IS NULL
-                    AND sr.published_at IS NOT NULL
                     AND sr.review_route = :reviewRoute
                     AND sb.assessment_id IN {$assessmentsPlaceholder}
                     GROUP BY sb.assessment_id, sr.owner
-                ) latest_feedback
+                ) latest_draft_feedback
                 INNER JOIN v_most_recent_rubric_mark vrm ON
-                    vrm.updated_date = latest_feedback.max_updated_at AND
-                    vrm.assessment_id = latest_feedback.assessment_id AND
-                    vrm.student_id    = latest_feedback.owner AND
+                    vrm.updated_date = latest_draft_feedback.max_updated_at AND
+                    vrm.assessment_id = latest_draft_feedback.assessment_id AND
+                    vrm.student_id    = latest_draft_feedback.owner AND
                     vrm.feedback_date is null
                 INNER JOIN rubric_instance ON vrm.rubric_instance_id = rubric_instance.id
                 INNER JOIN user u ON vrm.student_id = u.id
@@ -927,7 +926,7 @@ class Controller extends Base
 
             /* Update with draft values. These should be safely drop-in-place since draft marks is a subset of all marks.
              */
-            $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['latest'] = [
+            $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['draft'] = [
                 'normalisedMark' => $normalisedMark,
                 'humanReadableMark' => $humanReadableMark,
             ];
@@ -947,7 +946,7 @@ class Controller extends Base
 
                 /* Update with draft values. These should be safely drop-in-place since draft marks is a subset of all marks.
                  */
-                $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['latest'] = [
+                $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['draft'] = [
                     'normalisedMark' => $normalisedMark,
                     'humanReadableMark' => $humanReadableMark,
                 ];
