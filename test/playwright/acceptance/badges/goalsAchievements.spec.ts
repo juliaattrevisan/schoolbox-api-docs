@@ -3,6 +3,7 @@ import Badges from "@schoolboxTest/playwright/support/page/badges/Badges";
 import CreateBadge from "@schoolboxTest/playwright/support/page/badges/CreateBadge";
 import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
 import EditorTemplate from "@schoolboxTest/playwright/support/page/admin/design/EditorTemplates";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 
 /**
  * This test sets a goal, award an achievement, remove the goal, withdraw the achievement, adds an evidence
@@ -168,6 +169,7 @@ test.describe("Goals and Achievements tests", () => {
         const badges = new Badges(tester, page);
         const profilePage = new ProfilePage(tester, page);
         const editorTemplate = new EditorTemplate(page, tester);
+        const common = new Common(page);
         const badgeNameGoal = "Automation Badge created to set goal from Badges page";
         const student = "Jana Reed";
         const studentId = 25;
@@ -201,7 +203,7 @@ test.describe("Goals and Achievements tests", () => {
         await profilePage.clickBadgeOrDropdownOption(badgeNameGoal);
         await profilePage.clickBadgeOrDropdownOption("Add evidence");
         await tester.fillCKEditorById("reason", "Great job, Jana!");
-        await badges.clickEvidenceSubmitButton();
+        await common.clickInputSubmitButton();
 
         tester.isGoingTo("Check the evidence is presented by navigating to view evidence");
         await profilePage.goto(studentId);
@@ -213,7 +215,7 @@ test.describe("Goals and Achievements tests", () => {
         tester.isGoingTo("Get the evidence updated");
         await page.locator('a:has(sbx-icon[name="modify"])').last().click();
         await tester.fillCKEditorById("reason", "Well done, Jana!");
-        await badges.clickEvidenceSubmitButton();
+        await common.clickInputSubmitButton();
 
         tester.isGoingTo("Ensure the evidence text is updated");
         await expect(page.locator("#container")).toContainText("Well done, Jana!");
@@ -247,7 +249,7 @@ test.describe("Goals and Achievements tests", () => {
         await expect(page.locator("#container")).toContainText("Well done, Jana!");
 
         tester.isGoingTo("Remove the evidence and ensure it is no longer presented");
-        await badges.clickDropdownDelete();
+        await common.clickConfirmButton();
         await page.locator("a#confirm-dialog-confirm-button.button.submit").click();
         await expect(page.locator("#container")).not.toContainText("Well done, Jana!");
 
@@ -257,7 +259,7 @@ test.describe("Goals and Achievements tests", () => {
         await profilePage.clickBadgeOrDropdownOption(badgeNameGoal);
         await profilePage.clickBadgeOrDropdownOption("Award with evidence");
         await tester.clickEditorTemplateCKEditor("reason", "Badge Automation Template");
-        await badges.clickEvidenceSubmitButton();
+        await common.clickInputSubmitButton();
         await profilePage.goto(studentId);
         await profilePage.clickTab("achievements");
         await profilePage.clickBadgeOrDropdownOption(badgeNameGoal);
@@ -267,7 +269,7 @@ test.describe("Goals and Achievements tests", () => {
         tester.isGoingTo("Get the evidence updated and ensure it is presented properly");
         await page.locator('a:has(sbx-icon[name="modify"])').last().click();
         await tester.fillCKEditorById("reason", "This is updated");
-        await badges.clickEvidenceSubmitButton();
+        await common.clickInputSubmitButton();
         tester.isGoingTo("Ensure the evidence text is updated");
         await expect(page.locator("#container")).toContainText("This is updated");
     });

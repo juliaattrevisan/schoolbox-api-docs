@@ -59,7 +59,7 @@ test.describe.serial("Curriculum Description Component Tests", () => {
         await homepage.clickComponentsTab(Homepage.ELEMENT_LOCK_TOGGLE);
         await Homepage.clickComponentSettings(curriculumDescriptionComponent);
         tester.isGoingTo("Add title and select curriculum code");
-        await curriculumDescription.addTitle(curriculumDescriptionComponent, COMPONENT_TITLE);
+        await Homepage.typeComponentHeading(curriculumDescriptionComponent, COMPONENT_TITLE);
         tester.isGoingTo("Select curriculum code and update");
         await CurriculumDescription.setCurriculumCode(curriculumDescriptionComponent, CURRICULUM_ACELA1556.code);
         tester.isGoingTo("Verify selected curriculum code and description");

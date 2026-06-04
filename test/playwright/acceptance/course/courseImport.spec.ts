@@ -13,6 +13,7 @@ import CourseOutline from "@schoolboxTest/playwright/support/page/homepage/Cours
 import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 import EditorTemplate from "@schoolboxTest/playwright/support/page/admin/design/EditorTemplates";
 import UnitPlanner from "@schoolboxTest/playwright/support/page/unitPlanner/UnitPlanner";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 
 test.describe.skip("Course import tests", () => {
     // Run tests serially, as tests rely on prior tests to have been run
@@ -234,6 +235,7 @@ test.describe.skip("Course import tests", () => {
         const projectName = "Export Activity Project for Romeo and Juliet";
         const unitPlanner = new UnitPlanner(tester, page);
         const courseOutline = new CourseOutline(tester, page);
+        const common = new Common(page);
 
         const folderId = (await db.grabFromDatabase("folder", "id", {
             name: "Automation Course Import Folder1",
@@ -271,7 +273,7 @@ test.describe.skip("Course import tests", () => {
         await page.locator(`label[for=import-${importId}]`).click();
 
         tester.isGoingTo("click export the selected classes button");
-        await page.click("input[type=submit]");
+        await common.clickInputSubmitButton();
 
         tester.isGoingTo("click the export icon for Present a scene of Romeo and Juliet");
         await unitPlanner.clickViewMoreButton(15, "activities");
@@ -282,7 +284,7 @@ test.describe.skip("Course import tests", () => {
         await page.locator(`label[for=import-${importId}]`).click();
 
         tester.isGoingTo("click export the selected classes button");
-        await page.click("input[type=submit]");
+        await common.clickInputSubmitButton();
 
         tester.isGoingTo("click the export icon for Post-Unit Quiz");
         await unitPlanner.clickViewMoreButton(15, "activities");
@@ -293,7 +295,7 @@ test.describe.skip("Course import tests", () => {
         await page.locator(`label[for=import-${importId}]`).click();
 
         tester.isGoingTo("click export the selected classes button");
-        await page.click("input[type=submit]");
+        await common.clickInputSubmitButton();
 
         tester.isGoingTo("click the export icon for Lesson Plan for Romeo and Juliet");
         await unitPlanner.clickViewMoreButton(15, "activities");
@@ -311,7 +313,7 @@ test.describe.skip("Course import tests", () => {
         await importCourseIntoClass.insertExportDueDate(2, dueDate);
 
         tester.isGoingTo("click export the selected classes button");
-        await page.click("input[type=submit]");
+        await common.clickInputSubmitButton();
 
         tester.isGoingTo("click the export icon for Project for Romeo and Juliet");
         await unitPlanner.clickViewMoreButton(15, "activities");
@@ -328,7 +330,7 @@ test.describe.skip("Course import tests", () => {
         await importCourseIntoClass.insertExportDueDate(2, dueDate);
 
         tester.isGoingTo("click export the selected classes button");
-        await page.click("input[type=submit]");
+        await common.clickInputSubmitButton();
 
         tester.isGoingTo(
             "navigate to the class homepage to check if the assessments are presented in the course outline",
@@ -515,7 +517,7 @@ test.describe.skip("Course import tests", () => {
         const componentCourseOutlineId = (await componentCourseOutline.getAttribute("id")) as string;
         await homepage.clickLockToggle();
         await Homepage.clickComponentSettings(componentCourseOutline);
-        await homepage.typeTextBoxHeading(`Due Work and Tasks Only`);
+        await Homepage.typeComponentHeading(componentCourseOutline, `Due Work and Tasks Only`);
         await courseOutline.filterByLabel(componentCourseOutlineId, "project");
         await courseOutline.filterByLabel(componentCourseOutlineId, "quiz");
         await courseOutline.filterByLabel(componentCourseOutlineId, "lessonPlan");

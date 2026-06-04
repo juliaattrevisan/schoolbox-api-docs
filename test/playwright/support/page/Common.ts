@@ -128,12 +128,12 @@ export default class Common {
     /**
      * confirm button on modal dialogs
      */
-    static readonly SELECTOR_CONFIRM_DIALOG_BUTTON_CONFIRM = "a#confirm-dialog-confirm-button";
+    static readonly DATA_TEST_CONFIRM_DIALOG_BUTTON_CONFIRM = "confirm-dialog-confirm-button";
 
     /**
      * cancel button on modal dialogs
      */
-    static readonly SELECTOR_CONFIRM_DIALOG_BUTTON_CANCEL = "a#confirm-dialog-cancel-button";
+    static readonly DATA_TEST_CONFIRM_DIALOG_BUTTON_CANCEL = "confirm-dialog-cancel-button";
 
     /**
      * close x button on modal dialogs
@@ -153,7 +153,7 @@ export default class Common {
     /**
      * delete button on modal dialogs
      */
-    static readonly MODAL_DELETE_BUTTON = "button.button.submit";
+    static readonly MODAL_SUBMIT_BUTTON = "button.button.submit";
 
     /**
      * empty state when searching finds no results
@@ -162,6 +162,12 @@ export default class Common {
 
     // empty state text eg: share learning moments, set goals etc
     static readonly STUDENT_META_TEXT = "ul.meta";
+
+    // 3-dot menu for various items such as profile page, dialog agent action menu, assessment status page, grades page, etc
+    static readonly DATA_TEST_DOT_MENU_BUTTON = "sbx-pop-out-header-options-button";
+
+    // input type submit buttons
+    static readonly INPUT_SUBMIT_BUTTON = "input[type=submit]";
 
     constructor(page: Page) {
         this.page = page;
@@ -266,14 +272,14 @@ export default class Common {
      * clicks the confirm button on the dialogs
      */
     async clickConfirmButton(): Promise<void> {
-        await this.page.locator(Common.SELECTOR_CONFIRM_DIALOG_BUTTON_CONFIRM).click();
+        await this.page.getByTestId(Common.DATA_TEST_CONFIRM_DIALOG_BUTTON_CONFIRM).click();
     }
 
     /**
      * clicks the cancel button on the dialogs
      */
     async clickCancelButton(): Promise<void> {
-        await this.page.locator(Common.SELECTOR_CONFIRM_DIALOG_BUTTON_CANCEL).click();
+        await this.page.getByTestId(Common.DATA_TEST_CONFIRM_DIALOG_BUTTON_CANCEL).click();
     }
 
     /**
@@ -338,7 +344,7 @@ export default class Common {
      * click the last element to confirm deletion in a modal dialog
      */
     async clickModalDeleteButton(): Promise<void> {
-        await this.page.locator(Common.MODAL_DELETE_BUTTON).last().click();
+        await this.page.locator(Common.MODAL_SUBMIT_BUTTON).last().click();
     }
 
     /**
@@ -570,5 +576,22 @@ export default class Common {
         for (const notExpectedText of notExpectedTexts) {
             await expect(selectizeInput).not.toContainText(notExpectedText);
         }
+    }
+
+    /**
+     * Click the 3-dot menu button on a page
+     * This is used for opening various action menus across the site, such as on the profile page, dialog agent action menu, assessment status page, grades page, etc
+     */
+    async clickJellyTot(): Promise<void> {
+        await expect(this.page.getByTestId(Common.DATA_TEST_DOT_MENU_BUTTON)).toBeVisible();
+        await this.page.getByTestId(Common.DATA_TEST_DOT_MENU_BUTTON).click();
+    }
+
+    /**
+     * Click the input type submit button
+     * it could be used for various submit buttons across the site to confirm an action
+     */
+    async clickInputSubmitButton(): Promise<void> {
+        await this.page.locator(Common.INPUT_SUBMIT_BUTTON).click();
     }
 }

@@ -1,13 +1,12 @@
 import { expect } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 
 export default class CurriculumDescription {
     private tester: AcceptanceTester;
     private page: Page;
 
-    static readonly ELEMENT_TITLE_TEXTBOX = 'input[name="componentname"]';
-    static readonly ELEMENT_UPDATE_BUTTON = 'input[value="Update"]';
     static readonly ELEMENT_CURRICULUM_CODE_DROPDOWN = 'select[name="curriculumCode"]';
     static readonly DATA_TEST_CURRICULUM_CODE = "curriculum-code-{curriculumCode}";
     static readonly DATA_TEST_CURRICULUM_DESCRIPTION = "curriculum-description-{curriculumCode}";
@@ -15,17 +14,6 @@ export default class CurriculumDescription {
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
-    }
-
-    /**
-     * Fill the component title field
-     * @param curriculumDescriptionComponent - The curriculum description component locator
-     * @param title - The title to enter
-     */
-
-    public async addTitle(curriculumDescriptionComponent: Locator, title: string): Promise<void> {
-        this.tester.isGoingTo("Add a title");
-        await curriculumDescriptionComponent.locator(CurriculumDescription.ELEMENT_TITLE_TEXTBOX).fill(title);
     }
 
     /**
@@ -41,10 +29,7 @@ export default class CurriculumDescription {
         await curriculumDescriptionComponent
             .locator(CurriculumDescription.ELEMENT_CURRICULUM_CODE_DROPDOWN)
             .selectOption(curriculumCode);
-        await curriculumDescriptionComponent.locator(CurriculumDescription.ELEMENT_UPDATE_BUTTON).click();
-        await curriculumDescriptionComponent
-            .locator(CurriculumDescription.ELEMENT_UPDATE_BUTTON)
-            .waitFor({ state: "hidden" });
+        await Homepage.clickComponentUpdateButton(curriculumDescriptionComponent);
     }
 
     /**

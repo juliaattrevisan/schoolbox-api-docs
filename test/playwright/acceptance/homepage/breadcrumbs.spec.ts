@@ -78,7 +78,7 @@ test.describe("Breadcrumbs Component Tests", () => {
         await homepage.clickComponentsTab(Homepage.ELEMENT_LOCK_TOGGLE);
         await Homepage.clickComponentSettings(breadcrumbsComponent);
         tester.isGoingTo("Update Breadcrumbs settings (hide title for read-only users)");
-        await page.locator(`#component${breadcrumb9AEnglishId} input[type="submit"][value="Update"]`).click();
+        await Homepage.clickComponentUpdateButton(breadcrumbsComponent);
         tester.isGoingTo("Confirm title bar is visible for Alress");
         const breadcrumbHeader = breadcrumbsComponent.getByTestId("homepage-component-titlebar-name");
         await expect(breadcrumbHeader).toBeVisible();

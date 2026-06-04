@@ -181,7 +181,7 @@ test.describe.serial("Textbox Tests", () => {
         await homepage.clickLockToggle();
         const component = page.locator(Homepage.locateComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1));
         await Homepage.clickComponentSettings(component);
-        await homepage.typeTextBoxHeading("Jana to be hidden");
+        await Homepage.typeComponentHeading(component, "Jana to be hidden");
         tester.isGoingTo("Hide the textbox title from read only users");
         const componentId = (await db.grabFromDatabase("component_instance", "id", {
             identifier: homepageId,

@@ -145,13 +145,6 @@ export default class Badges {
     }
 
     /**
-     * click submit button on the evidence page
-     */
-    async clickEvidenceSubmitButton(): Promise<void> {
-        await this.page.click("input[type=submit]");
-    }
-
-    /**
      * click return to previous page button
      */
     async clickReturnButton(): Promise<void> {

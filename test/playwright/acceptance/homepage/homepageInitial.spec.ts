@@ -11,6 +11,7 @@ import CreateFolder from "@schoolboxTest/playwright/support/page/folder/CreateFo
 import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 import TextboxForm from "@schoolboxTest/playwright/support/page/homepage/TextboxForm";
 import Resources from "@schoolboxTest/playwright/support/page/resources/Resources";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 
 test.describe("Homepage Initial Tests", () => {
     test.beforeEach(async ({ tester }) => {
@@ -27,7 +28,6 @@ test.describe("Homepage Initial Tests", () => {
         const folderName = "Test Homepage";
         const homepageTemplateOption = "Blank";
         tester.isGoingTo("create a homepage folder");
-        // await tester.loginAsAdmin();
         await createFolder.goto();
         tester.isGoingTo("type a folder name, select a template option and set access permissions");
         await createFolder.typeName(folderName);
@@ -119,6 +119,7 @@ test.describe("Homepage Initial Tests", () => {
         const resources = new Resources(page);
         const homepage = new Homepage(tester, page);
         const textbox = new TextboxForm(tester, page);
+        const common = new Common(page);
         tester.isGoingTo("Navigate to the Test Homepage via resources browser");
         await createFolder.gotoResources();
         await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`).first()).toBeVisible();
@@ -134,7 +135,7 @@ test.describe("Homepage Initial Tests", () => {
         await homepage.clickComponentEmptyStateLink(layout, 3);
         await page.waitForTimeout(2000);
         await page.fill("input[name=heading]", "Test Blog Title");
-        await page.click("input[type=submit]");
+        await common.clickInputSubmitButton();
         await page.waitForTimeout(2000);
         await page.goto(`/homepage/${homepageId}`);
         tester.isGoingTo("Add a news article");

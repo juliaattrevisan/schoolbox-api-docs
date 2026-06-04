@@ -10,13 +10,9 @@ export default class SurveyForm {
 
     static readonly SELECTOR_TITLE = `${SurveyForm.FORM} input[name="title"]`;
 
-    static readonly SELECTOR_OPEN_DATE = `${SurveyForm.FORM} input[name="openDate"]`;
-
     static readonly SELECTOR_DUE_DATE = `${SurveyForm.FORM} input[name="dueDate"]`;
 
     static readonly SELECTOR_BUTTON_CREATE = `input[type=submit][value="Create"]`;
-
-    static readonly SELECTOR_BUTTON_UPDATE = `${SurveyForm.FORM} [type=submit][value="Update"]`;
 
     constructor(page: Page) {
         this.page = page;
@@ -49,24 +45,9 @@ export default class SurveyForm {
     }
 
     /**
-     * Sets open date
-     * @param openDate - The open date of the survey
-     */
-    async setOpenDate(openDate: string): Promise<void> {
-        await this.page.fill(SurveyForm.SELECTOR_OPEN_DATE, openDate);
-    }
-
-    /**
      * Submits this form to create a survey
      */
     async create(): Promise<void> {
         await this.page.click(SurveyForm.SELECTOR_BUTTON_CREATE);
-    }
-
-    /**
-     * Submits this form to update a survey
-     */
-    async update(): Promise<void> {
-        await this.page.click(SurveyForm.SELECTOR_BUTTON_UPDATE);
     }
 }

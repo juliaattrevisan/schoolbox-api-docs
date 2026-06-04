@@ -1,11 +1,14 @@
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import type { Page, Locator } from "@playwright/test";
 import { expect } from "@playwright/test";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 
 export default class ProfilePage {
     private tester: AcceptanceTester;
 
     private page: Page;
+
+    private common: Common;
 
     static readonly URL = "/search/user/{id}";
 
@@ -31,8 +34,6 @@ export default class ProfilePage {
 
     static readonly SELECTOR_FEEDBACK_FILTER = 'label[for="filter-feedback"]';
 
-    static readonly DATA_TEST_PROFILE_DOT_BUTTON = "sbx-pop-out-header-options-button";
-
     static readonly DATA_TEST_PROFILE_DOT_MENU = "profile-header-options";
 
     static readonly DATA_TEST_DOT_MENU_OPTIONS = "user-profile-{option}";
@@ -40,6 +41,7 @@ export default class ProfilePage {
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
+        this.common = new Common(page);
     }
 
     /**
@@ -185,18 +187,10 @@ export default class ProfilePage {
     }
 
     /**
-     * Opens the profile page 3-dot menu.
-     */
-    async openDotMenu(): Promise<void> {
-        await this.page.getByTestId(ProfilePage.DATA_TEST_PROFILE_DOT_BUTTON).click();
-        await expect(this.page.getByTestId(ProfilePage.DATA_TEST_PROFILE_DOT_MENU)).toBeVisible();
-    }
-
-    /**
      * Checks the profile page 3-dot menu is not presented.
      */
     async checkDotMenuIsNotPresented(): Promise<void> {
-        await expect(this.page.getByTestId(ProfilePage.DATA_TEST_PROFILE_DOT_BUTTON)).toBeHidden();
+        await expect(this.page.getByTestId(Common.DATA_TEST_DOT_MENU_BUTTON)).toBeHidden();
     }
 
     /**
@@ -232,7 +226,7 @@ export default class ProfilePage {
      * Clicks the 3-dot menu action and checks the impersonate button is disabled
      */
     async checkImpersonateIsDisabled(): Promise<void> {
-        await this.openDotMenu();
+        await this.common.clickJellyTot();
         await expect(
             this.page.getByTestId(ProfilePage.DATA_TEST_DOT_MENU_OPTIONS.replace("{option}", "impersonate-disabled")),
         ).toBeVisible();

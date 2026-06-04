@@ -1,23 +1,21 @@
 import { expect } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
+import CreateFolder from "@schoolboxTest/playwright/support/page/folder/CreateFolder";
 
 export default class Folders {
     private tester: AcceptanceTester;
 
     private page: Page;
 
+    private createFolder: CreateFolder;
+
     static readonly DATA_TEST_ADD_FOLDER_BUTTON = "folder-component-add-folder-button";
 
     static readonly DATA_TEST_FOLDER_TITLE = "folder-component-title";
 
-    static readonly DATA_TEST_FOLDER_FORM_INPUT_NAME = "folder-form-input-name";
-
-    static readonly DATA_TEST_FOLDER_FORM_SUBMIT = "folder-form-submit";
-
     static readonly DATA_TEST_DISPLAY_VIEW_SELECT = "component-config-displayPortraits-select";
-
-    static readonly DATA_TEST_UPDATE_BUTTON = "homepage-component-update-button";
 
     static readonly DATA_TEST_LIMIT_SELECT = "component-config-size-select";
 
@@ -52,6 +50,7 @@ export default class Folders {
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
+        this.createFolder = new CreateFolder(tester, page);
     }
 
     /**
@@ -78,44 +77,13 @@ export default class Folders {
     }
 
     /**
-     * Fill the folder name field on the folder form.
-     * @param folderName - The folder name to enter.
-     */
-    async fillFolderName(folderName: string): Promise<void> {
-        this.tester.isGoingTo(`Enter folder name: ${folderName}`);
-
-        await this.page.getByTestId(Folders.DATA_TEST_FOLDER_FORM_INPUT_NAME).fill(folderName);
-    }
-
-    /**
-     * Submit the folder form.
-     */
-    async submitCreateFolder(): Promise<void> {
-        this.tester.isGoingTo("Click Create Folder button");
-
-        await this.page.getByTestId(Folders.DATA_TEST_FOLDER_FORM_SUBMIT).click();
-    }
-
-    /**
-     * Save Folder component settings.
-     * @param component - The Folder component locator.
-     */
-    async saveComponentSettings(component: Locator): Promise<void> {
-        this.tester.isGoingTo("Save Folder component settings");
-
-        await component.getByTestId(Folders.DATA_TEST_UPDATE_BUTTON).click();
-        await expect(component.getByTestId(Folders.DATA_TEST_UPDATE_BUTTON)).toBeHidden();
-    }
-
-    /**
      * Set Folder component limit and click Update.
      * @param component - The Folder component locator.
      * @param limit - Limit value, for example "1", "2", or "0" for All.
      */
     public static async setFolderLimit(component: Locator, limit: string): Promise<void> {
         await component.getByTestId(Folders.DATA_TEST_LIMIT_SELECT).selectOption(limit);
-        await component.getByTestId(Folders.DATA_TEST_UPDATE_BUTTON).click();
-        await expect(component.getByTestId(Folders.DATA_TEST_UPDATE_BUTTON)).toBeHidden();
+        await Homepage.clickComponentUpdateButton(component);
     }
 
     /**
@@ -137,7 +105,7 @@ export default class Folders {
         await folderComponent.getByTestId(Folders.DATA_TEST_LIMIT_SELECT).selectOption(limit);
         await folderComponent.getByTestId(Folders.DATA_TEST_SORT_SELECT).selectOption(sortBy);
         await folderComponent.getByTestId(Folders.DATA_TEST_SORT_DIRECTION_SELECT).selectOption(sortingOrder);
-        await folderComponent.getByTestId(Folders.DATA_TEST_UPDATE_BUTTON).click();
+        await Homepage.clickComponentUpdateButton(folderComponent);
         await expect(folderComponent.getByTestId(Folders.DATA_TEST_DISPLAY_VIEW_SELECT)).toBeHidden();
     }
 
@@ -207,10 +175,10 @@ export default class Folders {
         await component.getByTestId(`${Folders.DATA_TEST_FOLDER_MODIFY_PREFIX}${currentFolderTitle}`).click();
 
         this.tester.isGoingTo(`Update folder title to ${newFolderTitle}`);
-        await this.page.getByTestId(Folders.DATA_TEST_FOLDER_FORM_INPUT_NAME).fill(newFolderTitle);
+        await this.createFolder.typeName(newFolderTitle);
 
         this.tester.isGoingTo("Click Modify Folder button");
-        await this.page.getByTestId(Folders.DATA_TEST_FOLDER_FORM_SUBMIT).click();
+        await this.createFolder.submit();
     }
 
     /**
@@ -244,8 +212,6 @@ export default class Folders {
         await this.page.locator("a[data-use-this-folder-component-action]").click();
 
         this.tester.isGoingTo("Update Folder component source");
-        await folderComponent.getByTestId(Folders.DATA_TEST_UPDATE_BUTTON).click();
-
-        await expect(folderComponent.getByTestId(Folders.DATA_TEST_UPDATE_BUTTON)).toBeHidden();
+        await Homepage.clickComponentUpdateButton(folderComponent);
     }
 }
