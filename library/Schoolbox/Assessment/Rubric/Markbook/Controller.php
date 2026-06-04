@@ -81,6 +81,18 @@ class Controller extends Base
 
 
     /**
+     * @var Decimal
+     */
+    private Decimal $decimalHydrator;
+
+
+    /**
+     * @var MarkScheme\TotalMarkFractional
+     */
+    private MarkScheme\TotalMarkFractional $totalMarkScheme;
+
+
+    /**
      * Constructor
      *
      * @param IConnector                         $internalDb
@@ -107,6 +119,11 @@ class Controller extends Base
         $this->assessmentIdFinder    = $assessmentIdFinder;
         $this->filterMapper          = $filterMapper;
         $this->translator            = $translator;
+
+        /* Used to calculate human readable and normalised marks for each student for capabilities and indicators
+         */
+        $this->decimalHydrator = new Decimal();
+        $this->totalMarkScheme = new MarkScheme\TotalMarkFractional();
     }
 
 
@@ -388,6 +405,7 @@ class Controller extends Base
                 vr.assessment_weight                         AS assessment_weight,
                 rubric_instance.id                           AS rubric_instance_id,
                 rubric_instance.title                        AS rubric_title,
+                rubric_instance.rubric_capability_mark_type_id AS rubric_capability_mark_type_id,
                 vr.capability_id                             AS capability_id,
                 vr.capability_name                           AS capability_name,
                 vr.capability_max_value                      AS capability_max_value,
@@ -449,6 +467,10 @@ class Controller extends Base
             if (!isset($assessments[$row['assessment_id']]['gridData'][$row['rubric_instance_id']])) {
                 $assessments[$row['assessment_id']]['gridData'][$row['rubric_instance_id']] = [
                     'title' => $row['rubric_title'],
+                    /* Mark Per Capability is used when the capability mark type is set to something other than None
+                     * Be careful of this fact, cos it's easy to === instead of !== if you're not paying attention
+                     */
+                    'isMarkPerCapability' => MarkType::SLUG_NONE !== MarkType::idToSlug($row['rubric_capability_mark_type_id']),
                     'capabilities' => []
                 ];
             }
@@ -462,6 +484,7 @@ class Controller extends Base
                 $capabilityMaxValue = $decimalHydrator->hydrate($row['capability_max_value']);
 
                 $assessments[$row['assessment_id']]['gridData'][$row['rubric_instance_id']]['capabilities'][$row['capability_id']] = [
+                    'id' => $row['capability_id'],
                     'name' => $row['capability_name'],
                     /* TODO find out what this means
                      */
@@ -484,7 +507,10 @@ class Controller extends Base
         }
 
         /* Apparently assessments are sorted alphabetically rather than by due date, which is a bit interesting: most of
-         * the time we sort by due date.
+         * the time we sort by due date. Jez concurs:
+         *
+         * > jez.gray 4/6/2026
+         * > I had never noticed. Seems strange to me now that you point it out
          */
         uasort(
             $assessments,
@@ -604,7 +630,7 @@ class Controller extends Base
         foreach ($getAuthoritativeMarksQuery->getIterator() as $i => $row) {
             /* Set up a student node if it didn't already exist; we only need to set it up once
              */
-            if (!isset($row['student_id'])) {
+            if (!isset($students[$row['student_id']])) {
                 $students[$row['student_id']] = [
                     'firstname' => $row['student_firstname'],
                     'preferred_name' => $row['student_preferred_name'],
@@ -648,7 +674,10 @@ class Controller extends Base
                     /* Obviously so you can see which grid is which, by its name, on the user interface
                      */
                     'title' => $row['rubric_title'],
-                    'isMarkPerCapability' => MarkType::SLUG_NONE === MarkType::idToSlug($row['rubric_capability_mark_type_id']),
+                    /* Mark Per Capability is used when the capability mark type is set to something other than None
+                     * Be careful of this fact, cos it's easy to === instead of !== if you're not paying attention
+                     */
+                    'isMarkPerCapability' => MarkType::SLUG_NONE !== MarkType::idToSlug($row['rubric_capability_mark_type_id']),
                     /* Capabilities' Mark Type and Grade Group can be represented differently to their Assessments'
                      * Mark Type and Grade Group
                      */
@@ -671,11 +700,39 @@ class Controller extends Base
             if (!isset($students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']])) {
                 $isMarkPerCapability = $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['isMarkPerCapability'];
 
+                /* Calculate normalised and human readable marks if relevant: depends on $isMarkPerCapability being true
+                 */
+                $humanReadableMark = null;
+                $normalisedMark = null;
+
+                if ($isMarkPerCapability) {
+                    $marks = $this->generateMarkTuple(
+                        $this->decimalHydrator->hydrate($row['capability_mark'] ?? null),
+                        $this->decimalHydrator->hydrate($row['capability_max_value'] ?? null),
+                    );
+
+                    $normalisedMark = $marks['normalisedMark'];
+
+                    /* This is already extant from our db rows: we don't need to reverse engineer it for capabilities
+                     */
+                    $humanReadableMark = $row['capability_human_readable_mark'];
+                }
+
                 $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']] = [
                     'name' => $row['capability_name'],
-                    'databaseMark' => $isMarkPerCapability ? $row['capability_mark'] : null,
-                    'humanReadableMark' => $isMarkPerCapability ? $row['capability_human_readable_mark'] : null,
-                    'maxMark' => $row['capability_max_value'],
+                    /* Published normalised and human-readable marks from the authoritative feedback
+                     */
+                    'published' => [
+                        'normalisedMark' => $normalisedMark,
+                        'humanReadableMark' => $humanReadableMark,
+                    ],
+                    /* Normalised and human readable marks from the most recent feedback: these would typically be draft
+                     * marks, but could end up being the same as the Published ones by sheer coincidence.
+                     */
+                    'latest' => [
+                        'normalisedMark' => null,
+                        'humanReadableMark' => null,
+                    ],
                     'indicators' => []
                 ];
             }
@@ -686,18 +743,35 @@ class Controller extends Base
              */
             if ($selectedIndicators === null || in_array((int)$row['indicator_id'], $selectedIndicators, true)) {
                 if (!isset($students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']])) {
+                    $marks = $this->generateMarkTuple(
+                        $this->decimalHydrator->hydrate($row['indicator_mark'] ?? null),
+                        $this->decimalHydrator->hydrate($row['indicator_max_value'] ?? null),
+                    );
+
+                    $normalisedMark = $marks['normalisedMark'];
+                    $humanReadableMark = $marks['humanReadableMark'];
+
                     $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']] = [
                         'name' => $row['indicator_name'],
-                        'databaseMark' => $row['indicator_mark'],
-                        'maxMark' => $row['indicator_max_value'],
+                        /* Published normalised and human-readable marks from the authoritative feedback
+                         */
+                        'published' => [
+                            'normalisedMark' => $normalisedMark,
+                            'humanReadableMark' => $humanReadableMark,
+                        ],
+                        /* Normalised and human readable marks from the most recent feedback: these would typically be draft
+                         * marks, but could end up being the same as the Published ones by sheer coincidence.
+                         */
+                        'latest' => [
+                            'normalisedMark' => null,
+                            'humanReadableMark' => null,
+                        ],
                         'selectedDescriptorText' => $row['descriptor_name'],
                     ];
                 }
             }
         }
-//new \Alaress_Probe($assessments[38]);
-//new \Alaress_Probe($students);
-//die();
+
         return $students;
     }
 
@@ -872,24 +946,6 @@ class Controller extends Base
             $lastObservedCapabilityId = $row['capability_id'];
             $lastObservedStudentId    = $row['student_id'];
         }
-        return $students;
-    }
-
-
-    /**
-     * Collate the human readable marks for both published and latest (draft) student marks then return them in a student marks array
-     *
-     * @param array $students
-     * @param array $assessments
-     * @return array
-     */
-    private function collateHumanReadableMarks(array $students, array $assessments): array
-    {
-        foreach ($students as $studentId => $student) {
-            $students = $this->generateHumanReadableMarks($students, $student['assessmentsPublished'] ?? [], $studentId, 'assessmentsPublished');
-            $students = $this->generateHumanReadableMarks($students, $student['assessmentsLatest'] ?? [], $studentId, 'assessmentsLatest');
-        }
-
         return $students;
     }
 
@@ -1226,54 +1282,61 @@ return $overallMarks;
         return $overallMarks;
     }
 
+
     /**
-     * Work out the human readable marks from the raw marks and insert them into the student marks array
+     * Generates a struct containing a (normalised, human-readable) value corresponding to the numerator/denominator.
+     * This is the exact same math that you can use for capability marks and indicator marks (idk why it was originally
+     * copypasted) but do note that Capability Marks already come with their human-readable equivalent from the db.
      *
-     * @param array  $students      array of students and marks calculate and build onto
-     * @param array  $studentMarks  array of the database marks for the student
-     * @param int    $studentId     tmp student ID to work out where to put these marks info
-     * @param string $field         string of the mark type (published / latest (draft))
-     * @return array
+     * TODO Split to utility class
+     * In future this can probably be split into its own utility class with a unit test so you can feed in a mark scheme
+     * instead of assuming the Total Mark implementation.
+     *
+     * @param float|null $numerator
+     * @param float|null $denominator
+     * @return null[]
      */
-    private function generateHumanReadableMarks(array $students, array $studentMarks, int $studentId, string $field): array
+    private function generateMarkTuple(?float $numerator, ?float $denominator): array
     {
-        $decimalHydrator = new Decimal();
-        $totalMarkScheme = new MarkScheme\TotalMarkFractional();
-        foreach (($studentMarks) as $assessmentId => $assessmentMarks) {
-            foreach (($assessmentMarks['capabilities'] ?? []) as $capabilityId => $capabilityMarks) {
-                $capabilityDatabaseMark      = $decimalHydrator->hydrate($capabilityMarks['databaseMark'] ?? null);
-                $capabilityMaxMark           = $decimalHydrator->hydrate($capabilityMarks['maxMark'] ?? null);
-                $humanReadableCapabilityMark = null;
-                $normalisedCapabilityMark    = null;
-                if ($capabilityMaxMark) {
-                    $normalisedCapabilityMark = $capabilityDatabaseMark !== null
-                        ? ($capabilityDatabaseMark / $capabilityMaxMark) * 100
-                        : null;
-                    $humanReadableCapabilityMark = $capabilityMarks['humanReadableMark'] ?? null;
-                }
-                $students[$studentId][$field][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = $humanReadableCapabilityMark;
-                $students[$studentId][$field][$assessmentId]['capabilities'][$capabilityId]['normalisedMark']    = $normalisedCapabilityMark;
+        /* Set up initial conditions: by default these start as null
+         */
+        $marks = [
+            'normalisedMark' => null,
+            'humanReadableMark' => null,
+        ];
 
-                foreach (($capabilityMarks['indicators'] ?? []) as $indicatorId => $indicatorMarks) {
-                    $indicatorDatabaseMark      = $decimalHydrator->hydrate($indicatorMarks['databaseMark'] ?? null);
-                    $indicatorMaxMark           = $decimalHydrator->hydrate($indicatorMarks['maxMark'] ?? null);
-                    $humanReadableIndicatorMark = null;
-                    $normalisedIndicatorMark    = null;
-
-                    if ($indicatorMaxMark) {
-                        $normalisedIndicatorMark    = $indicatorDatabaseMark !== null
-                            ? ($indicatorDatabaseMark / $indicatorMaxMark) * 100
-                            : null;
-                        $humanReadableIndicatorMark = $totalMarkScheme->setTotalMark($indicatorMaxMark)->getHumanReadableMark($normalisedIndicatorMark);
-                    }
-
-                    $students[$studentId][$field][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['humanReadableMark'] = $humanReadableIndicatorMark;
-                    $students[$studentId][$field][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['normalisedMark']    = $normalisedIndicatorMark;
-                }
-            }
+        /* ...so we can exit early in the case that the denominator is null, hopefully preventing a mathematically
+         * embarrassing runtime fatal in a randomly broken data set. Anything falsey will die here.
+         */
+        if (!$denominator) {
+            return $marks;
         }
-        return $students;
+
+        /* The numerator might be null, so exit early in that case as well. It wasn't meaningful.
+         * Note that zero is a perfectly valid value, so check for null specifically
+         */
+        if (null === $numerator) {
+            return $marks;
+        }
+
+        /* We have meaningful numerator and denominators so it's time to math the numbers to do the stuff
+         * TODO maybe we can round this to 3 decimals places but it probably has side effects in elsewhere
+         */
+        $normalisedMark = 100 * $numerator / $denominator;
+
+        /* Note that this is circumstantially disregarded when used in capability mark aggregation: the capability's
+         * human-readable mark already came from the database. Indicator human-readable marks, however, use this
+         */
+        $humanReadableMark = $this->totalMarkScheme
+            ->setTotalMark($denominator)
+            ->getHumanReadableMark($normalisedMark);
+
+        return [
+            'normalisedMark' => $normalisedMark,
+            'humanReadableMark' => $humanReadableMark,
+        ];
     }
+
 
     /**
      * Build data required by both the HTML and CSV form of the rubric markbook.
@@ -1296,18 +1359,27 @@ return $overallMarks;
         [$selectedCapabilities, $selectedIndicators] = $this->getRubricUsageSelections($request);
         $assessments   = $this->buildAssessmentData($assessmentIds, $selectedCapabilities, $selectedIndicators);
         $databaseMarks = $this->retrieveDatabaseMarks($assessments, $selectedCapabilities, $selectedIndicators);
-        $databaseMarks = $this->retrieveDatabaseDraftMarks($assessments, $selectedCapabilities, $selectedIndicators, $databaseMarks);
+
+        /* TODO What is THIS??
+         */
+//        $databaseMarks = $this->retrieveDatabaseDraftMarks($assessments, $selectedCapabilities, $selectedIndicators, $databaseMarks);
 
         /* TODO work out whatever this was
          */
         $exclusions = [];
         $linkedMarks = [];
         $overallMarks = [];
-//        $derivedMarks  = $this->collateHumanReadableMarks($databaseMarks, $assessments);
-//        $studentMarks  = $this->insertFolderMembers($derivedMarks, $folder);
-//        $exclusions    = $this->getExclusions($assessmentIds);
-//        $linkedMarks   = $this->insertSummaryPageLinks($studentMarks, $assessmentIds, $exclusions);
-//        $overallMarks  = $this->buildOverallMarks($assessments, $linkedMarks, $folder);
-        return [$assessments, $exclusions, $linkedMarks, $overallMarks];
+
+        $studentMarks  = $this->insertFolderMembers($databaseMarks, $folder);
+        $exclusions    = $this->getExclusions($assessmentIds);
+        $linkedMarks   = $this->insertSummaryPageLinks($studentMarks, $assessmentIds, $exclusions);
+        $overallMarks  = $this->buildOverallMarks($assessments, $linkedMarks, $folder);
+
+        return [
+            $assessments,
+            $exclusions,
+            $linkedMarks,
+            $overallMarks
+        ];
     }
 }
