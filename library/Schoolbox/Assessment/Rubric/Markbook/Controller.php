@@ -543,6 +543,7 @@ class Controller extends Base
     private function retrieveDatabaseMarks(array $assessments, ?array $selectedCapabilities, ?array $selectedIndicators): array
     {
         $students = [];
+
         // Don't load marks if no assessments.
         if (!count($assessments)) {
             return $students;
@@ -782,9 +783,14 @@ class Controller extends Base
     }
 
     /**
-     * Find each student in a folder and their draft marks (if extant), and return an array indexed by student ID
+     * Synonymously with how retrieveDatabaseMarks() worked, but it takes the result of that method and fills in the
+     * latest marks for capabilities and indicators using an almost-identical query, basically appending extra data to
+     * the result of retrieveDatabaseMarks().
      *
-     * dupe of retrieveDatabaseMarks
+     * v_most_recent_rubric_mark view is used instead of v_rubric_mark. Joining two views is probably a costly affair,
+     * but it's cheaper than doing it any other way.
+     *
+     * TODO This is an egregious mega copypasta which surely could be refactored for brevity
      *
      * @param array<int,array> $assessments
      * @param null|array       $selectedCapabilities Null if rubricUsage filter not enabled for page
@@ -810,12 +816,12 @@ class Controller extends Base
             return $assessments;
         }
 
-        $innerPb    = (new Database\Predicate\Builder($this->internalDb->getQuoter(), ''))
-            ->isNull('sr.deleted_at')
-            ->equals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
-            ->in('sb.assessment_id', array_keys($assessments));
+        /* Effectively a safe shortcut to an IN() clause
+         */
+        $assessmentIds = array_keys($assessments);
 
-        $innerWhere = implode(' AND ', $innerPb->getWhere());
+        $assessmentsPlaceholder = Builder::getArrayPlaceholders($assessmentIds, 'assessmentIds');
+        $assessmentsParameters = Builder::getArrayParameters($assessmentIds, 'assessmentIds');
 
         $outerPb = (new Database\Predicate\Builder($this->internalDb->getQuoter(), ''))
             ->equals('vrm.feedback_type', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
@@ -829,20 +835,22 @@ class Controller extends Base
                 $usagePb->in('vrm.indicator_id', $selectedIndicators);
             }
             $outerPb->any($usagePb);
-            $outerPb->isNull('rubric_instance.deleted_at');
         }
 
         $outerWhere = implode(' AND ', $outerPb->getWhere());
 
-        $getAuthoritativeMarksQuery = $this->internalDb->prepareQuery(
-            "
+        $getAuthoritativeMarksQuery = $this->internalDb->prepareQuery("
                 SELECT
                     vrm.assessment_id                  AS assessment_id,
                     vrm.student_id                     AS student_id,
                     u.firstname                        AS student_firstname,
                     u.preferred_name                   AS student_preferred_name,
                     u.lastname                         AS student_lastname,
+                    rubric_instance.id                 AS rubric_instance_id,
+                    rubric_instance.title              AS rubric_title,
+                    rubric_instance.rubric_capability_mark_type_id AS rubric_capability_mark_type_id,
                     vrm.capability_id                  AS capability_id,
+                    vrm.capability_name                AS capability_name,
                     vrm.capability_mark                AS capability_mark,
                     vrm.capability_human_readable_mark AS capability_human_readable_mark,
                     vrm.capability_max_value           AS capability_max_value,
@@ -850,6 +858,7 @@ class Controller extends Base
                     vrm.capability_grade_group_id      AS capability_grade_group_id,
                     vrm.descriptor_name                AS descriptor_name,
                     vrm.indicator_id                   AS indicator_id,
+                    vrm.indicator_name                 AS indicator_name,
                     vrm.indicator_mark                 AS indicator_mark,
                     vrm.indicator_max_value            AS indicator_max_value,
                     vrm.feedback_date                  AS feedback_date
@@ -860,7 +869,10 @@ class Controller extends Base
                         MAX(sr.updated_at) AS max_updated_at
                     FROM submission_return sr
                     INNER JOIN submission_box sb on sr.box_id = sb.id
-                    WHERE {$innerWhere}
+                    WHERE sr.deleted_at IS NULL
+                    AND sr.published_at IS NOT NULL
+                    AND sr.review_route = :reviewRoute
+                    AND sb.assessment_id IN {$assessmentsPlaceholder}
                     GROUP BY sb.assessment_id, sr.owner
                 ) latest_feedback
                 INNER JOIN v_most_recent_rubric_mark vrm ON
@@ -871,87 +883,77 @@ class Controller extends Base
                 INNER JOIN rubric_instance ON vrm.rubric_instance_id = rubric_instance.id
                 INNER JOIN user u ON vrm.student_id = u.id
                 WHERE {$outerWhere}
+                AND rubric_instance.deleted_at IS NULL
                 ORDER BY vrm.student_id, vrm.assessment_id, vrm.capability_id, vrm.indicator_id
             ",
-            array_merge($innerPb->getParams(), $outerPb->getParams()),
+            array_merge(
+                $assessmentsParameters,
+                $outerPb->getParams(),
+                [
+                    'reviewRoute' => ReturnedWork::REVIEW_ROUTE_INSTRUCTOR
+                ]
+            ),
         );
 
-        $assessmentsForStudent = [];
-        $capabilityMarks       = [];
-        $indicatorMarks        = [];
-
-        $lastObservedAssessmentId = null;
-        $lastObservedCapabilityId = null;
-        $lastObservedStudentId    = null;
-
+        /* This adds draft marks into the $students struct we built earlier.
+         *
+         * We should be able to assume that $students already contains the superset of this data struct; a row from
+         * v_most_recent_rubric_mark must be a subset of v_rubric_mark. Anything else seems broken to me
+         *
+         * TODO this repeats calculations that are destined to be the same; implement a skip-if-already-calculated to
+         *  save some cycles, ie. a (student, assessment, capability id) and (student, assessment, indicator id)
+         *  hash lookup so we can skip repeatedly calculating the same data
+         */
         foreach ($getAuthoritativeMarksQuery->getIterator() as $i => $row) {
-            if ($lastObservedStudentId !== $row['student_id']) {
-                // Has the student we're looking at changed? Reset the list of assessments for them
-                $assessmentsForStudent = [];
+            $isMarkPerCapability = $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['isMarkPerCapability'];
+
+            /* Calculate normalised and human readable marks if relevant: depends on $isMarkPerCapability being true
+             */
+            $humanReadableMark = null;
+            $normalisedMark = null;
+
+            if ($isMarkPerCapability) {
+                $marks = $this->generateMarkTuple(
+                    $this->decimalHydrator->hydrate($row['capability_mark'] ?? null),
+                    $this->decimalHydrator->hydrate($row['capability_max_value'] ?? null),
+                );
+
+                $normalisedMark = $marks['normalisedMark'];
+
+                /* This is already extant from our db rows: we don't need to reverse engineer it for capabilities
+                 */
+                $humanReadableMark = $row['capability_human_readable_mark'];
             }
 
-            if ($lastObservedAssessmentId !== $row['assessment_id']) {
-                // Has the assessment we're looking at changed? Reset the capabilities
-                $capabilityMarks = [];
-            }
+            /* Update with draft values. These should be safely drop-in-place since draft marks is a subset of all marks.
+             */
+            $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['latest'] = [
+                'normalisedMark' => $normalisedMark,
+                'humanReadableMark' => $humanReadableMark,
+            ];
 
-            if ($lastObservedCapabilityId !== $row['capability_id']) {
-                // Has the capability we're looking at changed? Reset the indicators
-                $indicatorMarks = [];
-            }
-
+            /* Check whether the indicator was in the filter selections. If it was chosen, or if none of the filters
+             * were chosen, then we need to include it in that stack. As per andyland filters, filtering nothing means
+             * include everything.
+             */
             if ($selectedIndicators === null || in_array((int)$row['indicator_id'], $selectedIndicators, true)) {
-                $indicatorMarks[$row['indicator_id']] = [
-                    'databaseMark'           => $row['indicator_mark'],
-                    'maxMark'                => $row['indicator_max_value'],
-                    'selectedDescriptorText' => $row['descriptor_name'],
+                $marks = $this->generateMarkTuple(
+                    $this->decimalHydrator->hydrate($row['indicator_mark'] ?? null),
+                    $this->decimalHydrator->hydrate($row['indicator_max_value'] ?? null),
+                );
+
+                $normalisedMark = $marks['normalisedMark'];
+                $humanReadableMark = $marks['humanReadableMark'];
+
+                /* Update with draft values. These should be safely drop-in-place since draft marks is a subset of all marks.
+                 */
+                $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['latest'] = [
+                    'normalisedMark' => $normalisedMark,
+                    'humanReadableMark' => $humanReadableMark,
                 ];
             }
-
-            $capData = [
-                'indicators' => $indicatorMarks,
-            ];
-            $isMarkPerCapability = $assessments[$row['assessment_id']]['isMarkPerCapability'] ?? false;
-            if ($assessments[$row['assessment_id']]['capabilities'][$row['capability_id']]['show']) {
-                    $capData['databaseMark']      = $isMarkPerCapability ? $row['capability_mark'] : null;
-                    $capData['humanReadableMark'] = $isMarkPerCapability ? $row['capability_human_readable_mark'] : null;
-                    $capData['maxMark']           = $row['capability_max_value'];
-
-                    /* Capabilities' Mark Type and Grade Group can be represented differently to
-                     * their Assessments' Mark Type and Grade Group
-                     */
-                    $capData['capabilityMarkTypeId']   = $row['capability_mark_type_id'];
-                    $capData['capabilityGradeGroupId'] = $row['capability_grade_group_id'];
-            }
-            $capabilityMarks[$row['capability_id']] = $capData;
-
-            $assessmentsForStudent[$row['assessment_id']] = [
-                'capabilities' => $capabilityMarks,
-            ];
-
-            if (isset($students[$row['student_id']])) {
-                /**
-                 * student array already exists (they have some published marks, just add these draft marks)
-                 * Stuff everything about the students marks into an array
-                 */
-                $students[$row['student_id']]['assessmentsLatest'] = $assessmentsForStudent;
-            } else {
-                /**
-                 * Student doesn't exist (only has draft marks, need to build the base student array
-                 */
-                $students[$row['student_id']] = [
-                    'firstname'      => $row['student_firstname'],
-                    'preferred_name' => $row['student_preferred_name'],
-                    'lastname'       => $row['student_lastname'],
-                    'assessmentsLatest'    => $assessmentsForStudent,
-                    'profileLink'    => '/search/user/' . $row['student_id'],
-                ];
-            }
-
-            $lastObservedAssessmentId = $row['assessment_id'];
-            $lastObservedCapabilityId = $row['capability_id'];
-            $lastObservedStudentId    = $row['student_id'];
         }
+
         return $students;
     }
 
@@ -1366,9 +1368,9 @@ return $overallMarks;
         $assessments   = $this->buildAssessmentData($assessmentIds, $selectedCapabilities, $selectedIndicators);
         $databaseMarks = $this->retrieveDatabaseMarks($assessments, $selectedCapabilities, $selectedIndicators);
 
-        /* TODO What is THIS??
+        /* Augment $databaseMarks with draft data
          */
-//        $databaseMarks = $this->retrieveDatabaseDraftMarks($assessments, $selectedCapabilities, $selectedIndicators, $databaseMarks);
+        $databaseMarks = $this->retrieveDatabaseDraftMarks($assessments, $selectedCapabilities, $selectedIndicators, $databaseMarks);
 
         /* TODO work out whatever this was
          */

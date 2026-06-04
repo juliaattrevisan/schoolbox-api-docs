@@ -83,9 +83,15 @@
                                             {% for studentId, student in students %}
                                                 {# A link to the assessment's summary screen which, for some reason, we store in a different data struct
                                                  # A bit wierd but ok, I guess it saves some repeated data...
+                                                 #
+                                                 # Note that summaryLink will be null if a student didn't do this activity: proabbly because
+                                                 # they were excluded.
                                                  #}
-                                                {% set summaryLink = student.assessments[assessmentId].summaryLink %}
+                                                {% set summaryLink = student.assessments[assessmentId].summaryLink ?? null %}
 
+                                                {# If gridData exists for this assessment, there is data to render in the cell.
+                                                 # Otherwise they're probably excluded
+                                                 #}
                                                 {% if student.gridData[assessmentId] is defined %}
                                                     {% if not capability.show or not student.gridData[assessmentId][rubricInstanceId].isMarkPerCapability %}
                                                         <td class="excluded"></td>
