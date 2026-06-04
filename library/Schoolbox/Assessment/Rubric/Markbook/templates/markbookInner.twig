@@ -116,8 +116,8 @@
                                                             {# Draft Marks #}
                                                             {% if draftMarks is not null %}
                                                                 <a href="{{ summaryLink }}"
-                                                                   data-draft-mark
                                                                    class="meta {% if draftMarks.humanReadableMark is null %}no-mark{% endif %}"
+                                                                   data-draft-mark
                                                                 >{{ draftMarks.humanReadableMark|default('–') }}</a>
                                                             {% endif %}
                                                         </td>
@@ -186,7 +186,8 @@
                                                                 {% set renderedIndicatorMark = descriptorText ? draftMarks.humanReadableMark|default('✓') : draftMarks.humanReadableMark|default('–') %}
                                                                 <a href="{{ summaryLink }}"
                                                                     {% if descriptorText %} title="{{ descriptorText }}"{% endif %}
-                                                                    class="{{ gradientClass }} {% if (draftMarks.humanReadableMark ?? null) is null %}no-mark{% endif %}"
+                                                                    class="meta {% if (draftMarks.humanReadableMark ?? null) is null %}no-mark{% endif %}"
+                                                                    data-draft-mark
                                                                 >{{ renderedIndicatorMark }}</a>
                                                             {% endif %}
                                                         </td>
