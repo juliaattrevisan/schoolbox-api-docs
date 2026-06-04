@@ -12,6 +12,7 @@ import type {
 } from "@schoolboxCurriculum/types/Node";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
 import { getUsageHref, getUsageIcon } from "@schoolboxCurriculum/js/nodeUtils";
+import { getIconColor } from "@js/util/sbx/colorUtils";
 import BadgeImage from "@schoolboxBadge/vue/badge-image.vue";
 
 interface Props {
@@ -57,7 +58,7 @@ function onSelect(): void {
                     <badge-image :badge="props.usage.object" css="badge"></badge-image>
                 </div>
                 <div v-else class="usage__icon-container">
-                    <sbx-icon :name="usageIcon" size="l"></sbx-icon>
+                    <sbx-icon :name="usageIcon" size="l" :color="getIconColor(usageIcon)"></sbx-icon>
                 </div>
                 <div class="usage__title-container">
                     <p v-if="props.usage.discriminator === ActivityTypes.BADGE">{{ props.usage.object.name }}</p>
@@ -81,7 +82,6 @@ function onSelect(): void {
 </template>
 
 <style lang="scss" scoped>
-@import "@css/core/base/icon-colours";
 .usage {
     border: 1px solid var(--sbx-color-border, #ededed);
     border-radius: var(--sbx-config-field-corner-radius, 0px);
