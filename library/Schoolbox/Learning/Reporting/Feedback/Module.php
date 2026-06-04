@@ -15,6 +15,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -41,10 +42,14 @@ class Module extends BaseModule
     protected function registerRoutes(): void
     {
         /* LMS-friendly Staff can see the form
+         * Check for participants to avoid showing the feedback pages when it'll go nowhere useful
          */
-        $lmsStaff = new Rule\All(
+        $canGiveFeedbackForAssessment = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\HasRolePermission(Role::PERMISSION_VIEW_STUDENT_GRADES, Role::STAFF),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasRolePermission(Role::PERMISSION_VIEW_STUDENT_GRADES, Role::STAFF),
+            ),
             new HasParticipant(),
         );
 
@@ -56,9 +61,11 @@ class Module extends BaseModule
             return $this->preloadParticipant($params);
         };
 
-        $this->register('GET', '/{assessmentId}/feedback/view', 'getFirstParticipantFeedback', $lmsStaff, $preloadAssessment);
-        $this->register('GET', '/{assessmentId}/{learnerId}/feedback{/feedbackId:\d+}', 'getParticularFeedback', $lmsStaff, $preloadParticipant);
-        $this->register('POST', '/{assessmentId}/{learnerId}/feedback{/feedbackId:\d+}', 'postParticularFeedback', $lmsStaff, $preloadParticipant);
+        $this->register('GET', '/{assessmentId}/feedback/view', 'getFirstParticipantFeedback', $canGiveFeedbackForAssessment, $preloadAssessment);
+        $this->register('GET', '/{assessmentId}/{learnerId}/feedback{/feedbackId:\d+}', 'getParticularFeedback', $canGiveFeedbackForAssessment, $preloadParticipant);
+        $this->register('POST', '/{assessmentId}/{learnerId}/feedback{/feedbackId:\d+}', 'postParticularFeedback', $canGiveFeedbackForAssessment, $preloadParticipant);
+        $this->register('POST', '/{assessmentId}/{learnerId}/feedback/publish', 'postPublishFeedback', $canGiveFeedbackForAssessment, $preloadParticipant);
+        $this->register('POST', '/{assessmentId}/feedbacks', 'postParticipantFeedbacks', $canGiveFeedbackForAssessment, $preloadAssessment);
     }
 
 
@@ -87,7 +94,7 @@ class Module extends BaseModule
 
         /* If a feedbackId was provided, load that particular feedback up
          */
-        if ($params['feedbackId']) {
+        if ($params['feedbackId'] ?? false) {
             // Feedback will already be loaded in $assessment; no need to load again.
             // We don't know the participant yet though, so find that.
             foreach ($assessment->getAllParticipants() as $p) {
@@ -151,17 +158,20 @@ class Module extends BaseModule
         $bakery = new BreadcrumbFactory(
             $this->getRouter()->getGenerator(),
             $this->getAuthorizer(),
-            $this->getMapperFactory()->get(Access::class),
+            $this->getAccess(),
         );
 
         return new Controller(
             $this->getErrorMapper(),
             $bakery,
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\Reporting\Mapper::class),
-            $this->getMapperFactory()->get(\Schoolbox\Assessment\Term\Mapper::class),
+            $this->getTermMapper(),
             $this->getMapperFactory()->get(\Schoolbox\Learning\DueWork\StateMapper::class),
             $this->injector->get('participantDataSource'),
             $this->injector->get('feedbackDataSource'),
+            $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\Reporting\Feedback\Mapper::class),
+            $this->injector->get('assessmentDataSource'),
+            $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::class),
         );
     }
 
@@ -192,6 +202,26 @@ class Module extends BaseModule
     protected function getAssessmentMapperProxy()
     {
         return $this->injector->get('assessmentDataSource');
+    }
+
+
+    /**
+     * @return Access
+     * @throws \InvalidArgumentException
+     */
+    private function getAccess()
+    {
+        return $this->getMapperFactory()->get(Access::class);
+    }
+
+
+    /**
+     * @return TermMapper
+     * @throws \InvalidArgumentException If unable to find mapper class
+     */
+    private function getTermMapper()
+    {
+        return $this->getMapperFactory()->get(TermMapper::class);
     }
 
 

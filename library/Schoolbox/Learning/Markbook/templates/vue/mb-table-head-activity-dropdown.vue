@@ -4,6 +4,7 @@ import {
     ACTIVITY_TYPE_DIALOG_AGENT,
     ACTIVITY_TYPE_DUE_WORK,
     ACTIVITY_TYPE_QUIZ,
+    ACTIVITY_TYPE_REPORTING,
 } from "@schoolboxAssessment/Types/assessmentTypes";
 import type { MarkbookActivity } from "./types/payload";
 import { useMarkbookStore } from "./store/markbookStore";
@@ -33,7 +34,11 @@ const viewStudentParticipationLink = window.Vue.computed(() => {
 
 <template>
     <li class="separator">Activity</li>
-    <li v-if="props.activity._links?.summary" :data-test="`markbook-assessment-dropdown-${props.activity.id}-view`">
+    <!-- Reporting doesn't get "View" since it's equivalent to "View Status".... the route perms aren't enough -->
+    <li
+        v-if="props.activity._links?.summary && props.activity.assessmentType !== ACTIVITY_TYPE_REPORTING"
+        :data-test="`markbook-assessment-dropdown-${props.activity.id}-view`"
+    >
         <a :href="getReturnUrl(props.activity._links.summary)" class="sbx-button--has-icon"
             ><sbx-icon name="view"></sbx-icon>View</a
         >
@@ -77,7 +82,11 @@ const viewStudentParticipationLink = window.Vue.computed(() => {
         >
     </li>
     <li
-        v-if="props.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK && viewStatusLink"
+        v-if="
+            viewStatusLink &&
+            (props.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK ||
+                props.activity.assessmentType === ACTIVITY_TYPE_REPORTING)
+        "
         :data-test="`markbook-assessment-dropdown-${props.activity.id}-import-feedback`"
     >
         <a :href="`${viewStatusLink}&importFeedback`" class="sbx-button--has-icon"
@@ -88,7 +97,8 @@ const viewStudentParticipationLink = window.Vue.computed(() => {
     <!-- Additional check for whether all impls are writable before opening the bulk publish -->
     <template
         v-if="
-            props.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK &&
+            (props.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK ||
+                props.activity.assessmentType === ACTIVITY_TYPE_REPORTING) &&
             activity._routes.postFeedbacks &&
             mbStore.isActivityWritable(props.activity)
         "

@@ -124,6 +124,17 @@ class Model extends AbstractAssessment
 
 
     /**
+     * @inheritdoc
+     */
+    public function getHumanReadableInstructorMark(Participant $participant, $publishedOnly)
+    {
+        /** @var Feedback\Model|null $feedback */
+        $feedback = $this->getAuthoritativeFeedback($participant, $publishedOnly);
+        return $feedback?->getHumanReadableInstructorMark();
+    }
+
+
+    /**
      * Decide if $learner can create a response to this activity.
      *
      * @param User $learner

@@ -22,6 +22,7 @@ use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\DialogAgent;
+use Schoolbox\Learning\Assessment\Reporting;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
 
@@ -206,12 +207,17 @@ class Full
             $allowedVisibilities
         );
 
-        // Filter for feedback display:
-        // If somehow not due work feedback: exclude
-        // If a self-assess:                 if published show,
-        //                                   if not respect $includeUnpublishedSelfReflectionFeedback
-        // If instructor:                    if published respect $isFeedbackVisible,
-        //                                   if not respect $includeUnpublishedInstructorFeedback
+        /* Filter for feedback display:
+         * If due work:
+         *   - If a self-assess:    if published, show
+         *                          if not respect $includeUnpublishedSelfReflectionFeedback
+         *   - If instructor:       if published, show
+         *                          if not respect $includeUnpublishedInstructorFeedback
+         * If reporting activity:
+         *   - If instructor:       if published, show
+         *                          if not respect $includeUnpublishedInstructorFeedback
+         * otherwise, if neither a due work or reporting, exclude
+         */
         $feedbackFilter = function (IFeedback $feedback) use (
             $includeUnpublishedSelfReflectionFeedback,
             $includeUnpublishedInstructorFeedback,
@@ -224,6 +230,11 @@ class Full
                     }
                     return $includeUnpublishedSelfReflectionFeedback;
                 }
+                if ($feedback->isPublished()) {
+                    return $isFeedbackVisible;
+                }
+                return $includeUnpublishedInstructorFeedback;
+            } else if ($feedback instanceof Reporting\Feedback\Model) {
                 if ($feedback->isPublished()) {
                     return $isFeedbackVisible;
                 }

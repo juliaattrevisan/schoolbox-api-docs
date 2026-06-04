@@ -177,7 +177,7 @@ class Controller extends Base
     /**
      * Submit multiple feedbacks in single call
      *
-     * This is a dueWork-only route
+     * This is a dueWork/reporting-only route
      *
      * @param DueWork\Model $assessment
      * @api   POST /learning/assessments/{assessmentId}/feedbacks
@@ -632,7 +632,7 @@ class Controller extends Base
     /**
      * Publish last draft feedback for a participant.
      *
-     * This is a dueWork-only route. It is not applicable to Project, Quiz, or Task.
+     * This is a dueWork/reporting-only route. It is not applicable to Project, Quiz, Task, or Dialog Agent.
      *
      * @param DueWork\Model $assessment
      * @param User  $student

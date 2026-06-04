@@ -97,19 +97,21 @@ export type MarkbookClassImplActivity = {
             {
                 "learningAssessmentTimeline.getFullTimeline": string | null;
                 "learningDueWorkResponse.getParticularResponse": string | null;
-                "learningDueWorkFeedback.postPublishFeedback": string | null;
                 "learningAssessment.postExclude": string | null;
                 "learningAssessment.postInclude": string | null;
-                "learningAssessment.getSummary": string | null;
+                historyRoute: string | null;
                 "learningAssessment.getInfo": string | null;
-                /* this will change depending on if it's a quiz or due work */
+                /* this will change depending on if it's a quiz, due work, or reporting activity */
                 postFeedback: string | null;
+                /* this will change depending on if it's a due work or reporting activity */
+                postPublishFeedback: string | null;
                 getAssessmentParticipationForm: string | null;
             }
         >;
     };
     instructorMarkScheme: MarkScheme;
     markVisibility: string;
+    feedbackCommentsEnable: boolean;
     courseManaged: boolean | null;
     projectId: MarkbookClassImplActivity["id"] | null;
     writable: boolean;

@@ -15,6 +15,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Task;
 use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\Reporting;
 use Schoolbox\Assessment\Course\Task\Completion;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -582,12 +583,12 @@ class CourseMarkbook
                     continue;
                 }
 
-                // Quiz/DueWork.
+                // Quiz/DueWork/Reporting
                 // We need to distinguish when a draft mark is pending, even if the mark is the same.
                 $authAnyFeedback       = $participant->getAuthoritativeFeedback(false);
                 $authPublishedFeedback = $participant->getAuthoritativeFeedback(true);
 
-                if (($aImpl instanceof DueWork\Model || $aImpl instanceof \Schoolbox\Learning\Assessment\Quiz\Model) && $authPublishedFeedback) {
+                if (($aImpl instanceof DueWork\Model || $aImpl instanceof Reporting\Model || $aImpl instanceof \Schoolbox\Learning\Assessment\Quiz\Model) && $authPublishedFeedback) {
                     // Store due-work feedback published comments
                     $this->studentComments[$courseImplId][$userId][$aId] = $authPublishedFeedback->getComment();
                 }
@@ -603,8 +604,8 @@ class CourseMarkbook
                     }
 
                     $publishedHrMark = $authPublishedFeedback->getHumanReadableMark();
-                    // instructor mark is only available for due works
-                    $publishedHrInstructorMark = $authPublishedFeedback instanceof DueWork\Feedback\Model
+                    // instructor mark is only available for due work and reporting activities
+                    $publishedHrInstructorMark = ($authPublishedFeedback instanceof DueWork\Feedback\Model || $authPublishedFeedback instanceof Reporting\Feedback\Model)
                         ? $authPublishedFeedback->getHumanReadableInstructorMark() : $publishedHrMark;
 
                     // resubmission required is only available for due works
@@ -626,8 +627,8 @@ class CourseMarkbook
                 $pendingDraft = $authAnyFeedback && $authAnyFeedback->isDraft();
                 if ($pendingDraft) {
                     $authHrMark = $authAnyFeedback->getHumanReadableMark();
-                    // instructor mark is only available for due works
-                    $authHrInstructorMark = $authAnyFeedback instanceof DueWork\Feedback\Model
+                    // instructor mark is only available for due work and reporting activities
+                    $authHrInstructorMark = ($authAnyFeedback instanceof DueWork\Feedback\Model || $authAnyFeedback instanceof Reporting\Feedback\Model)
                         ? $authAnyFeedback->getHumanReadableInstructorMark() : $authHrMark;
 
                     // resubmission required is only available for due works
