@@ -215,27 +215,77 @@ class Mapper extends BaseMapper
                 return null;
             }
 
-            $systemPurposeId = $student->getRegistrationSession()?->getSystemPurpose()?->getId();
-            $ibGroupSubjectsByUserId = $systemPurposeId
-                ? $this->findIbGroupSubjectsForUsers(
-                    [
-                        $user->getId() => $user,
-                    ],
-                    $systemPurposeId
-                )
-                : [];
-
-            $student->setUser($user);
-            $student->setIbGroupSubjects(
-                $ibGroupSubjectsByUserId[$user->getId()] ?? new GenericCollection(GroupSubjectModel::class)
-            );
-
-            $this->applySubjectLanguageOverrides(new GenericCollection(Model::class, [$student]));
-
-            return $student;
+            return $this->enrichStudentForUser($student, $user);
         } catch (BaseMapper\Exception\NotFound) {
             return null;
         }
+    }
+
+    /**
+     * Find the most recent active registration session student record for the given user,
+     * where "active" means the student is awaiting confirmation (Unconfirmed) or has
+     * already confirmed (Confirmed).
+     *
+     * @param User $user
+     * @return Model|null
+     * @throws BaseMapper\DefinitionException
+     * @throws BaseMapper\Exception
+     */
+    public function findActiveRegistrationForUser(User $user): ?Model
+    {
+        if (!$user->getId()) {
+            return null;
+        }
+
+        try {
+            $pb = $this->getPredicateBuilder();
+            $pb->equals('user_id', $user->getId());
+            $pb->greaterThanOrEqualTo('status', Model::STATUS_UNCONFIRMED);
+
+            $student = $this->findOneByPredicates($pb, [
+                'order' => [
+                    'updated_at' => 'DESC',
+                    'id'         => 'DESC',
+                ],
+                'limit' => 1,
+            ]);
+
+            if (!$student instanceof Model) {
+                return null;
+            }
+
+            return $this->enrichStudentForUser($student, $user);
+        } catch (BaseMapper\Exception\NotFound) {
+            return null;
+        }
+    }
+
+    /**
+     * Enrich a student model with the user reference and IB group subjects for the given user.
+     *
+     * @throws BaseMapper\DefinitionException
+     * @throws BaseMapper\Exception
+     */
+    private function enrichStudentForUser(Model $student, User $user): Model
+    {
+        $systemPurposeId = $student->getRegistrationSession()?->getSystemPurpose()?->getId();
+        $ibGroupSubjectsByUserId = $systemPurposeId
+            ? $this->findIbGroupSubjectsForUsers(
+                [
+                    $user->getId() => $user,
+                ],
+                $systemPurposeId
+            )
+            : [];
+
+        $student->setUser($user);
+        $student->setIbGroupSubjects(
+            $ibGroupSubjectsByUserId[$user->getId()] ?? new GenericCollection(GroupSubjectModel::class)
+        );
+
+        $this->applySubjectLanguageOverrides(new GenericCollection(Model::class, [$student]));
+
+        return $student;
     }
 
     /**

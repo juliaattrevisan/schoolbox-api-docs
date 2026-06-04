@@ -1082,8 +1082,19 @@ class Controller extends ConfigController
             return;
         }
 
+        $confirmationEligibleStatuses = [
+            RegistrationSessionStudentModel::STATUS_UNCONFIRMED,
+            RegistrationSessionStudentModel::STATUS_CONFIRMED,
+        ];
+
         try {
             $registrationSessionStudent = $this->persistRegistrationSessionStudent($sessionId, $studentId);
+
+            if (!in_array($registrationSessionStudent->getStatus(), $confirmationEligibleStatuses, true)) {
+                $this->sendJsonError('Candidate is not in a state that allows confirmation changes.', 409);
+                return;
+            }
+
             $updatedAt = Alaress_Date_Format::now();
             $updatedBy = $this->getUser();
 
@@ -1099,15 +1110,25 @@ class Controller extends ConfigController
                     ->setSubjectConfirmedBy($updatedBy);
             }
 
+            $bothConfirmed = $registrationSessionStudent->getCandidateConfirmed()
+                && $registrationSessionStudent->getSubjectConfirmed();
+
+            $registrationSessionStudent->setStatus(
+                $bothConfirmed
+                    ? RegistrationSessionStudentModel::STATUS_CONFIRMED
+                    : RegistrationSessionStudentModel::STATUS_UNCONFIRMED
+            );
+
             $this->registrationSessionStudentMapper->save($registrationSessionStudent);
 
             $this->response = $this->responseAsJson([
-                'success' => true,
-                'section' => $section,
-                'confirmed' => $confirmed,
-                'updatedAt' => $updatedAt,
-                'updatedBy' => [
-                    'id' => $updatedBy->getId(),
+                'success'            => true,
+                'section'            => $section,
+                'confirmed'          => $confirmed,
+                'confirmationStatus' => $bothConfirmed ? 'confirmed' : 'unconfirmed',
+                'updatedAt'          => $updatedAt->toIso8601String(),
+                'updatedBy'          => [
+                    'id'   => $updatedBy->getId(),
                     'name' => $updatedBy->getFullName(),
                 ],
             ]);
