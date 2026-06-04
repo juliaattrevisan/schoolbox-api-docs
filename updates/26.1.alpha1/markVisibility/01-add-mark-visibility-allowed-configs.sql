@@ -35,7 +35,7 @@ WHERE module = 'settings'
 INSERT INTO config (`name`, `title`, `value`, `description`, `field_id`,  `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
 VALUES (
     'mark_visibility_allow_students',
-    'Enable grade visibility options involving students',
+    'Enable feedback visibility options involving students',
     (
         CASE @submissionVisibilityMax
             WHEN 0 THEN '0'
@@ -44,7 +44,7 @@ VALUES (
             ELSE '0'
         END
     ),
-    "Toggling this to 'ON' will allow grade visibility options involving students to be selected.  Changing this setting will not affect already published grades.",
+    "Toggling this to 'ON' will allow feedback visibility options involving students to be selected.  Changing this setting will not affect already published feedback.",
     @fieldIdBoolean,
     @typeIdLmsPolicy,
     'true',
@@ -58,7 +58,7 @@ VALUES (
 INSERT INTO config (`name`, `title`, `value`, `description`, `field_id`,  `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
 VALUES (
     'mark_visibility_allow_parents',
-    'Enable grade visibility options involving parents',
+    'Enable feedback visibility options involving parents',
     (
         CASE @submissionVisibilityMax
             WHEN 0 THEN '0'
@@ -67,7 +67,7 @@ VALUES (
             ELSE '0'
         END
     ),
-    "Toggling this to 'ON' will allow grade visibility options involving parents to be selected.  Changing this setting will not affect already published grades.",
+    "Toggling this to 'ON' will allow feedback visibility options involving parents to be selected.  Changing this setting will not affect already published grades.",
     @fieldIdBoolean,
     @typeIdLmsPolicy,
     'true',
