@@ -103,55 +103,33 @@
                                                              # I wonder what they even do: there's no obvious javascript here, so must be elsewhere
                                                              #}
                                                             {% set publishedMarks = student.gridData[assessmentId][rubricInstanceId].capabilities[capabilityId].published %}
+                                                            {% set draftMarks = student.gridData[assessmentId][rubricInstanceId].capabilities[capabilityId].draft %}
 
                                                             {# Colour the human readable mark using the normalised mark #}
                                                             {% set gradientClass = urgency.marks(publishedMarks.normalisedMark) %}
 
+                                                            {# Published Marks #}
                                                             <a href="{{ summaryLink }}"
-{#                                                                {% if latestCapabilityMark %}data-actual-mark{% endif %}#}
                                                                 class="{{ gradientClass }} {% if publishedMarks.humanReadableMark is null %}no-mark{% endif %}"
                                                             >{{ publishedMarks.humanReadableMark|default('–') }}</a>
 
-{#                                                            {% if latestCapabilityMark %}#}
-{#                                                                <a href="{{ summaryLink }}"#}
-{#                                                                data-draft-mark#}
-{#                                                                class="meta {% if latestCapabilityMark is null %}no-mark{% endif %}"#}
-{#                                                                >{{ latestCapabilityMark|default('–') }}</a>#}
-{#                                                            {% endif %}#}
+                                                            {# Draft Marks #}
+                                                            {% if draftMarks is not null %}
+                                                                <a href="{{ summaryLink }}"
+                                                                   data-draft-mark
+                                                                   class="meta {% if draftMarks.humanReadableMark is null %}no-mark{% endif %}"
+                                                                >{{ draftMarks.humanReadableMark|default('–') }}</a>
+                                                            {% endif %}
                                                         </td>
                                                     {% endif %}
                                                 {% else %}
-                                                    {# Student doesn't have a feedback that used this capability; render a placeholde cell
-                                                     # with a link to the summary screen
+                                                    {# Student doesn't have a feedback that used this capability; render a placeholder cell with a link to the
+                                                     # summary screen otherwise the markbook becomes subtly misshapen with values in the wrong columns etc.
                                                      #}
                                                     <td class="mark">
                                                         <a href="{{ summaryLink }}">-</a>
                                                     </td>
                                                 {% endif %}
-
-{#                                                {% else %}#}
-{#                                                    <td>#}
-{#                                                    {% set capabilityMark = student.assessmentsPublished[assessmentId].capabilities[capabilityId].humanReadableMark ?? null %}#}
-{#                                                    {% set normalisedCapabilityMark = student.assessmentsPublished[assessmentId].capabilities[capabilityId].normalisedMark ?? null %}#}
-{#                                                    {% set summaryLink = student.assessments[assessmentId].summaryLink %}#}
-{#                                                    {% set gradientClass = urgency.marks(normalisedCapabilityMark) %}#}
-{#                                                    #}{# Latest Marks #}
-{#                                                    {% set latestCapabilityMark = student.assessmentsLatest[assessmentId].capabilities[capabilityId].humanReadableMark ?? null %}#}
-{#                                                    {% set latestNormalisedCapabilityMark = student.assessmentsLatest[assessmentId].capabilities[capabilityId].normalisedMark ?? null %}#}
-{#                                                    {% set latestGradientClass = urgency.marks(latestNormalisedCapabilityMark) %}#}
-{#                                                    <td class="mark">#}
-{#                                                        <a href="{{ summaryLink }}"#}
-{#                                                           {% if latestCapabilityMark %}data-actual-mark{% endif %}#}
-{#                                                           class="{{ gradientClass }} {% if capabilityMark is null %}no-mark{% endif %}"#}
-{#                                                        >{{ capabilityMark|default('–') }}</a>#}
-{#                                                        {% if latestCapabilityMark %}#}
-{#                                                            <a href="{{ summaryLink }}"#}
-{#                                                               data-draft-mark#}
-{#                                                               class="meta {% if latestCapabilityMark is null %}no-mark{% endif %}"#}
-{#                                                            >{{ latestCapabilityMark|default('–') }}</a>#}
-{#                                                        {% endif %}#}
-{#                                                    </td>#}
-{#                                                {% endif %}#}
                                             {% endfor %}
                                         </tr>
 
