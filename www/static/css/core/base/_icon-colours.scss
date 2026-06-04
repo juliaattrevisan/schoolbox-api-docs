@@ -3,24 +3,24 @@
  */
 
 [class*="icon-badge"]::before {
-    color: var(--color-icon-badge);
+    color: var(--sbx-color-icon-badge);
 }
 
 [class*="icon-teacher"]::before {
-    color: var(--color-icon-class);
+    color: var(--sbx-color-icon-class);
 }
 
 [class*="icon-course"]::before,
 [class*="icon-course-builder"]::before {
-    color: var(--color-icon-course);
+    color: var(--sbx-color-icon-course);
 }
 
 [class*="icon-folder"]::before {
-    color: var(--color-icon-folder);
+    color: var(--sbx-color-icon-folder);
 }
 
 [class*="icon-home"]::before {
-    color: var(--color-icon-home);
+    color: var(--sbx-color-icon-home);
 }
 
 [class*="icon-project"]::before,
@@ -31,9 +31,9 @@
 [class*="icon-quiz"]::before,
 [class*="icon-lesson"]::before,
 [class*="icon-lti"]::before {
-    color: var(--color-icon-learning-activity);
+    color: var(--sbx-color-icon-learning-activity);
 }
 
 [class*="icon-unit"]::before {
-    color: var(--color-icon-unit);
+    color: var(--sbx-color-icon-unit);
 }
