@@ -580,7 +580,8 @@ class Controller extends Base
 
         $outerWhere = implode(' AND ', $outerPb->getWhere());
 
-        $getAuthoritativeMarksQuery = $this->internalDb->prepareQuery("
+        $getAuthoritativeMarksQuery = $this->internalDb->prepareQuery(
+            "
                 SELECT
                     vrm.assessment_id                  AS assessment_id,
                     vrm.student_id                     AS student_id,
@@ -842,7 +843,8 @@ class Controller extends Base
 
         $outerWhere = implode(' AND ', $outerPb->getWhere());
 
-        $getAuthoritativeMarksQuery = $this->internalDb->prepareQuery("
+        $getAuthoritativeMarksQuery = $this->internalDb->prepareQuery(
+            "
                 SELECT
                     vrm.assessment_id                  AS assessment_id,
                     vrm.student_id                     AS student_id,
@@ -1313,9 +1315,10 @@ class Controller extends Base
     private function aggregateMarks(array $assessments, array $linkedMarks): array
     {
         $overallMarks = [];
-/* TODO replace
- */
-return $overallMarks;
+
+        /* TODO replace
+         */
+        return $overallMarks;
 
         foreach ($assessments as $assessmentId => $assessmentData) {
             $assessmentWeight = $assessmentData['weight'];
