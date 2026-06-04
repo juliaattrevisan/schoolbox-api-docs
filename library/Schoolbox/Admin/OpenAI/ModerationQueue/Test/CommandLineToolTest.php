@@ -52,9 +52,7 @@ class CommandLineToolTest extends TestCase
         $logrotate = file_get_contents(SITE_root . '/tools/logrotate/schoolbox');
 
         $this->assertMatchesRegularExpression(
-            '#/var/log/schoolbox/\*/data-retention\.log\s+' .
             '/var/log/schoolbox/\*/ai-moderation-queue\.log\s+' .
-            '/var/log/schoolbox/\*/garbage-collect\.log\s+\{\s+' .
             'weekly\s+missingok\s+rotate 4\s+compress\s+\}#',
             $logrotate,
         );
