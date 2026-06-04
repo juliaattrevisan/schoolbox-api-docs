@@ -2041,13 +2041,12 @@ function alertInvalidIconName(): false {
 
 .sbx-icon {
     align-items: center;
+    display: inline-flex;
     color: v-bind(color);
     height: v-bind(computedSize);
-    vertical-align: middle; /* Ensure the icon is vertically centered when used inline with text */
-    display: flex;
     justify-content: center;
+    vertical-align: middle; /* Ensure the icon is vertically centered when used inline with text */
     width: v-bind(computedSize);
-    display: inline-flex;
 }
 
 .sbx-icon__svg {

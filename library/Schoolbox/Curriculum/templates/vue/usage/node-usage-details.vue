@@ -16,7 +16,7 @@ interface Props {
     depth: number; // to gradually add more marginLeft to indicate node level depth
     isProcessing: boolean; // whether we are currently loading the node usage
     hasLoadError: boolean; // whether there was an error loading the node usage
-    folderId?: number; // to display the usage specific to a folder (unit), and currently only show the learning activities linked to that unit
+    folderId?: number; // to display only the usage within that folder (unit)
 }
 
 const props = defineProps<Props>();
@@ -36,7 +36,8 @@ function onRefreshSelected(): void {
 }
 
 /**
- * If there's a folder ID, we specifically check the learning activities linked to that folder, otherwise we check if there's any usage at all
+ * If there's a folder ID, we currently check for learning activities linked to that folder,
+ * otherwise we check if there's any usage at all
  * @returns { boolean }
  */
 const hasUsage = window.Vue.computed(() => {
@@ -48,10 +49,11 @@ const hasUsage = window.Vue.computed(() => {
 });
 
 /**
- * To only show usages linked specifically to a unit
+ * To only show usages linked specifically to a unit,
+ * currently only checking for learning activities
  * @returns { Array }
  */
-const unitLearningActivityUsages = window.Vue.computed(() => {
+const usagesWithinUnit = window.Vue.computed(() => {
     const folderId = props.folderId;
     if (folderId === undefined || folderId === UNSET_ID) {
         return [];
@@ -64,8 +66,8 @@ const unitLearningActivityUsages = window.Vue.computed(() => {
  * @returns { string }
  */
 const title = window.Vue.computed(() => {
-    const firstUsage = unitLearningActivityUsages.value[0];
-    return firstUsage ? `Usage within ${firstUsage.object.unit.title}` : "Total Usage";
+    const isWithinUnit = usagesWithinUnit.value[0];
+    return isWithinUnit ? `Usage within ${isWithinUnit.object.unit.title}` : "Total Usage";
 });
 
 /**
@@ -83,7 +85,7 @@ type ActiveUsageType = {
  */
 const activeUsages = window.Vue.computed(() => {
     const usages: ActiveUsageType[] = [];
-    const learningActivityUsages = unitLearningActivityUsages.value;
+    const learningActivityUsages = usagesWithinUnit.value;
     if (learningActivityUsages.length > 0) {
         usages.push({
             title: `Learning ${locale.activity.properPlural()}`,
