@@ -33,6 +33,16 @@ class CommandLineToolTest extends TestCase
     }
 
     /**
+     * Ensures the packaged CLI wrapper is directly executable like other shebang tools.
+     *
+     * @return void
+     */
+    public function testModerationQueueWrapperIsExecutable(): void
+    {
+        $this->assertTrue(is_executable(SITE_root . '/tools/openai/moderation-queue.php'));
+    }
+
+    /**
      * Ensures the dedicated cron log is rotated with the other bounded maintenance logs.
      *
      * @return void
