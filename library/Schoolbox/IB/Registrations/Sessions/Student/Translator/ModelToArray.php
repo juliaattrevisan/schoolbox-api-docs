@@ -87,13 +87,14 @@ class ModelToArray
             'ibGroupSubjects' => $this->helper->buildIbGroupSubjects($student->getIbGroupSubjects()),
             'candidateConfirmed'   => $student->getCandidateConfirmed(),
             'subjectConfirmed'     => $student->getSubjectConfirmed(),
-            'candidateConfirmedAt' => $student->getCandidateConfirmedAt()?->getDateTimeObject()->format('d M Y g:ia'),
-            'subjectConfirmedAt'   => $student->getSubjectConfirmedAt()?->getDateTimeObject()->format('d M Y g:ia'),
+            'candidateConfirmedAt' => $student->getCandidateConfirmedAt()?->toIso8601String(),
+            'subjectConfirmedAt'   => $student->getSubjectConfirmedAt()?->toIso8601String(),
             'candidateConfirmedBy' => $student->getCandidateConfirmedBy()?->getFullName(),
             'subjectConfirmedBy'   => $student->getSubjectConfirmedBy()?->getFullName(),
             'confirmationStatus'   => match ($student->getStatus()) {
-                Model::STATUS_CONFIRMED => 'confirmed',
-                default                 => 'unconfirmed',
+                Model::STATUS_CONFIRMED   => 'confirmed',
+                Model::STATUS_UNCONFIRMED => 'unconfirmed',
+                default                   => 'submitted',
             },
             '_routes' => [
                 'updateLanguages' => $this->buildUpdateLanguagesRoute($student),

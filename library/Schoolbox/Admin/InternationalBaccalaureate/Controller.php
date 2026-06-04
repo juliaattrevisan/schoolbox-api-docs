@@ -1111,7 +1111,7 @@ class Controller extends ConfigController
                 'section'            => $section,
                 'confirmed'          => $confirmed,
                 'confirmationStatus' => $bothConfirmed ? 'confirmed' : 'unconfirmed',
-                'updatedAt'          => $updatedAt->getDateTimeObject()->format('d M Y g:ia'),
+                'updatedAt'          => $updatedAt->toIso8601String(),
                 'updatedBy'          => [
                     'id'   => $updatedBy->getId(),
                     'name' => $updatedBy->getFullName(),

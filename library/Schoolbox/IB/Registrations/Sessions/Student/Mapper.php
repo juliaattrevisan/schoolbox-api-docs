@@ -240,7 +240,7 @@ class Mapper extends BaseMapper
         try {
             $pb = $this->getPredicateBuilder();
             $pb->equals('user_id', $user->getId());
-            $pb->in('status', [Model::STATUS_UNCONFIRMED, Model::STATUS_CONFIRMED]);
+            $pb->greaterThanOrEqualTo('status', Model::STATUS_UNCONFIRMED);
 
             $student = $this->findOneByPredicates($pb, [
                 'order' => [

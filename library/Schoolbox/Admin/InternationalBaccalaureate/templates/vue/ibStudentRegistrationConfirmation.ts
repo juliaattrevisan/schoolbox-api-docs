@@ -10,6 +10,7 @@ import IbStudentRegistrationConfirmation from "./ib-student-registration-confirm
             initialConfirmed: mountEl.dataset.confirmed === "true",
             initialConfirmedBy: mountEl.dataset.confirmedBy ?? "",
             initialConfirmedAt: mountEl.dataset.confirmedAt ?? "",
+            initialConfirmationStatus: mountEl.dataset.confirmationStatus ?? "unconfirmed",
         }).mount(mountEl);
     }
 });

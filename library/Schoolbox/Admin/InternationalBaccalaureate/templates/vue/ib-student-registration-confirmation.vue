@@ -7,6 +7,7 @@ interface Props {
     initialConfirmed: boolean;
     initialConfirmedBy: string;
     initialConfirmedAt: string;
+    initialConfirmationStatus: string;
 }
 
 const props = defineProps<Props>();
@@ -15,6 +16,11 @@ const confirmed = window.Vue.ref<boolean>(props.initialConfirmed);
 const confirmedBy = window.Vue.ref<string>(props.initialConfirmedBy);
 const confirmedAt = window.Vue.ref<string>(props.initialConfirmedAt);
 const isSaving = window.Vue.ref<boolean>(false);
+const isSubmitted = window.Vue.ref<boolean>(props.initialConfirmationStatus === "submitted");
+
+function formatDate(isoString: string): string {
+    return window.dayjs(isoString).format(window.dateDisplayFormats.dayjsDatetime);
+}
 
 const labelText =
     props.section === "candidate"
@@ -65,11 +71,16 @@ async function toggle(value: boolean): Promise<void> {
 <template>
     <div class="ib-registration-section-confirm">
         <label class="ib-registration-section-confirm__label">
-            <input v-model="confirmed" type="checkbox" :disabled="isSaving" @change="toggle(confirmed)" />
+            <input
+                v-model="confirmed"
+                type="checkbox"
+                :disabled="isSaving || isSubmitted"
+                @change="toggle(confirmed)"
+            />
             {{ labelText }}
         </label>
         <p v-if="confirmedBy && confirmedAt" class="ib-registration-section-confirm__meta">
-            Last updated by {{ confirmedBy }} on {{ confirmedAt }}
+            Last updated by {{ confirmedBy }} on {{ formatDate(confirmedAt) }}
         </p>
     </div>
 </template>
