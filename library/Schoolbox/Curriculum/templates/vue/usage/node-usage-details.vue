@@ -6,7 +6,7 @@
 import locale from "@js/terminology/rosettaStone";
 import type { Node, Usage } from "@schoolboxCurriculum/types/Node";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
-import { getSpecificUsages, UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
+import { getSpecificUsages, getLearningActivityUsages, UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import NodeUsageDetailsDescription from "./node-usage-details-description.vue";
 import NodeUsageDetailsItem from "./node-usage-details-item.vue";
@@ -66,14 +66,22 @@ type ActiveUsageType = {
  */
 const activeUsages = window.Vue.computed(() => {
     const usages: ActiveUsageType[] = [];
-    if (isUnitOnly.value && props.node._usageCounts.course > 0) {
+    if (isUnitOnly.value && props.node._usageCounts.assessment > 0) {
+        usages.push({
+            title: `Learning ${locale.activity.properPlural()}`,
+            count: props.node._usageCounts.assessment,
+            usages: getLearningActivityUsages(props.node.usage as Usage[], props.folderId),
+        });
+        return usages;
+    }
+    if (props.node._usageCounts.course > 0) {
         usages.push({
             title: "Courses",
             count: props.node._usageCounts.course,
             usages: getSpecificUsages(props.node.usage as Usage[], ActivityTypes.COURSE),
         });
     }
-    if (isUnitOnly.value && props.node._usageCounts.unit > 0) {
+    if (props.node._usageCounts.unit > 0) {
         usages.push({
             title: locale.unit.properPlural(),
             count: props.node._usageCounts.unit,
@@ -87,7 +95,7 @@ const activeUsages = window.Vue.computed(() => {
             usages: getSpecificUsages(props.node.usage as Usage[], ActivityTypes.LEARNING_ACTIVITY),
         });
     }
-    if (isUnitOnly.value && props.node._usageCounts.badge > 0) {
+    if (props.node._usageCounts.badge > 0) {
         usages.push({
             title: "Badges",
             count: props.node._usageCounts.badge,

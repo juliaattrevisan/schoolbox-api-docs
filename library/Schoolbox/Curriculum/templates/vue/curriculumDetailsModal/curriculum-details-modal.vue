@@ -81,6 +81,11 @@ function onModalClosed(): void {
 
 <template>
     <reveal-modal ref="modalEl" @closed="onModalClosed">
-        <node-details v-if="activeSelectedNodeId !== null" :node-id="activeSelectedNodeId" :include-usage="true" />
+        <node-details
+            v-if="activeSelectedNodeId !== null"
+            :node-id="activeSelectedNodeId"
+            :include-usage="true"
+            :folder-id="props.folderId"
+        />
     </reveal-modal>
 </template>

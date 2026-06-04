@@ -1,3 +1,4 @@
+import type { Unit } from "@schoolboxLibrary/types/Unit";
 import type { Badge } from "@schoolboxBadge/templates/types/Badge";
 import type { Breadcrumb } from "@schoolboxCurriculum/types/Breadcrumb";
 
@@ -123,9 +124,7 @@ export interface LearningActivityUsageObject extends UsageObject {
         view: string;
     };
     type: ActivityTypes;
-    unit: {
-        title: string;
-    };
+    unit: Unit;
 }
 
 /**
