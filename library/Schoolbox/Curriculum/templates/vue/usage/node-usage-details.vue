@@ -66,14 +66,14 @@ type ActiveUsageType = {
  */
 const activeUsages = window.Vue.computed(() => {
     const usages: ActiveUsageType[] = [];
-    if (props.node._usageCounts.course > 0) {
+    if (isUnitOnly.value && props.node._usageCounts.course > 0) {
         usages.push({
             title: "Courses",
             count: props.node._usageCounts.course,
             usages: getSpecificUsages(props.node.usage as Usage[], ActivityTypes.COURSE),
         });
     }
-    if (props.node._usageCounts.unit > 0) {
+    if (isUnitOnly.value && props.node._usageCounts.unit > 0) {
         usages.push({
             title: locale.unit.properPlural(),
             count: props.node._usageCounts.unit,
@@ -87,7 +87,7 @@ const activeUsages = window.Vue.computed(() => {
             usages: getSpecificUsages(props.node.usage as Usage[], ActivityTypes.LEARNING_ACTIVITY),
         });
     }
-    if (props.node._usageCounts.badge > 0) {
+    if (isUnitOnly.value && props.node._usageCounts.badge > 0) {
         usages.push({
             title: "Badges",
             count: props.node._usageCounts.badge,
