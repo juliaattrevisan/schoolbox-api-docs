@@ -335,10 +335,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
          */
         $data['markVisibility'] = (
             in_array(
-                $this->getConfigLoader()->get('submission_access'), FeedbackVisibility::getAvailableVisibilities(
-                    (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_STUDENTS),
-                    (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_PARENTS),
-                ),
+                $this->getConfigLoader()->get('submission_access'),
+                $this->getAvailableFeedbackVisibilities(),
                 true
             )
             ? $this->getConfigLoader()->get('submission_access')
@@ -1172,10 +1170,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'folder'                   => $context->getFolder(),
             'assessmentType'           => AssessmentType::objectToString($assessment),
             'markVisibility'           => $assessment->getMarkVisibility(),
-            'availableVisibilities'    => FeedbackVisibility::getAvailableVisibilities(
-                (bool) $this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_STUDENTS),
-                (bool) $this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_PARENTS),
-            ),
+            'availableVisibilities'    => $this->getAvailableFeedbackVisibilities(),
             'allWorkTypes'             => $this->workTypeMapper->findAll(['order' => ['sequence' => 'asc']]),
 
             /* Capabilities happen to have the same mark types as its DueWork IAssessable container,
@@ -1724,6 +1719,17 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $studentId
         );
         return $this->aiCache?->get($cacheKey);
+    }
+
+    /**
+     * @return array
+     */
+    private function getAvailableFeedbackVisibilities(): array
+    {
+        return FeedbackVisibility::getAvailableVisibilities(
+            (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_STUDENTS),
+            (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_PARENTS),
+        );
     }
 
     /**
