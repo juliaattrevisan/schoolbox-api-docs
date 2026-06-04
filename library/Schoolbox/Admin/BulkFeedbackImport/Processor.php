@@ -365,10 +365,28 @@ class Processor
                     continue;
                 }
 
-                /* Select a strategy to process feedbacks at runtime: due work and reporting save in different places
-                 * using different structures
-                 */
-                $feedbackStrategy = $this->selectFeedbackStrategy($assessmentData);
+                try {
+                    /* Select a strategy to process feedbacks at runtime: due work and reporting save in different places
+                     * using different structures
+                     */
+                    $feedbackStrategy = $this->selectFeedbackStrategy($assessmentData);
+                } catch (\RuntimeException $e) {
+                    $this->log(sprintf(
+                        'Row %s: invalid %s "%s" in folder "%s" (%s).
+                        Should be either %s or %s',
+                        $i,
+                        $this->rosettaStone->translate('activity'),
+                        $this->assessmentTitle,
+                        $folder['title'],
+                        $folder['id'],
+                        $this->rosettaStone->translate('dueWork'),
+                        $this->rosettaStone->translate('reporting')
+                    ), IStrategy::WARNING);
+
+                    $errors++;
+
+                    continue;
+                }
 
                 /* Try to spawn an IAssessable instance
                  *
@@ -450,6 +468,7 @@ class Processor
      *
      * @param array $assessmentData
      * @return IStrategy
+     * @throws \RuntimeException
      */
     private function selectFeedbackStrategy(array $assessmentData): IStrategy
     {
