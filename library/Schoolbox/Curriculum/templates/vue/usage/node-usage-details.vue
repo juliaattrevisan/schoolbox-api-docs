@@ -16,7 +16,7 @@ interface Props {
     depth: number; // to gradually add more marginLeft to indicate node level depth
     isProcessing: boolean; // whether we are currently loading the node usage
     hasLoadError: boolean; // whether there was an error loading the node usage
-    folderId: number; // to display the usage specific to a folder (unit)
+    folderId?: number; // to display the usage specific to a folder (unit)
 }
 
 const props = defineProps<Props>();
@@ -48,16 +48,26 @@ const hasUsage = window.Vue.computed(() => {
  * @returns { boolean }
  */
 const isUnitOnly = window.Vue.computed(() => {
-    return props.folderId !== UNSET_ID;
+    return props.folderId !== undefined && props.folderId !== UNSET_ID;
 });
 
 /**
- * To only show usages only linked specifically to a unit
+ * Whether to show only the usages linked to a unit, or all usages
+ * @returns { boolean }
+ */
+const hasUnitOnlyUsages = window.Vue.computed(() => {
+    return (
+        isUnitOnly.value && getLearningActivityUsages(props.node.usage as Usage[], props.folderId as number).length > 0
+    );
+});
+
+/**
+ * To change the title based on whether we are showing all usages or just those linked to a unit
  * @returns { string }
  */
 const title = window.Vue.computed(() => {
-    const learningActivityUsages = getLearningActivityUsages(props.node.usage as Usage[], props.folderId);
-    if (isUnitOnly.value && learningActivityUsages.length > 0) {
+    if (hasUnitOnlyUsages.value) {
+        const learningActivityUsages = getLearningActivityUsages(props.node.usage as Usage[], props.folderId as number);
         return `Usage within ${learningActivityUsages[0].object.unit.title}`;
     }
     return "Total Usage";
@@ -78,8 +88,8 @@ type ActiveUsageType = {
  */
 const activeUsages = window.Vue.computed(() => {
     const usages: ActiveUsageType[] = [];
-    const learningActivityUsages = getLearningActivityUsages(props.node.usage as Usage[], props.folderId);
-    if (isUnitOnly.value && learningActivityUsages.length > 0) {
+    if (hasUnitOnlyUsages.value) {
+        const learningActivityUsages = getLearningActivityUsages(props.node.usage as Usage[], props.folderId as number);
         usages.push({
             title: `Learning ${locale.activity.properPlural()}`,
             count: learningActivityUsages.length,
