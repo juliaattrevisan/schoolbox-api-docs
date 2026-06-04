@@ -96,7 +96,7 @@ function onSelect(): void {
 
 .usage__icon-container {
     align-items: center;
-    background-color: var(--sbx-color-foreground-primary-alt, #f6f6f6);
+    background-color: var(--sbx-color-foreground-secondary, #f6f6f6);
     display: flex;
     justify-content: center;
     flex: 0 0 60px;
