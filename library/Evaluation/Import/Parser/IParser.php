@@ -24,7 +24,6 @@ interface IParser
     const FORMAT_VERSION_160 = '16.0';
     const FORMAT_VERSION_165 = '16.5';
     const FORMAT_VERSION_170 = '17.0';
-    const FORMAT_VERSION_261 = '26.1';
 
     /**
      * @return string

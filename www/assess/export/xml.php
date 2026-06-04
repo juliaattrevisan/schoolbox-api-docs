@@ -11,6 +11,13 @@
 
 /* In learnosity era, we don't have an import/export mechanism.
  * We'd have to build it from the ground up.
+ *
+ * IF YOU REVIVE EXPORT: as of SA-22007 mark_visibility is stored and emitted as a string
+ * (e.g. "student"), no longer an integer. The export template
+ * (templates/core/assess/exportToMoodle.xml) still declares <version>17.0</version>, whose
+ * import parser (library/Assess/Import/Parser/V160.php) casts markvisibility to int. A revived
+ * exporter MUST declare a new format version and ship a matching parser that reads the string
+ * value, otherwise string visibilities will silently become MARK_VISIBILITY_PRIVATE on import.
  */
 $this->pageNotFound();
 

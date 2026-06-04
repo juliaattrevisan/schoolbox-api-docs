@@ -324,7 +324,6 @@ class Importer
             IParser::FORMAT_VERSION_160 => new \Assess\Import\Parser\V160($xml),
             IParser::FORMAT_VERSION_165 => new \Assess\Import\Parser\V165($xml),
             IParser::FORMAT_VERSION_170 => new \Assess\Import\Parser\V170($xml),
-            IParser::FORMAT_VERSION_261 => new \Assess\Import\Parser\V261($xml),
             default => throw new \DomainException('No parser found for version: ' . $version),
         };
     }
