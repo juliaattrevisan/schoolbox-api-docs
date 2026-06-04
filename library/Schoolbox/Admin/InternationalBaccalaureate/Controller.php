@@ -587,22 +587,14 @@ class Controller extends ConfigController
     /**
      * Diploma Programme Year 2 Registration Report page
      *
+     * @throws RouteNotFound|\Twig\Error\Error
      * @api GET /adminv2/international-baccalaureate/registrations/sessions/{sessionId}
      */
-    public function getReport(int $sessionId): void
+    public function getReport(RegistrationSessionModel $registrationSession): void
     {
-        try {
-            $session = $this->registrationSessionMapper->findById($sessionId);
-        } catch (MapperNotFound) {
-            $this->response = $this->responseAsJson([
-                'success' => false,
-                'message' => 'Registration session not found.',
-            ])->withStatus(404);
-            return;
-        }
-
+        $sessionId = (int) $registrationSession->getId();
         $pageCurrent = '/adminv2/international-baccalaureate/registrations';
-        $this->response = $this->responseDependentOnRequest(
+        $this->response = $this->responseFromTemplate(
             '@internationalBaccalaureate/registrations/report.twig',
             [
                 'pageCurrent' => $pageCurrent,
@@ -614,7 +606,7 @@ class Controller extends ConfigController
                     'completePreparation' => $this->getRouteIfAuthorized('internationalBaccalaureate.sessionCompletePreparation', ['sessionId' => $sessionId]),
                     'renotifyUnconfirmed' => $this->getRouteIfAuthorized('internationalBaccalaureate.renotifyUnconfirmed', ['sessionId' => $sessionId]),
                 ],
-                'sessionTitle' => $session->jsonSerialize()['title'],
+                'sessionTitle' => $registrationSession->jsonSerialize()['title'],
             ]
         );
     }
@@ -1007,6 +999,7 @@ class Controller extends ConfigController
     {
         $post       = $this->requestPost;
         $studentIds = $post->get('studentIds');
+        $studentsToTransition = [];
 
         try {
             $studentIds = $this->normalisePreparationStudentIds($studentIds);
@@ -1031,22 +1024,44 @@ class Controller extends ConfigController
 
             $database->commit();
             $transactionStarted = false;
-
-            $this->response = $this->responseAsJson([
-                                                        'success'           => true,
-                                                        'transitionedCount' => count($studentsToTransition),
-                                                    ]);
         } catch (\InvalidArgumentException $e) {
             if ($transactionStarted) {
                 $database->rollBack();
             }
             $this->sendJsonError($e->getMessage(), 400);
+            return;
         } catch (Exception) {
             if ($transactionStarted) {
                 $database->rollBack();
             }
             $this->sendJsonError('Something has gone wrong. Please try again later.', 500);
+            return;
         }
+
+        try {
+            foreach ($studentsToTransition as $student) {
+                $this->registrationSessionStudentMapper->propagate(
+                    $this->getUser(),
+                    BaseMapper::METHOD_UPDATE,
+                    $student,
+                    [
+                        'status' => [
+                            RegistrationSessionStudentModel::STATUS_UNCONFIRMED,
+                            RegistrationSessionStudentModel::STATUS_PREPARATION,
+                        ],
+                    ]
+                );
+            }
+        } catch (Exception) {
+            //Ignore exceptions from notifications, as the transition has already been completed and can be retried later if needed
+        }
+
+        $this->response = $this->responseAsJson(
+            [
+                'success' => true,
+                'transitionedCount' => count($studentsToTransition),
+            ]
+        );
     }
 
     /**
