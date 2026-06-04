@@ -3,51 +3,46 @@
  */
 
 /**
- * Return the CSS colour value for an icon based on the SCSS icon colour rules.
- * @param name - The icon name or class name
- * @returns The matching CSS colour value or currentColor if there is no match
+ * Return the custom property for the icon colour based on the icon name
+ * @param name - The icon name
+ * @returns The custom property for the icon colour
  */
 export function getIconColor(name: string): string {
     if (!name) {
         return "currentColor";
     }
-
-    const normalizedName = name.toLowerCase().trim();
-    const iconName = normalizedName.includes("") ? normalizedName : `icon-${normalizedName}`;
-
-    if (iconName.includes("course-builder")) {
+    if (name.includes("course-builder")) {
         return "var(--sbx-color-icon-course)";
     }
-    if (iconName.includes("badge")) {
+    if (name.includes("badge")) {
         return "var(--sbx-color-icon-badge)";
     }
-    if (iconName.includes("teacher")) {
+    if (name.includes("teacher")) {
         return "var(--sbx-color-icon-class)";
     }
-    if (iconName.includes("course")) {
+    if (name.includes("course")) {
         return "var(--sbx-color-icon-course)";
     }
-    if (iconName.includes("folder")) {
+    if (name.includes("folder")) {
         return "var(--sbx-color-icon-folder)";
     }
-    if (iconName.includes("home")) {
+    if (name.includes("home")) {
         return "var(--sbx-color-icon-home)";
     }
     if (
-        iconName.includes("project") ||
-        iconName.includes("dialog-agent") ||
-        iconName.includes("due-work") ||
-        iconName.includes("reporting") ||
-        iconName.includes("task") ||
-        iconName.includes("quiz") ||
-        iconName.includes("lesson") ||
-        iconName.includes("lti")
+        name.includes("project") ||
+        name.includes("dialog-agent") ||
+        name.includes("due-work") ||
+        name.includes("reporting") ||
+        name.includes("task") ||
+        name.includes("quiz") ||
+        name.includes("lesson") ||
+        name.includes("lti")
     ) {
         return "var(--sbx-color-icon-learning-activity)";
     }
-    if (iconName.includes("unit")) {
+    if (name.includes("unit")) {
         return "var(--sbx-color-icon-unit)";
     }
-
     return "currentColor";
 }
