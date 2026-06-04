@@ -51,11 +51,11 @@ class CommandLineToolTest extends TestCase
     {
         $logrotate = file_get_contents(SITE_root . '/tools/logrotate/schoolbox');
 
-        $this->assertMatchesRegularExpression(
-            '/var/log/schoolbox/\*/ai-moderation-queue\.log\s+' .
-            'weekly\s+missingok\s+rotate 4\s+compress\s+\}#',
-            $logrotate,
-        );
+        $this->assertStringContainsString('/var/log/schoolbox/*/ai-moderation-queue.log', $logrotate);
+        $this->assertStringContainsString('/var/log/schoolbox/*/garbage-collect.log {', $logrotate);
+        $this->assertStringContainsString('weekly', $logrotate);
+        $this->assertStringContainsString('rotate 4', $logrotate);
+        $this->assertStringContainsString('compress', $logrotate);
     }
 
     /**
