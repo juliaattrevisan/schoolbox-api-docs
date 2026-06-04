@@ -111,6 +111,7 @@
                                                             {# Published Marks #}
                                                             <a href="{{ summaryLink }}"
                                                                 class="{{ gradientClass }} {% if publishedMarks.humanReadableMark is null %}no-mark{% endif %}"
+                                                                data-actual-mark
                                                             >{{ publishedMarks.humanReadableMark|default('–') }}</a>
 
                                                             {# Draft Marks #}
@@ -169,6 +170,7 @@
                                                                 <a href="{{ summaryLink }}"
                                                                     {% if descriptorText %} title="{{ descriptorText }}"{% endif %}
                                                                     class="{{ gradientClass }} {% if (publishedMarks.humanReadableMark ?? null) is null %}no-mark{% endif %}"
+                                                                    data-actual-mark
                                                                 >{{ renderedIndicatorMark }}</a>
                                                             {% endif %}
 
