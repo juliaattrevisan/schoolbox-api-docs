@@ -8,10 +8,12 @@ const modalEl = window.Vue.ref<InstanceType<typeof RevealModal> | null>(null);
 
 interface Props {
     selectedNodeId?: number; // the assigned node to display
+    folderId?: number; // when linked to a unit folder, to display usages specific to that folder (unit)
 }
 
 const props = withDefaults(defineProps<Props>(), {
     selectedNodeId: UNSET_ID,
+    folderId: UNSET_ID,
 });
 
 const emit = defineEmits<{
