@@ -18,6 +18,11 @@ const confirmedAt = window.Vue.ref<string>(props.initialConfirmedAt);
 const isSaving = window.Vue.ref<boolean>(false);
 const isSubmitted = window.Vue.ref<boolean>(props.initialConfirmationStatus === "submitted");
 
+/**
+ * Format an ISO 8601 date string using the site's configured datetime display format.
+ * @param isoString - The ISO 8601 date string to format.
+ * @returns The formatted date string.
+ */
 function formatDate(isoString: string): string {
     return window.dayjs(isoString).format(window.dateDisplayFormats.dayjsDatetime);
 }

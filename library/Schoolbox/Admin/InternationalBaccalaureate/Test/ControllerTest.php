@@ -268,7 +268,7 @@ class ControllerTest extends TestCase
                     'subjectConfirmedAt'   => null,
                     'candidateConfirmedBy' => null,
                     'subjectConfirmedBy'   => null,
-                    'confirmationStatus'   => 'unconfirmed',
+                    'confirmationStatus'   => 'submitted',
                     '_routes' => [
                         'updateLanguages' => '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/234/languages',
                         'updateConfirmation' => '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/234/confirmation',

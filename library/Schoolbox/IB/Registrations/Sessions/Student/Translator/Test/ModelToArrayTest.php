@@ -158,8 +158,8 @@ class ModelToArrayTest extends TestCase
 
         $this->assertTrue($payload['candidateConfirmed']);
         $this->assertTrue($payload['subjectConfirmed']);
-        $this->assertSame('01 Jun 2026 10:30am', $payload['candidateConfirmedAt']);
-        $this->assertSame('01 Jun 2026 11:45am', $payload['subjectConfirmedAt']);
+        $this->assertSame('2026-06-01T10:30:00+00:00', $payload['candidateConfirmedAt']);
+        $this->assertSame('2026-06-01T11:45:00+00:00', $payload['subjectConfirmedAt']);
         $this->assertSame('Jana, Reed', $payload['candidateConfirmedBy']);
         $this->assertSame('Jana, Reed', $payload['subjectConfirmedBy']);
         $this->assertSame('confirmed', $payload['confirmationStatus']);
