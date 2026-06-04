@@ -23,6 +23,7 @@ use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Reporting;
 use Schoolbox\Learning\Assessment\Reporting\Model;
+use Schoolbox\Learning\Assessment\Reporting\Feedback\Model as Feedback;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
@@ -403,7 +404,9 @@ class Controller extends Base
                 continue;
             }
 
-            $feedback->setPublishedAt($now);
+            $feedback
+                ->setPublishedAt($now)
+                ->setPublishedBy($this->getUser()->getId());
 
             try {
                 $this->feedbackDataMapper->save($feedback);
@@ -435,6 +438,7 @@ class Controller extends Base
     public function postPublishFeedback(Reporting\Model $assessment, User $learner)
     {
         $participant = $assessment->getParticipant($learner);
+        /** @var null|Feedback */
         $feedback = $participant->findMostRecentInstructorGivenFeedback();
 
         if (null === $feedback) {
@@ -443,7 +447,9 @@ class Controller extends Base
 
         if (!$feedback->isPublished()) {
             // publish this
-            $feedback->setPublishedAt(Alaress_Date_Format::now());
+            $feedback
+                ->setPublishedAt(Alaress_Date_Format::now())
+                ->setPublishedBy($this->getUser()->getId());
         }
 
         $this->feedbackDataSource->save($feedback);
