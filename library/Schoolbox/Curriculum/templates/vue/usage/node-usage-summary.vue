@@ -87,10 +87,5 @@ const emit = defineEmits(["selected"]);
     gap: 0.5rem;
     min-width: auto;
     overflow: visible;
-    span {
-        background: none;
-        padding: 0.375rem 0.25rem;
-        margin: 0;
-    }
 }
 </style>
