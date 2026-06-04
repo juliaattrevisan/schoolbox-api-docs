@@ -155,10 +155,12 @@ window.Vue.watch(
     <fieldset class="sbx-checkbox-radio-group-scroll">
         <legend class="t-visually-hidden">Search results</legend>
         <div ref="resultsEl" class="sbx-scroll-container">
-            <p v-if="props.isSearching" class="ss-results__status" aria-live="polite" aria-busy="true">
+            <p v-if="props.isSearching" class="sbx-scroll-container__status" aria-live="polite" aria-busy="true">
                 Searching for results....
             </p>
-            <p v-else-if="props.hasNoResults" class="ss-results__status">No results found for your current search.</p>
+            <p v-else-if="props.hasNoResults" class="sbx-scroll-container__status">
+                No results found for your current search.
+            </p>
             <ul v-else class="sbx-checkbox-radio-group">
                 <ss-results-select-all
                     v-if="showSelectAll"
@@ -185,11 +187,11 @@ window.Vue.watch(
                     @hover="onHover"
                 />
             </ul>
-            <p v-if="props.hasError" class="ss-results__status alert">
+            <p v-if="props.hasError" class="sbx-scroll-container__status alert">
                 Sorry, there was an unknown error retrieving your search results. Please try again and contact your
                 support if the problem persists.
             </p>
-            <p v-if="props.isLoadingMore" class="ss-results__status">Loading more results....</p>
+            <p v-if="props.isLoadingMore" class="sbx-scroll-container__status">Loading more results....</p>
         </div>
     </fieldset>
 </template>

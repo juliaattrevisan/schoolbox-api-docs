@@ -106,6 +106,7 @@ const { query, isActive, isSearching, hasNoResults, hasError } = useQuerySearch(
  */
 const isSingleDefaultSelected = window.Vue.computed(() => {
     if (
+        isActive.value === false &&
         props.isSingleSelect &&
         props.defaultResults &&
         props.defaultResults.length === 1 &&
