@@ -3,7 +3,6 @@
  * To display a curriculum overview component within the unit planner
  */
 
-import { watchIgnorable } from "@vueuse/core";
 import { useStore as useFolderNodesStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
 import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import FnList from "@schoolboxCurriculum/vue/folderNodes/fn-list.vue";
@@ -35,23 +34,14 @@ const folderNodesStore = useFolderNodesStore(props.folderId, props.component.com
  */
 window.Vue.watch(
     () => folderNodesStore().selectedDetailsNodeId,
-    () => {
-        curriculumStore.selectedDetailsNodeId = folderNodesStore().selectedDetailsNodeId;
-    },
-);
-
-/**
- * So we can unset the selected details node id
- * so the same node can be opened again if desired
- */
-const { ignoreUpdates } = watchIgnorable(
-    () => curriculumStore.selectedDetailsNodeId,
-    () => {
-        if (curriculumStore.selectedDetailsNodeId !== UNSET_ID) {
-            ignoreUpdates(() => {
-                folderNodesStore().selectedDetailsNodeId = UNSET_ID;
-            });
+    async (selectedDetailsNodeId) => {
+        if (selectedDetailsNodeId === UNSET_ID) {
+            return;
         }
+
+        curriculumStore.selectedDetailsNodeId = selectedDetailsNodeId;
+        await window.Vue.nextTick();
+        folderNodesStore().selectedDetailsNodeId = UNSET_ID;
     },
 );
 
