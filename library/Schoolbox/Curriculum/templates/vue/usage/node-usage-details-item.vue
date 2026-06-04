@@ -56,7 +56,9 @@ function onSelect(): void {
                 <div v-if="props.usage.discriminator === ActivityTypes.BADGE" class="usage__icon-container">
                     <badge-image :badge="props.usage.object" css="badge"></badge-image>
                 </div>
-                <div v-else :class="`usage__icon-container ${usageIcon} size-24`"></div>
+                <div v-else class="usage__icon-container">
+                    <sbx-icon :name="usageIcon" size="l"></sbx-icon>
+                </div>
                 <div class="usage__title-container">
                     <p v-if="props.usage.discriminator === ActivityTypes.BADGE">{{ props.usage.object.name }}</p>
                     <p v-else>{{ props.usage.object.title }}</p>
@@ -81,9 +83,10 @@ function onSelect(): void {
 <style lang="scss" scoped>
 @import "@css/core/base/icon-colours";
 .usage {
-    border: 1px solid #ededed;
+    border: 1px solid var(--sbx-color-border, #ededed);
+    border-radius: var(--sbx-config-field-corner-radius, 0px);
     padding: 0;
-    width: 220px;
+    width: 230px;
 }
 
 .usage__container {
@@ -92,15 +95,11 @@ function onSelect(): void {
 }
 
 .usage__icon-container {
-    background-color: #f6f6f6;
+    align-items: center;
+    background-color: var(--sbx-color-foreground-primary-alt, #f6f6f6);
+    display: flex;
+    justify-content: center;
     flex: 0 0 60px;
-    padding: 0.75rem;
-    position: relative;
-    // move the icon more into the centre
-    &:before {
-        line-height: 1.25;
-        padding: 0 0 0 0.5rem;
-    }
 }
 
 .usage__title-container {
@@ -108,7 +107,7 @@ function onSelect(): void {
     padding: 0.25rem 0.5rem;
     p {
         display: -webkit-box;
-        font-size: 0.75rem;
+        font-size: var(--sbx-font-size-xs, 0.75rem);
         line-height: 1rem;
         margin-bottom: 0.25rem;
         overflow: hidden;

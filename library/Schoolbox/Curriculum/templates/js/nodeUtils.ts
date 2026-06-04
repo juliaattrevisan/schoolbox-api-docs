@@ -307,17 +307,19 @@ export function getTotalUsage(node: Node): number {
  */
 export function getUsageIcon(type: ActivityTypes): string {
     const icons = {
-        [ActivityTypes.COURSE]: "icon-course-builder",
-        [ActivityTypes.UNIT]: "icon-unit",
-        [ActivityTypes.LEARNING_ACTIVITY]: "icon-due-work",
-        [ActivityTypes.LEARNING_ACTIVITY_PROJECT]: "icon-project",
-        [ActivityTypes.LEARNING_ACTIVITY_DUE_WORK]: "icon-due-work",
-        [ActivityTypes.LEARNING_ACTIVITY_TASK]: "icon-task",
-        [ActivityTypes.LEARNING_ACTIVITY_QUIZ]: "icon-quiz",
-        [ActivityTypes.LEARNING_ACTIVITY_LESSON_PLAN]: "icon-lesson-plan",
-        [ActivityTypes.LEARNING_ACTIVITY_LTI]: "icon-lti",
-        [ActivityTypes.BADGE]: "icon-badge",
-        [ActivityTypes.FOLDER]: "icon-folder",
+        [ActivityTypes.COURSE]: "course-builder",
+        [ActivityTypes.UNIT]: "unit",
+        [ActivityTypes.LEARNING_ACTIVITY]: "due-work",
+        [ActivityTypes.LEARNING_ACTIVITY_PROJECT]: "project",
+        [ActivityTypes.LEARNING_ACTIVITY_DUE_WORK]: "due-work",
+        [ActivityTypes.LEARNING_ACTIVITY_TASK]: "task",
+        [ActivityTypes.LEARNING_ACTIVITY_QUIZ]: "quiz",
+        [ActivityTypes.LEARNING_ACTIVITY_LESSON_PLAN]: "lesson-plan",
+        [ActivityTypes.LEARNING_ACTIVITY_LTI]: "lti",
+        [ActivityTypes.LEARNING_ACTIVITY_DIALOG_AGENT]: "dialog-agent",
+        [ActivityTypes.LEARNING_ACTIVITY_REPORTING_ACTIVITY]: "reporting",
+        [ActivityTypes.BADGE]: "badge",
+        [ActivityTypes.FOLDER]: "folder",
     };
     return icons[type];
 }
