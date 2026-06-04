@@ -92,7 +92,7 @@ class Model implements IAssessableDataModel, IAssessmentContextDataModel, ISoftD
 
     /**
      * The mark visibility
-     * @var int
+     * @var string
      */
     protected $markVisibility;
 
@@ -255,7 +255,7 @@ class Model implements IAssessableDataModel, IAssessmentContextDataModel, ISoftD
     }
 
     /**
-     * @param int $markVisibility
+     * @param string $markVisibility
      * @return $this
      */
     public function setMarkVisibility($markVisibility): self
@@ -265,9 +265,9 @@ class Model implements IAssessableDataModel, IAssessmentContextDataModel, ISoftD
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getMarkVisibility(): int
+    public function getMarkVisibility(): string
     {
         return $this->markVisibility;
     }

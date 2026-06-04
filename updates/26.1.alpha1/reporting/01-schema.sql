@@ -8,7 +8,7 @@ CREATE TABLE `reporting` (
     `grade_group_id` INT,
     `instructor_max_mark` DECIMAL(14, 11),
     `max_mark` DECIMAL(14, 11),
-    `mark_visibility` TINYINT,
+    `mark_visibility` ENUM('staffOnly','staffAndStudent','staffAndParent','staffStudentAndParent') DEFAULT NULL,
     `feedback_comments_enable` TINYINT COMMENT 'a toggle: if enabled, staff can write comments in their reporting feedbacks',
     `supporting_data_enable` TINYINT COMMENT 'Supporting Data section is shown',
     -- I cannot think of a succinct way to summarise these date ranges; sry for long enum values

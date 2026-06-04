@@ -146,8 +146,8 @@
 //    {
 //        // If muted, students cannot see grades left on assignment in Canvas
 //        if ($muted) {
-//            return SubmissionBox::MARK_VISIBILITY_STAFF_ONLY;
+//            return IAssessable::MARK_VISIBILITY_PRIVATE;
 //        }
-//        return SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT;
+//        return IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
 //    }
 //}

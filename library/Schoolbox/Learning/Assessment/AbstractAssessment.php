@@ -150,9 +150,9 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * If published, then who can see the feedback for this Assessment.
      *
-     * One of { MARK_VISIBILITY_PRIVATE | MARK_VISIBILITY_STUDENT | MARK_VISIBILITY_PARENT_STUDENT }
+     * One of { MARK_VISIBILITY_PRIVATE | MARK_VISIBILITY_STUDENT | MARK_VISIBILITY_PARENT | MARK_VISIBILITY_PARENT_STUDENT }
      *
-     * @var int
+     * @var string
      */
     private $markVisibility;
 
@@ -706,6 +706,9 @@ abstract class AbstractAssessment implements IAssessable
             case self::MARK_VISIBILITY_STUDENT:
                 return $roleType === Role::STAFF || $roleType === Role::STUDENT;
 
+            case self::MARK_VISIBILITY_PARENT:
+                return $roleType === Role::STAFF || $roleType === Role::PARENT;
+
             case self::MARK_VISIBILITY_PRIVATE:
             default:
                 return $roleType === Role::STAFF;
@@ -1254,7 +1257,7 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
-     * @return int
+     * @return string
      */
     public function getMarkVisibility()
     {
@@ -1263,7 +1266,7 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
-     * @param int $markVisibility
+     * @param string $markVisibility
      * @return static
      */
     public function setMarkVisibility($markVisibility)

@@ -3,6 +3,7 @@ import locale from "@js/terminology/rosettaStone";
 import { useMarkbookStore } from "./store/markbookStore";
 import MbClassStatisticRow from "./mb-class-statistic-row.vue";
 import MbClassimplRowStudent from "./mb-classimpl-row-student.vue";
+import { getMarkVisibilityOptions } from "./markVisibilityOptions";
 import type { Props as MbClassStatisticRowProps } from "./mb-class-statistic-row.vue";
 import type { MarkbookClassImplActivity } from "./types/payload";
 import { ACTIVITY_TYPE_REPORTING, ACTIVITY_TYPE_TASK } from "@schoolboxAssessment/Types/assessmentTypes";
@@ -14,13 +15,6 @@ interface Props {
 
 const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
-
-const markVisibilityOptions = [
-    // Please note; .label is output via v-html and is not escaped
-    { value: 0, label: "&#xe63e; Staff Only", readonlyIcon: "icon-locked" },
-    { value: 1, label: "&#xe667; Staff and Students", readonlyIcon: "icon-staff-students" },
-    { value: 2, label: "&#xe666; Staff, Students and their Parents", readonlyIcon: "icon-staff" },
-] as { value: number; label: string; readonlyIcon: string }[];
 
 const classStatisticRows: Omit<MbClassStatisticRowProps, "classImpl">[] = [
     {
@@ -121,7 +115,8 @@ const orderedClassImplStudents = window.Vue.computed(() => {
             stats-key="markVisibility"
             :input="{
                 key: 'markVisibility',
-                selectOptions: markVisibilityOptions,
+                selectOptions: (aImpl) =>
+                    getMarkVisibilityOptions(mbStore.data?.availableVisibilities ?? [], aImpl.markVisibility),
                 allowCourseManaged: true,
                 readonlyForTypes: [ACTIVITY_TYPE_REPORTING],
                 fetch: (aImpl) => ({

@@ -59,12 +59,14 @@ class Visibility
         if ($currentUser->isSuperuser() || $currentUser->getRole()->isStaff()) {
             $visibilities[] = IAssessable::MARK_VISIBILITY_PRIVATE;
             $visibilities[] = IAssessable::MARK_VISIBILITY_STUDENT;
+            $visibilities[] = IAssessable::MARK_VISIBILITY_PARENT;
             $visibilities[] = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
         } else if ($currentUser->getRole()->isStudent()) {
             $visibilities[] = IAssessable::MARK_VISIBILITY_STUDENT;
             $visibilities[] = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
         } else {
             if ($currentUser->isParentOf($student)) {
+                $visibilities[] = IAssessable::MARK_VISIBILITY_PARENT;
                 $visibilities[] = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
             }
         }

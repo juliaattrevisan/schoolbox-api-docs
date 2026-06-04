@@ -103,7 +103,7 @@ class Mapper extends BaseMapper
         $this->joins('grade_group_id', GradeGroupMapper::class, 'id', null, null, 'gradeGroup', 'grade_group');
         $this->uses('availability', self::TYPE_STRING);
         $this->uses('anonymous_result', self::TYPE_BOOLEAN);
-        $this->uses('mark_visibility', self::TYPE_INTEGER);
+        $this->uses('mark_visibility', self::TYPE_STRING);
         $this->uses('external_id', self::TYPE_STRING);
         $this->uses('learnosity_reference', self::TYPE_STRING);
         $this->uses('learnosity_job_reference', self::TYPE_STRING);

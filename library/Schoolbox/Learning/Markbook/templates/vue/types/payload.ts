@@ -88,7 +88,7 @@ export type MarkbookClassImplActivity = {
         sdNormalized: number | null;
         weightPercent?: number | null;
         projectWeightPercent?: number | null;
-        markVisibility: number;
+        markVisibility: string;
     };
     _routes: {
         "learningAssessment.getStatus": string;
@@ -109,7 +109,7 @@ export type MarkbookClassImplActivity = {
         >;
     };
     instructorMarkScheme: MarkScheme;
-    markVisibility: number;
+    markVisibility: string;
     courseManaged: boolean | null;
     projectId: MarkbookClassImplActivity["id"] | null;
     writable: boolean;
@@ -166,7 +166,7 @@ export interface Markbook {
         "courseImport.getImport": string | null;
     };
     /** A list of available visibilities, currently only used on the class markbook */
-    availableVisibilities: number[];
+    availableVisibilities: string[];
     submissionErrorStates: SubmissionErrorStates;
     /** The query args to use for filters */
     filtersQueryArgs: string;

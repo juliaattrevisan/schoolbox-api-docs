@@ -460,16 +460,9 @@ class Cursor implements ICursor
             return [null, []]; // This indicates that the query should not be run because we know that no results will be returned.
         }
 
-        // Determine mark visibility.
-        if ($this->viewer->getRole()->isStaff()) {
-            $visibility = IAssessable::MARK_VISIBILITY_PRIVATE;
-        } elseif ($this->viewer->getRole()->isStudent()) {
-            $visibility = IAssessable::MARK_VISIBILITY_STUDENT;
-        } elseif ($this->viewer->getRole()->isParent()) {
-            $visibility = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
-        } else {
-            throw new UnexpectedValueException('Unexpected User: ' . $this->viewer->getId());
-        }
+        $visibilityPredicate = $this->database
+            ->buildPredicateBuilder('')
+            ->in('submission_box.mark_visibility', $this->getMarkVisibilitiesForViewer());
 
         $query = 'SELECT ';
         $params = [];
@@ -486,19 +479,19 @@ class Cursor implements ICursor
         }
 
         $query .= (
-            'FROM `submission_return`
+            "FROM `submission_return`
              JOIN `submission_box` ON `submission_return`.`box_id` = `submission_box`.`id`
              JOIN `assessment` ON `assessment`.`id` = `submission_box`.`assessment_id`
              WHERE `review_route` = :reviewRoute
              AND `submission_return`.`published_at` IS NOT NULL
              AND `submission_return`.`owner` = :userIdDueWorkFeedback
-             AND `submission_box`.`mark_visibility` >= :markVisibility
+             AND {$visibilityPredicate->getWhereIntersect()}
              AND `submission_return`.`deleted_at` IS NULL
-             AND `assessment`.`deleted_at` IS NULL '
+             AND `assessment`.`deleted_at` IS NULL "
         );
         $params['userIdDueWorkFeedback'] = $this->viewee->getId();
-        $params['markVisibility']        = $visibility;
         $params['reviewRoute']           = ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
+        $params = array_merge($params, $visibilityPredicate->getParams());
 
         // Note that since work type visibility is a bit complicated now (see comments above visibility constants in
         // Assessment\WorkType\Mapper), filtering based on work type visibility must now be done in PHP instead of SQL,
@@ -506,7 +499,6 @@ class Cursor implements ICursor
 
         return [$query, $params];
     }
-
 
     /**
      * Returns query to get quiz feedback.
@@ -529,16 +521,9 @@ class Cursor implements ICursor
             return [null, []]; // This indicates that the query should not be run because we know that no results will be returned.
         }
 
-        // Determine mark visibility.
-        if ($this->viewer->getRole()->isStaff()) {
-            $visibility = IAssessable::MARK_VISIBILITY_PRIVATE;
-        } elseif ($this->viewer->getRole()->isStudent()) {
-            $visibility = IAssessable::MARK_VISIBILITY_STUDENT;
-        } elseif ($this->viewer->getRole()->isParent()) {
-            $visibility = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
-        } else {
-            throw new UnexpectedValueException('Unexpected User: ' . $this->viewer->getId());
-        }
+        $visibilityPredicate = $this->database
+            ->buildPredicateBuilder('')
+            ->in('assess.mark_visibility', $this->getMarkVisibilitiesForViewer());
 
         $query = 'SELECT ';
         $params = [];
@@ -561,12 +546,12 @@ class Cursor implements ICursor
             JOIN `assessment` ON `assessment`.`id` = `assess`.`assessment_id`
             WHERE `assess_attempt`.`reviewed_at` IS NOT NULL
             AND `assess_attempt`.`user_id` = :userIdQuizFeedback
-            AND `assess`.`mark_visibility` >= :markVisibility
+            AND {$visibilityPredicate->getWhereIntersect()}
             AND `assess_attempt`.`deleted_at` IS NULL
             AND `assessment`.`deleted_at` IS NULL
         ");
         $params['userIdQuizFeedback'] = $this->viewee->getId();
-        $params['markVisibility']     = $visibility;
+        $params = array_merge($params, $visibilityPredicate->getParams());
 
         // Note that since work type visibility is a bit complicated now (see comments above visibility constants in
         // Assessment\WorkType\Mapper), filtering based on work type visibility must now be done in PHP instead of SQL,
@@ -575,6 +560,30 @@ class Cursor implements ICursor
         return [$query, $params];
     }
 
+    /**
+     * @return array
+     */
+    private function getMarkVisibilitiesForViewer(): array
+    {
+        if ($this->viewer->getRole()->isStaff()) {
+            // Return all visibilities.
+            return array_keys(IAssessable::MARK_VISIBILITY_STRINGS);
+        }
+
+        if ($this->viewer->getRole()->isStudent()) {
+            // Return all visibilities containing 'student'.
+            return [IAssessable::MARK_VISIBILITY_STUDENT, IAssessable::MARK_VISIBILITY_PARENT_STUDENT];
+        }
+
+        if ($this->viewer->getRole()->isParent()) {
+            // Return all visibilities containing 'parent'.
+            return [IAssessable::MARK_VISIBILITY_PARENT, IAssessable::MARK_VISIBILITY_PARENT_STUDENT];
+        }
+
+        throw new UnexpectedValueException(
+            "Viewer with userId {$this->viewer->getId()} does not fit expected categories."
+        );
+    }
 
     /**
      * Validate that parameter 'filter' meets the API spec: https://api.schoolbox.com.au/#post-/api/register/-provider-

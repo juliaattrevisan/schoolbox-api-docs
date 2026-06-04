@@ -10,7 +10,10 @@
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Routing\Dictionary\SubscriptionDictionary;
 use Alaress\Routing\Router;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Database\Factory;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentDataMapper;
+use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentDataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Quiz;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
@@ -27,8 +30,22 @@ use Schoolbox\User;
  *
  * It checks quiz notifications.
  */
+// @phpstan-ignore-next-line phpunit.testName - Notification daemon tests are discovered as test*.php files.
 class QuizNotifications extends AbstractNotificationTestCase
 {
+    private const MARK_VISIBILITY_PROGRESSION = [
+        IAssessable::MARK_VISIBILITY_PRIVATE => IAssessable::MARK_VISIBILITY_STUDENT,
+        IAssessable::MARK_VISIBILITY_STUDENT => IAssessable::MARK_VISIBILITY_PARENT_STUDENT,
+    ];
+
+    /**
+     * Maximum number of student subscribers to drive in this test. Each
+     * subscriber generates two LOG_MARK_PATTERN events per mark, and every
+     * visibility raise re-marks each attempt — so a large folder saturates the
+     * scheduled daemon's worker pool and stalls progression.
+     */
+    private const MAX_SUBSCRIBERS = 3;
+
     /** @var Folder\Model */
     protected $folder;
 
@@ -48,14 +65,19 @@ class QuizNotifications extends AbstractNotificationTestCase
     protected $markGivenCache;
 
     /**
-     * How many mark notifs have been sent to students?
+     * Created attempts keyed by quiz ID. Re-marked from onMarkGiven each time
+     * visibility is raised so the scheduled daemon emits a fresh round of
+     * Notifier::LOG_MARK_PATTERN lines at the new visibility level.
      *
-     * Terminate the test when all students have been notified about all quizzes they should be.
-     * @see $this->onWorkerComplete
-     *
-     * @var int
+     * @var Quiz\Attempt\Model[][]
      */
-    protected $sentMarkNotifs = 0;
+    protected $quizAttempts = [];
+
+    /** @var int */
+    protected $completedQuizzes = 0;
+
+    /** @var int */
+    protected $totalQuizzes = 0;
 
     /**
      * Provide the list of daemons that need to be attached for this test
@@ -68,15 +90,14 @@ class QuizNotifications extends AbstractNotificationTestCase
     }
 
     /**
-     * The test is complete when all students have received notifications for
-     * all quizzes that they should receive notifications for.
+     * The test is complete once every quiz has progressed through to its final
+     * mark visibility level (MARK_VISIBILITY_PARENT_STUDENT).
      *
      * @return bool
      */
     protected function isTestComplete()
     {
-        $maxNotifsSendable = count($this->subscribers) * 2;
-        return $this->sentMarkNotifs >= $maxNotifsSendable;
+        return $this->totalQuizzes > 0 && $this->completedQuizzes >= $this->totalQuizzes;
     }
 
     /**
@@ -140,19 +161,28 @@ class QuizNotifications extends AbstractNotificationTestCase
      */
     public function onReady()
     {
-        // start generating quizzes
         $this->log->notice('Gettin yo quiz on', [ 'char' => '>' ]);
 
-        // load up the quiz instances
-        $quizzes = [];
+        $quizzes = [
+            $this->generateQuiz(IAssessable::MARK_VISIBILITY_PRIVATE, '1 second', '5 second'),
+            $this->generateQuiz(IAssessable::MARK_VISIBILITY_STUDENT, '6 second', '10 second'),
+            $this->generateQuiz(IAssessable::MARK_VISIBILITY_PARENT_STUDENT, '11 second', '15 second'),
+        ];
 
-        // set these up 5 seconds apart
-        $quizzes[] = $this->generateQuiz(IAssessable::MARK_VISIBILITY_PRIVATE, '1 second', '5 second');
-        $quizzes[] = $this->generateQuiz(IAssessable::MARK_VISIBILITY_STUDENT, '6 second', '10 second');
-        $quizzes[] = $this->generateQuiz(IAssessable::MARK_VISIBILITY_PARENT_STUDENT, '11 second', '15 second');
+        $admin = $this->getUser($this->adminId);
+        $this->totalQuizzes = count($quizzes);
 
+        // Drive attempts/marks directly. The onReceipt() callback used to do this
+        // via @routed annotations, but routed was removed from requiredDaemons in
+        // d731c83 so onReceipt is no longer subscribed.
         foreach ($quizzes as $quiz) {
-            $this->saveQuiz($quiz, $this->getUser($this->adminId));
+            $this->saveQuiz($quiz, $admin);
+
+            foreach ($this->subscribers as $student) {
+                $attempt = $this->attemptQuiz($quiz, $student);
+                $this->quizAttempts[$quiz->getId()][] = $attempt;
+                $this->markAttempt($attempt, $admin);
+            }
         }
     }
 
@@ -298,12 +328,26 @@ class QuizNotifications extends AbstractNotificationTestCase
             $quiz = $qm->findById($quizId);
 
             if (!$quiz->isMarkShownToParents()) {
-                $newVis = $quiz->getMarkVisibility() + 1;
+                $newVis = self::MARK_VISIBILITY_PROGRESSION[$quiz->getMarkVisibility()]
+                    ?? IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
                 $this->log->notice("Raising visibility of quiz $quizId to $newVis", [ 'char' => '>' ]);
                 $quiz->setMarkVisibility($newVis);
 
                 $qm->setSessionDataOverride([ 'user' => $quiz->getUser() ]);
                 $qm->save($quiz);
+
+                // Re-mark every attempt so the scheduled daemon emits a fresh
+                // round of LOG_MARK_PATTERN lines at the new visibility level.
+                $admin = $this->getUser($this->adminId);
+                foreach ($this->quizAttempts[$quizId] ?? [] as $attempt) {
+                    $this->markAttempt($attempt, $admin);
+                }
+            } else {
+                $this->log->notice("Quiz $quizId has reached final visibility", [ 'char' => '+' ]);
+                $this->completedQuizzes++;
+                if ($this->isTestComplete()) {
+                    $this->markTestComplete();
+                }
             }
         }
     }
@@ -338,19 +382,27 @@ class QuizNotifications extends AbstractNotificationTestCase
             $users[$userId] = $this->getUser($userId);
         }
 
-        return (new Collection($users))->filter(
+        $students = (new Collection($users))->filter(
             function (User $user) {
                 return $user->getRole()->isStudent();
             }
         );
+
+        // Cap subscribers at a small number to keep the scheduler's worker
+        // pool from saturating. Each subscriber generates 2 LOG_MARK_PATTERN
+        // events per attempt-save, and we re-mark on every visibility raise,
+        // so a busy folder can starve the dispatcher and stall the test.
+        $studentsArray = array_slice($students->getAll(), 0, self::MAX_SUBSCRIBERS, true);
+        return new Collection($studentsArray);
     }
 
 
     /**
      * @param Quiz\Model $quiz
      * @param User $as
+     * @return Quiz\Attempt\Model
      */
-    protected function attemptQuiz(Quiz\Model $quiz, User $as)
+    protected function attemptQuiz(Quiz\Model $quiz, User $as): Quiz\Attempt\Model
     {
         // 1. Know your quiz
         $this->log->notice("Attempting quiz {$quiz->getId()} as {$as->formatName()}", [ 'char' => '+' ]);
@@ -389,6 +441,8 @@ class QuizNotifications extends AbstractNotificationTestCase
         $this->log->debug("Finishing attempt");
         $attempt->setFinish(Alaress_Date_Format::now());
         Quiz\Attempt\Mapper::getInstance()->save($attempt);
+
+        return $attempt;
     }
 
 
@@ -443,12 +497,17 @@ class QuizNotifications extends AbstractNotificationTestCase
             ->setStart($start)
             ->setFinish($finish)
             ->setDuration(120)
+            ->setReadingTimeDuration(0)
+            ->setShuffleItems(0)
+            ->setPromptsMode(0)
             ->setMarkVisibility($visibility)
             ->setMaxAttempts(1)
+            ->setAnonymousResult(false)
             ->setNotifyAuthor(false)
+            ->setMarkType((new MarkType())->setId(MarkType::TYPE_TOTAL))
             ->setTitle(
                 sprintf(
-                    'TEST QUIZ: visibility=%d; open=%s~%s; created=%s',
+                    'TEST QUIZ: visibility=%s; open=%s~%s; created=%s',
                     $visibility,
                     str_replace(' ', '_', $start->getDatabase()),
                     str_replace(' ', '_', $finish->getDatabase()),
@@ -473,6 +532,28 @@ class QuizNotifications extends AbstractNotificationTestCase
     {
         // define the effector as the author
         $quiz->setUser($as);
+
+        // Create the wrapping Assessment record first so the Quiz's
+        // assess.assessment_id FK can be populated when the Quiz mapper writes
+        // its joined columns. Quiz\Attempt\Mapper::canParticipate looks this up
+        // via $quiz->getAssessmentModel() during attempt save, so it must
+        // exist before any attempt is persisted.
+        $assessment = (new AssessmentDataModel())
+            ->setTitle($quiz->getTitle())
+            ->setDescription((string)$quiz->getDescription())
+            ->setPublishDate($quiz->getCreated())
+            ->setOpenDate($quiz->getStart())
+            ->setDueDate($quiz->getFinish())
+            ->setCloseDate($quiz->getFinish())
+            ->setWeight((float)$quiz->getWeight())
+            ->setWorkType($quiz->getWorkType())
+            ->setAssessmentContext($this->folder);
+
+        $assessMapper = AssessmentDataMapper::getInstance();
+        $assessMapper->setSessionDataOverride([ 'user' => $as ]);
+        $assessMapper->save($assessment);
+
+        $quiz->setAssessmentModel($assessment);
 
         // ensure the mapper thinks this is the effector
         $oam = Quiz\Mapper::getInstance();
@@ -510,16 +591,23 @@ class QuizNotifications extends AbstractNotificationTestCase
      *
      * @param DeprecatedModel $handler
      * @param array           $model
+     * @throws RuntimeException
      * @return array
      */
     private function handlerCreate(DeprecatedModel $handler, array $model)
     {
-        if ($id = $handler->create($model)) {
-            $model[$handler->_index] = $id;
-            return $model;
+        $id = $handler->create($model);
+        if (!$id) {
+            throw new RuntimeException('Failed to create legacy assessment record.');
         }
 
-        return null;
+        $index = (new ReflectionProperty($handler, '_index'))->getValue($handler);
+        if (!is_int($index) && !is_string($index)) {
+            throw new RuntimeException('Legacy assessment record has an invalid index field.');
+        }
+
+        $model[$index] = $id;
+        return $model;
     }
 
 

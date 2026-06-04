@@ -445,7 +445,10 @@ class Controller extends Base
                     ),
                     'courseImport.getImport' => null, /* not relevant on the class markbook */
                 ],
-                'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get(ConfigMapper::NAME_SUBMISSION_VISIBILITY_MAX)),
+                'availableVisibilities' => Visibility::getAvailableVisibilities(
+                    (bool) $this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_STUDENTS),
+                    (bool) $this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_PARENTS),
+                ),
                 'submissionErrorStates' => $this->stateMapper->findAll()->map(fn(State $state) => [
                     'id' => $state->getId(),
                     'name' => $state->getDisplayAs(),

@@ -14,11 +14,11 @@ use Alaress\Web\Controller as WebController;
 use Alaress\HTMLPurifier\IPurifier;
 use Schoolbox\Assessment\Course\Markbook\Export\CSV;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
 use Schoolbox\Filter\Filters\Assessment\AssessmentType\Definition as AssessmentTypeDefinition;
 use Schoolbox\GenericCollection;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -35,7 +35,6 @@ use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\DueWork\State;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Throwable;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
@@ -567,7 +566,10 @@ class Controller extends WebController\Base
                         ]
                     ),
                 ],
-                'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get(ConfigMapper::NAME_SUBMISSION_VISIBILITY_MAX)),
+                'availableVisibilities' => Visibility::getAvailableVisibilities(
+                    (bool) $this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_STUDENTS),
+                    (bool) $this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_PARENTS),
+                ),
                 'submissionErrorStates' => $this->stateMapper->findAll()->map(fn(State $state) => [
                     'id' => $state->getId(),
                     'name' => $state->getDisplayAs(),

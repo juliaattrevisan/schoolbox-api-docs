@@ -31,11 +31,13 @@ export default class MarkbookPage {
     static readonly DATA_TEST_MARKBOOK_CLASS_AVERAGE = "markbook-class-average-expander";
 
     // visibility constants
-    static readonly VISIBILITY_STAFF_ONLY = 0;
+    static readonly VISIBILITY_STAFF_ONLY = "staffOnly";
 
-    static readonly VISIBILITY_STAFF_AND_STUDENT = 1;
+    static readonly VISIBILITY_STAFF_AND_STUDENT = "staffAndStudent";
 
-    static readonly VISIBILITY_ALL = 2;
+    static readonly VISIBILITY_STAFF_AND_PARENT = "staffAndParent";
+
+    static readonly VISIBILITY_ALL = "staffStudentAndParent";
 
     constructor(page: Page) {
         this.page = page;

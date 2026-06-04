@@ -13,8 +13,8 @@
 namespace Schoolbox\Learning;
 
 use Alaress\Database\Connector\IConnector;
-use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder;
 
@@ -250,7 +250,7 @@ class AssessmentAudit
                 $row['publishDate'],
                 $row['dueDate'],
                 $row['selfReviewability'],
-                SubmissionBox::MARK_VISIBILITY_STRINGS[$row['markVisibility']],
+                IAssessable::MARK_VISIBILITY_STRINGS[$row['markVisibility']],
                 1 === $row['enable_policy'] ? 'true' : 'false',
                 implode(';', $submissionOptions),
                 $row['parentDeleted']

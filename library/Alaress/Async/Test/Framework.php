@@ -202,11 +202,25 @@ class Framework
             throw new InvalidArgumentException("Test case '$testClass' does not implement Alaress\\Async\\Test\\TestCase, cannot proceed");
         }
 
+        // If $testCase is a subclass of \PHPUnit\Framework\TestCase::class, instantiate a PHPUnit-style test case
+        // outside PHPUnit’s normal runner by giving it a valid method name.  Name 'requiredDaemons' is chosen because
+        // every Alaress\Async\Test\TestCase must implement that method.
+        // @see library/Alaress/Async/Test/TestCase.php
+        // This was necessary in order to get test/notif/tests/testQuizNotifications.php to work.
         /** @var TestCase $testCase */
-        $testCase = $rc->newInstance();
+        $testCase = $rc->isSubclassOf(\PHPUnit\Framework\TestCase::class)
+            ? $rc->newInstanceArgs(['requiredDaemons'])
+            : $rc->newInstance();
 
         // attach our logger
         $testCase->attachLogger($log);
+
+        if ($rc->hasMethod('setUp')) {
+            $setUp = $rc->getMethod('setUp');
+            $setUp->setAccessible(true);
+            $setUp->invoke($testCase);
+        }
+
         $testCase->prepare();
 
         // scan for listeners
@@ -397,13 +411,17 @@ class Framework
      */
     private function terminateProcess($ppid)
     {
-        // check for children
-        $pids = preg_split('/\s+/', shell_exec("ps -o pid --no-heading --ppid $ppid"));
+        $pIdsString = shell_exec("ps -o pid --no-heading --ppid $ppid");
 
-        foreach ($pids as $pid) {
-            if (is_numeric($pid)) {
-                // recurse into child looking for deeper process nesting
-                $this->terminateProcess($pid);
+        if (is_string($pIdsString)) {
+            // check for children
+            $pids = preg_split('/\s+/', $pIdsString);
+
+            foreach ($pids as $pid) {
+                if (is_numeric($pid)) {
+                    // recurse into child looking for deeper process nesting
+                    $this->terminateProcess($pid);
+                }
             }
         }
 

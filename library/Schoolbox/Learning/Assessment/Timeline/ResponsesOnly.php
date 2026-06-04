@@ -22,7 +22,7 @@ class ResponsesOnly extends Full
         $includeUnpublishedSelfReflectionFeedback,
         $includeUnpublishedInstructorFeedback,
         $includeDraftResponses,
-        $minimumVisibility
+        $allowedVisibilities
     ) {
         /** @var Submission $currentResponse */
         foreach ($this->getParticipant()->getAllResponses() as $currentResponse) {

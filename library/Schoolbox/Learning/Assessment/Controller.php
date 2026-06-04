@@ -330,9 +330,18 @@ abstract class Controller extends ListController implements IAssessmentControlle
          */
         $data['curriculumNodes'] = [];
 
-        /* Default Visibility comes from an LMS Policy setting in config
+        /* Default Visibility comes from an LMS Policy setting in config.
+         * If the default is not allowed by other config settings, the default becomes 'staff only'.
          */
-        $data['markVisibility'] = $this->getConfigLoader()->get('submission_access');
+        $data['markVisibility'] = (
+            in_array(
+                $this->getConfigLoader()->get('submission_access'),
+                $this->getAvailableFeedbackVisibilities(),
+                true
+            )
+            ? $this->getConfigLoader()->get('submission_access')
+            : IAssessable::MARK_VISIBILITY_PRIVATE
+        );
 
         // Did the caller request a returnUrl?
         $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
@@ -1161,7 +1170,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'folder'                   => $context->getFolder(),
             'assessmentType'           => AssessmentType::objectToString($assessment),
             'markVisibility'           => $assessment->getMarkVisibility(),
-            'availableVisibilities'    => FeedbackVisibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max')),
+            'availableVisibilities'    => $this->getAvailableFeedbackVisibilities(),
             'allWorkTypes'             => $this->workTypeMapper->findAll(['order' => ['sequence' => 'asc']]),
 
             /* Capabilities happen to have the same mark types as its DueWork IAssessable container,
@@ -1710,6 +1719,17 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $studentId
         );
         return $this->aiCache?->get($cacheKey);
+    }
+
+    /**
+     * @return array
+     */
+    private function getAvailableFeedbackVisibilities(): array
+    {
+        return FeedbackVisibility::getAvailableVisibilities(
+            (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_STUDENTS),
+            (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_PARENTS),
+        );
     }
 
     /**
