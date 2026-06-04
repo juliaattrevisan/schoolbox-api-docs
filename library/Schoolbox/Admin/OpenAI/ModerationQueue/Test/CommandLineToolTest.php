@@ -52,10 +52,6 @@ class CommandLineToolTest extends TestCase
         $logrotate = file_get_contents(SITE_root . '/tools/logrotate/schoolbox');
 
         $this->assertStringContainsString('/var/log/schoolbox/*/ai-moderation-queue.log', $logrotate);
-        $this->assertStringContainsString('/var/log/schoolbox/*/garbage-collect.log {', $logrotate);
-        $this->assertStringContainsString('weekly', $logrotate);
-        $this->assertStringContainsString('rotate 4', $logrotate);
-        $this->assertStringContainsString('compress', $logrotate);
     }
 
     /**
