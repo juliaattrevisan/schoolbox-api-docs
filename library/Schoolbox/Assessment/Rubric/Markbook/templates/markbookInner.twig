@@ -165,14 +165,14 @@
                                                                  #}
                                                                 {% set descriptorText = publishedMarks.selectedDescriptorText ?? null %}
                                                                 {% set renderedIndicatorMark = descriptorText ? publishedMarks.humanReadableMark|default('✓') : publishedMarks.humanReadableMark|default('–') %}
-                                                                    <a href="{{ summaryLink }}"
-                                                                        {% if descriptorText %} title="{{ descriptorText }}"{% endif %}
-                                                                        class="{{ gradientClass }} {% if (publishedMarks.humanReadableMark ?? null) is null %}no-mark{% endif %}"
-                                                                    >{{ renderedIndicatorMark }}</a>
+
+                                                                <a href="{{ summaryLink }}"
+                                                                    {% if descriptorText %} title="{{ descriptorText }}"{% endif %}
+                                                                    class="{{ gradientClass }} {% if (publishedMarks.humanReadableMark ?? null) is null %}no-mark{% endif %}"
+                                                                >{{ renderedIndicatorMark }}</a>
                                                             {% endif %}
 
                                                             {# Draft marks are rendered adjacently; a javascript presumably toggles their visibility somehow #}
-                                                            {# TODO find out how #}
                                                             {% if draftMarks is not null %}
                                                                 {# Colour the human readable mark using the normalised mark #}
                                                                 {% set gradientClass = urgency.marks(draftMarks.normalisedMark ?? null) %}
@@ -182,8 +182,8 @@
                                                                  # Even more alternatively, render a hyphen if the indicator never received a meaningful value
                                                                  #}
                                                                 {% set descriptorText = draftMarks.selectedDescriptorText ?? null %}
-
                                                                 {% set renderedIndicatorMark = descriptorText ? draftMarks.humanReadableMark|default('✓') : draftMarks.humanReadableMark|default('–') %}
+
                                                                 <a href="{{ summaryLink }}"
                                                                     {% if descriptorText %} title="{{ descriptorText }}"{% endif %}
                                                                     class="meta {% if (draftMarks.humanReadableMark ?? null) is null %}no-mark{% endif %}"
