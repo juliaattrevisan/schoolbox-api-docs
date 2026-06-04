@@ -49,4 +49,17 @@ class CommandLineToolTest extends TestCase
             $logrotate,
         );
     }
+
+    /**
+     * Ensures operators can inspect and release the scheduler lock if a placeholder run exits unexpectedly.
+     *
+     * @return void
+     */
+    public function testModerationQueueLockIsRegisteredWithLockInspector(): void
+    {
+        $inspector = file_get_contents(SITE_root . '/library/Alaress/Lock/CommandLineTool/Inspector.php');
+
+        $this->assertStringContainsString('ModerationQueueTool::LOCK_NAME', $inspector);
+        $this->assertStringContainsString('AI Moderation Queue (./tools/openai/moderation-queue.php)', $inspector);
+    }
 }
