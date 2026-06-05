@@ -363,22 +363,23 @@ class Controller extends Base
 
         $sql  = "
             SELECT
-                vr.assessment_id                             AS assessment_id,
-                vr.assessment_grade_group_id                 AS assessment_grade_group_id,
-                vr.assessment_title                          AS assessment_name,
-                vr.assessment_max_mark                       AS assessment_max_mark,
-                vr.assessment_mark_type                      AS assessment_mark_type,
-                vr.assessment_grade_group_id                 AS assessment_grade_group_id,
-                vr.assessment_weight                         AS assessment_weight,
-                rubric_instance.id                           AS rubric_instance_id,
-                rubric_instance.title                        AS rubric_title,
+                vr.assessment_id                               AS assessment_id,
+                vr.assessment_grade_group_id                   AS assessment_grade_group_id,
+                vr.assessment_title                            AS assessment_name,
+                vr.assessment_max_mark                         AS assessment_max_mark,
+                vr.assessment_mark_type                        AS assessment_mark_type,
+                vr.assessment_grade_group_id                   AS assessment_grade_group_id,
+                vr.assessment_weight                           AS assessment_weight,
+                rubric_instance.id                             AS rubric_instance_id,
+                rubric_instance.title                          AS rubric_instance_title,
                 rubric_instance.rubric_capability_mark_type_id AS rubric_capability_mark_type_id,
-                vr.capability_id                             AS capability_id,
-                vr.capability_name                           AS capability_name,
-                vr.capability_max_value                      AS capability_max_value,
-                vr.indicator_id                              AS indicator_id,
-                vr.indicator_name                            AS indicator_name,
-                vr.indicator_max_value                       AS indicator_max_value
+                rubric_instance.weight                         AS rubric_instance_weight,
+                vr.capability_id                               AS capability_id,
+                vr.capability_name                             AS capability_name,
+                vr.capability_max_value                        AS capability_max_value,
+                vr.indicator_id                                AS indicator_id,
+                vr.indicator_name                              AS indicator_name,
+                vr.indicator_max_value                         AS indicator_max_value
             FROM v_rubric vr
             INNER JOIN rubric_instance ON vr.rubric_instance_id = rubric_instance.id
             WHERE {$whereClause}
@@ -433,7 +434,8 @@ class Controller extends Base
              */
             if (!isset($assessments[$row['assessment_id']]['gridData'][$row['rubric_instance_id']])) {
                 $assessments[$row['assessment_id']]['gridData'][$row['rubric_instance_id']] = [
-                    'title' => $row['rubric_title'],
+                    'title' => $row['rubric_instance_title'],
+                    'weight' => $row['rubric_instance_weight'],
                     /* Mark Per Capability is used when the capability mark type is set to something other than None
                      * Be careful of this fact, cos it's easy to === instead of !== if you're not paying attention
                      */
@@ -547,26 +549,27 @@ class Controller extends Base
         $getAuthoritativeMarksQuery = $this->internalDb->prepareQuery(
             "
                 SELECT
-                    vrm.assessment_id                  AS assessment_id,
-                    vrm.student_id                     AS student_id,
-                    u.firstname                        AS student_firstname,
-                    u.preferred_name                   AS student_preferred_name,
-                    u.lastname                         AS student_lastname,
-                    rubric_instance.id                 AS rubric_instance_id,
-                    rubric_instance.title              AS rubric_title,
+                    vrm.assessment_id                              AS assessment_id,
+                    vrm.student_id                                 AS student_id,
+                    u.firstname                                    AS student_firstname,
+                    u.preferred_name                               AS student_preferred_name,
+                    u.lastname                                     AS student_lastname,
+                    rubric_instance.id                             AS rubric_instance_id,
+                    rubric_instance.title                          AS rubric_instance_title,
                     rubric_instance.rubric_capability_mark_type_id AS rubric_capability_mark_type_id,
-                    vrm.capability_id                  AS capability_id,
-                    vrm.capability_name                AS capability_name,
-                    vrm.capability_mark                AS capability_mark,
-                    vrm.capability_human_readable_mark AS capability_human_readable_mark,
-                    vrm.capability_max_value           AS capability_max_value,
-                    vrm.capability_mark_type_id        AS capability_mark_type_id,
-                    vrm.capability_grade_group_id      AS capability_grade_group_id,
-                    vrm.descriptor_name                AS descriptor_name,
-                    vrm.indicator_id                   AS indicator_id,
-                    vrm.indicator_name                 AS indicator_name,
-                    vrm.indicator_mark                 AS indicator_mark,
-                    vrm.indicator_max_value            AS indicator_max_value
+                    rubric_instance.weight                         AS rubric_instance_weight,
+                    vrm.capability_id                              AS capability_id,
+                    vrm.capability_name                            AS capability_name,
+                    vrm.capability_mark                            AS capability_mark,
+                    vrm.capability_human_readable_mark             AS capability_human_readable_mark,
+                    vrm.capability_max_value                       AS capability_max_value,
+                    vrm.capability_mark_type_id                    AS capability_mark_type_id,
+                    vrm.capability_grade_group_id                  AS capability_grade_group_id,
+                    vrm.descriptor_name                            AS descriptor_name,
+                    vrm.indicator_id                               AS indicator_id,
+                    vrm.indicator_name                             AS indicator_name,
+                    vrm.indicator_mark                             AS indicator_mark,
+                    vrm.indicator_max_value                        AS indicator_max_value
                 FROM (
                     SELECT
                         sb.assessment_id,
@@ -668,7 +671,7 @@ class Controller extends Base
                 $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']] = [
                     /* Obviously so you can see which grid is which, by its name, on the user interface
                      */
-                    'title' => $row['rubric_title'],
+                    'title' => $row['rubric_instance_title'],
                     /* Mark Per Capability is used when the capability mark type is set to something other than None
                      * Be careful of this fact, cos it's easy to === instead of !== if you're not paying attention
                      */
@@ -837,27 +840,28 @@ class Controller extends Base
         $getAuthoritativeMarksQuery = $this->internalDb->prepareQuery(
             "
                 SELECT
-                    vrm.assessment_id                  AS assessment_id,
-                    vrm.student_id                     AS student_id,
-                    u.firstname                        AS student_firstname,
-                    u.preferred_name                   AS student_preferred_name,
-                    u.lastname                         AS student_lastname,
-                    rubric_instance.id                 AS rubric_instance_id,
-                    rubric_instance.title              AS rubric_title,
+                    vrm.assessment_id                              AS assessment_id,
+                    vrm.student_id                                 AS student_id,
+                    u.firstname                                    AS student_firstname,
+                    u.preferred_name                               AS student_preferred_name,
+                    u.lastname                                     AS student_lastname,
+                    rubric_instance.id                             AS rubric_instance_id,
+                    rubric_instance.title                          AS rubric_instance_title,
                     rubric_instance.rubric_capability_mark_type_id AS rubric_capability_mark_type_id,
-                    vrm.capability_id                  AS capability_id,
-                    vrm.capability_name                AS capability_name,
-                    vrm.capability_mark                AS capability_mark,
-                    vrm.capability_human_readable_mark AS capability_human_readable_mark,
-                    vrm.capability_max_value           AS capability_max_value,
-                    vrm.capability_mark_type_id        AS capability_mark_type_id,
-                    vrm.capability_grade_group_id      AS capability_grade_group_id,
-                    vrm.descriptor_name                AS descriptor_name,
-                    vrm.indicator_id                   AS indicator_id,
-                    vrm.indicator_name                 AS indicator_name,
-                    vrm.indicator_mark                 AS indicator_mark,
-                    vrm.indicator_max_value            AS indicator_max_value,
-                    vrm.feedback_date                  AS feedback_date
+                    rubric_instance.weight                         AS rubric_instance_weight,
+                    vrm.capability_id                              AS capability_id,
+                    vrm.capability_name                            AS capability_name,
+                    vrm.capability_mark                            AS capability_mark,
+                    vrm.capability_human_readable_mark             AS capability_human_readable_mark,
+                    vrm.capability_max_value                       AS capability_max_value,
+                    vrm.capability_mark_type_id                    AS capability_mark_type_id,
+                    vrm.capability_grade_group_id                  AS capability_grade_group_id,
+                    vrm.descriptor_name                            AS descriptor_name,
+                    vrm.indicator_id                               AS indicator_id,
+                    vrm.indicator_name                             AS indicator_name,
+                    vrm.indicator_mark                             AS indicator_mark,
+                    vrm.indicator_max_value                        AS indicator_max_value,
+                    vrm.feedback_date                              AS feedback_date
                 FROM (
                     SELECT
                         sb.assessment_id,
@@ -968,7 +972,7 @@ class Controller extends Base
                 $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']] = [
                     /* Obviously so you can see which grid is which, by its name, on the user interface
                      */
-                    'title' => $row['rubric_title'],
+                    'title' => $row['rubric_instance_title'],
                     /* Mark Per Capability is used when the capability mark type is set to something other than None
                      * Be careful of this fact, cos it's easy to === instead of !== if you're not paying attention
                      */
@@ -1193,26 +1197,29 @@ class Controller extends Base
      * Iterates student individual marks to return overall student marks for capabilities and indicators
      *
      * @param array $assessments
-     * @param array $linkedMarks
+     * @param array $studentMarks
      * @param Folder\Model $folder
      * @return array
      * @throws InvalidArgumentException
      * @throws RangeException
      */
-    private function buildOverallMarks(array $assessments, array $linkedMarks, Folder\Model $folder): array
+    private function buildOverallMarks(array $assessments, array $studentMarks, Folder\Model $folder): array
     {
-        $overallMarks = $this->aggregateMarks($assessments, $linkedMarks);
+        $overallMarks = $this->aggregateMarks($assessments, $studentMarks);
 
         $summated = $this->summateAggregatedMarks($overallMarks, $folder);
 
         foreach ($summated as &$capability) {
             uasort($capability['indicators'], [$this, 'sortByName']);
         }
+
         unset($capability);
+
         uasort($summated, [$this, 'sortByName']);
 
         return $summated;
     }
+
 
     /**
      * Quick alpha sort function for indicators and capabilities summary section
@@ -1224,6 +1231,7 @@ class Controller extends Base
     {
         return strnatcasecmp($a['name'], $b['name']);
     }
+
 
     /**
      * Resolves the aggregated counts to summate final capability/indicator marks
@@ -1308,102 +1316,108 @@ class Controller extends Base
      * Iterates individual student marks to build the weighted sums per capability and indicator
      *
      * @param array $assessments
-     * @param array $linkedMarks
+     * @param array $studentMarks
      * @return array
      */
-    private function aggregateMarks(array $assessments, array $linkedMarks): array
+    private function aggregateMarks(array $assessments, array $studentMarks): array
     {
         $overallMarks = [];
 
-        /* TODO replace
-         */
-        return $overallMarks;
-
         foreach ($assessments as $assessmentId => $assessmentData) {
             $assessmentWeight = $assessmentData['weight'];
-            foreach ($assessmentData['capabilities'] as $capabilityId => $capabilityData) {
-                // First time we've seen this capability?
-                if (!array_key_exists($capabilityId, $overallMarks)) {
-                    $overallMarks[$capabilityId] = [
-                        'name'       => $capabilityData['name'],
-                        'show'       => $capabilityData['show'],
-                        'marks'      => [],
-                        'indicators' => [],
-                    ];
-                }
 
-                // Show the capability if we are showing it for any assessment
-                $overallMarks[$capabilityId]['show'] = $overallMarks[$capabilityId]['show'] || $capabilityData['show'];
-
-                // Only calculate capability marks if the assessment has weight and we are rendering the capability.
-                if ($assessmentWeight && $overallMarks[$capabilityId]['show']) {
-                    foreach ($linkedMarks as $studentId => $studentData) {
-                        // First time we've see this student for this capability?
-                        if (!array_key_exists($studentId, $overallMarks[$capabilityId]['marks'])) {
-                            $overallMarks[$capabilityId]['marks'][$studentId] = [
-                                'sumNormalised'      => null,
-                                'sumWeight'          => null,
-                                'latestSumNormalised' => null,
-                                'latestSumWeight'     => null,
-                            ];
-                        }
-                        // Does student have a mark for this capability for this assessment?
-                        $capabilityMark = $studentData['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark'] ?? null;
-                        if ($capabilityMark !== null) {
-                            $overallMarks[$capabilityId]['marks'][$studentId]['sumNormalised'] += $capabilityMark * $assessmentWeight;
-                            $overallMarks[$capabilityId]['marks'][$studentId]['sumWeight']     += $assessmentWeight;
-                            $overallMarks[$capabilityId]['marks'][$studentId]['latestSumNormalised'] += $capabilityMark * $assessmentWeight;
-                            $overallMarks[$capabilityId]['marks'][$studentId]['latestSumWeight']     += $assessmentWeight;
-                        }
-                        // Latest Marks
-                        $latestCapabilityMark = $studentData['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark'] ?? null;
-                        if ($latestCapabilityMark !== null) {
-                            $overallMarks[$capabilityId]['marks'][$studentId]['latestSumNormalised'] += $latestCapabilityMark * $assessmentWeight;
-                            $overallMarks[$capabilityId]['marks'][$studentId]['latestSumWeight']     += $assessmentWeight;
-                        }
-                    }
-                }
-
-                foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
-                    // First time we've seen this indicator?
-                    if (!array_key_exists($indicatorId, $overallMarks[$capabilityId]['indicators'])) {
-                        $overallMarks[$capabilityId]['indicators'][$indicatorId] = [
-                            'name'  => $indicatorData['name'],
-                            'marks' => [],
-                        ];
-                    }
-                    if (!$assessmentWeight) {
-                        // Don't aggregate marks if the assessment lacks weighting
-                        continue;
-                    }
-
-                    foreach ($linkedMarks as $studentId => $studentData) {
-                        // First time we've see this student for this indicator?
-                        if (!array_key_exists($studentId, $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'])) {
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId] = [
-                                'sumNormalised'      => null,
-                                'sumWeight'          => null,
-                                'latestSumNormalised' => null,
-                                'latestSumWeight'     => null,
-                            ];
-                        }
-                        // Does student have a mark for this indicator for this assessment?
-                        $indicatorMark = $studentData['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['normalisedMark'] ?? null;
-                        if ($indicatorMark !== null) {
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['sumNormalised'] += $indicatorMark * $assessmentWeight;
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['sumWeight']     += $assessmentWeight;
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestSumNormalised'] += $indicatorMark * $assessmentWeight;
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestSumWeight']     += $assessmentWeight;
-                        }
-                        // Latest Marks
-                        $latestIndicatorMark = $studentData['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['normalisedMark'] ?? null;
-                        if ($latestIndicatorMark !== null) {
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestSumNormalised'] += $latestIndicatorMark * $assessmentWeight;
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestSumWeight']     += $assessmentWeight;
-                        }
-                    }
-                }
-            }
+//            foreach ($assessmentData['capabilities'] as $capabilityId => $capabilityData) {
+//                // First time we've seen this capability?
+//                if (!array_key_exists($capabilityId, $overallMarks)) {
+//                    $overallMarks[$capabilityId] = [
+//                        'name' => $capabilityData['name'],
+//                        'show' => $capabilityData['show'],
+//                        'marks' => [],
+//                        'indicators' => [],
+//                    ];
+//                }
+//
+//                // Show the capability if we are showing it for any assessment
+//                $overallMarks[$capabilityId]['show'] = $overallMarks[$capabilityId]['show'] || $capabilityData['show'];
+//
+//                // Only calculate capability marks if the assessment has weight and we are rendering the capability.
+//                if ($assessmentWeight && $overallMarks[$capabilityId]['show']) {
+//                    foreach ($studentMarks as $studentId => $studentData) {
+//                        // First time we've see this student for this capability?
+//                        if (!array_key_exists($studentId, $overallMarks[$capabilityId]['marks'])) {
+//                            $overallMarks[$capabilityId]['marks'][$studentId] = [
+//                                'sumNormalised' => null,
+//                                'sumWeight' => null,
+//                                'latestSumNormalised' => null,
+//                                'latestSumWeight' => null,
+//                            ];
+//                        }
+//
+//                        // Does student have a mark for this capability for this assessment?
+//                        $capabilityMark = $studentData['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark'] ?? null;
+//
+//                        if ($capabilityMark !== null) {
+//                            $overallMarks[$capabilityId]['marks'][$studentId]['sumNormalised'] += $capabilityMark * $assessmentWeight;
+//                            $overallMarks[$capabilityId]['marks'][$studentId]['sumWeight'] += $assessmentWeight;
+//                            $overallMarks[$capabilityId]['marks'][$studentId]['latestSumNormalised'] += $capabilityMark * $assessmentWeight;
+//                            $overallMarks[$capabilityId]['marks'][$studentId]['latestSumWeight'] += $assessmentWeight;
+//                        }
+//
+//                        // Latest Marks
+//                        $latestCapabilityMark = $studentData['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark'] ?? null;
+//
+//                        if ($latestCapabilityMark !== null) {
+//                            $overallMarks[$capabilityId]['marks'][$studentId]['latestSumNormalised'] += $latestCapabilityMark * $assessmentWeight;
+//                            $overallMarks[$capabilityId]['marks'][$studentId]['latestSumWeight'] += $assessmentWeight;
+//                        }
+//                    }
+//                }
+//
+//                foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
+//                    // First time we've seen this indicator?
+//                    if (!array_key_exists($indicatorId, $overallMarks[$capabilityId]['indicators'])) {
+//                        $overallMarks[$capabilityId]['indicators'][$indicatorId] = [
+//                            'name'  => $indicatorData['name'],
+//                            'marks' => [],
+//                        ];
+//                    }
+//
+//                    if (!$assessmentWeight) {
+//                        // Don't aggregate marks if the assessment lacks weighting
+//                        continue;
+//                    }
+//
+//                    foreach ($studentMarks as $studentId => $studentData) {
+//                        // First time we've see this student for this indicator?
+//                        if (!array_key_exists($studentId, $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'])) {
+//                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId] = [
+//                                'sumNormalised' => null,
+//                                'sumWeight' => null,
+//                                'latestSumNormalised' => null,
+//                                'latestSumWeight' => null,
+//                            ];
+//                        }
+//
+//                        // Does student have a mark for this indicator for this assessment?
+//                        $indicatorMark = $studentData['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['normalisedMark'] ?? null;
+//
+//                        if ($indicatorMark !== null) {
+//                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['sumNormalised'] += $indicatorMark * $assessmentWeight;
+//                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['sumWeight'] += $assessmentWeight;
+//                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestSumNormalised'] += $indicatorMark * $assessmentWeight;
+//                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestSumWeight'] += $assessmentWeight;
+//                        }
+//
+//                        // Latest Marks
+//                        $latestIndicatorMark = $studentData['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['normalisedMark'] ?? null;
+//
+//                        if ($latestIndicatorMark !== null) {
+//                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestSumNormalised'] += $latestIndicatorMark * $assessmentWeight;
+//                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestSumWeight'] += $assessmentWeight;
+//                        }
+//                    }
+//                }
+//            }
         }
         return $overallMarks;
     }
