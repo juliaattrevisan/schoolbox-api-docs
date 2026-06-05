@@ -347,10 +347,10 @@ class Module extends BaseModule
          */
         $this->register('GET', "$assRoute/participation", 'getAssessmentParticipationForm', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
         $this->register('GET', "$assRoute/participation/new", 'getAssessmentParticipationLearningPlan', $canModifyExistingActivityCustomParticipation, $preloadAssessmentForParticipant);
-        $this->register('POST', "$assRoute/participation/new", 'postCreateAssessmentParticipationLearningPlan', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
-        $this->register('GET', "$assRoute/participation/{planId:\d+}/modify", 'getUpdateAssessmentParticipationLearningPlan', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
-        $this->register('POST', "$assRoute/participation/{planId:\d+}/modify", 'postUpdateAssessmentParticipationLearningPlan', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
-        $this->register('POST', "$assRoute/participation/customisation/include", 'postExistingCustomisationInclude', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
+        $this->register('POST', "$assRoute/participation/new", 'postCreateAssessmentParticipationLearningPlan', $canModifyExistingActivityCustomParticipation, $preloadAssessmentForParticipant);
+        $this->register('GET', "$assRoute/participation/{planId:\d+}/modify", 'getUpdateAssessmentParticipationLearningPlan', $canModifyExistingActivityCustomParticipation, $preloadAssessmentForParticipant);
+        $this->register('POST', "$assRoute/participation/{planId:\d+}/modify", 'postUpdateAssessmentParticipationLearningPlan', $canModifyExistingActivityCustomParticipation, $preloadAssessmentForParticipant);
+        $this->register('POST', "$assRoute/participation/customisation/include", 'postExistingCustomisationInclude', $canModifyExistingActivityCustomParticipation, $preloadAssessmentForParticipant);
 
         /* Rescore Feedbacks
          */
