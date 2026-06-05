@@ -49,7 +49,7 @@ class CustomStyleExtractor
             .summative-report h3,
             .summative-report h4,
             .summative-report h5,
-            .summative-report h6 { font-family: 'Playwrite GB J', serif; }
+            .summative-report h6 { font-family: 'Playwrite GB J', 'Impact', serif; }
         ";
 
         /* In the given slab of css rules $skinConfig,
