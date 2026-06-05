@@ -58,7 +58,7 @@ function getGroupColspan(activities: MarkbookActivity[]): number {
             <th class="fixed-left" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }">
                 <div><span>Student Weighted Average</span></div>
             </th>
-            <th v-if="mbStore.data.rank !== null" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }">
+            <th v-if="mbStore.showRankColumn" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }">
                 <div>
                     <span v-if="props.type === MarkbookType.CLASS">Class Ranking</span>
                     <span v-else-if="props.type === MarkbookType.COURSE">Course Ranking</span>
@@ -77,7 +77,7 @@ function getGroupColspan(activities: MarkbookActivity[]): number {
             <th class="fixed-left transparent" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }"></th>
             <th class="fixed-left white" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }"></th>
             <th
-                v-if="mbStore.data.rank !== null"
+                v-if="mbStore.showRankColumn"
                 class="white"
                 :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }"
             ></th>

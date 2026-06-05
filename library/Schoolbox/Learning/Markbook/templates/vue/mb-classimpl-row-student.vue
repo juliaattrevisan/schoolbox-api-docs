@@ -91,8 +91,8 @@ mbStore.feedbackDrawerEventBus.on(({ drawerRect }) => {
                 {{ student.stats.weightedMean ?? "–" }}
             </a>
         </th>
-        <td v-if="mbStore.data.rank !== null">
-            <span v-if="mbStore.data.rank[student.id] !== undefined && student.stats.weightedMean">
+        <td v-if="mbStore.showRankColumn">
+            <span v-if="mbStore.data.rank && mbStore.data.rank[student.id] !== undefined && student.stats.weightedMean">
                 {{ mbStore.data.rank[student.id] }}
             </span>
             <span v-else>–</span>

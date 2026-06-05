@@ -309,6 +309,14 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         };
     }
 
+    const showRankColumn = window.Vue.computed(() => {
+        if (data.value === null) {
+            return false;
+        }
+
+        return data.value.rank !== null;
+    });
+
     return {
         init,
         data,
@@ -336,5 +344,6 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         feedbackDrawerEventBus,
         updateExtraInfo,
         getSplitColumnVisibility,
+        showRankColumn,
     };
 });

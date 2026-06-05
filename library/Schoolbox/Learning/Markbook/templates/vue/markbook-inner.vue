@@ -181,7 +181,7 @@ const exportReportRoute = window.Vue.computed(() => {
                         <span data-tooltip class="hint has-tip tip-top" title="Average student cohort mark">?</span>
                     </th>
                     <th class="course-row fixed-left"></th>
-                    <th v-if="mbStore.data.rank !== null" class="course-row"></th>
+                    <th v-if="mbStore.showRankColumn" class="course-row"></th>
                     <template v-for="assessment in mbStore.orderedActivities" :key="assessment.id">
                         <td v-if="assessment.stats !== null" class="course-row">
                             <span v-if="mbStore.showDrafts && mbStore.hasDraftMarks(assessment)" class="meta">
