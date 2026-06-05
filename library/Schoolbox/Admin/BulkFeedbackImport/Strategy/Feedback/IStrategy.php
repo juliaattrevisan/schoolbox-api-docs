@@ -27,10 +27,10 @@ interface IStrategy
      * Process one row from the csv
      *
      * @param int $i A row counter so we can tell people about the line we're processing in the csv (ie. where errors occur in the csv)
-     * @param array $folder The folder in which the assessment lives
+     * @param array{id: int|string, title: string} $folder The folder in which the assessment lives
      * @param \Schoolbox\User $learner The student who is receiving the feedback
      * @param IAssessable $assessment A due work or reporting domain instance
-     * @param array $assessmentData A row from the $assessmentQuery result set
+     * @param array<string, mixed> $assessmentData A row from the $assessmentQuery result set
      * @param \Alaress_Date_Format $adf The derived publish date of the feedback
      * @param null|float $normalisedMark A numeric value out of 100
      * @param null|string $learnerHumanReadableMark Corresponds to a mark type/submission state that learners/families see
@@ -67,7 +67,7 @@ interface IStrategy
     /**
      * Returns a list of error messages encountered during processing rows
      *
-     * @return array
+     * @return array<int, array{message: string, type: string}>
      */
     public function getMessages(): array;
 
@@ -83,7 +83,7 @@ interface IStrategy
     /**
      * Returns a list of convenient links to status screens
      *
-     * @return array
+     * @return array<string, array{id: int|string|null, title: string}>
      */
     public function getLinks(): array;
 }

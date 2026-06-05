@@ -47,9 +47,10 @@ class NormalisedMark implements IStrategy
      * Calculate the (normalised mark, learner human readable mark, instructor human readable mark) tuple
      * via the dominant discriminator column $column
      *
-     * @param array $row
+     * @param array<string, mixed> $row
      * @param IAssessable $assessment
-     * @return array
+     * @return array{normalisedMark: null|float, learnerHumanReadableMark: null|string, instructorHumanReadableMark: null|string}
+     * @throws \RuntimeException
      */
     public function calculate(array $row, IAssessable $assessment): array
     {

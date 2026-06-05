@@ -28,7 +28,6 @@ use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Folder\Mapper;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\IStorage;
-use Schoolbox\Resource\Storage\Model;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -169,12 +168,13 @@ class Processor
     /**
      * Process feedbacks
      *
-     * @param Model $file
+     * @param IStorage $file
      * @param User $creator
-     * @return array
+     * @return array{messages: array, errors: int, links: array}
      * @throws FilesystemException
      * @throws Exception
      * @throws Deleted
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     public function parseFeedbacks(
         IStorage $file,
@@ -466,7 +466,7 @@ class Processor
     /**
      * Based on the assessment identifiers, figure out which feedback-saving strategy to use.
      *
-     * @param array $assessmentData
+     * @param array<string, mixed> $assessmentData
      * @return IStrategy
      * @throws \RuntimeException
      */
@@ -491,7 +491,7 @@ class Processor
      *    - learner human readable mark
      *    - instructor human readable mark
      *
-     * @param array $headerRow
+     * @param array<int, string> $headerRow
      * @return Strategy\Mark\IStrategy
      * @throws \Schoolbox\Application\Exception\Exception
      */
