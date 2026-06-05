@@ -121,7 +121,7 @@ class Controller extends Base
         $this->filterMapper          = $filterMapper;
         $this->translator            = $translator;
 
-        /* Used to calculate human readable and normalised marks for each student for capabilities and indicators
+        /* Used to calculate human-readable and normalised marks for each student for capabilities and indicators
          */
         $this->decimalHydrator = new Decimal();
         $this->totalMarkScheme = new MarkScheme\TotalMarkFractional();
@@ -735,7 +735,7 @@ class Controller extends Base
             if (!isset($students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']])) {
                 $isMarkPerCapability = $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['isMarkPerCapability'];
 
-                /* Calculate normalised and human readable marks if relevant: depends on $isMarkPerCapability being true
+                /* Calculate normalised and human-readable marks if relevant: depends on $isMarkPerCapability being true
                  */
                 $humanReadableMark = null;
                 $normalisedMark = null;
@@ -797,7 +797,7 @@ class Controller extends Base
                             'humanReadableMark' => $humanReadableMark,
                             'selectedDescriptorText' => $row['descriptor_name'],
                         ],
-                        /* Normalised and human readable marks from the most recent feedback: these would typically be draft
+                        /* Normalised and human-readable marks from the most recent feedback: these would typically be draft
                          * marks, but could end up being the same as the Published ones by sheer coincidence.
                          */
                         'draft' => [
@@ -829,6 +829,7 @@ class Controller extends Base
      * @param array $exclusions
      * @param array $students The array of student values which will already contian published, we are adding only the draft marks
      * @return array
+     * @throws RouteNotFound
      */
     private function retrieveDraftMarks(
         array $assessments,
@@ -1057,7 +1058,7 @@ class Controller extends Base
 
             $isMarkPerCapability = $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['isMarkPerCapability'];
 
-            /* Calculate normalised and human readable marks if relevant: depends on $isMarkPerCapability being true
+            /* Calculate normalised and human-readable marks if relevant: depends on $isMarkPerCapability being true
              */
             $humanReadableMark = null;
             $normalisedMark = null;
