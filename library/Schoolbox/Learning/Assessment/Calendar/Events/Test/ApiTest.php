@@ -6,6 +6,7 @@ namespace Schoolbox\Learning\Assessment\Calendar\Events\Test;
 
 use Alaress_Date_Format;
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Collection;
 use Schoolbox\Filter\Filters\Assessment\IdFinder;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Calendar\Events\Api;
@@ -51,7 +52,16 @@ class ApiTest extends TestCase
         $assessmentDataSource
             ->expects($this->once())
             ->method('loadParticipantsIntoAssessmentCollection')
-            ->with($assessments, $student, true, true)
+            ->with(
+                $assessments,
+                $this->callback(
+                    static function (Collection $users) use ($student): bool {
+                        return $users->count() === 1 && $users->first() === $student;
+                    }
+                ),
+                true,
+                true
+            )
             ->willReturn($assessments);
 
         $visibility = $this->createMock(Visibility::class);
@@ -99,7 +109,16 @@ class ApiTest extends TestCase
         $assessmentDataSource
             ->expects($this->once())
             ->method('loadParticipantsIntoAssessmentCollection')
-            ->with($assessments, $student, true, true)
+            ->with(
+                $assessments,
+                $this->callback(
+                    static function (Collection $users) use ($student): bool {
+                        return $users->count() === 1 && $users->first() === $student;
+                    }
+                ),
+                true,
+                true
+            )
             ->willReturn($assessments);
 
         $visibility = $this->createMock(Visibility::class);
@@ -141,7 +160,11 @@ class ApiTest extends TestCase
                         return $assessments->count() === 1 && $assessments->first() === $assessment;
                     }
                 ),
-                $student,
+                $this->callback(
+                    static function (Collection $users) use ($student): bool {
+                        return $users->count() === 1 && $users->first() === $student;
+                    }
+                ),
                 true,
                 true
             )
@@ -188,7 +211,11 @@ class ApiTest extends TestCase
             ->method('loadParticipantsIntoAssessmentCollection')
             ->with(
                 new GenericCollection(IAssessable::class, [$assessment]),
-                $student,
+                $this->callback(
+                    static function (Collection $users) use ($student): bool {
+                        return $users->count() === 1 && $users->first() === $student;
+                    }
+                ),
                 true,
                 true
             )

@@ -14,6 +14,7 @@ use Alaress_Date_Format;
 use Calendar\Event\Type\EventInterface;
 use Calendar\Event\Type\Submission\Event;
 use Calendar_Api_EventType_Interface;
+use Schoolbox\Collection;
 use Schoolbox\Filter\Filters\Assessment\IdFinder;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
@@ -174,10 +175,10 @@ class Api implements Calendar_Api_EventType_Interface
             if ($this->visibility) {
                 $assessments = new GenericCollection(IAssessable::class, [$assessment]);
                 $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection(
-                    $assessments,
-                    $this->user,
-                    true,
-                    true
+                    collection: $assessments,
+                    users: (new Collection())->add($this->user),
+                    removeExcluded: true,
+                    assumeParticipation: true
                 );
                 $assessment = $assessments->first();
             }

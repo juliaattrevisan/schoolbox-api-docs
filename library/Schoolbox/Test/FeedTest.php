@@ -9,6 +9,7 @@ use Alaress\Database\Statement\IStatement;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -295,9 +296,17 @@ class FeedTest extends TestCase
             ->method('findAllByIds')
             ->with($assessmentIds)
             ->willReturn($assessmentCollection);
+        $expectedParticipantUsers = $participantUser === null
+            ? null
+            : $this->callback(
+                static function (Collection $users) use ($participantUser): bool {
+                    return $users->count() === 1 && $users->first() === $participantUser;
+                }
+            );
+
         $assessmentDataSource->expects($this->once())
             ->method('loadParticipantsIntoAssessmentCollection')
-            ->with($assessmentCollection, $participantUser, true)
+            ->with($assessmentCollection, $expectedParticipantUsers, true)
             ->willReturn($assessmentCollection);
 
         return $assessmentDataSource;
