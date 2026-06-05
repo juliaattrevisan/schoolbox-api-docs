@@ -1275,25 +1275,29 @@ class Controller extends Base
                  * It used to be split out into its own traversal
                  */
                 foreach ($rubricGridData['capabilities'] as $capabilityId => $capabilityData) {
-                    $overallMarks[$capabilityId] = [
-                        'name' => $capabilityData['name'],
-                        /* What each student got for this capability
-                         * Contains a "published" and "draft" node
-                         */
-                        'students' => [],
-                        /* The indicators used in this capability
-                         */
-                        'indicators' => [],
-                    ];
-
-                    foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
-                        $overallMarks[$capabilityId]['indicators'][$indicatorId] = [
-                            'name' => $indicatorData['name'],
-                            /* What each student got for this indicator
+                    if (!isset($overallMarks[$capabilityId])) {
+                        $overallMarks[$capabilityId] = [
+                            'name' => $capabilityData['name'],
+                            /* What each student got for this capability
                              * Contains a "published" and "draft" node
                              */
-                            'students' => []
+                            'students' => [],
+                            /* The indicators used in this capability
+                             */
+                            'indicators' => [],
                         ];
+                    }
+
+                    foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
+                        if (!isset($overallMarks[$capabilityId]['indicators'][$indicatorId])) {
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId] = [
+                                'name' => $indicatorData['name'],
+                                /* What each student got for this indicator
+                                 * Contains a "published" and "draft" node
+                                 */
+                                'students' => []
+                            ];
+                        }
                     }
                 }
             }

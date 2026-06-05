@@ -212,19 +212,33 @@
                                     {# Class 'second-child' needed so that cells are styled correctly when the cell to the left spans mulitple rows. #}
                                     <th class="fixed-left white second-child capability">{{ capabilityData.name | markdown }}</th>
 
+                                    {# This is an intentional cross-reference with $students hash lookup because that
+                                     # contains the whole list of possible students rather than just the ones with grades
+                                     # We have to doubly-cross-reference back to $overall lol
+                                     #}
                                     {% for studentId, studentData in students %}
-                                        {% if capabilityData.show %}
+                                        {% set publishedMarks = overall[capabilityId].students[studentId].published ?? null %}
+                                        {% set draftMarks = overall[capabilityId].students[studentId].published.draft ?? null %}
+
+{#                                        {% if capabilityData.show %}#}
                                             <td class="mark">
-                                            {% set gradientClass = urgency.marks(capabilityData.marks[studentId].normalised ?? null) %}
-                                            {% set draftGradientClass = urgency.marks(capabilityData.marks[studentId].latestNormalised ?? null) %}
-                                            <a href="#" {% if draftGradientClass %}data-actual-mark{% endif %} class="{% if gradientClass %} {{ gradientClass }}{% endif %}">{{ capabilityData.marks[studentId].humanReadable|default('–') }}</a>
-                                            {% if draftGradientClass %}
-                                            <a href="#" data-draft-mark class="meta">{{ capabilityData.marks[studentId].latestHumanReadable|default('–') }}</a>
+                                                {% if publishedMarks is not null %}
+                                                    {% set gradientClass = urgency.marks(publishedMarks.normalisedMark ?? null) %}
+
+                                                    <a class="{{ gradientClass }}"
+                                                       data-actual-mark
+                                                    >{{ publishedMarks.humanReadableMark|default('–') }}</a>
+                                                {% endif %}
+
+                                                {% if draftMarks is not null %}
+                                                    <a class="{{ gradientClass }}"
+                                                       data-draft-mark
+                                                    >{{ publishedMarks.humanReadableMark|default('–') }}</a>
                                                 {% endif %}
                                             </td>
-                                        {% else %}
-                                            <td class="excluded"></td>
-                                        {% endif %}
+{#                                        {% else %}#}
+{#                                            <td class="excluded"></td>#}
+{#                                        {% endif %}#}
                                     {% endfor %}
                                 </tr>
 
@@ -232,16 +246,30 @@
                                     <tr class="indicator-row summated">
                                         {# Class 'second-child' needed so that cells are styled correctly when the cell to the left spans mulitple rows. #}
                                         <th class="fixed-left second-child white indicator">{{ indicatorData.name | markdown }}</th>
-                                        {% for studentId, studentData in students %}
-                                            <td class="mark">
-                                                {% set gradientClass = urgency.marks(indicatorData.marks[studentId].normalised ?? '') %}
-                                                {% set draftGradientClass = urgency.marks(indicatorData.marks[studentId].latestNormalised ?? '') %}
-                                            <a href="#" {% if draftGradientClass %}data-actual-mark{% endif %} class="{% if gradientClass %} {{ gradientClass }}{% endif %}">{{ indicatorData.marks[studentId].humanReadable|default('–') }}</a>
-                                            {% if draftGradientClass %}
-                                            <a href="#" data-draft-mark class="meta">{{ indicatorData.marks[studentId].latestHumanReadable|default('–') }}</a>
-                                            {% endif %}
-                                            </td>
 
+                                        {# This is an intentional cross-reference with $students hash lookup because that
+                                         # contains the whole list of possible students rather than just the ones with grades
+                                         # We have to doubly-cross-reference back to $overall lol
+                                         #}
+                                        {% for studentId, studentData in students %}
+                                            {% set publishedMarks = overall[capabilityId].indicators[indicatorId].students[studentId].published ?? null %}
+                                            {% set draftMarks = overall[capabilityId].indicators[indicatorId].students[studentId].draft ?? null %}
+
+                                            <td class="mark">
+                                                {% if publishedMarks is not null %}
+                                                    {% set gradientClass = urgency.marks(publishedMarks.normalisedMark ?? null) %}
+
+                                                    <a class="{{ gradientClass }}"
+                                                       data-actual-mark
+                                                    >{{ publishedMarks.humanReadableMark|default('–') }}</a>
+                                                {% endif %}
+
+                                                {% if draftMarks is not null %}
+                                                    <a class="{{ gradientClass }}"
+                                                       data-draft-mark
+                                                    >{{ publishedMarks.humanReadableMark|default('–') }}</a>
+                                                {% endif %}
+                                            </td>
                                         {% endfor %}
                                     </tr>
                                 {% endfor %}
@@ -250,7 +278,6 @@
                     </table>
                 </div>
             </div>
-
         {% else %}
             <div class="empty-state">
                 <sbx-icon name="progress" size="2.5rem"></sbx-icon>
