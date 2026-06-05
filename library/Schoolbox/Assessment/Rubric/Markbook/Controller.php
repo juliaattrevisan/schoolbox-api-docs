@@ -1423,18 +1423,24 @@ class Controller extends Base
         $markScheme = $markSchemeFactory->spawnForFolder($folder, true);
 
         foreach ($overallMarks as $capabilityId => &$capabilityData) {
-            foreach ($capabilityData['students'] as $studentId => &$studentData) {
-                /* Multiply this by 100
+            foreach ($capabilityData['students'] as &$studentCapabilityData) {
+                /* Multiply this by 100 before applying human-readable transformation
                  */
-                $studentData['published']['normalisedMark'] *= 100.00;
+                $studentCapabilityData['published']['normalisedMark'] *= 100.00;
+                $studentCapabilityData['published']['humanReadableMark'] = $markScheme->getHumanReadableMark((float)$studentCapabilityData['published']['normalisedMark']);
+            }
 
-                /* Cram in a human-readable equivalent lol
-                 */
-                $studentData['published']['humanReadableMark'] = $markScheme->getHumanReadableMark((float)$studentData['published']['normalisedMark']);
+            foreach ($capabilityData['indicators'] as &$indicatorStudentData) {
+                foreach ($indicatorStudentData['students'] as &$studentIndicatorData) {
+                    /* Multiply this by 100 before applying human-readable transformation
+                     */
+                    $studentIndicatorData['published']['normalisedMark'] *= 100;
+                    $studentIndicatorData['published']['humanReadableMark'] = $markScheme->getHumanReadableMark((float)$studentIndicatorData['published']['normalisedMark']);
+                }
             }
         }
 
-        unset($capabilityData, $studentData);
+        unset($capabilityData, $studentCapabilityData, $studentIndicatorData);
 
 
         /* TODO figure out this idea

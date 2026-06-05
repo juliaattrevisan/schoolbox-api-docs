@@ -261,13 +261,13 @@
 
                                                     <a class="{{ gradientClass }}"
                                                        data-actual-mark
-                                                    >{{ publishedMarks.humanReadableMark|default('–') }}</a>
+                                                    >{{ publishedMarks.humanReadableMark|default('–') }} ({{ publishedMarks.normalisedMark }})</a>
                                                 {% endif %}
 
                                                 {% if draftMarks is not null %}
                                                     <a class="{{ gradientClass }}"
                                                        data-draft-mark
-                                                    >{{ publishedMarks.humanReadableMark|default('–') }}</a>
+                                                    >{{ draftMarks.humanReadableMark|default('–') }} ({{ draftMarks.normalisedMark }})</a>
                                                 {% endif %}
                                             </td>
                                         {% endfor %}
