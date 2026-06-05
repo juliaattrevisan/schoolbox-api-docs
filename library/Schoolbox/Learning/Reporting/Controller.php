@@ -472,9 +472,12 @@ class Controller extends Base
         $folder = $assessment->getBaseContext()->getFolder();
 
         /* Find data between these date ranges
-         */
-        $from = new \Alaress_Date_Format('2025-01-01 00:00:00', 'Y-m-d H:i:s');
-        $to = new \Alaress_Date_Format('2026-11-07 00:00:00', 'Y-m-d H:i:s');
+        */
+        // TODO: SA-22532 - handle each of the cases of $assessment->getSupportingDataRange(), for now just always uses the current academic year
+        $now = \Alaress_Date_Format::now();
+
+        $from = $now->getStartOfSchoolYear();
+        $to = $now->endOfSchoolYear();
 
         $assessments = $this->assessmentMapperProxy->createCollection();
 
