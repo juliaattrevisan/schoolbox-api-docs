@@ -27,30 +27,34 @@ const emit = defineEmits(["selected"]);
         :disabled="props.isDisabled"
         @click.prevent="emit('selected')"
     >
-        <span
+        <sbx-label
             v-if="props.node._usageCounts?.course > 0"
-            :class="`label neutral ${getUsageIcon(ActivityTypes.COURSE)}`"
+            :text="props.node._usageCounts.course.toString()"
+            sentiment="neutral"
+            :icon="getUsageIcon(ActivityTypes.COURSE)"
             title="Courses"
-            >{{ props.node._usageCounts.course }}</span
-        >
-        <span
+        ></sbx-label>
+        <sbx-label
             v-if="props.node._usageCounts?.unit > 0"
-            :class="`label neutral ${getUsageIcon(ActivityTypes.UNIT)}`"
+            :text="props.node._usageCounts.unit.toString()"
+            sentiment="neutral"
+            :icon="getUsageIcon(ActivityTypes.UNIT)"
             title="Units"
-            >{{ props.node._usageCounts.unit }}</span
-        >
-        <span
+        ></sbx-label>
+        <sbx-label
             v-if="props.node._usageCounts?.assessment > 0"
-            :class="`label neutral ${getUsageIcon(ActivityTypes.LEARNING_ACTIVITY)}`"
+            :text="props.node._usageCounts.assessment.toString()"
+            sentiment="neutral"
+            :icon="getUsageIcon(ActivityTypes.LEARNING_ACTIVITY)"
             title="Learning activity"
-            >{{ props.node._usageCounts.assessment }}</span
-        >
-        <span
+        ></sbx-label>
+        <sbx-label
             v-if="props.node._usageCounts?.badge > 0"
-            :class="`label neutral ${getUsageIcon(ActivityTypes.BADGE)}`"
+            :text="props.node._usageCounts.badge.toString()"
+            sentiment="neutral"
+            :icon="getUsageIcon(ActivityTypes.BADGE)"
             title="Badges"
-            >{{ props.node._usageCounts.badge }}</span
-        >
+        ></sbx-label>
     </button>
     <button
         v-if="getTotalUsage(props.node) > 0 || props.node.description !== ''"
@@ -66,7 +70,6 @@ const emit = defineEmits(["selected"]);
 
 <style lang="scss" scoped>
 @import "@schoolboxCurriculum/vue/style/viewNode";
-@import "@css/core/base/icon-colours";
 .button-action-option {
     @extend .button;
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
@@ -84,10 +87,5 @@ const emit = defineEmits(["selected"]);
     gap: 0.5rem;
     min-width: auto;
     overflow: visible;
-    span {
-        background: none;
-        padding: 0.375rem 0.25rem;
-        margin: 0;
-    }
 }
 </style>

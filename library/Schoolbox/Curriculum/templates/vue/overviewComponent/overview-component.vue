@@ -113,5 +113,9 @@ function onModalClosed(): void {
         :starting-node-id="props.filter?.id"
         :has-tabs="selectorStore.currentNodesStore.hasNodes"
     />
-    <curriculum-details-modal :selected-node-id="store().selectedDetailsNodeId" @closed="onModalClosed" />
+    <curriculum-details-modal
+        :selected-node-id="store().selectedDetailsNodeId"
+        :folder-id="props.folderId"
+        @closed="onModalClosed"
+    />
 </template>
