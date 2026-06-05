@@ -96,7 +96,6 @@
         "eslint-plugin-eslint-comments": "~3.2.0",
         "eslint-plugin-import-x": "~4.16.1",
         "eslint-plugin-jsdoc": "~62.1.0",
-        "eslint-plugin-storybook": "10.4.2",
         "eslint-plugin-vue": "~10.7.0",
         "expose-loader": "~5.0.1",
         "extract-loader": "~5.1.0",
@@ -17758,20 +17757,6 @@
       },
       "funding": {
         "url": "https://github.com/sponsors/ljharb"
-      }
-    },
-    "node_modules/eslint-plugin-storybook": {
-      "version": "10.4.2",
-      "resolved": "https://registry.npmjs.org/eslint-plugin-storybook/-/eslint-plugin-storybook-10.4.2.tgz",
-      "integrity": "sha512-l3/vzLRmb8VSi3X1Bo6/Pa+64naw1jFsZE5jPPA4izvVdNhH1rF4rGuOC3kDTU926qKVBQtKua8D24XWQtvcGg==",
-      "dev": true,
-      "license": "MIT",
-      "dependencies": {
-        "@typescript-eslint/utils": "^8.48.0"
-      },
-      "peerDependencies": {
-        "eslint": ">=8",
-        "storybook": "^10.4.2"
       }
     },
     "node_modules/eslint-plugin-vue": {
@@ -43194,15 +43179,6 @@
         "hermes-parser": "^0.25.1",
         "zod": "^3.25.0 || ^4.0.0",
         "zod-validation-error": "^3.5.0 || ^4.0.0"
-      }
-    },
-    "eslint-plugin-storybook": {
-      "version": "10.4.2",
-      "resolved": "https://registry.npmjs.org/eslint-plugin-storybook/-/eslint-plugin-storybook-10.4.2.tgz",
-      "integrity": "sha512-l3/vzLRmb8VSi3X1Bo6/Pa+64naw1jFsZE5jPPA4izvVdNhH1rF4rGuOC3kDTU926qKVBQtKua8D24XWQtvcGg==",
-      "dev": true,
-      "requires": {
-        "@typescript-eslint/utils": "^8.48.0"
       }
     },
     "eslint-plugin-vue": {
