@@ -1235,83 +1235,83 @@ class Controller extends Base
     }
 
 
-    /**
-     * Resolves the aggregated counts to summate final capability/indicator marks
-     *
-     * @param array $overallMarks
-     * @param Folder\Model $folder
-     * @return array
-     * @throws InvalidArgumentException
-     * @throws RangeException
-     */
-    private function summateAggregatedMarks(array $overallMarks, Folder\Model $folder): array
-    {
-        /**
-         * Logic for the mark scheme...
-         *
-         * If there is no year level on the class page, we should default back to the system default.
-         * If there are multiple year levels on the class page, and they agree (we should use their grade group)
-         * If there are multiple year levels on the class page, and they do NOT agree (all different grade groups), we should fall back to the system default grade group.
-         */
-        $markSchemeFactory = new Factory($this->getConfigLoader());
-        $markScheme = $markSchemeFactory->spawnForFolder($folder, true);
-
-        foreach ($overallMarks as $capabilityId => $capabilityMarks) {
-            foreach ($capabilityMarks['marks'] as $studentId => $sums) {
-                $sumNormalised      = $sums['sumNormalised'];
-                $sumWeight          = $sums['sumWeight'];
-                $latestSumNormalised = $sums['latestSumNormalised'];
-                $latestSumWeight     = $sums['latestSumWeight'];
-                if (!$sumWeight && !$latestSumWeight) {
-                    // nothing exists, so remove this...
-                    unset($overallMarks[$capabilityId]['marks'][$studentId]);
-                } else {
-                    // only dump things into the array that actually exist...
-                    $overallMarks[$capabilityId]['marks'][$studentId] = [];
-                    if ($sumWeight) {
-                        $normalised = $sumNormalised / $sumWeight;
-                        $overallMarks[$capabilityId]['marks'][$studentId]['normalised'] = $normalised;
-                        $overallMarks[$capabilityId]['marks'][$studentId]['humanReadable'] = $markScheme->getHumanReadableMark($normalised);
-                        $overallMarks[$capabilityId]['marks'][$studentId]['latestNormalised'] = $normalised;
-                        $overallMarks[$capabilityId]['marks'][$studentId]['latestHumanReadable'] = $markScheme->getHumanReadableMark($normalised);
-                    }
-                    if ($latestSumWeight) {
-                        $latestNormalised                                  = $latestSumNormalised / $latestSumWeight;
-                        $overallMarks[$capabilityId]['marks'][$studentId]['latestNormalised'] = $latestNormalised;
-                        $overallMarks[$capabilityId]['marks'][$studentId]['latestHumanReadable'] = $markScheme->getHumanReadableMark($latestNormalised);
-                    }
-                }
-            }
-            foreach ($capabilityMarks['indicators'] as $indicatorId => $indicatorMarks) {
-                foreach ($indicatorMarks['marks'] as $studentId => $sums) {
-                    $sumNormalised = $sums['sumNormalised'];
-                    $sumWeight     = $sums['sumWeight'];
-                    $latestSumNormalised = $sums['latestSumNormalised'];
-                    $latestSumWeight     = $sums['latestSumWeight'];
-                    if (!$sumWeight && !$latestSumWeight) {
-                        // nothing exists, so remove this...
-                        unset($overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]);
-                    } else {
-                        // only dump things into the array that actually exist...
-                        $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId] = [];
-                        if ($sumWeight) {
-                            $normalised = $sumNormalised / $sumWeight;
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['normalised'] = $normalised;
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['humanReadable'] = $markScheme->getHumanReadableMark($normalised);
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestNormalised'] = $normalised;
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestHumanReadable'] = $markScheme->getHumanReadableMark($normalised);
-                        }
-                        if ($latestSumWeight) {
-                            $latestNormalised = $latestSumNormalised / $latestSumWeight;
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestNormalised'] = $latestNormalised;
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestHumanReadable'] = $markScheme->getHumanReadableMark($latestNormalised);
-                        }
-                    }
-                }
-            }
-        }
-        return $overallMarks;
-    }
+//    /**
+//     * Resolves the aggregated counts to summate final capability/indicator marks
+//     *
+//     * @param array $overallMarks
+//     * @param Folder\Model $folder
+//     * @return array
+//     * @throws InvalidArgumentException
+//     * @throws RangeException
+//     */
+//    private function summateAggregatedMarks(array $overallMarks, Folder\Model $folder): array
+//    {
+//        /**
+//         * Logic for the mark scheme...
+//         *
+//         * If there is no year level on the class page, we should default back to the system default.
+//         * If there are multiple year levels on the class page, and they agree (we should use their grade group)
+//         * If there are multiple year levels on the class page, and they do NOT agree (all different grade groups), we should fall back to the system default grade group.
+//         */
+//        $markSchemeFactory = new Factory($this->getConfigLoader());
+//        $markScheme = $markSchemeFactory->spawnForFolder($folder, true);
+//
+//        foreach ($overallMarks as $capabilityId => $capabilityMarks) {
+//            foreach ($capabilityMarks['marks'] as $studentId => $sums) {
+//                $sumNormalised      = $sums['sumNormalised'];
+//                $sumWeight          = $sums['sumWeight'];
+//                $latestSumNormalised = $sums['latestSumNormalised'];
+//                $latestSumWeight     = $sums['latestSumWeight'];
+//                if (!$sumWeight && !$latestSumWeight) {
+//                    // nothing exists, so remove this...
+//                    unset($overallMarks[$capabilityId]['marks'][$studentId]);
+//                } else {
+//                    // only dump things into the array that actually exist...
+//                    $overallMarks[$capabilityId]['marks'][$studentId] = [];
+//                    if ($sumWeight) {
+//                        $normalised = $sumNormalised / $sumWeight;
+//                        $overallMarks[$capabilityId]['marks'][$studentId]['normalised'] = $normalised;
+//                        $overallMarks[$capabilityId]['marks'][$studentId]['humanReadable'] = $markScheme->getHumanReadableMark($normalised);
+//                        $overallMarks[$capabilityId]['marks'][$studentId]['latestNormalised'] = $normalised;
+//                        $overallMarks[$capabilityId]['marks'][$studentId]['latestHumanReadable'] = $markScheme->getHumanReadableMark($normalised);
+//                    }
+//                    if ($latestSumWeight) {
+//                        $latestNormalised                                  = $latestSumNormalised / $latestSumWeight;
+//                        $overallMarks[$capabilityId]['marks'][$studentId]['latestNormalised'] = $latestNormalised;
+//                        $overallMarks[$capabilityId]['marks'][$studentId]['latestHumanReadable'] = $markScheme->getHumanReadableMark($latestNormalised);
+//                    }
+//                }
+//            }
+//            foreach ($capabilityMarks['indicators'] as $indicatorId => $indicatorMarks) {
+//                foreach ($indicatorMarks['marks'] as $studentId => $sums) {
+//                    $sumNormalised = $sums['sumNormalised'];
+//                    $sumWeight     = $sums['sumWeight'];
+//                    $latestSumNormalised = $sums['latestSumNormalised'];
+//                    $latestSumWeight     = $sums['latestSumWeight'];
+//                    if (!$sumWeight && !$latestSumWeight) {
+//                        // nothing exists, so remove this...
+//                        unset($overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]);
+//                    } else {
+//                        // only dump things into the array that actually exist...
+//                        $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId] = [];
+//                        if ($sumWeight) {
+//                            $normalised = $sumNormalised / $sumWeight;
+//                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['normalised'] = $normalised;
+//                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['humanReadable'] = $markScheme->getHumanReadableMark($normalised);
+//                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestNormalised'] = $normalised;
+//                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestHumanReadable'] = $markScheme->getHumanReadableMark($normalised);
+//                        }
+//                        if ($latestSumWeight) {
+//                            $latestNormalised = $latestSumNormalised / $latestSumWeight;
+//                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestNormalised'] = $latestNormalised;
+//                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestHumanReadable'] = $markScheme->getHumanReadableMark($latestNormalised);
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        return $overallMarks;
+//    }
 
 
     /**
@@ -1503,13 +1503,7 @@ class Controller extends Base
         new \Alaress_Probe($coefficients);
         die();
 
-        foreach ($assessments as $assessmentId => $assessmentData) {
-            $assessmentWeight = $assessmentData['weight'];
-
-            foreach ($assessments['gridData'] as $rubricInstance)
-            {
-                $rubricWeight = $rubricInstance['weight'];
-            }
+//        foreach ($assessments as $assessmentId => $assessmentData) {
 //            foreach ($assessmentData['capabilities'] as $capabilityId => $capabilityData) {
 //                // First time we've seen this capability?
 //                if (!array_key_exists($capabilityId, $overallMarks)) {
@@ -1602,7 +1596,7 @@ class Controller extends Base
 //                    }
 //                }
 //            }
-        }
+//        }
         return $overallMarks;
     }
 
