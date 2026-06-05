@@ -3,7 +3,17 @@
  *
  */
 
+import { unescape } from "es-toolkit";
 import { getMasonryConfig } from "./masonryConfig";
+
+/**
+ * Returns the decoded heading used for My Links.
+ *
+ * @returns {string}
+ */
+function getHeading() {
+    return unescape(getMasonryConfig().postToMyLinks.heading);
+}
 
 /**
  * Listen for the button press and then save the link to DB and display it on the page
@@ -25,17 +35,15 @@ export function initPostToMyLinks() {
  * Save the settings to the DB
  */
 async function postLink() {
-    const heading = getDecodedHeading();
-
     try {
         await fetch(getMasonryConfig().postToMyLinks.updateUrl, {
             method: "POST",
-            body: getFormData(heading),
+            body: getFormData(),
         });
     } catch (error) {
         console.warn(error);
     } finally {
-        displayLinkOnPage(heading);
+        displayLinkOnPage();
     }
 }
 
@@ -44,20 +52,20 @@ async function postLink() {
  *
  * @returns { FormData }
  */
-function getFormData(heading) {
+function getFormData() {
     const formData = new FormData();
     formData.append("url", getMasonryConfig().postToMyLinks.url);
-    formData.append("description", heading);
+    formData.append("description", getHeading());
     return formData;
 }
 
 /**
  * Add the link to the side panel
  */
-function displayLinkOnPage(heading) {
+function displayLinkOnPage() {
     const link = document.createElement("a");
     link.setAttribute("href", getMasonryConfig().postToMyLinks.url);
-    link.innerText = heading;
+    link.innerText = getHeading();
 
     const linkListItem = document.createElement("li");
     linkListItem.appendChild(link);
@@ -68,18 +76,4 @@ function displayLinkOnPage(heading) {
     // Remove the postToMyLinks button
     const postToMyLinksBtn = document.querySelector(getMasonryConfig().postToMyLinks.selector);
     postToMyLinksBtn.parentNode.removeChild(postToMyLinksBtn);
-}
-
-function getDecodedHeading() {
-    const textarea = document.createElement("textarea");
-    let heading = getMasonryConfig().postToMyLinks.heading;
-    let decodedHeading;
-
-    do {
-        decodedHeading = heading;
-        textarea.innerHTML = decodedHeading;
-        heading = textarea.value;
-    } while (heading !== decodedHeading);
-
-    return heading;
 }
