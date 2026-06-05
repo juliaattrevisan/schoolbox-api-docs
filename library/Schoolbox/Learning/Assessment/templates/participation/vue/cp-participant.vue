@@ -45,7 +45,7 @@ function getCustomisationMeta(plan: Plan | CustomisedPlan): string {
 /**
  * Gets the modification URL for a customised plan
  * @param customisedPlan - The customised plan to get the URL for
- * @returns The modification URL with return URL parameter
+ * @returns The modification URL with return URL parameter, null if no modification URL is available
  */
 function getCustomisedPlanUrl(customisedPlan: CustomisedPlan): string | null {
     const baseUrl =
