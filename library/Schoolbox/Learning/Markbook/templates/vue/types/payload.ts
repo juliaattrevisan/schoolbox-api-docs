@@ -176,7 +176,7 @@ export interface Markbook {
         "courseImport.getImport": string | null;
     };
     /** A list of available visibilities, currently only used on the class markbook */
-    availableVisibilities: string[]; // TODO: why isn't this used on the class markbook atm?
+    availableVisibilities: string[];
     submissionErrorStates: SubmissionErrorStates;
     /** The query args to use for filters */
     filtersQueryArgs: string;
