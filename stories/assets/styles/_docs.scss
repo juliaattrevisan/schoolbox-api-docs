@@ -48,6 +48,15 @@ table.docblock-argstable tr td,
 }
 
 /**
+ * Ti display a colour in a markdown file
+ */
+.story-color-preview {
+    border: 1px solid #ccc;
+    height: 30px;
+    width: 100px;
+}
+
+/**
  * These story styles are currently used in the Layout stories to help show the utility classes
  */
 .story-demo-boxes {

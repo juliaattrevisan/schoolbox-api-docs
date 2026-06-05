@@ -1,66 +1,92 @@
-import { Meta, ColorItem } from "@storybook/addon-docs/blocks";
+import { Meta } from "@storybook/addon-docs/blocks";
 
 <Meta title="Design Tokens/Colours" />
 
 # Colours
 
-`www/static/css/core/designTokens/_sbx-colors.scss`
+- Created in: `www/static/css/core/designTokens/_sbx-colors.scss`
+- Created in: `www/static/css/core/base/_colors.scss` - All will be moved to `_sbx-colors.scss` in 26.2.
+- Any colour used in the system should be defined here.
+- Some colours are configurable by Schools, as indicated by `-config`.
+- Some colours have a colour they should Contrast against.
 
 ## Configurable
 
 These colours can be updated via Design › Settings - Skin Config for a School to personalise their instance.
 
-| CSS Custom Property                  | Value     | Preview                                                                                                    | Contrast                             |
-| ------------------------------------ | --------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------ |
-| `--sbx-config-color-body-background` | `#e5eff7` | <div style={{backgroundColor: '#e5eff7', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-color-text-primary`           |
-| `--sbx-config-color-accent`          | `#001691` | <div style={{backgroundColor: '#001691', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-config-color-accent-text`     |
-| `--sbx-config-color-accent-text`     | `#ffffff` | <div style={{backgroundColor: '#ffffff', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-config-color-accent`          |
-| `--sbx-config-color-active`          | `#d2edf2` | <div style={{backgroundColor: '#d2edf2', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-config-color-accent`          |
-| `--sbx-config-color-menu-background` | `#001691` | <div style={{backgroundColor: '#001691', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-config-color-menu-foreground` |
-| `--sbx-config-color-menu-foreground` | `#ffffff` | <div style={{backgroundColor: '#ffffff', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-config-color-menu-background` |
-| `--sbx-config-color-menu-hover`      | `#009eb2` | <div style={{backgroundColor: '#009eb2', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-config-color-menu-foreground` |
+| CSS Custom Property                               | Value                              | Preview                                                                                          | Contrast                                          |
+| ------------------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
+| `--sbx-config-color-body-background`              | `#e5eff7`                          | <div class='story-color-preview' style={{background: '#e5eff7'}}></div>                          | `--sbx-color-text-primary`                        |
+| `--sbx-config-color-accent`                       | `#001691`                          | <div class='story-color-preview' style={{background: '#001691'}}></div>                          | `--sbx-config-color-accent-text`                  |
+| `--sbx-config-color-accent-text`                  | `#ffffff`                          | <div class='story-color-preview' style={{background: '#ffffff'}}></div>                          | `--sbx-config-color-accent`                       |
+| `--sbx-config-color-active`                       | `#d2edf2`                          | <div class='story-color-preview' style={{background: '#d2edf2'}}></div>                          | `--sbx-config-color-accent`                       |
+| `--sbx-config-color-menu-background`              | `#001691`                          | <div class='story-color-preview' style={{background: '#001691'}}></div>                          | `--sbx-config-color-menu-foreground`              |
+| `--sbx-config-color-menu-foreground`              | `#ffffff`                          | <div class='story-color-preview' style={{background: '#ffffff'}}></div>                          | `--sbx-config-color-menu-background`              |
+| `--sbx-config-color-menu-hover`                   | `#009eb2`                          | <div class='story-color-preview' style={{background: '#009eb2'}}></div>                          | `--sbx-config-color-menu-foreground`              |
+| `--sbx-config-color-component-heading-background` | `#001691`                          | <div class='story-color-preview' style={{background: '#001691'}}></div>                          | `--sbx-config-color-component-heading-text`       |
+| `--sbx-config-color-component-heading-text`       | `#cce0ef`                          | <div class='story-color-preview' style={{background: '#cce0ef'}}></div>                          | `--sbx-config-color-component-heading-background` |
+| `--sbx-config-login-form-background`              | `#hsla(230.9, 100%, 28.43%, 0.35)` | <div class='story-color-preview' style={{background: '#hsla(230.9, 100%, 28.43%, 0.35)'}}></div> | `--sbx-config-login-form-foreground`              |
+| `--sbx-config-login-form-foreground`              | `#ffffff`                          | <div class='story-color-preview' style={{background: '#001691'}}></div>                          | `--sbx-config-login-form-background`              |
 
 ## Core
 
 The core colours are used across the Schoolbox interface. They are designed to work together to provide sufficient contrast for text and UI elements.
 
-| CSS Custom Property                | Value     | Preview                                                                                                    | Contrast                           |
-| ---------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| `--sbx-color-foreground-primary`   | `#ffffff` | <div style={{backgroundColor: '#ffffff', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-color-text-primary`         |
-| `--sbx-color-foreground-secondary` | `#f7f7f7` | <div style={{backgroundColor: '#f7f7f7', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-color-text-secondary`       |
-| `--sbx-color-text-primary`         | `#000000` | <div style={{backgroundColor: '#000000', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-color-foreground-primary`   |
-| `--sbx-color-text-secondary`       | `#525252` | <div style={{backgroundColor: '#525252', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-color-foreground-secondary` |
-| `--sbx-color-border`               | `#dcdcdc` | <div style={{backgroundColor: '#dcdcdc', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-color-foreground-primary`   |
+| CSS Custom Property                  | Value     | Preview                                                                 | Contrast                           |
+| ------------------------------------ | --------- | ----------------------------------------------------------------------- | ---------------------------------- |
+| `--sbx-color-foreground-primary`     | `#ffffff` | <div class='story-color-preview' style={{background: '#ffffff'}}></div> | `--sbx-color-text-primary`         |
+| `--sbx-color-foreground-primary-alt` | `#fdfbfb` | <div class='story-color-preview' style={{background: '#fdfbfb'}}></div> | `--sbx-color-text-primary`         |
+| `--sbx-color-foreground-secondary`   | `#f4f2f2` | <div class='story-color-preview' style={{background: '#f4f2f2'}}></div> | `--sbx-color-text-secondary`       |
+| `--sbx-color-text-primary`           | `#000000` | <div class='story-color-preview' style={{background: '#000000'}}></div> | `--sbx-color-foreground-primary`   |
+| `--sbx-color-text-secondary`         | `#525252` | <div class='story-color-preview' style={{background: '#525252'}}></div> | `--sbx-color-foreground-secondary` |
+| `--sbx-color-border`                 | `#dcdcdc` | <div class='story-color-preview' style={{background: '#dcdcdc'}}></div> | `--sbx-color-foreground-primary`   |
 
 ## Status
 
 Status colours are used to indicate the state of an item, such as an alert, success, warning, or highlight.
 
-| CSS Custom Property          | Value     | Preview                                                                                                    | Contrast                     |
-| ---------------------------- | --------- | ---------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| `--sbx-color-alert`          | `#ea0a06` | <div style={{backgroundColor: '#ea0a06', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-color-alert-text`     |
-| `--sbx-color-alert-text`     | `#ffffff` | <div style={{backgroundColor: '#ffffff', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-color-alert`          |
-| `--sbx-color-success`        | `#3e843e` | <div style={{backgroundColor: '#3e843e', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-color-success-text`   |
-| `--sbx-color-success-text`   | `#ffffff` | <div style={{backgroundColor: '#ffffff', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-color-success`        |
-| `--sbx-color-warning`        | `#ff7d00` | <div style={{backgroundColor: '#ff7d00', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-color-warning-text`   |
-| `--sbx-color-warning-text`   | `#ffffff` | <div style={{backgroundColor: '#ffffff', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-color-warning`        |
-| `--sbx-color-highlight`      | `#fae587` | <div style={{backgroundColor: '#fae587', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-color-highlight-text` |
-| `--sbx-color-highlight-text` | `#000000` | <div style={{backgroundColor: '#000000', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-color-highlight`      |
+| CSS Custom Property            | Value     | Preview                                                                 | Contrast                       |
+| ------------------------------ | --------- | ----------------------------------------------------------------------- | ------------------------------ |
+| `--sbx-color-alert`            | `#ea0a06` | <div class='story-color-preview' style={{background: '#ea0a06'}}></div> | `--sbx-color-alert-text`       |
+| `--sbx-color-alert-text`       | `#ffffff` | <div class='story-color-preview' style={{background: '#ffffff'}}></div> | `--sbx-color-alert`            |
+| `--sbx-color-success`          | `#3e843e` | <div class='story-color-preview' style={{background: '#3e843e'}}></div> | `--sbx-color-success-text`     |
+| `--sbx-color-success-text`     | `#ffffff` | <div class='story-color-preview' style={{background: '#ffffff'}}></div> | `--sbx-color-success`          |
+| `--sbx-color-warning`          | `#ff7d00` | <div class='story-color-preview' style={{background: '#ff7d00'}}></div> | `--sbx-color-warning-text`     |
+| `--sbx-color-warning-text`     | `#ffffff` | <div class='story-color-preview' style={{background: '#ffffff'}}></div> | `--sbx-color-warning`          |
+| `--sbx-color-highlight`        | `#fae587` | <div class='story-color-preview' style={{background: '#fae587'}}></div> | `--sbx-color-highlight-text`   |
+| `--sbx-color-highlight-text`   | `#000000` | <div class='story-color-preview' style={{background: '#000000'}}></div> | `--sbx-color-highlight`        |
+| `--sbx-color-in-progress`      | `#0c78cf` | <div class='story-color-preview' style={{background: '#0c78cf'}}></div> | `--sbx-color-in-progress-text` |
+| `--sbx-color-in-progress-text` | `#fff`    | <div class='story-color-preview' style={{background: '#fff'}}></div>    | `--sbx-color-in-progress`      |
 
 ## Gradients
 
 Gradients provide a smooth color transition from red (alert) to green (success), useful for visualizing progress, scores, and performance metrics.
 
-| CSS Custom Property       | Value     | Preview                                                                                                    |
-| ------------------------- | --------- | ---------------------------------------------------------------------------------------------------------- |
-| `--sbx-color-gradient-0`  | `#ea0a06` | <div style={{backgroundColor: '#ea0a06', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> |
-| `--sbx-color-gradient-1`  | `#df3a0d` | <div style={{backgroundColor: '#df3a0d', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> |
-| `--sbx-color-gradient-2`  | `#d36313` | <div style={{backgroundColor: '#d36313', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> |
-| `--sbx-color-gradient-3`  | `#c9851a` | <div style={{backgroundColor: '#c9851a', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> |
-| `--sbx-color-gradient-4`  | `#bea020` | <div style={{backgroundColor: '#bea020', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> |
-| `--sbx-color-gradient-5`  | `#b2b425` | <div style={{backgroundColor: '#b2b425', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> |
-| `--sbx-color-gradient-6`  | `#8faa2b` | <div style={{backgroundColor: '#8faa2b', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> |
-| `--sbx-color-gradient-7`  | `#72a030` | <div style={{backgroundColor: '#72a030', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> |
-| `--sbx-color-gradient-8`  | `#5c9635` | <div style={{backgroundColor: '#5c9635', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> |
-| `--sbx-color-gradient-9`  | `#4a8d3a` | <div style={{backgroundColor: '#4a8d3a', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> |
-| `--sbx-color-gradient-10` | `#3e843e` | <div style={{backgroundColor: '#3e843e', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> |
+| CSS Custom Property       | Value     | Preview                                                                 |
+| ------------------------- | --------- | ----------------------------------------------------------------------- |
+| `--sbx-color-gradient-0`  | `#ea0a06` | <div class='story-color-preview' style={{background: '#ea0a06'}}></div> |
+| `--sbx-color-gradient-1`  | `#df3a0d` | <div class='story-color-preview' style={{background: '#df3a0d'}}></div> |
+| `--sbx-color-gradient-2`  | `#d36313` | <div class='story-color-preview' style={{background: '#d36313'}}></div> |
+| `--sbx-color-gradient-3`  | `#c9851a` | <div class='story-color-preview' style={{background: '#c9851a'}}></div> |
+| `--sbx-color-gradient-4`  | `#bea020` | <div class='story-color-preview' style={{background: '#bea020'}}></div> |
+| `--sbx-color-gradient-5`  | `#b2b425` | <div class='story-color-preview' style={{background: '#b2b425'}}></div> |
+| `--sbx-color-gradient-6`  | `#8faa2b` | <div class='story-color-preview' style={{background: '#8faa2b'}}></div> |
+| `--sbx-color-gradient-7`  | `#72a030` | <div class='story-color-preview' style={{background: '#72a030'}}></div> |
+| `--sbx-color-gradient-8`  | `#5c9635` | <div class='story-color-preview' style={{background: '#5c9635'}}></div> |
+| `--sbx-color-gradient-9`  | `#4a8d3a` | <div class='story-color-preview' style={{background: '#4a8d3a'}}></div> |
+| `--sbx-color-gradient-10` | `#3e843e` | <div class='story-color-preview' style={{background: '#3e843e'}}></div> |
+
+## Context specific
+
+Specific context specific colours.
+
+| CSS Custom Property                  | Preview                                                                                                 |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| `--sbx-color-icon-course`            | <div class='story-color-preview' style={{background: 'var(--sbx-color-icon-course)'}}></div>            |
+| `--sbx-color-icon-badge`             | <div class='story-color-preview' style={{background: 'var(--sbx-color-icon-badge)'}}></div>             |
+| `--sbx-color-icon-class`             | <div class='story-color-preview' style={{background: 'var(--sbx-color-icon-class)'}}></div>             |
+| `--sbx-color-icon-course`            | <div class='story-color-preview' style={{background: 'var(--sbx-color-icon-course)'}}></div>            |
+| `--sbx-color-icon-folder`            | <div class='story-color-preview' style={{background: 'var(--sbx-color-icon-folder)'}}></div>            |
+| `--sbx-color-icon-home`              | <div class='story-color-preview' style={{background: 'var(--sbx-color-icon-home)'}}></div>              |
+| `--sbx-color-icon-learning-activity` | <div class='story-color-preview' style={{background: 'var(--sbx-color-icon-learning-activity)'}}></div> |
+| `--sbx-color-icon-unit`              | <div class='story-color-preview' style={{background: 'var(--sbx-color-icon-unit)'}}></div>              |
