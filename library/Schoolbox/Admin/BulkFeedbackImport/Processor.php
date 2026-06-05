@@ -493,6 +493,7 @@ class Processor
      *
      * @param array $headerRow
      * @return Strategy\Mark\IStrategy
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     private function selectMarkStrategy(array $headerRow): Strategy\Mark\IStrategy
     {
@@ -508,7 +509,7 @@ class Processor
 
         /* We should never be here, but you never know: they could upload a totally random csv
          */
-        throw new \RuntimeException('Unknown csv; could not process row');
+        throw new \Schoolbox\Application\Exception\Exception('Unknown csv; could not process row');
     }
 
 
