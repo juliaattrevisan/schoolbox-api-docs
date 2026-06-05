@@ -15,6 +15,7 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\Web\Controller\Base;
 use Aura\Router;
 use Aura\Router\Exception\RouteNotFound;
+use DebugBar\DebugBarException;
 use DomainException;
 use InvalidArgumentException;
 use LogicException;
@@ -1200,26 +1201,25 @@ class Controller extends Base
      *
      * @param array $assessments
      * @param array $studentMarks
-     * @param Folder\Model $folder
+     * @param Model $folder
      * @return array
-     * @throws InvalidArgumentException
-     * @throws RangeException
+     * @throws DebugBarException
      */
     private function buildOverallMarks(array $assessments, array $studentMarks, Folder\Model $folder): array
     {
-        $overallMarks = $this->aggregateMarks($assessments, $studentMarks);
+        $overallMarks = $this->aggregateMarks($assessments, $folder, $studentMarks);
 
-        $summated = $this->summateAggregatedMarks($overallMarks, $folder);
+//        $summated = $this->summateAggregatedMarks($overallMarks, $folder);
 
-        foreach ($summated as &$capability) {
+        foreach ($overallMarks as &$capability) {
             uasort($capability['indicators'], [$this, 'sortByName']);
         }
 
         unset($capability);
 
-        uasort($summated, [$this, 'sortByName']);
+        uasort($overallMarks, [$this, 'sortByName']);
 
-        return $summated;
+        return $overallMarks;
     }
 
 
@@ -1318,10 +1318,12 @@ class Controller extends Base
      * Iterates individual student marks to build the weighted sums per capability and indicator
      *
      * @param array $assessments
+     * @param Model $folder
      * @param array $studentMarks
      * @return array
+     * @throws DebugBarException
      */
-    private function aggregateMarks(array $assessments, array $studentMarks): array
+    private function aggregateMarks(array $assessments, Folder\Model $folder, array $studentMarks): array
     {
         /* Precalculate all the coefficients now that we have assembled $assessments in its entirety with all its
          * capabilities and indicators and their max_values.
@@ -1348,7 +1350,7 @@ class Controller extends Base
                 $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'] += $rubricGridData['weight'];
                 $coefficients['grids'][$rubricInstanceId] = $rubricGridData['weight'];
 
-                /* This precompiles capability/indicator structs while we're traversing this $assessments struct.
+                /* This pre-compiles capability/indicator structs while we're traversing this $assessments struct.
                  * It used to be split out into its own traversal
                  */
                 foreach ($rubricGridData['capabilities'] as $capabilityId => $capabilityData) {
@@ -1376,8 +1378,28 @@ class Controller extends Base
             }
         }
 
-        /* Now precompute overall marks for each student
+        /* Now precompute overall marks for each student.
+         *
+         * This is something of a dirty secret but the normalised mark we compute for each capability and indicator are
+         * converted into a Letter Grade equivalent for human-readable values. These are defined in admin via the Year
+         * Level lists: there's a doodad that lets you choose a grade group to for Overall Grade values.
+         *
+         * It just so happens that this Letter Grade equivalent might actually be a number which is why, at first glance,
+         * the rubric markbook data might "look wrong" but actually isn't.
+         *
+         * This is a massive configuration at a distance and totally not obvious lol unless you're an actual teacher...
          */
+
+        /**
+         * Logic for the mark scheme...
+         *
+         * If there is no year level on the class page, we should default back to the system default.
+         * If there are multiple year levels on the class page, and they agree (we should use their grade group)
+         * If there are multiple year levels on the class page, and they do NOT agree (all different grade groups), we should fall back to the system default grade group.
+         */
+        $markSchemeFactory = new Factory($this->getConfigLoader());
+        $markScheme = $markSchemeFactory->spawnForFolder($folder, true);
+
         $aggregator = new WeightedAggregator();
 
         foreach ($studentMarks as $studentId => $studentData) {
@@ -1386,14 +1408,20 @@ class Controller extends Base
                     foreach ($rubricGridData['capabilities'] as $capabilityId => $capabilityData) {
                         if (!isset($overallMarks[$capabilityId]['students'][$studentId])) {
                             $overallMarks[$capabilityId]['students'][$studentId] = [
-                                'published' => 0,
-                                'draft' => 0,
+                                'published' => [
+                                    'normalisedMark' => 0,
+                                    'humanReadableMark' => null
+                                ],
+                                'draft' => [
+                                    'normalisedMark' => 0,
+                                    'humanReadableMark' => null
+                                ],
                             ];
                         }
 
                         /* Published capability mark for this student
                          */
-                        $overallMarks[$capabilityId]['students'][$studentId]['published'] += $aggregator->calculate(
+                        $overallMarks[$capabilityId]['students'][$studentId]['published']['normalisedMark'] += $aggregator->calculate(
                             (float)$coefficients['assessments'][$assessmentId],
                             (float)$coefficients['assessments']['totalWeight'],
                             (float)$coefficients['grids'][$rubricInstanceId],
@@ -1406,7 +1434,7 @@ class Controller extends Base
 
                         /* Draft capability mark for this student
                          */
-                        $overallMarks[$capabilityId]['students'][$studentId]['draft'] += $aggregator->calculate(
+                        $overallMarks[$capabilityId]['students'][$studentId]['draft']['normalisedMark'] += $aggregator->calculate(
                             (float)$coefficients['assessments'][$assessmentId],
                             (float)$coefficients['assessments']['totalWeight'],
                             (float)$coefficients['grids'][$rubricInstanceId],
@@ -1423,14 +1451,20 @@ class Controller extends Base
                         foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
                             if (!isset($overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId])) {
                                 $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId] = [
-                                    'published' => 0,
-                                    'draft' => 0,
+                                    'published' => [
+                                        'normalisedMark' => 0,
+                                        'humanReadableMark' => null
+                                    ],
+                                    'draft' => [
+                                        'normalisedMark' => 0,
+                                        'humanReadableMark' => null
+                                    ],
                                 ];
                             }
 
                             /* Published indicator mark for this student
                              */
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['published'] += $aggregator->calculate(
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['published']['normalisedMark'] += $aggregator->calculate(
                                 (float)$coefficients['assessments'][$assessmentId],
                                 (float)$coefficients['assessments']['totalWeight'],
                                 (float)$coefficients['grids'][$rubricInstanceId],
@@ -1443,7 +1477,7 @@ class Controller extends Base
 
                             /* Draft indicator mark for this student
                              */
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['draft'] += $aggregator->calculate(
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['draft']['normalisedMark'] += $aggregator->calculate(
                                 (float)$coefficients['assessments'][$assessmentId],
                                 (float)$coefficients['assessments']['totalWeight'],
                                 (float)$coefficients['grids'][$rubricInstanceId],
