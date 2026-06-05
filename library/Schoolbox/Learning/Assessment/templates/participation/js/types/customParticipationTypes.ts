@@ -5,11 +5,11 @@ import type { User } from "@schoolboxLibrary/types/User";
  */
 export type Routes = {
     getStudentsPastoralCountsUrl: string;
-    getLearningPlanNewUrl: string;
-    getAssessmentParticipationNewActivity: string;
-    getAssessmentParticipationCopyActivity: string;
-    includeInExistingCustomisation: string;
-    genAI: string;
+    getLearningPlanNewUrl: string | false;
+    getAssessmentParticipationNewActivity: string | false;
+    getAssessmentParticipationCopyActivity: string | false;
+    includeInExistingCustomisation: string | false;
+    genAI: string | false;
 };
 
 /**
