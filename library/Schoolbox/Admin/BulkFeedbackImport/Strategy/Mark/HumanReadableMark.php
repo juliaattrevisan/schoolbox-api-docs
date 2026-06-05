@@ -79,7 +79,11 @@ class HumanReadableMark implements IStrategy
             /* Find out what the learner's version would have been and save that too
              * Arguably you could skip this derivation, only doing it if $instructor scheme was different to $learner scheme
              */
-            $learnerHumanReadableMark = $learnerScheme->getHumanReadableMark($normalisedMark);
+            if (null === $normalisedMark && '' !== $instructorHumanReadableMark) {
+                $learnerHumanReadableMark = $instructorHumanReadableMark;
+            } else {
+                $learnerHumanReadableMark = $learnerScheme->getHumanReadableMark($normalisedMark);
+            }
         } catch (\InvalidArgumentException $e) {
             if ('' !== $instructorHumanReadableMark) {
                 /* If it's a Submission State, save the text as the human readable mark
