@@ -27,7 +27,7 @@ interface Props {
 const PAGE_SIZE = 30;
 
 const UNKNOWN_FEATURE_TEXT = "Unknown Feature";
-const PRINTING_CLASS = "ai-usage-log--printing";
+const SELECTED_SESSION_ACTIONS_ID = "ai-usage-log-selected-session-actions";
 
 const props = defineProps<Props>();
 
@@ -79,20 +79,6 @@ const selectedSessionInfo = window.Vue.computed<AiSelectedSessionInfo | AiSelect
 
     const info = { logFormat: sessionInfo.logFormat, session: sessionInfo, log: filteredLog };
     return info satisfies Record<keyof AiSelectedSessionInfo, unknown> as AiSelectedSessionInfo;
-});
-
-const canPrintSelectedSession = window.Vue.computed<boolean>(() => {
-    const sessionInfo = selectedSessionInfo.value;
-
-    return sessionInfo !== null && "log" in sessionInfo && sessionInfo.log.length > 0;
-});
-
-const selectedSessionActionsId = window.Vue.computed<string>(() => {
-    if (selectedSessionId.value === null) {
-        return "ai-usage-log-selected-session-actions";
-    }
-
-    return `ai-usage-log-selected-session-actions-${selectedSessionId.value}`;
 });
 
 /**
@@ -196,14 +182,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
  * Print the currently selected AI session log.
  */
 function printSelectedSession(): void {
-    const clearPrintingClass = (): void => {
-        document.body.classList.remove(PRINTING_CLASS);
-    };
-
-    document.body.classList.add(PRINTING_CLASS);
-    window.addEventListener("afterprint", clearPrintingClass, { once: true });
     window.print();
-    window.setTimeout(clearPrintingClass, 1000);
 }
 </script>
 
@@ -375,11 +354,11 @@ function printSelectedSession(): void {
                             <relative-time :datetime="selectedSessionInfo.session.createdAt" full-diff></relative-time>
                         </p>
                     </div>
-                    <nav v-if="canPrintSelectedSession" class="no-print">
-                        <sbx-pop-out :content-id="selectedSessionActionsId"></sbx-pop-out>
+                    <nav class="no-print">
+                        <sbx-pop-out :content-id="SELECTED_SESSION_ACTIONS_ID"></sbx-pop-out>
                     </nav>
                 </div>
-                <ul :id="selectedSessionActionsId" class="f-dropdown no-print" data-dropdown-content>
+                <ul :id="SELECTED_SESSION_ACTIONS_ID" class="f-dropdown no-print" data-dropdown-content>
                     <li>
                         <a
                             href="#"
@@ -419,21 +398,12 @@ function printSelectedSession(): void {
 
 <style lang="scss">
 @media print {
-    body.ai-usage-log--printing * {
-        visibility: hidden;
-    }
-
-    body.ai-usage-log--printing .ai-usage-log__printable,
-    body.ai-usage-log--printing .ai-usage-log__printable * {
-        visibility: visible;
-    }
-
-    body.ai-usage-log--printing .no-print {
+    .no-print {
         display: none !important;
     }
 
-    body.ai-usage-log--printing .ai-usage-log__viewer,
-    body.ai-usage-log--printing .ai-usage-log__printable {
+    .ai-usage-log__viewer,
+    .ai-usage-log__printable {
         border: 0 !important;
         box-shadow: none !important;
         margin: 0 !important;
@@ -442,21 +412,15 @@ function printSelectedSession(): void {
         max-width: 100% !important;
     }
 
-    body.ai-usage-log--printing .ai-usage-log__printable {
-        position: absolute;
-        top: 0;
-        left: 0;
-    }
-
-    body.ai-usage-log--printing .ai-usage-log__printable,
-    body.ai-usage-log--printing .ai-usage-log__printable * {
+    .ai-usage-log__printable,
+    .ai-usage-log__printable * {
         box-sizing: border-box !important;
         max-width: 100% !important;
         min-width: 0 !important;
         overflow: visible !important;
     }
 
-    body.ai-usage-log--printing .ai-usage-log__printable .card {
+    .ai-usage-log__printable .card {
         border: 0 !important;
         box-shadow: none !important;
         padding: 0 0 1rem !important;
