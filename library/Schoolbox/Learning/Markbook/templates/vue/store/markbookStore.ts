@@ -309,12 +309,29 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         };
     }
 
+    /**
+     * The "Student Weighted Average" column should always appear unless we're
+     * on the reporting markbook and there's no activities to show that aren't the reporting activity.
+     * aka, hide it if the single activity showing is one with splitComments enabled.
+     */
+    const showWeightedAverageColumn = window.Vue.computed(() => {
+        if (data.value === null) {
+            return false;
+        }
+
+        return activityGroups.value.length === 0 || activityGroups.value.some((group) => !group.splitComments);
+    });
+
+    /**
+     * The rank column should only appear if there are ranks available (The backend determines when that is the case).
+     * also the weighted average column must be showing, otherwise there's no basis for the ranks in the first place.
+     */
     const showRankColumn = window.Vue.computed(() => {
         if (data.value === null) {
             return false;
         }
 
-        return data.value.rank !== null;
+        return showWeightedAverageColumn.value && data.value.rank !== null;
     });
 
     return {
@@ -344,6 +361,7 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         feedbackDrawerEventBus,
         updateExtraInfo,
         getSplitColumnVisibility,
+        showWeightedAverageColumn,
         showRankColumn,
     };
 });

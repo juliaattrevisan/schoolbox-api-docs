@@ -55,7 +55,11 @@ function getGroupColspan(activities: MarkbookActivity[]): number {
     <thead v-if="mbStore.data !== null">
         <tr class="rotate-headers">
             <th class="fixed-left"><div></div></th>
-            <th class="fixed-left" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }">
+            <th
+                v-if="mbStore.showWeightedAverageColumn"
+                class="fixed-left"
+                :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }"
+            >
                 <div><span>Student Weighted Average</span></div>
             </th>
             <th v-if="mbStore.showRankColumn" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }">
@@ -75,7 +79,11 @@ function getGroupColspan(activities: MarkbookActivity[]): number {
 
         <tr class="course-headers">
             <th class="fixed-left transparent" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }"></th>
-            <th class="fixed-left white" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }"></th>
+            <th
+                v-if="mbStore.showWeightedAverageColumn"
+                class="fixed-left white"
+                :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }"
+            ></th>
             <th
                 v-if="mbStore.showRankColumn"
                 class="white"

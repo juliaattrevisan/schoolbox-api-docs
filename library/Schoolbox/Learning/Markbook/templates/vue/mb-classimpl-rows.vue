@@ -81,7 +81,7 @@ const orderedClassImplStudents = window.Vue.computed(() => {
                 <!-- you may not have access to this folder... and will get hit with an error page... so we may need to look at routes or perms for this... -->
                 <a :href="`/homepage/${classImpl.folder.id}`">{{ classImpl.folder.title }}</a>
             </th>
-            <th class="class-row fixed-left"></th>
+            <th v-if="mbStore.showWeightedAverageColumn" class="class-row fixed-left"></th>
             <td v-if="mbStore.showRankColumn" class="class-row"></td>
             <template v-for="{ activity, aImpl } in orderedClassImplActivities" :key="activity.id">
                 <td v-if="aImpl !== null && aImpl.stats" class="class-row">

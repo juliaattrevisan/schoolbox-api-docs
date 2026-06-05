@@ -28,22 +28,24 @@ const mbStore = useMarkbookStore();
             Class Average
         </th>
 
-        <th
-            v-if="mbStore.showDrafts"
-            data-test="class-average-mark-book-page-draft"
-            class="fixed-left student-grade-cell"
-            :class="getGradient(props.classImpl.stats.draftNormalisedMean, 100, true)"
-        >
-            {{ props.classImpl.stats.draftWeightedMean }}
-        </th>
-        <th
-            v-else
-            data-test="class-average-mark-book-page"
-            class="fixed-left student-grade-cell"
-            :class="getGradient(props.classImpl.stats.normalisedMean, 100, true)"
-        >
-            {{ props.classImpl.stats.weightedMean }}
-        </th>
+        <template v-if="mbStore.showWeightedAverageColumn">
+            <th
+                v-if="mbStore.showDrafts"
+                data-test="class-average-mark-book-page-draft"
+                class="fixed-left student-grade-cell"
+                :class="getGradient(props.classImpl.stats.draftNormalisedMean, 100, true)"
+            >
+                {{ props.classImpl.stats.draftWeightedMean }}
+            </th>
+            <th
+                v-else
+                data-test="class-average-mark-book-page"
+                class="fixed-left student-grade-cell"
+                :class="getGradient(props.classImpl.stats.normalisedMean, 100, true)"
+            >
+                {{ props.classImpl.stats.weightedMean }}
+            </th>
+        </template>
 
         <th v-if="mbStore.showRankColumn" class="student-grade-cell white">-</th>
         <th

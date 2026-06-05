@@ -124,7 +124,7 @@ async function onValueChange(activityId: number, aImpl: MarkbookClassImplActivit
 <template>
     <tr v-if="mbStore.data !== null" class="sub-row" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }">
         <th class="fixed-left">{{ label }}</th>
-        <th class="fixed-left">&nbsp;</th>
+        <th v-if="mbStore.showWeightedAverageColumn" class="fixed-left">&nbsp;</th>
         <td v-if="mbStore.showRankColumn"></td>
         <td
             v-for="{ assessment, aImpl, stat, readonly, selectOption, selectOptions } in activities"

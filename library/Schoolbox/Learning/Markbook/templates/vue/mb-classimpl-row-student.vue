@@ -63,6 +63,7 @@ mbStore.feedbackDrawerEventBus.on(({ drawerRect }) => {
         </th>
 
         <th
+            v-if="mbStore.showWeightedAverageColumn"
             class="fixed-left student-grade-cell"
             :class="
                 getGradient(
