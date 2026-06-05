@@ -1568,11 +1568,11 @@ class Controller extends Base
             $databaseMarks
         );
 
-        /* TODO work out whatever this was
+        /* At the bottom of the rubric markbook is a section called "Overall" which compiles the outcome per capability
+         * and indicator combination from all the rubric grids. This aggregation should potentially be weighted against
+         * the rubric weighting -per grid- but we'll get to that later.
          */
-        $overallMarks = [];
-
-        $overallMarks  = $this->buildOverallMarks($assessments, $databaseMarks, $folder);
+        $overallMarks = $this->buildOverallMarks($assessments, $databaseMarks, $folder);
 
         return [
             $assessments,
