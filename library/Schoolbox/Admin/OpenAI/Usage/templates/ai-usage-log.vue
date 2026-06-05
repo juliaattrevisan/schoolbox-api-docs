@@ -27,6 +27,7 @@ interface Props {
 const PAGE_SIZE = 30;
 
 const UNKNOWN_FEATURE_TEXT = "Unknown Feature";
+const PRINTING_CLASS = "ai-usage-log--printing";
 
 const props = defineProps<Props>();
 
@@ -195,7 +196,14 @@ async function openSessionDetails(session: AiSession): Promise<void> {
  * Print the currently selected AI session log.
  */
 function printSelectedSession(): void {
+    const clearPrintingClass = (): void => {
+        document.body.classList.remove(PRINTING_CLASS);
+    };
+
+    document.body.classList.add(PRINTING_CLASS);
+    window.addEventListener("afterprint", clearPrintingClass, { once: true });
     window.print();
+    window.setTimeout(clearPrintingClass, 1000);
 }
 </script>
 
@@ -341,8 +349,8 @@ function printSelectedSession(): void {
                 {{ sessionLoadError }}
             </div>
             <section v-else-if="selectedSessionInfo !== null" class="ai-usage-log__printable">
-                <div class="card small-12">
-                    <div class="l-flex l-flex--justify-space l-flex--align-start l-gap-s">
+                <div class="card small-12 actions-small-1">
+                    <div class="list-item">
                         <span>
                             <user-photo
                                 v-if="selectedSessionInfo.session.createdBy"
@@ -353,23 +361,23 @@ function printSelectedSession(): void {
                                 {{ props.features[selectedSessionInfo.session.feature]?.title ?? UNKNOWN_FEATURE_TEXT }}
                             </h3>
                         </span>
-                        <nav v-if="canPrintSelectedSession" class="no-print">
-                            <sbx-pop-out :content-id="selectedSessionActionsId"></sbx-pop-out>
-                        </nav>
+                        <p class="meta">
+                            <span v-if="!selectedSessionInfo.session.createdBy"> Created </span>
+                            <template v-else>
+                                Created by
+                                <component
+                                    :is="selectedSessionInfo.session.createdBy._links.profile ? 'a' : 'span'"
+                                    :href="selectedSessionInfo.session.createdBy._links.profile ?? undefined"
+                                >
+                                    {{ selectedSessionInfo.session.createdBy.fullName }}
+                                </component>
+                            </template>
+                            <relative-time :datetime="selectedSessionInfo.session.createdAt" full-diff></relative-time>
+                        </p>
                     </div>
-                    <p class="meta">
-                        <span v-if="!selectedSessionInfo.session.createdBy"> Created </span>
-                        <template v-else>
-                            Created by
-                            <component
-                                :is="selectedSessionInfo.session.createdBy._links.profile ? 'a' : 'span'"
-                                :href="selectedSessionInfo.session.createdBy._links.profile ?? undefined"
-                            >
-                                {{ selectedSessionInfo.session.createdBy.fullName }}
-                            </component>
-                        </template>
-                        <relative-time :datetime="selectedSessionInfo.session.createdAt" full-diff></relative-time>
-                    </p>
+                    <nav v-if="canPrintSelectedSession" class="no-print">
+                        <sbx-pop-out :content-id="selectedSessionActionsId"></sbx-pop-out>
+                    </nav>
                 </div>
                 <ul :id="selectedSessionActionsId" class="f-dropdown no-print" data-dropdown-content>
                     <li>
@@ -411,21 +419,21 @@ function printSelectedSession(): void {
 
 <style lang="scss">
 @media print {
-    body * {
+    body.ai-usage-log--printing * {
         visibility: hidden;
     }
 
-    .ai-usage-log__printable,
-    .ai-usage-log__printable * {
+    body.ai-usage-log--printing .ai-usage-log__printable,
+    body.ai-usage-log--printing .ai-usage-log__printable * {
         visibility: visible;
     }
 
-    .no-print {
+    body.ai-usage-log--printing .no-print {
         display: none !important;
     }
 
-    .ai-usage-log__viewer,
-    .ai-usage-log__printable {
+    body.ai-usage-log--printing .ai-usage-log__viewer,
+    body.ai-usage-log--printing .ai-usage-log__printable {
         border: 0 !important;
         box-shadow: none !important;
         margin: 0 !important;
@@ -434,21 +442,21 @@ function printSelectedSession(): void {
         max-width: 100% !important;
     }
 
-    .ai-usage-log__printable {
+    body.ai-usage-log--printing .ai-usage-log__printable {
         position: absolute;
         top: 0;
         left: 0;
     }
 
-    .ai-usage-log__printable,
-    .ai-usage-log__printable * {
+    body.ai-usage-log--printing .ai-usage-log__printable,
+    body.ai-usage-log--printing .ai-usage-log__printable * {
         box-sizing: border-box !important;
         max-width: 100% !important;
         min-width: 0 !important;
         overflow: visible !important;
     }
 
-    .ai-usage-log__printable .card {
+    body.ai-usage-log--printing .ai-usage-log__printable .card {
         border: 0 !important;
         box-shadow: none !important;
         padding: 0 0 1rem !important;
