@@ -56,6 +56,31 @@ test.describe("Editor templates tests", () => {
         tester.isGoingTo("Type a template name,add a field name and body and save it");
 
         await templates.verifyCreateTemplates();
+
+        tester.isGoingTo("Create additional news templates out of alphabetical order");
+        await templates.clickAddTemplateButton("news");
+        await templates.createTemplate(
+            "Automation Template News Zebra",
+            "Description for this template",
+            "Automation Body News Zebra",
+        );
+        await templates.clickAddTemplateButton("news");
+        await templates.createTemplate(
+            "Automation Template News Alpha",
+            "Description for this template",
+            "Automation Body News Alpha",
+        );
+
+        tester.isGoingTo("Check news templates are listed alphabetically in admin");
+        await templates.clickTemplateTab("news");
+        const newsTemplateTitles = await page
+            .locator('[data-test^="editor-templates-list-item-"] h3 button')
+            .allTextContents();
+        expect(newsTemplateTitles).toEqual([
+            "Automation Template News",
+            "Automation Template News Alpha",
+            "Automation Template News Zebra",
+        ]);
     });
 
     /**
@@ -126,7 +151,14 @@ test.describe("Editor templates tests", () => {
         await editorTemplate.verifyTemplateAvailability("Automation Template Event", "Homepage", 1);
         // checking in the create news page and attempt to search for event template
         await news.goto();
-        await editorTemplate.verifyTemplateAvailability("Automation Template News", "Event", 1);
+        await editorTemplate.verifyTemplateAvailability("Automation Template News", "Event", 3);
+        const newsTemplateItems = await page.locator("li.ck.ck-list__item").allTextContents();
+        const newsTemplateTitleOrder = [
+            "Automation Template News",
+            "Automation Template News Alpha",
+            "Automation Template News Zebra",
+        ].map((templateTitle) => newsTemplateItems.findIndex((itemText) => itemText.includes(templateTitle)));
+        expect(newsTemplateTitleOrder).toEqual([0, 1, 2]);
         // checking in the create learning moment page and attempt to search for news template
         await page.goto("/learning/evidence/user/25/create?momentType=text");
         await editorTemplate.verifyTemplateAvailability("Automation Template Moments", "News", 1);

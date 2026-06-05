@@ -37,7 +37,7 @@ class Helper
             return new GenericCollection(Model::class);
         }
         try {
-            $templates = $this->templateMapper->findByColumn('category_id', $this->categoryId);
+            $templates = $this->templateMapper->findByCategoryIdOrderedByTitle($this->categoryId);
             return $templates->map(function (Model $template) {
                 return [
                     'title' => $template->getTitle(),
