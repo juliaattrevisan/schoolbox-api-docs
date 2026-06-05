@@ -200,7 +200,7 @@ function printSelectedSession(): void {
 </script>
 
 <template>
-    <div class="row ai-usage-log__no-print">
+    <div class="row no-print">
         <div class="small-12 island">
             <section>
                 <fieldset class="content">
@@ -261,7 +261,7 @@ function printSelectedSession(): void {
         </div>
     </div>
 
-    <div class="ai-usage-log__no-print">
+    <div class="no-print">
         <div class="list-item">
             <h2 class="subheader">
                 Activity<template v-if="!isLoading">: {{ usageSessions.length }} events</template>
@@ -270,7 +270,7 @@ function printSelectedSession(): void {
     </div>
 
     <div class="row">
-        <div class="small-12 medium-6 columns l-mar-m--bottom ai-usage-log__no-print" :class="{ island: isLoading }">
+        <div class="small-12 medium-6 columns l-mar-m--bottom no-print" :class="{ island: isLoading }">
             <div v-if="loadError" data-alert class="alert-box alert">
                 {{ loadError }}
             </div>
@@ -353,7 +353,7 @@ function printSelectedSession(): void {
                                 {{ props.features[selectedSessionInfo.session.feature]?.title ?? UNKNOWN_FEATURE_TEXT }}
                             </h3>
                         </span>
-                        <nav v-if="canPrintSelectedSession" class="ai-usage-log__no-print">
+                        <nav v-if="canPrintSelectedSession" class="no-print">
                             <sbx-pop-out :content-id="selectedSessionActionsId"></sbx-pop-out>
                         </nav>
                     </div>
@@ -371,16 +371,17 @@ function printSelectedSession(): void {
                         <relative-time :datetime="selectedSessionInfo.session.createdAt" full-diff></relative-time>
                     </p>
                 </div>
-                <ul :id="selectedSessionActionsId" class="f-dropdown ai-usage-log__no-print" data-dropdown-content>
+                <ul :id="selectedSessionActionsId" class="f-dropdown no-print" data-dropdown-content>
                     <li>
-                        <button
-                            type="button"
+                        <a
+                            href="#"
                             class="sbx-button--has-icon"
                             data-test="ai-usage-log-print-session"
-                            @click="printSelectedSession"
+                            @click.prevent="printSelectedSession"
                         >
-                            <sbx-icon name="print"></sbx-icon>Print / Save as PDF
-                        </button>
+                            <sbx-icon name="print"></sbx-icon>
+                            Print / Save as PDF
+                        </a>
                     </li>
                 </ul>
                 <div class="clearfix"></div>
@@ -419,7 +420,7 @@ function printSelectedSession(): void {
         visibility: visible;
     }
 
-    .ai-usage-log__no-print {
+    .no-print {
         display: none !important;
     }
 
