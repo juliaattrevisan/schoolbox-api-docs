@@ -43,33 +43,54 @@ class Model
     // MEDIUM TEXT max length, to trim the response, rather than die.
     private const RESPONSE_MAX_LENGTH = 16777215;
 
+    /**
+     * @return string|null
+     */
     public function getAiSessionId(): ?string
     {
         return $this->aiSessionId;
     }
 
+    /**
+     * @param string|null $aiSessionId
+     * @return $this
+     */
     public function setAiSessionId(?string $aiSessionId): self
     {
         $this->aiSessionId = $aiSessionId;
         return $this;
     }
 
+    /**
+     * @return User|null
+     */
     public function getUser(): ?User
     {
         return $this->user;
     }
 
+    /**
+     * @param User|null $user
+     * @return $this
+     */
     public function setUser(?User $user): self
     {
         $this->user = $user;
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getPrompt(): string
     {
         return $this->prompt;
     }
 
+    /**
+     * @param string $prompt
+     * @return $this
+     */
     public function setPrompt(string $prompt): self
     {
         // Limit the prompt length to prevent database errors
@@ -80,55 +101,90 @@ class Model
         return $this;
     }
 
+    /**
+     * @return int|null
+     */
     public function getReturnCode(): ?int
     {
         return $this->returnCode;
     }
 
+    /**
+     * @param int|null $returnCode
+     * @return $this
+     */
     public function setReturnCode(?int $returnCode): self
     {
         $this->returnCode = $returnCode;
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getErrorMessage(): ?string
     {
         return $this->errorMessage;
     }
 
+    /**
+     * @param string|null $errorMessage
+     * @return $this
+     */
     public function setErrorMessage(?string $errorMessage): self
     {
         $this->errorMessage = $errorMessage;
         return $this;
     }
 
+    /**
+     * @return int|null
+     */
     public function getInputTokens(): ?int
     {
         return $this->inputTokens;
     }
 
+    /**
+     * @param int|null $inputTokens
+     * @return $this
+     */
     public function setInputTokens(?int $inputTokens): self
     {
         $this->inputTokens = $inputTokens;
         return $this;
     }
 
+    /**
+     * @return int|null
+     */
     public function getOutputTokens(): ?int
     {
         return $this->outputTokens;
     }
 
+    /**
+     * @param int|null $outputTokens
+     * @return $this
+     */
     public function setOutputTokens(?int $outputTokens): self
     {
         $this->outputTokens = $outputTokens;
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getInputText(): ?string
     {
         return $this->inputText;
     }
 
+    /**
+     * @param string|null $inputText
+     * @return $this
+     */
     public function setInputText(?string $inputText): self
     {
         // Limit the input text length to prevent database errors
@@ -139,11 +195,18 @@ class Model
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getOutputText(): ?string
     {
         return $this->outputText;
     }
 
+    /**
+     * @param string|null $outputText
+     * @return $this
+     */
     public function setOutputText(?string $outputText): self
     {
         // Limit the output text length to prevent database errors
@@ -154,35 +217,55 @@ class Model
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getModel(): ?string
     {
         return $this->model;
     }
 
+    /**
+     * @param string|null $model
+     * @return $this
+     */
     public function setModel(?string $model): self
     {
         $this->model = $model;
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getEndpoint(): ?string
     {
         return $this->endpoint;
     }
 
+    /**
+     * @param string|null $endpoint
+     * @return $this
+     */
     public function setEndpoint(?string $endpoint): self
     {
         $this->endpoint = $endpoint;
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getLogFormat(): ?string
     {
         return $this->logFormat;
     }
 
     /**
+     * Accepts either a {@see LogFormat} enum or its string value, and stores the string value.
+     *
      * @param string|LogFormat|null $logFormat
+     * @return $this
      */
     public function setLogFormat(string|LogFormat|null $logFormat): self
     {
@@ -193,11 +276,18 @@ class Model
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getResponse(): ?string
     {
         return $this->response;
     }
 
+    /**
+     * @param string|null $response
+     * @return $this
+     */
     public function setResponse(?string $response): self
     {
         // Limit the response length to prevent database errors

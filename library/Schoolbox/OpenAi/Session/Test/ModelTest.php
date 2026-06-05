@@ -14,8 +14,14 @@ use Schoolbox\OpenAi\Session\Feature;
 use Schoolbox\OpenAi\Session\Model;
 use Schoolbox\User;
 
+/**
+ * Unit tests for the AI session {@see Model}.
+ */
 class ModelTest extends TestCase
 {
+    /**
+     * A Feature enum passed to setFeature is stored and returned as its string value.
+     */
     public function testSetFeatureAcceptsEnumAndReturnsStringValue(): void
     {
         $model = new Model();
@@ -24,6 +30,9 @@ class ModelTest extends TestCase
         $this->assertSame('dialogagent', $model->getFeature());
     }
 
+    /**
+     * A plain string passed to setFeature is stored and returned unchanged.
+     */
     public function testSetFeatureAcceptsStringAndReturnsStringValue(): void
     {
         $model = new Model();
@@ -32,6 +41,9 @@ class ModelTest extends TestCase
         $this->assertSame('chat', $model->getFeature());
     }
 
+    /**
+     * setFeature accepts null.
+     */
     public function testSetFeatureAcceptsNull(): void
     {
         $model = new Model();
@@ -40,6 +52,9 @@ class ModelTest extends TestCase
         $this->assertNull($model->getFeature());
     }
 
+    /**
+     * The id is a string (the table's char(36) UUID), round-tripping unchanged.
+     */
     public function testIdIsString(): void
     {
         $model = new Model();
@@ -48,6 +63,9 @@ class ModelTest extends TestCase
         $this->assertSame('1f2e3d4c-5b6a-7890-abcd-ef0123456789', $model->getId());
     }
 
+    /**
+     * The user set via setUser is returned by getUser.
+     */
     public function testUserAccessor(): void
     {
         $user = new User();

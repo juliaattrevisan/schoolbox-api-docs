@@ -16,10 +16,16 @@ use Schoolbox\OpenAi\Session\Mapper;
 use Schoolbox\OpenAi\Session\Model;
 use Schoolbox\UserMapper;
 
+/**
+ * Database round-trip tests for the AI session {@see Mapper}.
+ */
 class MapperTest extends TestCase
 {
     use TestConnectorTrait;
 
+    /**
+     * Open a transaction and point the mappers at it, so every write is rolled back afterwards.
+     */
     public function setUp(): void
     {
         $this->connectSchoolbox();
@@ -31,11 +37,17 @@ class MapperTest extends TestCase
         UserMapper::getInstance()->setDatabase($this->schoolbox);
     }
 
+    /**
+     * Roll back everything written during the test.
+     */
     public function tearDown(): void
     {
         $this->schoolbox->rollback();
     }
 
+    /**
+     * Saving a session generates a char(36) UUID id, and the row round-trips on reload.
+     */
     public function testSaveGeneratesUuidAndRoundTrips(): void
     {
         $model = (new Model())->setFeature(Feature::CHAT);
@@ -54,6 +66,9 @@ class MapperTest extends TestCase
         $this->assertNull($reloaded->getUser());
     }
 
+    /**
+     * The user set via the created_by join is persisted and rehydrated on reload.
+     */
     public function testUserJoinRoundTrips(): void
     {
         // Use any existing user in the (transactional) test DB for the created_by FK.

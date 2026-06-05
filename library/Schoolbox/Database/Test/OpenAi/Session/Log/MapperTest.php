@@ -18,12 +18,23 @@ use Schoolbox\OpenAi\Session\Log\Model;
 use Schoolbox\OpenAi\Session\Mapper as SessionMapper;
 use Schoolbox\OpenAi\Session\Model as SessionModel;
 
+/**
+ * Database round-trip tests for the AI session log {@see Mapper}.
+ */
 class MapperTest extends TestCase
 {
     use TestConnectorTrait;
 
+    /**
+     * The id of the parent ai_session row created in setUp() for the FK.
+     *
+     * @var string
+     */
     private string $sessionId;
 
+    /**
+     * Open a transaction, point the mappers at it, and create a parent session for the FK.
+     */
     public function setUp(): void
     {
         $this->connectSchoolbox();
@@ -40,11 +51,17 @@ class MapperTest extends TestCase
         $this->sessionId = $session->getId();
     }
 
+    /**
+     * Roll back everything written during the test.
+     */
     public function tearDown(): void
     {
         $this->schoolbox->rollback();
     }
 
+    /**
+     * A fully populated log row persists and round-trips on reload.
+     */
     public function testSaveAndRoundTrip(): void
     {
         $model = (new Model())
@@ -82,6 +99,9 @@ class MapperTest extends TestCase
         $this->assertNull($reloaded->getUser());
     }
 
+    /**
+     * A null log_format is persisted and rehydrated as null.
+     */
     public function testNullLogFormatRoundTrips(): void
     {
         $model = (new Model())

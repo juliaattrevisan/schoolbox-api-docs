@@ -12,6 +12,9 @@ namespace Schoolbox\OpenAi\Session\Test;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\OpenAi\Session\Feature;
 
+/**
+ * Unit tests for the {@see Feature} enum.
+ */
 class FeatureTest extends TestCase
 {
     /**
@@ -32,6 +35,9 @@ class FeatureTest extends TestCase
         ], $values);
     }
 
+    /**
+     * Confirms cases can be resolved from their backing string value.
+     */
     public function testCanBuildFromValue(): void
     {
         $this->assertSame(Feature::CHAT, Feature::from('chat'));
