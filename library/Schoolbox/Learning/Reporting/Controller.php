@@ -484,6 +484,11 @@ class Controller extends Base
             $supportingDataFolders = SupportingDataFolder::tryFrom($assessment->getSupportingDataFolders())
                 ?? SupportingDataFolder::CURRENT_ONLY;
 
+            /* The curriculum codes to filter to */
+            $supportingDataCurriculumCodes = $assessment->getSupportingDataCurriculumNodes()
+                ->map(fn(CurriculumNode $curriculumNode) => $curriculumNode->getCode())
+                ->getAll();
+
             /* Note that the first arg to findAllByFolderIdForReview() can actually be a set of folder ids
              */
             $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview(
@@ -555,9 +560,10 @@ class Controller extends Base
                 //                        'AC9SAS09',
                 //                        'GC-FA-a'
                 //                    ]
-                    'curriculum_codes' => $assessment->getSupportingDataCurriculumNodes()
-                        ->map(fn(CurriculumNode $curriculumNode) => $curriculumNode->getCode())
-                        ->getAll(),
+                    /* the curriculum codes filter can't be an empty array, but can be null. */
+                    'curriculum_codes' => \count($supportingDataCurriculumCodes) > 0
+                        ? $supportingDataCurriculumCodes
+                        : null,
                 ],
             );
         }
