@@ -9,6 +9,7 @@
 namespace Schoolbox\Learning\Assessment\Reporting\Decorator;
 
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 
 trait ReportingTrait
 {
@@ -58,7 +59,7 @@ trait ReportingTrait
      *
      * As per tradition, zero work types selected == all work types selected
      *
-     * @var GenericCollection|null
+     * @var GenericCollection<WorkType>|null
      */
     private ?GenericCollection $supportingDataWorkTypes = null;
 
@@ -162,7 +163,7 @@ trait ReportingTrait
 
 
     /**
-     * @return GenericCollection|null
+     * @return GenericCollection<WorkType>|null
      */
     public function getSupportingDataWorkTypes(): ?GenericCollection
     {
@@ -171,7 +172,7 @@ trait ReportingTrait
 
 
     /**
-     * @param GenericCollection|null $supportingDataWorkTypes
+     * @param GenericCollection<WorkType>|null $supportingDataWorkTypes
      * @return $this
      */
     public function setSupportingDataWorkTypes(?GenericCollection $supportingDataWorkTypes): self

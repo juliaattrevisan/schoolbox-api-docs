@@ -24,6 +24,7 @@ use Schoolbox\Learning\Assessment\Quiz;
 use Schoolbox\Learning\Assessment\Reporting;
 use Schoolbox\Learning\Assessment\Task;
 use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\DueWork\State;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\Markbook\FeedbackFolders;
@@ -542,17 +543,7 @@ class Controller extends Base
                         AssessmentType::TYPE_PROJECT,
                         AssessmentType::TYPE_LTI_ASSESSMENT
                     ],
-                    'work_type' => [
-                        1, // Formative Assessment Task
-                        2, // Summative Assessment Task
-                        3, // Learning Activity
-                        4, // Homework Task
-                        5, // Observation
-                        6, // Lesson Planning
-                        7, // Reporting
-                        8, // Unknown (maybe deleted)
-                        9, // Approach To Learning
-                    ],
+                    'work_type' => $assessment->getSupportingDataWorkTypes()->map(fn(WorkType $workType) => $workType->getId())->getAll(),
                     /* If both are provided, assessment ids and curriculum nodes execute an intersect: this results in
                      * all the assessment ids provided that -also- are associated with any of the curric codes specified
                      */
