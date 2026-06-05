@@ -7,9 +7,9 @@ import { unescape } from "es-toolkit";
 import { getMasonryConfig } from "./masonryConfig";
 
 /**
- * Returns the decoded heading used for My Links.
+ * Get the decoded page heading to use for the saved link and side menu display.
  *
- * @returns {string}
+ * @returns { string }
  */
 function getHeading() {
     return unescape(getMasonryConfig().postToMyLinks.heading);
