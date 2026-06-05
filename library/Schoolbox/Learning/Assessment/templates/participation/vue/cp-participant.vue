@@ -215,7 +215,11 @@ function onOpenIncludeInExistingModal(): void {
                                 Include in Existing Customisation
                             </button>
                         </li>
-                        <li class="separator">Create</li>
+                        <li v-if="props.routes.getAssessmentParticipationNewActivity || props.routes.getAssessmentParticipationCopyActivity"
+                            class="separator"
+                        >
+                            Create
+                        </li>
                         <li v-if="props.routes.getAssessmentParticipationCopyActivity">
                             <button
                                 class="sbx-button--has-icon"
@@ -229,9 +233,8 @@ function onOpenIncludeInExistingModal(): void {
                                 Create Copy of {{ locale.activity.translate(false, true) }}
                             </button>
                         </li>
-                        <li>
+                        <li v-if="props.routes.getAssessmentParticipationNewActivity">
                             <button
-                                v-if="props.routes.getAssessmentParticipationNewActivity"
                                 class="sbx-button--has-icon"
                                 @click.prevent="
                                     onActionSelected(
