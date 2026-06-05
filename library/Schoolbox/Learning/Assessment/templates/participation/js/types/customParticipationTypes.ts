@@ -41,7 +41,7 @@ export type Assessable = {
     id: number;
     title: string;
     _links: {
-        modify: string;
+        modify: string | null;
     };
 };
 
