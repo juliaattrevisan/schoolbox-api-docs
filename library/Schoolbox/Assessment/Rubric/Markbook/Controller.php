@@ -31,9 +31,11 @@ use Schoolbox\L10n\RosettaStone as Translator;
 use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Learning\MarkScheme\Factory;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\Model;
 use UnderflowException;
 use UnexpectedValueException;
 
@@ -168,9 +170,11 @@ class Controller extends Base
      * Output the rubric report as a cool CSV for extra-Schoolbox data wrangling,
      * for those that are into that sort of thing.
      *
-     * @api   GET /learning/rubricMarkbook/export/{folderId}
+     * @param Model $folder Folder for this class
+     * @throws Exception
+     * @throws RouteNotFound
      * @since 192
-     * @param Folder\Model $folder Folder for this class
+     * @api   GET /learning/rubricMarkbook/export/{folderId}
      */
     public function getMarkbookExport(Folder\Model $folder): void
     {
@@ -178,29 +182,38 @@ class Controller extends Base
         $this->extendExecutionTime();
 
         $queryArgs = $this->requestQuery->getArrayCopy();
+
         unset($queryArgs['page']);
+
         $assessmentIds = $this->getAssessmentIds($folder->getId(), $queryArgs);
 
         [
             $assessments,
             $exclusions,
-            $students,
+            $studentMarks,
             $overallMarks
         ] = $this->buildMarkbookData($folder, $queryArgs, $assessmentIds);
 
         $csv = new Export\Csv(
-            $students,
+            $studentMarks,
             $assessments,
             $exclusions,
             $overallMarks,
             $this->translator,
             empty($queryArgs['descriptorsOnly']),
         );
+
         $showDrafts = (bool)($queryArgs['showDrafts'] ?? false);
+
         $csv->export(
-            ($showDrafts ? 'Draft - ' : '') . $folder->getNameWithCodes() . ' - Rubric Markbook.csv',
+            sprintf(
+                '%s%s - Rubric Markbook.csv',
+                $showDrafts ? 'Draft - ' : '',
+                $folder->getNameWithCodes()
+            ),
             $showDrafts,
         );
+
         exit;
     }
 
