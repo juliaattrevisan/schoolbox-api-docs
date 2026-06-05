@@ -36,6 +36,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Model;
+use Twig\Error\Error;
 use UnderflowException;
 use UnexpectedValueException;
 
@@ -52,37 +53,6 @@ use function uasort;
 
 class Controller extends Base
 {
-    /**
-     * @var IConnector
-     */
-    private $internalDb;
-
-    /**
-     * Data source for group lists
-     *
-     * @var UserAccessMapper
-     */
-    private $userAccessMapper;
-
-    /** @var Filter\IFactoryFactory */
-    private $filterFactoryFactory;
-
-    /** @var Filter\Selection\Mapper */
-    private $filterSelectionMapper;
-
-    /** @var Filter\Filters\Assessment\IdFinder */
-    private $assessmentIdFinder;
-
-    /** @var Filter\Mapper */
-    private $filterMapper;
-
-
-    /**
-     * @var Translator
-     */
-    private $translator;
-
-
     /**
      * @var Decimal
      */
@@ -107,22 +77,14 @@ class Controller extends Base
      * @param Translator                         $translator
      */
     public function __construct(
-        IConnector $internalDb,
-        UserAccessMapper $userAccessMapper,
-        Filter\IFactoryFactory $filterFactoryFactory,
-        Filter\Selection\Mapper $filterSelectionMapper,
-        Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
-        Filter\Mapper $filterMapper,
-        Translator $translator
+        private IConnector $internalDb,
+        private UserAccessMapper $userAccessMapper,
+        private Filter\IFactoryFactory $filterFactoryFactory,
+        private Filter\Selection\Mapper $filterSelectionMapper,
+        private Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
+        private Filter\Mapper $filterMapper,
+        private Translator $translator
     ) {
-        $this->internalDb            = $internalDb;
-        $this->userAccessMapper      = $userAccessMapper;
-        $this->filterFactoryFactory  = $filterFactoryFactory;
-        $this->filterSelectionMapper = $filterSelectionMapper;
-        $this->assessmentIdFinder    = $assessmentIdFinder;
-        $this->filterMapper          = $filterMapper;
-        $this->translator            = $translator;
-
         /* Used to calculate human-readable and normalised marks for each student for capabilities and indicators
          */
         $this->decimalHydrator = new Decimal();
@@ -133,17 +95,11 @@ class Controller extends Base
     /**
      * Renders a filter panel and placeholder that will asynchronously load the rubric report
      *
-     * @api   GET /learning/rubricMarkbook/{folderId}
+     * @param Model $folder Folder for this class
+     * @throws RouteNotFound
+     * @throws Error
      * @since 190
-     * @param Folder\Model $folder Folder for this class
-     * @throws Database\Predicate\InvalidColumnException
-     * @throws InvalidArgumentException
-     * @throws Mapper\DefinitionException
-     * @throws Mapper\Exception
-     * @throws Router\Exception\RouteNotFound
-     * @throws UnderflowException
-     * @throws DomainException
-     * @throws UnexpectedValueException
+     * @api   GET /learning/rubricMarkbook/{folderId}
      */
     public function getMarkbook(Folder\Model $folder): void
     {
@@ -221,21 +177,12 @@ class Controller extends Base
     /**
      * Displays a list of rubric marks for students and learners associated with the specified folder
      *
+     * @param Model $folder Folder for this class
+     * @throws Error
+     * @throws Exception
+     * @throws RouteNotFound
      * @api   POST /learning/rubricMarkbook/{folderId}
      * @since 190
-     * @param Folder\Model $folder Folder for this class
-     * @throws Database\Exception
-     * @throws Database\Predicate\InvalidColumnException
-     * @throws DomainException
-     * @throws InvalidArgumentException
-     * @throws Mapper\DefinitionException
-     * @throws Mapper\Exception
-     * @throws PDOException
-     * @throws UnderflowException
-     * @throws UnexpectedValueException
-     * @throws LogicException
-     * @throws Router\Exception\RouteNotFound
-     * @throws RangeException
      */
     public function postMarkbook(Folder\Model $folder): void
     {
