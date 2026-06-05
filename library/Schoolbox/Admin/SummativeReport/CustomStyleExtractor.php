@@ -40,6 +40,18 @@ class CustomStyleExtractor
      */
     public function extract(string $skinConfig): string
     {
+
+        return "
+            @import url('https://fonts.googleapis.com/css2?family=Playwrite+GB+J:ital,wght@0,100..400;1,100..400&display=swap');
+            .summative-report,
+            .summative-report h1,
+            .summative-report h2,
+            .summative-report h3,
+            .summative-report h4,
+            .summative-report h5,
+            .summative-report h6 { font-family: 'Playwrite GB J', serif; }
+        ";
+
         /* In the given slab of css rules $skinConfig,
          * go looking for anything that follows the format
          *
