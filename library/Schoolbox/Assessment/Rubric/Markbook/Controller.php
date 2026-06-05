@@ -1354,17 +1354,116 @@ class Controller extends Base
                 foreach ($rubricGridData['capabilities'] as $capabilityId => $capabilityData) {
                     $overallMarks[$capabilityId] = [
                         'name' => $capabilityData['name'],
+                        /* What each student got for this capability
+                         * Contains a "published" and "draft" node
+                         */
+                        'students' => [],
+                        /* The indicators used in this capability
+                         */
                         'indicators' => [],
                     ];
 
                     foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
                         $overallMarks[$capabilityId]['indicators'][$indicatorId] = [
                             'name' => $indicatorData['name'],
+                            /* What each student got for this indicator
+                             * Contains a "published" and "draft" node
+                             */
+                            'students' => []
                         ];
                     }
                 }
             }
         }
+
+        /* Now precompute overall marks for each student
+         */
+        $aggregator = new WeightedAggregator();
+
+        foreach ($studentMarks as $studentId => $studentData) {
+            foreach ($studentData['gridData'] as $assessmentId => $rubricInstanceData) {
+                foreach ($rubricInstanceData as $rubricInstanceId => $rubricGridData) {
+                    foreach ($rubricGridData['capabilities'] as $capabilityId => $capabilityData) {
+                        if (!isset($overallMarks[$capabilityId]['students'][$studentId])) {
+                            $overallMarks[$capabilityId]['students'][$studentId] = [
+                                'published' => 0,
+                                'draft' => 0,
+                            ];
+                        }
+
+                        /* Published capability mark for this student
+                         */
+                        $overallMarks[$capabilityId]['students'][$studentId]['published'] += $aggregator->calculate(
+                            (float)$coefficients['assessments'][$assessmentId],
+                            (float)$coefficients['assessments']['totalWeight'],
+                            (float)$coefficients['grids'][$rubricInstanceId],
+                            (float)$coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'],
+                            /* This is a value between 0-100; $aggregator does the division internally to convert this
+                             * value appropriately. It's a byproduct of assembling data that we've augmented earlier.
+                             */
+                            (float)($capabilityData['published']['normalisedMark'])
+                        );
+
+                        /* Draft capability mark for this student
+                         */
+                        $overallMarks[$capabilityId]['students'][$studentId]['draft'] += $aggregator->calculate(
+                            (float)$coefficients['assessments'][$assessmentId],
+                            (float)$coefficients['assessments']['totalWeight'],
+                            (float)$coefficients['grids'][$rubricInstanceId],
+                            (float)$coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'],
+                            /* This is a value between 0-100; $aggregator does the division internally to convert this
+                             * value appropriately. It's a byproduct of assembling data that we've augmented earlier.
+                             */
+                            (float)($capabilityData['draft']['normalisedMark'])
+                        );
+
+                        /* Now dig into each indicator within this capability and aggregate their values in a very
+                         * similar fashion.
+                         */
+                        foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
+                            if (!isset($overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId])) {
+                                $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId] = [
+                                    'published' => 0,
+                                    'draft' => 0,
+                                ];
+                            }
+
+                            /* Published indicator mark for this student
+                             */
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['published'] += $aggregator->calculate(
+                                (float)$coefficients['assessments'][$assessmentId],
+                                (float)$coefficients['assessments']['totalWeight'],
+                                (float)$coefficients['grids'][$rubricInstanceId],
+                                (float)$coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'],
+                                /* This is a value between 0-100; $aggregator does the division internally to convert this
+                                 * value appropriately. It's a byproduct of assembling data that we've augmented earlier.
+                                 */
+                                (float)($indicatorData['published']['normalisedMark'])
+                            );
+
+                            /* Draft indicator mark for this student
+                             */
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['draft'] += $aggregator->calculate(
+                                (float)$coefficients['assessments'][$assessmentId],
+                                (float)$coefficients['assessments']['totalWeight'],
+                                (float)$coefficients['grids'][$rubricInstanceId],
+                                (float)$coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'],
+                                /* This is a value between 0-100; $aggregator does the division internally to convert this
+                                 * value appropriately. It's a byproduct of assembling data that we've augmented earlier.
+                                 */
+                                (float)($indicatorData['draft']['normalisedMark'])
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        /* lol in $overallMarks, all the normalisedMark values are represented as fractions of 100, e.g. 0.99
+         * This needs to be converted to is non-fractional equivalent: ie. 99 instead of 0.99
+         *
+         * This is for compatibility with MarkScheme classes that are used to derive human-readables.
+         */
 
         new \Alaress_Probe($overallMarks);
         new \Alaress_Probe($coefficients);
