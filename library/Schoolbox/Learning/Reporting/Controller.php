@@ -478,8 +478,14 @@ class Controller extends Base
 
         $assessments = $this->assessmentMapperProxy->createCollection();
 
-        // TODO: should this actually be getSupportingDataEnable()? I'm unsure if there's a point to this markbook toggle at the moment given it's the only type of supporting data...
-        if ($assessment->getSupportingDataMarkbookEnable()) {
+        /* Supporting Data Enable and Supporting Data Markbook Enable must both be turned on
+         * for assessments to show up on the markbook.
+         *
+         * Currently the 'markbook enable' option isn't really meaningful at the moment since
+         * the only type of supporting data that can show are via activities currently,
+         * it's there for the future when we have other types of supporting data to show.
+         */
+        if ($assessment->getSupportingDataEnable() && $assessment->getSupportingDataMarkbookEnable()) {
             /* The folders to filter to, fall back to current only if for some reason this is unset */
             $supportingDataFolders = SupportingDataFolder::tryFrom($assessment->getSupportingDataFolders())
                 ?? SupportingDataFolder::CURRENT_ONLY;
