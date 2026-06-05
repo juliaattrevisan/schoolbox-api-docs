@@ -14,6 +14,7 @@ use Alaress\Web\Controller\Base;
 use Alaress\HTMLPurifier\IPurifier;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Schoolbox\Curriculum\Node\Model as CurriculumNode;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork;
@@ -543,7 +544,9 @@ class Controller extends Base
                         AssessmentType::TYPE_PROJECT,
                         AssessmentType::TYPE_LTI_ASSESSMENT
                     ],
-                    'work_type' => $assessment->getSupportingDataWorkTypes()->map(fn(WorkType $workType) => $workType->getId())->getAll(),
+                    'work_type' => $assessment->getSupportingDataWorkTypes()
+                        ->map(fn(WorkType $workType) => $workType->getId())
+                        ->getAll(),
                     /* If both are provided, assessment ids and curriculum nodes execute an intersect: this results in
                      * all the assessment ids provided that -also- are associated with any of the curric codes specified
                      */
@@ -552,6 +555,9 @@ class Controller extends Base
                 //                        'AC9SAS09',
                 //                        'GC-FA-a'
                 //                    ]
+                    'curriculum_codes' => $assessment->getSupportingDataCurriculumNodes()
+                        ->map(fn(CurriculumNode $curriculumNode) => $curriculumNode->getCode())
+                        ->getAll(),
                 ],
             );
         }

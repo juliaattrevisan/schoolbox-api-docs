@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\Assessment\Reporting\Decorator;
 
+use Schoolbox\Curriculum\Node\Model as CurriculumNode;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 
@@ -35,7 +36,7 @@ trait ReportingTrait
      *
      * As per tradition, zero curriculum nodes selected == all curriculum nodes selected
      *
-     * @var GenericCollection|null
+     * @var GenericCollection<CurriculumNode>|null
      */
     private ?GenericCollection $supportingDataCurriculumNodes = null;
 
@@ -123,7 +124,7 @@ trait ReportingTrait
 
 
     /**
-     * @return GenericCollection|null
+     * @return GenericCollection<CurriculumNode>|null
      */
     public function getSupportingDataCurriculumNodes(): ?GenericCollection
     {
@@ -132,7 +133,7 @@ trait ReportingTrait
 
 
     /**
-     * @param GenericCollection|null $supportingDataCurriculumNodes
+     * @param GenericCollection<CurriculumNode>|null $supportingDataCurriculumNodes
      * @return $this
      */
     public function setSupportingDataCurriculumNodes(?GenericCollection $supportingDataCurriculumNodes): self
