@@ -69,6 +69,12 @@ class NormalisedMark implements IStrategy
         }
         $normalisedMark = (float)trim((string)$row[self::DISCRIMINATOR_COLUMN]);
 
+        /* Add a really specific error circumstance where we calculated something illegal
+         */
+        if ($normalisedMark < 0 || $normalisedMark > 100) {
+            throw new \RuntimeException('Invalid normalised mark calculated.');
+        }
+
         /* This is what the student would see
          */
         $learnerHumanReadableMark = $learnerScheme->getHumanReadableMark($normalisedMark);
@@ -77,12 +83,6 @@ class NormalisedMark implements IStrategy
          * Disgustingly typehint this getInstructorMarkScheme() method which is unique to two activities atm
          */
         $instructorHumanReadableMark = $instructorScheme->getHumanReadableMark($normalisedMark);
-
-        /* Add a really specific error circumstance where we calculated something illegal
-         */
-        if ($normalisedMark < 0 || $normalisedMark > 100) {
-            throw new \RuntimeException('Invalid normalised mark calculated.');
-        }
 
         /* Apparently this is how you detect a Submission State: an exception is thrown
          * trying to interpret it as one of the Mark Schemes. No wonder it was classified
