@@ -12,6 +12,7 @@ use Config\ModuleLoader;
 use Psr\Container\ContainerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Filter\Module as FilterModule;
+use Schoolbox\IConfigLoader;
 
 class Admin extends ModuleLoader
 {
@@ -164,7 +165,9 @@ class Admin extends ModuleLoader
 
         /* International Baccalaureate
          */
-        $this->loadModule($di, \Schoolbox\Admin\InternationalBaccalaureate\Module::class, '/adminv2/international-baccalaureate');
+        if ($di->get('config')->get(ConfigMapper::NAME_IB_ENABLED)) {
+            $this->loadModule($di, \Schoolbox\Admin\InternationalBaccalaureate\Module::class, '/adminv2/international-baccalaureate');
+        }
 
         /* Data Retention
          */

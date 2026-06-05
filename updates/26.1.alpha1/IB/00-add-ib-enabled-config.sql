@@ -14,7 +14,7 @@ INSERT INTO config (
 VALUES (
     'ib_enabled',
     'International Baccalaureate Enabled',
-    'false',
+    0,
     'Controls whether International Baccalaureate admin and profile surfaces are available.',
     (SELECT id FROM lu_config_field WHERE field = 'boolean'),
     (SELECT id FROM lu_config_type WHERE type = 'Modules'),
