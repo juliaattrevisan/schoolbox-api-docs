@@ -479,6 +479,9 @@ class Controller extends Base
 
         // TODO: should this actually be getSupportingDataEnable()? I'm unsure if there's a point to this markbook toggle at the moment given it's the only type of supporting data...
         if ($assessment->getSupportingDataMarkbookEnable()) {
+            /* The folders to filter to, fall back to current only if for some reason this is unset */
+            $supportingDataFolders = SupportingDataFolder::tryFrom($assessment->getSupportingDataFolders())
+                ?? SupportingDataFolder::CURRENT_ONLY;
 
             /* Note that the first arg to findAllByFolderIdForReview() can actually be a set of folder ids
              */
@@ -486,7 +489,7 @@ class Controller extends Base
                 /* For the students in $folder, find all the folders where they had a published feedback.
                  * Or, use just the current class folder this activity is imported to to show content only from that page.
                  */
-                folderId: match (SupportingDataFolder::from($assessment->getSupportingDataFolders())) {
+                folderId: match ($supportingDataFolders) {
                     SupportingDataFolder::ANY_FOLDERS => $this->feedbackFolders->findForFolder($folder, $from, $to),
                     SupportingDataFolder::CURRENT_ONLY => [$folder->getId()],
                 },
