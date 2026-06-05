@@ -21,10 +21,12 @@ use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Authorizer\Rule\HasParticipant;
+use Schoolbox\Learning\Markbook\FeedbackFolders;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Role;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
@@ -105,6 +107,7 @@ class Module extends BaseModule
             $this->getAssessmentMapperProxy(),
             $this->getMapperFactory()->get(\Schoolbox\Learning\DueWork\StateMapper::class),
             new ScrubAdapter(),
+            $this->getFeedbackFolders(),
         );
     }
 
@@ -135,5 +138,17 @@ class Module extends BaseModule
     protected function getErrorMapper(): ErrorMapper
     {
         return $this->getMapperFactory()->get(ErrorMapper::class);
+    }
+
+    /**
+     * @return FeedbackFolders
+     */
+    protected function getFeedbackFolders(): FeedbackFolders
+    {
+        return new FeedbackFolders(
+            $this->injector->get('databaseInternal'),
+            $this->injector->get('externalClass'),
+            $this->getMapperFactory()->get(UserMapper::class),
+        );
     }
 }

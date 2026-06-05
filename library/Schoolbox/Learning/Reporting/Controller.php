@@ -22,6 +22,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Quiz;
 use Schoolbox\Learning\Assessment\Reporting;
+use Schoolbox\Learning\Assessment\Reporting\Folder as SupportingDataFolder;
 use Schoolbox\Learning\Assessment\Task;
 use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
@@ -32,7 +33,6 @@ use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\NotFound;
-use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
 
 /**
@@ -49,11 +49,13 @@ class Controller extends Base
      * @param AssessmentMapperProxy $assessmentMapperProxy
      * @param StateMapper           $stateMapper
      * @param IPurifier             $purifier
+     * @param FeedbackFolders       $feedbackFolders
      */
     public function __construct(
         private AssessmentMapperProxy $assessmentMapperProxy,
         private StateMapper $stateMapper,
         private IPurifier $purifier,
+        private FeedbackFolders $feedbackFolders,
     ) {
     }
 
@@ -468,15 +470,6 @@ class Controller extends Base
 
         $folder = $assessment->getBaseContext()->getFolder();
 
-        $feedbackFolders = new FeedbackFolders(
-            $this->getDi()->get('databaseInternal'),
-            $this->getDi()->get('externalClass'),
-            \Schoolbox\UserMapper::getInstance(), // TODO inject this from wherever you implement later
-        );
-
-        // toggle the stats
-        $overallStatistics = false;
-
         /* Find data between these date ranges
          */
         $from = new \Alaress_Date_Format('2025-01-01 00:00:00', 'Y-m-d H:i:s');
@@ -488,11 +481,15 @@ class Controller extends Base
         if ($assessment->getSupportingDataMarkbookEnable()) {
 
             /* Note that the first arg to findAllByFolderIdForReview() can actually be a set of folder ids
-            */
+             */
             $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview(
-                /* For the students in $folder, find all the folders where they had a published feedback
-                */
-                folderId: $feedbackFolders->findForFolder($folder, $from, $to),
+                /* For the students in $folder, find all the folders where they had a published feedback.
+                 * Or, use just the current class folder this activity is imported to to show content only from that page.
+                 */
+                folderId: match (SupportingDataFolder::from($assessment->getSupportingDataFolders())) {
+                    SupportingDataFolder::ANY_FOLDERS => $this->feedbackFolders->findForFolder($folder, $from, $to),
+                    SupportingDataFolder::CURRENT_ONLY => [$folder->getId()],
+                },
                 /* For the $studentIds provided, find all the folders where they had a published feedback
                  */
                 //                (new FeedbackFolders($this->getDi()->get('databaseInternal'), $this->getDi()->get('externalClass')))
@@ -522,7 +519,7 @@ class Controller extends Base
                 /* Only hydrate these particular participants and their feedbacks, if specified: otherwise swamp hydrates
                  * everyone who participated in each $assessment which might be more than you need.
                  */
-                users: $feedbackFolders->findStudents($folder),
+                users: $this->feedbackFolders->findStudents($folder),
                 /* Somewhat experimental:
                  * Don't need any response instances. You get some mixed results here, since the markbook infers states:
                  * a response existing, but no feedback given yet, is shown as a hyphen - ...but if a response doesn't
@@ -576,9 +573,10 @@ class Controller extends Base
             defaultMarkScheme: $overallMarkScheme,
             viewingUser: $this->getUser(),
             /* Ignore processing weight, mean, stdev, min, max, etc. statistics. This appears in an accordion thing on
-             * the markbook page. Setting this to false zeroes out the data, ignoring its normal calculation algorithms
+             * the class markbook page. Setting this to false zeroes out the data, ignoring its normal calculation algorithms,
+             * which we do not need on the reporting markbook
              */
-            overallStatistics: $overallStatistics,
+            overallStatistics: false,
             /* Use this to reduce $assessments to only returning a row for these guy(s)
              * findAllByFolderIdForReview() doesn't really support individual participants across multiple folders.
              * It goes into a different orthogonal method
