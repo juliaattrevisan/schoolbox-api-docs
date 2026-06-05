@@ -63,6 +63,10 @@ class NormalisedMark implements IStrategy
         $instructorScheme = $assessment->getInstructorMarkScheme();
         $learnerScheme = $assessment->getMarkScheme();
 
+        // check if we actually have numbers in this column, or someone did something stupid...
+        if (!is_numeric((string)$row[self::DISCRIMINATOR_COLUMN])) {
+            throw new \RuntimeException('Instructor mark scheme is not numeric.');
+        }
         $normalisedMark = (float)trim((string)$row[self::DISCRIMINATOR_COLUMN]);
 
         /* This is what the student would see
