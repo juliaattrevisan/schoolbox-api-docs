@@ -533,15 +533,17 @@ class Controller extends Base
      * Find each student in a folder and their marks (if extant), and return an array indexed by student ID
      *
      * @param array<int,array> $assessments
-     * @param null|array       $selectedCapabilities Null if rubricUsage filter not enabled for page
-     * @param null|array       $selectedIndicators   Null if rubricUsage filter not enabled for page
+     * @param null|array $selectedCapabilities Null if rubricUsage filter not enabled for page
+     * @param null|array $selectedIndicators Null if rubricUsage filter not enabled for page
+     * @param array $exclusions
      * @return array
-     * @throws Database\Exception
-     * @throws Database\Predicate\InvalidColumnException
-     * @throws UnderflowException
      */
-    private function retrieveDatabaseMarks(array $assessments, ?array $selectedCapabilities, ?array $selectedIndicators): array
-    {
+    private function retrieveDatabaseMarks(
+        array $assessments,
+        ?array $selectedCapabilities,
+        ?array $selectedIndicators,
+        array $exclusions
+    ): array {
         $students = [];
 
         // Don't load marks if no assessments.
@@ -674,6 +676,29 @@ class Controller extends Base
                 ];
             }
 
+            /* Cram in a link to the assessment's summary screen for a particular student if it didn't already exist
+             */
+            if (!isset($students[$row['student_id']]['assessments'][$row['assessment_id']])) {
+                $students[$row['student_id']]['assessments'][$row['assessment_id']] = [
+                    'summaryLink' => $this->routeGenerator->generate(
+                        'learningAssessment.getSummary',
+                        [
+                            'studentId' => $row['student_id'],
+                            'assessmentId' => $row['assessment_id'],
+                        ],
+                    )
+                ];
+            }
+
+            /* If this student's been excluded, we can skip processing their data if it exists.
+             *
+             * TODO you can probably find a way to convert this to a ->notIn clause to restrict the database's result
+             *  set instead of fetching it only to ignore it
+             */
+            if (isset($exclusions[$row['assessment_id']][$row['student_id']])) {
+                continue;
+            }
+
             /* Remember settings for the rubric instance that we're encountering, such as the rubric instance's mark per
              * capability setting, etc. if it hasn't already been set. We only need to set it up once.
              */
@@ -797,16 +822,19 @@ class Controller extends Base
      * TODO This is an egregious mega copypasta which surely could be refactored for brevity
      *
      * @param array<int,array> $assessments
-     * @param null|array       $selectedCapabilities Null if rubricUsage filter not enabled for page
-     * @param null|array       $selectedIndicators   Null if rubricUsage filter not enabled for page
-     * @param array            $students             The array of student values which will already contian published, we are adding only the draft marks
+     * @param null|array $selectedCapabilities Null if rubricUsage filter not enabled for page
+     * @param null|array $selectedIndicators Null if rubricUsage filter not enabled for page
+     * @param array $exclusions
+     * @param array $students The array of student values which will already contian published, we are adding only the draft marks
      * @return array
-     * @throws Database\Exception
-     * @throws Database\Predicate\InvalidColumnException
-     * @throws UnderflowException
      */
-    private function retrieveDatabaseDraftMarks(array $assessments, ?array $selectedCapabilities, ?array $selectedIndicators, array $students): array
-    {
+    private function retrieveDatabaseDraftMarks(
+        array $assessments,
+        ?array $selectedCapabilities,
+        ?array $selectedIndicators,
+        array $exclusions,
+        array $students
+    ): array {
         // Don't load marks if no assessments.
         if (!count($assessments)) {
             return $students;
@@ -945,6 +973,29 @@ class Controller extends Base
                      */
                     'gridData' => []
                 ];
+            }
+
+            /* Cram in a link to the assessment's summary screen for a particular student if it didn't already exist
+             */
+            if (!isset($students[$row['student_id']]['assessments'][$row['assessment_id']])) {
+                $students[$row['student_id']]['assessments'][$row['assessment_id']] = [
+                    'summaryLink' => $this->routeGenerator->generate(
+                        'learningAssessment.getSummary',
+                        [
+                            'studentId' => $row['student_id'],
+                            'assessmentId' => $row['assessment_id'],
+                        ],
+                    )
+                ];
+            }
+
+            /* If this student's been excluded, we can skip processing their data if it exists.
+             *
+             * TODO you can probably find a way to convert this to a ->notIn clause to restrict the database's result
+             *  set instead of fetching it only to ignore it
+             */
+            if (isset($exclusions[$row['assessment_id']][$row['student_id']])) {
+                continue;
             }
 
             /* Remember settings for the rubric instance that we're encountering, such as the rubric instance's mark per
@@ -1141,12 +1192,13 @@ class Controller extends Base
     private function getExclusions(array $assessmentIds): array
     {
         $exclusions = [];
+
         if (!count($assessmentIds)) {
             return $exclusions;
         }
 
         $bindings = Database\Predicate\Builder::getBindings($assessmentIds, 'a_id');
-        $sql      = "
+        $sql = "
             SELECT
                 a.id      AS assessment_id,
                 p.user_id AS user_id
@@ -1161,44 +1213,15 @@ class Controller extends Base
         ";
 
         $statement = $this->internalDb->executeQuery($sql, $bindings->getParams());
+
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch()) {
-            $exclusions[$row['assessment_id']][] = (int)$row['user_id'];
+            $userId = (int)$row['user_id'];
+
+            $exclusions[$row['assessment_id']][$userId] = $userId;
         }
+
         return $exclusions;
-    }
-
-
-    /**
-     * Insert summary page links for each student/assessment
-     *
-     * @param mixed[] $studentMarks  Indexed by userId
-     * @param int[]   $assessmentIds Indexed by assessmentId
-     * @param int[][] $exclusions    Indexed by assessmentId, userId
-     * @return array
-     * @throws Router\Exception\RouteNotFound
-     */
-    private function insertSummaryPageLinks(array $studentMarks, array $assessmentIds, array $exclusions): array
-    {
-        // Ensure each student has a summary link, even if they have no marks
-        foreach (array_keys($studentMarks) as $studentId) {
-            foreach ($assessmentIds as $assessmentId) {
-                if (array_key_exists($assessmentId, $exclusions) && in_array($studentId, $exclusions[$assessmentId], true)) {
-                    unset($studentMarks[$studentId]['assessments'][$assessmentId]);
-                    continue;
-                }
-                $summaryLink = $this->routeGenerator->generate(
-                    'learningAssessment.getSummary',
-                    [
-                        'studentId'    => $studentId,
-                        'assessmentId' => $assessmentId,
-                    ]
-                );
-                $studentMarks[$studentId]['assessments'][$assessmentId]['summaryLink'] = $summaryLink;
-            }
-        }
-
-        return $studentMarks;
     }
 
 
@@ -1495,18 +1518,43 @@ class Controller extends Base
      */
     private function buildMarkbookData(Folder\Model $folder, array $request, $assessmentIds): array
     {
+        /* These are the filter selections that were used from the ui
+         */
         [$selectedCapabilities, $selectedIndicators] = $this->getRubricUsageSelections($request);
-        $assessments   = $this->buildAssessmentData($assessmentIds, $selectedCapabilities, $selectedIndicators);
-        $databaseMarks = $this->retrieveDatabaseMarks($assessments, $selectedCapabilities, $selectedIndicators);
+
+        /* Find a list of students who have been excluded from the set of assessments; we don't need to process their
+         * results if they had any. We can skip them entirely
+         */
+        $exclusions = $this->getExclusions($assessmentIds);
+
+        /* Construct each rubric grid's "structure" (capabilities and indicators) that students' feedbacks are supposed
+         * to fulfil; some feedbacks might be incomplete, nonexistent, or uses an older version of a structure. This
+         * ensures their feedbacks align as best as possible to what it is supposed to be -now-
+         */
+        $assessments = $this->buildAssessmentData($assessmentIds, $selectedCapabilities, $selectedIndicators);
+
+        /* Find the published feedbacks for each student's grids. Students who have been excluded are skipped.
+         * We don't need those results.
+         */
+        $databaseMarks = $this->retrieveDatabaseMarks(
+            $assessments,
+            $selectedCapabilities,
+            $selectedIndicators,
+            $exclusions
+        );
 
         /* Augment $databaseMarks with draft data
          */
-        $databaseMarks = $this->retrieveDatabaseDraftMarks($assessments, $selectedCapabilities, $selectedIndicators, $databaseMarks);
+        $databaseMarks = $this->retrieveDatabaseDraftMarks(
+            $assessments,
+            $selectedCapabilities,
+            $selectedIndicators,
+            $exclusions,
+            $databaseMarks
+        );
 
         /* TODO work out whatever this was
          */
-        $exclusions = [];
-        $linkedMarks = [];
         $overallMarks = [];
 
         /* Adds guys who didn't get any feedback at all, to ensure no students are omitted from the rubric markbook.
@@ -1514,14 +1562,12 @@ class Controller extends Base
          */
         $databaseMarks  = $this->insertFolderMembers($databaseMarks, $folder);
 
-        $exclusions    = $this->getExclusions($assessmentIds);
-        $linkedMarks   = $this->insertSummaryPageLinks($databaseMarks, $assessmentIds, $exclusions);
-        $overallMarks  = $this->buildOverallMarks($assessments, $linkedMarks, $folder);
+        $overallMarks  = $this->buildOverallMarks($assessments, $databaseMarks, $folder);
 
         return [
             $assessments,
             $exclusions,
-            $linkedMarks,
+            $databaseMarks,
             $overallMarks
         ];
     }

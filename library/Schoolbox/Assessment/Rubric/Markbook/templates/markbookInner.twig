@@ -144,7 +144,7 @@
                                                         {# A link to the assessment's summary screen which, for some reason, we store in a different data struct
                                                          # A bit wierd but ok, I guess it saves some repeated data...
                                                          #}
-                                                        {% set summaryLink = student.assessments[assessmentId].summaryLink %}
+                                                        {% set summaryLink = student.assessments[assessmentId].summaryLink ?? null %}
 
                                                         {# Shortcuts to marks of various types #}
                                                         {% set publishedMarks = student.gridData[assessmentId][rubricInstanceId].capabilities[capabilityId].indicators[indicatorId].published ?? null %}
