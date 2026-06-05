@@ -2,7 +2,7 @@ import type { Ref } from "vue";
 import { hasErrorMessage, isAbortError } from "@js/util/errorUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import type { PastoralFlag } from "@schoolboxLibrary/Pastoral/types/PastoralFlag";
-import type { Participant } from "../../js/types/customParticipationTypes";
+import type { OptionalRoute, Participant } from "../../js/types/customParticipationTypes";
 
 /**
  * Composable for fetching and managing student pastoral flags
@@ -13,7 +13,7 @@ import type { Participant } from "../../js/types/customParticipationTypes";
  */
 export function useGetPastoralFlags(
     pastoralEnabled: boolean,
-    getStudentsPastoralCountsUrl: string,
+    getStudentsPastoralCountsUrl: OptionalRoute,
     allParticipants: () => Participant[],
 ): {
     loadError: Ref<string | null>;
@@ -27,7 +27,7 @@ export function useGetPastoralFlags(
      * Fetch the pastoral flags for the students
      */
     async function getStudentPastoralFlags(): Promise<void> {
-        if (!pastoralEnabled || getStudentsPastoralCountsUrl === "") {
+        if (!pastoralEnabled || !getStudentsPastoralCountsUrl) {
             return;
         }
         const url = getStudentsPastoralCountsUrl.replace(

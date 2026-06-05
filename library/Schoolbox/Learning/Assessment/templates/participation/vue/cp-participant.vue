@@ -45,14 +45,14 @@ function getCustomisationMeta(plan: Plan | CustomisedPlan): string {
 /**
  * Gets the modification URL for a customised plan
  * @param customisedPlan - The customised plan to get the URL for
- * @returns The modification URL with return URL parameter, null if no modification URL is available
+ * @returns The modification URL with return URL parameter, or undefined if no modification URL is available.
  */
-function getCustomisedPlanUrl(customisedPlan: CustomisedPlan): string | null {
+function getCustomisedPlanUrl(customisedPlan: CustomisedPlan): string | undefined {
     const baseUrl =
         customisedPlan.name !== null ? customisedPlan._links.modify : customisedPlan.assessable._links.modify;
     // if baseUrl is still null, then exit early
     if (null === baseUrl) {
-        return null;
+        return undefined;
     }
     return `${baseUrl}?${getReturnUrl()}`;
 }
@@ -153,7 +153,10 @@ function onOpenIncludeInExistingModal(): void {
         </td>
         <td>
             <template v-if="props.participant.customisedPlan !== null">
-                <a v-if="getCustomisedPlanUrl(props.participant.customisedPlan)" :href="getCustomisedPlanUrl(props.participant.customisedPlan)">
+                <a
+                    v-if="getCustomisedPlanUrl(props.participant.customisedPlan)"
+                    :href="getCustomisedPlanUrl(props.participant.customisedPlan)"
+                >
                     {{ props.participant.customisedPlan.name ?? props.participant.customisedPlan.assessable.title }}
                 </a>
                 <span v-else>
@@ -162,7 +165,10 @@ function onOpenIncludeInExistingModal(): void {
                 <span class="meta">{{ getCustomisationMeta(props.participant.customisedPlan) }}</span>
             </template>
             <template v-else-if="props.participant.plan.name !== null">
-                <a v-if="props.participant.plan._links.modify" :href="`${props.participant.plan._links.modify}?${getReturnUrl()}`">
+                <a
+                    v-if="props.participant.plan._links.modify"
+                    :href="`${props.participant.plan._links.modify}?${getReturnUrl()}`"
+                >
                     {{ props.participant.plan.name }}
                 </a>
                 <span v-else>{{ props.participant.plan.name }}</span>
@@ -223,7 +229,11 @@ function onOpenIncludeInExistingModal(): void {
                                 Include in Existing Customisation
                             </button>
                         </li>
-                        <li v-if="props.routes.getAssessmentParticipationNewActivity || props.routes.getAssessmentParticipationCopyActivity"
+                        <li
+                            v-if="
+                                props.routes.getAssessmentParticipationNewActivity ||
+                                props.routes.getAssessmentParticipationCopyActivity
+                            "
                             class="separator"
                         >
                             Create

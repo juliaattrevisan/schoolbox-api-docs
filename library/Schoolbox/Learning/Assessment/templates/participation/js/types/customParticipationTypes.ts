@@ -3,13 +3,15 @@ import type { User } from "@schoolboxLibrary/types/User";
 /**
  * Routes used in the custom participation component
  */
+export type OptionalRoute = string | false | null;
+
 export type Routes = {
-    getStudentsPastoralCountsUrl: string;
-    getLearningPlanNewUrl: string | false;
-    getAssessmentParticipationNewActivity: string | false;
-    getAssessmentParticipationCopyActivity: string | false;
-    includeInExistingCustomisation: string | false;
-    genAI: string | false;
+    getStudentsPastoralCountsUrl: OptionalRoute;
+    getLearningPlanNewUrl: OptionalRoute;
+    getAssessmentParticipationNewActivity: OptionalRoute;
+    getAssessmentParticipationCopyActivity: OptionalRoute;
+    includeInExistingCustomisation: OptionalRoute;
+    genAI: OptionalRoute;
 };
 
 /**
