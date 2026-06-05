@@ -1079,7 +1079,7 @@ class Controller extends Base
     /**
      * Combine users who have marks with students and learners who are in the class or group, but have no marks yet
      *
-     * @param array        $studentMarks
+     * @param array        $databaseMarks
      * @param Folder\Model $folder
      * @return array
      * @throws Database\Predicate\InvalidColumnException
@@ -1089,23 +1089,35 @@ class Controller extends Base
      * @throws PDOException
      * @throws UnderflowException
      */
-    private function insertFolderMembers(array $studentMarks, Folder\Model $folder): array
+    private function insertFolderMembers(array $databaseMarks, Folder\Model $folder): array
     {
         $studentsAndLearners = $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, true, true);
+
         foreach ($studentsAndLearners as $user) {
             $userId = $user->getId();
-            if (!isset($studentMarks[$userId])) {
-                $studentMarks[$userId] = [
-                    'firstname'   => $user->getFirstname(),
-                    'lastname'    => $user->getLastname(),
-                    'profileLink' => '/search/user/' . $userId,
-                    'assessments' => [],
+
+            if (!isset($databaseMarks[$userId])) {
+                /* Note that this is supposed to be the same data struct as seen i retrieveDatabaseMarks() and
+                 * retrieveDatabaseDraftMarks() where it progressively builds a hash lookup
+                 *
+                 * This method adds guys who didn't have any database marks (draft or otherwise) to ensure nobody is
+                 * left out of the rubric markbook
+                 */
+                $databaseMarks[$userId] = [
+                    'firstname' => $user->getFirstname(),
+                    'preferred_name' => $user->getPreferredName(),
+                    'lastname' => $user->getLastname(),
+                    'profileLink' => sprintf(
+                        '/search/user/%s',
+                        $userId
+                    ),
+                    'gridData' => [],
                 ];
             }
         }
 
         uasort(
-            $studentMarks,
+            $databaseMarks,
             static function (array $a, array $b): int {
                 $last = strnatcasecmp($a['lastname'] ?? '', $b['lastname'] ?? '');
                 if ($last === 0) {
@@ -1115,7 +1127,7 @@ class Controller extends Base
             }
         );
 
-        return $studentMarks;
+        return $databaseMarks;
     }
 
 
@@ -1497,9 +1509,13 @@ class Controller extends Base
         $linkedMarks = [];
         $overallMarks = [];
 
-        $studentMarks  = $this->insertFolderMembers($databaseMarks, $folder);
+        /* Adds guys who didn't get any feedback at all, to ensure no students are omitted from the rubric markbook.
+         * ($databaseMarks only contained guys who received feedback)
+         */
+        $databaseMarks  = $this->insertFolderMembers($databaseMarks, $folder);
+
         $exclusions    = $this->getExclusions($assessmentIds);
-        $linkedMarks   = $this->insertSummaryPageLinks($studentMarks, $assessmentIds, $exclusions);
+        $linkedMarks   = $this->insertSummaryPageLinks($databaseMarks, $assessmentIds, $exclusions);
         $overallMarks  = $this->buildOverallMarks($assessments, $linkedMarks, $folder);
 
         return [
