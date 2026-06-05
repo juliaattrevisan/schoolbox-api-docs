@@ -541,7 +541,7 @@ class Controller extends Base
      * @return array
      * @throws RouteNotFound
      */
-    private function retrieveDatabaseMarks(
+    private function retrievePublishedMarks(
         array $assessments,
         ?array $selectedCapabilities,
         ?array $selectedIndicators,
@@ -814,9 +814,9 @@ class Controller extends Base
     }
 
     /**
-     * Synonymously with how retrieveDatabaseMarks() worked, but it takes the result of that method and fills in the
+     * Synonymously with how retrievePublishedMarks() worked, but it takes the result of that method and fills in the
      * draft marks for capabilities and indicators using an almost-identical query, basically appending extra data to
-     * the result of retrieveDatabaseMarks().
+     * the result of retrievePublishedMarks().
      *
      * v_most_recent_rubric_mark view is used instead of v_rubric_mark. Joining two views is probably a costly affair,
      * but it's cheaper than doing it any other way.
@@ -830,7 +830,7 @@ class Controller extends Base
      * @param array $students The array of student values which will already contian published, we are adding only the draft marks
      * @return array
      */
-    private function retrieveDatabaseDraftMarks(
+    private function retrieveDraftMarks(
         array $assessments,
         ?array $selectedCapabilities,
         ?array $selectedIndicators,
@@ -1145,19 +1145,19 @@ class Controller extends Base
     {
         $studentsAndLearners = $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, true, true);
 
-        $databaseMarks = [];
+        $studentMarks = [];
 
         foreach ($studentsAndLearners as $user) {
             $userId = $user->getId();
 
-            if (!isset($databaseMarks[$userId])) {
-                /* Note that this is supposed to be the same data struct as seen i retrieveDatabaseMarks() and
-                 * retrieveDatabaseDraftMarks() where it progressively builds a hash lookup
+            if (!isset($studentMarks[$userId])) {
+                /* Note that this is supposed to be the same data struct as seen i retrievePublishedMarks() and
+                 * retrieveDraftMarks() where it progressively builds a hash lookup
                  *
                  * This method adds guys who didn't have any database marks (draft or otherwise) to ensure nobody is
                  * left out of the rubric markbook
                  */
-                $databaseMarks[$userId] = [
+                $studentMarks[$userId] = [
                     'firstname' => $user->getFirstname(),
                     'preferred_name' => $user->getPreferredName(),
                     'lastname' => $user->getLastname(),
@@ -1171,7 +1171,7 @@ class Controller extends Base
         }
 
         uasort(
-            $databaseMarks,
+            $studentMarks,
             static function (array $a, array $b): int {
                 $last = strnatcasecmp($a['lastname'] ?? '', $b['lastname'] ?? '');
                 if ($last === 0) {
@@ -1181,7 +1181,7 @@ class Controller extends Base
             }
         );
 
-        return $databaseMarks;
+        return $studentMarks;
     }
 
 
@@ -1536,7 +1536,7 @@ class Controller extends Base
          */
         $assessments = $this->buildAssessmentData($assessmentIds, $selectedCapabilities, $selectedIndicators);
 
-        /* Set up the list of students who are in the class list at the moment; this is the basis of the $databaseMarks
+        /* Set up the list of students who are in the class list at the moment; this is the basis of the $studentMarks
          * hash lookup that we'll progressively populate.
          *
          * This eventually manifests as a union of "guys who are in the class" and "guys who received feedback" for
@@ -1546,38 +1546,38 @@ class Controller extends Base
          * This process is repeated twice, almost verbatim, for published and draft marks.
          * TODO find a way to dedupe all this insanity
          */
-        $databaseMarks = $this->insertFolderMembers($folder);
+        $studentMarks = $this->insertFolderMembers($folder);
 
-        /* Augment $databaseMarks with published data
+        /* Augment $studentMarks with published data
          */
-        $databaseMarks = $this->retrieveDatabaseMarks(
+        $studentMarks = $this->retrievePublishedMarks(
             $assessments,
             $selectedCapabilities,
             $selectedIndicators,
             $exclusions,
-            $databaseMarks
+            $studentMarks
         );
 
-        /* Augment $databaseMarks with draft data
+        /* Augment $studentMarks with draft data
          */
-        $databaseMarks = $this->retrieveDatabaseDraftMarks(
+        $studentMarks = $this->retrieveDraftMarks(
             $assessments,
             $selectedCapabilities,
             $selectedIndicators,
             $exclusions,
-            $databaseMarks
+            $studentMarks
         );
 
         /* At the bottom of the rubric markbook is a section called "Overall" which compiles the outcome per capability
          * and indicator combination from all the rubric grids. This aggregation should potentially be weighted against
          * the rubric weighting -per grid- but we'll get to that later.
          */
-        $overallMarks = $this->buildOverallMarks($assessments, $databaseMarks, $folder);
+        $overallMarks = $this->buildOverallMarks($assessments, $studentMarks, $folder);
 
         return [
             $assessments,
             $exclusions,
-            $databaseMarks,
+            $studentMarks,
             $overallMarks
         ];
     }
