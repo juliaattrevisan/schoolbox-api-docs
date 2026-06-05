@@ -455,6 +455,7 @@ class Controller extends Base
                 $assessments[$row['assessment_id']]['gridData'][$row['rubric_instance_id']]['capabilities'][$row['capability_id']] = [
                     'id' => $row['capability_id'],
                     'name' => $row['capability_name'],
+                    'max' => $decimalHydrator->hydrate($row['capability_max_value']),
                     /* TODO find out what this means
                      */
                     'show' => $capabilityMaxValue && ($selectedCapabilities === null || in_array((int)$row['capability_id'], $selectedCapabilities, true)),
@@ -470,6 +471,7 @@ class Controller extends Base
                 if (!isset($assessments[$row['assessment_id']]['gridData'][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']])) {
                     $assessments[$row['assessment_id']]['gridData'][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']] = [
                         'name' => $row['indicator_name'],
+                        'max' => $decimalHydrator->hydrate($row['indicator_max_value']),
                     ];
                 }
             }
@@ -1321,11 +1323,60 @@ class Controller extends Base
      */
     private function aggregateMarks(array $assessments, array $studentMarks): array
     {
+        /* Precalculate all the coefficients now that we have assembled $assessments in its entirety with all its
+         * capabilities and indicators and their max_values.
+         */
         $overallMarks = [];
+
+        foreach ($assessments as $assessmentId => $assessmentData) {
+            if (!isset($coefficients['assessments']['totalWeight'])) {
+                $coefficients['assessments']['totalWeight'] = 0;
+            }
+
+            $coefficients['assessments'][$assessmentId] = $assessmentData['weight'];
+            $coefficients['assessments']['totalWeight'] += $assessmentData['weight'];
+
+            foreach ($assessmentData['gridData'] as $rubricInstanceId => $rubricGridData) {
+                if (!isset($coefficients['grids']['assessments'][$assessmentId])) {
+                    $coefficients['grids']['assessments'][$assessmentId] = [
+                        'totalGridWeight' => 0,
+                    ];
+                }
+
+                /* Total weight of all the grids in a particular assessment
+                 */
+                $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'] += $rubricGridData['weight'];
+                $coefficients['grids'][$rubricInstanceId] = $rubricGridData['weight'];
+
+                /* This precompiles capability/indicator structs while we're traversing this $assessments struct.
+                 * It used to be split out into its own traversal
+                 */
+                foreach ($rubricGridData['capabilities'] as $capabilityId => $capabilityData) {
+                    $overallMarks[$capabilityId] = [
+                        'name' => $capabilityData['name'],
+                        'indicators' => [],
+                    ];
+
+                    foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
+                        $overallMarks[$capabilityId]['indicators'][$indicatorId] = [
+                            'name' => $indicatorData['name'],
+                        ];
+                    }
+                }
+            }
+        }
+
+        new \Alaress_Probe($overallMarks);
+        new \Alaress_Probe($coefficients);
+        die();
 
         foreach ($assessments as $assessmentId => $assessmentData) {
             $assessmentWeight = $assessmentData['weight'];
 
+            foreach ($assessments['gridData'] as $rubricInstance)
+            {
+                $rubricWeight = $rubricInstance['weight'];
+            }
 //            foreach ($assessmentData['capabilities'] as $capabilityId => $capabilityData) {
 //                // First time we've seen this capability?
 //                if (!array_key_exists($capabilityId, $overallMarks)) {
