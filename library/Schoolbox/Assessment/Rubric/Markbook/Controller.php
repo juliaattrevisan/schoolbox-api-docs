@@ -1519,7 +1519,7 @@ class Controller extends Base
      * @throws Mapper\Exception
      * @throws Router\Exception\RouteNotFound
      */
-    private function buildMarkbookData(Folder\Model $folder, array $request, $assessmentIds): array
+    private function buildMarkbookData(Folder\Model $folder, array $request, array $assessmentIds): array
     {
         /* These are the filter selections that were used from the ui
          */
