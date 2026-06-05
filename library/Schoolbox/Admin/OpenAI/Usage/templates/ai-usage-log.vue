@@ -80,6 +80,20 @@ const selectedSessionInfo = window.Vue.computed<AiSelectedSessionInfo | AiSelect
     return info satisfies Record<keyof AiSelectedSessionInfo, unknown> as AiSelectedSessionInfo;
 });
 
+const canPrintSelectedSession = window.Vue.computed<boolean>(() => {
+    const sessionInfo = selectedSessionInfo.value;
+
+    return sessionInfo !== null && "log" in sessionInfo && sessionInfo.log.length > 0;
+});
+
+const selectedSessionActionsId = window.Vue.computed<string>(() => {
+    if (selectedSessionId.value === null) {
+        return "ai-usage-log-selected-session-actions";
+    }
+
+    return `ai-usage-log-selected-session-actions-${selectedSessionId.value}`;
+});
+
 /**
  * Close the current session details pane
  */
@@ -176,10 +190,17 @@ async function openSessionDetails(session: AiSession): Promise<void> {
 
     selectedSessionLog.value = response.data;
 }
+
+/**
+ * Print the currently selected AI session log.
+ */
+function printSelectedSession(): void {
+    window.print();
+}
 </script>
 
 <template>
-    <div class="row">
+    <div class="row ai-usage-log__no-print">
         <div class="small-12 island">
             <section>
                 <fieldset class="content">
@@ -240,7 +261,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
         </div>
     </div>
 
-    <div>
+    <div class="ai-usage-log__no-print">
         <div class="list-item">
             <h2 class="subheader">
                 Activity<template v-if="!isLoading">: {{ usageSessions.length }} events</template>
@@ -249,7 +270,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
     </div>
 
     <div class="row">
-        <div class="small-12 medium-6 columns l-mar-m--bottom" :class="{ island: isLoading }">
+        <div class="small-12 medium-6 columns l-mar-m--bottom ai-usage-log__no-print" :class="{ island: isLoading }">
             <div v-if="loadError" data-alert class="alert-box alert">
                 {{ loadError }}
             </div>
@@ -315,22 +336,27 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                 @page-change="changePage"
             />
         </div>
-        <div class="small-12 medium-6 island">
+        <div class="small-12 medium-6 island ai-usage-log__viewer">
             <div v-if="sessionLoadError" data-alert class="alert-box alert">
                 {{ sessionLoadError }}
             </div>
-            <section v-else-if="selectedSessionInfo !== null">
+            <section v-else-if="selectedSessionInfo !== null" class="ai-usage-log__printable">
                 <div class="card small-12">
-                    <span>
-                        <user-photo
-                            v-if="selectedSessionInfo.session.createdBy"
-                            :user-id="selectedSessionInfo.session.createdBy.id || 0"
-                            render="small"
-                        />
-                        <h3>
-                            {{ props.features[selectedSessionInfo.session.feature]?.title ?? UNKNOWN_FEATURE_TEXT }}
-                        </h3>
-                    </span>
+                    <div class="l-flex l-flex--justify-space l-flex--align-start l-gap-s">
+                        <span>
+                            <user-photo
+                                v-if="selectedSessionInfo.session.createdBy"
+                                :user-id="selectedSessionInfo.session.createdBy.id || 0"
+                                render="small"
+                            />
+                            <h3>
+                                {{ props.features[selectedSessionInfo.session.feature]?.title ?? UNKNOWN_FEATURE_TEXT }}
+                            </h3>
+                        </span>
+                        <nav v-if="canPrintSelectedSession" class="ai-usage-log__no-print">
+                            <sbx-pop-out :content-id="selectedSessionActionsId"></sbx-pop-out>
+                        </nav>
+                    </div>
                     <p class="meta">
                         <span v-if="!selectedSessionInfo.session.createdBy"> Created </span>
                         <template v-else>
@@ -345,6 +371,18 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                         <relative-time :datetime="selectedSessionInfo.session.createdAt" full-diff></relative-time>
                     </p>
                 </div>
+                <ul :id="selectedSessionActionsId" class="f-dropdown ai-usage-log__no-print" data-dropdown-content>
+                    <li>
+                        <button
+                            type="button"
+                            class="sbx-button--has-icon"
+                            data-test="ai-usage-log-print-session"
+                            @click="printSelectedSession"
+                        >
+                            <sbx-icon name="print"></sbx-icon>Print / Save as PDF
+                        </button>
+                    </li>
+                </ul>
                 <div class="clearfix"></div>
 
                 <div v-if="!('log' in selectedSessionInfo)" class="loader"></div>
@@ -370,4 +408,49 @@ async function openSessionDetails(session: AiSession): Promise<void> {
     </div>
 </template>
 
-<style scoped></style>
+<style lang="scss">
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    .ai-usage-log__printable,
+    .ai-usage-log__printable * {
+        visibility: visible;
+    }
+
+    .ai-usage-log__no-print {
+        display: none !important;
+    }
+
+    .ai-usage-log__viewer,
+    .ai-usage-log__printable {
+        border: 0 !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .ai-usage-log__printable {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .ai-usage-log__printable,
+    .ai-usage-log__printable * {
+        box-sizing: border-box !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        overflow: visible !important;
+    }
+
+    .ai-usage-log__printable .card {
+        border: 0 !important;
+        box-shadow: none !important;
+        padding: 0 0 1rem !important;
+    }
+}
+</style>
