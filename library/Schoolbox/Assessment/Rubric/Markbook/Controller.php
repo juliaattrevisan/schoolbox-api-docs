@@ -14,6 +14,7 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Web\Controller\Base;
 use Aura\Router;
+use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use InvalidArgumentException;
 use LogicException;
@@ -536,16 +537,17 @@ class Controller extends Base
      * @param null|array $selectedCapabilities Null if rubricUsage filter not enabled for page
      * @param null|array $selectedIndicators Null if rubricUsage filter not enabled for page
      * @param array $exclusions
+     * @param array $students
      * @return array
+     * @throws RouteNotFound
      */
     private function retrieveDatabaseMarks(
         array $assessments,
         ?array $selectedCapabilities,
         ?array $selectedIndicators,
-        array $exclusions
+        array $exclusions,
+        array $students
     ): array {
-        $students = [];
-
         // Don't load marks if no assessments.
         if (!count($assessments)) {
             return $students;
@@ -1130,7 +1132,6 @@ class Controller extends Base
     /**
      * Combine users who have marks with students and learners who are in the class or group, but have no marks yet
      *
-     * @param array        $databaseMarks
      * @param Folder\Model $folder
      * @return array
      * @throws Database\Predicate\InvalidColumnException
@@ -1140,9 +1141,11 @@ class Controller extends Base
      * @throws PDOException
      * @throws UnderflowException
      */
-    private function insertFolderMembers(array $databaseMarks, Folder\Model $folder): array
+    private function insertFolderMembers(Folder\Model $folder): array
     {
         $studentsAndLearners = $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, true, true);
+
+        $databaseMarks = [];
 
         foreach ($studentsAndLearners as $user) {
             $userId = $user->getId();
@@ -1533,14 +1536,26 @@ class Controller extends Base
          */
         $assessments = $this->buildAssessmentData($assessmentIds, $selectedCapabilities, $selectedIndicators);
 
-        /* Find the published feedbacks for each student's grids. Students who have been excluded are skipped.
-         * We don't need those results.
+        /* Set up the list of students who are in the class list at the moment; this is the basis of the $databaseMarks
+         * hash lookup that we'll progressively populate.
+         *
+         * This eventually manifests as a union of "guys who are in the class" and "guys who received feedback" for
+         * the assessments in this folder. If we encounter feedback for a student who *was* in this class, a node will
+         * spawn for them and proceed as if they *were* in the class right now.
+         *
+         * This process is repeated twice, almost verbatim, for published and draft marks.
+         * TODO find a way to dedupe all this insanity
+         */
+        $databaseMarks = $this->insertFolderMembers($folder);
+
+        /* Augment $databaseMarks with published data
          */
         $databaseMarks = $this->retrieveDatabaseMarks(
             $assessments,
             $selectedCapabilities,
             $selectedIndicators,
-            $exclusions
+            $exclusions,
+            $databaseMarks
         );
 
         /* Augment $databaseMarks with draft data
@@ -1556,11 +1571,6 @@ class Controller extends Base
         /* TODO work out whatever this was
          */
         $overallMarks = [];
-
-        /* Adds guys who didn't get any feedback at all, to ensure no students are omitted from the rubric markbook.
-         * ($databaseMarks only contained guys who received feedback)
-         */
-        $databaseMarks  = $this->insertFolderMembers($databaseMarks, $folder);
 
         $overallMarks  = $this->buildOverallMarks($assessments, $databaseMarks, $folder);
 
