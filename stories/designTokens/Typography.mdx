@@ -1,0 +1,46 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Design Tokens/Typography" />
+
+# Typography
+
+- Global values to control font sizes, font weights and line heights of components within our platform.
+- Where appropriate all new components should include these.
+
+## Font size
+
+- Defined in `www/static/css/core/designTokens/_sbx-type.scss`.
+- Should always be used when defining `font-size`.
+
+| CSS Custom Property    | Value       |
+| ---------------------- | ----------- |
+| `--sbx-font-size-xs`   | `0.875rem`  |
+| `--sbx-font-size-s`    | `0.9375rem` |
+| `--sbx-font-size-m`    | `1rem`      |
+| `--sbx-font-size-l`    | `1.125rem`  |
+| `--sbx-font-size-xl`   | `1.25rem`   |
+| `--sbx-font-size-xxl`  | `1.375rem`  |
+| `--sbx-font-size-xxxl` | `1.5rem`    |
+
+## Font weight
+
+- Defined in `www/static/css/core/designTokens/_sbx-type.scss`.
+- Should always be used when defining `font-weight`.
+
+| CSS Custom Property         | Value |
+| --------------------------- | ----- |
+| `--sbx-font-weight-normal`  | `400` |
+| `--sbx-font-weight-active`  | `500` |
+| `--sbx-font-weight-heading` | `600` |
+| `--sbx-font-weight-strong`  | `700` |
+
+## Line height
+
+- Defined in `www/static/css/core/designTokens/_sbx-type.scss`.
+- Should always be used when defining `line-height`.
+
+| CSS Custom Property        | Value |
+| -------------------------- | ----- |
+| `--sbx-line-height-tight`  | `1.2` |
+| `--sbx-line-height-normal` | `1.5` |
+| `--sbx-line-height-large`  | `1.8` |
