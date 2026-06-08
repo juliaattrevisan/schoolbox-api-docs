@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\WorkType;
 
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Sequential;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
@@ -416,5 +417,20 @@ class Model implements ISoftDeletable, Sequential
     public function setPermittedReportingActivity(bool $permittedReportingActivity): void
     {
         $this->permittedReportingActivity = $permittedReportingActivity;
+    }
+
+    public function isPermittedForAssessmentType(string $assessmentType): bool
+    {
+        return match ($assessmentType) {
+            AssessmentType::TYPE_PROJECT => $this->permittedProject === true,
+            AssessmentType::TYPE_DUE_WORK => $this->permittedDueWork === true,
+            AssessmentType::TYPE_TASK => $this->permittedTask === true,
+            AssessmentType::TYPE_QUIZ => $this->permittedQuiz === true,
+            AssessmentType::TYPE_LTI_ASSESSMENT => $this->permittedLti === true,
+            AssessmentType::TYPE_LESSON_PLAN => $this->permittedLessonPlan === true,
+            AssessmentType::TYPE_DIALOG_AGENT => $this->permittedDialogAgent === true,
+            AssessmentType::TYPE_REPORTING => $this->permittedReportingActivity === true,
+            default => throw new \InvalidArgumentException("Unknown assessment type: $assessmentType"),
+        };
     }
 }

@@ -1104,6 +1104,23 @@ abstract class Controller extends ListController implements IAssessmentControlle
     abstract protected function getAssessmentTwigData(IAssessable $assessment): array;
 
 
+    private function getWorkTypesPermittedForAssessment(IAssessable $assessment): Collection
+    {
+        $assessmentType = AssessmentType::objectToString($assessment);
+        $workTypes = $this->workTypeMapper
+            ->findAll(['order' => ['sequence' => 'asc']])
+            ->filter(static fn (WorkType\Model $workType): bool => $workType->isPermittedForAssessmentType($assessmentType))
+            ->reindex();
+
+        $currentWorkType = $assessment->getWorkType();
+        if ($currentWorkType !== null && !in_array($currentWorkType->getId(), $workTypes->getPropertyValues('id'), true)) {
+            $workTypes->add($currentWorkType);
+        }
+
+        return $workTypes;
+    }
+
+
     /**
      * @param AssessmentContext $context
      * @param IAssessable       $assessment
@@ -1171,7 +1188,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'assessmentType'           => AssessmentType::objectToString($assessment),
             'markVisibility'           => $assessment->getMarkVisibility(),
             'availableVisibilities'    => $this->getAvailableFeedbackVisibilities(),
-            'allWorkTypes'             => $this->workTypeMapper->findAll(['order' => ['sequence' => 'asc']]),
+            'allWorkTypes'             => $this->getWorkTypesPermittedForAssessment($assessment),
 
             /* Capabilities happen to have the same mark types as its DueWork IAssessable container,
              * so we don't need a different method than the existing getAllMarkTypes
