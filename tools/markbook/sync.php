@@ -119,7 +119,7 @@ $app = new class extends CliTool\BaseApp
                 $markbookExternal = new External_Synergetic_Markbook($config->get('synergetic_mark_sync_value'), $this->getLogger(), $year, $semester);
             } catch (InvalidArgumentException $e) {
                 $this->getLogger()->error("ERROR: {$e->getMessage()}");
-                $this->help($externalType);
+                $this->outputHelpIfOptionProvided();
                 exit(1);
             }
         } else {
