@@ -4,6 +4,7 @@ namespace Schoolbox\Editor\OpenAI\Payload;
 
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Log;
+use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Admin\DialogAgent\Scenario\Model as Scenario;
 use Schoolbox\Admin\DialogAgent\Scenario\Criterion\Model as Criterion;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
@@ -232,7 +233,7 @@ class DialogAgentFeedback
             'content' => $assessment->getOpeningMessage(),
         ]);
 
-        $logEntries = $this->aiLogMapper->findByColumn('session_id', $response->getSessionId(), [
+        $logEntries = $this->aiLogMapper->findByColumn('ai_session_id', $response->getSessionId(), [
             'order' => [ 'created_at' => 'ASC' ]
         ]);
 

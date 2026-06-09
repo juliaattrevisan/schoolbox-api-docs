@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\OpenAi\Guardrails\Check;
 
-use Schoolbox\Editor\OpenAI\Log;
+use Schoolbox\OpenAi\Session\Log;
 
 /**
  * Guardrail check to flag requests that exceed a specified character limit.
