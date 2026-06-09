@@ -83,6 +83,6 @@ export type AiUsageLogApiResponse = {
     metadata: PaginationMeta;
 };
 
-export type AiSessionLogApiResponse<
-    TLogFormat extends AiLogFormat = AiLogFormat,
-> = (AiSessionLog & { logFormat: TLogFormat })[];
+export type AiSessionLogApiResponse<TLogFormat extends AiLogFormat = AiLogFormat> = (AiSessionLog & {
+    logFormat: TLogFormat;
+})[];
