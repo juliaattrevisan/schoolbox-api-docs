@@ -457,7 +457,11 @@ class Controller extends Base
                     'id' => $row['capability_id'],
                     'name' => $row['capability_name'],
                     'max' => $decimalHydrator->hydrate($row['capability_max_value']),
-                    /* TODO find out what this means
+                    /* "We care about this capability, even if we never show it to humans in the ui"
+                     *
+                     * We need this node to accumualte data even if we never intend to show it to humans in the ui.
+                     * This .show node only has meaning to humans if Capability Mark Type was something other than None,
+                     * and/or we chose it in the Filters settings.
                      */
                     'show' => $capabilityMaxValue && ($selectedCapabilities === null || in_array((int)$row['capability_id'], $selectedCapabilities, true)),
                     'indicators' => [],
@@ -1568,12 +1572,6 @@ class Controller extends Base
         }
 
         unset($capabilityData, $studentCapabilityData, $studentIndicatorData);
-
-
-        /* TODO figure out this idea
-         */
-        //                // Show the capability if we are showing it for any assessment
-        //                $overallMarks[$capabilityId]['show'] = $overallMarks[$capabilityId]['show'] || $capabilityData['show'];
 
         return $overallMarks;
     }
