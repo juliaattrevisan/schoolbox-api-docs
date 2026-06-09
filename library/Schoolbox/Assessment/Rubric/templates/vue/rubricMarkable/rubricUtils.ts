@@ -46,7 +46,7 @@ export function applyMarkScheme(
     if (markScheme.mode === MarkTypeSlug.TOTAL) {
         return {
             value: value !== null ? String(value) : null,
-            humanReadableMark: value !== null ? `${value} / ${maxValue}` : null,
+            humanReadableMark: value !== null ? `${value} / ${maxValue ?? 0}` : null,
         };
     }
 
