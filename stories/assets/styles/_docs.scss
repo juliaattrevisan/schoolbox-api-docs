@@ -2,6 +2,10 @@
  * Any styles for Storybook docs
  */
 
+:root {
+    --sbx-storybook-docs-background: white;
+}
+
 /**
  * These styles overwrite the heavy handed table styles in our core.css file,
  * so the tables display better in the Storybook docs using the dark theme
@@ -28,14 +32,23 @@ table.docblock-argstable tr td,
 .sbdocs > table tr td,
 .sbdocs > div > table tr th,
 .sbdocs > div > table tr td {
+    border: 1px solid #464646;
     color: #c9cdcf !important;
+}
+
+.sbdocs h2 {
+    border-bottom: 2px solid #6c6c6d;
+}
+
+.sbdocs-a, .sbdocs-a:hover {
+    color: white !important;
 }
 
 /**
  * The primary story window background
  */
 .docs-story {
-    background: white;
+    background: var(--sbx-storybook-docs-background);
 }
 
 /**
@@ -45,6 +58,15 @@ table.docblock-argstable tr td,
 .docblock-code-toggle:focus {
     background-color: #1b1c1d;
     color: #c9cdcf;
+}
+
+/**
+ * Ti display a colour in a markdown file
+ */
+.story-color-preview {
+    border: 1px solid #ccc;
+    height: 30px;
+    width: 100px;
 }
 
 /**
