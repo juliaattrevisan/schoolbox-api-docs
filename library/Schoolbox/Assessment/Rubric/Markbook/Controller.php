@@ -1228,7 +1228,7 @@ class Controller extends Base
      * @param array $b
      * @return int
      */
-    private function sortByName($a, $b)
+    private function sortByName(array $a, array $b): int
     {
         return strnatcasecmp($a['name'], $b['name']);
     }
