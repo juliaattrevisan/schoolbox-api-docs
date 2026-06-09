@@ -18,6 +18,10 @@ test.describe.serial("Admin User Management - Lists: Qualifications", () => {
 
     const qualificationName = "Test Qualification PLW";
 
+    test.beforeAll(async ({ db }) => {
+        await db.updateInDatabase("config", { value: "1" }, { "name like": "ib_enabled" });
+    });
+
     test.beforeEach(async ({ tester, page }) => {
         qualificationList = new QualificationList(tester, page);
         await tester.loginAsAdmin();
@@ -109,7 +113,7 @@ test.describe.serial("Admin User Management - Lists: Qualifications", () => {
 
             const initialItemsOrder = await qualificationList.getItemsOrder();
 
-            tester.isGoingTo("Verify Pre-unit Quiz to be above Post to Forum: Prologue in the initial order");
+            tester.isGoingTo("Verify the qualifications are presented in the proper order");
             expect(initialItemsOrder.indexOf(item1.toString())).toBeLessThan(
                 initialItemsOrder.indexOf(item2.toString()),
             );
@@ -158,5 +162,6 @@ test.describe.serial("Admin User Management - Lists: Qualifications", () => {
             { deleted_at: "2022-01-15 11:22:34" },
             { "name like": "Test Qualification PLW%", deleted_at: null },
         );
+        await db.updateInDatabase("config", { value: "0" }, { "name like": "ib_enabled" });
     });
 });
