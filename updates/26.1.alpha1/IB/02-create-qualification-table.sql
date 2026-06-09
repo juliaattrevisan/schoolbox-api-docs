@@ -53,6 +53,5 @@ CREATE TABLE `lu_qualification` (
 
 -- Insert initial qualification data that was previously hardcoded
 INSERT INTO `lu_qualification` (`name`, `system_purpose_id`, `sequence`) VALUES
-('DP Year 1', 2, 1),
-('DP Year 2', 1, 2),
-('VCE', 3, 3);
+('Diploma Programme', 1, 1),
+('Diploma Course', 3, 3);

@@ -163,6 +163,7 @@ class Subnav
         $userHasServicePermissionIbCoordinator = (
             $this->user->hasServicePermission(UserAccess::SERVICE_IB_COORDINATOR, UserAccess::ACCESS_FULL)
         );
+        $ibEnabled = (bool)$this->configLoader->get(ConfigMapper::NAME_IB_ENABLED);
         $userHasAnyModeratorServicePermission = (
             $userHasServicePermissionNews ||
             $userHasServicePermissionCalendar ||
@@ -172,10 +173,8 @@ class Subnav
             $userHasServicePermissionCms ||
             $userHasServicePermissionDesign ||
             $userHasServicePermissionTimetable ||
+            $userHasServicePermissionIbCoordinator ||
             $userHasServicePermissionDifferentiationProfile
-        );
-        $userHasServicePermissionIBCoordinator = (
-            $this->user->hasServicePermission(UserAccess::SERVICE_IB_COORDINATOR, UserAccess::ACCESS_FULL)
         );
 
         /* Keys of this array uniquely identify a page and its subpages
@@ -423,7 +422,7 @@ class Subnav
             ],
             '/adminv2/international-baccalaureate' => [
                 'name'       => 'IB',
-                'visible'    => $userIsSuperuser || $userHasServicePermissionIBCoordinator,
+                'visible'    => self::isIbVisible($ibEnabled, $userIsSuperuser, $userHasServicePermissionIbCoordinator),
                 'searchable' => false,
                 'children'   => [
                     '/adminv2/international-baccalaureate/configuration' => [
@@ -1242,5 +1241,19 @@ class Subnav
         ]);
 
         return $this;
+    }
+
+    /**
+     * Determines whether the IB (International Baccalaureate) section is visible.
+     *
+     * @param bool $ibEnabled                             Indicates if the IB feature is enabled.
+     * @param bool $userIsSuperuser                       Indicates if the user has superuser privileges.
+     * @param bool $userHasServicePermissionIbCoordinator Indicates if the user has the IB Coordinator service permission.
+     *
+     * @return bool Returns true if the IB section is visible, otherwise false.
+     */
+    public static function isIbVisible(bool $ibEnabled, bool $userIsSuperuser, bool $userHasServicePermissionIbCoordinator): bool
+    {
+        return $ibEnabled && ($userIsSuperuser || $userHasServicePermissionIbCoordinator);
     }
 }

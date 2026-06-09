@@ -70,7 +70,7 @@ class Mapper extends BaseMapper
         return "
             FROM      {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('category', '', 'c')}
-            INNER JOIN {$this->getJoinSql('qualification', '', 'q')}
+            LEFT JOIN {$this->getJoinSql('qualification', '', 'q')}
         ";
     }
 

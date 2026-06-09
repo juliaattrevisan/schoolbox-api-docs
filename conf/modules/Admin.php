@@ -164,7 +164,9 @@ class Admin extends ModuleLoader
 
         /* International Baccalaureate
          */
-        $this->loadModule($di, \Schoolbox\Admin\InternationalBaccalaureate\Module::class, '/adminv2/international-baccalaureate');
+        if ($di->get('config')->get(ConfigMapper::NAME_IB_ENABLED)) {
+            $this->loadModule($di, \Schoolbox\Admin\InternationalBaccalaureate\Module::class, '/adminv2/international-baccalaureate');
+        }
 
         /* Data Retention
          */
