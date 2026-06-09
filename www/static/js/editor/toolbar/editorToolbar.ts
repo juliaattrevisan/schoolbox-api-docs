@@ -103,6 +103,7 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
             "|",
             "numberedList",
             "bulletedList",
+            "todoList",
             "|",
             {
                 label: "Other",
@@ -163,6 +164,7 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
             "|",
             "numberedList",
             "bulletedList",
+            "todoList",
             "|",
             {
                 label: "Other",
