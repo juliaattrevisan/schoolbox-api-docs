@@ -4,10 +4,10 @@ import { Meta } from "@storybook/addon-docs/blocks";
 
 # Depth _(z-index)_
 
-- Created in: `www/static/css/core/base/_depth.scss`.
-- To globally manage the stacking order of elements, we have created the below CSS custom properties.
-- All `z-index` values should be derived from these. Using `calc()`, these values can be added or subtracted to.
-- However, if more than `3` additions or subtractions are required it signals that introducing another base number may be necessary for better management.
+- Defined in: `www/static/css/core/base/_depth.scss`.
+- Should always be used when defining `z-index`.
+- Using `calc()`, these values can be added or subtracted to.
+- If adding/subtracting beyond `3`, another custom property may be necessary.
 
 ## Properties
 

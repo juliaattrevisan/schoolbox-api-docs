@@ -28,8 +28,12 @@ table.docblock-argstable tr td,
 .sbdocs > table tr td,
 .sbdocs > div > table tr th,
 .sbdocs > div > table tr td {
-    border: 1px solid #aaabac;
+    border: 1px solid #464646;
     color: #c9cdcf !important;
+}
+
+.sbdocs h2 {
+    border-bottom: 2px solid #6c6c6d;
 }
 
 /**
