@@ -1593,7 +1593,7 @@ class Controller extends Base
      *
      * @param float|null $numerator
      * @param float|null $denominator
-     * @return null[]
+     * @return array
      */
     private function generateMarkTuple(?float $numerator, ?float $denominator): array
     {
