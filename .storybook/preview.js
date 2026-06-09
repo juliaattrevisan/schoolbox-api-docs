@@ -53,9 +53,9 @@ const preview = {
             options: {
                 demo: {
                     name: "demo",
-                    value: "var(--sbx-color-background)",
-                }
-            }
+                    value: "var(--sbx-storybook-docs-background)",
+                },
+            },
         },
         chromatic: {
             pauseAnimationAtEnd: true, // Notifies Chromatic to pause the animations when they finish at a global level.
@@ -94,9 +94,9 @@ const preview = {
 
     initialGlobals: {
         backgrounds: {
-            value: "demo"
-        }
-    }
+            value: "demo",
+        },
+    },
 };
 
 export default preview;
