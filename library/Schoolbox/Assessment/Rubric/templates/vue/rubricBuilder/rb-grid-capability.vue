@@ -69,7 +69,6 @@ function onAddIndicatorKeydown(event: KeyboardEvent): void {
 /**
  * When the focus is removed from the "add indicator" input, add a new indicator to the capability
  * (this needs to exist as the ref can't be passed directly when inside <template>)
- * @param nameRef the ref for the indicator name input
  */
 function onAddIndicatorBlur(): void {
     emit("addIndicatorBlur", newIndicatorName);
