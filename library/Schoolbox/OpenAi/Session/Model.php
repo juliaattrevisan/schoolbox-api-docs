@@ -40,6 +40,22 @@ class Model
     private ?string $feature = null;
 
     /**
+     * Log format derived from the session's first log, for the admin list only.
+     * Not a column; populated by {@see Mapper::getFilteredSessions()}.
+     *
+     * @var string|null
+     */
+    private ?string $derivedLogFormat = null;
+
+    /**
+     * Return code derived from the session's first log, for the admin list only.
+     * Not a column; populated by {@see Mapper::getFilteredSessions()}.
+     *
+     * @var int|null
+     */
+    private ?int $derivedReturnCode = null;
+
+    /**
      * @return string|null
      */
     public function getId(): ?string
@@ -95,6 +111,42 @@ class Model
             ? $feature->value
             : $feature;
 
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDerivedLogFormat(): ?string
+    {
+        return $this->derivedLogFormat;
+    }
+
+    /**
+     * @param string|null $derivedLogFormat
+     * @return $this
+     */
+    public function setDerivedLogFormat(?string $derivedLogFormat): self
+    {
+        $this->derivedLogFormat = $derivedLogFormat;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getDerivedReturnCode(): ?int
+    {
+        return $this->derivedReturnCode;
+    }
+
+    /**
+     * @param int|null $derivedReturnCode
+     * @return $this
+     */
+    public function setDerivedReturnCode(?int $derivedReturnCode): self
+    {
+        $this->derivedReturnCode = $derivedReturnCode;
         return $this;
     }
 }

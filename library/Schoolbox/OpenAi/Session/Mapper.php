@@ -13,6 +13,7 @@ namespace Schoolbox\OpenAi\Session;
 
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -136,5 +137,177 @@ class Mapper extends BaseMapper
         }
 
         return $collection;
+    }
+
+
+    /**
+     * Fetch a page of sessions for the admin usage log, newest first.
+     *
+     * Filters: keyword (matched against the logs' prompt/response via EXISTS),
+     * feature, creating user, and created_at date range. logFormat/returnCode are
+     * derived from each session's first log (earliest created_at, then id).
+     *
+     * @param string|null               $keyword
+     * @param string|null               $feature
+     * @param User|null                 $user
+     * @param \Alaress_Date_Format|null $start
+     * @param \Alaress_Date_Format|null $end
+     * @param int|null                  $limit
+     * @param int|null                  $offset
+     * @return GenericCollection|Model[]
+     * @throws Exception
+     */
+    public function getFilteredSessions(
+        ?string $keyword,
+        ?string $feature,
+        ?User $user,
+        ?\Alaress_Date_Format $start,
+        ?\Alaress_Date_Format $end,
+        ?int $limit = 100,
+        ?int $offset = 0
+    ): GenericCollection {
+        [$where, $params] = $this->buildSessionFilter($keyword, $feature, $user, $start, $end);
+
+        $limitSql  = null !== $limit ? 'LIMIT :limit' : '';
+        $offsetSql = null !== $offset ? 'OFFSET :offset' : '';
+
+        $query = "
+            SELECT
+                `{$this->table}`.id AS id,
+                `{$this->table}`.feature AS feature,
+                `{$this->table}`.created_at AS created_at,
+                firstLog.log_format AS derived_log_format,
+                firstLog.return_code AS derived_return_code,
+                {$this->getJoinColumnString('user', 'u')}
+            FROM `{$this->table}`
+            LEFT JOIN {$this->getJoinSql('user', '', 'u', true)}
+            LEFT JOIN `ai_session_log` firstLog ON firstLog.id = (
+                SELECT id FROM `ai_session_log`
+                WHERE ai_session_id = `{$this->table}`.id
+                ORDER BY created_at ASC, id ASC
+                LIMIT 1
+            )
+            {$where}
+            ORDER BY `{$this->table}`.created_at DESC
+            {$limitSql}
+            {$offsetSql}
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        foreach ($params as $name => $value) {
+            $statement->bindValue($name, $value);
+        }
+        if (null !== $limit) {
+            $statement->bindValue('limit', $limit, \PDO::PARAM_INT);
+        }
+        if (null !== $offset) {
+            $statement->bindValue('offset', $offset, \PDO::PARAM_INT);
+        }
+        $statement->execute();
+
+        $collection = $this->createCollection();
+        $userMapper = $this->getJoinMapper('user');
+
+        foreach ($statement as $row) {
+            $session = $this->hydrate($row)
+                ->setDerivedLogFormat($row['derived_log_format'] ?? null)
+                ->setDerivedReturnCode(
+                    isset($row['derived_return_code']) ? (int)$row['derived_return_code'] : null
+                );
+
+            /** @var \Schoolbox\User|null $sessionUser */
+            $sessionUser = $userMapper->hydrate($row, 'u');
+            if ($sessionUser) {
+                $session->setUser($sessionUser);
+            }
+
+            $collection->add($session);
+        }
+
+        return $collection;
+    }
+
+
+    /**
+     * Count all sessions matching the same filters, ignoring limit/offset.
+     *
+     * @param string|null               $keyword
+     * @param string|null               $feature
+     * @param User|null                 $user
+     * @param \Alaress_Date_Format|null $start
+     * @param \Alaress_Date_Format|null $end
+     * @return int
+     * @throws Exception
+     */
+    public function countFilteredSessions(
+        ?string $keyword,
+        ?string $feature,
+        ?User $user,
+        ?\Alaress_Date_Format $start,
+        ?\Alaress_Date_Format $end,
+    ): int {
+        [$where, $params] = $this->buildSessionFilter($keyword, $feature, $user, $start, $end);
+
+        $statement = $this->getDatabase()->prepare(
+            "SELECT COUNT(*) FROM `{$this->table}` {$where}"
+        );
+        foreach ($params as $name => $value) {
+            $statement->bindValue($name, $value);
+        }
+        $statement->execute();
+
+        return (int)$statement->fetchColumn();
+    }
+
+
+    /**
+     * Build the shared WHERE clause and bound params for the session list/count.
+     *
+     * @param string|null               $keyword
+     * @param string|null               $feature
+     * @param User|null                 $user
+     * @param \Alaress_Date_Format|null $start
+     * @param \Alaress_Date_Format|null $end
+     * @return array{0: string, 1: array<string, mixed>}
+     */
+    private function buildSessionFilter(
+        ?string $keyword,
+        ?string $feature,
+        ?User $user,
+        ?\Alaress_Date_Format $start,
+        ?\Alaress_Date_Format $end,
+    ): array {
+        $clauses = [];
+        $params  = [];
+
+        if ('' !== trim((string)$keyword)) {
+            $like = '%' . $this->getDatabase()->getQuoter()->escapeForLike($keyword) . '%';
+            $clauses[] = 'EXISTS (
+                SELECT 1 FROM `ai_session_log` l
+                WHERE l.ai_session_id = `' . $this->table . '`.id
+                  AND (l.prompt LIKE :keyword OR l.response LIKE :keyword)
+            )';
+            $params['keyword'] = $like;
+        }
+        if ('' !== trim((string)$feature)) {
+            $clauses[] = '`' . $this->table . '`.feature = :feature';
+            $params['feature'] = $feature;
+        }
+        if (null !== $user) {
+            $clauses[] = '`' . $this->table . '`.created_by = :userId';
+            $params['userId'] = $user->getId();
+        }
+        if (null !== $start) {
+            $clauses[] = '`' . $this->table . '`.created_at >= :startAt';
+            $params['startAt'] = $start->getDatabase();
+        }
+        if (null !== $end) {
+            $clauses[] = '`' . $this->table . '`.created_at <= :endAt';
+            $params['endAt'] = $end->getDatabase();
+        }
+
+        $where = $clauses ? 'WHERE ' . implode("\nAND ", $clauses) : '';
+
+        return [$where, $params];
     }
 }
