@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Markbook;
 
+use DebugBar\DebugBarException;
+
 class WeightedAggregator
 {
     /**
@@ -19,8 +21,8 @@ class WeightedAggregator
      * particular grid contributes to its overall value across multiple grids in multiple assessments. It can also be
      * used to calculate a capability value (if applicable).
      *
-     * Weighted contribution = (assessment weight/assessment total weight)
-     *                       * (rubric grid weight/total rubric grid weights in the assessment)
+     * Weighted contribution = (assessment weight/assessment total weight that used this capability or indicator)
+     *                       * (rubric grid weight/total rubric grid weights in the assessment that used this capability or indicator)
      *                       * capability value or indicator value as a percentage between 0 and 100
      *
      * Overall value of a capability or indicator = sum of its weighted contributions
@@ -32,7 +34,8 @@ class WeightedAggregator
      * @param float|null $assessmentTotalWeight
      * @param float|null $gridWeight
      * @param float|null $gridTotalWeight
-     * @param float|null $normalisedMark  A float between 0 and 100
+     * @param float|null $normalisedMark A float between 0 and 100
+     * @param string|null $prefix An optional prefix for diagnostic usage only
      * @return float|null
      */
     public function calculate(
@@ -40,7 +43,8 @@ class WeightedAggregator
         ?float $assessmentTotalWeight,
         ?float $gridWeight,
         ?float $gridTotalWeight,
-        ?float $normalisedMark
+        ?float $normalisedMark,
+        ?string $prefix,
     ): ?float {
         /* Avoid divide-by-zero scenarios: exit early
          */
@@ -52,6 +56,28 @@ class WeightedAggregator
             return null;
         }
 
-        return ($assessmentWeight / $assessmentTotalWeight) * ($gridWeight / $gridTotalWeight) * $normalisedMark;
+        /* normalised mark is null; this doesn't count toward anything and shouldn't be equated to zero.
+         * Exit early instead.
+         */
+        if (null === $normalisedMark) {
+            return null;
+        }
+
+        $val = ($assessmentWeight / $assessmentTotalWeight) * ($gridWeight / $gridTotalWeight) * $normalisedMark;
+
+        /* Diagnostic
+         */
+//         var_dump(sprintf(
+//             "%s: (%s/%s) * (%s/%s) * %s = %s",
+//             $prefix,
+//             $assessmentWeight,
+//             $assessmentTotalWeight,
+//             $gridWeight,
+//             $gridTotalWeight,
+//             $normalisedMark,
+//             $val
+//        ));
+
+         return $val;
     }
 }

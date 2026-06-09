@@ -1335,7 +1335,7 @@ class Controller extends Base
 
                         /* Published capability mark for this student
                          */
-                        $overallMarks[$capabilityId]['students'][$studentId]['published']['normalisedMark'] += $aggregator->calculate(
+                        $val = $aggregator->calculate(
                             (float)$coefficients['assessments'][$assessmentId],
                             (float)$coefficients['assessments']['totalWeight'],
                             (float)$coefficients['grids'][$rubricInstanceId],
@@ -1343,12 +1343,23 @@ class Controller extends Base
                             /* This is a value between 0-100; $aggregator does the division internally to convert this
                              * value appropriately. It's a byproduct of assembling data that we've augmented earlier.
                              */
-                            (float)($capabilityData['published']['normalisedMark'])
+                            $capabilityData['published']['normalisedMark'],
+                            sprintf(
+                                'Student %s: %s',
+                                $studentId,
+                                $overallMarks[$capabilityId]['name']
+                            ),
                         );
+
+                        /* Only aggregate if not null
+                         */
+                        if (null !== $val) {
+                            $overallMarks[$capabilityId]['students'][$studentId]['published']['normalisedMark'] += $val;
+                        }
 
                         /* Draft capability mark for this student
                          */
-                        $overallMarks[$capabilityId]['students'][$studentId]['draft']['normalisedMark'] += $aggregator->calculate(
+                        $val = $aggregator->calculate(
                             (float)$coefficients['assessments'][$assessmentId],
                             (float)$coefficients['assessments']['totalWeight'],
                             (float)$coefficients['grids'][$rubricInstanceId],
@@ -1356,8 +1367,19 @@ class Controller extends Base
                             /* This is a value between 0-100; $aggregator does the division internally to convert this
                              * value appropriately. It's a byproduct of assembling data that we've augmented earlier.
                              */
-                            (float)($capabilityData['draft']['normalisedMark'])
+                            $capabilityData['draft']['normalisedMark'],
+                            sprintf(
+                                'Student %s: %s (draft)',
+                                $studentId,
+                                $overallMarks[$capabilityId]['name']
+                            ),
                         );
+
+                        /* Only aggregate if not null
+                         */
+                        if (null !== $val) {
+                            $overallMarks[$capabilityId]['students'][$studentId]['draft']['normalisedMark'] += $val;
+                        }
 
                         /* Now dig into each indicator within this capability and aggregate their values in a very
                          * similar fashion.
@@ -1378,7 +1400,7 @@ class Controller extends Base
 
                             /* Published indicator mark for this student
                              */
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['published']['normalisedMark'] += $aggregator->calculate(
+                            $val = $aggregator->calculate(
                                 (float)$coefficients['assessments'][$assessmentId],
                                 (float)$coefficients['assessments']['totalWeight'],
                                 (float)$coefficients['grids'][$rubricInstanceId],
@@ -1386,12 +1408,23 @@ class Controller extends Base
                                 /* This is a value between 0-100; $aggregator does the division internally to convert this
                                  * value appropriately. It's a byproduct of assembling data that we've augmented earlier.
                                  */
-                                (float)($indicatorData['published']['normalisedMark'])
+                                $indicatorData['published']['normalisedMark'],
+                                sprintf(
+                                    'Student %s: %s',
+                                    $studentId,
+                                    $overallMarks[$capabilityId]['indicators'][$indicatorId]['name']
+                                ),
                             );
+
+                            /* Only aggregate if not null
+                             */
+                            if (null !== $val) {
+                                $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['published']['normalisedMark'] += $val;
+                            }
 
                             /* Draft indicator mark for this student
                              */
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['draft']['normalisedMark'] += $aggregator->calculate(
+                            $val = $aggregator->calculate(
                                 (float)$coefficients['assessments'][$assessmentId],
                                 (float)$coefficients['assessments']['totalWeight'],
                                 (float)$coefficients['grids'][$rubricInstanceId],
@@ -1399,8 +1432,19 @@ class Controller extends Base
                                 /* This is a value between 0-100; $aggregator does the division internally to convert this
                                  * value appropriately. It's a byproduct of assembling data that we've augmented earlier.
                                  */
-                                (float)($indicatorData['draft']['normalisedMark'])
+                                $indicatorData['draft']['normalisedMark'],
+                                sprintf(
+                                    'Student %s: %s (draft)',
+                                    $studentId,
+                                    $overallMarks[$capabilityId]['indicators'][$indicatorId]['name']
+                                ),
                             );
+
+                            /* Only aggregate if not null
+                             */
+                            if (null !== $val) {
+                                $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['draft']['normalisedMark'] += $val;
+                            }
                         }
                     }
                 }
