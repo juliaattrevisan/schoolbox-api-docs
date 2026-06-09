@@ -13,6 +13,7 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\OpenAi\Session\Log;
+use Schoolbox\Editor\OpenAI\Log\Translator\Format\AgentChat;
 use Schoolbox\Editor\OpenAI\Payload\ImageGeneration as PayloadGenerator;
 use Schoolbox\OpenAi\AgentChat\EventStream\ResponseListener;
 use Schoolbox\OpenAi\AgentChat\LogHandler\LogOutputText;
@@ -69,7 +70,7 @@ class ImageGeneration
             $user,
             Helper::FEATURE_IMAGE,
             $sessionId,
-            Log\Translator\Format\AgentChat::getLogFormat(),
+            AgentChat::getLogFormat(),
         );
         return $this->client->createResponseStream(
             $payload,

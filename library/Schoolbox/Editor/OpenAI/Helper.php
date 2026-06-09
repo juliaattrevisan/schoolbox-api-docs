@@ -506,6 +506,7 @@ class Helper
             // continue with the little robot dude payload, and see what AI responds with...
         }
 
+        $log = null;
         try {
             $openAiRequest = new Request('POST', $this->getEndpoint(self::FEATURE_CHAT), array_merge(
                 $this->getAuthorization(),
