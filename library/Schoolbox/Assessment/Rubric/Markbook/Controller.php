@@ -463,7 +463,7 @@ class Controller extends Base
                      * This .show node only has meaning to humans if Capability Mark Type was something other than None,
                      * and/or we chose it in the Filters settings.
                      */
-                    'show' => $capabilityMaxValue && ($selectedCapabilities === null || in_array((int)$row['capability_id'], $selectedCapabilities, true)),
+                    'show' => $assessments[$row['assessment_id']]['gridData'][$row['rubric_instance_id']]['isMarkPerCapability'] && ($selectedCapabilities === null || in_array((int)$row['capability_id'], $selectedCapabilities, true)),
                     'indicators' => [],
                 ];
             }

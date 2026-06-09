@@ -135,6 +135,7 @@
                                                     {# Student doesn't have a feedback that used this capability; render a placeholder cell with a link to the
                                                      # summary screen otherwise the markbook becomes subtly misshapen with values in the wrong columns etc.
                                                      #}
+
                                                     {% if not capability.show %}
                                                         <td class="excluded"></td>
                                                     {% elseif studentId in (exclusions[assessmentId] ?? []) %}
