@@ -16,7 +16,8 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
+use Schoolbox\OpenAi\Session\Log\Mapper as AILogMapper;
+use Schoolbox\OpenAi\Session\Mapper as SessionMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\UserMapper;
@@ -67,6 +68,7 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
+            $this->getMapperFactory()->get(SessionMapper::class),
             $this->getAILogMapper(),
             $this->getMapperFactory()->get(ConfigMapper::class),
             $this->getMapperFactory()->get(UserMapper::class),
@@ -94,7 +96,7 @@ class Module extends BaseModule
             throw new InvalidArgumentException('AI session identifier parameter is missing.');
         }
 
-        $log = $this->getAILogMapper()->findOneByColumn('session_id', $params['sessionId']);
+        $log = $this->getAILogMapper()->findOneByColumn('ai_session_id', $params['sessionId']);
 
         return ['log' => $log];
     }

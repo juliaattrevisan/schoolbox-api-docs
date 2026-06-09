@@ -19,6 +19,9 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\Admin\OpenAI\Config as AIConfig;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\OpenAi\Session\Mapper as SessionMapper;
+use Schoolbox\OpenAi\Session\Log\Mapper as SessionLogMapper;
+use Schoolbox\OpenAi\Session\Log\Model as SessionLogModel;
 use Schoolbox\UserMapper;
 use Schoolbox\User;
 
@@ -33,12 +36,14 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param Log\Mapper $aiLogMapper
+     * @param SessionMapper $sessionMapper
+     * @param SessionLogMapper $sessionLogMapper
      * @param ConfigMapper $configMapper
      * @param UserMapper $userMapper
      */
     public function __construct(
-        private Log\Mapper $aiLogMapper,
+        private SessionMapper $sessionMapper,
+        private SessionLogMapper $sessionLogMapper,
         private ConfigMapper $configMapper,
         private UserMapper $userMapper,
     ) {
@@ -195,7 +200,7 @@ class Controller extends Base
          * it's just that it's one row that represents multiple grouped logs for a given session ID.
          * Not all fields will make sense in this context (e.g. prompt, response, errorMessage, etc)
          */
-        $logGroups = $this->aiLogMapper->getGroupedLogs(
+        $logGroups = $this->sessionMapper->getFilteredSessions(
             $keyword,
             $feature,
             $user,
@@ -206,7 +211,7 @@ class Controller extends Base
         );
 
         // Find total counts
-        $count = $this->aiLogMapper->countGroupedLogs(
+        $count = $this->sessionMapper->countFilteredSessions(
             $keyword,
             $feature,
             $user,
@@ -250,13 +255,13 @@ class Controller extends Base
 
 
     /**
-     * @param Log\Model $log - first log in the tree
+     * @param SessionLogModel $log - first log in the session
      * @return void
      * @see /library/Schoolbox/Admin/OpenAI/Usage/templates/payload.ts AiSessionLogApiResponse
      */
-    public function getLog(Log\Model $log): void
+    public function getLog(SessionLogModel $log): void
     {
-        $logEntries = $this->aiLogMapper->findByColumn('session_id', $log->getSessionId(), [
+        $logEntries = $this->sessionLogMapper->findByColumn('ai_session_id', $log->getAiSessionId(), [
             'order' => [
                 'created_at' => 'ASC'
             ]
