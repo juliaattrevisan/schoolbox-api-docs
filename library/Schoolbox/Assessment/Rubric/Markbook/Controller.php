@@ -1201,13 +1201,13 @@ class Controller extends Base
      *
      * @param array $assessments
      * @param array $studentMarks
+     * @param array $exclusions
      * @param Model $folder
      * @return array
-     * @throws DebugBarException
      */
-    private function buildOverallMarks(array $assessments, array $studentMarks, Folder\Model $folder): array
+    private function buildOverallMarks(array $assessments, array $studentMarks, array $exclusions, Folder\Model $folder): array
     {
-        $overallMarks = $this->aggregateMarks($assessments, $folder, $studentMarks);
+        $overallMarks = $this->aggregateMarks($assessments, $studentMarks, $exclusions, $folder);
 
         foreach ($overallMarks as &$capability) {
             uasort($capability['indicators'], [$this, 'sortByName']);
@@ -1239,10 +1239,10 @@ class Controller extends Base
      * @param array $assessments
      * @param Model $folder
      * @param array $studentMarks
+     * @param array $exclusions
      * @return array
-     * @throws DebugBarException
      */
-    private function aggregateMarks(array $assessments, Folder\Model $folder, array $studentMarks): array
+    private function aggregateMarks(array $assessments, array $studentMarks, array $exclusions, Folder\Model $folder): array
     {
         /* $coefficients is a set of supposedly-convenient values that we can quickly reference
          *
@@ -1393,75 +1393,24 @@ class Controller extends Base
             foreach ($studentData['gridData'] as $assessmentId => $rubricInstanceData) {
                 foreach ($rubricInstanceData as $rubricInstanceId => $rubricGridData) {
                     foreach ($rubricGridData['capabilities'] as $capabilityId => $capabilityData) {
-                        if (!isset($overallMarks[$capabilityId]['students'][$studentId])) {
+                        /* Excluded guys get null for this calculation
+                         */
+                        if (isset($exclusions[$assessmentId][$studentId])) {
                             $overallMarks[$capabilityId]['students'][$studentId] = [
                                 'published' => [
-                                    'normalisedMark' => 0,
+                                    'normalisedMark' => null,
                                     'humanReadableMark' => null
                                 ],
                                 'draft' => [
-                                    'normalisedMark' => 0,
+                                    'normalisedMark' => null,
                                     'humanReadableMark' => null
                                 ],
                             ];
-                        }
-
-                        /* Published capability mark for this student
-                         */
-                        $val = $aggregator->calculate(
-                            $coefficients['assessments'][$assessmentId],
-                            $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['published'] ?? null,
-                            $coefficients['grids'][$rubricInstanceId],
-                            $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'],
-                            /* This is a value between 0-100; $aggregator does the division internally to convert this
-                             * value appropriately. It's a byproduct of assembling data that we've augmented earlier.
+                        } else {
+                            /* Otherwise populate it with actual calculate data
                              */
-                            $capabilityData['published']['normalisedMark'],
-                            sprintf(
-                                'Assessment %s, student %s: %s',
-                                $assessmentId,
-                                $studentId,
-                                $overallMarks[$capabilityId]['name']
-                            ),
-                        );
-
-                        /* Only aggregate if not null
-                         */
-                        if (null !== $val) {
-                            $overallMarks[$capabilityId]['students'][$studentId]['published']['normalisedMark'] += $val;
-                        }
-
-                        /* Draft capability mark for this student
-                         */
-                        $val = $aggregator->calculate(
-                            $coefficients['assessments'][$assessmentId],
-                            $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['draft'] ?? null,
-                            $coefficients['grids'][$rubricInstanceId],
-                            $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'],
-                            /* This is a value between 0-100; $aggregator does the division internally to convert this
-                             * value appropriately. It's a byproduct of assembling data that we've augmented earlier.
-                             */
-                            $capabilityData['draft']['normalisedMark'],
-                            sprintf(
-                                'Assessment %s, student %s: %s (draft)',
-                                $assessmentId,
-                                $studentId,
-                                $overallMarks[$capabilityId]['name']
-                            ),
-                        );
-
-                        /* Only aggregate if not null
-                         */
-                        if (null !== $val) {
-                            $overallMarks[$capabilityId]['students'][$studentId]['draft']['normalisedMark'] += $val;
-                        }
-
-                        /* Now dig into each indicator within this capability and aggregate their values in a very
-                         * similar fashion.
-                         */
-                        foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
-                            if (!isset($overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId])) {
-                                $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId] = [
+                            if (!isset($overallMarks[$capabilityId]['students'][$studentId])) {
+                                $overallMarks[$capabilityId]['students'][$studentId] = [
                                     'published' => [
                                         'normalisedMark' => 0,
                                         'humanReadableMark' => null
@@ -1473,54 +1422,137 @@ class Controller extends Base
                                 ];
                             }
 
-                            /* Published indicator mark for this student
+                            /* Published capability mark for this student
                              */
                             $val = $aggregator->calculate(
                                 $coefficients['assessments'][$assessmentId],
-                                $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['published'] ?? null,
+                                $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['published'] ?? null,
                                 $coefficients['grids'][$rubricInstanceId],
                                 $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'],
                                 /* This is a value between 0-100; $aggregator does the division internally to convert this
                                  * value appropriately. It's a byproduct of assembling data that we've augmented earlier.
                                  */
-                                $indicatorData['published']['normalisedMark'],
+                                $capabilityData['published']['normalisedMark'],
                                 sprintf(
                                     'Assessment %s, student %s: %s',
                                     $assessmentId,
                                     $studentId,
-                                    $overallMarks[$capabilityId]['indicators'][$indicatorId]['name']
+                                    $overallMarks[$capabilityId]['name']
                                 ),
                             );
 
                             /* Only aggregate if not null
                              */
                             if (null !== $val) {
-                                $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['published']['normalisedMark'] += $val;
+                                $overallMarks[$capabilityId]['students'][$studentId]['published']['normalisedMark'] += $val;
                             }
 
-                            /* Draft indicator mark for this student
+                            /* Draft capability mark for this student
                              */
                             $val = $aggregator->calculate(
                                 $coefficients['assessments'][$assessmentId],
-                                $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['draft'] ?? null,
+                                $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['draft'] ?? null,
                                 $coefficients['grids'][$rubricInstanceId],
                                 $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'],
                                 /* This is a value between 0-100; $aggregator does the division internally to convert this
                                  * value appropriately. It's a byproduct of assembling data that we've augmented earlier.
                                  */
-                                $indicatorData['draft']['normalisedMark'],
+                                $capabilityData['draft']['normalisedMark'],
                                 sprintf(
                                     'Assessment %s, student %s: %s (draft)',
                                     $assessmentId,
                                     $studentId,
-                                    $overallMarks[$capabilityId]['indicators'][$indicatorId]['name']
+                                    $overallMarks[$capabilityId]['name']
                                 ),
                             );
 
                             /* Only aggregate if not null
                              */
                             if (null !== $val) {
-                                $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['draft']['normalisedMark'] += $val;
+                                $overallMarks[$capabilityId]['students'][$studentId]['draft']['normalisedMark'] += $val;
+                            }
+                        }
+
+                        /* Now dig into each indicator within this capability and aggregate their values in a very
+                         * similar fashion.
+                         */
+                        foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
+                            /* Excluded guys get null for this calculation
+                             */
+                            if (isset($exclusions[$assessmentId][$studentId])) {
+                                $overallMarks[$capabilityId]['students'][$studentId] = [
+                                    'published' => [
+                                        'normalisedMark' => null,
+                                        'humanReadableMark' => null
+                                    ],
+                                    'draft' => [
+                                        'normalisedMark' => null,
+                                        'humanReadableMark' => null
+                                    ],
+                                ];
+                            } else {
+                                if (!isset($overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId])) {
+                                    $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId] = [
+                                        'published' => [
+                                            'normalisedMark' => 0,
+                                            'humanReadableMark' => null
+                                        ],
+                                        'draft' => [
+                                            'normalisedMark' => 0,
+                                            'humanReadableMark' => null
+                                        ],
+                                    ];
+                                }
+
+                                /* Published indicator mark for this student
+                                 */
+                                $val = $aggregator->calculate(
+                                    $coefficients['assessments'][$assessmentId],
+                                    $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['published'] ?? null,
+                                    $coefficients['grids'][$rubricInstanceId],
+                                    $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'],
+                                    /* This is a value between 0-100; $aggregator does the division internally to convert this
+                                     * value appropriately. It's a byproduct of assembling data that we've augmented earlier.
+                                     */
+                                    $indicatorData['published']['normalisedMark'],
+                                    sprintf(
+                                        'Assessment %s, student %s: %s',
+                                        $assessmentId,
+                                        $studentId,
+                                        $overallMarks[$capabilityId]['indicators'][$indicatorId]['name']
+                                    ),
+                                );
+
+                                /* Only aggregate if not null
+                                 */
+                                if (null !== $val) {
+                                    $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['published']['normalisedMark'] += $val;
+                                }
+
+                                /* Draft indicator mark for this student
+                                 */
+                                $val = $aggregator->calculate(
+                                    $coefficients['assessments'][$assessmentId],
+                                    $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['draft'] ?? null,
+                                    $coefficients['grids'][$rubricInstanceId],
+                                    $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'],
+                                    /* This is a value between 0-100; $aggregator does the division internally to convert this
+                                     * value appropriately. It's a byproduct of assembling data that we've augmented earlier.
+                                     */
+                                    $indicatorData['draft']['normalisedMark'],
+                                    sprintf(
+                                        'Assessment %s, student %s: %s (draft)',
+                                        $assessmentId,
+                                        $studentId,
+                                        $overallMarks[$capabilityId]['indicators'][$indicatorId]['name']
+                                    ),
+                                );
+
+                                /* Only aggregate if not null
+                                 */
+                                if (null !== $val) {
+                                    $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['draft']['normalisedMark'] += $val;
+                                }
                             }
                         }
                     }
@@ -1691,7 +1723,7 @@ class Controller extends Base
          * and indicator combination from all the rubric grids. This aggregation should potentially be weighted against
          * the rubric weighting -per grid- but we'll get to that later.
          */
-        $overallMarks = $this->buildOverallMarks($assessments, $studentMarks, $folder);
+        $overallMarks = $this->buildOverallMarks($assessments, $studentMarks, $exclusions, $folder);
 
         return [
             $assessments,
