@@ -50,7 +50,7 @@ type AiSelectedSessionInfo<TFeature extends AiFeature = AiFeature> = {
     [KLogFormat in AiLogFormat]: {
         logFormat: KLogFormat;
         session: AiSession<KLogFormat, TFeature>;
-        log: AiSessionLogApiResponse<KLogFormat, TFeature>;
+        log: AiSessionLogApiResponse<KLogFormat>;
     };
 }[AiLogFormat];
 

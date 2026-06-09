@@ -49,7 +49,6 @@ export type AiSessionLog = {
     sessionId: AiSessionId;
     createdAt: DateRFC3339;
     createdBy?: UserAuthor;
-    feature: AiFeature;
 } & (
     | { [K in AiLogFormat]: { logFormat: K; data: AiLogFormatDataMap[K] } }[AiLogFormat]
     | { logFormat: null; data: null }
@@ -86,5 +85,4 @@ export type AiUsageLogApiResponse = {
 
 export type AiSessionLogApiResponse<
     TLogFormat extends AiLogFormat = AiLogFormat,
-    TFeature extends AiFeature = AiFeature,
-> = (AiSessionLog & { logFormat: TLogFormat; feature: TFeature })[];
+> = (AiSessionLog & { logFormat: TLogFormat })[];
