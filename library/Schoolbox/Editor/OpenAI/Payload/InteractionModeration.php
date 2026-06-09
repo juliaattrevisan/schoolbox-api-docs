@@ -345,9 +345,6 @@ class InteractionModeration
             ]);
         }
 
-        /* If there wasn't any meaningful content in the feed, throw an error for now so we can
-         * ensure that we don't acc
-
         /* Just dump it into one large JSON string for now, apparently that's what we want */
         return json_encode($feedPrompt, JSON_THROW_ON_ERROR);
     }
