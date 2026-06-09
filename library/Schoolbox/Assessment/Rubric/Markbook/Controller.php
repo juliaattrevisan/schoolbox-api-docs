@@ -1560,12 +1560,20 @@ class Controller extends Base
                 if (null !== $studentCapabilityData['published']['normalisedMark']) {
                     $studentCapabilityData['published']['humanReadableMark'] = $markScheme->getHumanReadableMark((float)$studentCapabilityData['published']['normalisedMark']);
                 }
+
+                if (null !== $studentCapabilityData['draft']['normalisedMark']) {
+                    $studentCapabilityData['draft']['humanReadableMark'] = $markScheme->getHumanReadableMark((float)$studentCapabilityData['draft']['normalisedMark']);
+                }
             }
 
             foreach ($capabilityData['indicators'] as &$indicatorStudentData) {
                 foreach ($indicatorStudentData['students'] as &$studentIndicatorData) {
                     if (null !== $studentIndicatorData['published']['normalisedMark']) {
                         $studentIndicatorData['published']['humanReadableMark'] = $markScheme->getHumanReadableMark((float)$studentIndicatorData['published']['normalisedMark']);
+                    }
+
+                    if (null !== $studentIndicatorData['draft']['normalisedMark']) {
+                        $studentIndicatorData['draft']['humanReadableMark'] = $markScheme->getHumanReadableMark((float)$studentIndicatorData['draft']['normalisedMark']);
                     }
                 }
             }
