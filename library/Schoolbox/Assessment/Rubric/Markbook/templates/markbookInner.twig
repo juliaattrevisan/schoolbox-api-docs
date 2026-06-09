@@ -260,6 +260,11 @@
                                                    data-draft-mark
                                                 >{{ publishedMarks.humanReadableMark|default('–') }}</a>
                                             {% endif %}
+
+                                            {# Student doesn't have anything at all #}
+                                            {% if publishedMarks is null and draftMarks is null %}
+                                                <a href="#">–</a>
+                                            {% endif %}
                                         </td>
                                     {% endfor %}
                                 </tr>
@@ -290,6 +295,11 @@
                                                     <a class="meta"
                                                        data-draft-mark
                                                     >{{ draftMarks.humanReadableMark|default('–') }}</a>
+                                                {% endif %}
+
+                                                {# Student doesn't have anything at all #}
+                                                {% if publishedMarks is null and draftMarks is null %}
+                                                    <a href="#">–</a>
                                                 {% endif %}
                                             </td>
                                         {% endfor %}
