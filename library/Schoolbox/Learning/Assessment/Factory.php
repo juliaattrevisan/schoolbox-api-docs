@@ -858,7 +858,9 @@ class Factory
      * Validate the submitted work type against the overall Schoolbox work type list.
      *
      * This intentionally does not enforce per-assessment-type permission flags, so existing activities can continue
-     * saving a work type that is no longer selectable for their activity type.
+     * saving a work type that is no longer selectable for their activity type. Only roles with additional trust in
+     * the customer context have authority to perform this action, which is another consideration for choosing the
+     * less permission-restrictive path.
      *
      * @param mixed $workTypeId
      * @return int
