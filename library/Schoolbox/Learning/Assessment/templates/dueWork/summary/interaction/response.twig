@@ -96,7 +96,7 @@
 
                 {% for currentFeedback in currentInteraction.allFeedback %}
 
-                    {% set hasCollapser = currentFeedback.allFiles.count or currentFeedback.comment | length > 0 or currentFeedback.rubricMarkedGrid %}
+                    {% set hasCollapser = currentFeedback.allFiles.count or currentFeedback.comment | length > 0 or currentFeedback.rubricMarkedGrids.count %}
 
                     {# We pass the responseId as well, so that people can download annotated kami docs #}
                     {% include '@learningAssessment/dueWork/summary/interaction/feedback.twig' with {
