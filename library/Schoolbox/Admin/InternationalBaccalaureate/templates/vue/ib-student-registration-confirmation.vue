@@ -24,7 +24,8 @@ const isSubmitted = window.Vue.ref<boolean>(props.initialConfirmationStatus === 
  * @returns The formatted date string.
  */
 function formatDate(isoString: string): string {
-    return window.dayjs(isoString).format(window.dateDisplayFormats.dayjsDatetime);
+    const d = window.dayjs(isoString);
+    return `${d.format(window.dateDisplayFormats.dayjsDateShort)} ${d.format(window.dateDisplayFormats.dayjsTime)}`;
 }
 
 const labelText =
@@ -79,6 +80,7 @@ async function toggle(value: boolean): Promise<void> {
             <input
                 v-model="confirmed"
                 type="checkbox"
+                class="plain"
                 :disabled="isSaving || isSubmitted"
                 @change="toggle(confirmed)"
             />
