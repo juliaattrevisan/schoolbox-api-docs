@@ -44,10 +44,9 @@ export function applyMarkScheme(
     }
 
     if (markScheme.mode === MarkTypeSlug.TOTAL) {
-        const stringValue = value !== null ? String(value) : null;
         return {
-            value: stringValue,
-            humanReadableMark: `${stringValue} / ${maxValue}`,
+            value: value !== null ? String(value) : null,
+            humanReadableMark: value !== null ? `${value} / ${maxValue}` : null,
         };
     }
 
