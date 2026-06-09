@@ -247,12 +247,7 @@ class Factory
             // Work type should always be null for lesson plans.
             $this->setWorkType(null);
         } else {
-            try {
-                // If an invalid work type has been supplied by the client, treat as information missing.
-                $this->setWorkType($this->workTypeMapper->findById($post['workType'])->getId());
-            } catch (MapperException) {
-                throw $this->errorMapper->generateException(Error\Mapper::ERROR_INFORMATION_MISSING);
-            }
+            $this->setWorkType($this->findSubmittedWorkTypeId($post['workType'] ?? null));
         }
 
         /* Projects need this to instantiate
@@ -856,6 +851,26 @@ class Factory
     {
         $this->workType = $workType;
         return $this;
+    }
+
+
+    /**
+     * Validate the submitted work type against the overall Schoolbox work type list.
+     *
+     * This intentionally does not enforce per-assessment-type permission flags, so existing activities can continue
+     * saving a work type that is no longer selectable for their activity type.
+     *
+     * @param mixed $workTypeId
+     * @return int
+     * @throws DomainException
+     */
+    private function findSubmittedWorkTypeId(mixed $workTypeId): int
+    {
+        try {
+            return $this->workTypeMapper->findById($workTypeId)->getId();
+        } catch (MapperException) {
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_INFORMATION_MISSING);
+        }
     }
 
     /**
