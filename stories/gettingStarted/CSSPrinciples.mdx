@@ -34,9 +34,9 @@ There should be much less chance for styles to leak out into different parts of 
 
 The solution is comprised of three key factors:
 
-- An increased usage of global properties (design tokens) to set up the the majority of base styles for the system
-- A more component driven approach to our CSS, aided by the use of Storybook and BEM
-- The introduction of utility classes to help reduce the amount of custom CSS we need to write
+- An increased usage of global properties (design tokens) to set up the the majority of base styles for the system.
+- A more component driven approach to our CSS, aided by the use of Storybook and BEM.
+- The introduction of utility classes to help reduce the amount of custom CSS we need to write.
 
 To evaluate the benefits of this approach have a read through the following articles:
 
@@ -48,13 +48,13 @@ To evaluate the benefits of this approach have a read through the following arti
 
 To help ensure our CSS is written in a consistent manner, we've introduced a set of rules to follow:
 
-- New styling must be detailed within Storybook
-- Accessibility considerations must be validated
-- When adding a new compoent, the linked styling should be contained within one SCSS file
-- Styles within selectors should be ordered alphabetically
-- When using BEM, Parent styles, followed by elements, followed by modifiers should be added
-- Ideally no more than 3 levels of nesting should ever exist. If more are required, consider using a utility class or a new component
-- All new styles are to be prefixed
+- New styling must be detailed within Storybook.
+- Accessibility considerations must be validated.
+- When adding a new component, the linked styling should be contained within one SCSS file.
+- Styles within selectors should be ordered alphabetically.
+- When using BEM, Parent styles, followed by elements, followed by modifiers should be added.
+- Ideally no more than 2 levels of nesting should ever exist. If more are required, consider using a utility class or a new component.
+- All new styles are to be prefixed.
 
 ### Prefixes
 
