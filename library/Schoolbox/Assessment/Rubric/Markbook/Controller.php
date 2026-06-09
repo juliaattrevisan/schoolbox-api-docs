@@ -1395,7 +1395,7 @@ class Controller extends Base
                     foreach ($rubricGridData['capabilities'] as $capabilityId => $capabilityData) {
                         /* Excluded guys get null for this calculation
                          */
-                        if (isset($exclusions[$assessmentId][$studentId])) {
+                        if (!isset($overallMarks[$capabilityId]['students'][$studentId])) {
                             $overallMarks[$capabilityId]['students'][$studentId] = [
                                 'published' => [
                                     'normalisedMark' => null,
@@ -1406,22 +1406,9 @@ class Controller extends Base
                                     'humanReadableMark' => null
                                 ],
                             ];
-                        } else {
-                            /* Otherwise populate it with actual calculate data
-                             */
-                            if (!isset($overallMarks[$capabilityId]['students'][$studentId])) {
-                                $overallMarks[$capabilityId]['students'][$studentId] = [
-                                    'published' => [
-                                        'normalisedMark' => 0,
-                                        'humanReadableMark' => null
-                                    ],
-                                    'draft' => [
-                                        'normalisedMark' => 0,
-                                        'humanReadableMark' => null
-                                    ],
-                                ];
-                            }
+                        }
 
+                        if (!isset($exclusions[$assessmentId][$studentId])) {
                             /* Published capability mark for this student
                              */
                             $val = $aggregator->calculate(
@@ -1479,8 +1466,8 @@ class Controller extends Base
                         foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
                             /* Excluded guys get null for this calculation
                              */
-                            if (isset($exclusions[$assessmentId][$studentId])) {
-                                $overallMarks[$capabilityId]['students'][$studentId] = [
+                            if (!isset($overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId])) {
+                                $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId] = [
                                     'published' => [
                                         'normalisedMark' => null,
                                         'humanReadableMark' => null
@@ -1490,20 +1477,9 @@ class Controller extends Base
                                         'humanReadableMark' => null
                                     ],
                                 ];
-                            } else {
-                                if (!isset($overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId])) {
-                                    $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId] = [
-                                        'published' => [
-                                            'normalisedMark' => 0,
-                                            'humanReadableMark' => null
-                                        ],
-                                        'draft' => [
-                                            'normalisedMark' => 0,
-                                            'humanReadableMark' => null
-                                        ],
-                                    ];
-                                }
+                            }
 
+                            if (!isset($exclusions[$assessmentId][$studentId])) {
                                 /* Published indicator mark for this student
                                  */
                                 $val = $aggregator->calculate(
@@ -1577,12 +1553,16 @@ class Controller extends Base
 
         foreach ($overallMarks as $capabilityId => &$capabilityData) {
             foreach ($capabilityData['students'] as &$studentCapabilityData) {
-                $studentCapabilityData['published']['humanReadableMark'] = $markScheme->getHumanReadableMark((float)$studentCapabilityData['published']['normalisedMark']);
+                if (null !== $studentCapabilityData['published']['normalisedMark']) {
+                    $studentCapabilityData['published']['humanReadableMark'] = $markScheme->getHumanReadableMark((float)$studentCapabilityData['published']['normalisedMark']);
+                }
             }
 
             foreach ($capabilityData['indicators'] as &$indicatorStudentData) {
                 foreach ($indicatorStudentData['students'] as &$studentIndicatorData) {
-                    $studentIndicatorData['published']['humanReadableMark'] = $markScheme->getHumanReadableMark((float)$studentIndicatorData['published']['normalisedMark']);
+                    if (null !== $studentIndicatorData['published']['normalisedMark']) {
+                        $studentIndicatorData['published']['humanReadableMark'] = $markScheme->getHumanReadableMark((float)$studentIndicatorData['published']['normalisedMark']);
+                    }
                 }
             }
         }

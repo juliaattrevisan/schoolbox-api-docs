@@ -231,7 +231,7 @@
                                                 {% endif %}
 
                                                 {% if draftMarks is not null %}
-                                                    <a class="{{ gradientClass }}"
+                                                    <a class="meta"
                                                        data-draft-mark
                                                     >{{ publishedMarks.humanReadableMark|default('–') }}</a>
                                                 {% endif %}
@@ -257,17 +257,17 @@
 
                                             <td class="mark">
                                                 {% if publishedMarks is not null %}
-                                                    {% set gradientClass = urgency.marks(publishedMarks.normalisedMark ?? null) %}
+                                                    {% set gradientClass = urgency.marks(publishedMarks.normalisedMark) %}
 
                                                     <a class="{{ gradientClass }}"
                                                        data-actual-mark
-                                                    >{{ publishedMarks.humanReadableMark|default('–') }} ({{ publishedMarks.normalisedMark }})</a>
+                                                    >{{ publishedMarks.humanReadableMark|default('–') }}</a>
                                                 {% endif %}
 
                                                 {% if draftMarks is not null %}
-                                                    <a class="{{ gradientClass }}"
+                                                    <a class="meta"
                                                        data-draft-mark
-                                                    >{{ draftMarks.humanReadableMark|default('–') }} ({{ draftMarks.normalisedMark }})</a>
+                                                    >{{ draftMarks.humanReadableMark|default('–') }}</a>
                                                 {% endif %}
                                             </td>
                                         {% endfor %}
