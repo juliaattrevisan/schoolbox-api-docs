@@ -12,7 +12,6 @@ namespace Schoolbox\Editor\OpenAI\Payload;
 
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Curriculum\Node;
-use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Admin\DialogAgent\Scenario\Model as Scenario;
 use Schoolbox\Admin\DialogAgent\Scenario\Field\Model as Field;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;

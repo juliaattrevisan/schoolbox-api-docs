@@ -3,7 +3,6 @@
 namespace Schoolbox\Editor\OpenAI\Payload;
 
 use Schoolbox\Admin\OpenAI\Config;
-use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\Admin\DialogAgent\Scenario\Model as Scenario;
 use Schoolbox\Admin\DialogAgent\Scenario\Criterion\Model as Criterion;

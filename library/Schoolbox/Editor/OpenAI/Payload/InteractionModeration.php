@@ -8,7 +8,7 @@
 
 namespace Schoolbox\Editor\OpenAI\Payload;
 
-use Schoolbox\Editor\OpenAI\Helper;
+use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Log\LogFormat;
 use Schoolbox\Editor\OpenAI\Log\Model as LogModel;
 use Schoolbox\Editor\OpenAI\Log\Translator\Format\StrategyFactory;
@@ -227,12 +227,18 @@ class InteractionModeration
      *
      * @param string $openAiEndpoint
      * @param string $openAiModel
-     * @param string $openAiDeploymentId
+     * @param string $azureDeploymentId
+     * @param string $azureDeploymentModel
+     * @param string $reasoningEffort
+     * @param string $textVerbosity
      */
     public function __construct(
         private string $openAiEndpoint,
         private string $openAiModel,
-        private string $openAiDeploymentId,
+        private string $azureDeploymentId,
+        private string $azureDeploymentModel,
+        private string $reasoningEffort,
+        private string $textVerbosity,
     ) {
     }
 
@@ -246,20 +252,9 @@ class InteractionModeration
      */
     public function generate(GenericCollection $interactionFeed): array
     {
-        /* OpenAI uses the model name from our ui.
-         * Azure uses the Deployment ID instead.
-         * Disgusting.
-         */
-        $model = $this->openAiModel;
-        if (Helper::ENDPOINT_TYPE_AZURE === $this->openAiEndpoint) {
-            $model = $this->openAiDeploymentId;
-        }
-
         $payload = [
             /* An ordered list of instructions for OpenAi */
             'input' => [],
-            /* Which variant of OpenAI to use (text model) */
-            'model' => $model,
             /* A kind of OpenAI currency to use in this request */
             'max_output_tokens' => self::MAX_OUTPUT_TOKENS,
             /**
@@ -274,6 +269,15 @@ class InteractionModeration
                 'format' => self::RESPONSE_FORMAT,
             ],
         ];
+
+        if ($this->textVerbosity !== Config::TEXT_VERBOSITY_OPTION_DEFAULT) {
+            $payload['text']['verbosity'] = $this->textVerbosity;
+        }
+
+        if ($this->reasoningEffort !== Config::REASONING_EFFORT_OPTION_DEFAULT) {
+            $payload['reasoning'] = ['effort' => $this->reasoningEffort];
+        }
+
 
         /* The specific system prompt about what to generate */
         $payload['input'][] = [
@@ -291,7 +295,13 @@ class InteractionModeration
             'content' => $this->generateInteractionFeedPrompt($interactionFeed),
         ];
 
-        return $payload;
+        return new PayloadFinaliser()->finalise(
+            $payload,
+            $this->openAiEndpoint,
+            $this->openAiModel,
+            $this->azureDeploymentId,
+            $this->azureDeploymentModel,
+        );
     }
 
 

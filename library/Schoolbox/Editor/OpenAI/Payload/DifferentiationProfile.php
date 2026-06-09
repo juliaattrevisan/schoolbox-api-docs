@@ -5,7 +5,6 @@ namespace Schoolbox\Editor\OpenAI\Payload;
 use Schoolbox\Admin\DifferentiationProfiles\Model;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Collection;
-use Schoolbox\Editor\OpenAI\Helper;
 
 class DifferentiationProfile
 {

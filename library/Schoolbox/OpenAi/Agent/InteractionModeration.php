@@ -60,6 +60,9 @@ class InteractionModeration
             trim($this->config[Config::FIELD_PROVIDER]['value']),
             trim($this->config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
             trim($this->config[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
+            trim($this->config[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_MODEL]['value'] ?? ''),
+            trim($this->config[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_REASONING_EFFORT]['value'] ?? '') ?: Config::REASONING_EFFORT_OPTION_DEFAULT,
+            trim($this->config[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_TEXT_VERBOSITY]['value'] ?? '') ?: Config::TEXT_VERBOSITY_OPTION_DEFAULT,
         )->generate($interactionFeed);
 
         $log = $this->client->createLog(
@@ -93,10 +96,9 @@ class InteractionModeration
         // and ditching all its training markdown (lol) that it loves to use
         //
         // https://community.openai.com/t/json-returning-with-json/584818/6
-        $data = json_decode($moderationResponseData, true);
+        $data         = json_decode($moderationResponseData, true);
+        $relevantData = new ResponseParser()->extractContentText($data);
 
-        /* The actual output we requested is in this chain of objects, for now assume it'll only ever be one */
-        $relevantData = $data['output'][0]['content'][0]['text'] ?? null;
         if (!isset($relevantData)) {
             throw new SchoolboxException('Invalid response');
         }
