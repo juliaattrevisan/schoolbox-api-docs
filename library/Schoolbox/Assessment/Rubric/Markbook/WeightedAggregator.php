@@ -68,16 +68,16 @@ class WeightedAggregator
 
         /* Diagnostic
          */
-//         var_dump(sprintf(
-//             "%s: (%s/%s) * (%s/%s) * %s = %s",
-//             $prefix,
-//             $assessmentWeight,
-//             $assessmentTotalWeight,
-//             $gridWeight,
-//             $gridTotalWeight,
-//             $normalisedMark,
-//             $val
-//        ));
+         var_dump(sprintf(
+             "%s: (%s/%s) * (%s/%s) * %s = %s",
+             $prefix,
+             $assessmentWeight,
+             $assessmentTotalWeight,
+             $gridWeight,
+             $gridTotalWeight,
+             $normalisedMark,
+             $val
+        ));
 
          return $val;
     }
