@@ -1106,15 +1106,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
     private function getWorkTypesPermittedForAssessment(IAssessable $assessment): Collection
     {
-        $assessmentType = AssessmentType::objectToString($assessment);
-        $workTypes = $this->workTypeMapper
-            ->findAll(['order' => ['sequence' => 'asc']])
-            ->filter(static fn (WorkType\Model $workType): bool => $workType->isPermittedForAssessmentType($assessmentType))
-            ->reindex();
+        $workTypes = $this->workTypeMapper->findPermittedForAssessment($assessment);
 
         $currentWorkType = $assessment->getWorkType();
         if ($currentWorkType !== null && !in_array($currentWorkType->getId(), $workTypes->getPropertyValues('id'), true)) {
-            $workTypes->add($currentWorkType);
+            $workTypes->add($currentWorkType)->sortBy('sequence', 'asc')->reindex();
         }
 
         return $workTypes;
