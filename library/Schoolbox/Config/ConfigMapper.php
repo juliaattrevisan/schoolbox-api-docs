@@ -721,9 +721,9 @@ class ConfigMapper extends Mapper
      * @return bool
      * @throws Exception
      */
-    protected function ibEnableToggle(Config $model): bool
+    protected function ibEnableToggle(Config $model, ?Config $prev = null): bool
     {
-        if ($model->getName() === self::NAME_IB_ENABLED) {
+        if ($model->getName() === self::NAME_IB_ENABLED && $prev !== null && $model->getValue() !== $prev->getValue()) {
             $ibEnabled = (bool)$model->getValue();
             $packageMapper = \Schoolbox\Admin\Package\Mapper::getInstance();
             /* IB packages are hidden/shown based on the IB Enabled setting. They are not deleted as they contain
@@ -735,6 +735,7 @@ class ConfigMapper extends Mapper
                 'IBProgramme',
                 'IBPYPProgramme',
                 'IBMYPProgramme',
+                'IBBadges',
             ]);
             $packages = $packageMapper->findByPredicates($pb);
             /** @var PackageModel $package */
