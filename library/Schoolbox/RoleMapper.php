@@ -37,7 +37,7 @@ class RoleMapper extends Mapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
         $this->uses('group_type', self::TYPE_STRING, self::COLUMN_ENUM, 'type', [Role::STAFF, Role::STUDENT, Role::PARENT, Role::GUEST,]);
-        $this->uses('can_change_password', self::TYPE_BOOLEAN);
+        $this->uses('can_change_password', self::TYPE_BOOL_ENUM);
         $this->uses('view_student_profile', self::TYPE_BOOLEAN);
         $this->uses('view_student_grades', self::TYPE_BOOLEAN);
         $this->uses('view_student_calendar', self::TYPE_BOOLEAN);

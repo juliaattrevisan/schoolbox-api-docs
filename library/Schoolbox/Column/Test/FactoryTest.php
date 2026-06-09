@@ -42,6 +42,7 @@ class FactoryTest extends BaseTestCase
             array('\\Schoolbox\\Column\\Timestamp',  Mapper::TYPE_TIMESTAMP),
             array('\\Schoolbox\\Column\\Time',       Mapper::TYPE_TIME),
             array('\\Schoolbox\\Column\\Boolean',    Mapper::TYPE_BOOLEAN),
+            array('\\Schoolbox\\Column\\BoolEnum',   Mapper::TYPE_BOOL_ENUM),
             array('\\Schoolbox\\Column\\Serialized', Mapper::TYPE_SERIALIZED),
             array('\\Schoolbox\\Column\\Decimal',    Mapper::TYPE_DECIMAL),
             array('\\Schoolbox\\Column\\Interval',   Mapper::TYPE_TIMESPAN),
