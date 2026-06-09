@@ -119,10 +119,9 @@ class IdFinder extends Filter\AbstractIdFinder
         $rubricUsages   = $completeFilters[RubricUsage\Definition::class];
         $markPerCap     = $completeFilters[MarkPerCap\Definition::class];
 
-        $dueWorkAlias                                             = 'sb';
         [$aTypeJoin, $aTypeWhere]                                 = $this->getClauseAType($aTypes, $rubricUsages, $markPerCap);
-        [$rubricUsageJoin, $rubricUsageWhere, $rubricUsageParams] = $this->getClauseRubricUsage($rubricUsages, $aTypes, $dueWorkAlias);
-        [$markPerCapWhere, $markPerCapParams]                     = $this->getClauseMarkPerCapability($markPerCap, $dueWorkAlias);
+        [$rubricUsageJoin, $rubricUsageWhere, $rubricUsageParams] = $this->getClauseRubricUsage($rubricUsages, $aTypes);
+        [$markPerCapWhere, $markPerCapParams]                     = $this->getClauseMarkPerCapability($markPerCap);
         [$temporalWhere, $temporalParams, $participantPlanJoin]   = $this->getClauseTemporalState($temporalStates);
         [$termDJoin, $termDWhere, $termDParams]                   = $this->getClauseTerm($termsDue, self::DATE_COL_DUE);
         [$termCJoin, $termCWhere, $termCParams]                   = $this->getClauseTerm($termsClose, self::DATE_COL_CLS);
@@ -532,7 +531,6 @@ class IdFinder extends Filter\AbstractIdFinder
      * @param null|Collection|int[] $aTypes
      * @param Collection|null       $rubricUsages
      * @param Collection|null       $markPerCap
-     * @param string                $dueWorkAlias
      * @return mixed[]
      * @throws InvalidColumnException
      */
@@ -647,7 +645,6 @@ class IdFinder extends Filter\AbstractIdFinder
      *
      * @param Collection|null $rubricUsages
      * @param Collection|null $aTypes
-     * @param string          $dueWorkAlias
      * @return array
      * @throws InvalidColumnException
      * @throws UnexpectedValueException
@@ -655,7 +652,7 @@ class IdFinder extends Filter\AbstractIdFinder
      * We don't to join to `submission_box` here:
      * @see getClauseAType
      */
-    private function getClauseRubricUsage(?Collection $rubricUsages, ?Collection $aTypes, string $dueWorkAlias): array
+    private function getClauseRubricUsage(?Collection $rubricUsages, ?Collection $aTypes): array
     {
         // Do we not wish to apply this filter?
         if (null === $rubricUsages) {
@@ -707,14 +704,13 @@ class IdFinder extends Filter\AbstractIdFinder
      * If the filters include the 'none' option, also fetch assessments that don't use rubrics
 
      * @param Collection|null $markPerCapability
-     * @param string          $dueWorkAlias
      * @return array
      * @throws InvalidColumnException
      *
      * We don't to join to `submission_box` here:
      * @see getClauseAType
      */
-    private function getClauseMarkPerCapability(?Collection $markPerCapability, string $dueWorkAlias): array
+    private function getClauseMarkPerCapability(?Collection $markPerCapability): array
     {
         // Do we not wish to apply this filter?
         if (null === $markPerCapability) {
