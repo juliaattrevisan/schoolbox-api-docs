@@ -210,4 +210,5 @@ export type ProfileEditorPayload = {
  */
 export type ProfileEditorConfig = {
     differentiationEnabled: boolean;
+    ibEnabled: boolean;
 };

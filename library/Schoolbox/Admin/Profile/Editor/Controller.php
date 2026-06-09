@@ -67,6 +67,7 @@ class Controller extends Base
             'payload' => $payload,
             'configSettings' => [
                 'differentiationEnabled' => $this->getConfigLoader()->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED),
+                'ibEnabled' => $this->getConfigLoader()->get(ConfigMapper::NAME_IB_ENABLED),
             ],
         ], 'Profile Editor - ' . ucwords($roleType));
     }
