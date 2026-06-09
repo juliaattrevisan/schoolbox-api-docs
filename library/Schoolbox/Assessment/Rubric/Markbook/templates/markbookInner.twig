@@ -110,10 +110,12 @@
                                                             {% set gradientClass = urgency.marks(publishedMarks.normalisedMark) %}
 
                                                             {# Published Marks #}
-                                                            <a href="{{ summaryLink }}"
-                                                                class="{{ gradientClass }} {% if publishedMarks.humanReadableMark is null %}no-mark{% endif %}"
-                                                                data-actual-mark
-                                                            >{{ publishedMarks.humanReadableMark|default('–') }}</a>
+                                                            {% if publishedMarks is not null %}
+                                                                <a href="{{ summaryLink }}"
+                                                                    class="{{ gradientClass }} {% if publishedMarks.humanReadableMark is null %}no-mark{% endif %}"
+                                                                    data-actual-mark
+                                                                >{{ publishedMarks.humanReadableMark|default('–') }}</a>
+                                                            {% endif %}
 
                                                             {# Draft Marks #}
                                                             {% if draftMarks is not null %}
@@ -121,6 +123,11 @@
                                                                    class="meta {% if draftMarks.humanReadableMark is null %}no-mark{% endif %}"
                                                                    data-draft-mark
                                                                 >{{ draftMarks.humanReadableMark|default('–') }}</a>
+                                                            {% endif %}
+
+                                                            {# Student doesn't have anything at all #}
+                                                            {% if publishedMarks is null and draftMarks is null %}
+                                                                <a href="{{ summaryLink }}">–</a>
                                                             {% endif %}
                                                         </td>
                                                     {% endif %}
@@ -134,7 +141,7 @@
                                                         <td class="excluded" title="Excluded from assessment"></td>
                                                     {% else %}
                                                         <td class="mark">
-                                                            <a href="{{ summaryLink }}">-</a>
+                                                            <a href="{{ summaryLink }}">–</a>
                                                         </td>
                                                     {% endif %}
                                                 {% endif %}
@@ -196,6 +203,11 @@
                                                                     class="meta {% if (draftMarks.humanReadableMark ?? null) is null %}no-mark{% endif %}"
                                                                     data-draft-mark
                                                                 >{{ renderedIndicatorMark }}</a>
+                                                            {% endif %}
+
+                                                            {# Student doesn't have anything at all #}
+                                                            {% if publishedMarks is null and draftMarks is null %}
+                                                                <a href="{{ summaryLink }}">–</a>
                                                             {% endif %}
                                                         </td>
                                                     {% endif %}
