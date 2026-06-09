@@ -1424,17 +1424,11 @@ class Controller extends Base
 
         foreach ($overallMarks as $capabilityId => &$capabilityData) {
             foreach ($capabilityData['students'] as &$studentCapabilityData) {
-                /* Multiply this by 100 before applying human-readable transformation
-                 */
-                $studentCapabilityData['published']['normalisedMark'] *= 100.00;
                 $studentCapabilityData['published']['humanReadableMark'] = $markScheme->getHumanReadableMark((float)$studentCapabilityData['published']['normalisedMark']);
             }
 
             foreach ($capabilityData['indicators'] as &$indicatorStudentData) {
                 foreach ($indicatorStudentData['students'] as &$studentIndicatorData) {
-                    /* Multiply this by 100 before applying human-readable transformation
-                     */
-                    $studentIndicatorData['published']['normalisedMark'] *= 100;
                     $studentIndicatorData['published']['humanReadableMark'] = $markScheme->getHumanReadableMark((float)$studentIndicatorData['published']['normalisedMark']);
                 }
             }
