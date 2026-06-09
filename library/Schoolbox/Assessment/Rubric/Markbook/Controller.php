@@ -1209,15 +1209,13 @@ class Controller extends Base
     {
         $overallMarks = $this->aggregateMarks($assessments, $folder, $studentMarks);
 
-        /* TODO figure out this sort order later
-         */
-//        foreach ($overallMarks as &$capability) {
-//            uasort($capability['indicators'], [$this, 'sortByName']);
-//        }
-//
-//        unset($capability);
-//
-//        uasort($overallMarks, [$this, 'sortByName']);
+        foreach ($overallMarks as &$capability) {
+            uasort($capability['indicators'], [$this, 'sortByName']);
+        }
+
+        unset($capability);
+
+        uasort($overallMarks, [$this, 'sortByName']);
 
         return $overallMarks;
     }
