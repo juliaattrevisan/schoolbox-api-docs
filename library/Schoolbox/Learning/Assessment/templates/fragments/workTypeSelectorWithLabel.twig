@@ -9,46 +9,42 @@
 <select id="workTypeSelector" name="workType" data-test="assessment-form-select-workType" {% if selectIsDisabled %}disabled{% else %}required{% endif %}>
     <option value="" disabled{% if not assessment.workType %} selected="selected"{% endif %}>Select work type</option>
     {% for workType in allWorkTypes %}
+        {% if workType.isVisibleToLearners and workType.isVisibleToParents %}
+            {% set workTypeVisibilityAlert = "This work type sets the " ~ locale.activity.proper ~ " Audience to staff, students, and parents (they can access this " ~ locale.activity ~ "). Feedback Visibility is configured separately." %}
+        {% elseif workType.isVisibleToLearners %}
+            {% set workTypeVisibilityAlert = "This work type sets the " ~ locale.activity.proper ~ " Audience to staff and students. Parents cannot access this " ~ locale.activity ~ " or view any feedback. Feedback Visibility is configured separately and options including parents will have no effect." %}
+        {% elseif workType.isVisibleToParents %}
+            {% set workTypeVisibilityAlert = "This work type sets the " ~ locale.activity.proper ~ " Audience to staff and parents. Students cannot access this " ~ locale.activity ~ " or view any feedback. Feedback Visibility is configured separately and options including students will have no effect." %}
+        {% else %}
+            {% set workTypeVisibilityAlert = "This work type sets the " ~ locale.activity.proper ~ " Audience to staff only. Students and parents cannot access this " ~ locale.activity ~ " or view any feedback. Feedback Visibility is configured separately and options including students or parents will have no effect." %}
+        {% endif %}
         <option value="{{ workType.id }}"
-            data-visible-to-learners="{{ workType.isVisibleToLearners ? '1' : '0' }}"
-            data-visible-to-parents="{{ workType.isVisibleToParents ? '1' : '0' }}"
+            data-work-type-visibility-message="{{ workTypeVisibilityAlert|e('html_attr') }}"
             {% if assessment.workType.id ?? '' == workType.id %}selected="selected"{% endif %}
             {% if courseManaged.isReadonly %}disabled{% endif %}
         >{{ workType.name }}</option>
     {% endfor %}
 </select>
-<div class="alert-box" data-work-type-visibility-alert style="display:none"></div>
+<div id="workTypeVisibilityAlert" class="alert-box" data-work-type-visibility-alert style="display:none"></div>
 <script>
     (function() {
-        const script = document.currentScript;
+        const selector = document.getElementById("workTypeSelector");
+        const alert = document.getElementById("workTypeVisibilityAlert");
 
-        $(function() {
-            const selector = document.getElementById("workTypeSelector");
-            const alert = script ? script.previousElementSibling : document.querySelector("[data-work-type-visibility-alert]");
-            const messages = {
-                "1:1": {{ ("This work type sets the " ~ locale.activity.proper ~ " Audience to staff, students, and parents (they can access this " ~ locale.activity ~ "). Feedback Visibility is configured separately.")|json_encode|raw }},
-                "1:0": {{ ("This work type sets the " ~ locale.activity.proper ~ " Audience to staff and students. Parents cannot access this " ~ locale.activity ~ " or view any feedback. Feedback Visibility is configured separately and options including parents will have no effect.")|json_encode|raw }},
-                "0:1": {{ ("This work type sets the " ~ locale.activity.proper ~ " Audience to staff and parents. Students cannot access this " ~ locale.activity ~ " or view any feedback. Feedback Visibility is configured separately and options including students will have no effect.")|json_encode|raw }},
-                "0:0": {{ ("This work type sets the " ~ locale.activity.proper ~ " Audience to staff only. Students and parents cannot access this " ~ locale.activity ~ " or view any feedback. Feedback Visibility is configured separately and options including students or parents will have no effect.")|json_encode|raw }},
-            };
+        if (!selector || !alert) {
+            return;
+        }
 
-            function updateWorkTypeVisibilityAlert() {
-                const option = selector.options[selector.selectedIndex];
-                const message = option
-                    ? messages[option.dataset.visibleToLearners + ":" + option.dataset.visibleToParents]
-                    : "";
+        function updateWorkTypeVisibilityAlert() {
+            const option = selector.options[selector.selectedIndex];
+            const message = option ? option.dataset.workTypeVisibilityMessage : "";
 
-                alert.textContent = message || "";
-                alert.style.display = message ? "" : "none";
-            }
+            alert.textContent = message || "";
+            alert.style.display = message ? "" : "none";
+        }
 
-            if (!selector || !alert) {
-                return;
-            }
-
-            selector.addEventListener("change", updateWorkTypeVisibilityAlert);
-            updateWorkTypeVisibilityAlert();
-        });
+        selector.addEventListener("change", updateWorkTypeVisibilityAlert);
+        updateWorkTypeVisibilityAlert();
     }());
 </script>
 {% if selectIsDisabled %}

@@ -26,6 +26,18 @@ class WorkTypeSelectorWithLabelTemplateTest extends TestCase
                     'isVisibleToLearners' => true,
                     'isVisibleToParents' => true,
                 ],
+                [
+                    'id' => 3,
+                    'name' => 'Students only',
+                    'isVisibleToLearners' => true,
+                    'isVisibleToParents' => false,
+                ],
+                [
+                    'id' => 4,
+                    'name' => 'Parents only',
+                    'isVisibleToLearners' => false,
+                    'isVisibleToParents' => true,
+                ],
             ],
             'assessment' => [
                 'familyName' => 'task',
@@ -48,26 +60,28 @@ class WorkTypeSelectorWithLabelTemplateTest extends TestCase
             ],
         ]);
 
-        self::assertStringContainsString('data-visible-to-learners="0"', $html);
-        self::assertStringContainsString('data-visible-to-parents="0"', $html);
-        self::assertStringContainsString('data-visible-to-learners="1"', $html);
-        self::assertStringContainsString('data-visible-to-parents="1"', $html);
-        self::assertStringContainsString('data-work-type-visibility-alert', $html);
+        $decodedHtml = html_entity_decode($html, ENT_QUOTES | ENT_HTML5);
+
+        self::assertStringContainsString('data-work-type-visibility-message="This work type sets the Activity Audience to staff only', $decodedHtml);
+        self::assertStringContainsString('data-work-type-visibility-message="This work type sets the Activity Audience to staff, students, and parents', $decodedHtml);
+        self::assertStringNotContainsString('document.currentScript', $decodedHtml);
+        self::assertStringNotContainsString('$(function', $decodedHtml);
+        self::assertStringContainsString('data-work-type-visibility-alert', $decodedHtml);
         self::assertStringContainsString(
             'This work type sets the Activity Audience to staff, students, and parents',
-            $html
+            $decodedHtml
         );
         self::assertStringContainsString(
             'This work type sets the Activity Audience to staff and students. Parents cannot access this activity',
-            $html
+            $decodedHtml
         );
         self::assertStringContainsString(
             'This work type sets the Activity Audience to staff and parents. Students cannot access this activity',
-            $html
+            $decodedHtml
         );
         self::assertStringContainsString(
             'This work type sets the Activity Audience to staff only',
-            $html
+            $decodedHtml
         );
     }
 
