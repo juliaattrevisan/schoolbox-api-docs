@@ -21,7 +21,8 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Schoolbox\Editor\OpenAI\Log;
+use Schoolbox\OpenAi\Session\Log;
+use Schoolbox\OpenAi\Session\Mapper as SessionMapper;
 use Schoolbox\Editor\OpenAI\Log\LogFormat;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
@@ -60,22 +61,23 @@ class Client implements IClient
     /**
      * Constructor
      *
-     * @param HttpClient            $httpClient  The HTTP client, for making requests to the AI provider.
-     * @param UriInterface          $baseUrl     The base URL for the API provider, including:
-     *                                           * the base domain and path
-     *                                           * any query string which is added to all requests
-     * @param array<string, string> $authHeaders The headers (as a key-value pair) which must be provided to the
-     *                                           provider, in order to authenticate requests.
-     *                                           * OpenAI accepts `["Authorization" => "Bearer $apiKey"]`
-     *                                           * Azure's OpenAI compat layer accepts `['api-key' => $apiKey]`
-     *
-     * @param Log\Mapper            $logMapper   Mapper for storing logs.
+     * @param HttpClient            $httpClient     The HTTP client, for making requests to the AI provider.
+     * @param UriInterface          $baseUrl        The base URL for the API provider, including:
+     *                                              * the base domain and path
+     *                                              * any query string which is added to all requests
+     * @param array<string, string> $authHeaders    The headers (as a key-value pair) which must be provided to the
+     *                                              provider, in order to authenticate requests.
+     *                                              * OpenAI accepts `["Authorization" => "Bearer $apiKey"]`
+     *                                              * Azure's OpenAI compat layer accepts `['api-key' => $apiKey]`
+     * @param Log\Mapper            $logMapper      Mapper for storing logs.
+     * @param SessionMapper         $sessionMapper  Mapper for ensuring the parent ai_session row exists.
      */
     public function __construct(
         private HttpClient $httpClient,
         private UriInterface $baseUrl,
         private array $authHeaders,
         private Log\Mapper $logMapper,
+        private SessionMapper $sessionMapper,
     ) {
     }
 
@@ -189,6 +191,7 @@ class Client implements IClient
 
     /**
      * @inheritdoc
+     * @throws MapperException if the session mapper fails to find or create the parent ai_session row
      */
     public function createLog(
         array $payload,
@@ -208,11 +211,11 @@ class Client implements IClient
         if (isset($user)) {
             $log = $log->setUser($user);
         }
-        if (isset($feature)) {
-            $log = $log->setFeature($feature);
-        }
         if (isset($aiSessionId)) {
-            $log = $log->setSessionId($aiSessionId);
+            // Ensure the parent ai_session row exists (carrying the feature) before
+            // any ai_session_log row references it.
+            $this->sessionMapper->findOrCreate($aiSessionId, $feature, $user);
+            $log = $log->setAiSessionId($aiSessionId);
         }
         return $log;
     }

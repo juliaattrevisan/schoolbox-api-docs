@@ -17,7 +17,8 @@ use Schoolbox\Admin\OpenAI;
 use UnexpectedValueException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Editor\OpenAI\Helper;
-use Schoolbox\Editor\OpenAI\Log\Mapper;
+use Schoolbox\OpenAi\Session\Log\Mapper;
+use Schoolbox\OpenAi\Session\Mapper as SessionMapper;
 use Schoolbox\IConfigLoader;
 
 /**
@@ -58,11 +59,13 @@ class ClientFactory
      * @param IConfigLoader       $config         Configuration: used to determine how to create an AI client.
      * @param Mapper              $logMapper      Log: used for logging calls to AI providers.
      * @param HttpClient          $httpClient     HTTP client: used for sending calls to AI providers.
+     * @param SessionMapper       $sessionMapper  Session: used for ensuring the parent ai_session row exists.
      */
     public function __construct(
         private IConfigLoader $config,
         private Mapper $logMapper,
         private HttpClient $httpClient,
+        private SessionMapper $sessionMapper,
     ) {
     }
 
@@ -145,6 +148,7 @@ class ClientFactory
             new Uri(self::OPENAI_BASE_URL),
             $authHeader,
             $this->logMapper,
+            $this->sessionMapper,
         );
     }
 
@@ -191,6 +195,7 @@ class ClientFactory
             new Uri($endpoint)->withQuery(http_build_query($queryParts)),
             $authHeader,
             $this->logMapper,
+            $this->sessionMapper,
         );
     }
 }
