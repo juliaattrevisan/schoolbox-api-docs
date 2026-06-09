@@ -4,15 +4,12 @@ import { Meta } from "@storybook/addon-docs/blocks";
 
 # Colours
 
-- Created in: `www/static/css/core/designTokens/_sbx-colors.scss`.
-- Created in: `www/static/css/core/base/_colors.scss` - All will be moved to `_sbx-colors.scss` in 26.2.
-- Any colour used in the system should be defined here.
-- Some colours are configurable by Schools, as indicated by `-config`.
-- Some colours have a colour they should Contrast against.
+- Should always be used when defining `color`, `background-color`, `border-color`, and `outline`.
 
 ## Configurable
 
-These colours can be updated via Design › Settings - Skin Config for a School to personalise their instance.
+- Defined in: `www/static/css/core/designTokens/_sbx-colors.scss`.
+- These properties can be customised via Admin > Design > Settings - Skin Config.
 
 | CSS Custom Property                               | Initial Value                      | Preview                                                                                          | Contrast                                          |
 | ------------------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
@@ -30,7 +27,8 @@ These colours can be updated via Design › Settings - Skin Config for a School 
 
 ## Core
 
-The core colours are used across the Schoolbox interface. They are designed to work together to provide sufficient contrast for text and UI elements.
+- Defined in: `www/static/css/core/designTokens/_sbx-colors.scss`.
+- They are designed to work together to provide sufficient contrast for text and UI elements.
 
 | CSS Custom Property                  | Value     | Preview                                                                 | Contrast                           |
 | ------------------------------------ | --------- | ----------------------------------------------------------------------- | ---------------------------------- |
@@ -43,7 +41,8 @@ The core colours are used across the Schoolbox interface. They are designed to w
 
 ## Status
 
-Status colours are used to indicate the state of an item, such as an alert, success, warning, or highlight.
+- Defined in: `www/static/css/core/designTokens/_sbx-colors.scss`.
+- Status colours are used to indicate the state of an item, such as an alert, success, warning, or highlight.
 
 | CSS Custom Property            | Value     | Preview                                                                 | Contrast                       |
 | ------------------------------ | --------- | ----------------------------------------------------------------------- | ------------------------------ |
@@ -60,7 +59,8 @@ Status colours are used to indicate the state of an item, such as an alert, succ
 
 ## Gradients
 
-Gradients provide a smooth color transition from red (alert) to green (success), useful for visualizing progress, scores, and performance metrics.
+- Defined in: `www/static/css/core/designTokens/_sbx-colors.scss`.
+- Gradients provide a smooth color transition from red (alert) to green (success), useful for visualizing progress, scores, and performance metrics.
 
 | CSS Custom Property       | Value     | Preview                                                                 |
 | ------------------------- | --------- | ----------------------------------------------------------------------- |
@@ -78,7 +78,8 @@ Gradients provide a smooth color transition from red (alert) to green (success),
 
 ## Context specific
 
-Specific context specific colours.
+- Defined in: `www/static/css/core/base/_colors.scss`.
+- Specific context specific colours.
 
 | CSS Custom Property                  | Preview                                                                                                 |
 | ------------------------------------ | ------------------------------------------------------------------------------------------------------- |
