@@ -40,7 +40,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('learner_id', self::TYPE_INTEGER, null, 'learner');
         $this->uses('authoritative', self::TYPE_BOOLEAN, null, 'authoritative');
-        $this->uses('session_id', self::TYPE_STRING, null, 'sessionId');
+        $this->uses('ai_session_id', self::TYPE_STRING, null, 'sessionId');
         $this->uses('assistance_requested_at', self::TYPE_DATETIME, null, 'assistanceRequestedAt');
         $this->uses('started_at', self::TYPE_DATETIME, null, 'startedAt');
         $this->uses('locked_at', self::TYPE_DATETIME, null, 'lockedAt');
