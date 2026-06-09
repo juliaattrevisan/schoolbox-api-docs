@@ -17,6 +17,9 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\OpenAi\Session\Log\Mapper as SessionLogMapper;
+use Schoolbox\OpenAi\Session\Log\Model as SessionLogModel;
+use Schoolbox\OpenAi\Session\Mapper as SessionMapper;
 use Schoolbox\User;
 
 class Helper
@@ -102,7 +105,8 @@ class Helper
         private string $openAiModel,
         private Client $client,
         private \Schoolbox\Error\Mapper $errorMapper,
-        private Log\Mapper $logMapper,
+        private SessionLogMapper $logMapper,
+        private SessionMapper $sessionMapper,
     ) {
     }
 
@@ -185,10 +189,10 @@ class Helper
      * Append a chunk's output / metrics to the log
      *
      * @param array $chunkData - from parseChunk()
-     * @param Log\Model $log
+     * @param SessionLogModel $log
      * @param ?string $type
      */
-    private function appendChunkToLog(array $chunkData, Log\Model $log, ?string $type = null): void
+    private function appendChunkToLog(array $chunkData, SessionLogModel $log, ?string $type = null): void
     {
         $log->setResponse(($log->getResponse() ?? '') . $chunkData['output']);
 
@@ -224,11 +228,11 @@ class Helper
      * Read a chunked stream response from OpenAI and echo it once each full chunk is received
      *
      * @param \Psr\Http\Message\StreamInterface $stream
-     * @param Log\Model $log
+     * @param SessionLogModel $log
      * @param ?string $type
      * @return ?array The final "response.completed" chunk, or null if it was never found
      */
-    public function readStream(\Psr\Http\Message\StreamInterface $stream, Log\Model $log, ?string $type = null): ?array
+    public function readStream(\Psr\Http\Message\StreamInterface $stream, SessionLogModel $log, ?string $type = null): ?array
     {
         $chunkBuffer = '';
         $isGeneratingImage = false;
@@ -327,14 +331,15 @@ class Helper
             throw new \DomainException('OpenAI API key is unavailable');
         }
 
-        /* Log what the user tried to do if we made a vaguely-successful request
-         * and didn't somehow die long the way
+        /* Ensure the ai_session row exists (carrying the feature) before logging
+         * against it, then build the log for this request.
          */
+        $this->sessionMapper->findOrCreate($aiSessionId, $feature, $user);
+
         $log = $this->logMapper->createModel()
             ->setUser($user)
             ->setPrompt($payload)
-            ->setFeature($feature)
-            ->setSessionId($aiSessionId)
+            ->setAiSessionId($aiSessionId)
             ->setEndpoint($this->getEndpoint());
 
         /* Minimum requirements met: let's send it and see what AI overlords think of our payload
@@ -510,12 +515,13 @@ class Helper
             /* Log what the user tried to do if we made a vaguely-successful request
              * and didn't somehow die long the way
              */
+            $this->sessionMapper->findOrCreate($aiSessionId, self::FEATURE_CHAT, $user);
+
             $log = $this->logMapper->createModel()
                 ->setUser($user)
                 ->setPrompt($payload)
                 ->setModel($this->openAiModel)
-                ->setFeature(self::FEATURE_CHAT)
-                ->setSessionId($aiSessionId)
+                ->setAiSessionId($aiSessionId)
                 ->setEndpoint($this->getEndpoint(self::FEATURE_CHAT));
 
             $promise = $this->client->sendAsync($openAiRequest, ['stream' => true]);
