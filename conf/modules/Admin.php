@@ -12,7 +12,6 @@ use Config\ModuleLoader;
 use Psr\Container\ContainerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Filter\Module as FilterModule;
-use Schoolbox\IConfigLoader;
 
 class Admin extends ModuleLoader
 {
