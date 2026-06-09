@@ -10,9 +10,9 @@ import StorybookSlot from "../../../vue/components/storybook-slot.vue";
  *
  * | Property | Type     | Description                                                                                      | Default        | Options                                                                   |
  * | -------- | -------- | ------------------------------------------------------------------------------------------------ | -------------- | ------------------------------------------------------------------------- |
+ * | `color`  | `string` | The color of the icon.                                                                           | `currentColor` | Can accept any valid CSS colour value, including custom properties.       |
  * | `name`   | `string` | The name of the icon, as specified [here](?path=/docs/icons-icons--docs)                         | `""`           | Any string name linked to an icon                                         |
  * | `size`   | `string` | The size of the icon                                                                             | `m`            | `xs`, `s`, `m`, `l`, `xl` `xxl`, or any other appropriate size value like `36px` |
- * | `color`  | `string` | The color of the icon.                                                                           | `currentColor` | Can accept any valid CSS colour value, including custom properties.       |
  */
 const meta: Meta<typeof SbxIcon> = {
     component: StorybookSlot,
@@ -43,7 +43,7 @@ export const Default: Story = {
 };
 
 /**
- * Changing the size
+ * Changing the size.
  */
 export const Size: Story = {
     render: () => ({
@@ -55,7 +55,7 @@ export const Size: Story = {
 };
 
 /**
- * Changing the color
+ * Changing the color.
  */
 export const Color: Story = {
     render: () => ({
@@ -67,7 +67,7 @@ export const Color: Story = {
 };
 
 /**
- * Any `<svg>` can be passed in within the `<sbx-icon>` component
+ * Any `<svg>` can be passed in within the `<sbx-icon>` component.
  */
 export const Slot: Story = {
     render: () => ({
