@@ -1256,16 +1256,19 @@ class Controller extends Base
           The total weight of the rubric grids in $assessmentId. This is used to calculate a weight sum of each rubric
           grid's contribution to the overall value.
 
-        $coefficients[capability][$capabilityId][student][$studentId]['assessmentTotalWeight']
+        $coefficients[capability][$capabilityId][student][$studentId]['totalAssessmentWeight']['published']
           The total weight of the capability's usages across all the assessments where the student had a mark.
           This aggregates toward a denominator for "assessment total weight" for this constituent of a rubric grid.
           It only accumulates if a student had a mark in it; this denominator is specifically for a particular guy
+          There's a "published" and "draft" variants of this
 
-        $coefficients[capability][$capabilityId][indicators][student][$studentId]['assessmentTotalWeight']
+        $coefficients[capability][$capabilityId][indicators][student][$studentId]['totalAssessmentWeight']['published']
           The total weight of the indicator's usages across all the assessments where the student had a mark.
           This aggregates toward a denominator for "assessment total weight" for this constituent of a rubric grid.
           It only accumulates if a student had a mark in it; this denominator is specifically for a particular guy
+          There's a "published" and "draft" variants of this
         */
+        $coefficients = [];
 
         /* Precalculate all the coefficients now that we have assembled $assessments in its entirety with all its
          * capabilities and indicators and their max_values.
@@ -1321,6 +1324,58 @@ class Controller extends Base
             }
         }
 
+        /* Precompute denominators for each student's capabilities and indicators
+         */
+        foreach ($studentMarks as $studentId => $studentData) {
+            foreach ($studentData['gridData'] as $assessmentId => $rubricInstanceData) {
+                foreach ($rubricInstanceData as $rubricInstanceId => $rubricGridData) {
+                    foreach ($rubricGridData['capabilities'] as $capabilityId => $capabilityData) {
+                        if (null !== $capabilityData['published']['normalisedMark']) {
+                            /* Initialise and add it to the published capability total for this guy
+                             */
+                            if (!isset($coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['published'])) {
+                                $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['published'] = 0;
+                            }
+
+                            $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['published'] += $coefficients['assessments'][$assessmentId];
+                        }
+
+                        if (null !== $capabilityData['draft']['normalisedMark']) {
+                            /* Initialise and add it to the draft capability total for this guy
+                             */
+                            if (!isset($coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['draft'])) {
+                                $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['draft'] = 0;
+                            }
+
+                            $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['draft'] += $coefficients['assessments'][$assessmentId];
+                        }
+
+                        foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
+                            if (null !== $indicatorData['published']['normalisedMark']) {
+                                /* Initialise and add it to the published indicator total for this guy
+                                 */
+                                if (!isset($coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['published'])) {
+                                    $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['published'] = 0;
+                                }
+
+                                $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['published'] += $coefficients['assessments'][$assessmentId];
+                            }
+
+                            if (null !== $indicatorData['draft']['normalisedMark']) {
+                                /* Initialise and add it to the draft indicator total for this guy
+                                 */
+                                if (!isset($coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['draft'])) {
+                                    $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['draft'] = 0;
+                                }
+
+                                $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['draft'] += $coefficients['assessments'][$assessmentId];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         /* Now precompute overall marks for each student.
          *
          * This is something of a dirty secret but the normalised mark we compute for each capability and indicator are
@@ -1355,7 +1410,7 @@ class Controller extends Base
                          */
                         $val = $aggregator->calculate(
                             $coefficients['assessments'][$assessmentId],
-                            $coefficients['assessments']['capabilities'][$capabilityId]['totalWeight'],
+                            $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['published'] ?? null,
                             $coefficients['grids'][$rubricInstanceId],
                             $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'],
                             /* This is a value between 0-100; $aggregator does the division internally to convert this
@@ -1380,7 +1435,7 @@ class Controller extends Base
                          */
                         $val = $aggregator->calculate(
                             $coefficients['assessments'][$assessmentId],
-                            $coefficients['assessments']['capabilities'][$capabilityId]['student'][$studentId]['totalWeight'],
+                            $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['draft'] ?? null,
                             $coefficients['grids'][$rubricInstanceId],
                             $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'],
                             /* This is a value between 0-100; $aggregator does the division internally to convert this
@@ -1422,7 +1477,7 @@ class Controller extends Base
                              */
                             $val = $aggregator->calculate(
                                 $coefficients['assessments'][$assessmentId],
-                                $coefficients['assessments']['capabilities'][$capabilityId]['student'][$studentId]['indicators'][$indicatorId]['totalWeight'],
+                                $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['published'] ?? null,
                                 $coefficients['grids'][$rubricInstanceId],
                                 $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'],
                                 /* This is a value between 0-100; $aggregator does the division internally to convert this
@@ -1447,7 +1502,7 @@ class Controller extends Base
                              */
                             $val = $aggregator->calculate(
                                 $coefficients['assessments'][$assessmentId],
-                                $coefficients['assessments']['capabilities'][$capabilityId]['student'][$studentId]['indicators'][$indicatorId]['totalWeight'],
+                                $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['draft'] ?? null,
                                 $coefficients['grids'][$rubricInstanceId],
                                 $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'],
                                 /* This is a value between 0-100; $aggregator does the division internally to convert this
