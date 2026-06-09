@@ -17,57 +17,6 @@
 /*M!100616 SET @OLD_NOTE_VERBOSITY=@@NOTE_VERBOSITY, NOTE_VERBOSITY=0 */;
 
 --
--- Table structure for table `ai_session`
---
-
-DROP TABLE IF EXISTS `ai_session`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `ai_session` (
-  `id` char(36) NOT NULL,
-  `feature` enum('chat','lessonplan','image','differentiation','dialogagent','learningactivitycustomisation','aimoderationagent') NOT NULL,
-  `created_at` datetime NOT NULL,
-  `created_by` int(10) unsigned DEFAULT NULL COMMENT 'Null for system-created logs.',
-  PRIMARY KEY (`id`),
-  KEY `ai_session_feature_ix` (`feature`),
-  KEY `ai_session_created_at_ix` (`created_at`),
-  KEY `ai_session_created_by_fk` (`created_by`),
-  CONSTRAINT `ai_session_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `ai_session_log`
---
-
-DROP TABLE IF EXISTS `ai_session_log`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `ai_session_log` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `ai_session_id` char(36) NOT NULL,
-  `prompt` text NOT NULL,
-  `input_tokens` int(11) DEFAULT NULL,
-  `output_tokens` int(11) DEFAULT NULL,
-  `input_text` text DEFAULT NULL,
-  `output_text` text DEFAULT NULL,
-  `model` varchar(255) DEFAULT NULL,
-  `endpoint` varchar(255) DEFAULT NULL,
-  `log_format` enum('agent_chat','guardrail') DEFAULT NULL,
-  `response` mediumtext DEFAULT NULL,
-  `return_code` int(11) DEFAULT NULL,
-  `error_message` varchar(1024) DEFAULT NULL,
-  `created_at` datetime NOT NULL,
-  `created_by` int(10) unsigned DEFAULT NULL COMMENT 'Null for system-created logs.',
-  PRIMARY KEY (`id`),
-  KEY `ai_session_log_ai_session_id_fk` (`ai_session_id`),
-  KEY `ai_session_log_created_by_fk` (`created_by`),
-  CONSTRAINT `ai_session_log_ai_session_id_fk` FOREIGN KEY (`ai_session_id`) REFERENCES `ai_session` (`id`),
-  CONSTRAINT `ai_session_log_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `allowedFileExtension`
 --
 
@@ -801,7 +750,7 @@ CREATE TABLE `clipboard_import_log` (
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `finish_at_idx` (`finish_at`,`status`)
-) ENGINE=InnoDB AUTO_INCREMENT=17459 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17434 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1177,7 +1126,7 @@ CREATE TABLE `config` (
   KEY `config_type_id` (`type_id`),
   CONSTRAINT `fk_config_field_id` FOREIGN KEY (`field_id`) REFERENCES `lu_config_field` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_config_type_id` FOREIGN KEY (`type_id`) REFERENCES `lu_config_type` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=782 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=783 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1584,7 +1533,6 @@ CREATE TABLE `dialog_agent_response` (
   `learner_id` int(10) unsigned NOT NULL,
   `authoritative` tinyint(1) DEFAULT NULL,
   `session_id` char(36) DEFAULT NULL,
-  `ai_session_id` char(36) DEFAULT NULL,
   `started_at` datetime DEFAULT NULL,
   `assistance_requested_at` datetime DEFAULT NULL,
   `locked_at` datetime DEFAULT NULL,
@@ -1604,8 +1552,6 @@ CREATE TABLE `dialog_agent_response` (
   KEY `fk_dar_createdby_idx` (`created_by`),
   KEY `fk_dar_updatedby_idx` (`updated_by`),
   KEY `fk_dar_deletedby_idx` (`deleted_by`),
-  KEY `dialog_agent_response_ai_session_id_fk` (`ai_session_id`),
-  CONSTRAINT `fk_dar_ai_session_idx` FOREIGN KEY (`ai_session_id`) REFERENCES `ai_session` (`id`),
   CONSTRAINT `fk_dar_createdby` FOREIGN KEY (`created_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_dar_deletedby` FOREIGN KEY (`deleted_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_dar_dialog_agent` FOREIGN KEY (`dialog_agent_id`) REFERENCES `dialog_agent` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -4139,7 +4085,7 @@ CREATE TABLE `lu_qualification` (
   KEY `idx_sequence` (`sequence`),
   KEY `idx_system_purpose_id` (`system_purpose_id`),
   CONSTRAINT `fk_lu_qualification_system_purpose` FOREIGN KEY (`system_purpose_id`) REFERENCES `ib_system_purposes` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4870,7 +4816,7 @@ DROP TABLE IF EXISTS `openai_log`;
 CREATE TABLE `openai_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(10) unsigned DEFAULT NULL,
-  `session_id` char(36) NOT NULL,
+  `session_id` char(36) DEFAULT NULL,
   `prompt` text NOT NULL,
   `input_tokens` int(11) DEFAULT NULL,
   `output_tokens` int(11) DEFAULT NULL,
@@ -4878,7 +4824,7 @@ CREATE TABLE `openai_log` (
   `output_text` text DEFAULT NULL,
   `model` varchar(255) DEFAULT NULL,
   `endpoint` varchar(255) DEFAULT NULL,
-  `feature` enum('chat','lessonplan','image','differentiation','dialogagent','learningactivitycustomisation','aimoderationagent') NOT NULL DEFAULT 'chat',
+  `feature` enum('chat','lessonplan','image','differentiation','dialogagent','learningactivitycustomisation','aimoderationagent') DEFAULT NULL,
   `log_format` enum('agent_chat','guardrail') DEFAULT NULL,
   `response` mediumtext DEFAULT NULL,
   `return_code` int(11) DEFAULT NULL,
@@ -4888,7 +4834,7 @@ CREATE TABLE `openai_log` (
   KEY `openai_log_user_id_fk` (`user_id`),
   KEY `openai_log_session` (`session_id`),
   CONSTRAINT `openai_log_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -9356,4 +9302,4 @@ CREATE TABLE `wikiRevision` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2026-06-09  7:13:08
+-- Dump completed on 2026-06-09  7:25:06
