@@ -21,7 +21,7 @@ class WeightedAggregator
      * particular grid contributes to its overall value across multiple grids in multiple assessments. It can also be
      * used to calculate a capability value (if applicable).
      *
-     * Weighted contribution = (assessment weight/assessment total weight that used this capability or indicator)
+     * Weighted contribution = (assessment weight/assessment total weight that used this capability or indicator where student had a mark)
      *                       * (rubric grid weight/total rubric grid weights in the assessment that used this capability or indicator)
      *                       * capability value or indicator value as a percentage between 0 and 100
      *

@@ -1244,6 +1244,29 @@ class Controller extends Base
      */
     private function aggregateMarks(array $assessments, Folder\Model $folder, array $studentMarks): array
     {
+        /* $coefficients is a set of supposedly-convenient values that we can quickly reference
+         *
+        $coefficient['assessments'][$assessmentId]
+          The weight of an individual assessment.
+
+        $coefficients['grids'][$rubricInstanceId]
+          The weight of a particular rubric grid.
+
+        $coefficients['grids']['assessments'][$assessmentId]
+          The total weight of the rubric grids in $assessmentId. This is used to calculate a weight sum of each rubric
+          grid's contribution to the overall value.
+
+        $coefficients[capability][$capabilityId][student][$studentId]['assessmentTotalWeight']
+          The total weight of the capability's usages across all the assessments where the student had a mark.
+          This aggregates toward a denominator for "assessment total weight" for this constituent of a rubric grid.
+          It only accumulates if a student had a mark in it; this denominator is specifically for a particular guy
+
+        $coefficients[capability][$capabilityId][indicators][student][$studentId]['assessmentTotalWeight']
+          The total weight of the indicator's usages across all the assessments where the student had a mark.
+          This aggregates toward a denominator for "assessment total weight" for this constituent of a rubric grid.
+          It only accumulates if a student had a mark in it; this denominator is specifically for a particular guy
+        */
+
         /* Precalculate all the coefficients now that we have assembled $assessments in its entirety with all its
          * capabilities and indicators and their max_values.
          */
@@ -1264,7 +1287,9 @@ class Controller extends Base
                 $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'] += $rubricGridData['weight'];
                 $coefficients['grids'][$rubricInstanceId] = $rubricGridData['weight'] ? (float)$rubricGridData['weight'] : null;
 
-                /* This pre-compiles capability/indicator structs while we're traversing this $assessments struct.
+                /* Set up OverallMarks struct
+                 *
+                 * This pre-compiles capability/indicator structs while we're traversing this $assessments struct.
                  * It used to be split out into its own traversal
                  */
                 foreach ($rubricGridData['capabilities'] as $capabilityId => $capabilityData) {
@@ -1281,14 +1306,6 @@ class Controller extends Base
                         ];
                     }
 
-                    /* The sum of assessment weights that used this capability
-                     */
-                    if (!isset($coefficients['assessments']['capabilities'][$capabilityId]['totalWeight'])) {
-                        $coefficients['assessments']['capabilities'][$capabilityId]['totalWeight'] = 0;
-                    }
-
-                    $coefficients['assessments']['capabilities'][$capabilityId]['totalWeight'] += $assessmentData['weight'];
-
                     foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
                         if (!isset($overallMarks[$capabilityId]['indicators'][$indicatorId])) {
                             $overallMarks[$capabilityId]['indicators'][$indicatorId] = [
@@ -1299,14 +1316,6 @@ class Controller extends Base
                                 'students' => []
                             ];
                         }
-
-                        /* The sum of assessment weights that used this indicator
-                         */
-                        if (!isset($coefficients['assessments']['capabilities'][$capabilityId]['indicators'][$indicatorId]['totalWeight'])) {
-                            $coefficients['assessments']['capabilities'][$capabilityId]['indicators'][$indicatorId]['totalWeight'] = 0;
-                        }
-
-                        $coefficients['assessments']['capabilities'][$capabilityId]['indicators'][$indicatorId]['totalWeight'] += $assessmentData['weight'];
                     }
                 }
             }
@@ -1371,7 +1380,7 @@ class Controller extends Base
                          */
                         $val = $aggregator->calculate(
                             $coefficients['assessments'][$assessmentId],
-                            $coefficients['assessments']['capabilities'][$capabilityId]['totalWeight'],
+                            $coefficients['assessments']['capabilities'][$capabilityId]['student'][$studentId]['totalWeight'],
                             $coefficients['grids'][$rubricInstanceId],
                             $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'],
                             /* This is a value between 0-100; $aggregator does the division internally to convert this
@@ -1413,7 +1422,7 @@ class Controller extends Base
                              */
                             $val = $aggregator->calculate(
                                 $coefficients['assessments'][$assessmentId],
-                                $coefficients['assessments']['capabilities'][$capabilityId]['indicators'][$indicatorId]['totalWeight'],
+                                $coefficients['assessments']['capabilities'][$capabilityId]['student'][$studentId]['indicators'][$indicatorId]['totalWeight'],
                                 $coefficients['grids'][$rubricInstanceId],
                                 $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'],
                                 /* This is a value between 0-100; $aggregator does the division internally to convert this
@@ -1438,7 +1447,7 @@ class Controller extends Base
                              */
                             $val = $aggregator->calculate(
                                 $coefficients['assessments'][$assessmentId],
-                                $coefficients['assessments']['capabilities'][$capabilityId]['indicators'][$indicatorId]['totalWeight'],
+                                $coefficients['assessments']['capabilities'][$capabilityId]['student'][$studentId]['indicators'][$indicatorId]['totalWeight'],
                                 $coefficients['grids'][$rubricInstanceId],
                                 $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'],
                                 /* This is a value between 0-100; $aggregator does the division internally to convert this
