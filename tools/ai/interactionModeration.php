@@ -15,7 +15,7 @@ use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Editor\OpenAI\Helper;
-use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
+use Schoolbox\OpenAI\Session\Log\Mapper as AILogMapper;
 use Schoolbox\OpenAi\Agent\InteractionModeration;
 use Schoolbox\OpenAi\ClientFactory;
 

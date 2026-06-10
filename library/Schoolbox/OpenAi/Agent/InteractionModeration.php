@@ -14,7 +14,7 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
-use Schoolbox\Editor\OpenAI\Log;
+use Schoolbox\OpenAI\Session\Log;
 use Schoolbox\Editor\OpenAI\Payload\InteractionModeration as PayloadGenerator;
 use Schoolbox\OpenAi\IClient;
 use Schoolbox\GenericCollection;
