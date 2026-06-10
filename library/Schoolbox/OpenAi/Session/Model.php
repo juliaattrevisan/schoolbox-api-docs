@@ -102,10 +102,10 @@ class Model
     /**
      * Accepts either a {@see Feature} enum or its string value, and stores the string value.
      *
-     * @param string|Feature|null $feature
+     * @param string|Feature $feature
      * @return $this
      */
-    public function setFeature(string|Feature|null $feature): self
+    public function setFeature(string|Feature $feature): self
     {
         $this->feature = $feature instanceof Feature
             ? $feature->value

@@ -52,10 +52,10 @@ class Model
     }
 
     /**
-     * @param string|null $aiSessionId
+     * @param string $aiSessionId
      * @return $this
      */
-    public function setAiSessionId(?string $aiSessionId): self
+    public function setAiSessionId(string $aiSessionId): self
     {
         $this->aiSessionId = $aiSessionId;
         return $this;

@@ -13,6 +13,7 @@ use PHPUnit\Framework\TestCase;
 use Schoolbox\OpenAi\Session\Feature;
 use Schoolbox\OpenAi\Session\Model;
 use Schoolbox\User;
+use TypeError;
 
 /**
  * Unit tests for the AI session {@see Model}.
@@ -42,14 +43,24 @@ class ModelTest extends TestCase
     }
 
     /**
-     * setFeature accepts null.
+     * The feature is null until explicitly set.
      */
-    public function testSetFeatureAcceptsNull(): void
+    public function testFeatureIsNullUntilSet(): void
     {
         $model = new Model();
-        $model->setFeature(null);
 
         $this->assertNull($model->getFeature());
+    }
+
+    /**
+     * setFeature rejects null.
+     */
+    public function testSetFeatureRejectsNull(): void
+    {
+        $model = new Model();
+
+        $this->expectException(TypeError::class);
+        $model->setFeature(null);
     }
 
     /**
