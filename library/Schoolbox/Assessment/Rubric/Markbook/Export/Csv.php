@@ -209,7 +209,7 @@ class Csv extends AbstractCSV
 
                     /* Add this random char because of microsoft sinfulness
                      */
-                    $marks[] = self::EXCEL_PREFIX . $val;
+                    $marks[] = $this->mark($val);
                 }
 
                 /* The first arg to this method is the "headings" but it actually corresponds to the columns prior, that
@@ -244,9 +244,7 @@ class Csv extends AbstractCSV
                         $val = $subnode['humanReadableMark'] ?? null;
                     }
 
-                    /* Add this random char because of microsoft sinfulness
-                     */
-                    $marks[] = self::EXCEL_PREFIX . $val;
+                    $marks[] = $this->mark($val);
                 }
 
                 $this->exportRow([
@@ -276,11 +274,7 @@ class Csv extends AbstractCSV
             $marks = [];
 
             foreach ($this->studentMarks as $studentId => $studentData) {
-                $val = $this->overallMarks[$capabilityId]['students'][$studentId][$this->node]['humanReadableMark'] ?? null;
-
-                /* Add this random char because of microsoft sinfulness
-                 */
-                $marks[] = self::EXCEL_PREFIX . $val;
+                $marks[] = $this->mark($this->overallMarks[$capabilityId]['students'][$studentId][$this->node]['humanReadableMark'] ?? null);
             }
 
             /* The first arg to this method is the "headings" but it actually corresponds to the columns prior, that
@@ -309,11 +303,7 @@ class Csv extends AbstractCSV
                 $marks = [];
 
                 foreach ($this->studentMarks as $studentId => $studentData) {
-                    $val = $this->overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId][$this->node]['humanReadableMark'] ?? null;
-
-                    /* Add this random char because of microsoft sinfulness
-                     */
-                    $marks[] = self::EXCEL_PREFIX . $val;
+                    $marks[] = $this->mark($this->overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId][$this->node]['humanReadableMark'] ?? null);
                 }
 
                 $this->exportRow([
@@ -346,6 +336,22 @@ class Csv extends AbstractCSV
         }
 
         return self::NODE_PUBLISHED;
+    }
+
+
+    /**
+     * Add this random char because of microsoft sinfulness
+     *
+     * @param string|null $val
+     * @return string
+     */
+    private function mark(?string $val): string
+    {
+        if ('' === trim((string)$val)) {
+            return '';
+        }
+
+        return self::EXCEL_PREFIX . trim($val);
     }
 
 
