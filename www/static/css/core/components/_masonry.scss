@@ -283,8 +283,7 @@ $masonry-drop-background: $input-focus-bg-color;
 }
 
 // Eportfolio masonry icons
-.icon-masonry.icon-masonry-Component_Eportfolio_AdvancedListController {
-    @extend .icon-advanced-list;
+sbx-icon.icon-masonry.icon-masonry-Component_Eportfolio_AdvancedListController {
     color: $icon-color-advanced-list;
 }
 .icon-masonry.icon-masonry-Component_Eportfolio_BasicListController {
