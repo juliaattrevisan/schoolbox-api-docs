@@ -610,8 +610,7 @@ class Controller extends BaseController
             'parent'  => [
                 /* only parents of a student can view the contacts tab, this is checked by $tabs already so fall back to true */
                 '_default'     => true,
-                'contacts'     => $hasContactTab,
-                'registration' => false,
+                'contacts'     => $hasContactTab
             ],
             'staff'   => [
                 /* staff can view a student's profile tabs if their role has viewStudentProfile enabled */
