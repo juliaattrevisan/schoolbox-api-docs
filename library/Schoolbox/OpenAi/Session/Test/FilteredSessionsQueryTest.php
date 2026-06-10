@@ -29,6 +29,16 @@ class FilteredSessionsQueryTest extends TestCase
         $this->assertStringNotContainsString('LEFT JOIN `ai_session_log` firstLog', $sql);
     }
 
+    public function testFilteredSessionsWithoutLimitDoesNotUseOffset(): void
+    {
+        $sql = $this->capturePreparedSql(
+            fn(Mapper $mapper) => $mapper->getFilteredSessions(null, null, null, null, null, null, 10)
+        );
+
+        $this->assertStringNotContainsString('LIMIT :limit', $sql);
+        $this->assertStringNotContainsString('OFFSET :offset', $sql);
+    }
+
     public function testFilteredSessionCountRequiresChildLog(): void
     {
         $sql = $this->capturePreparedSql(

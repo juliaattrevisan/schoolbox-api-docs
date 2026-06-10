@@ -167,7 +167,7 @@ class Mapper extends BaseMapper
         [$where, $params] = $this->buildSessionFilter($keyword, $feature, $user, $start, $end);
 
         $limitSql  = null !== $limit ? 'LIMIT :limit' : '';
-        $offsetSql = null !== $offset ? 'OFFSET :offset' : '';
+        $offsetSql = null !== $limit && null !== $offset ? 'OFFSET :offset' : '';
 
         // The admin list emits a details route for each session, and that route
         // preloads the first ai_session_log row. Requiring firstLog here keeps
@@ -201,7 +201,7 @@ class Mapper extends BaseMapper
         if (null !== $limit) {
             $statement->bindValue('limit', $limit, \PDO::PARAM_INT);
         }
-        if (null !== $offset) {
+        if (null !== $limit && null !== $offset) {
             $statement->bindValue('offset', $offset, \PDO::PARAM_INT);
         }
         $statement->execute();
