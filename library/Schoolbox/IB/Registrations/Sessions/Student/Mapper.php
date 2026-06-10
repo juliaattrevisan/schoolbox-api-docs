@@ -59,6 +59,8 @@ class Mapper extends BaseMapper
         $this->uses('subject_confirmed', self::TYPE_BOOLEAN, null, 'subjectConfirmed');
         $this->uses('subject_confirmed_at', self::TYPE_DATETIME, null, 'subjectConfirmedAt');
         $this->joins('subject_confirmed_by', UserMapper::class, 'id', null, null, 'subjectConfirmedBy', 'subjectConfirmedBy');
+        $this->uses('manually_registered_at', self::TYPE_DATETIME, null, 'manuallyRegisteredAt');
+        $this->joins('manually_registered_by', UserMapper::class, 'id', null, null, 'manuallyRegisteredBy', 'manuallyRegisteredBy');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
     }
@@ -79,7 +81,8 @@ class Mapper extends BaseMapper
                    {$this->getJoinColumnString('registrationSession.deletedBy', 'ud')},
                    {$this->getJoinColumnString('user', 'u')},
                    {$this->getJoinColumnString('candidateConfirmedBy', 'ucc')},
-                   {$this->getJoinColumnString('subjectConfirmedBy', 'usc')}
+                   {$this->getJoinColumnString('subjectConfirmedBy', 'usc')},
+                   {$this->getJoinColumnString('manuallyRegisteredBy', 'umrb')}
         ";
     }
 
@@ -100,6 +103,7 @@ class Mapper extends BaseMapper
             INNER JOIN {$this->getJoinSql('user', '', 'u')}
             LEFT JOIN {$this->getJoinSql('candidateConfirmedBy', '', 'ucc')}
             LEFT JOIN {$this->getJoinSql('subjectConfirmedBy', '', 'usc')}
+            LEFT JOIN {$this->getJoinSql('manuallyRegisteredBy', '', 'umrb')}
         ";
     }
 
@@ -119,6 +123,8 @@ class Mapper extends BaseMapper
         $candidateConfirmedByMapper = $this->getJoinMapper('candidateConfirmedBy');
         /** @var UserMapper $subjectConfirmedByMapper */
         $subjectConfirmedByMapper = $this->getJoinMapper('subjectConfirmedBy');
+        /** @var UserMapper $manuallyRegisteredByMapper */
+        $manuallyRegisteredByMapper = $this->getJoinMapper('manuallyRegisteredBy');
         $students = $this->createCollection();
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
@@ -175,6 +181,12 @@ class Mapper extends BaseMapper
 
                 if ($subjectConfirmedBy) {
                     $student->setSubjectConfirmedBy($subjectConfirmedBy);
+                }
+
+                $manuallyRegisteredBy = $manuallyRegisteredByMapper->hydrate($row, 'umrb');
+
+                if ($manuallyRegisteredBy) {
+                    $student->setManuallyRegisteredBy($manuallyRegisteredBy);
                 }
 
                 $students[$student->getId()] = $student;
