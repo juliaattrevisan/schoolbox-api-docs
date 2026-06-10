@@ -32,6 +32,13 @@ class Csv extends AbstractCSV
 
 
     /**
+     * These two nodes also exist in a similar manner: we choose one over the other depending on a ui selection.
+     */
+    private const string NODE_HUMAN_READABLE = 'humanReadableMark';
+    private const string NODE_DESCRIPTOR_TEXT = 'selectedDescriptorText';
+
+
+    /**
      * A placeholder text used in the Overall Marks section in the assessment column.
      */
     private const string COLUMN_OVERALL = '(overall)';
@@ -52,12 +59,19 @@ class Csv extends AbstractCSV
 
 
     /**
-     * Which data struct node to access depending on the Show Drafts section.
+     * Which data struct node to access depending on the Show Drafts selection.
      * This selection is constant throughout runtime; you can't swap them on a whim
      *
      * @var string
      */
     private string $node;
+
+
+    /**
+     * Which mark node to access in a data struct depending on the Descriptors Only selection.
+     * This selection is constant throughout runtime; you can't swap them on a whim
+     */
+    private string $markNode;
 
 
     /**
@@ -77,14 +91,26 @@ class Csv extends AbstractCSV
         private array $studentMarks,
         private array $overallMarks,
         private Translator $translator,
-        private bool $descriptorsOnly,
+        bool $descriptorsOnly,
         bool $showDrafts
     ) {
         $this->capabilityMarkColumn = $this->translator->translateSentence('({:rubricGroup} mark)');
 
         /* Decide whether we're using Draft node or Published mark nodes.
          */
-        $this->node = $this->nodeSelector($showDrafts);
+        $this->node = self::NODE_PUBLISHED;
+
+        if ($showDrafts) {
+            $this->node = self::NODE_DRAFT;
+        }
+
+        /* Decide whether we're showing descriptor text or human-readable nodes.
+         */
+        $this->markNode = self::NODE_HUMAN_READABLE;
+
+        if ($descriptorsOnly) {
+            $this->markNode = self::NODE_DESCRIPTOR_TEXT;
+        }
     }
 
 
@@ -211,15 +237,7 @@ class Csv extends AbstractCSV
                     if (isset($exclusions[$assessmentId][$studentId])) {
                         $val = self::COLUMN_EXCLUDED;
                     } else {
-                        $subnode = $studentData['gridData'][$assessmentId][$rubricInstanceId]['capabilities'][$capabilityId][$this->node] ?? null;
-
-                        /* Show the text of the selected descriptor instead of its human-readable mark
-                         */
-                        if ($this->descriptorsOnly) {
-                            $val = $subnode['selectedDescriptorText'] ?? null;
-                        } else {
-                            $val = $subnode['humanReadableMark'] ?? null;
-                        }
+                        $val = $studentData['gridData'][$assessmentId][$rubricInstanceId]['capabilities'][$capabilityId][$this->node][$this->markNode] ?? null;
                     }
 
                     /* Add this random char because of microsoft sinfulness
@@ -255,15 +273,7 @@ class Csv extends AbstractCSV
                     if (isset($exclusions[$assessmentId][$studentId])) {
                         $val = self::COLUMN_EXCLUDED;
                     } else {
-                        $subnode = $studentData['gridData'][$assessmentId][$rubricInstanceId]['capabilities'][$capabilityId]['indicators'][$indicatorId][$this->node] ?? null;
-
-                        /* Show the text of the selected descriptor instead of its human-readable mark
-                         */
-                        if ($this->descriptorsOnly) {
-                            $val = $subnode['selectedDescriptorText'] ?? null;
-                        } else {
-                            $val = $subnode['humanReadableMark'] ?? null;
-                        }
+                        $val = $studentData['gridData'][$assessmentId][$rubricInstanceId]['capabilities'][$capabilityId]['indicators'][$indicatorId][$this->node][$this->markNode] ?? null;
                     }
 
                     $marks[] = $this->mark($val);
