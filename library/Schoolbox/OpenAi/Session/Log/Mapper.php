@@ -52,7 +52,6 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
     }
 
-
     /**
      * @inheritDoc
      *
@@ -69,7 +68,6 @@ class Mapper extends BaseMapper
         ";
     }
 
-
     /**
      * @inheritDoc
      *
@@ -82,7 +80,6 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('user', '', 'u', true)}
         ";
     }
-
 
     /**
      * @inheritDoc

@@ -42,7 +42,6 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
     }
 
-
     /**
      * Find the session for a caller-supplied UUID, or create it if absent.
      *
@@ -75,7 +74,6 @@ class Mapper extends BaseMapper
         return $this->findById($id);
     }
 
-
     /**
      * @inheritDoc
      *
@@ -92,7 +90,6 @@ class Mapper extends BaseMapper
         ";
     }
 
-
     /**
      * @inheritDoc
      *
@@ -105,7 +102,6 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('user', '', 'u', true)}
         ";
     }
-
 
     /**
      * @inheritDoc
@@ -138,7 +134,6 @@ class Mapper extends BaseMapper
 
         return $collection;
     }
-
 
     /**
      * Fetch a page of sessions for the admin usage log, newest first.
@@ -227,7 +222,6 @@ class Mapper extends BaseMapper
         return $collection;
     }
 
-
     /**
      * Count all sessions matching the same filters, ignoring limit/offset.
      *
@@ -258,7 +252,6 @@ class Mapper extends BaseMapper
 
         return (int)$statement->fetchColumn();
     }
-
 
     /**
      * Build the shared WHERE clause and bound params for the session list/count.
