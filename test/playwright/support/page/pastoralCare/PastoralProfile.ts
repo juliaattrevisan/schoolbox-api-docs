@@ -122,10 +122,21 @@ export default class PastoralProfile {
     }
 
     /**
-     * click post comment button
+     * Expects the current pastoral record count.
+     * @param count - The expected number of visible pastoral records
+     */
+    async expectRecordCount(count: number): Promise<void> {
+        await expect(this.page.getByTestId(PastoralProfile.DATA_TEST_PASTORAL_RECORDS)).toHaveCount(count);
+    }
+
+    /**
+     * click show archived records toggle
      */
     async clickShowArchivedRecordsToggle(): Promise<void> {
-        await this.page.getByTestId(PastoralProfile.DATA_TEST_SHOW_ARCHIVED_RECORDS_TOGGLE).click();
+        await Promise.all([
+            this.page.waitForURL(/showArchived=1/),
+            this.page.getByTestId(PastoralProfile.DATA_TEST_SHOW_ARCHIVED_RECORDS_TOGGLE).click(),
+        ]);
     }
 
     /**
