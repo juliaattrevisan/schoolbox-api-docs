@@ -10,10 +10,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Config\API;
 
-use Alaress\Authorizer\Authorizer;
-use Alaress\Web\Controller\Base;
-use Aura\Router\Generator;
+use Alaress\Module\Cache\Rebuilder;
+use Alaress\Web\Controller\ConfigController;
 use Crell\ApiProblem\ApiProblem;
+use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\API\Token\JwtParser\InstanceRegistryIssued;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -21,20 +21,25 @@ use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
 
-class Controller extends Base
+class Controller extends ConfigController
 {
     /**
      * Controller constructor.
      *
      * @param ConfigMapper $configMapper
-     * @param InstanceRegistryIssued $jwtParser
      * @param FieldStrategyFactory $fieldStrategyFactory
+     * @param Rebuilder $rebuilder
+     * @param CacheInterface $oidcCache
+     * @param InstanceRegistryIssued $jwtParser
      */
     public function __construct(
-        private readonly ConfigMapper $configMapper,
-        private readonly InstanceRegistryIssued $jwtParser,
-        private readonly FieldStrategyFactory $fieldStrategyFactory
+        ConfigMapper $configMapper,
+        FieldStrategyFactory $fieldStrategyFactory,
+        Rebuilder $rebuilder,
+        CacheInterface $oidcCache,
+        private readonly InstanceRegistryIssued $jwtParser
     ) {
+        parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder, $oidcCache);
     }
 
 
@@ -88,10 +93,17 @@ class Controller extends Base
             return;
         }
 
-        // Validate and serialize the config value
         try {
-            $serializedValue = AuthorizationHelper::validateAndSerializeConfigValue($data['value'], $config, $this->fieldStrategyFactory);
-            $config->setValue($serializedValue);
+            $this->updateConfig(
+                [$config->getName() => $data['value']],
+                $this->getConfigMapper()->getPredicateBuilder()->equals(ConfigMapper::COL_NAME, $config->getName()),
+            );
+
+            /* Re-fetch the config to get the updated value and ensure validation is applied, this might be acceptable so won't change the
+             * updateConfig method to return the updated config, as it would require changing the existing method signature and potentially
+             *  affect other parts of the codebase that use it.
+             */
+            $config = $this->getConfigMapper()->findOneByColumn(ConfigMapper::COL_NAME, $config->getName());
         } catch (\UnexpectedValueException $e) {
             $problem = (new ApiProblem('Validation error: ' . $e->getMessage(), 'Validation Failed'))
                 ->setStatus(400)
@@ -99,10 +111,6 @@ class Controller extends Base
             $this->response = $this->responseAsJson($problem)
                                    ->withStatus(400);
             return;
-        }
-
-        try {
-            $this->configMapper->save($config);
         } catch (Exception $e) {
             $problem = (new ApiProblem($e->getMessage()))
                 ->setStatus(400)
@@ -157,7 +165,7 @@ class Controller extends Base
                 continue;
             }
             try {
-                $config = $this->configMapper->findOneByColumn('name', $configData['name']);
+                $config = $this->getConfigMapper()->findOneByColumn(ConfigMapper::COL_NAME, $configData['name']);
 
                 // Check if user can edit this config
                 $serverParams = $this->request->getServerParams();
@@ -168,18 +176,23 @@ class Controller extends Base
                     continue;
                 }
 
-                // Validate and serialize the config value
                 try {
-                    $serializedValue = AuthorizationHelper::validateAndSerializeConfigValue($configData['value'], $config, $this->fieldStrategyFactory);
-                    $config->setValue($serializedValue);
+                    $this->updateConfig(
+                        [$config->getName() => $configData['value']],
+                        $this->getConfigMapper()->getPredicateBuilder()->equals(ConfigMapper::COL_NAME, $config->getName()),
+                    );
+
+                    /* Re-fetch the config to get the updated value and ensure validation is applied, this might be acceptable so won't change the
+                     * updateConfig method to return the updated config, as it would require changing the existing method signature and potentially
+                     *  affect other parts of the codebase that use it.
+                     */
+                    $config = $this->getConfigMapper()->findOneByColumn(ConfigMapper::COL_NAME, $config->getName());
                 } catch (\UnexpectedValueException $e) {
                     $errors[] = "Validation error for config '{$configData['name']}': " . $e->getMessage();
                     $result['error'] = "Validation error for config '{$configData['name']}': " . $e->getMessage();
                     $results[] = $result;
                     continue;
                 }
-
-                $this->configMapper->save($config);
 
                 $result = AuthorizationHelper::configToArray($config);
                 $result['status'] = 'success';
@@ -212,11 +225,11 @@ class Controller extends Base
     public function apiSitePackageGet(): void
     {
         try {
-            $config = $this->configMapper->findOneByColumn('name', 'site_package');
+            $config = $this->getConfigMapper()->findOneByColumn(ConfigMapper::COL_NAME, ConfigMapper::NAME_SITE_PACKAGE);
 
             // Return only the value for this specific endpoint
             $this->response = $this->responseAsJson([
-                'name' => 'site_package',
+                'name' => ConfigMapper::NAME_SITE_PACKAGE,
                 'value' => $config->getValue()
             ]);
         } catch (\Schoolbox\Mapper\Exception $e) {

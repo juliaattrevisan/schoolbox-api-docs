@@ -66,8 +66,10 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(ConfigMapper::class),
-            $this->createInstanceRegistryJwtParser(),
-            $this->createFieldStrategyFactory()
+            $this->createFieldStrategyFactory(),
+            $this->injector->get('moduleCache.rebuilder'),
+            $this->injector->get('oidc.cache'),
+            $this->createInstanceRegistryJwtParser()
         );
     }
 
