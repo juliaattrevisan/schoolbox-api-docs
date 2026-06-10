@@ -117,19 +117,6 @@ class Csv extends AbstractCSV
     }
 
 
-//    /**
-//     * TEMP for development only; remove when finished
-//     * TODO remove this method
-//     *
-//     * @param string $filename
-//     */
-//    protected function initExport(string $filename): void
-//    {
-//        // set the output headers
-//        $this->fp = fopen("php://output", 'w');
-//    }
-
-
     /**
      * Export the header row for this CSV.
      *
@@ -220,7 +207,9 @@ class Csv extends AbstractCSV
                         $val = $subnode['humanReadableMark'] ?? null;
                     }
 
-                    $marks[] = $val;
+                    /* Add this random char because of microsoft sinfulness
+                     */
+                    $marks[] = self::EXCEL_PREFIX . $val;
                 }
 
                 /* The first arg to this method is the "headings" but it actually corresponds to the columns prior, that
@@ -255,7 +244,9 @@ class Csv extends AbstractCSV
                         $val = $subnode['humanReadableMark'] ?? null;
                     }
 
-                    $marks[] = $val;
+                    /* Add this random char because of microsoft sinfulness
+                     */
+                    $marks[] = self::EXCEL_PREFIX . $val;
                 }
 
                 $this->exportRow([
@@ -285,7 +276,11 @@ class Csv extends AbstractCSV
             $marks = [];
 
             foreach ($this->studentMarks as $studentId => $studentData) {
-                $marks[] = $this->overallMarks[$capabilityId]['students'][$studentId][$this->node]['humanReadableMark'] ?? null;
+                $val = $this->overallMarks[$capabilityId]['students'][$studentId][$this->node]['humanReadableMark'] ?? null;
+
+                /* Add this random char because of microsoft sinfulness
+                 */
+                $marks[] = self::EXCEL_PREFIX . $val;
             }
 
             /* The first arg to this method is the "headings" but it actually corresponds to the columns prior, that
@@ -314,7 +309,11 @@ class Csv extends AbstractCSV
                 $marks = [];
 
                 foreach ($this->studentMarks as $studentId => $studentData) {
-                    $marks[] = $this->overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId][$this->node]['humanReadableMark'] ?? null;
+                    $val = $this->overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId][$this->node]['humanReadableMark'] ?? null;
+
+                    /* Add this random char because of microsoft sinfulness
+                     */
+                    $marks[] = self::EXCEL_PREFIX . $val;
                 }
 
                 $this->exportRow([
