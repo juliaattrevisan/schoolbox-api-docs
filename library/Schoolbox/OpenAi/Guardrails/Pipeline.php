@@ -36,6 +36,8 @@ class Pipeline
      */
     private GenericCollection $inputChecks;
 
+    private const int HTTP_STATUS_CODE_OK = 200;
+
     // TODO: Output checks?
 
     /**
@@ -96,6 +98,9 @@ class Pipeline
                 $this->client->saveLog($log);
                 throw $e;
             }
+
+            // Note $check->check() can modify $log, so $log might have a return code already set.
+            $log->setReturnCode($log->getReturnCode() ?? self::HTTP_STATUS_CODE_OK);
 
             $this->client->saveLog($log);
         }
