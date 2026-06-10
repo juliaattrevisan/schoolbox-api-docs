@@ -61,7 +61,7 @@
                         participant: participant,
                     } %}
                 {% elseif currentInteraction is feedback %}
-                    {% set hasCollapser = currentInteraction.allFiles.count or currentInteraction.comment | length > 0 or currentInteraction.rubricMarkedGrid %}
+                    {% set hasCollapser = currentInteraction.allFiles.count or currentInteraction.comment | length > 0 or currentInteraction.rubricMarkedGrids.count %}
                     {% include '@learningAssessment/dueWork/summary/interaction/feedback.twig' with {
                         currentFeedback: currentInteraction,
                         participant: participant,
