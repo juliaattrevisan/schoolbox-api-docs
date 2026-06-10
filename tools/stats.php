@@ -421,24 +421,24 @@ $app = new class extends CliTool\App {
             'whats_new_completed' => 'SELECT COUNT(*) FROM tour_status INNER JOIN tour ON tour_status.tour_uuid = tour.uuid WHERE tour.title like "%Release" AND tour.deleted_at IS NULL AND tour_status.status = "' . Schoolbox\Tour\Status\Model::STATUS_COMPLETED . '"',
 
             //AI Usage
-            'openai_success'    => 'SELECT COUNT(*) FROM openai_log WHERE return_code = 200',
-            'openai_error'      => 'SELECT COUNT(*) FROM openai_log WHERE return_code != 200',
-            'openai_input_tokens' => 'SELECT SUM(input_tokens) FROM openai_log WHERE return_code = 200',
-            'openai_output_tokens' => 'SELECT SUM(output_tokens) FROM openai_log WHERE return_code = 200',
-            'openai_tokens' => 'SELECT SUM(output_tokens) + SUM(input_tokens) FROM openai_log WHERE return_code = 200',
+            'openai_success'    => 'SELECT COUNT(*) FROM ai_session_log WHERE return_code = 200',
+            'openai_error'      => 'SELECT COUNT(*) FROM ai_session_log WHERE return_code != 200',
+            'openai_input_tokens' => 'SELECT SUM(input_tokens) FROM ai_session_log WHERE return_code = 200',
+            'openai_output_tokens' => 'SELECT SUM(output_tokens) FROM ai_session_log WHERE return_code = 200',
+            'openai_tokens' => 'SELECT SUM(output_tokens) + SUM(input_tokens) FROM ai_session_log WHERE return_code = 200',
 
             //image tokens
-            'openai_input_tokens_image' => 'SELECT SUM(input_tokens) FROM openai_log WHERE return_code = 200 AND feature = "image"',
-            'openai_output_tokens_image' => 'SELECT SUM(output_tokens) FROM openai_log WHERE return_code = 200 AND feature = "image"',
-            'openai_tokens_image' => 'SELECT SUM(output_tokens) + SUM(input_tokens) FROM openai_log WHERE return_code = 200 AND feature = "image"',
+            'openai_input_tokens_image' => 'SELECT SUM(input_tokens) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE return_code = 200 AND s.feature = "image"',
+            'openai_output_tokens_image' => 'SELECT SUM(output_tokens) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE return_code = 200 AND s.feature = "image"',
+            'openai_tokens_image' => 'SELECT SUM(output_tokens) + SUM(input_tokens) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE return_code = 200 AND s.feature = "image"',
 
             // AI feature usage
-            'openai_chat' => "SELECT count(*) FROM openai_log WHERE feature = 'chat'",
-            'openai_lessonplan' => "SELECT count(*) FROM openai_log WHERE feature = 'lessonplan'",
-            'openai_image' => "SELECT count(*) FROM openai_log WHERE feature = 'image'",
-            'openai_differentiation' => "SELECT count(*) FROM openai_log WHERE feature = 'differentiation'",
-            'openai_dialogagent' => "SELECT count(*) FROM openai_log WHERE feature = 'dialogagent'",
-            'openai_learning_customisation' => "SELECT count(*) FROM openai_log WHERE feature = 'learningactivitycustomisation'",
+            'openai_chat' => "SELECT count(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'chat'",
+            'openai_lessonplan' => "SELECT count(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'lessonplan'",
+            'openai_image' => "SELECT count(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'image'",
+            'openai_differentiation' => "SELECT count(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'differentiation'",
+            'openai_dialogagent' => "SELECT count(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'dialogagent'",
+            'openai_learning_customisation' => "SELECT count(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'learningactivitycustomisation'",
 
             //Packages
             'package_installed' => 'SELECT COUNT(*) FROM package WHERE installed = 1',
@@ -468,27 +468,27 @@ $app = new class extends CliTool\App {
             }
 
             $queryList['openai_model_' . $model] = [
-                "SELECT COUNT(*) FROM openai_log WHERE " . implode(' AND ', $queryParts),
+                "SELECT COUNT(*) FROM ai_session_log WHERE " . implode(' AND ', $queryParts),
                 $queryParams,
             ];
         }
 
         // Build the unknown model query
         $queryList['openai_model_unknown'] = [
-            "SELECT COUNT(*) FROM openai_log WHERE " . implode(' AND ', array_map(fn ($model) => 'model NOT LIKE ?', OpenAiConfig::AI_MODELS)),
+            "SELECT COUNT(*) FROM ai_session_log WHERE " . implode(' AND ', array_map(fn ($model) => 'model NOT LIKE ?', OpenAiConfig::AI_MODELS)),
             array_map(fn ($model) => $model . '%', OpenAiConfig::AI_MODELS),
         ];
 
         // Query image model usage
         foreach (OpenAiConfig::AI_IMAGE_MODELS as $imageModel) {
             $queryList['openai_image_model_' . $imageModel] = [
-                "SELECT COUNT(*) FROM openai_log WHERE feature = 'image' AND JSON_VALUE(prompt, '$.tools[0].model') = ?",
+                "SELECT COUNT(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'image' AND JSON_VALUE(prompt, '$.tools[0].model') = ?",
                 [$imageModel],
             ];
         }
         $queryList['openai_image_model_unknown'] = [
             sprintf(
-                "SELECT COUNT(*) FROM openai_log WHERE feature = 'image' AND COALESCE(JSON_VALUE(prompt, '$.tools[0].model'), '') NOT IN (%s)",
+                "SELECT COUNT(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'image' AND COALESCE(JSON_VALUE(prompt, '$.tools[0].model'), '') NOT IN (%s)",
                 implode(',', array_fill(0, count(OpenAiConfig::AI_IMAGE_MODELS), '?')),
             ),
             OpenAiConfig::AI_IMAGE_MODELS,
