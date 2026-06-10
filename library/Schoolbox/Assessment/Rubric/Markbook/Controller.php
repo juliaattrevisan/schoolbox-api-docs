@@ -148,25 +148,30 @@ class Controller extends Base
             $overallMarks
         ] = $this->buildMarkbookData($folder, $queryArgs, $assessmentIds);
 
+        /* Optional params from the frontend. The Show Drafts checkbox state is obeyed.
+         */
+        $showDrafts = (bool)($queryArgs['showDrafts'] ?? false);
+        $descriptorsOnly = (bool)($queryArgs['descriptorsOnly'] ?? false);
+
         $csv = new Export\Csv(
             $assessments,
             $exclusions,
             $studentMarks,
             $overallMarks,
             $this->translator,
-            empty($queryArgs['descriptorsOnly']),
-        );
-
-        $showDrafts = (bool)($queryArgs['showDrafts'] ?? false);
-
-        $csv->export(
-            sprintf(
-                '%s%s - Rubric Markbook.csv',
-                $showDrafts ? 'Draft - ' : '',
-                $folder->getNameWithCodes()
-            ),
+            $descriptorsOnly,
             $showDrafts,
         );
+
+        /* TODO replace with the Filename Codec usage which for some reason I can't find in this branch
+         */
+        $filename = sprintf(
+            '%s%s - Rubric Markbook.csv',
+            $showDrafts ? 'Draft - ' : '',
+            $folder->getNameWithCodes()
+        );
+
+        $csv->export($filename);
 
         exit;
     }

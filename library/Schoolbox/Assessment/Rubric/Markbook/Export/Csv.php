@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Markbook\Export;
 
+use DebugBar\DebugBarException;
 use Schoolbox\L10n\RosettaStone as Translator;
 use Schoolbox\Learning\Markbook\AbstractCSV;
 
@@ -18,6 +19,19 @@ use Schoolbox\Learning\Markbook\AbstractCSV;
 class Csv extends AbstractCSV
 {
     /**
+     * These two nodes exist in $studentMarks to symmetrical segregate each kind of mark data.
+     *
+     * Note that there's also a Reasoning node if you needed to dig down into individual calculations here, but I doubt
+     * anyone would ever want to do that in this particular usage.
+     *
+     * TODO Move this const to a more global space and share its usage: "published" and "draft" have hardcoded usages
+     *  throughout the entire Rubric Markbook controller atm
+     */
+    private const string NODE_PUBLISHED = 'published';
+    private const string NODE_DRAFT = 'draft';
+
+
+    /**
      * Constructor
      *
      * @param array $assessments A set of assessment data structs containing the cap/ind structure
@@ -26,6 +40,7 @@ class Csv extends AbstractCSV
      * @param array $overallMarks Each student's weighted aggregated overall value for each capability and indicator
      * @param Translator $translator For localising terminology
      * @param bool $descriptorsOnly A bool that determines whether human readable marks show, or whether descriptor text shows
+     * @param bool $showDrafts A bool that determines (if true) that we show draft marks; otherwise, shows published marks
      */
     public function __construct(
         private array $assessments,
@@ -33,7 +48,8 @@ class Csv extends AbstractCSV
         private array $studentMarks,
         private array $overallMarks,
         private Translator $translator,
-        private bool $descriptorsOnly
+        private bool $descriptorsOnly,
+        private bool $showDrafts
     ) {
     }
 
@@ -45,11 +61,26 @@ class Csv extends AbstractCSV
      * @param bool   $showDrafts Should draft marks be shown in the export?
      * @return void
      */
-    public function export(string $filename, bool $showDrafts): void
+    public function export(string $filename): void
     {
         $this->initExport($filename);
 
         $this->exportHeader();
+
+        foreach ($this->assessments as $assessmentId => $assessmentData) {
+            foreach ($assessmentData['gridData'] as $rubricInstanceId => $rubricInstanceData) {
+                $this->exportGrid(
+                    (int)$assessmentId,
+                    $assessmentData,
+                    (int)$rubricInstanceId,
+                    $rubricInstanceData,
+                    /* Decide whether we're using Draft node or Published mark nodes.
+                     */
+                    $this->nodeSelector()
+                );
+            }
+        }
+
 //        foreach ($this->assessments as $assessmentId => $assessment) {
 //            $this->exportAssessment($assessmentId, $assessment, $showDrafts);
 //        }
@@ -59,17 +90,17 @@ class Csv extends AbstractCSV
     }
 
 
-    /**
-     * TEMP for development only; remove when finished
-     * TODO remove this method
-     *
-     * @param string $filename
-     */
-    protected function initExport(string $filename): void
-    {
-        // set the output headers
-        $this->fp = fopen("php://output", 'w');
-    }
+//    /**
+//     * TEMP for development only; remove when finished
+//     * TODO remove this method
+//     *
+//     * @param string $filename
+//     */
+//    protected function initExport(string $filename): void
+//    {
+//        // set the output headers
+//        $this->fp = fopen("php://output", 'w');
+//    }
 
 
     /**
@@ -120,6 +151,68 @@ class Csv extends AbstractCSV
             $student['lastname'] ?? '',
             $student['firstname'] ?? ''
         ]));
+    }
+
+
+    /**
+     * Export a particular grid for a given $rubricInstanceData struct, with each student's individual output
+     *
+     * @param int $assessmentId
+     * @param array $assessmentData
+     * @param int $rubricInstanceId
+     * @param array $rubricInstanceData
+     * @param string $node
+     * @return void
+     */
+    private function exportGrid(
+        int $assessmentId,
+        array $assessmentData,
+        int $rubricInstanceId,
+        array $rubricInstanceData,
+        string $node,
+    ): void {
+//        new \Alaress_Probe($assessmentId, $rubricInstanceData, $this->studentMarks);
+
+        /* Send out each grid's capability/indicator combos for each student.
+         */
+        foreach ($rubricInstanceData['capabilities'] as $capabilityId => $capabilityData) {
+            foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
+                $marks = [];
+
+                foreach ($this->studentMarks as $studentId => $studentData) {
+                    $marks[] = $studentData['gridData'][$assessmentId][$rubricInstanceId]['capabilities'][$capabilityId]['indicators'][$indicatorId][$node]['humanReadableMark'] ?? null;
+                }
+
+                /* The first arg to this method is the "headings" but it actually corresponds to the columns prior, that
+                 * actually contain the assessment/rubric/cap/indicator titles that are the same for each student (kind
+                 * of like a struct "prefix")
+                 *
+                 * Internally this simply array_merge()'s the two args anyway.
+                 */
+                $this->exportRow([
+                    $assessmentData['name'],
+                    $rubricInstanceData['title'],
+                    $capabilityData['name'],
+                    $indicatorData['name'],
+                ], $marks);
+            }
+        }
+    }
+
+
+    /**
+     * Decides whether we're accessing the Published marks node or the Draft marks node based on the $showDrafts bool.
+     * The $studentMarks data struct is built symmetrically so it's an easy toggle to use.
+     *
+     * @return string
+     */
+    private function nodeSelector(): string
+    {
+        if ($this->showDrafts) {
+            return self::NODE_DRAFT;
+        }
+
+        return self::NODE_PUBLISHED;
     }
 
 
