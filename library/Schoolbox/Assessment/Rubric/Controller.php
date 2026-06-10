@@ -429,7 +429,7 @@ class Controller extends BaseController
          */
         $rubricInstance = $this->rubricInstanceMapper->createModel()
             ->setId(null) // Yep, that's a null right there
-            ->setTitle($rubric['title'])
+            ->setTitle(trim($rubric['title']))
             ->setCapabilityMarkType($markType)
             ->setCapabilityGradeGroup($gradeGroup)
             ->setMarkedUsingRange($rubric['useMarkRange'] ?? false);
