@@ -144,6 +144,7 @@ class Mapper extends BaseMapper
      * Filters: keyword (matched against the logs' prompt/response via EXISTS),
      * feature, creating user, and created_at date range. logFormat/returnCode are
      * derived from each session's first log (earliest created_at, then id).
+     * This is a summary hint for the admin list, not a guarantee that every log in the session has this format.
      *
      * @param string|null               $keyword
      * @param string|null               $feature

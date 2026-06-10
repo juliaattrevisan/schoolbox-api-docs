@@ -84,7 +84,9 @@ class Pipeline
                 $this->user,
                 $this->feature,
                 $this->sessionId,
-                LogFormat::GUARDRAIL, // TODO: this might fool the usage log into thinking the whole session is a guardrail format?
+                // Guardrail logs share the conversation session, so session summaries can derive "guardrail"
+                // even when later logs in the same session are "agent_chat".
+                LogFormat::GUARDRAIL,
             );
 
             $outcome = $check->check($inputText, $log);

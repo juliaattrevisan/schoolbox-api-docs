@@ -76,6 +76,7 @@ const selectedSessionInfo = window.Vue.computed<AiSelectedSessionInfo | AiSelect
     // TODO: properly support sessions with multiple log formats, for now just filter out invalid logs
     const filteredLog = logInfo.filter((entry) => entry.logFormat !== null && entry.data !== null);
 
+    // sessionInfo.logFormat only selects the renderer; the renderer interprets each entry's own logFormat.
     const info = { logFormat: sessionInfo.logFormat, session: sessionInfo, log: filteredLog };
     return info satisfies Record<keyof AiSelectedSessionInfo, unknown> as AiSelectedSessionInfo;
 });
