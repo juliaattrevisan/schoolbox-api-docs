@@ -1433,6 +1433,11 @@ class Controller extends Base
                              */
                             if (null !== $val) {
                                 $overallMarks[$capabilityId]['students'][$studentId]['published']['normalisedMark'] += $val;
+
+                                /* TODO You could compound $val's diagnostic here if you wanted to expose it on the frontend as a tooltip or something
+                                 *  because debugging this in prod will not be easy without being able to see the math behind it.
+                                 *  $overallMarks[$capabilityId]['students'][$studentId]['published']['reasoning'][] = $val
+                                 */
                             }
 
                             /* Draft capability mark for this student
@@ -1458,6 +1463,11 @@ class Controller extends Base
                              */
                             if (null !== $val) {
                                 $overallMarks[$capabilityId]['students'][$studentId]['draft']['normalisedMark'] += $val;
+
+                                /* TODO You could compound $val's diagnostic here if you wanted to expose it on the frontend as a tooltip or something
+                                 *  because debugging this in prod will not be easy without being able to see the math behind it.
+                                 *  $overallMarks[$capabilityId]['students'][$studentId]['draft']['reasoning'][] = $val
+                                 */
                             }
                         }
 
@@ -1504,6 +1514,11 @@ class Controller extends Base
                                  */
                                 if (null !== $val) {
                                     $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['published']['normalisedMark'] += $val;
+
+                                    /* TODO You could compound $val's diagnostic here if you wanted to expose it on the frontend as a tooltip or something
+                                     *  because debugging this in prod will not be easy without being able to see the math behind it.
+                                     *  $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['published']['reasoning'][] = $val
+                                     */
                                 }
 
                                 /* Draft indicator mark for this student
@@ -1529,6 +1544,11 @@ class Controller extends Base
                                  */
                                 if (null !== $val) {
                                     $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['draft']['normalisedMark'] += $val;
+
+                                    /* TODO You could compound $val's diagnostic here if you wanted to expose it on the frontend as a tooltip or something
+                                     *  because debugging this in prod will not be easy without being able to see the math behind it.
+                                     *  $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['draft']['reasoning'][] = $val;
+                                     */
                                 }
                             }
                         }
