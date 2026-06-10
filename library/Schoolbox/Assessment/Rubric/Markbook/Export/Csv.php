@@ -47,47 +47,76 @@ class Csv extends AbstractCSV
      */
     public function export(string $filename, bool $showDrafts): void
     {
-//        $this->initExport($filename);
-//
-//        $this->exportHeader();
+        $this->initExport($filename);
+
+        $this->exportHeader();
 //        foreach ($this->assessments as $assessmentId => $assessment) {
 //            $this->exportAssessment($assessmentId, $assessment, $showDrafts);
 //        }
 //        $this->exportOverallMarks($showDrafts);
 //
-//        $this->closeExport();
+        $this->closeExport();
     }
 
-//
-//    /**
-//     * Helper for exporting a student's name.
-//     *
-//     * @param array $student
-//     * @return string
-//     */
-//    private function exportStudentName(array $student): string
-//    {
-//        $nameParts = [$student['lastname'] ?? '', $student['firstname'] ?? ''];
-//        return implode(', ', array_filter($nameParts));
-//    }
-//
-//
-//    /**
-//     * Export the header row for this CSV.
-//     */
-//    private function exportHeader(): void
-//    {
-//        $this->exportRow(
-//            [
-//                $this->translator->translate('assessment', false, true),
-//                $this->translator->translate('rubricGroup', false, true),
-//                $this->translator->translate('rubricCriterion', false, true),
-//            ],
-//            array_map(function ($student) {
-//                return $this->exportStudentName($student);
-//            }, $this->students)
-//        );
-//    }
+
+    /**
+     * TEMP for development only; remove when finished
+     * TODO remove this method
+     *
+     * @param string $filename
+     */
+    protected function initExport(string $filename): void
+    {
+        // set the output headers
+        $this->fp = fopen("php://output", 'w');
+    }
+
+
+    /**
+     * Export the header row for this CSV.
+     */
+    private function exportHeader(): void
+    {
+        $this->exportRow(
+            [
+                $this->translator->translate('assessment', false, true),
+                /* An assessment contains multiple grids; there isn't a terminology specifically for a rubric grid so
+                 * I'll just use the generic words for now
+                 */
+                'Rubric',
+                $this->translator->translate('rubricGroup', false, true),
+                $this->translator->translate('rubricCriterion', false, true),
+            ],
+            array_map(function ($student) {
+                return $this->exportStudentName($student);
+            }, $this->studentMarks)
+        );
+    }
+
+
+    /**
+     * Helper for exporting a student's name.
+     *
+     * @param array $student
+     * @return string
+     */
+    private function exportStudentName(array $student): string
+    {
+        /* Notably this doesn't care for a student's preferred name. There doesn't seem to be a particular convention
+         * when it comes to the significance of Preferred Names if extant; though I would expect we'd lean toward formal
+         * usage of Firstname for formal marky/reporty type stuff.
+         *
+         * TODO pump this into a User instance so you have access to the name formatting convenience methods, saving you
+         *  a re-derivation of the exact same usage
+         */
+        return implode(', ', array_filter([
+            $student['lastname'] ?? '',
+            $student['firstname'] ?? ''
+        ]));
+    }
+
+
+
 //
 //
 //    /**
