@@ -56,8 +56,8 @@ class Module extends BaseModule
          */
         $this->register('POST', '', 'postSearch', $isAdmin);
 
-        /* Load the details of a particular session_identifier which can consist of multiple rows in the
-         * openai_log table due to people resuming their ai session etc.
+        /* Load the details of a particular AI session, which can consist of multiple
+         * ai_session_log rows due to people resuming their AI session etc.
          */
         $this->register('GET', '/log/{sessionId}', 'getLog', $isAdmin, $preload);
     }
