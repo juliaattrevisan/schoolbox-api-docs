@@ -54,10 +54,12 @@ export type InProgressRow = {
 };
 
 /**
- * A student row used in the Registered section, extending StudentRow with an IB candidate number.
+ * A student row used in the Registered section, extending StudentRow with registration metadata.
  */
 export type RegisteredRow = StudentRow & {
-    ibCandidateNumber?: string;
+    ibCandidateNumber?: string | null;
+    manuallyRegisteredBy?: string | null;
+    manuallyRegisteredAt?: string | null;
 };
 
 // ---------------------------------------------------------------------------
@@ -94,8 +96,12 @@ export type ApiStudent = {
     userName: string;
     hasMissingDetails: boolean;
     missingFields: string[];
+    ibCandidateNumber: string | null;
+    manuallyRegisteredBy: string | null;
+    manuallyRegisteredAt: string | null;
     _routes: {
         updateLanguages: string | null;
+        manuallyRegister: string | null;
     };
     ibGroupSubjects: {
         HL: ApiSubject[];
@@ -120,6 +126,15 @@ export type ApiCandidatesResponse = {
     success: true;
     students: Record<string, ApiStudent[]>;
     statuses: ApiStatus[];
+};
+
+/**
+ * Raw response from the mark-as-manually-registered endpoint.
+ */
+export type ApiManuallyRegisterResponse = {
+    success: boolean;
+    registeredCount: number;
+    message?: string;
 };
 
 /**

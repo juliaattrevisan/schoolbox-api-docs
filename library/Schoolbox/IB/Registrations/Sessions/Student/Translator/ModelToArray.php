@@ -84,7 +84,10 @@ class ModelToArray
                 ],
                 $missingFields
             ),
-            'ibGroupSubjects' => $this->helper->buildIbGroupSubjects($student->getIbGroupSubjects()),
+            'ibGroupSubjects'           => $this->helper->buildIbGroupSubjects($student->getIbGroupSubjects()),
+            'ibCandidateNumber'         => $user?->getIbCandidateNumber(),
+            'manuallyRegisteredBy'      => $student->getManuallyRegisteredBy()?->getFullName(),
+            'manuallyRegisteredAt'      => $student->getManuallyRegisteredAt()?->toIso8601String(),
             'candidateConfirmed'   => $student->getCandidateConfirmed(),
             'subjectConfirmed'     => $student->getSubjectConfirmed(),
             'candidateConfirmedAt' => $student->getCandidateConfirmedAt()?->toIso8601String(),
