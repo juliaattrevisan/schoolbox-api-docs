@@ -14,6 +14,7 @@ use Schoolbox\OpenAi\Session\Feature;
 use Schoolbox\OpenAi\Session\Model;
 use Schoolbox\User;
 use TypeError;
+use ValueError;
 
 /**
  * Unit tests for the AI session {@see Model}.
@@ -40,6 +41,17 @@ class ModelTest extends TestCase
         $model->setFeature('chat');
 
         $this->assertSame('chat', $model->getFeature());
+    }
+
+    /**
+     * A plain string passed to setFeature must be a known Feature value.
+     */
+    public function testSetFeatureRejectsUnknownStringValue(): void
+    {
+        $model = new Model();
+
+        $this->expectException(ValueError::class);
+        $model->setFeature('unknown');
     }
 
     /**

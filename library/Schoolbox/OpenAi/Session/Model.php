@@ -102,6 +102,8 @@ class Model
     /**
      * Accepts either a {@see Feature} enum or its string value, and stores the string value.
      *
+     * @throws \ValueError If $feature is not a valid Feature value.
+     *
      * @param string|Feature $feature
      * @return $this
      */
@@ -109,7 +111,7 @@ class Model
     {
         $this->feature = $feature instanceof Feature
             ? $feature->value
-            : $feature;
+            : Feature::from($feature)->value;
 
         return $this;
     }
