@@ -239,6 +239,10 @@ SELECT
         lti_assessment.mark_visibility,
         reporting.mark_visibility
     )
+        WHEN 'staffOnly' THEN 'Staff Only'
+        WHEN 'staffAndStudent' THEN 'Staff & Student'
+        WHEN 'staffStudentAndParent' THEN 'Staff, Student & Parent'
+        WHEN 'staffAndParent' THEN 'Staff & Parent'
         WHEN 0 THEN 'Staff Only'
         WHEN 1 THEN 'Staff & Student'
         WHEN 2 THEN 'Staff, Student & Parent'
