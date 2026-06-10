@@ -67,14 +67,14 @@ class WeightedAggregator
         /* Diagnostic
          */
         $diagnostic = sprintf(
-             "%s: (%s/%s) * (%s/%s) * %s = %s",
-             $prefix,
-             $assessmentWeight,
-             $assessmentTotalWeight,
-             $gridWeight,
-             $gridTotalWeight,
-             $normalisedMark,
-             $val
+            "%s: (%s/%s) * (%s/%s) * %s = %s",
+            $prefix,
+            $assessmentWeight,
+            $assessmentTotalWeight,
+            $gridWeight,
+            $gridTotalWeight,
+            $normalisedMark,
+            $val
         );
 
         return [
