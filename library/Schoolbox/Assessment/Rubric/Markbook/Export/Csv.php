@@ -32,6 +32,20 @@ class Csv extends AbstractCSV
 
 
     /**
+     * A placeholder text used in the Overall Marks section in the assessment column.
+     */
+    private const string COLUMN_OVERALL = '(overall)';
+
+
+    /**
+     * This is a terminology for Rubric Capabilities ("groups", sadly, cos that's in the db still)
+     *
+     * @var string
+     */
+    private string $capabilityMarkColumn;
+
+
+    /**
      * Constructor
      *
      * @param array $assessments A set of assessment data structs containing the cap/ind structure
@@ -51,6 +65,7 @@ class Csv extends AbstractCSV
         private bool $descriptorsOnly,
         private bool $showDrafts
     ) {
+        $this->capabilityMarkColumn = $this->translator->translateSentence('({:rubricGroup} mark)');
     }
 
 
@@ -203,7 +218,7 @@ class Csv extends AbstractCSV
                     $capabilityData['name'],
                     /* Use the terminology for "capability"
                      */
-                    $this->translator->translateSentence('({:rubricGroup} mark)')
+                    $this->capabilityMarkColumn,
                 ], $marks);
             }
 
@@ -256,15 +271,15 @@ class Csv extends AbstractCSV
             $this->exportRow([
                 /* A mock assessment name
                  */
-                '(overall)',
+                self::COLUMN_OVERALL,
                 /* This column is not useful because we don't care about grids in this usage:
                  * slap in another placeholder text for now
                  */
-                '(overall)',
+                self::COLUMN_OVERALL,
                 $capabilityData['name'],
                 /* Use the terminology for "capability"
                  */
-                $this->translator->translateSentence('({:rubricGroup} mark)')
+                $this->capabilityMarkColumn,
             ], $marks);
 
             /* Indicator marks for each student
@@ -279,11 +294,11 @@ class Csv extends AbstractCSV
                 $this->exportRow([
                     /* A mock assessment name
                      */
-                    '(overall)',
+                    self::COLUMN_OVERALL,
                     /* This column is not useful because we don't care about grids in this usage:
                      * slap in another placeholder text for now
                      */
-                    '(overall)',
+                    self::COLUMN_OVERALL,
                     $capabilityData['name'],
                     $indicatorData['name'],
                 ], $marks);
