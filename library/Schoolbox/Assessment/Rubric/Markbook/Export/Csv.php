@@ -74,6 +74,13 @@ class Csv extends AbstractCSV
 
     /**
      * Export the header row for this CSV.
+     *
+     * This is a list of
+     *     - Assessment (a localised terminology)
+     *     - Rubric
+     *     - Capability (a localised terminology)
+     *     - Indicator (a localised terminology)
+     *     - a set of student names derived from $studentMarks (a complete superset of guys)
      */
     private function exportHeader(): void
     {
@@ -114,7 +121,6 @@ class Csv extends AbstractCSV
             $student['firstname'] ?? ''
         ]));
     }
-
 
 
 //
