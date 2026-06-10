@@ -242,6 +242,10 @@
                                         {% set publishedMarks = overall[capabilityId].students[studentId].published ?? null %}
                                         {% set draftMarks = overall[capabilityId].students[studentId].published.draft ?? null %}
 
+                                        {# Diagnostic reasoning #}
+                                        {% set publishedReasoning = overall[capabilityId].students[studentId].published.reasoning ?? [] %}
+                                        {% set draftReasoning = overall[capabilityId].students[studentId].draft.reasoning ?? [] %}
+
                                         {# Overall Marks section always displays cap marks I guess, since there's no real way to meaningfully
                                          # produce a synonymous behaviour with pre-multigrid rubrics. One grid can have Cap Marks on and another
                                          # can have it off. I guess we have to show it all the time or show it none of the time.
@@ -253,6 +257,11 @@
                                                 <a class="{{ gradientClass }}"
                                                    data-actual-mark
                                                 >{{ publishedMarks.humanReadableMark|default('–') }}</a>
+
+                                                {# Diagnostic reasoning #}
+                                                {% for contribution in publishedReasoning %}
+                                                    <p data-actual-mark style="display:none">{{ contribution }}</p>
+                                                {% endfor %}
                                             {% endif %}
 
                                             {% if draftMarks is not null %}
@@ -264,6 +273,11 @@
                                             {# Student doesn't have anything at all #}
                                             {% if publishedMarks is null and draftMarks is null %}
                                                 <a href="#">–</a>
+
+                                                {# Diagnostic reasoning #}
+                                                {% for contribution in draftReasoning %}
+                                                    <p data-draft-mark style="display:none">{{ contribution }}</p>
+                                                {% endfor %}
                                             {% endif %}
                                         </td>
                                     {% endfor %}
@@ -282,6 +296,10 @@
                                             {% set publishedMarks = overall[capabilityId].indicators[indicatorId].students[studentId].published ?? null %}
                                             {% set draftMarks = overall[capabilityId].indicators[indicatorId].students[studentId].draft ?? null %}
 
+                                            {# Diagnostic reasoning #}
+                                            {% set publishedReasoning = overall[capabilityId].indicators[indicatorId].students[studentId].published.reasoning ?? [] %}
+                                            {% set draftReasoning = overall[capabilityId].indicators[indicatorId].students[studentId].draft.reasoning ?? [] %}
+
                                             <td class="mark">
                                                 {% if publishedMarks is not null %}
                                                     {% set gradientClass = urgency.marks(publishedMarks.normalisedMark) %}
@@ -289,12 +307,22 @@
                                                     <a class="{{ gradientClass }}"
                                                        data-actual-mark
                                                     >{{ publishedMarks.humanReadableMark|default('–') }}</a>
+
+                                                    {# Diagnostic reasoning #}
+                                                    {% for contribution in publishedReasoning %}
+                                                        <p data-actual-mark style="display:none">{{ contribution }}</p>
+                                                    {% endfor %}
                                                 {% endif %}
 
                                                 {% if draftMarks is not null %}
                                                     <a class="meta"
                                                        data-draft-mark
                                                     >{{ draftMarks.humanReadableMark|default('–') }}</a>
+
+                                                    {# Diagnostic reasoning #}
+                                                    {% for contribution in draftReasoning %}
+                                                        <p data-draft-mark style="display:none">{{ contribution }}</p>
+                                                    {% endfor %}
                                                 {% endif %}
 
                                                 {# Student doesn't have anything at all #}

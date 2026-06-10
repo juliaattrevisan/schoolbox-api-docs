@@ -36,7 +36,7 @@ class WeightedAggregator
      * @param float|null $gridTotalWeight
      * @param float|null $normalisedMark A float between 0 and 100
      * @param string|null $prefix An optional prefix for diagnostic usage only
-     * @return float|null
+     * @return array|null
      */
     public function calculate(
         ?float $assessmentWeight,
@@ -45,7 +45,7 @@ class WeightedAggregator
         ?float $gridTotalWeight,
         ?float $normalisedMark,
         ?string $prefix,
-    ): ?float {
+    ): ?array {
         /* Avoid divide-by-zero scenarios: exit early
          */
         if (!$assessmentTotalWeight) {
@@ -68,17 +68,20 @@ class WeightedAggregator
 
         /* Diagnostic
          */
-//         var_dump(sprintf(
-//             "%s: (%s/%s) * (%s/%s) * %s = %s",
-//             $prefix,
-//             $assessmentWeight,
-//             $assessmentTotalWeight,
-//             $gridWeight,
-//             $gridTotalWeight,
-//             $normalisedMark,
-//             $val
-//        ));
+        $diagnostic = (sprintf(
+             "%s: (%s/%s) * (%s/%s) * %s = %s",
+             $prefix,
+             $assessmentWeight,
+             $assessmentTotalWeight,
+             $gridWeight,
+             $gridTotalWeight,
+             $normalisedMark,
+             $val
+        ));
 
-         return $val;
+        return [
+            'diagnostic' => $diagnostic,
+            'val' => $val,
+        ];
     }
 }

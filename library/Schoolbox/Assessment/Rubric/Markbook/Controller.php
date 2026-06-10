@@ -1204,11 +1204,17 @@ class Controller extends Base
      * @param array $studentMarks
      * @param array $exclusions
      * @param Model $folder
+     * @param bool $includeDiagnostics Adds the individual calculations as a frontend payload so you can see it in prod
      * @return array
      */
-    private function buildOverallMarks(array $assessments, array $studentMarks, array $exclusions, Folder\Model $folder): array
-    {
-        $overallMarks = $this->aggregateMarks($assessments, $studentMarks, $exclusions, $folder);
+    private function buildOverallMarks(
+        array $assessments,
+        array $studentMarks,
+        array $exclusions,
+        Folder\Model $folder,
+        bool $includeDiagnostics = false
+    ): array {
+        $overallMarks = $this->aggregateMarks($assessments, $studentMarks, $exclusions, $folder, $includeDiagnostics);
 
         foreach ($overallMarks as &$capability) {
             uasort($capability['indicators'], [$this, 'sortByName']);
@@ -1238,12 +1244,13 @@ class Controller extends Base
      * Iterates individual student marks to build the weighted sums per capability and indicator
      *
      * @param array $assessments
-     * @param Model $folder
      * @param array $studentMarks
      * @param array $exclusions
+     * @param Model $folder
+     * @param bool $includeDiagnostic
      * @return array
      */
-    private function aggregateMarks(array $assessments, array $studentMarks, array $exclusions, Folder\Model $folder): array
+    private function aggregateMarks(array $assessments, array $studentMarks, array $exclusions, Folder\Model $folder, bool $includeDiagnostic): array
     {
         /* $coefficients is a set of supposedly-convenient values that we can quickly reference
          *
@@ -1400,11 +1407,14 @@ class Controller extends Base
                             $overallMarks[$capabilityId]['students'][$studentId] = [
                                 'published' => [
                                     'normalisedMark' => null,
-                                    'humanReadableMark' => null
+                                    'humanReadableMark' => null,
+                                    'reasoning' => [],
+
                                 ],
                                 'draft' => [
                                     'normalisedMark' => null,
-                                    'humanReadableMark' => null
+                                    'humanReadableMark' => null,
+                                    'reasoning' => [],
                                 ],
                             ];
                         }
@@ -1432,12 +1442,14 @@ class Controller extends Base
                             /* Only aggregate if not null
                              */
                             if (null !== $val) {
-                                $overallMarks[$capabilityId]['students'][$studentId]['published']['normalisedMark'] += $val;
+                                $overallMarks[$capabilityId]['students'][$studentId]['published']['normalisedMark'] += $val['val'];
 
-                                /* TODO You could compound $val's diagnostic here if you wanted to expose it on the frontend as a tooltip or something
-                                 *  because debugging this in prod will not be easy without being able to see the math behind it.
-                                 *  $overallMarks[$capabilityId]['students'][$studentId]['published']['reasoning'][] = $val
+                                /* You could compound $val's diagnostic here if you wanted to expose it on the frontend as a tooltip or something
+                                 * because debugging this in prod will not be easy without being able to see the math behind it.
                                  */
+                                if ($includeDiagnostic) {
+                                    $overallMarks[$capabilityId]['students'][$studentId]['published']['reasoning'][] = $val['diagnostic'];
+                                }
                             }
 
                             /* Draft capability mark for this student
@@ -1462,12 +1474,14 @@ class Controller extends Base
                             /* Only aggregate if not null
                              */
                             if (null !== $val) {
-                                $overallMarks[$capabilityId]['students'][$studentId]['draft']['normalisedMark'] += $val;
+                                $overallMarks[$capabilityId]['students'][$studentId]['draft']['normalisedMark'] += $val['val'];
 
-                                /* TODO You could compound $val's diagnostic here if you wanted to expose it on the frontend as a tooltip or something
-                                 *  because debugging this in prod will not be easy without being able to see the math behind it.
-                                 *  $overallMarks[$capabilityId]['students'][$studentId]['draft']['reasoning'][] = $val
+                                /* You could compound $val's diagnostic here if you wanted to expose it on the frontend as a tooltip or something
+                                 * because debugging this in prod will not be easy without being able to see the math behind it.
                                  */
+                                if ($includeDiagnostic) {
+                                    $overallMarks[$capabilityId]['students'][$studentId]['draft']['reasoning'][] = $val['diagnostic'];
+                                }
                             }
                         }
 
@@ -1481,11 +1495,13 @@ class Controller extends Base
                                 $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId] = [
                                     'published' => [
                                         'normalisedMark' => null,
-                                        'humanReadableMark' => null
+                                        'humanReadableMark' => null,
+                                        'reasoning' => [],
                                     ],
                                     'draft' => [
                                         'normalisedMark' => null,
-                                        'humanReadableMark' => null
+                                        'humanReadableMark' => null,
+                                        'reasoning' => [],
                                     ],
                                 ];
                             }
@@ -1513,12 +1529,14 @@ class Controller extends Base
                                 /* Only aggregate if not null
                                  */
                                 if (null !== $val) {
-                                    $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['published']['normalisedMark'] += $val;
+                                    $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['published']['normalisedMark'] += $val['val'];
 
-                                    /* TODO You could compound $val's diagnostic here if you wanted to expose it on the frontend as a tooltip or something
-                                     *  because debugging this in prod will not be easy without being able to see the math behind it.
-                                     *  $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['published']['reasoning'][] = $val
+                                    /* You could compound $val's diagnostic here if you wanted to expose it on the frontend as a tooltip or something
+                                     * because debugging this in prod will not be easy without being able to see the math behind it.
                                      */
+                                    if ($includeDiagnostic) {
+                                        $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['published']['reasoning'][] = $val['diagnostic'];
+                                    }
                                 }
 
                                 /* Draft indicator mark for this student
@@ -1543,12 +1561,14 @@ class Controller extends Base
                                 /* Only aggregate if not null
                                  */
                                 if (null !== $val) {
-                                    $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['draft']['normalisedMark'] += $val;
+                                    $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['draft']['normalisedMark'] += $val['val'];
 
-                                    /* TODO You could compound $val's diagnostic here if you wanted to expose it on the frontend as a tooltip or something
-                                     *  because debugging this in prod will not be easy without being able to see the math behind it.
-                                     *  $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['draft']['reasoning'][] = $val;
+                                    /* You could compound $val's diagnostic here if you wanted to expose it on the frontend as a tooltip or something
+                                     * because debugging this in prod will not be easy without being able to see the math behind it.
                                      */
+                                    if ($includeDiagnostic) {
+                                        $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['draft']['reasoning'][] = $val['diagnostic'];
+                                    }
                                 }
                             }
                         }
@@ -1726,7 +1746,7 @@ class Controller extends Base
          * and indicator combination from all the rubric grids. This aggregation should potentially be weighted against
          * the rubric weighting -per grid- but we'll get to that later.
          */
-        $overallMarks = $this->buildOverallMarks($assessments, $studentMarks, $exclusions, $folder);
+        $overallMarks = $this->buildOverallMarks($assessments, $studentMarks, $exclusions, $folder, true);
 
         return [
             $assessments,
