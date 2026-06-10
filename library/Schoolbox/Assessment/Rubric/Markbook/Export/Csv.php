@@ -210,7 +210,17 @@ class Csv extends AbstractCSV
                 $marks = [];
 
                 foreach ($this->studentMarks as $studentId => $studentData) {
-                    $marks[] = $studentData['gridData'][$assessmentId][$rubricInstanceId]['capabilities'][$capabilityId][$this->node]['humanReadableMark'] ?? null;
+                    $subnode = $studentData['gridData'][$assessmentId][$rubricInstanceId]['capabilities'][$capabilityId][$this->node] ?? null;
+
+                    /* Show the text of the selected descriptor instead of its human-readable mark
+                     */
+                    if ($this->descriptorsOnly) {
+                        $val = $subnode['selectedDescriptorText'] ?? null;
+                    } else {
+                        $val = $subnode['humanReadableMark'] ?? null;
+                    }
+
+                    $marks[] = $val;
                 }
 
                 /* The first arg to this method is the "headings" but it actually corresponds to the columns prior, that
@@ -235,7 +245,17 @@ class Csv extends AbstractCSV
                 $marks = [];
 
                 foreach ($this->studentMarks as $studentId => $studentData) {
-                    $marks[] = $studentData['gridData'][$assessmentId][$rubricInstanceId]['capabilities'][$capabilityId]['indicators'][$indicatorId][$this->node]['humanReadableMark'] ?? null;
+                    $subnode = $studentData['gridData'][$assessmentId][$rubricInstanceId]['capabilities'][$capabilityId]['indicators'][$indicatorId][$this->node] ?? null;
+
+                    /* Show the text of the selected descriptor instead of its human-readable mark
+                     */
+                    if ($this->descriptorsOnly) {
+                        $val = $subnode['selectedDescriptorText'] ?? null;
+                    } else {
+                        $val = $subnode['humanReadableMark'] ?? null;
+                    }
+
+                    $marks[] = $val;
                 }
 
                 $this->exportRow([
