@@ -67,6 +67,9 @@ class Csv extends AbstractCSV
 
         $this->exportHeader();
 
+        /* Each grid in each assessment and all the students' marks for capabilities and indicators
+         * This is the meat of the rubric markbook in a csv format.
+         */
         foreach ($this->assessments as $assessmentId => $assessmentData) {
             foreach ($assessmentData['gridData'] as $rubricInstanceId => $rubricInstanceData) {
                 $this->exportGrid(
@@ -81,11 +84,11 @@ class Csv extends AbstractCSV
             }
         }
 
-//        foreach ($this->assessments as $assessmentId => $assessment) {
-//            $this->exportAssessment($assessmentId, $assessment, $showDrafts);
-//        }
-//        $this->exportOverallMarks($showDrafts);
-//
+        /* The overall marks section for each student's progressive evolution for each capability and indicator.
+         * This is the potatoes of the rubric markbook in csv format.
+         */
+        $this->exportOverallMarks($this->nodeSelector());
+
         $this->closeExport();
     }
 
@@ -171,8 +174,6 @@ class Csv extends AbstractCSV
         array $rubricInstanceData,
         string $node,
     ): void {
-//        new \Alaress_Probe($rubricInstanceData, $this->studentMarks);
-
         /* Send out each grid's capability/indicator combos for each student.
          */
         foreach ($rubricInstanceData['capabilities'] as $capabilityId => $capabilityData) {
@@ -218,6 +219,39 @@ class Csv extends AbstractCSV
                 $this->exportRow([
                     $assessmentData['name'],
                     $rubricInstanceData['title'],
+                    $capabilityData['name'],
+                    $indicatorData['name'],
+                ], $marks);
+            }
+        }
+    }
+
+
+    /**
+     * Each capability and indicator is listed uniquely here, along with each student's aggregated overall value for said
+     * capabilities and indicators across all the assessments that used them.
+     *
+     * All in a nice csv format
+     *
+     * @return void
+     */
+    private function exportOverallMarks(string $node): void
+    {
+        foreach ($this->overallMarks as $capabilityId => $capabilityData) {
+            foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
+                $marks = [];
+
+                foreach ($this->studentMarks as $studentId => $studentData) {
+                    $marks[] = $this->overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId][$node]['humanReadableMark'] ?? null;
+                }
+
+                $this->exportRow([
+                    /* A mock assessment name
+                     */
+                    '(overall)',
+                    /* This column is empty because we don't care about grids in this usage
+                     */
+                    '',
                     $capabilityData['name'],
                     $indicatorData['name'],
                 ], $marks);
