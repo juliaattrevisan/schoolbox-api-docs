@@ -171,16 +171,23 @@ class Csv extends AbstractCSV
         array $rubricInstanceData,
         string $node,
     ): void {
-//        new \Alaress_Probe($assessmentId, $rubricInstanceData, $this->studentMarks);
+//        new \Alaress_Probe($rubricInstanceData, $this->studentMarks);
 
         /* Send out each grid's capability/indicator combos for each student.
          */
         foreach ($rubricInstanceData['capabilities'] as $capabilityId => $capabilityData) {
-            foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
+            /* If the rubric grid used a Capability Mark Type (denoted by isMarkPerCapability) then we can show the
+             * marks each student received for this capability. It's represented as an individual row where its
+             * indicator title is "(capability mark)" so we hijack a column to do it. lol
+             *
+             * Excuse me while I ram in a whole new row for this circumstance before we continue onwards with our
+             * usual programming
+             */
+            if ($rubricInstanceData['isMarkPerCapability']) {
                 $marks = [];
 
                 foreach ($this->studentMarks as $studentId => $studentData) {
-                    $marks[] = $studentData['gridData'][$assessmentId][$rubricInstanceId]['capabilities'][$capabilityId]['indicators'][$indicatorId][$node]['humanReadableMark'] ?? null;
+                    $marks[] = $studentData['gridData'][$assessmentId][$rubricInstanceId]['capabilities'][$capabilityId][$node]['humanReadableMark'] ?? null;
                 }
 
                 /* The first arg to this method is the "headings" but it actually corresponds to the columns prior, that
@@ -189,6 +196,25 @@ class Csv extends AbstractCSV
                  *
                  * Internally this simply array_merge()'s the two args anyway.
                  */
+                $this->exportRow([
+                    $assessmentData['name'],
+                    $rubricInstanceData['title'],
+                    $capabilityData['name'],
+                    /* Use the terminology for "capability"
+                     */
+                    $this->translator->translateSentence('({:rubricGroup} mark)')
+                ], $marks);
+            }
+
+            /* Indicator marks for each student
+             */
+            foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
+                $marks = [];
+
+                foreach ($this->studentMarks as $studentId => $studentData) {
+                    $marks[] = $studentData['gridData'][$assessmentId][$rubricInstanceId]['capabilities'][$capabilityId]['indicators'][$indicatorId][$node]['humanReadableMark'] ?? null;
+                }
+
                 $this->exportRow([
                     $assessmentData['name'],
                     $rubricInstanceData['title'],
