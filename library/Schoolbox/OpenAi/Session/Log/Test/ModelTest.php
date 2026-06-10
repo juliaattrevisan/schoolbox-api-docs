@@ -63,6 +63,18 @@ class ModelTest extends TestCase
     }
 
     /**
+     * A multibyte prompt is trimmed to the TEXT column maximum byte length without breaking UTF-8.
+     */
+    public function testPromptIsTrimmedToTextMaxByteLength(): void
+    {
+        $model = new Model();
+        $model->setPrompt(str_repeat('€', 22000));
+
+        $this->assertLessThanOrEqual(65535, strlen($model->getPrompt()));
+        $this->assertTrue(mb_check_encoding($model->getPrompt(), 'UTF-8'));
+    }
+
+    /**
      * An over-long input text is trimmed to the TEXT column maximum length.
      */
     public function testInputTextIsTrimmedToTextMaxLength(): void
@@ -71,6 +83,18 @@ class ModelTest extends TestCase
         $model->setInputText(str_repeat('a', 70000));
 
         $this->assertSame(65535, mb_strlen($model->getInputText()));
+    }
+
+    /**
+     * Multibyte input text is trimmed to the TEXT column maximum byte length without breaking UTF-8.
+     */
+    public function testInputTextIsTrimmedToTextMaxByteLength(): void
+    {
+        $model = new Model();
+        $model->setInputText(str_repeat('€', 22000));
+
+        $this->assertLessThanOrEqual(65535, strlen($model->getInputText()));
+        $this->assertTrue(mb_check_encoding($model->getInputText(), 'UTF-8'));
     }
 
     /**
@@ -85,6 +109,18 @@ class ModelTest extends TestCase
     }
 
     /**
+     * Multibyte output text is trimmed to the TEXT column maximum byte length without breaking UTF-8.
+     */
+    public function testOutputTextIsTrimmedToTextMaxByteLength(): void
+    {
+        $model = new Model();
+        $model->setOutputText(str_repeat('€', 22000));
+
+        $this->assertLessThanOrEqual(65535, strlen($model->getOutputText()));
+        $this->assertTrue(mb_check_encoding($model->getOutputText(), 'UTF-8'));
+    }
+
+    /**
      * An over-long response is trimmed to the MEDIUMTEXT column maximum length.
      */
     public function testResponseIsTrimmedToMediumTextMaxLength(): void
@@ -93,5 +129,17 @@ class ModelTest extends TestCase
         $model->setResponse(str_repeat('a', 16777215 + 10));
 
         $this->assertSame(16777215, mb_strlen($model->getResponse()));
+    }
+
+    /**
+     * A multibyte response is trimmed to the MEDIUMTEXT column maximum byte length without breaking UTF-8.
+     */
+    public function testResponseIsTrimmedToMediumTextMaxByteLength(): void
+    {
+        $model = new Model();
+        $model->setResponse(str_repeat('€', 5592415));
+
+        $this->assertLessThanOrEqual(16777215, strlen($model->getResponse()));
+        $this->assertTrue(mb_check_encoding($model->getResponse(), 'UTF-8'));
     }
 }

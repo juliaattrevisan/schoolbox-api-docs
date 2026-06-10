@@ -93,11 +93,7 @@ class Model
      */
     public function setPrompt(string $prompt): self
     {
-        // Limit the prompt length to prevent database errors
-        if ($prompt && mb_strlen($prompt) > self::PROMPT_MAX_LENGTH) {
-            $prompt = mb_substr($prompt, 0, self::PROMPT_MAX_LENGTH);
-        }
-        $this->prompt = $prompt;
+        $this->prompt = self::trimToMaxBytes($prompt, self::PROMPT_MAX_LENGTH);
         return $this;
     }
 
@@ -187,11 +183,9 @@ class Model
      */
     public function setInputText(?string $inputText): self
     {
-        // Limit the input text length to prevent database errors
-        if ($inputText && mb_strlen($inputText) > self::TEXT_MAX_LENGTH) {
-            $inputText = mb_substr($inputText, 0, self::TEXT_MAX_LENGTH);
-        }
-        $this->inputText = $inputText;
+        $this->inputText = null === $inputText
+            ? null
+            : self::trimToMaxBytes($inputText, self::TEXT_MAX_LENGTH);
         return $this;
     }
 
@@ -209,11 +203,9 @@ class Model
      */
     public function setOutputText(?string $outputText): self
     {
-        // Limit the output text length to prevent database errors
-        if ($outputText && mb_strlen($outputText) > self::TEXT_MAX_LENGTH) {
-            $outputText = mb_substr($outputText, 0, self::TEXT_MAX_LENGTH);
-        }
-        $this->outputText = $outputText;
+        $this->outputText = null === $outputText
+            ? null
+            : self::trimToMaxBytes($outputText, self::TEXT_MAX_LENGTH);
         return $this;
     }
 
@@ -290,11 +282,18 @@ class Model
      */
     public function setResponse(?string $response): self
     {
-        // Limit the response length to prevent database errors
-        if ($response && mb_strlen($response) > self::RESPONSE_MAX_LENGTH) {
-            $response = mb_substr($response, 0, self::RESPONSE_MAX_LENGTH);
-        }
-        $this->response = $response;
+        $this->response = null === $response
+            ? null
+            : self::trimToMaxBytes($response, self::RESPONSE_MAX_LENGTH);
         return $this;
+    }
+
+    private static function trimToMaxBytes(string $value, int $maxBytes): string
+    {
+        if (strlen($value) <= $maxBytes) {
+            return $value;
+        }
+
+        return mb_strcut($value, 0, $maxBytes, 'UTF-8');
     }
 }
