@@ -13,6 +13,7 @@ use Alaress\Database\Test\TestConnectorTrait;
 use Schoolbox\Editor\OpenAI\Log\LogFormat;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\OpenAi\Session\Feature;
 use Schoolbox\OpenAi\Session\Log\Mapper as LogMapper;
 use Schoolbox\OpenAi\Session\Log\Model as LogModel;
@@ -51,6 +52,7 @@ class FilteredSessionsTest extends TestCase
     /**
      * A session is returned with logFormat/returnCode derived from its first log,
      * and the feature filter matches it.
+     * @throws Exception
      */
     public function testReturnsSessionWithDerivedFirstLogValues(): void
     {
@@ -59,16 +61,20 @@ class FilteredSessionsTest extends TestCase
 
         // First log (earliest) is the one whose log_format/return_code should surface.
         LogMapper::getInstance()->save(
-            (new LogModel())->setAiSessionId($id)->setPrompt('first')
+            new LogModel()->setAiSessionId($id)->setPrompt('first')
                 ->setLogFormat(LogFormat::AGENT_CHAT)->setReturnCode(200)
         );
         LogMapper::getInstance()->save(
-            (new LogModel())->setAiSessionId($id)->setPrompt('second')
+            new LogModel()->setAiSessionId($id)->setPrompt('second')
                 ->setLogFormat(LogFormat::GUARDRAIL)->setReturnCode(500)
         );
 
         $sessions = Mapper::getInstance()->getFilteredSessions(
-            null, Feature::CHAT->value, null, null, null, 100, 0
+            null,
+            Feature::CHAT->value,
+            null,
+            null,
+            null,
         );
 
         $match = null;
@@ -86,17 +92,22 @@ class FilteredSessionsTest extends TestCase
 
     /**
      * The keyword filter matches sessions by their logs' prompt/response text.
+     * @throws Exception
      */
     public function testKeywordFilterMatchesLogText(): void
     {
         $id = Uuid::uuid4()->toString();
         Mapper::getInstance()->findOrCreate($id, Feature::CHAT->value, null);
         LogMapper::getInstance()->save(
-            (new LogModel())->setAiSessionId($id)->setPrompt('a unique needle phrase')
+            new LogModel()->setAiSessionId($id)->setPrompt('a unique needle phrase')
         );
 
         $count = Mapper::getInstance()->countFilteredSessions(
-            'unique needle', null, null, null, null
+            'unique needle',
+            null,
+            null,
+            null,
+            null
         );
 
         $this->assertGreaterThanOrEqual(1, $count);
