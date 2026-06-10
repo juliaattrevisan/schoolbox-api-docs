@@ -40,6 +40,7 @@ class Generic extends Full
      * @param bool $includeUnpublishedInstructorFeedback
      * @param bool $includeDraftResponses
      * @param array $allowedVisibilities
+     * @throws \UnexpectedValueException if an unexpected assessment type is encountered.
      */
     protected function recombine(
         $includeUnpublishedSelfReflectionFeedback,
