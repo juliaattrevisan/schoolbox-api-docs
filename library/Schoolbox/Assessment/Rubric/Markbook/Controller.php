@@ -149,9 +149,9 @@ class Controller extends Base
         ] = $this->buildMarkbookData($folder, $queryArgs, $assessmentIds);
 
         $csv = new Export\Csv(
-            $studentMarks,
             $assessments,
             $exclusions,
+            $studentMarks,
             $overallMarks,
             $this->translator,
             empty($queryArgs['descriptorsOnly']),
