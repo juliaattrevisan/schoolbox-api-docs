@@ -13,6 +13,13 @@ namespace Schoolbox\Assessment\Rubric\Markbook;
 class WeightedAggregator
 {
     /**
+     * Number of decimal points to use in the final calculation
+     * We've used 2 in most places, so let's start with that as a default value
+     */
+    private const int PRECISION = 2;
+
+
+    /**
      * Calculate a weighted aggregation contribution of a rubric capability or indicator.
      *
      * This individual formula is used to calculate how an indicator's mark (the selected descriptor's value) from a
@@ -62,7 +69,7 @@ class WeightedAggregator
         }
 
         $val = ($assessmentWeight / $assessmentTotalWeight) * ($gridWeight / $gridTotalWeight) * $normalisedMark;
-        $val = (float)number_format($val, 2);
+        $val = (float)number_format($val, self::PRECISION);
 
         /* Diagnostic
          */
