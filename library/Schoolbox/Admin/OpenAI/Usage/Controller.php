@@ -196,9 +196,11 @@ class Controller extends Base
         }
 
         /**
-         * Each entry of $logGroups has the same semantics as an individual $log,
-         * it's just that it's one row that represents multiple grouped logs for a given session ID.
-         * Not all fields will make sense in this context (e.g. prompt, response, errorMessage, etc)
+         * Each entry of $logGroups is an `ai_session` row representing a whole session,
+         * not a single `ai_session_log` interaction. The per-log fields (e.g. prompt,
+         * response, errorMessage) therefore aren't present here; the logFormat/returnCode
+         * shown for a session are derived from its first log by
+         * SessionMapper::getFilteredSessions().
          */
         $logGroups = $this->sessionMapper->getFilteredSessions(
             $keyword,
