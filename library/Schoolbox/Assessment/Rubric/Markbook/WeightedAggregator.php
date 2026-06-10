@@ -10,8 +10,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Markbook;
 
-use DebugBar\DebugBarException;
-
 class WeightedAggregator
 {
     /**
@@ -68,7 +66,7 @@ class WeightedAggregator
 
         /* Diagnostic
          */
-        $diagnostic = (sprintf(
+        $diagnostic = sprintf(
              "%s: (%s/%s) * (%s/%s) * %s = %s",
              $prefix,
              $assessmentWeight,
@@ -77,7 +75,7 @@ class WeightedAggregator
              $gridTotalWeight,
              $normalisedMark,
              $val
-        ));
+        );
 
         return [
             'diagnostic' => $diagnostic,
