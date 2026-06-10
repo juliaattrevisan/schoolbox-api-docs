@@ -1432,10 +1432,8 @@ class Controller extends Base
                                  */
                                 $capabilityData['published']['normalisedMark'],
                                 sprintf(
-                                    'Assessment %s, student %s, capability %s',
+                                    'Assessment %s',
                                     $assessmentId,
-                                    $studentId,
-                                    $overallMarks[$capabilityId]['name']
                                 ),
                             );
 
@@ -1464,10 +1462,8 @@ class Controller extends Base
                                  */
                                 $capabilityData['draft']['normalisedMark'],
                                 sprintf(
-                                    'Assessment %s, student %s, capability %s (draft)',
+                                    'Assessment %s (draft)',
                                     $assessmentId,
-                                    $studentId,
-                                    $overallMarks[$capabilityId]['name']
                                 ),
                             );
 
@@ -1519,10 +1515,8 @@ class Controller extends Base
                                      */
                                     $indicatorData['published']['normalisedMark'],
                                     sprintf(
-                                        'Assessment %s, student %s, indicator %s',
+                                        'Assessment %s',
                                         $assessmentId,
-                                        $studentId,
-                                        $overallMarks[$capabilityId]['indicators'][$indicatorId]['name']
                                     ),
                                 );
 
@@ -1551,10 +1545,8 @@ class Controller extends Base
                                      */
                                     $indicatorData['draft']['normalisedMark'],
                                     sprintf(
-                                        'Assessment %s, student %s, indicator %s (draft)',
+                                        'Assessment %s (draft)',
                                         $assessmentId,
-                                        $studentId,
-                                        $overallMarks[$capabilityId]['indicators'][$indicatorId]['name']
                                     ),
                                 );
 

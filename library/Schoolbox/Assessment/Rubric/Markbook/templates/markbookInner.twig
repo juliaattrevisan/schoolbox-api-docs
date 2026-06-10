@@ -259,25 +259,28 @@
                                                 >{{ publishedMarks.humanReadableMark|default('–') }}</a>
 
                                                 {# Diagnostic reasoning #}
-                                                {% for contribution in publishedReasoning %}
-                                                    <p data-actual-mark style="display:none">{{ contribution }}</p>
-                                                {% endfor %}
+                                                <p data-actual-mark style="display:none">
+                                                    {% for contribution in publishedReasoning %}
+                                                        {{ contribution }}<br />
+                                                    {% endfor %}
+                                                </p>
                                             {% endif %}
 
                                             {% if draftMarks is not null %}
                                                 <a class="meta"
                                                    data-draft-mark
-                                                >{{ publishedMarks.humanReadableMark|default('–') }}</a>
+                                                >{{ draftMarks.humanReadableMark|default('–') }}</a>
+
+                                                <p data-draft-mark style="display:none">
+                                                    {% for contribution in draftReasoning %}
+                                                        {{ contribution }}<br />
+                                                    {% endfor %}
+                                                </p>
                                             {% endif %}
 
                                             {# Student doesn't have anything at all #}
                                             {% if publishedMarks is null and draftMarks is null %}
                                                 <a href="#">–</a>
-
-                                                {# Diagnostic reasoning #}
-                                                {% for contribution in draftReasoning %}
-                                                    <p data-draft-mark style="display:none">{{ contribution }}</p>
-                                                {% endfor %}
                                             {% endif %}
                                         </td>
                                     {% endfor %}
@@ -309,9 +312,11 @@
                                                     >{{ publishedMarks.humanReadableMark|default('–') }}</a>
 
                                                     {# Diagnostic reasoning #}
-                                                    {% for contribution in publishedReasoning %}
-                                                        <p data-actual-mark style="display:none">{{ contribution }}</p>
-                                                    {% endfor %}
+                                                    <p data-actual-mark style="display:none">
+                                                        {% for contribution in publishedReasoning %}
+                                                            {{ contribution }}<br />
+                                                        {% endfor %}
+                                                    </p>
                                                 {% endif %}
 
                                                 {% if draftMarks is not null %}
@@ -320,9 +325,11 @@
                                                     >{{ draftMarks.humanReadableMark|default('–') }}</a>
 
                                                     {# Diagnostic reasoning #}
-                                                    {% for contribution in draftReasoning %}
-                                                        <p data-draft-mark style="display:none">{{ contribution }}</p>
-                                                    {% endfor %}
+                                                    <p data-draft-mark style="display:none">
+                                                        {% for contribution in draftReasoning %}
+                                                            {{ contribution }}<br />
+                                                        {% endfor %}
+                                                    </p>
                                                 {% endif %}
 
                                                 {# Student doesn't have anything at all #}
