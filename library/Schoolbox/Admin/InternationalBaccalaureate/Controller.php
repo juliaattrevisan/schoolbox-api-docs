@@ -606,6 +606,7 @@ class Controller extends ConfigController
                     'completePreparation' => $this->getRouteIfAuthorized('internationalBaccalaureate.sessionCompletePreparation', ['sessionId' => $sessionId]),
                     'renotifyUnconfirmed' => $this->getRouteIfAuthorized('internationalBaccalaureate.renotifyUnconfirmed', ['sessionId' => $sessionId]),
                     'resetDetails' => $this->getRouteIfAuthorized('internationalBaccalaureate.sessionResetDetails', ['sessionId' => $sessionId]),
+                    'manuallyRegister' => $this->getRouteIfAuthorized('internationalBaccalaureate.sessionMarkAsManuallyRegistered', ['sessionId' => $sessionId]),
                 ],
                 'sessionTitle' => $registrationSession->jsonSerialize()['title'],
             ]
@@ -1149,6 +1150,94 @@ class Controller extends ConfigController
             $this->response = $this->responseAsJson([
                 'success'           => true,
                 'transitionedCount' => count($studentsToReset),
+            ]);
+        } catch (Exception) {
+            if ($transactionStarted) {
+                $database->rollBack();
+            }
+            $this->sendJsonError('Something has gone wrong. Please try again later.', 500);
+        }
+    }
+
+    /**
+     * Mark selected candidates as manually registered in IBIS outside the API workflow.
+     * Records the staff member and timestamp for audit purposes.
+     *
+     * @api POST /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/mark-as-manually-registered
+     */
+    public function sessionMarkAsManuallyRegistered(RegistrationSessionModel $registrationSession): void
+    {
+        $post       = $this->requestPost;
+        $studentIds = $post->get('studentIds');
+
+        try {
+            $studentIds = $this->normalisePreparationStudentIds($studentIds);
+        } catch (\InvalidArgumentException $e) {
+            $this->sendJsonError($e->getMessage(), 400);
+            return;
+        }
+
+        $eligibleStatuses = [
+            RegistrationSessionStudentModel::STATUS_CONFIRMED,
+            RegistrationSessionStudentModel::STATUS_FAILED,
+        ];
+
+        $database           = $this->registrationSessionStudentMapper->getDatabase();
+        $transactionStarted = false;
+
+        try {
+            $allStudents     = $this->registrationSessionStudentMapper->findStudentsForSession((int) $registrationSession->getId());
+            $studentsByAnyId = [];
+
+            foreach ($allStudents as $student) {
+                if ($student->getId() !== null) {
+                    $studentsByAnyId[(int) $student->getId()] = $student;
+                }
+
+                if ($student->getUser()?->getId() !== null) {
+                    $studentsByAnyId[(int) $student->getUser()->getId()] = $student;
+                }
+            }
+
+            $seen               = [];
+            $studentsToRegister = [];
+
+            foreach ($studentIds as $studentId) {
+                $student = $studentsByAnyId[$studentId] ?? null;
+
+                if (
+                    $student !== null
+                    && !isset($seen[$student->getId()])
+                    && in_array($student->getStatus(), $eligibleStatuses, true)
+                ) {
+                    $seen[$student->getId()] = true;
+                    $studentsToRegister[]    = $student;
+                }
+            }
+
+            if ($studentsToRegister === []) {
+                $this->sendJsonError('No eligible students found for manual registration.', 400);
+                return;
+            }
+
+            $registeredBy       = $this->getUser();
+            $registeredAt       = \Alaress_Date_Format::now();
+            $transactionStarted = $database->beginTransaction();
+
+            foreach ($studentsToRegister as $student) {
+                $student
+                    ->setStatus(RegistrationSessionStudentModel::STATUS_REGISTERED)
+                    ->setManuallyRegisteredBy($registeredBy)
+                    ->setManuallyRegisteredAt($registeredAt);
+                $this->registrationSessionStudentMapper->save($student);
+            }
+
+            $database->commit();
+            $transactionStarted = false;
+
+            $this->response = $this->responseAsJson([
+                'success'         => true,
+                'registeredCount' => count($studentsToRegister),
             ]);
         } catch (Exception) {
             if ($transactionStarted) {
