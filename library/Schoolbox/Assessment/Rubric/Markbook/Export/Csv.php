@@ -233,11 +233,42 @@ class Csv extends AbstractCSV
      *
      * All in a nice csv format
      *
+     * @param string $node
      * @return void
      */
     private function exportOverallMarks(string $node): void
     {
         foreach ($this->overallMarks as $capabilityId => $capabilityData) {
+            /* Squish in a row for Capability Mark data. For now we always show this value in Overall Marks.
+             */
+            $marks = [];
+
+            foreach ($this->studentMarks as $studentId => $studentData) {
+                $marks[] = $this->overallMarks[$capabilityId]['students'][$studentId][$node]['humanReadableMark'] ?? null;
+            }
+
+            /* The first arg to this method is the "headings" but it actually corresponds to the columns prior, that
+             * actually contain the assessment/rubric/cap/indicator titles that are the same for each student (kind
+             * of like a struct "prefix")
+             *
+             * Internally this simply array_merge()'s the two args anyway.
+             */
+            $this->exportRow([
+                /* A mock assessment name
+                 */
+                '(overall)',
+                /* This column is not useful because we don't care about grids in this usage:
+                 * slap in another placeholder text for now
+                 */
+                '(overall)',
+                $capabilityData['name'],
+                /* Use the terminology for "capability"
+                 */
+                $this->translator->translateSentence('({:rubricGroup} mark)')
+            ], $marks);
+
+            /* Indicator marks for each student
+             */
             foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
                 $marks = [];
 
@@ -249,9 +280,10 @@ class Csv extends AbstractCSV
                     /* A mock assessment name
                      */
                     '(overall)',
-                    /* This column is empty because we don't care about grids in this usage
+                    /* This column is not useful because we don't care about grids in this usage:
+                     * slap in another placeholder text for now
                      */
-                    '',
+                    '(overall)',
                     $capabilityData['name'],
                     $indicatorData['name'],
                 ], $marks);
