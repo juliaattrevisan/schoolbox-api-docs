@@ -51,7 +51,7 @@ class Model
      */
     private $id;
 
-    /** @var News\Model() */
+    /** @var News\Model */
     private $commsNewsArticle;
 
     /** @var null|self */

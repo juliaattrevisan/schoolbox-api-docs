@@ -2,11 +2,13 @@
  # Display the mark visiblity for an assessment
  #}
 {% macro markVisibilityMeta(assessment, plural = false) %}
-    {% if assessment.markVisibility == 2 %}
+    {% if assessment.markVisibility == 'staffStudentAndParent' %}
         <li><sbx-icon name="staff" color="var(--sbx-color-text-secondary)"></sbx-icon> {{ (plural) ? locale.grades.properPlural : locale.grades.proper }} visible to staff, students and parents</li>
-    {% elseif assessment.markVisibility == 1 %}
+    {% elseif assessment.markVisibility == 'staffAndParent' %}
+        <li><sbx-icon name="staff" color="var(--sbx-color-text-secondary)"></sbx-icon> {{ (plural) ? locale.grades.properPlural : locale.grades.proper }} visible to staff and parents</li>
+    {% elseif assessment.markVisibility == 'staffAndStudent' %}
         <li><sbx-icon name="staff-students" color="var(--sbx-color-text-secondary)"></sbx-icon> {{ (plural) ? locale.grades.properPlural : locale.grades.proper }} visible to staff and students</li>
-    {% elseif assessment.markVisibility == 0 %}
+    {% elseif assessment.markVisibility == 'staffOnly' %}
         <li><sbx-icon name="teacher" color="var(--sbx-color-text-secondary)"></sbx-icon> {{ (plural) ? locale.grades.properPlural : locale.grades.proper }} visible to staff</li>
     {% endif %}
 {% endmacro %}

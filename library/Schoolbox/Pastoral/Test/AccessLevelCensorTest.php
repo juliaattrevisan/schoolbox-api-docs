@@ -145,7 +145,7 @@ class AccessLevelCensorTest extends TestCase
      *
      * @param User                $owner
      * @param PastoralAccess|null $pastoralAccess
-     * @return GenericCollection|Pastoral\Model[]
+     * @return array
      */
     private static function buildRelatedRecordCollection(User $owner, ?PastoralAccess $pastoralAccess = null): array
     {

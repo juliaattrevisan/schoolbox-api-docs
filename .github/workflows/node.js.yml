@@ -20,19 +20,9 @@ on:
       - "tsconfig.json"
       - "npm-shrinkwrap.json"
       - ".github/workflows/node.js.yml"
-  push:
-    branches: ["develop", "master"]
-    paths:
-      - "**.js"
-      - "**.ts"
-      - "**.vue"
-      - "**.scss"
-      - ".eslintignore"
-      - ".eslintrc.js"
-      - "package.json"
-      - "tsconfig.json"
-      - "npm-shrinkwrap.json"
-      - ".github/workflows/node.js.yml"
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 # Cancel on push to same branch
 concurrency:
@@ -45,10 +35,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 20.x
+      - name: Use Node.js 24.x
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 24.x
           cache: 'npm'
       - run: npm ci
       - run: tar -cf node_modules.tar node_modules
@@ -68,10 +58,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 20.x
+      - name: Use Node.js 24.x
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 24.x
       - uses: actions/download-artifact@v4
         with:
           name: schoolbox-node-modules
@@ -87,10 +77,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 20.x
+      - name: Use Node.js 24.x
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 24.x
       - uses: actions/download-artifact@v4
         with:
           name: schoolbox-node-modules
@@ -107,10 +97,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 20.x
+      - name: Use Node.js 24.x
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 24.x
       - uses: actions/download-artifact@v4
         with:
           name: schoolbox-node-modules
@@ -129,10 +119,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 20.x
+      - name: Use Node.js 24.x
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 24.x
       - uses: actions/download-artifact@v4
         with:
           name: schoolbox-node-modules

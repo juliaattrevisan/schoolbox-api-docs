@@ -10,39 +10,43 @@
 
 namespace Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage;
 
-use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model as IndicatorModel;
 
 class Model
 {
     /** @var int */
-    public const SEQUENCE_BASE = 1; // Indicator sequence is 1-based, not 0-based
+    public const int SEQUENCE_BASE = 1; // Indicator sequence is 1-based, not 0-based
+
 
     /**
      * @var IndicatorModel
      */
-    private $indicator;
+    private IndicatorModel $indicator;
+
 
     /**
-     * @var SubmissionBox
+     * @var null|\Schoolbox\Assessment\Rubric\Instance\Model
      */
-    private $submission_box;
+    private ?\Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance;
+
 
     /**
      * This indicator usage's max value.
      */
     private ?float $maxValue = null;
 
+
     /**
      * @var int
      */
-    private $sequence;
+    private int $sequence;
+
 
     /**
      * @param IndicatorModel $indicator
      * @return $this
      */
-    public function setIndicator(IndicatorModel $indicator)
+    public function setIndicator(IndicatorModel $indicator): self
     {
         $this->indicator = $indicator;
         return $this;
@@ -51,27 +55,29 @@ class Model
     /**
      * @return IndicatorModel
      */
-    public function getIndicator()
+    public function getIndicator(): IndicatorModel
     {
         return $this->indicator;
     }
 
-    /**
-     * @param  SubmissionBox $submission_box
-     * @return $this
-     */
-    public function setSubmissionBox(SubmissionBox $submission_box)
-    {
-        $this->submission_box = $submission_box;
-        return $this;
-    }
 
     /**
-     * @return SubmissionBox
+     * @return null|\Schoolbox\Assessment\Rubric\Instance\Model
      */
-    public function getSubmissionBox()
+    public function getRubricInstance(): ?\Schoolbox\Assessment\Rubric\Instance\Model
     {
-        return $this->submission_box;
+        return $this->rubricInstance;
+    }
+
+
+    /**
+     * @param null|\Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance
+     * @return $this
+     */
+    public function setRubricInstance(?\Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance): self
+    {
+        $this->rubricInstance = $rubricInstance;
+        return $this;
     }
 
 

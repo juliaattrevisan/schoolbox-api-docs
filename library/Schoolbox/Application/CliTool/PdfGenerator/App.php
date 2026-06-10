@@ -205,12 +205,12 @@ abstract class App extends BaseApp
         Print this help and exit
 
     $yellow-o=OUT_FILE$white
-        Filename to write archive to, e.g. '-o=output.zip'
-        Defaults to STDOUT (1>).
+        (Deprecated: use `>` to redirect STDOUT to a file)
+        Filename to write archive to, e.g. '-o=output.zip'.
 
     $yellow-l=LOG_FILE$white
-        Filename to append logs to, e.g. '-l=error.log'
-        Defaults to STDERR (2>).
+        (Deprecated: use `2>>` to redirect and append STDERR to a file)
+        Filename to append logs to, e.g. '-l=error.log'.
 
     $yellow-v[v[v]]$white
         Log verbosity. Max 3 levels, e.g. -vvv

@@ -14,136 +14,116 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Decorator;
 
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\Factory;
-
 trait DueWorkTrait
 {
     /**
      * @var int
      */
-    protected $acceptOnline = DueWork::ACCEPT_ONLINE_NONE;
+    private int $acceptOnline;
 
 
     /**
      * @var int
      */
-    protected $markType;
+    private int $markType;
+
 
     /**
      *@var int
      */
-    protected $instructorMarkType;
-
-    /**
-     * @var int
-     */
-    protected $gradingScheme;
-
-    /**
-     * @var int
-     */
-    protected $instructorGradingScheme;
-
-    /**
-     * @var bool
-     */
-    protected $useRubric = false;
-
-    /**
-     * @var array|null
-     */
-    protected $rubricData;
-
-    /**
-     * @var int|null
-     */
-    protected $capabilityMarkType;
+    private int $instructorMarkType;
 
 
     /**
-     * @var int|null
+     * @var null|int
      */
-    protected $capabilityGradeGroup;
+    private ?int $gradingScheme;
 
 
     /**
-     * @var bool
+     * @var null|int
      */
-    protected $useMarkRange = false;
+    private ?int $instructorGradingScheme;
+
 
     /**
-     * @var array|string[]
+     * @var null|string
      */
-    protected $attachedFiles;
+    private ?string $selfReviewable;
 
-    /**
-     * @var string
-     */
-    private $selfReviewable;
 
     /**
      * Only relevant if this DueWork's MarkType is 'TotalMark'
      *
-     * @var float
+     * @var null|float
      */
-    private $maxMark;
+    private ?float $maxMark;
+
 
     /**
      * Only relevant if this DueWork's MarkType is 'TotalMark'
      *
-     * @var float
+     * @var null|float
      */
-    protected $instructorMaxMark;
+    private ?float $instructorMaxMark;
+
 
     /**
      * @var bool
      */
-    private $similarityCheckEnabled = false;
+    private bool $similarityCheckEnabled;
+
 
     /**
-     * @var bool
+     * @var null|bool
      */
-    protected bool $enableWorksheet = false;
+    private ?bool $enableWorksheet = null;
+
 
     /**
      * @var string|null
      */
-    protected ?string $worksheetTemplate = null;
+    private ?string $worksheetTemplate = null;
+
 
     /**
-     * @var bool
+     * @var bool|null
      */
-    protected bool $enableOffline = false;
+    private ?bool $enableOffline = null;
+
 
     /**
-     * @var bool
+     * @var bool|null
      */
-    protected bool $enableText = false;
+    private ?bool $enableText = null;
+
 
     /**
-     * @var bool
+     * @var bool|null
      */
-    protected bool $enableFiles = false;
+    private ?bool $enableFiles = null;
+
 
     /**
-     * @var bool
+     * @var bool|null
      */
-    protected bool $enablePolicy = false;
+    private ?bool $enablePolicy = null;
+
 
     /**
      * @return int
      */
-    protected function getAcceptOnline()
+    public function getAcceptOnline()
     {
         return $this->acceptOnline;
     }
+
 
     /**
      * @param int $acceptOnline
      * @return $this
      */
-    protected function setAcceptOnline($acceptOnline)
+    public function setAcceptOnline($acceptOnline)
     {
         $this->acceptOnline = $acceptOnline;
         return $this;
@@ -153,197 +133,118 @@ trait DueWorkTrait
     /**
      * @return int
      */
-    protected function getMarkType()
+    public function getMarkType()
     {
         return $this->markType;
     }
+
 
     /**
      * @param int $markType
      * @return $this
      */
-    protected function setMarkType($markType)
+    public function setMarkType($markType)
     {
         $this->markType = $markType;
         return $this;
     }
 
+
     /**
      * @return int
      */
-    protected function getInstructorMarkType()
+    public function getInstructorMarkType()
     {
         return $this->instructorMarkType;
     }
+
 
     /**
      * @param int $instructorMarkType
      * @return $this
      */
-    protected function setInstructorMarkType($instructorMarkType)
+    public function setInstructorMarkType($instructorMarkType)
     {
         $this->instructorMarkType = $instructorMarkType;
         return $this;
     }
 
+
     /**
      * @return int|null
      */
-    protected function getGradingScheme(): ?int
+    public function getGradingScheme(): ?int
     {
         return $this->gradingScheme;
     }
+
 
     /**
      * @param int|null $gradingScheme
      * @return static
      */
-    protected function setGradingScheme(?int $gradingScheme): static
+    public function setGradingScheme(?int $gradingScheme): static
     {
         $this->gradingScheme = $gradingScheme;
         return $this;
     }
 
+
     /**
      * @return int|null
      */
-    protected function getInstructorGradingScheme(): ?int
+    public function getInstructorGradingScheme(): ?int
     {
         return $this->instructorGradingScheme;
     }
+
 
     /**
      * @param int|null $instructorGradingScheme
      * @return static
      */
-    protected function setInstructorGradingScheme(?int $instructorGradingScheme): static
+    public function setInstructorGradingScheme(?int $instructorGradingScheme): static
     {
         $this->instructorGradingScheme = $instructorGradingScheme;
         return $this;
     }
 
-    /**
-     * @return boolean
-     */
-    protected function getUseRubric()
-    {
-        return $this->useRubric;
-    }
-
-    /**
-     * @param boolean $usesRubric
-     * @return $this
-     */
-    protected function setUseRubric($usesRubric)
-    {
-        $this->useRubric = $usesRubric;
-        return $this;
-    }
-
-    /**
-     * @return int|null
-     */
-    protected function getCapabilityMarkType(): ?int
-    {
-        return $this->capabilityMarkType;
-    }
-
-    /**
-     * @param int|null $capabilityMarkType
-     * @return $this
-     */
-    protected function setCapabilityMarkType(?int $capabilityMarkType): self
-    {
-        $this->capabilityMarkType = $capabilityMarkType;
-        return $this;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getCapabilityGradeGroup(): ?int
-    {
-        return $this->capabilityGradeGroup;
-    }
-
-    /**
-     * @param int|null $capabilityGradeGroup
-     * @return $this
-     */
-    public function setCapabilityGradeGroup(?int $capabilityGradeGroup): self
-    {
-        $this->capabilityGradeGroup = $capabilityGradeGroup;
-        return $this;
-    }
-
-
-    /**
-     * @return boolean
-     */
-    protected function getUseMarkRange()
-    {
-        return $this->useMarkRange;
-    }
-
-    /**
-     * @param boolean $useMarkRange
-     * @return $this
-     */
-    protected function setUseMarkRange($useMarkRange)
-    {
-        $this->useMarkRange = $useMarkRange;
-        return $this;
-    }
 
     /**
      * @return float|null
      */
-    protected function getMaxMark()
+    public function getMaxMark()
     {
         return $this->maxMark;
     }
 
+
     /**
      * @param float|null $maxMark
      */
-    protected function setMaxMark($maxMark)
+    public function setMaxMark($maxMark)
     {
         $this->maxMark = $maxMark;
     }
 
+
     /**
      * @return float|null
      */
-    protected function getInstructorMaxMark()
+    public function getInstructorMaxMark()
     {
         return $this->instructorMaxMark;
     }
 
+
     /**
      * @param float|null $instructorMaxMark
      */
-    protected function setInstructorMaxMark($instructorMaxMark)
+    public function setInstructorMaxMark($instructorMaxMark)
     {
         $this->instructorMaxMark = $instructorMaxMark;
     }
 
-    /**
-     * @return array|null $rubricData
-     */
-    protected function getRubricData()
-    {
-        return $this->rubricData;
-    }
-
-    /**
-     * @param array|null $rubricData
-     * @return static
-     */
-    protected function setRubricData(?array $rubricData = null)
-    {
-        $this->rubricData = $rubricData;
-        return $this;
-    }
 
     /**
      * @return null|string
@@ -352,6 +253,7 @@ trait DueWorkTrait
     {
         return $this->selfReviewable;
     }
+
 
     /**
      * @param null|string $selfReviewable
@@ -363,6 +265,7 @@ trait DueWorkTrait
         return $this;
     }
 
+
     /**
      * @return bool
      */
@@ -370,6 +273,7 @@ trait DueWorkTrait
     {
         return $this->similarityCheckEnabled;
     }
+
 
     /**
      * @param bool $similarityCheckEnabled
@@ -381,6 +285,16 @@ trait DueWorkTrait
         return $this;
     }
 
+
+    /**
+     * @return bool|null
+     */
+    public function getEnableWorksheet(): ?bool
+    {
+        return $this->enableWorksheet;
+    }
+
+
     /**
      * @param bool $enableWorksheet
      * @return $this
@@ -391,13 +305,15 @@ trait DueWorkTrait
         return $this;
     }
 
+
     /**
-     * @return bool
+     * @return string|null
      */
-    public function getEnableWorksheet(): bool
+    public function getWorksheetTemplate(): ?string
     {
-        return $this->enableWorksheet;
+        return $this->worksheetTemplate;
     }
+
 
     /**
      * @param string|null $worksheetTemplate
@@ -409,13 +325,15 @@ trait DueWorkTrait
         return $this;
     }
 
+
     /**
-     * @return string|null
+     * @return bool|null
      */
-    public function getWorksheetTemplate(): ?string
+    public function getEnableOffline(): ?bool
     {
-        return $this->worksheetTemplate;
+        return $this->enableOffline;
     }
+
 
     /**
      * @param bool $enableOffline
@@ -427,13 +345,15 @@ trait DueWorkTrait
         return $this;
     }
 
+
     /**
-     * @return bool
+     * @return bool|null
      */
-    public function getEnableOffline(): bool
+    public function getEnableText(): ?bool
     {
-        return $this->enableOffline;
+        return $this->enableText;
     }
+
 
     /**
      * @param bool $enableText
@@ -445,13 +365,15 @@ trait DueWorkTrait
         return $this;
     }
 
+
     /**
-     * @return bool
+     * @return bool|null
      */
-    public function getEnableText(): bool
+    public function getEnableFiles(): ?bool
     {
-        return $this->enableText;
+        return $this->enableFiles;
     }
+
 
     /**
      * @param bool $enableFiles
@@ -463,13 +385,15 @@ trait DueWorkTrait
         return $this;
     }
 
+
     /**
-     * @return bool
+     * @return bool|null
      */
-    public function getEnableFiles(): bool
+    public function getEnablePolicy(): ?bool
     {
-        return $this->enableFiles;
+        return $this->enablePolicy;
     }
+
 
     /**
      * @param bool $enablePolicy
@@ -479,13 +403,5 @@ trait DueWorkTrait
     {
         $this->enablePolicy = $enablePolicy;
         return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getEnablePolicy(): bool
-    {
-        return $this->enablePolicy;
     }
 }

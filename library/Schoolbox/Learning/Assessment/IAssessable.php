@@ -12,7 +12,6 @@ namespace Schoolbox\Learning\Assessment;
 
 use InvalidArgumentException;
 use RuntimeException;
-use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\GenericCollection;
@@ -23,16 +22,33 @@ use Schoolbox\User;
 use Schoolbox\Collection;
 use Alaress_Date_Format;
 use DomainException;
-use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Curriculum\Node;
 
 interface IAssessable extends ISoftDeletable
 {
-    public const MARK_VISIBILITY_PRIVATE        = SubmissionBox::MARK_VISIBILITY_STAFF_ONLY;
-    public const MARK_VISIBILITY_STUDENT        = SubmissionBox::MARK_VISIBILITY_STAFF_AND_STUDENT;
-    public const MARK_VISIBILITY_PARENT_STUDENT = SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT;
-    public const MARK_VISIBILITY_STAFF_PARENT   = 4;
+    // Note these must match the enum values on the mark_visibility fields of various database tables:
+    //  * submission_box.mark_visibility
+    //  * project.mark_visibility
+    //  * assess.mark_visibility
+    //  * lti_assessment.mark_visibility
+    public const string MARK_VISIBILITY_PRIVATE        = 'staffOnly';
+    public const string MARK_VISIBILITY_STUDENT        = 'staffAndStudent';
+    public const string MARK_VISIBILITY_PARENT         = 'staffAndParent';
+    public const string MARK_VISIBILITY_PARENT_STUDENT = 'staffStudentAndParent';
 
+    // Human-readable versions of the above consts (for use in the UI).
+    public const string MARK_VISIBILITY_PRIVATE_STRING        = 'Staff Only';
+    public const string MARK_VISIBILITY_STUDENT_STRING        = 'Staff & Student';
+    public const string MARK_VISIBILITY_PARENT_STRING         = 'Staff & Parent';
+    public const string MARK_VISIBILITY_PARENT_STUDENT_STRING = 'Staff, Student & Parent';
+
+    // Mark Visibility strings
+    public const array MARK_VISIBILITY_STRINGS = [
+        self::MARK_VISIBILITY_PRIVATE        => self::MARK_VISIBILITY_PRIVATE_STRING,
+        self::MARK_VISIBILITY_STUDENT        => self::MARK_VISIBILITY_STUDENT_STRING,
+        self::MARK_VISIBILITY_PARENT         => self::MARK_VISIBILITY_PARENT_STRING,
+        self::MARK_VISIBILITY_PARENT_STUDENT => self::MARK_VISIBILITY_PARENT_STUDENT_STRING,
+    ];
 
     /**
      * The default readable name for this type of assessment, NOT translated
@@ -233,16 +249,17 @@ interface IAssessable extends ISoftDeletable
      *
      * * self::MARK_VISIBILITY_PRIVATE: only staff may view
      * * self::MARK_VISIBILITY_STUDENT: staff and students may view
+     * * self::MARK_VISIBILITY_PARENT: staff and parents may view
      * * self::MARK_VISIBILITY_PARENT_STUDENT: staff, students and parents may view
      *
-     * @return int
+     * @return string
      */
     public function getMarkVisibility();
 
     /**
      * Sets the mark visibility of this assessment.
      *
-     * @param int $markVisibility
+     * @param string $markVisibility
      * @return static
      */
     public function setMarkVisibility($markVisibility);
@@ -549,18 +566,11 @@ interface IAssessable extends ISoftDeletable
     public function getCountInteractions(bool $includeDrafts = false): int;
 
 
-    /**
-     * Returns whether this assessment should only visible to staff and instructors
-     *
-     * @return bool
-     */
-    public function isStaffOrInstructorVisibleOnly(): bool;
-
     /* Getters/Setters
      */
 
     /**
-     * @var int
+     * @return int
      */
     public function getId();
 
@@ -816,7 +826,7 @@ interface IAssessable extends ISoftDeletable
     /**
      * Must allow nulls (eg for Tasks and Quiz, which for the moment cannot have LetterGrade MarkTypes)
      *
-     * @param GradeGroup|null $gradeGroup
+     * @param GradeGroup $gradeGroup
      * @return static
      */
     public function setGradeGroup(GradeGroup $gradeGroup);
@@ -923,6 +933,22 @@ interface IAssessable extends ISoftDeletable
      * @return string
      */
     public function getFeedbackClass();
+
+
+    /**
+     * @return GenericCollection<\Schoolbox\Assessment\Rubric\Instance\Model>|null
+     */
+    public function getRubricInstances(): ?GenericCollection;
+
+
+    /**
+     * This variant of a setters also checks/asserts the contents of $rubricInstances supplied here to ensure they're
+     * the same type as what it originally was.
+     *
+     * @param GenericCollection<\Schoolbox\Assessment\Rubric\Instance\Model>|null $rubricInstances
+     * @return $this
+     */
+    public function setRubricInstances(?GenericCollection $rubricInstances): self;
 
 
     /**

@@ -13,6 +13,8 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\DataRetention\Strategy;
 
 use Alaress\Database\Connector\IConnector;
+use PDO;
+use PDOStatement;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\DataRetention\RetentionPeriod;
 use Schoolbox\Admin\DataRetention\ValidRetentionPeriod;
@@ -40,7 +42,7 @@ abstract class Base implements IStrategy
     /**
      * A hash lookup of cached prepared statements and how often they were reused.
      *
-     * @var array<string, array{statement: \PDOStatement, count: int}>
+     * @var array<string, array{statement: PDOStatement, count: int}>
      */
     protected array $preparedStatements = [];
 
@@ -105,11 +107,14 @@ abstract class Base implements IStrategy
             // begin transaction for the chunk
             $this->database->beginTransaction();
 
+            // did the chunk delete anything?
+            $deletedThings = false;
+
             try {
                 // log the chunk we are working on
                 $this->log->notice(sprintf("[%s/%s] Processing chunk", $chunkNum + 1, $chunkCount));
 
-                $this->deleteChunk($chunk);
+                $deletedThings = $this->deleteChunk($chunk);
 
                 if ($this->perform) {
                     // perform the transaction for the chunk
@@ -145,7 +150,13 @@ abstract class Base implements IStrategy
                     $this->log->notice(sprintf("Chunk loop limit of '%s' reached, stopping for now", $this->chunkLoops));
                     return;
                 }
-                $chunkLoop++;
+
+                if ($deletedThings) {
+                    $this->log->notice("Things were deleted in this chunk.");
+                    $chunkLoop++;
+                } else {
+                    $this->log->notice("No entries deleted in this chunk, not counting this to the chunk count");
+                }
             }
         }
 
@@ -218,11 +229,11 @@ abstract class Base implements IStrategy
      * Delete a chunk of entities and their related data,
      * this is transacted, and logged to assist with errors and debugging
      * @param array $chunk
-     * @return void
+     * @return bool (true, things were deleted, false, nothing was deleted, don't count this chunk as a loop iteration)
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      */
-    abstract protected function deleteChunk(array $chunk): void;
+    abstract protected function deleteChunk(array $chunk): bool;
 
     /**
      * Get the strategy name, this is used to identify the strategy in the command line tool, e.g. 'cmslog'
@@ -260,9 +271,9 @@ abstract class Base implements IStrategy
     /**
      * Get the cached prepared statement for a query, or create a new one if it doesn't exist
      * @param string $query
-     * @return \PDOStatement
+     * @return PDOStatement
      */
-    protected function getPreparedStatement(string $query): \PDOStatement
+    protected function getPreparedStatement(string $query): PDOStatement
     {
         if (!isset($this->preparedStatements[$query])) {
             $this->preparedStatements[$query] = [
@@ -273,5 +284,19 @@ abstract class Base implements IStrategy
         // log that fetched the prepared statement
         $this->preparedStatements[$query]['count']++;
         return $this->preparedStatements[$query]['statement'];
+    }
+
+    /**
+     * Executes a prepared query with the given parameters and returns all rows as an associative array.
+     *
+     * @param array<string, mixed> $params
+     * @return list<array<string, mixed>>
+     */
+    protected function fetchRows(string $query, array $params): array
+    {
+        $statement = $this->getPreparedStatement($query);
+        $statement->execute($params);
+
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 }

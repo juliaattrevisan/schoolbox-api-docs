@@ -180,7 +180,7 @@ class Helper
                     in_array(get_class($folderAssessment), $allowedActivities) &&
                     $folderAssessment->getWorkType() &&
                     \in_array($folderAssessment->getWorkType()->getId(), $workTypes->getPropertyValues('id'), true) &&
-                    $visibility->isVisibleToUserOrChildOfUser($folderAssessment, $viewer, true, null, !$this->access->isInstructor($viewer, $folderAssessment->getBaseContext()->getFolder()))
+                    $visibility->isVisibleToUser($folderAssessment, $viewer, true, null, !$this->access->isInstructor($viewer, $folderAssessment->getBaseContext()->getFolder()))
                 ) {
                     $workTypeAssessments->add($folderAssessment);
                 }

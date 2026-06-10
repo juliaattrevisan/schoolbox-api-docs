@@ -1,0 +1,49 @@
+/**
+ * Box drop shadow config
+ * Applied to UI "boxes" in Advanced UI
+ * Box = element on page background that typically has the --sbx-color-foreground-primary background color, such as islands, empty states, components, etc.
+ */
+
+:root {
+    --sbx-config-container-drop-shadow: var(--sbx-shadow-none);
+}
+
+body.sbx-body {
+    // Apply box shadows to base box surfaces
+    .island section,
+    .island > table,
+    .c-island,
+    .empty-state,
+    .empty-state-flex-centered,
+    .side-nav,
+    .scrollable,
+    .cover-photo,
+    .cr-results-grid,
+    #activity-feed {
+        box-shadow: var(--sbx-config-container-drop-shadow);
+    }
+
+    // Undo unintended shadows on some elements, typically when the elements are
+    // inside an element that already has a shadow
+    .reveal-modal *,
+    .modal *,
+    .island section section,
+    #permissions .scrollable,
+    .sortable .empty-state,
+    .content-overlay .empty-state-flex-centered,
+    .off-canvas-list section,
+    #activity-feed section,
+    .c-island .scrollable {
+        box-shadow: none;
+    }
+
+    // have to shadow each section separately
+    .VueTables--client {
+        .VueTables__search,
+        .VueTables__wrapper,
+        .filters,
+        .VueTables__table-footer {
+            box-shadow: var(--sbx-config-container-drop-shadow);
+        }
+    }
+}

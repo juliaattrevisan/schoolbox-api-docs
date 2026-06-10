@@ -216,7 +216,8 @@ abstract class Thumbnail
     {
         /* If it has at least the right extension, download it directly
          */
-        if (($filename = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_BASENAME))) {
+        $path = parse_url($url, PHP_URL_PATH);
+        if (is_string($path) && ($filename = pathinfo($path, PATHINFO_BASENAME))) {
             try {
                 $file = MimetypeMapper::getInstance()->getByFilename($filename);
                 if ($file->isImage()) {

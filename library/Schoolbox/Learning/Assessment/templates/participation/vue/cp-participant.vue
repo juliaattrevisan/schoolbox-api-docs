@@ -126,7 +126,7 @@ function onOpenIncludeInExistingModal(): void {
         </td>
         <td v-if="props.differentiationEnabled">
             <button
-                v-if="props.participant._links.differentiationProfile"
+                v-if="props.participant._links?.differentiationProfile"
                 class="button sbx-button--has-icon f-no-margins"
                 type="button"
                 :data-test="`cp-participant-${props.participant.user.id}-view-differentiation-profile`"
@@ -138,7 +138,7 @@ function onOpenIncludeInExistingModal(): void {
         </td>
         <td v-if="canSuggestCustomisation">
             <button
-                v-if="props.participant._links.differentiationProfile"
+                v-if="props.participant._links?.differentiationProfile"
                 class="button f-no-margins sbx-button--has-icon"
                 type="button"
                 @click.prevent="onViewSuggestedCustomisation"

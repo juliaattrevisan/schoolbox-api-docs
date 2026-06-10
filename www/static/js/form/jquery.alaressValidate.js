@@ -539,7 +539,8 @@
     /**
      * Default error placement method.
      *
-     * First check for the attribute data-has-error-placeholder, in which case insert into an .error-placeholder div
+     * First check for the attribute data-has-error-placeholder, in which case insert into an .error-placeholder div (only for fieldsets)
+     * Then check for a data-error-placeholder-selector attribute, in which case insert into the specified element by selector
      * Then check for standard checkbox or radio, in which case insert error before the set of checkboxes/radios
      * In all other situations place the error after the element.
      *
@@ -549,6 +550,8 @@
     $.alaressValidate.defaultErrorPlacement = function (error, element) {
         if (element.parents("fieldset").is("[data-has-error-placeholder]")) {
             element.parents("fieldset").find("div.error-placeholder").html(error);
+        } else if (element.data("error-placeholder-selector")) {
+            $(element.data("error-placeholder-selector")).html(error);
         } else if (element.closest(".input-group").length) {
             error.insertAfter(element.closest(".input-group"));
         } else if (element[0].selectize) {

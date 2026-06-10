@@ -57,7 +57,7 @@ trait StorableTrait
 
     /**
      * @param string $basename
-     * @return $this
+     * @return static
      */
     public function setBasename($basename)
     {
@@ -115,7 +115,7 @@ trait StorableTrait
 
     /**
      * @param string $extension
-     * @return $this
+     * @return static
      */
     public function setExtension($extension)
     {

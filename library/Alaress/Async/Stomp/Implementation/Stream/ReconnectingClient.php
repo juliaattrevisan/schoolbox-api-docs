@@ -15,9 +15,11 @@ use Alaress\Jitter\MaxAttemptsExceededException;
 use Closure;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use React\EventLoop\TimerInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use Throwable;
+use WeakReference;
 
 /**
  * Decorator around IClient that transparently reconnects and replays
@@ -48,6 +50,20 @@ class ReconnectingClient implements IClient
     private int $reconnectAttempts = 0;
 
     /**
+     * Pending reconnect timer, if any.
+     */
+    private ?TimerInterface $pendingTimer = null;
+
+    /**
+     * Whether this client has been stopped and should no longer attempt reconnects.
+     *
+     * Set during PHP shutdown (before GC/destructors) to prevent scheduleReconnect()
+     * from registering a new ev_timer on the stopped loop — which would leave a
+     * dangling C watcher that segfaults when ev_loop_destroy() runs.
+     */
+    private bool $stopped = false;
+
+    /**
      * @var array<callable>
      * @noinspection PhpPropertyOnlyWrittenInspection - this is read in `scheduleReconnect`
      */
@@ -66,6 +82,34 @@ class ReconnectingClient implements IClient
         private ?LoggerInterface $log = null,
     ) {
         $this->inner = call_user_func($this->factory);
+
+        // PHP shutdown functions run before GC/destructors.
+        // Stopping on shutdown prevents scheduleReconnect() from registering an
+        // ev_timer on the dead loop when Connection::__destruct() fires the
+        // onClose callback during teardown.
+        // It's implemented as a weak reference because otherwise `$this` will
+        // not be released if the object is destructed before shutdown, thus
+        // holding this object in memory indefinitely.
+        $weakRef = WeakReference::create($this);
+        register_shutdown_function(fn () => $weakRef->get()?->stop());
+    }
+
+    /**
+     * Cancel any pending reconnect timer and prevent further reconnect attempts.
+     *
+     * Safe to call on a stopped loop — cancelTimer() only operates on live C watchers
+     * if the ev_loop is still alive, which it is at shutdown-function time.
+     */
+    private function stop(): void
+    {
+        $this->stopped = true;
+        if ($this->pendingTimer) {
+            $this->log?->debug("Shutdown received: stopping reconnection timer function");
+            $this->loop->cancelTimer($this->pendingTimer);
+            $this->pendingTimer = null;
+        } else {
+            $this->log?->debug("Shutdown received, but no reconnection timer function to stop");
+        }
     }
 
     /**
@@ -125,6 +169,10 @@ class ReconnectingClient implements IClient
      */
     private function scheduleReconnect(): void
     {
+        if ($this->stopped) {
+            return;
+        }
+
         $delay = $this->jitter->calculateJitter($this->reconnectAttempts);
         $this->log?->info(
             "Disconnected from STOMP queue: attempting to reconnect",
@@ -134,9 +182,13 @@ class ReconnectingClient implements IClient
             ],
         );
 
-        $this->loop->addTimer(
+        $this->pendingTimer = $this->loop->addTimer(
             $delay / 1000,
             function (): void {
+                $this->pendingTimer = null;
+                if ($this->stopped) {
+                    return;
+                }
                 $this->log?->debug("Reconnecting to STOMP queue...");
                 try {
                     $this->inner = call_user_func($this->factory);

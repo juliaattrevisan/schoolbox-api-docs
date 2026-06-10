@@ -1,0 +1,1 @@
+-- system_purpose_id is created and seeded in 14-createGroupSubjectLanguagesTable.sql.

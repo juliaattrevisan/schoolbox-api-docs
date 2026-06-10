@@ -18,7 +18,7 @@ use Schoolbox\Comms\News;
  */
 class Model
 {
-    /** @var News\Model() */
+    /** @var News\Model */
     private $commsNewsArticle;
 
     /** @var string */

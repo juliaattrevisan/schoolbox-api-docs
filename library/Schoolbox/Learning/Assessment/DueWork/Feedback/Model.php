@@ -54,11 +54,11 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
 
 
     /**
-     * The marked rubric grid for this feedback.
+     * The marked rubric grids for this feedback.
      *
-     * @var MarkedGrid
+     * @var null|\Schoolbox\GenericCollection<MarkedGrid>
      */
-    private $rubricMarkedGrid;
+    private ?\Schoolbox\GenericCollection $rubricMarkedGrids = null;
 
 
     /**
@@ -77,7 +77,8 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
      */
     public function __construct()
     {
-        $this->setAllFiles(new Collection());
+        $this->allFiles = new Collection();
+        $this->rubricMarkedGrids = new \Schoolbox\GenericCollection(MarkedGrid::class);
     }
 
 
@@ -227,21 +228,21 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
 
 
     /**
-     * @return null|MarkedGrid
+     * @return null|\Schoolbox\GenericCollection<MarkedGrid>
      */
-    public function getRubricMarkedGrid(): ?MarkedGrid
+    public function getRubricMarkedGrids(): ?\Schoolbox\GenericCollection
     {
-        return $this->rubricMarkedGrid;
+        return $this->rubricMarkedGrids;
     }
 
 
     /**
-     * @param MarkedGrid $rubricMarkedGrid
+     * @param \Schoolbox\GenericCollection<MarkedGrid> $rubricMarkedGrids
      * @return static
      */
-    public function setRubricMarkedGrid(MarkedGrid $rubricMarkedGrid): self
+    public function setRubricMarkedGrids(\Schoolbox\GenericCollection $rubricMarkedGrids): self
     {
-        $this->rubricMarkedGrid = $rubricMarkedGrid;
+        $this->rubricMarkedGrids = $rubricMarkedGrids;
         return $this;
     }
 

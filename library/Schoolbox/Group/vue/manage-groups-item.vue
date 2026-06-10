@@ -483,7 +483,7 @@ export default {
 .group-actions {
     // to put them in the top right corner
     background: var(--sbx-color-foreground-primary, white);
-    border-radius: var(--sbx-config-field-roundness, 0);
+    border-radius: var(--sbx-config-field-corner-radius, 0);
     position: absolute;
     right: 0.5rem;
     top: 0.5rem;

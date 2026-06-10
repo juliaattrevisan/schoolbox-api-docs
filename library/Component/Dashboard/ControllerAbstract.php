@@ -43,7 +43,27 @@ abstract class Component_Dashboard_ControllerAbstract extends Component_Controll
         $this->setContextPermission(UserAccess::ACCESS_FULL);
 
         if ($this->isUsingAltSource()) {
-            $this->setContentPermission(min($this->access->getFolderAccess($this->getUser(), $this->getSource()->getId()), $this->getMaximumPermission()));
+            /**
+             * on the occasion that getSource is set/valid, but getSource()->getId() is null.
+             * getsource has been deleted in the database, but is still being referred to. so also set the source as 0
+             * we deal with this in `library/Component/ControllerAbstract.php` when we run `isSourceRenderable`
+             * */
+            //if getSource->GetId is null (database deleted, but still referred to) also show as deleted.
+            if ($this->getSource() && $this->getSource()->getId() != null) {
+                $sourceId = $this->getSource()->getId();
+            } else {
+                $sourceId = 0;
+            }
+
+            try {
+                $this->setContentPermission(min($this->access->getFolderAccess($this->getUser(), $sourceId), $this->getMaximumPermission()));
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                /**
+                 * If the alt source has been deleted, catch that here
+                 * So that it doesn't escalate to the kernel and 404 the whole page
+                 */
+                $this->setContentPermission(UserAccess::ACCESS_DENY);
+            }
         } else {
             $this->setContentPermission(UserAccess::ACCESS_FULL);
         }

@@ -23,7 +23,7 @@ use Schoolbox\Mapper\Exception as MapperException;
  * @method Model createModel($idValue = null)
  * @method Model findById($id)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
- * @method Model[] findByColumnList($columnList, $options = [])
+ * @method GenericCollection<Model> findByColumnList($columnList, $options = [])
  * @method Model findOneByColumnList($columnList, array $options = [])
  */
 class Mapper extends BaseMapper
@@ -33,7 +33,7 @@ class Mapper extends BaseMapper
      * @see expanded reason in /library/Schoolbox/Assessment/Rubric/templates/vue/types.ts
      * @see also SA-13689.
      */
-    public const CAPABILITY_NAME_MAX_CHARS_TO_STORE = 900;
+    public const int CAPABILITY_NAME_MAX_CHARS_TO_STORE = 900;
 
     /**
      * @inheritdoc
@@ -42,16 +42,15 @@ class Mapper extends BaseMapper
     {
         $this->hasTable('rubric_capability');
         $this->hasModel(Model::class);
-
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-
         $this->uses('name', self::TYPE_STRING);
-        $this->uses('parent_type', self::TYPE_STRING);
 
-        // Parent ID can reference any of:
+        // Parent Type can reference any of:
         // submission, category, curriculum
-        // as far as I can tell, it's never not "category"
+        // as far as I can tell, it's always "category"
+        $this->uses('parent_type', self::TYPE_STRING);
         $this->uses('parent_id', self::TYPE_INTEGER);
+
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         // Add curriculum codes
@@ -68,8 +67,6 @@ class Mapper extends BaseMapper
         );
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyUniqueness']);
-
-//        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteIndicators']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteUsages']);
     }
 
@@ -82,8 +79,8 @@ class Mapper extends BaseMapper
         /** @var NodeMapper $curriculumNodeMapper */
         $curriculumNodeMapper = $this->getJoinMapper('curriculum_node_for_rubric_capability');
         $collection           = $this->createCollection();
+
         foreach ($statement as $row) {
-            /** @var Model $capability */
             $capability                       = $this->hydrate($row);
             $collection[$capability->getId()] = $capability;
         }
@@ -94,6 +91,7 @@ class Mapper extends BaseMapper
             'curriculum_node_for_rubric_capability',
             $collection->keys()
         );
+
         foreach ($collection as $capability) {
             if (isset($capabilityNodes[$capability->getId()])) {
                 $capability->setCurriculumNodes($capabilityNodes[$capability->getId()]);
@@ -125,8 +123,8 @@ class Mapper extends BaseMapper
     public function verifyUniqueness(Model $object): bool
     {
         $pb = $this->getPredicateBuilder()
-                   ->equals('parent_id', $object->getParentId())
-                   ->equals('parent_type', $object->getParentType());
+            ->equals('parent_id', $object->getParentId())
+            ->equals('parent_type', $object->getParentType());
 
         // Don't compare this object with itself
         if ($object->getId()) {
@@ -136,6 +134,7 @@ class Mapper extends BaseMapper
         // Check this name isn't in use
         $existingNames  = $this->findScalarByPredicates('name', $pb);
         $normalizedName = Util::normalizeName($object->getName());
+
         foreach ($existingNames as $existingName) {
             if (Util::normalizeName($existingName) === $normalizedName) {
                 throw new MapperException(
@@ -154,6 +153,7 @@ class Mapper extends BaseMapper
      * Soft-deleting a capability (hard) deletes all of its usages.
      *
      * @param Model $capability
+     * @throws MapperException
      */
     public function deleteUsages(Model $capability): void
     {
@@ -167,8 +167,7 @@ class Mapper extends BaseMapper
      * @param int|int[] $parentId   The parent ID (or list thereof) to find for
      * @param string    $parentType One of the `Model::PARENT_TYPE_*` constants
      * @param bool      $cache      If false, bypass result cache
-     * @return GenericCollection|Model[]
-     * @throws MapperException
+     * @return GenericCollection<Model>
      */
     public function findForParent($parentId, string $parentType, bool $cache = true): GenericCollection
     {
@@ -190,8 +189,7 @@ class Mapper extends BaseMapper
      *
      * @param int|int[] $folderId The folder ID (or list thereof) to find for
      * @param bool      $cache    If false, bypass result cache
-     * @return GenericCollection|Model[]
-     * @throws MapperException
+     * @return GenericCollection<Model>
      */
     public function findForFolder($folderId, bool $cache = true): GenericCollection
     {
@@ -214,20 +212,23 @@ class Mapper extends BaseMapper
         string $name,
         bool $cache = true
     ): ?Model {
-        $capabilities   = $this->findByColumnList(
+        $capabilities = $this->findByColumnList(
             [
                 'parent_id'   => $parentId,
                 'parent_type' => $parentType,
             ],
             ['cache' => $cache,]
         );
+
         $normalizedName = Util::normalizeName($name);
+
         foreach ($capabilities as $capability) {
             /** @var Model $capability */
             if ($normalizedName === Util::normalizeName($capability->getName())) {
                 return $capability;
             }
         }
+
         return null;
     }
 
@@ -270,6 +271,7 @@ class Mapper extends BaseMapper
     ): Model {
         // Try to find a capability with this name
         $existing = $this->findOneForParentByName($parentId, $parentType, $name, $cache);
+
         if ($existing) {
             // Found
             return $existing;
@@ -284,11 +286,13 @@ class Mapper extends BaseMapper
 
         // Couldn't find. Create one
         $item = $this->createModel()
-                     ->setParentId($parentId)
-                     ->setParentType($parentType)
-                     ->setName($name)
-                     ->setCurriculumNodes($curriculumNodes);
+            ->setParentId($parentId)
+            ->setParentType($parentType)
+            ->setName($name)
+            ->setCurriculumNodes($curriculumNodes);
+
         $this->save($item);
+
         return $item;
     }
 

@@ -680,7 +680,9 @@ class Calendar extends DeprecatedModel
 
         $this->removeAttendanceByEvent($eventID);
 
-        parent::delete($eventID);
+        $deleted = parent::delete($eventID);
         $this->delPerms($eventID);
+
+        return $deleted;
     }
 }

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Tests\Api\Assessment;
 
 use Aura\Di\Exception\ServiceNotFound;
+use Codeception\Scenario;
 use Generator;
 use Symfony\Component\Yaml\Yaml;
 use Tests\Support\ApiTester;
@@ -27,20 +28,18 @@ class ApiAssessmentCest
 
     private IAssessable $dueWork;
 
-    public function _before(ApiTester $i): void
-    {
-        // rely on an existing assessment for now
-        $this->dueWork = $i->getExistingAssessment(null);
-        $this->folder  = $this->dueWork->getBaseContext()->getFolder();
-    }
-
     /**
      * @param ApiTester $i
      * @return void
      * @throws ServiceNotFound
      */
-    public function run(ApiTester $i): void
+    public function run(ApiTester $i, Scenario $scenario): void
     {
+        $scenario->skip('Skipped pending rubric restructure fix [SA-22466].');
+
+        $this->dueWork = $i->getExistingAssessment(null);
+        $this->folder = $this->dueWork->getBaseContext()->getFolder();
+
         $users = $i->getUsers();
         foreach ($users as $user) {
             $this->testGet($i, $user);

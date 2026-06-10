@@ -18,7 +18,7 @@ use Schoolbox\Collection;
 
 class Average extends AbstractSummator
 {
-    /** @var float */
+    /** @var float|null */
     protected $sum;
 
     /** @var int */

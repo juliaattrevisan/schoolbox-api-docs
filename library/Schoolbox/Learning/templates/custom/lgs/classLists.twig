@@ -7,7 +7,8 @@
     <template v-slot:student-menu-items="slotProps">
         <template v-for="(element, index) in slotProps.student.routes">
             <li v-if="!index.match(/(dueWork|grades)/)">
-                <a :href="element.href" :class="element.class" :title="element.title">
+                <a :href="element.href" :class="element.class || (element.icon ? 'sbx-button--has-icon' : '')" :title="element.title">
+                    <sbx-icon v-if="element.icon" :name="element.icon"></sbx-icon>
                     {{ element.label }}
                 </a>
             </li>

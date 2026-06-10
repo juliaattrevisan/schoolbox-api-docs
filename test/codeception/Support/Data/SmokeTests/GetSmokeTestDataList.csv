@@ -1295,8 +1295,8 @@ LMS,"View course markbook",Superuser,/learning/courseMarkbook/2?1[project]=0&1[q
 LMS,"View course markbook",Teacher,/learning/courseMarkbook/2?1[project]=0&1[quiz]=0&1[dueWork]=0&1[task]=0&5[1]=0&5[2]=0&5[3]=0&5[4]=0&8[5]=0&8[6]=0&8[7]=0&8[9]=0&10[unpublished]=0&10[upcoming]=0&10[open]=0&10[overdue]=0&10[closed]=0&11[unweighted]=0&11[weighted]=0&12[1]=0&12[2]=0&12[3]=0&12[5]=0&12[6]=0&12[7]=0&12[8]=0&12[9]=0&12[10]=0&12[11]=0&12[12]=0&12[none]=0&14[52]=0&14[55]=0&14[90]=0,200
 LMS,"View course markbook",Student,/learning/courseMarkbook/2?1[project]=0&1[quiz]=0&1[dueWork]=0&1[task]=0&5[1]=0&5[2]=0&5[3]=0&5[4]=0&8[5]=0&8[6]=0&8[7]=0&8[9]=0&10[unpublished]=0&10[upcoming]=0&10[open]=0&10[overdue]=0&10[closed]=0&11[unweighted]=0&11[weighted]=0&12[1]=0&12[2]=0&12[3]=0&12[5]=0&12[6]=0&12[7]=0&12[8]=0&12[9]=0&12[10]=0&12[11]=0&12[12]=0&12[none]=0&14[52]=0&14[55]=0&14[90]=0,401
 LMS,"View course markbook",Parent,/learning/courseMarkbook/2?1[project]=0&1[quiz]=0&1[dueWork]=0&1[task]=0&5[1]=0&5[2]=0&5[3]=0&5[4]=0&8[5]=0&8[6]=0&8[7]=0&8[9]=0&10[unpublished]=0&10[upcoming]=0&10[open]=0&10[overdue]=0&10[closed]=0&11[unweighted]=0&11[weighted]=0&12[1]=0&12[2]=0&12[3]=0&12[5]=0&12[6]=0&12[7]=0&12[8]=0&12[9]=0&12[10]=0&12[11]=0&12[12]=0&12[none]=0&14[52]=0&14[55]=0&14[90]=0,401
-LMS,"View learning analytics",Superuser,/learning/analytics/course/2,200
-LMS,"View learning analytics",Teacher,/learning/analytics/course/2,200
+LMS,"View learning analytics",Superuser,/learning/analytics/course/2,IGNORE
+LMS,"View learning analytics",Teacher,/learning/analytics/course/2,IGNORE
 LMS,"View learning analytics",Student,/learning/analytics/course/2,401
 LMS,"View learning analytics",Parent,/learning/analytics/course/2,401
 LMS,"View assessment calendar",Superuser,/learning/assessment/calendar?1=,200

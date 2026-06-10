@@ -54,10 +54,13 @@
                                            value="{{ flagColors.foreground }}" data-test="audiences-modify-pastoral-flag-color-input" />
                                 </div>
                                 <div class="small-6 medium-2 columns">
-                                    <span id="pastoralFlagPreview"
-                                          class="label neutral {% if icon and color %}icon-{{ icon }}{% else %}hide{% endif %}"
-                                          style="color: {{ flagColors.foreground }}; background-color: {{ flagColors.background }}"
-                                    >1</span>
+                                    <sbx-label id="pastoralFlagPreview"
+                                          text="1"
+                                          icon="{{ icon }}"
+                                          text-color="{{ flagColors.foreground }}"
+                                          background-color="{{ flagColors.background }}"
+                                          class="{% if not icon or not color %}hide{% endif %}"
+                                    ></sbx-label>
                                 </div>
                             </div>
                         </div>
@@ -308,16 +311,11 @@
                                                 icon = iconSelect.value;
                                         if (color.length === 0 || icon.length === 0) {
                                             flagPreview.classList.add('hide');
+                                            flagPreview.setAttribute('icon', '');
                                         } else {
-                                            // Remove hide and all icon classes
                                             flagPreview.classList.remove('hide');
-                                            flagPreview.classList.remove(
-                                                    ...Array.from(flagPreview.classList.values()).filter((v) => v.startsWith('icon-'))
-                                            );
-
-                                            // Add new icon class and set color
-                                            flagPreview.classList.add('icon-' + icon);
-                                            flagPreview.style.color = color;
+                                            flagPreview.setAttribute('icon', icon);
+                                            flagPreview.setAttribute('text-color', color);
 
                                             // Background color:
                                             // same hue/saturation/alpha as foreground,
@@ -330,7 +328,7 @@
                                                         l: baseBackgroundHsl.l,
                                                         a: colorHsl.a,
                                                     });
-                                            flagPreview.style.backgroundColor = actualBackground.toHslString();
+                                            flagPreview.setAttribute('background-color', actualBackground.toHslString());
                                         }
                                     });
                                 });

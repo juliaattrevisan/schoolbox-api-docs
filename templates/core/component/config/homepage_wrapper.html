@@ -19,10 +19,10 @@
                 </div>
                 <nav>
                     <!-- BEGIN settings_link -->
-                    <a {HIDE_CONTROLS_ON_WRITE} {COMPONENT_SETTINGS_DATA} data-target='settings' data-state='closed' href="#" class="settings edit sbx-icon-only-button" title="Settings"><sbx-icon name="settings"></sbx-icon></a>
+                    <a {HIDE_CONTROLS_ON_WRITE} {COMPONENT_SETTINGS_DATA} data-target='settings' data-state='closed' href="#" class="settings edit sbx-icon-only-button" title="Settings" data-test="homepage-component-settings"><sbx-icon name="settings"></sbx-icon></a>
                     <!-- END settings_link -->
                     <!-- BEGIN settings_collapse -->
-                    <a data-collapser="true" href="#" class="collapse sbx-icon-only-button" title="Expand/collapse content" aria-label="Expand/collapse content"><sbx-icon name="{CONFIG_COLLAPSED_SBX_ICON}"></sbx-icon></a>
+                    <a data-collapser="true" href="#" class="collapse sbx-icon-only-button" title="Expand/collapse content" aria-label="Expand/collapse content" data-test="homepage-component-collapse"><sbx-icon name="{CONFIG_COLLAPSED_SBX_ICON}"></sbx-icon></a>
                     <!-- END settings_collapse -->
                     <!-- BEGIN settings_close -->
                     <a {HIDE_CONTROLS_ON_WRITE} {COMPONENT_SETTINGS_DATA} data-target="delete" data-state='closed' href="#" class="close delete sbx-icon-only-button" title="Close" data-test="homepage-component-close"><sbx-icon name="close"></sbx-icon></a>
@@ -47,7 +47,7 @@
                             </label>
                         </div>
                         <!-- END config_element -->
-                        <input type="submit" value="Update" />
+                        <input type="submit" value="Update" data-test="homepage-component-update-button" />
                     </form>
                 </div>
             </section>

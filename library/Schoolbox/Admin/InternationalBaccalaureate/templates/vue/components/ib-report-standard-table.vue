@@ -1,14 +1,83 @@
 <script setup lang="ts">
-/**
- * Student table used in the Preparation, Unconfirmed, and Confirmed sections of the registration report.
- */
+import { apiRequest } from "@js/util/sbx/apiUtils";
 import IbReportSubjectLabels from "./ib-report-subject-labels.vue";
-import type { StudentRow } from "../../js/types/ibReportTypes";
+import { useIbReportUpdateLanguageStore } from "../store/ibReportUpdateLanguageStore";
+import type { ApiRenotifyResponse, StudentRow } from "../../js/types/ibReportTypes";
 
 interface Props {
     students: StudentRow[];
+    searchLanguagesEndpoint: string;
+    section: StudentRow["stage"];
+    activeSelectionSection: StudentRow["stage"] | null;
 }
-defineProps<Props>();
+const props = defineProps<Props>();
+
+const selectedList = defineModel<StudentRow[]>("selectedList", { default: () => [] });
+
+const updateLanguageStore = useIbReportUpdateLanguageStore();
+const renotifyingStudentIds = window.Vue.ref<Set<number>>(new Set());
+
+const emit = defineEmits<{
+    completePreparationSingle: [studentId: number];
+    resetDetailsSingle: [studentId: number];
+}>();
+
+/**
+ * Opens the update language modal for the given student.
+ * @param student The student to update.
+ */
+function openModal(student: StudentRow): void {
+    updateLanguageStore.prompt(student);
+}
+
+/**
+ * Re-sends the unconfirmed details notification to the given student.
+ * @param student The student to renotify.
+ */
+async function renotifyStudent(student: StudentRow): Promise<void> {
+    if (student.renotifyEndpoint === null || renotifyingStudentIds.value.has(student.userId)) {
+        return;
+    }
+
+    renotifyingStudentIds.value = new Set([...renotifyingStudentIds.value, student.userId]);
+    const toast = window.sbProps.toastActivate("Renotifying student...");
+
+    try {
+        const response = (await apiRequest<ApiRenotifyResponse>({
+            url: student.renotifyEndpoint,
+            method: "POST",
+            body: {
+                studentIds: [student.userId],
+            },
+        })) as ApiRenotifyResponse;
+
+        if (!response.success) {
+            toast.timeout({ text: response.message ?? "Failed to renotify student.", isSuccess: false });
+            return;
+        }
+
+        toast.timeout({
+            text: response.message ?? "Student(s) renotified.",
+            isSuccess: !response.partial,
+        });
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "Failed to renotify student.";
+        toast.timeout({ text: errorMessage, isSuccess: false });
+    } finally {
+        const nextStudentIds = new Set(renotifyingStudentIds.value);
+        nextStudentIds.delete(student.userId);
+        renotifyingStudentIds.value = nextStudentIds;
+    }
+}
+
+/**
+ * Whether the student currently has an in-flight renotify request.
+ * @param student The student row.
+ * @returns True if the student is currently renotifying, false otherwise.
+ */
+function isRenotifying(student: StudentRow): boolean {
+    return renotifyingStudentIds.value.has(student.userId);
+}
 </script>
 
 <template>
@@ -26,7 +95,20 @@ defineProps<Props>();
         </thead>
         <tbody>
             <tr v-for="student in students" :key="student.id">
-                <td><input type="checkbox" disabled :aria-label="`Select ${student.name}`" /></td>
+                <td class="checklist">
+                    <template
+                        v-if="props.activeSelectionSection === null || props.activeSelectionSection === props.section"
+                    >
+                        <input
+                            :id="`select-${student.id}`"
+                            v-model="selectedList"
+                            type="checkbox"
+                            :value="student"
+                            :disabled="student.stage !== props.section"
+                            :aria-label="`Select ${student.name}`"
+                        /><label class="checkbox-label" :for="`select-${student.id}`"></label>
+                    </template>
+                </td>
                 <td>{{ student.name }}</td>
                 <td>
                     <sbx-icon
@@ -46,9 +128,51 @@ defineProps<Props>();
                 <td><ib-report-subject-labels :entry="student.subjects.sl" /></td>
                 <td><ib-report-subject-labels :entry="student.subjects.core" /></td>
                 <td>
-                    <button type="button" disabled aria-label="More options">
-                        <sbx-icon name="more"></sbx-icon>
-                    </button>
+                    <sbx-pop-out
+                        :content-id="`ib-row-dropdown-${student.id}`"
+                        move-to="#ib-report-pop-out-container"
+                    ></sbx-pop-out>
+                    <ul
+                        :id="`ib-row-dropdown-${student.id}`"
+                        class="f-dropdown"
+                        data-dropdown-content
+                        aria-hidden="true"
+                    >
+                        <li v-if="student.updateLanguageEndpoint !== null">
+                            <button class="sbx-button--has-icon" @click.prevent="openModal(student)">
+                                <sbx-icon name="modify"></sbx-icon>
+                                Update Language Selection
+                            </button>
+                        </li>
+                        <li v-if="student.renotifyEndpoint !== null">
+                            <button
+                                class="sbx-button--has-icon"
+                                :disabled="isRenotifying(student)"
+                                @click.prevent="renotifyStudent(student)"
+                            >
+                                <sbx-icon name="notifications-hollow"></sbx-icon>
+                                Renotify student
+                            </button>
+                        </li>
+                        <li v-if="student.stage === 'preparation'">
+                            <button
+                                class="sbx-button--has-icon"
+                                @click.prevent="emit('completePreparationSingle', student.id)"
+                            >
+                                <sbx-icon name="notifications-hollow"></sbx-icon>
+                                Complete Preparation
+                            </button>
+                        </li>
+                        <li v-if="student.stage === 'unconfirmed' || student.stage === 'confirmed'">
+                            <button
+                                class="sbx-button--has-icon"
+                                @click.prevent="emit('resetDetailsSingle', student.id)"
+                            >
+                                <sbx-icon name="undo"></sbx-icon>
+                                Reset All Details
+                            </button>
+                        </li>
+                    </ul>
                 </td>
             </tr>
         </tbody>

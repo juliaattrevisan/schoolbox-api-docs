@@ -7,9 +7,7 @@
 
 namespace Schoolbox\Learning\Assessment\Participant\Test;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Schoolbox\External\User as ExternalUser;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -38,8 +36,6 @@ class AssessmentListMutatorTest extends TestCase
      */
     private $assessments;
 
-    private $externalUser;
-
     /**
      * Set up student, parent, user methods
      */
@@ -61,13 +57,6 @@ class AssessmentListMutatorTest extends TestCase
             ->setRole($parentRole)
             ->setChildren(new GenericCollection(User::class));
         $this->parent->getChildren()->setOffset($this->student->getId(), $this->student);
-
-        $this->externalUser = $this->createConfiguredMock(
-            ExternalUser::class,
-            [
-                'loadChildren' => $this->parent->getChildren()
-            ]
-        );
 
         // Set up assessments
         $assessment1 = new DueWork\Model();
@@ -100,10 +89,8 @@ class AssessmentListMutatorTest extends TestCase
     public function testUser(): void
     {
         // mock of visibility: pretend 1 visible, 2 not
-        /** @var Visibility|MockObject $mockVisibility */
-        $mockVisibility = $this->createMock(Visibility::class);
+        $mockVisibility = $this->createStub(Visibility::class);
         $mockVisibility
-            ->expects($this->any())
             ->method('isVisibleToUser')
             ->willReturnCallback(function (IAssessable $v) {
                 return $v->getId() === 1;
@@ -112,7 +99,6 @@ class AssessmentListMutatorTest extends TestCase
         $mutator = new AssessmentListMutator(
             $this->student,
             $mockVisibility,
-            $this->externalUser,
             \Alaress_Date_Format::now(),
             true
         );
@@ -139,10 +125,8 @@ class AssessmentListMutatorTest extends TestCase
     public function testParentOfUser(): void
     {
         // mock of visibility: pretend 2 visible, 1 not
-        /** @var Visibility|MockObject $mockVisibility */
-        $mockVisibility = $this->createMock(Visibility::class);
+        $mockVisibility = $this->createStub(Visibility::class);
         $mockVisibility
-            ->expects($this->any())
             ->method('isVisibleToUser')
             ->willReturnCallback(function (IAssessable $v) {
                 return $v->getId() === 2;
@@ -151,21 +135,51 @@ class AssessmentListMutatorTest extends TestCase
         $mutator = new AssessmentListMutator(
             $this->parent,
             $mockVisibility,
-            $this->externalUser,
             \Alaress_Date_Format::now(),
             true
         );
 
-        // Mapping: has filtered out $parent's child from assessment 1
+        // Mapping: pre-computes visibility without mutating participants.
         $mappedAssessments = $this->assessments->map([$mutator, 'map']);
         $this->assertCount(2, $mappedAssessments);
-        $this->assertCount(0, $mappedAssessments[1]->getAllParticipants());
+        $this->assertCount(1, $mappedAssessments[1]->getAllParticipants());
         $this->assertCount(1, $mappedAssessments[2]->getAllParticipants());
 
-        // Filtering: has filtered out assessment 1, as $student isn't participating
+        // Filtering: has filtered out assessment 1, as the parent can't view it.
         $filteredAssessments = $mappedAssessments->filter([$mutator, 'filter']);
         $this->assertCount(1, $filteredAssessments);
         $this->assertArrayNotHasKey(1, $filteredAssessments);
         $this->assertArrayHasKey(2, $filteredAssessments);
+    }
+
+
+    /**
+     * Ensures parent filtering does not inherit a child's assessment visibility.
+     */
+    public function testParentVisibilityIsNotReplacedByChildVisibility(): void
+    {
+        $mockVisibility = $this->createStub(Visibility::class);
+        $mockVisibility
+            ->method('isVisibleToUser')
+            ->willReturnCallback(
+                /**
+                 * Allows visibility only when the checked viewer is the child student.
+                 */
+                function (IAssessable $assessment, User $viewer) {
+                    return $viewer->getId() === $this->student->getId();
+                }
+            );
+
+        $mutator = new AssessmentListMutator(
+            $this->parent,
+            $mockVisibility,
+            \Alaress_Date_Format::now(),
+            true
+        );
+
+        $mappedAssessments   = $this->assessments->map([$mutator, 'map']);
+        $filteredAssessments = $mappedAssessments->filter([$mutator, 'filter']);
+
+        $this->assertCount(0, $filteredAssessments);
     }
 }

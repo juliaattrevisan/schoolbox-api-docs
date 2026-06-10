@@ -200,7 +200,7 @@ class Model extends AbstractAssessment
     /**
      * Task marks are always visible to all users which have permission to view it.
      *
-     * @return int
+     * @return string
      */
     public function getMarkVisibility()
     {
@@ -210,7 +210,7 @@ class Model extends AbstractAssessment
     /**
      * Task marks are always visible to all users which have permission to view it.
      *
-     * @param int $markVisibility
+     * @param string $markVisibility
      * @return static
      */
     public function setMarkVisibility($markVisibility)
@@ -392,7 +392,7 @@ class Model extends AbstractAssessment
 
     /**
      * @param boolean $isSelfAssessable
-     * @return $this;
+     * @return $this
      */
     public function setIsSelfAssessable($isSelfAssessable)
     {
@@ -410,7 +410,7 @@ class Model extends AbstractAssessment
 
     /**
      * @param string $url
-     * @return $this;
+     * @return $this
      */
     public function setUrl($url)
     {

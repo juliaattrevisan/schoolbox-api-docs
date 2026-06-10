@@ -10,8 +10,10 @@
 
 namespace Alaress;
 
+use Alaress\CacheFactory\Factory;
 use Alaress\Redis\AutoRefreshClient;
 use Predis;
+use Psr\SimpleCache\CacheInterface;
 
 class Redis
 {
@@ -87,6 +89,13 @@ class Redis
      * @var string
      */
     protected $instanceId = '';
+
+    /**
+     * A cache factory for building Redis-backed caches.
+     *
+     * Created as needed, and only once, by `buildCache`.
+     */
+    private ?Factory $cacheFactory = null;
 
     /**
      * Gets an instance of this wrapper.
@@ -270,8 +279,9 @@ class Redis
             return call_user_func($callback, $params);
         }
 
-        $key         = $this->getRedisKey($base_key, $params);
-        $cachedValue = $this->fetchCachedValue($key);
+        $cache        = $this->buildCache($base_key);
+        $key          = $this->getKey($params);
+        $cachedValue  = $cache->get($key);
 
         // Was a result returned? If so decode it
         if (!isset($cachedValue)) {
@@ -291,7 +301,7 @@ class Redis
         // fetched result was not compressed
         if ($requiresRecalculation || $requiresRecache) {
             $cachedValue = $this->encodeCalculatedValue($returnValue);
-            $this->storeCachedValue($key, $cachedValue, $timeout);
+            $cache->set($key, $cachedValue, $timeout);
         }
 
         return $returnValue;
@@ -306,41 +316,25 @@ class Redis
      * @param mixed    $params   A parameter to pass to $callback. This is also
      *                           used to generate the cache key.
      *
-     * @return int (The number of keys that were removed)
+     * @return int (The number of keys that were removed, will be 1 or 0)
      */
     public function dropKeyCache(string $base_key, mixed $params): int
     {
-        $redis = $this->client;
-        $key   = $this->getRedisKey($base_key, $params);
-
-        try {
-            return $redis->del($key);
-        } catch (Predis\PredisException $e) {
-            trigger_error(sprintf('Redis exception: "%s"', $e->getMessage()), E_USER_WARNING);
-        }
-        return 0;
+        $cache = $this->buildCache($base_key);
+        $key   = $this->getKey($params);
+        return $cache->delete($key) ? 1 : 0;
     }
 
     /**
-     * Build a common redis key for inserting and returning cached data
-     * If updating, will also have to update the format at:
-     * tools/redis/setExternalTTL.php::getLikeCacheKey
+     * Build the cache key for inserting and returning cached data.
      *
-     * @param string   $base_key The base of the key to store the result in.
-     * @param mixed    $params   A parameter to pass to $callback. This is also
-     *                           used to generate the cache key.
-     *
-     * @return string The redis key to either extract or insert data into redis
+     * @param mixed $params A parameter to pass to $callback. This is also used
+     *                      to generate the cache key.
+     * @return string
      */
-    private function getRedisKey(string $base_key, mixed $params): string
+    private function getKey(mixed $params): string
     {
-        return sprintf(
-            '%s:%s:%s:%s',
-            self::FUNCTION_CALL_CACHE_PREFIX,
-            $this->instanceId,
-            $base_key,
-            hash('sha256', serialize($params)),
-        );
+        return hash('sha256', serialize($params));
     }
 
     /**
@@ -417,6 +411,18 @@ class Redis
     }
 
     /**
+     * Build a cache for the given key.
+     *
+     * @param string $baseKey
+     * @return CacheInterface
+     */
+    protected function buildCache(string $baseKey): CacheInterface
+    {
+        $this->cacheFactory ??= new Factory($this->client);
+        return $this->cacheFactory->build($baseKey);
+    }
+
+    /**
      * Compress `$value` if possible.
      *
      * @param string $value
@@ -436,45 +442,5 @@ class Redis
     protected function uncompressValue(string $value): string|false
     {
         return gzuncompress($value);
-    }
-
-    /**
-     * Fetch the cached value for the given key.
-     *
-     * @param string $key The key to fetch from.
-     * @return string|null
-     */
-    protected function fetchCachedValue(string $key): ?string
-    {
-        $cachedValue = null;
-        try {
-            $cachedValue = $this->client->get($key);
-        } catch (Predis\PredisException $e) {
-            trigger_error(sprintf('Redis exception when reading: "%s"', $e->getMessage()), E_USER_WARNING);
-            // otherwise continue
-        }
-        return $cachedValue;
-    }
-
-    /**
-     * Store the value within a key, with an optional timeout.
-     *
-     * @param string   $key     The key to store into.
-     * @param string   $value   The value to store.
-     * @param int|null $timeout Timeout in seconds, or null if no timeout.
-     * @return void
-     */
-    protected function storeCachedValue(string $key, string $value, ?int $timeout): void
-    {
-        try {
-            if ($timeout > 0) {
-                $this->client->setex($key, $timeout, $value);
-            } else {
-                $this->client->set($key, $value);
-            }
-        } catch (Predis\PredisException $e) {
-            trigger_error(sprintf('Redis exception when writing cache: "%s"', $e->getMessage()), E_USER_WARNING);
-            // otherwise continue
-        }
     }
 }

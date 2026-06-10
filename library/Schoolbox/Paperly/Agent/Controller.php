@@ -12,6 +12,7 @@ namespace Schoolbox\Paperly\Agent;
 use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Web\Controller\Base;
 use OutOfBoundsException;
+use SensitiveParameter;
 use Session;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,7 +31,7 @@ class Controller extends Base
      */
     public function __construct(
         private array $ipWhitelist,
-        private string $secret,
+        #[SensitiveParameter] private string $secret,
         private Handler $handler,
         private Proxy $proxy,
     ) {

@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\DataRetention;
 
 use Schoolbox\Application\CliTool;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\LockInterface;
 
 /**
@@ -184,48 +185,15 @@ class CommandLineTool extends CliTool\App
 
 
         // build the bus for all the data retention tasks
-        /** @var Strategy\IStrategy[] $bus */
-        $bus = [];
-
-        if ($validStrats->isStratEnabled(ValidStrats::MOMENTS)) {
-            $bus[] = new Strategy\Moments(
-                $logger,
-                $this->perform(),
-                $this->getDatabaseInternal(),
-                $lock,
-                $this->getConfig(),
-                $endTime,
-                clone $retentionPeriod,
-                $loopCount,
-                $chunkSize,
-            );
-        }
-        if ($validStrats->isStratEnabled(ValidStrats::MYFILES)) {
-            $bus[] = new Strategy\MyFiles(
-                $logger,
-                $this->perform(),
-                $this->getDatabaseInternal(),
-                $lock,
-                $this->getConfig(),
-                $endTime,
-                clone $retentionPeriod,
-                $loopCount,
-                $chunkSize,
-            );
-        }
-        if ($validStrats->isStratEnabled(ValidStrats::STUDENTSUBMISSIONS)) {
-            $bus[] = new Strategy\StudentSubmissions(
-                $logger,
-                $this->perform(),
-                $this->getDatabaseInternal(),
-                $lock,
-                $this->getConfig(),
-                $endTime,
-                clone $retentionPeriod,
-                $loopCount,
-                $chunkSize,
-            );
-        }
+        $bus = $this->buildStrategies(
+            $validStrats,
+            $logger,
+            $lock,
+            $endTime,
+            $retentionPeriod,
+            $loopCount,
+            $chunkSize,
+        );
 
         // log the settings we are running with
         $logger->notice(sprintf("Running %s:", $this->perform() ? "with perform" : "in dry-run mode"));
@@ -273,6 +241,101 @@ class CommandLineTool extends CliTool\App
         } else {
             $logger->notice('No data retention strategies to run');
         }
+    }
+
+    /**
+     * Build the ordered list of enabled retention strategies to process.
+     *
+     * This function allows the tests in DataRetention/Test/CommandLineToolStrategyBusTest to be done without having
+     * to call CommandLineTool::run(), as so avoids pulling in many dependencies that are unrelated to the tests.
+     *
+     * @return Strategy\IStrategy[]
+     */
+    protected function buildStrategies(
+        ValidStrats $validStrats,
+        LoggerInterface $logger,
+        LockInterface $lock,
+        int $endTime,
+        RetentionPeriod $retentionPeriod,
+        int $loopCount,
+        int $chunkSize,
+    ): array {
+        $bus = [];
+        $perform = $this->perform();
+        $database = $this->getDatabaseInternal();
+        $config = $this->getConfig();
+
+        if ($validStrats->isStratEnabled(ValidStrats::MOMENTS)) {
+            $bus[] = new Strategy\Moments(
+                $logger,
+                $perform,
+                $database,
+                $lock,
+                $config,
+                $endTime,
+                clone $retentionPeriod,
+                $loopCount,
+                $chunkSize,
+            );
+        }
+
+        if ($validStrats->isStratEnabled(ValidStrats::MYFILES)) {
+            $bus[] = new Strategy\MyFiles(
+                $logger,
+                $perform,
+                $database,
+                $lock,
+                $config,
+                $endTime,
+                clone $retentionPeriod,
+                $loopCount,
+                $chunkSize,
+            );
+        }
+
+        if ($validStrats->isStratEnabled(ValidStrats::EPORTFOLIO)) {
+            $bus[] = new Strategy\Eportfolio(
+                $logger,
+                $perform,
+                $database,
+                $lock,
+                $config,
+                $endTime,
+                clone $retentionPeriod,
+                $loopCount,
+                $chunkSize,
+            );
+        }
+
+        if ($validStrats->isStratEnabled(ValidStrats::CMS)) {
+            $bus[] = new Strategy\Cms(
+                $logger,
+                $this->perform(),
+                $this->getDatabaseInternal(),
+                $lock,
+                $this->getConfig(),
+                $endTime,
+                clone $retentionPeriod,
+                $loopCount,
+                $chunkSize,
+            );
+        }
+
+        if ($validStrats->isStratEnabled(ValidStrats::STUDENTSUBMISSIONS)) {
+            $bus[] = new Strategy\StudentSubmissions(
+                $logger,
+                $this->perform(),
+                $this->getDatabaseInternal(),
+                $lock,
+                $this->getConfig(),
+                $endTime,
+                clone $retentionPeriod,
+                $loopCount,
+                $chunkSize,
+            );
+        }
+
+        return $bus;
     }
 
     /**

@@ -137,8 +137,6 @@ class SubmissionNotifier extends AbstractModuleNotifier
         $studentId = (int)$submission->getOwner()->getId();
         $boxId     = $submission->getSubmissionBox()->getId();
 
-        $mapper = $this->getMapper();
-
         switch ($method) {
             case Mapper::METHOD_CREATE:
                 // is this in draft mode? if so, do nothing
@@ -320,7 +318,8 @@ class SubmissionNotifier extends AbstractModuleNotifier
         }
 
         $worktype = $box->getAssessmentModel()->getWorkType();
-        if ($worktype && $worktype->isStaffOrInstructorVisibleOnly()) {
+        // Note this function concerns students only so we only need to check visibility to learners.
+        if ($worktype && !$worktype->isVisibleToLearners()) {
             return $envelope;
         }
 

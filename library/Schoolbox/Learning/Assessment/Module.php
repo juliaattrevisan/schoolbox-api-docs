@@ -52,6 +52,7 @@ use Schoolbox\Learning\Authorizer\Rule\IsDeletionUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsImplementation;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructorOrHasHomepageAccess;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
+use Schoolbox\Learning\Authorizer\Rule\IsManageReportingActivity;
 use Schoolbox\Learning\Authorizer\Rule\IsModifyUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsSafeExamBrowserRequired;
 use Schoolbox\Learning\Authorizer\Rule\IsSimilarityCheckEnabled;
@@ -74,6 +75,7 @@ use Schoolbox\LTI\Provider\Mapper as LtiToolMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Role;
@@ -147,7 +149,8 @@ class Module extends BaseModule
             $isSuper,
             new Rule\All(
                 $canWrite,
-                new IsDeletionUnLocked(new LockedChecker($this->getTermMapper()))
+                new IsDeletionUnLocked(new LockedChecker($this->getTermMapper())),
+                new IsManageReportingActivity($this->getConfig())
             )
         );
 
@@ -156,7 +159,8 @@ class Module extends BaseModule
             new Rule\All(
                 $canWrite,
                 new AssessmentNotDeleted(),
-                new IsModifyUnLocked(new LockedChecker($this->getTermMapper()))
+                new IsModifyUnLocked(new LockedChecker($this->getTermMapper())),
+                new IsManageReportingActivity($this->getConfig())
             )
         );
 
@@ -194,6 +198,39 @@ class Module extends BaseModule
                     $canWrite,
                     new AssessmentNotDeleted(),
                     new IsModifyUnLocked(new LockedChecker($this->getTermMapper())),
+                    new Rule\Any(
+                        /* If you're not a super, then you're an instructor; you might have restricted access to the
+                         * student participation screen. Reporting Activities diverge from the original intent of
+                         * student participation: they have a strict set of requirements that preclude a lot of the
+                         * normal student participation features.
+                         *
+                         * isManageReportingActivity() checks if the assessment is a Reporting activity. If not, then we
+                         * let you get to the Student Participation screen as normal, Otherwise, it checks your role
+                         * perms, feature flags, etc to see if you can manage reporting activities: if so, we let you
+                         * through to the student participation screen. Otherwise, you're denied.
+                         *
+                         * If you can't manage reporting activities, you might be a differentiation profile person: we
+                         * check if the feature flag is enabled, that it's indeed a Reporting Activity and that you have
+                         * the diff profile service permission. If so, we let you through.
+                         *
+                         * This is a really particular combination of settings that allow, or deny, your access to the
+                         * student participation screen.
+                         */
+                        new IsManageReportingActivity($this->getConfig()),
+                        new Rule\All(
+                            /* Differentiation Profile guys have access to Student Participation for reporting under a
+                             * very particular set of circumstances: this depends on IsManageReportingActivity returning
+                             * truthy for non-reporting-activities already.
+                             *
+                             *   - Feature flag must be on
+                             *   - Assessment must be a Reporting Activity
+                             *   - User must have diff profile moderate service perms
+                             */
+                            new Rule\IsConfigOn(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE, $this->getConfig()),
+                            new ValidAssessmentType([AssessmentType::TYPE_REPORTING]),
+                            new Rule\HasServicePermission(UserAccess::SERVICE_DIFFERENTIATION, UserAccess::ACCESS_WRITE),
+                        )
+                    )
                 )
             )
         );
@@ -689,6 +726,8 @@ class Module extends BaseModule
         $aiLogMapper                = $this->getMapperFactory()->get(AILogMapper::class);
         $dialogAgentDataModelMapper = $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::class);
         $dialogAgentScenarioMapper  = $this->getMapperFactory()->get(\Schoolbox\Admin\DialogAgent\Scenario\Mapper::class);
+        $rubricResultSetMapper      = $this->getMapperFactory()->get(\Schoolbox\Assessment\Rubric\DataModel\Result\Mapper::class);
+        $rubricMapper               = $this->getMapperFactory()->get(\Schoolbox\Assessment\Rubric\DataModel\DataSource::class);
         $linkedAssessmentsMapper    = $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper::class);
         $courseImplementationMapper = $this->getMapperFactory()->get(CourseImplementationMapper::class);
         $unitImplementationMapper   = $this->getMapperFactory()->get(UnitImplementationMapper::class);
@@ -753,8 +792,8 @@ class Module extends BaseModule
                     $this->getAccess(),
                     $transactor,
                     $bakery,
-                    $this->getMapperFactory()->get(RubricDataSource::class),
-                    $this->getMapperFactory()->get(RubricResultSetMapper::class),
+                    $rubricResultSetMapper,
+                    $rubricMapper,
                     $this->injector->get('submissionDataSource'),
                     $participantDataSource,
                     $termMapper,
@@ -807,6 +846,8 @@ class Module extends BaseModule
                     $this->getAccess(),
                     $transactor,
                     $bakery,
+                    $rubricResultSetMapper,
+                    $rubricMapper,
                     $termMapper,
                     $participantDataSource,
                     $courseSpecMapper,
@@ -840,6 +881,8 @@ class Module extends BaseModule
                     $this->getAccess(),
                     $transactor,
                     $bakery,
+                    $rubricResultSetMapper,
+                    $rubricMapper,
                     $this->getMapperFactory()->get(QuizMapper::class),
                     $this->getMapperFactory()->get(QuizSectionMapper::class),
                     $this->getMapperFactory()->get(QuizAttemptMapper::class),
@@ -888,6 +931,8 @@ class Module extends BaseModule
                     $this->getAccess(),
                     $transactor,
                     $bakery,
+                    $rubricResultSetMapper,
+                    $rubricMapper,
                     new TaskResponseDataSource($this->getMapperFactory()->get(TaskResponseMapper::class)),
                     $termMapper,
                     $participantDataSource,
@@ -922,6 +967,8 @@ class Module extends BaseModule
                     $this->getAccess(),
                     $transactor,
                     $bakery,
+                    $rubricResultSetMapper,
+                    $rubricMapper,
                     $termMapper,
                     $participantDataSource,
                     $courseSpecMapper,
@@ -961,6 +1008,8 @@ class Module extends BaseModule
                     $this->getAccess(),
                     $transactor,
                     $bakery,
+                    $rubricResultSetMapper,
+                    $rubricMapper,
                     $termMapper,
                     $participantDataSource,
                     $courseSpecMapper,
@@ -986,6 +1035,8 @@ class Module extends BaseModule
                     $this->getAccess(),
                     $transactor,
                     $bakery,
+                    $rubricResultSetMapper,
+                    $rubricMapper,
                     $termMapper,
                     $participantDataSource,
                     $courseSpecMapper,
@@ -1022,6 +1073,8 @@ class Module extends BaseModule
                     $this->getAccess(),
                     $transactor,
                     $bakery,
+                    $rubricResultSetMapper,
+                    $rubricMapper,
                     $termMapper,
                     $participantDataSource,
                     $courseSpecMapper,

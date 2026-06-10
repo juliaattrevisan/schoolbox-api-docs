@@ -11,11 +11,8 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Admin\Package;
 use Schoolbox\UserMapper;
 
-class Cli extends CliTool\App
+class Cli extends CliTool\BaseApp
 {
-    // --help: print help
-    private const OPT_LONG_HELP = 'help';
-
     /**
      * @var Package\Mapper
      */
@@ -31,14 +28,6 @@ class Cli extends CliTool\App
     private int $maxHiddenLength    = 60;
     private int $maxInstalledLength = 60;
     private int $maxTitleLength     = 60;
-
-    /** @inheritdoc */
-    public function getLongOpts(): array
-    {
-        return [
-            self::OPT_LONG_HELP,
-        ];
-    }
 
     /** @inheritdoc */
     public function runAsRoot(): ?bool
@@ -57,19 +46,6 @@ class Cli extends CliTool\App
         $this->user = $userMapper->findByUsername(UserMapper::USERNAME_ALARESS_ADMIN);
         $this->maxHiddenLength = strlen('Not Hidden\  ');
         $this->maxInstalledLength = strlen('Not Installed\    ');
-
-        if ($this->getOpt(self::OPT_LONG_HELP)) {
-            echo <<<HELP
-
-Displays a list of all available packages, and will install a selected package
-
-Usage: tools/package/install.php [-v] [-p]
-        -p Actually install the package, else just display what would occur
-        -v Verbose mode (may be provided up to 3 times for increasing verbosity)
-
-HELP;
-            exit;
-        }
 
         if (!$this->perform()) {
             $this->getLogger()->alert("Preview Mode");
@@ -146,5 +122,37 @@ HELP;
             $this->getLogger()->error("Current Error:{$e->getMessage()}");
         }
         $this->choiceInstall();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getName(): string
+    {
+        return 'Package Installer';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getDescription(): string
+    {
+        return 'Displays a list of all available packages, and will install a selected package';
+    }
+
+    /**
+     * This tool does not support any options.
+     */
+    protected function setOptions(): CliTool\BaseApp
+    {
+        return $this;
+    }
+
+    /**
+     * This tool does support perform mode.
+     */
+    protected function hasPerformMode(): bool
+    {
+        return true;
     }
 }

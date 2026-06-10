@@ -52,13 +52,8 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
-use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as RubricDescriptorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\IndicatorMark\Mapper as RubricIndicatorMarkMapper;
-use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper as RubricLevelMapper;
-use Schoolbox\Assessment\Rubric\DataModel\Result\Mapper as RubricResultSetMapper;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
-use Schoolbox\Assessment\Rubric\Grid\Level;
-use Schoolbox\Assessment\Rubric\Grid\Translator\ModelToArray as RubricGridTranslator;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
 use Schoolbox\Error;
@@ -88,7 +83,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\User;
@@ -129,6 +123,8 @@ class Controller extends Assessment\Controller
 
 
     /**
+     * Constructor.
+     *
      * @param UserMapper $userMapper
      * @param Mapper $errorMapper
      * @param AssessmentDataSource $assessmentMapper
@@ -136,8 +132,8 @@ class Controller extends Assessment\Controller
      * @param Access $access
      * @param Transactor $transactor
      * @param Factory $bakery
+     * @param \Schoolbox\Assessment\Rubric\DataModel\Result\Mapper $resultSetMapper
      * @param RubricDataSource $rubricMapper
-     * @param RubricResultSetMapper $resultSetMapper
      * @param DueWorkResponseMapper $dueWorkResponseMapper
      * @param ParticipantMapper $participantMapper
      * @param Term\Mapper $termMapper
@@ -148,8 +144,7 @@ class Controller extends Assessment\Controller
      * @param CourseSpecificationMapper $courseSpecificationMapper
      * @param UnitSpecificationMapper $unitSpecificationMapper
      * @param Replicator $replicator
-     * @param Producer $producer for sending the message created by `$messageFactory` to
-     *                                                                  taskd
+     * @param Producer $producer for sending the message created by `$messageFactory` to taskd
      * @param Turnitin\File\Mapper $turnitinFileMapper - for generating the Similarity Report.
      * @param IFeedbackDataSource $feedbackDataSource
      * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
@@ -181,8 +176,8 @@ class Controller extends Assessment\Controller
         Access $access,
         Transactor $transactor,
         Assessment\Breadcrumb\Factory $bakery,
-        private RubricDataSource $rubricMapper,
-        private RubricResultSetMapper $resultSetMapper,
+        protected \Schoolbox\Assessment\Rubric\DataModel\Result\Mapper $resultSetMapper,
+        protected \Schoolbox\Assessment\Rubric\DataModel\DataSource $rubricMapper,
         private DueWorkResponseMapper $dueWorkResponseMapper,
         private ParticipantMapper $participantMapper,
         Term\Mapper $termMapper,
@@ -225,6 +220,8 @@ class Controller extends Assessment\Controller
             $access,
             $transactor,
             $bakery,
+            $resultSetMapper,
+            $rubricMapper,
             $termMapper,
             $participantDataSource,
             $courseSpecificationMapper,
@@ -247,7 +244,6 @@ class Controller extends Assessment\Controller
             null,
             null,
             $mimeTypeMapper,
-            $this->rubricDataSource,
             $activityTemplateHelper,
         );
     }
@@ -360,7 +356,7 @@ class Controller extends Assessment\Controller
             'aImpls'           => $aImpls,
             // Only display download link if there are actually files to download
             'download'          => $this->hasDownloadableSubmissionFiles($assessment),
-            'rubricMarks'       => RubricIndicatorMarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
+            'rubricMarks'       => RubricIndicatorMarkMapper::getInstance()->findMarkedByAssessment($assessment),
             'allInteractionsLocked' => $interactionLockedCount === count($aImpls),
             'selfReflect'       => false,
             'selfAssess'        => false,
@@ -455,20 +451,24 @@ class Controller extends Assessment\Controller
 
         $participant = $assessment->getParticipantIfExtant($student);
 
-        // Generate rubric marked grids for every feedback being displayed
-        if ($assessment->getUseRubric()) {
-            $assessment->setRubricGrid($this->rubricMapper->retrieveGrid($assessment, false));
-            if ($participant) {
-                foreach ($participant->getAllFeedbacks() as $feedback) {
-                    // All feedbacks ought to be due work feedbacks,
-                    // and thus have a rubric grid
-                    // TODO this returns false if I use the alias, but works correctly if I use the fully qualified name - why?
+        if ($participant) {
+            // Generate rubric marked grids for every feedback being displayed
+            foreach ($participant->getAllFeedbacks() as $feedback) {
+                foreach ($assessment->getRubricInstances() as $rubricInstance) {
+                    /* All feedbacks ought to be due work feedbacks and thus have rubric grid compatibility but we'll
+                     * assert the Due Work feedback instances anyway, just in case there's a mix
+                     *
+                     * A feedback can have multiple rubric grids as feedback now so we need to segregate by each
+                     * rubric_instance instead of assuming just one grid exists.
+                     */
                     if ($feedback instanceof Feedback\Model) {
-                        $feedback->setRubricMarkedGrid($this->rubricMapper->retrieveMarkedGrid($feedback));
+                        $feedback->getRubricMarkedGrids()->setOffset($rubricInstance->getId(), $this->rubricMapper->retrieveMarkedGrid($feedback, $rubricInstance));
                     }
                 }
             }
         }
+
+
         /**
          * record view
          */
@@ -687,7 +687,7 @@ class Controller extends Assessment\Controller
         $basename = (new Url($assessment->getTitle()))->getSlug();
 
         /** @var Model $assessment */
-        $content  = $this->array2csv($this->collateResultSquare($assessment->isMarkPerCapability(), $rubricGrid, $assessment->getAllParticipants()));
+        $content  = $this->array2csv($this->collateResultSquare($rubricGrid->isMarkPerCapability(), $rubricGrid, $assessment->getAllParticipants()));
 
         /* Maybe we set the Show Drafts option
          */
@@ -700,12 +700,11 @@ class Controller extends Assessment\Controller
         }
 
         $this->response = $this->responseFromContent($content)
-                               ->withHeader('Pragma', ' ')
-                               ->withHeader('Cache-Control', ' ')
-                               ->withHeader('Content-Type', 'text/csv')
-                               ->withHeader('Content-Length', strlen($content))
-                               ->withHeader('Content-Disposition', "attachment; filename=\"{$prefix}{$basename}.csv\"")
-        ;
+            ->withHeader('Pragma', ' ')
+            ->withHeader('Cache-Control', ' ')
+            ->withHeader('Content-Type', 'text/csv')
+            ->withHeader('Content-Length', strlen($content))
+            ->withHeader('Content-Disposition', "attachment; filename=\"{$prefix}{$basename}.csv\"");
     }
 
 
@@ -765,8 +764,10 @@ class Controller extends Assessment\Controller
             }
 
             try {
+                /* @phpstan-ignore-next-line */
                 $markedGridLatest = $latestFeedback ? $this->rubricMapper->retrieveMarkedGrid($latestFeedback) : null;
                 // if no published feedback default to empty
+                /* @phpstan-ignore-next-line */
                 $markedGridPublished = $publishedFeedback ? $this->rubricMapper->retrieveMarkedGrid($publishedFeedback) : null;
             } catch (MapperException) {
                 // can't really do anything
@@ -1009,7 +1010,7 @@ class Controller extends Assessment\Controller
         $participant = $assessment->getParticipantIfExtant($student);
 
         $reviewRoute = ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
-        if ($assessment->isSelfReflectableOnly()) {
+        if ($assessment->isSelfReflectionOnly()) {
             $reviewRoute = ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION;
         } elseif ($assessment->isSelfAssessable()) {
             $reviewRoute = ReturnedWork::REVIEW_ROUTE_SELF_GRADING;
@@ -1027,21 +1028,10 @@ class Controller extends Assessment\Controller
             }
         }
 
-        if ($feedback instanceof Feedback\Model) {
-            $feedback->setRubricMarkedGrid($this->rubricMapper->retrieveMarkedGrid($feedback));
-        }
-
-        // Attach rubrics data
-        $rubricMapper = RubricDataSource::getInstance();
-        if ($assessment->getUseRubric()) {
-            $assessment->setRubricGrid($rubricMapper->retrieveGrid($assessment, false));
-        }
-
         /* Find all the records spawned by $participant
          *
          * Order them by submitted time to find the most recent, and use that
          */
-
         $allResponses = $participant ? $participant->getAllResponses() : new Collection();
 
         /* Otherwise continue
@@ -1150,7 +1140,6 @@ class Controller extends Assessment\Controller
                             ->setKamiDocumentId($kamiFile)
                             ->setStatusDone();
                         $this->kamiMapper->save($kamiModel);
-                        /** @var SubmissionFile $kamiFile */
                         $kamiSubmissionFile = $this->submissionFileMapper->createModel()
                             ->setFilename($worksheetName)
                             ->setKami($kamiModel)
@@ -1199,8 +1188,15 @@ class Controller extends Assessment\Controller
         $this->getSession()->getSegment(static::class)->set('errorMessage', null);
 
         // Are we self assessing or only self reflecting?
-        $selfReflect = $reviewRoute === ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION;
-        $selfAssess = $reviewRoute === ReturnedWork::REVIEW_ROUTE_SELF_GRADING;
+
+        /* TODO but...these are already derived directly from $assessment->isSelfReflectionOnly() (self reflection)
+         *  and $assessment->isSelfAssessable() (self grading) - you can already figure out the answer without needing
+         *  these extra $selfAssess and $selfReflect vars. I wonder why those were ever necessary...
+         */
+        /* TODO probably superfluous (and always was?)
+         */
+//        $selfReflect = $reviewRoute === ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION;
+//        $selfAssess = $reviewRoute === ReturnedWork::REVIEW_ROUTE_SELF_GRADING;
 
         if ($this->requestQuery->get(Redirect::RETURN_URL)) {
             $returnUrl = Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL));
@@ -1232,8 +1228,10 @@ class Controller extends Assessment\Controller
             'policy'         => $assessment->getEnablePolicy() ? $this->getConfigLoader()->get('lms_student_policy') : '', // only use the policy, if this assessment is showing the policy
             'errorMessage'   => $errorMessage,
             'readonly'       => $isInteractionLocked,
-            'selfReflect'    => $selfReflect,
-            'selfAssess'     => $selfAssess,
+            /* TODO probably superfluous (and always was?)
+             */
+//            'selfReflect'    => $selfReflect,
+//            'selfAssess'     => $selfAssess,
             'acceptsOnline'  => $acceptsOnlineSubmissions,
             'returnUrl'      => $returnUrl,
             'kamiSession'    => $kamiSession,
@@ -1241,9 +1239,10 @@ class Controller extends Assessment\Controller
             'editorTemplates' => $this->activityTemplateHelper !== null ? $this->activityTemplateHelper->getTemplatesForCategory() : [],
 
             /* Only show these things if the assessment is self-gradable */
-            'showDescriptorValue' => $selfAssess,
-            'showGroupTotal'      => $selfAssess && ($assessment->getCapabilityMarkType() !== SubmissionBox\MarkType::SLUG_NONE),
-            'showRubricTotal'     => $selfAssess
+            /* TODO probably superfluous (and always was?)
+             */
+//            'showGroupTotal'      => $selfAssess && ($assessment->getCapabilityMarkType() !== SubmissionBox\MarkType::SLUG_NONE),
+//            'showRubricTotal'     => $selfAssess
         ];
 
         $this->response = $this->responseFromTemplate(
@@ -1468,7 +1467,7 @@ class Controller extends Assessment\Controller
 
         // Check whether we are self-assessing, or only self-reflecting; default is the instructor route, which is neither
         $reviewRoute = ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
-        if ($assessment->isSelfReflectableOnly()) {
+        if ($assessment->isSelfReflectionOnly()) {
             $reviewRoute = ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION;
         } elseif ($assessment->isSelfAssessable()) {
             $reviewRoute = ReturnedWork::REVIEW_ROUTE_SELF_GRADING;
@@ -1499,10 +1498,18 @@ class Controller extends Assessment\Controller
             $mostRecentFeedback = $participant->findMostRecentSelfAssessedFeedback();
             // Check whether the latest feedback has rubric data set.
             $hasRubric = isset($requestPost['rubric']);
+
+            /* TODO What was the point of this? It's already been decided by $hasRubric = isset($requestPost['rubric'])
+             *  and if there isn't a most recent feedback or its assessable is nonexistent or the assessable doesn't
+             *  have any rubric grids, then it's still already decided: none of this changes the outcome which is solely
+             *  dependent on the rubric node existing in $requestPost. The only time where it might have mattered is
+             *  when $requestPost never contained a rubric node.................but since when did that ever happen?
+             *  Anyway it doesn't seem to matter in 2026, we always get the rubric payload if it existed.
+             */
             if (
                 $mostRecentFeedback !== null
                 && $mostRecentFeedback->getAssessable() instanceof Model
-                && $mostRecentFeedback->getAssessable()->getUseRubric()
+                && $mostRecentFeedback->getAssessable()->getRubricInstances()->count()
             ) {
                 $hasRubric = true;
             }
@@ -1552,14 +1559,43 @@ class Controller extends Assessment\Controller
                 // Does this assessment use rubrics?
                 // Save the rubric if so, even if nothing is there.
                 if ($hasRubric) {
-                    $markedGrid = $factory->buildFromPostData(
-                        $this->rubricMapper->retrieveMarkedGrid($feedback),
-                        $requestPost['rubric'] ?? [],
-                    );
-                    $this->rubricMapper->persistMarkedGrid($markedGrid);
+                    /* Get a set of rubric instances that were mentioned in the post payload
+                     *
+                     * TODO somehow assert these were relevant to $feedback in some way to prevent cross-contamination
+                     *  where you might accidentally update a rubric instance and its grid but it didn't belong to this
+                     *  particular assessment instance at all. That'd be an accident, most likely
+                     */
+                    $rubricInstances = $assessment->getRubricInstances()->indexBy('id');
+
+                    /* Persist every rubric grid that was posted regardless of what descriptor(s) might have been chosen
+                     */
+                    foreach ($requestPost['rubric'] as $rubricInstanceId => $rubricJson) {
+                        $rubricData = json_decode($rubricJson, true);
+                        $rubricInstance = $rubricInstances[$rubricInstanceId] ?? null;
+
+                        /* This indicates that a rubric grid existed in the post payload but not $assessable at runtime
+                         * which suggests someone mutated $assessable at the same time as the $post was made, due to
+                         * multiplayer schoolbox or some other mutator executing. In this case we skip processing of
+                         * the rubric grid from $post; it doesn't exist in the $assessment anymore.
+                         */
+                        if (null === $rubricInstance) {
+                            continue;
+                        }
+
+                        $markedGrid = $factory->buildFromPostData(
+                            $this->rubricMapper->retrieveMarkedGrid($feedback, $rubricInstance),
+                            $rubricData,
+                        );
+
+                        $this->rubricMapper->persistMarkedGrid($markedGrid);
+
+                        /* Assign the grid back to the feedback's collection (a cyclic reference)
+                         */
+                        $feedback->getRubricMarkedGrids()->setOffset($rubricInstance->getId(), $markedGrid);
+                    }
 
                     // Update the feedback with the rubric marks
-                    $feedback->setRubricMarkedGrid($markedGrid);
+
                     $this->feedbackDataSource->save($feedback);
                     $response->setAllFeedback($response->getAllFeedback()->add($feedback));
                 }
@@ -1703,11 +1739,9 @@ class Controller extends Assessment\Controller
      */
     public function postManageSubmissions(IAssessable $assessment): void
     {
-        $postData = $this->requestPost->getArrayCopy();
-
-        /* By default, assume we're submitting now
-         */
-        $submittedAt = \Alaress_Date_Format::now();
+        $postData               = $this->requestPost->getArrayCopy();
+        $submittedNow           = Alaress_Date_Format::now();
+        $submissionTimeResolver = new SubmissionTimeResolver();
 
         /* Process the latest drafts from each of these user ids in $assessment and
          * forcibly submit them.
@@ -1726,18 +1760,11 @@ class Controller extends Assessment\Controller
                 continue;
             }
 
-            /* If the assessment was overdue, we need to micromanage submission times.
-             */
-            if ($assessment->isOverdue()) {
-                /* If the postData[draft][punctual] was selected,
-                 * set the submission time to be just before the due date.
-                 *
-                 * Otherwise, penalise the student and accept it whenever the teacher sent this payload.
-                 */
-                if ('true' === $postData['draft']['punctual']) {
-                    $submittedAt = $assessment->getDueAt()->addseconds(-1);
-                }
-            }
+            $submittedAt = $submissionTimeResolver->resolve(
+                $assessment,
+                'true' === ($postData['draft']['punctual'] ?? null),
+                $submittedNow
+            );
 
             $latestResponse->setSubmittedAt($submittedAt);
 
@@ -1749,14 +1776,11 @@ class Controller extends Assessment\Controller
         foreach ($postData['offline']['ids'] ?? [] as $studentId) {
             $userStub = $this->getUserMapper()->createModel()->setId((int)$studentId);
 
-            /* If the postData[offline][punctual] was selected,
-             * set the submission time to be just before the due date.
-             *
-             * Otherwise, penalise the student and accept it whenever the teacher sent this payload.
-             */
-            if ('true' === $postData['offline']['punctual']) {
-                $submittedAt = $assessment->getDueAt()->addseconds(-1);
-            }
+            $submittedAt = $submissionTimeResolver->resolve(
+                $assessment,
+                'true' === ($postData['offline']['punctual'] ?? null),
+                $submittedNow
+            );
 
             $this->persistAcknowledgementResponse($assessment, $userStub, $submittedAt);
         }
@@ -2000,93 +2024,7 @@ class Controller extends Assessment\Controller
             ],
         ];
 
-        if ($assessment instanceof Model) {
-            // ...append rubric-related data...
-            $data = array_merge($data, $this->generateRubricTwigData($assessment));
-        }
-
         // ...and scene.
-        return $data;
-    }
-
-
-    /**
-     * Common logic when generating Rubrics
-     *
-     * @param Model $dueWork
-     * @return array
-     * @throws MapperException
-     */
-    private function generateRubricTwigData(Model $dueWork): array
-    {
-        $data = [];
-
-        $rubricZone = new Zone('rubric');
-        // JS file.type isn't set reliably enough to use text/csv mime filter
-        $rubricZone
-            ->setFileVar('rb_attach[]')
-            ->setAttachPrompt('Import a rubric')
-            ->useImportExpiryDate();
-        //->setMimeFilter('text/csv');
-        $data['rubricAttachZone'] = $rubricZone->getTwigContext();
-
-        $resultSets = $this->resultSetMapper->findAll();
-
-        $rs = [];
-        foreach ($resultSets as $result) {
-            if (!isset($rs[$result->getResultSetId()])) {
-                $rs[$result->getResultSetId()] = [
-                    'id' => $result->getResultSetId(),
-                    'results' => [],
-                ];
-            }
-
-            $rs[$result->getResultSetId()]['results'][] = [
-                'value' => $result->getValue(),
-                'label' => $result->getLabel(),
-            ];
-        }
-
-        $data['rubricResultSets'] = array_values($rs);
-
-        // Do any students have marks for this rubric?
-        $levelIds      = RubricLevelMapper::getInstance()->findIdsByColumn('b.assessment_id', $dueWork->getId());
-        $descriptorIds = RubricDescriptorMapper::getInstance()->findIdsByColumn('level_id', $levelIds);
-        $countMarkIds  = RubricIndicatorMarkMapper::getInstance()->countByColumnList(
-            [
-                'descriptor_id' => $descriptorIds,
-                'valid'         => true,
-            ]
-        );
-
-        // The rubric grid can be used as is without Twig-wrangling
-        $rubricGrid = $this->rubricMapper->retrieveGrid($dueWork, true);
-        if (count($rubricGrid->getLevels()) === 0) {
-            // Two fake levels
-            $rubricGrid->getLevels()
-                       ->add(new Level())
-                       ->add(new Level());
-        }
-        $data['rubricGrid'] = $rubricGrid; // TODO: remove legacy individual rubric grid, this will prevent the other spots from breaking until we get around to them
-
-        /**
-         * list of all rubric grids for this assessment
-         * @see also in /library/Schoolbox/Learning/Assessment/Controller.php:getCloneAssessmentForm
-         */
-        $data['rubricGrids'] = [];
-        $data['rubricGridsPayload'] = [];
-
-        // TODO: for now just one grid support, in the format of multiple
-        $rubricGridTranslator = new RubricGridTranslator();
-        if ($dueWork->getUseRubric()) {
-            $data['rubricGrids'][] = $rubricGrid;
-            $data['rubricGridsPayload'][] = $rubricGridTranslator($rubricGrid, $dueWork);
-        }
-
-        // for multiple rubrics, this allows the frontend to add another one
-        // TODO: this probably needs to be an endpoint of its own as I expect it would change if you changed the original rubric? there's some nuance around how capabilities/indicators are deduped
-        $data['rubricBlankGrid'] = $rubricGridTranslator($this->rubricMapper->retrieveBlankGrid($dueWork, true), $dueWork);
-
         return $data;
     }
 

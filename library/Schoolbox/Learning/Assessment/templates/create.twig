@@ -292,7 +292,7 @@
                         {% for type in types %}
                         <div class="column small-12 medium-6{%  if loop.last %} end{% endif %}">
                             <input type="radio" name="type" value="{{ type.value }}" id="{{ type.id }}" />
-                            <label title="{{ type.title }}" for="{{ type.id }}" class="block" data-test="create-activity-{{ type.id }}"><i class="icon-{{ type.icon }}"></i>{{ type.label }}</label>
+                            <label title="{{ type.title }}" for="{{ type.id }}" class="block" data-test="create-activity-{{ type.id }}"><sbx-icon name="{{ type.icon }}" size="2rem"></sbx-icon>{{ type.label }}</label>
                         </div>
                         {% endfor %}
                         <div class="column small-12 medium-12 error-placeholder"></div>

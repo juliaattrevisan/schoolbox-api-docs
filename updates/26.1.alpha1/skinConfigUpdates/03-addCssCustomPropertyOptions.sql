@@ -1,3 +1,6 @@
+# Enlarge the options column to ensure it can fit the new customProperty key and value
+ALTER TABLE config MODIFY options text DEFAULT NULL;
+
 UPDATE config
 SET
     options = JSON_MERGE_PATCH(

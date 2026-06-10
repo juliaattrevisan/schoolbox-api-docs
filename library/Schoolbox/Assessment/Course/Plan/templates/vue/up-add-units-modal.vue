@@ -48,7 +48,7 @@ window.Vue.onMounted(() => {
     <basic-modal v-model:is-open="addUnitsStore.isOpen">
         <form class="l-flex-col l-gap-m f-no-margins" @submit.prevent="onAddSelected">
             <h2 data-test="up-add-units-title">Create {{ locale.unit.translate(true, true) }}</h2>
-            <div class="c-vert-scroll-container l-flex-col l-gap-s">
+            <div class="sbx-vert-scroll-container l-flex-col l-gap-s">
                 <div class="l-flex-col l-gap-s">
                     <!-- Loop through newUnits and display label and text input for each -->
                     <div v-for="(unit, index) in addUnitsStore.newUnits" :key="index" class="l-flex-col l-gap-xs">

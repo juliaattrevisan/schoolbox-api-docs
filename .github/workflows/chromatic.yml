@@ -15,8 +15,8 @@ concurrency:
 jobs:
   chromatic-deployment:
     timeout-minutes: 15
-    #Branch must contain -sb in the branch name
-    if: ${{ contains(github.ref_name, '-sb') }}
+    # Branch must contain -sb in the branch name, and run only on the base repo
+    if: ${{ contains(github.ref_name, '-sb') && github.repository == 'alaress/schoolbox' }}
     # Operating System
     runs-on: ubuntu-24.04
     # Job steps

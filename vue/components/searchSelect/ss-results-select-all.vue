@@ -75,23 +75,16 @@ function onClick(event?: MouseEvent): void {
 }
 
 /**
- * To toggle the selected state of the result
+ * To unset the active keyboard index
  */
 function onMouseover(): void {
-    emit("hover", props.index);
-}
-
-/**
- * To unset the active index
- */
-function onMouseout(): void {
     emit("hover", -1);
 }
 
 /**
  * To allow keyboard navigation of the search results
  */
-const resultEl = useTemplateRef<HTMLDivElement | null>("resultEl");
+const resultEl = useTemplateRef<HTMLLIElement | null>("resultEl");
 const { isActive } = useActiveIndex(
     resultEl,
     toRef(() => props.index),
@@ -101,45 +94,19 @@ const { isActive } = useActiveIndex(
 </script>
 
 <template>
-    <div
+    <li
         ref="resultEl"
-        :class="`search-result ${isActive ? 'search-result--active' : ''} f-no-margins`"
+        :class="`ss-results-item ${isActive ? 'ss-results-item--active' : ''} checklist sbx-checkbox-radio-container`"
         data-test="ss-results-select-all"
-        @click="onClick"
         @mouseover="onMouseover"
-        @mouseout="onMouseout"
     >
-        <div class="checklist sbx-checkbox-radio-container">
-            <input
-                id="checkbox-select-all"
-                type="checkbox"
-                :checked="isSelected"
-                :class="{ indeterminate: isSomeResultsSelected }"
-                @click.stop="onClick"
-            />
-            <label for="checkbox-select-all">Select all</label>
-        </div>
-    </div>
+        <input
+            id="checkbox-select-all"
+            type="checkbox"
+            :checked="isSelected"
+            :class="{ indeterminate: isSomeResultsSelected }"
+            @click.stop="onClick"
+        />
+        <label for="checkbox-select-all">Select all</label>
+    </li>
 </template>
-
-<style lang="scss" scoped>
-.search-result {
-    background: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
-    border-bottom: 1px solid var(--sbx-color-border, var(--body-background));
-    display: flex;
-    font-size: 0.825rem;
-    padding: var(--spacing-s);
-    transition: background 0.2s;
-    width: 100%;
-    &:last-of-type {
-        border-bottom: none;
-    }
-    &--active {
-        background: var(--sbx-config-color-active, var(--content-ui-hover));
-    }
-}
-
-input[type="checkbox"]:not(.plain) + label {
-    margin: 0;
-}
-</style>

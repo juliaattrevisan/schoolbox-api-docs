@@ -1,44 +1,31 @@
+import type { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
+
 type MarkSchemeAbstract = {
-    template: string;
-    context: {
-        mode: string;
-    };
+    mode: MarkTypeSlug;
 };
 
 export interface MarkSchemeNone extends MarkSchemeAbstract {
-    template: "";
-    context: {
-        mode: "none";
-    };
+    mode: MarkTypeSlug.NONE;
 }
 
 export interface MarkSchemeTotalMarkFractional extends MarkSchemeAbstract {
-    template: "TotalMarkFractional";
-    context: {
-        mode: "raw";
-        conf: {
-            totalMark: number;
-        };
+    mode: MarkTypeSlug.TOTAL;
+    conf: {
+        totalMark: number;
     };
 }
 
 export interface MarkSchemePercentage extends MarkSchemeAbstract {
-    template: "Percentage";
-    context: {
-        mode: "percent";
-    };
+    mode: MarkTypeSlug.PERCENT;
 }
 
 export interface MarkSchemeLetterGrade extends MarkSchemeAbstract {
-    template: "LetterGrade";
-    context: {
-        mode: "letter";
-        conf: {
-            lowerBound: number;
-            rawGrade: number;
-            caption: string;
-        }[];
-    };
+    mode: MarkTypeSlug.LETTER;
+    conf: {
+        lowerBound: number;
+        rawGrade: number;
+        caption: string;
+    }[];
 }
 
 /** All the states from submission_errors for use in the markScheme inputs */

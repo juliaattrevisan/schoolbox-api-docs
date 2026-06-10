@@ -1,0 +1,149 @@
+-- Rubric Capability Usage
+-- Add a rubric_instance_id column
+alter table rubric_capability_usage
+    add rubric_instance_id int unsigned null after rubric_capability_id;
+
+-- deprecate submission_box_id
+alter table rubric_capability_usage
+    change submission_box_id _submission_box_id int(11) unsigned not null;
+
+-- find the rubric_instance_id equivalent of each submission_box_id value
+-- that we installed earlier
+UPDATE rubric_capability_usage rcu
+INNER JOIN submission_box sb ON rcu._submission_box_id = sb.id
+INNER JOIN rubric_instance ri ON sb.assessment_id = ri.assessment_id
+INNER JOIN assessment a ON sb.assessment_id = a.id
+SET rcu.rubric_instance_id = ri.id;
+
+
+-- Rubric Indicator Usage
+-- Add a rubric_instance_id column
+alter table rubric_indicator_usage
+    add rubric_instance_id int unsigned null after rubric_indicator_id;
+
+-- deprecate submission_box_id
+alter table rubric_indicator_usage
+    change submission_box_id _submission_box_id int(11) unsigned not null;
+
+-- find the rubric_instance_id equivalent of each submission_box_id value
+-- that we installed earlier
+UPDATE rubric_indicator_usage riu
+INNER JOIN submission_box sb ON riu._submission_box_id = sb.id
+INNER JOIN rubric_instance ri ON sb.assessment_id = ri.assessment_id
+INNER JOIN assessment a ON sb.assessment_id = a.id
+SET riu.rubric_instance_id = ri.id;
+
+
+-- Rubric Level
+-- Add a rubric_instance_id column
+alter table rubric_level
+    add rubric_instance_id int unsigned null after id;
+
+alter table rubric_level
+    change box_id _box_id int(11) unsigned not null;
+
+-- find the rubric_instance_id equivalent of each submission_box_id value
+-- that we installed earlier
+UPDATE rubric_level rl
+INNER JOIN submission_box sb ON rl._box_id = sb.id
+INNER JOIN rubric_instance ri ON sb.assessment_id = ri.assessment_id
+INNER JOIN assessment a ON sb.assessment_id = a.id
+SET rl.rubric_instance_id = ri.id;
+
+
+-- Foreign Keys for everything
+-- add a fk that couldn't have existed previously
+ALTER TABLE rubric_capability_usage
+ADD INDEX `fk_rcu_ri_idx` (rubric_instance_id ASC);
+
+ALTER TABLE rubric_capability_usage
+ADD CONSTRAINT fk_rcu_ri
+FOREIGN KEY (rubric_instance_id)
+REFERENCES rubric_instance (id)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION;
+
+-- add a fk that couldn't have existed previously
+ALTER TABLE rubric_indicator_usage
+ADD INDEX `fk_riu_ri_idx` (rubric_instance_id ASC);
+
+ALTER TABLE rubric_indicator_usage
+ADD CONSTRAINT fk_riu_ri
+FOREIGN KEY (rubric_instance_id)
+REFERENCES rubric_instance (id)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION;
+
+-- add a fk that couldn't have existed previously
+ALTER TABLE rubric_level
+ADD INDEX `fk_rl_ri_idx` (rubric_instance_id ASC);
+
+ALTER TABLE rubric_level
+ADD CONSTRAINT fk_rl_ri FOREIGN KEY (rubric_instance_id)
+REFERENCES rubric_instance (id);
+
+
+-- Note: rubric_capability_usage and rubric_indicator_usage could still contain rows where rubric_instance_id is null.
+--
+-- That's because these tables retained rubric usages even for deleted assessments; presumably, this is for the occasion
+-- where the school wanted to restore these assessments, rubrics and all.
+--
+-- We seeded rubric_instance with data from use_rubric=0 assessments. These rows could still contain relationships with
+-- rows in rubric_capability_usage even if the assessment no longer needed it. These rows could/should be deleted once we
+-- are sure that nobody cares for them anymore (I expect this should be the case given they're related to assessments
+-- that no longer functionally exist; the data retention tool that eventually deletes assessments should also eventually
+-- delete rubric usages associated with them, perhaps)
+--
+-- We've left it as an exercise for the teachers to decide, but maybe we could simulate a deletion by soft-deleting the
+-- rubric_instance we just made, to emulate existing behaviour.
+--
+
+-- Maybe controversial: update foreign keys and int unsigned.
+--
+-- Remove old foreign keys
+-- These were replaced with foreign keys to rubric_instance_id instead.
+
+# -- rcu has a composite primary key: a (rubric_capability_id, rubric_instance_id) tuple
+alter table rubric_capability_usage
+    drop foreign key fk_rubric_group_usage_box_id;
+
+alter table rubric_capability_usage
+    drop primary key;
+
+alter table rubric_capability_usage
+    add primary key (rubric_capability_id, rubric_instance_id);
+
+drop index submission_box_id on rubric_capability_usage;
+
+-- This was previously mandatory (non-null) but it's been discontinued. Saving rows to the db causes crashes because it
+-- expects there to be a value here
+
+ALTER TABLE rubric_capability_usage
+    MODIFY _submission_box_id INT NULL;
+
+-- riu has a composite primary key: a (rubric_indicator_id, rubric_instance_id) tuple
+alter table rubric_indicator_usage
+    drop foreign key fk_rubric_usage_box_id;
+
+alter table rubric_indicator_usage
+    drop primary key;
+
+alter table rubric_indicator_usage
+    add primary key (rubric_indicator_id, rubric_instance_id);
+
+drop index submission_box_id on rubric_indicator_usage;
+
+-- This was previously mandatory (non-null) but it's been discontinued. Saving rows to the db causes crashes because it
+-- expects there to be a value here
+
+ALTER TABLE rubric_indicator_usage
+    MODIFY _submission_box_id INT NULL;
+
+alter table rubric_level
+    drop foreign key fk_rubric_level_box_id;
+
+-- This was previously mandatory (non-null) but it's been discontinued. Saving rows to the db causes crashes because it
+-- expects there to be a value here
+
+ALTER TABLE rubric_level
+MODIFY _box_id INT NULL;

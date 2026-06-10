@@ -102,6 +102,22 @@ const { query, isActive, isSearching, hasNoResults, hasError } = useQuerySearch(
 ); // to search for results
 
 /**
+ * if single select and the only default result is already selected, show no results
+ */
+const isSingleDefaultSelected = window.Vue.computed(() => {
+    if (
+        isActive.value === false &&
+        props.isSingleSelect &&
+        props.defaultResults &&
+        props.defaultResults.length === 1 &&
+        props.defaultResults[0].id === selected.value[0]?.id
+    ) {
+        return true;
+    }
+    return false;
+});
+
+/**
  * To show the current search results, or the default results
  * if the search is not active
  * @returns - the current results
@@ -109,6 +125,9 @@ const { query, isActive, isSearching, hasNoResults, hasError } = useQuerySearch(
 const currentResults = window.Vue.computed(() => {
     if (isActive.value) {
         return results.value;
+    }
+    if (isSingleDefaultSelected.value) {
+        return [];
     }
     if (props.defaultResults && props.defaultResults.length > 0) {
         return props.defaultResults;
@@ -162,6 +181,9 @@ window.Vue.watch(
  */
 const showResults = window.Vue.computed(() => {
     if (hasPressedEscape.value) {
+        return false;
+    }
+    if (isSingleDefaultSelected.value) {
         return false;
     }
     if (isActive.value) {
@@ -231,7 +253,7 @@ function onButtonSelected(): void {
                 {{ props.buttonTitle }}
             </button>
         </div>
-        <div class="results-container">
+        <div class="search-select__results-container">
             <ss-results
                 v-if="showResults"
                 :query="query"
@@ -250,10 +272,3 @@ function onButtonSelected(): void {
         </div>
     </div>
 </template>
-
-<style lang="scss" scoped>
-.results-container {
-    position: relative;
-    top: -1px; // to align the results with the bottom of the ss-query-input
-}
-</style>

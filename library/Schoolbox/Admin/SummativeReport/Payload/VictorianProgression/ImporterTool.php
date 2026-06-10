@@ -23,6 +23,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Factory;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -917,7 +918,7 @@ HELP;
                         'instructor-markType' => (string)MarkType::TYPE_LETTER,
                         'gradingScheme' => $gradingScheme,
                         'instructor-gradingScheme' => $gradingScheme,
-                        'visibility' => SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT,
+                        'visibility' => IAssessable::MARK_VISIBILITY_PARENT_STUDENT,
                     ];
 
                     /* Make it then save it

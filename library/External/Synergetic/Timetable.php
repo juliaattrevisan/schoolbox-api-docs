@@ -1186,7 +1186,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
 
     /**
-     * @var IConnector $database
+     * @param IConnector $database
      */
     private function setDatabase($database)
     {

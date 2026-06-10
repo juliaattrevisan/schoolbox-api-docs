@@ -78,9 +78,8 @@ class LaravelDatetimeAlaressDateRelativeTest extends TestCase
 
     public function testRelativeTimePastDays1()
     {
-        $this->markTestSkipped('Yesterday no longer shows as "yesterday"');
         $input = '2011-08-30 13:12:01';
-        $expected = 'Yesterday';
+        $expected = '1 day before';
 
         $relativeDate = self::buildDateObject(new DateTime($input));
         $result = $relativeDate->getRelativeTime(new DateTime('2011-08-31 13:12:01'));
@@ -101,9 +100,8 @@ class LaravelDatetimeAlaressDateRelativeTest extends TestCase
 
     public function testRelativeTimePastWeeks1()
     {
-        $this->markTestSkipped('Last week no longer shows as "Last week"');
         $input = '2011-08-23 05:00:14';
-        $expected = 'Last week';
+        $expected = '1 week before';
 
         $relativeDate = self::buildDateObject(new DateTime($input));
         $result = $relativeDate->getRelativeTime(new DateTime('2011-08-31 17:40:11'));
@@ -151,9 +149,8 @@ class LaravelDatetimeAlaressDateRelativeTest extends TestCase
 
     public function testRelativeTimePresent()
     {
-        $this->markTestSkipped('Now no longer shows as "just then"');
         $input = '2011-06-08 05:01:01';
-        $expected = 'just then';
+        $expected = '0 seconds before';
 
         $relativeDate = self::buildDateObject(new DateTime($input));
         $result = $relativeDate->getRelativeTime(new DateTime($input));
@@ -229,9 +226,8 @@ class LaravelDatetimeAlaressDateRelativeTest extends TestCase
 
     public function testRelativeTimeFutureDays1()
     {
-        $this->markTestSkipped('Tomorrow no longer shows as "tomorrow"');
         $input = '2011-06-09 06:01:03';
-        $expected = 'Tomorrow';
+        $expected = '1 day after';
 
         $relativeDate = self::buildDateObject(new DateTime($input));
         $result = $relativeDate->getRelativeTime(new DateTime('2011-06-08 05:01:01'));
@@ -241,10 +237,8 @@ class LaravelDatetimeAlaressDateRelativeTest extends TestCase
 
     public function testRelativeTimeFutureDays2()
     {
-        $this->markTestSkipped('Future dates no longer show as "next weekday"');
         $input = '2011-06-10 10:01:01';
-        $dayofweek = date('l', strtotime($input));
-        $expected = 'on ' . $dayofweek;
+        $expected = '2 days after';
 
         $relativeDate = self::buildDateObject(new DateTime($input));
         $result = $relativeDate->getRelativeTime(new DateTime('2011-06-08 05:01:01'));
@@ -254,10 +248,8 @@ class LaravelDatetimeAlaressDateRelativeTest extends TestCase
 
     public function testRelativeTimeFutureDays3()
     {
-        $this->markTestSkipped('Future dates no longer show as "next weekday"');
         $input = '2011-06-17 10:01:01';
-        $dayofweek = date('l', strtotime($input));
-        $expected = 'next ' . $dayofweek;
+        $expected = '1 week after';
 
         $relativeDate = self::buildDateObject(new DateTime($input));
         $result = $relativeDate->getRelativeTime(new DateTime('2011-06-08 05:01:01'));
@@ -320,9 +312,8 @@ class LaravelDatetimeAlaressDateRelativeTest extends TestCase
      */
     public function testRelativeTimeDystopia()
     {
-        $this->markTestSkipped('I think Carbon gets this wrong, it returns 202 years not 201');
         $input = '2211-06-10 10:01:01';
-        $expected = 'on 10th Jun 2211';
+        $expected = '200 years after';
 
         $relativeDate = self::buildDateObject(new DateTime($input));
         $result = $relativeDate->getRelativeTime(new DateTime('2011-06-08 05:01:01'));

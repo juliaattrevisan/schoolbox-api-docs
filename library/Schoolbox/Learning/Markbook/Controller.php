@@ -166,10 +166,20 @@ class Controller extends Base
                         'stats'           => null,
                         '_links'          => $unitAssessmentsTranslator->getLinks($assessment, true),
                         '_routes'         => [
-                            'postFeedbacks' => $this->getRouteIfAuthorized(
+                            /* this will change depending on if it's due work or reporting activity */
+                            'postFeedbacks' => $assessment instanceof DueWork\Model ? $this->getRouteIfAuthorized(
                                 'learningDueWorkFeedback.postParticipantFeedbacks',
-                                ['assessment' => $assessment, 'assessmentId' => $assessment->getId()]
-                            ),
+                                [
+                                    'assessment'   => $assessment,
+                                    'assessmentId' => $assessment->getId(),
+                                ]
+                            ) : ($assessment instanceof Reporting\Model ? $this->getRouteIfAuthorized(
+                                'learningReportingFeedback.postParticipantFeedbacks',
+                                [
+                                    'assessment'   => $assessment,
+                                    'assessmentId' => $assessment->getId(),
+                                ]
+                            ) : null),
                         ],
                     ];
                 })->indexByCallback(fn(array $assessment) => $assessment['id']),
@@ -187,7 +197,7 @@ class Controller extends Base
                         'title' => $folder->getFolder()->getTitle(),
                     ],
                     'assessments' => $markbook->getAssessments()->indexBy('id')->map(function (IAssessable $aImpl) use ($markbook, $terms) {
-                        /** Only due work has the concept of "instructorMarkScheme", others just use markScheme for now */
+                        /** Only due work & reporting have the concept of "instructorMarkScheme", others just use markScheme for now */
                         $instructorMarkScheme = ($aImpl instanceof DueWork\Model || $aImpl instanceof Reporting\Model)
                             ? $aImpl->getInstructorMarkScheme()
                             : $aImpl->getMarkScheme();
@@ -225,10 +235,11 @@ class Controller extends Base
                             'weight'         => $aImpl->getWeight(),
                             'projectId'      => $parentProject?->getId(),
                             'writable'       => $this->isAssessmentMarkable($this->getUser(), $aImpl, $terms),
-                            'instructorMarkScheme' => [
-                                'template' => $instructorMarkScheme?->getTemplate(),
-                                'context'  => $instructorMarkScheme?->generateContext(),
-                            ],
+                            /* feedback comments are enabled by default, unless a reporting activity opted out of them */
+                            'feedbackCommentsEnable' => $aImpl instanceof Reporting\Model
+                                ? $aImpl->getFeedbackCommentsEnable()
+                                : true,
+                            'instructorMarkScheme' => $instructorMarkScheme?->generateContext(),
                             'participants'   => $markbook->getStudents()->map(
                                 function (User $student) use ($aImpl, $markbook) {
                                     $participant = $aImpl->getParticipantIfExtant($student, false);
@@ -341,15 +352,6 @@ class Controller extends Base
                                             'student' => $student,
                                         ]
                                     ),
-                                    'learningDueWorkFeedback.postPublishFeedback' => $this->getRouteIfAuthorized(
-                                        'learningDueWorkFeedback.postPublishFeedback',
-                                        [
-                                            'assessment' => $aImpl,
-                                            'assessmentId' => $aImpl->getId(),
-                                            'studentId' => $student->getId(),
-                                            'student' => $student,
-                                        ]
-                                    ),
                                     'learningAssessment.postExclude' => $this->getRouteIfAuthorized(
                                         'learningAssessment.postExclude',
                                         [
@@ -368,15 +370,6 @@ class Controller extends Base
                                             'student' => $student,
                                         ]
                                     ),
-                                    'learningAssessment.getSummary' => $this->getRouteIfAuthorized(
-                                        'learningAssessment.getSummary',
-                                        [
-                                            'assessment' => $aImpl,
-                                            'assessmentId' => $aImpl->getId(),
-                                            'studentId' => $student->getId(),
-                                            'student' => $student,
-                                        ]
-                                    ),
                                     'learningAssessment.getInfo' => $this->getRouteIfAuthorized(
                                         'learningAssessment.getInfo',
                                         [
@@ -386,7 +379,26 @@ class Controller extends Base
                                             'student' => $student,
                                         ]
                                     ),
-                                    /* this will change depending on if it's a quiz or due work */
+                                    /* reporting has its own one of these as you can't submit stuff for it */
+                                    'historyRoute' =>
+                                        $aImpl instanceof Reporting\Model ? $this->getRouteIfAuthorized(
+                                            'learningReportingFeedback.getParticularFeedback',
+                                            [
+                                                'assessment' => $aImpl,
+                                                'assessmentId' => $aImpl->getId(),
+                                                'learnerId' => $student->getId(),
+                                                'learner' => $student,
+                                            ]
+                                        ) : $this->getRouteIfAuthorized(
+                                            'learningAssessment.getSummary',
+                                            [
+                                                'assessment' => $aImpl,
+                                                'assessmentId' => $aImpl->getId(),
+                                                'studentId' => $student->getId(),
+                                                'student' => $student,
+                                            ]
+                                        ),
+                                    /* this will change depending on if it's a due work, quiz, or reporting activity */
                                     'postFeedback' =>
                                         $aImpl instanceof DueWork\Model ? $this->getRouteIfAuthorized(
                                             'learningDueWorkFeedback.postParticipantFeedback',
@@ -404,7 +416,37 @@ class Controller extends Base
                                                 'studentId' => $student->getId(),
                                                 'student' => $student,
                                             ],
-                                        ) : null
+                                        ) : ($aImpl instanceof Reporting\Model ? $this->getRouteIfAuthorized(
+                                            'learningReportingFeedback.postParticularFeedback',
+                                            [
+                                                'assessment' => $aImpl,
+                                                'assessmentId' => $aImpl->getId(),
+                                                'learnerId' => $student->getId(),
+                                                'learner' => $student,
+                                            ]
+                                        ) : null)
+                                    ),
+                                    /* this will change depending on if it's due work or reporting activity */
+                                    'postPublishFeedback' => (
+                                        $aImpl instanceof DueWork\Model ? $this->getRouteIfAuthorized(
+                                            'learningDueWorkFeedback.postPublishFeedback',
+                                            [
+                                                'assessment' => $aImpl,
+                                                'assessmentId' => $aImpl->getId(),
+                                                'studentId' => $student->getId(),
+                                                'student' => $student,
+                                            ]
+                                        ) : (
+                                            $aImpl instanceof Reporting\Model ? $this->getRouteIfAuthorized(
+                                                'learningReportingFeedback.postPublishFeedback',
+                                                [
+                                                    'assessment' => $aImpl,
+                                                    'assessmentId' => $aImpl->getId(),
+                                                    'learnerId' => $student->getId(),
+                                                    'learner' => $student,
+                                                ]
+                                            ) : null
+                                        )
                                     ),
                                     /* The original assessment customisation route, if it's a customised copy otherwise null
                                      */
@@ -448,7 +490,10 @@ class Controller extends Base
                     ),
                     'courseImport.getImport' => null, /* not relevant on the class markbook */
                 ],
-                'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get(ConfigMapper::NAME_SUBMISSION_VISIBILITY_MAX)),
+                'availableVisibilities' => Visibility::getAvailableVisibilities(
+                    (bool) $this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_STUDENTS),
+                    (bool) $this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_PARENTS),
+                ),
                 'submissionErrorStates' => $this->stateMapper->findAll()->map(fn(State $state) => [
                     'id' => $state->getId(),
                     'name' => $state->getDisplayAs(),

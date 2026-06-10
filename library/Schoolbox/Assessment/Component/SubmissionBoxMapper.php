@@ -22,6 +22,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as MarkbookAdapter;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage;
 
 /**
@@ -81,7 +82,7 @@ class SubmissionBoxMapper extends BaseMapper
         $this->joins('rubric_capability_mark_type_id', SubmissionBox\MarkTypeMapper::class, 'mark_type_id', null, null, 'capabilityMarkType');
         $this->joins('rubric_capability_grade_group_id', SubmissionBox\GradeLevel\Group\Mapper::class, 'id', null, null, 'capabilityGradeGroup');
         $this->uses('rubric_mark_range', self::TYPE_BOOLEAN, null, 'markedUsingRange');
-        $this->uses('mark_visibility', self::TYPE_INTEGER);
+        $this->uses('mark_visibility', self::TYPE_STRING);
         $this->uses('skip_unsubmitted', self::TYPE_BOOLEAN);
         $this->uses('self_reviewability', self::TYPE_STRING);
         $this->uses('similarity_check_enabled', self::TYPE_BOOLEAN);
@@ -236,10 +237,23 @@ class SubmissionBoxMapper extends BaseMapper
      *
      * @param SubmissionBox $dueWork
      * @return bool
+     * @throws Exception
      */
-    public function softDeleteRubricLevels(SubmissionBox $dueWork)
+    public function softDeleteRubricLevels(SubmissionBox $dueWork): bool
     {
-        RubricLevelMapper::getInstance()->deleteByColumn('box_id', $dueWork->getId());
+        /* Find the rubric levels associated with any of the rubric instances used by this submission box's assessment,
+         * and delete those rubric levels.
+         *
+         * I suppose this is the equivalent for multiple grids: delete all the levels associated with all the rubric
+         * instances that were in this $dueWork.
+         */
+        $rubricInstanceMapper = \Schoolbox\Assessment\Rubric\Instance\Mapper::getInstance();
+        $rubricLevelMapper = RubricLevelMapper::getInstance();
+
+        $rubricInstanceIds = $rubricInstanceMapper->findByColumn('assessment_id', $dueWork->getAssessmentModel()->getId())->indexBy('id')->keys();
+
+        $rubricLevelMapper->deleteByColumn('rubric_instance_id', $rubricInstanceIds);
+
         return true;
     }
 

@@ -15,6 +15,7 @@ use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
+use Schoolbox\User;
 
 /**
  * A marked rubric grid.
@@ -156,33 +157,6 @@ class MarkedGrid
 
 
     /**
-     * @return IFeedback
-     */
-    public function getFeedback(): IFeedback
-    {
-        return $this->feedback;
-    }
-
-
-    /**
-     * @return Grid
-     */
-    public function getGrid(): Grid
-    {
-        return $this->grid;
-    }
-
-
-    /**
-     * @return IMarkScheme
-     */
-    public function getMarkScheme(): IMarkScheme
-    {
-        return $this->markScheme;
-    }
-
-
-    /**
      * Returns an iterator over capability usages.
      *
      * @return iterable|CapabilityUsage[]
@@ -233,7 +207,65 @@ class MarkedGrid
 
 
     /**
-     * @return CapabilityMark[]|GenericCollection
+     * @param User $viewer the user viewing this marked grid, for permissions purposes
+     * @param bool $showPoints
+     * @return array
+     * @see /library/Schoolbox/Assessment/Rubric/templates/vue/types.ts RubricMarkedGrid
+     */
+    public function toArray(
+        User $viewer,
+        bool $showPoints,
+    ): array {
+        /* TODO: similar to Grid->jsonSerialize, this is not final and will be easier to figure out what needs
+         * to be changed once we can see all the payloads for the builder/readonly/markable grids in action.
+         * There's also the assessment API to consider, i'm ignoring it for now as we'll need to change it regardless to accomidate multi rubrics
+         * To avoid passing thru a translator down very deep twig file chains in a lot of places, we can do it here for now
+         */
+
+        /* TODO: ensure access controls (particularly whether students can see mark info assuming there's cases when they shouldn't?) are handled correctly
+         * there are more notes both in this translator and in the Grid translators about addressing this.
+         */
+
+        // TODO: injecting this stuff like this is quite unpleasant, let's review once it's at least working...
+        $rubricMarkedGridTranslator = new Translator\ModelToArray(
+            $viewer,
+            $showPoints,
+        );
+        return $rubricMarkedGridTranslator($this);
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * @return IFeedback
+     */
+    public function getFeedback(): IFeedback
+    {
+        return $this->feedback;
+    }
+
+
+    /**
+     * @return Grid
+     */
+    public function getGrid(): Grid
+    {
+        return $this->grid;
+    }
+
+
+    /**
+     * @return IMarkScheme
+     */
+    public function getMarkScheme(): IMarkScheme
+    {
+        return $this->markScheme;
+    }
+
+
+    /**
+     * @return GenericCollection<CapabilityMark>
      */
     public function getCapabilityMarks(): GenericCollection
     {
@@ -242,7 +274,7 @@ class MarkedGrid
 
 
     /**
-     * @param CapabilityMark[]|GenericCollection $capabilityMarks
+     * @param GenericCollection<CapabilityMark> $capabilityMarks
      * @return static
      */
     public function setCapabilityMarks(GenericCollection $capabilityMarks): self

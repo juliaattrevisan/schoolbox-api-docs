@@ -12,6 +12,7 @@ namespace Schoolbox\Permission\Access;
 
 use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Config;
+use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -202,17 +203,17 @@ class Access
 
 
     /**
-     * Is the specified user an instructor for the specified folder ?
+     * Is the specified user an instructor for the specified folder?
      *
      * An instructor is any user with WRITE+ permission to a folder
      *
      * @param User         $user
      * @param Folder\Model $folder
      * @return bool
-     * @throws InvalidArgumentException
-     * @throws Mapper\Exception
-     * @throws LogicException
-     * @throws UnexpectedValueException
+     * @throws InvalidArgumentException Due to getFolderAccess() call.
+     * @throws Mapper\Exception         Due to getFolderAccess() call.
+     * @throws LogicException           Due to getFolderAccess() call.
+     * @throws UnexpectedValueException Due to getFolderAccess() call.
      */
     public function isInstructor(User $user, Folder\Model $folder): bool
     {
@@ -221,21 +222,145 @@ class Access
 
 
     /**
-     * Is the specified user a learner of the specified folder ?
+     * This function should be used if the caller has a folderId but not a Folder object, and creating a Folder object
+     * would be onerous.  Otherwise, $this->isInstructor() should be preferred.
+     *
+     * @param User $user
+     * @param int  $folderId
+     * @return bool
+     * @throws MapperException
+     */
+    public function isInstructorInFolderId(User $user, int $folderId): bool
+    {
+        return $this->getFolderAccess($user, $folderId) >= UserAccess::ACCESS_WRITE;
+    }
+
+
+    /**
+     * Is the specified user a learner of the specified folder?
      *
      * A learner is any user with READ permission to a folder
      *
      * @param User         $user
      * @param Folder\Model $folder
      * @return bool
-     * @throws InvalidArgumentException
-     * @throws Mapper\Exception
-     * @throws LogicException
-     * @throws UnexpectedValueException
+     * @throws InvalidArgumentException Due to getFolderAccess() call.
+     * @throws Mapper\Exception         Due to getFolderAccess() call.
+     * @throws LogicException           Due to getFolderAccess() call.
+     * @throws UnexpectedValueException Due to getFolderAccess() call.
      */
     public function isLearner(User $user, Folder\Model $folder): bool
     {
         return $this->getFolderAccess($user, $folder->getId()) === UserAccess::ACCESS_READ;
+    }
+
+
+    /**
+     * This function should be used if the caller has a folderId but not a Folder object, and creating a Folder object
+     * would be onerous.  Otherwise, $this->isLearner() should be preferred.
+     *
+     * @param User $user
+     * @param int  $folderId
+     * @return bool
+     * @throws MapperException
+     */
+    public function isLearnerInFolderId(User $user, int $folderId): bool
+    {
+        return $this->getFolderAccess($user, $folderId) === UserAccess::ACCESS_READ;
+    }
+
+
+    /**
+     * Is the specified user a parent of a learner in the specified folder?
+     *
+     * A user is considered a parent of a learner if they have at least one child
+     * who has READ access to the folder.
+     *
+     * Requires that either:
+     * - The user is the current session user (children loaded during session creation), or
+     * - {@see User::setChildren()} has been called on the user beforehand.
+     *
+     * @param User         $user
+     * @param Folder\Model $folder
+     * @return bool
+     * @throws InvalidArgumentException Due to getFolderAccess() call.
+     * @throws Mapper\Exception         Due to getFolderAccess() call.
+     * @throws LogicException           Due to getFolderAccess() call.
+     */
+    public function isParentOfLearner(User $user, Folder\Model $folder): bool
+    {
+        $children = $user->getChildren();
+
+        if (null === $children) {
+            return false;
+        }
+
+        foreach ($children as $child) {
+            if ($this->isLearner($child, $folder)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
+     * This function should be used if the caller has a folderId but not a Folder object, and creating a Folder object
+     * would be onerous.  Otherwise, $this->isParentOfLearner() should be preferred.
+     *
+     * @param User $user
+     * @param int  $folderId
+     * @return bool
+     * @throws MapperException
+     */
+    public function isParentOfLearnerInFolderId(User $user, int $folderId): bool
+    {
+        $children = $user->getChildren();
+
+        if (null === $children) {
+            return false;
+        }
+
+        foreach ($children as $child) {
+            if ($this->isLearnerInFolderId($child, $folderId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Return the children of $parent who are learners in $folder.
+     * Note all learners in $folder have the same level of access, due to the definition of 'learner'.
+     *
+     * @param User         $parent
+     * @param Folder\Model $folder
+     * @return GenericCollection<User>
+     * @throws InvalidArgumentException Due to isLearner() call.
+     * @throws Mapper\Exception         Due to isLearner() call.
+     * @throws LogicException           Due to isLearner() call.
+     *
+     * @see isParentOfLearner()
+     */
+    public function getChildLearnersOfParent(User $parent, Folder\Model $folder): GenericCollection
+    {
+        $children = $parent->getChildren();
+
+        if (null === $children) {
+            return new GenericCollection(User::class);
+        }
+
+        return $children->filter(
+            /**
+             * Keeps only child users who are learners in the supplied folder.
+             */
+            function (User $child) use ($folder) {
+                return $this->isLearner($child, $folder);
+            }
+        );
     }
 
 
@@ -414,7 +539,7 @@ class Access
      * @throws InvalidArgumentException TODO implement better annotation/handling for impossible logic exceptions
      * @throws Mapper\Exception         If folder does not exist.
      * @throws LogicException           If unable to build an ExternalUser instance
-     * @throws UnexpectedValueException If cannot add item to folder collection (TODO SA-9670)
+     * @throws UnexpectedValueException Due to getNnianAncestors() call.
      */
     public function getFolderAccess(User $user, int $folderId, $cache = true): int
     {

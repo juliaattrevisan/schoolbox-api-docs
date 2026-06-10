@@ -16,27 +16,23 @@ import type { MarkSchemeTotalMarkFractional, SubmissionErrorStates } from "./mar
 const PRECISION = 2;
 
 interface Props {
+    id: string | number;
+    name?: string;
     markScheme: MarkSchemeTotalMarkFractional;
     submissionErrorStates: SubmissionErrorStates;
-    participant: {
-        user: {
-            id: number;
-        };
-    };
     tabIndex?: number;
     /**
      * Should this form input be rendered as readonly?
      */
     readonly?: boolean;
+    class?: string;
     /**
-     * The target for alaressValidate, if left blank then it will use the input itself
-     */
-    alaressValidateTarget?: string;
-    /**
-     * Optional precedence: used for quiz only
+     * Optional precedence: used for quiz & capability marks only
      * Maximum marks available per attempt, indexed by user id
      */
     limit?: number;
+    errorPlaceholderSelector?: string;
+    allowInvalidMark?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -51,7 +47,7 @@ const limit = window.Vue.computed(() => {
         return props.limit;
     }
 
-    const { totalMark } = props.markScheme.context.conf;
+    const { totalMark } = props.markScheme.conf;
 
     if (Math.floor(totalMark) !== totalMark) {
         return Number(totalMark.toFixed(PRECISION));
@@ -63,27 +59,24 @@ const limit = window.Vue.computed(() => {
 
 <template>
     <ms-text-input
+        :id="props.id"
         v-model:mark="mark"
-        :participant="props.participant"
+        :name="props.name"
         :submission-error-states="props.submissionErrorStates"
+        :class="props.class"
         :tab-index="props.tabIndex"
         :placeholder="props.readonly ? '(no mark given)' : `Mark out of ${limit}`"
         :limit="limit"
         :max-length="48"
         :input-title="`Maximum Mark: ${limit}`"
         :readonly="props.readonly"
-        :alaress-validate-target="props.alaressValidateTarget"
         :alaress-validate-options="{
-            rules: {
-                mark: {
-                    withinRange: true,
-                },
-            },
+            withinRange: true,
             messages: {
-                mark: {
-                    withinRange: `The grade must be between 0 and ${limit}.`,
-                },
+                withinRange: `The grade must be between 0 and ${limit}.`,
             },
         }"
+        :error-placeholder-selector="props.errorPlaceholderSelector"
+        :allow-invalid-mark="props.allowInvalidMark"
     />
 </template>

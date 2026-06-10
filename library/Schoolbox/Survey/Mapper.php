@@ -28,7 +28,7 @@ use Schoolbox\Survey\Attempt\Mapper as SurveyAttemptMapper;
  * A Survey is defined in the database as:
  *  * a row of the `assess` table, in which assess.availabilty === 'survey'.
  *  * note that for survey rows, assess.assessment_id may be NULL
- *  * contrast with the database definition of a Quiz (library/Schoolbox/Survey/Mapper.php).
+ *  * contrast with the database definition of a Quiz (library/Schoolbox/Learning/Quiz/Mapper.php).
  *
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  */

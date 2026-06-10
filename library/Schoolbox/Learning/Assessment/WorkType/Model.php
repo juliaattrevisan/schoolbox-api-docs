@@ -52,14 +52,11 @@ class Model implements ISoftDeletable, Sequential
      */
     private $showOnGradesPage;
 
-    /** @var bool */
-    private $staffOrInstructorVisibleOnly;
-
     /** @var ?bool */
     private ?bool $isVisibleToParents = null;
 
     /** @var ?bool */
-    private ?bool $isVisibleToStudents = null;
+    private ?bool $isVisibleToLearners = null;
 
     /** @var ?bool */
     private ?bool $permittedProject = null;
@@ -81,6 +78,9 @@ class Model implements ISoftDeletable, Sequential
 
     /** @var ?bool */
     private ?bool $permittedDialogAgent = null;
+
+    /** @var ?bool */
+    private ?bool $permittedReportingActivity = null;
 
 
     /**
@@ -169,37 +169,15 @@ class Model implements ISoftDeletable, Sequential
 
 
     /**
-     * Human friendly getter
-     *
+     * Human-friendly getter
      * @return bool
-     * @throws InsufficientHydrationException
      */
-    public function isStaffOrInstructorVisibleOnly(): bool
+    public function isVisibleToParents(): bool
     {
-        if (null === $this->staffOrInstructorVisibleOnly) {
-            throw new InsufficientHydrationException('Cannot determine visibility from NULL property');
+        if (null === $this->isVisibleToParents) {
+            throw new InsufficientHydrationException('Cannot determine parent visibility from NULL property');
         }
-        return $this->staffOrInstructorVisibleOnly;
-    }
-
-
-    /**
-     * @return ?bool
-     */
-    public function getStaffOrInstructorVisibleOnly(): ?bool
-    {
-        return $this->staffOrInstructorVisibleOnly;
-    }
-
-
-    /**
-     * @param bool $staffOrInstructorVisibleOnly
-     * @return $this
-     */
-    public function setStaffOrInstructorVisibleOnly(bool $staffOrInstructorVisibleOnly): self
-    {
-        $this->staffOrInstructorVisibleOnly = $staffOrInstructorVisibleOnly;
-        return $this;
+        return $this->isVisibleToParents;
     }
 
     /**
@@ -221,41 +199,55 @@ class Model implements ISoftDeletable, Sequential
     }
 
     /**
-     * @return ?bool
+     * Human-friendly getter
+     * @return bool
      */
-    public function getIsVisibleToStudents(): ?bool
+    public function isVisibleToLearners(): bool
     {
-        return $this->isVisibleToStudents;
+        if (null === $this->isVisibleToLearners) {
+            throw new InsufficientHydrationException('Cannot determine learner visibility from NULL property');
+        }
+        return $this->isVisibleToLearners;
     }
 
     /**
-     * @param bool $isVisibleToStudents
+     * @return ?bool
+     */
+    public function getIsVisibleToLearners(): ?bool
+    {
+        return $this->isVisibleToLearners;
+    }
+
+    /**
+     * @param bool $isVisibleToLearners
      * @return self
      */
-    public function setIsVisibleToStudents(bool $isVisibleToStudents): self
+    public function setIsVisibleToLearners(bool $isVisibleToLearners): self
     {
-        $this->isVisibleToStudents = $isVisibleToStudents;
+        $this->isVisibleToLearners = $isVisibleToLearners;
         return $this;
     }
 
     /**
      * Return the visibility of the work type as a string constant, derived from the visibility booleans.
+     * If you do not have a model instance available, use WorkType\Helper::getVisibilityFromBooleans() instead.
+     *
      * @throws InsufficientHydrationException
      * @return string
      */
     public function getVisibility(): string
     {
-        if ($this->isVisibleToParents === null || $this->isVisibleToStudents === null) {
+        if ($this->isVisibleToParents === null || $this->isVisibleToLearners === null) {
             // If not for this exception, this function would return a non-null value even when the underlying data
             // items have not been hydrated.  Avoid misleading the caller by throwing an exception.
             throw new InsufficientHydrationException('Cannot determine visibility from NULL property');
         }
 
-        return match ([$this->isVisibleToParents, $this->isVisibleToStudents]) {
-            [false, false] => Mapper::VISIBILITY_STAFF_ONLY,
-            [false, true ] => Mapper::VISIBILITY_STAFF_STUDENTS,
-            [true , false] => Mapper::VISIBILITY_STAFF_PARENTS,
-            [true , true ] => Mapper::VISIBILITY_STAFF_STUDENTS_PARENTS,
+        return match ([$this->isVisibleToParents, $this->isVisibleToLearners]) {
+            [false, false] => Mapper::VISIBILITY_STAFF_INSTRUCTORS,
+            [false, true ] => Mapper::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS,
+            [true , false] => Mapper::VISIBILITY_STAFF_INSTRUCTORS_PARENTS,
+            [true , true ] => Mapper::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS_PARENTS,
         };
     }
 
@@ -268,25 +260,21 @@ class Model implements ISoftDeletable, Sequential
     public function setVisibility(string $visibility): self
     {
         switch ($visibility) {
-            case Mapper::VISIBILITY_STAFF_ONLY:
-                $this->isVisibleToStudents = false;
+            case Mapper::VISIBILITY_STAFF_INSTRUCTORS:
+                $this->isVisibleToLearners = false;
                 $this->isVisibleToParents = false;
-                $this->staffOrInstructorVisibleOnly = true; // Set this to keep this field working until it is removed in SA-21973.
                 break;
-            case Mapper::VISIBILITY_STAFF_STUDENTS:
-                $this->isVisibleToStudents = true;
+            case Mapper::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS:
+                $this->isVisibleToLearners = true;
                 $this->isVisibleToParents = false;
-                $this->staffOrInstructorVisibleOnly = false; // Set this to keep this field working until it is removed in SA-21973.
                 break;
-            case Mapper::VISIBILITY_STAFF_PARENTS:
-                $this->isVisibleToStudents = false;
+            case Mapper::VISIBILITY_STAFF_INSTRUCTORS_PARENTS:
+                $this->isVisibleToLearners = false;
                 $this->isVisibleToParents = true;
-                $this->staffOrInstructorVisibleOnly = false; // Set this to keep this field working until it is removed in SA-21973.
                 break;
-            case Mapper::VISIBILITY_STAFF_STUDENTS_PARENTS:
-                $this->isVisibleToStudents = true;
+            case Mapper::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS_PARENTS:
+                $this->isVisibleToLearners = true;
                 $this->isVisibleToParents = true;
-                $this->staffOrInstructorVisibleOnly = false; // Set this to keep this field working until it is removed in SA-21973.
                 break;
             default:
                 throw new \UnexpectedValueException('Unknown visibility: ' . $visibility);
@@ -411,5 +399,22 @@ class Model implements ISoftDeletable, Sequential
     public function setPermittedDialogAgent(bool $permittedDialogAgent): void
     {
         $this->permittedDialogAgent = $permittedDialogAgent;
+    }
+
+    /**
+     * @return ?bool
+     */
+    public function getPermittedReportingActivity(): ?bool
+    {
+        return $this->permittedReportingActivity;
+    }
+
+    /**
+     * @param bool $permittedReportingActivity
+     * @return void
+     */
+    public function setPermittedReportingActivity(bool $permittedReportingActivity): void
+    {
+        $this->permittedReportingActivity = $permittedReportingActivity;
     }
 }

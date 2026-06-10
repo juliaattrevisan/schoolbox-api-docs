@@ -57,93 +57,93 @@ class OauthProviderIssuedTest extends TestCase
 
         yield 'no issuer configured, no issuer in JWT' => [
             $defaultConfigurationClientId,
-                $defaultJwtAudience,
+            $defaultJwtAudience,
             true,
         ];
         yield 'no issuer configured, null issuer in JWT' => [
             $defaultConfigurationClientId,
-                $defaultJwtAudience + [ConfigMapper::NAME_OAUTH_ISSUER => null],
+            $defaultJwtAudience + [ConfigMapper::NAME_OAUTH_ISSUER => null],
             true,
         ];
         yield 'no issuer configured, issuer in JWT' => [
             $defaultConfigurationClientId,
-                $defaultJwtAudience + [IParser::CLAIM_ISS => 'vagrant.dev.schoolbox.cloud'],
-            true,
+            $defaultJwtAudience + [IParser::CLAIM_ISS => 'vagrant.dev.schoolbox.cloud'],
+            false,
         ];
         yield 'issuer configured, no issuer in JWT' => [
             $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => 'vagrant.dev.schoolbox.cloud'],
-                $defaultJwtAudience,
+            $defaultJwtAudience,
             false,
         ];
         yield 'issuer configured, null issuer in JWT' => [
             $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => 'vagrant.dev.schoolbox.cloud'],
-                $defaultJwtAudience + [ConfigMapper::NAME_OAUTH_ISSUER => null],
+            $defaultJwtAudience + [ConfigMapper::NAME_OAUTH_ISSUER => null],
             false,
         ];
         yield 'issuer configured, matching issuer in JWT' => [
             $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => 'vagrant.dev.schoolbox.cloud'],
-                $defaultJwtAudience + [IParser::CLAIM_ISS => 'vagrant.dev.schoolbox.cloud'],
+            $defaultJwtAudience + [IParser::CLAIM_ISS => 'vagrant.dev.schoolbox.cloud'],
             true,
         ];
         yield 'issuer configured, non-matching issuer in JWT' => [
             $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => 'vagrant.dev.schoolbox.cloud'],
-                $defaultJwtAudience + [IParser::CLAIM_ISS => 'vagrant.dev.schoolbox.cloudd'],
+            $defaultJwtAudience + [IParser::CLAIM_ISS => 'vagrant.dev.schoolbox.cloudd'],
             false,
         ];
 
         // null issuer configured: treat same as empty
         yield 'null issuer configured, no issuer in JWT' => [
             $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => null],
-                $defaultJwtAudience,
+            $defaultJwtAudience,
             true,
         ];
         yield 'null issuer configured, null issuer in JWT' => [
             $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => null],
-                $defaultJwtAudience + [IParser::CLAIM_ISS => null],
+            $defaultJwtAudience + [IParser::CLAIM_ISS => null],
             true,
         ];
         yield 'null issuer configured, issuer in JWT' => [
             $defaultConfigurationClientId,
-                $defaultJwtAudience + [IParser::CLAIM_ISS => 'vagrant.dev.schoolbox.cloud'],
-            true,
+            $defaultJwtAudience + [IParser::CLAIM_ISS => 'vagrant.dev.schoolbox.cloud'],
+            false,
         ];
 
         // non-string issuer configured: cast to string
         yield 'non-string issuer configured, no issuer in JWT' => [
             $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => 1],
-                $defaultJwtAudience,
+            $defaultJwtAudience,
             false,
         ];
         yield 'non-string issuer configured, matching issuer in JWT' => [
             $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => 1],
-                $defaultJwtAudience + [IParser::CLAIM_ISS => 1],
+            $defaultJwtAudience + [IParser::CLAIM_ISS => 1],
             true,
         ];
         yield 'non-string issuer configured, semi-matching issuer in JWT' => [
             $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => 1],
-                $defaultJwtAudience + [IParser::CLAIM_ISS => '1'],
+            $defaultJwtAudience + [IParser::CLAIM_ISS => '1'],
             true,
         ];
         yield 'non-string issuer configured, non-matching issuer in JWT' => [
             $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => 1],
-                $defaultJwtAudience + [IParser::CLAIM_ISS => 2],
+            $defaultJwtAudience + [IParser::CLAIM_ISS => 2],
             false,
         ];
 
         // non-string issuer in JWT: cast to string
         yield 'no issuer configured, non-string issuer in JWT' => [
             $defaultConfigurationClientId,
-                $defaultJwtAudience + [IParser::CLAIM_ISS => 1],
-            true,
+            $defaultJwtAudience + [IParser::CLAIM_ISS => 1],
+            false,
         ];
         yield 'issuer configured, semi-matching non-string issuer in JWT' => [
             $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => '1'],
-                $defaultJwtAudience + [IParser::CLAIM_ISS => 1],
+            $defaultJwtAudience + [IParser::CLAIM_ISS => 1],
             true,
         ];
         yield 'issuer configured, non-matching non-string issuer in JWT' => [
             $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => '2'],
-                $defaultJwtAudience + [IParser::CLAIM_ISS => 1],
+            $defaultJwtAudience + [IParser::CLAIM_ISS => 1],
             false,
         ];
 

@@ -173,7 +173,7 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
                         <div class="small-12 medium-4 large-3">
                             <div class="checklist l-flex-col l-gap-s">
                                 <label class="title">Filter</label>
-                                <ul class="option-list l-flex-row l-gap-s">
+                                <ul class="option-list l-flex-row l-gap-l">
                                     <li data-v-40e5173a="">
                                         <input id="waiting-list" type="checkbox" checked />
                                         <label for="waiting-list">Waiting List</label>
@@ -190,8 +190,8 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
                             <div class="switch">
                                 <input id="useDualMarkTypes" name="useDualMarkTypes" type="checkbox" />
                                 <label for="useDualMarkTypes" data-test="assessment-form-checkbox-dualMarkTypes">
-                                    <span class="icon-approve"></span>
-                                    <span class="icon-cancel"></span>
+                                    <span><sbx-icon name="approve" size="m" color="currentColor"></sbx-icon></span>
+                                    <span><sbx-icon name="close" size="m" color="currentColor"></sbx-icon></span>
                                 </label>
                             </div>
                         </div>
@@ -304,10 +304,25 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
     </template>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .preview-container {
     border: 1px solid var(--sbx-color-border, #dcdcdc);
-    border-radius: var(--sbx-config-field-roundness, 0);
+    border-radius: var(--sbx-config-field-corner-radius, 0);
     padding: var(--spacing-m);
+}
+
+/* use the new config setting colours */
+.component-titlebar,
+#component-layout .column-top .component-titlebar,
+#component-layout .column-left .component-titlebar,
+#component-layout .column-right .component-titlebar {
+    background-color: var(--sbx-config-color-component-heading-background);
+    h2,
+    nav a[class^="icon-"],
+    nav a[class*=" icon-"],
+    nav a.sbx-icon-only-button,
+    nav a.sbx-icon-only-button sbx-icon {
+        color: var(--sbx-config-color-component-heading-text);
+    }
 }
 </style>

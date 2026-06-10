@@ -216,7 +216,9 @@ class Factory
                 $normScheme = $feedback->isSelfAssessment() ? $learnerScheme : $instructorScheme;
                 $norm = $normScheme->getNormalisedMark($this->mark);
 
-                //then sanitise the output for both instructor and learner marks
+                /* Always rederive/sanitise both the learner and instructor human readable marks, even if they're the same.
+                 * For example, this ensures a value of "5" using a percentage mark type becomes "5 %"
+                 */
                 $humanReadableMark = $learnerScheme->getHumanReadableMark($norm);
                 $humanReadableInstructorMark = $instructorScheme->getHumanReadableMark($norm);
 

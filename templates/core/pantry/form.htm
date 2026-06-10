@@ -22,6 +22,21 @@
     });
 
 </script>
+<style>
+    #iconCheckboxToggle0 + label.input-toggle,
+    #iconCheckboxToggle3 + label.input-toggle,
+    #iconRadioToggle00 + label.input-toggle,
+    #iconRadioToggle33 + label.input-toggle {
+        color: var(--sbx-color-text-secondary, var(--body-foreground));
+    }
+
+    #iconCheckboxToggle0:checked + label.input-toggle,
+    #iconCheckboxToggle3:checked + label.input-toggle,
+    #iconRadioToggle00:checked + label.input-toggle,
+    #iconRadioToggle33:checked + label.input-toggle {
+        color: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground));
+    }
+</style>
 <!-- END custom_head -->
 
 <div class="row">
@@ -250,22 +265,24 @@
                                     <label for="selectAllNested">Select All</label>
                                 </li>
                                 <li>
-                                    <input id="parentCheckbox1" type="checkbox" data-parent-checkbox>
-                                    <label for="parentCheckbox1" title="Select to reveal children">
-                                        Parent Checkbox
-                                        <i class="icon-click-view size-8"></i>
-                                    </label>
-                                    <div class="checklist" data-child-group>
-                                        <ul class="option-list">
-                                            <li>
-                                                <input id="childCheckbox1" type="checkbox" data-child-checkbox>
-                                                <label for="childCheckbox1">A Child Checkbox</label>
-                                            </li>
-                                            <li>
-                                                <input id="childCheckbox2" type="checkbox" data-child-checkbox>
-                                                <label for="childCheckbox2">Another Child Checkbox</label>
-                                            </li>
-                                        </ul>
+                                    <div>
+                                        <input id="parentCheckbox1" type="checkbox" data-parent-checkbox>
+                                        <label for="parentCheckbox1" title="Select to reveal children">
+                                            Parent Checkbox
+                                            <sbx-icon name="down-arrow"></sbx-icon>
+                                        </label>
+                                        <div class="checklist" data-child-group>
+                                            <ul class="option-list">
+                                                <li>
+                                                    <input id="childCheckbox1" type="checkbox" data-child-checkbox>
+                                                    <label for="childCheckbox1">A Child Checkbox</label>
+                                                </li>
+                                                <li>
+                                                    <input id="childCheckbox2" type="checkbox" data-child-checkbox>
+                                                    <label for="childCheckbox2">Another Child Checkbox</label>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </li>
                             </ul>
@@ -351,13 +368,27 @@
                     </div>
 
                     <div class="small-12 medium-6 columns">
-                        <fieldset>
+                        <fieldset class="sbx-checkbox-radio-group-scroll">
                             <legend>Check List Container</legend>
-                            <div class="checklist checklist-container">
-                                <input id="checkbox-table1" type="checkbox"><label for="checkbox-table1">Checkbox 1</label>
-                                <input id="checkbox-table2" type="checkbox"><label for="checkbox-table2">Checkbox 2</label>
-                                <input id="checkbox-table3" type="checkbox"><label for="checkbox-table3">Checkbox 3</label>
-                                <input id="checkbox-table4" type="checkbox" checked><label for="checkbox-table4">Checkbox 4</label>
+                            <div class="sbx-scroll-container">
+                                <ul class="sbx-checkbox-radio-group">
+                                    <li class="ss-results-item checklist sbx-checkbox-radio-container">
+                                        <input id="checkbox-table1" type="checkbox" />
+                                        <label for="checkbox-table1">Checkbox 1</label>
+                                    </li>
+                                    <li class="ss-results-item checklist sbx-checkbox-radio-container">
+                                        <input id="checkbox-table2" type="checkbox" />
+                                        <label for="checkbox-table2">Checkbox 2</label>
+                                    </li>
+                                    <li class="ss-results-item checklist sbx-checkbox-radio-container">
+                                        <input id="checkbox-table3" type="checkbox" />
+                                        <label for="checkbox-table3">Checkbox 3</label>
+                                    </li>
+                                    <li class="ss-results-item checklist sbx-checkbox-radio-container">
+                                        <input id="checkbox-table4" type="checkbox" />
+                                        <label for="checkbox-table4">Checkbox 4</label>
+                                    </li>
+                                </ul>
                             </div>
                         </fieldset>
                     </div>
@@ -377,8 +408,8 @@
                         <div class="switch">
                             <input id="disbledCheckboxSwitch" type="checkbox" checked>
                             <label for="disbledCheckboxSwitch">
-                                <span class="icon-approve"></span>
-                                <span class="icon-cancel"></span>
+                                <span><sbx-icon name="approve" size="m" color="currentColor"></sbx-icon></span>
+                                <span><sbx-icon name="close" size="m" color="currentColor"></sbx-icon></span>
                             </label>
                         </div>
                         <div class="long switch">
@@ -406,15 +437,15 @@
                     <legend>Radio button blocks</legend>
                     <div class="small-12 medium-4 columns">
                         <input type="radio" name="pokemon" value="Project" id="project" checked>
-                        <label for="project" class="block"><i class="icon-project"></i>Project</label>
+                        <label for="project" class="block"><sbx-icon name="project" size="xl" color="currentColor"></sbx-icon>Project</label>
                     </div>
                     <div class="small-12 medium-4 columns">
                         <input type="radio" name="pokemon" value="Due Work" id="dueWork">
-                        <label for="dueWork" class="block"><i class="icon-due-work"></i>Due Work</label>
+                        <label for="dueWork" class="block"><sbx-icon name="due-work" size="xl" color="currentColor"></sbx-icon>Due Work</label>
                     </div>
                     <div class="small-12 medium-4 columns">
                         <input type="radio" name="pokemon" value="Task" id="task" disabled>
-                        <label for="task" class="block"><i class="icon-task"></i>Task</label>
+                        <label for="task" class="block"><sbx-icon name="task" size="xl" color="currentColor"></sbx-icon>Task</label>
                     </div>
                     <div class="small-12 medium-12 error-placeholder"></div>
                 </fieldset>
@@ -424,58 +455,58 @@
                     <div class="small-6 columns">
                         <input id="iconCheckboxToggle0" type="checkbox" />
                         <label for="iconCheckboxToggle0" class="input-toggle" title="Remove From Group">
-                            <span class="icon-close alert"></span>
+                            <sbx-icon name="close" size="m" color="currentColor"></sbx-icon>
                         </label>
                         <input id="iconCheckboxToggle1" type="checkbox" />
                         <label for="iconCheckboxToggle1" class="input-toggle" title="Remove From Group">
-                            <span class="icon-eye"></span>
+                            <sbx-icon name="view" size="m"></sbx-icon>
                         </label>
                         <input id="iconCheckboxToggle2" type="checkbox" />
                         <label for="iconCheckboxToggle2" class="input-toggle" title="Remove From Group">
-                            <span class="icon-modify"></span>
+                            <sbx-icon name="modify" size="m"></sbx-icon>
                         </label>
                     </div>
                     <div class="small-6 columns">
                         <input id="iconCheckboxToggle3" type="checkbox" disabled />
                         <label for="iconCheckboxToggle3" class="input-toggle" title="Remove From Group">
-                            <span class="icon-close alert"></span>
+                            <sbx-icon name="close" size="m" ></sbx-icon>
                         </label>
                         <input id="iconCheckboxToggle4" type="checkbox" disabled />
                         <label for="iconCheckboxToggle4" class="input-toggle" title="Remove From Group">
-                            <span class="icon-eye"></span>
+                            <sbx-icon name="view" size="m" ></sbx-icon>
                         </label>
                         <input id="iconCheckboxToggle5" type="checkbox" disabled />
                         <label for="iconCheckboxToggle5" class="input-toggle" title="Remove From Group">
-                            <span class="icon-modify"></span>
+                            <sbx-icon name="modify" size="m" ></sbx-icon>
                         </label>
                     </div>
                     <legend>Radio toggle with Icons</legend>
                     <div class="small-6 columns">
                         <input id="iconRadioToggle00" type="radio" name="icons" />
                         <label for="iconRadioToggle00" class="input-toggle" title="Remove From Group">
-                            <span class="icon-close alert"></span>
+                            <sbx-icon name="close" size="m" ></sbx-icon>
                         </label>
                         <input id="iconRadioToggle11" type="radio" name="icons" />
                         <label for="iconRadioToggle11" class="input-toggle" title="Remove From Group">
-                            <span class="icon-eye"></span>
+                            <sbx-icon name="view" size="m" ></sbx-icon>
                         </label>
                         <input id="iconRadioToggle22" type="radio" name="icons" />
                         <label for="iconRadioToggle22" class="input-toggle" title="Remove From Group">
-                            <span class="icon-modify"></span>
+                            <sbx-icon name="modify" size="m" ></sbx-icon>
                         </label>
                     </div>
                     <div class="small-6 columns">
                         <input id="iconRadioToggle33" type="radio" name="icons" disabled />
                         <label for="iconRadioToggle33" class="input-toggle" title="Remove From Group">
-                            <span class="icon-close alert"></span>
+                            <sbx-icon name="close" size="m" ></sbx-icon>
                         </label>
                         <input id="iconRadioToggle44" type="radio" name="icons" disabled />
                         <label for="iconRadioToggle44" class="input-toggle" title="Remove From Group">
-                            <span class="icon-eye"></span>
+                            <sbx-icon name="view" size="m" ></sbx-icon>
                         </label>
                         <input id="iconRadioToggle55" type="radio" name="icons" disabled />
                         <label for="iconRadioToggle55" class="input-toggle" title="Remove From Group">
-                            <span class="icon-modify"></span>
+                            <sbx-icon name="modify" size="m" ></sbx-icon>
                         </label>
                     </div>
                     <legend>Checkbox Switch with Text</legend>

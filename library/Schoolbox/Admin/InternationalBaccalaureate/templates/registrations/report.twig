@@ -10,7 +10,11 @@
         <div id="ib-report-app">
             <ib-report
                 candidates-endpoint="{{ _routes.candidatesEndpoint }}"
+                candidate-export-endpoint="{{ _routes.candidateExportEndpoint }}"
                 search-languages-endpoint="{{ _routes.searchLanguages }}"
+                renotify-endpoint="{{ _routes.renotifyUnconfirmed }}"
+                complete-preparation-endpoint="{{ _routes.completePreparation }}"
+                reset-details-endpoint="{{ _routes.resetDetails }}"
                 session-title="{{ sessionTitle }}"
             />
         </div>

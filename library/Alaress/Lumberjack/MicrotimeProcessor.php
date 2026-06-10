@@ -23,7 +23,7 @@ class MicrotimeProcessor implements ProcessorInterface
         $t = microtime(true);
 
         $record->extra = array_merge(
-            $record->extra ?? [],
+            $record->extra,
             ['microtime' => $t - (int)$t,]
         );
 

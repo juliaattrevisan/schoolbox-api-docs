@@ -383,11 +383,8 @@ class ListController extends Web\Controller\Base
      */
     public function postReorderAssessments(AssessmentContext $context)
     {
-        /**
-         * @var IAssessable[] $allAssessments
-         * @var IAssessable[] $sortedAssessments
-         */
-        $allAssessments    = $this->getAssessmentMapper()->findAllByContext($context)->indexBy('id');
+        /** @var IAssessable[] $allAssessments */
+        $allAssessments = $this->getAssessmentMapper()->findAllByContext($context)->indexBy('id');
         $sortedAssessments = new GenericCollection(IAssessable::class);
         foreach ($this->requestPost->get('id', []) as $assessmentId) {
             if (isset($allAssessments[$assessmentId])) {
@@ -509,10 +506,30 @@ class ListController extends Web\Controller\Base
      */
     public function updateVisibility(IAssessable $assessment): void
     {
-        $visibility            = (int)$this->requestPost['visibility'];
-        $availableVisibilities = FeedbackVisibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max'));
-        if (!in_array($visibility, $availableVisibilities)) {
+        $visibility            = (string) $this->requestPost['visibility'];
+        $currentVisibility     = $assessment->getMarkVisibility();
+        $availableVisibilities = FeedbackVisibility::getAvailableVisibilities(
+            (bool) $this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_STUDENTS),
+            (bool) $this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_PARENTS),
+        );
+
+        // Only check whether $visibility is in $availableVisibilities if $visibility has changed.
+        // Reasoning:
+        // It may be that the current visibility is not in the currently available set due to changes in LMS policy
+        // settings (config.mark_visibility_allow_students, config.mark_visibility_allow_parents).  If that is the case,
+        // that is a problem, but it is probably not the logged-in user's problem.  They probably did not cause it, and
+        // should not be expected to fix it.
+        if (
+            $visibility !== $currentVisibility
+            && !in_array($visibility, $availableVisibilities, true)
+        ) {
             $this->response = $this->responseAsJson(['error' => 'Invalid visibility'])->withStatus(500);
+            return;
+        }
+
+        if ($visibility === $currentVisibility) {
+            // The mark visibility has not changed, so there is no need to update the database.
+            $this->response = $this->responseAsJson(['message' => 'Loaded successfully']);
             return;
         }
 
@@ -782,6 +799,15 @@ class ListController extends Web\Controller\Base
              */
             throw $e;
         } catch (\Exception $e) {
+            /* TODO Technical Uplift Candidate
+             *  This \Exception catch also catches db errors, such as this (message, code) outcome described below.
+             *  It breaks the DomainException interface that expects a http status code
+             *    message: SQLSTATE[HY000]: General error: 1364 Field '_box_id' doesn't have a default value
+             *    code:    HY000
+             *
+             *  TODO (continued) This causes a type mismatch error:
+             *   Exception::__construct(): Argument #2 ($code) must be of type int, string given
+             */
             $db->rollback();
             // cast
             throw new DomainException($e->getMessage(), $e->getCode(), $e);
@@ -940,12 +966,14 @@ class ListController extends Web\Controller\Base
         ) {
             preg_match('/(unit|project)-([0-9]+)/', $locationId, $match);
             try {
-                if (isset($match[1]) && $match[1] === 'unit') {
-                    return $this->unitSpecificationMapper->findById($match[2]);
-                } elseif (isset($match[1]) && $match[1] === 'project') {
-                    $project = $this->assessmentMapper->findById($match[2]);
-                    if ($project instanceof Project) {
-                        return $project;
+                if (isset($match[1])) {
+                    if ($match[1] === 'unit') {
+                        return $this->unitSpecificationMapper->findById($match[2]);
+                    } elseif ($match[1] === 'project') {
+                        $project = $this->assessmentMapper->findById($match[2]);
+                        if ($project instanceof Project) {
+                            return $project;
+                        }
                     }
                 }
             } catch (MapperException $e) {
@@ -1511,7 +1539,9 @@ class ListController extends Web\Controller\Base
             'humanReadable' => null,
             'rubric' => null,
             'resubmissionRequired' => null,
-            'rubricMarkedGrid' => null,
+            /* TODO For some reason, this was added, but I don't think it gets used
+             */
+//            'rubricMarkedGrid' => null,
             'responseWithKamiDocs' => null,
             'fileCount' => null,
             'humanReadableInstructorMark' => null,
@@ -1585,9 +1615,11 @@ class ListController extends Web\Controller\Base
                 if ($latestFeedback instanceof \Schoolbox\Learning\Assessment\DueWork\Feedback\Model) {
                     /** @var \Schoolbox\Learning\Assessment\DueWork\Feedback\Model $latestFeedback  */
                     /** @var \Schoolbox\Learning\Assessment\DueWork\Model $assessment */
-                    $feedback['rubric'] = $assessment->getUseRubric();
+                    $feedback['rubric'] = (bool)$assessment->getRubricInstances()->count();
                     $feedback['resubmissionRequired'] = $latestFeedback->getResubmissionRequired();
-                    $feedback['rubricMarkedGrid'] = $latestFeedback->getRubricMarkedGrid();
+                    /* TODO For some reason, this was added, but I don't think it gets used
+                     */
+                    // $feedback['rubricMarkedGrid'] = $latestFeedback->getRubricMarkedGrid();
                     $feedback['responseWithKamiDocs'] = $latestFeedback->hasResponseWithKamiDocs();
                     $feedback['fileCount'] = $latestFeedback->getAllFiles()->count();
                     $feedback['humanReadableInstructorMark'] = $latestFeedback->getHumanReadableInstructorMark();
@@ -1596,6 +1628,8 @@ class ListController extends Web\Controller\Base
                 } elseif ($latestFeedback instanceof \Schoolbox\Learning\Assessment\Lti\Feedback\Model) {
                     $feedback['scoreGiven'] = $latestFeedback->getScoreGiven();
                     $feedback['scoreMaximum'] = $latestFeedback->getScoreMaximum();
+                } elseif ($latestFeedback instanceof \Schoolbox\Learning\Assessment\Reporting\Feedback\Model) {
+                    $feedback['humanReadableInstructorMark'] = $latestFeedback->getHumanReadableInstructorMark();
                 }
 
                 // coalesce humanReadableInstructorMark with humanReadable if humanReadableInstructorMark wasn't set

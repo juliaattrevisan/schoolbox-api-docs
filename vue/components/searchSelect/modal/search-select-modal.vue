@@ -268,7 +268,7 @@ window.Vue.watch(isOpen, async (newIsOpen) => {
                         :parent-el="searchSelectEl"
                         :placeholder="props.placeholder"
                     />
-                    <div class="results-container">
+                    <div class="search-select__results-container">
                         <ss-results
                             :query="query"
                             :is-active="isActive"
@@ -292,10 +292,3 @@ window.Vue.watch(isOpen, async (newIsOpen) => {
         </basic-modal>
     </div>
 </template>
-
-<style lang="scss" scoped>
-.results-container {
-    position: relative;
-    top: -1px; // to align the results with the bottom of the ss-query-input
-}
-</style>

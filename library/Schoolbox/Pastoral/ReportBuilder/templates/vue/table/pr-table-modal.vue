@@ -8,9 +8,9 @@ import { useScroll } from "@vueuse/core";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import PastoralRecord from "@schoolboxLibrary/Pastoral/vue/pastoral-record.vue";
+import { useLoadRecords } from "@schoolboxLibrary/Pastoral/vue/composable/useLoadRecords";
 import type { TableHeader, SelectedCell, Tab } from "../../js/types/pastoralReportTypes";
 import { ScopeUrlParam } from "../../js/types/pastoralReportTypes";
-import { useLoadRecords } from "../composable/useLoadRecords";
 import { usePrintRecords } from "../composable/usePrintRecords";
 import PrGeneratePrint from "../pr-generate-print.vue";
 

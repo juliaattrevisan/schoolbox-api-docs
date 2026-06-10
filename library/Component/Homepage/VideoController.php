@@ -19,7 +19,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
     protected $outputList;
 
     /**
-     * @var ResourceVideo
+     * @var ResourceVideo|null
      */
     protected $defaultVideo;
 

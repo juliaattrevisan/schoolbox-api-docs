@@ -49,13 +49,13 @@ function onConfirm(): void {
                 <div
                     v-for="participant in participants"
                     :key="participant.user.id"
-                    class="l-flex l-gap-s l-align-center"
+                    class="l-flex l-gap-s l-flex--align-center"
                 >
                     <img
                         :src="`/portrait.php?id=${participant.user.id}&size=square32`"
                         :alt="`${participant.user.lastname}, ${participant.user.firstname}`"
                     />
-                    <p>
+                    <p class="f-no-margins">
                         {{
                             participant.user.preferredName ? participant.user.preferredName : participant.user.firstname
                         }}

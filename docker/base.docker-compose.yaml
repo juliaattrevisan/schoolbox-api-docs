@@ -390,10 +390,12 @@ services:
     profiles:
       - lti
     post_start:
-      # Install Composer dependencies:
-      # first without plugins to clear old dependencies, then standard install
-      - command: composer install --no-plugins --no-scripts;
-      - command: composer install -o
+      # Install Composer dependencies, without plugins or scripts:
+      # the devkit uses an old version of symfony/flex, which is incompatible
+      # with either latest or current LTS composer.
+      # The script runs the Symfony CLI command `assets:install`, which is
+      # unnecessary as the only asset is a CSS file which is accessible anyway.
+      - command: composer install -o --no-plugins --no-scripts;
     # Add host.docker.internal as an alias back to the host machine, so that
     # the host can debug
     extra_hosts:

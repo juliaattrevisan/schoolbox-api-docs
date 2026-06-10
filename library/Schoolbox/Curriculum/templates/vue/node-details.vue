@@ -19,10 +19,15 @@ interface Props {
      * Defaults to false
      */
     includeUsage?: boolean;
+    /**
+     * To display the usage specific to a folder (unit)
+     */
+    folderId?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     includeUsage: false,
+    folderId: UNSET_ID,
 });
 
 const activeNode = window.Vue.ref<{ node: Node; breadcrumbs: Breadcrumb[] } | null>(null);
@@ -147,6 +152,7 @@ window.Vue.onMounted(() => {
             :depth="0"
             :is-processing="isLoading"
             :has-load-error="hasLoadError"
+            :folder-id="props.folderId"
         />
     </div>
 </template>

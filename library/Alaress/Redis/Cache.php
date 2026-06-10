@@ -16,6 +16,8 @@ use Predis\Transaction\MultiExec;
 
 /**
  * A cache that uses Redis as its backend.
+ *
+ * @deprecated use a cache built by `\Alaress\CacheFactory\Factory` instead
  */
 class Cache extends BaseCache
 {

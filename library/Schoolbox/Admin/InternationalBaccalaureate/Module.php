@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\InternationalBaccalaureate;
 
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -22,12 +23,16 @@ use Schoolbox\IB\Group\Subject\Language\Mapper as IBGroupSubjectLanguageMapper;
 use Schoolbox\IB\Group\Subject\Mapper as IBGroupSubjectMapper;
 use Schoolbox\IB\Group\Mapper as IBGroupMapper;
 use Schoolbox\IB\Registrations\Sessions\Mapper as RegistrationSessionMapper;
+use Schoolbox\IB\Registrations\Sessions\Student\Helper as RegistrationSessionStudentHelper;
 use Schoolbox\IB\Registrations\Sessions\Student\Mapper as RegistrationSessionStudentMapper;
+use Schoolbox\IB\Registrations\Sessions\Student\Subject\Language\Mapper as RegistrationSessionStudentSubjectLanguageMapper;
+use Schoolbox\IB\Registrations\Sessions\Student\Translator\ModelToArray as RegistrationSessionStudentModelToArray;
 use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
+use Schoolbox\User;
 
 class Module extends BaseModule
 {
@@ -38,12 +43,27 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
+        $ibEnabled = new Rule\IsConfigOn(ConfigMapper::NAME_IB_ENABLED, $this->getConfig());
         $ruleIBCoordinatorAccess = new Rule\All(
+            $ibEnabled,
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasServicePermission(UserAccess::SERVICE_IB_COORDINATOR, UserAccess::ACCESS_FULL)
             )
+        );
+        /* IB Coordinator access is required to confirm details, but students can also confirm their own details.
+         */
+        $ruleIBConfirmingDetailsPerms = new Rule\Any(
+            $ruleIBCoordinatorAccess,
+            new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Callback(function (array $params, User $user) {
+                    if (!$user->getRole()->isStudent() || $user->getId() !== (int)$params['studentId']) {
+                        throw new Unauthorized('You are not authorized to view this page.');
+                    }
+                })
+            ),
         );
         $preloadRegistrationSession = function ($params) {
             return $this->preloadRegistrationSession($params);
@@ -62,9 +82,20 @@ class Module extends BaseModule
          */
         $this->register('GET', '/registrations/sessions', 'getRegistrationSessions', $ruleIBCoordinatorAccess);
         $this->register('POST', '/registrations/sessions', 'createRegistrationSession', $ruleIBCoordinatorAccess);
-        $this->register('DELETE', '/registrations/sessions/{sessionId:\d+}', 'deleteRegistrationSession', $ruleIBCoordinatorAccess, $preloadRegistrationSession);
-        $this->register('GET', '/registrations/sessions/{id:\\d+}', 'getReport', $ruleIBCoordinatorAccess);
-        $this->register('GET', '/registrations/sessions/{id:\\d+}/candidates', 'getRegistrationSessionStudents', $ruleIBCoordinatorAccess);
+        $this->register('DELETE', '/registrations/sessions/{sessionId:\\d+}', 'deleteRegistrationSession', $ruleIBCoordinatorAccess, $preloadRegistrationSession);
+        $this->register('GET', '/registrations/sessions/{sessionId:\\d+}', 'getReport', $ruleIBCoordinatorAccess, $preloadRegistrationSession);
+        $this->register('GET', '/registrations/sessions/{sessionId:\\d+}/candidates', 'getRegistrationSessionStudents', $ruleIBCoordinatorAccess);
+        $this->register('PUT', '/registrations/sessions/{sessionId:\\d+}/candidates/{studentId:\\d+}/languages', 'updateRegistrationSessionStudentSubjectLanguages', $ruleIBCoordinatorAccess);
+        $this->register('GET', '/registrations/sessions/{sessionId:\\d+}/candidates/export/csv', 'exportRegistrationSessionStudentsCsv', $ruleIBCoordinatorAccess, $preloadRegistrationSession);
+        /* Transition between states
+         */
+        $this->register('POST', '/registrations/sessions/{sessionId:\\d+}/complete-preparation', 'sessionCompletePreparation', $ruleIBCoordinatorAccess, $preloadRegistrationSession);
+        $this->register('POST', '/registrations/sessions/{sessionId:\\d+}/reset-details', 'sessionResetDetails', $ruleIBCoordinatorAccess, $preloadRegistrationSession);
+        $this->register('PUT', '/registrations/sessions/{sessionId:\\d+}/candidates/{studentId:\\d+}/confirmation', 'updateRegistrationSessionStudentConfirmation', $ruleIBConfirmingDetailsPerms);
+
+        /* Notifications
+         */
+        $this->register('POST', '/registrations/sessions/{sessionId:\\d+}/candidates/renotify', 'renotifyUnconfirmed', $ruleIBCoordinatorAccess, $preloadRegistrationSession);
     }
 
     /**
@@ -72,6 +103,8 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
+        $registrationSessionStudentHelper = new RegistrationSessionStudentHelper();
+
         return new Controller(
             $this->getMapperFactory()->get(ConfigMapper::class),
             $this->getMapperFactory()->get(IBGroupMapper::class),
@@ -82,6 +115,14 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(RegistrationSessionMapper::class),
             $this->injector->get('externalClass'),
             $this->getMapperFactory()->get(RegistrationSessionStudentMapper::class),
+            $this->getMapperFactory()->get(RegistrationSessionStudentSubjectLanguageMapper::class),
+            new RegistrationSessionStudentModelToArray(
+                $registrationSessionStudentHelper,
+                $this->getRouter()->getGenerator(),
+                $this->getAuthorizer(),
+                $this->injector->get('user'),
+            ),
+            $registrationSessionStudentHelper,
             $this->injector->get('externalUser'),
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
             $this->injector->get('moduleCache.rebuilder'),

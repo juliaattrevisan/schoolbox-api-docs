@@ -13,6 +13,7 @@ $tree-node-selected-color: var(--sbx-config-color-accent, $content-ui-foreground
 $tree-folder-icon-color: var(--sbx-config-color-accent, $content-ui-foreground);
 $tree-homepage-icon-color: darkorange;
 $tree-course-icon-color: #008600;
+$tree-unit-icon-color: grey;
 $tree-favorite-icon-color: darkorange;
 
 %browser-icon-colors {
@@ -33,6 +34,11 @@ $tree-favorite-icon-color: darkorange;
         color: $tree-course-icon-color;
     }
 
+    .icon-unit:before,
+    sbx-icon.icon-unit {
+        color: $tree-unit-icon-color;
+    }
+
     .icon-favourite:before,
     sbx-icon.icon-favourite {
         color: $tree-favorite-icon-color;
@@ -42,6 +48,7 @@ $tree-favorite-icon-color: darkorange;
     sbx-icon.icon-home:before,
     sbx-icon.icon-course-builder:before,
     sbx-icon.icon-course:before,
+    sbx-icon.icon-unit:before,
     sbx-icon.icon-favourite:before {
         content: none;
     }
@@ -162,15 +169,11 @@ ul.jstree-default {
             > .resource-browser-preview-link {
                 color: inherit;
                 float: left;
-                margin: -0.5rem 1rem 0 -1rem;
-                padding: 0.5rem 0 0 1rem;
                 text-decoration: none;
             }
 
             > .resource-browser-preview-icon {
                 float: left;
-                margin: -0.5rem 1rem 0 -1rem;
-                padding: 0.5rem 0 0 1rem;
             }
 
             > .resource-browser-preview-link > .resource-browser-preview-icon {

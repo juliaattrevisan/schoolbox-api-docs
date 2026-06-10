@@ -18,7 +18,7 @@ abstract class Mapper extends Schoolbox\Mapper
     /**
      * Interface for connecting to external database.
      *
-     * @var \External_User()
+     * @var \External_User
      */
     protected $external_user;
 

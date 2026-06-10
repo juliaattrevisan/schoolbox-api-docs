@@ -221,7 +221,8 @@ class Creational extends AbstractFactory
         }
 
         /* Check if we have been given a URL to an image */
-        if ($filename = pathinfo(parse_url($this->getUrl(), PHP_URL_PATH), PATHINFO_BASENAME)) {
+        $path = parse_url($this->getUrl(), PHP_URL_PATH);
+        if (is_string($path) && ($filename = pathinfo($path, PATHINFO_BASENAME))) {
             try {
                 $file = \Schoolbox\File\MimetypeMapper::getInstance()->getByFilename($filename);
 

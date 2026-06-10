@@ -38,12 +38,12 @@ set labelDisplayNames = {
         <label for="{{ permInputId }}"
                title="{{ labelDisplayNames[perm[1]] }}{% if isDisabled %} (disabled){% endif %}"
                class="input-toggle">
-            <span class="icon-{{ iconClassnames[perm[1]] }}"></span>
+            <sbx-icon name="{{ iconClassnames[perm[1]] }}" size="l" color="currentColor"></sbx-icon>
         </label>
     </span>
     {% if level == 1 %}
     <span>
-        <span class="icon-add size-8 hide-for-small-only"></span>
+        <sbx-icon name="add" size="s" color="currentColor" class="hide-for-small-only"></sbx-icon>
     </span>
     {% endif %}
 {% endfor %}

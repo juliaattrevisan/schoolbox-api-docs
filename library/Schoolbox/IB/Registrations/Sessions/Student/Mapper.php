@@ -21,16 +21,19 @@ use Schoolbox\IB\Group\Model as IBGroupModel;
 use Schoolbox\IB\Group\Subject\Language\Model as GroupSubjectLanguageModel;
 use Schoolbox\IB\Group\Subject\Model as GroupSubjectModel;
 use Schoolbox\IB\Registrations\Sessions\Mapper as SessionMapper;
+use Schoolbox\IB\Registrations\Sessions\Student\Subject\Language\Mapper as SubjectLanguageMapper;
+use Schoolbox\IB\Registrations\Sessions\Student\Subject\Language\Model as SubjectLanguageModel;
 use Schoolbox\IB\Subject\Model as IBSubjectModel;
 use Schoolbox\Language\Model as LanguageModel;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Resource\Folder\Code\Model as FolderCodeModel;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
  * Class Mapper
  * @method Model createModel($idValue = null)
- * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method ?Model hydrate(array $row, $alias = '', $callback = null)
  * @method GenericCollection|Model[] findByColumnList($columnList, $options = [])
  *
  * @package Schoolbox\IB\Registrations\Sessions\Student
@@ -50,6 +53,12 @@ class Mapper extends BaseMapper
         $this->joins('registration_session_id', SessionMapper::class, 'id', null, null, 'registrationSession', 'registrationSession');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->uses('status', self::TYPE_INTEGER);
+        $this->uses('candidate_confirmed', self::TYPE_BOOLEAN, null, 'candidateConfirmed');
+        $this->uses('candidate_confirmed_at', self::TYPE_DATETIME, null, 'candidateConfirmedAt');
+        $this->joins('candidate_confirmed_by', UserMapper::class, 'id', null, null, 'candidateConfirmedBy', 'candidateConfirmedBy');
+        $this->uses('subject_confirmed', self::TYPE_BOOLEAN, null, 'subjectConfirmed');
+        $this->uses('subject_confirmed_at', self::TYPE_DATETIME, null, 'subjectConfirmedAt');
+        $this->joins('subject_confirmed_by', UserMapper::class, 'id', null, null, 'subjectConfirmedBy', 'subjectConfirmedBy');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
     }
@@ -64,10 +73,13 @@ class Mapper extends BaseMapper
                    {$this->getJoinColumnString('registrationSession', 'rs')},
                    {$this->getJoinColumnString('registrationSession.systemPurpose', 'sp')},
                    {$this->getJoinColumnString('registrationSession.systemPurpose.category', 'c')},
+                   {$this->getJoinColumnString('registrationSession.systemPurpose.qualification', 'q')},
                    {$this->getJoinColumnString('registrationSession.createdBy', 'uc')},
                    {$this->getJoinColumnString('registrationSession.updatedBy', 'uu')},
                    {$this->getJoinColumnString('registrationSession.deletedBy', 'ud')},
-                   {$this->getJoinColumnString('user', 'u')}
+                   {$this->getJoinColumnString('user', 'u')},
+                   {$this->getJoinColumnString('candidateConfirmedBy', 'ucc')},
+                   {$this->getJoinColumnString('subjectConfirmedBy', 'usc')}
         ";
     }
 
@@ -81,10 +93,13 @@ class Mapper extends BaseMapper
             INNER JOIN {$this->getJoinSql('registrationSession', '', 'rs')}
             LEFT JOIN {$this->getJoinSql('registrationSession.systemPurpose', 'rs', 'sp')}
             LEFT JOIN {$this->getJoinSql('registrationSession.systemPurpose.category', 'sp', 'c')}
+            LEFT JOIN {$this->getJoinSql('registrationSession.systemPurpose.qualification', 'sp', 'q')}
             LEFT JOIN {$this->getJoinSql('registrationSession.createdBy', 'rs', 'uc')}
             LEFT JOIN {$this->getJoinSql('registrationSession.updatedBy', 'rs', 'uu')}
             LEFT JOIN {$this->getJoinSql('registrationSession.deletedBy', 'rs', 'ud')}
             INNER JOIN {$this->getJoinSql('user', '', 'u')}
+            LEFT JOIN {$this->getJoinSql('candidateConfirmedBy', '', 'ucc')}
+            LEFT JOIN {$this->getJoinSql('subjectConfirmedBy', '', 'usc')}
         ";
     }
 
@@ -100,6 +115,10 @@ class Mapper extends BaseMapper
         $sessionMapper = $this->getJoinMapper('registrationSession');
         /** @var UserMapper $userMapper */
         $userMapper = $this->getJoinMapper('user');
+        /** @var UserMapper $candidateConfirmedByMapper */
+        $candidateConfirmedByMapper = $this->getJoinMapper('candidateConfirmedBy');
+        /** @var UserMapper $subjectConfirmedByMapper */
+        $subjectConfirmedByMapper = $this->getJoinMapper('subjectConfirmedBy');
         $students = $this->createCollection();
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
@@ -109,11 +128,15 @@ class Mapper extends BaseMapper
                 $session = $sessionMapper->hydrate($row, 'rs');
 
                 if ($session) {
+                    /** @var \Schoolbox\IB\SystemPurpose\Model $systemPurpose */
                     $systemPurpose = $sessionMapper->getJoinMapper('systemPurpose')->hydrate($row, 'sp');
 
                     if ($systemPurpose) {
+                        $systemPurpose->setQualification(
+                            $sessionMapper->getJoinMapper('systemPurpose.qualification')->hydrate($row, 'q')
+                        );
                         $systemPurpose->setCategory(
-                            $sessionMapper->getJoinMapper('systemPurpose')->getJoinMapper('category')->hydrate($row, 'c')
+                            $sessionMapper->getJoinMapper('systemPurpose.category')->hydrate($row, 'c')
                         );
                         $session->setSystemPurpose($systemPurpose);
                     }
@@ -143,11 +166,126 @@ class Mapper extends BaseMapper
                     $student->setUser($user);
                 }
 
+                $candidateConfirmedBy = $candidateConfirmedByMapper->hydrate($row, 'ucc');
+                $subjectConfirmedBy = $subjectConfirmedByMapper->hydrate($row, 'usc');
+
+                if ($candidateConfirmedBy) {
+                    $student->setCandidateConfirmedBy($candidateConfirmedBy);
+                }
+
+                if ($subjectConfirmedBy) {
+                    $student->setSubjectConfirmedBy($subjectConfirmedBy);
+                }
+
                 $students[$student->getId()] = $student;
             }
         }
 
         return $students;
+    }
+
+    /**
+     * Find the registration candidate that is ready for student verification.
+     *
+     * @param User $user
+     * @return Model|null
+     * @throws BaseMapper\DefinitionException
+     * @throws BaseMapper\Exception
+     */
+    public function findUnconfirmedForUser(User $user): ?Model
+    {
+        if (!$user->getId()) {
+            return null;
+        }
+
+        try {
+            $pb = $this->getPredicateBuilder();
+            $pb->equals('user_id', $user->getId());
+            $pb->equals('status', Model::STATUS_UNCONFIRMED);
+
+            $student = $this->findOneByPredicates($pb, [
+                'order' => [
+                    'updated_at' => 'DESC',
+                    'id'         => 'DESC',
+                ],
+                'limit' => 1,
+            ]);
+
+            if (!$student instanceof Model) {
+                return null;
+            }
+
+            return $this->enrichStudentForUser($student, $user);
+        } catch (BaseMapper\Exception\NotFound) {
+            return null;
+        }
+    }
+
+    /**
+     * Find the most recent active registration session student record for the given user,
+     * where "active" means the student is awaiting confirmation (Unconfirmed) or has
+     * already confirmed (Confirmed).
+     *
+     * @param User $user
+     * @return Model|null
+     * @throws BaseMapper\DefinitionException
+     * @throws BaseMapper\Exception
+     */
+    public function findActiveRegistrationForUser(User $user): ?Model
+    {
+        if (!$user->getId()) {
+            return null;
+        }
+
+        try {
+            $pb = $this->getPredicateBuilder();
+            $pb->equals('user_id', $user->getId());
+            $pb->greaterThanOrEqualTo('status', Model::STATUS_UNCONFIRMED);
+
+            $student = $this->findOneByPredicates($pb, [
+                'order' => [
+                    'updated_at' => 'DESC',
+                    'id'         => 'DESC',
+                ],
+                'limit' => 1,
+            ]);
+
+            if (!$student instanceof Model) {
+                return null;
+            }
+
+            return $this->enrichStudentForUser($student, $user);
+        } catch (BaseMapper\Exception\NotFound) {
+            return null;
+        }
+    }
+
+    /**
+     * Enrich a student model with the user reference and IB group subjects for the given user.
+     *
+     * @throws BaseMapper\DefinitionException
+     * @throws BaseMapper\Exception
+     */
+    private function enrichStudentForUser(Model $student, User $user): Model
+    {
+        $systemPurposeId = $student->getRegistrationSession()?->getSystemPurpose()?->getId();
+        $ibGroupSubjectsByUserId = $systemPurposeId
+            ? $this->findIbGroupSubjectsForUsers(
+                [
+                    $user->getId() => $user,
+                ],
+                $systemPurposeId
+            )
+            : [];
+
+        $student->setUser($user);
+        $student->setIbGroupSubjects(
+            $ibGroupSubjectsByUserId[$user->getId()] ?? new GenericCollection(GroupSubjectModel::class)
+        );
+
+        $this->applySubjectLanguageOverrides(new GenericCollection(Model::class, [$student]));
+
+        return $student;
     }
 
     /**
@@ -232,7 +370,10 @@ class Mapper extends BaseMapper
             $usersById[$user->getId()] = $user;
         }
 
-        $ibGroupSubjectsByUserId = $this->findIbGroupSubjectsForUsers($usersById);
+        $ibGroupSubjectsByUserId = $this->findIbGroupSubjectsForUsers(
+            $usersById,
+            $registrationSession->getSystemPurpose()->getId()
+        );
         $students = $this->createCollection();
 
         foreach ($rows as $row) {
@@ -256,14 +397,124 @@ class Mapper extends BaseMapper
             $students->add($student);
         }
 
+        $this->applySubjectLanguageOverrides($students);
+
         return $students;
     }
 
     /**
+     * Returns true if any student in the given session has reached registered (submitted to IBIS) status.
+     *
+     * @param int $sessionId
+     * @return bool
+     */
+    public function hasRegisteredStudents(int $sessionId): bool
+    {
+        $statement = $this->getDatabase()->query(
+            "
+            SELECT COUNT(*)
+            FROM ib_registration_session_student
+            WHERE registration_session_id = :sessionId
+            AND status = :status
+        ",
+            [
+                'sessionId' => $sessionId,
+                'status' => Model::STATUS_REGISTERED,
+            ]
+        );
+
+        return (int) $statement->fetchColumn() > 0;
+    }
+
+    protected function getSubjectLanguageMapper(): SubjectLanguageMapper
+    {
+        return SubjectLanguageMapper::getInstance();
+    }
+
+    /**
+     * @param GenericCollection|Model[] $students
+     */
+    protected function applySubjectLanguageOverrides(GenericCollection $students): void
+    {
+        $studentIds = [];
+
+        foreach ($students as $student) {
+            if (!$student instanceof Model || !$student->getId()) {
+                continue;
+            }
+
+            $studentIds[] = $student->getId();
+        }
+
+        if ($studentIds === []) {
+            return;
+        }
+
+        $selectionsByStudentId = $this->getSubjectLanguageMapper()
+            ->findByRegistrationSessionStudentIds($studentIds);
+
+        foreach ($students as $student) {
+            if (!$student instanceof Model || !$student->getId()) {
+                continue;
+            }
+
+            foreach ($selectionsByStudentId[$student->getId()] ?? [] as $selection) {
+                if ($selection instanceof SubjectLanguageModel) {
+                    $this->applySubjectLanguageOverride($student, $selection);
+                }
+            }
+        }
+    }
+
+    private function applySubjectLanguageOverride(Model $student, SubjectLanguageModel $selection): void
+    {
+        $groupSubjectId = $selection->getGroupSubject()?->getId();
+        $language = $selection->getLanguage();
+
+        if (!$groupSubjectId || !$language?->getId()) {
+            return;
+        }
+
+        $groupSubjects = $student->getIbGroupSubjects();
+        $groupSubject = $this->findGroupSubjectById($groupSubjects, $groupSubjectId);
+
+        if (!$groupSubject) {
+            return;
+        }
+
+        $groupSubject->setLanguages(new GenericCollection(GroupSubjectLanguageModel::class, [
+            (new GroupSubjectLanguageModel())
+                ->setGroupSubject($groupSubject)
+                ->setLanguage($language)
+                ->setClassCode(new GenericCollection(FolderCodeModel::class)),
+        ]));
+    }
+
+    private function findGroupSubjectById(GenericCollection $groupSubjects, int $groupSubjectId): ?GroupSubjectModel
+    {
+        if ($groupSubjects->offsetExists($groupSubjectId)) {
+            $groupSubject = $groupSubjects[$groupSubjectId];
+
+            if ($groupSubject instanceof GroupSubjectModel && $groupSubject->getId() === $groupSubjectId) {
+                return $groupSubject;
+            }
+        }
+
+        foreach ($groupSubjects as $groupSubject) {
+            if ($groupSubject instanceof GroupSubjectModel && $groupSubject->getId() === $groupSubjectId) {
+                return $groupSubject;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @param array<int, User> $usersById
+     * @param int $systemPurposeId
      * @return array<int, GenericCollection>
      */
-    private function findIbGroupSubjectsForUsers(array $usersById): array
+    private function findIbGroupSubjectsForUsers(array $usersById, int $systemPurposeId): array
     {
         if (empty($usersById)) {
             return [];
@@ -281,7 +532,7 @@ class Mapper extends BaseMapper
         $rowsByClassCode = !empty($classCodes)
             ? $this->findIbGroupSubjectRowsByClassCode(array_values($classCodes))
             : [];
-        $coreRows = $this->findCoreIbGroupSubjectRows();
+        $coreRows = $this->findCoreIbGroupSubjectRows($systemPurposeId);
         $groupSubjectsByUserId = [];
 
         foreach (array_keys($usersById) as $userId) {
@@ -360,7 +611,7 @@ class Mapper extends BaseMapper
             "
                 SELECT
                     gsl.id AS group_subject_language_id,
-                    gslcc.class_code,
+                    fc.code AS class_code,
                     gs.id AS group_subject_id,
                     gs.group_id,
                     gs.level,
@@ -371,9 +622,13 @@ class Mapper extends BaseMapper
                     l.id AS language_id,
                     l.code AS language_code,
                     l.name AS language_name
-                FROM ib_group_subject_language_class_codes gslcc
-                INNER JOIN ib_group_subject_languages gsl
-                    ON gsl.id = gslcc.group_subject_language_id
+                FROM ib_group_subject_languages gsl
+                INNER JOIN ib_group_subject_language_class_codes gslcc
+                    ON gslcc.group_subject_language_id = gsl.id
+                INNER JOIN folder_code fc
+                    ON fc.folder_id = gslcc.folder_id
+                    AND fc.code = gslcc.class_code
+                    AND fc.deleted_at IS NULL
                 INNER JOIN ib_group_subjects gs
                     ON gs.id = gsl.group_subject_id
                 INNER JOIN lu_ib_groups g
@@ -382,8 +637,8 @@ class Mapper extends BaseMapper
                     ON s.id = gs.subject_id
                 INNER JOIN lu_language l
                     ON l.id = gsl.language_id
-                WHERE gslcc.class_code IN ({$bindings->getPlaceholder()})
-                ORDER BY g.sequence ASC, s.name ASC, gs.level ASC, l.name ASC, gslcc.class_code ASC
+                WHERE fc.code IN ({$bindings->getPlaceholder()})
+                ORDER BY g.sequence ASC, s.name ASC, gs.level ASC, l.name ASC, fc.code ASC
             ",
             $bindings->getParams()
         );
@@ -399,13 +654,13 @@ class Mapper extends BaseMapper
     /**
      * @return array<int, array<string, mixed>>
      */
-    private function findCoreIbGroupSubjectRows(): array
+    private function findCoreIbGroupSubjectRows(int $systemPurposeId): array
     {
         $statement = $this->getDatabase()->query(
             "
                 SELECT
                     gsl.id AS group_subject_language_id,
-                    gslcc.class_code,
+                    fc.code AS class_code,
                     gs.id AS group_subject_id,
                     gs.group_id,
                     gs.level,
@@ -421,17 +676,23 @@ class Mapper extends BaseMapper
                     ON g.id = gs.group_id
                 INNER JOIN lu_ib_subjects s
                     ON s.id = gs.subject_id
-                LEFT JOIN ib_group_subject_languages gsl
+                INNER JOIN ib_group_subject_languages gsl
                     ON gsl.group_subject_id = gs.id
+                    AND gsl.system_purpose_id = :systemPurposeId
                 LEFT JOIN ib_group_subject_language_class_codes gslcc
                     ON gslcc.group_subject_language_id = gsl.id
+                LEFT JOIN folder_code fc
+                    ON fc.folder_id = gslcc.folder_id
+                    AND fc.code = gslcc.class_code
+                    AND fc.deleted_at IS NULL
                 LEFT JOIN lu_language l
                     ON l.id = gsl.language_id
                 WHERE g.name = :groupName
-                ORDER BY g.sequence ASC, s.name ASC, l.name ASC, gslcc.class_code ASC
+                ORDER BY g.sequence ASC, s.name ASC, l.name ASC, fc.code ASC
             ",
             [
                 'groupName' => self::CORE_GROUP_NAME,
+                'systemPurposeId' => $systemPurposeId,
             ]
         );
 
@@ -476,9 +737,12 @@ class Mapper extends BaseMapper
             return;
         }
 
-        $groupSubject->getLanguages()->add(
-            (new GroupSubjectLanguageModel())
-                ->setId((int) $row['group_subject_language_id'])
+        $groupSubjectLanguageId = (int) $row['group_subject_language_id'];
+        $languages = $groupSubject->getLanguages();
+
+        if (!$languages->offsetExists($groupSubjectLanguageId)) {
+            $languages[$groupSubjectLanguageId] = (new GroupSubjectLanguageModel())
+                ->setId($groupSubjectLanguageId)
                 ->setGroupSubject($groupSubject)
                 ->setLanguage(
                     (new LanguageModel())
@@ -486,7 +750,20 @@ class Mapper extends BaseMapper
                         ->setCode((string) $row['language_code'])
                         ->setName((string) $row['language_name'])
                 )
-                ->setClassCode((string) $row['class_code'])
-        );
+                ->setClassCode(new GenericCollection(FolderCodeModel::class));
+        }
+
+        if ($row['class_code'] === null) {
+            return;
+        }
+
+        /** @var GroupSubjectLanguageModel $groupSubjectLanguage */
+        $groupSubjectLanguage = $languages[$groupSubjectLanguageId];
+        $classCode = (string) $row['class_code'];
+        $classCodes = $groupSubjectLanguage->getClassCode();
+
+        if (!$classCodes->offsetExists($classCode)) {
+            $classCodes[$classCode] = (new FolderCodeModel())->setCode($classCode);
+        }
     }
 }

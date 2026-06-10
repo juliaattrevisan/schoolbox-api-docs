@@ -1,7 +1,7 @@
 .button {
     align-items: center;
     background: none;
-    border-radius: var(--sbx-config-field-roundness, 0);
+    border-radius: var(--sbx-config-field-corner-radius, 0);
     display: flex;
     font-size: 1rem;
     justify-content: center;

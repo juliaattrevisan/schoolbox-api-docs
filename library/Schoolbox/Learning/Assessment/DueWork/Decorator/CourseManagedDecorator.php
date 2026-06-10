@@ -15,10 +15,10 @@ use InvalidArgumentException;
 use RangeException;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\AttachedFilesTrait;
+use Schoolbox\Learning\Assessment\DataModel\RubricTrait;
 use Schoolbox\Learning\Assessment\DecoratorInterface;
 use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use UnexpectedValueException;
 
@@ -35,9 +35,8 @@ class CourseManagedDecorator implements DecoratorInterface
 {
     use DueWorkTrait;
     use AttachedFilesTrait;
+    use RubricTrait;
 
-    /** @var DueWork|null $original */
-    private $original;
 
     /**
      * Decorator constructor.
@@ -46,14 +45,10 @@ class CourseManagedDecorator implements DecoratorInterface
      * @param int          $instructorMarkType
      * @param int|null     $gradingScheme
      * @param int|null     $instructorGradingScheme
-     * @param bool         $useRubric
-     * @param int          $capabilityMarkType
-     * @param int|null     $capabilityGradeGroup
-     * @param bool         $useMarkRange
      * @param float|null   $maxMark
      * @param float|null   $instructorMaxMark
      * @param array|null   $rubricData
-     * @param array        $attachedFiles
+     * @param null|array   $attachedFiles
      * @param bool         $enableWorksheet
      * @param string| null $worksheetTemplate
      * @param bool         $enableOffline
@@ -63,53 +58,41 @@ class CourseManagedDecorator implements DecoratorInterface
      * @param DueWork|null $original
      */
     public function __construct(
-        int $markType,
-        int $instructorMarkType,
-        ?int $gradingScheme,
-        ?int $instructorGradingScheme,
-        bool $useRubric,
-        int $capabilityMarkType,
-        ?int $capabilityGradeGroup,
-        bool $useMarkRange,
-        ?float $maxMark,
-        ?float $instructorMaxMark,
+        private int $markType,
+        private int $instructorMarkType,
+        private ?int $gradingScheme,
+        private ?int $instructorGradingScheme,
+        private ?float $maxMark,
+        private ?float $instructorMaxMark,
         ?array $rubricData,
-        array $attachedFiles,
+        ?array $attachedFiles,
         bool $enableWorksheet,
         ?string $worksheetTemplate,
         bool $enableOffline,
         bool $enableText,
         bool $enableFiles,
         bool $enablePolicy,
-        ?DueWork $original
+        private ?DueWork $original
     ) {
-        $this->setMarkType($markType);
-        $this->setInstructorMarkType($instructorMarkType);
-        $this->setGradingScheme($gradingScheme);
-        $this->setInstructorGradingScheme($instructorGradingScheme);
-        $this->setUseRubric($useRubric);
-        $this->setCapabilityMarkType($capabilityMarkType);
-        $this->setCapabilityGradeGroup($capabilityGradeGroup);
-        $this->setUseMarkRange($useMarkRange);
-        $this->setMaxMark($maxMark);
-        $this->setInstructorMaxMark($instructorMaxMark);
-        $this->setRubricData($rubricData);
-        $this->setAttachedFiles($attachedFiles);
+        /* For unknown reasons, php finds our usage of traits objectionable: I have to go back to doing it like this.
+         * (Our constructor definitions are in conflict with traits' definitions)
+         */
         $this->setEnableWorksheet($enableWorksheet);
         $this->setWorksheetTemplate($worksheetTemplate);
         $this->setEnableOffline($enableOffline);
         $this->setEnableText($enableText);
         $this->setEnableFiles($enableFiles);
         $this->setEnablePolicy($enablePolicy);
-        $this->original = $original;
+        $this->setRubricData($rubricData);
+        $this->setAttachedFiles($attachedFiles);
     }
+
 
     /**
      * @param DueWork $assessment
      * @throws DomainException
      * @throws InvalidArgumentException
      * @throws RangeException
-     * @throws Exception
      * @throws UnexpectedValueException
      */
     public function decorate($assessment)

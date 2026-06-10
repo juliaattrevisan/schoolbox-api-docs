@@ -1071,18 +1071,6 @@ class Model extends AbstractAssessment implements ISelfAssessable
 
 
     /**
-     * Whether this assessment has a meaningful mark per capability setting activated
-     * If null, or None, then mark per capability is presumed ot be off.
-     *
-     * @return bool
-     */
-    public function isMarkPerCapability(): bool
-    {
-        return $this->capabilityMarkType !== null && $this->capabilityMarkType->getId() !== MarkType::TYPE_NONE;
-    }
-
-
-    /**
      * Can learners give feedback on their own submissions?
      *
      * Returns TRUE if the assessment is set to reflect-only or full
@@ -1107,7 +1095,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
      * @return bool
      * @throws UnexpectedValueException If property is not set
      */
-    public function isSelfReflectableOnly(): bool
+    public function isSelfReflectionOnly(): bool
     {
         if (null === $this->selfReviewability) {
             throw new UnexpectedValueException('Property not set');

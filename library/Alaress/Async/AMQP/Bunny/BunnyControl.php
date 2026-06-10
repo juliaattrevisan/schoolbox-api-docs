@@ -237,7 +237,6 @@ class BunnyControl implements ControlInterface
         // no fields left?
         if (!count($fields)) {
             throw new \OutOfRangeException("You have no valid fields");
-            return array();
         }
 
         $cmd = "list $type ";

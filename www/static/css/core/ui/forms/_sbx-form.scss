@@ -4,7 +4,7 @@
 
 /* Shared form input focus styles */
 @mixin form-input-focus {
-    background: var(--sbx-color-foreground-primary);
+    background-color: var(--sbx-color-foreground-primary);
     border-color: var(--sbx-config-color-accent);
     outline: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
     outline-offset: calc(var(--sbx-border-width-normal) + 1px);

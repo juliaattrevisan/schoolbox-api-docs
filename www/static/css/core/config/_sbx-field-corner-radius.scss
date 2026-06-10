@@ -1,0 +1,63 @@
+/**
+ * Field corner radius config
+ * Used to control border-radius of form and UI elements
+ * Field = element that users interact with to input or manipulate data, such as buttons, inputs, etc,
+ * pretty much all elements within a 'Container'
+ */
+
+:root {
+    --sbx-config-field-corner-radius: var(--sbx-border-radius-s);
+}
+
+body.sbx-body {
+    // Core elements
+    textarea,
+    .selectize-control,
+    .sbx-colour-picker,
+    .sbx-attachzone,
+    .sbx-switch,
+    .sbx-radio-block,
+    .sbx-progress,
+    .sbx-alert,
+    .context-switch,
+    .avatar-switch,
+    .alert-box,
+    .alert-box-icon,
+    .button-block,
+    input[type="radio"] + .block,
+    .dzone,
+    .filters label,
+    .tooltip,
+    .f-dropdown,
+    .toast,
+
+    // Labels
+    .label,
+
+    // Specific inner elements
+    .checklist.events li label,
+    .switch label,
+    .selector label::before,
+    .selector label::after,
+    .progress,
+    input[type="radio"]:not(.plain) + label.input-toggle,
+    input[type="checkbox"]:not(.plain) + label.input-toggle,
+    .progress .meter,
+    .activity-feed .grade,
+    .alert-box .close,
+    .eotc-status .close,
+    .alert-box-icon .close,
+    .selected-item,
+    .selected-nodes-container,
+    blockquote,
+    .clr-field button,
+    .article-files li,
+    .masonry-placeholder {
+        border-radius: var(--sbx-config-field-corner-radius) !important;
+    }
+
+    // round just the bottom of the refine options input in the image generator modal
+    .ac-prompt-actions {
+        border-radius: 0 0 var(--sbx-config-field-corner-radius) var(--sbx-config-field-corner-radius);
+    }
+}

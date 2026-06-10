@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { cloneDeep } from "es-toolkit";
 import locale from "@js/terminology/rosettaStone";
+import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import CommentField from "@schoolboxLibrary/Learning/Assessment/templates/dueWork/vue/comment-field.vue";
 import ResubmissionRequired from "@schoolboxLibrary/Learning/Assessment/templates/dueWork/vue/resubmission-required.vue";
@@ -107,12 +108,12 @@ function getCellInfo() {
         extraFormData = { maxMarks };
 
         /** Also- the mark scheme's mask is derived from the extra data too for learnosity reasons */
-        if (instructorMarkScheme.template === "TotalMarkFractional") {
+        if (instructorMarkScheme.mode === MarkTypeSlug.TOTAL) {
             if (maxMarks === null) {
                 throw new Error("Max marks not found in extraInfo for quiz");
             }
 
-            instructorMarkScheme.context.conf.totalMark = maxMarks;
+            instructorMarkScheme.conf.totalMark = maxMarks;
         }
     }
 
@@ -237,12 +238,13 @@ async function onFeedbackPublish(): Promise<void> {
             class="mb-feedback l-pad-s--top"
             :class="{ 'mb-feedback--loading': mbStore.feedbackUILoadingInfo !== null }"
         >
-            <div v-if="cellInfo.instructorMarkScheme.template.length" class="small-12 medium-3 column">
+            <div v-if="cellInfo.instructorMarkScheme.mode !== MarkTypeSlug.NONE" class="small-12 medium-3 column">
                 <label>
                     {{ locale.grades.proper() }}
                     <mark-scheme
+                        :id="`mark-${cellInfo.student.id}`"
                         v-model:mark="cellInfo.feedback.data.hrMarkInstructor"
-                        :participant="{ user: cellInfo.student }"
+                        name="mark"
                         :mark-scheme="cellInfo.instructorMarkScheme"
                         :submission-error-states="mbStore.data.submissionErrorStates"
                         :limit="
@@ -257,10 +259,18 @@ async function onFeedbackPublish(): Promise<void> {
                     style="margin-top: 0.5rem"
                 />
             </div>
+            <!--
+            If comments are disabled, unfortunately just set visibility to hidden
+            so that the height doesn't shrink and make the grade input unusable for submission states...
+            ***I KNOW*** this looks really wack with the large whitespace, we can figure something out in the future if needed.
+            -->
             <div
                 class="small-12 column mb-feedback-comment"
-                :class="{ 'medium-9': cellInfo.instructorMarkScheme.template.length }"
-                :style="{ maxHeight: `min(${props.maxHeight}, 90vh)` }"
+                :class="{ 'medium-9': cellInfo.instructorMarkScheme.mode !== MarkTypeSlug.NONE }"
+                :style="{
+                    maxHeight: `min(${props.maxHeight}, 90vh)`,
+                    visibility: cellInfo.aImpl.feedbackCommentsEnable ? undefined : 'hidden',
+                }"
             >
                 <comment-field
                     v-model:comment="cellInfo.feedback.data.comment"
@@ -272,7 +282,7 @@ async function onFeedbackPublish(): Promise<void> {
                 <resubmission-required
                     v-if="
                         cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK &&
-                        cellInfo.instructorMarkScheme.template.length === 0
+                        cellInfo.instructorMarkScheme.mode === MarkTypeSlug.NONE
                     "
                     v-model:resubmission-required="resubmissionRequiredRef"
                     :identifier="cellInfo.student.id"

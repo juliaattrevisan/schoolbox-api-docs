@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Calendar\Cache;
 
+use Alaress\CacheFactory\Factory;
 use Alaress\Http\Cache;
 use Calendar_Api_Config_Connector_Vcal as CalendarConfig;
 use DateTimeImmutable;
@@ -16,6 +17,7 @@ use DateTimeZone;
 use GuzzleHttp\Exception\GuzzleException;
 use InvalidArgumentException;
 use Predis\ClientInterface as RedisClient;
+use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException as CacheInvalidArgumentException;
 use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\InvalidDataException;
@@ -28,8 +30,7 @@ use Sabre\VObject\Writer;
  */
 class Vcal
 {
-    private const CACHE_PREFIX   = 'vcal_';
-    private const CACHE_KEY_BASE = 'vcal:%s:%s';
+    private const string CACHE_PREFIX = 'vcal_';
 
 
     // Cache expiry: 3 hours.. Ensure longer than cron refresh time
@@ -39,8 +40,13 @@ class Vcal
      * If you don't, you could allow people to request a dynamically calculated result
      * set and suffer a potential performance hit.
      */
-    private const CACHE_EXPIRY = 10800;
+    private const int CACHE_EXPIRY = 10800;
 
+    /**
+     * Internal cache, used for reading and writing parsed vCal data: eventually
+     * will be passed into the constructor directly.
+     */
+    private CacheInterface $internalCache;
 
     /**
      * Constructor
@@ -54,6 +60,7 @@ class Vcal
         private Cache $cache,
         private int $cacheTimeout = self::CACHE_EXPIRY,
     ) {
+        $this->internalCache = new Factory($this->redis)->build('vcal');
     }
 
 
@@ -71,10 +78,10 @@ class Vcal
         $source = $this->retrieveSource($config);
 
         if (isset($source)) {
-            $this->redis->setex(
+            $this->internalCache->set(
                 $this->determineCacheKey($config),
+                Writer::writeJson($this->convertSourceToEvents($source)),
                 self::CACHE_EXPIRY,
-                Writer::writeJson($this->convertSourceToEvents($source))
             );
         }
     }
@@ -89,17 +96,19 @@ class Vcal
     public function read(CalendarConfig $config): ?VCalendar
     {
         $cacheKey = $this->determineCacheKey($config);
-        if ($this->redis->exists($cacheKey)) {
-            $cal = Reader::readJson($this->redis->get($cacheKey));
-            if (!$cal instanceof VCalendar) {
-                // If we can't unserialize the data, delete it.
-                $this->redis->del($cacheKey);
-                return null;
-            }
-
-            return $cal;
+        $data     = $this->internalCache->get($cacheKey);
+        if (!isset($data)) {
+            return null;
         }
-        return null;
+
+        $cal = Reader::readJson($data);
+        if (!$cal instanceof VCalendar) {
+            // If we can't unserialize the data, delete it.
+            $this->internalCache->delete($cacheKey);
+            return null;
+        }
+
+        return $cal;
     }
 
 
@@ -175,7 +184,7 @@ class Vcal
     public function keyExists(CalendarConfig $config): bool
     {
         $cacheKey = $this->determineCacheKey($config);
-        return (bool)$this->redis->exists($cacheKey);
+        return $this->internalCache->has($cacheKey);
     }
 
     /**
@@ -188,6 +197,6 @@ class Vcal
     {
         // Can't use config's PK, as it doesn't exist in the encoded object.
         // We can only use its URL.
-        return sprintf(self::CACHE_KEY_BASE, INSTANCE_ID, hash('sha256', $config->getUrl()));
+        return hash('sha256', $config->getUrl());
     }
 }

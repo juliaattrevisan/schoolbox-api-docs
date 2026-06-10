@@ -422,7 +422,7 @@ class NNIANTest extends TestCase
      */
     private function getMockFolderMapper(GenericCollection $folders, bool $isCacheEnabled): Folder\Mapper
     {
-        /** @var MockObject|Folder\Mapper $folderMapper */
+        /** @var MockObject&Folder\Mapper $folderMapper */
         $folderMapper = $this->createMock(Folder\Mapper::class);
 
         /** @see \Schoolbox\Resource\Folder\Mapper::findCheaplyById */

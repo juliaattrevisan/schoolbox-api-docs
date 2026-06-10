@@ -138,6 +138,7 @@ class Controller extends ConfigController
                     'description'    => $config->getDescription(),
                     'customProperty' => $this->getCustomProperty($decodedOptions),
                     'contrast'       => $this->getContrastProperty($decodedOptions),
+                    'hasAlpha'       => $this->getHasAlpha($decodedOptions),
                     'type'           => $this->getOptionType($config, $fieldMap),
                     'selectOptions'  => $this->getSelectOptions($decodedOptions),
                     'editable'       => $config->getEditable(),
@@ -178,25 +179,52 @@ class Controller extends ConfigController
     {
         $preferredOrder = [
             ConfigMapper::NAME_SKIN_CATEGORY_COLOURS,
-            ConfigMapper::NAME_SKIN_CATEGORY_ROUNDNESS,
+            ConfigMapper::NAME_SKIN_CATEGORY_CORNER_RADIUS,
             ConfigMapper::NAME_SKIN_CATEGORY_DROP_SHADOW,
             ConfigMapper::NAME_SKIN_CATEGORY_CSS,
         ];
-
         $orderedCategories = [];
-
         foreach ($preferredOrder as $categoryName) {
             foreach ($categories as $displayName => $subcategoryMap) {
-                if (strtolower($displayName) !== $categoryName) {
+                if ($this->normaliseCategoryName($displayName) !== $this->normaliseCategoryName($categoryName)) {
                     continue;
                 }
 
-                $orderedCategories[$displayName] = $subcategoryMap;
+                $orderedCategories[$displayName] = $this->orderSubcategories($displayName, $subcategoryMap);
                 unset($categories[$displayName]);
             }
         }
-
         return $orderedCategories + $categories;
+    }
+
+    private function normaliseCategoryName(string $categoryName): string
+    {
+        return str_replace('_', ' ', strtolower($categoryName));
+    }
+
+    /**
+     * Reorder subcategories for categories that need a custom admin display order.
+     *
+     * @param array<int, array<string, mixed>> $subcategories
+     * @return array<int, array<string, mixed>>
+     */
+    private function orderSubcategories(string $categoryName, array $subcategories): array
+    {
+        // exit early if this category doesn't need custom ordering
+        if (strtolower($categoryName) !== ConfigMapper::NAME_SKIN_CATEGORY_COLOURS) {
+            return $subcategories;
+        }
+        $topMenuSubcategories = [];
+        $otherSubcategories = [];
+        // put the "Top Menu" subcategory first, so it's more likely users can see the top menu colour changes
+        foreach ($subcategories as $subcategory) {
+            if (strtolower((string)($subcategory['name'] ?? '')) === ConfigMapper::NAME_SKIN_SUBCATEGORY_TOP_MENU) {
+                $topMenuSubcategories[] = $subcategory;
+                continue;
+            }
+            $otherSubcategories[] = $subcategory;
+        }
+        return array_merge($topMenuSubcategories, $otherSubcategories);
     }
 
     /**
@@ -277,6 +305,18 @@ class Controller extends ConfigController
     private function getContrastProperty(array $decodedOptions): ?string
     {
         return $this->getStringOptionValue($decodedOptions, 'contrast');
+    }
+
+    /**
+     * Extract the colour picker alpha-channel setting from config options metadata.
+     *
+     * @param array<string, mixed> $decodedOptions
+     */
+    private function getHasAlpha(array $decodedOptions): ?bool
+    {
+        $optionValue = $decodedOptions['hasAlpha'] ?? null;
+
+        return is_bool($optionValue) ? $optionValue : null;
     }
 
     /**

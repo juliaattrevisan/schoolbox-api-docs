@@ -6,7 +6,7 @@
 ARG ENV=dev
 ARG PHP_MAJOR_VERSION=8.4
 
-FROM dunglas/frankenphp:1.12.2-php${PHP_MAJOR_VERSION}-trixie
+FROM dunglas/frankenphp:1.12.3-php${PHP_MAJOR_VERSION}-trixie
 
 ARG PHP_MAJOR_VERSION
 
@@ -53,7 +53,8 @@ RUN apt-get update && apt-get upgrade -y && \
         fileinfo \
         libxml \
         gd \
-        opcache && \
+        opcache \
+        ev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 

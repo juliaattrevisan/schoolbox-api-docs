@@ -44,7 +44,7 @@ class PropertyDecorator implements IDecorator
 
 
     /**
-     * @param mixed  $json
+     * @param array  $json
      * @param object $model
      * @return array
      */

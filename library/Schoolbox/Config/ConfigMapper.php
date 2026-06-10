@@ -9,10 +9,12 @@
 namespace Schoolbox\Config;
 
 use PDOStatement;
+use Schoolbox\Admin\Package\Model as PackageModel;
 use Schoolbox\Admin\SkinConfig\Category as SkinConfigCategory;
 use Schoolbox\Admin\SkinConfig\Subcategory as SkinConfigSubcategory;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception;
 
 /**
  * Class ConfigMapper
@@ -53,6 +55,7 @@ class ConfigMapper extends Mapper
     public const string MODULE_IB = 'ib';
 
     // IB config name constants
+    public const string NAME_IB_ENABLED = 'ib_enabled';
     public const string NAME_IB_SCHOOL_NAME = 'ib_school_name';
     public const string NAME_IB_SCHOOL_CODE = 'ib_school_code';
 
@@ -248,8 +251,8 @@ class ConfigMapper extends Mapper
     public const string NAME_MOBILE_DAEMON_ENABLED = 'mobile_daemon_enabled';
     public const string NAME_LMS_ENABLED = 'lms_enabled';
     public const string NAME_RESTRICT_STUDENT_SUBMISSIONS = 'restrict_student_submissions';
-
-    public const string NAME_SUBMISSION_VISIBILITY_MAX = 'submission_visibility_max';
+    public const string NAME_MARK_VISIBILITY_ALLOW_STUDENTS = 'mark_visibility_allow_students';
+    public const string NAME_MARK_VISIBILITY_ALLOW_PARENTS  = 'mark_visibility_allow_parents';
     public const string NAME_LTI_ASSESSMENTS_ENABLE = 'lti_assessments_enable';
     public const string NAME_LTI_DEBUG_MODE         = 'lti_debug_mode';
 
@@ -359,6 +362,8 @@ class ConfigMapper extends Mapper
     public const string NAME_HOMEPAGE_COLOUR_HEAD_BG = 'homepage_colour_head_bg';
     public const string NAME_HOMEPAGE_COLOUR_FONT = 'homepage_colour_font';
     public const string NAME_HOMEPAGE_COLOUR_BG_PRIMARY = 'homepage_colour_bg_primary';
+    public const string NAME_SKIN_COLOUR_COMPONENT_HEADING_TEXT = 'skin_colour_component_heading_text';
+    public const string NAME_SKIN_COLOUR_COMPONENT_HEADING_BACKGROUND = 'skin_colour_component_heading_background';
     public const string NAME_SKIN_COLOUR_NAVIGATION_FOREGROUND = 'skin_colour_navigation_foreground';
     public const string NAME_SKIN_COLOUR_NAVIGATION_BACKGROUND = 'skin_colour_navigation_background';
     public const string NAME_SKIN_COLOUR_NAVIGATION_HOVER = 'skin_colour_navigation_hover';
@@ -395,7 +400,7 @@ class ConfigMapper extends Mapper
      */
     public const string NAME_SKIN_CATEGORY_COLOURS = 'colours';
     public const string NAME_SKIN_CATEGORY_CSS = 'custom css';
-    public const string NAME_SKIN_CATEGORY_ROUNDNESS = 'roundness';
+    public const string NAME_SKIN_CATEGORY_CORNER_RADIUS = 'corner_radius';
     public const string NAME_SKIN_CATEGORY_DROP_SHADOW = 'drop shadow';
 
     /* Skin Config Sub-Categories
@@ -534,7 +539,7 @@ class ConfigMapper extends Mapper
         'feedback_url',
         'feedback_text',
         self::NAME_MAIL_FORCE_FROM_SYSTEM,
-        self::NAME_MAIL_ENABLED
+        self::NAME_MAIL_ENABLED,
     ];
 
     /**
@@ -587,6 +592,7 @@ class ConfigMapper extends Mapper
         self::NAME_MAIL_ENABLED,
         self::NAME_PWA_ENABLED,
         self::NAME_CURRICULUM_COVERAGE_REPORT_ENABLED,
+        self::NAME_IB_ENABLED,
     ];
 
     /**
@@ -657,6 +663,7 @@ class ConfigMapper extends Mapper
             'skinSubcategory',
         );
 
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'ibEnableToggle']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCache']);
     }
 
@@ -704,6 +711,39 @@ class ConfigMapper extends Mapper
     protected function updateCache(Config $model): bool
     {
         // TODO consider updating cache of ConfigLoader?
+        return true;
+    }
+
+    /**
+     * Post save callback to ensure IB is enabled/disabled when the relevant setting is toggled
+     *
+     * @param Config $model
+     * @return bool
+     * @throws Exception
+     */
+    protected function ibEnableToggle(Config $model, ?Config $prev = null): bool
+    {
+        if ($model->getName() === self::NAME_IB_ENABLED && $prev !== null && $model->getValue() !== $prev->getValue()) {
+            $ibEnabled = (bool)$model->getValue();
+            $packageMapper = \Schoolbox\Admin\Package\Mapper::getInstance();
+            /* IB packages are hidden/shown based on the IB Enabled setting. They are not deleted as they contain
+             * configuration data which we want to preserve when toggling IB on/off.
+             */
+            $pb = $packageMapper->getPredicateBuilder()->in('location', [
+                'IBPYPTransDis2025',
+                'IBDPCore',
+                'IBProgramme',
+                'IBPYPProgramme',
+                'IBMYPProgramme',
+                'IBBadges',
+            ]);
+            $packages = $packageMapper->findByPredicates($pb);
+            /** @var PackageModel $package */
+            foreach ($packages as $package) {
+                $package->setHidden(!$ibEnabled);
+                $packageMapper->save($package);
+            }
+        }
         return true;
     }
 

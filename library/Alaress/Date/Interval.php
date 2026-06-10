@@ -270,7 +270,7 @@ class Interval implements JsonSerializable
     public function getAsDateInterval()
     {
         $interval = new DateInterval($this->format('P%DDT%hH%iM%sS'));
-        $interval->invert = $this->invert;
+        $interval->invert = (int)$this->invert;
         return $interval;
     }
 

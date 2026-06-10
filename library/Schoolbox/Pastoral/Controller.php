@@ -42,6 +42,7 @@ use Schoolbox\Pastoral\Group\Member\Model as PastoralGroupMember;
 use Schoolbox\Pastoral\Group\Model as PastoralGroup;
 use Schoolbox\Pastoral\Model as PastoralModel;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
+use Schoolbox\Pastoral\ReportBuilder\Translator\ModelToArray as ReportBuilderTranslator;
 use Schoolbox\Pastoral\Revision\DataSource as PastoralRevisionDataSource;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
@@ -56,6 +57,7 @@ use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Pastoral\Flag\Cursor;
 
 class Controller extends Base
 {
@@ -95,6 +97,7 @@ class Controller extends Base
      * @param \Schoolbox\External\User        $externalUser
      * @param RecordProcessor                 $recordProcessor
      * @param PastoralMapper                  $pastoralMapper
+     * @param ReportBuilderTranslator         $reportBuilderTranslator
      */
     public function __construct(
         private IConfigLoader $config,
@@ -122,6 +125,7 @@ class Controller extends Base
         private \Schoolbox\External\User $externalUser,
         private RecordProcessor $recordProcessor,
         private PastoralMapper $pastoralMapper,
+        private ReportBuilderTranslator $reportBuilderTranslator,
     ) {
     }
 
@@ -290,63 +294,39 @@ class Controller extends Base
      */
     public function getFlag(User $student): void
     {
-        /**
-         * This is a quick pull to copy/paste based on getStudent,
-         * but it'll need to be done properly with the cursor in: SA-21304
-         */
-
         $get = $this->requestQuery;
 
         $user = $this->getUser();
 
-        $typeId    = (isset($get['type']) && is_numeric($get['type'])) ? (int)$get['type'] : null;
-        $subtypeId = (isset($get['subtype']) && is_numeric($get['subtype'])) ? (int)$get['subtype'] : null;
+        $typeId = $get->getInt('type');
+        $subtypeId = $get->getInt('subtype');
+        $limit = $get->getInt('limit') ?? Cursor::LIMIT_DEFAULT;
+        $encodedCursor = $get->get('cursor');
 
-        $records = $this->pastoralDataSource->findRecords($user, $student, $typeId, $subtypeId, null, null, null, false);
-
-        $data = $records->map($this->pastoralTranslator)->reindex();
+        $cursor = new Cursor(
+            $this->getConfigLoader(),
+            $this->pastoralDataSource,
+            $user,
+            $student,
+            $typeId,
+            $subtypeId,
+            false,
+            $limit,
+        );
+        $records = $cursor->retrieveResults($encodedCursor);
 
         $this->response = $this->responseAsJson([
             'data'     => [
-                'results' => $data,
+                'results' => $records->map($this->reportBuilderTranslator),
             ],
             'metadata' => [
-                'count'  => count($data),
+                'count'  => $cursor->retrieveResultCount(),
                 'cursor' => [
-                    'next'    => null,
-                    'current' => null,
+                    'current' => $cursor->current($records),
+                    'next'    => $cursor->next($records),
                 ],
             ],
         ]);
-
-        /**
-         * This was an initial attempt to use the class report cursor
-         * but I'm parking now as it'll be revisited in: SA-21304
-         */
-
-        // $cursor  = new Cursor(
-        //     $this->pastoralDataSource,
-        //     $this->getUser(),
-        //     $student,
-        //     [],
-        //     'created',
-        //     10,
-        // );
-
-        // $records = $cursor->retrieveResults('');
-
-        // $this->response = $this->responseAsJson([
-        //     'data'     => [
-        //         'results' => $records->map($this->pastoralTranslator),
-        //     ],
-        //     'metadata' => [
-        //         'count'  => $cursor->retrieveResultCount(),
-        //         'cursor' => [
-        //             'current' => $cursor->current($records),
-        //             'next'    => $cursor->next($records),
-        //         ],
-        //     ],
-        // ]);
     }
 
     /**

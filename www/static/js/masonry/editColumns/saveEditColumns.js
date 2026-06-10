@@ -6,6 +6,7 @@
 import { getMasonryConfig } from "../masonryConfig";
 import UpdateMasonryEvents from "../updateMasonryEvents";
 import { getFormData } from "./editColumns";
+import { validateHeadingColourContrast } from "./editColumnsColours";
 
 /**
  * Start listening for the save event
@@ -20,6 +21,10 @@ export function initSaveEditColumns() {
  * @param { Element }
  */
 async function onEditColumnsSave() {
+    if (!validateHeadingColourContrast()) {
+        return;
+    }
+
     const $toast = $('[data-relation="saveLayout"]');
     try {
         $toast.toastActivate({ text: "Saving..." });

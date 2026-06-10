@@ -18,7 +18,7 @@ class Url
     /** @var string */
     private $url;
 
-    /** @var string. The hostname according to config */
+    /** @var string The hostname according to config */
     private $siteHost;
 
     /**

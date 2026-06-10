@@ -6,8 +6,9 @@
  */
 
 body.sbx-body {
-    // Highchart fill - directly override the white background
-    .highcharts-background {
+    // Highchart fill - directly override the white background,
+    // for all except within the .pr-table-total-row, .pr-table-row as those are already set elsewhere
+    tr:not(.pr-table-total-row, .pr-table-row) .highcharts-background {
         fill: var(--sbx-color-foreground-primary);
     }
 
@@ -56,7 +57,8 @@ body.sbx-body {
 
     // Neutral labels - overridden as they currently implement Sass methods which are not compatible with CSS variables
     .neutral.label,
-    .label--moment-draft {
+    .label--moment-draft,
+    .result-rubric-label {
         background-color: var(--sbx-color-foreground-secondary);
         color: var(--sbx-color-text-secondary);
     }
@@ -184,20 +186,5 @@ body.sbx-body {
     // remove the borders off fieldsets that sit on the background colour
     fieldset.no-pad {
         border: none;
-    }
-
-    // use the new config setting colours
-    .component-titlebar,
-    #component-layout .column-top .component-titlebar,
-    #component-layout .column-left .component-titlebar,
-    #component-layout .column-right .component-titlebar {
-        background-color: var(--sbx-config-color-component-heading-background);
-        h2,
-        nav a[class^="icon-"],
-        nav a[class*=" icon-"],
-        nav a.sbx-icon-only-button,
-        nav a.sbx-icon-only-button sbx-icon {
-            color: var(--sbx-config-color-component-heading-text);
-        }
     }
 }

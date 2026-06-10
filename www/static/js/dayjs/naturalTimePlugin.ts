@@ -1,4 +1,4 @@
-import strtotime from "locutus/php/datetime/strtotime";
+import { strtotime } from "locutus/php/datetime/strtotime";
 import type { PluginFunc, Dayjs as DayjsInstance } from "dayjs";
 
 /**

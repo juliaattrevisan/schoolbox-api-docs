@@ -496,7 +496,7 @@ class Api extends \Codeception\Module
             ->setPublishAt($now)
             ->setDueAt($close)
             ->setCloseAt($close)
-            ->setMarkVisibility(SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT);
+            ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
 
         if ($context instanceof Project) {
             $context->getAssessables()->add($dueWork);
@@ -528,7 +528,7 @@ class Api extends \Codeception\Module
             ->setPublishAt($now)
             ->setDueAt($close)
             ->setCloseAt($close)
-            ->setMarkVisibility(SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT);
+            ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
 
         $this->assessmentDataSource->save($project, $staff);
         return $project;
@@ -554,7 +554,7 @@ class Api extends \Codeception\Module
             // The function calls below have been commented out to get around a PHPStan warning:
             // "Call to method Schoolbox\Learning\Assessment\Task\Model::setMarkVisibility() on a separate line has no effect."
             //->setCloseAt($close)                                                      // Note Assessment\Task\Model->setCloseAt() doesn't actually do anything.
-            //->setMarkVisibility(SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT); // Note Assessment\Task\Model->setMarkVisibility() doesn't actually do anything.
+            //->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT); // Note Assessment\Task\Model->setMarkVisibility() doesn't actually do anything.
 
         $context->getAssessables()->add($task);
         $this->assessmentDataSource->save($task, $staff);
@@ -580,7 +580,7 @@ class Api extends \Codeception\Module
             ->setPublishAt($now)
             ->setDueAt($close)
             ->setCloseAt($close)
-            ->setMarkVisibility(SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT);
+            ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
 
         $context->getAssessables()->add($quiz);
         $this->assessmentDataSource->save($quiz, $staff);

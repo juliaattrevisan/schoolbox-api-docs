@@ -9,7 +9,7 @@
 
 namespace Alaress\Async\Test;
 
-use PHPUnit_Framework_AssertionFailedError;
+use PHPUnit\Framework\AssertionFailedError;
 use ReflectionMethod;
 
 class Subscription
@@ -67,7 +67,7 @@ class Subscription
 
     /**
      * @param  array $hooks
-     * @throws PHPUnit_Framework_AssertionFailedError
+     * @throws AssertionFailedError
      * @return bool
      */
     public function fire(array $hooks)
@@ -109,7 +109,7 @@ class Subscription
             }
         }
 
-        // any assertions in here will throw PHPUnit_Framework_AssertionFailedError
+        // any assertions in here will throw AssertionFailedError
         // they will be caught be the framework
         $this->callback->invokeArgs($this->testCase, $args);
 

@@ -72,6 +72,7 @@ class MockConnector implements IConnector
         // getMockBuilder is protected and final: how does that make sense!?
         // Fake it with Closure::bind
         $testCaseGetMockBuilder = Closure::bind(
+            /** @phpstan-ignore-next-line - $this is bound to $this->testCase */
             (fn($class) => $this->getMockBuilder($class))(...),
             $this->testCase,
             $this->testCase,
@@ -130,6 +131,7 @@ class MockConnector implements IConnector
         reset($this->resultSet);
 
         $testCaseAny = Closure::bind(
+            /** @phpstan-ignore-next-line - $this is bound to $this->testCase */
             (fn() => $this->any())(...),
             $this->testCase,
             $this->testCase,

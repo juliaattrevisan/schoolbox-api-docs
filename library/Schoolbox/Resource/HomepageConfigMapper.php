@@ -12,11 +12,13 @@
 
 namespace Schoolbox\Resource;
 
+use Alaress\Web\Request\Values;
 use Component_Config;
 use Component_ConfigMapper;
 use Component_Instance;
 use Component_InstanceMapper;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
@@ -99,11 +101,11 @@ class HomepageConfigMapper extends Mapper
         $this->emptyHomepage($homepage);
         $homepageConfig = array();
         $positions      = array('top', 'left', 'right');
-        $opts           = array('head_font', 'head_bg', 'font', 'bg_primary');
+        $opts           = $this->getDefaultColourConfigNames();
         // prep colour resets
         foreach ($positions as $position) {
-            foreach ($opts as $opt) {
-                $homepageConfig[$position . '_' . $opt] = $this->getConfigLoader()->get('homepage_colour_' . $opt);
+            foreach ($opts as $opt => $configName) {
+                $homepageConfig[$position . '_' . $opt] = $this->getConfigLoader()->get($configName);
             }
         }
         // set colour resets
@@ -202,5 +204,34 @@ class HomepageConfigMapper extends Mapper
                 }
             }
         }
+    }
+
+    private function getDefaultColourConfigNames(): array
+    {
+        if ($this->isAdvancedUiEnabled()) {
+            return [
+                'head_font'  => ConfigMapper::NAME_SKIN_COLOUR_COMPONENT_HEADING_TEXT,
+                'head_bg'    => ConfigMapper::NAME_SKIN_COLOUR_COMPONENT_HEADING_BACKGROUND,
+                'font'       => ConfigMapper::NAME_HOMEPAGE_COLOUR_FONT,
+                'bg_primary' => ConfigMapper::NAME_HOMEPAGE_COLOUR_BG_PRIMARY,
+            ];
+        }
+
+        return [
+            'head_font'  => ConfigMapper::NAME_HOMEPAGE_COLOUR_HEAD_FONT,
+            'head_bg'    => ConfigMapper::NAME_HOMEPAGE_COLOUR_HEAD_BG,
+            'font'       => ConfigMapper::NAME_HOMEPAGE_COLOUR_FONT,
+            'bg_primary' => ConfigMapper::NAME_HOMEPAGE_COLOUR_BG_PRIMARY,
+        ];
+    }
+
+    private function isAdvancedUiEnabled(): bool
+    {
+        $advancedUiEnabled = $this->getConfigLoader()->get(ConfigMapper::NAME_SONAR_UI_TOGGLE);
+        $configValues = new Values([
+            ConfigMapper::NAME_SONAR_UI_TOGGLE => $advancedUiEnabled,
+        ]);
+
+        return $configValues->getBool(ConfigMapper::NAME_SONAR_UI_TOGGLE, false) ?? false;
     }
 }

@@ -653,7 +653,7 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * @return BaseMapper|QuizMapper
+     * @return QuizMapper
      * @throws BaseMapper\DefinitionException
      */
     private function getQuizMapper(): QuizMapper

@@ -60,11 +60,11 @@ SET
     );
 
 SET
-    @category_roundness = (
+    @category_corner_radius = (
         SELECT id
         FROM lu_skin_config_category
         WHERE
-            name = 'Roundness'
+            name = 'Corner Radius'
     );
 
 SET
@@ -81,7 +81,7 @@ SET
         FROM lu_skin_config_subcategory
         WHERE
             category_id = @category_colours
-            AND name = 'Menu'
+            AND name = 'Top Menu'
     );
 
 SET
@@ -121,11 +121,11 @@ SET
     );
 
 SET
-    @subcategory_roundness = (
+    @subcategory_corner_radius = (
         SELECT id
         FROM lu_skin_config_subcategory
         WHERE
-            category_id = @category_roundness
+            category_id = @category_corner_radius
             AND name IS NULL
     );
 
@@ -153,7 +153,16 @@ SET
         SELECT `value`
         FROM config
         WHERE
-            name = 'skin_colour_form_input_border_color'
+            name = 'skin_colour_content_ui_submit_background'
+        LIMIT 1
+    );
+
+SET
+    @value_skin_colour_accent_text = (
+        SELECT `value`
+        FROM config
+        WHERE
+            name = 'skin_colour_content_ui_submit_foreground'
         LIMIT 1
     );
 
@@ -256,7 +265,7 @@ INSERT INTO
 VALUES (
         'skin_colour_menu_background',
         @value_skin_colour_menu_background,
-        'Menu Background Colour',
+        'Top Menu Background',
         'The background colour of the top menu.',
         @config_colour_field_id,
         @sonar_config_type_id,
@@ -265,12 +274,12 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 1,
-        '{"customProperty":"--sbx-config-color-menu-background","contrast":"--sbx-config-color-menu-foreground"}'
+        '{"customProperty":"--sbx-config-color-menu-background","contrast":"--sbx-config-color-menu-foreground", "hasAlpha": false}'
     ),
     (
         'skin_colour_menu_foreground',
         @value_skin_colour_menu_foreground,
-        'Menu Foreground Colour',
+        'Top Menu Foreground',
         'The foreground colour of the top menu.',
         @config_colour_field_id,
         @sonar_config_type_id,
@@ -279,13 +288,13 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 2,
-        '{"customProperty":"--sbx-config-color-menu-foreground","contrast":"--sbx-config-color-menu-background"}'
+        '{"customProperty":"--sbx-config-color-menu-foreground","contrast":"--sbx-config-color-menu-background", "hasAlpha": false}'
     ),
     (
         'skin_colour_menu_hover',
         @value_skin_colour_menu_hover,
-        'Menu Hover Colour',
-        'The background colour of the element when the mouse is hovering over a menu element.',
+        'Top Menu Hover',
+        'The background colour of the element when the mouse is hovering over a top menu element.',
         @config_colour_field_id,
         @sonar_config_type_id,
         'true',
@@ -293,12 +302,12 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 3,
-        '{"customProperty":"--sbx-config-color-menu-hover","contrast":"--sbx-config-color-menu-foreground"}'
+        '{"customProperty":"--sbx-config-color-menu-hover","contrast":"--sbx-config-color-menu-foreground", "hasAlpha": false}'
     ),
     (
         'skin_colour_body_background',
         @value_skin_colour_body_background,
-        'Body Background Colour',
+        'Body Background',
         'The background colour of every page.',
         @config_colour_field_id,
         @sonar_config_type_id,
@@ -307,12 +316,12 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 4,
-        '{"customProperty":"--sbx-config-color-body-background","contrast":"--sbx-color-text-primary"}'
+        '{"customProperty":"--sbx-config-color-body-background","contrast":"--sbx-color-text-primary", "hasAlpha": false}'
     ),
     (
         'skin_colour_accent',
         @value_skin_colour_accent,
-        'Accent Colour',
+        'Accent',
         'The colour used in interactive elements like buttons, links and check boxes.',
         @config_colour_field_id,
         @sonar_config_type_id,
@@ -321,12 +330,12 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 5,
-        '{"customProperty":"--sbx-config-color-accent","contrast":"--sbx-color-foreground-primary"}'
+        '{"customProperty":"--sbx-config-color-accent","contrast":"--sbx-color-foreground-primary", "hasAlpha": false}'
     ),
     (
         'skin_colour_accent_text',
-        '#ffffff',
-        'Accent Text Colour',
+        @value_skin_colour_accent_text,
+        'Accent Text',
         'The text colour for when displayed over the Accent Colour.',
         @config_colour_field_id,
         @sonar_config_type_id,
@@ -335,12 +344,12 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 6,
-        '{"customProperty":"--sbx-config-color-accent-text","contrast":"--sbx-config-color-accent"}'
+        '{"customProperty":"--sbx-config-color-accent-text","contrast":"--sbx-config-color-accent", "hasAlpha": false}'
     ),
     (
         'skin_colour_active',
         @value_skin_colour_active,
-        'Active Colour',
+        'Active',
         'The colour used to indicate active elements, like active filters, selected menu items and hover states.',
         @config_colour_field_id,
         @sonar_config_type_id,
@@ -349,13 +358,13 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 7,
-        '{"customProperty":"--sbx-config-color-active","contrast":"--sbx-config-color-accent"}'
+        '{"customProperty":"--sbx-config-color-active","contrast":"--sbx-config-color-accent", "hasAlpha": false}'
     ),
     (
         'skin_colour_component_heading_background',
         @value_skin_colour_component_heading_background,
-        'Component Heading Background Colour',
-        'The colour of the heading background on homepage components.',
+        'Default Component Heading Background',
+        'The colour of the heading background on newly created Homepage/ePortfolio components.',
         @config_colour_field_id,
         @sonar_config_type_id,
         'true',
@@ -363,13 +372,13 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 8,
-        '{"customProperty":"--sbx-config-color-component-heading-background","contrast":"--sbx-config-color-component-heading-text"}'
+        '{"customProperty":"--sbx-config-color-component-heading-background","contrast":"--sbx-config-color-component-heading-text", "hasAlpha": false}'
     ),
     (
         'skin_colour_component_heading_text',
         @value_skin_colour_component_heading_text,
-        'Component Heading Text Colour',
-        'The colour of the heading text on homepage components.',
+        'Default Component Heading Text',
+        'The colour of the heading text on newly created Homepage/ePortfolio components.',
         @config_colour_field_id,
         @sonar_config_type_id,
         'true',
@@ -377,12 +386,12 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 9,
-        '{"customProperty":"--sbx-config-color-component-heading-text","contrast":"--sbx-config-color-component-heading-background"}'
+        '{"customProperty":"--sbx-config-color-component-heading-text","contrast":"--sbx-config-color-component-heading-background", "hasAlpha": false}'
     ),
     (
         'skin_colour_sonar_login_background',
         @value_skin_colour_sonar_login_background,
-        'Login Background Colour',
+        'Login Background',
         'The background colour of the login form on the login page.',
         @config_colour_field_id,
         @sonar_config_type_id,
@@ -391,12 +400,12 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 10,
-        '{"customProperty":"--sbx-config-login-form-background","contrast":"--sbx-config-login-form-foreground"}'
+        '{"customProperty":"--sbx-config-login-form-background","contrast":"--sbx-config-login-form-foreground", "hasAlpha": true}'
     ),
     (
         'skin_colour_sonar_login_foreground',
         '#ffffff',
-        'Login Foreground Colour',
+        'Login Foreground',
         'The foreground colour of the login form on the login page.',
         @config_colour_field_id,
         @sonar_config_type_id,
@@ -405,12 +414,12 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 11,
-        '{"customProperty":"--sbx-config-login-form-foreground","contrast":"--sbx-config-login-form-background"}'
+        '{"customProperty":"--sbx-config-login-form-foreground","contrast":"--sbx-config-login-form-background", "hasAlpha": false}'
     ),
     (
-        'skin_box_roundness',
+        'skin_container_corner_radius',
         'var(--sbx-border-radius-m)',
-        'Box Roundness',
+        'Container',
         'Add rounded corners to primary container elements.',
         @config_select_field_id,
         @sonar_config_type_id,
@@ -419,12 +428,12 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 12,
-        '{"customProperty":"--sbx-config-box-roundness","select":[{"name":"none","value":"var(--sbx-border-radius-none)"},{"name":"Small","value":"var(--sbx-border-radius-s)"},{"name":"Medium","value":"var(--sbx-border-radius-m)"},{"name":"Large","value":"var(--sbx-border-radius-l)"}]}'
+        '{"customProperty":"--sbx-config-container-corner-radius","select":[{"name":"None","value":"var(--sbx-border-radius-none)"},{"name":"Small","value":"var(--sbx-border-radius-s)"},{"name":"Medium","value":"var(--sbx-border-radius-m)"},{"name":"Large","value":"var(--sbx-border-radius-l)"}]}'
     ),
     (
-        'skin_field_roundness',
+        'skin_field_corner_radius',
         'var(--sbx-border-radius-s)',
-        'Field Roundness',
+        'Field',
         'Add rounded corners to elements like check boxes, buttons and labels.',
         @config_select_field_id,
         @sonar_config_type_id,
@@ -433,12 +442,12 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 13,
-        '{"customProperty":"--sbx-config-field-roundness","select":[{"name":"none","value":"var(--sbx-border-radius-none)"},{"name":"Small","value":"var(--sbx-border-radius-s)"},{"name":"Medium","value":"var(--sbx-border-radius-m)"},{"name":"Large","value":"var(--sbx-border-radius-l)"}]}'
+        '{"customProperty":"--sbx-config-field-corner-radius","select":[{"name":"None","value":"var(--sbx-border-radius-none)"},{"name":"Small","value":"var(--sbx-border-radius-s)"},{"name":"Medium","value":"var(--sbx-border-radius-m)"},{"name":"Large","value":"var(--sbx-border-radius-l)"}]}'
     ),
     (
-        'skin_box_drop_shadow',
+        'skin_container_drop_shadow',
         'var(--sbx-shadow-none)',
-        'Box Drop Shadow',
+        'Container',
         'Add a drop shadow to primary container elements.',
         @config_select_field_id,
         @sonar_config_type_id,
@@ -447,7 +456,7 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 14,
-        '{"customProperty":"--sbx-config-box-drop-shadow","select":[{"name":"None","value":"var(--sbx-shadow-none)"},{"name":"Small","value":"var(--sbx-shadow-s)"},{"name":"Medium","value":"var(--sbx-shadow-m)"},{"name":"Large","value":"var(--sbx-shadow-l)"}]}'
+        '{"customProperty":"--sbx-config-container-drop-shadow","select":[{"name":"None","value":"var(--sbx-shadow-none)"},{"name":"Small","value":"var(--sbx-shadow-s)"},{"name":"Medium","value":"var(--sbx-shadow-m)"},{"name":"Large","value":"var(--sbx-shadow-l)"}]}'
     ),
     (
         'skin_sonar_custom_css',
@@ -570,25 +579,25 @@ VALUES (
             SELECT configID
             FROM config
             WHERE
-                name = 'skin_field_roundness'
+                name = 'skin_field_corner_radius'
         ),
-        @subcategory_roundness
+        @subcategory_corner_radius
     ),
     (
         (
             SELECT configID
             FROM config
             WHERE
-                name = 'skin_box_roundness'
+                name = 'skin_container_corner_radius'
         ),
-        @subcategory_roundness
+        @subcategory_corner_radius
     ),
     (
         (
             SELECT configID
             FROM config
             WHERE
-                name = 'skin_box_drop_shadow'
+                name = 'skin_container_drop_shadow'
         ),
         @subcategory_drop_shadow
     ),

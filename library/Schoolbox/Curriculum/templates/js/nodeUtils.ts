@@ -307,17 +307,19 @@ export function getTotalUsage(node: Node): number {
  */
 export function getUsageIcon(type: ActivityTypes): string {
     const icons = {
-        [ActivityTypes.COURSE]: "icon-course-builder",
-        [ActivityTypes.UNIT]: "icon-unit",
-        [ActivityTypes.LEARNING_ACTIVITY]: "icon-due-work",
-        [ActivityTypes.LEARNING_ACTIVITY_PROJECT]: "icon-project",
-        [ActivityTypes.LEARNING_ACTIVITY_DUE_WORK]: "icon-due-work",
-        [ActivityTypes.LEARNING_ACTIVITY_TASK]: "icon-task",
-        [ActivityTypes.LEARNING_ACTIVITY_QUIZ]: "icon-quiz",
-        [ActivityTypes.LEARNING_ACTIVITY_LESSON_PLAN]: "icon-lesson-plan",
-        [ActivityTypes.LEARNING_ACTIVITY_LTI]: "icon-lti",
-        [ActivityTypes.BADGE]: "icon-badge",
-        [ActivityTypes.FOLDER]: "icon-folder",
+        [ActivityTypes.COURSE]: "course-builder",
+        [ActivityTypes.UNIT]: "unit",
+        [ActivityTypes.LEARNING_ACTIVITY]: "due-work",
+        [ActivityTypes.LEARNING_ACTIVITY_PROJECT]: "project",
+        [ActivityTypes.LEARNING_ACTIVITY_DUE_WORK]: "due-work",
+        [ActivityTypes.LEARNING_ACTIVITY_TASK]: "task",
+        [ActivityTypes.LEARNING_ACTIVITY_QUIZ]: "quiz",
+        [ActivityTypes.LEARNING_ACTIVITY_LESSON_PLAN]: "lesson-plan",
+        [ActivityTypes.LEARNING_ACTIVITY_LTI]: "lti",
+        [ActivityTypes.LEARNING_ACTIVITY_DIALOG_AGENT]: "dialog-agent",
+        [ActivityTypes.LEARNING_ACTIVITY_REPORTING_ACTIVITY]: "reporting",
+        [ActivityTypes.BADGE]: "badge",
+        [ActivityTypes.FOLDER]: "folder",
     };
     return icons[type];
 }
@@ -346,6 +348,27 @@ export function getUsageHref(usage: Usage): string {
  */
 export function getSpecificUsages(usages: Usage[], type: ActivityTypes): Usage[] {
     return usages.filter((usage) => usage.discriminator === type);
+}
+
+/**
+ * To only return learning activity usages linked to the specified folder id
+ * @param usages - the usages
+ * @param folderId - the folder id to check for
+ * @returns - the usages of the specified type
+ */
+export function getLearningActivityUsages(
+    usages: Usage[],
+    folderId: number,
+): {
+    discriminator: ActivityTypes.LEARNING_ACTIVITY;
+    object: LearningActivityUsageObject;
+}[] {
+    return usages.filter(
+        (usage) => usage.discriminator === ActivityTypes.LEARNING_ACTIVITY && usage.object.unit.folder?.id === folderId,
+    ) as {
+        discriminator: ActivityTypes.LEARNING_ACTIVITY;
+        object: LearningActivityUsageObject;
+    }[];
 }
 
 /**

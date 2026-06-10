@@ -10,23 +10,19 @@ import type { MarkSchemeLetterGrade, SubmissionErrorStates } from "./markScheme"
 const LIMIT = 100;
 
 interface Props {
+    id: string | number;
+    name?: string;
     markScheme: MarkSchemeLetterGrade;
     submissionErrorStates: SubmissionErrorStates;
-    participant: {
-        user: {
-            id: number;
-        };
-    };
     tabIndex?: number;
     studentView?: boolean;
+    class?: string;
     /**
      * Should this form input be rendered as readonly?
      */
     readonly?: boolean;
-    /**
-     * The target for alaressValidate, if left blank then it will use the input itself
-     */
-    alaressValidateTarget?: string;
+    errorPlaceholderSelector?: string;
+    allowInvalidMark?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -36,36 +32,29 @@ const mark = defineModel<string | null>("mark", { required: true });
 <template>
     <ms-text-input
         v-if="props.readonly"
+        :id="props.id"
         v-model:mark="mark"
-        :participant="props.participant"
+        :name="props.name"
         :submission-error-states="props.submissionErrorStates"
+        :class="props.class"
         :tab-index="props.tabIndex"
         :placeholder="props.readonly ? '(no mark given)' : '(no grade)'"
         :limit="LIMIT"
         :max-length="48"
         input-title=""
-        :readonly="props.readonly"
-        :alaress-validate-target="props.alaressValidateTarget"
-        :alaress-validate-options="{
-            rules: {
-                mark: {
-                    withinLetterGradeRange: true,
-                },
-            },
-            messages: {
-                mark: {
-                    withinLetterGradeRange: `Please select one of the available grade options.`,
-                },
-            },
-        }"
+        readonly
+        :error-placeholder-selector="props.errorPlaceholderSelector"
+        :allow-invalid-mark="props.allowInvalidMark"
     />
 
+    <!-- TODO: at some point add alaressValidate's 'withinLetterGradeRange' rule to this -->
     <select
         v-else
+        :id="props.id?.toString() ?? undefined"
         class="letter-grade-select"
-        :data-test="`assessment-feedback-mark-select-${props.participant.user.id}`"
-        data-mark-input
-        name="mark"
+        :class="props.class"
+        :data-test="`assessment-feedback-mark-select-${props.id}`"
+        :name="props.name"
         :tabindex="props.tabIndex"
         :title="`Select a ${locale.grades.proper()}`"
         @change="(e) => (mark = (e.target as HTMLSelectElement).value)"
@@ -76,10 +65,7 @@ const mark = defineModel<string | null>("mark", { required: true });
          -->
         <option :value="null" disabled :selected="mark === null">(no grade)</option>
 
-        <optgroup
-            v-if="props.markScheme.context.conf.length === 0"
-            :label="`Original ${locale.grades.properPlural()} Deleted`"
-        >
+        <optgroup v-if="props.markScheme.conf.length === 0" :label="`Original ${locale.grades.properPlural()} Deleted`">
             <option selected value="-1" disabled>empty</option>
         </optgroup>
         <!-- If humanReadableMark has a value, look for it among the current Grade Group dropdown options.
@@ -87,7 +73,7 @@ const mark = defineModel<string | null>("mark", { required: true });
          -->
         <optgroup v-else :label="locale.grades.properPlural()">
             <option
-                v-for="(level, i) in props.markScheme.context.conf"
+                v-for="(level, i) in props.markScheme.conf"
                 :key="i"
                 :value="level.caption"
                 :selected="mark === level.caption"
@@ -99,7 +85,7 @@ const mark = defineModel<string | null>("mark", { required: true });
         <!-- If it didn't exist in the Grade Group, it might have been one of the Submission States
          like Submitted/Absent/Pending etc. so look there as well
          -->
-        <optgroup v-if="!props.studentView" label="States">
+        <optgroup v-if="!props.studentView && props.submissionErrorStates.length" label="States">
             <option
                 v-for="state in props.submissionErrorStates"
                 :key="state.id"
@@ -125,7 +111,7 @@ const mark = defineModel<string | null>("mark", { required: true });
             v-if="
                 mark !== null &&
                 mark.length &&
-                props.markScheme.context.conf.find((level) => level.caption === mark) === undefined &&
+                props.markScheme.conf.find((level) => level.caption === mark) === undefined &&
                 props.submissionErrorStates.find((state) => state.name === mark) === undefined
             "
             label="Original Deleted Grade"

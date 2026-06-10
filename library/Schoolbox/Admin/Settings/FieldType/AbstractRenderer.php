@@ -66,7 +66,7 @@ abstract class AbstractRenderer implements IConfigRenderer
 
     /**
      * @param Config $config
-     * @return string[]
+     * @return array<string, mixed>
      */
     protected function getData(Config $config): array
     {

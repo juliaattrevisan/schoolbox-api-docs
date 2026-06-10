@@ -17,7 +17,9 @@ export default class Badges {
 
     static readonly DATA_TEST_LIST_BOX_GOAL_ACHIEVEMENT = "ss-query-input";
 
-    static readonly DATA_TEST_SELECTED_STUDENT = "ss-results-item-container"; // append -[userId]
+    static readonly DATA_TEST_SELECTED_STUDENT_CONTAINER = "ss-results-item-container"; // append -[userId]
+
+    static readonly DATA_TEST_SELECTED_STUDENT_LABEL = "ss-results-item-label"; // append -[userId]
 
     static readonly DATA_TEST_MODAL_BUTTON_SET_GOAL_ACHIEVEMENT = "badge-award-confirm";
 
@@ -117,10 +119,11 @@ export default class Badges {
         await openModal.getByTestId(Badges.DATA_TEST_LIST_BOX_GOAL_ACHIEVEMENT).fill(studentName);
         // Find the student in the list and click it (need to generalise the data-test as it's dynamic)
         await openModal
-            .locator(`[data-test^="${Badges.DATA_TEST_SELECTED_STUDENT}"]`) // (starts with)
+            .locator(`[data-test^="${Badges.DATA_TEST_SELECTED_STUDENT_CONTAINER}"]`) // (starts with)
             .filter({
                 hasText: studentName,
             })
+            .locator(`[data-test^="${Badges.DATA_TEST_SELECTED_STUDENT_LABEL}"]`) // (starts with)
             .click();
         // Click on the <h2> of the modal to make sure the search select is not focused anymore
         await openModal.locator("h2").click();

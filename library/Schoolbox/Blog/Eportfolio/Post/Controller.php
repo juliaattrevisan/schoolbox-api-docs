@@ -40,7 +40,7 @@ class Controller extends Base
     protected $userAccessMapper;
 
     /**
-     * @var FileMapper;
+     * @var FileMapper
      */
     protected $fileMapper;
 
@@ -60,12 +60,12 @@ class Controller extends Base
     protected $errorMapper;
 
     /**
-     * @var EportfolioBlogMapper;
+     * @var EportfolioBlogMapper
      */
     protected $blogMapper;
 
     /**
-     * @var EportfolioBlogCommentMapper;
+     * @var EportfolioBlogCommentMapper
      */
     protected $blogCommentMapper;
 

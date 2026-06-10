@@ -203,6 +203,10 @@ where:
   - remember, alpha and beta version counts start from 1
 - `26.1.beta2` is the 2nd preview version for the 2nd major version released in 2026
 
+### Point release notes
+
+When preparing point release notes, use the `point-release-notes` skill in `.agents/skills/point-release-notes/SKILL.md`.
+
 ---
 
 ## Database Schema changes

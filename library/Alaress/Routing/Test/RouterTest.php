@@ -13,8 +13,8 @@ use Alaress\Routing\Dictionary\SubscriptionDictionary;
 use Alaress\Routing\Router;
 use InvalidArgumentException;
 use OutOfBoundsException;
-use PHPUnit_Framework_AssertionFailedError;
-use PHPUnit_Framework_Exception;
+use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\TestCase;
 
 class RouterTest extends TestCase
@@ -100,7 +100,7 @@ class RouterTest extends TestCase
      * @param string $path
      * @param string $expectedKey
      * @throws InvalidArgumentException
-     * @throws PHPUnit_Framework_Exception
+     * @throws Exception
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('dataPatternPathGet')]
     public function testPatternPathGet($path, $expectedKey)
@@ -128,7 +128,7 @@ class RouterTest extends TestCase
      * @param bool $recursive
      * @throws InvalidArgumentException
      * @throws OutOfBoundsException
-     * @throws PHPUnit_Framework_AssertionFailedError
+     * @throws AssertionFailedError
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('dataDropAll')]
     public function testDropAll($recursive)

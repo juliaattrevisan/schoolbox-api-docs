@@ -34,7 +34,7 @@ function onViewDP(): void {
             @keydown.enter="onViewDP"
             @keydown.space.prevent="onViewDP"
         >
-            <sbx-icon name="learning-support"></sbx-icon>
+            <sbx-icon name="group"></sbx-icon>
             View {{ locale.differentiationProfile.translate(false, true) }}
         </div>
     </dt>

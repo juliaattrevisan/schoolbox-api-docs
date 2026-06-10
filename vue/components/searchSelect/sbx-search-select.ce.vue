@@ -1,6 +1,11 @@
 <script setup lang="ts">
 /**
  * To search for results with a query and select them
+ * Note that this web component is currently a bit of a test to see if all search-selects
+ * can eventually be covered by this web component.
+ * As such this and `vue/components/searchSelect/search-select.vue` may diverge slightly, and this should be considered
+ * when conversion occurs properly.
+ * Currently this web component is only used as the name filter within the filters panel.
  */
 
 import { toRef } from "vue";
@@ -230,7 +235,7 @@ function onButtonSelected(): void {
                 {{ props.buttonTitle }}
             </button>
         </div>
-        <div class="sbx-search-select__results-container">
+        <div class="search-select__results-container">
             <ss-results
                 v-if="showResults"
                 :query="query"
@@ -249,10 +254,3 @@ function onButtonSelected(): void {
         </div>
     </div>
 </template>
-
-<style>
-.sbx-search-select__results-container {
-    position: relative;
-    top: -1px; /* to align the results with the bottom of the ss-query-input */
-}
-</style>

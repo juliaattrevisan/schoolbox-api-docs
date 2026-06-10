@@ -14,24 +14,17 @@ use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
 use Exception;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 interface DispatchStrategyInterface
 {
     // non-printable characters used for message stream control
-    const STR_END_OF_TRANSMISSION = "\004";
-    const STR_ACKNOWLEDGE         = "\006";
-    const STR_NACKNOWLEDGE        = "\025";
-    const STR_CANCEL              = "\030";
-    const STR_RECORD_SEPARATOR    = "\036";
-    const STR_UNIT_SEPARATOR      = "\037";
-
-
-    /**
-     * Get the name of the strategy currently being used
-     *
-     * @return string
-     */
-    public function getName();
+    public const string STR_END_OF_TRANSMISSION = "\004";
+    public const string STR_ACKNOWLEDGE         = "\006";
+    public const string STR_NACKNOWLEDGE        = "\025";
+    public const string STR_CANCEL              = "\030";
+    public const string STR_RECORD_SEPARATOR    = "\036";
+    public const string STR_UNIT_SEPARATOR      = "\037";
 
 
     /**
@@ -39,7 +32,7 @@ interface DispatchStrategyInterface
      *
      * @return ProtocolInterface
      */
-    public function getProtocol();
+    public function getProtocol(): ProtocolInterface;
 
 
     /**
@@ -47,7 +40,7 @@ interface DispatchStrategyInterface
      *
      * @return WorkerBundleInterface
      */
-    public function newWorkerBundle();
+    public function newWorkerBundle(): WorkerBundleInterface;
 
 
     /**
@@ -55,7 +48,7 @@ interface DispatchStrategyInterface
      *
      * @return string
      */
-    public function getCommand();
+    public function getCommand(): string;
 
 
     /**
@@ -64,7 +57,7 @@ interface DispatchStrategyInterface
      * @param WorkerBundleInterface $workers
      * @return bool
      */
-    public function canAccept($workers);
+    public function canAccept(WorkerBundleInterface $workers): bool;
 
 
     /**
@@ -77,7 +70,7 @@ interface DispatchStrategyInterface
      * @param int                   $remainingTaskCount
      * @return int
      */
-    public function getAvailableWorker($workers, $remainingTaskCount);
+    public function getAvailableWorker(WorkerBundleInterface $workers, int $remainingTaskCount): int;
 
 
     /**
@@ -85,7 +78,7 @@ interface DispatchStrategyInterface
      *
      * @return array
      */
-    public function getSupportedActions();
+    public function getSupportedActions(): array;
 
 
     /**
@@ -94,7 +87,7 @@ interface DispatchStrategyInterface
      * @param string $data
      * @return int
      */
-    public function checkState($data);
+    public function checkState(string $data): int;
 
 
     /**
@@ -104,17 +97,17 @@ interface DispatchStrategyInterface
      * @param mixed  $arguments
      * @return string
      */
-    public function composeTaskString($command, $arguments);
+    public function composeTaskString(string $command, mixed $arguments): string;
 
 
     /**
      * Separate the given parameter into an array of two elements: command and args.
      *
      * @param string $taskString
-     * @throws InvalidArgumentException
      * @return array
+     * @throws InvalidArgumentException
      */
-    public function decomposeTaskString($taskString);
+    public function decomposeTaskString(string $taskString): array;
 
 
     /**
@@ -123,7 +116,7 @@ interface DispatchStrategyInterface
      * @param mixed $data
      * @return string
      */
-    public function encodeRecord($data);
+    public function encodeRecord(mixed $data): string;
 
 
     /**
@@ -132,7 +125,7 @@ interface DispatchStrategyInterface
      * @param string $data
      * @return array
      */
-    public function decodeRecords($data);
+    public function decodeRecords(string $data): array;
 
 
     /**
@@ -140,7 +133,7 @@ interface DispatchStrategyInterface
      *
      * @return int
      */
-    public function getQueueDelay();
+    public function getQueueDelay(): int;
 
 
     /**
@@ -148,7 +141,7 @@ interface DispatchStrategyInterface
      *
      * @return string
      */
-    public function getFlags();
+    public function getFlags(): string;
 
 
     /**
@@ -156,7 +149,7 @@ interface DispatchStrategyInterface
      *
      * @return int
      */
-    public function getWarningQueueLength();
+    public function getWarningQueueLength(): int;
 
 
     /**
@@ -164,7 +157,7 @@ interface DispatchStrategyInterface
      *
      * @return int
      */
-    public function getMaxQueueLength();
+    public function getMaxQueueLength(): int;
 
 
     /**
@@ -173,7 +166,7 @@ interface DispatchStrategyInterface
      *
      * @return bool
      */
-    public function canDispatcherFlywheel();
+    public function canDispatcherFlywheel(): bool;
 
 
     /**
@@ -181,7 +174,7 @@ interface DispatchStrategyInterface
      *
      * @return int
      */
-    public function getWorkerIdleTimeout();
+    public function getWorkerIdleTimeout(): int;
 
 
     /**
@@ -190,15 +183,15 @@ interface DispatchStrategyInterface
      * @param WorkerBundleInterface $workers
      * @return void
      */
-    public function cleanup($workers);
+    public function cleanup(WorkerBundleInterface $workers): void;
 
 
     /**
-     * @param Exception       $exception
+     * @param Throwable       $exception
      * @param LoggerInterface $log
      * @return void
      */
-    public function handleException($exception, $log);
+    public function handleException(Throwable $exception, LoggerInterface $log): void;
 
 
     /**
@@ -208,7 +201,7 @@ interface DispatchStrategyInterface
      * @param bool $hard
      * @return int
      */
-    public function getWorkerExecutionTimeout($hard = true);
+    public function getWorkerExecutionTimeout(bool $hard = true): int;
 
 
     /**
@@ -233,4 +226,14 @@ interface DispatchStrategyInterface
      * @return int
      */
     public function getMetricInterval(): int;
+
+    /**
+     * Return the max number of milliseconds in the future for which the scheduler which uses this dispatcher should
+     * queue future triggers.
+     *
+     * If zero, then set no maximum time: always queue future triggers.
+     *
+     * @return int
+     */
+    public function getMaxFutureTriggerTime(): int;
 }

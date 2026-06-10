@@ -1,0 +1,191 @@
+<?php
+
+/**
+ * IB registration session student CSV export test
+ *
+ * @copyright Copyright 2026, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\IB\Registrations\Sessions\Student\Export\Test;
+
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Schoolbox\GenericCollection;
+use Schoolbox\IB\Registrations\Sessions\Student\Export\Csv;
+use Schoolbox\IB\Registrations\Sessions\Student\Model as RegistrationSessionStudentModel;
+use Schoolbox\Language\Model as LanguageModel;
+use Schoolbox\Nationality\Model as NationalityModel;
+use Schoolbox\User;
+
+class CsvTest extends TestCase
+{
+    public function testHeadingsMatchIbisTemplate(): void
+    {
+        $this->assertSame(
+            [
+                'firstName' => 'First Name',
+                'lastName' => 'Last Name',
+                'dateOfBirth' => 'Date of Birth',
+                'gender' => 'Gender',
+                'nationality1' => '1st Nationality',
+                'language1' => '1st Language',
+            ],
+            (new Csv())->headings()
+        );
+    }
+
+    public function testBuildRowUsesNamesForNationalityAndLanguage(): void
+    {
+        $student = (new RegistrationSessionStudentModel())
+            ->setUser(
+                (new User())
+                    ->setFirstname(' Legal ')
+                    ->setPreferredName(' Alex ')
+                    ->setLastname(' Nguyen ')
+                    ->setLanguageCollection(
+                        new GenericCollection(LanguageModel::class, [
+                            (new LanguageModel())->setCode('ENG')->setName(' English '),
+                        ])
+                    )
+                    ->setNationalityCollection(
+                        new GenericCollection(NationalityModel::class, [
+                            (new NationalityModel())->setCode('AUS')->setName(' Australian '),
+                        ])
+                    )
+            );
+
+        $row = (new Csv())->buildRow(
+            $student,
+            [
+                'StudentBirthDate' => strtotime('2009-04-12 12:00:00'),
+                'StudentGender' => ' F ',
+            ]
+        );
+
+        $this->assertSame(
+            [
+                'firstName' => 'Alex',
+                'lastName' => 'Nguyen',
+                'dateOfBirth' => '2009-04-12',
+                'gender' => 'F',
+                'nationality1' => 'Australian',
+                'language1' => 'English',
+            ],
+            $row
+        );
+    }
+
+    #[DataProvider('dangerousCsvValueProvider')]
+    public function testBuildRowNeutralisesCsvFormulaPrefixes(string $value, string $expected): void
+    {
+        $student = (new RegistrationSessionStudentModel())
+            ->setUser(
+                (new User())
+                    ->setFirstname($value)
+                    ->setLastname($value)
+                    ->setLanguageCollection(
+                        new GenericCollection(LanguageModel::class, [
+                            (new LanguageModel())->setName($value),
+                        ])
+                    )
+                    ->setNationalityCollection(
+                        new GenericCollection(NationalityModel::class, [
+                            (new NationalityModel())->setName($value),
+                        ])
+                    )
+            );
+
+        $row = (new Csv())->buildRow(
+            $student,
+            ['StudentGender' => $value]
+        );
+
+        $this->assertSame($expected, $row['firstName']);
+        $this->assertSame($expected, $row['lastName']);
+        $this->assertSame($expected, $row['gender']);
+        $this->assertSame($expected, $row['nationality1']);
+        $this->assertSame($expected, $row['language1']);
+    }
+
+    #[DataProvider('validDateOfBirthProvider')]
+    public function testBuildRowAcceptsValidDateOfBirthFormats(mixed $dateOfBirth): void
+    {
+        $row = (new Csv())->buildRow(
+            new RegistrationSessionStudentModel(),
+            ['StudentBirthDate' => $dateOfBirth]
+        );
+
+        $this->assertSame('2024-02-29', $row['dateOfBirth']);
+    }
+
+    public function testBuildRowUsesEmptyStringsForMissingValues(): void
+    {
+        $this->assertSame(
+            [
+                'firstName' => '',
+                'lastName' => '',
+                'dateOfBirth' => '',
+                'gender' => '',
+                'nationality1' => '',
+                'language1' => '',
+            ],
+            (new Csv())->buildRow(new RegistrationSessionStudentModel(), [])
+        );
+    }
+
+    #[DataProvider('invalidDateOfBirthProvider')]
+    public function testBuildRowUsesEmptyStringForInvalidDateOfBirth(mixed $dateOfBirth): void
+    {
+        $row = (new Csv())->buildRow(
+            new RegistrationSessionStudentModel(),
+            ['StudentBirthDate' => $dateOfBirth]
+        );
+
+        $this->assertSame('', $row['dateOfBirth']);
+    }
+
+    /**
+     * @return array<string, array{mixed}>
+     */
+    public static function validDateOfBirthProvider(): array
+    {
+        return [
+            'unix timestamp' => [strtotime('2024-02-29 12:00:00')],
+            'date-only string' => ['2024-02-29'],
+            'connector iso string' => ['2024-02-29T00:00:00'],
+        ];
+    }
+
+    /**
+     * @return array<string, array{mixed}>
+     */
+    public static function invalidDateOfBirthProvider(): array
+    {
+        return [
+            'null' => [null],
+            'false' => [false],
+            'empty string' => [''],
+            'blank string' => ['   '],
+            'non-date string' => ['not-a-date'],
+            'zero timestamp' => [0],
+            'negative timestamp' => [-1],
+        ];
+    }
+
+    /**
+     * @return array<string, array{string, string}>
+     */
+    public static function dangerousCsvValueProvider(): array
+    {
+        return [
+            'equals prefix' => ['=SUM(1,1)', "'=SUM(1,1)"],
+            'plus prefix' => ['+SUM(1,1)', "'+SUM(1,1)"],
+            'minus prefix' => ['-SUM(1,1)', "'-SUM(1,1)"],
+            'at prefix' => ['@SUM(1,1)', "'@SUM(1,1)"],
+            'tab padded prefix' => ["\t=SUM(1,1)\n", "'=SUM(1,1)"],
+        ];
+    }
+}

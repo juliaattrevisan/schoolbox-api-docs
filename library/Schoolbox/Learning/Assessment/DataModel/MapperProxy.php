@@ -98,21 +98,30 @@ class MapperProxy
 
 
     /**
+     * @var RubricDataSource
+     */
+    private RubricDataSource $rubricMapper;
+
+
+    /**
      * Constructor
      *
-     * @param Mapper                $baseMapper
-     * @param Translator            $translator
+     * @param Mapper $baseMapper
+     * @param Translator $translator
      * @param ParticipantDataSource $participantDataSource
+     * @param RubricDataSource $rubricMapper
      */
     public function __construct(
         Mapper $baseMapper,
         Translator $translator,
-        ParticipantDataSource $participantDataSource
+        ParticipantDataSource $participantDataSource,
+        RubricDataSource $rubricMapper,
     ) {
         $this->baseMapper            = $baseMapper;
         $this->translator            = $translator;
         $this->participantDataSource = $participantDataSource;
         $this->model                 = IAssessable::class;
+        $this->rubricMapper          = $rubricMapper;
     }
 
 
@@ -1315,6 +1324,7 @@ class MapperProxy
         // Folder context translation:
         // Look up the data model's assessment object ID, and translate to a project ID
         $context = $dataModel->getAssessmentContext();
+
         if ($context instanceof Project) {
             $project = ProjectMapper::getInstance()->findOneByColumn('assessment_id', $context->getAssessmentModel()->getId());
             $context->setId($project->getId());
@@ -1355,42 +1365,16 @@ class MapperProxy
         if ($subObject instanceof Task) {
             $taskMapper = TaskMapper::getInstance();
 
-            /* Save the Task before the files, because you need the primary key
-             * in the relational table
+            /* Save the Task before the files, because you need the primary key in the relational table
              */
             $taskMapper->save($subObject);
             $taskMapper->saveFiles($subObject);
         } elseif ($subObject instanceof SubmissionBox) {
             $boxMapper = SubmissionBoxMapper::getInstance();
 
-            /** @var DueWorkObject $dueWork */
-            $dueWork = $assessable;
-            if ($dueWork->getUseRubric()) {
-                // Rubric involved? Save the due work, and then persist rubric
-                $rubricMapper = RubricDataSource::getInstance();
-
-                // Need to compare the previously existing grid with the newly
-                // saved one, for invalidation purposes
-                $originalGrid = null;
-                if (!$isCreate) {
-                    $originalGrid = $rubricMapper->retrieveGrid($assessable, false);
-                }
-
-                $boxMapper->save($subObject);
-
-                if ($dueWork->getRubricGrid()) {
-                    /* Disregard grid changes if CourseManaged is on
-                     */
-                    $courseManagedFields = new CourseManagedFields($currentUser, $assessable);
-
-                    if (!$courseManagedFields->isReadonly()) {
-                        $rubricMapper->persistGrid($dueWork->getRubricGrid(), $originalGrid, $subObject);
-                    }
-                }
-            } else {
-                // No rubric? Just save the due work
-                $boxMapper->save($subObject);
-            }
+            /* Save the Due Work before the files, because you need the primary key in the relational table
+             */
+            $boxMapper->save($subObject);
 
             $boxMapper->saveFiles($subObject);
         } elseif ($subObject instanceof Quiz) {
@@ -1429,6 +1413,98 @@ class MapperProxy
         } elseif ($subObject instanceof Project) {
             ProjectMapper::getInstance()->save($subObject);
         }
+
+        /* TODO Save each rubric instance separately, but it has to be pre-decorated into $assessment:
+         *  we don't have access to $_POST payloads here.
+         *
+         * We get a set of rubric grids from the frontend payload, in a mix of two formats:
+         *   Existing grid:        rubric[39]
+         *   New grid:             rubric[-1], rubric[-2], ...rubric[-n]
+         *
+         * These were already prepared in a rubric instance, or a stub rubric instance for new grids, then added
+         * to the stack of $assessable->getRubricInstances().
+         *
+         * Anyway, disregard grid changes if CourseManaged is on, having said all that...lol
+         * Course Managed activities don't let you change some stuff in an implementation, incl. rubric grids afaik
+         */
+        if ($assessable->getRubricInstances()->count() && !(new CourseManagedFields($currentUser, $assessable))->isReadonly()) {
+            /* At this point, both the subobject and the assessment should have been persisted already.
+             *
+             * if (!$isCreate) { ... }
+             * There' is/was's this special weird idea $isCreate that meant you had to save them in a particular order
+             * based on whether you were creating or updating (!??!!?) but seeing as we're near the end of this method,
+             * all of that will have already happened.
+             */
+            $rubricMapper = RubricDataSource::getInstance();
+
+            /* Keep track of all the still-existing rubric instance ids
+             * We soft delete every rubric instance associated with $assessable that -isn't- in this set anymore.
+             * That's how we manage doing a diff to find rubric grids that were deleted via ui.
+             */
+            $keepRubricInstanceIds = [];
+
+            /* This contains a mix of totally new, and pre-existing, rubric instances.
+             */
+            foreach ($assessable->getRubricInstances() as $rubricInstance) {
+                /* The latest version of the rubric grid, as per the Decorators that processed the frontend
+                 * payload, storing it in the temporary place so we can get it here.
+                 */
+                $newGrid = $rubricInstance->getGrid();
+
+                // Need to compare the previously existing grid with the newly
+                // saved one, for invalidation purposes
+                if ($rubricInstance->getId() > 0) {
+                    /* This is what the database knows.
+                     */
+                    $originalGrid = $rubricMapper->retrieveOneGrid($assessable, $rubricInstance, false);
+                } else {
+                    /* Otherwise this is a new grid: I suppose it's the same as the original grid, in the
+                     * interest of just falling into place inside persistGrid() and passing the backend validation
+                     * that checks "compatibility"
+                     */
+                    $originalGrid = $newGrid;
+                }
+
+                /* The grid exists, but in the creational workflow, its assessment model identifier is nonexistent.
+                 * For this particular usage it should inherit whatever the assessment id now became, since we just
+                 * persisted the assessment model. Wild!
+                 */
+                if (null === $newGrid->getRubricInstance()->getAssessmentModel()->getId()) {
+                    $newGrid->getRubricInstance()->getAssessmentModel()->setId($assessable->getId());
+                }
+
+                /* Save a grid's contents and its rubric_instance
+                 */
+                $rubricMapper->persistGrid($newGrid, $originalGrid);
+
+                /* Remember to keep the grid (it has a whole new rubric_instance with a freshly-persisted id)
+                 * This is a grid we added
+                 */
+                $keepRubricInstanceIds[] = $newGrid->getRubricInstance()->getId();
+            }
+
+            /* Soft delete everything except whatever we captured in $keepRubricInstanceIds
+             * Originally, I tried a predicate builder approach:
+             *
+                    $subpredicate = $rubricInstanceMapper->getPredicateBuilder()
+                        ->notIn('id', $keepRubricInstanceIds)
+                        ->equals('assessment_id', $assessable->getId());
+
+                    $pb = $rubricInstanceMapper->getPredicateBuilder()
+                        ->all($subpredicate);
+
+                    $rubricInstanceMapper->deleteByPredicates($pb);
+             *
+             * But it kept giving me this nonsensical hankypanky:
+             *    Could not save activity. Error executing statement: SQLSTATE[22007]: Invalid datetime format: 1292 Truncated incorrect DECIMAL value: 'null'.
+             *
+             * TODO Find out what particular DECIMAL field is needed
+             *  (It wasn't the rubric_instance.weight - those all had values)
+             */
+            $rubricInstanceMapper = \Schoolbox\Assessment\Rubric\Instance\Mapper::getInstance();
+            $rubricInstanceMapper->removeFromAssessment($assessable, $keepRubricInstanceIds);
+        }
+
 
         // TODO Remove this hack in SA-6049 (see description above)
         if (!$isCreate) {
@@ -1758,6 +1834,15 @@ class MapperProxy
                 if ($loadParticipants) {
                     $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student, $options);
                 }
+
+                /* Each rubric instance represents a grid; find its latest incarnation and supply it here.
+                 * There might be another more appropriate place for such a population but idk where that is right now.
+                 * TODO There might be a nicer way to load each grid's construct than one-at-a-time
+                 */
+                foreach ($assessment->getRubricInstances() as $rubricInstance) {
+                    $rubricInstance->setGrid($this->rubricMapper->retrieveOneGrid($assessment, $rubricInstance, false));
+                }
+
                 return $assessment;
             } catch (MapperException\Deleted $e) {
                 // Populate participants for the deleted assessment, and rethrow
@@ -1768,6 +1853,15 @@ class MapperProxy
                     if ($loadParticipants) {
                         $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student, $options);
                     }
+
+                    /* Each rubric instance represents a grid; find its latest incarnation and supply it here.
+                     * There might be another more appropriate place for such a population but idk where that is right now.
+                     * TODO There might be a nicer way to load each grid's construct than one-at-a-time
+                     */
+                    foreach ($assessment->getRubricInstances() as $rubricInstance) {
+                        $rubricInstance->setGrid($this->rubricMapper->retrieveOneGrid($assessment, $rubricInstance, false));
+                    }
+
                     $e->setDeletedObject($assessment);
                 }
                 throw $e;

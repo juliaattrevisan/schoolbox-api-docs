@@ -24,6 +24,8 @@ export default class CurriculumSelector {
 
     static readonly DATA_TEST_MODAL_NODE_CHECKBOX_LABEL = "cs-modal-node-checkbox-label-";
 
+    static readonly DATA_TEST_MODAL_NODE_RADIO_LABEL = "cs-modal-node-radio-label-";
+
     static readonly DATA_TEST_MODAL_CURRENT_NODES_CONTAINER = "cs-modal-current-nodes-container";
 
     static readonly DATA_TEST_MODAL_CURRENT_NODE_CHECKBOX_LABEL = "cs-modal-current-node-checkbox-label-";
@@ -82,7 +84,7 @@ export default class CurriculumSelector {
     async browseToNode(ids: number[], $context?: Locator): Promise<void> {
         const context = $context || this.page;
         for (const id of ids) {
-            await context.getByTestId(`${CurriculumSelector.DATA_TEST_MODAL_NODE_NAME}${id.toString()}`).click();
+            await context.getByTestId(`${CurriculumSelector.DATA_TEST_MODAL_NODE_NAME}${id.toString()}`).last().click();
         }
     }
 
@@ -98,6 +100,31 @@ export default class CurriculumSelector {
                 .getByTestId(`${CurriculumSelector.DATA_TEST_MODAL_NODE_CHECKBOX_LABEL}${id.toString()}`)
                 .click();
         }
+    }
+
+    /**
+     * Select a single node in the modal
+     * @param id - The node id to select
+     * @param $context - The context to use when there are multiple curriculum selectors on the page
+     */
+    async selectSingleNode(id: number, $context?: Locator): Promise<void> {
+        const context = $context || this.page;
+        const nodeRadioLabel = context.getByTestId(
+            `${CurriculumSelector.DATA_TEST_MODAL_NODE_RADIO_LABEL}${id.toString()}`,
+        );
+
+        if ((await nodeRadioLabel.count()) > 0) {
+            await nodeRadioLabel.last().click();
+            return;
+        }
+
+        await context
+            .locator(`input[type="radio"][value="${id}"]`)
+            .last()
+            .evaluate((element: HTMLInputElement) => {
+                element.checked = true;
+                element.dispatchEvent(new Event("change", { bubbles: true }));
+            });
     }
 
     /**
@@ -132,7 +159,7 @@ export default class CurriculumSelector {
      */
     async saveModal($context?: Locator): Promise<void> {
         const context = $context || this.page;
-        await context.getByTestId(CurriculumSelector.DATA_TEST_MODAL_SAVE_BUTTON).click();
+        await context.getByTestId(CurriculumSelector.DATA_TEST_MODAL_SAVE_BUTTON).last().click();
         await this.tester.common.waitForModalToBeClosed();
     }
 

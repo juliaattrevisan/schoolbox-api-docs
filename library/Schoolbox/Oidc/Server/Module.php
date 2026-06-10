@@ -84,12 +84,8 @@ class Module extends BaseModule
 
         // Cache server-related data in storage:
         // auth codes, access tokens, etc. should be somewhat persistent
-        $cache = new Psr16Cache(
-            new RedisAdapter(
-                $this->injector->get('redis.storage'),
-                CacheHelper::BASE_SERVER_KEY . '.' . INSTANCE_ID,
-            )
-        );
+        $cache = new \Alaress\CacheFactory\Factory($this->injector->get('redis.storage'))
+            ->build(CacheHelper::BASE_SERVER_KEY);
 
         // Get stuff out of the request
         /** @var ServerRequestInterface $request */

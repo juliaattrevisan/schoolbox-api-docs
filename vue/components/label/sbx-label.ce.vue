@@ -25,6 +25,10 @@ interface Props {
      */
     icon?: string;
     /**
+     * The icon color of the label
+     */
+    iconColor?: string;
+    /**
      * The href of the label
      */
     href?: string;
@@ -44,6 +48,7 @@ const props = withDefaults(defineProps<Props>(), {
     backgroundColor: undefined,
     textColor: undefined,
     icon: undefined,
+    iconColor: undefined,
     href: undefined,
     text: undefined,
     isButton: false,
@@ -70,7 +75,12 @@ const emit = defineEmits<{
                 color: props.textColor || undefined,
             }"
         >
-            <sbx-icon v-if="props.icon" :name="props.icon" class="sbx-label__icon" />
+            <sbx-icon
+                v-if="props.icon"
+                :name="props.icon"
+                class="sbx-label__icon"
+                :color="props.iconColor || undefined"
+            />
             {{ props.text }}
         </span>
     </button>
@@ -83,7 +93,12 @@ const emit = defineEmits<{
                 color: props.textColor || undefined,
             }"
         >
-            <sbx-icon v-if="props.icon" :name="props.icon" class="sbx-label__icon" />
+            <sbx-icon
+                v-if="props.icon"
+                :name="props.icon"
+                class="sbx-label__icon"
+                :color="props.iconColor || undefined"
+            />
             {{ props.text }}
         </span>
     </a>
@@ -96,7 +111,7 @@ const emit = defineEmits<{
             color: props.textColor || undefined,
         }"
     >
-        <sbx-icon v-if="props.icon" :name="props.icon" class="sbx-label__icon" />
+        <sbx-icon v-if="props.icon" :name="props.icon" class="sbx-label__icon" :color="props.iconColor || undefined" />
         {{ props.text }}
     </span>
 </template>
@@ -108,11 +123,11 @@ Long term they will reference the design colour tokens
 */
 .sbx-label {
     align-items: center;
-    border-radius: var(--sbx-config-field-roundness, 0);
+    border-radius: var(--sbx-config-field-corner-radius, 0);
     color: white;
     display: inline-flex;
     font-size: var(--sbx-font-size-xs, 0.75rem);
-    gap: 0.5rem;
+    gap: var(--sbx-size-xs, 0.5rem);
     padding: var(--spacing-xs) var(--spacing-s);
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;

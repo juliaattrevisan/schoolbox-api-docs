@@ -294,7 +294,7 @@ class Plan
     /**
      * IMPORTANT: The participants must be indexed by user.id
      *
-     * @param Participant|GenericCollection $participants
+     * @param GenericCollection $participants
      * @return $this
      */
     public function setParticipants(GenericCollection $participants): self

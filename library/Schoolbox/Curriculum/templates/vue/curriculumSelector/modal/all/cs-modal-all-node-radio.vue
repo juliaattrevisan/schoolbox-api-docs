@@ -47,7 +47,10 @@ function onChange(): void {
             :checked="isChecked"
             @change="onChange"
         />
-        <label :for="`radio-${props.node.id}__${extraId}`"></label>
+        <label
+            :for="`radio-${props.node.id}__${extraId}`"
+            :data-test="`cs-modal-node-radio-label-${props.node.id}`"
+        ></label>
     </div>
 </template>
 

@@ -122,11 +122,13 @@ export default class AssessmentForm {
     // Visibility constants
     // NOTE: The PHP implementation referenced Schoolbox\Assessment\Component\SubmissionBox
     //       but as we are in TypeScript, we do not have access to this class.
-    static readonly VISIBILITY_STAFF_ONLY = 0;
+    static readonly VISIBILITY_STAFF_ONLY = "staffOnly";
 
-    static readonly VISIBILITY_STAFF_AND_STUDENT = 1;
+    static readonly VISIBILITY_STAFF_AND_STUDENT = "staffAndStudent";
 
-    static readonly VISIBILITY_ALL = 2;
+    static readonly VISIBILITY_STAFF_AND_PARENT = "staffAndParent";
+
+    static readonly VISIBILITY_ALL = "staffStudentAndParent";
 
     // Accepts online submission constants
     static readonly ACCEPT_SUBMISSION_NONE = 0;

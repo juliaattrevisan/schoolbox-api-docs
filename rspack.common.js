@@ -183,7 +183,9 @@ module.exports = {
             "./library/Schoolbox/Learning/Assessment/templates/dialogAgent/vue/status/dialogAgentStatus.ts",
         dialogAgentResponse:
             "./library/Schoolbox/Learning/Assessment/templates/dialogAgent/vue/response/dialogAgentResponse.ts",
-        rubricBuilder: "./library/Schoolbox/Assessment/Rubric/templates/vue/rubricBuilder.ts",
+        rubricBuilder: "./library/Schoolbox/Assessment/Rubric/templates/vue/rubricBuilder/rubricBuilder.ts",
+        rubricMarkable: "./library/Schoolbox/Assessment/Rubric/templates/vue/rubricMarkable/rubricMarkable.ts",
+        rubricReadonly: "./library/Schoolbox/Assessment/Rubric/templates/vue/rubricReadonly/rubricReadonly.ts",
 
         // Textboxes
         textboxList: "./library/Schoolbox/Resource/Textbox/vue/textboxList.ts",
@@ -207,6 +209,8 @@ module.exports = {
         ibConfiguration: "./library/Schoolbox/Admin/InternationalBaccalaureate/templates/vue/ibConfiguration.ts",
         ibRegistration: "./library/Schoolbox/Admin/InternationalBaccalaureate/templates/vue/ibRegistration.ts",
         ibReport: "./library/Schoolbox/Admin/InternationalBaccalaureate/templates/vue/ibReport.ts",
+        ibStudentRegistrationConfirmation:
+            "./library/Schoolbox/Admin/InternationalBaccalaureate/templates/vue/ibStudentRegistrationConfirmation.ts",
         aiUsageLog: "./library/Schoolbox/Admin/OpenAI/Usage/templates/aiUsageLog.ts",
         adminDifferentiationProfiles:
             "./library/Schoolbox/Admin/DifferentiationProfiles/templates/vue/adminDifferentiationProfiles.ts",

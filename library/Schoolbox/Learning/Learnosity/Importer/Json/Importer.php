@@ -15,6 +15,7 @@ use Ramsey\Uuid\Uuid;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Assessment\WorkType\Mapper;
 use Schoolbox\Learning\AssessmentContext;
@@ -99,6 +100,42 @@ class Importer
         private \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper
     ) {
         $this->associateStatement = $this->databaseInternal->prepare(self::QUERY_ASSOCIATE_LEARNOSITY);
+    }
+
+
+    /**
+     * Resolves a markVisibility value from either the current string format or the legacy
+     * integer format used in JSON exports prior to version 26.1.
+     *
+     * TODO: If more changes are made to the export format, we may want to implement a system similar to that which
+     *       already exists for importing legacy XML quiz exports.
+     * @see e.g. library/Assess/Import/Parser/V160.php
+     *
+     * Legacy integer mapping
+     *   0 => staffOnly, 1 => staffAndStudent, 2 => staffStudentAndParent
+     */
+    public static function resolveMarkVisibility(int|string $value): string
+    {
+        // Normalise value to trimmed string.
+        $value = trim((string)$value);
+
+        // First deal values expected in exports from Schoolbox >=26.1.
+        if (array_key_exists($value, IAssessable::MARK_VISIBILITY_STRINGS)) {
+            return $value;
+        }
+
+        // Next deal with values expected in exports from Schoolbox <26.1.
+        switch ($value) {
+            case '0':
+                return IAssessable::MARK_VISIBILITY_PRIVATE;
+            case '1':
+                return IAssessable::MARK_VISIBILITY_STUDENT;
+            case '2':
+                return IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
+            // Note IAssessable::MARK_VISIBILITY_PARENT was introduced in 26.1.
+        }
+
+        throw new \UnexpectedValueException("Unknown mark visibility value: $value");
     }
 
 
@@ -290,9 +327,9 @@ class Importer
             ->setDueAt($inUnitSpec ? null : new \Alaress_Date_Format(new \DateTime('+1 day 23:59:59')))
             ->setCloseAt($inUnitSpec ? null : new \Alaress_Date_Format(new \DateTime('+2 day 23:59:59')))
             ->setWeight($settings['weight'])
-            ->setDefaultOpenSpan($settings['defaultOpenSpan'])
+            ->setDefaultOpenSpan($settings['defaultOpenSpan'] ?? null) // This key was not included in exports <25.1.
             ->setMaxAttempts($settings['maxAttempts'])
-            ->setMarkVisibility($settings['markVisibility'])
+            ->setMarkVisibility(self::resolveMarkVisibility($settings['markVisibility']))
             ->setReadingTimeDuration($settings['readingTimeDuration'])
             /* Learnosity-era unlimited durations are represented by zero, not -1
              */
@@ -552,7 +589,7 @@ class Importer
 
             /* Update widgets too
              */
-            foreach ($item['definition']['widgets'] as &$widget) {
+            foreach ($item['definition']['widgets'] ?? [] as &$widget) {
                 if (Exporter::WIDGET_FEATURE === $widget['widget_type']) {
                     $widget['reference'] = $featureMapping[$widget['reference']];
                 } else {
@@ -573,7 +610,7 @@ class Importer
          * rewrite its old identifier and send 50 items at a time
          */
         foreach ($learnosityContent['activities'] as &$activity) {
-            foreach ($activity['data']['items'] as &$item) {
+            foreach ($activity['data']['items'] ?? [] as &$item) {
                 /* These two fields are the same, due to a bug in learnosity they need to co-exist
                  * since learnosity let you make content in an obsolete format without telling you
                  */

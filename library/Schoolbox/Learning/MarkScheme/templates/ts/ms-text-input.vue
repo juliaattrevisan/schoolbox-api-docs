@@ -7,12 +7,10 @@
 import type { SubmissionErrorStates } from "./markScheme";
 
 interface Props {
-    participant: {
-        user: {
-            id: number;
-        };
-    };
+    id: string | number;
+    name?: string;
     submissionErrorStates: SubmissionErrorStates;
+    class?: string;
     tabIndex?: number;
     /**
      * the placeholder text
@@ -35,13 +33,11 @@ interface Props {
      */
     readonly?: boolean;
     /**
-     * The target for alaressValidate, if left blank then it will use the input itself
-     */
-    alaressValidateTarget?: string;
-    /**
      * Options for alaressValidate
      */
     alaressValidateOptions?: Record<string, unknown>;
+    errorPlaceholderSelector?: string;
+    allowInvalidMark?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -60,21 +56,27 @@ async function onMarkChanged(): Promise<void> {
         return;
     }
 
-    /* only persist the mark if it's valid */
-    if (markInputEl.value && $(markInputEl.value).valid()) {
-        const newValue = markInputEl.value.value;
-
-        /* ignore if the mark hasn't _meaningfully_ changed */
-        if ((newValue ?? "") === (mark.value ?? "")) {
-            return;
-        }
-
-        updatingFromInput = true;
-        mark.value = newValue;
-
-        await window.Vue.nextTick();
-        updatingFromInput = false;
+    if (!markInputEl.value) {
+        throw new Error("Unable to find mark input element");
     }
+
+    /* only persist the mark if it's valid (and props.allowInvalidMark is false), still always check validity for validation messages */
+    if (props.alaressValidateOptions && !window.jQuery(markInputEl.value).valid() && !props.allowInvalidMark) {
+        return;
+    }
+
+    const newValue = markInputEl.value.value;
+
+    /* ignore if the mark hasn't _meaningfully_ changed */
+    if ((newValue ?? "") === (mark.value ?? "")) {
+        return;
+    }
+
+    updatingFromInput = true;
+    mark.value = newValue;
+
+    await window.Vue.nextTick();
+    updatingFromInput = false;
 }
 
 /**
@@ -94,23 +96,23 @@ window.Vue.onMounted(() => {
     }
 
     if (!props.readonly) {
-        $(markInputEl.value).combobox(props.submissionErrorStates.map((state) => state.name));
-
-        const validateTarget =
-            (props.alaressValidateTarget ? document.querySelector(props.alaressValidateTarget) : null) ||
-            markInputEl.value.form;
-
-        if (!validateTarget) {
-            throw new Error("Unable to initialise alaressValidate without a form element");
+        if (props.submissionErrorStates.length > 0) {
+            window.jQuery(markInputEl.value).combobox(props.submissionErrorStates.map((state) => state.name));
         }
 
-        // Remove any existing validator, otherwise this will never re-initialise
-        // with the new values... this might be bad if you try to use the element in
-        // a form with other inputs... i'm not sure yet.
-        $.removeData(validateTarget, "validator");
+        if (props.alaressValidateOptions) {
+            if (!markInputEl.value.form) {
+                throw new Error("Unable to initialise alaressValidate without a form element");
+            }
 
-        $(validateTarget).alaressValidate(props.alaressValidateOptions);
-        $(validateTarget).valid(); /* always run upon load */
+            // if it doesn't already have a validator, add one
+            if (!window.jQuery(markInputEl.value.form).data("validator")) {
+                window.jQuery(markInputEl.value.form).alaressValidate();
+            }
+
+            window.jQuery(markInputEl.value).rules("add", props.alaressValidateOptions);
+            window.jQuery(markInputEl.value).valid(); /* always run upon load */
+        }
     }
 
     /**
@@ -132,21 +134,22 @@ window.Vue.onMounted(() => {
 
 <template>
     <input
-        :id="`mark-${props.participant.user.id}`"
+        :id="props.id?.toString() ?? undefined"
         ref="markInputRef"
         :value="mark"
         class="no-margin"
-        name="mark"
+        :class="props.class"
+        :name="props.name"
         type="text"
         :tabindex="props.tabIndex"
         :placeholder="props.placeholder"
         :data-validation-limit="props.limit"
         :maxlength="props.maxLength"
         :title="props.inputTitle"
-        :data-test="`assessment-feedback-mark-input-${props.participant.user.id}`"
-        data-mark-input
+        :data-test="`assessment-feedback-mark-input-${props.id}`"
         data-combobox
         :readonly="props.readonly"
+        :data-error-placeholder-selector="props.errorPlaceholderSelector"
         @change="onMarkChanged"
         @keypress.enter.prevent="onClickEnter"
     />

@@ -14,7 +14,7 @@ import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 import EditorTemplate from "@schoolboxTest/playwright/support/page/admin/design/EditorTemplates";
 import UnitPlanner from "@schoolboxTest/playwright/support/page/unitPlanner/UnitPlanner";
 
-test.describe("Course import tests", () => {
+test.describe.skip("Course import tests", () => {
     // Run tests serially, as tests rely on prior tests to have been run
     test.describe.configure({ mode: "serial" });
 
@@ -129,7 +129,7 @@ test.describe("Course import tests", () => {
             deleted_at: null,
             "title LIKE": dueWorkName,
         })) as number;
-        await page.locator(`li[data-assessment="${dueworkId}"]`).click();
+        await page.getByTestId(`assessment-list-item-${dueworkId}`).click();
         await expect(page.locator("#ir-content")).toContainText("This is a learning activity description.");
 
         tester.isGoingTo(

@@ -28,7 +28,7 @@ a.c-button {
     align-items: center;
     align-self: start; // https://moderncss.dev/css-button-styling-guide/#gotcha-child-of-flex-columns
     background-color: var(--sbx-config-color-accent);
-    border-radius: var(--sbx-config-field-roundness);
+    border-radius: var(--sbx-config-field-corner-radius);
     color: var(--sbx-config-color-accent-text);
     display: inline-flex;
     gap: var(--sbx-size-xs);
@@ -120,7 +120,7 @@ a.c-button {
         }
     }
     &--with-input {
-        border-radius: 0 var(--sbx-config-field-roundness) var(--sbx-config-field-roundness) 0;
+        border-radius: 0 var(--sbx-config-field-corner-radius) var(--sbx-config-field-corner-radius) 0;
         overflow: hidden;
         height: 2.25rem;
         span {

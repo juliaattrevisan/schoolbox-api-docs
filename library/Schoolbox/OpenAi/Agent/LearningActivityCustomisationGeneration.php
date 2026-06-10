@@ -55,7 +55,10 @@ class LearningActivityCustomisationGeneration
             trim($this->config[Config::FIELD_PROVIDER]['value']),
             trim($this->config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
             trim($this->config[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
+            trim($this->config[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_MODEL]['value'] ?? ''),
             trim($this->config[Config::SECTION_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'] ?? ''),
+            trim($this->config[Config::SECTION_GENERAL][Config::FIELD_REASONING_EFFORT]['value'] ?? '') ?: Config::REASONING_EFFORT_OPTION_DEFAULT,
+            trim($this->config[Config::SECTION_GENERAL][Config::FIELD_TEXT_VERBOSITY]['value'] ?? '') ?: Config::TEXT_VERBOSITY_OPTION_DEFAULT,
             $assessable,
             $differentiationProfileModel->getStudent(),
             $course,
@@ -69,7 +72,7 @@ class LearningActivityCustomisationGeneration
 
         $data = json_decode($response->getBody()->getContents(), true);
 
-        $relevantData = $data['output'][0]['content'][0]['text'] ?? null;
+        $relevantData = new ResponseParser()->extractContentText($data);
 
         if (!isset($relevantData)) {
             return [$data['output'] ?? null, 500];

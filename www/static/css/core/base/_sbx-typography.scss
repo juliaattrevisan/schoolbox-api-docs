@@ -17,7 +17,7 @@
 body.sbx-body {
     font-family: var(--sbx-font-primary) !important;
     // then prevent it overriding specific fonts that need to be preserved for icons, barcodes, etc.
-    & *:not(select, option, .barcode-39, .fc-icon, [class*="lg-"], [class*="vjs-"]) {
+    & *:not(select, option, .barcode-39, .fc-icon, [class*="lg-"], [class*="vjs-"], [class*="swiper-"]) {
         font-family: var(--sbx-font-primary) !important;
     }
 
@@ -29,7 +29,7 @@ body.sbx-body {
 
     // Enlarge a bit specifically those subheaders that sit outside islands
     h2.subheader {
-        font-size: var(--sbx-font-size-l);
+        font-size: var(--sbx-font-size-xl);
     }
 
     // Enlarge a bit and remove italic for readability
@@ -68,6 +68,11 @@ body.sbx-body {
         font-size: var(--sbx-font-size-xs);
         font-weight: var(--sbx-font-weight-normal);
         text-transform: none;
+    }
+
+    // Capitalize service status labels to avoid inconsistent capitalization in content entry
+    #service-status-list .label {
+        text-transform: capitalize;
     }
 
     table.rubric th[colspan] {

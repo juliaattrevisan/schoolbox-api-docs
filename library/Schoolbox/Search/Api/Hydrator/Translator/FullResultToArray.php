@@ -53,9 +53,7 @@ class FullResultToArray
             'creator'     => $result->creator
                 ? call_user_func($this->userTranslator, $result->creator)
                 : null,
-            'context'     => isset($result->context)
-                ? array_map($this->folderTranslator, $result->context)
-                : null,
+            'context'     => array_map($this->folderTranslator, $result->context),
             'icon'        => $result->icon,
             '_links'      => $result->links,
         ];

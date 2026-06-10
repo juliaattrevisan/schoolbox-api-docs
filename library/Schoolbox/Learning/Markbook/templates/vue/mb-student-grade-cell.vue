@@ -9,7 +9,9 @@ import {
     ACTIVITY_TYPE_DUE_WORK,
     ACTIVITY_TYPE_LTI_ASSESSMENT,
     ACTIVITY_TYPE_QUIZ,
+    ACTIVITY_TYPE_REPORTING,
 } from "@schoolboxAssessment/Types/assessmentTypes";
+import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 import { useMarkbookStore } from "./store/markbookStore";
 
 interface Props {
@@ -75,6 +77,7 @@ const hasPopOutMenu = window.Vue.computed(() => {
         ACTIVITY_TYPE_QUIZ,
         ACTIVITY_TYPE_DIALOG_AGENT,
         ACTIVITY_TYPE_LTI_ASSESSMENT,
+        ACTIVITY_TYPE_REPORTING,
     ].includes(assessment.value.assessmentType);
 });
 
@@ -190,7 +193,12 @@ async function onClickCell(): Promise<void> {
         }
 
         mbStore.popoutSelectedCell = null;
-        mbStore.setFeedbackSelectedCell(selectedFeedbackInfo);
+
+        /* you must have the ability to either enter a mark or a comment (reporting can disable both at once) */
+        if (aImpl.value.feedbackCommentsEnable || aImpl.value.instructorMarkScheme.mode !== MarkTypeSlug.NONE) {
+            mbStore.setFeedbackSelectedCell(selectedFeedbackInfo);
+        }
+
         return;
     }
 

@@ -2,8 +2,8 @@
 
 namespace Schoolbox\Editor\OpenAI\Payload;
 
+use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Curriculum\Node\Mapper;
-use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -126,16 +126,22 @@ class LessonPlan
      *
      * @param string $openAiEndpoint
      * @param string $openAiModel
-     * @param string $openAiDeploymentId
+     * @param string $azureDeploymentId
+     * @param string $azureDeploymentModel
      * @param string $textSystemPrompt
+     * @param string $reasoningEffort The reasoning effort level from admin config
+     * @param string $textVerbosity The text verbosity level from admin config
      * @param string $language
      * @param Mapper $curriculumNodeMapper
      */
     public function __construct(
         private string $openAiEndpoint,
         private string $openAiModel,
-        private string $openAiDeploymentId,
+        private string $azureDeploymentId,
+        private string $azureDeploymentModel,
         private string $textSystemPrompt,
+        private string $reasoningEffort,
+        private string $textVerbosity,
         private string $language,
         private \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper
     ) {
@@ -269,16 +275,6 @@ class LessonPlan
             $additionalContext,
         );
 
-        /* OpenAI uses the model name from our ui.
-         * Azure uses the Deployment ID instead.
-         * Disgusting.
-         */
-        $model = $this->openAiModel;
-
-        if (Helper::ENDPOINT_TYPE_AZURE === $this->openAiEndpoint) {
-            $model = $this->openAiDeploymentId;
-        }
-
         $payload = [
             /* An ordered list of instructions for OpenAi
              */
@@ -292,11 +288,6 @@ class LessonPlan
                     "content" => $prompt['user'],
                 ],
             ],
-            /* Which variant of OpenAI to use
-             * Each has their own way of producing results in varying ways
-             * (pick one)
-             */
-            "model" => $model,
             /* A kind of OpenAI currency to use in this request
              */
             "max_output_tokens" => self::MAX_OUTPUT_TOKENS,
@@ -310,9 +301,17 @@ class LessonPlan
              */
             "stream" => false,
             'text' => [
-                'format' => $responseFormat
-            ]
+                'format' => $responseFormat,
+            ],
         ];
+
+        if ($this->textVerbosity !== Config::TEXT_VERBOSITY_OPTION_DEFAULT) {
+            $payload['text']['verbosity'] = $this->textVerbosity;
+        }
+
+        if ($this->reasoningEffort !== Config::REASONING_EFFORT_OPTION_DEFAULT) {
+            $payload['reasoning'] = ['effort' => $this->reasoningEffort];
+        }
 
         /* Add in the overarching text system prompt if available
          */
@@ -323,7 +322,13 @@ class LessonPlan
             ]);
         }
 
-        return $payload;
+        return new PayloadFinaliser()->finalise(
+            $payload,
+            $this->openAiEndpoint,
+            $this->openAiModel,
+            $this->azureDeploymentId,
+            $this->azureDeploymentModel,
+        );
     }
 
 

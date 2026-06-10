@@ -330,7 +330,7 @@ export default window.Vue.defineComponent({
 .admin-search-container {
     position: relative;
     > div {
-        border-radius: var(--sbx-config-field-roundness, 0);
+        border-radius: var(--sbx-config-field-corner-radius, 0);
         box-shadow: var(--sbx-shadow-m, 0 2px 4px rgba(0, 0, 0, 0.2));
         position: absolute;
         top: 40px;

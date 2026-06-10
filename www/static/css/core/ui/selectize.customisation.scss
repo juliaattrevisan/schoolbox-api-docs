@@ -77,7 +77,7 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
             padding: 0 0.5rem 0 0.5rem;
             font-size: $selectize-font-size;
             font-weight: $font-weight-normal;
-            border-radius: var(--sbx-config-field-roundness, 3px);
+            border-radius: var(--sbx-config-field-corner-radius, 3px);
             a {
                 padding: 0.5rem !important;
                 width: 1.5rem !important;
@@ -191,7 +191,7 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
 }
 
 .selectize-dropdown {
-    border-radius: var(--sbx-config-field-roundness, 0);
+    border-radius: var(--sbx-config-field-corner-radius, 0);
     padding: var(--sbx-size-xxs, 0);
     // ¯\_(ツ)_/¯
     // (just has to be > .reveal-modal-bg z-index value)

@@ -38,9 +38,6 @@ class UserRulesetTest extends TestCase
     protected function setUp(): void
     {
         $this->markTestSkipped(Sync\Grammar\Factory::class . ' currently relies on database');
-        $this->logger = new Logger(STDOUT, STDERR, Monologger::DEBUG, [], true);
-        $stratFactory = new Sync\Grammar\Factory($this->logger);
-        $this->ruleset = $stratFactory->build(Role::STUDENT);
     }
 
 

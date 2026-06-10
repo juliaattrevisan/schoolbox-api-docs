@@ -77,7 +77,12 @@ function onRemoveSelected(): void {
     <li>
         <div class="node l-flex-row l-flex--justify-space l-flex--center l-flex--no-wrap l-pad-xs--vert">
             <div class="l-flex-row l-flex--no-wrap l-flex--align-center l-gap-xs">
-                <sbx-icon v-if="!props.node.enabled" name="hidden" title="This outcome is disabled" />
+                <sbx-icon
+                    v-if="!props.node.enabled"
+                    name="hidden"
+                    title="This outcome is disabled"
+                    :data-test="`fn-list-node-disabled-${props.node.id}`"
+                />
                 <a
                     v-if="hasCode"
                     class="node__code f-no-margins l-flex__item--0-shrink"
@@ -89,12 +94,14 @@ function onRemoveSelected(): void {
             </div>
             <button
                 v-if="showRemove"
-                class="node__remove f-no-icon-button icon-close l-flex-row l-flex--center l-flex__item--0-shrink"
+                class="node__remove f-no-icon-button sbx-icon-only-button l-flex-row l-flex--center l-flex__item--0-shrink"
                 :aria-label="`Remove [${props.node.code}] ${props.node.name}`"
                 :title="`Remove [${props.node.code}] ${props.node.name}`"
                 :data-test="`fn-list-node-remove-${props.node.id}`"
                 @click.prevent="onRemoveSelected"
-            ></button>
+            >
+                <sbx-icon name="close" size="m" color="currentColor"></sbx-icon>
+            </button>
         </div>
         <template v-if="showChildren">
             <ul>
@@ -113,7 +120,7 @@ function onRemoveSelected(): void {
 
 <style scoped>
 .node:not(:last-child) {
-    border-bottom: 1px solid var(--body-background);
+    border-bottom: 1px solid var(--sbx-color-border, var(--body-background));
 }
 
 .node__code,

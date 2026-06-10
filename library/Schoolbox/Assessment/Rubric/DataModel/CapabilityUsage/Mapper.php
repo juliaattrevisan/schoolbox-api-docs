@@ -10,18 +10,16 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage;
 
 use PDOStatement;
-use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 
 /**
- * Mapper for usage of a rubric capability on a due work.
+ * Mapper for usage of a rubric capability
  *
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model createModel($idValue = null)
- * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
+ * @method GenericCollection<Model> findByColumn($columnName, $columnValue, $options = [])
  */
 class Mapper extends BaseMapper
 {
@@ -34,6 +32,7 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
         $this->uses('max_value', self::TYPE_DECIMAL);
         $this->uses('sequence', self::TYPE_INTEGER);
+
         $this->joins(
             'rubric_capability_id',
             Capability\Mapper::class,
@@ -43,14 +42,15 @@ class Mapper extends BaseMapper
             'capability',
             'capability'
         );
+
         $this->joins(
-            'submission_box_id',
-            SubmissionBoxMapper::class,
+            'rubric_instance_id',
+            \Schoolbox\Assessment\Rubric\Instance\Mapper::class,
             'id',
             null,
             null,
-            'submissionBox',
-            'submission_box'
+            'rubricInstance',
+            'rubricInstance'
         );
     }
 
@@ -63,7 +63,7 @@ class Mapper extends BaseMapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('submission_box', 'sb')},
+                {$this->getJoinColumnString('rubricInstance', 'ri')},
                 {$this->getJoinColumnString('capability', 'c')}
         ";
     }
@@ -76,7 +76,7 @@ class Mapper extends BaseMapper
     {
         return "
             FROM {$this->getTable()}
-            INNER JOIN {$this->getJoinSql('submission_box', '', 'sb', true)}
+            INNER JOIN {$this->getJoinSql('rubricInstance', '', 'ri', true)}
             INNER JOIN {$this->getJoinSql('capability', '', 'c', true)}
         ";
     }
@@ -88,16 +88,20 @@ class Mapper extends BaseMapper
     protected function hydrateSelect(PDOStatement $statement): GenericCollection
     {
         $collection = $this->createCollection();
+
         foreach ($statement as $row) {
             $usage = $this->hydrate($row);
-            /** @var SubmissionBox $submissionBox */
-            $submissionBox = $this->hydrateJoin($row, 'submission_box', 'sb');
+
+            /** @var \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance */
+            $rubricInstance = $this->hydrateJoin($row, 'rubricInstance', 'ri');
+
             /** @var Capability\Model $capability */
             $capability = $this->hydrateJoin($row, 'capability', 'c');
+
             $usage
-                ->setSubmissionBox($submissionBox)
-                ->setCapability($capability)
-            ;
+                ->setRubricInstance($rubricInstance)
+                ->setCapability($capability);
+
             $collection->add($usage);
         }
         return $collection;

@@ -186,7 +186,7 @@ class RendererTest extends TestCase
      */
     protected function buildFieldStrategyFactory(): FieldStrategyFactory
     {
-        /** @var MapperFactory|MockObject $mockMapperFactory */
+        /** @var MockObject $mockMapperFactory */
         $mockMapperFactory = $this->createMock(MapperFactory::class);
 
         $mockGradeMapper = $this->buildMockGradeMapper();
@@ -256,7 +256,7 @@ class RendererTest extends TestCase
             $groupModels[$groupId]->setGradeLevels(new GenericCollection(GradeLevel\Model::class, $gradeModels));
         }
 
-        /** @var Group\Mapper|MockObject $mockGradeMapper */
+        /** @var Group\Mapper&MockObject $mockGradeMapper */
         $mockGradeMapper = $this->createMock(Group\Mapper::class);
         $mockGradeMapper
             ->method('findAll')

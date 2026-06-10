@@ -125,7 +125,7 @@ class Module extends BaseModule
 
 
     /**
-     * @return \Schoolbox\Mapper|News\Mapper
+     * @return News\Mapper
      * @throws InvalidArgumentException
      */
     private function getArticleMapper(): News\Mapper
@@ -135,7 +135,7 @@ class Module extends BaseModule
 
 
     /**
-     * @return News\Audience\Segment\StrategyFactory|object
+     * @return News\Audience\Segment\StrategyFactory
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     private function getStrategyFactory(): News\Audience\Segment\StrategyFactory

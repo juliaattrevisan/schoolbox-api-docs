@@ -1,0 +1,89 @@
+import type { MarkScheme } from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/markScheme";
+
+// TODO: refine these along with builderTypes.ts, the assessment API, etc
+
+/**
+ * @see /library/Schoolbox/Assessment/Rubric/Grid/Translator/ModelToArray/Base.php
+ */
+export type RubricGrid = {
+    id: number; // currently the assessment ID
+    title: string;
+    weight: number | null;
+    levels: RubricGridLevel[];
+    /** A derived maximum value for the rubric, calculated from its capabilities */
+    derivedMaxValue: number;
+    capabilities: RubricGridCapability[];
+    capabilityMarkScheme: MarkScheme;
+};
+
+export type RubricGridLevel = {
+    id: number;
+    /** Level name, scrubbed in the backend */
+    name: string;
+};
+
+export type RubricGridCapability = {
+    id: number;
+    /** Capability name, scrubbed in the backend */
+    name: string;
+    maxValue: number | null;
+    /** A derived maximum value for the capability, calculated from its indicators */
+    derivedMaxValue: number;
+    /**
+     * Should capability marks show for the given capability usage?
+     *
+     * Marks will only show if:
+     * - this grid is on an activity which supports mark-per-capability
+     * - the max value for this grid's usage of `$capability` is > 0
+     *
+     * TODO: how required is this, especially with grid.capabilityMarkType being checkable
+     */
+    showCapabilityMark: boolean;
+    indicators: RubricGridIndicator[];
+};
+
+export type RubricGridIndicator = {
+    id: number;
+    /** Indicator name, scrubbed in the backend */
+    name: string;
+    descriptors: (RubricGridDescriptor | null)[];
+};
+
+export type RubricGridDescriptor = {
+    id: number;
+    /** Descriptor description, scrubbed in the backend */
+    description: string | null;
+    value:
+        | { left: number; right: number } // if using mark range
+        | { max: number } // no mark range, just show max value
+        | null; // if no value, or if no access to see the value
+};
+
+/**
+ * @see /library/Schoolbox/Assessment/Rubric/MarkedGrid/Translator/ModelToArray.php
+ */
+export type RubricMarkedGrid = {
+    rubricId: RubricGrid["id"];
+    /**
+     * the overall human-readable mark given
+     * null if it shouldn't be displayed / doesn't exist (e.g. for self assessment feedback, if feedback.isSelfGrading is false)
+     */
+    humanReadableMark: string | null;
+    normalisedMark: number | null;
+    capabilities: RubricMarkedGridCapability[];
+};
+
+export type RubricMarkedGridCapability = {
+    id: RubricGridCapability["id"];
+    humanReadableMark: string | null;
+    value: string | null; // Form value (capabilityMark.retrieveHumanReadableValueAsFormInput)
+    scaledMark: number | null;
+    indicators: RubricMarkedGridIndicator[];
+};
+
+export type RubricMarkedGridIndicator = {
+    id: RubricGridIndicator["id"];
+    value: number | null;
+    /** The selected descriptor ID, if any */
+    descriptorId: RubricGridDescriptor["id"] | null;
+};

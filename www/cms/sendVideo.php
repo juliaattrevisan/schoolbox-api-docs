@@ -13,6 +13,7 @@ use Alaress\Exception\UnreachableException;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\Filesystem;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\File\Mimetype;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -46,8 +47,8 @@ if (isset($_GET['hash'])) {
 // OTFS
 // --------------------------------------------------------------------------------------------------------------------
 
-$type = $_GET['type'];
-$id   = $_GET['id'];
+$type = $_GET['type'] ?? null;
+$id   = $_GET['id'] ?? null;
 
 if (isset($type) && isset($id)) {
     /** @var SitePage $page */
@@ -235,6 +236,8 @@ if (isset($type) && isset($id)) {
         flush();
         ob_flush();
     }
+} else {
+    error(ErrorMapper::ERROR_FILE_NOT_FOUND, code: 404);
 }
 
 /**

@@ -584,13 +584,16 @@ td {
     }
 
     span {
+        align-items: center;
+        display: inline-flex;
         position: absolute;
-        top: 0.2rem;
-        line-height: 1.625rem;
+        top: 50%;
+        line-height: normal;
         font-weight: 100;
         text-transform: uppercase;
         font-size: rem-calc($base-font-size - 3);
         text-indent: 0;
+        transform: translateY(-50%);
         transition: opacity $switch-paddle-transition-speed $switch-paddle-transition-ease;
     }
 }
@@ -756,7 +759,7 @@ td {
     line-height: 2;
     text-align: left;
     transition: all 0.1s ease-in;
-    i {
+    :is(i, sbx-icon) {
         @extend .size-32;
         color: var(--sbx-config-color-accent, $content-ui-foreground);
         padding-right: 0.35rem;
@@ -772,12 +775,16 @@ td {
 input[type="radio"] {
     + .block {
         @extend .button-block;
+
+        :is(i, sbx-icon) {
+            padding-right: 1rem;
+        }
     }
     &:checked + .block {
         background-color: var(--sbx-config-color-accent, $content-ui-foreground);
         border: $input-border-width solid var(--sbx-config-color-accent, $content-ui-foreground);
         color: $content-ui-selected;
-        i {
+        :is(i, sbx-icon) {
             color: $content-ui-selected;
         }
     }
@@ -818,6 +825,11 @@ input[type="radio"] {
             background-color: $hover-background-color;
         }
 
+        sbx-icon {
+            margin-right: 0;
+            vertical-align: middle;
+        }
+
         [class^="icon-"]:before {
             padding-right: 0;
         }
@@ -827,7 +839,8 @@ input[type="radio"] {
         + #{$label-selector} {
             background-color: $active-color;
             color: $active-text-color;
-            [class^="icon-"] {
+            [class^="icon-"],
+            sbx-icon {
                 color: $active-text-color;
             }
         }
@@ -843,47 +856,6 @@ input[type="checkbox"].plain {
 
 .checklist .checklist {
     margin-left: 2rem;
-}
-
-// Checklist Container
-.checklist.checklist-container {
-    padding: 0;
-    max-height: 13rem;
-    border: $fieldset-border-width $fieldset-border-style var(--sbx-config-color-accent, $input-border-color);
-    overflow-y: auto;
-
-    input[type="checkbox"]:not(.plain):not(:disabled) {
-        border: none;
-        display: none;
-
-        &:checked + label {
-            background: $content-ui-background;
-            &:hover {
-                background: css-lighten($content-ui-background, 3%);
-            }
-        }
-
-        + label {
-            border-bottom: 1px solid var(--sbx-config-color-accent, $input-border-color);
-            margin: 0;
-            padding: 0.5rem 0 0.5rem 2.5rem;
-            width: 100%;
-
-            &:after,
-            &:before {
-                margin: 0.5rem 0 0.5rem 0.5rem;
-            }
-
-            &:hover {
-                cursor: pointer;
-                background: $content-ui-background;
-            }
-        }
-    }
-
-    .checklist-wrapper {
-        position: relative;
-    }
 }
 
 .toggle-set {

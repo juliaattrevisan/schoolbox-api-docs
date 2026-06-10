@@ -9,21 +9,17 @@ import type { SubmissionErrorStates } from "./markScheme";
 const LIMIT = 100;
 
 interface Props {
+    id: string | number;
+    name?: string;
     submissionErrorStates: SubmissionErrorStates;
-    participant: {
-        user: {
-            id: number;
-        };
-    };
     tabIndex?: number;
     /**
      * Should this form input be rendered as readonly?
      */
     readonly?: boolean;
-    /**
-     * The target for alaressValidate, if left blank then it will use the input itself
-     */
-    alaressValidateTarget?: string;
+    class?: string;
+    errorPlaceholderSelector?: string;
+    allowInvalidMark?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -32,27 +28,24 @@ const mark = defineModel<string | null>("mark", { required: true });
 
 <template>
     <ms-text-input
+        :id="props.id"
         v-model:mark="mark"
-        :participant="props.participant"
+        :name="props.name"
         :submission-error-states="props.submissionErrorStates"
+        :class="props.class"
         :tab-index="props.tabIndex"
         :placeholder="props.readonly ? '(no mark given)' : 'Percentage mark'"
         :limit="LIMIT"
         :max-length="48"
         input-title="Percentage"
         :readonly="props.readonly"
-        :alaress-validate-target="props.alaressValidateTarget"
         :alaress-validate-options="{
-            rules: {
-                mark: {
-                    withinPercentageRange: true,
-                },
-            },
+            withinPercentageRange: true,
             messages: {
-                mark: {
-                    withinPercentageRange: `The grade must be between 0 and ${LIMIT}.`,
-                },
+                withinPercentageRange: `The grade must be between 0 and ${LIMIT}.`,
             },
         }"
+        :error-placeholder-selector="props.errorPlaceholderSelector"
+        :allow-invalid-mark="props.allowInvalidMark"
     />
 </template>

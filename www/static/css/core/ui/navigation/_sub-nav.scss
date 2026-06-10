@@ -136,7 +136,7 @@ $sub-nav-item-divider-margin: rem-calc(12) !default;
             @include button-dimensions();
             color: var(--sbx-config-color-accent, $content-ui-foreground);
             background-color: $content-ui-background;
-            display: inline-block;
+            display: inline-flex;
 
             &:hover {
                 color: var(--sbx-config-color-accent, $content-ui-foreground);

@@ -3,8 +3,8 @@
 namespace Schoolbox\Editor\OpenAI\Payload;
 
 use Schoolbox\Admin\DifferentiationProfiles\Model;
+use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Collection;
-use Schoolbox\Editor\OpenAI\Helper;
 
 class DifferentiationProfile
 {
@@ -91,12 +91,25 @@ class DifferentiationProfile
 
     /**
      * Constructor.
+     *
+     * @param string     $openAiEndpoint
+     * @param string     $openAiModel
+     * @param string     $azureDeploymentId
+     * @param string     $azureDeploymentModel
+     * @param string     $systemPrompt The system prompt from admin config
+     * @param string     $reasoningEffort The reasoning effort level from admin config
+     * @param string     $textVerbosity The text verbosity level from admin config
+     * @param string     $documentContent
+     * @param Collection $enabledFields
      */
     public function __construct(
         private string $openAiEndpoint,
         private string $openAiModel,
-        private string $openAiDeploymentId,
+        private string $azureDeploymentId,
+        private string $azureDeploymentModel,
         private string $systemPrompt,
+        private string $reasoningEffort,
+        private string $textVerbosity,
         private string $documentContent,
         private Collection $enabledFields,
     ) {
@@ -104,14 +117,6 @@ class DifferentiationProfile
 
     public function generate(): array
     {
-        /* OpenAI uses the model name from our ui.
-         * Azure uses the Deployment ID instead.
-         */
-        $model = $this->openAiModel;
-        if (Helper::ENDPOINT_TYPE_AZURE === $this->openAiEndpoint) {
-            $model = $this->openAiDeploymentId;
-        }
-
         $responseFormat = $this->getResponseFormat();
 
         /* Replacing the token with the config setting defined prompt
@@ -126,7 +131,6 @@ class DifferentiationProfile
         $userPrompt = $this->generateUserPrompt();
 
         $payload = [
-            'model'             => $model,
             'temperature'       => self::TEMPERATURE,
             'top_p'             => self::TOP_P,
             'max_output_tokens' => self::MAX_OUTPUT_TOKENS,
@@ -142,10 +146,25 @@ class DifferentiationProfile
             ],
             'stream'            => false,
             'text'              => [
-                'format' => $responseFormat
+                'format' => $responseFormat,
             ],
         ];
-        return $payload;
+
+        if ($this->textVerbosity !== Config::TEXT_VERBOSITY_OPTION_DEFAULT) {
+            $payload['text']['verbosity'] = $this->textVerbosity;
+        }
+
+        if ($this->reasoningEffort !== Config::REASONING_EFFORT_OPTION_DEFAULT) {
+            $payload['reasoning'] = ['effort' => $this->reasoningEffort];
+        }
+
+        return new PayloadFinaliser()->finalise(
+            $payload,
+            $this->openAiEndpoint,
+            $this->openAiModel,
+            $this->azureDeploymentId,
+            $this->azureDeploymentModel,
+        );
     }
 
     /**

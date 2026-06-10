@@ -40,6 +40,7 @@ class Module extends BaseModule
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasRole(Role::STAFF)
+                // TODO Replace with Learning/Authorizer/Rule/IsInstructorOrHasHomepageAccess() I suppose
                 // TODO: instructors (non-staff) mangaging rubrics they have acess to? otherwise they hit a 403
             )
         );
@@ -50,10 +51,10 @@ class Module extends BaseModule
         };
 
         // Download/upload rubric actions
-        $this->register('POST', '', 'create', $permission);
-        $this->register('POST', '/csv', 'download', $permission);
+        $this->register('POST', '', 'postCreate', $permission);
+        $this->register('POST', '/csv', 'postDownload', $permission);
         $this->register('POST', '/determineMarkInvalidation', 'determineMarkInvalidation', $permission);
-        $this->register('POST', '/import/{storageTuple}', 'import', $permission, $filePreload);
+        $this->register('POST', '/import/{storageTuple}', 'postImport', $permission, $filePreload);
     }
 
 
@@ -81,6 +82,7 @@ class Module extends BaseModule
             $this->injector->get('l10n'),
             $this->getMapperFactory()->get(MarkTypeMapper::class),
             $this->getMapperFactory()->get(GradeGroupMapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Assessment\Rubric\Instance\Mapper::class)
         );
     }
 }

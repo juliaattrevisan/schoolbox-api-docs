@@ -10,8 +10,11 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Grid;
 
 use Alaress\Specification\NotEmpty;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Rubric\RowSet\Capability;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Mapper\Exception;
 
 /**
  * Class Factory
@@ -19,43 +22,102 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 class Factory
 {
     /**
+     * Frontend encodes a rubric grid into a json string and sends multiple grids at a time, in each $_POST request.
+     * You can get to each grid's payload via its rubric_instance.id but you have to manufacture the index itself.
+     */
+    public const string RUBRIC_PAYLOAD_INDEX = 'rubric[%d]';
+
+
+    /**
+     * @var MarkTypeMapper
+     */
+    private MarkTypeMapper $markTypeMapper;
+
+
+    /**
+     * @var GradeLevel\Group\Mapper
+     */
+    private GradeLevel\Group\Mapper $gradeGroupMapper;
+
+
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        $this->markTypeMapper = MarkTypeMapper::getInstance();
+        $this->gradeGroupMapper = GradeLevel\Group\Mapper::getInstance();
+    }
+
+
+    /**
      * Port of `\Schoolbox\Assessment\Rubric\Factory::buildFromPostData`,
      * but builds a `Grid` object instead.
      *
-     * @param Grid  $grid A grid (which already contains an assessment and rowset)
-     * @param array $postData
+     * @param Grid $grid A grid (which already contains an assessment and rowset)
+     * @param array $rubricData
      * @param bool $validate Whether to run the backend validation on this data
      *                       - should be FALSE for CSV import and export, as
      *                       attempting to import/export an invalid grid should
      *                       still succeed even if saving it will not.
      * @return Grid
-     * @throws \InvalidArgumentException
+     * @throws Exception
      * @see /library/Schoolbox/Assessment/Rubric/templates/vue/payload.ts
      */
-    public function buildFromPostData(Grid $grid, array $postData, bool $validate = true): Grid
-    {
-        // we're only going to take the first one... this could be converted to foreach easily enough
-        $rubricData   = reset($postData);
+    public function buildFromPostData(
+        Grid $grid,
+        array $rubricData,
+        bool $validate = true
+    ): Grid {
+        /* The rubric instance corresponding to $grid might be a stub. That means it's a new grid and we actually need
+         * to hydrate it with the settings from the frontend payload.
+         *
+         * Actually
+         * even for rubric_instances that already existed, we still need to potentially update any/all of its settings.
+         * That means we have to do this regardless. Wild.
+         */
+        $newCapabilityMarkType = $this->markTypeMapper->createModel()
+            ->setId(MarkType::slugToId($rubricData['capabilityMarkType']))
+            /* Unbelievably, this slug is needed in the Export To CSV functionality. What a secret!
+             */
+            ->setSlug($rubricData['capabilityMarkType']);
 
-        $assessment    = $grid->getAssessment();
-        $levels        = $rubricData['level']      ?? [];
-        $capabilities  = $rubricData['group']      ?? [];
-        $indicators    = $rubricData['criterion']  ?? [];
-        $descriptors   = $rubricData['descriptor'] ?? [];
+        $newCapabilityGradeGroup = $this->gradeGroupMapper->createModel()
+            ->setId($rubricData['capabilityGradeGroup']);
+
+        $grid->getRubricInstance()
+            ->setTitle($rubricData['title'])
+            ->setWeight($rubricData['weight'])
+            ->setCapabilityMarkType($newCapabilityMarkType)
+            ->setCapabilityGradeGroup($newCapabilityGradeGroup)
+            ->setMarkedUsingRange($rubricData['useMarkRange'] ?? false);
+
+        /* The post payload contains all the rubric grids associated with an assessment but we only need to look at one
+         * grid for now since we've decided that any of the N grids could cause invalidation and thus exit early.
+         *
+         * These are the new settings that came from the ui
+         */
+        $levels = $rubricData['level'] ?? [];
+        $capabilities = $rubricData['group'] ?? [];
+        $indicators = $rubricData['criterion'] ?? [];
+        $descriptors = $rubricData['descriptor'] ?? [];
         $usesMarkRange = $rubricData['useMarkRange'] ?? false;
-        $markPerCap    = false;
 
-        if ($assessment instanceof DueWork) {
-            $markPerCap    = $assessment->isMarkPerCapability();
-        }
+        /* This was originally an assessment property but it's actually on the rubric instance now and isn't part of
+         * the $_POST['rubric'] node, which is a bit interesting
+         */
+        $markPerCap = $grid->getRubricInstance()->isMarkPerCapability();
 
         // Rebuild the set of levels from scratch each time
         $newLevels = $grid->getLevels()->emptyClone();
+
         foreach ($levels as $levelSequence => $level) {
             $levelName = $level['name'];
-            $levelId   = filter_var($level['id'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+            $levelId = filter_var($level['id'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+
             $newLevels->add((new Level())->setName($levelName)->setId($levelId));
         }
+
         $grid->setLevels($newLevels);
 
         // Must assume that all capabilities in formdata exist:
@@ -65,6 +127,7 @@ class Factory
 
         // Which capabilities are actually in use?
         $capabilityIdsInUse = [];
+
         foreach ($indicators as $indicator) {
             if (isset($indicator['on'])) {
                 $capabilityIdsInUse[$indicator['groupId']] = true;
@@ -76,13 +139,16 @@ class Factory
         /** @var Capability[] $capabilityCache */
         $capabilityCache     = [];
         $newCapabilityUsages = $grid->getCapabilityUsages()->emptyClone();
+
         foreach ($capabilities as $capabilityData) {
             // This capability must exist and be in use in order for it to be saved
             $capabilityId   = (int)$capabilityData['id'];
             $capabilityName = $capabilityData['name'];
+
             if (!$capabilityId) {
                 continue;
             }
+
             if (empty($capabilityIdsInUse[$capabilityId])) {
                 continue;
             }
@@ -92,12 +158,13 @@ class Factory
 
             if ($validate) {
                 $capabilityMaxSpec = new ValidCapabilityMax($markPerCap);
+
                 if (!$capabilityMaxSpec->isSatisfiedBy($capabilityMaxValue)) {
                     throw new \InvalidArgumentException('Please provide capability maximum points that are numeric and equal to or greater than 0');
                 }
             }
 
-            $capability         = $grid->getRowSet()->retrieveCapability($capabilityId);
+            $capability = $grid->getRowSet()->retrieveCapability($capabilityId);
 
             // If $group is null, then that's a problem; we're trying to save
             // usage for a group which doesn't exist
@@ -112,6 +179,7 @@ class Factory
             $capabilityCache[$capabilityId]     = $capability;
             $newCapabilityUsages[$capabilityId] = $capabilityUsage;
         }
+
         $grid->setCapabilityUsages($newCapabilityUsages);
 
 
@@ -121,6 +189,7 @@ class Factory
             $indicatorId      = (int)$indicatorData['id'];
             $indicatorName    = $indicatorData['name'];
             $indicatorEnabled = isset($indicatorData['on']) && $indicatorData['on'];
+
             if (!$indicatorEnabled) {
                 continue;
             }
@@ -152,15 +221,15 @@ class Factory
                 $descriptorValue = $descriptor['points'];
 
                 if ('' !== $descriptorText || '' !== $descriptorValue) {
-                    $indicatorUsage->getDescriptors()[$levelSequence] =
-                        (new Descriptor())
-                            ->setId($descriptorId)
-                            ->setDescription($descriptorText);
+                    $indicatorUsage->getDescriptors()[$levelSequence] = (new Descriptor())
+                        ->setId($descriptorId)
+                        ->setDescription($descriptorText);
 
                     // Validate descriptor
                     if ($validate) {
                         $descriptorSpec = new ValidDescriptor($usesMarkRange);
-                        if (! $descriptorSpec->isSatisfiedBy($descriptorValue)) {
+
+                        if (!$descriptorSpec->isSatisfiedBy($descriptorValue)) {
                             throw new \InvalidArgumentException('Please use positive numbers only, and disable Mark Range to use decimal places in descriptor point values');
                         }
                     }
@@ -173,26 +242,31 @@ class Factory
             // Validate sequence of descriptor points
             if ($validate) {
                 $notEmptySpec = new NotEmpty();
+
                 if (!$notEmptySpec->isSatisfiedBy($indicatorUsage->getDescriptors())) {
                     throw new \InvalidArgumentException('You require at least one non-empty descriptor in each selected indicator');
                 }
+
                 $monotonicDescriptorRowSpec = new ValidMonotonicDescriptorRow($usesMarkRange);
+
                 if (!$monotonicDescriptorRowSpec->isSatisfiedBy($indicatorUsage->getDescriptors())) {
                     throw new \InvalidArgumentException('Please only use descriptor values that form an ascending or descending sequence within a row');
                 }
             }
 
-            $capabilityUsage                                     = $grid->retrieveCapabilityUsage($capability);
+            $capabilityUsage = $grid->retrieveCapabilityUsage($capability);
             $capabilityUsage->getIndicatorUsages()[$indicatorId] = $indicatorUsage;
         }
 
 
-        // Validate if an indicator is used
-        if ($validate) {
-            $gridSpec = new ValidRubricGrid();
-            if (!$gridSpec->isSatisfiedBy($grid)) {
-                throw new \InvalidArgumentException('Please have at least one selected indicator if using a rubric');
-            }
+        /* If backend validation was requested check that $grid is in a functional state
+         * This mainly involves checking that at least one indicator was selected.
+         *
+         * Note that Andy left a spec pattern inheritance tree that prevents meaningful typesafety; I'm minded to just
+         * delete that entire idea wholesale someday.
+         */
+        if ($validate && !(new ValidRubricGrid())->isSatisfiedBy($grid)) {
+            throw new \InvalidArgumentException('Please have at least one selected indicator if using a rubric');
         }
 
 
@@ -200,6 +274,7 @@ class Factory
         // If no value was passed: use calculated value
         foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
             $capabilityMaxValue = $capabilityUsage->getMaxValue();
+
             if (null === $capabilityMaxValue) {
                 $capabilityUsage->setMaxValue($capabilityUsage->calculateMaxValueFromIndicators());
             }

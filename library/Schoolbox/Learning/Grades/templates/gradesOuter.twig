@@ -47,10 +47,10 @@
         {% if subject.teachers|length or canViewInstructorMarks %}
         <ul class="meta">
             {% if subject.teachers|length %}
-                <li class="icon-teacher">Teacher(s): {% for teacher in subject.teachers %}<a href="/search/user/{{ teacher.id }}" title="View Profile">{{ teacher.fullName }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</li>
+                <li><sbx-icon name="teacher" color="var(--sbx-color-text-secondary)"></sbx-icon>Teacher(s): {% for teacher in subject.teachers %}<a href="/search/user/{{ teacher.id }}" title="View Profile">{{ teacher.fullName }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</li>
             {% endif %}
             {% if canViewInstructorMarks %}
-                <li data-has-student-view-meta class="icon-teacher">Teacher view</li>
+                <li data-has-student-view-meta><sbx-icon data-has-student-view-meta-icon name="teacher" color="var(--sbx-color-text-secondary)"></sbx-icon>Teacher view</li>
             {% endif %}
         </ul>
         {% endif %}

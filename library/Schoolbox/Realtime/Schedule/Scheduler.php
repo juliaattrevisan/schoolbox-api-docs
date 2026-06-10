@@ -21,7 +21,7 @@ use Alaress\Redis\Async\Event\Message;
 use Alaress\Redis\Async\EventListener;
 use Alaress\Scheduler\AbstractScheduler;
 use Alaress\Scheduler\Trigger\TriggerInterface;
-use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
+use Alaress\WorkerCrew\Pooling\DispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use ErrorException;
 use InvalidArgumentException;
@@ -43,18 +43,6 @@ use Schoolbox\User;
  */
 class Scheduler extends AbstractScheduler implements IConsumer, EventListener
 {
-    /**
-     * Default maximum amount of time in the future to schedule triggers for, in
-     * seconds.
-     *
-     * Assumes that the time between when the daemon is restarted (and thus
-     * reloads previously stored but not scheduled notifications) is less than
-     * this.
-     *
-     * Eventually, this will become configurable.
-     */
-    public const int DEFAULT_MAX_FUTURE_TRIGGER_TIME = 60 * 60 * 24 * 7;
-
     /**
      * @param LoopInterface             $loop
      * @param DispatchStrategyInterface $dispatchStrategy
@@ -143,6 +131,9 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
             }
 
             // attempt to schedule this trigger - there are a fair few things that could go wrong...
+            // This uses the scheduler's configuration:
+            // getMaxQueueLength, getWarningQueueLength, getQueueDelay only AFAICT,
+            // but also protocol and supported actions?
             $this->scheduleNotification($trigger, $resolver);
 
             // notice that we don't acknowledge the resolver here before returning
@@ -265,6 +256,6 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
      */
     protected function getMethod()
     {
-        return DefaultDispatchStrategy::TASK_PUBLISH;
+        return DispatchStrategy::TASK_PUBLISH;
     }
 }

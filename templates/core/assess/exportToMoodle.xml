@@ -1,5 +1,9 @@
 <?xml version="1.0" ?>
 <quiz>
+    <!-- Export is currently DISABLED (see www/assess/export/xml.php). This version is stale:
+         as of SA-22007 mark_visibility is a string, not an int, but the 17.0 import parser
+         (Assess\Import\Parser\V160) casts it to int. Bump this version and add a matching
+         parser before reviving export, or string visibilities will be silently lost. -->
     <version>17.0</version>
     <title>{ASSESS_TITLE}</title>
     <worktype>{ASSESS_WORKTYPE}</worktype>

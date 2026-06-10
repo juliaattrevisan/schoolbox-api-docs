@@ -35,20 +35,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     public const SELF_REVIEWABILITY_REFLECT_ONLY = 'reflect-only'; // learner can only reflect on their work, but not give grades
     public const SELF_REVIEWABILITY_FULL         = 'full';         // learner can give reflect and give grades
 
-    public const MARK_VISIBILITY_STAFF_ONLY           = 0;
-    public const MARK_VISIBILITY_STAFF_AND_STUDENT    = 1;
-    public const MARK_VISIBILITY_STAFF_STUDENT_PARENT = 2;
-
-    //Mark Visibility strings
-    public const MARK_VISIBILITY_STAFF_ONLY_STRING = 'Staff Only';
-    public const MARK_VISIBILITY_STAFF_AND_STUDENT_STRING = 'Staff & Student';
-    public const MARK_VISIBILITY_STAFF_STUDENT_PARENT_STRING = 'Staff, Student & Parent';
-    public const MARK_VISIBILITY_STRINGS = [
-        0 => self::MARK_VISIBILITY_STAFF_ONLY_STRING,
-        1 => self::MARK_VISIBILITY_STAFF_AND_STUDENT_STRING,
-        2 => self::MARK_VISIBILITY_STAFF_STUDENT_PARENT_STRING,
-    ];
-
     /**
      * @var int|null
      */
@@ -181,7 +167,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     protected $markedUsingRange;
 
     /**
-     * @var int
+     * @var string
      */
     protected $mark_visibility;
 
@@ -256,7 +242,10 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
      */
     public function isMarkShownToParents()
     {
-        return $this->getMarkVisibility() == IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
+        return in_array(
+            $this->getMarkVisibility(),
+            [IAssessable::MARK_VISIBILITY_PARENT, IAssessable::MARK_VISIBILITY_PARENT_STUDENT]
+        );
     }
 
     /**
@@ -276,24 +265,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
             return true;
         }
         return false;
-    }
-
-    /**
-     * What is the plaintext visibility of this submission box
-     *
-     * @return string
-     */
-    public function getMarkVisibilityDescription()
-    {
-        switch ($this->getMarkVisibility()) {
-            case IAssessable::MARK_VISIBILITY_PRIVATE:
-                return 'Staff Only';
-            case IAssessable::MARK_VISIBILITY_STUDENT:
-                return 'Staff and Students';
-            case IAssessable::MARK_VISIBILITY_PARENT_STUDENT:
-                return 'Staff, Students and Parents';
-        }
-        return '';
     }
 
     /**
@@ -560,7 +531,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
 
 
     /**
-     * @param  int $mark_visibility
+     * @param  string $mark_visibility
      * @return $this
      */
     public function setMarkVisibility($mark_visibility)
@@ -570,7 +541,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getMarkVisibility()
     {

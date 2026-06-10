@@ -310,7 +310,7 @@ button.submit {
     @extend .button;
     background: $white;
     border: 1px solid $form-border-color;
-    border-radius: var(--sbx-config-field-roundness, 0);
+    border-radius: var(--sbx-config-field-corner-radius, 0);
     color: var(--sbx-config-color-accent, $content-ui-foreground);
     cursor: text;
     font-size: 0.8rem;
@@ -341,7 +341,7 @@ button.submit {
 .sbx-icon-only-button {
     align-items: center;
     background: none;
-    border-radius: var(--sbx-config-field-roundness, 0);
+    border-radius: var(--sbx-config-field-corner-radius, 0);
     display: inline-flex;
     font-size: 0; // hide any text content, but keep the button dimensions
     justify-content: center;
@@ -388,8 +388,8 @@ button.submit {
 
 // a button with only SVG icons that displays inline with text
 .f-dropdown :is(a, button).sbx-button--has-icon {
-    display: flex;
     align-items: flex-start;
+    display: flex;
     gap: var(--spacing-s);
     justify-content: left;
 }
@@ -398,8 +398,8 @@ button.submit {
     line-height: 1;
 }
 .sbx-button--has-icon {
-    display: inline-flex;
     align-items: center;
+    display: inline-flex;
     gap: var(--spacing-s);
 }
 .button.sbx-button--has-icon {

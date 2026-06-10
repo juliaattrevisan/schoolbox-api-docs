@@ -55,7 +55,7 @@
 input[type="color"] {
     background-color: var(--sbx-color-foreground-primary);
     border-color: var(--sbx-config-color-accent);
-    border-radius: var(--sbx-config-field-roundness, var(--roundness-form-elements));
+    border-radius: var(--sbx-config-field-corner-radius, var(--roundness-form-elements));
 }
 
 /**
@@ -73,7 +73,7 @@ hr {
     &__input::-webkit-slider-runnable-track {
         background-color: var(--sbx-color-foreground-primary);
         border: var(--sbx-size-form-element-border-width) solid var(--sbx-config-color-accent);
-        border-radius: var(--sbx-config-field-roundness, 0);
+        border-radius: var(--sbx-config-field-corner-radius, 0);
     }
     &__input::-webkit-slider-thumb {
         background-color: var(--sbx-config-color-accent);

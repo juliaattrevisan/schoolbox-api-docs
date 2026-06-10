@@ -119,6 +119,7 @@ foreach ($componentFactory->getDefinitionList('component_category') as $definiti
         'COMPONENT_ID'             => $definitionId,
         'COMPONENT_DESCRIPTION'    => $definition->getDescription(),
         'COMPONENT_CLASS'          => $definition->getCssClass(),
+        'COMPONENT_ICON'           => $definition->getPaletteIconName(),
         'COMPONENT_MULTIPLE_STATE' => $multiState,
         'COMPONENT_NAME'           => $definition->getName(),
         'COMPONENT_CATEGORY_NAME'  => $definition->getComponentCategoryName(),

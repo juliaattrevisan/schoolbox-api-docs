@@ -87,7 +87,7 @@ class Model implements IAssessableDataModel, ISoftDeletable
     /**
      * Mark visibility
      */
-    private ?int $markVisibility = null;
+    private ?string $markVisibility = null;
 
     /**
      * @return string|null
@@ -234,18 +234,18 @@ class Model implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @return int|null
+     * @return string|null
      */
-    public function getMarkVisibility(): ?int
+    public function getMarkVisibility(): ?string
     {
         return $this->markVisibility;
     }
 
     /**
-     * @param int|null $markVisibility
+     * @param string|null $markVisibility
      * @return $this
      */
-    public function setMarkVisibility(?int $markVisibility): self
+    public function setMarkVisibility(?string $markVisibility): self
     {
         $this->markVisibility = $markVisibility;
         return $this;

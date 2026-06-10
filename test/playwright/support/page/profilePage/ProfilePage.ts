@@ -31,6 +31,12 @@ export default class ProfilePage {
 
     static readonly SELECTOR_FEEDBACK_FILTER = 'label[for="filter-feedback"]';
 
+    static readonly DATA_TEST_PROFILE_DOT_BUTTON = "sbx-pop-out-header-options-button";
+
+    static readonly DATA_TEST_PROFILE_DOT_MENU = "profile-header-options";
+
+    static readonly DATA_TEST_DOT_MENU_OPTIONS = "user-profile-{option}";
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -165,5 +171,84 @@ export default class ProfilePage {
     async checkImagePresence(userId: string | number): Promise<void> {
         const imageSrc = await this.page.locator("img.full-width").getAttribute("src");
         expect(imageSrc).toContain(`id=${userId}`);
+    }
+
+    /**
+     * Returns an action from the opened profile page 3-dot menu by locating the data-test attribute
+     * @param actionDataTest - The data-test attribute value of the action: modify, impersonate, create-pastoral-record
+     * @returns - The profile page 3-dot menu action
+     */
+    getDotMenuAction(actionDataTest: string): Locator {
+        return this.page
+            .getByTestId(ProfilePage.DATA_TEST_PROFILE_DOT_MENU)
+            .getByTestId(ProfilePage.DATA_TEST_DOT_MENU_OPTIONS.replace("{option}", actionDataTest));
+    }
+
+    /**
+     * Opens the profile page 3-dot menu.
+     */
+    async openDotMenu(): Promise<void> {
+        await this.page.getByTestId(ProfilePage.DATA_TEST_PROFILE_DOT_BUTTON).click();
+        await expect(this.page.getByTestId(ProfilePage.DATA_TEST_PROFILE_DOT_MENU)).toBeVisible();
+    }
+
+    /**
+     * Checks the profile page 3-dot menu is not presented.
+     */
+    async checkDotMenuIsNotPresented(): Promise<void> {
+        await expect(this.page.getByTestId(ProfilePage.DATA_TEST_PROFILE_DOT_BUTTON)).toBeHidden();
+    }
+
+    /**
+     * Check whether or not the 3-dot menu items are visible
+     * options: modify, impersonate, create-pastoral-record
+     * e.g.: { option: "modify", isVisible: true }
+     * @param options - The array of options to check with the name and visibility
+     */
+    async checkDotMenuOptionsVisibility(options: { option: string; isVisible: boolean }[]): Promise<void> {
+        for (const option of options) {
+            if (option.isVisible) {
+                await expect(
+                    this.page.getByTestId(ProfilePage.DATA_TEST_DOT_MENU_OPTIONS.replace("{option}", option.option)),
+                ).toBeVisible();
+            } else {
+                await expect(
+                    this.page.getByTestId(ProfilePage.DATA_TEST_DOT_MENU_OPTIONS.replace("{option}", option.option)),
+                ).toBeHidden();
+            }
+        }
+    }
+
+    /**
+     * Checks an action in the opened profile page 3-dot menu links to the expected url.
+     * @param actionName - The action name: modify, impersonate, create-pastoral-record
+     * @param expectedUrl - The expected href
+     */
+    async checkDotMenuActionUrl(actionName: string, expectedUrl: RegExp): Promise<void> {
+        await expect(this.getDotMenuAction(actionName)).toHaveAttribute("href", expectedUrl);
+    }
+
+    /**
+     * Clicks the 3-dot menu action and checks the impersonate button is disabled
+     */
+    async checkImpersonateIsDisabled(): Promise<void> {
+        await this.openDotMenu();
+        await expect(
+            this.page.getByTestId(ProfilePage.DATA_TEST_DOT_MENU_OPTIONS.replace("{option}", "impersonate-disabled")),
+        ).toBeVisible();
+        await expect(
+            this.page.getByTestId(ProfilePage.DATA_TEST_DOT_MENU_OPTIONS.replace("{option}", "impersonate-disabled")),
+        ).not.toHaveAttribute("href", /.*/);
+    }
+
+    /**
+     * Checks a single profile header action button is visible and links to the expected url.
+     * @param actionName - The action name
+     * @param expectedUrl - The expected href
+     */
+    async checkSingleHeaderActionButton(actionName: string, expectedUrl: RegExp): Promise<void> {
+        const button = this.page.locator(".button-action a").filter({ hasText: actionName });
+        await expect(button).toBeVisible();
+        await expect(button).toHaveAttribute("href", expectedUrl);
     }
 }

@@ -138,10 +138,6 @@ $allow-sidebar-stash: $large-up;
     .left-off-canvas-menu {
         box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.15);
         transform: none;
-
-        .left-menu-dock::after {
-            content: "\e915"; //.icon-pin-hollow
-        }
     }
     .exit-off-canvas {
         z-index: calc(var(--sbx-depth-menu) - 2);
@@ -421,22 +417,12 @@ $allow-sidebar-stash: $large-up;
 
         .left-menu-dock {
             color: $off-canvas-foreground;
-            display: block;
-            height: 2.5rem;
-            padding: 0.5rem;
+            display: inline-flex;
             position: absolute;
             right: 0;
-            width: 2.5rem;
-            z-index: var(--sbx-depth-default); // Safari will not see the icon without this
 
             &:hover {
                 background-color: $off-canvas-hover;
-            }
-
-            &::after {
-                content: "\e913"; //.icon-pin
-                font-family: $font-family-icon;
-                padding-left: rem-calc(4);
             }
         }
     }

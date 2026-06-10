@@ -7,6 +7,8 @@
  * @link      https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -18,22 +20,38 @@ require_once __DIR__ . '/../../conf/core/require.php';
 /**
  * Imports eportfolio page layouts from a user to all users within a group.
  */
-$app = new class extends CliTool\App
+$app = new class extends CliTool\BaseApp
 {
-
-    /** @inheritDoc */
-    public function getShortOpts(): array
+    /** @inheritdoc */
+    protected function getName(): string
     {
-        return ['u:', 'U:', 'r:'];
+        return 'ePortfolio Import';
     }
 
-
-    /** @inheritDoc */
-    public function getLongOpts(): array
+    /** @inheritdoc */
+    protected function getDescription(): string
     {
-        return ['page:', 'skip-duplicates', 'enable-eportfolio', 'dry-run'];
+        return 'Copies ePortfolio page layouts from a single user into either another user, or all users with a given role.';
     }
 
+    /** @inheritdoc */
+    protected function setOptions(): CliTool\BaseApp
+    {
+        $this->optionCollection->add('u:', 'The ID of the user to copy ePortfolios from');
+        $this->optionCollection->add('U:', 'The ID of the user to copy ePortfolios into (either this or -r must be set)');
+        $this->optionCollection->add('r:', 'The ID of the role to copy ePortfolios into (either this or -U must be set)');
+        $this->optionCollection->add('page:', 'If set, import only this page ID');
+        $this->optionCollection->add('skip-duplicates', 'Skip copying an ePortfolio if the destination user already has a page with the same name');
+        $this->optionCollection->add('enable-eportfolio', 'Enable ePortfolio for destination users that have it disabled, then proceed with copy');
+        $this->optionCollection->add('dry-run', 'Show what would be updated without making any changes');
+        return $this;
+    }
+
+    /** @inheritdoc */
+    protected function hasPerformMode(): bool
+    {
+        return false;
+    }
 
     /** @inheritDoc */
     public function run(): void
@@ -57,7 +75,6 @@ $app = new class extends CliTool\App
             $errors = true;
         }
         if ($errors) {
-            $this->renderHelpMessage();
             exit(1);
         }
 
@@ -269,35 +286,6 @@ $app = new class extends CliTool\App
                 }
             }
         }
-    }
-
-
-    /**
-     * Echos a help message to STDOUT
-     */
-    private function renderHelpMessage(): void
-    {
-        echo <<<HELP
-Copies ePortfolios from a single user into either another user, or all users
-with a given role.
-
-Usage: import.php -u[fromUserId] [-U[toUserId]] [-r[toRoleId]] [--page[pageId]]
-                  [--dry-run] [--skip-duplicates] [--enable-eportfolio]
-    -u:                  the ID of the user to copy ePortfolios from.
-    -U:                  the ID of the user to copy ePortfolios into
-                         Either this or -r must be set.
-    -r:                  the ID of the role to copy ePortfolios into
-    --page:              if set, import only this page ID
-    --dry-run:           if set, don't actually update anything, but show what
-                         would be updated.
-    --skip-duplicates:   if set, skips copying an ePortfolio if the destination
-                         user already has an ePortfolio page with this name.
-    --enable-eportfolio: if set, enables ePortfolio for destination users which
-                         have ePortfolios disabled, then proceeds with copy.
-                         Default behavior skips copy for users which have
-                         ePortfolio disabled.
-
-HELP;
     }
 };
 

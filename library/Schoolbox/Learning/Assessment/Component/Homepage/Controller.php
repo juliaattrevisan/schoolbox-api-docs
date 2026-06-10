@@ -15,7 +15,6 @@ use Component_Homepage_ControllerAbstract;
 use Component_Instance;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\External\User as ExternalUser;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\Assessment\DueDateSortStrategy;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -99,7 +98,6 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
         $mutator = new AssessmentListMutator(
             $this->getUser(),
             new Visibility($this->getAccess()),
-            new ExternalUser(),
             $now,
             $showClosed
         );

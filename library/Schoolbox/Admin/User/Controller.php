@@ -17,6 +17,7 @@ use HouseMapper;
 use HouseResidentialMapper;
 use Monolog\Logger;
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Importer\Endpoint\Factory;
 use Schoolbox\Role;
 use Scrub;
@@ -99,12 +100,12 @@ class Controller extends Base
     protected HouseMapper $houseMapper;
 
     /**
-     * @var UserLogMapper;
+     * @var UserLogMapper
      */
     protected UserLogMapper $userLogMapper;
 
     /**
-     * @var CMSLogMapper;
+     * @var CMSLogMapper
      */
     protected CMSLogMapper $cmsLogMapper;
 
@@ -219,15 +220,6 @@ class Controller extends Base
         ],
         UserAccess::SERVICE_SPORTS_ADMINISTRATOR => [
             'name' => 'Fixtures',
-            'identifier' => self::IDENTIFIER_NONE,
-            'availability' => [
-                'read' => false,
-                'write' => false,
-                'moderate' => true
-            ]
-        ],
-        UserAccess::SERVICE_IB_COORDINATOR => [
-            'name' => 'IB Coordinator',
             'identifier' => self::IDENTIFIER_NONE,
             'availability' => [
                 'read' => false,
@@ -417,7 +409,7 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate(
             '@adminUser/modify.twig',
             [
-                'serviceMapping' => self::SERVICE_MAPPING,
+                'serviceMapping' => $this->getServicesMapping(),
                 'identifiers' => self::IDENTIFIERS,
                 'accessLevel' => self::ACCESS_LEVELS,
                 'pageCurrent' => $this->routeGenerator->generate('adminUser.getInsert'),
@@ -551,7 +543,7 @@ class Controller extends Base
                 'titles' => $this->userTitleMapper->findAll(),
                 'portraitZone' => $portraitZone->getTwigContext(),
                 'isSchoolboxAdmin' => false,
-                'serviceMapping' => self::SERVICE_MAPPING,
+                'serviceMapping' => $this->getServicesMapping(),
                 'identifiers' => self::IDENTIFIERS,
             ],
             'Admin - Users'
@@ -988,5 +980,30 @@ class Controller extends Base
         }
 
         $this->response = $this->responseAsJson(true);
+    }
+
+    /**
+     * Get available services
+     *
+     * @return array|array[]
+     */
+    private function getServicesMapping(): array
+    {
+        $services = self::SERVICE_MAPPING;
+        /* IB coordinator service option should only be available when IB is enabled
+         * note that when the IB is toggled off it will not reset the IB permission
+         */
+        if ($this->getConfigLoader()->get(ConfigMapper::NAME_IB_ENABLED)) {
+            $services[UserAccess::SERVICE_IB_COORDINATOR] = [
+                'name' => 'IB Coordinator',
+                'identifier' => self::IDENTIFIER_NONE,
+                'availability' => [
+                    'read' => false,
+                    'write' => false,
+                    'moderate' => true
+                ]
+            ];
+        }
+        return $services;
     }
 }

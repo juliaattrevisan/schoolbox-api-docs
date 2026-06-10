@@ -63,6 +63,8 @@ export default class Homepage {
 
     static readonly ELEMENT_COMPONENT_EDIT_HEADING = 'input[name="componentname"]';
 
+    static readonly ELEMENT_COMPONENT_UPDATE_BUTTON = 'input[value="Update"]';
+
     static readonly REMOVE_BUTTON_CONFIRMATION_MESSAGE = "Remove";
 
     static readonly DATA_TEST_ASSESSMENT_COMPONENT_ROW = "component-assessment-"; // append "{componentId}"
@@ -230,7 +232,7 @@ export default class Homepage {
      * @param icon - The icon to check
      */
     async checkComponentIcon(icon: string): Promise<void> {
-        await expect(this.page.locator(`span.size-32.icon-masonry.icon-masonry-${icon}`)).toBeVisible();
+        await expect(this.page.locator(`sbx-icon.icon-masonry.icon-masonry-${icon}`)).toBeVisible();
     }
 
     /**
@@ -245,6 +247,15 @@ export default class Homepage {
      */
     public static async clickComponentSettings(component: Locator): Promise<void> {
         await component.locator(Homepage.ELEMENT_COMPONENT_SETTINGS).click();
+    }
+
+    /**
+     * Click the Update button in a component settings form.
+     * @param component - The locator of the component to update
+     */
+    public static async clickComponentUpdateButton(component: Locator): Promise<void> {
+        await component.locator(Homepage.ELEMENT_COMPONENT_UPDATE_BUTTON).click();
+        await expect(component.locator(Homepage.ELEMENT_COMPONENT_UPDATE_BUTTON)).toBeHidden();
     }
 
     /**

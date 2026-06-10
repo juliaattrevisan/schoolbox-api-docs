@@ -127,7 +127,7 @@ class Translator
     {
         // Extract all entity types and values from article's audiences
         $entityTypesAndValues = [];
-        /** @var ISimpleStrategy[] $strategiesInUse */
+        /** @var GenericCollection|ISimpleStrategy[] $strategiesInUse */
         $strategiesInUse = new GenericCollection(ISimpleStrategy::class);
         foreach ($article->getAudience() as $segment) {
             if ($segment->isSimple()) {

@@ -5,19 +5,26 @@
     #component-layout {
         --top-head-bg:        {top_head_bg};
         --top-head-font:      {top_head_font};
-        --top-font-primary:   {top_font_primary};
-        --top-bg-primary:     {top_bg_primary};
 
         --left-head-bg:       {left_head_bg};
         --left-head-font:     {left_head_font};
-        --left-font-primary:  {left_font_primary};
-        --left-bg-primary:    {left_bg_primary};
 
         --right-head-bg:      {right_head_bg};
         --right-head-font:    {right_head_font};
+    }
+
+    <!-- BEGIN legacy_homepage_colour_css -->
+    #component-layout {
+        --top-font-primary:   {top_font_primary};
+        --top-bg-primary:     {top_bg_primary};
+
+        --left-font-primary:  {left_font_primary};
+        --left-bg-primary:    {left_bg_primary};
+
         --right-font-primary: {right_font_primary};
         --right-bg-primary:   {right_bg_primary};
     }
+    <!-- END legacy_homepage_colour_css -->
 </style>
 
 <script type="text/javascript">
@@ -27,18 +34,19 @@
     colours['{COLOUR_ARRAY}'] = {
         'top_head_font'      : '{top_head_font}',
         'top_head_bg'        : '{top_head_bg}',
-        'top_font_primary'   : '{top_font_primary}',
-        'top_bg_primary'     : '{top_bg_primary}',
-
         'left_head_font'     : '{left_head_font}',
         'left_head_bg'       : '{left_head_bg}',
-        'left_font_primary'  : '{left_font_primary}',
-        'left_bg_primary'    : '{left_bg_primary}',
-
         'right_head_font'    : '{right_head_font}',
         'right_head_bg'      : '{right_head_bg}',
+
+        <!-- BEGIN legacy_homepage_colour_js -->
+        'top_font_primary'   : '{top_font_primary}',
+        'top_bg_primary'     : '{top_bg_primary}',
+        'left_font_primary'  : '{left_font_primary}',
+        'left_bg_primary'    : '{left_bg_primary}',
         'right_font_primary' : '{right_font_primary}',
-        'right_bg_primary'   : '{right_bg_primary}'
+        'right_bg_primary'   : '{right_bg_primary}',
+        <!-- END legacy_homepage_colour_js -->
     };
     // <!-- END colour_list -->
 </script>
@@ -215,7 +223,8 @@
                                 <input id="head_bg" class="colorBox" name="colors[head_bg]" type="text" data-colorpicker />
                             </fieldset>
                         </div>
-                        <div class="small-12 medium-6 columns">
+                        <!-- BEGIN legacy_homepage_content_colours -->
+                        <div id="content-colours" class="small-12 medium-6 columns">
                             <fieldset>
                                 <legend>Content Colours</legend>
                                 <label for="font_primary">Text</label>
@@ -224,9 +233,10 @@
                                 <input id="bg_primary" class="colorBox" name="colors[bg_primary]" type="text" data-colorpicker />
                             </fieldset>
                         </div>
+                        <!-- END legacy_homepage_content_colours -->
                     </fieldset>
 
-                    <ul class="flex-list buttons">
+                    <ul class="flex-list buttons l-pad-s">
                         <li><a href="#" class="button no-margin" data-role="reset-to-default">Reset</a></li>
                         <li><a href="#" class="button no-margin" data-role="undo">Undo Changes</a></li>
                         <li><a href="#" class="button submit no-margin" data-role="save">Save</a></li>

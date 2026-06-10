@@ -32,6 +32,7 @@ use Schoolbox\IB\SystemPurpose\Model as SystemPurposeModel;
 use Schoolbox\Comms\News\Topic;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
+use Schoolbox\Learning\Assessment\Reporting\Model as Reporting;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\Learning\Assessment\Lti\Model as Lti;
@@ -673,9 +674,6 @@ class Controller extends Base
                 $result = $mapper->delete($record);
             } catch (MapperException) {
                 // Something failed in the mapper: noop
-
-                // Deletion _can_ raise UnexpectedValueException
-                /** @phpstan-ignore-next-line */
             } catch (UnexpectedValueException) {
                 // Something else unexpected happened, likely thrown by a
                 // pre-delete: noop
@@ -1138,19 +1136,27 @@ class Controller extends Base
                         'tooltipPosition' => 'right',
                     ],
                     'visibility' => [
-                        'getter'    => 'getVisibility', // Note this function returns a value derived from isVisibleToParents and isVisibleToStudents.
-                        'caption'   => 'Visibility',
+                        'getter'    => 'getVisibility', // Note this function returns a value derived from isVisibleToParents and isVisibleToLearners.
+                        'caption'   => 'Activity Audience',
                         'mandatory' => true,
-                        'default'   => WorkTypeMapper::VISIBILITY_STAFF_ONLY,
+                        'default'   => WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS,
                         'lookup'    => [
-                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_ONLY, 'value' => 'Staff Only'],
-                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_STUDENTS, 'value' => 'Staff & Students'],
-                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_PARENTS, 'value' => 'Staff & Parents'],
-                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_STUDENTS_PARENTS, 'value' => 'Staff, Students & Parents'],
+                            // Note we intentionally do not use 'instructor'/'learner' terminology here, since users are not familiar with those terms.
+                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS, 'value' => 'Staff Only'],
+                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS, 'value' => 'Staff & Students'],
+                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS_PARENTS, 'value' => 'Staff & Parents'],
+                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS_PARENTS, 'value' => 'Staff, Students & Parents'],
                         ],
                         'nullable'  => false,
                         'width'     => 2,
-                        'tooltip'   => 'Select the role types that have access to view learning activities using this work type.  Access includes the assigning of the learning activity and the feedback that is made visible.',
+                        'tooltip'   => (
+                            "Select who can access activities using this work type. Feedback visibility is configured" .
+                            " per activity, but it cannot override the Activity Audience - roles excluded from the" .
+                            " audience won’t be able to view feedback. Note: students or parents with write access to" .
+                            " pages are acting in a staff/instructor-like role and will have access to (and visibility" .
+                            " of) the activity and feedback. Staff added to a group with read access will be treated" .
+                            " in a student/learner participant-like role."
+                        )
                     ],
                     'permittedActivities' => [
                         'caption'   => 'Permitted Activities',
@@ -1208,6 +1214,13 @@ class Controller extends Base
                     ],
                     'permittedDialogAgent' => [
                         'caption'    => DialogAgent::getDefaultTypeName(),
+                        'checkbox'   => true,
+                        'mandatory'  => true,
+                        'default'    => false,
+                        'popOutList' => 'permittedActivities',
+                    ],
+                    'permittedReportingActivity' => [
+                        'caption'    => Reporting::getDefaultTypeName(),
                         'checkbox'   => true,
                         'mandatory'  => true,
                         'default'    => false,
@@ -1833,6 +1846,35 @@ class Controller extends Base
             ]
         ];
 
+        $ibEnabled = $this->getConfigLoader()->get(ConfigMapper::NAME_IB_ENABLED);
+        $qualificationFields = [
+            'id' => [
+                'caption'   => 'ID',
+                'width'     => 1,
+                'readonly'  => true,
+            ],
+            'name'          => [
+                'caption'   => 'Name',
+                'width'     => $ibEnabled ? 5 : 11,
+                'maxLength' => 255,
+                'mandatory' => true,
+                'default'   => '',
+            ],
+        ];
+
+        /* Conditionally adding the system purpose column depend on whether IB is enabled
+         */
+        if ($ibEnabled) {
+            $qualificationFields['systemPurpose'] = [
+                'caption'   => 'System Purpose',
+                'width'     => 6,
+                'mandatory' => false,
+                'nullable'  => true,
+                'nullable_label' => 'Not Selected',
+                'lookup'    => $luSystemPurpose,
+            ];
+        }
+
         $return['qualification'] = [
             'title'             => 'Qualifications',
             'mapper'            => QualificationMapper::class,
@@ -1840,28 +1882,7 @@ class Controller extends Base
             'showId'            => true,
             'sortable'          => true, // Enable drag and drop functionality
             'deleteFailMsg'     => 'This qualification cannot be deleted as it may be in use.',
-            'fields'            => [
-                'id' => [
-                    'caption'   => 'ID',
-                    'width'     => 1,
-                    'readonly'  => true,
-                ],
-                'name'          => [
-                    'caption'   => 'Name',
-                    'width'     => 5,
-                    'maxLength' => 255,
-                    'mandatory' => true,
-                    'default'   => '',
-                ],
-                'systemPurpose' => [
-                    'caption'   => 'System Purpose',
-                    'width'     => 4,
-                    'mandatory' => false,
-                    'nullable'  => true,
-                    'nullable_label' => 'Not Selected',
-                    'lookup'    => $luSystemPurpose,
-                ],
-            ]
+            'fields'            => $qualificationFields,
         ];
 
         $return['nationality'] = [
@@ -1976,7 +1997,7 @@ class Controller extends Base
             $rows     = $mapper->findAll(['order' => $orderArr]);
         }
 
-        $idGetter = $tables[$table]['fields']['id']['getter'] ?? 'getId';
+        $idGetter = $tables[$table]['fields']['id']['getter'] ?? $mapper->getGetIdentifierMethodName();
 
         foreach ($rows as $row) {
             $rowId = $row->$idGetter();

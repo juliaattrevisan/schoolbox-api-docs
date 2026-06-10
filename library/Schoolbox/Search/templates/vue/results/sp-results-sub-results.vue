@@ -116,6 +116,7 @@ function isLast(index: number): boolean {
     <sp-results-error v-else-if="hasLoadError" />
     <button
         v-else-if="showLoadMore"
+        class="button sbx-button--smaller"
         :data-test="`sp-results-sub-results-load-more-${props.result.id}`"
         @click.prevent="onLoadMoreSelected"
     >

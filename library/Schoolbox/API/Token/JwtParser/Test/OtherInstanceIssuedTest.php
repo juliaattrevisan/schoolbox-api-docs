@@ -13,6 +13,7 @@ use Monolog\Handler\HandlerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Schoolbox\API\Token\JwtParser\AudienceMatchMode;
 use Schoolbox\API\Token\JwtParser\OtherInstanceIssued;
 use Schoolbox\Config\ArrayLoader;
 use Schoolbox\UserMapper;
@@ -69,6 +70,7 @@ class OtherInstanceIssuedTest extends TestCase
             $this->createMock(UserMapper::class),
             new ArrayLoader([]),
             $this->createLogger($handler),
+            AudienceMatchMode::WARN,
         );
     }
 }

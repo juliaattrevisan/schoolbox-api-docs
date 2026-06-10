@@ -29,7 +29,7 @@ use SensitiveParameter;
  * * creating a token for a user within the admin system
  * * creating a login QR code
  */
-class SelfIssued extends Base
+class SelfIssued extends InstanceIssued
 {
     public const CUSTOM_CLAIM_TASKD = self::CUSTOM_CLAIM_NAMESPACE . 'taskd';
 
@@ -45,9 +45,10 @@ class SelfIssued extends Base
         UserMapper $userMapper,
         IConfigLoader $config,
         LoggerInterface $log,
+        AudienceMatchMode $matchMode,
         private User\Token\Mapper $tokenMapper,
     ) {
-        parent::__construct($userMapper, $config, $log);
+        parent::__construct($userMapper, $config, $log, $matchMode);
     }
 
     /**
@@ -55,18 +56,18 @@ class SelfIssued extends Base
      */
     public function accepts(#[SensitiveParameter] string $jwt): bool
     {
-        $claims             = $this->decodeWithoutVerification($jwt);
-        $thisInstanceIssuer = $this->determineThisInstanceIssuer();
+        $claims   = $this->decodeWithoutVerification($jwt);
+        $hostname = $this->determineHostname();
         $this->log->debug(
             sprintf(
                 'Checking JWT %s "%s" against this instance "%s"',
                 self::CLAIM_ISS,
                 $claims[self::CLAIM_ISS] ?? '',
-                $thisInstanceIssuer,
+                $hostname,
             ),
         );
 
-        return isset($claims[self::CLAIM_ISS]) && $claims[self::CLAIM_ISS] === $thisInstanceIssuer;
+        return isset($claims[self::CLAIM_ISS]) && $claims[self::CLAIM_ISS] === $hostname;
     }
 
     /**
@@ -79,51 +80,46 @@ class SelfIssued extends Base
             new Key($this->config->get(ConfigMapper::NAME_JWT_PUBLIC_KEY), Jwt::SIGNING_ALGORITHM),
             (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY),
         );
-        if (!isset($claims[self::CLAIM_SUB])) {
-            throw new Exception\InvalidIdentity(sprintf('JWT must contain a "%s" claim', self::CLAIM_SUB));
+
+        // Validate audience
+        $this->assertValidAudience($claims);
+
+        // Validate subject
+        $username = $this->extractUsername($claims, self::CLAIM_SUB);
+        $user     = $this->findUser($username, self::CLAIM_SUB);
+
+        // Validate JTI for self-issued tokens
+        if (!isset($claims[self::CLAIM_JTI])) {
+            throw new Exception\InvalidIdentity(
+                sprintf('JWT must contain a "%s" claim', self::CLAIM_JTI)
+            );
         }
-        $username = $claims[self::CLAIM_SUB];
-        if (trim($username) === '') {
-            throw new Exception\InvalidIdentity(sprintf('JWT "%s" claim must not be empty', self::CLAIM_SUB));
-        }
-        $user = $this->findUser($claims[self::CLAIM_SUB], self::CLAIM_SUB);
-        if (isset($claims[self::CLAIM_JTI])) {
-            // if not help instance, validate the jti
-            try {
-                /** @var User\Token\Model $token */
-                $token = $this->tokenMapper->findOneByColumnList(
-                    [
-                        'user_id' => $user->getId(),
-                        'jwt_id' => $claims[self::CLAIM_JTI],
-                    ]
-                );
-                if ($token->getExpiry() && $token->getExpiry()->isPast()) {
-                    throw new Exception\Rejected('The JWT ID provided has expired');
-                }
-            } catch (MapperException $e) {
-                // could not find a token with user id and jwt id
-                throw new Exception\Rejected(
-                    'The JWT ID provided does not match a token for the given user',
-                    $e->getCode(),
-                    $e,
-                );
+        try {
+            /** @var User\Token\Model $token */
+            $token = $this->tokenMapper->findOneByColumnList(
+                [
+                    'user_id' => $user->getId(),
+                    'jwt_id' => $claims[self::CLAIM_JTI],
+                ]
+            );
+            if ($token->getExpiry() && $token->getExpiry()->isPast()) {
+                throw new Exception\Rejected('The JWT ID provided has expired');
             }
+        } catch (MapperException $e) {
+            // could not find a token with user id and jwt id
+            throw new Exception\Rejected(
+                'The JWT ID provided does not match a token for the given user',
+                $e->getCode(),
+                $e,
+            );
         }
+
+        // TODO remove this check? Hasn't IP tracking been removed?
         if (isset($claims[self::CUSTOM_CLAIM_TASKD]) && $claims[self::CUSTOM_CLAIM_TASKD] === 1) {
             $this->log->info(sprintf('Claim "%s" is set: bypassing IP tracking', self::CUSTOM_CLAIM_TASKD));
             $this->bypassIpTracking = true;
         }
 
         return $user;
-    }
-
-    /**
-     * Determine what this instance's issuer value is.
-     *
-     * @return string
-     */
-    private function determineThisInstanceIssuer(): string
-    {
-        return (new Factory($this->config))->buildFullyQualified()->getHost();
     }
 }

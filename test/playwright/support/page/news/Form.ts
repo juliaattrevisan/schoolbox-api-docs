@@ -28,6 +28,12 @@ export default class Form {
 
     static readonly DATA_TEST_ARTICLE_BLURB = "news-article-form-blurb";
 
+    static readonly DATA_TEST_AUDIENCE_LIST_ITEM = "news-item-audience-select-audience-list-item";
+
+    static readonly DATA_TEST_AUDIENCE_LIST_ITEM_LABEL = "news-item-audience-select-audience-list-item-label";
+
+    static readonly DATA_TEST_AUDIENCE_LIST_ITEM_REMOVE = "news-item-audience-select-remove-{nameLabel}";
+
     static readonly FORM_CREATE = "form#createForm";
 
     private filePath?: string;
@@ -162,8 +168,7 @@ export default class Form {
         await this.page.locator("button.button:has(sbx-icon[name='drag-drop'])").click();
         await expect(this.page.locator('div[class="reveal-modal no-pad open"]')).toBeVisible();
         await this.page.locator(`button.button-block:has-text("${audienceBrick}")`).click();
-        // await expect(this.page.locator('label[for="audience-list-input-IjEi"]')).toBeVisible();
-        await expect(this.page.locator('div[class="checklist-wrapper"]').first()).toBeVisible();
+        await expect(this.page.getByTestId(Form.DATA_TEST_AUDIENCE_LIST_ITEM).first()).toBeVisible();
     }
 
     /**
@@ -171,7 +176,9 @@ export default class Form {
      * @param audience - tick a checkbox in the Select Audience via bricks: Campuses, Roles, Teams, HOuses, Year Levels
      */
     async checkboxAudience(audience: string): Promise<void> {
-        await this.page.locator(`div.checklist-wrapper:has-text("${audience}")`).click();
+        await this.page
+            .locator(`[data-test="${Form.DATA_TEST_AUDIENCE_LIST_ITEM_LABEL}"]:has-text("${audience}")`)
+            .click();
     }
 
     /**
@@ -309,11 +316,11 @@ export default class Form {
     }
 
     /**
-     * untick the checkboxes
-     * @param title - The checkboxes to untick
+     * remove an audience tag
+     * @param title - The title of the audience tag to remove
      */
     async removeAudience(title: string): Promise<void> {
-        await this.page.locator(`a[title="Remove ${title} from audience"]`).click();
+        await this.page.getByTestId(Form.DATA_TEST_AUDIENCE_LIST_ITEM_REMOVE.replace("{nameLabel}", title)).click();
     }
 
     /**

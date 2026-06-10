@@ -759,12 +759,12 @@ export default {
                                                 :title="specialNeedsLabel"
                                             >
                                             </span>
-                                            <span
+                                            <sbx-icon
                                                 v-if="showMedicalAlerts && String(student.StudentMedicalAlert) !== ''"
-                                                class="icon-alert alert"
+                                                name="alert"
+                                                color="var(--sbx-color-alert, var(--color-alert))"
                                                 :title="'Medical Alert: ' + student.StudentMedicalAlert"
-                                            >
-                                            </span>
+                                            ></sbx-icon>
                                         </slot>
                                     </p>
                                     <ul
@@ -778,7 +778,9 @@ export default {
                                                 <a
                                                     :data-test="`class-list-${student.id}-menu-item-${element.label}`"
                                                     :href="element.href"
-                                                    :class="element.class"
+                                                    :class="
+                                                        element.class || (element.icon ? 'sbx-button--has-icon' : '')
+                                                    "
                                                     :title="element.title"
                                                 >
                                                     <sbx-icon v-if="element.icon" :name="element.icon"></sbx-icon>
@@ -791,7 +793,7 @@ export default {
                             </td>
                             <td class="show-for-medium-up" v-if="differentiationEnabled">
                                 <button
-                                    v-if="student._links.differentiationProfile"
+                                    v-if="student._links?.differentiationProfile"
                                     class="button sbx-button--has-icon"
                                     type="button"
                                     :data-test="`class-list-${student.id}-view-differentiation-profile`"

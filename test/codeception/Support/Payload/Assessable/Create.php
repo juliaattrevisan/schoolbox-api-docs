@@ -86,6 +86,6 @@ class Create extends Request
     /** @inheritDoc */
     public function getRubricAssessmentId(): int
     {
-        return 0;
+        return -1;
     }
 }

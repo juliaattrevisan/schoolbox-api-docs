@@ -3,6 +3,7 @@
  * To list all the currently selected items
  */
 
+import { useResizeObserver } from "@vueuse/core";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 import SsSelectedItem from "./ss-selected-item.vue";
 import { ON_FILTER_CHANGE } from "./event/SbxSearchSelectEvent";
@@ -50,6 +51,15 @@ function onRemoveItem(item: SearchSelectItem): void {
     emit("remove", [item]);
 }
 
+const selectedContentEl = window.Vue.useTemplateRef<HTMLDivElement | null>("selectedContentEl"); // to detect when the selected items content is resized
+const currentHeight = window.Vue.ref(0);
+const shouldScrollSelected = window.Vue.computed(() => currentHeight.value > 133);
+
+useResizeObserver(selectedContentEl, (entries) => {
+    const entry = entries[0];
+    currentHeight.value = entry.contentRect.height;
+});
+
 /**
  * to keep the filter panel / search select in sync when changes are made to either
  */
@@ -90,17 +100,23 @@ if (props.forFilterPanel) {
 </script>
 
 <template>
-    <div v-if="props.selected.length > 0" class="selected l-flex-row l-gap-s l-pad-s" data-test="ss-selected">
-        <ss-selected-item
-            v-for="item in props.selected"
-            :key="item.id"
-            :item="item"
-            :is-single-select="props.isSingleSelect"
-            :can-select-item="props.canSelectItem"
-            :is-read-only="props.isReadOnly"
-            @select="onSelectItem"
-            @remove="onRemoveItem"
-        />
+    <div
+        v-if="props.selected.length > 0"
+        :class="['sbx-tag-group', { 'sbx-scroll-container sbx-tag-group--scroll': shouldScrollSelected }]"
+        data-test="ss-selected"
+    >
+        <div ref="selectedContentEl" class="l-flex-row l-gap-s">
+            <ss-selected-item
+                v-for="item in props.selected"
+                :key="item.id"
+                :item="item"
+                :is-single-select="props.isSingleSelect"
+                :can-select-item="props.canSelectItem"
+                :is-read-only="props.isReadOnly"
+                @select="onSelectItem"
+                @remove="onRemoveItem"
+            />
+        </div>
     </div>
     <input
         :id="props.formValueName"
@@ -133,14 +149,3 @@ if (props.forFilterPanel) {
         </option>
     </select>
 </template>
-
-<style lang="scss" scoped>
-.selected {
-    border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
-    border-radius: var(--sbx-config-field-roundness, 0px);
-    margin-bottom: -1px; //to butt up against the search input
-    max-height: 133px;
-    min-height: 50px;
-    overflow: auto;
-}
-</style>

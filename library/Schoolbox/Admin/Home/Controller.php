@@ -28,6 +28,7 @@ use Schoolbox\External\Connector\Log\Mapper as ImportLogMapper;
 use Schoolbox\InstanceRegistry\InstanceRegistry;
 use Schoolbox\Learning\Turnitin\Helper;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage\S3\DisasterRecovery;
 use Schoolbox\Version\Version;
@@ -169,10 +170,14 @@ class Controller extends Base
             $importLogs = $this->importLogMapper->status();
         }
 
+        $showSonarReminder = $this->getUser()->isSuperuser() ||
+            $this->getUser()->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL);
+
         $this->response = $this->responseFromTemplate(
             '@adminHome/index.twig',
             [
                 'userIsSuperuser' => $this->getUser()->isSuperuser(),
+                'showSonarReminder' => $showSonarReminder,
                 'pageCurrent' => $this->routeGenerator->generate('adminHome.getIndex'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminHome.getIndex')),
                 'usageInGraph' => $usageInGraph,

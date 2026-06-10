@@ -1,10 +1,11 @@
 import "@melloware/coloris/dist/coloris.css";
 import Coloris from "@melloware/coloris";
 import tinycolor from "tinycolor2";
-import { colourPickerInitialiseEventName } from "./colourPickerEvent";
+import { colourPickerInitialiseEventName, type ColourPickerInitialiseEvent } from "./colourPickerEvent";
 import "./colour-picker.css";
 
-const colorPickerDefaults = {
+const colorPickerDefaults: Coloris.ColorisOptions = {
+    el: [],
     theme: "default",
     margin: 10,
     format: "hex",
@@ -13,10 +14,64 @@ const colorPickerDefaults = {
     swatches: window.sbProps.colourDefaults.swatches,
 };
 
+let colourPickerInstanceId = 0;
+
+/**
+ * Build the selector Coloris uses to apply virtual instance options to a colour picker input.
+ * @param targetEl The input element being initialised.
+ * @param el The original Coloris target from the initialise event.
+ * @returns A selector that matches the input element.
+ */
+function getColourPickerInstanceSelector(targetEl: HTMLInputElement, el: Coloris.ColorisOptions["el"]): string {
+    if (typeof el === "string") {
+        return el;
+    }
+    const instanceId = `colour-picker-instance-${colourPickerInstanceId}`;
+    colourPickerInstanceId += 1;
+    targetEl.dataset.colourPickerInstance = instanceId;
+    return `[data-colour-picker-instance="${instanceId}"]`;
+}
+
+/**
+ * Remove binding-only options so the remaining options can be applied as a Coloris virtual instance.
+ * @param colorisOptions The event-supplied colour picker options.
+ * @returns Options supported by Coloris virtual instances.
+ */
+function getColourPickerInstanceOptions(
+    colorisOptions: ColourPickerInitialiseEvent["detail"],
+): Partial<Coloris.ColorisVirtualInstanceOptions> {
+    const instanceOptions = { ...colorisOptions } as Partial<ColourPickerInitialiseEvent["detail"]> &
+        Partial<Coloris.ColorisVirtualInstanceOptions>;
+    // Remove the options that are only available globally: https://github.com/mdbassit/Coloris#simulating-multiple-instances
+    delete instanceOptions.el;
+    delete instanceOptions.wrap;
+    delete instanceOptions.rtl;
+    delete instanceOptions.inline;
+    delete instanceOptions.defaultColor;
+    delete instanceOptions.a11y;
+    return instanceOptions;
+}
+
+/**
+ * Bind Coloris to the target input without applying per-field options as global picker state.
+ * @param targetEl The input element being initialised.
+ * @param colorisOptions The event-supplied colour picker options.
+ */
+function bindColourPicker(targetEl: HTMLInputElement, colorisOptions: ColourPickerInitialiseEvent["detail"]): void {
+    const bindingOptions: Coloris.ColorisOptions = {
+        el: targetEl,
+    };
+    if (colorisOptions.wrap !== undefined) {
+        bindingOptions.wrap = colorisOptions.wrap;
+    }
+    Coloris(bindingOptions);
+}
+
 Coloris.init();
+Coloris(colorPickerDefaults);
 
 document.addEventListener(colourPickerInitialiseEventName, (e) => {
-    const colorisOptions: Coloris.ColorisOptions = Object.assign(colorPickerDefaults, e.detail);
+    const colorisOptions = e.detail;
 
     const targetEl =
         typeof colorisOptions.el === "string" ? document.querySelector(colorisOptions.el) : colorisOptions.el;
@@ -30,10 +85,11 @@ document.addEventListener(colourPickerInitialiseEventName, (e) => {
         targetEl.value = `#${targetEl.value}`;
     }
 
-    Coloris({
-        ...colorisOptions,
-        el: targetEl,
-    });
+    bindColourPicker(targetEl, colorisOptions);
+    Coloris.setInstance(
+        getColourPickerInstanceSelector(targetEl, colorisOptions.el),
+        getColourPickerInstanceOptions(colorisOptions),
+    );
 });
 
 window.tinycolor = tinycolor;

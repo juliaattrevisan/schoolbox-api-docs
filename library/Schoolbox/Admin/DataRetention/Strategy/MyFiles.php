@@ -143,7 +143,7 @@ class MyFiles extends Base
      *
      * @param array<int, array{id: int|string, table: string}> $chunk
      */
-    protected function deleteChunk(array $chunk): void
+    protected function deleteChunk(array $chunk): bool
     {
         $directFileIds = $this->normalizeIds(
             array_column(
@@ -191,6 +191,8 @@ class MyFiles extends Base
                 )
             );
         }
+
+        return true;
     }
 
     /**

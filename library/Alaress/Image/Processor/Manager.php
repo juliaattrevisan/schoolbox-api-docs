@@ -31,7 +31,6 @@ use Schoolbox\Resource\Storage\Transform;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception as LockException;
-use Symfony\Component\Lock\Exception\LockReleasingException;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\Store\RedisStore;
@@ -316,13 +315,12 @@ class Manager
      *
      * @throws LockAcquiringException
      * @throws LockConflictedException
-     * @throws LockException\LockReleasingException
      */
     private function renewLockAndMaxExecutionTime(): void
     {
         try {
             $this->lock->refresh();
-        } catch (LockReleasingException | LockConflictedException | LockAcquiringException $e) {
+        } catch (LockConflictedException | LockAcquiringException $e) {
             $this->logger->debug("Unable to release image lock, ignoring...");
         }
         $this->lock->acquire();
@@ -627,7 +625,6 @@ class Manager
      * @throws InvalidArgumentException
      * @throws LockAcquiringException
      * @throws LockConflictedException
-     * @throws LockException\LockReleasingException
      * @throws RuntimeException
      * @throws SchoolboxExternal\Exception
      * @throws UnexpectedValueException

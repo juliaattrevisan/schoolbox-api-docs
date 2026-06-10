@@ -48,9 +48,21 @@ class ValidStratsTest extends TestCase
                 'studentSubmissions',
                 ['studentSubmissions'],
             ],
+            'single ePortfolio valid' => [
+                'ePortfolio',
+                ['ePortfolio'],
+            ],
+            'all valid strategies' => [
+                'moments,myFiles,ePortfolio',
+                ['moments', 'myFiles', 'ePortfolio'],
+            ],
             'valid and invalid mixed' => [
-                'moments,unknown,myFiles',
-                ['moments', 'myFiles'],
+                'moments,unknown,myFiles,cms',
+                ['moments', 'myFiles', 'cms'],
+            ],
+            'cms only' => [
+                'cms',
+                ['cms'],
             ],
             'all valid mixed' => [
                 'moments,myFiles,studentSubmissions',
@@ -116,6 +128,12 @@ class ValidStratsTest extends TestCase
                 true,
             ],
 
+            'ePortfolio enabled' => [
+                'ePortfolio',
+                'ePortfolio',
+                true,
+            ],
+
             'moments not enabled when only myFiles' => [
                 'moments',
                 'myFiles',
@@ -126,6 +144,12 @@ class ValidStratsTest extends TestCase
                 'myFiles',
                 'studentSubmissions',
                 false,
+            ],
+
+            'cms enabled' => [
+                'cms',
+                'cms',
+                true,
             ],
 
             'unknown strat not enabled when moments present' => [

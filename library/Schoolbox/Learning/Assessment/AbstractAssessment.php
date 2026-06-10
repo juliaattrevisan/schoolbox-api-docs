@@ -30,7 +30,6 @@ use Schoolbox\Curriculum\Node;
 use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStoneFactory;
 use TypeError;
-use UnexpectedValueException;
 
 abstract class AbstractAssessment implements IAssessable
 {
@@ -151,9 +150,9 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * If published, then who can see the feedback for this Assessment.
      *
-     * One of { MARK_VISIBILITY_PRIVATE | MARK_VISIBILITY_STUDENT | MARK_VISIBILITY_PARENT_STUDENT }
+     * One of { MARK_VISIBILITY_PRIVATE | MARK_VISIBILITY_STUDENT | MARK_VISIBILITY_PARENT | MARK_VISIBILITY_PARENT_STUDENT }
      *
-     * @var int
+     * @var string
      */
     private $markVisibility;
 
@@ -192,13 +191,23 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
+     * A set of rubric_instance records which contain the settings for each grid associated with this learning activity
+     * (if applicable) - actual grid contents need to be obtained separately.
+     *
+     * @var GenericCollection<\Schoolbox\Assessment\Rubric\Instance\Model>|null
+     */
+    private ?GenericCollection $rubricInstances;
+
+
+    /**
      * Assessable constructor.
      */
     public function __construct()
     {
         $this->curriculumNodes = new GenericCollection(Node\Model::class);
-        $this->plans           = new GenericCollection(Plan::class);
-        $this->customisedAssessments           = new GenericCollection(IAssessable::class);
+        $this->plans = new GenericCollection(Plan::class);
+        $this->customisedAssessments = new GenericCollection(IAssessable::class);
+        $this->rubricInstances = new GenericCollection(\Schoolbox\Assessment\Rubric\Instance\Model::class);
     }
 
 
@@ -299,6 +308,7 @@ abstract class AbstractAssessment implements IAssessable
         $this->title           = $source->getTitle();
         $this->weight          = $source->getWeight();
         $this->workType        = $source->getWorkType();
+        $this->rubricInstances = $source->getRubricInstances();
 
         // Dates are cloned
         $this->publishAt = $source->getPublishAt() ? clone $source->getPublishAt() : null;
@@ -433,6 +443,11 @@ abstract class AbstractAssessment implements IAssessable
         // Intentionally calls getter rather than direct access to enable assessment-specific date acrobatics
         $participant = $student ? $this->getParticipantIfExtant($student) : null;
         $publishDate = $participant ? $participant->getPublishDate() : $this->getPublishAt();
+
+        // A null publish date means the assessment has not been published.
+        if (null === $publishDate) {
+            return false;
+        }
 
         return $now->gte($publishDate);
     }
@@ -659,9 +674,10 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function getHumanReadableInstructorMark(Participant $participant, $publishedOnly)
     {
-        // For all non-due work assessments, this falls back to getHumanReadableMark (the due work model overrides this)
+        // For all non due work/reporting assessments, this falls back to getHumanReadableMark (the models override this)
         // This avoids having to do a ton of instanceof checks everywhere and as I expect we will introduce
         // this functionality for more assessment types in the future, this makes it easier to do so.
+        // ^ oh look, we did. although definitely have thoughts on how this was approached now 1.5 years later...
 
         return $this->getHumanReadableMark($participant, $publishedOnly);
     }
@@ -690,6 +706,9 @@ abstract class AbstractAssessment implements IAssessable
 
             case self::MARK_VISIBILITY_STUDENT:
                 return $roleType === Role::STAFF || $roleType === Role::STUDENT;
+
+            case self::MARK_VISIBILITY_PARENT:
+                return $roleType === Role::STAFF || $roleType === Role::PARENT;
 
             case self::MARK_VISIBILITY_PRIVATE:
             default:
@@ -763,19 +782,6 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
-     * @inheritdoc
-     * @throws InsufficientHydrationException
-     */
-    public function isStaffOrInstructorVisibleOnly(): bool
-    {
-        if (null === $this->workType) {
-            return false;
-        }
-        return $this->workType->isStaffOrInstructorVisibleOnly();
-    }
-
-
-    /**
      * The friendly, uninformative version of assertValidDates
      *
      * @return bool
@@ -832,7 +838,6 @@ abstract class AbstractAssessment implements IAssessable
      */
     protected function assertDateSequence(array $dates): void
     {
-        /** @var Alaress_Date_Format $previousAdf */
         $previousAdf   = null;
         $previousLabel = '';
 
@@ -1253,7 +1258,7 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
-     * @return int
+     * @return string
      */
     public function getMarkVisibility()
     {
@@ -1262,7 +1267,7 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
-     * @param int $markVisibility
+     * @param string $markVisibility
      * @return static
      */
     public function setMarkVisibility($markVisibility)
@@ -1348,6 +1353,29 @@ abstract class AbstractAssessment implements IAssessable
     public function setCurriculumNodes(GenericCollection $curriculumNodes): IAssessable
     {
         $this->curriculumNodes->replaceWith($curriculumNodes);
+        return $this;
+    }
+
+
+    /**
+     * @return GenericCollection<\Schoolbox\Assessment\Rubric\Instance\Model>|null
+     */
+    public function getRubricInstances(): ?GenericCollection
+    {
+        return $this->rubricInstances;
+    }
+
+
+    /**
+     * This variant of a setters also checks/asserts the contents of $rubricInstances supplied here to ensure they're
+     * the same type as what it originally was.
+     *
+     * @param GenericCollection<\Schoolbox\Assessment\Rubric\Instance\Model>|null $rubricInstances
+     * @return $this
+     */
+    public function setRubricInstances(?GenericCollection $rubricInstances): self
+    {
+        $this->rubricInstances->replaceWith($rubricInstances);
         return $this;
     }
 

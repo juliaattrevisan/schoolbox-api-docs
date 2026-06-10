@@ -39,7 +39,7 @@ class TestModel
 
     /**
      * @param string $file
-     * @return $this;
+     * @return $this
      */
     public function setFile($file)
     {
@@ -57,7 +57,7 @@ class TestModel
 
     /**
      * @param string $filename
-     * @return $this;
+     * @return $this
      */
     public function setFilename($filename)
     {
@@ -75,7 +75,7 @@ class TestModel
 
     /**
      * @param int $id
-     * @return $this;
+     * @return $this
      */
     public function setId($id)
     {
@@ -93,7 +93,7 @@ class TestModel
 
     /**
      * @param boolean $is_viewed
-     * @return $this;
+     * @return $this
      */
     public function setIsViewed($is_viewed)
     {

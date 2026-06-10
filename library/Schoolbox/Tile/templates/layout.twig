@@ -88,12 +88,17 @@
                                 Number(form.find('input[name="grid_width"]').val())
                             )
                         );
-                        // Grid padding: a set pixel count
+                        // Grid spacing: a set pixel count
                         var gridPadding = Number(form.find('input[name="grid_padding"]').val());
                         if (gridWidth > 0) {
+                            tileList.removeAttr("data-column-gap-percentage");
+                            tileList.css({
+                                "column-gap": String(gridPadding)+"px",
+                                "row-gap":    String(gridPadding)+"px"
+                            });
                             tileList.find('.tile').css({
                                 "width":          String(gridWidth)+"px",
-                                "margin":         String(gridPadding)+"px",
+                                "margin":         "0",
                                 "padding-bottom": String(gridWidth * aspect)+"px"
                             });
                         }
@@ -107,16 +112,21 @@
                                 Number(form.find('input[name="column_count"]').val())
                             )
                         );
-                        // Column padding: a % of the width of the tile is taken up with padding
+                        // Column spacing: a % of the base column width is used as gap
                         var columnPadding = Number(form.find('input[name="column_padding"]').val());
                         if (colCount > 0) {
                             var baseColumnWidth   = (100/colCount);
                             var paddingProportion = columnPadding / 100;
-                            var tilePadding       = baseColumnWidth * paddingProportion;
-                            var tileWidth         = baseColumnWidth - tilePadding;
+                            var gapWidth          = baseColumnWidth * paddingProportion;
+                            var tileWidth         = (100 - (gapWidth * (colCount - 1))) / colCount;
+                            tileList.css({
+                                "column-gap": String(gapWidth)+"%",
+                                "row-gap":    String(tileList.width() * gapWidth / 100)+"px"
+                            });
+                            tileList.attr("data-column-gap-percentage", String(gapWidth));
                             tileList.find('[data-tile]').css({
                                 "width":          String(tileWidth)+"%",
-                                "margin":         String(tilePadding / 2)+"%",
+                                "margin":         "0",
                                 "padding-bottom": String(tileWidth * aspect)+"%"
                             });
                         }

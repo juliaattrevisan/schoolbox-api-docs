@@ -12,6 +12,7 @@ namespace Alaress\Redis\CommandLineTool;
 use Alaress\Redis;
 use External\Isams\Register\CacheHelper as IsamsCacheHelper;
 use Schoolbox\Oidc\CacheHelper;
+use Schoolbox\Resource\Storage\GC\Check\Storage;
 
 class Registry
 {
@@ -34,7 +35,7 @@ class Registry
     public const KEY_PATTERNS = [
         // Cache-only patterns go here
         Redis::INSTANCE_CACHE   => [
-            // Ccrub
+            // Scrub
             '^fc:' . self::INSTANCE_ID_MATCH . ':scrub.html:',
             '^fc:' . self::INSTANCE_ID_MATCH . ':scrub.htmlAbsoluteUri:',
 
@@ -87,6 +88,11 @@ class Registry
             // Old key
             'httpClient:' . self::INSTANCE_ID_MATCH . ':' . self::SET_KEY,
             'httpClient:' . self::INSTANCE_ID_MATCH . ':',
+
+            // Storage hashes within storage file content:
+            // used so that storage file content does not need to be looked up
+            // every time the garbage collector is run.
+            Storage::CACHE_NAMESPACE . '\\.' . self::INSTANCE_ID_MATCH . ':',
         ],
         // Storage-only patterns go here
         Redis::INSTANCE_STORAGE => [

@@ -1041,7 +1041,7 @@ class Event implements ISoftDeletable
 
     /**
      * @param bool|null $showAttendees
-     * @return $this;
+     * @return $this
      */
     public function setShowAttendees(?bool $showAttendees): self
     {

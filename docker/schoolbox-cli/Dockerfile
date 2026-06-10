@@ -10,7 +10,7 @@ FROM ${BASE_PHP_IMAGE}
 
 ARG NVM_VERSION='0.40.3'
 ARG AWS_CLI_VERSION='2.27.55'
-ARG NODE_VERSION=20
+ARG NODE_VERSION=24
 
 # Install tools required by cron tasks and CLI:
 # * cron itself, git, mariadb client, ffmpeg, imagemagick, sudo, jq
@@ -99,7 +99,7 @@ COPY ./config/mariadb.conf.d/* /etc/mysql/mariadb.conf.d/
 COPY ./config/php/* /usr/local/etc/php/conf.d/
 
 # Install Composer (dev only?)
-COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Cleanup
 RUN \

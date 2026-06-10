@@ -18,6 +18,100 @@ class Component_Definition
 
     public const MODULE_HOMEPAGE_TEMPLATE = 'homepage_template';
 
+    /**
+     * Palette icon names keyed by the legacy masonry CSS class.
+     *
+     * A small number of homepage components still need dedicated sbx-icon glyphs,
+     * so those entries use the closest existing icon for now.
+     *
+     * @var array<string, string>
+     */
+    private const PALETTE_ICON_NAME_MAP = [
+        'Component_Dashboard_ActivityController' => 'info',
+        'Component_Dashboard_HomepageNewsController' => 'report',
+        'Schoolbox_Calendar_Component_Dashboard_Controller' => 'calendar',
+        'Component_Dashboard_ChildSubjectController' => 'group',
+        'Component_Dashboard_GreetingController' => 'chat',
+        'Schoolbox_Comms_News_Component_Dashboard_Controller' => 'news',
+        'Component_Dashboard_ImageGalleryController' => 'image-gallery',
+        'Component_Dashboard_NewsController' => 'news',
+        'Component_Dashboard_RecentSubmissionsController' => 'due-work',
+        'Component_Dashboard_RssController' => 'rss',
+        'Component_Dashboard_SlideshowController' => 'image-slideshow',
+        'Component_Dashboard_SubjectController' => 'class-list',
+        'Component_Dashboard_TextboxController' => 'textbox',
+        'Component_Dashboard_TimetableController' => 'timetable',
+        'Schoolbox_Twitter_Component_Dashboard_Controller' => 'twitter',
+        'Schoolbox_Learning_Component_Dashboard_UpcomingWorkController' => 'due-work',
+        'Component_Dashboard_VideoController' => 'video',
+        'Schoolbox_Weather_Component_Dashboard_Controller' => 'weather',
+        'Schoolbox_ResourceBooking_Booking_Component_ResourceManagement' => 'resource-booking',
+        'Schoolbox_Tile_Component_DashboardTileController' => 'tiles',
+        'Schoolbox_Fixtures_Component_Dashboard_Controller' => 'sport',
+        'Schoolbox_Learning_Component_Dashboard_ClassController' => 'teacher',
+        'Schoolbox_Resource_Folder_Component_Dashboard_GroupController' => 'group',
+        'Schoolbox_Learning_Moment_StudentToolkit_Component_Dashboard_Controller' => 'favourite',
+        'Schoolbox_Geosnapshot_Component_Dashboard_Controller' => 'geosnapshot',
+        'Schoolbox_Intellischool_Component_Dashboard_Controller' => 'intellischool',
+        'Component_Dashboard_CanvasAssignmentsController' => 'canvas-lms',
+        'Schoolbox_Learning_Component_Dashboard_CurrentLessonPlanController' => 'lesson-plan',
+        'Schoolbox_Paperly_Component_Dashboard_Controller' => 'paperly',
+        'Schoolbox_Blog_Homepage_Component_Controller' => 'comment',
+        'Schoolbox_Calendar_Component_Homepage_Controller' => 'calendar',
+        'Component_Homepage_CountdownController' => 'countdown',
+        'Schoolbox_Comms_News_Component_Homepage_Controller' => 'news',
+        'Schoolbox_Fixtures_Component_Homepage_Controller' => 'sport',
+        'Schoolbox_Resource_Textbox_Component_Homepage_Controller' => 'textbox',
+        'Schoolbox_Tile_Component_HomepageTileController' => 'tiles',
+        'Component_Homepage_ChatController' => 'chat',
+        'Component_Homepage_EtherpadController' => 'collab-docs',
+        'Component_Homepage_ForumListController' => 'forum',
+        'Schoolbox_Resource_GoogleFile_Component_Homepage_Controller' => 'google-drive',
+        'Component_Homepage_ManagersController' => 'group-managers',
+        'Component_Homepage_MembersController' => 'group',
+        'Component_Homepage_PollController' => 'poll',
+        'Component_Homepage_SocialStreamController' => 'social-stream',
+        'Component_Homepage_SurveyController' => 'surveys',
+        'Component_Homepage_WikiController' => 'wiki',
+        'Component_Homepage_ClassListController' => 'class-list',
+        'Component_Homepage_ManageClassController' => 'class-list',
+        'Component_Homepage_TeachersController' => 'teacher',
+        'Schoolbox_Learning_Assessment_Component_Homepage_Builder_Controller' => 'course-builder',
+        'Schoolbox_Learning_Assessment_Component_Homepage_Outline_Controller' => 'course-outline',
+        'Schoolbox_Curriculum_Component_CurriculumDetailsController' => 'curriculum-details',
+        'Schoolbox_Curriculum_Component_CurriculumOverviewController' => 'curriculum',
+        'Schoolbox_Learning_Assessment_DialogAgent_Component_Homepage_Controller' => 'dialog-agent',
+        'Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller' => 'due-work',
+        'Schoolbox_Learning_Component_Homepage_LearningMomentsController' => 'share',
+        'Component_Homepage_DropBoxController' => 'drop-box',
+        'Schoolbox_Learning_Assessment_Quiz_Component_Homepage_Controller' => 'quiz',
+        'Component_Homepage_RubricController' => 'criteria',
+        'Schoolbox_Learning_Assessment_Task_Component_Homepage_Controller' => 'task',
+        'Schoolbox_Learning_Component_Homepage_CurrentLessonPlanController' => 'lesson-plan',
+        'Component_Homepage_AudioController' => 'audio',
+        'Component_Homepage_ClickviewController' => 'click-view',
+        'Schoolbox_LTI_Component_Homepage_Controller' => 'lti',
+        'Schoolbox_Learning_Assessment_Lti_Component_Homepage_Controller' => 'lti',
+        'Schoolbox_Geosnapshot_Component_Homepage_Controller' => 'geosnapshot',
+        'Component_Homepage_ImageController' => 'image',
+        'Component_Homepage_ImageGalleryController' => 'image-gallery',
+        'Component_Homepage_SlideshowController' => 'image-slideshow',
+        'Component_Homepage_RandImageController' => 'random-image',
+        'Component_Homepage_VideoController' => 'video',
+        'Component_Homepage_BreadcrumbController' => 'breadcrumbs',
+        'Component_Homepage_FileListController' => 'files',
+        'Component_Homepage_FolderListController' => 'folder',
+        'Component_Homepage_ManageFolderController' => 'folder',
+        'Component_Homepage_LinkListController' => 'link',
+        'Component_Homepage_FeedController' => 'homepagefeed',
+        'Component_Homepage_PinterestController' => 'pinterest',
+        'Component_Homepage_PodcastController' => 'podcast',
+        'Component_Homepage_RSSController' => 'rss',
+        'Schoolbox_Twitter_Component_Homepage_Controller' => 'twitter',
+        'Component_Homepage_WolframController' => 'wolfram-alpha',
+        'Schoolbox_Intellischool_Component_Homepage_Controller' => 'intellischool',
+    ];
+
     /** @var int $id */
     protected $id;
 
@@ -120,6 +214,14 @@ class Component_Definition
     public function getCssClass(): string
     {
         return str_replace('\\', '_', $this->getClass());
+    }
+
+    /**
+     * Gets the sbx-icon name for palette rendering.
+     */
+    public function getPaletteIconName(): string
+    {
+        return self::PALETTE_ICON_NAME_MAP[$this->getCssClass()] ?? 'components';
     }
 
     // Getters & Setters

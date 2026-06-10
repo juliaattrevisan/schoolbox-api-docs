@@ -19,10 +19,71 @@ use Schoolbox;
  */
 class Mapper extends Schoolbox\Mapper
 {
-    public const string VISIBILITY_STAFF_ONLY = 'staffOnly';
-    public const string VISIBILITY_STAFF_STUDENTS = 'staffAndStudents';
-    public const string VISIBILITY_STAFF_PARENTS = 'staffAndParents';
-    public const string VISIBILITY_STAFF_STUDENTS_PARENTS = 'staffAndStudentsAndParents';
+    /**
+     * The docblocks in this file define how work type visibility should work in Schoolbox.
+     *
+     * Glossary:
+     *  - Instructor: A user with WRITE+ access to the assessment folder.
+     *  - Learner: A user with READ access to the assessment folder.  (Note this is a folder-level concept.)
+     *  - Participant: A user for whom $assessment->getParticipantIfExtant($user) returns a non-null participant.
+     *                 (Note this is an assessment-level concept.)
+     *  - Learner-participant: A learner who is also a participant.
+     *  - Parent of learner-participant: A parent whose child is a learner-participant.
+     *
+     * Notes:
+     *  - Being a learner without being a participant has no effect on assessment visibility.
+     *  - Being a participant without being a learner implies the user is either an instructor or has no access to the
+     *    class (since learner means READ access to the class, non-learner means either WRITE+ or no access).
+     *    Both of these cases are already handled, so no special treatment is required.
+     *  - Granting a user READ access to a class via their role type does not cause that user to be a
+     *    participant in assessments in that class.
+     *  - Granting a user READ access to a class individually via group membership does cause that user to be a
+     *    participant in assessments in that class.
+     *  - Visibility of assessments also depends on:
+     *     - Whether they are published (only instructors and staff should see unpublished assessments)
+     *       (Note a user who is both staff and a learner-participant should be treated as a learner-participant, and
+     *        so not see unpublished assessments)
+     *     - Whether they are closed and whether closed assessments should be visible.
+     *
+     * @see implementation in the Learning\Assessment\Visibility class.
+     */
+
+    /**
+     * Visibility 'Staff and instructors only'
+     *  - Instructors - always included
+     *  - Learner-participants - always excluded
+     *  - Parents of learner-participants - included only if instructors
+     *  - Users of role type 'staff' - included unless they are learner-participants
+     *  - Other users of any role type - included only if instructors
+     */
+    public const string VISIBILITY_STAFF_INSTRUCTORS = 'staffAndInstructorsOnly';
+    /**
+     * Visibility 'Staff and instructors and learners'
+     *  - Instructors - always included
+     *  - Learner-participants - always included
+     *  - Parents of learner-participants - included only if instructors or learner-participants
+     *  - Users of role type 'staff' - always included
+     *  - Other users of any role type - included only if instructors or learner-participants
+     */
+    public const string VISIBILITY_STAFF_INSTRUCTORS_LEARNERS = 'staffAndInstructorsAndLearners';
+    /**
+     * Visibility 'Staff and instructors and parents'
+     *  - Instructors - always included
+     *  - Learner-participants - always excluded
+     *  - Parents of learner-participants - included unless they are learner-participants
+     *  - Users of role type 'staff' - included unless they are learner-participants
+     *  - Other users of any role type - included only if instructors
+     */
+    public const string VISIBILITY_STAFF_INSTRUCTORS_PARENTS = 'staffAndInstructorsAndParents';
+    /**
+     * Visibility 'Staff and instructors and learners and parents'
+     *  - Instructors - always included
+     *  - Learner-participants - always included
+     *  - Parents of learner-participants - always included
+     *  - Users of role type 'staff' - always included
+     *  - Other users of any role type - included only if instructors or learner-participants
+     */
+    public const string VISIBILITY_STAFF_INSTRUCTORS_LEARNERS_PARENTS = 'staffAndInstructorsAndLearnersAndParents';
 
     /**
      * @inheritdoc
@@ -35,9 +96,8 @@ class Mapper extends Schoolbox\Mapper
         $this->uses('name', self::TYPE_STRING);
         $this->uses('external_result_type', self::TYPE_STRING);
         $this->uses('show_on_grades_page', self::TYPE_BOOLEAN);
-        $this->uses('staff_or_instructor_visible_only', self::TYPE_BOOLEAN);
         $this->uses('is_visible_to_parents', self::TYPE_BOOLEAN);
-        $this->uses('is_visible_to_students', self::TYPE_BOOLEAN);
+        $this->uses('is_visible_to_learners', self::TYPE_BOOLEAN);
         $this->uses('permitted_project', self::TYPE_BOOLEAN);
         $this->uses('permitted_due_work', self::TYPE_BOOLEAN);
         $this->uses('permitted_task', self::TYPE_BOOLEAN);
@@ -45,6 +105,7 @@ class Mapper extends Schoolbox\Mapper
         $this->uses('permitted_lti', self::TYPE_BOOLEAN);
         $this->uses('permitted_lesson_plan', self::TYPE_BOOLEAN);
         $this->uses('permitted_dialog_agent', self::TYPE_BOOLEAN);
+        $this->uses('permitted_reporting_activity', self::TYPE_BOOLEAN);
 
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->uses('updated_by', self::TYPE_INTEGER);

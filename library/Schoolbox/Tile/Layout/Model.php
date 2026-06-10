@@ -318,6 +318,24 @@ class Model implements ISoftDeletable, \JsonSerializable
     }
 
     /**
+     * @return float
+     */
+    public function getColumnGapPercentage(): float
+    {
+        return $this->getBaseColumnWidthPercentage() * ($this->columnPadding / 100);
+    }
+
+    /**
+     * @return float
+     */
+    public function getColumnTileWidthPercentage(): float
+    {
+        $columnCount = $this->getValidColumnCount();
+
+        return (100 - ($this->getColumnGapPercentage() * ($columnCount - 1))) / $columnCount;
+    }
+
+    /**
      * @param  int $columnPadding
      *
      * @return $this
@@ -345,6 +363,22 @@ class Model implements ISoftDeletable, \JsonSerializable
     {
         $this->gridPadding = $gridPadding;
         return $this;
+    }
+
+    /**
+     * @return float
+     */
+    private function getBaseColumnWidthPercentage(): float
+    {
+        return 100 / $this->getValidColumnCount();
+    }
+
+    /**
+     * @return int
+     */
+    private function getValidColumnCount(): int
+    {
+        return $this->columnCount > 0 ? $this->columnCount : self::DEFAULT_COLUMN_COUNT;
     }
 
     /**

@@ -101,9 +101,8 @@ class Dispatcher implements DispatcherInterface
     public function enqueue($identifier, $command, $data)
     {
         $qLength = $this->q->count();
-        $mLength = trim($this->strat->getMaxQueueLength());
-
-        if ($qLength >= $mLength) {
+        $mLength = intval(trim($this->strat->getMaxQueueLength()));
+        if ($mLength > 0 && $qLength >= $mLength) {
             throw new QueueingException("Cannot enqueue, max queue length of $mLength reached");
         }
 
@@ -111,7 +110,8 @@ class Dispatcher implements DispatcherInterface
         $this->q->enqueue([ $identifier, $command, $data ]);
         $this->log->debug("Enqueued '$command': queue length is " . $this->q->count());
 
-        if ($qLength >= $this->strat->getWarningQueueLength()) {
+        $wLength = $this->strat->getWarningQueueLength();
+        if ($wLength > 0 && $qLength >= $wLength) {
             $this->log->warning("Queue is getting large");
         }
 

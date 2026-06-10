@@ -17,8 +17,14 @@
         margin: -0.5rem 1rem 0 -1rem;
     }
 
-    sbx-icon[size="l"]:not(.no-text) {
-        color: var(--sbx-color-text-secondary, $body-foreground);
+    sbx-icon.assessment-card-icon {
+        float: left;
+        margin: -0.5rem 1rem 0 -1rem;
+        padding: 0.5rem 0 0 1rem;
+    }
+
+    .assessment-card-collapser {
+        cursor: pointer;
         float: left;
         margin: -0.5rem 1rem 0 -1rem;
         padding: 0.5rem 0 0 1rem;
@@ -44,7 +50,11 @@
             margin: -0.25rem 1rem 0 -1rem;
         }
 
-        sbx-icon[size="l"]:not(.no-text) {
+        sbx-icon.assessment-card-icon {
+            margin: -0.25rem 1rem 0 -1rem;
+        }
+
+        .assessment-card-collapser {
             margin: -0.25rem 1rem 0 -1rem;
         }
     }
@@ -214,12 +224,20 @@
         min-height: 2.5rem;
         padding: 0 1rem;
 
-        [class*="icon-"] {
+        [class*="icon-"],
+        sbx-icon.compact-card-icon {
             width: 2rem;
             margin-top: 0;
-            padding: 0 0 0 1rem;
+            padding: 0.5rem 0;
             line-height: 1.65rem;
             @extend .text-center;
+        }
+
+        sbx-icon.compact-card-icon {
+            box-sizing: content-box;
+            display: inline-flex;
+            flex: 0 0 auto;
+            vertical-align: middle;
         }
 
         > * {

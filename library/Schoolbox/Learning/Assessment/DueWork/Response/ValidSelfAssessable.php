@@ -43,7 +43,7 @@ class ValidSelfAssessable
      * Will throw a type error if participant is not for a dueWork
      *
      * @param Participant $participant
-     * @return DueWork\Model|IAssessable
+     * @return DueWork\Model
      */
     protected function getDueWork(Participant $participant): DueWork\Model
     {

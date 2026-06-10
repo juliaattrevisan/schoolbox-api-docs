@@ -35,7 +35,7 @@
         // used on the platform currently.
         align-items: center;
         // Default global roundness
-        border-radius: var(--sbx-config-field-roundness, var(--roundness-images));
+        border-radius: var(--sbx-config-field-corner-radius, var(--roundness-images));
         display: flex;
         flex: 1 var(--image-size-m);
         max-height: var(--image-size-m);

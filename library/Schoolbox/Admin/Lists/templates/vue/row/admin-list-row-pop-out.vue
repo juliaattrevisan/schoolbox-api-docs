@@ -185,7 +185,7 @@ export default {
     align-items: stretch;
     width: 100%;
     border: 1px solid $form-border-color;
-    border-radius: var(--sbx-config-field-roundness, 0);
+    border-radius: var(--sbx-config-field-corner-radius, 0);
 }
 
 .list {
@@ -209,7 +209,7 @@ export default {
     min-height: auto;
     margin: 2px;
     padding: 5px 10px;
-    border-radius: var(--sbx-config-field-roundness, 0);
+    border-radius: var(--sbx-config-field-corner-radius, 0);
     color: var(--sbx-config-color-accent, #000);
     font-size: 0.7rem;
     text-align: center;

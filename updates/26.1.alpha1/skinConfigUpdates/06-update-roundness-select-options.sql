@@ -39,6 +39,6 @@ SET
     )
 WHERE
     name IN (
-        'skin_field_roundness',
-        'skin_box_roundness'
+        'skin_field_corner_radius',
+        'skin_container_corner_radius'
     );

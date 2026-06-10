@@ -7,67 +7,114 @@
  * @link        https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Alaress\WorkerCrew\Pooling;
 
+/**
+ * Builder for dispatch strategies, as configured by an array read from a
+ * config file.
+ */
 class ConfiguredDispatchStrategyBuilder
 {
-    /** @var int */
-    protected $minWorkers = DefaultDispatchStrategy::MIN_WORKERS;
-
-    /** @var int */
-    protected $maxWorkers = DefaultDispatchStrategy::MAX_WORKERS;
-
-    /** @var int */
-    protected $queueDelay = DefaultDispatchStrategy::QUEUE_DELAY;
-
-    /** @var int */
-    protected $maxFlywheel = DefaultDispatchStrategy::MAX_FLYWHEEL;
-
-    /** @var int */
-    protected $idleTimeout = DefaultDispatchStrategy::IDLE_TIMEOUT;
-
-    /** @var int */
-    protected $queueWarnSize = DefaultDispatchStrategy::QUEUE_SIZE_WARN;
-
-    /** @var int */
-    protected $queueMaxSize = DefaultDispatchStrategy::QUEUE_SIZE_MAX;
-
-    /** @var int */
-    protected $workerTimeoutSoft = DefaultDispatchStrategy::WORKER_SOFT_TIMEOUT;
-
-    /** @var int */
-    protected $workerTimeoutHard = DefaultDispatchStrategy::WORKER_HARD_TIMEOUT;
-
-    /** @var int */
-    protected $maxRequestsPerWorker = DefaultDispatchStrategy::MAX_REQUESTS_PER_WORKER;
-
-    /** @var int */
-    protected $workerWriteTimeout = DefaultDispatchStrategy::WORKER_WRITE_TIMEOUT;
-
-    /** @var int */
-    protected $metricInterval = DefaultDispatchStrategy::METRIC_INTERVAL;
-
+    /**
+     * Minimum workers which may be alive at any one time.
+     *
+     * @see DispatchStrategyInterface::getAvailableWorker()
+     */
+    protected int $minWorkers = DispatchStrategy::MIN_WORKERS;
 
     /**
-     * @param array $conf
+     * Maximum workers which may be alive at any one time.
+     *
+     * @see DispatchStrategyInterface::getAvailableWorker()
      */
-    public function __construct(array $conf = array())
+    protected int $maxWorkers = DispatchStrategy::MAX_WORKERS;
+
+    /**
+     * @see DispatchStrategyInterface::getQueueDelay()
+     */
+    protected int $queueDelay = DispatchStrategy::QUEUE_DELAY;
+
+    /**
+     * How many times may the dispatcher run with an empty queue, before being
+     * spun down (and restarted once the queue is no longer empty)?
+     *
+     * @see DispatchStrategyInterface::canDispatcherFlywheel()
+     */
+    protected int $maxFlywheel = DispatchStrategy::MAX_FLYWHEEL;
+
+    /**
+     * @see DispatchStrategyInterface::getWorkerIdleTimeout()
+     */
+    protected int $idleTimeout = DispatchStrategy::IDLE_TIMEOUT;
+
+    /**
+     * @see DispatchStrategyInterface::getWarningQueueLength()
+     */
+    protected int $queueWarnSize = DispatchStrategy::QUEUE_SIZE_WARN;
+
+    /**
+     * @see DispatchStrategyInterface::getMaxQueueLength()
+     */
+    protected int $queueMaxSize = DispatchStrategy::QUEUE_SIZE_MAX;
+
+    /**
+     * @see DispatchStrategyInterface::getWorkerExecutionTimeout(hard: false)
+     */
+    protected int $workerTimeoutSoft = DispatchStrategy::WORKER_SOFT_TIMEOUT;
+
+    /**
+     * @see DispatchStrategyInterface::getWorkerExecutionTimeout(hard: true)
+     */
+    protected int $workerTimeoutHard = DispatchStrategy::WORKER_HARD_TIMEOUT;
+
+    /**
+     * @see DispatchStrategyInterface::getMaxRequestsPerWorker()
+     */
+    protected int $maxRequestsPerWorker = DispatchStrategy::MAX_REQUESTS_PER_WORKER;
+
+    /**
+     * @see DispatchStrategyInterface::getWorkerWriteTimeout()
+     */
+    protected int $workerWriteTimeout = DispatchStrategy::WORKER_WRITE_TIMEOUT;
+
+    /**
+     * @see DispatchStrategyInterface::getMetricInterval()
+     */
+    protected int $metricInterval = DispatchStrategy::METRIC_INTERVAL;
+
+    /**
+     * @see DispatchStrategyInterface::getMaxFutureTriggerTime()
+     */
+    protected int $maxFutureTriggerTime = DispatchStrategy::MAX_FUTURE_TRIGGER_TIME;
+
+    /**
+     * Constructor
+     *
+     * @param array<string, int|numeric-string> $conf Any properties which may be set in the dispatch strategy.
+     *
+     * @see ConfigurationReader for the format of `$conf`
+     */
+    public function __construct(array $conf = [])
     {
         foreach ($conf as $k => $v) {
             if (property_exists($this, $k)) {
-                $this->$k = $v;
+                // It just so happens that all properties are ints
+                $this->$k = intval($v);
             }
         }
     }
 
-
     /**
+     * Build a dispatch strategy as per the configuration.
+     *
      * @param string $flags
-     * @return ConfiguredDispatchStrategy
+     * @return DispatchStrategyInterface
      */
-    public function build($flags = '')
+    public function build(string $flags = ''): DispatchStrategyInterface
     {
-        return new ConfiguredDispatchStrategy(
+        return new DispatchStrategy(
             $this->minWorkers,
             $this->maxWorkers,
             $this->maxFlywheel,
@@ -79,16 +126,18 @@ class ConfiguredDispatchStrategyBuilder
             $this->workerTimeoutHard,
             $flags,
             $this->maxRequestsPerWorker,
+            $this->maxFutureTriggerTime,
             $this->workerWriteTimeout,
             $this->metricInterval,
         );
     }
 
-
     /**
+     * Return a summary of this dispatch strategy builder, for output in logs.
+     *
      * @return array
      */
-    public function summarise()
+    public function summarise(): array
     {
         $maxRequestsPerWorkerOutput = $this->maxRequestsPerWorker > 0
             ? sprintf('max %d', $this->maxRequestsPerWorker)
@@ -96,9 +145,9 @@ class ConfiguredDispatchStrategyBuilder
         return [
             'metrics' => sprintf("Metrics every %dms", $this->metricInterval),
             'queue'   => sprintf(
-                "Queue:    %d warn, %d max, %dms check interval",
-                $this->queueWarnSize,
-                $this->queueMaxSize,
+                "Queue:    %s warn, %s max, %dms check interval",
+                $this->queueWarnSize ?: 'disabled',
+                $this->queueMaxSize ?: 'disabled',
                 $this->queueDelay,
             ),
             'worker'  => sprintf(
@@ -114,185 +163,5 @@ class ConfiguredDispatchStrategyBuilder
                 $this->workerTimeoutHard,
             ),
         ];
-    }
-
-
-    /**
-     * @param int $idleTimeout
-     * @return self
-     */
-    public function setIdleTimeout($idleTimeout)
-    {
-        $this->idleTimeout = $idleTimeout;
-        return $this;
-    }
-
-
-    /**
-     * @param int $maxFlywheel
-     * @return self
-     */
-    public function setMaxFlywheel($maxFlywheel)
-    {
-        $this->maxFlywheel = $maxFlywheel;
-        return $this;
-    }
-
-
-    /**
-     * @param int $maxWorkers
-     * @return self
-     */
-    public function setMaxWorkers($maxWorkers)
-    {
-        $this->maxWorkers = $maxWorkers;
-        return $this;
-    }
-
-
-    /**
-     * @param int $minWorkers
-     * @return self
-     */
-    public function setMinWorkers($minWorkers)
-    {
-        $this->minWorkers = $minWorkers;
-        return $this;
-    }
-
-
-    /**
-     * @param int $queueDelay
-     * @return self
-     */
-    public function setQueueDelay($queueDelay)
-    {
-        $this->queueDelay = $queueDelay;
-        return $this;
-    }
-
-
-    /**
-     * @param int $queueMaxSize
-     * @return self
-     */
-    public function setQueueMaxSize($queueMaxSize)
-    {
-        $this->queueMaxSize = $queueMaxSize;
-        return $this;
-    }
-
-
-    /**
-     * @param int $queueWarnSize
-     * @return self
-     */
-    public function setQueueWarnSize($queueWarnSize)
-    {
-        $this->queueWarnSize = $queueWarnSize;
-        return $this;
-    }
-
-
-    /**
-     * @param int $workerTimeoutHard
-     * @return self
-     */
-    public function setWorkerTimeoutHard($workerTimeoutHard)
-    {
-        $this->workerTimeoutHard = $workerTimeoutHard;
-        return $this;
-    }
-
-
-    /**
-     * @param int $workerTimeoutSoft
-     * @return self
-     */
-    public function setWorkerTimeoutSoft($workerTimeoutSoft)
-    {
-        $this->workerTimeoutSoft = $workerTimeoutSoft;
-        return $this;
-    }
-
-
-    /**
-     * @return int
-     */
-    public function getIdleTimeout()
-    {
-        return $this->idleTimeout;
-    }
-
-
-    /**
-     * @return int
-     */
-    public function getMaxFlywheel()
-    {
-        return $this->maxFlywheel;
-    }
-
-
-    /**
-     * @return int
-     */
-    public function getMaxWorkers()
-    {
-        return $this->maxWorkers;
-    }
-
-
-    /**
-     * @return int
-     */
-    public function getMinWorkers()
-    {
-        return $this->minWorkers;
-    }
-
-
-    /**
-     * @return int
-     */
-    public function getQueueDelay()
-    {
-        return $this->queueDelay;
-    }
-
-
-    /**
-     * @return int
-     */
-    public function getQueueMaxSize()
-    {
-        return $this->queueMaxSize;
-    }
-
-
-    /**
-     * @return int
-     */
-    public function getQueueWarnSize()
-    {
-        return $this->queueWarnSize;
-    }
-
-
-    /**
-     * @return int
-     */
-    public function getWorkerTimeoutHard()
-    {
-        return $this->workerTimeoutHard;
-    }
-
-
-    /**
-     * @return int
-     */
-    public function getWorkerTimeoutSoft()
-    {
-        return $this->workerTimeoutSoft;
     }
 }

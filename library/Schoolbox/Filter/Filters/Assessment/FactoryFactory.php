@@ -277,7 +277,7 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
 
 
     /**
-     * @return Term\Mapper|Mapper
+     * @return Term\Mapper
      * @throws InvalidArgumentException
      */
     private function getTermMapper(): Term\Mapper
@@ -287,7 +287,7 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
 
 
     /**
-     * @return WorkType\Mapper|Mapper
+     * @return WorkType\Mapper
      * @throws InvalidArgumentException
      */
     private function getWorkTypeMapper(): WorkType\Mapper
@@ -297,7 +297,7 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
 
 
     /**
-     * @return CourseSpec\Mapper|Mapper
+     * @return CourseSpec\Mapper
      * @throws InvalidArgumentException
      */
     private function getCourseSpecMapper(): CourseSpec\Mapper
@@ -307,7 +307,7 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
 
 
     /**
-     * @return CourseImpl\Mapper|Mapper
+     * @return CourseImpl\Mapper
      * @throws InvalidArgumentException
      */
     private function getCourseImplMapper(): CourseImpl\Mapper
@@ -317,7 +317,7 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
 
 
     /**
-     * @return UnitSpec\Mapper|Mapper
+     * @return UnitSpec\Mapper
      * @throws InvalidArgumentException
      */
     private function getUnitSpecMapper(): UnitSpec\Mapper
@@ -327,7 +327,7 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
 
 
     /**
-     * @return Project\Mapper|Mapper
+     * @return Project\Mapper
      * @throws InvalidArgumentException
      */
     private function getProjectMapper(): Project\Mapper

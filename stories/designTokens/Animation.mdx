@@ -1,10 +1,27 @@
 import { Meta } from "@storybook/addon-docs/blocks";
 
-<Meta title="Draft/Design Tokens/Animation" />
+<Meta title="Design Tokens/Animation" />
 
 # Animation
 
-![draft](/draft.png)
+## Duration
 
-- CSS: `stories/assets/styles/styles.scss`
-- Figma: https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=8-11
+- Defined in `www/static/css/core/designTokens/_sbx-animation.scss`.
+- Should always be used when defining animation and transition durations.
+
+| CSS Custom Property               | Value   |
+| --------------------------------- | ------- |
+| `--sbx-animation-duration-fast`   | `50ms`  |
+| `--sbx-animation-duration-normal` | `200ms` |
+| `--sbx-animation-duration-slow`   | `400ms` |
+
+## Easing
+
+- Defined in `www/static/css/core/designTokens/_sbx-animation.scss`.
+- Should always be used when defining animation and transition timing functions.
+
+| CSS Custom Property           | Value                          |
+| ----------------------------- | ------------------------------ |
+| `--sbx-animation-ease-in`     | `cubic-bezier(0.4, 0, 1, 1)`   |
+| `--sbx-animation-ease-out`    | `cubic-bezier(0, 0, 0.2, 1)`   |
+| `--sbx-animation-ease-in-out` | `cubic-bezier(0.4, 0, 0.2, 1)` |

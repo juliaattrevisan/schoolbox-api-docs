@@ -2,6 +2,7 @@
  * A single subject entry with its name and associated language.
  */
 export type SubjectEntry = {
+    groupSubjectId: number;
     subject: string;
     language: string | null;
     languageId: number | null;
@@ -27,8 +28,12 @@ export type CandidateDetailsStatus = "confirmed" | "unconfirmed";
 export type StudentRow = {
     id: number;
     name: string;
+    userId: number;
     candidateDetailsStatus: CandidateDetailsStatus;
     subjects: SubjectGroup;
+    updateLanguageEndpoint: string | null;
+    renotifyEndpoint: string | null;
+    stage: "preparation" | "unconfirmed" | "confirmed" | "inProgress" | "failed" | "registered";
 };
 
 /**
@@ -84,11 +89,14 @@ export type ApiSubject = {
  */
 export type ApiStudent = {
     userId: number;
-    registrationSessionStudentId: number;
+    registrationSessionStudentId: number | null;
     status: number;
     userName: string;
     hasMissingDetails: boolean;
     missingFields: string[];
+    _routes: {
+        updateLanguages: string | null;
+    };
     ibGroupSubjects: {
         HL: ApiSubject[];
         SL: ApiSubject[];
@@ -112,4 +120,18 @@ export type ApiCandidatesResponse = {
     success: true;
     students: Record<string, ApiStudent[]>;
     statuses: ApiStatus[];
+};
+
+/**
+ * Raw response from the renotify endpoint.
+ */
+export type ApiRenotifyResponse = {
+    success: boolean;
+    partial: boolean;
+    message?: string;
+    renotified: number[];
+    failed: {
+        studentId: number;
+        message: string;
+    }[];
 };

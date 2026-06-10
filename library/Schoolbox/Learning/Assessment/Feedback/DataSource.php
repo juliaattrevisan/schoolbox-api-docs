@@ -134,7 +134,6 @@ class DataSource implements IFeedbackDataSource
      */
     public function createModel(IAssessable $target)
     {
-        /** @var IFeedback $feedback */
         $feedback = null;
 
         foreach ($this->subSources as $subSource) {
@@ -144,6 +143,7 @@ class DataSource implements IFeedbackDataSource
             }
         }
 
+        /** @var IFeedback $feedback */
         return $feedback;
     }
 }

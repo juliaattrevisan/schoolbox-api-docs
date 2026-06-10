@@ -58,7 +58,7 @@ class ReturnedWork implements ISoftDeletable
     /**
      * This Return is optionally linked to a Submission
      *
-     * @var SubmissionBox\Submission\Submission|null;
+     * @var SubmissionBox\Submission\Submission|null
      */
     protected $submission;
 

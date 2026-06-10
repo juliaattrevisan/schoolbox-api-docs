@@ -20,7 +20,7 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as assessmentDataSource;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Mapper;
@@ -57,7 +57,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
      */
     protected $workTypeMapper;
 
-    /** @var assessmentDataSource $assessmentDataSource */
+    /** @var AssessmentDataSource $assessmentDataSource */
     protected $assessmentDataSource;
 
     /**
@@ -70,13 +70,85 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
      */
     public function loadDependencies($dependencies = null)
     {
-        $this->userMapper           = UserMapper::getInstance();
-        $this->boxMapper            = SubmissionBoxMapper::getInstance();
-        $this->termMapper           = Term\Mapper::getInstance();
-        $this->workTypeMapper       = WorkTypeMapper::getInstance();
-
-        $this->assessmentDataSource = Mapper::getDi()->get("assessmentDataSource");
+        if (!is_array($dependencies)) {
+            $dependencies = [];
+        }
+        if (empty($dependencies['userMapper'])) {
+            $dependencies['userMapper'] = UserMapper::getInstance();
+        }
+        if (empty($dependencies['boxMapper'])) {
+            $dependencies['boxMapper'] = SubmissionBoxMapper::getInstance();
+        }
+        if (empty($dependencies['termMapper'])) {
+            $dependencies['termMapper'] = Term\Mapper::getInstance();
+        }
+        if (empty($dependencies['workTypeMapper'])) {
+            $dependencies['workTypeMapper'] = WorkTypeMapper::getInstance();
+        }
+        if (empty($dependencies['assessmentDataSource'])) {
+            $dependencies['assessmentDataSource'] = Mapper::getDi()->get("assessmentDataSource");
+        }
         parent::loadDependencies($dependencies);
+    }
+
+    /**
+     * This is called via reflection from AbstractModuleNotifier->loadDependencies().
+     *
+     * @param UserMapper $userMapper
+     * @return $this
+     */
+    protected function setUserMapper(UserMapper $userMapper): self
+    {
+        $this->userMapper = $userMapper;
+        return $this;
+    }
+
+    /**
+     * This is called via reflection from AbstractModuleNotifier->loadDependencies().
+     *
+     * @param SubmissionBoxMapper $boxMapper
+     * @return $this
+     */
+    protected function setBoxMapper(SubmissionBoxMapper $boxMapper): self
+    {
+        $this->boxMapper = $boxMapper;
+        return $this;
+    }
+
+    /**
+     * This is called via reflection from AbstractModuleNotifier->loadDependencies().
+     *
+     * @param Term\Mapper $termMapper
+     * @return $this
+     */
+    protected function setTermMapper(Term\Mapper $termMapper): self
+    {
+        $this->termMapper = $termMapper;
+        return $this;
+    }
+
+    /**
+     * This is called via reflection from AbstractModuleNotifier->loadDependencies().
+     *
+     * @param WorkTypeMapper $workTypeMapper
+     * @return $this
+     */
+    protected function setWorkTypeMapper(WorkTypeMapper $workTypeMapper): self
+    {
+        $this->workTypeMapper = $workTypeMapper;
+        return $this;
+    }
+
+    /**
+     * This is called via reflection from AbstractModuleNotifier->loadDependencies().
+     *
+     * @param AssessmentDataSource $assessmentDataSource
+     * @return $this
+     */
+    protected function setAssessmentDataSource(AssessmentDataSource $assessmentDataSource): self
+    {
+        $this->assessmentDataSource = $assessmentDataSource;
+        return $this;
     }
 
     /**
@@ -133,7 +205,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
             } catch (Mapper\Exception $e) {
                 return;
             }
-            if ($workType->isStaffOrInstructorVisibleOnly()) {
+            if (!$workType->isVisibleToLearners() && !$workType->isVisibleToParents()) {
                 return;
             }
         }
@@ -200,6 +272,9 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         if (!$assessment || !($assessment->isFeedbackVisibleToRoleType(Role::STUDENT) || $requestResubmission)) {
             return $envelope;
         }
+        if (!($assessment->getWorkType()?->isVisibleToLearners() ?? true)) {
+            return $envelope;
+        }
         $href = "/learning/assessments/{$assessment->getId()}/{$student->getId()}";
 
         $bob = new Builder();
@@ -246,6 +321,9 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         $box        = $returnedWork->getSubmissionBox();
         $assessment = $this->getAssessment($box, $student);
         if (!$assessment) {
+            return $envelope;
+        }
+        if (!($assessment->getWorkType()?->isVisibleToParents() ?? true)) {
             return $envelope;
         }
         $cat = $assessment->getBaseContext()->getFolder();

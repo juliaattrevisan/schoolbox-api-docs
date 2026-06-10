@@ -63,22 +63,22 @@ class Controller extends Base
     protected $errorMapper;
 
     /**
-     * @var BlogMapper;
+     * @var BlogMapper
      */
     protected $blogMapper;
 
     /**
-     * @var BlogCommentMapper;
+     * @var BlogCommentMapper
      */
     protected $blogCommentMapper;
 
     /**
-     * @var FileMapper;
+     * @var FileMapper
      */
     protected $fileMapper;
 
     /**
-     * @var FolderMapper;
+     * @var FolderMapper
      */
     protected $folderMapper;
 

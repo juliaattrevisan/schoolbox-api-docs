@@ -339,7 +339,7 @@ class MutableFieldsOnlyTest extends TestCase
      * @param IStorage|null $storage
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvokeCreateData')]
-    public function testInvokeCreate(array $input, Model $expected, ?Istorage $storage = null): void
+    public function testInvokeCreate(array $input, Model $expected, ?IStorage $storage = null): void
     {
         $converter = $this->createConverter($storage);
 
@@ -364,7 +364,7 @@ class MutableFieldsOnlyTest extends TestCase
         array $input,
         Model $existing,
         Model $expected,
-        ?Istorage $storage = null
+        ?IStorage $storage = null
     ): void {
         $converter = $this->createConverter($storage);
 
@@ -389,13 +389,13 @@ class MutableFieldsOnlyTest extends TestCase
             $collectorMock = $this->createMock(Collector::class);
             $collectorMock->method('getFirst')->willReturn($storage);
 
-            /** @var CollectorFactory|MockObject $collectorFactoryMock */
+            /** @var CollectorFactory&MockObject $collectorFactoryMock */
             $collectorFactoryMock = $this->createMock(CollectorFactory::class);
             $collectorFactoryMock->method('build')->willReturn($collectorMock);
             return new MutableFieldsOnly($collectorFactoryMock);
         }
 
-        /** @var CollectorFactory|MockObject $collectorFactoryMock */
+        /** @var CollectorFactory&MockObject $collectorFactoryMock */
         $collectorFactoryMock = $this->createMock(CollectorFactory::class);
         return new MutableFieldsOnly($collectorFactoryMock);
     }

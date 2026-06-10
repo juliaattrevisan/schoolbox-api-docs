@@ -161,36 +161,38 @@
                         </div>
                     </div>
                     <div class="small-12 medium-6 columns" id="mass-submit-offline" data-list-id="mass-submit-offline-list">
-                        <p data-mass-unavailable>You have no students requiring submission.</p>
-                        <p data-mass-available>Mark students as submitted:</p>
+                        <div class="l-flex-col l-gap-s">
+                            <p data-mass-unavailable>You have no students requiring submission.</p>
+                            <p data-mass-available>Mark students as submitted:</p>
 
-                        <section class="checklist" id="mass-submit-offline-list">
-                            {# this will get detached from the DOM on pageload (jquery.bulky.js) #}
-                            {# data-articipant-name label is populated by JS (jquery.bulky.js) #}
-                            <div data-template>
-                                <input type="checkbox" data-selected />
-                                <label class="checkbox-label" data-participant-name></label>
+                            <section class="checklist l-flex-col l-gap-s l-mar-m--bottom" id="mass-submit-offline-list">
+                                {# this will get detached from the DOM on pageload (jquery.bulky.js) #}
+                                {# data-articipant-name label is populated by JS (jquery.bulky.js) #}
+                                <div data-template>
+                                    <input type="checkbox" data-selected />
+                                    <label class="checkbox-label" data-participant-name></label>
+                                </div>
+                            </section>
+
+                            {# Submission Date override: this is used to state that despite when the action
+                            # to submit offline actually occurred, the student should have been considered on
+                            # time. This occurs when teachers Mark As Submitted on behalf of their students after
+                            # the due date is reached, despite having practically done the work on time; they
+                            # just didn't complete the workflow.
+                            #}
+                            <div id="mass-submit-offline-punctual-container" data-mass-available>
+                                <hr />
+                                <p>
+                                    Did these students submit their work on time? <br />
+                                    <span class="switch">
+                                        <input id="offline-punctual" type="checkbox" checked="">
+                                        <label for="offline-punctual">
+                                            <span>Yes</span>
+                                            <span>No</span>
+                                        </label>
+                                    </span>
+                                </p>
                             </div>
-                        </section>
-
-                        {# Submission Date override: this is used to state that despite when the action
-                         # to submit offline actually occurred, the student should have been considered on
-                         # time. This occurs when teachers Mark As Submitted on behalf of their students after
-                         # the due date is reached, despite having practically done the work on time; they
-                         # just didn't complete the workflow.
-                         #}
-                        <div id="mass-submit-offline-punctual-container" data-mass-available>
-                            <hr />
-                            <p>
-                                Did these students submit their work on time? <br />
-                                <span class="switch">
-                                    <input id="offline-punctual" type="checkbox" checked="">
-                                    <label for="offline-punctual">
-                                        <span>Yes</span>
-                                        <span>No</span>
-                                    </label>
-                                </span>
-                            </p>
                         </div>
                     </div>
                 </div>

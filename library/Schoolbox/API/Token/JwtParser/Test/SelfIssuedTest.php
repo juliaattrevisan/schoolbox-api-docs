@@ -13,6 +13,7 @@ use Monolog\Handler\HandlerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Schoolbox\API\Token\JwtParser\AudienceMatchMode;
 use Schoolbox\API\Token\JwtParser\IParser;
 use Schoolbox\API\Token\JwtParser\SelfIssued;
 use Schoolbox\Config\ArrayLoader;
@@ -78,7 +79,8 @@ class SelfIssuedTest extends TestCase
                 ConfigMapper::NAME_SITE_DOMAIN   => 'schoolbox.cloud',
             ]),
             $this->createLogger($handler),
-            $this->createMock(Token\Mapper::class)
+            AudienceMatchMode::WARN,
+            $this->createMock(Token\Mapper::class),
         );
     }
 }

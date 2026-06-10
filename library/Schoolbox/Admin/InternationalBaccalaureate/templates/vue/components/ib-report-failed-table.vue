@@ -1,15 +1,29 @@
 <script setup lang="ts">
-/**
- * Student table used in the Failed Registrations section of the registration report.
- * Extends the standard table with an error message column.
- */
 import IbReportSubjectLabels from "./ib-report-subject-labels.vue";
-import type { FailedRow } from "../../js/types/ibReportTypes";
+import { useIbReportUpdateLanguageStore } from "../store/ibReportUpdateLanguageStore";
+import type { FailedRow, StudentRow } from "../../js/types/ibReportTypes";
 
 interface Props {
     students: FailedRow[];
+    activeSelectionSection: StudentRow["stage"] | null;
 }
-defineProps<Props>();
+const props = defineProps<Props>();
+
+const selectedList = defineModel<FailedRow[]>("selectedList", { default: () => [] });
+
+const emit = defineEmits<{
+    resetDetailsSingle: [studentId: number];
+}>();
+
+const updateLanguageStore = useIbReportUpdateLanguageStore();
+
+/**
+ * Opens the update language modal for the given student.
+ * @param student The student to update.
+ */
+function openModal(student: FailedRow): void {
+    updateLanguageStore.prompt(student);
+}
 </script>
 
 <template>
@@ -28,7 +42,17 @@ defineProps<Props>();
         </thead>
         <tbody>
             <tr v-for="student in students" :key="student.id">
-                <td><input type="checkbox" disabled :aria-label="`Select ${student.name}`" /></td>
+                <td class="checklist">
+                    <template v-if="props.activeSelectionSection === null || props.activeSelectionSection === 'failed'">
+                        <input
+                            :id="`select-${student.id}`"
+                            v-model="selectedList"
+                            type="checkbox"
+                            :value="student"
+                            :aria-label="`Select ${student.name}`"
+                        /><label class="checkbox-label" :for="`select-${student.id}`"></label>
+                    </template>
+                </td>
                 <td>{{ student.name }}</td>
                 <td>
                     <sbx-icon
@@ -49,9 +73,32 @@ defineProps<Props>();
                 <td><ib-report-subject-labels :entry="student.subjects.core" /></td>
                 <td class="ib-report-error-message">{{ student.errorMessage ?? "—" }}</td>
                 <td>
-                    <button type="button" disabled aria-label="More options">
-                        <sbx-icon name="more"></sbx-icon>
-                    </button>
+                    <sbx-pop-out
+                        :content-id="`ib-failed-row-dropdown-${student.id}`"
+                        move-to="#ib-report-pop-out-container"
+                    ></sbx-pop-out>
+                    <ul
+                        :id="`ib-failed-row-dropdown-${student.id}`"
+                        class="f-dropdown"
+                        data-dropdown-content
+                        aria-hidden="true"
+                    >
+                        <li v-if="student.updateLanguageEndpoint !== null">
+                            <button class="sbx-button--has-icon" @click.prevent="openModal(student)">
+                                <sbx-icon name="modify"></sbx-icon>
+                                Update Language Selection
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                class="sbx-button--has-icon"
+                                @click.prevent="emit('resetDetailsSingle', student.id)"
+                            >
+                                <sbx-icon name="undo"></sbx-icon>
+                                Reset All Details
+                            </button>
+                        </li>
+                    </ul>
                 </td>
             </tr>
         </tbody>

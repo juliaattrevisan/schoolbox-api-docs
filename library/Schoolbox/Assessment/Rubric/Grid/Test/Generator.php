@@ -203,10 +203,12 @@ class Generator
         // Build a row set
         $rowSet = (new RubricRowSet\Test\Generator())->generateRowSet($capabilities);
 
+        $rubricInstance = new \Schoolbox\Assessment\Rubric\Instance\Model()
+            ->setId(117);
 
         // Build a grid that uses the row set
         $dueWork = $this->dueWork;
-        $grid    = new RubricGrid\Grid($dueWork, $rowSet);
+        $grid    = new RubricGrid\Grid($dueWork, $rubricInstance, $rowSet);
 
 
         // Create the mark scheme

@@ -16,6 +16,10 @@ use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Participant\Model;
+use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as RubricDescriptorMapper;
+use Schoolbox\Assessment\Rubric\DataModel\IndicatorMark\Mapper as RubricIndicatorMarkMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper as RubricLevelMapper;
+use Schoolbox\Assessment\Rubric\Grid\Level;
 use Schoolbox\Filter\Codec;
 use Schoolbox\Filter;
 use Schoolbox\Filter\CompositeFactoryFactory;
@@ -100,6 +104,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param Access $access
      * @param Transactor $transactor
      * @param BreadcrumbFactory $bakery
+     * @param \Schoolbox\Assessment\Rubric\DataModel\Result\Mapper $resultSetMapper
+     * @param RubricDataSource $rubricMapper
      * @param Mapper $termMapper
      * @param DataSource $participantDataSource
      * @param CourseSpecificationMapper $courseSpecificationMapper
@@ -122,7 +128,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param null|string $learnosityConsumerKey
      * @param null|string $learnosityConsumerSecret
      * @param MimetypeMapper|null $mimetypeMapper
-     * @param RubricDataSource|null $rubricDataSource
      * @param EditorTemplateHelper|null $editorTemplateHelper
      */
     public function __construct(
@@ -133,6 +138,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
         Access $access,
         Transactor $transactor,
         protected BreadcrumbFactory $bakery,
+        protected \Schoolbox\Assessment\Rubric\DataModel\Result\Mapper $resultSetMapper,
+        protected \Schoolbox\Assessment\Rubric\DataModel\DataSource $rubricMapper,
         private Term\Mapper $termMapper,
         Participant\DataSource $participantDataSource,
         private CourseSpecificationMapper $courseSpecificationMapper,
@@ -155,7 +162,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
         #[\SensitiveParameter] ?string $learnosityConsumerKey = null,
         #[\SensitiveParameter] ?string $learnosityConsumerSecret = null,
         protected ?MimetypeMapper $mimetypeMapper = null,
-        protected ?RubricDataSource $rubricDataSource = null,
         private ?EditorTemplateHelper $editorTemplateHelper = null,
     ) {
         parent::__construct(
@@ -290,11 +296,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         // Unfortunately each different type of assessment needs to be handled
         // uniquely in this method, because type is passed in the query string.
-        if (AssessmentType::TYPE_LTI_ASSESSMENT === $type && $assessment instanceof \Schoolbox\Learning\Assessment\Lti\Model) {
-            // Use Learnosity's GUID generator for better or worse,
-            // because it's used above.
-            // Consider replacing with Ramsey UUID?
-            $assessment->setGuid($assessment->getGuid() ?? Uuid::generate());
+        if (AssessmentType::TYPE_LTI_ASSESSMENT === $type && $assessment instanceof Lti\Model) {
+            $this->populateLtiAssessmentGuid($assessment);
         }
 
         // create a dynamic plan on the assessment to get started
@@ -327,9 +330,18 @@ abstract class Controller extends ListController implements IAssessmentControlle
          */
         $data['curriculumNodes'] = [];
 
-        /* Default Visibility comes from an LMS Policy setting in config
+        /* Default Visibility comes from an LMS Policy setting in config.
+         * If the default is not allowed by other config settings, the default becomes 'staff only'.
          */
-        $data['markVisibility'] = $this->getConfigLoader()->get('submission_access');
+        $data['markVisibility'] = (
+            in_array(
+                $this->getConfigLoader()->get('submission_access'),
+                $this->getAvailableFeedbackVisibilities(),
+                true
+            )
+            ? $this->getConfigLoader()->get('submission_access')
+            : IAssessable::MARK_VISIBILITY_PRIVATE
+        );
 
         // Did the caller request a returnUrl?
         $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
@@ -620,7 +632,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
              * and only apply it when the rubric is being used in the original assessment
              */
             if ($assessment instanceof DueWork\Model && $assessment->getUseRubric()) {
-                $rubricGrid = $this->rubricDataSource->retrieveGrid($assessment, true, true);
+                $rubricGrid = $this->rubricMapper->retrieveGrid($assessment, true, true);
 
                 /**
                  * list of all rubric grids for this assessment
@@ -628,9 +640,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
                  */
 
                 // TODO: for now, just one grid support, in the format of multiple
-                $rubricGridTranslator = new RubricGridTranslator();
+                $rubricGridTranslator = new RubricGridTranslator\Full();
                 $data['rubricGrids'] = [$rubricGrid];
-                $data['rubricGridsPayload'] = [$rubricGridTranslator($rubricGrid, $assessment)];
+                $data['rubricGridsPayload'] = [$rubricGridTranslator($rubricGrid)];
             }
         }
 
@@ -659,49 +671,112 @@ abstract class Controller extends ListController implements IAssessmentControlle
     public function getUpdateAssessmentForm(IAssessable $assessment): void
     {
         $data = $this->getAssessmentAsTwigArray($assessment->getContext(), $assessment);
+
+        /* Assemble generic breadcrumb trail
+         */
+        $data['breadcrumbs'] = $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]);
+
+        /* These are used in ckeditor
+         */
         $data['editorTemplates'] = $this->editorTemplateHelper !== null
             ? $this->editorTemplateHelper->getTemplatesForCategory()
             : [];
 
-        $breadcrumbs = $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]);
-
-        /* Quizzes have two parts to change
-         */
-        if ($assessment instanceof Quiz\Model) {
-            $breadcrumbs->add([
-                'Modify Settings',
-                null
-            ]);
+        // LTI assessments need a GUID backfilled
+        if ($assessment instanceof Lti\Model) {
+            $this->populateLtiAssessmentGuid($assessment);
         }
 
-        /* Dialog Agents have two parts to change
+        /* Redirection urls
          */
-        if ($assessment instanceof DialogAgent\Model) {
-            $breadcrumbs->add([
-                'Modify Settings',
-                null
-            ]);
-        }
-
-        $data['breadcrumbs'] = $breadcrumbs;
         $data['returnUrlName'] = Redirect::RETURN_URL;
         $data['returnUrl'] = $this->requestQuery->get(Redirect::RETURN_URL);
 
-        /* Curriculum Codes prefilled from those associated with the assessment itself
-         hide nodes with no codes
+        /* Curriculum Codes prefilled from those associated with the assessment itself hide nodes with no codes
          */
         $data['curriculumNodes'] = $assessment->getViewableCurriculumNodes()->reindex();
 
-        $data['custom_assessment_participation'] = $this->getConfigLoader()->get('custom_assessment_participation');
-        $data['selfAssessmentEnabled'] = $this->getConfigLoader()->get('self_assessment_enabled');
-
+        /* Grade Groups (used with Letter Grade) use this setting as a default to save users always having to change it
+         */
         $data['defaultGradeGroup'] = $this->getConfigLoader()->get('default_grade_group');
 
+        /* Specification assessments can be moved between locations in the resource browser
+         * Implementations cannot
+         */
         $data['canRelocate'] = $assessment->isSpecification();
+
+        /* The participants of an assessment
+         */
+        $data['participants'] = $assessment
+            ->getAllParticipants()
+            ->filter(fn($participant) => !$participant->isExcluded())
+            ->map(fn(Participant $participant) => $this->getParticipantObject($participant, $assessment->getOriginalAssessmentId()))
+            ->reindex();
 
         /* Course Managed Field and associated checkbox in the ui
          */
         $courseManagedFields = new CourseManagedFields($this->getUser(), $assessment);
+
+        $data['courseManaged'] = [
+            'isVisible' => $courseManagedFields->isVisible(),
+            'isMutable' => $courseManagedFields->isMutable(),
+            'isReadonly' => $courseManagedFields->isReadonly(),
+        ];
+
+        /* Find out if Differentiation Profiles are enabled
+         * This might lead to students having customised versions of an assessment
+         */
+        $data['differentiationEnabled'] = $this->getConfigLoader()->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED);
+        $data['custom_assessment_participation'] = $this->getConfigLoader()->get('custom_assessment_participation');
+
+        if (null !== $assessment->getOriginalAssessmentId()) {
+            $data['customisedFor'] = $assessment->getOriginalAssessmentId();
+        }
+
+        /* Due Work
+         * Kami, some policy stuff and worksheets are due work specific
+         */
+        if ($assessment instanceof DueWork\Model) {
+            /* At the moment only due works have self-reflection and self-assessment abilities
+             */
+            $data['selfAssessmentEnabled'] = $this->getConfigLoader()->get('self_assessment_enabled');
+
+            // To be able to view the current student policy if enabling within the submission type
+            $data['lmsStudentPolicy'] = $this->getConfigLoader()->get('lms_student_policy');
+
+            // To determine whether to display the interactive worksheet option
+            $data['kami_enabled'] = $this->getConfigLoader()->get(ConfigMapper::NAME_KAMI_ENABLED);
+
+            $kamiFiles = $this->mimetypeMapper
+                ->findMimeTypesFromExtensions(
+                    array_keys(KamiModel::ALLOWED_FILE_TYPES)
+                );
+
+            $zone = (new Zone('worksheet'))
+                ->setMulti(false)
+                ->setAttachPrompt('Attach a worksheet')
+                ->setAttachmentsLabel('')
+                ->setMimeFilter(implode(",", $kamiFiles))
+                ->setFilesystemContext('worksheet')
+                // Disallow modification of existing worksheet templates.
+                ->setReadOnly($assessment->getWorksheetTemplate() !== null)
+                ->setFileVar('worksheet');
+
+            if ($assessment->getWorksheetTemplate()) {
+                $zone = $zone->attachFiles([$assessment->getWorksheetTemplate()]);
+            }
+
+            $data['attachzoneWorksheet'] = $zone->getTwigContext();
+        }
+
+        /* Quizzes have two parts to change: append breadcrumbs
+         */
+        if ($assessment instanceof Quiz\Model) {
+            $data['breadcrumbs']->add([
+                'Modify Settings',
+                null
+            ]);
+        }
 
         /* Lesson Plan Template metadata, used to construct forms
          */
@@ -752,6 +827,13 @@ abstract class Controller extends ListController implements IAssessmentControlle
          * These need their chosen scenario supplied
          */
         if ($assessment instanceof DialogAgent\Model) {
+            /* Dialog Agents have two parts to change: append breadcrumbs
+             */
+            $data['breadcrumbs']->add([
+                'Modify Settings',
+                null
+            ]);
+
             $dialogAgentMapper = \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::getInstance();
             $dialogAgentScenarioMapper = \Schoolbox\Admin\DialogAgent\Scenario\Mapper::getInstance();
 
@@ -780,51 +862,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
             /* There are numerous date range options of which numerous could be enabled
              */
             $data['reporting']['availableRangeOptions'] = Range::lookup();
-        }
-
-        $data['courseManaged'] = [
-            'isVisible' => $courseManagedFields->isVisible(),
-            'isMutable' => $courseManagedFields->isMutable(),
-            'isReadonly' => $courseManagedFields->isReadonly(),
-        ];
-
-        $data['differentiationEnabled'] = $this->getConfigLoader()->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED);
-
-        if ($assessment instanceof DueWork\Model) {
-            // To be able to view the current student policy if enabling within the submission type
-            $data['lmsStudentPolicy'] = $this->getConfigLoader()->get('lms_student_policy');
-
-            // To determine whether to display the interactive worksheet option
-            $data['kami_enabled'] = $this->getConfigLoader()->get(ConfigMapper::NAME_KAMI_ENABLED);
-
-            $kamiFiles = $this->mimetypeMapper
-                ->findMimeTypesFromExtensions(
-                    array_keys(KamiModel::ALLOWED_FILE_TYPES)
-                );
-
-            $zone = (new Zone('worksheet'))
-                ->setMulti(false)
-                ->setAttachPrompt('Attach a worksheet')
-                ->setAttachmentsLabel('')
-                ->setMimeFilter(implode(",", $kamiFiles))
-                ->setFilesystemContext('worksheet')
-                 // Disallow modification of existing worksheet templates.
-                ->setReadOnly($assessment->getWorksheetTemplate() !== null)
-                ->setFileVar('worksheet');
-            if ($assessment->getWorksheetTemplate()) {
-                $zone = $zone->attachFiles([$assessment->getWorksheetTemplate()]);
-            }
-            $data['attachzoneWorksheet'] = $zone->getTwigContext();
-        }
-
-        $data['participants'] = $assessment
-            ->getAllParticipants()
-            ->filter(fn($participant) => !$participant->isExcluded())
-            ->map(fn(Participant $participant) => $this->getParticipantObject($participant, $assessment->getOriginalAssessmentId()))
-            ->reindex();
-
-        if (null !== $assessment->getOriginalAssessmentId()) {
-            $data['customisedFor'] = $assessment->getOriginalAssessmentId();
         }
 
         $this->response = $this->responseFromTemplate("@learningAssessment/update.twig", $data);
@@ -1133,12 +1170,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'folder'                   => $context->getFolder(),
             'assessmentType'           => AssessmentType::objectToString($assessment),
             'markVisibility'           => $assessment->getMarkVisibility(),
-            'availableVisibilities'    => FeedbackVisibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max')),
+            'availableVisibilities'    => $this->getAvailableFeedbackVisibilities(),
             'allWorkTypes'             => $this->workTypeMapper->findAll(['order' => ['sequence' => 'asc']]),
 
             /* Capabilities happen to have the same mark types as its DueWork IAssessable container,
-            * so we don't need a different method than the existing getAllMarkTypes
-            */
+             * so we don't need a different method than the existing getAllMarkTypes
+             */
             'capabilityMarkTypes'      => $markTypes,
             'capabilityGradingSchemes' => $this->getAllGradeSchemes()->map(fn(GradeScheme $scheme) => [
                 'id' => $scheme->getId(),
@@ -1151,7 +1188,114 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'parentFolderId'           => $parentFolderId,
         ];
 
-        $data = array_merge($data, $this->getAssessmentTwigData($assessment));
+        /* Always look for rubric data regardless of the activity type; everything could potentially have it now.
+         */
+        return array_merge($data, $this->getAssessmentTwigData($assessment), $this->generateRubricTwigData($assessment));
+    }
+
+
+    /**
+     * Common logic when generating Rubrics
+     *
+     * Every learning activity can have 0 or more rubric grids associated with it, making this method common to all.
+     * (It was originally in the Due Work controller for historical reasons; I transplanted it here)
+     *
+     * @param IAssessable $assessment
+     * @return array
+     * @throws MapperException
+     */
+    private function generateRubricTwigData(IAssessable $assessment): array
+    {
+        $data = [];
+
+        $rubricZone = (new Zone('rubric'))
+            ->setFileVar('rb_attach[]')
+            ->setAttachPrompt('Import a rubric')
+            ->useImportExpiryDate();
+            // JS file.type isn't set reliably enough to use text/csv mime filter
+            //->setMimeFilter('text/csv');
+
+        $data['rubricAttachZone'] = $rubricZone->getTwigContext();
+
+        /* This allows users to quickly mass-produce a set of descriptors from a predefined set
+         * They're found in rubric_result
+         */
+        $resultSets = $this->resultSetMapper->findAll();
+
+        $rs = [];
+
+        foreach ($resultSets as $result) {
+            /* Only initialise the result set tuple once, so you can accumulate structs in the results node here.
+             */
+            if (!isset($rs[$result->getResultSetId()])) {
+                $rs[$result->getResultSetId()] = [
+                    'id' => $result->getResultSetId(),
+                    'results' => [],
+                ];
+            }
+
+            $rs[$result->getResultSetId()]['results'][] = [
+                'value' => $result->getValue(),
+                'label' => $result->getLabel(),
+            ];
+        }
+
+        $data['rubricResultSets'] = array_values($rs);
+
+        // Do any students have marks for this rubric?
+        /* TODO Find out what this meant.
+         *  I think it was for detecting changes to the grid, prompting users with "this will invalidate marks already
+         *  given", because the grid structure changed somehow (or, detecting this scenario, maybe)
+         */
+//        $levelIds      = RubricLevelMapper::getInstance()->findIdsByColumn('b.assessment_id', $dueWork->getId());
+//        $descriptorIds = RubricDescriptorMapper::getInstance()->findIdsByColumn('level_id', $levelIds);
+//        $countMarkIds  = RubricIndicatorMarkMapper::getInstance()->countByColumnList(
+//            [
+//                'descriptor_id' => $descriptorIds,
+//                'valid'         => true,
+//            ]
+//        );
+
+
+        /**
+         * list of all rubric grids for this assessment
+         * (Two representations of the same rubric data)
+         *
+         * @see also in /library/Schoolbox/Learning/Assessment/Controller.php:getCloneAssessmentForm
+         */
+        $data['rubricGrids'] = [];
+        $data['rubricGridsPayload'] = [];
+
+        /* Converts an object to a frontend-friendly payload
+         */
+        $rubricGridTranslator = new RubricGridTranslator\Full();
+
+        /* Assemble each rubric grid via its instance, separately, for now. Maybe there's a shortcut to all this that
+         * is cheaper, but this will be the simplest for the time being.
+         */
+        foreach ($assessment->getRubricInstances() as $rubricInstance) {
+            /* Obtain the levels, caps/ind/desc data for a given rubric instance, compiling them into a struct that you
+             * can render in the vue component in the frontend
+             */
+            $rubricGrid = $this->rubricMapper->retrieveOneGrid($assessment, $rubricInstance, true);
+
+            /* Arbitrarily supply two placeholder levels if the grid never had any, such as when you're making a whole
+             * new grid from scratch for the first time. This prompts users to fill them in. This is the only place
+             * where this happens: otherwise I would have considered pushing this into retrieveOneGrid()
+             */
+            if (count($rubricGrid->getLevels()) === 0) {
+                $rubricGrid->getLevels()
+                    ->add(new Level())
+                    ->add(new Level());
+            }
+
+            $data['rubricGrids'][] = $rubricGrid;
+            $data['rubricGridsPayload'][] = $rubricGridTranslator($rubricGrid);
+        }
+
+        // for multiple rubrics, this allows the frontend to add another one
+        // TODO: this probably needs to be an endpoint of its own as I expect it would change if you changed the original rubric? there's some nuance around how capabilities/indicators are deduped
+        $data['rubricBlankGrid'] = $rubricGridTranslator($this->rubricMapper->retrieveBlankGrid($assessment, true));
 
         return $data;
     }
@@ -1578,6 +1722,17 @@ abstract class Controller extends ListController implements IAssessmentControlle
     }
 
     /**
+     * @return array
+     */
+    private function getAvailableFeedbackVisibilities(): array
+    {
+        return FeedbackVisibility::getAvailableVisibilities(
+            (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_STUDENTS),
+            (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_PARENTS),
+        );
+    }
+
+    /**
      * project only endpoint
      *
      * fetch and display the participants for a specific class assessment, that is part of the course assessment
@@ -1607,5 +1762,18 @@ abstract class Controller extends ListController implements IAssessmentControlle
     public function getClassStatusChunk(IAssessable $assessmentSpec, IAssessable $assessmentImpl): void
     {
         throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+    }
+
+    /**
+     * If the assessment is an LTI assessment, and it doesn't have a GUID
+     * already: populate it.
+     *
+     * @param Lti\Model $assessment
+     * @return void
+     * @throws \Exception if for whatever reason the generator throws one?
+     */
+    private function populateLtiAssessmentGuid(Lti\Model $assessment): void
+    {
+        $assessment->setGuid($assessment->getGuid() ?? \Ramsey\Uuid\Uuid::uuid7()->toString());
     }
 }

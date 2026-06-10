@@ -59,7 +59,7 @@ $f-dropdown-line-height: rem-calc(18) !default;
             background: var(--sbx-config-color-active, var(--content-ui-hover));
         }
         a,
-        button {
+        button:not([class*="sbx-tag"]) {
             background: var(--sbx-color-foreground-primary, var(--content-ui-background));
             color: var(--sbx-config-color-accent, var(--content-ui-foreground));
             display: block;

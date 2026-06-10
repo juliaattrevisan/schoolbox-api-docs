@@ -541,13 +541,10 @@ abstract class AbstractTreeBuilder
         switch ($code) {
             case UserAccess::ACCESS_FULL:
                 return 'full';
-                break;
             case UserAccess::ACCESS_WRITE:
                 return 'write';
-                break;
             case UserAccess::ACCESS_READ:
                 return 'read';
-                break;
             default:
                 break;
         }

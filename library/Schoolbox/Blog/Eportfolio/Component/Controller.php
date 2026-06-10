@@ -105,22 +105,22 @@ class Controller extends Component_Eportfolio_ControllerAbstract
      */
 
     /**
-     * @var EportfolioBlogMapper;
+     * @var EportfolioBlogMapper
      */
     protected $blogMapper;
 
     /**
-     * @var UserMapper;
+     * @var UserMapper
      */
     protected $userMapper;
 
     /**
-     * @var EportfolioBlogCommentMapper;
+     * @var EportfolioBlogCommentMapper
      */
     protected $blogCommentMapper;
 
     /**
-     * @var EportfolioBlogImageMapper;
+     * @var EportfolioBlogImageMapper
      */
     protected $blogImageMapper;
 
