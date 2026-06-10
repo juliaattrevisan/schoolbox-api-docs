@@ -1422,7 +1422,7 @@ class Controller extends Base
                                  */
                                 $capabilityData['published']['normalisedMark'],
                                 sprintf(
-                                    'Assessment %s, student %s: %s',
+                                    'Assessment %s, student %s, capability %s',
                                     $assessmentId,
                                     $studentId,
                                     $overallMarks[$capabilityId]['name']
@@ -1447,7 +1447,7 @@ class Controller extends Base
                                  */
                                 $capabilityData['draft']['normalisedMark'],
                                 sprintf(
-                                    'Assessment %s, student %s: %s (draft)',
+                                    'Assessment %s, student %s, capability %s (draft)',
                                     $assessmentId,
                                     $studentId,
                                     $overallMarks[$capabilityId]['name']
@@ -1493,7 +1493,7 @@ class Controller extends Base
                                      */
                                     $indicatorData['published']['normalisedMark'],
                                     sprintf(
-                                        'Assessment %s, student %s: %s',
+                                        'Assessment %s, student %s, indicator %s',
                                         $assessmentId,
                                         $studentId,
                                         $overallMarks[$capabilityId]['indicators'][$indicatorId]['name']
@@ -1518,7 +1518,7 @@ class Controller extends Base
                                      */
                                     $indicatorData['draft']['normalisedMark'],
                                     sprintf(
-                                        'Assessment %s, student %s: %s (draft)',
+                                        'Assessment %s, student %s, indicator %s (draft)',
                                         $assessmentId,
                                         $studentId,
                                         $overallMarks[$capabilityId]['indicators'][$indicatorId]['name']
