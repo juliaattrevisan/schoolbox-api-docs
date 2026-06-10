@@ -22,7 +22,7 @@ use Schoolbox\OpenAi\ClientFactory;
 require_once __DIR__ . '/../../conf/core/require.php';
 
 /**
- * Temporary tool to run the InteractionModeration agent against a particular session_id within openai_log
+ * Temporary tool to run the InteractionModeration agent against a particular AI session within ai_session_log.
  */
 $app = new class extends CliTool\App {
     /**
@@ -69,7 +69,7 @@ $app = new class extends CliTool\App {
                     echo <<<HELP
 Interaction Moderation Tool
 
-Runs the AI interaction moderation agent against existing openai_log rows for a session.
+Runs the AI interaction moderation agent against existing ai_session_log rows for an AI session.
 
 Usage: {$this->getToolFilename()} --session-id SESSION_ID
     --session-id    The AI session ID to run moderation against
@@ -88,7 +88,7 @@ HELP;
         $this->aiLogMapper = AILogMapper::getInstance();
         $this->clientFactory = $this->getDi()->get('ai.clientFactory');
 
-        $logs = $this->aiLogMapper->findByColumn('session_id', $sessionId, [
+        $logs = $this->aiLogMapper->findByColumn('ai_session_id', $sessionId, [
             'order' => [
                 'created_at' => 'ASC',
             ],
