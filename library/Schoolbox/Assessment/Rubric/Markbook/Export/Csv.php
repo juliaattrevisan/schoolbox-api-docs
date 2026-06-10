@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Markbook\Export;
 
-use DebugBar\DebugBarException;
 use Schoolbox\L10n\RosettaStone as Translator;
 use Schoolbox\Learning\Markbook\AbstractCSV;
 
@@ -94,6 +93,8 @@ class Csv extends AbstractCSV
         bool $descriptorsOnly,
         bool $showDrafts
     ) {
+        /* Only need to figure this out once.
+         */
         $this->capabilityMarkColumn = $this->translator->translateSentence('({:rubricGroup} mark)');
 
         /* Decide whether we're using Draft node or Published mark nodes.
@@ -208,6 +209,7 @@ class Csv extends AbstractCSV
      * @param array $assessmentData
      * @param int $rubricInstanceId
      * @param array $rubricInstanceData
+     * @param array $exclusions
      * @return void
      */
     private function exportGrid(
@@ -355,23 +357,6 @@ class Csv extends AbstractCSV
 
 
     /**
-     * Decides whether we're accessing the Published marks node or the Draft marks node based on the $showDrafts bool.
-     * The $studentMarks data struct is built symmetrically so it's an easy toggle to use.
-     *
-     * @param bool $showDrafts
-     * @return string
-     */
-    private function nodeSelector(bool $showDrafts): string
-    {
-        if ($showDrafts) {
-            return self::NODE_DRAFT;
-        }
-
-        return self::NODE_PUBLISHED;
-    }
-
-
-    /**
      * Add this random char because of microsoft sinfulness
      *
      * @param string|null $val
@@ -385,189 +370,4 @@ class Csv extends AbstractCSV
 
         return self::EXCEL_PREFIX . trim($val);
     }
-
-
-//
-//
-//    /**
-//     * Export all rows for a single assessment for this CSV.
-//     *
-//     * @param int   $assessmentId
-//     * @param array $assessment
-//     * @param bool  $showDrafts
-//     */
-//    private function exportAssessment(int $assessmentId, array $assessment, bool $showDrafts): void
-//    {
-//        $assessmentName = $assessment['name'];
-//        foreach ($assessment['capabilities'] as $capabilityId => $capability) {
-//            $capabilityName = $capability['name'];
-//
-//            // Output capability marks only if this assessment uses them
-//            if ($assessment['isMarkPerCapability']) {
-//                $capabilityMarks = $this->retrieveAssessmentCapabilityMarks($assessmentId, $capabilityId, $showDrafts);
-//                $this->exportRow(
-//                    [$assessmentName, $capabilityName, $this->translator->translateSentence('({:rubricGroup} mark)')],
-//                    $capabilityMarks
-//                );
-//            }
-//
-//            // Output indicator marks
-//            foreach ($capability['indicators'] as $indicatorId => $indicator) {
-//                $this->exportRow(
-//                    [$assessmentName, $capabilityName, $indicator['name']],
-//                    $this->retrieveAssessmentIndicatorMarks($assessmentId, $capabilityId, $indicatorId, $showDrafts)
-//                );
-//            }
-//        }
-//    }
-//
-//
-//    /**
-//     * Export overall mark rows for this CSV.
-//     *
-//     * @param bool $showDrafts
-//     * @return void
-//     */
-//    private function exportOverallMarks(bool $showDrafts): void
-//    {
-//        foreach ($this->overallMarks as $capability) {
-//            $overallHeader  = '(overall)';
-//            $capabilityName = $capability['name'];
-//
-//            // Output capability marks only if they are to be shown
-//            if ($capability['show']) {
-//                $capabilityMarks = $this->retrieveOverallCapabilityMarks($capability, $showDrafts);
-//                $this->exportRow(
-//                    [$overallHeader, $capabilityName, $this->translator->translateSentence('({:rubricGroup} mark)')],
-//                    $capabilityMarks
-//                );
-//            }
-//
-//            // Output indicator marks
-//            foreach ($capability['indicators'] as $indicator) {
-//                $this->exportRow(
-//                    [$overallHeader, $capabilityName, $indicator['name']],
-//                    $this->retrieveOverallIndicatorMarks($indicator, $showDrafts)
-//                );
-//            }
-//        }
-//    }
-//
-//
-//    /**
-//     * Retrieve the capability marks for this assessment out of student data.
-//     *
-//     * @param int  $assessmentId
-//     * @param int  $capabilityId
-//     * @param bool $showDrafts
-//     * @return array
-//     */
-//    private function retrieveAssessmentCapabilityMarks(int $assessmentId, int $capabilityId, bool $showDrafts): array
-//    {
-//        $capabilityMarks = [];
-//        foreach ($this->students as $studentId => $student) {
-//            if (empty($this->exclusions[$assessmentId][$studentId])) {
-//                $studentMark = $student['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] ?? '';
-//                if ($showDrafts) {
-//                    if (isset($student['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'])) {
-//                        $studentMark = $student['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] . self::DRAFT_SUFFIX;
-//                    }
-//                }
-//                $studentMark = self::EXCEL_PREFIX . $studentMark;
-//            } else {
-//                $studentMark = '(excluded)';
-//            }
-//            $capabilityMarks[$studentId] = $studentMark;
-//        }
-//        return $capabilityMarks;
-//    }
-//
-//
-//    /**
-//     * Retrieve the indicator marks for this assessment out of student data.
-//     *
-//     * @param int  $assessmentId
-//     * @param int  $capabilityId
-//     * @param int  $indicatorId
-//     * @param bool $showDrafts
-//     * @return array
-//     */
-//    private function retrieveAssessmentIndicatorMarks(
-//        int $assessmentId,
-//        int $capabilityId,
-//        int $indicatorId,
-//        bool $showDrafts,
-//    ): array {
-//        $indicatorMarks = [];
-//        foreach ($this->students as $studentId => $student) {
-//            if (empty($this->exclusions[$assessmentId][$studentId])) {
-//                $result      = $student['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId] ?? null;
-//                $isDraftMark = false;
-//                if ($showDrafts) {
-//                    if (isset($student['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId])) {
-//                        $result      = $student['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId];
-//                        $isDraftMark = true;
-//                    }
-//                }
-//                if (is_array($result)) {
-//                    $studentMark = $this->descriptorsOnly && ($result['humanReadableMark'] ?? null)
-//                        ? (self::EXCEL_PREFIX . $result['humanReadableMark'])
-//                        : $result['selectedDescriptorText'];
-//                    if ($isDraftMark) {
-//                        $studentMark .= self::DRAFT_SUFFIX;
-//                    }
-//                } else {
-//                    $studentMark = '';
-//                }
-//            } else {
-//                $studentMark = '(excluded)';
-//            }
-//            $indicatorMarks[$studentId] = $studentMark;
-//        }
-//        return $indicatorMarks;
-//    }
-//
-//
-//    /**
-//     * Retrieve the capability marks out of overall data.
-//     *
-//     * @param array $capability
-//     * @param bool  $showDrafts
-//     * @return array
-//     */
-//    private function retrieveOverallCapabilityMarks(array $capability, bool $showDrafts): array
-//    {
-//        $capabilityMarks = [];
-//        foreach ($this->students as $studentId => $student) {
-//            $capabilityMarks[$studentId] = $this->extractDraftOrPublishedValue(
-//                $capability['marks'][$studentId] ?? [],
-//                $showDrafts,
-//                'humanReadable',
-//                'latestHumanReadable',
-//            );
-//        }
-//        return $capabilityMarks;
-//    }
-//
-//
-//    /**
-//     * Retrieve the indicator marks out of overall data.
-//     *
-//     * @param array $indicator
-//     * @param bool  $showDrafts
-//     * @return array
-//     */
-//    private function retrieveOverallIndicatorMarks(array $indicator, bool $showDrafts): array
-//    {
-//        $indicatorMarks = [];
-//        foreach ($this->students as $studentId => $student) {
-//            $indicatorMarks[$studentId] = $this->extractDraftOrPublishedValue(
-//                $indicator['marks'][$studentId] ?? [],
-//                $showDrafts,
-//                'humanReadable',
-//                'latestHumanReadable',
-//            );
-//        }
-//        return $indicatorMarks;
-//    }
 }
