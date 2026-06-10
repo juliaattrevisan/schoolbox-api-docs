@@ -151,5 +151,3 @@ function toggleCollapse(assessmentId: number): void {
         <p>This {{ locale.activity.singular() }} has no students participating.</p>
     </div>
 </template>
-
-<li><a :href="exportRouteFiltered" class="sbx-button--has-icon"><sbx-icon name="export"></sbx-icon>Export CSV</a></li>
