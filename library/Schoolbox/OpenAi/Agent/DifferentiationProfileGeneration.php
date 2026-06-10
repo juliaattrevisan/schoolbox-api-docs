@@ -41,7 +41,7 @@ class DifferentiationProfileGeneration
      * @param Collection  $pastoralRecords
      * @param Collection  $enabledFields
      * @param User        $student
-     * @param string|null $aiSessionId
+     * @param string      $aiSessionId The AI session ID used to associate logs with this request.
      * @return array
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
@@ -50,7 +50,7 @@ class DifferentiationProfileGeneration
         Collection $pastoralRecords,
         Collection $enabledFields,
         User $student,
-        ?string $aiSessionId = null,
+        string $aiSessionId,
     ): array {
 
         $attachments = $this->generateFilePrompts($pastoralRecords);

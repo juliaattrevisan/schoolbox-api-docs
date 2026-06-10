@@ -60,7 +60,7 @@ class LessonPlanGeneration
      * @param array<int>  $curriculumNodeIds List of related nodes to provide context for.
      * @param string      $additionalContext Any additional context provided for the lesson plan.
      * @param string|null $generateForField  If provided: generate context for this field only.
-     * @param string|null $aiSessionId       If provided: associate the log with this session ID.
+     * @param string      $aiSessionId       The AI session ID used to associate logs with this request.
      * @return array{0: array, 1: int} 0: response body, 1: status
      * @throws ClientExceptionInterface
      * @throws MapperException
@@ -75,7 +75,7 @@ class LessonPlanGeneration
         array $curriculumNodeIds,
         string $additionalContext,
         ?string $generateForField,
-        ?string $aiSessionId = null
+        string $aiSessionId
     ): array {
         $payloadGenerator = new LessonPlan(
             trim($this->config[Config::FIELD_PROVIDER]['value']),

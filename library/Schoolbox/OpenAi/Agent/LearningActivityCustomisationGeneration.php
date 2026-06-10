@@ -38,7 +38,7 @@ class LearningActivityCustomisationGeneration
      * @param IAssessable                 $assessable                  The assessable learning activity.
      * @param DifferentiationProfileModel $differentiationProfileModel The differentiation profile
      * @param Folder                      $course
-     * @param string|null                 $aiSessionId
+     * @param string                      $aiSessionId                 The AI session ID used to associate logs with this request.
      * @return array
      * @throws ClientExceptionInterface
      */
@@ -47,7 +47,7 @@ class LearningActivityCustomisationGeneration
         IAssessable $assessable,
         DifferentiationProfileModel $differentiationProfileModel,
         Folder $course,
-        ?string $aiSessionId = null,
+        string $aiSessionId,
     ): array {
         $attachments = $this->generateFilePrompts($assessable);
 
