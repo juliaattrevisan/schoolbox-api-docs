@@ -20,6 +20,7 @@ import type {
     ApiStudent,
     ApiSubject,
     ApiCandidatesResponse,
+    ApiManuallyRegisterResponse,
 } from "../js/types/ibReportTypes";
 
 interface Props {
@@ -29,6 +30,7 @@ interface Props {
     renotifyEndpoint: string;
     completePreparationEndpoint: string;
     resetDetailsEndpoint: string;
+    manuallyRegisterEndpoint: string;
     sessionTitle: string;
 }
 const props = defineProps<Props>();
@@ -89,6 +91,7 @@ window.Vue.watch(failedSelected, (newVal) => {
 
 const isCompleting = window.Vue.ref<boolean>(false);
 const isResetting = window.Vue.ref<boolean>(false);
+const isManuallyRegistering = window.Vue.ref<boolean>(false);
 const resetModalOpen = window.Vue.ref<boolean>(false);
 const studentsToReset = window.Vue.ref<Pick<StudentRow, "id" | "userId" | "name">[]>([]);
 
@@ -165,7 +168,14 @@ async function loadCandidates(): Promise<void> {
         confirmed.value = (byKey["confirmed"] ?? []).map((s) => mapStudentRow(s, "confirmed"));
         inProgress.value = (byKey["inProgress"] ?? []).map((s) => mapStudentRow(s, "inProgress"));
         failed.value = (byKey["failed"] ?? []).map((s) => mapStudentRow(s, "failed") as FailedRow);
-        registered.value = (byKey["registered"] ?? []).map((s) => mapStudentRow(s, "registered") as RegisteredRow);
+        registered.value = (byKey["registered"] ?? []).map(
+            (s): RegisteredRow => ({
+                ...mapStudentRow(s, "registered"),
+                ibCandidateNumber: s.ibCandidateNumber,
+                manuallyRegisteredBy: s.manuallyRegisteredBy,
+                manuallyRegisteredAt: s.manuallyRegisteredAt,
+            }),
+        );
     } catch (e) {
         console.error("Failed to load candidates", e);
         loadError.value = "Failed to load registration report.";
@@ -284,6 +294,52 @@ async function handleResetDetails(): Promise<void> {
     }
 }
 
+/**
+ * POSTs the given student IDs to the mark-as-manually-registered endpoint.
+ * On success, moves matched students from confirmed/failed into registered.
+ * @param studentIds The registration session student IDs to register.
+ */
+async function handleManuallyRegister(studentIds: number[]): Promise<void> {
+    if (isManuallyRegistering.value) return;
+    isManuallyRegistering.value = true;
+
+    const toast = window.sbProps.toastActivate("Marking as manually registered...");
+
+    try {
+        const response = await apiRequest<ApiManuallyRegisterResponse, { studentIds: number[] }>({
+            url: props.manuallyRegisterEndpoint,
+            method: "POST",
+            body: { studentIds },
+        });
+
+        if (!response.success) {
+            toast.timeout({
+                text: response.data?.message ?? "Failed to mark as manually registered.",
+                isSuccess: false,
+            });
+            return;
+        }
+
+        const removedIds = new Set(studentIds);
+        const newRegistered = [
+            ...confirmed.value.filter((s) => removedIds.has(s.id)).map((s) => ({ ...s, stage: "registered" as const })),
+            ...failed.value.filter((s) => removedIds.has(s.id)).map((s) => ({ ...s, stage: "registered" as const })),
+        ];
+        confirmed.value = confirmed.value.filter((s) => !removedIds.has(s.id));
+        failed.value = failed.value.filter((s) => !removedIds.has(s.id));
+        registered.value = [...newRegistered, ...registered.value];
+        clearSelection();
+        toast.timeout({
+            text: `${studentIds.length} student${studentIds.length === 1 ? "" : "s"} marked as manually registered.`,
+        });
+    } catch (e) {
+        console.error("Failed to mark as manually registered", e);
+        toast.timeout({ text: "Failed to mark as manually registered.", isSuccess: false });
+    } finally {
+        isManuallyRegistering.value = false;
+    }
+}
+
 window.Vue.onMounted((): void => {
     void loadCandidates();
 });
@@ -339,6 +395,7 @@ window.Vue.onMounted((): void => {
                     section="confirmed"
                     :active-selection-section="activeSelectionSection"
                     @reset-details-single="(id) => promptResetDetails([id])"
+                    @manually-register-single="(id) => handleManuallyRegister([id])"
                 />
             </ib-report-section>
 
@@ -352,6 +409,7 @@ window.Vue.onMounted((): void => {
                     :students="failed"
                     :active-selection-section="activeSelectionSection"
                     @reset-details-single="(id) => promptResetDetails([id])"
+                    @manually-register-single="(id) => handleManuallyRegister([id])"
                 />
             </ib-report-section>
 
@@ -379,12 +437,13 @@ window.Vue.onMounted((): void => {
                 confirmedSelected.length +
                 failedSelected.length
             "
-            :is-loading="isCompleting || isResetting"
+            :is-loading="isCompleting || isResetting || isManuallyRegistering"
             :active-section="activeSelectionSection"
             @complete-preparation="handleCompletePreparation(preparationSelected.map((s) => s.id))"
             @reset-details="
                 promptResetDetails([...unconfirmedSelected, ...confirmedSelected, ...failedSelected].map((s) => s.id))
             "
+            @manually-register="handleManuallyRegister([...confirmedSelected, ...failedSelected].map((s) => s.id))"
             @clear-selection="clearSelection"
         />
     </div>

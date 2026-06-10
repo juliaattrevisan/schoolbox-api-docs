@@ -12,6 +12,7 @@ defineProps<Props>();
 defineEmits<{
     completePreparation: [];
     resetDetails: [];
+    manuallyRegister: [];
     clearSelection: [];
 }>();
 </script>
@@ -42,6 +43,16 @@ defineEmits<{
             >
                 <sbx-icon name="undo"></sbx-icon>
                 Reset All Details
+            </button>
+            <button
+                v-if="activeSection === 'confirmed' || activeSection === 'failed'"
+                type="button"
+                class="button sbx-button--has-icon l-flex__item--1-auto"
+                :disabled="isLoading"
+                @click="$emit('manuallyRegister')"
+            >
+                <sbx-icon name="approve"></sbx-icon>
+                Mark as manually registered
             </button>
             <button
                 type="button"

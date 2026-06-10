@@ -20,6 +20,7 @@ const renotifyingStudentIds = window.Vue.ref<Set<number>>(new Set());
 const emit = defineEmits<{
     completePreparationSingle: [studentId: number];
     resetDetailsSingle: [studentId: number];
+    manuallyRegisterSingle: [studentId: number];
 }>();
 
 /**
@@ -170,6 +171,15 @@ function isRenotifying(student: StudentRow): boolean {
                             >
                                 <sbx-icon name="undo"></sbx-icon>
                                 Reset All Details
+                            </button>
+                        </li>
+                        <li v-if="student.stage === 'confirmed'">
+                            <button
+                                class="sbx-button--has-icon"
+                                @click.prevent="emit('manuallyRegisterSingle', student.id)"
+                            >
+                                <sbx-icon name="approve"></sbx-icon>
+                                Mark as manually registered
                             </button>
                         </li>
                     </ul>

@@ -13,6 +13,7 @@ const selectedList = defineModel<FailedRow[]>("selectedList", { default: () => [
 
 const emit = defineEmits<{
     resetDetailsSingle: [studentId: number];
+    manuallyRegisterSingle: [studentId: number];
 }>();
 
 const updateLanguageStore = useIbReportUpdateLanguageStore();
@@ -96,6 +97,15 @@ function openModal(student: FailedRow): void {
                             >
                                 <sbx-icon name="undo"></sbx-icon>
                                 Reset All Details
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                class="sbx-button--has-icon"
+                                @click.prevent="emit('manuallyRegisterSingle', student.id)"
+                            >
+                                <sbx-icon name="approve"></sbx-icon>
+                                Mark as manually registered
                             </button>
                         </li>
                     </ul>
