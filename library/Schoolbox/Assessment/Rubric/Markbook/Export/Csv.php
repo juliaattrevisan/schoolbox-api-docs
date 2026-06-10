@@ -38,6 +38,12 @@ class Csv extends AbstractCSV
 
 
     /**
+     * A placeholder text used in every cell where a student has been excluded
+     */
+    private const string COLUMN_EXCLUDED = '(excluded)';
+
+
+    /**
      * This is a terminology for Rubric Capabilities ("groups", sadly, cos that's in the db still)
      *
      * @var string
@@ -104,6 +110,7 @@ class Csv extends AbstractCSV
                     $assessmentData,
                     (int)$rubricInstanceId,
                     $rubricInstanceData,
+                    $this->exclusions
                 );
             }
         }
@@ -182,6 +189,7 @@ class Csv extends AbstractCSV
         array $assessmentData,
         int $rubricInstanceId,
         array $rubricInstanceData,
+        array $exclusions
     ): void {
         /* Send out each grid's capability/indicator combos for each student.
          */
@@ -197,14 +205,21 @@ class Csv extends AbstractCSV
                 $marks = [];
 
                 foreach ($this->studentMarks as $studentId => $studentData) {
-                    $subnode = $studentData['gridData'][$assessmentId][$rubricInstanceId]['capabilities'][$capabilityId][$this->node] ?? null;
-
-                    /* Show the text of the selected descriptor instead of its human-readable mark
+                    /* Use a placeholder text when a student was excluded from an assessment.
+                     * This placeholder applies to all cells.
                      */
-                    if ($this->descriptorsOnly) {
-                        $val = $subnode['selectedDescriptorText'] ?? null;
+                    if (isset($exclusions[$assessmentId][$studentId])) {
+                        $val = self::COLUMN_EXCLUDED;
                     } else {
-                        $val = $subnode['humanReadableMark'] ?? null;
+                        $subnode = $studentData['gridData'][$assessmentId][$rubricInstanceId]['capabilities'][$capabilityId][$this->node] ?? null;
+
+                        /* Show the text of the selected descriptor instead of its human-readable mark
+                         */
+                        if ($this->descriptorsOnly) {
+                            $val = $subnode['selectedDescriptorText'] ?? null;
+                        } else {
+                            $val = $subnode['humanReadableMark'] ?? null;
+                        }
                     }
 
                     /* Add this random char because of microsoft sinfulness
@@ -234,14 +249,21 @@ class Csv extends AbstractCSV
                 $marks = [];
 
                 foreach ($this->studentMarks as $studentId => $studentData) {
-                    $subnode = $studentData['gridData'][$assessmentId][$rubricInstanceId]['capabilities'][$capabilityId]['indicators'][$indicatorId][$this->node] ?? null;
-
-                    /* Show the text of the selected descriptor instead of its human-readable mark
+                    /* Use a placeholder text when a student was excluded from an assessment.
+                     * This placeholder applies to all cells.
                      */
-                    if ($this->descriptorsOnly) {
-                        $val = $subnode['selectedDescriptorText'] ?? null;
+                    if (isset($exclusions[$assessmentId][$studentId])) {
+                        $val = self::COLUMN_EXCLUDED;
                     } else {
-                        $val = $subnode['humanReadableMark'] ?? null;
+                        $subnode = $studentData['gridData'][$assessmentId][$rubricInstanceId]['capabilities'][$capabilityId]['indicators'][$indicatorId][$this->node] ?? null;
+
+                        /* Show the text of the selected descriptor instead of its human-readable mark
+                         */
+                        if ($this->descriptorsOnly) {
+                            $val = $subnode['selectedDescriptorText'] ?? null;
+                        } else {
+                            $val = $subnode['humanReadableMark'] ?? null;
+                        }
                     }
 
                     $marks[] = $this->mark($val);
