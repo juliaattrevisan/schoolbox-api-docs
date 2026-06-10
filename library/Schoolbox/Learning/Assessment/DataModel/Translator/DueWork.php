@@ -88,7 +88,6 @@ class DueWork implements IAssessmentTypeTranslator
         null === $domainObject->getUseRubric()              || $dataModel->setUseRubric($domainObject->getUseRubric());
         null === $domainObject->getCapabilityMarkType()     || $dataModel->setCapabilityMarkType($domainObject->getCapabilityMarkType());
         null === $domainObject->getCapabilityGradeGroup()   || $dataModel->setCapabilityGradeGroup($domainObject->getCapabilityGradeGroup());
-        null === $domainObject->getUseMarkRange()           || $dataModel->setMarkedUsingRange($domainObject->getUseMarkRange());
         null === $domainObject->getSelfReviewability()      || $dataModel->setSelfReviewability($domainObject->getSelfReviewability());
         null === $domainObject->getSimilarityCheckEnabled() || $dataModel->setSimilarityCheckEnabled($domainObject->getSimilarityCheckEnabled());
         null === $domainObject->getEnableWorksheet()        || $dataModel->setEnableWorksheet($domainObject->getEnableWorksheet());
@@ -199,15 +198,10 @@ class DueWork implements IAssessmentTypeTranslator
             $domainObject->setUseRubric(true);
             $domainObject->setCapabilityMarkType($dataModel->getCapabilityMarkType());
             $domainObject->setCapabilityGradeGroup($dataModel->getCapabilityGradeGroup());
-
-            if ($dataModel->isMarkedUsingRange()) {
-                $domainObject->setUseMarkRange(true);
-            }
         } else {
             $domainObject->setUseRubric(false);
             $domainObject->setCapabilityMarkType(null);
             $domainObject->setCapabilityGradeGroup(null);
-            $domainObject->setUseMarkRange(false);
         }
 
         // Figure out submission visibility

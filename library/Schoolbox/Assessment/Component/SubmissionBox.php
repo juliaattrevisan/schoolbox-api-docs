@@ -163,9 +163,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     protected $capabilityGradeGroup;
 
 
-    /** @var bool */
-    protected $markedUsingRange;
-
     /**
      * @var string
      */
@@ -498,37 +495,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
         $this->capabilityMarkType = $capabilityMarkType;
         return $this;
     }
-
-
-    /**
-     * @deprecated mapper method
-     * @return boolean
-     */
-    public function getMarkedUsingRange()
-    {
-        return $this->isMarkedUsingRange();
-    }
-
-
-    /**
-     * @return bool
-     */
-    public function isMarkedUsingRange()
-    {
-        return $this->markedUsingRange;
-    }
-
-
-    /**
-     * @param boolean $markedUsingRange
-     * @return static
-     */
-    public function setMarkedUsingRange($markedUsingRange)
-    {
-        $this->markedUsingRange = $markedUsingRange;
-        return $this;
-    }
-
 
     /**
      * @param  string $mark_visibility

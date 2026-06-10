@@ -500,16 +500,16 @@ class DataSource
     /**
      * Retrieves the grid contents of a particular rubric instance, $rubricInstance.
      *
-     * @param $assessment
-     * @param \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance
+     * @param IAssessable $assessment
+     * @param Model $rubricInstance
      * @param bool $getUsages
      * @param bool $cloneNewRubric
      * @return Grid
      * @throws MapperException
      */
     public function retrieveOneGrid(
-        $assessment,
-        \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance,
+        IAssessable $assessment,
+        Model $rubricInstance,
         bool $getUsages,
         bool $cloneNewRubric = false
     ): Grid {
@@ -630,7 +630,7 @@ class DataSource
                     $levelIndex++;
                 }
 
-                $indicatorUsage->applyDescriptorMinValues($assessment->getUseMarkRange());
+                $indicatorUsage->applyDescriptorMinValues($rubricInstance->getMarkedUsingRange());
 
                 $capabilityUsage->getIndicatorUsages()[$indicatorId] = $indicatorUsage;
             }
