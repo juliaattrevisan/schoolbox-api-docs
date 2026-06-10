@@ -20,8 +20,8 @@ use Schoolbox\UserMapper;
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
- * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
- * @method Model[]|GenericCollection createCollection($contents = [])
+ * @method GenericCollection<Model> findByColumn($columnName, $columnValue, $options = [])
+ * @method GenericCollection<Model> createCollection($contents = [])
  */
 class Mapper extends BaseMapper
 {
@@ -85,7 +85,7 @@ class Mapper extends BaseMapper
      * @inheritDoc
      *
      * @param \PDOStatement $statement
-     * @return Model[]|GenericCollection
+     * @return GenericCollection<Model>
      */
     protected function hydrateSelect(\PDOStatement $statement)
     {
