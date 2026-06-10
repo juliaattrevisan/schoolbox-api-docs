@@ -46,6 +46,15 @@ class Csv extends AbstractCSV
 
 
     /**
+     * Which data struct node to access depending on the Show Drafts section.
+     * This selection is constant throughout runtime; you can't swap them on a whim
+     *
+     * @var string
+     */
+    private string $node;
+
+
+    /**
      * Constructor
      *
      * @param array $assessments A set of assessment data structs containing the cap/ind structure
@@ -63,17 +72,20 @@ class Csv extends AbstractCSV
         private array $overallMarks,
         private Translator $translator,
         private bool $descriptorsOnly,
-        private bool $showDrafts
+        bool $showDrafts
     ) {
         $this->capabilityMarkColumn = $this->translator->translateSentence('({:rubricGroup} mark)');
+
+        /* Decide whether we're using Draft node or Published mark nodes.
+         */
+        $this->node = $this->nodeSelector($showDrafts);
     }
 
 
     /**
-     * Export this markbook as a CSV.
+     * Export this markbook as a CSV. Note that ui settings are fulfilled here too.
      *
-     * @param string $filename   The filename for the CSV export.
-     * @param bool   $showDrafts Should draft marks be shown in the export?
+     * @param string $filename The filename for the CSV export.
      * @return void
      */
     public function export(string $filename): void
@@ -92,9 +104,6 @@ class Csv extends AbstractCSV
                     $assessmentData,
                     (int)$rubricInstanceId,
                     $rubricInstanceData,
-                    /* Decide whether we're using Draft node or Published mark nodes.
-                     */
-                    $this->nodeSelector()
                 );
             }
         }
@@ -102,7 +111,7 @@ class Csv extends AbstractCSV
         /* The overall marks section for each student's progressive evolution for each capability and indicator.
          * This is the potatoes of the rubric markbook in csv format.
          */
-        $this->exportOverallMarks($this->nodeSelector());
+        $this->exportOverallMarks();
 
         $this->closeExport();
     }
@@ -179,7 +188,6 @@ class Csv extends AbstractCSV
      * @param array $assessmentData
      * @param int $rubricInstanceId
      * @param array $rubricInstanceData
-     * @param string $node
      * @return void
      */
     private function exportGrid(
@@ -187,7 +195,6 @@ class Csv extends AbstractCSV
         array $assessmentData,
         int $rubricInstanceId,
         array $rubricInstanceData,
-        string $node,
     ): void {
         /* Send out each grid's capability/indicator combos for each student.
          */
@@ -203,7 +210,7 @@ class Csv extends AbstractCSV
                 $marks = [];
 
                 foreach ($this->studentMarks as $studentId => $studentData) {
-                    $marks[] = $studentData['gridData'][$assessmentId][$rubricInstanceId]['capabilities'][$capabilityId][$node]['humanReadableMark'] ?? null;
+                    $marks[] = $studentData['gridData'][$assessmentId][$rubricInstanceId]['capabilities'][$capabilityId][$this->node]['humanReadableMark'] ?? null;
                 }
 
                 /* The first arg to this method is the "headings" but it actually corresponds to the columns prior, that
@@ -228,7 +235,7 @@ class Csv extends AbstractCSV
                 $marks = [];
 
                 foreach ($this->studentMarks as $studentId => $studentData) {
-                    $marks[] = $studentData['gridData'][$assessmentId][$rubricInstanceId]['capabilities'][$capabilityId]['indicators'][$indicatorId][$node]['humanReadableMark'] ?? null;
+                    $marks[] = $studentData['gridData'][$assessmentId][$rubricInstanceId]['capabilities'][$capabilityId]['indicators'][$indicatorId][$this->node]['humanReadableMark'] ?? null;
                 }
 
                 $this->exportRow([
@@ -248,10 +255,9 @@ class Csv extends AbstractCSV
      *
      * All in a nice csv format
      *
-     * @param string $node
      * @return void
      */
-    private function exportOverallMarks(string $node): void
+    private function exportOverallMarks(): void
     {
         foreach ($this->overallMarks as $capabilityId => $capabilityData) {
             /* Squish in a row for Capability Mark data. For now we always show this value in Overall Marks.
@@ -259,7 +265,7 @@ class Csv extends AbstractCSV
             $marks = [];
 
             foreach ($this->studentMarks as $studentId => $studentData) {
-                $marks[] = $this->overallMarks[$capabilityId]['students'][$studentId][$node]['humanReadableMark'] ?? null;
+                $marks[] = $this->overallMarks[$capabilityId]['students'][$studentId][$this->node]['humanReadableMark'] ?? null;
             }
 
             /* The first arg to this method is the "headings" but it actually corresponds to the columns prior, that
@@ -288,7 +294,7 @@ class Csv extends AbstractCSV
                 $marks = [];
 
                 foreach ($this->studentMarks as $studentId => $studentData) {
-                    $marks[] = $this->overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId][$node]['humanReadableMark'] ?? null;
+                    $marks[] = $this->overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId][$this->node]['humanReadableMark'] ?? null;
                 }
 
                 $this->exportRow([
@@ -311,11 +317,12 @@ class Csv extends AbstractCSV
      * Decides whether we're accessing the Published marks node or the Draft marks node based on the $showDrafts bool.
      * The $studentMarks data struct is built symmetrically so it's an easy toggle to use.
      *
+     * @param bool $showDrafts
      * @return string
      */
-    private function nodeSelector(): string
+    private function nodeSelector(bool $showDrafts): string
     {
-        if ($this->showDrafts) {
+        if ($showDrafts) {
             return self::NODE_DRAFT;
         }
 
