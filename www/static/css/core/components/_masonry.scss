@@ -286,8 +286,7 @@ $masonry-drop-background: $input-focus-bg-color;
 sbx-icon.icon-masonry.icon-masonry-Component_Eportfolio_AdvancedListController {
     color: $icon-color-advanced-list;
 }
-.icon-masonry.icon-masonry-Component_Eportfolio_BasicListController {
-    @extend .icon-list;
+sbx-icon.icon-masonry.icon-masonry-Component_Eportfolio_BasicListController {
     color: $icon-color-basic-list;
 }
 .icon-masonry.icon-masonry-Schoolbox_Blog_Eportfolio_Component_Controller {
