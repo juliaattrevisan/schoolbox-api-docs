@@ -195,10 +195,10 @@ class Client implements IClient
      */
     public function createLog(
         array $payload,
-        ?string $inputText = null,
-        ?User $user = null,
-        ?string $feature = null,
-        ?string $aiSessionId = null,
+        ?string $inputText,
+        ?User $user,
+        string $feature,
+        string $aiSessionId,
         ?LogFormat $logFormat = null,
     ): Log\Model {
         /** @noinspection PhpUnhandledExceptionInspection - this will never throw */
@@ -211,12 +211,12 @@ class Client implements IClient
         if (isset($user)) {
             $log = $log->setUser($user);
         }
-        if (isset($aiSessionId)) {
-            // Ensure the parent ai_session row exists (carrying the feature) before
-            // any ai_session_log row references it.
-            $this->sessionMapper->findOrCreate($aiSessionId, $feature, $user);
-            $log = $log->setAiSessionId($aiSessionId);
-        }
+        // Ensure the parent ai_session row exists (carrying the feature) before
+        // any ai_session_log row references it.
+        $this->sessionMapper->findOrCreate($aiSessionId, $feature, $user);
+
+        $log = $log->setAiSessionId($aiSessionId);
+
         return $log;
     }
 

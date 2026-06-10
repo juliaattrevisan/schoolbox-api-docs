@@ -50,13 +50,13 @@ class Mapper extends BaseMapper
      * so possession of an id never implies the row exists. `INSERT IGNORE` makes
      * "create vs reuse" atomic; the first writer's feature/created_by/created_at win.
      *
-     * @param string      $id      The session UUID (the ai_session primary key).
-     * @param string|null $feature The owning feature, as a {@see Feature} value.
-     * @param User|null   $user    The creating user (for created_by), if known.
+     * @param string    $id      The session UUID (the ai_session primary key).
+     * @param string    $feature The owning feature, as a {@see Feature} value.
+     * @param User|null $user    The creating user (for created_by), if known.
      * @return Model The persisted (existing or newly created) session.
      * @throws BaseMapper\Exception
      */
-    public function findOrCreate(string $id, ?string $feature, ?User $user): Model
+    public function findOrCreate(string $id, string $feature, ?User $user): Model
     {
         $statement = $this->getDatabase()->prepare(
             'INSERT IGNORE INTO `ai_session` (`id`, `feature`, `created_by`, `created_at`)
