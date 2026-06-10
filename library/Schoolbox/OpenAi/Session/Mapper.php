@@ -139,7 +139,7 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Fetch a page of sessions for the admin usage log, newest first.
+     * Fetch a page of sessions with logs for the admin usage log, newest first.
      *
      * Filters: keyword (matched against the logs' prompt/response via EXISTS),
      * feature, creating user, and created_at date range. logFormat/returnCode are
@@ -169,6 +169,9 @@ class Mapper extends BaseMapper
         $limitSql  = null !== $limit ? 'LIMIT :limit' : '';
         $offsetSql = null !== $offset ? 'OFFSET :offset' : '';
 
+        // The admin list emits a details route for each session, and that route
+        // preloads the first ai_session_log row. Requiring firstLog here keeps
+        // orphan sessions from appearing with a broken details link.
         $query = "
             SELECT
                 `{$this->table}`.id AS id,
@@ -179,7 +182,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('user', 'u')}
             FROM `{$this->table}`
             LEFT JOIN {$this->getJoinSql('user', '', 'u', true)}
-            LEFT JOIN `ai_session_log` firstLog ON firstLog.id = (
+            JOIN `ai_session_log` firstLog ON firstLog.id = (
                 SELECT id FROM `ai_session_log`
                 WHERE ai_session_id = `{$this->table}`.id
                 ORDER BY created_at ASC, id ASC
@@ -226,7 +229,7 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Count all sessions matching the same filters, ignoring limit/offset.
+     * Count all sessions with logs matching the same filters, ignoring limit/offset.
      *
      * @param string|null               $keyword
      * @param string|null               $feature
@@ -244,6 +247,7 @@ class Mapper extends BaseMapper
         ?\Alaress_Date_Format $end,
     ): int {
         [$where, $params] = $this->buildSessionFilter($keyword, $feature, $user, $start, $end);
+        $where = $this->requireSessionLog($where);
 
         $statement = $this->getDatabase()->prepare(
             "SELECT COUNT(*) FROM `{$this->table}` {$where}"
@@ -254,6 +258,26 @@ class Mapper extends BaseMapper
         $statement->execute();
 
         return (int)$statement->fetchColumn();
+    }
+
+    /**
+     * Require at least one child log for session counts.
+     *
+     * Session rows without logs cannot open the usage-log details route, because
+     * the route preload resolves a first ai_session_log row from the session id.
+     */
+    private function requireSessionLog(string $where): string
+    {
+        $hasLog = 'EXISTS (
+            SELECT 1 FROM `ai_session_log` l
+            WHERE l.ai_session_id = `' . $this->table . '`.id
+        )';
+
+        if ('' === $where) {
+            return 'WHERE ' . $hasLog;
+        }
+
+        return $where . "\nAND " . $hasLog;
     }
 
     /**

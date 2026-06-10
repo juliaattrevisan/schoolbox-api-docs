@@ -1,0 +1,70 @@
+<?php
+
+/**
+ * @copyright Copyright 2026, Schoolbox Pty Ltd
+ * @link      https://schoolbox.education/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\OpenAi\Session\Test;
+
+use Alaress\Database\Connector\NullConnector;
+use PDOStatement;
+use PHPUnit\Framework\TestCase;
+use Schoolbox\OpenAi\Session\Mapper;
+
+/**
+ * Unit tests for the admin AI session list query.
+ */
+class FilteredSessionsQueryTest extends TestCase
+{
+    public function testFilteredSessionsRequireFirstLogInListQuery(): void
+    {
+        $sql = $this->capturePreparedSql(
+            fn(Mapper $mapper) => $mapper->getFilteredSessions(null, null, null, null, null)
+        );
+
+        $this->assertStringContainsString('JOIN `ai_session_log` firstLog', $sql);
+        $this->assertStringNotContainsString('LEFT JOIN `ai_session_log` firstLog', $sql);
+    }
+
+    public function testFilteredSessionCountRequiresChildLog(): void
+    {
+        $sql = $this->capturePreparedSql(
+            fn(Mapper $mapper) => $mapper->countFilteredSessions(null, null, null, null, null)
+        );
+
+        $this->assertStringContainsString('EXISTS (', $sql);
+        $this->assertStringContainsString('FROM `ai_session_log` l', $sql);
+        $this->assertStringContainsString('l.ai_session_id = `ai_session`.id', $sql);
+    }
+
+    /**
+     * @param callable(Mapper): void $query
+     */
+    private function capturePreparedSql(callable $query): string
+    {
+        $connector = new class extends NullConnector {
+            public ?string $preparedStatement = null;
+
+            public function prepare(string $statement, array $driverOptions = []): PDOStatement
+            {
+                $this->preparedStatement = $statement;
+                throw new \RuntimeException('Prepared SQL captured');
+            }
+        };
+
+        $mapper = new Mapper();
+        $mapper->setDatabase($connector);
+
+        try {
+            $query($mapper);
+        } catch (\RuntimeException $e) {
+            $this->assertSame('Prepared SQL captured', $e->getMessage());
+            return $connector->preparedStatement ?? '';
+        }
+
+        $this->fail('Expected mapper query to prepare SQL');
+    }
+}
