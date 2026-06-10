@@ -14,42 +14,34 @@ use Schoolbox\Realtime\Admin\Helper;
 
 require __DIR__ . '/../../conf/core/require.php';
 
-$app = new class extends CliTool\App {
-    /** @inheritDoc */
-    public function getLongOpts(): array
+$app = new class extends CliTool\BaseApp {
+    protected function getName(): string
     {
-        return [
-            'help',
-            'role:',
-            'roletype:',
-            'namespace:',
-        ];
+        return 'delete-personalised-settings';
     }
 
+    protected function getDescription(): string
+    {
+        return 'Deletes personal notification settings. This cannot be undone, once performed.';
+    }
+
+    protected function setOptions(): self
+    {
+        $this->addOption(null, 'role:', 'ID of a role to delete settings from');
+        $this->addOption(null, 'roletype:', 'One of: staff, parent, student');
+        $this->addOption(null, 'namespace:', '"all" or a specific notification namespace');
+        return $this;
+    }
+
+    protected function hasPerformMode(): bool
+    {
+        return true;
+    }
 
     /** @inheritDoc */
     public function run(): void
     {
         $msgNamespaceMapper = \Schoolbox\Realtime\Message\NSMapper::getInstance();
-        $nameSpaces         = $msgNamespaceMapper->findAll()->sortBy('slug', 'asc')->getPropertyValues('slug');
-        $nameSpaceList      = implode(', ', $nameSpaces);
-        /* Help
-         */
-        if ($this->getOpt('help')) {
-            echo <<<HELP
-
-Deletes personal notification settings. This cannot be undone, once performed.
-
-Usage: delete-personalised-settings.php [--role] [--roletype] [--namespace]
-        --role: ID of a role to delete settings from
-        --roletype: one of staff, parent and student
-        --namespace: "all" or one of $nameSpaceList
-
-HELP;
-
-            exit(0);
-        }
-
         $msgRerouteMapper = \Schoolbox\Realtime\Message\RerouteMapper::getInstance();
         $roleMapper       = RoleMapper::getInstance();
 
