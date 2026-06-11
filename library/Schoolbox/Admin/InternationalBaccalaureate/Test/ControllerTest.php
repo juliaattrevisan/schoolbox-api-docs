@@ -46,6 +46,7 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Nationality\Model as NationalityModel;
 use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 use Twig\Environment;
 
 class ControllerTest extends TestCase
@@ -97,6 +98,7 @@ class ControllerTest extends TestCase
                     'registrationSessionStudentId' => 456,
                     'status' => RegistrationSessionStudentModel::STATUS_CONFIRMED,
                     'userName' => 'Nguyen, Alex',
+                    'ibCandidateNumber' => null,
                     'hasMissingDetails' => false,
                     'missingFields' => [],
                     'session' => '',
@@ -191,6 +193,7 @@ class ControllerTest extends TestCase
                     'registrationSessionStudentId' => 789,
                     'status' => RegistrationSessionStudentModel::STATUS_FAILED,
                     'userName' => 'Patel, Sam',
+                    'ibCandidateNumber' => null,
                     'hasMissingDetails' => false,
                     'missingFields' => [],
                     'session' => '',
@@ -278,6 +281,252 @@ class ControllerTest extends TestCase
             ],
             $payload['students'][RegistrationSessionStudentModel::STATUS_FAILED]
         );
+    }
+
+    public function testPostRegistrationSessionCandidateNumbersSavesNonBlankValues(): void
+    {
+        $studentOne = $this->buildStudent(
+            456,
+            123,
+            RegistrationSessionStudentModel::STATUS_CONFIRMED,
+            'Alex',
+            'Nguyen',
+            'S123'
+        );
+        $studentTwo = $this->buildStudent(
+            789,
+            234,
+            RegistrationSessionStudentModel::STATUS_FAILED,
+            'Sam',
+            'Patel',
+            'S234'
+        );
+
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('findStudentsForSession')
+            ->with(12)
+            ->willReturn(new Collection([$studentOne, $studentTwo]));
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('findOneByColumnList')
+            ->with([
+                'user_id' => 123,
+                'registration_session_id' => 12,
+            ])
+            ->willReturn($studentOne);
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('save');
+
+        $userMapper = $this->createMock(UserMapper::class);
+        $userMapper
+            ->expects($this->once())
+            ->method('save')
+            ->with($this->callback(function (User $user): bool {
+                $this->assertSame(123, $user->getId());
+                $this->assertSame('CAND-123', $user->getIbCandidateNumber());
+
+                return true;
+            }));
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class),
+            userMapper: $userMapper
+        );
+        $controller->setRequestPost(new Values([
+            'candidateNumbers' => [
+                123 => ' CAND-123 ',
+                234 => ' ',
+            ],
+        ]));
+
+        $controller->postRegistrationSessionCandidateNumbers((new RegistrationSessionModel())->setId(12));
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(303, $response->getStatusCode());
+        $this->assertSame(
+            ['/adminv2/international-baccalaureate/registrations/sessions/12'],
+            $response->getHeader('Location')
+        );
+    }
+
+    public function testPostRegistrationSessionCandidateNumbersSkipsBlankValues(): void
+    {
+        $student = $this->buildStudent(
+            456,
+            123,
+            RegistrationSessionStudentModel::STATUS_CONFIRMED,
+            'Alex',
+            'Nguyen',
+            'S123'
+        );
+
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('findStudentsForSession')
+            ->with(12)
+            ->willReturn(new Collection([$student]));
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('findOneByColumnList');
+
+        $userMapper = $this->createMock(UserMapper::class);
+        $userMapper
+            ->expects($this->never())
+            ->method('save');
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class),
+            userMapper: $userMapper
+        );
+        $controller->setRequestPost(new Values([
+            'candidateNumbers' => [
+                123 => '',
+            ],
+        ]));
+
+        $controller->postRegistrationSessionCandidateNumbers((new RegistrationSessionModel())->setId(12));
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(303, $response->getStatusCode());
+    }
+
+    public function testPostRegistrationSessionCandidateNumbersIgnoresUsersOutsideReport(): void
+    {
+        $student = $this->buildStudent(
+            456,
+            123,
+            RegistrationSessionStudentModel::STATUS_CONFIRMED,
+            'Alex',
+            'Nguyen',
+            'S123'
+        );
+
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('findStudentsForSession')
+            ->with(12)
+            ->willReturn(new Collection([$student]));
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('findOneByColumnList');
+
+        $userMapper = $this->createMock(UserMapper::class);
+        $userMapper
+            ->expects($this->never())
+            ->method('save');
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class),
+            userMapper: $userMapper
+        );
+        $controller->setRequestPost(new Values([
+            'candidateNumbers' => [
+                999 => 'CAND-999',
+            ],
+        ]));
+
+        $controller->postRegistrationSessionCandidateNumbers((new RegistrationSessionModel())->setId(12));
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(303, $response->getStatusCode());
+    }
+
+    public function testPostRegistrationSessionCandidateNumbersPersistsDynamicCandidateBeforeSaving(): void
+    {
+        $dynamicStudent = (new RegistrationSessionStudentModel())
+            ->setRegistrationSession((new RegistrationSessionModel())->setId(12))
+            ->setStatus(RegistrationSessionStudentModel::STATUS_PREPARATION)
+            ->setUser(
+                (new User())
+                    ->setId(234)
+                    ->setFirstname('Sam')
+                    ->setLastname('Patel')
+            );
+        $persistedStudent = (new RegistrationSessionStudentModel())
+            ->setId(789)
+            ->setRegistrationSession((new RegistrationSessionModel())->setId(12))
+            ->setStatus(RegistrationSessionStudentModel::STATUS_PREPARATION)
+            ->setUser($dynamicStudent->getUser());
+
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->expects($this->exactly(2))
+            ->method('findStudentsForSession')
+            ->with(12)
+            ->willReturnOnConsecutiveCalls(
+                new Collection([$dynamicStudent]),
+                new Collection([$dynamicStudent])
+            );
+
+        $findRegistrationSessionStudentCallCount = 0;
+        $registrationSessionStudentMapper
+            ->expects($this->exactly(2))
+            ->method('findOneByColumnList')
+            ->with([
+                'user_id' => 234,
+                'registration_session_id' => 12,
+            ])
+            ->willReturnCallback(function () use (&$findRegistrationSessionStudentCallCount, $persistedStudent) {
+                if ($findRegistrationSessionStudentCallCount++ === 0) {
+                    throw new \Schoolbox\Mapper\Exception\NotFound();
+                }
+
+                return $persistedStudent;
+            });
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('save')
+            ->with($this->callback(function (RegistrationSessionStudentModel $student): bool {
+                $this->assertNull($student->getId());
+                $this->assertSame(12, $student->getRegistrationSession()?->getId());
+                $this->assertSame(234, $student->getUser()?->getId());
+
+                return true;
+            }))
+            ->willReturn([789]);
+
+        $userMapper = $this->createMock(UserMapper::class);
+        $userMapper
+            ->expects($this->once())
+            ->method('save')
+            ->with($this->callback(function (User $user): bool {
+                $this->assertSame(234, $user->getId());
+                $this->assertSame('CAND-234', $user->getIbCandidateNumber());
+
+                return true;
+            }));
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class),
+            userMapper: $userMapper
+        );
+        $controller->setRequestPost(new Values([
+            'candidateNumbers' => [
+                234 => 'CAND-234',
+            ],
+        ]));
+
+        $controller->postRegistrationSessionCandidateNumbers((new RegistrationSessionModel())->setId(12));
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(303, $response->getStatusCode());
     }
 
     public function testRenotifyUnconfirmedTouchesStudentAndPropagatesUnconfirmedNotification(): void
@@ -1556,6 +1805,7 @@ class ControllerTest extends TestCase
         ?IBGroupSubjectMapper $groupSubjectMapper = null,
         ?LanguageMapper $languageMapper = null,
         ?RegistrationSessionStudentSubjectLanguageMapper $subjectLanguageMapper = null,
+        ?UserMapper $userMapper = null,
         ?User $currentUser = null
     ): Controller {
         $registrationSessionStudentHelper = new RegistrationSessionStudentHelper();
@@ -1574,6 +1824,27 @@ class ControllerTest extends TestCase
                 if ($route === 'internationalBaccalaureate.renotifyUnconfirmed') {
                     return sprintf(
                         '/adminv2/international-baccalaureate/registrations/sessions/%d/candidates/renotify',
+                        $params['sessionId']
+                    );
+                }
+
+                if ($route === 'internationalBaccalaureate.getReport') {
+                    return sprintf(
+                        '/adminv2/international-baccalaureate/registrations/sessions/%d',
+                        $params['sessionId']
+                    );
+                }
+
+                if ($route === 'internationalBaccalaureate.getRegistrationSessionCandidateNumbers') {
+                    return sprintf(
+                        '/adminv2/international-baccalaureate/registrations/sessions/%d/candidates/candidate-numbers',
+                        $params['sessionId']
+                    );
+                }
+
+                if ($route === 'internationalBaccalaureate.postRegistrationSessionCandidateNumbers') {
+                    return sprintf(
+                        '/adminv2/international-baccalaureate/registrations/sessions/%d/candidates/candidate-numbers',
                         $params['sessionId']
                     );
                 }
@@ -1611,6 +1882,7 @@ class ControllerTest extends TestCase
             ),
             $registrationSessionStudentHelper,
             $externalUser,
+            $userMapper ?? $this->createStub(UserMapper::class),
             $this->createStub(FieldStrategyFactory::class),
             $this->createStub(Rebuilder::class),
             $this->createStub(CacheInterface::class)
@@ -1626,6 +1898,8 @@ class ControllerTest extends TestCase
         );
         $controller->setRequest($httpFactory->createServerRequest('GET', '/')->withParsedBody([]));
         $controller->setDi($this->buildContainer());
+        $controller->setAuthorizer($authorizer);
+        $controller->setRouteGenerator($routeGenerator);
         $controller->setUser($currentUser);
 
         return $controller;

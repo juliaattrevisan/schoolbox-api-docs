@@ -11,6 +11,9 @@
             <ib-report
                 candidates-endpoint="{{ _routes.candidatesEndpoint }}"
                 candidate-export-endpoint="{{ _routes.candidateExportEndpoint }}"
+                {% if _routes.candidateNumberUpdateRoute %}
+                candidate-number-update-route="{{ _routes.candidateNumberUpdateRoute }}"
+                {% endif %}
                 search-languages-endpoint="{{ _routes.searchLanguages }}"
                 renotify-endpoint="{{ _routes.renotifyUnconfirmed }}"
                 complete-preparation-endpoint="{{ _routes.completePreparation }}"
