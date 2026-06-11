@@ -7,6 +7,7 @@ import { getWithoutExtension } from "@js/util/fileUtils";
 import { getAttributes, ResourceType } from "@js/resource/resourceUtils";
 import type { Resource } from "@js/resource/resourceUtils";
 import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
+import { getLightboxRel, LIGHTBOX_LINK_ATTRIBUTE } from "./lightboxLinkUtils";
 
 /**
  * Move the caret out of link context so the next insertion does not inherit the previous link.
@@ -61,6 +62,10 @@ export function addResource(editor: Editor, resource: Resource): void {
     const config = editor.config.get("sbConfig") as SbxEditorConfig;
     const imageUtils = editor.plugins.get("ImageUtils");
     const resourceAttributes = getAttributes(resource, config.baseHref);
+    if (resource.type === ResourceType.IMAGE) {
+        resourceAttributes[LIGHTBOX_LINK_ATTRIBUTE] = getLightboxRel(editor);
+    }
+
     editor.model.change((writer) => {
         if (!("linkHref" in resourceAttributes)) {
             // Videos/audio use image placeholders without their own link. If the caret is still carrying

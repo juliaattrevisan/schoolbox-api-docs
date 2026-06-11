@@ -6,10 +6,9 @@
 import { Plugin, type ResizeImageCommand, type Element, type ViewElement } from "ckeditor5";
 import { ResourceType, getExtraAttributes } from "@js/resource/resourceUtils";
 import InsertResourceCommand from "./InsertResourceCommand";
+import { LIGHTBOX_LINK_ATTRIBUTE } from "./lightboxLinkUtils";
 
-export const LIGHTBOX_LINK_ATTRIBUTE = "linkLightboxRel";
 const LINK_ATTRIBUTE_PRIORITY = 5;
-
 export default class ResourceEditing extends Plugin {
     /**
      * Runs on startup, defines the schema and converters
