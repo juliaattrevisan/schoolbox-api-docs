@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2024, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
@@ -10,47 +11,52 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\BulkFeedbackImport;
 
 use League\Flysystem\FilesystemException;
+use Schoolbox\Admin\BulkFeedbackImport\Strategy\Feedback\DueWork;
+use Schoolbox\Admin\BulkFeedbackImport\Strategy\Feedback\IStrategy;
+use Schoolbox\Admin\BulkFeedbackImport\Strategy\Feedback\Reporting;
+use Schoolbox\Admin\BulkFeedbackImport\Strategy\Mark\HumanReadableMark;
+use Schoolbox\Admin\BulkFeedbackImport\Strategy\Mark\NormalisedMark;
 use Schoolbox\Admin\Import\Profile\Reader;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
+use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Folder\Mapper;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\IStorage;
-use Schoolbox\Resource\Storage\Model;
-use Schoolbox\L10n\RosettaStone;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Processor
 {
     /**
-     * Used to make logging a bit more bearable
-     */
-    private const WARNING = 'warning';
-    private const INFO = 'info';
-
-
-    /**
      * Assume a default time of 1:11pm
      */
-    private const PUBLISH_TIME = '13:11:11';
+    private const string PUBLISH_TIME = '13:11:11';
 
 
     /**
-     * Used to find a relationship between a folder and a particular
-     * assessment by its (assessment title, worktype) combo
+     * A query to find assessments related to the folder id, work type and assessment title tuple.
+     *
+     * It joins onto subobject tables because multiple assessments with the same work type and title might exist for
+     * assessments that have different sub objects.
+     *
+     * Used to find a relationship between a folder and a particular assessment by its (assessment title, worktype) combo
      */
-    private const QUERY_ASSESSMENT_TITLE_WORKTYPE = "
+    private const string QUERY_ASSESSMENT_TITLE_WORKTYPE = "
         SELECT
             a.id AS assessment_id,
             a.title AS assessment_title,
-            sb.id AS box_id
+            sb.id AS box_id,
+            r.id AS reporting_id
         FROM mv_assessment_relation mvar
         INNER JOIN assessment a ON a.id = mvar.assessment_id
-        INNER JOIN submission_box sb ON sb.assessment_id = a.id
+        LEFT JOIN submission_box sb ON sb.assessment_id = a.id
+        LEFT JOIN reporting r ON r.assessment_id = a.id
         INNER JOIN folder f ON mvar.folder_id = f.id
         WHERE mvar.folder_id = :folderId
         AND a.work_type_id = :workTypeId
@@ -64,14 +70,6 @@ class Processor
      * @var \PDOStatement
      */
     private \PDOStatement $assessmentQuery;
-
-
-    /**
-     * A set of (user id, fullname) tuples to save some mem
-     *
-     * @var array
-     */
-    private array $learnerLookup = [];
 
 
     /**
@@ -91,13 +89,29 @@ class Processor
 
 
     /**
+     * This is used to save feedbacks into Due Work
+     *
+     * @var IStrategy
+     */
+    private IStrategy $dueWorkStrategy;
+
+
+    /**
+     * This is used to save feedbacks into Reporting
+     *
+     * @var IStrategy
+     */
+    private IStrategy $reportingStrategy;
+
+
+    /**
      * Constructor
      *
      * The submissionBoxMapper is used to craft a returned work model so that its corresponding mapper
      * can create Participant and Participant Plan records for feedbacks
      *
      * The returnedWorkMapper is used to create Participant and Participant Plan records for a feedback
-     * via its postsave hooks
+     * via its post-save hooks
      *
      * @param MapperProxy $assessmentMapperProxy
      * @param FilesystemProxy $filesystemProxy
@@ -105,6 +119,9 @@ class Processor
      * @param Mapper $folderMapper
      * @param SubmissionBoxMapper $submissionBoxMapper
      * @param ReturnedWorkMapper $returnedWorkMapper
+     * @param \Schoolbox\Learning\Assessment\DataModel\Reporting\Mapper $reportingMapper
+     * @param StateMapper $stateMapper
+     * @param IFeedbackDataSource $feedbackDataSource
      * @param RosettaStone $rosettaStone
      * @param string $dateLocal
      * @param string $assessmentTitle
@@ -118,50 +135,67 @@ class Processor
         private \Schoolbox\Resource\Folder\Mapper $folderMapper,
         private SubmissionBoxMapper $submissionBoxMapper,
         private ReturnedWorkMapper $returnedWorkMapper,
+        private \Schoolbox\Learning\Assessment\DataModel\Reporting\Mapper $reportingMapper,
+        private StateMapper $stateMapper,
+        private IFeedbackDataSource $feedbackDataSource,
         private RosettaStone $rosettaStone,
         private string $dateLocal,
         private string $assessmentTitle,
         private \Schoolbox\Learning\Assessment\WorkType\Model $workType,
         private bool $perform
     ) {
-        /* We're going to reuse this a lot
+        /* These feedback strats allow us to potentially explore all supported activities. We don't know ahead of time
+         * which activities match the ones specified in the csv; could be one of these or even both.
          */
-        $this->assessmentQuery = $this->userMapper->getDatabase()->prepare(self::QUERY_ASSESSMENT_TITLE_WORKTYPE);
+        $this->dueWorkStrategy = new DueWork(
+            $this->perform,
+            $this->rosettaStone,
+            $this->assessmentTitle,
+            $this->submissionBoxMapper,
+            $this->returnedWorkMapper
+        );
+
+        $this->reportingStrategy = new Reporting(
+            $this->perform,
+            $this->rosettaStone,
+            $this->assessmentTitle,
+            $this->reportingMapper,
+            $this->feedbackDataSource,
+        );
     }
 
 
     /**
      * Process feedbacks
      *
-     * @param Model $file
+     * @param IStorage $file
      * @param User $creator
-     * @return array
+     * @return array{messages: array, errors: int, links: array}
      * @throws FilesystemException
      * @throws Exception
      * @throws Deleted
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     public function parseFeedbacks(
         IStorage $file,
         \Schoolbox\User $creator,
     ): array {
-        /* A list of warnings/errors/scenarios that schools must fix before we can continue
-         */
-        $errors = 0;
+        $reader = new Reader($this->filesystemProxy->readStream($file), true);
+        $headerRow = $reader->readHeaderRow();
 
-        /* A shortcut to status screens
+        /* Figure out what column to use as a basis for discovering (normalised mark, learner human readable mark and
+         * instructor human readable mark) tuple. It's presumed to be consistent throughout the csv.
          */
-        $links = [];
+        $markStrategy = $this->selectMarkStrategy($headerRow);
 
         /* Load a particular file
          */
         $reader = new Reader($this->filesystemProxy->readStream($file), true);
-        $reader->setExpectedColumns([
-            'Class Code',
-            'Student External ID',
-            'Normalised Mark',
-            'Comment',
-            'Publish Date'
-        ]);
+        $reader->setExpectedColumns($markStrategy->getExpectedColumns());
+
+        /* A list of warnings/errors/scenarios that schools must fix before we can continue
+         */
+        $errors = 0;
 
         /* Maintain a row counter
          */
@@ -171,13 +205,19 @@ class Processor
          */
         $now = \Alaress_Date_Format::now();
 
+        /* We're going to reuse this a lot
+         */
+        $this->assessmentQuery = $this->userMapper->getDatabase()->prepare(self::QUERY_ASSESSMENT_TITLE_WORKTYPE);
+
+        /* Start processing the csv body itself
+         */
         foreach ($reader as $row) {
-            /* Remember the row number
+            /* Remember the row number in the csv, starting at 1
+             * This is used to log errors to help humans locate them in the csv itself
              */
             $i++;
 
-            /* Compute publish date from csv
-             * and also make it the same as created_at and updated_at to better keep track
+            /* Compute publish date from csv and also make it the same as created_at and updated_at to better keep track
              * of things after an import has occurred
              */
             $datetime = trim((string)$row['Publish Date']);
@@ -193,7 +233,7 @@ class Processor
 
                     $adf = new \Alaress_Date_Format($combined, $format);
                 } catch (\Carbon\Exceptions\InvalidFormatException $e) {
-                    $this->log(sprintf("Row %s: Invalid date format. Make sure it's correct and try again.", $i), self::WARNING);
+                    $this->log(sprintf("Row %s: Invalid date format. Make sure it's correct and try again.", $i), IStrategy::WARNING);
 
                     $errors++;
 
@@ -217,9 +257,10 @@ class Processor
                     ];
                 } catch (\Schoolbox\Mapper\Exception $e) {
                     $this->log(sprintf(
-                        "Row %s: Can't find Class Code. Make sure it's correct and try again.",
-                        $i
-                    ), self::WARNING);
+                        "Row %s: Can't find Class Code \"%s\". Make sure it's correct and try again.",
+                        $i,
+                        $folderCode
+                    ), IStrategy::WARNING);
 
                     $errors++;
 
@@ -238,30 +279,19 @@ class Processor
              */
             $externalId = trim((string)$row['Student External ID']);
 
-            if (!isset($this->learnerLookup[$externalId])) {
-                try {
-                    $learner = $this->userMapper->findByExternalId($externalId);
+            try {
+                $learner = $this->userMapper->findByExternalId($externalId);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $this->log(sprintf(
+                    'Row %s: student %s not found.',
+                    $i,
+                    $externalId
+                ), IStrategy::WARNING);
 
-                    $this->learnerLookup[$externalId] = [
-                        'id' => $learner->getId(),
-                        'fullname' => $learner->getFullname(),
-                    ];
-                } catch (\Schoolbox\Mapper\Exception $e) {
-                    $this->log(sprintf(
-                        'Row %s: student %s not found.',
-                        $i,
-                        $externalId
-                    ), self::WARNING);
+                $errors++;
 
-                    $errors++;
-
-                    continue;
-                }
+                continue;
             }
-
-            /* Yank it from a local cache
-             */
-            $learner = $this->learnerLookup[$externalId];
 
             /* Then find the assessment's corresponding submission box id
              */
@@ -292,7 +322,7 @@ class Processor
                     $folder['id'],
                     $this->workType->getName(),
                     $this->workType->getId()
-                ), self::WARNING);
+                ), IStrategy::WARNING);
 
                 $errors++;
 
@@ -311,28 +341,47 @@ class Processor
                     $folder['id'],
                     $this->workType->getName(),
                     $this->workType->getId()
-                ), self::WARNING);
+                ), IStrategy::WARNING);
 
                 $errors++;
 
                 continue;
             }
 
-            foreach ($candidateAssessments as $data) {
-                $boxId = $data['box_id'] ?? null;
-                $assessmentId = $data['assessment_id'] ?? null;
-
-                /* For some reason this homepage doesn't have the assessment set up
+            /* Use each strat's processRow() method to interpret how to put this data into a feedback
+             */
+            foreach ($candidateAssessments as $assessmentData) {
+                /* For some reason we don't have an assessment identifier; that's pretty catastrophic
+                 * This shouldn't ever be the case
                  */
-                if (null === $boxId) {
+                if (null === $assessmentData['assessment_id']) {
                     $this->log(sprintf(
-                        'Row %s: unknown submission_box for %s "%s" in folder "%s" (%s)',
+                        'Row %s: Unknown assessment; could not find an id.',
                         $i,
-                        $this->rosettaStone->translate('activity', false),
+                    ), IStrategy::WARNING);
+
+                    $errors++;
+
+                    continue;
+                }
+
+                try {
+                    /* Select a strategy to process feedbacks at runtime: due work and reporting save in different places
+                     * using different structures
+                     */
+                    $feedbackStrategy = $this->selectFeedbackStrategy($assessmentData);
+                } catch (\RuntimeException $e) {
+                    $this->log(sprintf(
+                        'Row %s: invalid %s "%s" in folder "%s" (%s).
+                        Should be either %s or %s',
+                        $i,
+                        $this->rosettaStone->translate('activity'),
                         $this->assessmentTitle,
                         $folder['title'],
-                        $folder['id']
-                    ), self::WARNING);
+                        $folder['id'],
+                        $this->rosettaStone->translate('dueWork'),
+                        $this->rosettaStone->translate('reporting')
+                    ), IStrategy::WARNING);
 
                     $errors++;
 
@@ -345,97 +394,122 @@ class Processor
                  * to do enormous amounts of heavy lifting: you could shortcut this by maybe spawning stubs
                  * containing only the Mark Scheme chosen by the assessment...
                  */
-                $assessment = $this->assessmentMapperProxy->findById($assessmentId);
+                /** @var \Schoolbox\Learning\Assessment\Reporting\Model $assessment */
+                $assessment = $this->assessmentMapperProxy->findById($assessmentData['assessment_id']);
 
-                /* Compute human-readable mark from assessment's mark scheme instead
-                 * It must be between 0 and 100, inclusive
+                /* Interpret the csv structure to figure out where marks come from and how to derive all three pieces
                  */
-                $normalisedMark = (float)trim((string)$row['Normalised Mark']);
-
-                if ($normalisedMark < 0 || $normalisedMark > 100) {
+                try {
+                    $vals = $markStrategy->calculate($row, $assessment);
+                } catch (\RuntimeException $e) {
                     $this->log(sprintf(
                         'Row %s: normalised mark must be between 0 and 100 for %s "%s"',
                         $i,
                         $this->rosettaStone->translate('activity', false),
                         $this->assessmentTitle,
-                    ), self::WARNING);
+                    ), IStrategy::WARNING);
 
                     $errors++;
 
                     continue;
                 }
 
-                /* This is what the student would see
-                 */
-                $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark);
-
-                /* This is what the instructor would see, due to SA-18452
-                 */
-                $instructorHumanReadableMark = $assessment->getInstructorMarkScheme()->getHumanReadableMark($normalisedMark);
-
-                /* Actual marks and comments
-                 */
-                $comment = trim((string)$row['Comment']);
-
-                /* Slam in a new submission_return
-                 */
-                $learner = $this->userMapper->findById($learner['id']);
-
-                if ($this->perform) {
-                    /* TODO inefficient/non-conventional, I know
-                     *  Solution had a time constraint.
-                     */
-                    $box = $this->submissionBoxMapper->findById($boxId);
-
-                    $returnedWork = $this->returnedWorkMapper->createModel()
-                        ->setSubmissionBox($box)
-                        ->setMarker($creator)
-                        ->setOwner($learner)
-                        ->setReviewRoute('instructor')
-                        ->setComment($comment)
-                        ->setHumanReadableMark($humanReadableMark)
-                        ->setHumanReadableInstructorMark($instructorHumanReadableMark)
-                        ->setNormalizedMark($normalisedMark)
-                        ->setResubmissionRequired(false)
-                        ->setPublishedBy($creator->getId())
-                        ->setCreatedAt($adf)
-                        ->setPublishedAt($adf)
-                        ->setUpdatedAt($adf);
-
-                    $this->returnedWorkMapper->save($returnedWork);
-                }
-
-                /* Some convenient shortcuts
-                 * Note that $folder['title'] also contains the class code, so we can reasonably presume
-                 * that this is unique.
-                 */
-                $links[$folder['title']] = [
-                    'id' => $assessmentId,
-                    'title' => $assessment->getTitle(),
-                ];
-
-                $this->log(sprintf(
-                    'Row %s: added grade %s (instructor grade %s, normalised mark %s) for %s (%s) in %s "%s" (%s) found in folder "%s" (%s)',
+                $feedbackStrategy->processRow(
                     $i,
-                    $humanReadableMark,
-                    $instructorHumanReadableMark,
-                    $normalisedMark,
-                    $learner->getFullName(),
-                    $externalId,
-                    $this->rosettaStone->translate('activity', false),
-                    $assessment->getTitle(),
-                    $assessment->getId(),
-                    $folder['title'],
-                    $folder['id']
-                ), self::INFO);
+                    $folder,
+                    $learner,
+                    $assessment,
+                    $assessmentData,
+                    $adf,
+                    $vals['normalisedMark'],
+                    $vals['learnerHumanReadableMark'],
+                    $vals['instructorHumanReadableMark'],
+                    $row['Comment'],
+                    $creator
+                );
             }
         }
 
+        /* Collect all the messages from all the feedback strats
+         */
+        $messages = array_merge(
+            $this->messages,
+            $this->dueWorkStrategy->getMessages(),
+            $this->reportingStrategy->getMessages()
+        );
+
+        /* Collect all the errors from all feedback strats
+         */
+        $errors += $this->dueWorkStrategy->getErrorCount();
+        $errors += $this->reportingStrategy->getErrorCount();
+
+        /* Collect all the links from all the feedback strats
+         */
+        $links = array_merge(
+            $this->dueWorkStrategy->getLinks(),
+            $this->reportingStrategy->getLinks()
+        );
+
+        /* It's possible someone will try to upload a csv file that only contains the header row;
+         * These nullsafe/nullcoalesces circumvent that exceedingly unusual situation.
+         *
+         * It renders an empty Preview panel and empty Results/Links panel in the Perform mode of the import.
+         */
         return [
-            'messages' => $this->messages,
+            'messages' => $messages,
             'errors' => $errors,
-            'links' => $links
+            'links' => $links,
         ];
+    }
+
+
+    /**
+     * Based on the assessment identifiers, figure out which feedback-saving strategy to use.
+     *
+     * @param array<string, mixed> $assessmentData
+     * @return IStrategy
+     * @throws \RuntimeException
+     */
+    private function selectFeedbackStrategy(array $assessmentData): IStrategy
+    {
+        if (null !== $assessmentData[$this->dueWorkStrategy->getDiscriminatorColumn()]) {
+            return $this->dueWorkStrategy;
+        }
+
+        if (null !== $assessmentData[$this->reportingStrategy->getDiscriminatorColumn()]) {
+            return $this->reportingStrategy;
+        }
+
+        throw new \RuntimeException('Unknown feedback importer strategy.');
+    }
+
+
+    /**
+     * One of the columns "Normalised Mark" and "Human Readable Grade" exists with a meaningful value.
+     * From a row in the csv, figure how to calculate the three values.
+     *    - normalised mark
+     *    - learner human readable mark
+     *    - instructor human readable mark
+     *
+     * @param array<int, string> $headerRow
+     * @return Strategy\Mark\IStrategy
+     * @throws \Schoolbox\Application\Exception\Exception
+     */
+    private function selectMarkStrategy(array $headerRow): Strategy\Mark\IStrategy
+    {
+        if (in_array(NormalisedMark::DISCRIMINATOR_COLUMN, $headerRow)) {
+            /* If a Normalised Mark column exists in the header, derive Human Readable Grades from Normalised Mark.
+             */
+            return new NormalisedMark($this->stateMapper);
+        } elseif (in_array(HumanReadableMark::DISCRIMINATOR_COLUMN, $headerRow)) {
+            /* If a Human Readable Grade column exists in the header, derive Normalised Mark from Human Readable Grade.
+             */
+            return new HumanReadableMark($this->stateMapper);
+        }
+
+        /* We should never be here, but you never know: they could upload a totally random csv
+         */
+        throw new \Schoolbox\Application\Exception\Exception('Unknown csv; could not process row');
     }
 
 
