@@ -1,20 +1,11 @@
 import { expect } from "@playwright/test";
-import type { Locator, Page } from "@playwright/test";
-import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import type { Locator } from "@playwright/test";
 import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 
 export default class CurriculumDescription {
-    private tester: AcceptanceTester;
-    private page: Page;
-
     static readonly ELEMENT_CURRICULUM_CODE_DROPDOWN = 'select[name="curriculumCode"]';
     static readonly DATA_TEST_CURRICULUM_CODE = "curriculum-code-{curriculumCode}";
     static readonly DATA_TEST_CURRICULUM_DESCRIPTION = "curriculum-description-{curriculumCode}";
-
-    constructor(tester: AcceptanceTester, page: Page) {
-        this.tester = tester;
-        this.page = page;
-    }
 
     /**
      * Select a curriculum code from the dropdown and click Update

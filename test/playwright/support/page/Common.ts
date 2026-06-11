@@ -151,7 +151,7 @@ export default class Common {
     static readonly COMMENT_SUBMIT_BUTTON = "button[class=button submit]";
 
     /**
-     * delete button on modal dialogs
+     * submit button on modal dialogs eg: delete button
      */
     static readonly MODAL_SUBMIT_BUTTON = "button.button.submit";
 
