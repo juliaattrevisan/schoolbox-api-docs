@@ -9,7 +9,6 @@
     <div class="admin-content">
         <div class="small-12 island">
             <h2 class="subheader">Update Candidate Numbers - {{ sessionTitle }}</h2>
-
             {% if candidates is empty %}
                 <p class="meta">All students in this report have an IB Candidate Number.</p>
                 <a class="button" href="{{ _routes.report }}">Return to Report</a>
@@ -21,17 +20,15 @@
                                 <thead>
                                     <tr>
                                         <th scope="col">Name</th>
-                                        <th scope="col">Stage</th>
                                         <th scope="col">IB Candidate Number</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for candidate in candidates %}
                                         <tr>
-                                            <td>{{ candidate.name }}</td>
-                                            <td>{{ candidate.statusLabel }}</td>
+                                            <td><p>{{ candidate.name }}</p></td>
                                             <td>
-                                                <label class="sr-only" for="ib-candidate-number-{{ candidate.userId }}">
+                                                <label class="t-visually-hidden" for="ib-candidate-number-{{ candidate.userId }}">
                                                     IB Candidate Number for {{ candidate.name }}
                                                 </label>
                                                 <input
@@ -48,9 +45,14 @@
                             </table>
                         </fieldset>
                     </section>
-
-                    <input data-test="ib-candidate-numbers-save" type="submit" value="Save">
-                    <a data-test="ib-candidate-numbers-cancel" class="button secondary" href="{{ _routes.report }}">Cancel</a>
+                    <ul class="flex-list buttons">
+                        <li>
+                            <a href="{{ _routes.report }}" class="button secondary">Cancel</a>
+                        </li>
+                        <li>
+                            <input data-test="ib-candidate-numbers-save" type="submit" value="Save">
+                        </li>
+                    </ul>
                 </form>
             {% endif %}
         </div>
