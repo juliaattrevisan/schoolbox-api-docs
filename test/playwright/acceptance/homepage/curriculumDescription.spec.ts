@@ -19,7 +19,6 @@ import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 
 test.describe.serial("Curriculum Description Component Tests", () => {
     let homepage: Homepage;
-    let curriculumDescription: CurriculumDescription;
     let curriculumDescriptionComponent: Locator;
     let curriculumDescriptionComponentId: number;
     const COMPONENT_TITLE = "Test Curriculum Description Automation";
@@ -44,7 +43,6 @@ test.describe.serial("Curriculum Description Component Tests", () => {
      */
     test.beforeEach(async ({ tester, page }) => {
         homepage = new Homepage(tester, page);
-        curriculumDescription = new CurriculumDescription(tester, page);
         await tester.loginAsAdmin();
     });
 

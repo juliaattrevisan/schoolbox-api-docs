@@ -249,7 +249,7 @@ test.describe("Goals and Achievements tests", () => {
         await expect(page.locator("#container")).toContainText("Well done, Jana!");
 
         tester.isGoingTo("Remove the evidence and ensure it is no longer presented");
-        await common.clickConfirmButton();
+        await badges.clickDropdownDelete();
         await page.locator("a#confirm-dialog-confirm-button.button.submit").click();
         await expect(page.locator("#container")).not.toContainText("Well done, Jana!");
 

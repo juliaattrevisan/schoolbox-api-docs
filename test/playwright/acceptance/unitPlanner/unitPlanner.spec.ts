@@ -9,13 +9,11 @@ import UnitPlanner from "@schoolboxTest/playwright/support/page/unitPlanner/Unit
 import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
 import CurriculumSelector from "@schoolboxTest/playwright/support/page/curriculum/selector/CurriculumSelector";
 import CurriculumOverview from "@schoolboxTest/playwright/support/page/homepage/CurriculumOverview";
-import CreateFolder from "@schoolboxTest/playwright/support/page/folder/CreateFolder";
 
 test.describe("Unit Planner Tests", () => {
     test.describe.configure({ mode: "serial" });
 
     let unitPlanner: UnitPlanner;
-    let createFolder: CreateFolder;
     const unitId = 15; // "Romeo and Juliet"
     const overviewColumnLabel = "Unit Overview";
     const romeoUnitId = 15; // "Romeo and Juliet"
@@ -26,7 +24,6 @@ test.describe("Unit Planner Tests", () => {
     test.beforeEach(async ({ tester, page }) => {
         const teacher = "Jack Coles";
         unitPlanner = new UnitPlanner(tester, page);
-        createFolder = new CreateFolder(tester, page);
         await tester.loginAsAdmin();
         await tester.impersonate(teacher);
         await unitPlanner.goto(6);
