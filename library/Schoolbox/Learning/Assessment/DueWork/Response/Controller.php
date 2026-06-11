@@ -16,6 +16,7 @@ use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToReadFile;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Mapper as FeedbackFileMapper;
 use Schoolbox\Assessment\Rubric\Grid\Payload;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy as DueWorkFeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Fetcher;
 use Psr\Container\ContainerExceptionInterface;
@@ -310,12 +311,15 @@ class Controller extends Base
 
         /* Rubric Grid Payloads
          */
-        $data['rubricGridPayloads'] = new Payload($rubricMapper, $this->getConfigLoader()->get('rubric_show_points'), $this->getUser())
-            ->generate(
-                $assessment->getRubricInstances(),
-                $selfAssessmentFeedback,
-                $feedback,
-            );
+        $data['rubricGridPayloads'] = new Payload(
+            $rubricMapper,
+            $this->getConfigLoader()->get(ConfigMapper::NAME_RUBRIC_SHOW_POINTS),
+            $this->getUser()
+        )->generate(
+            $assessment->getRubricInstances(),
+            $selfAssessmentFeedback,
+            $feedback,
+        );
 
         $this->response = $this->responseFromTemplate('@learningDueWorkResponse/inlineGrading/standard.twig', $data);
     }

@@ -271,6 +271,7 @@ class ConfigMapper extends Mapper
     public const string NAME_MAX_FILE_SIZE = 'max_file_size';
 
     public const string NAME_RUBRIC_MAX_LEVELS = 'rubric_max_levels';
+    public const string NAME_RUBRIC_SHOW_POINTS = 'rubric_show_points';
 
     public const string NAME_LMS_SEB_ENABLED = 'lms_seb_enable';
 
