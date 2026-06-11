@@ -15,7 +15,7 @@
         'returnUrlSuffix'        string
         'conversationsPerFolder' Conversation[]   Conversations of selected folders, indexed by folder.id
         'longitudinalRubric'     array TODO either define array structure, or upgrade to object
-        'readOnlyProgressTicks'  bool             Whether progress ticks should render as static indicators only.
+        'readOnlyMode'           bool             Whether the grade report should render as read-only.
         'transitions'            array            Used by progressTickForm.
 #}
 
@@ -61,7 +61,7 @@
 </div>
 {% endif %}
 {% endblock %}
-{% if markbook.assessments | length and not readOnlyProgressTicks %}
+{% if markbook.assessments | length and not readOnlyMode %}
 <script type="text/javascript">
     window.sbProps.injectScriptsIfNotLoaded({
         srcList: ["{{ CDN_PREFIX }}/js/submissions/task/jquery.progressTickForm.js?v={{ config.site_version }}"],
@@ -77,6 +77,8 @@
         }
     });
 </script>
+{% endif %}
+{% if markbook.assessments | length %}
 <div class="row">
     <div class="small-12 island">
         <section>
@@ -109,7 +111,7 @@
                                         student:     student,
                                         canViewInstructorMarks: canViewInstructorMarks,
                                         effectiveViewer: effectiveViewer,
-                                        readOnlyProgressTicks: readOnlyProgressTicks
+                                        readOnlyMode: readOnlyMode
                                     } only %}
                                     <ul>
                                         {% for projectAssessment in assessment.assessments %}
@@ -119,7 +121,7 @@
                                                 student:     student,
                                                 canViewInstructorMarks: canViewInstructorMarks,
                                                 effectiveViewer: effectiveViewer,
-                                                readOnlyProgressTicks: readOnlyProgressTicks
+                                                readOnlyMode: readOnlyMode
                                             } only %}
                                         </li>
                                         {% endfor %}
@@ -132,7 +134,7 @@
                                         student:     student,
                                         canViewInstructorMarks: canViewInstructorMarks,
                                         effectiveViewer: effectiveViewer,
-                                        readOnlyProgressTicks: readOnlyProgressTicks
+                                        readOnlyMode: readOnlyMode
                                     } only %}
                                 </li>
                                 {% endif %}

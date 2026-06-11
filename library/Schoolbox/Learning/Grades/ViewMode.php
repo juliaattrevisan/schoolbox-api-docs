@@ -38,9 +38,9 @@ final class ViewMode
      *
      * @param string $viewMode Requested or resolved grade view mode.
      * @param bool   $effectiveViewerIsParent Whether the effective viewer has a parent role.
-     * @return bool True when progress ticks should render as static indicators.
+     * @return bool True when the grade report should render as read-only.
      */
-    public static function progressTicksAreReadOnly(string $viewMode, bool $effectiveViewerIsParent): bool
+    public static function isReadOnlyMode(string $viewMode, bool $effectiveViewerIsParent): bool
     {
         return $effectiveViewerIsParent || in_array($viewMode, [self::STUDENT, self::PARENT], true);
     }

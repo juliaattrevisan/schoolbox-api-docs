@@ -40,10 +40,10 @@ class ViewModeTest extends TestCase
      */
     public function testStudentAndParentPreviewModesAreReadOnly(): void
     {
-        self::assertFalse(ViewMode::progressTicksAreReadOnly('', false));
-        self::assertFalse(ViewMode::progressTicksAreReadOnly(ViewMode::STAFF, false));
-        self::assertTrue(ViewMode::progressTicksAreReadOnly(ViewMode::STUDENT, false));
-        self::assertTrue(ViewMode::progressTicksAreReadOnly(ViewMode::PARENT, false));
+        self::assertFalse(ViewMode::isReadOnlyMode('', false));
+        self::assertFalse(ViewMode::isReadOnlyMode(ViewMode::STAFF, false));
+        self::assertTrue(ViewMode::isReadOnlyMode(ViewMode::STUDENT, false));
+        self::assertTrue(ViewMode::isReadOnlyMode(ViewMode::PARENT, false));
     }
 
     /**
@@ -51,8 +51,8 @@ class ViewModeTest extends TestCase
      */
     public function testParentViewerProgressTicksAreReadOnly(): void
     {
-        self::assertTrue(ViewMode::progressTicksAreReadOnly('', true));
-        self::assertTrue(ViewMode::progressTicksAreReadOnly(ViewMode::STAFF, true));
+        self::assertTrue(ViewMode::isReadOnlyMode('', true));
+        self::assertTrue(ViewMode::isReadOnlyMode(ViewMode::STAFF, true));
     }
 
     /**

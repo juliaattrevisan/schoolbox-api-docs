@@ -307,6 +307,8 @@ class Controller extends Base
         $terms = $this->termMapper->findAllWithExtraordinary($viewee);
 
         $yearUrl = $this->getYearUrl($viewee->getId());
+        $readOnlyMode = ViewMode::isReadOnlyMode($viewMode, $effectiveViewer->getRole()->isParent());
+
         $this->response = $this->responseFromTemplate(
             '@learningGrades/gradesOuter.twig',
             [
@@ -323,6 +325,7 @@ class Controller extends Base
                 'viewModes'           => ViewMode::values(),
                 'viewModeQuerySuffix' => $viewModeQuerySuffix,
                 'effectiveViewer'     => $effectiveViewer,
+                'readOnlyMode'        => $readOnlyMode,
             ],
             "Grades for {$subject->getTitle()}",
             'grade'
@@ -562,8 +565,8 @@ class Controller extends Base
             }
         }
 
-        $readOnlyProgressTicks = ViewMode::progressTicksAreReadOnly($viewMode, $effectiveViewer->getRole()->isParent());
-        $tickTransitions = $readOnlyProgressTicks
+        $readOnlyMode    = ViewMode::isReadOnlyMode($viewMode, $effectiveViewer->getRole()->isParent());
+        $tickTransitions = $readOnlyMode
             ? []
             : ViewMode::tickTransitions($this->access->isInstructor($effectiveViewer, $subject));
 
@@ -586,7 +589,7 @@ class Controller extends Base
                 'longitudinalRubric'    => $longitudinalRubric,
                 'showRubricPoints'      => $showRubricPoints,
                 'rubricAssessmentList'  => $rubricAssessmentList,
-                'readOnlyProgressTicks' => $readOnlyProgressTicks,
+                'readOnlyMode'          => $readOnlyMode,
                 'transitions'           => $tickTransitions,
                 'returnUrlSuffix'       => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($_SERVER['REQUEST_URI']),
             ])->getBody()->getContents(),

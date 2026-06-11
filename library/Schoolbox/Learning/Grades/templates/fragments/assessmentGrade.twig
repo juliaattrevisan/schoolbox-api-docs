@@ -6,7 +6,7 @@
  # * student:                User - The user record for the student
  # * canViewInstructorMarks: bool - Whether the user can view instructor marks
  # * effectiveViewer:        User - The user whose feedback visibility rules apply
- # * readOnlyProgressTicks:  bool - Whether progress ticks should render as static indicators only
+ # * readOnlyMode:           bool - Whether the grade report should render as read-only
  #}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 {% import '@learning/macro/urgency.twig' as urgency %}
@@ -65,7 +65,7 @@
                 assessment: assessment,
                 student:    student,
                 viewer:     effectiveViewer,
-                readonly:   readOnlyProgressTicks
+                readonly:   readOnlyMode
             } only %}
         {% else %}
             {# learners and instructors can view the display mark, only instructors can see the instructor mark #}
