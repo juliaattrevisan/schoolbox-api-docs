@@ -28,7 +28,6 @@ use Schoolbox\Learning\Assessment\CourseManagedFields;
 use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgentObject;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkObject;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Project as ProjectObject;
@@ -502,9 +501,9 @@ class MapperProxy
                 LEFT JOIN lti_assessment_score sc ON la.id = sc.lti_assessment_id AND pc.user_id = sc.student_id AND sc.deleted_at IS NULL AND sc.is_feedback = 1
            WHERE
                 la.assessment_id IN ({$assessmentIdBindings4['placeholders']})
-           
-           UNION 
-           
+
+           UNION
+
            -- Reporting Activities
            SELECT
                 'reporting' AS assessment_type,
@@ -519,9 +518,9 @@ class MapperProxy
                 JOIN participant_plan pp ON pp.assessment_id = reporting.assessment_id AND pp.deleted_at IS NULL
                 JOIN assessment a ON a.id = reporting.assessment_id
                 LEFT JOIN participant pc ON pp.id = pc.participant_plan_id AND pc.excluded_at IS NULL
-                LEFT JOIN reporting_feedback ON reporting.id = reporting_feedback.reporting_id 
-                    AND pc.user_id = reporting_feedback.learner_id 
-                    AND reporting_feedback.deleted_at IS NULL 
+                LEFT JOIN reporting_feedback ON reporting.id = reporting_feedback.reporting_id
+                    AND pc.user_id = reporting_feedback.learner_id
+                    AND reporting_feedback.deleted_at IS NULL
            WHERE
                 reporting.mark_type IN ({$markTypeBindings['placeholders']})
                 AND reporting.assessment_id IN ({$assessmentIdBindings['placeholders']})
@@ -1994,7 +1993,7 @@ class MapperProxy
              */
             $statement = $this->baseMapper->getDatabase()->prepare("
                 SELECT assessment_id
-                FROM curriculum_node_for_assessment cnfa 
+                FROM curriculum_node_for_assessment cnfa
                 WHERE cnfa.curriculum_node_id IN {$placeholders}
             ");
 
@@ -2002,11 +2001,7 @@ class MapperProxy
 
             /* We tried to filter this (even if it results in an empty set)
              */
-            $curriculumAssessmentIds = [];
-
-            while ($row = $statement->fetch()) {
-                $curriculumAssessmentIds[] = $row['assessment_id'];
-            }
+            $curriculumAssessmentIds = $statement->fetchAll(\PDO::FETCH_COLUMN);
 
             /* If we never tried to set this before, pretend we did by using the curriculum assessment ids
              *
