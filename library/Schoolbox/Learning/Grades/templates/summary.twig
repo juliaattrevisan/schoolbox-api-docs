@@ -20,8 +20,7 @@
 {{ bread.crumbs(['Learning', routeLookup('learning.getClasses')], [locale.grades.properPlural]) }}
 
 {% set canSwitchViewMode = USER.role.isStaff %}
-{% set showHeaderOptions = customisationsRoute %}
-<div class="row{% if showHeaderOptions %} actions-small-2{% endif %}">
+<div class="row{% if customisationsRoute %} actions-small-2{% endif %}">
     <div class="small-12 columns">
         <h1>{{ locale.grades.properPlural }} for {{ term.title }}</h1>
 
@@ -33,7 +32,7 @@
             } only %}
         {% endif %}
     </div>
-    {% if showHeaderOptions %}
+    {% if customisationsRoute %}
         <nav>
             <sbx-pop-out content-id="header-options" data-test="sbx-pop-out-header-options"></sbx-pop-out>
         </nav>
