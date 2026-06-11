@@ -11,6 +11,7 @@ defineProps<Props>();
 
 defineEmits<{
     completePreparation: [];
+    approveOnBehalf: [];
     resetDetails: [];
     clearSelection: [];
 }>();
@@ -32,6 +33,16 @@ defineEmits<{
             >
                 <sbx-icon name="notifications-hollow"></sbx-icon>
                 Complete Preparation
+            </button>
+            <button
+                v-if="activeSection === 'unconfirmed'"
+                type="button"
+                class="button sbx-button--has-icon l-flex__item--1-auto"
+                :disabled="isLoading"
+                @click="$emit('approveOnBehalf')"
+            >
+                <sbx-icon name="approve"></sbx-icon>
+                Approve on behalf of student
             </button>
             <button
                 v-if="activeSection === 'unconfirmed' || activeSection === 'confirmed' || activeSection === 'failed'"

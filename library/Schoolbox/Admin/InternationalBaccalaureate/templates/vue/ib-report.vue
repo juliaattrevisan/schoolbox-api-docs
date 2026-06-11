@@ -20,6 +20,7 @@ import type {
     ApiStudent,
     ApiSubject,
     ApiCandidatesResponse,
+    ApiUpdateConfirmationResponse,
 } from "../js/types/ibReportTypes";
 
 interface Props {
@@ -89,6 +90,7 @@ window.Vue.watch(failedSelected, (newVal) => {
 
 const isCompleting = window.Vue.ref<boolean>(false);
 const isResetting = window.Vue.ref<boolean>(false);
+const isApprovingOnBehalf = window.Vue.ref<boolean>(false);
 const resetModalOpen = window.Vue.ref<boolean>(false);
 const studentsToReset = window.Vue.ref<Pick<StudentRow, "id" | "userId" | "name">[]>([]);
 
@@ -131,6 +133,7 @@ function mapStudentRow(
             core: s.ibGroupSubjects.Core.map(mapSubjectEntry),
         },
         updateLanguageEndpoint: s._routes.updateLanguages,
+        updateConfirmationEndpoint: s._routes.updateConfirmation,
         renotifyEndpoint: studentRenotifyEndpoint,
         stage,
     };
@@ -284,6 +287,72 @@ async function handleResetDetails(): Promise<void> {
     }
 }
 
+/**
+ * Confirms both candidate and subject details on behalf of the given students,
+ * then moves them from the Unconfirmed section to Confirmed.
+ * @param students The unconfirmed students to approve on behalf of.
+ */
+async function handleApproveOnBehalf(students: StudentRow[]): Promise<void> {
+    if (isApprovingOnBehalf.value) return;
+    isApprovingOnBehalf.value = true;
+
+    const toast = window.sbProps.toastActivate("Approving on behalf of student(s)...");
+
+    try {
+        const results = await Promise.allSettled(
+            students.map(async (student) => {
+                const endpoint = student.updateConfirmationEndpoint;
+                if (!endpoint) throw new Error(`No confirmation endpoint for student ${student.id}`);
+
+                const candidateResponse = await apiRequest<
+                    ApiUpdateConfirmationResponse,
+                    { section: string; confirmed: boolean }
+                >({
+                    url: endpoint,
+                    method: "PUT",
+                    body: { section: "candidate", confirmed: true },
+                });
+                if (!candidateResponse.success) {
+                    throw new Error(candidateResponse.message ?? "Failed to confirm candidate details.");
+                }
+
+                const subjectResponse = await apiRequest<
+                    ApiUpdateConfirmationResponse,
+                    { section: string; confirmed: boolean }
+                >({
+                    url: endpoint,
+                    method: "PUT",
+                    body: { section: "subject", confirmed: true },
+                });
+                if (!subjectResponse.success) {
+                    throw new Error(subjectResponse.message ?? "Failed to confirm subject details.");
+                }
+
+                return student;
+            }),
+        );
+
+        const succeededStudents = students.filter((_, i) => results[i].status === "fulfilled");
+        const succeededIds = new Set(succeededStudents.map((s) => s.id));
+
+        unconfirmed.value = unconfirmed.value.filter((s) => !succeededIds.has(s.id));
+        confirmed.value = [
+            ...succeededStudents.map((s) => ({ ...s, stage: "confirmed" as const })),
+            ...confirmed.value,
+        ];
+
+        clearSelection();
+        toast.timeout({
+            text: `${succeededStudents.length} student${succeededStudents.length === 1 ? "" : "s"} approved on behalf.`,
+        });
+    } catch (e) {
+        console.error("Failed to approve on behalf", e);
+        toast.timeout({ text: "Failed to approve on behalf of student.", isSuccess: false });
+    } finally {
+        isApprovingOnBehalf.value = false;
+    }
+}
+
 window.Vue.onMounted((): void => {
     void loadCandidates();
 });
@@ -327,6 +396,7 @@ window.Vue.onMounted((): void => {
                     :search-languages-endpoint="props.searchLanguagesEndpoint"
                     section="unconfirmed"
                     :active-selection-section="activeSelectionSection"
+                    @approve-on-behalf-single="(id) => handleApproveOnBehalf(unconfirmed.filter((s) => s.id === id))"
                     @reset-details-single="(id) => promptResetDetails([id])"
                 />
             </ib-report-section>
@@ -379,9 +449,10 @@ window.Vue.onMounted((): void => {
                 confirmedSelected.length +
                 failedSelected.length
             "
-            :is-loading="isCompleting || isResetting"
+            :is-loading="isCompleting || isResetting || isApprovingOnBehalf"
             :active-section="activeSelectionSection"
             @complete-preparation="handleCompletePreparation(preparationSelected.map((s) => s.id))"
+            @approve-on-behalf="handleApproveOnBehalf(unconfirmedSelected)"
             @reset-details="
                 promptResetDetails([...unconfirmedSelected, ...confirmedSelected, ...failedSelected].map((s) => s.id))
             "

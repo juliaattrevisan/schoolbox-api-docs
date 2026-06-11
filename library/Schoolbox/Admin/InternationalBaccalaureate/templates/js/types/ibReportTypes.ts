@@ -32,6 +32,7 @@ export type StudentRow = {
     candidateDetailsStatus: CandidateDetailsStatus;
     subjects: SubjectGroup;
     updateLanguageEndpoint: string | null;
+    updateConfirmationEndpoint: string | null;
     renotifyEndpoint: string | null;
     stage: "preparation" | "unconfirmed" | "confirmed" | "inProgress" | "failed" | "registered";
 };
@@ -96,12 +97,26 @@ export type ApiStudent = {
     missingFields: string[];
     _routes: {
         updateLanguages: string | null;
+        updateConfirmation: string | null;
     };
     ibGroupSubjects: {
         HL: ApiSubject[];
         SL: ApiSubject[];
         Core: ApiSubject[];
     };
+};
+
+/**
+ * Raw response from the update-confirmation endpoint.
+ */
+export type ApiUpdateConfirmationResponse = {
+    success: boolean;
+    section: string;
+    confirmed: boolean;
+    confirmationStatus: "confirmed" | "unconfirmed";
+    updatedAt: string;
+    updatedBy: { id: number; name: string };
+    message?: string;
 };
 
 /**
