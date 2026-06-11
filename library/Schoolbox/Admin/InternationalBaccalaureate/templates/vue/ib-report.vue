@@ -333,17 +333,27 @@ async function handleApproveOnBehalf(students: StudentRow[]): Promise<void> {
         );
 
         const succeededStudents = students.filter((_, i) => results[i].status === "fulfilled");
+        const failedCount = students.length - succeededStudents.length;
+
+        if (succeededStudents.length === 0) {
+            toast.timeout({ text: "Failed to approve on behalf of student.", isSuccess: false });
+            return;
+        }
+
         const succeededIds = new Set(succeededStudents.map((s) => s.id));
 
         unconfirmed.value = unconfirmed.value.filter((s) => !succeededIds.has(s.id));
         confirmed.value = [
-            ...succeededStudents.map((s) => ({ ...s, stage: "confirmed" as const })),
+            ...succeededStudents.map((s) => ({ ...s, stage: "confirmed" as const, renotifyEndpoint: null })),
             ...confirmed.value,
         ];
 
         clearSelection();
+
+        const successText = `${succeededStudents.length} student${succeededStudents.length === 1 ? "" : "s"} approved on behalf.`;
         toast.timeout({
-            text: `${succeededStudents.length} student${succeededStudents.length === 1 ? "" : "s"} approved on behalf.`,
+            text: failedCount > 0 ? `${successText} ${failedCount} failed.` : successText,
+            isSuccess: failedCount === 0,
         });
     } catch (e) {
         console.error("Failed to approve on behalf", e);
