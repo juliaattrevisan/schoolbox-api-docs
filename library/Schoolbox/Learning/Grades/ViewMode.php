@@ -14,13 +14,14 @@ final class ViewMode
     public const string PARENT = 'parent';
 
     /**
-     * Return a supported view mode for a request value, defaulting to staff mode for invalid values.
+     * Return a supported view mode for a request value.
+     * The default value is null so that callers can decide on an appropriate default depending on user type.
      *
      * @param null|string $value Requested view mode value.
      */
-    public static function fromRequestValue(?string $value): string
+    public static function fromRequestValue(?string $value): ?string
     {
-        return in_array($value, self::values(), true) ? $value : self::STAFF;
+        return in_array($value, self::values(), true) ? $value : null;
     }
 
     /**

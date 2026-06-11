@@ -26,13 +26,13 @@ class ViewModeTest extends TestCase
     }
 
     /**
-     * Invalid request values fall back to staff mode for staff-controlled preview selection.
+     * Invalid request values return null by default so callers can choose an appropriate fallback.
      */
-    public function testFromRequestValueDefaultsInvalidValuesToStaff(): void
+    public function testFromRequestValueReturnsNullForInvalidValues(): void
     {
-        self::assertSame(ViewMode::STAFF, ViewMode::fromRequestValue(null));
-        self::assertSame(ViewMode::STAFF, ViewMode::fromRequestValue(''));
-        self::assertSame(ViewMode::STAFF, ViewMode::fromRequestValue('guardian'));
+        self::assertNull(ViewMode::fromRequestValue(null));
+        self::assertNull(ViewMode::fromRequestValue(''));
+        self::assertNull(ViewMode::fromRequestValue('guardian'));
     }
 
     /**

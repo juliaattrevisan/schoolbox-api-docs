@@ -606,12 +606,16 @@ class Controller extends Base
         $currentUser = $this->getUser();
 
         if ($currentUser->getRole()->isStaff()) {
-            $viewMode               = ViewMode::fromRequestValue($this->requestQuery->get('viewMode'));
-            $effectiveViewer        = $this->getEffectiveViewer($currentUser, $viewee, $viewMode);
+            $requestViewMode = $this->requestQuery->get('viewMode');
+            $viewMode = (
+                ViewMode::fromRequestValue(is_string($requestViewMode) ? $requestViewMode : null)
+                ?? ViewMode::STAFF
+            );
+            $effectiveViewer = $this->getEffectiveViewer($currentUser, $viewee, $viewMode);
             $canViewInstructorMarks = $viewMode === ViewMode::STAFF;
         } else {
-            $viewMode               = '';
-            $effectiveViewer        = $currentUser;
+            $viewMode = '';
+            $effectiveViewer = $currentUser;
             $canViewInstructorMarks = false;
         }
 
