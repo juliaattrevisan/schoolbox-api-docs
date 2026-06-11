@@ -37,14 +37,12 @@
             <sbx-pop-out content-id="header-options" data-test="sbx-pop-out-header-options"></sbx-pop-out>
         </nav>
         <ul id="header-options" class="f-dropdown" data-dropdown-content aria-label="Grades options">
-            {% if customisationsRoute %}
-                <li>
-                    <a href="{{ customisationsRoute }}" class="sbx-button--has-icon" title="View Customisations" data-test="grades-view-customisations">
-                        <sbx-icon name="group"></sbx-icon>
-                        View Customisations
-                    </a>
-                </li>
-            {% endif %}
+            <li>
+                <a href="{{ customisationsRoute }}" class="sbx-button--has-icon" title="View Customisations" data-test="grades-view-customisations">
+                    <sbx-icon name="group"></sbx-icon>
+                    View Customisations
+                </a>
+            </li>
         </ul>
     {% endif %}
 </div>
