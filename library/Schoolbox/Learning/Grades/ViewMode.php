@@ -32,4 +32,34 @@ final class ViewMode
     {
         return [self::STAFF, self::STUDENT, self::PARENT];
     }
+
+    /**
+     * Staff-selected student and parent preview modes must not mutate assessment state.
+     *
+     * @param string $viewMode Requested or resolved grade view mode.
+     * @param bool   $effectiveViewerIsParent Whether the effective viewer has a parent role.
+     * @return bool True when progress ticks should render as static indicators.
+     */
+    public static function progressTicksAreReadOnly(string $viewMode, bool $effectiveViewerIsParent): bool
+    {
+        return $effectiveViewerIsParent || in_array($viewMode, [self::STUDENT, self::PARENT], true);
+    }
+
+    /**
+     * Return frontend progress-tick transitions for interactive grade views.
+     * Progress-tick transitions tell the frontend progress-tick widget what status to move an assessment to when the
+     * user clicks the tick.  E.g. When the status is 'incomplete', when the user clicks the tick, the next status
+     * depends on whether the user is an instructor.  If instructor, 'teacherAssessed'. If student, 'selfAssessed'.
+     *
+     * @param bool $effectiveViewerIsInstructor Whether the effective viewer has instructor access to the folder.
+     * @return array{incomplete: string, selfAssessed: string, teacherAssessed: string}
+     */
+    public static function tickTransitions(bool $effectiveViewerIsInstructor): array
+    {
+        return [
+            'incomplete'      => $effectiveViewerIsInstructor ? 'teacherAssessed' : 'selfAssessed',
+            'selfAssessed'    => $effectiveViewerIsInstructor ? 'teacherAssessed' : 'incomplete',
+            'teacherAssessed' => 'incomplete',
+        ];
+    }
 }

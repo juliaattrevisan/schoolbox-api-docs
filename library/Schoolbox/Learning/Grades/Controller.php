@@ -562,13 +562,10 @@ class Controller extends Base
             }
         }
 
-        $isViewerAnInstructor = $viewMode === ViewMode::STAFF
-            && $this->access->isInstructor($this->getUser(), $subject);
-        $tickTransitions      = [
-            'incomplete'      => $isViewerAnInstructor ? 'teacherAssessed' : 'selfAssessed',
-            'selfAssessed'    => $isViewerAnInstructor ? 'teacherAssessed' : 'incomplete',
-            'teacherAssessed' => 'incomplete',
-        ];
+        $readOnlyProgressTicks = ViewMode::progressTicksAreReadOnly($viewMode, $effectiveViewer->getRole()->isParent());
+        $tickTransitions = $readOnlyProgressTicks
+            ? []
+            : ViewMode::tickTransitions($this->access->isInstructor($effectiveViewer, $subject));
 
         /**
          * Only staff can view instructor marks in the grade report
@@ -589,6 +586,7 @@ class Controller extends Base
                 'longitudinalRubric'    => $longitudinalRubric,
                 'showRubricPoints'      => $showRubricPoints,
                 'rubricAssessmentList'  => $rubricAssessmentList,
+                'readOnlyProgressTicks' => $readOnlyProgressTicks,
                 'transitions'           => $tickTransitions,
                 'returnUrlSuffix'       => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($_SERVER['REQUEST_URI']),
             ])->getBody()->getContents(),
@@ -598,7 +596,7 @@ class Controller extends Base
     /**
      * Derive and return variables pertaining to view mode.
      * @param User $viewee
-     * @return array<string, User, bool>
+     * @return array{string, User, bool}
      */
     private function getViewModeVariables(User $viewee): array
     {

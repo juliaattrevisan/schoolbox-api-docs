@@ -36,6 +36,44 @@ class ViewModeTest extends TestCase
     }
 
     /**
+     * Staff-selected student and parent preview modes are read-only.
+     */
+    public function testStudentAndParentPreviewModesAreReadOnly(): void
+    {
+        self::assertFalse(ViewMode::progressTicksAreReadOnly('', false));
+        self::assertFalse(ViewMode::progressTicksAreReadOnly(ViewMode::STAFF, false));
+        self::assertTrue(ViewMode::progressTicksAreReadOnly(ViewMode::STUDENT, false));
+        self::assertTrue(ViewMode::progressTicksAreReadOnly(ViewMode::PARENT, false));
+    }
+
+    /**
+     * Actual parent users see read-only progress ticks.
+     */
+    public function testParentViewerProgressTicksAreReadOnly(): void
+    {
+        self::assertTrue(ViewMode::progressTicksAreReadOnly('', true));
+        self::assertTrue(ViewMode::progressTicksAreReadOnly(ViewMode::STAFF, true));
+    }
+
+    /**
+     * Instructor tick transitions follow the effective viewer's folder access in interactive modes.
+     */
+    public function testTickTransitionsUseEffectiveViewerAccess(): void
+    {
+        self::assertSame([
+            'incomplete'      => 'teacherAssessed',
+            'selfAssessed'    => 'teacherAssessed',
+            'teacherAssessed' => 'incomplete',
+        ], ViewMode::tickTransitions(true));
+
+        self::assertSame([
+            'incomplete'      => 'selfAssessed',
+            'selfAssessed'    => 'incomplete',
+            'teacherAssessed' => 'incomplete',
+        ], ViewMode::tickTransitions(false));
+    }
+
+    /**
      * Provide supported request values and their normalized modes.
      *
      * @return array<string, array{string, string}>

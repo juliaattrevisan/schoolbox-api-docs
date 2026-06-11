@@ -7,9 +7,12 @@
  # * viewer:      User  (optional) - The user whose visibility rules apply. Defaults to the
  #                                   logged-in USER. Pass the effective viewer here so staff
  #                                   impersonating a student/parent see that role's affordances.
+ # * readonly:    bool  (optional) - Whether to render static status only, even if the logged-in
+ #                                   user is authorized to update the task.
  #}
 
 {% set viewer = viewer is defined ? viewer : USER %}
+{% set readonly = readonly is defined ? readonly : false %}
 
 {# Find the user's participation record
  #
@@ -45,7 +48,7 @@
         )
     ) %}
 
-    {% if postRoute %} {# Note routeLookupIfAuthorized() can return '', so postRoute can be either '' or null. #}
+    {% if postRoute and not readonly %} {# Note routeLookupIfAuthorized() can return '', so postRoute can be either '' or null. #}
         {# The progress tick is a button for tasks for which the logged-in user is authorized to change the status. #}
 
         <form action="{{ postRoute }}"
