@@ -1360,7 +1360,7 @@ class Controller extends ConfigController
 
     /**
      * @param RegistrationSessionStudentModel[] $students
-     * @return array<int, array{userId: int, name: string, statusLabel: string}>
+     * @return array<int, array{userId: int, name: string}>
      */
     private function buildCandidateNumberRows(array $students): array
     {
