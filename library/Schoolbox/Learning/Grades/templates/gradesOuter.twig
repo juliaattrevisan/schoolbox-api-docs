@@ -20,7 +20,7 @@
 
 {# True when a staff member is viewing as a student/parent. In that case the comment form is
  # rendered as that role would see it, but left read-only for the impersonating viewer. #}
-{% set isImpersonating = USER.id != effectiveViewer.id %}
+{% set isViewingAsOther = USER.id != effectiveViewer.id %}
 
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.all-work.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/highchartsMore.js?v={{ config.site_version }}"></script>
@@ -31,7 +31,7 @@
     $(function () {
         // Set up comment abilities: post.
         // Skipped while impersonating so the comment form stays read-only (no editor, no handlers).
-        {% if not isImpersonating %}
+        {% if not isViewingAsOther %}
         $.fn.allWork.commentSetup({
             data: {
                 studentId: '{{ student.id }}',
@@ -141,43 +141,43 @@
         <div class="row">
             <div class="small-12 columns">
                 <h2 class="subheader">Comments</h2>
-                {% if isImpersonating %}
+                {% if isViewingAsOther %}
                     <p class="meta">Viewing as {{ viewMode|capitalize }} &mdash; comments are read-only in this view.</p>
                 {% endif %}
             </div>
 
             {% if canComment %}
             <script type="text/javascript" src='{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}'></script>
-            <div class="small-12 island"{% if isImpersonating %} title="Comments are read-only while viewing as {{ viewMode|capitalize }}."{% endif %}>
+            <div class="small-12 island"{% if isViewingAsOther %} title="Comments are read-only while viewing as {{ viewMode|capitalize }}."{% endif %}>
                 <form id="create-comment" data-comment-form action="/ajax/comment.php" method="post">
                     <section class="content">
                         <input type="hidden" name="studentId" value="{{ student.id }}"/>
                         <input type="hidden" name="categoryId" value="{{ subject.id }}"/>
-                        <textarea id="create-comment-{{ student.id }}" name="comment" rows="3"{% if isImpersonating %} disabled{% endif %}></textarea>
+                        <textarea id="create-comment-{{ student.id }}" name="comment" rows="3"{% if isViewingAsOther %} disabled{% endif %}></textarea>
                         <div class="row">
                             {% if effectiveViewer.role.isStaff %}
                                 <div class="small-3 medium-3 column">
-                                    <input id="vis-student" type="checkbox" name="visibility[student]" value="1"{% if isImpersonating %} disabled{% endif %} />
+                                    <input id="vis-student" type="checkbox" name="visibility[student]" value="1"{% if isViewingAsOther %} disabled{% endif %} />
                                     <label for="vis-student" class="checkbox-label">Visible To Student</label>
                                 </div>
                                 <div class="small-3 medium-3 column">
-                                    <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" checked{% if isImpersonating %} disabled{% endif %} />
+                                    <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" checked{% if isViewingAsOther %} disabled{% endif %} />
                                     <label for="vis-parent" class="checkbox-label">Visible To Parents</label>
                                 </div>
                             {% elseif effectiveViewer.role.isStudent %}
                                 <div class="small-3 medium-3 column">
-                                    <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" checked{% if isImpersonating %} disabled{% endif %} />
+                                    <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" checked{% if isViewingAsOther %} disabled{% endif %} />
                                     <label for="vis-parent" class="checkbox-label">Visible To Parents</label>
                                 </div>
                             {% elseif effectiveViewer.role.isParent %}
                                 <div class="small-3 medium-3 column">
-                                    <input id="vis-student" type="checkbox" name="visibility[student]" value="1"{% if isImpersonating %} disabled{% endif %} />
+                                    <input id="vis-student" type="checkbox" name="visibility[student]" value="1"{% if isViewingAsOther %} disabled{% endif %} />
                                     <label for="vis-student" class="checkbox-label">Visible To Student</label>
                                 </div>
                             {% endif %}
                         </div>
                     </section>
-                    {% if isImpersonating %}
+                    {% if isViewingAsOther %}
                         <a class="button submit disabled" aria-disabled="true">Post comment</a>
                     {% else %}
                         <a class="button submit" data-comment-post="new">Post comment</a>
@@ -214,7 +214,7 @@
                                     </div>
                                 </div>
                                 <nav>
-                                    {% if isCommenter and not isImpersonating %}
+                                    {% if isCommenter and not isViewingAsOther %}
                                         <a class="sbx-icon-only-button no-text"
                                            title="Delete"
                                            data-comment-delete
