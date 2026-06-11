@@ -995,6 +995,89 @@ class ControllerTest extends TestCase
         $this->assertSame(RegistrationSessionStudentModel::STATUS_PREPARATION, $studentThree->getStatus());
     }
 
+    public function testSessionRegisterViaApiTransitionsSelectedConfirmedStudents(): void
+    {
+        $studentOne = $this->buildStudent(
+            456,
+            123,
+            RegistrationSessionStudentModel::STATUS_CONFIRMED,
+            'Alex',
+            'Nguyen',
+            'S123'
+        );
+        $studentTwo = $this->buildStudent(
+            789,
+            234,
+            RegistrationSessionStudentModel::STATUS_CONFIRMED,
+            'Sam',
+            'Patel',
+            'S234'
+        );
+        $studentThree = $this->buildStudent(
+            890,
+            345,
+            RegistrationSessionStudentModel::STATUS_UNCONFIRMED,
+            'Jordan',
+            'Smith',
+            'S345'
+        );
+
+        $database = $this->createMock(IConnector::class);
+        $database
+            ->expects($this->once())
+            ->method('beginTransaction')
+            ->willReturn(true);
+        $database
+            ->expects($this->once())
+            ->method('commit');
+        $database
+            ->expects($this->never())
+            ->method('rollBack');
+
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->method('getDatabase')
+            ->willReturn($database);
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('findStudentsForSession')
+            ->with(12)
+            ->willReturn(new Collection([$studentOne, $studentTwo, $studentThree]));
+
+        $savedUserIds = [];
+        $registrationSessionStudentMapper
+            ->expects($this->exactly(2))
+            ->method('save')
+            ->with($this->callback(function (RegistrationSessionStudentModel $student) use (&$savedUserIds): bool {
+                $savedUserIds[] = $student->getUser()?->getId();
+                $this->assertSame(RegistrationSessionStudentModel::STATUS_IN_PROGRESS, $student->getStatus());
+
+                return true;
+            }));
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class)
+        );
+        $controller->setRequestPost(new Values([
+            'studentIds' => [123, '234', 234],
+        ]));
+
+        $controller->sessionRegisterViaApi((new RegistrationSessionModel())->setId(12));
+
+        $this->assertSame([123, 234], $savedUserIds);
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(200, $response->getStatusCode());
+
+        $payload = json_decode((string) $response->getBody(), true);
+        $this->assertTrue($payload['success']);
+        $this->assertSame(2, $payload['transitionedCount']);
+        $this->assertSame(RegistrationSessionStudentModel::STATUS_UNCONFIRMED, $studentThree->getStatus());
+    }
+
     public function testRenotifyUnconfirmedReportsPartialSuccess(): void
     {
         $unconfirmedStudent = $this->buildStudent(
@@ -1089,6 +1172,61 @@ class ControllerTest extends TestCase
         $payload = json_decode((string) $response->getBody(), true);
         $this->assertSame(400, $payload['status']);
         $this->assertSame('Student IDs are required.', $payload['title']);
+    }
+
+    public function testSessionRegisterViaApiRejectsStudentThatIsNotConfirmed(): void
+    {
+        $database = $this->createMock(IConnector::class);
+        $database
+            ->expects($this->never())
+            ->method('beginTransaction');
+        $database
+            ->expects($this->never())
+            ->method('commit');
+        $database
+            ->expects($this->never())
+            ->method('rollBack');
+
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->method('getDatabase')
+            ->willReturn($database);
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('findStudentsForSession')
+            ->with(12)
+            ->willReturn(new Collection([
+                $this->buildStudent(
+                    456,
+                    123,
+                    RegistrationSessionStudentModel::STATUS_UNCONFIRMED,
+                    'Alex',
+                    'Nguyen',
+                    'S123'
+                ),
+            ]));
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('save');
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class)
+        );
+        $controller->setRequestPost(new Values([
+            'studentIds' => [123],
+        ]));
+
+        $controller->sessionRegisterViaApi((new RegistrationSessionModel())->setId(12));
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(400, $response->getStatusCode());
+
+        $payload = json_decode((string) $response->getBody(), true);
+        $this->assertSame(400, $payload['status']);
+        $this->assertSame('No eligible students found for API registration.', $payload['title']);
     }
 
     public function testRenotifyUnconfirmedReportsMissingCandidate(): void
