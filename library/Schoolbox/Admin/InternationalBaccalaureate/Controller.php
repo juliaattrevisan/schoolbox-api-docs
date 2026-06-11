@@ -1333,6 +1333,7 @@ class Controller extends ConfigController
     }
 
     /**
+     * Find students in a registration session who are missing candidate numbers, indexed by their user ID to prevent duplicates.
      * @return RegistrationSessionStudentModel[]
      */
     private function findStudentsMissingCandidateNumber(int $sessionId): array
@@ -1367,12 +1368,15 @@ class Controller extends ConfigController
             fn(RegistrationSessionStudentModel $student): array => [
                 'userId' => (int) $student->getUser()?->getId(),
                 'name' => $this->buildCandidateDisplayName($student),
-                'statusLabel' => $this->getRegistrationStatusLabel($student->getStatus()),
             ],
             $students
         );
     }
 
+    /**
+     * Build a display name for a candidate, using the registration session student helper to normalise the given name and surname, and handling potential null values.
+     * @return string
+     */
     private function buildCandidateDisplayName(RegistrationSessionStudentModel $student): string
     {
         $user = $student->getUser();
@@ -1381,17 +1385,6 @@ class Controller extends ConfigController
             $this->registrationSessionStudentHelper->normalise($user?->getGivenName()),
             $this->registrationSessionStudentHelper->normalise($user?->getLastname())
         );
-    }
-
-    private function getRegistrationStatusLabel(int $status): string
-    {
-        foreach (RegistrationSessionStudentModel::STATUSES as $statusDefinition) {
-            if ($statusDefinition['value'] === $status) {
-                return $statusDefinition['label'];
-            }
-        }
-
-        return 'Unknown';
     }
 
     /**
