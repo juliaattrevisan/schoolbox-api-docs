@@ -507,11 +507,11 @@ article .todo-list {
     }
     /* force the checkboxes to display */
     input[type="checkbox"] {
-        height: 1.5rem !important;
+        height: var(--sbx-form-checkbox-size, 1.5rem) !important;
         margin: 0 !important;
         opacity: 1 !important;
         position: static !important;
-        width: 1.5rem !important;
+        width: var(--sbx-form-checkbox-size, 1.5rem) !important;
     }
     .todo-list__label__description {
         margin-left: 0.5rem;

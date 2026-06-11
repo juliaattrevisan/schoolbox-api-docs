@@ -257,19 +257,19 @@ body.ck-fullscreen {
     .todo-list
     .todo-list__label
     > span[contenteditable="false"]
-    > input[checked]:hover::before {
+    > input:checked:hover::before {
     background: var(--sbx-config-color-active, var(--content-ui-background));
     box-shadow: none;
 }
 
 /* match our checked styles for checkboxes */
-.ck-editor__editable.ck-content .todo-list .todo-list__label > span[contenteditable="false"] > input[checked]::before {
+.ck-editor__editable.ck-content .todo-list .todo-list__label > span[contenteditable="false"] > input:checked::before {
     background: var(--sbx-color-foreground-primary, var(--content-ui-background));
     border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 
 /* match our checked + hover styles for checkboxes */
-.ck-editor__editable.ck-content .todo-list .todo-list__label > span[contenteditable="false"] > input[checked]::after {
+.ck-editor__editable.ck-content .todo-list .todo-list__label > span[contenteditable="false"] > input:checked::after {
     border-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 
