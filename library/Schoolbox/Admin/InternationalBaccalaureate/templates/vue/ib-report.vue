@@ -377,7 +377,6 @@ window.Vue.onMounted((): void => {
             <sbx-pop-out content-id="ib-report-actions-dropdown"></sbx-pop-out>
         </div>
         <ul id="ib-report-actions-dropdown" class="f-dropdown" data-dropdown-content aria-hidden="true">
-            <li class="separator">Actions</li>
             <li>
                 <a :href="props.candidateExportEndpoint" class="sbx-button--has-icon">
                     <sbx-icon name="download"></sbx-icon>
