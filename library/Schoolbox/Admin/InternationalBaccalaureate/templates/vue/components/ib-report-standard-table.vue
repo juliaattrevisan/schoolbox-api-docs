@@ -21,6 +21,7 @@ const updateLanguageStore = useIbReportUpdateLanguageStore();
 const emit = defineEmits<{
     completePreparationSingle: [studentId: number];
     renotifySingle: [userId: number];
+    registerViaApiSingle: [studentId: number];
     resetDetailsSingle: [studentId: number];
     manuallyRegisterSingle: [studentId: number];
     approveOnBehalfSingle: [studentId: number];
@@ -109,6 +110,15 @@ function openModal(student: StudentRow): void {
                         data-dropdown-content
                         aria-hidden="true"
                     >
+                        <li v-if="student.stage === 'confirmed'">
+                            <button
+                                class="sbx-button--has-icon"
+                                @click.prevent="emit('registerViaApiSingle', student.id)"
+                            >
+                                <sbx-icon name="export"></sbx-icon>
+                                Register via API
+                            </button>
+                        </li>
                         <li v-if="student.updateLanguageEndpoint !== null">
                             <button class="sbx-button--has-icon" @click.prevent="openModal(student)">
                                 <sbx-icon name="modify"></sbx-icon>

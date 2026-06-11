@@ -4,9 +4,15 @@ import type { StudentRow } from "../../js/types/ibReportTypes";
 
 interface Props {
     students: Pick<StudentRow, "id" | "userId" | "name">[];
+    title?: string;
+    description: string;
+    confirmLabel: string;
     isLoading: boolean;
 }
-defineProps<Props>();
+
+withDefaults(defineProps<Props>(), {
+    title: "Please confirm",
+});
 
 const isOpen = defineModel<boolean>("isOpen", { default: false });
 
@@ -19,9 +25,9 @@ defineEmits<{
 <template>
     <basic-modal v-model:is-open="isOpen" size="s" :is-close-disabled="isLoading">
         <div class="u-flex-col u-gap-m f-no-margins">
-            <h2>Please confirm</h2>
+            <h2>{{ title }}</h2>
             <p class="f-no-margins">
-                Resetting will clear all registration details and move the selected student(s) back to Preparation.
+                {{ description }}
             </p>
 
             <div class="sbx-vert-scroll-container u-flex-col u-gap-xs">
@@ -35,7 +41,7 @@ defineEmits<{
                         :alt="student.name"
                         width="32"
                         height="32"
-                        class="ib-reset-modal__portrait"
+                        class="ib-student-confirmation-modal__portrait"
                     />
                     <span>{{ student.name }}</span>
                 </div>
@@ -51,7 +57,7 @@ defineEmits<{
                     :disabled="isLoading"
                     @click="$emit('confirm')"
                 >
-                    Reset all details
+                    {{ confirmLabel }}
                 </button>
             </div>
         </div>
@@ -59,7 +65,7 @@ defineEmits<{
 </template>
 
 <style scoped>
-.ib-reset-modal__portrait {
+.ib-student-confirmation-modal__portrait {
     border-radius: 50%;
     flex-shrink: 0;
 }
