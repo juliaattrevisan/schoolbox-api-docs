@@ -20,6 +20,7 @@ use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Model;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\User as ExternalUser;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
@@ -457,7 +458,7 @@ class Controller extends Base
                     $filteredMarkbook,
                     $viewee,
                     $effectiveViewer,
-                    $this->getConfigLoader()->get('grade_gradient_enable'),
+                    $this->getConfigLoader()->get(ConfigMapper::NAME_GRADE_GRADIENT_ENABLED),
                     $workTypeIds
                 );
             }
