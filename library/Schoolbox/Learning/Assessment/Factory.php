@@ -38,6 +38,7 @@ use Schoolbox\Learning\Assessment\Task\Decorator\Decorator as TaskDecorator;
 use Schoolbox\Learning\Assessment\Task\Decorator\TaskTrait;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -247,7 +248,11 @@ class Factory
             // Work type should always be null for lesson plans.
             $this->setWorkType(null);
         } else {
-            $this->setWorkType($this->findSubmittedWorkTypeId($post['workType'] ?? null));
+            try {
+                $this->setWorkType($this->workTypeMapper->findById($post['workType'] ?? null)->getId());
+            } catch (MapperException) {
+                throw $this->errorMapper->generateException(Error\Mapper::ERROR_INFORMATION_MISSING);
+            }
         }
 
         /* Projects need this to instantiate
@@ -570,6 +575,17 @@ class Factory
          */
         $courseManagedFields = new CourseManagedFields($this->creator, $assessment);
 
+        if (!$courseManagedFields->isReadonly() && $this->getWorkType() !== null) {
+            try {
+                $this->assertSubmittedWorkTypeCanBeSaved(
+                    $assessment,
+                    $this->workTypeMapper->findById($this->getWorkType()),
+                );
+            } catch (MapperException) {
+                throw $this->errorMapper->generateException(Error\Mapper::ERROR_INFORMATION_MISSING);
+            }
+        }
+
         if ($assessment instanceof Project) {
             $decorator = new ProjectDecorator(
                 $this->getMarkType(),
@@ -854,24 +870,13 @@ class Factory
     }
 
 
-    /**
-     * Validate the submitted work type against the overall Schoolbox work type list.
-     *
-     * This intentionally does not enforce per-assessment-type permission flags, so existing activities can continue
-     * saving a work type that is no longer selectable for their activity type. Only roles with additional trust in
-     * the customer context have authority to perform this action, which is another consideration for choosing the
-     * less permission-restrictive path.
-     *
-     * @param mixed $workTypeId
-     * @return int
-     * @throws DomainException
-     */
-    private function findSubmittedWorkTypeId(mixed $workTypeId): int
+    private function assertSubmittedWorkTypeCanBeSaved(IAssessable $assessment, WorkType $submittedWorkType): void
     {
-        try {
-            return $this->workTypeMapper->findById($workTypeId)->getId();
-        } catch (MapperException) {
-            throw $this->errorMapper->generateException(Error\Mapper::ERROR_INFORMATION_MISSING);
+        $currentWorkType = $assessment->getWorkType();
+        $workTypeChanged = $currentWorkType === null || $currentWorkType->getId() !== $submittedWorkType->getId();
+
+        if ($workTypeChanged && !$submittedWorkType->isPermittedForAssessmentType(AssessmentType::objectToString($assessment))) {
+            throw new UnexpectedValueException('The selected work type does not support the selected assessment type.');
         }
     }
 
