@@ -310,7 +310,7 @@ class Controller extends Base
 
         /* Rubric Grid Payloads
          */
-        $data['rubricGridPayloads'] = new Payload($rubricMapper, $this->getConfigLoader()->get('rubric_show_points'))
+        $data['rubricGridPayloads'] = new Payload($rubricMapper, $this->getConfigLoader()->get('rubric_show_points'), $this->getUser())
             ->generate(
                 $assessment->getRubricInstances(),
                 $selfAssessmentFeedback,

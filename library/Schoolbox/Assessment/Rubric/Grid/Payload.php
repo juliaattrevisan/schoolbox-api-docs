@@ -14,6 +14,7 @@ use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\User;
 
 /**
  * Compiles a frontend-friendly json-based struct consisting of:
@@ -29,8 +30,13 @@ class Payload
     /**
      * @param RubricDataSource $rubricMapper
      * @param bool $rubricShowPoints
+     * @param User $viewer
      */
-    public function __construct(private RubricDataSource $rubricMapper, private bool $rubricShowPoints) {
+    public function __construct(
+        private RubricDataSource $rubricMapper,
+        private bool $rubricShowPoints,
+        private \Schoolbox\User $viewer
+    ) {
     }
 
 
@@ -72,8 +78,7 @@ class Payload
             if (null !== $selfGradedFeedback) {
                 $selfGradedGrid = $this->rubricMapper
                     ->retrieveMarkedGrid($selfGradedFeedback, $rubricInstance)
-                    ->getGrid()
-                    ->toArray($this->rubricShowPoints);
+                    ->toArray($this->viewer, $this->rubricShowPoints);
             }
 
             /* Feedback is optional here
@@ -81,8 +86,7 @@ class Payload
             if (null !== $authoritativeFeedback) {
                 $markedGrid = $this->rubricMapper
                     ->retrieveMarkedGrid($authoritativeFeedback, $rubricInstance)
-                    ->getGrid()
-                    ->toArray($this->rubricShowPoints);
+                    ->toArray($this->viewer, $this->rubricShowPoints);
             }
 
             $struct[] = [
