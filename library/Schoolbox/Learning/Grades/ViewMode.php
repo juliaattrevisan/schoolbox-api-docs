@@ -35,15 +35,27 @@ final class ViewMode
     }
 
     /**
-     * Staff-selected student and parent preview modes must not mutate assessment state.
+     * Progress ticks are read-only for parents and when staff preview the page as a different effective viewer.
      *
      * @param string $viewMode Requested or resolved grade view mode.
      * @param bool   $effectiveViewerIsParent Whether the effective viewer has a parent role.
-     * @return bool True when the grade report should render as read-only.
+     * @return bool True when progress ticks should render as read-only.
      */
-    public static function isReadOnlyMode(string $viewMode, bool $effectiveViewerIsParent): bool
+    public static function progressTicksReadOnly(string $viewMode, bool $effectiveViewerIsParent): bool
     {
         return $effectiveViewerIsParent || in_array($viewMode, [self::STUDENT, self::PARENT], true);
+    }
+
+    /**
+     * Comments are read-only when staff preview the page as a different effective viewer.
+     *
+     * @param int $currentUserId Logged-in user ID.
+     * @param int $effectiveViewerId User ID whose visibility rules apply.
+     * @return bool True when comments should render as read-only.
+     */
+    public static function commentsReadOnly(int $currentUserId, int $effectiveViewerId): bool
+    {
+        return $currentUserId !== $effectiveViewerId;
     }
 
     /**

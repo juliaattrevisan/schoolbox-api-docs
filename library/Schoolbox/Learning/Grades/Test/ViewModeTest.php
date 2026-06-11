@@ -36,14 +36,14 @@ class ViewModeTest extends TestCase
     }
 
     /**
-     * Staff-selected student and parent preview modes are read-only.
+     * Staff-selected student and parent preview modes render read-only progress ticks.
      */
-    public function testStudentAndParentPreviewModesAreReadOnly(): void
+    public function testStudentAndParentPreviewModesRenderReadOnlyProgressTicks(): void
     {
-        self::assertFalse(ViewMode::isReadOnlyMode('', false));
-        self::assertFalse(ViewMode::isReadOnlyMode(ViewMode::STAFF, false));
-        self::assertTrue(ViewMode::isReadOnlyMode(ViewMode::STUDENT, false));
-        self::assertTrue(ViewMode::isReadOnlyMode(ViewMode::PARENT, false));
+        self::assertFalse(ViewMode::progressTicksReadOnly('', false));
+        self::assertFalse(ViewMode::progressTicksReadOnly(ViewMode::STAFF, false));
+        self::assertTrue(ViewMode::progressTicksReadOnly(ViewMode::STUDENT, false));
+        self::assertTrue(ViewMode::progressTicksReadOnly(ViewMode::PARENT, false));
     }
 
     /**
@@ -51,8 +51,18 @@ class ViewModeTest extends TestCase
      */
     public function testParentViewerProgressTicksAreReadOnly(): void
     {
-        self::assertTrue(ViewMode::isReadOnlyMode('', true));
-        self::assertTrue(ViewMode::isReadOnlyMode(ViewMode::STAFF, true));
+        self::assertTrue(ViewMode::progressTicksReadOnly('', true));
+        self::assertTrue(ViewMode::progressTicksReadOnly(ViewMode::STAFF, true));
+    }
+
+    /**
+     * Comments are read-only only when staff are previewing as another effective viewer.
+     */
+    public function testCommentsAreReadOnlyOnlyWhenViewingAsAnotherUser(): void
+    {
+        self::assertFalse(ViewMode::commentsReadOnly(123, 123));
+        self::assertFalse(ViewMode::commentsReadOnly(456, 456));
+        self::assertTrue(ViewMode::commentsReadOnly(123, 456));
     }
 
     /**

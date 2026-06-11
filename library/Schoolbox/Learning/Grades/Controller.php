@@ -244,6 +244,7 @@ class Controller extends Base
      * @throws MapperException If a database column alias is incorrect
      * @throws LogicException If cyclic graph detected
      * @throws UnexpectedValueException If unable to merge student collections
+     * @throws TwigError
      */
     public function getGradesForSubject(User $viewee, Term\Model $term, Folder\Model $subject): void
     {
@@ -307,7 +308,6 @@ class Controller extends Base
         $terms = $this->termMapper->findAllWithExtraordinary($viewee);
 
         $yearUrl = $this->getYearUrl($viewee->getId());
-        $readOnlyMode = ViewMode::isReadOnlyMode($viewMode, $effectiveViewer->getRole()->isParent());
 
         $this->response = $this->responseFromTemplate(
             '@learningGrades/gradesOuter.twig',
@@ -325,7 +325,8 @@ class Controller extends Base
                 'viewModes'           => ViewMode::values(),
                 'viewModeQuerySuffix' => $viewModeQuerySuffix,
                 'effectiveViewer'     => $effectiveViewer,
-                'readOnlyMode'        => $readOnlyMode,
+                'progressTicksReadOnly' => ViewMode::progressTicksReadOnly($viewMode, $effectiveViewer->getRole()->isParent()),
+                'commentsReadOnly'    => ViewMode::commentsReadOnly($this->getUser()->getId(), $effectiveViewer->getId()),
             ],
             "Grades for {$subject->getTitle()}",
             'grade'
@@ -565,8 +566,8 @@ class Controller extends Base
             }
         }
 
-        $readOnlyMode    = ViewMode::isReadOnlyMode($viewMode, $effectiveViewer->getRole()->isParent());
-        $tickTransitions = $readOnlyMode
+        $progressTicksReadOnly = ViewMode::progressTicksReadOnly($viewMode, $effectiveViewer->getRole()->isParent());
+        $tickTransitions = $progressTicksReadOnly
             ? []
             : ViewMode::tickTransitions($this->access->isInstructor($effectiveViewer, $subject));
 
@@ -589,7 +590,7 @@ class Controller extends Base
                 'longitudinalRubric'    => $longitudinalRubric,
                 'showRubricPoints'      => $showRubricPoints,
                 'rubricAssessmentList'  => $rubricAssessmentList,
-                'readOnlyMode'          => $readOnlyMode,
+                'progressTicksReadOnly' => $progressTicksReadOnly,
                 'transitions'           => $tickTransitions,
                 'returnUrlSuffix'       => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($_SERVER['REQUEST_URI']),
             ])->getBody()->getContents(),

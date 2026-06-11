@@ -14,14 +14,11 @@
         'viewModes'              string[]            Supported view modes in display order
         'viewModeQuerySuffix'    string              Query suffix that preserves the selected view mode
         'effectiveViewer'        User                The user whose feedback visibility rules apply
-        'readOnlyMode'           bool                Whether the grade report should render as read-only
+        'progressTicksReadOnly'  bool                Whether progress ticks should render as read-only
+        'commentsReadOnly'       bool                Whether comments should render as read-only
 #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learning/macro/urgency.twig' as urgency %}
-
-{# True when a staff member is viewing as a student/parent. In that case the comment form is
- # rendered as that role would see it, but left read-only for the impersonating viewer. #}
-{% set isViewingAsOther = USER.id != effectiveViewer.id %}
 
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.all-work.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/highchartsMore.js?v={{ config.site_version }}"></script>
@@ -31,8 +28,8 @@
 <script type="text/javascript">
     $(function () {
         // Set up comment abilities: post.
-        // Skipped in read-only mode so the comment form stays inert (no editor, no handlers).
-        {% if not readOnlyMode %}
+        // Skipped when viewing as another user so the comment form stays inert (no editor, no handlers).
+        {% if not commentsReadOnly %}
         $.fn.allWork.commentSetup({
             data: {
                 studentId: '{{ student.id }}',
@@ -142,43 +139,43 @@
         <div class="row">
             <div class="small-12 columns">
                 <h2 class="subheader">Comments</h2>
-                {% if isViewingAsOther %}
+                {% if commentsReadOnly %}
                     <p class="meta">Viewing as {{ viewMode|capitalize }} &mdash; comments are read-only in this view.</p>
                 {% endif %}
             </div>
 
             {% if canComment %}
             <script type="text/javascript" src='{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}'></script>
-            <div class="small-12 island"{% if isViewingAsOther %} title="Comments are read-only while viewing as {{ viewMode|capitalize }}."{% endif %}>
+            <div class="small-12 island"{% if commentsReadOnly %} title="Comments are read-only while viewing as {{ viewMode|capitalize }}."{% endif %}>
                 <form id="create-comment" data-comment-form action="/ajax/comment.php" method="post">
                     <section class="content">
                         <input type="hidden" name="studentId" value="{{ student.id }}"/>
                         <input type="hidden" name="categoryId" value="{{ subject.id }}"/>
-                        <textarea id="create-comment-{{ student.id }}" name="comment" rows="3"{% if readOnlyMode %} disabled{% endif %}></textarea>
+                        <textarea id="create-comment-{{ student.id }}" name="comment" rows="3"{% if commentsReadOnly %} disabled{% endif %}></textarea>
                         <div class="row">
                             {% if effectiveViewer.role.isStaff %}
                                 <div class="small-3 medium-3 column">
-                                    <input id="vis-student" type="checkbox" name="visibility[student]" value="1"{% if readOnlyMode %} disabled{% endif %} />
+                                    <input id="vis-student" type="checkbox" name="visibility[student]" value="1"{% if commentsReadOnly %} disabled{% endif %} />
                                     <label for="vis-student" class="checkbox-label">Visible To Student</label>
                                 </div>
                                 <div class="small-3 medium-3 column">
-                                    <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" checked{% if readOnlyMode %} disabled{% endif %} />
+                                    <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" checked{% if commentsReadOnly %} disabled{% endif %} />
                                     <label for="vis-parent" class="checkbox-label">Visible To Parents</label>
                                 </div>
                             {% elseif effectiveViewer.role.isStudent %}
                                 <div class="small-3 medium-3 column">
-                                    <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" checked{% if readOnlyMode %} disabled{% endif %} />
+                                    <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" checked{% if commentsReadOnly %} disabled{% endif %} />
                                     <label for="vis-parent" class="checkbox-label">Visible To Parents</label>
                                 </div>
                             {% elseif effectiveViewer.role.isParent %}
                                 <div class="small-3 medium-3 column">
-                                    <input id="vis-student" type="checkbox" name="visibility[student]" value="1"{% if readOnlyMode %} disabled{% endif %} />
+                                    <input id="vis-student" type="checkbox" name="visibility[student]" value="1"{% if commentsReadOnly %} disabled{% endif %} />
                                     <label for="vis-student" class="checkbox-label">Visible To Student</label>
                                 </div>
                             {% endif %}
                         </div>
                     </section>
-                    {% if readOnlyMode %}
+                    {% if commentsReadOnly %}
                         <a class="button submit disabled" aria-disabled="true">Post comment</a>
                     {% else %}
                         <a class="button submit" data-comment-post="new">Post comment</a>
@@ -215,7 +212,7 @@
                                     </div>
                                 </div>
                                 <nav>
-                                    {% if isCommenter and not readOnlyMode %}
+                                    {% if isCommenter and not commentsReadOnly %}
                                         <a class="sbx-icon-only-button no-text"
                                            title="Delete"
                                            data-comment-delete
