@@ -87,7 +87,7 @@ class Payload
 
             $struct[] = [
                 'rubric' => $grid,
-                'selfGradedGrid' => $selfGradedGrid,
+                'selfAssessmentFeedback' => $selfGradedGrid,
                 'markedGrid' => $markedGrid,
             ];
         }

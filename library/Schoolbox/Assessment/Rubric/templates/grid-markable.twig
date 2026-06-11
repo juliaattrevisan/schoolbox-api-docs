@@ -36,10 +36,7 @@
  # @param bool $selfReflect                      Whether self-reflection can occur on this response instance
  # @param User $learner                          The person who submitted the response instance
  # @param $selfAssessmentFeedback                "the self-assessed feedback, shouldst there be one"
- # @param Grid $rubricGrid                       A Grid instance, obtained via the Rubric DataSource retrieveOneGrid() method or similar.
- #                                               Represents the basic structure of a rubric_instance (caps/inds/descs/levels)
- # @param Grid $rubricMarkedGrid                 A Grid instance corresponding to an instructor-marked grid
- # @param Grid $rubricSelfGradedGrid             A Grid instance corresponding to a learner-marked grid
+ # @param string rubricGridPayloads              A json-encoded representation of the rubric grid structure, marked grid, self graded grid
  #}
 
 {% set showPoints = true %}
@@ -47,11 +44,7 @@
 
 <div data-vue-app="rubric-markable">
     <rubric-markable
-        :rubric-marked-grids-payload="[{
-            rubric: {{ rubricGrid.toArray(showPoints)|json_encode }},
-            markedGrid: {{ (rubricMarkedGrid ? rubricMarkedGrid.toArray(USER, showPoints) : null)|json_encode }},
-            selfAssessmentFeedback: {{ (rubricSelfGradedGrid ? rubricSelfGradedGrid.toArray(USER, showPoints) : null)|json_encode }}
-        }]"
+        :rubric-marked-grids-payload="{{ rubricGridPayloads }}"
         :assessment-mark-scheme="{{ markScheme.generateContext|json_encode }}"
         :participant-id="{{ not blindMode and learner.id ? learner.id : 'null' }}"
         {# TODO: these are signs of likely permission issues #}

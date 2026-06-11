@@ -15,6 +15,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToReadFile;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Mapper as FeedbackFileMapper;
+use Schoolbox\Assessment\Rubric\Grid\Payload;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy as DueWorkFeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Fetcher;
 use Psr\Container\ContainerExceptionInterface;
@@ -306,6 +307,15 @@ class Controller extends Base
                 $selfAssessmentFeedback->getRubricMarkedGrids()->setOffset($rubricInstance->getId(), $rubricMapper->retrieveMarkedGrid($selfAssessmentFeedback, $rubricInstance));
             }
         }
+
+        /* Rubric Grid Payloads
+         */
+        $data['rubricGridPayloads'] = new Payload($rubricMapper, $this->getConfigLoader()->get('rubric_show_points'))
+            ->generate(
+                $assessment->getRubricInstances(),
+                $selfAssessmentFeedback,
+                $feedback,
+            );
 
         $this->response = $this->responseFromTemplate('@learningDueWorkResponse/inlineGrading/standard.twig', $data);
     }

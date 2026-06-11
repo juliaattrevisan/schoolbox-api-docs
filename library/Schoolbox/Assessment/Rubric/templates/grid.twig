@@ -25,7 +25,6 @@
  # settings suggest you could.
  #
  # @param IAssessable $assessment                A learning activity instance
- # @param Rubric\Instance\Model $rubricInstance  The container containing rubric settings for this particular grid, and the grid itself.
  # @param bool $showGroupTotal                   Corresponds to whether mark-per-capability is enabled for this particular grid (ie. Capability Mark Type was used meaningfully)
  # @param bool $showRubricTotal                  Shows the total value of the rubric grid's selected descriptors; shown to instructors and self-graders
  # @param bool $markVisibility                   Whether this feedback is visible to the current user.
@@ -35,25 +34,12 @@
  # @param bool $selfReflect                      Whether self-reflection can occur on this response instance
  # @param User $learner                          The person who submitted the response instance
  # @param IFeedback $selfAssessmentFeedback      "the self-assessed feedback, shouldst there be one"
- # @param Grid $rubricGrid                       A Grid instance, obtained via the Rubric DataSource retrieveOneGrid() method or similar.
- #                                               Represents the basic structure of a rubric_instance (caps/inds/descs/levels)
- # @param Grid $rubricMarkedGrid                 A Grid instance corresponding to an instructor-marked grid
- # @param Grid $rubricSelfGradedGrid             A Grid instance corresponding to a learner-marked grid
+ # @param string rubricGridPayloads              A json-encoded representation of the rubric grid structure, marked grid, self graded grid
  #}
-
-{# TODO This is actually a year-level config option too
- # This should be derived first from the year level's setting, then falling back to the system setting
- #}
-{% set showPoints = config.rubric_show_points %}
-
 <div data-vue-app="rubric-readonly">
     <rubric-readonly
-        :rubric-marked-grids-payload="[{
-            rubric: {{ rubricGrid.toArray(showPoints)|json_encode }},
-            markedGrid: {{ (rubricMarkedGrid ? rubricMarkedGrid.toArray(USER, showPoints) : null)|json_encode }},
-            selfAssessmentFeedback: {{ (rubricSelfGradedGrid ? rubricSelfGradedGrid.toArray(USER, showPoints) : null)|json_encode }}
-        }]"
-        :assessment-mark-scheme="{{ rubricGrid.assessment.markScheme.generateContext|json_encode }}"
+        :rubric-marked-grids-payload="{{ rubricGridPayloads }}"
+        :assessment-mark-scheme="{{ assessment.markScheme.generateContext|json_encode }}"
         :participant-id="{{ learner.id ?? 'null' }}"
         {# TODO: these are signs of likely permission issues #}
         {% if showRubricTotal ?? false %}show-rubric-total{% endif %}
