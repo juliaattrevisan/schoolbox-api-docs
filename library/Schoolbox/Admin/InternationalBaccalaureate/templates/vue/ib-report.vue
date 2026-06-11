@@ -36,10 +36,6 @@ interface Props {
 const props = defineProps<Props>();
 const updateLanguageStore = useIbReportUpdateLanguageStore();
 const renotifyEndpoint = props.renotifyEndpoint.trim() === "" ? null : props.renotifyEndpoint;
-const candidateNumberUpdateRoute = window.Vue.computed<string | undefined>(() => {
-    const route = props.candidateNumberUpdateRoute?.trim();
-    return route === undefined || route === "" ? undefined : route;
-});
 
 const isLoading = window.Vue.ref<boolean>(true);
 const loadError = window.Vue.ref<string | null>(null);
@@ -388,7 +384,7 @@ window.Vue.onMounted((): void => {
                     Export to CSV
                 </a>
             </li>
-            <li v-if="candidateNumberUpdateRoute !== undefined">
+            <li v-if="props.candidateNumberUpdateRoute !== undefined">
                 <a :href="candidateNumberUpdateRoute" class="sbx-button--has-icon">
                     <sbx-icon name="modify"></sbx-icon>
                     Update Candidate Numbers
