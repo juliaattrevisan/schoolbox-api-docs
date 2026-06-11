@@ -598,7 +598,7 @@ class Controller extends Base
     /**
      * Derive and return variables pertaining to view mode.
      * @param User $viewee
-     * @return array
+     * @return array<string, User, bool>
      */
     private function getViewModeVariables(User $viewee): array
     {
