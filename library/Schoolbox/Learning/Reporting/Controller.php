@@ -467,8 +467,6 @@ class Controller extends Base
      */
     private function buildMarkbook(Reporting\Model $assessment): Markbook
     {
-        $start = microtime(true);
-
         $folder = $assessment->getBaseContext()->getFolder();
 
         /* Find data between these date ranges
@@ -613,18 +611,6 @@ class Controller extends Base
         );
 
         $markbook->sortAssessables();
-        $end = microtime(true);
-
-        /* Temporary timing experiment: unfiltered, for 10 homepages, markbook takes:
-         * float(2.780165910720825) to build
-         *
-         * When filtered to use due dates, types and work types, the markbook takes:
-         * float(0.5908069610595703) to build (4 times faster?)
-         *
-         * When filtered to also use a curric code, the markbook takes:
-         * float(0.085470199584961) to build
-         */
-        $_SESSION['mbdur'] =  $end - $start;
 
         return $markbook;
     }
