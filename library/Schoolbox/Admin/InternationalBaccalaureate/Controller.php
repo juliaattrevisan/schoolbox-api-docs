@@ -608,6 +608,7 @@ class Controller extends ConfigController
                     'candidateExportEndpoint' => $this->getRouteIfAuthorized('internationalBaccalaureate.exportRegistrationSessionStudentsCsv', ['sessionId' => $sessionId]),
                     'searchLanguages' => $this->getRouteIfAuthorized('internationalBaccalaureate.searchLanguages'),
                     'completePreparation' => $this->getRouteIfAuthorized('internationalBaccalaureate.sessionCompletePreparation', ['sessionId' => $sessionId]),
+                    'registerViaApi' => $this->getRouteIfAuthorized('internationalBaccalaureate.sessionRegisterViaApi', ['sessionId' => $sessionId]),
                     'renotifyUnconfirmed' => $this->getRouteIfAuthorized('internationalBaccalaureate.renotifyUnconfirmed', ['sessionId' => $sessionId]),
                     'resetDetails' => $this->getRouteIfAuthorized('internationalBaccalaureate.sessionResetDetails', ['sessionId' => $sessionId]),
                     'manuallyRegister' => $this->getRouteIfAuthorized('internationalBaccalaureate.sessionMarkAsManuallyRegistered', ['sessionId' => $sessionId]),
@@ -1181,6 +1182,83 @@ class Controller extends ConfigController
                 'transitionedCount' => count($studentsToTransition),
             ]
         );
+    }
+
+    /**
+     * Queue selected confirmed candidates for API registration.
+     *
+     * @api POST /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/register
+     */
+    public function sessionRegisterViaApi(RegistrationSessionModel $registrationSession): void
+    {
+        $post       = $this->requestPost;
+        $studentIds = $post->get('studentIds');
+
+        try {
+            $studentIds = $this->normalisePreparationStudentIds($studentIds);
+        } catch (\InvalidArgumentException $e) {
+            $this->sendJsonError($e->getMessage(), 400);
+            return;
+        }
+
+        $database           = $this->registrationSessionStudentMapper->getDatabase();
+        $transactionStarted = false;
+
+        try {
+            $allStudents     = $this->registrationSessionStudentMapper->findStudentsForSession((int) $registrationSession->getId());
+            $studentsByAnyId = [];
+
+            foreach ($allStudents as $student) {
+                if ($student->getId() !== null) {
+                    $studentsByAnyId[(int) $student->getId()] = $student;
+                }
+
+                if ($student->getUser()?->getId() !== null) {
+                    $studentsByAnyId[(int) $student->getUser()->getId()] = $student;
+                }
+            }
+
+            $seen               = [];
+            $studentsToRegister = [];
+
+            foreach ($studentIds as $studentId) {
+                $student = $studentsByAnyId[$studentId] ?? null;
+
+                if (
+                    $student !== null
+                    && !isset($seen[$student->getId()])
+                    && $student->getStatus() === RegistrationSessionStudentModel::STATUS_CONFIRMED
+                ) {
+                    $seen[$student->getId()] = true;
+                    $studentsToRegister[]    = $student;
+                }
+            }
+
+            if ($studentsToRegister === []) {
+                $this->sendJsonError('No eligible students found for API registration.', 400);
+                return;
+            }
+
+            $transactionStarted = $database->beginTransaction();
+
+            foreach ($studentsToRegister as $student) {
+                $student->setStatus(RegistrationSessionStudentModel::STATUS_IN_PROGRESS);
+                $this->registrationSessionStudentMapper->save($student);
+            }
+
+            $database->commit();
+            $transactionStarted = false;
+
+            $this->response = $this->responseAsJson([
+                'success'           => true,
+                'transitionedCount' => count($studentsToRegister),
+            ]);
+        } catch (Exception) {
+            if ($transactionStarted) {
+                $database->rollBack();
+            }
+            $this->sendJsonError('Something has gone wrong. Please try again later.', 500);
+        }
     }
 
     /**
