@@ -649,17 +649,14 @@ class Controller extends Base
 
             case ViewMode::PARENT:
                 $this->externalUser->loadParents([$student]);
-                $parents = $student->getParents();
-                $parent  = ($parents !== null && $parents->count() > 0 && $parents->first() instanceof User)
-                    ? $parents->first()
-                    : (new User())->setId(0)->setRole((new Role())->setType(Role::PARENT));
+                $parent = $student->getParents()?->first()
+                    ?? new User()->setId(0)->setRole(new Role()->setType(Role::PARENT));
 
                 // Parents returned by $student->getParents() are not returned with their children
                 // hydrated, and the synthetic parent has none. Set the student as the child of the
-                // parent so downstream visibility checks that walk $parent->getChildren() work in
-                // both the real-parent and synthetic-parent branches.
+                // parent so downstream visibility checks will work.
                 $parent->setChildren(
-                    (new GenericCollection(User::class))->setOffset($student->getId(), $student)
+                    new GenericCollection(User::class)->setOffset($student->getId(), $student)
                 );
 
                 return $parent;
