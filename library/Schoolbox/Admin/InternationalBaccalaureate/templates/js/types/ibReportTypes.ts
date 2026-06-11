@@ -134,6 +134,8 @@ export type ApiCandidatesResponse = {
 export type ApiManuallyRegisterResponse = {
     success: boolean;
     registeredCount: number;
+    manuallyRegisteredBy?: string;
+    manuallyRegisteredAt?: string;
     message?: string;
 };
 

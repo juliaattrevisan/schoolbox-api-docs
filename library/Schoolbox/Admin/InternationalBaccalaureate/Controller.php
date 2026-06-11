@@ -1236,8 +1236,10 @@ class Controller extends ConfigController
             $transactionStarted = false;
 
             $this->response = $this->responseAsJson([
-                'success'         => true,
-                'registeredCount' => count($studentsToRegister),
+                'success'               => true,
+                'registeredCount'       => count($studentsToRegister),
+                'manuallyRegisteredBy'  => $registeredBy->getFullName(),
+                'manuallyRegisteredAt'  => $registeredAt->toIso8601String(),
             ]);
         } catch (Exception) {
             if ($transactionStarted) {

@@ -382,6 +382,23 @@ class Mapper extends BaseMapper
             $usersById[$user->getId()] = $user;
         }
 
+        $manuallyRegisteredByIds = array_values(array_unique(array_filter(
+            array_map('intval', array_column($rows, 'ss.manually_registered_by')),
+            fn (int $id) => $id !== 0
+        )));
+
+        $manuallyRegisteredByUsersById = [];
+
+        if ($manuallyRegisteredByIds !== []) {
+            $manuallyRegisteredByUsers = $userMapper->findByPredicates(
+                $userMapper->getPredicateBuilder()->in('id', $manuallyRegisteredByIds)
+            );
+
+            foreach ($manuallyRegisteredByUsers as $user) {
+                $manuallyRegisteredByUsersById[$user->getId()] = $user;
+            }
+        }
+
         $ibGroupSubjectsByUserId = $this->findIbGroupSubjectsForUsers(
             $usersById,
             $registrationSession->getSystemPurpose()->getId()
@@ -396,6 +413,12 @@ class Mapper extends BaseMapper
 
             if (isset($usersById[$userId])) {
                 $student->setUser($usersById[$userId]);
+            }
+
+            $manuallyRegisteredById = (int) ($row['ss.manually_registered_by'] ?? 0);
+
+            if ($manuallyRegisteredById !== 0 && isset($manuallyRegisteredByUsersById[$manuallyRegisteredById])) {
+                $student->setManuallyRegisteredBy($manuallyRegisteredByUsersById[$manuallyRegisteredById]);
             }
 
             $student->setIbGroupSubjects(

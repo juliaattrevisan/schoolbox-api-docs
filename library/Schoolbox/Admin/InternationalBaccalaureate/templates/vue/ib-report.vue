@@ -321,9 +321,15 @@ async function handleManuallyRegister(studentIds: number[]): Promise<void> {
         }
 
         const removedIds = new Set(studentIds);
+        const manuallyRegisteredBy = response.data?.manuallyRegisteredBy ?? null;
+        const manuallyRegisteredAt = response.data?.manuallyRegisteredAt ?? null;
         const newRegistered = [
-            ...confirmed.value.filter((s) => removedIds.has(s.id)).map((s) => ({ ...s, stage: "registered" as const })),
-            ...failed.value.filter((s) => removedIds.has(s.id)).map((s) => ({ ...s, stage: "registered" as const })),
+            ...confirmed.value
+                .filter((s) => removedIds.has(s.id))
+                .map((s) => ({ ...s, stage: "registered" as const, manuallyRegisteredBy, manuallyRegisteredAt })),
+            ...failed.value
+                .filter((s) => removedIds.has(s.id))
+                .map((s) => ({ ...s, stage: "registered" as const, manuallyRegisteredBy, manuallyRegisteredAt })),
         ];
         confirmed.value = confirmed.value.filter((s) => !removedIds.has(s.id));
         failed.value = failed.value.filter((s) => !removedIds.has(s.id));
