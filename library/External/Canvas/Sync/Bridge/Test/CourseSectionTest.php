@@ -22,7 +22,7 @@ class CourseSectionTest extends TestCase
     #[DataProvider('sisSourceIdTemplateProvider')]
     public function testFormatSisSourceIdTemplate(string $template, string $expected): void
     {
-        $parent = $this->createFolder('2026 Classes', '2026');
+        $parent = $this->createFolder('2026 Classes');
         $folder = $this->createFolder('12 Mathematics Advanced', 'MAIN/12MAT');
 
         self::assertSame(
@@ -34,6 +34,10 @@ class CourseSectionTest extends TestCase
     public static function sisSourceIdTemplateProvider(): array
     {
         return [
+            'folder code' => [
+                '{folderCode}',
+                '12MAT',
+            ],
             'default concatenated folder and parent code' => [
                 '{folderCode}{parentCode}',
                 '12MAT2026',
@@ -53,17 +57,19 @@ class CourseSectionTest extends TestCase
         ];
     }
 
-    private function createFolder(string $name, string $code): Folder\Model
+    private function createFolder(string $name, ?string $code = null): Folder\Model
     {
         $folder = (new Folder\Model())
             ->setName($name)
             ->setCodes(new GenericCollection(Folder\Code\Model::class));
 
-        $folder->getCodes()->add(
-            (new Folder\Code\Model())
-                ->setFolder($folder)
-                ->setCode($code)
-        );
+        if ($code !== null) {
+            $folder->getCodes()->add(
+                (new Folder\Code\Model())
+                    ->setFolder($folder)
+                    ->setCode($code)
+            );
+        }
 
         return $folder;
     }

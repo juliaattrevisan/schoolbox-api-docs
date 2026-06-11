@@ -253,10 +253,35 @@ class CourseSection
             $template,
             [
                 '{folderCode}' => trim($folderCode ?? preg_replace("#^[^/]+/#", '', $folder->getCodeString())),
-                '{parentCode}' => trim($parentFolder?->getCodeString() ?? ''),
+                '{parentCode}' => self::getParentCode($parentFolder),
                 '{folderName}' => trim($folder->getName()),
             ]
         );
+    }
+
+
+    /**
+     * Return the parent folder code, falling back to the year embedded in the folder name.
+     *
+     * @param Folder\Model|null $parentFolder
+     * @return string
+     */
+    private static function getParentCode(?Folder\Model $parentFolder): string
+    {
+        if ($parentFolder === null) {
+            return '';
+        }
+
+        $parentCode = trim($parentFolder->getCodeString());
+        if ($parentCode !== '') {
+            return $parentCode;
+        }
+
+        if (preg_match('/(\d{4})/', $parentFolder->getName(), $matches)) {
+            return $matches[1];
+        }
+
+        return '';
     }
 
 
