@@ -88,18 +88,18 @@ class Controller extends Base
             $markbookAssessments->add($assessment);
         }
 
+        $unitAssessmentsTranslator = new UnitAssessments(
+            $this->routeGenerator,
+            $this->getAuthorizer(),
+            $this->getUser(),
+            $this->getUser(),
+        );
+
         $data = [
             /* Only show class ranking if the config allows it. It seemingly ranks based on Student Weighted Average.
              */
             'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $markbook->getRanking() : null,
-            'assessments' => $markbookAssessments->reindex()->map(function (IAssessable $markbookAssessment, $sequence) use ($assessment) {
-                $unitAssessmentsTranslator = new UnitAssessments(
-                    $this->routeGenerator,
-                    $this->getAuthorizer(),
-                    $this->getUser(),
-                    $this->getUser(),
-                );
-
+            'assessments' => $markbookAssessments->reindex()->map(function (IAssessable $markbookAssessment, $sequence) use ($assessment, $unitAssessmentsTranslator) {
                 $unitSpec = null;
                 $base = $markbookAssessment->getBaseContext();
                 if ($base instanceof \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model) {
