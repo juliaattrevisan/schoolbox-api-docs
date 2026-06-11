@@ -20,6 +20,7 @@ import { addResource, exitLinkContext, insertSoftBreak } from "@js/editor/plugin
 import ResourceUI from "@js/editor/plugin/resource/ResourceUI";
 import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
 import { EditorToolbar } from "@js/editor/types/editorTypes";
+import { LIGHTBOX_LINK_ATTRIBUTE } from "./ResourceEditing";
 
 /**
  * Returns `true` if non-empty `text/html` is included in the data transfer.
@@ -45,6 +46,19 @@ function isSelectionStillAtUploadedImage(editor: Plugin["editor"], imageElement:
         selection.getSelectedElement() === imageElement ||
         selection.getFirstPosition()?.isEqual(positionAfterImage) === true
     );
+}
+
+type EditorWithSourceElement = Plugin["editor"] & {
+    sourceElement?: HTMLElement;
+};
+
+/**
+ * Returns the lightbox rel value for uploaded images.
+ * @param editor - the ckeditor instance
+ * @returns - the rel attribute value
+ */
+function getLightboxRel(editor: Plugin["editor"]): string {
+    return `lightbox[${(editor as EditorWithSourceElement).sourceElement?.id ?? ""}]`;
 }
 
 export default class ResourceEditing extends Plugin {
@@ -106,6 +120,8 @@ export default class ResourceEditing extends Plugin {
             this.editor.model.change((writer) => {
                 writer.setAttribute("alt", data.name, imageElement);
                 writer.setAttribute("linkHref", data.default, imageElement);
+                // add a rel tag so we can trigger the light gallery
+                writer.setAttribute(LIGHTBOX_LINK_ATTRIBUTE, getLightboxRel(this.editor), imageElement);
 
                 const insertPosition = writer.createPositionAfter(imageElement);
 
