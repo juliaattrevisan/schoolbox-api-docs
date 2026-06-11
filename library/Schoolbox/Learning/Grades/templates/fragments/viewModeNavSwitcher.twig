@@ -18,10 +18,10 @@
     {% endfor %}
 </div>
 <script type="text/javascript">
-    $(function () {
-        $('[data-grades-view-mode-switcher] [data-grades-view-mode]').on('change', function () {
+    document.querySelectorAll('[data-grades-view-mode-switcher] [data-grades-view-mode]').forEach((radio) => {
+        radio.addEventListener('change', function () {
             if (this.checked) {
-                window.location.href = $(this).data('href');
+                window.location.href = this.dataset.href;
             }
         });
     });
