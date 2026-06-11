@@ -1187,15 +1187,11 @@ class Controller extends ConfigController
 
         try {
             $allStudents     = $this->registrationSessionStudentMapper->findStudentsForSession((int) $registrationSession->getId());
-            $studentsByAnyId = [];
+            $studentsById = [];
 
             foreach ($allStudents as $student) {
                 if ($student->getId() !== null) {
-                    $studentsByAnyId[(int) $student->getId()] = $student;
-                }
-
-                if ($student->getUser()?->getId() !== null) {
-                    $studentsByAnyId[(int) $student->getUser()->getId()] = $student;
+                    $studentsById[(int) $student->getId()] = $student;
                 }
             }
 
@@ -1203,7 +1199,7 @@ class Controller extends ConfigController
             $studentsToRegister = [];
 
             foreach ($studentIds as $studentId) {
-                $student = $studentsByAnyId[$studentId] ?? null;
+                $student = $studentsById[$studentId] ?? null;
 
                 if (
                     $student !== null
