@@ -10,6 +10,27 @@
     </div>
 </div>
 <div id="custom-participation-container">
+    {# getCreateAssessmentForm is shared among all learning activities, but for Reporting activities, there's special
+     # treatment: despite the user having access to this form, they shouldn't be visiting getCreateAssessmentForm from
+     # this particular means (Student Participation screen) which is annoyingly nuanced.
+     #}
+    {% set getAssessmentParticipationNewActivityRoute = null %}
+    {% set postExistingCustomisationIncludeRoute = null %}
+
+    {% if assessment is not reporting %}
+        {% set getAssessmentParticipationNewActivityRoute = routeLookupIfAuthorized('learningAssessment.getCreateAssessmentForm', {
+            contextType: contextType,
+            contextId: assessment.context.id,
+            context: assessment.context
+        }) %}
+
+        {% set postExistingCustomisationIncludeRoute = routeLookupIfAuthorized('learningAssessment.postExistingCustomisationInclude', {
+            assessmentId: assessment.id,
+            assessment: assessment,
+            })
+        %}
+    {% endif %}
+
     <custom-participation
     :all-participants="{{ (allParticipants ?? []) | json_encode }}"
     :pastoral-enabled="Boolean({{ pastoralEnabled }})"
@@ -17,19 +38,12 @@
     :routes="{{ {
         getStudentsPastoralCountsUrl: routeLookup('pastoral.getStudentsCount'),
         getLearningPlanNewUrl: learningPlanNew,
-        getAssessmentParticipationNewActivity: routeLookupIfAuthorized('learningAssessment.getCreateAssessmentForm', {
-            contextType: contextType,
-            contextId: assessment.context.id,
-            context: assessment.context
-        }),
+        getAssessmentParticipationNewActivity: getAssessmentParticipationNewActivityRoute,
         getAssessmentParticipationCopyActivity: routeLookupIfAuthorized('learningAssessment.getCloneAssessmentForm', {
             assessmentId: assessment.id,
             assessment: assessment,
         }),
-        includeInExistingCustomisation: routeLookupIfAuthorized('learningAssessment.postExistingCustomisationInclude', {
-            assessmentId: assessment.id,
-            assessment: assessment,
-        }),
+        includeInExistingCustomisation: postExistingCustomisationIncludeRoute,
         genAI: routeLookupIfAuthorized('openai.postLearningActivityCustomisation'),
     } | json_encode }}"
     :assessment-id="{{ assessment.id }}"

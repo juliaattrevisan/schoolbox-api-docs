@@ -58,6 +58,7 @@ const canSuggestCustomisation = window.Vue.computed(() => {
     return (
         props.differentiationEnabled &&
         sbProps.aiFeatures.learningactivitycustomisation?.enabled &&
+        !!props.routes.genAI &&
         (props.assessmentType === ACTIVITY_TYPE_DUE_WORK || props.assessmentType === ACTIVITY_TYPE_TASK)
     );
 });
@@ -249,7 +250,7 @@ function onViewSuggestedCustomisation(participant: Participant): void {
         @confirm="onConfirmActionSelected"
     />
     <cp-suggested-customisation-modal
-        v-if="props.differentiationEnabled && sbProps.aiFeatures.learningactivitycustomisation?.enabled"
+        v-if="canSuggestCustomisation"
         v-model:participant="currentParticipant"
         :routes="props.routes"
         :assessment-id="props.assessmentId"

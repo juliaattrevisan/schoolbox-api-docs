@@ -10,10 +10,10 @@ import { apiRequest } from "@js/util/sbx/apiUtils";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import LoadingCards from "@schoolboxVue/components/loading/loading-cards.vue";
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
-import type { CustomisedSuggestionResponse, Participant } from "../js/types/customParticipationTypes";
+import type { CustomisedSuggestionResponse, OptionalRoute, Participant } from "../js/types/customParticipationTypes";
 
 const props = defineProps<{
-    route: string;
+    route: OptionalRoute;
     assessmentId: number;
     participant: Participant | null;
     confirmText: string;
@@ -35,7 +35,7 @@ let controller: AbortController | null = null; // to allow aborting the previous
  * Load the AI customised suggestion for the participant
  */
 async function load(): Promise<void> {
-    if (props.route === "") {
+    if (!props.route) {
         loadError.value = "No route specified";
         return;
     }
