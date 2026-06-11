@@ -314,7 +314,7 @@ async function handleManuallyRegister(studentIds: number[]): Promise<void> {
 
         if (!response.success) {
             toast.timeout({
-                text: response.data?.message ?? "Failed to mark as manually registered.",
+                text: response.message ?? "Failed to mark as manually registered.",
                 isSuccess: false,
             });
             return;

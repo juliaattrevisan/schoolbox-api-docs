@@ -11,6 +11,11 @@ interface Props {
 }
 defineProps<Props>();
 
+/**
+ * Formats an ISO date string as short date + time using site display formats.
+ * @param isoString - ISO 8601 date string to format.
+ * @returns Formatted date and time string.
+ */
 function formatDate(isoString: string): string {
     const d = window.dayjs(isoString);
     return `${d.format(window.dateDisplayFormats.dayjsDateShort)} ${d.format(window.dateDisplayFormats.dayjsTime)}`;
