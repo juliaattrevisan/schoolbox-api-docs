@@ -1193,10 +1193,8 @@ class Controller extends Assessment\Controller
          *  and $assessment->isSelfAssessable() (self grading) - you can already figure out the answer without needing
          *  these extra $selfAssess and $selfReflect vars. I wonder why those were ever necessary...
          */
-        /* TODO probably superfluous (and always was?)
-         */
-//        $selfReflect = $reviewRoute === ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION;
-//        $selfAssess = $reviewRoute === ReturnedWork::REVIEW_ROUTE_SELF_GRADING;
+        $selfReflect = $assessment->isSelfReflectionOnly();
+        $selfAssess = $assessment->isSelfGradable();
 
         if ($this->requestQuery->get(Redirect::RETURN_URL)) {
             $returnUrl = Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL));
@@ -1228,10 +1226,8 @@ class Controller extends Assessment\Controller
             'policy'         => $assessment->getEnablePolicy() ? $this->getConfigLoader()->get('lms_student_policy') : '', // only use the policy, if this assessment is showing the policy
             'errorMessage'   => $errorMessage,
             'readonly'       => $isInteractionLocked,
-            /* TODO probably superfluous (and always was?)
-             */
-//            'selfReflect'    => $selfReflect,
-//            'selfAssess'     => $selfAssess,
+            'selfReflect'    => $selfReflect,
+            'selfAssess'     => $selfAssess,
             'acceptsOnline'  => $acceptsOnlineSubmissions,
             'returnUrl'      => $returnUrl,
             'kamiSession'    => $kamiSession,
@@ -1239,10 +1235,11 @@ class Controller extends Assessment\Controller
             'editorTemplates' => $this->activityTemplateHelper !== null ? $this->activityTemplateHelper->getTemplatesForCategory() : [],
 
             /* Only show these things if the assessment is self-gradable */
-            /* TODO probably superfluous (and always was?)
+            /* TODO showGroupTotal is a property of the rubric instance now...I think these are wrong to implement here
+             *  in this manner. Snake lord I'll have to work it out with you one day
              */
-//            'showGroupTotal'      => $selfAssess && ($assessment->getCapabilityMarkType() !== SubmissionBox\MarkType::SLUG_NONE),
-//            'showRubricTotal'     => $selfAssess
+            'showGroupTotal' => null,
+            'showRubricTotal' => $selfAssess
         ];
 
         $this->response = $this->responseFromTemplate(

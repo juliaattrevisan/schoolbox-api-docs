@@ -160,6 +160,24 @@ interface IFeedback
      */
     public function setResponse(?IResponse $response = null);
 
+
+    /**
+     * Fetches the collection of marked rubric grids in this feedback.
+     *
+     * @return \Schoolbox\GenericCollection|null
+     */
+    public function getRubricMarkedGrids(): ?\Schoolbox\GenericCollection;
+
+
+    /**
+     * Sets the marked rubric grids collection in this feedback.
+     *
+     * @param \Schoolbox\GenericCollection $rubricMarkedGrids
+     * @return self
+     */
+    public function setRubricMarkedGrids(\Schoolbox\GenericCollection $rubricMarkedGrids): self;
+
+
     /**
      * Get the date when this IFeedback was made accessible to respondents
      * (typically students)

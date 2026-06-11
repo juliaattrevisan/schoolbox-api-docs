@@ -11,6 +11,7 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress_Date_Format;
+use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\User;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -88,6 +89,15 @@ abstract class AbstractFeedback implements IFeedback
      * @var Alaress_Date_Format|null
      */
     protected ?Alaress_Date_Format $publishedAt = null;
+
+
+    /**
+     * The marked rubric grids for this feedback.
+     *
+     * @var null|\Schoolbox\GenericCollection<MarkedGrid>
+     */
+    protected ?\Schoolbox\GenericCollection $rubricMarkedGrids = null;
+
 
     /**
      * Determine whether this Feedback has been published.
@@ -254,6 +264,26 @@ abstract class AbstractFeedback implements IFeedback
     public function setResponse(?IResponse $response = null)
     {
         $this->response = $response;
+        return $this;
+    }
+
+
+    /**
+     * @return null|\Schoolbox\GenericCollection<MarkedGrid>
+     */
+    public function getRubricMarkedGrids(): ?\Schoolbox\GenericCollection
+    {
+        return $this->rubricMarkedGrids;
+    }
+
+
+    /**
+     * @param \Schoolbox\GenericCollection<MarkedGrid> $rubricMarkedGrids
+     * @return static
+     */
+    public function setRubricMarkedGrids(\Schoolbox\GenericCollection $rubricMarkedGrids): self
+    {
+        $this->rubricMarkedGrids = $rubricMarkedGrids;
         return $this;
     }
 }
