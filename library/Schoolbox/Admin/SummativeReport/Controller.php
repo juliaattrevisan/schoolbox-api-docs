@@ -1181,7 +1181,7 @@ class Controller extends ConfigController
          *
          * TODO Technical Uplift Candidate
          *  Annoyingly, rubricDataSource and rubricMapper are the same idea but with different names.
-         *  Just use the same name (either one suits) universally; rename them across the baord.
+         *  Just use the same name (either one suits) universally; rename them across the board.
          */
         $payloadGenerator = new RubricPayloadGenerator(
             $this->rubricDataSource,
@@ -1200,15 +1200,13 @@ class Controller extends ConfigController
                 $feedback = $classAssessmentFeedbacks->getOffset($assessment->getId());
 
                 if (null !== $feedback) {
-                    if ($assessment->getRubricInstances()->count()) {
-                        foreach ($assessment->getRubricInstances() as $rubricInstance) {
-                            /* Something doesn't use the swamp: but what? Only spawn the grid instance if it was null
-                             *
-                             * TODO find out why the grids aren't being populated here
-                             */
-                            if (null === $rubricInstance->getGrid()) {
-                                $rubricInstance->setGrid($this->rubricDataSource->retrieveOneGrid($assessment, $rubricInstance, false));
-                            }
+                    foreach ($assessment->getRubricInstances() as $rubricInstance) {
+                        /* Something doesn't use the swamp: but what? Only spawn the grid instance if it was null
+                         *
+                         * TODO find out why the grids aren't being populated here
+                         */
+                        if (null === $rubricInstance->getGrid()) {
+                            $rubricInstance->setGrid($this->rubricDataSource->retrieveOneGrid($assessment, $rubricInstance, false));
                         }
                     }
 
