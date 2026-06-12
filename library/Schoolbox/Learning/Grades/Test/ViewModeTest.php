@@ -76,33 +76,26 @@ class ViewModeTest extends TestCase
     }
 
     /**
-     * Instructor tick transitions follow the effective viewer's folder access in interactive modes.
+     * Non-staff users with folder write access still use learner tick transitions in the grade report.
      */
-    public function testTickTransitionsUseEffectiveViewerAccess(): void
+    public function testTickTransitionsRequireStaffViewModeAndInstructorAccess(): void
     {
-        self::assertSame([
+        $instructorTransitions = [
             'incomplete'      => 'teacherAssessed',
             'selfAssessed'    => 'teacherAssessed',
             'teacherAssessed' => 'incomplete',
-        ], ViewMode::tickTransitions(true));
-
-        self::assertSame([
+        ];
+        $learnerTransitions = [
             'incomplete'      => 'selfAssessed',
             'selfAssessed'    => 'incomplete',
             'teacherAssessed' => 'incomplete',
-        ], ViewMode::tickTransitions(false));
-    }
+        ];
 
-    /**
-     * Non-staff users with folder write access still use learner tick transitions in the grade report.
-     */
-    public function testInstructorTickTransitionsRequireStaffViewMode(): void
-    {
-        self::assertTrue(ViewMode::canUseInstructorTickTransitions(ViewMode::STAFF, true));
-        self::assertFalse(ViewMode::canUseInstructorTickTransitions('', true));
-        self::assertFalse(ViewMode::canUseInstructorTickTransitions(ViewMode::STUDENT, true));
-        self::assertFalse(ViewMode::canUseInstructorTickTransitions(ViewMode::PARENT, true));
-        self::assertFalse(ViewMode::canUseInstructorTickTransitions(ViewMode::STAFF, false));
+        self::assertSame($instructorTransitions, ViewMode::tickTransitions(ViewMode::STAFF, true));
+        self::assertSame($learnerTransitions, ViewMode::tickTransitions('', true));
+        self::assertSame($learnerTransitions, ViewMode::tickTransitions(ViewMode::STUDENT, true));
+        self::assertSame($learnerTransitions, ViewMode::tickTransitions(ViewMode::PARENT, true));
+        self::assertSame($learnerTransitions, ViewMode::tickTransitions(ViewMode::STAFF, false));
     }
 
     /**

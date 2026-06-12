@@ -12,6 +12,11 @@ use Schoolbox\User;
 
 /**
  * Defines the supported server-side grade viewing modes.
+ *
+ * IMPORTANT:
+ * Only staff in ViewMode::STAFF can view instructor marks and transition progress ticks to 'teacherAssessed' status.
+ * Folder write+ access alone is not enough: non-staff users can be granted write+ access and therefore satisfy
+ * Access::isInstructor(), but that should not grant them staff-only grades-report privileges.
  */
 final class ViewMode
 {
@@ -146,33 +151,18 @@ final class ViewMode
      * user clicks the tick.  E.g. When the status is 'incomplete', when the user clicks the tick, the next status
      * depends on whether the user is an instructor.  If instructor, 'teacherAssessed'. If student, 'selfAssessed'.
      *
+     * @param string $viewMode Current grade-report view mode.
      * @param bool $effectiveViewerIsInstructor Whether the effective viewer has instructor access to the folder.
      * @return array{incomplete: string, selfAssessed: string, teacherAssessed: string}
      */
-    public static function tickTransitions(bool $effectiveViewerIsInstructor): array
+    public static function tickTransitions(string $viewMode, bool $effectiveViewerIsInstructor): array
     {
+        $canUseInstructorTransitions = $viewMode === self::STAFF && $effectiveViewerIsInstructor;
+
         return [
-            'incomplete'      => $effectiveViewerIsInstructor ? 'teacherAssessed' : 'selfAssessed',
-            'selfAssessed'    => $effectiveViewerIsInstructor ? 'teacherAssessed' : 'incomplete',
+            'incomplete'      => $canUseInstructorTransitions ? 'teacherAssessed' : 'selfAssessed',
+            'selfAssessed'    => $canUseInstructorTransitions ? 'teacherAssessed' : 'incomplete',
             'teacherAssessed' => 'incomplete',
         ];
-    }
-
-    /**
-     * IMPORTANT:
-     * Only staff in ViewMode::STAFF can view instructor marks in the grade report and transition progress ticks
-     * to 'teacherAssessed' status.  Folder write+ access alone is not enough: non-staff users can be granted
-     * write+ access and therefore satisfy Access::isInstructor(), but that should not grant them staff-only
-     * grades-report privileges.
-     *
-     * @param string $viewMode Current grade-report view mode.
-     * @param bool $effectiveViewerIsInstructor Whether the effective viewer has instructor access to the folder.
-     * @return bool True when the grade report should use instructor progress-tick transitions.
-     */
-    public static function canUseInstructorTickTransitions(
-        string $viewMode,
-        bool $effectiveViewerIsInstructor
-    ): bool {
-        return $viewMode === self::STAFF && $effectiveViewerIsInstructor;
     }
 }

@@ -584,21 +584,6 @@ class Controller extends Base
         }
 
         $progressTicksReadOnly = ViewMode::progressTicksReadOnly($this->getUser(), $effectiveViewer);
-        $canUseInstructorTickTransitions = ViewMode::canUseInstructorTickTransitions(
-            $viewMode,
-            $this->access->isInstructor($effectiveViewer, $subject)
-        );
-        $tickTransitions = $progressTicksReadOnly
-            ? []
-            : ViewMode::tickTransitions($canUseInstructorTickTransitions);
-
-        /**
-         * IMPORTANT:
-         * Only staff in ViewMode::STAFF can view instructor marks in the grade report and transition progress ticks
-         * to 'teacherAssessed' status.  Folder write+ access alone is not enough: non-staff users can be granted
-         * write+ access and therefore satisfy Access::isInstructor(), but that should not grant them staff-only
-         * grades-report privileges.
-         */
         $this->response = $this->responseAsJson([
             'status'  => 200,
             'content' => $this->responseFromTemplateUnthemed('@learningGrades/gradesInner.twig', [
@@ -615,7 +600,11 @@ class Controller extends Base
                 'showRubricPoints'      => $showRubricPoints,
                 'rubricAssessmentList'  => $rubricAssessmentList,
                 'progressTicksReadOnly' => $progressTicksReadOnly,
-                'transitions'           => $tickTransitions,
+                'transitions'           => (
+                    $progressTicksReadOnly
+                    ? []
+                    : ViewMode::tickTransitions($viewMode, $this->access->isInstructor($effectiveViewer, $subject))
+                ),
                 'returnUrlSuffix'       => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($_SERVER['REQUEST_URI']),
             ])->getBody()->getContents(),
         ]);
