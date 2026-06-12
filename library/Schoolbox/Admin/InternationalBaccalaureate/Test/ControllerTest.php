@@ -577,6 +577,74 @@ class ControllerTest extends TestCase
         $this->assertSame(303, $response->getStatusCode());
     }
 
+    public function testPostRegistrationSessionCandidateNumbersKeepsReportUserWhenPersistedStudentHasSparseUser(): void
+    {
+        $student = $this->buildStudent(
+            456,
+            123,
+            RegistrationSessionStudentModel::STATUS_CONFIRMED,
+            'Alex',
+            'Nguyen',
+            'S123'
+        );
+        $reportUser = $student->getUser();
+        $persistedStudent = (new RegistrationSessionStudentModel())
+            ->setId(456)
+            ->setRegistrationSession((new RegistrationSessionModel())->setId(12))
+            ->setStatus(RegistrationSessionStudentModel::STATUS_CONFIRMED)
+            ->setUser(
+                (new User())
+                    ->setId(123)
+                    ->setFirstname('Alex')
+                    ->setLastname('Nguyen')
+            );
+
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('findStudentsForSession')
+            ->with(12)
+            ->willReturn(new Collection([$student]));
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('findOneByColumnList')
+            ->with([
+                'user_id' => 123,
+                'registration_session_id' => 12,
+            ])
+            ->willReturn($persistedStudent);
+
+        $userMapper = $this->createMock(UserMapper::class);
+        $userMapper
+            ->expects($this->once())
+            ->method('save')
+            ->with($this->callback(function (User $user) use ($reportUser): bool {
+                $this->assertSame($reportUser, $user);
+                $this->assertSame(123, $user->getId());
+                $this->assertSame('CAND-NEW', $user->getIbCandidateNumber());
+
+                return true;
+            }));
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class),
+            userMapper: $userMapper
+        );
+        $controller->setRequestPost(new Values([
+            'candidateNumbers' => [
+                123 => ' CAND-NEW ',
+            ],
+        ]));
+
+        $controller->postRegistrationSessionCandidateNumbers((new RegistrationSessionModel())->setId(12));
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(303, $response->getStatusCode());
+    }
+
     public function testPostRegistrationSessionCandidateNumbersClearsExistingValues(): void
     {
         $student = $this->buildStudent(

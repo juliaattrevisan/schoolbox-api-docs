@@ -702,8 +702,7 @@ class Controller extends ConfigController
                     continue;
                 }
 
-                $registrationSessionStudent = $this->persistRegistrationSessionStudent($sessionId, $userId);
-                $user = $registrationSessionStudent->getUser() ?? $user;
+                $this->persistRegistrationSessionStudent($sessionId, $userId);
                 $user->setIbCandidateNumber($candidateNumber);
                 $this->userMapper->save($user);
             }
@@ -1373,26 +1372,12 @@ class Controller extends ConfigController
         return array_map(
             fn(RegistrationSessionStudentModel $student): array => [
                 'userId' => (int) $student->getUser()?->getId(),
-                'name' => $this->buildCandidateDisplayName($student),
+                'name' => $student->getUser()?->formatName('{lastname}, {preferredname}') ?? '',
                 'ibCandidateNumber' => $this->registrationSessionStudentHelper->normalise(
                     $student->getUser()?->getIbCandidateNumber()
                 ),
             ],
             $students
-        );
-    }
-
-    /**
-     * Build a display name for a candidate, using the registration session student helper to normalise the given name and surname, and handling potential null values.
-     * @return string
-     */
-    private function buildCandidateDisplayName(RegistrationSessionStudentModel $student): string
-    {
-        $user = $student->getUser();
-
-        return $this->registrationSessionStudentHelper->buildUserName(
-            $this->registrationSessionStudentHelper->normalise($user?->getGivenName()),
-            $this->registrationSessionStudentHelper->normalise($user?->getLastname())
         );
     }
 
