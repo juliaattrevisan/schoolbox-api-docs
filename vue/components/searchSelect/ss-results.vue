@@ -117,7 +117,6 @@ function onHover(index: number): void {
 }
 
 const resultsEl = useTemplateRef<HTMLDivElement | null>("resultsEl"); // to detect when the results container is scrolled to the bottom
-const maxResultsHeight = 400; // the maximum height of the results container
 
 const currentHeight = window.Vue.ref(0);
 useResizeObserver(resultsEl, (entries) => {
@@ -132,8 +131,7 @@ useResizeObserver(resultsEl, (entries) => {
 const { arrivedState } = useScroll(resultsEl);
 const { bottom } = toRefs(arrivedState);
 window.Vue.watch(bottom, (isAtBottom) => {
-    if (isAtBottom && currentHeight.value === maxResultsHeight - 2) {
-        // -2 to account for the border
+    if (isAtBottom) {
         emit("atBottom");
     }
 });
