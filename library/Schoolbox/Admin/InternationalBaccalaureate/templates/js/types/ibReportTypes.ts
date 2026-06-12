@@ -55,13 +55,6 @@ export type InProgressRow = {
     subjects: SubjectGroup;
 };
 
-/**
- * A student row used in the Registered section, extending StudentRow with an IB candidate number.
- */
-export type RegisteredRow = StudentRow & {
-    ibCandidateNumber: string | null;
-};
-
 // ---------------------------------------------------------------------------
 // Raw API types — shape returned by the candidates endpoint
 // ---------------------------------------------------------------------------

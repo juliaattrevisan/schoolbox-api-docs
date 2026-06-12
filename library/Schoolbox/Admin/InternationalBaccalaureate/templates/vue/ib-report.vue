@@ -15,7 +15,6 @@ import type {
     StudentRow,
     FailedRow,
     InProgressRow,
-    RegisteredRow,
     SubjectEntry,
     ApiStudent,
     ApiSubject,
@@ -44,7 +43,7 @@ const unconfirmed = window.Vue.ref<StudentRow[]>([]);
 const confirmed = window.Vue.ref<StudentRow[]>([]);
 const inProgress = window.Vue.ref<InProgressRow[]>([]);
 const failed = window.Vue.ref<FailedRow[]>([]);
-const registered = window.Vue.ref<RegisteredRow[]>([]);
+const registered = window.Vue.ref<StudentRow[]>([]);
 
 const { selectedList: preparationSelected } = useSelectedList(preparation);
 const { selectedList: unconfirmedSelected } = useSelectedList(unconfirmed);
@@ -170,7 +169,7 @@ async function loadCandidates(): Promise<void> {
         confirmed.value = (byKey["confirmed"] ?? []).map((s) => mapStudentRow(s, "confirmed"));
         inProgress.value = (byKey["inProgress"] ?? []).map((s) => mapStudentRow(s, "inProgress"));
         failed.value = (byKey["failed"] ?? []).map((s) => mapStudentRow(s, "failed") as FailedRow);
-        registered.value = (byKey["registered"] ?? []).map((s) => mapStudentRow(s, "registered") as RegisteredRow);
+        registered.value = (byKey["registered"] ?? []).map((s) => mapStudentRow(s, "registered"));
     } catch (e) {
         console.error("Failed to load candidates", e);
         loadError.value = "Failed to load registration report.";
