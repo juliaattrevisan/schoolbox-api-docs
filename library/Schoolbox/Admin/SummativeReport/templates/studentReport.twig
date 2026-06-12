@@ -574,15 +574,18 @@
                 {% if hasAssessments %}
                     {% for assessment in summaryAssessments[folder.id] %}
                         {% set participant = assessment ? assessment.participantIfExtant(student) : null %}
-                        {% include '@adminSummativeReport/assessmentReport.twig' with
-                            {
-                                student: student,
-                                assessment: assessment,
-                                feedback: summaryAssessmentFeedbacks[assessment.id] ?? null,
-                                page: 'subject-summary',
-                                options: summaryOptions,
-                                rubricGridPayloads: null,
-                            } only %}
+
+                        {% set feedback = summaryAssessmentFeedbacks[assessment.id] ?? null %}
+                        {% set feedbackId = feedback.id ?? null %}
+
+                        {% include '@adminSummativeReport/assessmentReport.twig' with {
+                            student: student,
+                            assessment: assessment,
+                            feedback: summaryAssessmentFeedbacks[assessment.id] ?? null,
+                            page: 'subject-summary',
+                            options: summaryOptions,
+                            rubricGridPayloads: rubricGridPayloadsHistorySummary[feedbackId] ?? null
+                        } only %}
                     {% endfor %}
                 {% endif %}
             {% endif %}
@@ -656,15 +659,14 @@
                         {% set feedback = classAssessmentFeedbacks[assessment.id] ?? null %}
                         {% set feedbackId = feedback.id ?? null %}
 
-                        {% include '@adminSummativeReport/assessmentReport.twig' with
-                            {
-                                student: student,
-                                assessment: assessment,
-                                feedback: feedback,
-                                page: 'subject',
-                                options: classOptions,
-                                rubricGridPayloads: rubricGridPayloadsHistoryClass[feedbackId] ?? null
-                            } only %}
+                        {% include '@adminSummativeReport/assessmentReport.twig' with {
+                            student: student,
+                            assessment: assessment,
+                            feedback: feedback,
+                            page: 'subject',
+                            options: classOptions,
+                            rubricGridPayloads: rubricGridPayloadsHistoryClass[feedbackId] ?? null
+                        } only %}
                     {% endfor %}
                 </div>
 
