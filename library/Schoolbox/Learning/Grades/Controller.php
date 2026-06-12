@@ -47,7 +47,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Mapper;
-use Schoolbox\Role;
 use Schoolbox\User;
 use Twig\Error\Error as TwigError;
 use TypeError;
@@ -57,6 +56,8 @@ use function func_get_args;
 
 class Controller extends Base
 {
+    private ViewMode $viewMode;
+
     /**
      * @param AssessmentMapperProxy $assessmentMapperProxy
      * @param Mapper $folderMapper
@@ -78,8 +79,9 @@ class Controller extends Base
         private AssessmentFilters\IdFinder $assessmentIdFinder,
         private Filter\IFactoryFactory $filterFactoryFactory,
         private WorkType\Mapper $workTypeMapper,
-        private ExternalUser $externalUser,
+        ExternalUser $externalUser,
     ) {
+        $this->viewMode = new ViewMode($externalUser);
     }
 
     /**
@@ -170,7 +172,12 @@ class Controller extends Base
             $markSchemeFactory
         );
 
-        [$viewMode, $effectiveViewer, $canViewInstructorMarks] = $this->getViewModeVariables($viewee);
+        $requestViewMode = $this->requestQuery->get('viewMode');
+        [$viewMode, $effectiveViewer, $canViewInstructorMarks] = $this->viewMode->getViewModeVariables(
+            $this->getUser(),
+            $viewee,
+            is_string($requestViewMode) ? $requestViewMode : null
+        );
         [$folders, $markbooks, $assessments] = $gradeHelper->generateGrades(
             $effectiveViewer,
             $viewee,
@@ -249,7 +256,12 @@ class Controller extends Base
     public function getGradesForSubject(User $viewee, Term\Model $term, Folder\Model $subject): void
     {
         $page = FilterPage\Model::PAGE_GRADES;
-        [$viewMode, $effectiveViewer, $canViewInstructorMarks] = $this->getViewModeVariables($viewee);
+        $requestViewMode = $this->requestQuery->get('viewMode');
+        [$viewMode, $effectiveViewer, $canViewInstructorMarks] = $this->viewMode->getViewModeVariables(
+            $this->getUser(),
+            $viewee,
+            is_string($requestViewMode) ? $requestViewMode : null
+        );
         $viewModeQuerySuffix = $viewMode !== '' ? '?viewMode=' . rawurlencode($viewMode) : '';
 
         $route       = $this->routeGenerator->generate('learningGrades.postReport', [
@@ -350,7 +362,12 @@ class Controller extends Base
     {
         $request = $this->requestPost->get('filter_selection') ?: [];
         $page = FilterPage\Model::PAGE_GRADES;
-        [$viewMode, $effectiveViewer, $canViewInstructorMarks] = $this->getViewModeVariables($viewee);
+        $requestViewMode = $this->requestQuery->get('viewMode');
+        [$viewMode, $effectiveViewer, $canViewInstructorMarks] = $this->viewMode->getViewModeVariables(
+            $this->getUser(),
+            $viewee,
+            is_string($requestViewMode) ? $requestViewMode : null
+        );
 
         /* @var RosettaStone $l10n */
         $l10n = $this->getDi()->get('l10n');
@@ -602,76 +619,6 @@ class Controller extends Base
                 'returnUrlSuffix'       => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($_SERVER['REQUEST_URI']),
             ])->getBody()->getContents(),
         ]);
-    }
-
-    /**
-     * Derive and return variables pertaining to view mode.
-     * @param User $viewee
-     * @return array{string, User, bool}
-     */
-    private function getViewModeVariables(User $viewee): array
-    {
-        $currentUser = $this->getUser();
-
-        if ($currentUser->getRole()->isStaff()) {
-            $requestViewMode = $this->requestQuery->get('viewMode');
-            $viewMode = (
-                ViewMode::fromRequestValue(is_string($requestViewMode) ? $requestViewMode : null)
-                ?? ViewMode::STAFF
-            );
-            $effectiveViewer = $this->getEffectiveViewer($currentUser, $viewee, $viewMode);
-            $canViewInstructorMarks = $viewMode === ViewMode::STAFF;
-        } else {
-            $viewMode = '';
-            $effectiveViewer = $currentUser;
-            $canViewInstructorMarks = false;
-        }
-
-        return [$viewMode, $effectiveViewer, $canViewInstructorMarks];
-    }
-
-    /**
-     * Resolve the user whose visibility rules apply for the given staff-selected view mode.
-     *
-     * Only valid when $currentUser is a staff member. Non-staff requests do not select a
-     * mode and should use $currentUser as the effective viewer directly.
-     *
-     * @param string $mode One of the ViewMode constants. Callers must pre-validate the
-     *                     requested value via ViewMode::fromRequestValue().
-     * @throws InvalidArgumentException If called for a non-staff user or given an unknown mode.
-     */
-    private function getEffectiveViewer(User $currentUser, User $student, string $mode): User
-    {
-        if (!$currentUser->getRole()->isStaff()) {
-            throw new InvalidArgumentException(
-                'getEffectiveViewer() should only be called for staff users.'
-            );
-        }
-
-        switch ($mode) {
-            case ViewMode::STAFF:
-                return $currentUser;
-
-            case ViewMode::STUDENT:
-                return $student;
-
-            case ViewMode::PARENT:
-                $this->externalUser->loadParents([$student]);
-                $parent = $student->getParents()?->first()
-                    ?? new User()->setId(0)->setRole(new Role()->setType(Role::PARENT));
-
-                // Parents returned by $student->getParents() are not returned with their children
-                // hydrated, and the synthetic parent has none. Set the student as the child of the
-                // parent so downstream visibility checks will work.
-                $parent->setChildren(
-                    new GenericCollection(User::class)->setOffset($student->getId(), $student)
-                );
-
-                return $parent;
-
-            default:
-                throw new InvalidArgumentException("Unexpected value '$mode' for \$mode.");
-        }
     }
 
     /**

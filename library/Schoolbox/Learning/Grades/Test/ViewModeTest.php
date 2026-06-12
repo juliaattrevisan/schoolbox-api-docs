@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Grades\Test;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Schoolbox\External\User as ExternalUser;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Grades\ViewMode;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -103,6 +106,72 @@ class ViewModeTest extends TestCase
     }
 
     /**
+     * Staff users default to staff view mode when the request value is absent or invalid.
+     */
+    public function testStaffViewModeVariablesDefaultToStaffMode(): void
+    {
+        $staff = $this->createUser(1, Role::STAFF);
+        $student = $this->createUser(2, Role::STUDENT);
+        $viewMode = new ViewMode($this->createExternalUserStub());
+
+        self::assertSame([ViewMode::STAFF, $staff, true], $viewMode->getViewModeVariables($staff, $student, null));
+        self::assertSame([ViewMode::STAFF, $staff, true], $viewMode->getViewModeVariables($staff, $student, 'guardian'));
+    }
+
+    /**
+     * Non-staff users do not select a view mode and use themselves as the effective viewer.
+     */
+    public function testNonStaffViewModeVariablesUseCurrentUser(): void
+    {
+        $student = $this->createUser(2, Role::STUDENT);
+        $viewee = $this->createUser(3, Role::STUDENT);
+        $viewMode = new ViewMode($this->createExternalUserStub());
+
+        self::assertSame(['', $student, false], $viewMode->getViewModeVariables($student, $viewee, ViewMode::STAFF));
+    }
+
+    /**
+     * Student preview mode uses the viewed student as the effective viewer.
+     */
+    public function testStudentPreviewModeUsesViewedStudentAsEffectiveViewer(): void
+    {
+        $staff = $this->createUser(1, Role::STAFF);
+        $student = $this->createUser(2, Role::STUDENT);
+        $viewMode = new ViewMode($this->createExternalUserStub());
+
+        self::assertSame(
+            [ViewMode::STUDENT, $student, false],
+            $viewMode->getViewModeVariables($staff, $student, ViewMode::STUDENT)
+        );
+    }
+
+    /**
+     * Parent preview mode loads the viewed student's parents and hydrates the parent child relationship.
+     */
+    public function testParentPreviewModeUsesLoadedParentAsEffectiveViewer(): void
+    {
+        $staff = $this->createUser(1, Role::STAFF);
+        $student = $this->createUser(2, Role::STUDENT);
+        $parent = $this->createUser(3, Role::PARENT);
+        $externalUser = $this->createExternalUserMock();
+        $externalUser
+            ->expects(self::once())
+            ->method('loadParents')
+            ->with([$student])
+            ->willReturnCallback(function (array $students) use ($student, $parent): array {
+                $student->setParents((new GenericCollection(User::class))->add($parent));
+                return $students;
+            });
+        $viewMode = new ViewMode($externalUser);
+
+        self::assertSame(
+            [ViewMode::PARENT, $parent, false],
+            $viewMode->getViewModeVariables($staff, $student, ViewMode::PARENT)
+        );
+        self::assertSame($student, $parent->getChildren()?->first());
+    }
+
+    /**
      * Provide supported request values and their normalized modes.
      *
      * @return array<string, array{string, string}>
@@ -125,5 +194,26 @@ class ViewModeTest extends TestCase
     private function createUser(int $id, string $roleType): User
     {
         return (new User())->setId($id)->setRole((new Role())->setType($roleType));
+    }
+
+    /**
+     * Create an ExternalUser stub without invoking its dependency-spawning constructor.
+     */
+    private function createExternalUserStub(): ExternalUser
+    {
+        return $this->createStub(ExternalUser::class);
+    }
+
+    /**
+     * Create an ExternalUser mock without invoking its dependency-spawning constructor.
+     *
+     * @return ExternalUser&MockObject
+     */
+    private function createExternalUserMock(): ExternalUser&MockObject
+    {
+        return $this->getMockBuilder(ExternalUser::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['loadParents'])
+            ->getMock();
     }
 }
