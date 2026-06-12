@@ -1,11 +1,14 @@
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import type { Page, Locator } from "@playwright/test";
 import { expect } from "@playwright/test";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 
 export default class GradesPage {
     private tester: AcceptanceTester;
 
     private page: Page;
+
+    private common: Common;
 
     static readonly URL = "/learning/grades/{id}";
 
@@ -29,6 +32,7 @@ export default class GradesPage {
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
+        this.common = new Common(page);
     }
 
     /**
@@ -50,17 +54,10 @@ export default class GradesPage {
     }
 
     /**
-     * click the jelly tot
-     */
-    async clickJellyTot(): Promise<void> {
-        await this.page.getByTestId(GradesPage.DATA_TEST_JELLY_TOT).click();
-    }
-
-    /**
      * Change the current grades visibility to "View Instructor Grades"
      */
     async viewInstructorGrades(): Promise<void> {
-        await this.clickJellyTot();
+        await this.common.clickJellyTot();
         await this.page.locator(GradesPage.SELECTOR_VIEW_INSTRUCTOR_GRADES).click();
     }
 
@@ -68,9 +65,9 @@ export default class GradesPage {
      * Change the current grades visibility to "View Student Grades"
      */
     async viewStudentGrades(): Promise<void> {
-        await this.clickJellyTot();
+        await this.common.clickJellyTot();
         await this.page.locator(GradesPage.SELECTOR_VIEW_STUDENT_GRADES).click();
-        await this.clickJellyTot();
+        await this.common.clickJellyTot();
     }
 
     /**

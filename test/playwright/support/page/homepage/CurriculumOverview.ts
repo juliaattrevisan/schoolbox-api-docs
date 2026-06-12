@@ -2,6 +2,7 @@ import { expect } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import CurriculumSelector from "@schoolboxTest/playwright/support/page/curriculum/selector/CurriculumSelector";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 
 export default class CurriculumOverview {
     private tester: AcceptanceTester;
@@ -10,9 +11,8 @@ export default class CurriculumOverview {
     static readonly DATA_TEST_EMPTY_STATE_MAP_CURRICULUM_CODES = "map-curriculum-codes";
     static readonly DATA_TEST_FN_LIST_CONTAINER = "fn-list-container";
     static readonly DATA_TEST_MODIFY_CURRICULUM = "unit-planner-curriculum-modify-{folderId}";
-    static readonly ELEMENT_DETAILS_MODAL = ".reveal-modal.open";
-    static readonly ELEMENT_DETAILS_MODAL_TITLE = `${CurriculumOverview.ELEMENT_DETAILS_MODAL} h2`;
-    static readonly ELEMENT_DETAILS_MODAL_BREADCRUMB = `${CurriculumOverview.ELEMENT_DETAILS_MODAL} p.meta`;
+    static readonly ELEMENT_DETAILS_MODAL_TITLE = `${Common.SELECTOR_MODAL_DIALOG_OPEN} h2`;
+    static readonly ELEMENT_DETAILS_MODAL_BREADCRUMB = `${Common.SELECTOR_MODAL_DIALOG_OPEN} p.meta`;
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;

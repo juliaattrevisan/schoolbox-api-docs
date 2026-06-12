@@ -28,13 +28,14 @@ test.describe("Profile Page 3-dot Menu", () => {
         page,
     }) => {
         const profilePage = new ProfilePage(tester, page);
+        const common = new Common(page);
 
         tester.isGoingTo("navigate to the Jana Reed profile page as a superuser");
         await tester.loginAsAdmin();
         await profilePage.goto(janaReedId);
 
         tester.isGoingTo("check the profile page 3-dot menu options and urls for Jana Reed");
-        await profilePage.openDotMenu();
+        await common.clickJellyTot();
         await profilePage.checkDotMenuOptionsVisibility([
             { option: "modify", isVisible: true },
             { option: "impersonate", isVisible: true },
@@ -76,6 +77,7 @@ test.describe("Profile Page 3-dot Menu", () => {
         page,
     }) => {
         const profilePage = new ProfilePage(tester, page);
+        const common = new Common(page);
         const impersonatorPermissions = [
             { uid: jackColesId, service: 15, sid: 5, type: 3 },
             { uid: jackColesId, service: 15, sid: 6, type: 3 },
@@ -92,7 +94,7 @@ test.describe("Profile Page 3-dot Menu", () => {
             await profilePage.goto(janaReedId);
 
             tester.isGoingTo("check Jack Coles can impersonate Jana Reed and create a pastoral record");
-            await profilePage.openDotMenu();
+            await common.clickJellyTot();
             await profilePage.checkDotMenuOptionsVisibility([
                 { option: "modify", isVisible: false },
                 { option: "impersonate", isVisible: true },
