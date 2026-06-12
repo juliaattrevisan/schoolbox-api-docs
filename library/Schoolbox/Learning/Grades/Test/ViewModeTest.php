@@ -7,6 +7,8 @@ namespace Schoolbox\Learning\Grades\Test;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\Grades\ViewMode;
+use Schoolbox\Role;
+use Schoolbox\User;
 
 /**
  * Tests grades view mode request value handling.
@@ -40,10 +42,11 @@ class ViewModeTest extends TestCase
      */
     public function testStudentAndParentPreviewModesRenderReadOnlyProgressTicks(): void
     {
-        self::assertFalse(ViewMode::progressTicksReadOnly('', false));
-        self::assertFalse(ViewMode::progressTicksReadOnly(ViewMode::STAFF, false));
-        self::assertTrue(ViewMode::progressTicksReadOnly(ViewMode::STUDENT, false));
-        self::assertTrue(ViewMode::progressTicksReadOnly(ViewMode::PARENT, false));
+        $staff = $this->createUser(1, Role::STAFF);
+
+        self::assertFalse(ViewMode::progressTicksReadOnly($staff, $staff));
+        self::assertTrue(ViewMode::progressTicksReadOnly($staff, $this->createUser(2, Role::STUDENT)));
+        self::assertTrue(ViewMode::progressTicksReadOnly($staff, $this->createUser(3, Role::PARENT)));
     }
 
     /**
@@ -51,8 +54,9 @@ class ViewModeTest extends TestCase
      */
     public function testParentViewerProgressTicksAreReadOnly(): void
     {
-        self::assertTrue(ViewMode::progressTicksReadOnly('', true));
-        self::assertTrue(ViewMode::progressTicksReadOnly(ViewMode::STAFF, true));
+        $parent = $this->createUser(1, Role::PARENT);
+
+        self::assertTrue(ViewMode::progressTicksReadOnly($parent, $parent));
     }
 
     /**
@@ -60,9 +64,12 @@ class ViewModeTest extends TestCase
      */
     public function testCommentsAreReadOnlyOnlyWhenViewingAsAnotherUser(): void
     {
-        self::assertFalse(ViewMode::commentsReadOnly(123, 123));
-        self::assertFalse(ViewMode::commentsReadOnly(456, 456));
-        self::assertTrue(ViewMode::commentsReadOnly(123, 456));
+        $staff = $this->createUser(123, Role::STAFF);
+        $parent = $this->createUser(456, Role::PARENT);
+
+        self::assertFalse(ViewMode::commentsReadOnly($staff, $staff));
+        self::assertFalse(ViewMode::commentsReadOnly($parent, $parent));
+        self::assertTrue(ViewMode::commentsReadOnly($staff, $parent));
     }
 
     /**
@@ -95,5 +102,16 @@ class ViewModeTest extends TestCase
             'student' => ['student', ViewMode::STUDENT],
             'parent' => ['parent', ViewMode::PARENT],
         ];
+    }
+
+    /**
+     * Create a user with the requested role type.
+     *
+     * @param int $id User ID.
+     * @param string $roleType Role type.
+     */
+    private function createUser(int $id, string $roleType): User
+    {
+        return (new User())->setId($id)->setRole((new Role())->setType($roleType));
     }
 }

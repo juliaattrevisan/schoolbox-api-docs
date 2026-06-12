@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Grades;
 
+use Schoolbox\User;
+
 /**
  * Defines the supported server-side grade viewing modes.
  */
@@ -37,25 +39,25 @@ final class ViewMode
     /**
      * Progress ticks are read-only for parents and when staff preview the page as a different effective viewer.
      *
-     * @param string $viewMode Requested or resolved grade view mode.
-     * @param bool   $effectiveViewerIsParent Whether the effective viewer has a parent role.
+     * @param User $currentUser Logged-in user.
+     * @param User $effectiveViewer User whose visibility rules apply.
      * @return bool True when progress ticks should render as read-only.
      */
-    public static function progressTicksReadOnly(string $viewMode, bool $effectiveViewerIsParent): bool
+    public static function progressTicksReadOnly(User $currentUser, User $effectiveViewer): bool
     {
-        return $effectiveViewerIsParent || in_array($viewMode, [self::STUDENT, self::PARENT], true);
+        return $effectiveViewer->getRole()->isParent() || $currentUser->getId() !== $effectiveViewer->getId();
     }
 
     /**
      * Comments are read-only when staff preview the page as a different effective viewer.
      *
-     * @param int $currentUserId Logged-in user ID.
-     * @param int $effectiveViewerId User ID whose visibility rules apply.
+     * @param User $currentUser Logged-in user.
+     * @param User $effectiveViewer User whose visibility rules apply.
      * @return bool True when comments should render as read-only.
      */
-    public static function commentsReadOnly(int $currentUserId, int $effectiveViewerId): bool
+    public static function commentsReadOnly(User $currentUser, User $effectiveViewer): bool
     {
-        return $currentUserId !== $effectiveViewerId;
+        return $currentUser->getId() !== $effectiveViewer->getId();
     }
 
     /**

@@ -325,8 +325,8 @@ class Controller extends Base
                 'viewModes'           => ViewMode::values(),
                 'viewModeQuerySuffix' => $viewModeQuerySuffix,
                 'effectiveViewer'     => $effectiveViewer,
-                'progressTicksReadOnly' => ViewMode::progressTicksReadOnly($viewMode, $effectiveViewer->getRole()->isParent()),
-                'commentsReadOnly'    => ViewMode::commentsReadOnly($this->getUser()->getId(), $effectiveViewer->getId()),
+                'progressTicksReadOnly' => ViewMode::progressTicksReadOnly($this->getUser(), $effectiveViewer),
+                'commentsReadOnly'      => ViewMode::commentsReadOnly($this->getUser(), $effectiveViewer),
             ],
             "Grades for {$subject->getTitle()}",
             'grade'
@@ -566,7 +566,7 @@ class Controller extends Base
             }
         }
 
-        $progressTicksReadOnly = ViewMode::progressTicksReadOnly($viewMode, $effectiveViewer->getRole()->isParent());
+        $progressTicksReadOnly = ViewMode::progressTicksReadOnly($this->getUser(), $effectiveViewer);
         $tickTransitions = $progressTicksReadOnly
             ? []
             : ViewMode::tickTransitions($this->access->isInstructor($effectiveViewer, $subject));
