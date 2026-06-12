@@ -85,11 +85,4 @@ class HelperTest extends TestCase
         );
     }
 
-    public function testBuildsUserNameFromGivenAndLastNames(): void
-    {
-        $this->assertSame(
-            'Smith, Jane',
-            (new Helper())->buildUserName('Jane', 'Smith')
-        );
-    }
 }

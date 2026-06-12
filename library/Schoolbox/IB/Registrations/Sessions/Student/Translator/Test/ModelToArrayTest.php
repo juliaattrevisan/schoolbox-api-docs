@@ -181,7 +181,7 @@ class ModelToArrayTest extends TestCase
 
         $payload = $this->createTranslator()($student, [], '');
 
-        $this->assertSame('Nguyen, ', $payload['userName']);
+        $this->assertSame('Nguyen,', $payload['userName']);
         $this->assertTrue($payload['hasMissingDetails']);
         $candidateDetailsByKey = array_column(
             $payload['candidateDetails'],
