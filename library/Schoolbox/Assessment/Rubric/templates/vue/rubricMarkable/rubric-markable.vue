@@ -11,6 +11,7 @@ import { cloneDeep } from "es-toolkit";
 import type { MarkScheme } from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/markScheme";
 import type { User } from "@schoolboxLibrary/types/User";
 import FieldsetCollapsible from "@schoolboxVue/components/fieldset-collapsible.vue";
+import RubricCalculationDetailsModal from "./rubric-calculation-details-modal.vue";
 import type { RubricGrid, RubricMarkedGrid, RubricMarkedGridCapability, RubricMarkedGridIndicator } from "./types";
 import RmMarkableGrid from "./rm-markable-grid.vue";
 import { applyMarkScheme } from "./rubricUtils";
@@ -265,4 +266,6 @@ window.Vue.watch(
         name="rubric-total-mark"
         :value="derivedTotalMark?.humanReadableMark ?? ''"
     />
+
+    <rubric-calculation-details-modal :rubrics="rubrics" />
 </template>

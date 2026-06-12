@@ -1,0 +1,5 @@
+export const RUBRIC_OPEN_CALCULATION_DETAILS_MODAL = "RUBRIC__OPEN_CALCULATION_DETAILS_MODAL";
+
+export interface RubricDocumentEventHandlerMap {
+    [RUBRIC_OPEN_CALCULATION_DETAILS_MODAL]: CustomEvent<void>;
+}

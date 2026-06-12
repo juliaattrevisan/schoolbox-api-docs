@@ -1,0 +1,17 @@
+{##
+ # The Calculation Details button (for markable rubrics)
+ #}
+{% autoescape 'js' %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const viewButtonEl = document.querySelector('[data-view-rubric-calculation-details]');
+
+        viewButtonEl.addEventListener('click', () => {
+            document.dispatchEvent(new CustomEvent("RUBRIC__OPEN_CALCULATION_DETAILS_MODAL", {}));
+        });
+    });
+</script>
+{% endautoescape %}
+<p>
+    <button data-view-rubric-calculation-details class="full-width" type="button">Calculation Details</button>
+</p>
