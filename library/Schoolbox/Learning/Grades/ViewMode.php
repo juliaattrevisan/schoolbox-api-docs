@@ -77,4 +77,22 @@ final class ViewMode
             'teacherAssessed' => 'incomplete',
         ];
     }
+
+    /**
+     * IMPORTANT:
+     * Only staff in ViewMode::STAFF can view instructor marks in the grade report and transition progress ticks
+     * to 'teacherAssessed' status.  Folder write+ access alone is not enough: non-staff users can be granted
+     * write+ access and therefore satisfy Access::isInstructor(), but that should not grant them staff-only
+     * grades-report privileges.
+     *
+     * @param string $viewMode Current grade-report view mode.
+     * @param bool $effectiveViewerIsInstructor Whether the effective viewer has instructor access to the folder.
+     * @return bool True when the grade report should use instructor progress-tick transitions.
+     */
+    public static function canUseInstructorTickTransitions(
+        string $viewMode,
+        bool $effectiveViewerIsInstructor
+    ): bool {
+        return $viewMode === self::STAFF && $effectiveViewerIsInstructor;
+    }
 }

@@ -567,13 +567,20 @@ class Controller extends Base
         }
 
         $progressTicksReadOnly = ViewMode::progressTicksReadOnly($this->getUser(), $effectiveViewer);
+        $canUseInstructorTickTransitions = ViewMode::canUseInstructorTickTransitions(
+            $viewMode,
+            $this->access->isInstructor($effectiveViewer, $subject)
+        );
         $tickTransitions = $progressTicksReadOnly
             ? []
-            : ViewMode::tickTransitions($this->access->isInstructor($effectiveViewer, $subject));
+            : ViewMode::tickTransitions($canUseInstructorTickTransitions);
 
         /**
-         * Only staff can view instructor marks in the grade report
-         * This avoids a student gaining write+ access to a page (becoming an "instructor") then seeing the marks
+         * IMPORTANT:
+         * Only staff in ViewMode::STAFF can view instructor marks in the grade report and transition progress ticks
+         * to 'teacherAssessed' status.  Folder write+ access alone is not enough: non-staff users can be granted
+         * write+ access and therefore satisfy Access::isInstructor(), but that should not grant them staff-only
+         * grades-report privileges.
          */
         $this->response = $this->responseAsJson([
             'status'  => 200,

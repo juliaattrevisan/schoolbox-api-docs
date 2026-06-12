@@ -91,6 +91,18 @@ class ViewModeTest extends TestCase
     }
 
     /**
+     * Non-staff users with folder write access still use learner tick transitions in the grade report.
+     */
+    public function testInstructorTickTransitionsRequireStaffViewMode(): void
+    {
+        self::assertTrue(ViewMode::canUseInstructorTickTransitions(ViewMode::STAFF, true));
+        self::assertFalse(ViewMode::canUseInstructorTickTransitions('', true));
+        self::assertFalse(ViewMode::canUseInstructorTickTransitions(ViewMode::STUDENT, true));
+        self::assertFalse(ViewMode::canUseInstructorTickTransitions(ViewMode::PARENT, true));
+        self::assertFalse(ViewMode::canUseInstructorTickTransitions(ViewMode::STAFF, false));
+    }
+
+    /**
      * Provide supported request values and their normalized modes.
      *
      * @return array<string, array{string, string}>
