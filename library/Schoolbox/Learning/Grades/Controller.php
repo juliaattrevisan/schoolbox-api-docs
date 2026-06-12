@@ -222,10 +222,10 @@ class Controller extends Base
             'mailHandle'             => $this->getSession()->get('mailhandle'),
             'currentUser'            => $this->getUser(),
             'yearUrl'                => $this->getYearUrl($viewee->getId()),
-            'viewMode'               => $viewModeContext->viewMode,
+            'viewMode'               => $viewModeContext->viewModeValue->value ?? '',
             'viewModes'              => ViewMode::values(),
-            'viewModeQuerySuffix'    => $viewModeContext->viewMode !== ''
-                ? '?viewMode=' . rawurlencode($viewModeContext->viewMode)
+            'viewModeQuerySuffix'    => $viewModeContext->viewModeValue !== null
+                ? '?viewMode=' . rawurlencode($viewModeContext->viewModeValue->value)
                 : '',
             'effectiveViewer'        => $viewModeContext->effectiveViewer,
             'canViewInstructorMarks' => $viewModeContext->canViewInstructorMarks,
@@ -264,8 +264,8 @@ class Controller extends Base
             $viewee,
             is_string($requestViewMode) ? $requestViewMode : null
         );
-        $viewModeQuerySuffix = $viewModeContext->viewMode !== ''
-            ? '?viewMode=' . rawurlencode($viewModeContext->viewMode)
+        $viewModeQuerySuffix = $viewModeContext->viewModeValue !== null
+            ? '?viewMode=' . rawurlencode($viewModeContext->viewModeValue->value)
             : '';
 
         $route       = $this->routeGenerator->generate('learningGrades.postReport', [
@@ -297,7 +297,7 @@ class Controller extends Base
         $markSchemeFactory = new Factory($this->getConfigLoader());
         $overallMarkScheme = $markSchemeFactory->spawnForFolder(
             $subject,
-            $viewModeContext->viewMode === ViewMode::STAFF
+            $viewModeContext->viewModeValue === ViewModeValue::STAFF
         );
         $markbook = new Markbook($assessments, $overallMarkScheme, $viewModeContext->effectiveViewer);
 
@@ -337,7 +337,7 @@ class Controller extends Base
                 'markbook'            => $markbook,
                 'conversation'        => $conversation,
                 'yearUrl'             => $yearUrl,
-                'viewMode'            => $viewModeContext->viewMode,
+                'viewMode'            => $viewModeContext->viewModeValue->value ?? '',
                 'viewModes'           => ViewMode::values(),
                 'viewModeQuerySuffix' => $viewModeQuerySuffix,
                 'effectiveViewer'     => $viewModeContext->effectiveViewer,
@@ -408,7 +408,7 @@ class Controller extends Base
         // * students (if the config var is on, and their personal grade average setting is on)
         // We no longer show the grade graph at all if there's no comparative grades.
         $hasPermissionsAndSettings =
-            $viewModeContext->viewMode === ViewMode::STAFF
+            $viewModeContext->viewModeValue === ViewModeValue::STAFF
             || ($viewee->getDisplayGradeGraph() && $this->isTabEnabled('graph', $subject));
         $hasDataToShow = false;
 
@@ -434,7 +434,7 @@ class Controller extends Base
         $markSchemeFactory = new Factory($this->getConfigLoader());
         $overallMarkScheme = $markSchemeFactory->spawnForFolder(
             $subject,
-            $viewModeContext->viewMode === ViewMode::STAFF
+            $viewModeContext->viewModeValue === ViewModeValue::STAFF
         );
         $filteredMarkbook = new Markbook($assessments, $overallMarkScheme, $viewModeContext->effectiveViewer)
             ->sortAssessables(new AssessmentComparator($viewee));
@@ -522,7 +522,8 @@ class Controller extends Base
         $longitudinalRubric   = [];
         $rubricAssessmentList = [];
         if ($canSeeRubricGrade || $canSeeCapabilityGrade || $canSeeProgression) {
-            $includeComparison = $viewModeContext->viewMode === ViewMode::STAFF || $viewee->getDisplayGradeGraph();
+            $includeComparison = $viewModeContext->viewModeValue === ViewModeValue::STAFF
+                || $viewee->getDisplayGradeGraph();
             $longitudinalRubric   = $this->getLongitudinalRubricData(
                 $assessments,
                 $viewee,
@@ -615,7 +616,7 @@ class Controller extends Base
                     $viewModeContext->progressTicksReadOnly
                     ? []
                     : ViewMode::tickTransitions(
-                        $viewModeContext->viewMode,
+                        $viewModeContext->viewModeValue,
                         $this->access->isInstructor($viewModeContext->effectiveViewer, $subject)
                     )
                 ),

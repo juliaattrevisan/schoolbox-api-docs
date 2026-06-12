@@ -11,6 +11,7 @@ use Schoolbox\External\User as ExternalUser;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Grades\ViewMode;
 use Schoolbox\Learning\Grades\ViewModeContext;
+use Schoolbox\Learning\Grades\ViewModeValue;
 use Schoolbox\Role;
 use Schoolbox\User;
 
@@ -23,10 +24,10 @@ class ViewModeTest extends TestCase
      * ViewMode accepts each supported request value unchanged.
      *
      * @param string $input Request value to normalize.
-     * @param string $expected Expected ViewMode constant.
+     * @param ViewModeValue $expected Expected view mode value.
      */
     #[DataProvider('validModeProvider')]
-    public function testFromRequestValueAcceptsValidModes(string $input, string $expected): void
+    public function testFromRequestValueAcceptsValidModes(string $input, ViewModeValue $expected): void
     {
         self::assertSame($expected, ViewMode::fromRequestValue($input));
     }
@@ -92,11 +93,11 @@ class ViewModeTest extends TestCase
             'teacherAssessed' => 'incomplete',
         ];
 
-        self::assertSame($instructorTransitions, ViewMode::tickTransitions(ViewMode::STAFF, true));
-        self::assertSame($learnerTransitions, ViewMode::tickTransitions('', true));
-        self::assertSame($learnerTransitions, ViewMode::tickTransitions(ViewMode::STUDENT, true));
-        self::assertSame($learnerTransitions, ViewMode::tickTransitions(ViewMode::PARENT, true));
-        self::assertSame($learnerTransitions, ViewMode::tickTransitions(ViewMode::STAFF, false));
+        self::assertSame($instructorTransitions, ViewMode::tickTransitions(ViewModeValue::STAFF, true));
+        self::assertSame($learnerTransitions, ViewMode::tickTransitions(null, true));
+        self::assertSame($learnerTransitions, ViewMode::tickTransitions(ViewModeValue::STUDENT, true));
+        self::assertSame($learnerTransitions, ViewMode::tickTransitions(ViewModeValue::PARENT, true));
+        self::assertSame($learnerTransitions, ViewMode::tickTransitions(ViewModeValue::STAFF, false));
     }
 
     /**
@@ -110,7 +111,7 @@ class ViewModeTest extends TestCase
 
         $this->assertViewModeContext(
             $viewMode->getViewModeContext($staff, $student, null),
-            ViewMode::STAFF,
+            ViewModeValue::STAFF,
             $staff,
             true,
             false,
@@ -118,7 +119,7 @@ class ViewModeTest extends TestCase
         );
         $this->assertViewModeContext(
             $viewMode->getViewModeContext($staff, $student, 'guardian'),
-            ViewMode::STAFF,
+            ViewModeValue::STAFF,
             $staff,
             true,
             false,
@@ -136,8 +137,8 @@ class ViewModeTest extends TestCase
         $viewMode = new ViewMode($this->createExternalUserStub());
 
         $this->assertViewModeContext(
-            $viewMode->getViewModeContext($student, $viewee, ViewMode::STAFF),
-            '',
+            $viewMode->getViewModeContext($student, $viewee, ViewModeValue::STAFF->value),
+            null,
             $student,
             false,
             false,
@@ -155,8 +156,8 @@ class ViewModeTest extends TestCase
         $viewMode = new ViewMode($this->createExternalUserStub());
 
         $this->assertViewModeContext(
-            $viewMode->getViewModeContext($staff, $student, ViewMode::STUDENT),
-            ViewMode::STUDENT,
+            $viewMode->getViewModeContext($staff, $student, ViewModeValue::STUDENT->value),
+            ViewModeValue::STUDENT,
             $student,
             false,
             true,
@@ -184,8 +185,8 @@ class ViewModeTest extends TestCase
         $viewMode = new ViewMode($externalUser);
 
         $this->assertViewModeContext(
-            $viewMode->getViewModeContext($staff, $student, ViewMode::PARENT),
-            ViewMode::PARENT,
+            $viewMode->getViewModeContext($staff, $student, ViewModeValue::PARENT->value),
+            ViewModeValue::PARENT,
             $parent,
             false,
             true,
@@ -197,14 +198,14 @@ class ViewModeTest extends TestCase
     /**
      * Provide supported request values and their normalized modes.
      *
-     * @return array<string, array{string, string}>
+     * @return array<string, array{string, ViewModeValue}>
      */
     public static function validModeProvider(): array
     {
         return [
-            'staff' => ['staff', ViewMode::STAFF],
-            'student' => ['student', ViewMode::STUDENT],
-            'parent' => ['parent', ViewMode::PARENT],
+            'staff' => ['staff', ViewModeValue::STAFF],
+            'student' => ['student', ViewModeValue::STUDENT],
+            'parent' => ['parent', ViewModeValue::PARENT],
         ];
     }
 
@@ -243,7 +244,7 @@ class ViewModeTest extends TestCase
     /**
      * Assert that resolved view-mode context exposes the expected typed properties.
      *
-     * @param string $viewMode Expected view mode value.
+     * @param null|ViewModeValue $viewModeValue Expected view mode value.
      * @param User $effectiveViewer Expected effective viewer.
      * @param bool $canViewInstructorMarks Whether instructor marks should be visible.
      * @param bool $progressTicksReadOnly Whether progress ticks are read-only.
@@ -251,13 +252,13 @@ class ViewModeTest extends TestCase
      */
     private function assertViewModeContext(
         ViewModeContext $context,
-        string $viewMode,
+        ?ViewModeValue $viewModeValue,
         User $effectiveViewer,
         bool $canViewInstructorMarks,
         bool $progressTicksReadOnly,
         bool $commentsReadOnly
     ): void {
-        self::assertSame($viewMode, $context->viewMode);
+        self::assertSame($viewModeValue, $context->viewModeValue);
         self::assertSame($effectiveViewer, $context->effectiveViewer);
         self::assertSame($canViewInstructorMarks, $context->canViewInstructorMarks);
         self::assertSame($progressTicksReadOnly, $context->progressTicksReadOnly);

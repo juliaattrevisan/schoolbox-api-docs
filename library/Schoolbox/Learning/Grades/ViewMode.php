@@ -11,19 +11,15 @@ use Schoolbox\Role;
 use Schoolbox\User;
 
 /**
- * Defines the supported server-side grade viewing modes.
+ * Resolves and applies server-side grade viewing modes.
  *
  * IMPORTANT:
- * Only staff in ViewMode::STAFF can view instructor marks and transition progress ticks to 'teacherAssessed' status.
+ * Only staff in ViewModeValue::STAFF can view instructor marks and transition progress ticks to 'teacherAssessed' status.
  * Folder write+ access alone is not enough: non-staff users can be granted write+ access and therefore satisfy
  * Access::isInstructor(), but that should not grant them staff-only grades-report privileges.
  */
 final class ViewMode
 {
-    public const string STAFF = 'staff';
-    public const string STUDENT = 'student';
-    public const string PARENT = 'parent';
-
     /**
      * @param ExternalUser $externalUser
      */
@@ -37,9 +33,9 @@ final class ViewMode
      *
      * @param null|string $value Requested view mode value.
      */
-    public static function fromRequestValue(?string $value): ?string
+    public static function fromRequestValue(?string $value): ?ViewModeValue
     {
-        return in_array($value, self::values(), true) ? $value : null;
+        return $value === null ? null : ViewModeValue::tryFrom($value);
     }
 
     /**
@@ -49,7 +45,10 @@ final class ViewMode
      */
     public static function values(): array
     {
-        return [self::STAFF, self::STUDENT, self::PARENT];
+        return array_map(
+            static fn (ViewModeValue $viewModeValue): string => $viewModeValue->value,
+            ViewModeValue::cases()
+        );
     }
 
     /**
@@ -62,17 +61,17 @@ final class ViewMode
     public function getViewModeContext(User $currentUser, User $viewee, ?string $requestViewMode): ViewModeContext
     {
         if ($currentUser->getRole()->isStaff()) {
-            $viewMode = self::fromRequestValue($requestViewMode) ?? self::STAFF;
-            $effectiveViewer = $this->getEffectiveViewer($currentUser, $viewee, $viewMode);
-            $canViewInstructorMarks = $viewMode === self::STAFF;
+            $viewModeValue = self::fromRequestValue($requestViewMode) ?? ViewModeValue::STAFF;
+            $effectiveViewer = $this->getEffectiveViewer($currentUser, $viewee, $viewModeValue);
+            $canViewInstructorMarks = $viewModeValue === ViewModeValue::STAFF;
         } else {
-            $viewMode = '';
+            $viewModeValue = null;
             $effectiveViewer = $currentUser;
             $canViewInstructorMarks = false;
         }
 
         return new ViewModeContext(
-            $viewMode,
+            $viewModeValue,
             $effectiveViewer,
             $canViewInstructorMarks,
             self::progressTicksReadOnly($currentUser, $effectiveViewer),
@@ -88,11 +87,11 @@ final class ViewMode
      *
      * @param User $currentUser Logged-in user.
      * @param User $student Student whose grades are being viewed.
-     * @param string $mode One of the ViewMode constants. Callers must pre-validate the
+     * @param ViewModeValue $viewModeValue Requested view mode value. Callers must pre-validate the
      *                     requested value via ViewMode::fromRequestValue().
      * @throws InvalidArgumentException If called for a non-staff user or given an unknown mode.
      */
-    public function getEffectiveViewer(User $currentUser, User $student, string $mode): User
+    public function getEffectiveViewer(User $currentUser, User $student, ViewModeValue $viewModeValue): User
     {
         if (!$currentUser->getRole()->isStaff()) {
             throw new InvalidArgumentException(
@@ -100,14 +99,14 @@ final class ViewMode
             );
         }
 
-        switch ($mode) {
-            case self::STAFF:
+        switch ($viewModeValue) {
+            case ViewModeValue::STAFF:
                 return $currentUser;
 
-            case self::STUDENT:
+            case ViewModeValue::STUDENT:
                 return $student;
 
-            case self::PARENT:
+            case ViewModeValue::PARENT:
                 $this->externalUser->loadParents([$student]);
                 $parent = $student->getParents()?->first()
                     ?? new User()->setId(0)->setRole(new Role()->setType(Role::PARENT));
@@ -120,10 +119,9 @@ final class ViewMode
                 );
 
                 return $parent;
-
-            default:
-                throw new InvalidArgumentException("Unexpected value '$mode' for \$mode.");
         }
+
+        throw new InvalidArgumentException("Unexpected value '{$viewModeValue->value}' for \$viewModeValue.");
     }
 
     /**
@@ -156,13 +154,13 @@ final class ViewMode
      * user clicks the tick.  E.g. When the status is 'incomplete', when the user clicks the tick, the next status
      * depends on whether the user is an instructor.  If instructor, 'teacherAssessed'. If student, 'selfAssessed'.
      *
-     * @param string $viewMode Current grade-report view mode.
+     * @param null|ViewModeValue $viewModeValue Current grade-report view mode.
      * @param bool $effectiveViewerIsInstructor Whether the effective viewer has instructor access to the folder.
      * @return array{incomplete: string, selfAssessed: string, teacherAssessed: string}
      */
-    public static function tickTransitions(string $viewMode, bool $effectiveViewerIsInstructor): array
+    public static function tickTransitions(?ViewModeValue $viewModeValue, bool $effectiveViewerIsInstructor): array
     {
-        $canUseInstructorTransitions = $viewMode === self::STAFF && $effectiveViewerIsInstructor;
+        $canUseInstructorTransitions = $viewModeValue === ViewModeValue::STAFF && $effectiveViewerIsInstructor;
 
         return [
             'incomplete'      => $canUseInstructorTransitions ? 'teacherAssessed' : 'selfAssessed',
