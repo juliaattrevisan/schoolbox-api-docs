@@ -24,8 +24,6 @@ use Schoolbox\External\Event\Model as EventModel;
 use Schoolbox\External\Event\Overrides\Mapper as OverridesMapper;
 use Schoolbox\External\Event\Overrides\Model as OverrideModel;
 
-require_once dirname(__DIR__) . '/Classes.php';
-
 /**
  * Tests for Veracross timetable class import behaviour.
  */
