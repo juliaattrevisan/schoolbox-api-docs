@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import locale from "@js/terminology/rosettaStone";
+import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import { RUBRIC_OPEN_CALCULATION_DETAILS_MODAL } from "../rubricEvent";
+import { useRubricMarks } from "./composable/useRubricMarks";
 import type { RubricGrid, RubricMarkedGrid } from "./types";
+import { applyMarkScheme, deriveRubricMark } from "./rubricUtils";
 
 interface Props {
     rubrics: {
@@ -11,6 +14,32 @@ interface Props {
     }[];
 }
 const props = defineProps<Props>();
+
+const { derivedRubricMarks } = useRubricMarks(
+    // The derived total mark should always be a percentage in the context of this modal
+    { mode: MarkTypeSlug.PERCENT },
+    window.Vue.toRef(props.rubrics),
+);
+
+const rubricInfo = window.Vue.computed(() =>
+    props.rubrics.map(({ rubric, markedGrid }) => {
+        const derivedMark = derivedRubricMarks.value.find((m) => m.rubricId === rubric.id)!;
+
+        // Always display using the total mark scheme in this modal
+        const scaledMark = deriveRubricMark(markedGrid);
+        const { humanReadableMark } = applyMarkScheme(scaledMark, rubric.derivedMaxValue, {
+            mode: MarkTypeSlug.TOTAL,
+            conf: { totalMark: rubric.derivedMaxValue },
+        });
+
+        return {
+            title: rubric.title,
+            scaledWeight: derivedMark.scaledWeightRounded,
+            humanReadableMark,
+            normalisedMark: markedGrid.normalisedMark,
+        };
+    }),
+);
 
 const open = window.Vue.ref(false);
 
@@ -47,6 +76,17 @@ window.Vue.onUnmounted(() => {
             100.
         </p>
 
-        TODO
+        <div v-for="(rubric, index) in rubricInfo" :key="index">
+            <strong>
+                {{ rubric.title.length ? rubric.title : `Rubric ${index + 1}` }}
+                -
+                {{ rubric.scaledWeight }}% Weighting
+            </strong>
+
+            <p>({{ rubric.humanReadableMark }}) × 100 = {{ rubric.normalisedMark }}%</p>
+        </div>
+
+        <strong>Combined</strong>
+        <p>TODO</p>
     </basic-modal>
 </template>

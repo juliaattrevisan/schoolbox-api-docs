@@ -104,10 +104,7 @@ const rubrics = window.Vue.ref<RubricData[]>(
     }),
 );
 
-const { getScaledRubricWeight, derivedTotalMark, totalRubricWeight } = useRubricMarks(
-    props.assessmentMarkScheme,
-    rubrics,
-);
+const { derivedRubricMarks, derivedTotalMark, totalRubricWeight } = useRubricMarks(props.assessmentMarkScheme, rubrics);
 
 /**
  * When the combined total mark changes, reflect that in the mark input & overall assign from button
@@ -134,7 +131,7 @@ window.Vue.watch(
             <!-- Append the weighting, if it matters -->
             <template v-if="rubrics.length > 1 && totalRubricWeight > 0">
                 -
-                {{ getScaledRubricWeight(rubric.rubric) }}% Weighting
+                {{ derivedRubricMarks.find((m) => m.rubricId === rubric.rubric.id)?.scaledWeightRounded }}% Weighting
             </template>
         </template>
 

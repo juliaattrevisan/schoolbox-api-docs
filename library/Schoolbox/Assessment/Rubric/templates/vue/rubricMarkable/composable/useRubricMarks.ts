@@ -52,6 +52,51 @@ export function useRubricMarks(
     });
 
     /**
+     * Calculate the derived mark for each rubric grid after applying the relevant weight
+     */
+    const derivedRubricMarks = window.Vue.computed(() => {
+        return rubrics.value.map(({ rubric, markedGrid }) => {
+            let scaledWeight = 0;
+            if (totalRubricWeight.value > 0) {
+                // rubrics without a weight are equivalent to 0 weight
+                scaledWeight = (rubric.weight ?? 0) / totalRubricWeight.value;
+            }
+
+            let scaledWeightRounded = scaledWeight * 100;
+            if (scaledWeightRounded % 1 !== 0) {
+                scaledWeightRounded = parseFloat(scaledWeightRounded.toFixed(2));
+            }
+
+            const baseInfo = {
+                rubricId: rubric.id,
+                scaledWeight,
+                scaledWeightRounded,
+            };
+
+            if (markedGrid.normalisedMark === null) {
+                return {
+                    ...baseInfo,
+                    weightedMark: null,
+                    weightedMarkRounded: null,
+                };
+            }
+
+            const weightedMark = markedGrid.normalisedMark * scaledWeight;
+
+            let weightedMarkRounded = weightedMark;
+            if (weightedMarkRounded % 1 !== 0) {
+                weightedMarkRounded = parseFloat(weightedMarkRounded.toFixed(2));
+            }
+
+            return {
+                ...baseInfo,
+                weightedMark,
+                weightedMarkRounded,
+            };
+        });
+    });
+
+    /**
      * The combined total mark across all rubric grids, derived from the individual grid totals and rubric weights.
      * Generally this also represents the final mark for the assessment, assuming it hasn't been customised separately.
      */
@@ -61,27 +106,14 @@ export function useRubricMarks(
             return null;
         }
 
-        let totalNormalisedMark = 0;
-        let hasMeaningfulMark = false;
-
-        for (const { rubric, markedGrid } of rubrics.value) {
-            if (markedGrid.normalisedMark === null) {
-                continue;
-            }
-
-            hasMeaningfulMark = true;
-
-            let weightMultiplier = 0;
-            if (totalRubricWeight.value > 0) {
-                // rubrics without a weight are equivalent to 0 weight
-                weightMultiplier = (rubric.weight ?? 0) / totalRubricWeight.value;
-            }
-
-            totalNormalisedMark += markedGrid.normalisedMark * weightMultiplier;
+        const meaningfulWeightedMarks = derivedRubricMarks.value.filter((m) => m.weightedMark !== null);
+        if (meaningfulWeightedMarks.length === 0) {
+            return null;
         }
 
-        if (!hasMeaningfulMark) {
-            return null;
+        let totalNormalisedMark = 0;
+        for (const { weightedMark } of meaningfulWeightedMarks) {
+            totalNormalisedMark += weightedMark ?? 0;
         }
 
         // figure out the 'scaled mark' so we can apply the mark scheme to it
@@ -104,29 +136,10 @@ export function useRubricMarks(
         };
     });
 
-    /**
-     * Calculate a scaled rubric weight and round to 2dp if necessary for display
-     * @param rubric the rubric to calculate the scaled weight for
-     * @returns scaled weight, or 0 if it doesn't have a weight
-     */
-    function getScaledRubricWeight(rubric: RubricGrid): number {
-        if (totalRubricWeight.value <= 0) {
-            return 0;
-        }
-
-        const weight = ((rubric.weight ?? 0) / totalRubricWeight.value) * 100;
-
-        if (weight % 1 !== 0) {
-            return parseFloat(weight.toFixed(2));
-        }
-
-        return weight;
-    }
-
     return {
         totalRubricWeight,
         derivedMaxMark,
+        derivedRubricMarks,
         derivedTotalMark,
-        getScaledRubricWeight,
     };
 }
