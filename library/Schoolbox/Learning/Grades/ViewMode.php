@@ -119,9 +119,9 @@ final class ViewMode
                 );
 
                 return $parent;
-        }
 
-        throw new InvalidArgumentException("Unexpected value '{$viewModeValue->value}' for \$viewModeValue.");
+            // No default case is needed because the switch is on an enum.
+        }
     }
 
     /**
