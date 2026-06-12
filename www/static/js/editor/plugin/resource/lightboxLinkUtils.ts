@@ -12,5 +12,5 @@ type EditorWithSourceElement = Editor & {
  * @returns - the rel attribute value
  */
 export function getLightboxRel(editor: Editor): string {
-    return `lightbox[${(editor as EditorWithSourceElement).sourceElement?.id ?? ""}]`;
+    return `lightbox[${(editor as EditorWithSourceElement).sourceElement?.id ?? editor.id}]`;
 }

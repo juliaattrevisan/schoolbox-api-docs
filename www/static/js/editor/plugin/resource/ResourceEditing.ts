@@ -72,7 +72,7 @@ export default class ResourceEditing extends Plugin {
                 key: LIGHTBOX_LINK_ATTRIBUTE,
             },
             view: (rel, { writer }, { item }: { item: Element }) => {
-                if (!item.hasAttribute("linkHref")) {
+                if (rel === null || rel === undefined || !item.hasAttribute("linkHref")) {
                     return null;
                 }
                 const linkElement = writer.createAttributeElement(
