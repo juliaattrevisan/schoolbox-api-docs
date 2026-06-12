@@ -384,7 +384,7 @@ window.Vue.onMounted((): void => {
                 </a>
             </li>
             <li v-if="props.candidateNumberUpdateRoute !== undefined">
-                <a :href="candidateNumberUpdateRoute" class="sbx-button--has-icon">
+                <a :href="props.candidateNumberUpdateRoute" class="sbx-button--has-icon">
                     <sbx-icon name="modify"></sbx-icon>
                     Update Candidate Numbers
                 </a>
