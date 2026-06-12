@@ -10,8 +10,13 @@
         <div class="small-12 island">
             <h2 class="subheader">Update Candidate Numbers - {{ sessionTitle }}</h2>
             {% if candidates is empty %}
-                <p class="meta">No students are currently included in this report.</p>
-                <a class="button" href="{{ _routes.report }}">Return to Report</a>
+                <div class="empty-state-flex-centered f-no-margins">
+                    <sbx-icon name="integration-student" size="2.5rem"></sbx-icon>
+                    <slot>
+                        <p>No students are currently included in this report.</p>
+                        <a class="button" href="{{ _routes.report }}">Return to Report</a>
+                    </slot>
+                </div>
             {% else %}
                 <form id="ib-candidate-numbers-form" action="{{ _routes.save }}" method="post">
                     <section>
