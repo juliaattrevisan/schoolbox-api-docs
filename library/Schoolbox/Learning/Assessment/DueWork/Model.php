@@ -104,13 +104,6 @@ class Model extends AbstractAssessment implements ISelfAssessable
     protected $capabilityGradeGroup;
 
     /**
-     * This DueWork's Rubric has Use Mark Range on
-     *
-     * @var bool
-     */
-    protected $useMarkRange = false;
-
-    /**
      * Only relevant if this DueWork's MarkType is 'TotalMark'
      * The max mark as per $this->markType
      *
@@ -284,7 +277,6 @@ class Model extends AbstractAssessment implements ISelfAssessable
         $this->selfReviewability      = $source->selfReviewability;
         $this->showSubmittedOnly      = $source->showSubmittedOnly;
         $this->similarityCheckEnabled = $source->similarityCheckEnabled;
-        $this->useMarkRange           = $source->useMarkRange;
         $this->useRubric              = $source->useRubric;
         $this->enableOffline          = $source->enableOffline;
         $this->enableFiles            = $source->enableFiles;
@@ -958,24 +950,6 @@ class Model extends AbstractAssessment implements ISelfAssessable
     public function setCapabilityMarkType(?MarkType $capabilityMarkType): self
     {
         $this->capabilityMarkType = $capabilityMarkType;
-        return $this;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getUseMarkRange(): bool
-    {
-        return $this->useMarkRange;
-    }
-
-    /**
-     * @param boolean $useMarkRange
-     * @return $this
-     */
-    public function setUseMarkRange(bool $useMarkRange)
-    {
-        $this->useMarkRange = $useMarkRange;
         return $this;
     }
 

@@ -45,7 +45,7 @@ class ModelToArray
         $languageCodes = $this->helper->extractCodes($user?->getLanguageCollection());
         $nationalityCodes = $this->helper->extractCodes($user?->getNationalityCollection());
         $dateOfBirth = $this->helper->formatDateOfBirth($externalStudent['StudentBirthDate'] ?? null);
-        $userName = $this->helper->buildUserName($givenName, $lastName);
+        $userName = $this->helper->normalise($user?->formatName('{lastname}, {preferredname}'));
 
         $requiredDetails = [
             'userName' => $userName,

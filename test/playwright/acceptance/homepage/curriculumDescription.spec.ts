@@ -19,7 +19,6 @@ import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 
 test.describe.serial("Curriculum Description Component Tests", () => {
     let homepage: Homepage;
-    let curriculumDescription: CurriculumDescription;
     let curriculumDescriptionComponent: Locator;
     let curriculumDescriptionComponentId: number;
     const COMPONENT_TITLE = "Test Curriculum Description Automation";
@@ -44,7 +43,6 @@ test.describe.serial("Curriculum Description Component Tests", () => {
      */
     test.beforeEach(async ({ tester, page }) => {
         homepage = new Homepage(tester, page);
-        curriculumDescription = new CurriculumDescription(tester, page);
         await tester.loginAsAdmin();
     });
 
@@ -59,7 +57,7 @@ test.describe.serial("Curriculum Description Component Tests", () => {
         await homepage.clickComponentsTab(Homepage.ELEMENT_LOCK_TOGGLE);
         await Homepage.clickComponentSettings(curriculumDescriptionComponent);
         tester.isGoingTo("Add title and select curriculum code");
-        await curriculumDescription.addTitle(curriculumDescriptionComponent, COMPONENT_TITLE);
+        await Homepage.typeComponentHeading(curriculumDescriptionComponent, COMPONENT_TITLE);
         tester.isGoingTo("Select curriculum code and update");
         await CurriculumDescription.setCurriculumCode(curriculumDescriptionComponent, CURRICULUM_ACELA1556.code);
         tester.isGoingTo("Verify selected curriculum code and description");

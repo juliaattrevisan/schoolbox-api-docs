@@ -39,6 +39,7 @@ const capabilityMaxValueModel = defineModel<RubricGridCapability["maxValue"] | n
 const emit = defineEmits<{
     move: [direction: -1 | 1];
     addIndicatorKeydown: [event: KeyboardEvent, nameRef: Ref<string, string>];
+    addIndicatorBlur: [nameRef: Ref<string, string>];
 }>();
 
 const componentId = window.Vue.useId();
@@ -63,6 +64,14 @@ const newIndicatorName = window.Vue.ref("");
  */
 function onAddIndicatorKeydown(event: KeyboardEvent): void {
     emit("addIndicatorKeydown", event, newIndicatorName);
+}
+
+/**
+ * When the focus is removed from the "add indicator" input, add a new indicator to the capability
+ * (this needs to exist as the ref can't be passed directly when inside <template>)
+ */
+function onAddIndicatorBlur(): void {
+    emit("addIndicatorBlur", newIndicatorName);
 }
 
 /**
@@ -203,6 +212,7 @@ window.Vue.onMounted(() => {
                 :maxlength="MAX_INDICATOR_LENGTH"
                 :disabled="isCreating || undefined"
                 @keydown="onAddIndicatorKeydown"
+                @blur="onAddIndicatorBlur"
             ></textarea>
         </th>
     </tr>

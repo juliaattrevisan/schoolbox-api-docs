@@ -18,6 +18,8 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
+use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
@@ -31,11 +33,25 @@ class Controller extends Base
     /**
      * Number of minutes this source csv should exist
      */
-    private const CSV_DURATION = 15;
+    private const int CSV_DURATION = 15;
 
 
     /**
      * Constructor.
+     *
+     * @param MapperProxy $assessmentMapperProxy
+     * @param FilesystemProxy $filesystemProxy
+     * @param \Schoolbox\Error\Mapper $errorMapper
+     * @param \Schoolbox\Learning\Assessment\WorkType\Mapper $worktypeMapper
+     * @param \Schoolbox\UserMapper $userMapper
+     * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
+     * @param \Schoolbox\Resource\Storage\Mapper $storageMapper
+     * @param SubmissionBoxMapper $submissionBoxMapper
+     * @param ReturnedWorkMapper $returnedWorkMapper
+     * @param \Schoolbox\Learning\Assessment\DataModel\Reporting\Mapper $reportingMapper
+     * @param StateMapper $stateMapper
+     * @param IFeedbackDataSource $feedbackDataSource
+     * @param RosettaStone $rosettaStone
      */
     public function __construct(
         private MapperProxy $assessmentMapperProxy,
@@ -47,6 +63,9 @@ class Controller extends Base
         private \Schoolbox\Resource\Storage\Mapper $storageMapper,
         private SubmissionBoxMapper $submissionBoxMapper,
         private ReturnedWorkMapper $returnedWorkMapper,
+        private \Schoolbox\Learning\Assessment\DataModel\Reporting\Mapper $reportingMapper,
+        private StateMapper $stateMapper,
+        private IFeedbackDataSource $feedbackDataSource,
         protected RosettaStone $rosettaStone,
     ) {
     }
@@ -55,6 +74,11 @@ class Controller extends Base
     /**
      * Provide input form for configuration and async upload for the csv file
      * Also link to a csv template that users can download and follow
+     *
+     * @return void
+     * @throws Error
+     * @throws RouteNotFound
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function getIndex(): void
     {
@@ -89,6 +113,7 @@ class Controller extends Base
     /**
      * Process in planning mode
      *
+     * @return void
      * @throws Deleted
      * @throws Error
      * @throws Exception
@@ -119,6 +144,9 @@ class Controller extends Base
             $this->folderMapper,
             $this->submissionBoxMapper,
             $this->returnedWorkMapper,
+            $this->reportingMapper,
+            $this->stateMapper,
+            $this->feedbackDataSource,
             $this->rosettaStone,
             trim((string)$this->getConfigLoader()->get('date_local')),
             $settings['assessmentTitle'],
@@ -145,6 +173,7 @@ class Controller extends Base
     /**
      * Process in perform mode
      *
+     * @return void
      * @throws Deleted
      * @throws Error
      * @throws FilesystemException
@@ -170,6 +199,9 @@ class Controller extends Base
             $this->folderMapper,
             $this->submissionBoxMapper,
             $this->returnedWorkMapper,
+            $this->reportingMapper,
+            $this->stateMapper,
+            $this->feedbackDataSource,
             $this->rosettaStone,
             trim((string)$this->getConfigLoader()->get('date_local')),
             $settings['assessmentTitle'],
@@ -200,8 +232,14 @@ class Controller extends Base
      * Also assumes a publish datetime here, though you probably want this to be configurable
      * at some point in the future
      *
-     * @param array $postVar
-     * @return array
+     * @param array<string, mixed> $postVar
+     * @return array{
+     *     assessmentTitle: string,
+     *     worktype: \Schoolbox\Learning\Assessment\WorkType\Model|null,
+     *     feedbackAuthor: \Schoolbox\User,
+     *     publishAt: \Alaress_Date_Format
+     * }
+     * @throws \DomainException
      */
     private function verifySettings(array $postVar): array
     {

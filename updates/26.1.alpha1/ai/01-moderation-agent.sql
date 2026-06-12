@@ -43,3 +43,15 @@ VALUES (
            'ai-services',
            1
        );
+
+ALTER TABLE openai_log
+    MODIFY feature ENUM (
+        'chat', 
+        'lessonplan', 
+        'image', 
+        'differentiation', 
+        'dialogagent', 
+        'learningactivitycustomisation',
+        'aimoderationagent'
+    ) NULL;
+

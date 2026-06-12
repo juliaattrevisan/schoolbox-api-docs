@@ -3,7 +3,6 @@
 namespace Schoolbox\Editor\OpenAI\Payload;
 
 use Schoolbox\Admin\OpenAI\Config;
-use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;

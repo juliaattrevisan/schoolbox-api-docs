@@ -67,6 +67,7 @@ function openModal(student: FailedRow): void {
                         name="alert"
                         color="var(--sbx-color-warning, #e67e22)"
                         aria-label="Candidate details unconfirmed"
+                        title="Missing required candidate details."
                     ></sbx-icon>
                 </td>
                 <td><ib-report-subject-labels :entry="student.subjects.hl" /></td>

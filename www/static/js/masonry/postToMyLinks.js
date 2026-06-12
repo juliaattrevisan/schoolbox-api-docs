@@ -3,7 +3,17 @@
  *
  */
 
+import { unescape } from "es-toolkit";
 import { getMasonryConfig } from "./masonryConfig";
+
+/**
+ * Get the decoded page heading to use for the saved link and side menu display.
+ *
+ * @returns { string }
+ */
+function getHeading() {
+    return unescape(getMasonryConfig().postToMyLinks.heading);
+}
 
 /**
  * Listen for the button press and then save the link to DB and display it on the page
@@ -45,7 +55,7 @@ async function postLink() {
 function getFormData() {
     const formData = new FormData();
     formData.append("url", getMasonryConfig().postToMyLinks.url);
-    formData.append("description", getMasonryConfig().postToMyLinks.heading);
+    formData.append("description", getHeading());
     return formData;
 }
 
@@ -55,7 +65,7 @@ function getFormData() {
 function displayLinkOnPage() {
     const link = document.createElement("a");
     link.setAttribute("href", getMasonryConfig().postToMyLinks.url);
-    link.innerText = getMasonryConfig().postToMyLinks.heading;
+    link.innerText = getHeading();
 
     const linkListItem = document.createElement("li");
     linkListItem.appendChild(link);

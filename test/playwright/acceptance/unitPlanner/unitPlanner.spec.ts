@@ -8,6 +8,7 @@ import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import UnitPlanner from "@schoolboxTest/playwright/support/page/unitPlanner/UnitPlanner";
 import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
 import CurriculumSelector from "@schoolboxTest/playwright/support/page/curriculum/selector/CurriculumSelector";
+import CurriculumOverview from "@schoolboxTest/playwright/support/page/homepage/CurriculumOverview";
 
 test.describe("Unit Planner Tests", () => {
     test.describe.configure({ mode: "serial" });
@@ -153,8 +154,8 @@ test.describe("Unit Planner Tests", () => {
                 `div[class="component-container Schoolbox_Curriculum_Component_CurriculumOverviewController"]`,
             ),
         ).toBeVisible();
-        await expect(page.getByTestId("fn-list-container")).toContainText("[ACHHK078]");
-        await expect(page.getByTestId("fn-list-container")).toContainText("Year 4 History");
+        await expect(page.getByTestId(CurriculumOverview.DATA_TEST_FN_LIST_CONTAINER)).toContainText("[ACHHK078]");
+        await expect(page.getByTestId(CurriculumOverview.DATA_TEST_FN_LIST_CONTAINER)).toContainText("Year 4 History");
 
         tester.isGoingTo("delete the node via unit planner and ensure it is not visible");
         await unitPlanner.goto(6);
@@ -180,7 +181,7 @@ test.describe("Unit Planner Tests", () => {
                 `div[class="component-container Schoolbox_Curriculum_Component_CurriculumOverviewController"]`,
             ),
         ).toBeVisible();
-        await expect(page.getByTestId("fn-list-container")).not.toBeVisible();
+        await expect(page.getByTestId(CurriculumOverview.DATA_TEST_FN_LIST_CONTAINER)).not.toBeVisible();
         await expect(page.locator("div.empty-state")).toBeVisible();
     });
 

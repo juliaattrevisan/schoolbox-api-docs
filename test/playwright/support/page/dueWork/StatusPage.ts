@@ -17,8 +17,6 @@ export default class StatusPage {
 
     static readonly SELECTOR_BUTTON_PUBLISH = "a[data-draft='publish']";
 
-    static readonly DATA_TEST_JELLY_TOT = "sbx-pop-out-header-options-button";
-
     static readonly DATA_TEST_PARTICIPANT_JELLY_TOT = "sbx-pop-out-feedback-options-"; // Append "-[participantId]-button"
 
     static readonly DATA_TEST_PARTICIPANT_JELLY_TOT_VIEW_AND_GRADE = "assessment-status-feedback-viewSubmission-"; // Append "-[participantId]"
@@ -80,14 +78,6 @@ export default class StatusPage {
         await this.page.waitForTimeout(2000); // Wait for auto-save to finish
         await publishButton.click();
         await expect(publishButton).not.toBeVisible();
-    }
-
-    /**
-     * click the jelly tot
-     */
-    async clickJellyTot(): Promise<void> {
-        await expect(this.page.getByTestId(StatusPage.DATA_TEST_JELLY_TOT)).toBeVisible();
-        await this.page.getByTestId(StatusPage.DATA_TEST_JELLY_TOT).click();
     }
 
     /**

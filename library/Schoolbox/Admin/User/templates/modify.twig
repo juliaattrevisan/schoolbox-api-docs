@@ -224,7 +224,7 @@
                                             </select>
                                         </div>
 
-                                        {% if user %}
+                                        {% if user and config.ib_enabled %}
                                         <div>
                                             <label for="ibCandidateNumber">IB Candidate Number</label>
                                             <input id="ibCandidateNumber" type="text" disabled value="{{ user.ibCandidateNumber ?? '' }}" title="This field is updated automatically via the IBIS registration write-back workflow"/>

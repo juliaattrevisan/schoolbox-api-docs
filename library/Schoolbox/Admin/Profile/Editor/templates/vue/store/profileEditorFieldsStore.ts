@@ -443,6 +443,9 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
         if (peStore.config?.differentiationEnabled === false && field.field === "differentiationProfile") {
             return false;
         }
+        if (peStore.config?.ibEnabled === false && field.field === "ibCandidateNumber") {
+            return false;
+        }
         return true;
     }
 

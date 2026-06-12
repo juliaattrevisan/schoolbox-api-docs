@@ -89,7 +89,7 @@ test.describe("Editor templates tests", () => {
             "Automation Body to be deleted",
         );
         await templates.clickDeleteIcon("Automation Template Badge to be deleted");
-        await page.locator("button.button.submit").click();
+        await page.getByTestId("editor-templates-delete-confirm-button").click();
 
         await expect(page.getByTestId("toast")).toBeHidden();
 

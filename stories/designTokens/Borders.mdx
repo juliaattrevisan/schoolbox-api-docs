@@ -1,0 +1,41 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Design Tokens/Borders" />
+
+# Borders
+
+## Configurable
+
+- Defined in: `www/static/css/core/config/_sbx-container-corner-radius.scss` and `www/static/css/core/config/_sbx-field-corner-radius.scss`.
+- These properties can be customised via Admin > Design > Settings - Skin Config.
+
+| CSS Custom Property                    | Initial Value                | Description                                                                                                                                          |
+| -------------------------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--sbx-config-container-corner-radius` | `var(--sbx-border-radius-s)` | Element on page background that typically has the `--sbx-color-foreground-primary` background color, such as islands, empty states, components, etc. |
+| `--sbx-config-field-corner-radius`     | `var(--sbx-border-radius-m)` | Element that users interact with to input or manipulate data, such as buttons, inputs, etc,                                                          |
+
+## Border Radius
+
+- Defined in `www/static/css/core/designTokens/_sbx-borders.scss`.
+- Should always be used when defining `border-radius`.
+
+| CSS Custom Property        | Value     |
+| -------------------------- | --------- |
+| `--sbx-border-radius-none` | `0`       |
+| `--sbx-border-radius-s`    | `0.25rem` |
+| `--sbx-border-radius-m`    | `0.5rem`  |
+| `--sbx-border-radius-l`    | `1rem`    |
+| `--sbx-border-radius-full` | `50%`     |
+
+## Border Width
+
+- Defined in `www/static/css/core/designTokens/_sbx-borders.scss`.
+- Should always be used when defining `border-width`.
+
+| CSS Custom Property           | Value |
+| ----------------------------- | ----- |
+| `--sbx-border-width-none`     | `0`   |
+| `--sbx-border-width-normal`   | `1px` |
+| `--sbx-border-width-thick`    | `2px` |
+| `--sbx-border-width-thicker`  | `4px` |
+| `--sbx-border-width-thickest` | `8px` |

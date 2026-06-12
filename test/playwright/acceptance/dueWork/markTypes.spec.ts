@@ -17,6 +17,7 @@ import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/Prof
 import GradesPage from "@schoolboxTest/playwright/support/page/grades/GradesPage";
 import ActivityFeed from "@schoolboxTest/playwright/support/page/profilePage/ActivityFeed";
 import CourseOutline from "@schoolboxTest/playwright/support/page/homepage/CourseOutline";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 
 /**
  * TODO: SKIPPED As part of SA-22090 we are intentionally making rubrics unmarkable for now, in the meantime, this test is disabled.
@@ -52,6 +53,7 @@ test.describe.skip("Due Work - Mark type tests", () => {
     test("Create activities", async ({ tester, page }) => {
         const unitPlanner = new UnitPlanner(tester, page);
         const assessmentForm = new AssessmentForm(tester, page);
+        const common = new Common(page);
 
         tester.isGoingTo("navigate to Year 9 English Modify unit planner page");
         await unitPlanner.goto(6);
@@ -133,7 +135,7 @@ test.describe.skip("Due Work - Mark type tests", () => {
         await classToImportRow.locator("input[id^=openDate]").fill("yesterday");
         await classToImportRow.locator("input[id^=closeDate]").fill("next week");
 
-        await page.click("input[type=submit]");
+        await common.clickInputSubmitButton();
 
         tester.isGoingTo("go to the class homepage");
         await page.goto(classLink);

@@ -8,10 +8,12 @@ const modalEl = window.Vue.ref<InstanceType<typeof RevealModal> | null>(null);
 
 interface Props {
     selectedNodeId?: number; // the assigned node to display
+    folderId?: number; // when linked to a unit folder, to display usages specific to that folder (unit)
 }
 
 const props = withDefaults(defineProps<Props>(), {
     selectedNodeId: UNSET_ID,
+    folderId: UNSET_ID,
 });
 
 const emit = defineEmits<{
@@ -79,6 +81,11 @@ function onModalClosed(): void {
 
 <template>
     <reveal-modal ref="modalEl" @closed="onModalClosed">
-        <node-details v-if="activeSelectedNodeId !== null" :node-id="activeSelectedNodeId" />
+        <node-details
+            v-if="activeSelectedNodeId !== null"
+            :node-id="activeSelectedNodeId"
+            :include-usage="true"
+            :folder-id="props.folderId"
+        />
     </reveal-modal>
 </template>

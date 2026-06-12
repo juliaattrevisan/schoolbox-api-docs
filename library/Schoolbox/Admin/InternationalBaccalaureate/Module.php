@@ -43,7 +43,9 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
+        $ibEnabled = new Rule\IsConfigOn(ConfigMapper::NAME_IB_ENABLED, $this->getConfig());
         $ruleIBCoordinatorAccess = new Rule\All(
+            $ibEnabled,
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),

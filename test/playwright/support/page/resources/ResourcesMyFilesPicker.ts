@@ -1,6 +1,7 @@
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import { expect } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
+import Files from "@schoolboxTest/playwright/support/page/homepage/Files";
 
 export default class ResourcesMyFilesPicker {
     private tester: AcceptanceTester;
@@ -26,7 +27,7 @@ export default class ResourcesMyFilesPicker {
      * Clicks the attachment zone
      */
     async clickAttachmentZone(): Promise<void> {
-        await this.page.locator("#CmsZone").click();
+        await this.page.locator(Files.ELEMENT_ATTACH_FILE).click();
     }
 
     /**

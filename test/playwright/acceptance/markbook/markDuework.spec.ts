@@ -108,7 +108,7 @@ test.describe("Test Due Work options in class and course mark-book", () => {
             tester.isGoingTo("click the due work title and click the 'Import Feedback' option");
             await markbookPage.openAssessmentDropdown(assessmentId);
             await markbookPage.clickAssessmentDropdownItem(assessmentId, "import-feedback");
-            await expect(page.locator(`div#importFeedbackModal.reveal-modal.open`)).toBeVisible();
+            await commonPage.waitForModalToBeOpen();
             await statusPage.enterFeedbackImportModalText(`${studentExternalIdJamal}	80	import feedback test`);
             await statusPage.clickImportMarkAndCommentRadio();
             await statusPage.clickImportButtonInModal();
@@ -231,7 +231,7 @@ test.describe("Test Due Work options in class and course mark-book", () => {
             tester.isGoingTo("click the due work title and click the 'Import Feedback' option");
             await markbookPage.openAssessmentDropdown(assessmentIdCourse);
             await markbookPage.clickAssessmentDropdownItem(assessmentIdCourse, "import-feedback");
-            await expect(page.locator(`div#importFeedbackModal.reveal-modal.open`)).toBeVisible();
+            await commonPage.waitForModalToBeOpen();
             await statusPage.enterFeedbackImportModalText(`${studentExternalIdJamal}	80	import feedback test`);
             await statusPage.clickImportMarkAndCommentRadio();
             await statusPage.clickImportButtonInModal();

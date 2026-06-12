@@ -1846,6 +1846,35 @@ class Controller extends Base
             ]
         ];
 
+        $ibEnabled = $this->getConfigLoader()->get(ConfigMapper::NAME_IB_ENABLED);
+        $qualificationFields = [
+            'id' => [
+                'caption'   => 'ID',
+                'width'     => 1,
+                'readonly'  => true,
+            ],
+            'name'          => [
+                'caption'   => 'Name',
+                'width'     => $ibEnabled ? 5 : 11,
+                'maxLength' => 255,
+                'mandatory' => true,
+                'default'   => '',
+            ],
+        ];
+
+        /* Conditionally adding the system purpose column depend on whether IB is enabled
+         */
+        if ($ibEnabled) {
+            $qualificationFields['systemPurpose'] = [
+                'caption'   => 'System Purpose',
+                'width'     => 6,
+                'mandatory' => false,
+                'nullable'  => true,
+                'nullable_label' => 'Not Selected',
+                'lookup'    => $luSystemPurpose,
+            ];
+        }
+
         $return['qualification'] = [
             'title'             => 'Qualifications',
             'mapper'            => QualificationMapper::class,
@@ -1853,28 +1882,7 @@ class Controller extends Base
             'showId'            => true,
             'sortable'          => true, // Enable drag and drop functionality
             'deleteFailMsg'     => 'This qualification cannot be deleted as it may be in use.',
-            'fields'            => [
-                'id' => [
-                    'caption'   => 'ID',
-                    'width'     => 1,
-                    'readonly'  => true,
-                ],
-                'name'          => [
-                    'caption'   => 'Name',
-                    'width'     => 5,
-                    'maxLength' => 255,
-                    'mandatory' => true,
-                    'default'   => '',
-                ],
-                'systemPurpose' => [
-                    'caption'   => 'System Purpose',
-                    'width'     => 4,
-                    'mandatory' => false,
-                    'nullable'  => true,
-                    'nullable_label' => 'Not Selected',
-                    'lookup'    => $luSystemPurpose,
-                ],
-            ]
+            'fields'            => $qualificationFields,
         ];
 
         $return['nationality'] = [

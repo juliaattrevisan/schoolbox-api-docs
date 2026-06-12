@@ -31,6 +31,7 @@ use Schoolbox\Learning\Turnitin\Cli\ReportTool;
 use Schoolbox\Learning\Turnitin\Cli\GroupTool;
 use Schoolbox\Learning\Turnitin\Cli\RetrofitTool;
 use Schoolbox\Learning\Turnitin\Cli\HistoricalTool;
+use Schoolbox\Admin\OpenAI\ModerationQueue\CommandLineTool as ModerationQueueTool;
 use Schoolbox\Pastoral\CommandLineTool\AttachmentUploader;
 use Schoolbox\Resource\Storage\Cli\ExpiryTool;
 use Schoolbox\Search\Api\Database\Index\CommandLineTool\IndexBuilder;
@@ -128,6 +129,9 @@ class Inspector extends CliTool\App
 
         // Data Retention, hard delete things that were soft deleted
         \Schoolbox\Admin\DataRetention\CommandLineTool::LOCK_NAME => 'Data Retention Cleanup tool (./tools/dataRetention/process.php)',
+
+        // AI moderation queue placeholder
+        ModerationQueueTool::LOCK_NAME => 'AI Moderation Queue (./tools/openai/moderation-queue.php)',
     ];
 
 

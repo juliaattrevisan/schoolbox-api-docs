@@ -51,8 +51,6 @@ FROM (
     SELECT 'self' AS `roletype`
     UNION ALL
     SELECT 'staff'
-    UNION ALL
-    SELECT 'parent'
 ) AS `registration_profile_tab_visibility`
 WHERE NOT EXISTS (
     SELECT 1

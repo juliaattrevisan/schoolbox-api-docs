@@ -9,10 +9,12 @@
 namespace Schoolbox\Config;
 
 use PDOStatement;
+use Schoolbox\Admin\Package\Model as PackageModel;
 use Schoolbox\Admin\SkinConfig\Category as SkinConfigCategory;
 use Schoolbox\Admin\SkinConfig\Subcategory as SkinConfigSubcategory;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception;
 
 /**
  * Class ConfigMapper
@@ -53,6 +55,7 @@ class ConfigMapper extends Mapper
     public const string MODULE_IB = 'ib';
 
     // IB config name constants
+    public const string NAME_IB_ENABLED = 'ib_enabled';
     public const string NAME_IB_SCHOOL_NAME = 'ib_school_name';
     public const string NAME_IB_SCHOOL_CODE = 'ib_school_code';
 
@@ -536,7 +539,7 @@ class ConfigMapper extends Mapper
         'feedback_url',
         'feedback_text',
         self::NAME_MAIL_FORCE_FROM_SYSTEM,
-        self::NAME_MAIL_ENABLED
+        self::NAME_MAIL_ENABLED,
     ];
 
     /**
@@ -589,6 +592,7 @@ class ConfigMapper extends Mapper
         self::NAME_MAIL_ENABLED,
         self::NAME_PWA_ENABLED,
         self::NAME_CURRICULUM_COVERAGE_REPORT_ENABLED,
+        self::NAME_IB_ENABLED,
     ];
 
     /**
@@ -659,6 +663,7 @@ class ConfigMapper extends Mapper
             'skinSubcategory',
         );
 
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'ibEnableToggle']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCache']);
     }
 
@@ -706,6 +711,39 @@ class ConfigMapper extends Mapper
     protected function updateCache(Config $model): bool
     {
         // TODO consider updating cache of ConfigLoader?
+        return true;
+    }
+
+    /**
+     * Post save callback to ensure IB is enabled/disabled when the relevant setting is toggled
+     *
+     * @param Config $model
+     * @return bool
+     * @throws Exception
+     */
+    protected function ibEnableToggle(Config $model, ?Config $prev = null): bool
+    {
+        if ($model->getName() === self::NAME_IB_ENABLED && $prev !== null && $model->getValue() !== $prev->getValue()) {
+            $ibEnabled = (bool)$model->getValue();
+            $packageMapper = \Schoolbox\Admin\Package\Mapper::getInstance();
+            /* IB packages are hidden/shown based on the IB Enabled setting. They are not deleted as they contain
+             * configuration data which we want to preserve when toggling IB on/off.
+             */
+            $pb = $packageMapper->getPredicateBuilder()->in('location', [
+                'IBPYPTransDis2025',
+                'IBDPCore',
+                'IBProgramme',
+                'IBPYPProgramme',
+                'IBMYPProgramme',
+                'IBBadges',
+            ]);
+            $packages = $packageMapper->findByPredicates($pb);
+            /** @var PackageModel $package */
+            foreach ($packages as $package) {
+                $package->setHidden(!$ibEnabled);
+                $packageMapper->save($package);
+            }
+        }
         return true;
     }
 

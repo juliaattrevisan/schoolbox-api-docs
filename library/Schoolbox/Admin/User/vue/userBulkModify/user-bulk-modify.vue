@@ -505,13 +505,25 @@ export default {
                 <em>{{ selectedRowsCountWithRowName }} selected</em>
             </h3>
             <span v-if="!hasSelectedShiftKey" class="shift-select-note">Use Shift+Select to select multiple users</span>
-            <button @click.prevent="onClearUsersSelected" class="button-clear">Clear User Selection</button>
+            <button
+                @click.prevent="onClearUsersSelected"
+                class="button-clear"
+                data-test="bulk-user-modify-clear-selection"
+            >
+                Clear User Selection
+            </button>
             <ul class="flex-list buttons">
                 <li class="two-thirds">
-                    <button @click.prevent="onModifySelected" class="submit">Modify</button>
+                    <button @click.prevent="onModifySelected" class="submit" data-test="user-bulk-modify-modify-button">
+                        Modify
+                    </button>
                 </li>
                 <li class="one-third">
-                    <button @click.prevent="onDeleteUsersSelected" class="alert button-delete sbx-button--has-icon">
+                    <button
+                        @click.prevent="onDeleteUsersSelected"
+                        class="alert button-delete sbx-button--has-icon"
+                        data-test="user-bulk-modify-delete-button"
+                    >
                         <sbx-icon name="delete"></sbx-icon>
                         Delete Users
                     </button>
