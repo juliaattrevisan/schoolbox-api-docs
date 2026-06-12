@@ -368,7 +368,7 @@ const showCommentsColumn = window.Vue.computed(() => {
         <span
             v-else-if="mbStore.showDrafts && participant.marks.draft.responseId !== null"
             class="meta"
-            v-html="participant.marks.published.comment"
+            v-html="participant.marks.draft.comment"
         />
         <!-- eslint-enable vue/no-v-html -->
         <!-- eslint-disable vue/no-v-html -- scrubbed in the backend -->
