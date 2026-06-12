@@ -30,6 +30,7 @@ export type StudentRow = {
     name: string;
     userId: number;
     candidateDetailsStatus: CandidateDetailsStatus;
+    ibCandidateNumber: string | null;
     subjects: SubjectGroup;
     updateLanguageEndpoint: string | null;
     updateConfirmationEndpoint: string | null;
@@ -58,7 +59,6 @@ export type InProgressRow = {
  * A student row used in the Registered section, extending StudentRow with registration metadata.
  */
 export type RegisteredRow = StudentRow & {
-    ibCandidateNumber?: string | null;
     manuallyRegisteredBy?: string | null;
     manuallyRegisteredAt?: string | null;
 };
@@ -95,9 +95,9 @@ export type ApiStudent = {
     registrationSessionStudentId: number | null;
     status: number;
     userName: string;
+    ibCandidateNumber: string | null;
     hasMissingDetails: boolean;
     missingFields: string[];
-    ibCandidateNumber: string | null;
     manuallyRegisteredBy: string | null;
     manuallyRegisteredAt: string | null;
     _routes: {

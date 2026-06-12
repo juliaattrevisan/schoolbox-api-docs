@@ -46,6 +46,7 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception\NotFound as MapperNotFound;
 use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 use Schoolbox\Resource\Folder\Code\Model as FolderCodeModel;
+use Schoolbox\UserMapper;
 
 class Controller extends ConfigController
 {
@@ -76,6 +77,7 @@ class Controller extends ConfigController
         private RegistrationSessionStudentModelToArray $registrationSessionStudentModelToArray,
         private RegistrationSessionStudentHelper $registrationSessionStudentHelper,
         private \External_UserInterface $externalUser,
+        private UserMapper $userMapper,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
         CacheInterface $oidcCache
@@ -594,6 +596,7 @@ class Controller extends ConfigController
     {
         $sessionId = (int) $registrationSession->getId();
         $pageCurrent = '/adminv2/international-baccalaureate/registrations';
+
         $this->response = $this->responseFromTemplate(
             '@internationalBaccalaureate/registrations/report.twig',
             [
@@ -607,9 +610,111 @@ class Controller extends ConfigController
                     'renotifyUnconfirmed' => $this->getRouteIfAuthorized('internationalBaccalaureate.renotifyUnconfirmed', ['sessionId' => $sessionId]),
                     'resetDetails' => $this->getRouteIfAuthorized('internationalBaccalaureate.sessionResetDetails', ['sessionId' => $sessionId]),
                     'manuallyRegister' => $this->getRouteIfAuthorized('internationalBaccalaureate.sessionMarkAsManuallyRegistered', ['sessionId' => $sessionId]),
+                    'candidateNumberUpdateRoute' => $this->getRouteIfAuthorized(
+                        'internationalBaccalaureate.getRegistrationSessionCandidateNumbers',
+                        ['sessionId' => $sessionId]
+                    ),
                 ],
                 'sessionTitle' => $registrationSession->jsonSerialize()['title'],
             ]
+        );
+    }
+
+    /**
+     * Manually update candidate numbers for students in this registration report.
+     *
+     * @api GET /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/candidates/candidate-numbers
+     */
+    public function getRegistrationSessionCandidateNumbers(RegistrationSessionModel $registrationSession): void
+    {
+        $sessionId = (int) $registrationSession->getId();
+        $pageCurrent = '/adminv2/international-baccalaureate/registrations';
+        $reportRoute = $this->getRouteIfAuthorized(
+            'internationalBaccalaureate.getReport',
+            ['sessionId' => $sessionId]
+        );
+
+        $this->response = $this->responseFromTemplate(
+            '@internationalBaccalaureate/registrations/candidate-numbers.twig',
+            [
+                'pageCurrent' => $pageCurrent,
+                'allBreadcrumbs' => array_merge(
+                    (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($pageCurrent),
+                    [['Update Candidate Numbers', null]]
+                ),
+                'sessionTitle' => $registrationSession->jsonSerialize()['title'],
+                'candidates' => $this->buildCandidateNumberRows(
+                    $this->findReportCandidateStudents($sessionId)
+                ),
+                '_routes' => [
+                    'save' => $this->getRouteIfAuthorized(
+                        'internationalBaccalaureate.postRegistrationSessionCandidateNumbers',
+                        ['sessionId' => $sessionId]
+                    ),
+                    'report' => $reportRoute ?? '/adminv2/international-baccalaureate/registrations',
+                ],
+            ]
+        );
+    }
+
+    /**
+     * Persist manually entered candidate numbers to student profile records.
+     *
+     * @api POST /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/candidates/candidate-numbers
+     */
+    public function postRegistrationSessionCandidateNumbers(RegistrationSessionModel $registrationSession): void
+    {
+        $sessionId = (int) $registrationSession->getId();
+        $candidateNumbers = $this->requestPost->get('candidateNumbers');
+
+        if (is_array($candidateNumbers)) {
+            $studentsByUserId = [];
+
+            foreach ($this->findReportCandidateStudents($sessionId) as $student) {
+                $userId = $student->getUser()?->getId();
+
+                if ($userId !== null) {
+                    $studentsByUserId[$userId] = $student;
+                }
+            }
+
+            foreach ($candidateNumbers as $userId => $candidateNumber) {
+                $userId = (int) $userId;
+                $candidateNumber = trim((string) $candidateNumber);
+
+                if ($userId <= 0 || !isset($studentsByUserId[$userId])) {
+                    continue;
+                }
+
+                $student = $studentsByUserId[$userId];
+                $user = $student->getUser();
+
+                if ($user === null) {
+                    continue;
+                }
+
+                if ($candidateNumber === '') {
+                    if ($this->registrationSessionStudentHelper->normalise($user->getIbCandidateNumber()) === '') {
+                        continue;
+                    }
+
+                    $user->setIbCandidateNumber(null);
+                    $this->userMapper->save($user);
+                    continue;
+                }
+
+                $this->persistRegistrationSessionStudent($sessionId, $userId);
+                $user->setIbCandidateNumber($candidateNumber);
+                $this->userMapper->save($user);
+            }
+        }
+
+        $reportRoute = $this->getRouteIfAuthorized(
+            'internationalBaccalaureate.getReport',
+            ['sessionId' => $sessionId]
+        );
+        $this->response = $this->redirectAfterPost(
+            $reportRoute ?? '/adminv2/international-baccalaureate/registrations'
         );
     }
 
@@ -874,7 +979,7 @@ class Controller extends ConfigController
         int $sessionId,
         int $studentId
     ): void {
-        $subjects = new Values($this->request->getParsedBody() ?? [])->get('subjects');
+        $subjects = (new Values($this->request->getParsedBody() ?? []))->get('subjects');
 
         if (!is_array($subjects)) {
             $this->response = $this->responseAsJson([
@@ -1318,6 +1423,49 @@ class Controller extends ConfigController
         } catch (Exception $e) {
             $this->sendJsonError('Something has gone wrong. Please try again later.', 500);
         }
+    }
+
+    /**
+     * @return RegistrationSessionStudentModel[]
+     */
+    private function findReportCandidateStudents(int $sessionId): array
+    {
+        $studentsByUserId = [];
+
+        foreach ($this->registrationSessionStudentMapper->findStudentsForSession($sessionId) as $student) {
+            if (!$student instanceof RegistrationSessionStudentModel) {
+                continue;
+            }
+
+            $user = $student->getUser();
+            $userId = $user?->getId();
+
+            if ($userId === null) {
+                continue;
+            }
+
+            $studentsByUserId[$userId] = $student;
+        }
+
+        return array_values($studentsByUserId);
+    }
+
+    /**
+     * @param RegistrationSessionStudentModel[] $students
+     * @return array<int, array{userId: int, name: string, ibCandidateNumber: string}>
+     */
+    private function buildCandidateNumberRows(array $students): array
+    {
+        return array_map(
+            fn(RegistrationSessionStudentModel $student): array => [
+                'userId' => (int) $student->getUser()?->getId(),
+                'name' => $student->getUser()?->formatName('{lastname}, {preferredname}') ?? '',
+                'ibCandidateNumber' => $this->registrationSessionStudentHelper->normalise(
+                    $student->getUser()?->getIbCandidateNumber()
+                ),
+            ],
+            $students
+        );
     }
 
     /**

@@ -33,6 +33,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
@@ -87,6 +88,8 @@ class Module extends BaseModule
         $this->register('GET', '/registrations/sessions/{sessionId:\\d+}/candidates', 'getRegistrationSessionStudents', $ruleIBCoordinatorAccess);
         $this->register('PUT', '/registrations/sessions/{sessionId:\\d+}/candidates/{studentId:\\d+}/languages', 'updateRegistrationSessionStudentSubjectLanguages', $ruleIBCoordinatorAccess);
         $this->register('GET', '/registrations/sessions/{sessionId:\\d+}/candidates/export/csv', 'exportRegistrationSessionStudentsCsv', $ruleIBCoordinatorAccess, $preloadRegistrationSession);
+        $this->register('GET', '/registrations/sessions/{sessionId:\\d+}/candidates/candidate-numbers', 'getRegistrationSessionCandidateNumbers', $ruleIBCoordinatorAccess, $preloadRegistrationSession);
+        $this->register('POST', '/registrations/sessions/{sessionId:\\d+}/candidates/candidate-numbers', 'postRegistrationSessionCandidateNumbers', $ruleIBCoordinatorAccess, $preloadRegistrationSession);
         /* Transition between states
          */
         $this->register('POST', '/registrations/sessions/{sessionId:\\d+}/complete-preparation', 'sessionCompletePreparation', $ruleIBCoordinatorAccess, $preloadRegistrationSession);
@@ -125,6 +128,7 @@ class Module extends BaseModule
             ),
             $registrationSessionStudentHelper,
             $this->injector->get('externalUser'),
+            $this->getMapperFactory()->get(UserMapper::class),
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
             $this->injector->get('moduleCache.rebuilder'),
             $this->injector->get('oidc.cache'),
