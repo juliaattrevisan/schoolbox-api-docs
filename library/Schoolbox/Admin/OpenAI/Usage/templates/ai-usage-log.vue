@@ -357,20 +357,20 @@ function printSelectedSession(): void {
                     <nav class="no-print">
                         <sbx-pop-out :content-id="SELECTED_SESSION_ACTIONS_ID"></sbx-pop-out>
                     </nav>
+                    <ul :id="SELECTED_SESSION_ACTIONS_ID" class="f-dropdown no-print" data-dropdown-content>
+                        <li>
+                            <a
+                                href="#"
+                                class="sbx-button--has-icon"
+                                data-test="ai-usage-log-print-session"
+                                @click.prevent="printSelectedSession"
+                            >
+                                <sbx-icon name="print"></sbx-icon>
+                                Print / Save as PDF
+                            </a>
+                        </li>
+                    </ul>
                 </div>
-                <ul :id="SELECTED_SESSION_ACTIONS_ID" class="f-dropdown no-print" data-dropdown-content>
-                    <li>
-                        <a
-                            href="#"
-                            class="sbx-button--has-icon"
-                            data-test="ai-usage-log-print-session"
-                            @click.prevent="printSelectedSession"
-                        >
-                            <sbx-icon name="print"></sbx-icon>
-                            Print / Save as PDF
-                        </a>
-                    </li>
-                </ul>
                 <div class="clearfix"></div>
 
                 <div v-if="!('log' in selectedSessionInfo)" class="loader"></div>
@@ -396,7 +396,8 @@ function printSelectedSession(): void {
     </div>
 </template>
 
-<style lang="scss">
+<style scoped lang="scss">
+/* styles for printing (scoped) */
 @media print {
     .no-print {
         display: none !important;
@@ -424,6 +425,22 @@ function printSelectedSession(): void {
         border: 0 !important;
         box-shadow: none !important;
         padding: 0 0 1rem !important;
+    }
+}
+</style>
+
+<style>
+/* styles for printing (global) */
+@media print {
+    #container,
+    .island {
+        padding: 0; /* to get more of the page estate */
+    }
+
+    .breadcrumb,
+    .admin-container > div.small-12 > h1,
+    #footer {
+        display: none !important;
     }
 }
 </style>
