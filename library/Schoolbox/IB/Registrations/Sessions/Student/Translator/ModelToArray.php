@@ -65,6 +65,7 @@ class ModelToArray
             'registrationSessionStudentId' => $student->getId(),
             'status' => $student->getStatus(),
             'userName' => $userName,
+            'ibCandidateNumber' => $this->formatNullableValue($user?->getIbCandidateNumber()),
             'hasMissingDetails' => $missingFields !== [],
             'missingFields' => $missingFields,
             'session' => $this->buildSession($student),
@@ -178,6 +179,13 @@ class ModelToArray
         return $name !== '' && $code !== ''
             ? "{$name} ({$code})"
             : $name . $code;
+    }
+
+    private function formatNullableValue(mixed $value): ?string
+    {
+        $normalised = $this->helper->normalise($value);
+
+        return $normalised !== '' ? $normalised : null;
     }
 
     private function buildUpdateLanguagesRoute(Model $student): ?string
