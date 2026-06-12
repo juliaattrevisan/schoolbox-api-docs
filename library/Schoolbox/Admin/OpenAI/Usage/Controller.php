@@ -196,10 +196,9 @@ class Controller extends Base
         }
 
         /**
-         * Each entry of $logSessions can be thought of as an `ai_session` row that represents a whole session -
-         * not a single `ai_session_log` interaction. The per-log fields (e.g. prompt, response, errorMessage)
-         * therefore aren't present here; the logFormat/returnCode shown for a session are derived from its first log
-         * by SessionMapper::getFilteredSessions().
+         * Each entry of $logSessions represents a whole session of logs.  The per-log fields (e.g. prompt, response,
+         * errorMessage) therefore aren't present here; the logFormat/returnCode shown for a session are derived from
+         * its first log by SessionMapper::getFilteredSessions().
          */
         $logSessions = $this->sessionMapper->getFilteredSessions(
             $keyword,
@@ -225,9 +224,6 @@ class Controller extends Base
             ->setPageSize($limit);
 
         /**
-         * Compile a stack of unique sessions rather than each individual log instance because you'll
-         * have a lot of records -per session id- for those who are resuming chats etc.
-         *
          * The frontend treats an AI Session as a distinct representation compared to an AI Session Log entry
          * for future flexibility if we were to change the way sessions are represented, this distinction is
          * handled by the two translators.
