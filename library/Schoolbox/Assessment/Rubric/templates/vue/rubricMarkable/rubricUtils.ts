@@ -1,6 +1,7 @@
 import { assertUnreachable } from "@js/util/errorUtils";
 import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 import type { MarkScheme } from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/markScheme";
+import type { RubricMarkedGrid } from "./types";
 
 /**
  * Turn a specified value into a percentage of the max marks for a capability or rubric total mark
@@ -128,4 +129,33 @@ export function deriveScaledMark(
     }
 
     return assertUnreachable(markScheme);
+}
+
+/**
+ * Derive the mark for a particular marked grid from the scaled capability marks within it
+ * Rounded to 2dp where necessary
+ * @param markedGrid the marked grid to derive the mark for
+ * @returns the derived mark, or null if there aren't any meaningful capability marks to derive from
+ */
+export function deriveRubricMark(markedGrid: RubricMarkedGrid): number | null {
+    let total = 0;
+    let hasMeaningfulMark = false;
+
+    for (const capability of markedGrid.capabilities) {
+        if (capability.scaledMark !== null) {
+            total += capability.scaledMark;
+            hasMeaningfulMark = true;
+        }
+    }
+
+    if (!hasMeaningfulMark) {
+        return null;
+    }
+
+    // if the total is not a whole number, round to 2dp
+    if (total % 1 !== 0) {
+        total = parseFloat(total.toFixed(2));
+    }
+
+    return total;
 }
