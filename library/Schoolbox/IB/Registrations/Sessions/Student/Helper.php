@@ -59,15 +59,6 @@ class Helper
         return Model::STATUSES;
     }
 
-    /**
-     * @param string $givenName
-     * @param string $lastName
-     * @return string
-     */
-    public function buildUserName(string $givenName, string $lastName): string
-    {
-        return "{$givenName}, {$lastName}";
-    }
 
     /**
      * @param iterable<mixed>|null $models
