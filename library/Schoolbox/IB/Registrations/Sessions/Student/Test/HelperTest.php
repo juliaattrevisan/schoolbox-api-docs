@@ -84,5 +84,4 @@ class HelperTest extends TestCase
             (new Helper())->getStatuses()
         );
     }
-
 }
