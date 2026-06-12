@@ -91,9 +91,7 @@ $allow-notification-stash: $xlarge-up;
              * ie. when the button is not required
              */
             .mark-all-read {
-                min-height: 0;
-                height: 0;
-                padding: 0;
+                display: none;
             }
         }
     }
