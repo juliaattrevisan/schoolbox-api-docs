@@ -122,7 +122,9 @@ window.Vue.onUnmounted(() => {
             <p v-else>N/A</p>
         </div>
 
-        <strong>Combined</strong>
-        <p>{{ combinedText }}</p>
+        <template v-if="rubricInfo.length > 1">
+            <strong>Combined</strong>
+            <p>{{ combinedText }}</p>
+        </template>
     </basic-modal>
 </template>
