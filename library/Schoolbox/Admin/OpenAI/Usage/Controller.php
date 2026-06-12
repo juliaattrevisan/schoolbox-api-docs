@@ -196,13 +196,12 @@ class Controller extends Base
         }
 
         /**
-         * Each entry of $logGroups is an `ai_session` row representing a whole session,
-         * not a single `ai_session_log` interaction. The per-log fields (e.g. prompt,
-         * response, errorMessage) therefore aren't present here; the logFormat/returnCode
-         * shown for a session are derived from its first log by
-         * SessionMapper::getFilteredSessions().
+         * Each entry of $logSessions can be thought of as an `ai_session` row that represents a whole session -
+         * not a single `ai_session_log` interaction. The per-log fields (e.g. prompt, response, errorMessage)
+         * therefore aren't present here; the logFormat/returnCode shown for a session are derived from its first log
+         * by SessionMapper::getFilteredSessions().
          */
-        $logGroups = $this->sessionMapper->getFilteredSessions(
+        $logSessions = $this->sessionMapper->getFilteredSessions(
             $keyword,
             $feature,
             $user,
@@ -240,7 +239,7 @@ class Controller extends Base
             $sessionLinksTranslator
         );
 
-        $sessions = $logGroups->map($sessionTranslator);
+        $sessions = $logSessions->map($sessionTranslator);
 
         $this->response = $this->responseAsJson([
             'data' => $sessions,
