@@ -69,7 +69,7 @@ class Payload
 
         /** @var \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance */
         foreach ($rubricInstances as $rubricInstance) {
-            $grid = $rubricInstance->getGrid()->toArray($this->rubricShowPoints);
+            $grid = $rubricInstance->getGrid()?->toArray($this->rubricShowPoints);
             $selfGradedGrid = null;
             $markedGrid = null;
 

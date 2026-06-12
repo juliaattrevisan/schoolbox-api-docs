@@ -580,7 +580,8 @@
                                 assessment: assessment,
                                 feedback: summaryAssessmentFeedbacks[assessment.id] ?? null,
                                 page: 'subject-summary',
-                                options: summaryOptions
+                                options: summaryOptions,
+                                rubricGridPayloads: null,
                             } only %}
                     {% endfor %}
                 {% endif %}
@@ -652,13 +653,17 @@
                 {% endif %}
                 <div class="summative-content">
                     {% for assessment in classAssessments[folder.id] %}
+                        {% set feedback = classAssessmentFeedbacks[assessment.id] ?? null %}
+                        {% set feedbackId = feedback.id ?? null %}
+
                         {% include '@adminSummativeReport/assessmentReport.twig' with
                             {
                                 student: student,
                                 assessment: assessment,
-                                feedback: classAssessmentFeedbacks[assessment.id] ?? null,
+                                feedback: feedback,
                                 page: 'subject',
-                                options: classOptions
+                                options: classOptions,
+                                rubricGridPayloads: rubricGridPayloadsHistory[feedbackId] ?? null
                             } only %}
                     {% endfor %}
                 </div>
