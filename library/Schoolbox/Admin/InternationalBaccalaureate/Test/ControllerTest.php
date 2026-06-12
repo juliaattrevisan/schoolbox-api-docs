@@ -442,12 +442,12 @@ class ControllerTest extends TestCase
                         [
                             [
                                 'userId' => 123,
-                                'name' => 'Alex, Nguyen',
+                                'name' => 'Nguyen, Alex',
                                 'ibCandidateNumber' => 'CAND-123',
                             ],
                             [
                                 'userId' => 234,
-                                'name' => 'Sam, Patel',
+                                'name' => 'Patel, Sam',
                                 'ibCandidateNumber' => '',
                             ],
                         ],
