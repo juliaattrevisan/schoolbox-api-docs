@@ -390,7 +390,25 @@ class Controller extends Base
 
         $originalStart = clone $item->getEvent()->getStartDateTime()->getDateTimeObject();
         $originalEnd   = clone $item->getEvent()->getEndDateTime()->getDateTimeObject();
-        $originalQuantity = $item->getQuantity();
+        $originalQuantityByBookingId = [$item->getId() => $item->getQuantity()];
+        $originalSeries = new Collection();
+        if (($this->requestPost['efficacy'] ?? null) === EventRecurrenceMapper::EFFICACY_SERIES) {
+            $originalSeries = $this->getBookingMapper()->findSeriesBookings(
+                $item->getId(),
+                $item->getEvent()->getSeriesId()
+            );
+        }
+        $originalSeries->add($item);
+        foreach ($originalSeries as $originalBooking) {
+            $originalQuantityByBookingId[$originalBooking->getId()] = $originalBooking->getQuantity();
+            foreach (
+                $this->getBookingMapper()->findRelatedBookings($originalBooking->getId()) as $originalRelatedBooking
+            ) {
+                $originalQuantityByBookingId[$originalRelatedBooking->getId()] = (
+                    $originalRelatedBooking->getQuantity()
+                );
+            }
+        }
         $code = self::HTTP_STATUS_CODE_OK;
         $nBookingsUpdatedByStatusId = [];
 
@@ -440,7 +458,7 @@ class Controller extends Base
                     booking: $booking,
                     isClash: $thisBookingHasClashes,
                     user: $this->getUser(),
-                    originalQuantity: $originalQuantity,
+                    originalQuantity: $originalQuantityByBookingId[$booking->getId()] ?? $booking->getQuantity(),
                     periodChanged: $isTimeChanged,
                     overrideValidation: $overrideValidation,
                 );

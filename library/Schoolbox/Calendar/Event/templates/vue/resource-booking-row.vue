@@ -55,15 +55,17 @@ const efficacy = window.Vue.ref<string>("");
 const bookingNotes = window.Vue.ref<string>(props.booking.notes);
 const startDate = window.Vue.ref<string>(props.booking.start);
 const endDate = window.Vue.ref<string>(props.booking.end);
-const bookingQuantity = window.Vue.ref<number>(props.booking.quantity);
+const bookingQuantity = window.Vue.ref<string>(String(props.booking.quantity));
 const showQuantityInput = window.Vue.computed(() => props.booking.resource.capacity > 1 || props.booking.quantity > 1);
 const quantityMax = window.Vue.computed(() => Math.max(props.booking.resource.capacity, props.booking.quantity));
 const isQuantityValid = window.Vue.computed(() => {
+    const quantity = Number(bookingQuantity.value);
     return (
         !showQuantityInput.value ||
-        (Number.isInteger(bookingQuantity.value) &&
-            bookingQuantity.value >= 1 &&
-            bookingQuantity.value <= quantityMax.value)
+        (/^[0-9]+$/.test(bookingQuantity.value) &&
+            Number.isInteger(quantity) &&
+            quantity >= 1 &&
+            quantity <= quantityMax.value)
     );
 });
 const isFormSubmittable = window.Vue.computed(() => {
@@ -88,7 +90,7 @@ function cancelEditBookingForm(): void {
     bookingNotes.value = props.booking.notes;
     startDate.value = props.booking.start;
     endDate.value = props.booking.end;
-    bookingQuantity.value = props.booking.quantity;
+    bookingQuantity.value = String(props.booking.quantity);
     // Close form.
     toggleEditForm();
 }
@@ -111,7 +113,7 @@ async function postEditBookingForm(): Promise<void> {
             startDatetime: startDate.value,
             endDatetime: endDate.value,
             notes: bookingNotes.value,
-            quantity: bookingQuantity.value,
+            quantity: Number(bookingQuantity.value),
             efficacy: efficacy.value,
         },
     });
@@ -215,12 +217,11 @@ async function postDeleteBookingForm(): Promise<void> {
                 <label :for="`resource-booking-row-quantity-${props.booking.id}`">Quantity</label>
                 <input
                     :id="`resource-booking-row-quantity-${props.booking.id}`"
-                    v-model.number="bookingQuantity"
+                    v-model="bookingQuantity"
                     name="quantity"
-                    type="number"
-                    min="1"
-                    :max="quantityMax"
-                    step="1"
+                    type="text"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
                     required
                     data-test="resource-booking-row-quantity-input"
                 />

@@ -462,10 +462,9 @@ $(function() {
                         </label>
                         <input name="quantity"
                                id="booking-quantity"
-                               type="number"
-                               min="1"
-                               max="{{ quantityMax }}"
-                               step="1"
+                               type="text"
+                               inputmode="numeric"
+                               pattern="[0-9]*"
                                value="{{ item.quantity }}"/>
                     </div>
                     {% endif %}

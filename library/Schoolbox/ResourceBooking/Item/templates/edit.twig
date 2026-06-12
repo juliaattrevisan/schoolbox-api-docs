@@ -261,10 +261,10 @@
                 </fieldset>
 
                 <fieldset class="content">
-                    <legend>
+                    <label for="allow_clash_bookings">
                         Allow Conflicting Booking Requests
                         <span class="hint has-tip tip-top" data-tooltip title="If enabled, users can request bookings even when capacity is full. Only bookings within the available capacity can be approved.">?</span>
-                    </legend>
+                    </label>
                     <div class="small-12 columns">
                         <div class="switch">
                             <input type="checkbox" value="1" {% if item.allowClashBookings %}checked{% endif %} id="allow_clash_bookings" name="allow_clash_bookings">
@@ -275,13 +275,13 @@
                         </div>
                     </div>
                     <div class="small-4 columns">
-                        <fieldset class="clear-fieldset">
-                            <legend id="capacity-label" class="required">
-                                Number of bookable items
+                        <div class="clear-fieldset">
+                            <label for="capacity" class="required">
+                                Number of Bookable Items
                                 <span class="hint has-tip tip-top" data-tooltip title="The maximum number of bookings that can use this resource at the same time. Use 1 when only one booking should be available at a time.">?</span>
-                            </legend>
-                            <input name="capacity" id="capacity" type="number" min="1" max="999" step="1" value="{{ item.capacity|default(1) }}" aria-labelledby="capacity-label" required />
-                        </fieldset>
+                            </label>
+                            <input name="capacity" id="capacity" type="text" inputmode="numeric" pattern="[0-9]*" value="{{ item.capacity|default(1) }}" required />
+                        </div>
                     </div>
                 </fieldset>
 
@@ -413,11 +413,11 @@
                         </label>
                     </div>
                 </fieldset>
-                <fieldset>
-                    <legend>
-                        Restrict bookings to current {{ locale.term }}
+                <fieldset class="content">
+                    <label for="current_term_restriction">
+                        Restrict Bookings to Current {{ locale.term|split(' ')|map(word => word|capitalize)|join(' ') }}
                         <span class='hint has-tip tip-top' data-tooltip title="If this is set, this item cannot be reserved outside of the current {{ locale.term }}">?</span>
-                    </legend>
+                    </label>
                     <div class="small-12 columns">
                         <div class="switch">
                             <input type="checkbox" value="1" {% if item.currentTermRestriction %}checked{% endif %} id="current_term_restriction" name="current_term_restriction">
