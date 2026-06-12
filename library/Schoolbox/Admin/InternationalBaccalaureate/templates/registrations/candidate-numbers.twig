@@ -10,7 +10,7 @@
         <div class="small-12 island">
             <h2 class="subheader">Update Candidate Numbers - {{ sessionTitle }}</h2>
             {% if candidates is empty %}
-                <p class="meta">All students in this report have an IB Candidate Number.</p>
+                <p class="meta">No students are currently included in this report.</p>
                 <a class="button" href="{{ _routes.report }}">Return to Report</a>
             {% else %}
                 <form id="ib-candidate-numbers-form" action="{{ _routes.save }}" method="post">
@@ -36,7 +36,7 @@
                                                     name="candidateNumbers[{{ candidate.userId }}]"
                                                     type="text"
                                                     maxlength="255"
-                                                    value=""
+                                                    value="{{ candidate.ibCandidateNumber }}"
                                                 />
                                             </td>
                                         </tr>

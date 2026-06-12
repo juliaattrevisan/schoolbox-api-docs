@@ -596,14 +596,6 @@ class Controller extends ConfigController
     {
         $sessionId = (int) $registrationSession->getId();
         $pageCurrent = '/adminv2/international-baccalaureate/registrations';
-        $candidateNumberUpdateRoute = null;
-
-        if ($this->findStudentsMissingCandidateNumber($sessionId) !== []) {
-            $candidateNumberUpdateRoute = $this->getRouteIfAuthorized(
-                'internationalBaccalaureate.getRegistrationSessionCandidateNumbers',
-                ['sessionId' => $sessionId]
-            );
-        }
 
         $this->response = $this->responseFromTemplate(
             '@internationalBaccalaureate/registrations/report.twig',
@@ -617,7 +609,10 @@ class Controller extends ConfigController
                     'completePreparation' => $this->getRouteIfAuthorized('internationalBaccalaureate.sessionCompletePreparation', ['sessionId' => $sessionId]),
                     'renotifyUnconfirmed' => $this->getRouteIfAuthorized('internationalBaccalaureate.renotifyUnconfirmed', ['sessionId' => $sessionId]),
                     'resetDetails' => $this->getRouteIfAuthorized('internationalBaccalaureate.sessionResetDetails', ['sessionId' => $sessionId]),
-                    'candidateNumberUpdateRoute' => $candidateNumberUpdateRoute,
+                    'candidateNumberUpdateRoute' => $this->getRouteIfAuthorized(
+                        'internationalBaccalaureate.getRegistrationSessionCandidateNumbers',
+                        ['sessionId' => $sessionId]
+                    ),
                 ],
                 'sessionTitle' => $registrationSession->jsonSerialize()['title'],
             ]
@@ -648,7 +643,7 @@ class Controller extends ConfigController
                 ),
                 'sessionTitle' => $registrationSession->jsonSerialize()['title'],
                 'candidates' => $this->buildCandidateNumberRows(
-                    $this->findStudentsMissingCandidateNumber($sessionId)
+                    $this->findReportCandidateStudents($sessionId)
                 ),
                 '_routes' => [
                     'save' => $this->getRouteIfAuthorized(
@@ -674,7 +669,7 @@ class Controller extends ConfigController
         if (is_array($candidateNumbers)) {
             $studentsByUserId = [];
 
-            foreach ($this->findStudentsMissingCandidateNumber($sessionId) as $student) {
+            foreach ($this->findReportCandidateStudents($sessionId) as $student) {
                 $userId = $student->getUser()?->getId();
 
                 if ($userId !== null) {
@@ -686,17 +681,29 @@ class Controller extends ConfigController
                 $userId = (int) $userId;
                 $candidateNumber = trim((string) $candidateNumber);
 
-                if ($userId <= 0 || $candidateNumber === '' || !isset($studentsByUserId[$userId])) {
+                if ($userId <= 0 || !isset($studentsByUserId[$userId])) {
                     continue;
                 }
 
-                $registrationSessionStudent = $this->persistRegistrationSessionStudent($sessionId, $userId);
-                $user = $registrationSessionStudent->getUser() ?? $studentsByUserId[$userId]->getUser();
+                $student = $studentsByUserId[$userId];
+                $user = $student->getUser();
 
                 if ($user === null) {
                     continue;
                 }
 
+                if ($candidateNumber === '') {
+                    if ($this->registrationSessionStudentHelper->normalise($user->getIbCandidateNumber()) === '') {
+                        continue;
+                    }
+
+                    $user->setIbCandidateNumber(null);
+                    $this->userMapper->save($user);
+                    continue;
+                }
+
+                $registrationSessionStudent = $this->persistRegistrationSessionStudent($sessionId, $userId);
+                $user = $registrationSessionStudent->getUser() ?? $user;
                 $user->setIbCandidateNumber($candidateNumber);
                 $this->userMapper->save($user);
             }
@@ -1333,10 +1340,9 @@ class Controller extends ConfigController
     }
 
     /**
-     * Find students in a registration session who are missing candidate numbers, indexed by their user ID to prevent duplicates.
      * @return RegistrationSessionStudentModel[]
      */
-    private function findStudentsMissingCandidateNumber(int $sessionId): array
+    private function findReportCandidateStudents(int $sessionId): array
     {
         $studentsByUserId = [];
 
@@ -1348,7 +1354,7 @@ class Controller extends ConfigController
             $user = $student->getUser();
             $userId = $user?->getId();
 
-            if ($userId === null || $this->registrationSessionStudentHelper->normalise($user->getIbCandidateNumber()) !== '') {
+            if ($userId === null) {
                 continue;
             }
 
@@ -1360,7 +1366,7 @@ class Controller extends ConfigController
 
     /**
      * @param RegistrationSessionStudentModel[] $students
-     * @return array<int, array{userId: int, name: string}>
+     * @return array<int, array{userId: int, name: string, ibCandidateNumber: string}>
      */
     private function buildCandidateNumberRows(array $students): array
     {
@@ -1368,6 +1374,9 @@ class Controller extends ConfigController
             fn(RegistrationSessionStudentModel $student): array => [
                 'userId' => (int) $student->getUser()?->getId(),
                 'name' => $this->buildCandidateDisplayName($student),
+                'ibCandidateNumber' => $this->registrationSessionStudentHelper->normalise(
+                    $student->getUser()?->getIbCandidateNumber()
+                ),
             ],
             $students
         );

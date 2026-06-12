@@ -25,7 +25,7 @@ import type {
 interface Props {
     candidatesEndpoint: string;
     candidateExportEndpoint: string;
-    candidateNumberUpdateRoute?: string;
+    candidateNumberUpdateRoute: string;
     searchLanguagesEndpoint: string;
     renotifyEndpoint: string;
     completePreparationEndpoint: string;
@@ -382,7 +382,7 @@ window.Vue.onMounted((): void => {
                     Export to CSV
                 </a>
             </li>
-            <li v-if="props.candidateNumberUpdateRoute !== undefined">
+            <li>
                 <a :href="props.candidateNumberUpdateRoute" class="sbx-button--has-icon">
                     <sbx-icon name="modify"></sbx-icon>
                     Update Candidate Numbers

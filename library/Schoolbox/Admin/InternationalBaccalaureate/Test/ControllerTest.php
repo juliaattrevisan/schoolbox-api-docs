@@ -355,6 +355,126 @@ class ControllerTest extends TestCase
         );
     }
 
+    public function testGetReportAlwaysProvidesCandidateNumberUpdateRoute(): void
+    {
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('findStudentsForSession');
+
+        $twig = $this->createMock(Environment::class);
+        $twig
+            ->method('addGlobal');
+        $twig
+            ->expects($this->once())
+            ->method('render')
+            ->with(
+                'include/chrome.twig',
+                $this->callback(function (array $data): bool {
+                    $this->assertSame('@internationalBaccalaureate/registrations/report.twig', $data['template']);
+                    $this->assertSame(
+                        '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/candidate-numbers',
+                        $data['data']['_routes']['candidateNumberUpdateRoute']
+                    );
+
+                    return true;
+                })
+            )
+            ->willReturn('');
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class),
+            twig: $twig
+        );
+
+        $this->withEmptySubnavConfig(
+            fn() => $controller->getReport($this->buildRegistrationSession())
+        );
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    public function testGetRegistrationSessionCandidateNumbersDisplaysAllReportStudents(): void
+    {
+        $studentOne = $this->buildStudent(
+            456,
+            123,
+            RegistrationSessionStudentModel::STATUS_CONFIRMED,
+            'Alex',
+            'Nguyen',
+            'S123',
+            ' CAND-123 '
+        );
+        $studentTwo = $this->buildStudent(
+            789,
+            234,
+            RegistrationSessionStudentModel::STATUS_FAILED,
+            'Sam',
+            'Patel',
+            'S234'
+        );
+
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('findStudentsForSession')
+            ->with(12)
+            ->willReturn(new Collection([$studentOne, $studentTwo]));
+
+        $twig = $this->createMock(Environment::class);
+        $twig
+            ->method('addGlobal');
+        $twig
+            ->expects($this->once())
+            ->method('render')
+            ->with(
+                'include/chrome.twig',
+                $this->callback(function (array $data): bool {
+                    $this->assertSame(
+                        '@internationalBaccalaureate/registrations/candidate-numbers.twig',
+                        $data['template']
+                    );
+                    $this->assertSame(
+                        [
+                            [
+                                'userId' => 123,
+                                'name' => 'Alex, Nguyen',
+                                'ibCandidateNumber' => 'CAND-123',
+                            ],
+                            [
+                                'userId' => 234,
+                                'name' => 'Sam, Patel',
+                                'ibCandidateNumber' => '',
+                            ],
+                        ],
+                        $data['data']['candidates']
+                    );
+
+                    return true;
+                })
+            )
+            ->willReturn('');
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class),
+            twig: $twig
+        );
+
+        $this->withEmptySubnavConfig(
+            fn() => $controller->getRegistrationSessionCandidateNumbers($this->buildRegistrationSession())
+        );
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
     public function testPostRegistrationSessionCandidateNumbersSkipsBlankValues(): void
     {
         $student = $this->buildStudent(
@@ -390,6 +510,115 @@ class ControllerTest extends TestCase
         $controller->setRequestPost(new Values([
             'candidateNumbers' => [
                 123 => '',
+            ],
+        ]));
+
+        $controller->postRegistrationSessionCandidateNumbers((new RegistrationSessionModel())->setId(12));
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(303, $response->getStatusCode());
+    }
+
+    public function testPostRegistrationSessionCandidateNumbersUpdatesExistingValues(): void
+    {
+        $student = $this->buildStudent(
+            456,
+            123,
+            RegistrationSessionStudentModel::STATUS_CONFIRMED,
+            'Alex',
+            'Nguyen',
+            'S123',
+            'CAND-OLD'
+        );
+
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('findStudentsForSession')
+            ->with(12)
+            ->willReturn(new Collection([$student]));
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('findOneByColumnList')
+            ->with([
+                'user_id' => 123,
+                'registration_session_id' => 12,
+            ])
+            ->willReturn($student);
+
+        $userMapper = $this->createMock(UserMapper::class);
+        $userMapper
+            ->expects($this->once())
+            ->method('save')
+            ->with($this->callback(function (User $user): bool {
+                $this->assertSame(123, $user->getId());
+                $this->assertSame('CAND-NEW', $user->getIbCandidateNumber());
+
+                return true;
+            }));
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class),
+            userMapper: $userMapper
+        );
+        $controller->setRequestPost(new Values([
+            'candidateNumbers' => [
+                123 => ' CAND-NEW ',
+            ],
+        ]));
+
+        $controller->postRegistrationSessionCandidateNumbers((new RegistrationSessionModel())->setId(12));
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(303, $response->getStatusCode());
+    }
+
+    public function testPostRegistrationSessionCandidateNumbersClearsExistingValues(): void
+    {
+        $student = $this->buildStudent(
+            456,
+            123,
+            RegistrationSessionStudentModel::STATUS_CONFIRMED,
+            'Alex',
+            'Nguyen',
+            'S123',
+            'CAND-OLD'
+        );
+
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('findStudentsForSession')
+            ->with(12)
+            ->willReturn(new Collection([$student]));
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('findOneByColumnList');
+
+        $userMapper = $this->createMock(UserMapper::class);
+        $userMapper
+            ->expects($this->once())
+            ->method('save')
+            ->with($this->callback(function (User $user): bool {
+                $this->assertSame(123, $user->getId());
+                $this->assertNull($user->getIbCandidateNumber());
+
+                return true;
+            }));
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class),
+            userMapper: $userMapper
+        );
+        $controller->setRequestPost(new Values([
+            'candidateNumbers' => [
+                123 => ' ',
             ],
         ]));
 
@@ -1806,7 +2035,8 @@ class ControllerTest extends TestCase
         ?LanguageMapper $languageMapper = null,
         ?RegistrationSessionStudentSubjectLanguageMapper $subjectLanguageMapper = null,
         ?UserMapper $userMapper = null,
-        ?User $currentUser = null
+        ?User $currentUser = null,
+        ?Environment $twig = null
     ): Controller {
         $registrationSessionStudentHelper = new RegistrationSessionStudentHelper();
         $routeGenerator = $this->createStub(Generator::class);
@@ -1835,6 +2065,20 @@ class ControllerTest extends TestCase
                     );
                 }
 
+                if ($route === 'internationalBaccalaureate.getRegistrationSessionStudents') {
+                    return sprintf(
+                        '/adminv2/international-baccalaureate/registrations/sessions/%d/candidates',
+                        $params['sessionId']
+                    );
+                }
+
+                if ($route === 'internationalBaccalaureate.exportRegistrationSessionStudentsCsv') {
+                    return sprintf(
+                        '/adminv2/international-baccalaureate/registrations/sessions/%d/candidates/export/csv',
+                        $params['sessionId']
+                    );
+                }
+
                 if ($route === 'internationalBaccalaureate.getRegistrationSessionCandidateNumbers') {
                     return sprintf(
                         '/adminv2/international-baccalaureate/registrations/sessions/%d/candidates/candidate-numbers',
@@ -1845,6 +2089,24 @@ class ControllerTest extends TestCase
                 if ($route === 'internationalBaccalaureate.postRegistrationSessionCandidateNumbers') {
                     return sprintf(
                         '/adminv2/international-baccalaureate/registrations/sessions/%d/candidates/candidate-numbers',
+                        $params['sessionId']
+                    );
+                }
+
+                if ($route === 'internationalBaccalaureate.searchLanguages') {
+                    return '/adminv2/international-baccalaureate/configuration/api/languages';
+                }
+
+                if ($route === 'internationalBaccalaureate.sessionCompletePreparation') {
+                    return sprintf(
+                        '/adminv2/international-baccalaureate/registrations/sessions/%d/complete-preparation',
+                        $params['sessionId']
+                    );
+                }
+
+                if ($route === 'internationalBaccalaureate.sessionResetDetails') {
+                    return sprintf(
+                        '/adminv2/international-baccalaureate/registrations/sessions/%d/reset-details',
                         $params['sessionId']
                     );
                 }
@@ -1862,6 +2124,8 @@ class ControllerTest extends TestCase
             ->method('isPathAuthorizedForUser')
             ->willReturn(true);
         $currentUser ??= new User();
+        $currentUser->setSuperuser(false);
+        $currentUser->setAccessList(new GenericCollection(\Schoolbox\Permission\Access\UserAccess::class));
 
         $controller = new Controller(
             $this->createStub(ConfigMapper::class),
@@ -1893,7 +2157,7 @@ class ControllerTest extends TestCase
             new ResponseFactory(
                 $httpFactory,
                 $httpFactory,
-                $this->createStub(Environment::class)
+                $twig ?? $this->createStub(Environment::class)
             )
         );
         $controller->setRequest($httpFactory->createServerRequest('GET', '/')->withParsedBody([]));
@@ -1935,7 +2199,59 @@ class ControllerTest extends TestCase
         return new ArrayLoader([
             ConfigMapper::NAME_IB_SCHOOL_NAME => 'Example School',
             ConfigMapper::NAME_NAME_FORMAT => '{title} {firstname} {lastname}',
+            'debug_mode' => true,
+            'debug_templates' => false,
+            'strict_templates' => false,
         ]);
+    }
+
+    private function buildRegistrationSession(): RegistrationSessionModel
+    {
+        return (new RegistrationSessionModel())
+            ->setId(12)
+            ->setSystemPurpose(
+                (new \Schoolbox\IB\SystemPurpose\Model())
+                    ->setName('Diploma Programme')
+                    ->setCategory((new \Schoolbox\IB\Category\Model())->setName('IB'))
+            )
+            ->setExamSession('November')
+            ->setAcademicYear('2026')
+            ->setCreatedAt(\Alaress_Date_Format::newDatabaseDate('2026-01-01 00:00:00'));
+    }
+
+    private function withEmptySubnavConfig(callable $callback): mixed
+    {
+        $predicateBuilder = $this->createStub(\Alaress\Database\Predicate\Builder::class);
+        $predicateBuilder
+            ->method('equals')
+            ->willReturnSelf();
+        $predicateBuilder
+            ->method('notEquals')
+            ->willReturnSelf();
+        $predicateBuilder
+            ->method('notNull')
+            ->willReturnSelf();
+
+        $configMapper = $this->createStub(ConfigMapper::class);
+        $configMapper
+            ->method('getPredicateBuilder')
+            ->willReturn($predicateBuilder);
+        $configMapper
+            ->method('findByPredicates')
+            ->willReturn(new Collection());
+
+        $instancesProperty = new \ReflectionProperty(BaseMapper::class, 'instance');
+        $instancesProperty->setAccessible(true);
+        $originalInstances = $instancesProperty->getValue();
+        $instances = $originalInstances ?? [];
+        $instances[ConfigMapper::class] = $configMapper;
+        $instancesProperty->setValue(null, $instances);
+
+        try {
+            return $callback();
+        } finally {
+            $instancesProperty->setValue(null, $originalInstances);
+        }
     }
 
     private function buildStudent(
@@ -1944,7 +2260,8 @@ class ControllerTest extends TestCase
         int $status,
         string $firstName,
         string $lastName,
-        string $externalId
+        string $externalId,
+        ?string $ibCandidateNumber = null
     ): RegistrationSessionStudentModel {
         return (new RegistrationSessionStudentModel())
             ->setId($id)
@@ -1956,6 +2273,7 @@ class ControllerTest extends TestCase
                     ->setExternalId($externalId)
                     ->setFirstname($firstName)
                     ->setLastname($lastName)
+                    ->setIbCandidateNumber($ibCandidateNumber)
                     ->setLocalEmail(false)
                     ->setAltEmail(sprintf('%s.%s@example.edu', strtolower($firstName), strtolower($lastName)))
                     ->setLanguageCollection(
