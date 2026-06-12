@@ -15,7 +15,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const { derivedRubricMarks } = useRubricMarks(
+const { derivedRubricMarks, derivedTotalMark, totalRubricWeight } = useRubricMarks(
     // The derived total mark should always be a percentage in the context of this modal
     { mode: MarkTypeSlug.PERCENT },
     window.Vue.toRef(props.rubrics),
@@ -25,6 +25,15 @@ const rubricInfo = window.Vue.computed(() =>
     props.rubrics.map(({ rubric, markedGrid }) => {
         const derivedMark = derivedRubricMarks.value.find((m) => m.rubricId === rubric.id)!;
 
+        const baseInfo = {
+            title: rubric.title,
+            scaledWeight: derivedMark.scaledWeightRounded,
+        };
+
+        if (markedGrid.normalisedMark === null) {
+            return { ...baseInfo, hasMeaningfulMark: false as const };
+        }
+
         // Always display using the total mark scheme in this modal
         const scaledMark = deriveRubricMark(markedGrid);
         const { humanReadableMark } = applyMarkScheme(scaledMark, rubric.derivedMaxValue, {
@@ -33,13 +42,39 @@ const rubricInfo = window.Vue.computed(() =>
         });
 
         return {
-            title: rubric.title,
-            scaledWeight: derivedMark.scaledWeightRounded,
+            ...baseInfo,
+            hasMeaningfulMark: true as const,
             humanReadableMark,
             normalisedMark: markedGrid.normalisedMark,
+            weightedMark: derivedMark.weightedMarkRounded,
         };
     }),
 );
+
+const combinedText = window.Vue.computed(() => {
+    if (totalRubricWeight.value <= 0 || derivedTotalMark.value === null) {
+        // no meaningful weights? nothing to calculate
+        return "N/A";
+    }
+
+    // each "(normalised mark × scaled weight)" calculation part for the rubrics
+    const rubricParts = rubricInfo.value
+        .filter((r) => r.hasMeaningfulMark)
+        .map((r) => `(${r.normalisedMark} × ${r.scaledWeight})`);
+
+    // The numerator is the sum of aall rubrics
+    // When there is more than 1 part, surround with brackets and join with plus signs,
+    // otherwise just show the single part which already has brackets (or 0 if there are no parts at all)
+    const numeratorText = rubricParts.length > 1 ? `(${rubricParts.join(" + ")})` : (rubricParts[0] ?? "0");
+
+    // The denominator is the sum of all the scaled weights (joined with + if there are multiple)
+    const denominatorText =
+        rubricInfo.value.length > 1
+            ? `(${rubricInfo.value.map((r) => r.scaledWeight).join(" + ")})`
+            : `${rubricInfo.value[0].scaledWeight}`;
+
+    return `${numeratorText} / ${denominatorText} = ${derivedTotalMark.value.humanReadableMark}`;
+});
 
 const open = window.Vue.ref(false);
 
@@ -83,10 +118,11 @@ window.Vue.onUnmounted(() => {
                 {{ rubric.scaledWeight }}% Weighting
             </strong>
 
-            <p>({{ rubric.humanReadableMark }}) × 100 = {{ rubric.normalisedMark }}%</p>
+            <p v-if="rubric.hasMeaningfulMark">({{ rubric.humanReadableMark }}) × 100 = {{ rubric.normalisedMark }}%</p>
+            <p v-else>N/A</p>
         </div>
 
         <strong>Combined</strong>
-        <p>TODO</p>
+        <p>{{ combinedText }}</p>
     </basic-modal>
 </template>
