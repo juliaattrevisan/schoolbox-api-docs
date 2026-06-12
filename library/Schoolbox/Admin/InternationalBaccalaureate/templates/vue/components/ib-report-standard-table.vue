@@ -20,6 +20,7 @@ const renotifyingStudentIds = window.Vue.ref<Set<number>>(new Set());
 const emit = defineEmits<{
     completePreparationSingle: [studentId: number];
     resetDetailsSingle: [studentId: number];
+    approveOnBehalfSingle: [studentId: number];
 }>();
 
 /**
@@ -122,6 +123,7 @@ function isRenotifying(student: StudentRow): boolean {
                         name="alert"
                         color="var(--sbx-color-warning, #e67e22)"
                         aria-label="Candidate details unconfirmed"
+                        title="Missing required candidate details."
                     ></sbx-icon>
                 </td>
                 <td><ib-report-subject-labels :entry="student.subjects.hl" /></td>
@@ -161,6 +163,15 @@ function isRenotifying(student: StudentRow): boolean {
                             >
                                 <sbx-icon name="notifications-hollow"></sbx-icon>
                                 Complete Preparation
+                            </button>
+                        </li>
+                        <li v-if="student.stage === 'unconfirmed'">
+                            <button
+                                class="sbx-button--has-icon"
+                                @click.prevent="emit('approveOnBehalfSingle', student.id)"
+                            >
+                                <sbx-icon name="approve"></sbx-icon>
+                                Approve on behalf of student
                             </button>
                         </li>
                         <li v-if="student.stage === 'unconfirmed' || student.stage === 'confirmed'">
