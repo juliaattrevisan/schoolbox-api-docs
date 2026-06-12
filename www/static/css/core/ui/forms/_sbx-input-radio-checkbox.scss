@@ -98,6 +98,12 @@ body.sbx-body {
     }
 
     // the icon only radio - used in notification settings
+    input[type="radio"]:not(.plain) + label.input-toggle {
+        align-items: center;
+        color: var(--sbx-config-color-accent);
+        display: inline-flex;
+        justify-content: center;
+    }
     input[type="radio"]:not(.plain):checked + label.input-toggle {
         background-color: var(--sbx-config-color-accent);
         color: var(--sbx-config-color-accent-text);
@@ -270,6 +276,12 @@ body.sbx-body {
     }
 
     // the icon only checkbox - used in notification settings
+    input[type="checkbox"]:not(.plain) + label.input-toggle {
+        align-items: center;
+        color: var(--sbx-config-color-accent);
+        display: inline-flex;
+        justify-content: center;
+    }
     input[type="checkbox"]:not(.plain):checked + label.input-toggle {
         background-color: var(--sbx-config-color-accent);
         color: var(--sbx-config-color-accent-text);
