@@ -53,14 +53,20 @@ final class ViewMode
     }
 
     /**
-     * Derive and return variables pertaining to view mode.
+     * Derive and return the current grade view-mode context.
      *
      * @param User $currentUser Logged-in user.
      * @param User $viewee Student whose grades are being viewed.
      * @param null|string $requestViewMode Requested view mode value.
-     * @return array{string, User, bool}
+     * @return array{
+     *     viewMode: string,
+     *     effectiveViewer: User,
+     *     canViewInstructorMarks: bool,
+     *     progressTicksReadOnly: bool,
+     *     commentsReadOnly: bool
+     * }
      */
-    public function getViewModeVariables(User $currentUser, User $viewee, ?string $requestViewMode): array
+    public function getViewModeContext(User $currentUser, User $viewee, ?string $requestViewMode): array
     {
         if ($currentUser->getRole()->isStaff()) {
             $viewMode = self::fromRequestValue($requestViewMode) ?? self::STAFF;
@@ -72,7 +78,13 @@ final class ViewMode
             $canViewInstructorMarks = false;
         }
 
-        return [$viewMode, $effectiveViewer, $canViewInstructorMarks];
+        return [
+            'viewMode'               => $viewMode,
+            'effectiveViewer'        => $effectiveViewer,
+            'canViewInstructorMarks' => $canViewInstructorMarks,
+            'progressTicksReadOnly'  => self::progressTicksReadOnly($currentUser, $effectiveViewer),
+            'commentsReadOnly'       => self::commentsReadOnly($currentUser, $effectiveViewer),
+        ];
     }
 
     /**

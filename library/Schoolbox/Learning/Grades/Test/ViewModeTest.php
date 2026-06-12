@@ -101,26 +101,39 @@ class ViewModeTest extends TestCase
     /**
      * Staff users default to staff view mode when the request value is absent or invalid.
      */
-    public function testStaffViewModeVariablesDefaultToStaffMode(): void
+    public function testStaffViewModeContextDefaultsToStaffMode(): void
     {
         $staff = $this->createUser(1, Role::STAFF);
         $student = $this->createUser(2, Role::STUDENT);
         $viewMode = new ViewMode($this->createExternalUserStub());
+        $expectedContext = [
+            'viewMode'               => ViewMode::STAFF,
+            'effectiveViewer'        => $staff,
+            'canViewInstructorMarks' => true,
+            'progressTicksReadOnly'  => false,
+            'commentsReadOnly'       => false,
+        ];
 
-        self::assertSame([ViewMode::STAFF, $staff, true], $viewMode->getViewModeVariables($staff, $student, null));
-        self::assertSame([ViewMode::STAFF, $staff, true], $viewMode->getViewModeVariables($staff, $student, 'guardian'));
+        self::assertSame($expectedContext, $viewMode->getViewModeContext($staff, $student, null));
+        self::assertSame($expectedContext, $viewMode->getViewModeContext($staff, $student, 'guardian'));
     }
 
     /**
      * Non-staff users do not select a view mode and use themselves as the effective viewer.
      */
-    public function testNonStaffViewModeVariablesUseCurrentUser(): void
+    public function testNonStaffViewModeContextUsesCurrentUser(): void
     {
         $student = $this->createUser(2, Role::STUDENT);
         $viewee = $this->createUser(3, Role::STUDENT);
         $viewMode = new ViewMode($this->createExternalUserStub());
 
-        self::assertSame(['', $student, false], $viewMode->getViewModeVariables($student, $viewee, ViewMode::STAFF));
+        self::assertSame([
+            'viewMode'               => '',
+            'effectiveViewer'        => $student,
+            'canViewInstructorMarks' => false,
+            'progressTicksReadOnly'  => false,
+            'commentsReadOnly'       => false,
+        ], $viewMode->getViewModeContext($student, $viewee, ViewMode::STAFF));
     }
 
     /**
@@ -132,10 +145,13 @@ class ViewModeTest extends TestCase
         $student = $this->createUser(2, Role::STUDENT);
         $viewMode = new ViewMode($this->createExternalUserStub());
 
-        self::assertSame(
-            [ViewMode::STUDENT, $student, false],
-            $viewMode->getViewModeVariables($staff, $student, ViewMode::STUDENT)
-        );
+        self::assertSame([
+            'viewMode'               => ViewMode::STUDENT,
+            'effectiveViewer'        => $student,
+            'canViewInstructorMarks' => false,
+            'progressTicksReadOnly'  => true,
+            'commentsReadOnly'       => true,
+        ], $viewMode->getViewModeContext($staff, $student, ViewMode::STUDENT));
     }
 
     /**
@@ -157,10 +173,13 @@ class ViewModeTest extends TestCase
             });
         $viewMode = new ViewMode($externalUser);
 
-        self::assertSame(
-            [ViewMode::PARENT, $parent, false],
-            $viewMode->getViewModeVariables($staff, $student, ViewMode::PARENT)
-        );
+        self::assertSame([
+            'viewMode'               => ViewMode::PARENT,
+            'effectiveViewer'        => $parent,
+            'canViewInstructorMarks' => false,
+            'progressTicksReadOnly'  => true,
+            'commentsReadOnly'       => true,
+        ], $viewMode->getViewModeContext($staff, $student, ViewMode::PARENT));
         self::assertSame($student, $parent->getChildren()?->first());
     }
 
