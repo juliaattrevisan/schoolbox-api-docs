@@ -21,6 +21,7 @@ import type {
     ApiSubject,
     ApiCandidatesResponse,
     ApiUpdateConfirmationResponse,
+    ApiRenotifyResponse,
 } from "../js/types/ibReportTypes";
 
 interface Props {
@@ -215,7 +216,7 @@ async function handleCompletePreparation(studentIds: number[]): Promise<void> {
         const removedIds = new Set(studentIds);
         const completedStudents = preparation.value
             .filter((s) => removedIds.has(s.id))
-            .map((s) => ({ ...s, stage: "unconfirmed" as const }));
+            .map((s) => ({ ...s, stage: "unconfirmed" as const, renotifyEndpoint }));
         preparation.value = preparation.value.filter((s) => !removedIds.has(s.id));
         unconfirmed.value = [...completedStudents, ...unconfirmed.value];
         clearSelection();
@@ -363,6 +364,38 @@ async function handleApproveOnBehalf(students: StudentRow[]): Promise<void> {
     }
 }
 
+/**
+ * Renotifies the given unconfirmed students via the session-level renotify endpoint.
+ * @param students The students to renotify.
+ */
+async function handleRenotifySelected(students: StudentRow[]): Promise<void> {
+    if (!renotifyEndpoint || students.length === 0) return;
+
+    const toast = window.sbProps.toastActivate("Renotifying student(s)...");
+
+    try {
+        const response = (await apiRequest<ApiRenotifyResponse, { studentIds: number[] }>({
+            url: renotifyEndpoint,
+            method: "POST",
+            body: { studentIds: students.map((s) => s.userId) },
+        })) as ApiRenotifyResponse;
+
+        if (!response.success) {
+            toast.timeout({ text: response.message ?? "Failed to renotify student(s).", isSuccess: false });
+            return;
+        }
+
+        clearSelection();
+        toast.timeout({
+            text: response.message ?? `${students.length} student${students.length === 1 ? "" : "s"} renotified.`,
+            isSuccess: !response.partial,
+        });
+    } catch (e) {
+        console.error("Failed to renotify students", e);
+        toast.timeout({ text: "Failed to renotify student(s).", isSuccess: false });
+    }
+}
+
 window.Vue.onMounted((): void => {
     void loadCandidates();
 });
@@ -462,6 +495,7 @@ window.Vue.onMounted((): void => {
             :is-loading="isCompleting || isResetting || isApprovingOnBehalf"
             :active-section="activeSelectionSection"
             @complete-preparation="handleCompletePreparation(preparationSelected.map((s) => s.id))"
+            @renotify="handleRenotifySelected(unconfirmedSelected)"
             @approve-on-behalf="handleApproveOnBehalf(unconfirmedSelected)"
             @reset-details="
                 promptResetDetails([...unconfirmedSelected, ...confirmedSelected, ...failedSelected].map((s) => s.id))

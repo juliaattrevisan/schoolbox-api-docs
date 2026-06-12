@@ -11,6 +11,7 @@ defineProps<Props>();
 
 defineEmits<{
     completePreparation: [];
+    renotify: [];
     approveOnBehalf: [];
     resetDetails: [];
     clearSelection: [];
@@ -33,6 +34,16 @@ defineEmits<{
             >
                 <sbx-icon name="notifications-hollow"></sbx-icon>
                 Complete Preparation
+            </button>
+            <button
+                v-if="activeSection === 'unconfirmed'"
+                type="button"
+                class="button sbx-button--has-icon l-flex__item--1-auto"
+                :disabled="isLoading"
+                @click="$emit('renotify')"
+            >
+                <sbx-icon name="notifications-hollow"></sbx-icon>
+                Renotify
             </button>
             <button
                 v-if="activeSection === 'unconfirmed'"
