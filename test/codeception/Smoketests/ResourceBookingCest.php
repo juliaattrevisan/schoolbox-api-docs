@@ -41,6 +41,7 @@ class ResourceBookingCest
      * Hook method to execute prior to each test
      * @param IntegrationTester $i
      */
+    // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore -- Codeception hook name.
     public function _before(IntegrationTester $i): void
     {
         $i->loginAdmin();

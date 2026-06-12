@@ -1469,6 +1469,14 @@ class Validation
         BookingItemModel $resource,
         ?Event $event
     ): bool {
+        $moderationType = $resource->getModerationType();
+        if (
+            $moderationType === null
+            || $moderationType->getId() === BookingModerationTypeModel::TYPE_OPEN
+        ) {
+            return $this->nonClashingBookingWouldBeApproved($resource, null, $this->user);
+        }
+
         return $this->nonClashingBookingWouldBeApproved($resource, $event?->getAuthor(), $this->user);
     }
 
