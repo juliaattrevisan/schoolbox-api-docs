@@ -43,7 +43,7 @@ class ModelToArrayTest extends TestCase
         $this->assertSame(123, $payload['userId']);
         $this->assertSame(456, $payload['registrationSessionStudentId']);
         $this->assertSame(RegistrationSessionStudentModel::STATUS_CONFIRMED, $payload['status']);
-        $this->assertSame('Alex, Nguyen', $payload['userName']);
+        $this->assertSame('Nguyen, Alex', $payload['userName']);
         $this->assertFalse($payload['hasMissingDetails']);
         $this->assertSame([], $payload['missingFields']);
         $this->assertSame('May 2026', $payload['session']);
@@ -181,7 +181,7 @@ class ModelToArrayTest extends TestCase
 
         $payload = $this->createTranslator()($student, [], '');
 
-        $this->assertSame(', Nguyen', $payload['userName']);
+        $this->assertSame('Nguyen, ', $payload['userName']);
         $this->assertTrue($payload['hasMissingDetails']);
         $candidateDetailsByKey = array_column(
             $payload['candidateDetails'],

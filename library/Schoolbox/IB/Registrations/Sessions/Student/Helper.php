@@ -66,7 +66,7 @@ class Helper
      */
     public function buildUserName(string $givenName, string $lastName): string
     {
-        return "{$givenName}, {$lastName}";
+        return "{$lastName}, {$givenName}";
     }
 
     /**
