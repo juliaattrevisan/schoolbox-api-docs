@@ -28,6 +28,7 @@ use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use RangeException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Rubric\Grid\Payload;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper;
 use Schoolbox\File\MimetypeMapper;
@@ -1241,6 +1242,19 @@ class Controller extends Assessment\Controller
             'showGroupTotal' => null,
             'showRubricTotal' => $selfAssess
         ];
+
+
+        /* Rubric Grid Payloads
+         */
+        $data['rubricGridPayloads'] = new Payload(
+            $this->rubricMapper,
+            $this->getConfigLoader()->get(ConfigMapper::NAME_RUBRIC_SHOW_POINTS),
+            $this->getUser()
+        )->generate(
+            $assessment->getRubricInstances(),
+            null,
+            null,
+        );
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/dueWork/createSubmission.twig',
