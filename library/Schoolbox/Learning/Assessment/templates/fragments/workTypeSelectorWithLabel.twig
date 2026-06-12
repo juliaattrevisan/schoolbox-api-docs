@@ -25,16 +25,19 @@
         >{{ workType.name }}</option>
     {% endfor %}
 </select>
-<div id="workTypeVisibilityAlert" class="alert-box" data-work-type-visibility-alert style="display:none"></div>
+<div id="workTypeVisibilityAlert" class="alert-box" data-test="assessment-form-work-type-visibility-alert" style="display:none"></div>
 <script>
     (function() {
         const selector = document.getElementById("workTypeSelector");
         const alert = document.getElementById("workTypeVisibilityAlert");
 
         if (!selector || !alert) {
-            return;
+            throw new Error("Work type selector visibility alert elements are missing.");
         }
 
+        /**
+         * Updates the selected work type visibility alert message.
+         */
         function updateWorkTypeVisibilityAlert() {
             const option = selector.options[selector.selectedIndex];
             const message = option ? option.dataset.workTypeVisibilityMessage : "";
