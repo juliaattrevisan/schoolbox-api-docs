@@ -229,6 +229,7 @@ class Controller extends Base
                 : '',
             'effectiveViewer'        => $viewModeContext->effectiveViewer,
             'canViewInstructorMarks' => $viewModeContext->canViewInstructorMarks,
+            'progressTicksReadOnly'  => $viewModeContext->progressTicksReadOnly,
             'currentRouteBase'       => $currentRouteBase,
             'customisationsRoute'    => $this->getRouteIfAuthorized(
                 'customisationRecord.viewRecordByStudent',

@@ -9,6 +9,7 @@
     viewModes:  string[]                         - Supported view modes in display order
     effectiveViewer: User                        - The user whose feedback visibility rules apply
     canViewInstructorMarks: bool                 - Whether instructor-only marks should be rendered
+    progressTicksReadOnly: bool                  - Whether progress ticks should render as read-only
     viewModeQuerySuffix: string                  - Query suffix that preserves the selected view mode
     currentRouteBase: string                     - Base URL of the current page, used by the view-mode switcher
     customisationsRoute: string|null             - Route to the student's customisation record, or null if the viewer may not see it
@@ -140,7 +141,8 @@
                                         assessment:  assessment,
                                         student:     student,
                                         canViewInstructorMarks: canViewInstructorMarks,
-                                        effectiveViewer: effectiveViewer
+                                        effectiveViewer: effectiveViewer,
+                                        progressTicksReadOnly: progressTicksReadOnly
                                     } only %}
                                 </li>
                             {% endfor %}

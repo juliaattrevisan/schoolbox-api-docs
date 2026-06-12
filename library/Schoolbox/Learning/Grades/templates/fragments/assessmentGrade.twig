@@ -12,6 +12,7 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
 {% import '@learningAssessment/project/macro/icon.twig' as icon %}
 
+{% set progressTicksReadOnly = progressTicksReadOnly is defined ? progressTicksReadOnly : false %}
 {% set participant = assessment ? assessment.participantIfExtant(student) : null %}
 
 {# Lesson Plans do not appear in the Grades page

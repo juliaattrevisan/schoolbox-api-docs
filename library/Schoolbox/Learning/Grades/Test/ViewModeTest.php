@@ -196,6 +196,26 @@ class ViewModeTest extends TestCase
     }
 
     /**
+     * The grades summary page must pass the read-only progress tick flag through to assessment cards.
+     */
+    public function testSummaryTemplateReceivesAndPassesProgressTickReadOnly(): void
+    {
+        $controller = file_get_contents(__DIR__ . '/../Controller.php');
+        $summaryTemplate = file_get_contents(__DIR__ . '/../templates/summary.twig');
+
+        self::assertIsString($controller);
+        self::assertIsString($summaryTemplate);
+        self::assertMatchesRegularExpression(
+            "/'@learningGrades\\/summary\\.twig', \\[(?:(?!\\], '', 'grade'\\)).)*'progressTicksReadOnly'\\s*=>\\s*\\\$viewModeContext->progressTicksReadOnly/s",
+            $controller
+        );
+        self::assertMatchesRegularExpression(
+            "/@learningGrades\\/fragments\\/assessmentGrade\\.twig' with \\{(?:(?!\\} only).)*progressTicksReadOnly:\\s*progressTicksReadOnly/s",
+            $summaryTemplate
+        );
+    }
+
+    /**
      * Provide supported request values and their normalized modes.
      *
      * @return array<string, array{string, ViewModeValue}>
