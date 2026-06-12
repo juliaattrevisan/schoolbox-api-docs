@@ -762,7 +762,13 @@
                                 <dl>
                                     {% for detail in registrationPayload.candidateDetails %}
                                         <dt class="small-12 medium-4 columns"><b>{{ detail.label }}</b></dt>
-                                        <dd class="small-12 medium-8 columns">{{ detail.value }}</dd>
+                                        <dd class="small-12 medium-8 columns">
+                                            {%- if detail.key == 'dateOfBirth' and not detail.isMissing -%}
+                                                {{ detail.value|date(dateFormats.shortDateOnlyFormat) }}
+                                            {%- else -%}
+                                                {{ detail.value }}
+                                            {%- endif -%}
+                                        </dd>
                                     {% endfor %}
                                 </dl>
                             </div>
