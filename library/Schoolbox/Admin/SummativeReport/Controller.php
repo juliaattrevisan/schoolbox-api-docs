@@ -1133,7 +1133,6 @@ class Controller extends ConfigController
         /* Need this to fetch the Govt. Student Number and slap it onto summative reports
          * Your connector might not supply this, so could be entirely null for all we know
          */
-        $externalUser = [];
         $govtStudentNumber = null;
 
         if ('' !== trim((string)$student->getExternalId())) {
