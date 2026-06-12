@@ -76,12 +76,13 @@
                 {% elseif currentInteraction is feedback %}
                     {% set hasCollapser = currentInteraction.allFiles.count or currentInteraction.comment | length > 0 or currentInteraction.rubricMarkedGrids.count %}
                     {% include '@learningAssessment/dueWork/summary/interaction/feedback.twig' with {
+                        assessment: assessment,
                         currentFeedback: currentInteraction,
                         participant: participant,
                         hasCollapser: hasCollapser,
                         collapsed: true,
                         deleteIcon: true,
-                        rubricGridPayloadsHistory: rubricGridPayloadsHistory[currentInteraction.id],
+                        rubricGridPayloads: rubricGridPayloadsHistory[currentInteraction.id],
                     } %}
                 {% endif %}
                 </section>

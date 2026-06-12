@@ -107,7 +107,6 @@
                 {% set hasCollapser = currentFeedback.allFiles.count or currentFeedback.comment | length > 0 or currentFeedback.rubricMarkedGrids.count %}
 
                 {# We pass the responseId as well, so that people can download annotated kami docs #}
-                <pre>{{ dump(rubricGridPayloadsHistory[currentFeedback.id]) }}</pre>
                 {% include '@learningAssessment/dueWork/summary/interaction/feedback.twig' with {
                     currentFeedback: currentFeedback,
                     assessment: currentInteraction.assessable,

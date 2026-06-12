@@ -1125,6 +1125,16 @@ class DataSource
          */
         $feedback = $mapper->findById($feedbackId);
 
+        /* Remove previous marks
+         *
+         * Use the derived mapper and the derived feedbackId to delete any rubric pieces that were previously associated
+         * with it which essentially cleanses the slate. Although, I think you'd be better off deleting them immediately
+         * prior to saving, in case something died during the construction of whatever you were going to save. That
+         * would have left you in a half-baked state, deleting previous data but not persisting current data.
+         */
+        $this->indicatorMarkMapper->deleteFeedbackMarks($feedbackId, $rubricInstance, $mapper->getTable());
+        $this->capabilityMarkMapper->deleteFeedbackMarks($feedbackId, $rubricInstance, $mapper->getTable());
+
         // Create list of cap/ind marks that will be saved
         $capabilityMarksToSave = $this->capabilityMarkMapper->createCollection();
         $indicatorMarksToSave  = $this->indicatorMarkMapper->createCollection();
@@ -1142,6 +1152,12 @@ class DataSource
                 ->setValue($capabilityMark->getValue())
                 ->setHumanReadableValue($capabilityMark->getHumanReadableValue())
                 ->setValid(true);
+
+            /* For some reason this has become integral: we can't just save the collection at the end.
+             * I have to save them in situ as I progress: must be something to do with the object-by-reference nature
+             * of what we're building here.
+             */
+            $this->capabilityMarkMapper->save($capabilityMarkModel);
 
             // Create ind marks
             foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
@@ -1162,23 +1178,10 @@ class DataSource
                     ->setDescriptor($descriptorModel)
                     ->setValue($indicatorMark->getValue())
                     ->setValid(true);
+
+                $this->indicatorMarkMapper->save($indicatorMarksToSave[$indicatorId]);
             }
         }
-
-        /* Remove previous marks
-         *
-         * Use the derived mapper and the derived feedbackId to delete any rubric pieces that were previously associated
-         * with it which essentially cleanses the slate. Although, I think you'd be better off deleting them immediately
-         * prior to saving, in case something died during the construction of whatever you were going to save. That
-         * would have left you in a half-baked state, deleting previous data but not persisting current data.
-         */
-        $this->indicatorMarkMapper->deleteFeedbackMarks($feedbackId, $rubricInstance, $mapper->getTable());
-        $this->capabilityMarkMapper->deleteFeedbackMarks($feedbackId, $rubricInstance, $mapper->getTable());
-
-        /* Save the updated cap/ind marks
-         */
-        $this->capabilityMarkMapper->save($capabilityMarksToSave);
-        $this->indicatorMarkMapper->save($indicatorMarksToSave);
     }
 
 
