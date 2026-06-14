@@ -21,7 +21,7 @@ use Schoolbox\Admin\OpenAI\Config as AIConfig;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\OpenAi\Session\Mapper as SessionMapper;
 use Schoolbox\OpenAi\Session\Log\Mapper as SessionLogMapper;
-use Schoolbox\OpenAi\Session\Log\Model as SessionLogModel;
+use Schoolbox\OpenAi\Session\Model as SessionModel;
 use Schoolbox\UserMapper;
 use Schoolbox\User;
 
@@ -252,13 +252,13 @@ class Controller extends Base
 
 
     /**
-     * @param SessionLogModel $log - first log in the session
+     * @param SessionModel $session
      * @return void
      * @see /library/Schoolbox/Admin/OpenAI/Usage/templates/payload.ts AiSessionLogApiResponse
      */
-    public function getLog(SessionLogModel $log): void
+    public function getSessionLogs(SessionModel $session): void
     {
-        $logEntries = $this->sessionLogMapper->findByColumn('ai_session_id', $log->getAiSessionId(), [
+        $logEntries = $this->sessionLogMapper->findByColumn('ai_session_id', $session->getId(), [
             'order' => [
                 'created_at' => 'ASC'
             ]

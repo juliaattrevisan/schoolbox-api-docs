@@ -157,7 +157,7 @@ window.Vue.onMounted(async () => {
  * @param session The session to open
  */
 async function openSessionDetails(session: AiSession): Promise<void> {
-    if (!session._routes.getLog) {
+    if (!session._routes.getSessionLogs) {
         return; // no access to view the log
     }
 
@@ -167,7 +167,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
 
     const response = await apiRequest<AiSessionLogApiResponse>({
         method: "GET",
-        url: session._routes.getLog,
+        url: session._routes.getSessionLogs,
     });
 
     if (!response.success) {
@@ -292,7 +292,13 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                             </td>
                             <td>{{ 200 !== session.returnCode ? "Error" : "" }}</td>
                             <td class="actions-small-1">
-                                <nav v-if="session.id !== null && session.logFormat !== null && session._routes.getLog">
+                                <nav
+                                    v-if="
+                                        session.id !== null &&
+                                        session.logFormat !== null &&
+                                        session._routes.getSessionLogs
+                                    "
+                                >
                                     <button
                                         type="button"
                                         class="sbx-icon-only-button f-no-margins"

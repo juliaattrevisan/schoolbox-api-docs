@@ -27,7 +27,7 @@ class Links extends AbstractLinks
     {
         $translation = [];
 
-        $translation['getLog'] = $this->getRouteIfAuthorized('openAIUsage.getLog', [
+        $translation['getSessionLogs'] = $this->getRouteIfAuthorized('openAIUsage.getSessionLogs', [
             'sessionId' => $session->getId(),
         ]);
 

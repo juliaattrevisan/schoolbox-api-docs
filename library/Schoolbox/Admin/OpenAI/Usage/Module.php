@@ -45,7 +45,7 @@ class Module extends BaseModule
         );
 
         $preload = function (array $params) {
-            return $this->preloadLog($params);
+            return $this->preloadSession($params);
         };
 
         /* Allow users the opportunity to get a set of results using filter criteria
@@ -59,7 +59,7 @@ class Module extends BaseModule
         /* Load the details of a particular AI session, which can consist of multiple
          * ai_session_log rows due to people resuming their AI session etc.
          */
-        $this->register('GET', '/log/{sessionId}', 'getLog', $isAdmin, $preload);
+        $this->register('GET', '/session/{sessionId}/logs', 'getSessionLogs', $isAdmin, $preload);
     }
 
     /**
@@ -77,28 +77,28 @@ class Module extends BaseModule
 
 
     /**
-     * Preload the first log entry on the {sessionId} param
+     * Preload the AI session from the {sessionId} param.
      *
      * @param array $params
      * @return array
      * @throws MapperException
      * @throws Deleted
      */
-    private function preloadLog(array $params): array
+    private function preloadSession(array $params): array
     {
-        // if preloaded, then return
-        if ($params['log'] ?? null) {
-            return ['log' => $params['log']];
+        if ($params['session'] ?? null) {
+            return ['session' => $params['session']];
         }
 
-        // fetch the first log entry for this sessionId
         if (!isset($params['sessionId'])) {
             throw new InvalidArgumentException('AI session identifier parameter is missing.');
         }
 
-        $log = $this->getAILogMapper()->findOneByColumn('ai_session_id', $params['sessionId']);
+        $session = $this->getMapperFactory()
+            ->get(SessionMapper::class)
+            ->findById($params['sessionId']);
 
-        return ['log' => $log];
+        return ['session' => $session];
     }
 
 
