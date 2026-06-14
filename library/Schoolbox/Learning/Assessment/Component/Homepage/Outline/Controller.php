@@ -143,7 +143,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         $this->courseImplementation = null;
         $filters = json_decode(html_entity_decode($this->getConfig('assessmentTypes')), true);
 
-        $assessmentTypeOptions = AssessmentType::getPermittedOptions($this->getConfigLoader(), $this->getUser());
+        $assessmentTypeOptions = AssessmentType::getEnabledOptions($this->getConfigLoader());
 
         /**
          * if filters fail, we should use the system default, of show everything
@@ -291,7 +291,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         }
 
         $data = [
-            'assessmentTypes'      => AssessmentType::getEnabledOptions($this->getConfigLoader()),
+            'assessmentTypes'      => AssessmentType::getPermittedOptions($this->getConfigLoader(), $this->getUser()),
             'filterList'           => $this->filterList,
             'readOnly'             => $this->readOnly,
             'canWrite'             => $this->canWrite,
