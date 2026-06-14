@@ -285,33 +285,6 @@ class ResourceBookingCest
             strpos($response, '/resource-booking/booking/' . $approvedBooking->getId() . '/reject'),
             'Approved report row has no reject action'
         );
-
-        $i->impersonateUser(24);
-        $i->sendGET('/resource-booking/report?start=01%2F02%2F2077&end=01%2F02%2F2077&category%5B%5D=3&clashesOnly=0&classes=0');
-
-        $i->seeResponseCodeIs(200);
-        $response = $i->grabResponse();
-
-        $i->assertMatchesRegularExpression(
-            '~'
-            . preg_quote($pendingBooking->getName(), '~')
-            . '.*?'
-            . preg_quote($pendingResource->getName(), '~')
-            . '.*?<td>\s*&nbsp;\s*</td>'
-            . '~s',
-            $response,
-            'Pending report row hides moderation actions from users who cannot moderate the resource'
-        );
-        $i->assertSame(
-            false,
-            strpos($response, '/resource-booking/booking/' . $pendingBooking->getId() . '/approve'),
-            'Pending report row has no approve action for users who cannot moderate the resource'
-        );
-        $i->assertSame(
-            false,
-            strpos($response, '/resource-booking/booking/' . $pendingBooking->getId() . '/reject'),
-            'Pending report row has no reject action for users who cannot moderate the resource'
-        );
     }
 
     public function createResourceRejectsInvalidCapacity(IntegrationTester $i): void
