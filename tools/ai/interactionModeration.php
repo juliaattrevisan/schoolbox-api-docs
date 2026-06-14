@@ -18,6 +18,8 @@ use Schoolbox\OpenAi\Feature;
 use Schoolbox\OpenAi\Session\Log\Mapper as AILogMapper;
 use Schoolbox\OpenAi\Agent\InteractionModeration;
 use Schoolbox\OpenAi\ClientFactory;
+use Schoolbox\OpenAi\Moderation\Event\Mapper as ModerationEventMapper;
+use Schoolbox\OpenAi\Moderation\Event\Status as ModerationEventStatus;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -38,6 +40,11 @@ $app = new class extends CliTool\App {
      * The AI session ID to run moderation against
      */
     private const string OPT_LONG_SESSION_ID = 'session-id:';
+
+    /**
+     * @var ModerationEventMapper
+     */
+    private ModerationEventMapper $moderationEventMapper;
 
     /**
      * @var AILogMapper
@@ -78,28 +85,33 @@ HELP;
             exit(CliKernelAbstract::EXIT_STATUS_OK);
         }
 
-        $sessionId = trim((string)($this->getOpt(self::OPT_LONG_SESSION_ID) ?? ''));
+        $targetSessionId = trim((string)($this->getOpt(self::OPT_LONG_SESSION_ID) ?? ''));
 
-        if ($sessionId === '') {
+        if ($targetSessionId === '') {
             $this->getLogger()->error('--session-id is required.');
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
 
+        $this->moderationEventMapper = ModerationEventMapper::getInstance();
         $this->aiLogMapper = AILogMapper::getInstance();
         $this->clientFactory = $this->getDi()->get('ai.clientFactory');
 
-        $logs = $this->aiLogMapper->findByColumn('ai_session_id', $sessionId, [
+        /* find related logs */
+
+        $logs = $this->aiLogMapper->findByColumn('ai_session_id', $targetSessionId, [
             'order' => [
                 'created_at' => 'ASC',
             ],
         ]);
 
         if ($logs->count() === 0) {
-            $this->getLogger()->error(sprintf('No logs found for session ID "%s"', $sessionId));
+            $this->getLogger()->error(sprintf('No logs found for session ID "%s"', $targetSessionId));
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
 
-        $this->getLogger()->info(sprintf('Found %d log(s) for session ID "%s"', $logs->count(), $sessionId));
+        $this->getLogger()->info(sprintf('Found %d log(s) for session ID "%s"', $logs->count(), $targetSessionId));
+
+        /* run the agent */
 
         $agentConfig = (new AIConfig())->decode(
             (string)$this->getConfig()->get(ConfigMapper::NAME_AI_MODERATION_AGENT)
@@ -115,6 +127,21 @@ HELP;
         $moderationSessionId = (string)Uuid::uuid4();
         $moderationResult = $interactionModeration->request(null, $moderationSessionId, $logs);
 
+        /* persist the result (for both flagged and non-flagged sessions) */
+        // TODO: it would be good if $moderationResult was a well-defined object instead of an untyped array
+        $status = $moderationResult['needs_human_review']
+            ? ModerationEventStatus::REQUIRES_ATTENTION
+            : ModerationEventStatus::NO_ACTION_REQUIRED; // TODO: this might actually be 'null' (the col currently isn't nullable) - depends on if we need to distinguish "not flagged" vs "user marked as no action required"
+
+        $event = $this->moderationEventMapper->createModel()
+            ->setAiSessionId($moderationSessionId)
+            ->setTargetAiSessionId($targetSessionId)
+            ->setStatus($status)
+            ->setModerationDetails(json_encode($moderationResult, JSON_THROW_ON_ERROR));
+
+        $this->moderationEventMapper->save($event);
+
+        /* dump the results out since this is a temp testing tool */
         fwrite(
             $this->getOutStream(),
             json_encode($moderationResult, JSON_PRETTY_PRINT) . PHP_EOL

@@ -14,6 +14,14 @@ use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+/**
+ * @method Model createModel($idValue = null)
+ * @method Model findById($identifierValue)
+ * @method null|Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model[]|GenericCollection findAll($contents = [])
+ * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
+ * @method Model[]|GenericCollection createCollection($contents = [])
+ */
 class Mapper extends \Schoolbox\Mapper
 {
     /**
