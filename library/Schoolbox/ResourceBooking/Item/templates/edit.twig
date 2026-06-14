@@ -261,6 +261,15 @@
                 </fieldset>
                 <fieldset class="content">
                     <div class="small-12 medium-6 columns">
+                        <div class="clear-fieldset">
+                            <label for="capacity" class="required">
+                                Number of Bookable Items
+                                <span class="hint has-tip tip-top" data-tooltip title="The maximum number of bookings that can use this resource at the same time. Use 1 when only one booking should be available at a time.">?</span>
+                            </label>
+                            <input name="capacity" id="capacity" type="text" inputmode="numeric" pattern="[0-9]*" value="{{ item.capacity|default(1) }}" required />
+                        </div>
+                    </div>
+                    <div class="small-12 medium-6 columns">
                         <label for="allow_clash_bookings">
                             Allow Conflicting Booking Requests
                             <span class="hint has-tip tip-top" data-tooltip title="If enabled, users can request bookings even when capacity is full. Only bookings within the available capacity can be approved.">?</span>
@@ -271,15 +280,6 @@
                                 <span>On</span>
                                 <span>Off</span>
                             </label>
-                        </div>
-                    </div>
-                    <div class="small-12 medium-6 columns">
-                        <div class="clear-fieldset">
-                            <label for="capacity" class="required">
-                                Number of Bookable Items
-                                <span class="hint has-tip tip-top" data-tooltip title="The maximum number of bookings that can use this resource at the same time. Use 1 when only one booking should be available at a time.">?</span>
-                            </label>
-                            <input name="capacity" id="capacity" type="text" inputmode="numeric" pattern="[0-9]*" value="{{ item.capacity|default(1) }}" required />
                         </div>
                     </div>
                 </fieldset>
