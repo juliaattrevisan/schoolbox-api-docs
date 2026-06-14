@@ -186,7 +186,7 @@ class ResourceBookingCest
             false,
             ModerationType\Model::TYPE_MANAGED
         );
-        $reportUser = \Schoolbox\UserMapper::getInstance()->findByUsername('alaress');
+        $reportUser = \Schoolbox\UserMapper::getInstance()->findById(22);
         $i->assertNotNull($reportUser, 'Report user exists in the test dataset');
         $pendingResource->addModerator($reportUser);
         ResourceBooking\Item\Mapper::getInstance()->save($pendingResource);
@@ -199,7 +199,6 @@ class ResourceBookingCest
             ModerationType\Model::TYPE_OPEN
         );
 
-        $i->impersonateUser(3);
         $pendingBooking = $this->createCapacityTestBooking(
             $i,
             $pendingResource,
