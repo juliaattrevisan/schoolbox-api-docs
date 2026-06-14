@@ -41,6 +41,7 @@ class ResourceBookingCest
      * Hook method to execute prior to each test
      * @param IntegrationTester $i
      */
+    // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore -- Codeception hook name.
     public function _before(IntegrationTester $i): void
     {
         $i->loginAdmin();
@@ -111,11 +112,13 @@ class ResourceBookingCest
         $i->sendRequest($resource);
 
         $ItemMapper = \Schoolbox\ResourceBooking\Item\Mapper::getInstance();
-        $newItemID = $ItemMapper->findOneByColumn('name', $resource_title)->getID();
+        $newItem = $ItemMapper->findOneByColumn('name', $resource_title);
+        $newItemID = $newItem->getID();
 
         #THEN
         $i->seeResponseCodeIs(303);
         $i->seeHttpHeader('location', "/resource-booking/item/" . $newItemID);
+        $i->assertEquals(1, $newItem->getCapacity(), 'Default resource capacity is 1');
     }
 
     /**
@@ -142,12 +145,159 @@ class ResourceBookingCest
         $updatePayload = new Payload\ResourceBooking\Resource\Update($newItem);
         $updatePayload->setResourceName($resource_title);
         $updatePayload->setDescription('<p>Updated this description successfully</p>');
+        $updatePayload->setCapacity('7');
         $i->sendRequest($updatePayload);
         $newItemID = $newItem->getId();
 
         #THEN
         $i->seeResponseCodeIs(303);
         $i->seeHttpHeader('location', "/resource-booking/item/" . $newItemID);
+        $updatedItem = $ItemMapper->findById($newItemID);
+        $i->assertEquals(7, $updatedItem->getCapacity(), 'Updated resource capacity is persisted');
+    }
+
+    public function readResourceDisplaysCapacityAndConflictBookingRules(IntegrationTester $i): void
+    {
+        $resourceMapper = ResourceBooking\Item\Mapper::getInstance();
+        $resource = new Payload\ResourceBooking\Resource\Create();
+        $resourceName = 'Testing Resource Rules at ' . microtime(true);
+        $resource->setResourceName($resourceName);
+        $resource->setCapacity('7');
+        $resource->setAllowClashBookings(true);
+
+        $i->sendRequest($resource);
+
+        $i->seeResponseCodeIs(303);
+        $newItem = $resourceMapper->findOneByColumn('name', $resourceName);
+
+        $i->sendGET('/resource-booking/item/' . $newItem->getId());
+
+        $i->seeResponseCodeIs(200);
+        $i->seeResponseContains('Conflict bookings: Allowed');
+        $i->seeResponseContains('Capacity: 7 concurrent bookings');
+    }
+
+    public function bookingReportDisplaysCapacityColumnsAndQuantity(IntegrationTester $i): void
+    {
+        $pendingResource = $this->createCapacityTestResource(
+            $i,
+            'Capacity report pending resource',
+            7,
+            false,
+            ModerationType\Model::TYPE_MANAGED
+        );
+        $reportUser = \Schoolbox\UserMapper::getInstance()->findById(22);
+        $i->assertNotNull($reportUser, 'Report user exists in the test dataset');
+        $pendingResource->addModerator($reportUser);
+        ResourceBooking\Item\Mapper::getInstance()->save($pendingResource);
+
+        $approvedResource = $this->createCapacityTestResource(
+            $i,
+            'Capacity report approved resource',
+            7,
+            false,
+            ModerationType\Model::TYPE_OPEN
+        );
+
+        $pendingBooking = $this->createCapacityTestBooking(
+            $i,
+            $pendingResource,
+            'Capacity report pending booking',
+            date('d/m/Y g:ia', strtotime('2077-02-01 10:00:00')),
+            date('d/m/Y g:ia', strtotime('2077-02-01 11:00:00'))
+        );
+        $this->assertBookingStatus($i, $pendingBooking, ResourceBooking\Booking\Status\Model::STATUS_PENDING);
+
+        $i->loginAdmin();
+        $approvedBooking = $this->createCapacityTestBooking(
+            $i,
+            $approvedResource,
+            'Capacity report approved booking',
+            date('d/m/Y g:ia', strtotime('2077-02-01 12:00:00')),
+            date('d/m/Y g:ia', strtotime('2077-02-01 13:00:00')),
+            2
+        );
+
+        $i->impersonateUser($reportUser->getId());
+        $i->sendGET('/resource-booking/report?start=01%2F02%2F2077&end=01%2F02%2F2077&category%5B%5D=3&clashesOnly=0&classes=0');
+
+        $i->seeResponseCodeIs(200);
+        $response = $i->grabResponse();
+
+        $lastHeaderPosition = -1;
+        foreach (
+            [
+                '<th>Start</th>',
+                '<th>End</th>',
+                '<th>Booking</th>',
+                '<th>Venue/Resource</th>',
+                '<th>Quantity</th>',
+                '<th>Booker</th>',
+                '<th>Status</th>',
+                '<th>Notes</th>',
+                '<th>Actions</th>',
+            ] as $header
+        ) {
+            $headerPosition = strpos($response, $header);
+            $i->assertNotFalse($headerPosition, $header . ' header is present');
+            $i->assertGreaterThan($lastHeaderPosition, $headerPosition, $header . ' header appears in order');
+            $lastHeaderPosition = $headerPosition;
+        }
+        $bookerName = \Schoolbox\UserMapper::getInstance()->findById(1)->formatName();
+
+        $i->assertMatchesRegularExpression(
+            '~'
+            . preg_quote($pendingBooking->getName(), '~')
+            . '.*?'
+            . preg_quote($pendingResource->getName(), '~')
+            . '.*?<td>\s*1\s*</td>'
+            . '.*?'
+            . preg_quote($bookerName, '~')
+            . '.*?'
+            . preg_quote('Pending', '~')
+            . '.*?<article><p>These are some notes</p></article>'
+            . '.*?/resource-booking/booking/' . $pendingBooking->getId() . '/approve'
+            . '.*?/resource-booking/booking/' . $pendingBooking->getId() . '/reject'
+            . '~s',
+            $response,
+            'Pending report row shows booking, venue/resource, quantity, booker, status, notes, and actions in order'
+        );
+        $i->assertMatchesRegularExpression(
+            '~'
+            . preg_quote($approvedBooking->getName(), '~')
+            . '.*?'
+            . preg_quote($approvedResource->getName(), '~')
+            . '.*?<td>\s*2\s*</td>'
+            . '.*?'
+            . preg_quote('Approved', '~')
+            . '.*?<td>\s*&nbsp;\s*</td>'
+            . '~s',
+            $response,
+            'Approved report row shows status without moderation actions'
+        );
+        $i->assertSame(
+            false,
+            strpos($response, '/resource-booking/booking/' . $approvedBooking->getId() . '/approve'),
+            'Approved report row has no approve action'
+        );
+        $i->assertSame(
+            false,
+            strpos($response, '/resource-booking/booking/' . $approvedBooking->getId() . '/reject'),
+            'Approved report row has no reject action'
+        );
+    }
+
+    public function createResourceRejectsInvalidCapacity(IntegrationTester $i): void
+    {
+        foreach (['0', '1000', 'abc', '1.5', ''] as $capacity) {
+            $resource = new Payload\ResourceBooking\Resource\Create();
+            $resource->setResourceName('Testing Resource Invalid Capacity at ' . microtime(true));
+            $resource->setCapacity($capacity);
+
+            $i->sendRequest($resource);
+
+            $i->seeResponseCodeIs(400);
+        }
     }
 
     /**
@@ -629,6 +779,89 @@ class ResourceBookingCest
         $i->assertEquals($bookingStatus, '2');
     }
 
+    public function capacityTwoAllowsSecondOverlappingApprovedBooking(IntegrationTester $i): void
+    {
+        $resource = $this->createCapacityTestResource(
+            $i,
+            'Capacity 2 allows second overlapping booking',
+            2,
+            false,
+            ModerationType\Model::TYPE_OPEN
+        );
+        $startDate = date('d/m/Y g:ia', strtotime('2077-02-01 10:00:00'));
+        $endDate = date('d/m/Y g:ia', strtotime('2077-02-01 11:00:00'));
+
+        $firstBooking = $this->createCapacityTestBooking($i, $resource, 'First capacity booking', $startDate, $endDate);
+        $secondBooking = $this->createCapacityTestBooking($i, $resource, 'Second capacity booking', $startDate, $endDate);
+
+        $this->assertBookingStatus($i, $firstBooking, ResourceBooking\Booking\Status\Model::STATUS_APPROVED);
+        $this->assertBookingStatus($i, $secondBooking, ResourceBooking\Booking\Status\Model::STATUS_APPROVED);
+    }
+
+    public function capacityTwoRejectsThirdOverlappingBookingWhenClashesNotAllowed(IntegrationTester $i): void
+    {
+        $resource = $this->createCapacityTestResource(
+            $i,
+            'Capacity 2 rejects third overlapping booking',
+            2,
+            false,
+            ModerationType\Model::TYPE_OPEN
+        );
+        $startDate = date('d/m/Y g:ia', strtotime('2077-02-01 10:00:00'));
+        $endDate = date('d/m/Y g:ia', strtotime('2077-02-01 11:00:00'));
+
+        $this->createCapacityTestBooking($i, $resource, 'First approved capacity booking', $startDate, $endDate);
+        $this->createCapacityTestBooking($i, $resource, 'Second approved capacity booking', $startDate, $endDate);
+        $thirdBookingName = 'Third rejected capacity booking ' . microtime(true);
+        $payload = new Payload\ResourceBooking\Resource\BookItem($resource, $thirdBookingName);
+        $payload->setStartDate($startDate);
+        $payload->setEndDate($endDate);
+        $i->sendRequest($payload);
+
+        $i->seeResponseCodeIs(400);
+        $i->canSeeResponseContainsJson(['message' => 'Could not create any bookings']);
+        $i->dontSeeInDatabase('resource_booking', ['name' => $thirdBookingName]);
+    }
+
+    public function capacityTwoCreatesThirdAsPendingWhenClashesAllowed(IntegrationTester $i): void
+    {
+        $resource = $this->createCapacityTestResource(
+            $i,
+            'Capacity 2 creates third overlapping booking as pending',
+            2,
+            true,
+            ModerationType\Model::TYPE_OPEN
+        );
+        $startDate = date('d/m/Y g:ia', strtotime('2077-02-01 10:00:00'));
+        $endDate = date('d/m/Y g:ia', strtotime('2077-02-01 11:00:00'));
+
+        $this->createCapacityTestBooking($i, $resource, 'First approved clash-capacity booking', $startDate, $endDate);
+        $this->createCapacityTestBooking($i, $resource, 'Second approved clash-capacity booking', $startDate, $endDate);
+        $thirdBooking = $this->createCapacityTestBooking($i, $resource, 'Third pending clash-capacity booking', $startDate, $endDate);
+
+        $this->assertBookingStatus($i, $thirdBooking, ResourceBooking\Booking\Status\Model::STATUS_PENDING);
+    }
+
+    public function moderatedResourceWithCapacityAvailableCreatesPending(IntegrationTester $i): void
+    {
+        $resource = $this->createCapacityTestResource(
+            $i,
+            'Moderated resource with spare capacity creates pending booking',
+            5,
+            false,
+            ModerationType\Model::TYPE_MODERATED
+        );
+        $booking = $this->createCapacityTestBooking(
+            $i,
+            $resource,
+            'Moderated pending capacity booking',
+            date('d/m/Y g:ia', strtotime('2077-02-01 10:00:00')),
+            date('d/m/Y g:ia', strtotime('2077-02-01 11:00:00'))
+        );
+
+        $this->assertBookingStatus($i, $booking, ResourceBooking\Booking\Status\Model::STATUS_PENDING);
+    }
+
     // Clash booking tests -------------------------------------------------------------------------------------------//
     //
     // Bookings (both pending and approved) that clash with existing pending bookings are always allowed.
@@ -1010,5 +1243,68 @@ class ResourceBookingCest
             ResourceBooking\Booking\Status\Model::STATUS_APPROVED,
             "The clash booking has status 'approved' as expected"
         );
+    }
+
+    private function createCapacityTestResource(
+        IntegrationTester $i,
+        string $titlePrefix,
+        int $capacity,
+        bool $allowClashBookings,
+        int $moderationTypeId
+    ): ResourceBooking\Item\Model {
+        $resourceMapper = ResourceBooking\Item\Mapper::getInstance();
+        $resourceTitle = $titlePrefix . ' ' . microtime(true);
+        $payload = new Payload\ResourceBooking\Resource\Create();
+        $payload->setResourceName($resourceTitle);
+        $payload->setResourceCat('3');
+        $payload->setCapacity((string)$capacity);
+        $payload->setAllowClashBookings($allowClashBookings);
+        $payload->setModerationTypeId((string)$moderationTypeId);
+
+        $i->sendRequest($payload);
+
+        $i->seeResponseCodeIs(303);
+        $resource = $resourceMapper->findOneByColumn('name', $resourceTitle);
+        $i->seeHttpHeader('location', '/resource-booking/item/' . $resource->getId());
+        $i->assertEquals($capacity, $resource->getCapacity(), 'Resource capacity has the expected value');
+        $i->assertEquals(
+            $allowClashBookings,
+            $resource->getAllowClashBookings(),
+            'Property allow_clash_bookings has the expected value'
+        );
+
+        return $resource;
+    }
+
+    private function createCapacityTestBooking(
+        IntegrationTester $i,
+        ResourceBooking\Item\Model $resource,
+        string $titlePrefix,
+        string $startDate,
+        string $endDate,
+        int $quantity = 1
+    ): ResourceBooking\Booking\Model {
+        $bookingMapper = ResourceBooking\Booking\Mapper::getInstance();
+        $bookingName = $titlePrefix . ' ' . microtime(true);
+        $payload = new Payload\ResourceBooking\Resource\BookItem($resource, $bookingName);
+        $payload->setStartDate($startDate);
+        $payload->setEndDate($endDate);
+        $payload->setFormParam('quantity', (string)$quantity);
+
+        $i->sendRequest($payload);
+        $i->seeResponseCodeIs(200);
+
+        return $bookingMapper->findOneByColumn('name', $bookingName);
+    }
+
+    private function assertBookingStatus(
+        IntegrationTester $i,
+        ResourceBooking\Booking\Model $booking,
+        int $expectedStatusId
+    ): void {
+        $bookingStatus = $i->grabFromDatabase('resource_booking', 'resource_booking_status_id', [
+            'id' => $booking->getId(),
+        ]);
+        $i->assertEquals((string)$expectedStatusId, $bookingStatus);
     }
 }

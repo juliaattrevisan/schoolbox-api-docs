@@ -73,6 +73,7 @@ class Controller extends Base
 {
     private const int HTTP_STATUS_CODE_OK = 200;
     private const int HTTP_STATUS_CODE_NO_CONTENT = 204;
+    private const int HTTP_STATUS_CODE_BAD_REQUEST = 400;
     private const int HTTP_STATUS_CODE_FORBIDDEN = 403;
     private const int HTTP_STATUS_CODE_NOT_FOUND = 404;
     private const int HTTP_STATUS_CODE_SERVER_ERROR = 500;
@@ -1274,9 +1275,17 @@ class Controller extends Base
             $eventById = new GenericCollection(Event::class, [$event->getId() => $event]);
         }
 
+        // Note we are not only interested in resources booked in the future here.
+        // We cannot allow multiple bookings of the same resource for a single event, even if only one is in the past.
+        $bookedResourceIdsByEventId = $this->bookingMapper->getBookedResourceIdsByEventId($eventById->keys());
+
         // Check whether each hypothetical booking would result in a clash.
         $isClashByResourceIdByEventId = (
-            $this->getBookingValidation()->checkForClashesIfResourceBookingsAddedToEvents($resourceById, $eventById)
+            $this->getBookingValidation()->checkForClashesIfResourceBookingsAddedToEvents(
+                $resourceById,
+                $eventById,
+                $bookedResourceIdsByEventId,
+            )
         );
 
         // This will hold the booking models to be persisted.
@@ -1288,10 +1297,6 @@ class Controller extends Base
             BookingStatusModel::STATUS_APPROVED => 0,
             BookingStatusModel::STATUS_REJECTED => 0,
         ];
-
-        // Note we are not only interested in resources booked in the future here.
-        // We cannot allow multiple bookings of the same resource for a single event, even if only one is in the past.
-        $bookedResourceIdsByEventId = $this->bookingMapper->getBookedResourceIdsByEventId($eventById->keys());
 
         // Create a list of booking models to be persisted depending on:
         //  * whether the resource has already been booked for the event
@@ -1354,6 +1359,8 @@ class Controller extends Base
         $startDatetimeStr = $data['startDatetime'] ?? null;
         $endDatetimeStr = $data['endDatetime'] ?? null;
         $notes = $data['notes'] ?? null;
+        $quantityRaw = $data['quantity'] ?? null;
+        $quantityWasSubmitted = array_key_exists('quantity', $data);
         $efficacy = $data['efficacy'] ?? null;
         $responseData = [
             // The data structure here must match type 'EditBookingResponse' in resource-booking-row.vue.
@@ -1446,6 +1453,42 @@ class Controller extends Base
         $bookingsToUpdate = $this->bookingMapper->findByColumn('id', $bookingIdsToUpdate);
         foreach ($bookingsToUpdate as $bookingToUpdate) {
             $bookingToUpdate->setEvent($eventById[$bookingToUpdate->getEvent()->getId()]);
+            $bookingToUpdate->setResource($booking->getResource());
+        }
+
+        $originalQuantityByBookingId = [];
+        $originalStartByBookingId = [];
+        $originalEndByBookingId = [];
+        $quantityByBookingId = [];
+        foreach ($bookingsToUpdate as $bookingToUpdate) {
+            $originalStart = $bookingToUpdate->getBookingStartAt() ?? $bookingToUpdate->getEvent()->getStartDateTime();
+            $originalEnd = $bookingToUpdate->getBookingEndAt() ?? $bookingToUpdate->getEvent()->getEndDateTime();
+            $originalQuantityByBookingId[$bookingToUpdate->getId()] = $bookingToUpdate->getQuantity();
+            $originalStartByBookingId[$bookingToUpdate->getId()] = $originalStart?->getDatabaseDate();
+            $originalEndByBookingId[$bookingToUpdate->getId()] = $originalEnd?->getDatabaseDate();
+
+            $quantityForBooking = $this->getBookingValidation()->getQuantityFromPostData(
+                $quantityWasSubmitted ? ['quantity' => $quantityRaw] : [],
+                $bookingToUpdate
+            );
+            $quantityErrors = $this->getBookingValidation()->validateBookingQuantity(
+                $bookingToUpdate->getResource(),
+                $quantityForBooking,
+                $bookingToUpdate
+            );
+
+            if (!empty($quantityErrors)) {
+                $this->response = $this->responseAsJson(
+                    new ApiProblem('Invalid booking quantity.')
+                        ->setDetail('Please enter a quantity between 1 and ' .
+                            max($bookingToUpdate->getResource()->getCapacity(), $bookingToUpdate->getQuantity()) . '.')
+                        ->setStatus(self::HTTP_STATUS_CODE_BAD_REQUEST)
+                        ->asArray()
+                )->withStatus(self::HTTP_STATUS_CODE_BAD_REQUEST);
+                return;
+            }
+
+            $quantityByBookingId[$bookingToUpdate->getId()] = $quantityForBooking;
         }
 
         foreach ($bookingsToUpdate as $loopBooking) {
@@ -1462,7 +1505,9 @@ class Controller extends Base
                 $loopBooking->setBookingStartAt($loopEventStart->addMinutes($startIncrementFromEventInMinutes));
                 $loopBooking->setBookingEndAt($loopEventEnd->addMinutes($endIncrementFromEventInMinutes));
             }
-            $loopBooking->setNotes($notes);
+            $loopBooking
+                ->setQuantity($quantityByBookingId[$loopBooking->getId()])
+                ->setNotes($notes);
         }
 
         // Check whether each hypothetical moved booking would result in a clash.
@@ -1476,12 +1521,21 @@ class Controller extends Base
 
         // Set booking status to pending if the booking has a clash.  Otherwise the status can stay as it was.
         foreach ($bookingsToUpdate as $bookingToUpdate) {
-            $statusId = $this->bookingValidation->getNewStatusIdForBooking(
-                $booking,
-                $isClashByBookingId[$bookingToUpdate->getId()],
-                $this->getUser()
+            $bookingIdToUpdate = $bookingToUpdate->getId();
+            $bookingStart = $bookingToUpdate->getBookingStartAt() ?? $bookingToUpdate->getEvent()->getStartDateTime();
+            $bookingEnd = $bookingToUpdate->getBookingEndAt() ?? $bookingToUpdate->getEvent()->getEndDateTime();
+            $periodChanged = (
+                $originalStartByBookingId[$bookingIdToUpdate] !== $bookingStart?->getDatabaseDate()
+                || $originalEndByBookingId[$bookingIdToUpdate] !== $bookingEnd?->getDatabaseDate()
             );
-            $booking->setStatus($this->bookingStatusMapper->createModel($statusId));
+            $statusId = $this->getBookingValidation()->getNewStatusIdForUpdatedBooking(
+                booking: $bookingToUpdate,
+                isClash: $isClashByBookingId[$bookingIdToUpdate] ?? false,
+                user: $this->getUser(),
+                originalQuantity: $originalQuantityByBookingId[$bookingIdToUpdate],
+                periodChanged: $periodChanged,
+            );
+            $bookingToUpdate->setStatus($this->bookingStatusMapper->createModel($statusId));
         }
 
         try {
@@ -1855,7 +1909,8 @@ class Controller extends Base
                 $booking->getResource(),
                 $newBookingStart->getDateTimeObject(), // We need a different kind of date object.
                 $newBookingEnd->getDateTimeObject(), // We need a different kind of date object.
-                $booking
+                $booking,
+                $booking->getQuantity()
             );
 
             // As noted above, the booking start/end datetimes only need to be updated if they are non-null.
@@ -1869,7 +1924,16 @@ class Controller extends Base
             }
 
             $oldStatusId = $booking->getStatus()->getId();
-            $newStatusId = $validation->getNewStatusIdForBooking($booking, count($clashErrors) > 0, $this->getUser());
+            $clashErrorStrings = $validation->getAllErrorStringsAsFlatArray($clashErrors);
+            $newStatusId = (
+                $validation->validationErrorsContainHardBlockers($clashErrors)
+                ? BookingStatusModel::STATUS_REJECTED
+                : $validation->getNewStatusIdForBooking(
+                    $booking,
+                    in_array(Validation::ERROR_CONFLICT, $clashErrorStrings, true),
+                    $this->getUser()
+                )
+            );
 
             if ($newStatusId !== $oldStatusId) {
                 $booking->setStatus($this->bookingStatusMapper->createModel($newStatusId));

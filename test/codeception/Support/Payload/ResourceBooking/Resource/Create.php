@@ -25,6 +25,7 @@ class Create extends Payload\Request
         $this->setAllowedRole('1', true);
         $this->setAllowedRole('2', true);
         $this->setResourceCat('1');
+        $this->setCapacity('1');
         $moderationType = \Schoolbox\ResourceBooking\Item\ModerationType\Model::TYPE_MODERATED;
         $this->setModerationTypeId($moderationType);
     }
@@ -116,6 +117,11 @@ class Create extends Payload\Request
     public function setAllowClashBookings(bool $bool): void
     {
         $this->setFormParam('allow_clash_bookings', $bool ? '1' : '0');
+    }
+
+    public function setCapacity(string $capacity): void
+    {
+        $this->setFormParam('capacity', $capacity);
     }
 
     private function setTime(string $timeType, string $minute, ?string $hour = null, ?string $day = null)

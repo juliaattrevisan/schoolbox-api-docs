@@ -281,7 +281,8 @@ class Notifier extends AbstractModuleNotifier
                     $object->getResource(),
                     $startDateTimeAlaressObj->getDateTimeObject(), // We need a different kind of date object.
                     $endDateTimeAlaressObj->getDateTimeObject(), // We need a different kind of date object.
-                    $object
+                    $object,
+                    $object->getQuantity()
                 );
 
                 if (!empty($clashErrors)) {
