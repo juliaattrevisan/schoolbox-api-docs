@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Event\Overrides\Test;
 
-use PDO;
 use Schoolbox\Config\ArrayLoader;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\External\Event\Overrides\Mapper;
@@ -50,30 +49,18 @@ class MapperTest extends TestCase
 
     private function createStatement(array $row): \PDOStatement
     {
-        $pdo = new PDO('sqlite::memory:');
-        $statement = $pdo->prepare(
-            'SELECT
-                :id AS id,
-                :event_id AS event_id,
-                :external_id AS external_id,
-                :action AS action,
-                :sequence AS sequence,
-                :created_at AS created_at,
-                :updated_at AS updated_at,
-                :role_id AS "r.id"'
-        );
+        return new class ($row) extends \PDOStatement {
+            /**
+             * @param array<string, mixed> $row
+             */
+            public function __construct(private array $row)
+            {
+            }
 
-        $statement->execute([
-            'id' => $row['id'],
-            'event_id' => $row['event_id'],
-            'external_id' => $row['external_id'],
-            'action' => $row['action'],
-            'sequence' => $row['sequence'],
-            'created_at' => $row['created_at'],
-            'updated_at' => $row['updated_at'],
-            'role_id' => $row['r.id'],
-        ]);
-
-        return $statement;
+            public function getIterator(): \Iterator
+            {
+                return new \ArrayIterator([$this->row]);
+            }
+        };
     }
 }
