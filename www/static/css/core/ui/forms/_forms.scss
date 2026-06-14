@@ -756,6 +756,7 @@ td {
     width: 100%;
     font-size: $base-font-size;
     font-weight: $font-weight-normal;
+    gap: var(--sbx-size-s, 0.5rem);
     line-height: 2;
     text-align: left;
     transition: all 0.1s ease-in;
@@ -767,10 +768,6 @@ td {
 input[type="radio"] {
     + .block {
         @extend .button-block;
-
-        :is(i, sbx-icon) {
-            padding-right: 1rem;
-        }
     }
     &:checked + .block {
         background-color: var(--sbx-config-color-accent, $content-ui-foreground);
