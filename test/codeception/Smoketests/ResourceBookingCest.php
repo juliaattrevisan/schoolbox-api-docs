@@ -199,6 +199,7 @@ class ResourceBookingCest
             ModerationType\Model::TYPE_OPEN
         );
 
+        $i->impersonateUser(3);
         $pendingBooking = $this->createCapacityTestBooking(
             $i,
             $pendingResource,
@@ -206,6 +207,9 @@ class ResourceBookingCest
             date('d/m/Y g:ia', strtotime('2077-02-01 10:00:00')),
             date('d/m/Y g:ia', strtotime('2077-02-01 11:00:00'))
         );
+        $this->assertBookingStatus($i, $pendingBooking, ResourceBooking\Booking\Status\Model::STATUS_PENDING);
+
+        $i->loginAdmin();
         $approvedBooking = $this->createCapacityTestBooking(
             $i,
             $approvedResource,
