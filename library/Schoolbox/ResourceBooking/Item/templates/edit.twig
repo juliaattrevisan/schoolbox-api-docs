@@ -259,13 +259,12 @@
                         </label>
                     </div>
                 </fieldset>
-
                 <fieldset class="content">
-                    <label for="allow_clash_bookings">
-                        Allow Conflicting Booking Requests
-                        <span class="hint has-tip tip-top" data-tooltip title="If enabled, users can request bookings even when capacity is full. Only bookings within the available capacity can be approved.">?</span>
-                    </label>
-                    <div class="small-12 columns">
+                    <div class="small-12 medium-6 columns">
+                        <label for="allow_clash_bookings">
+                            Allow Conflicting Booking Requests
+                            <span class="hint has-tip tip-top" data-tooltip title="If enabled, users can request bookings even when capacity is full. Only bookings within the available capacity can be approved.">?</span>
+                        </label>
                         <div class="switch">
                             <input type="checkbox" value="1" {% if item.allowClashBookings %}checked{% endif %} id="allow_clash_bookings" name="allow_clash_bookings">
                             <label for="allow_clash_bookings">
@@ -274,7 +273,7 @@
                             </label>
                         </div>
                     </div>
-                    <div class="small-4 columns">
+                    <div class="small-12 medium-6 columns">
                         <div class="clear-fieldset">
                             <label for="capacity" class="required">
                                 Number of Bookable Items
@@ -414,11 +413,11 @@
                     </div>
                 </fieldset>
                 <fieldset class="content">
-                    <label for="current_term_restriction">
-                        Restrict Bookings to Current {{ locale.term|split(' ')|map(word => word|capitalize)|join(' ') }}
-                        <span class='hint has-tip tip-top' data-tooltip title="If this is set, this item cannot be reserved outside of the current {{ locale.term }}">?</span>
-                    </label>
                     <div class="small-12 columns">
+                        <label for="current_term_restriction">
+                            Restrict Bookings to Current {{ locale.term|split(' ')|map(word => word|capitalize)|join(' ') }}
+                            <span class='hint has-tip tip-top' data-tooltip title="If this is set, this item cannot be reserved outside of the current {{ locale.term }}">?</span>
+                        </label>
                         <div class="switch">
                             <input type="checkbox" value="1" {% if item.currentTermRestriction %}checked{% endif %} id="current_term_restriction" name="current_term_restriction">
                             <label for="current_term_restriction">
