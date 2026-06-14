@@ -327,7 +327,7 @@ function printSelectedSession(): void {
             <div v-if="sessionLoadError" data-alert class="alert-box alert">
                 {{ sessionLoadError }}
             </div>
-            <section v-else-if="selectedSessionInfo !== null" class="ai-usage-log__printable">
+            <section v-else-if="selectedSessionInfo !== null">
                 <div class="card small-12 actions-small-1">
                     <div class="list-item">
                         <span>
@@ -403,28 +403,8 @@ function printSelectedSession(): void {
         display: none !important;
     }
 
-    .ai-usage-log__viewer,
-    .ai-usage-log__printable {
-        border: 0 !important;
-        box-shadow: none !important;
-        margin: 0 !important;
-        padding: 0 !important;
+    .ai-usage-log__viewer {
         width: 100% !important;
-        max-width: 100% !important;
-    }
-
-    .ai-usage-log__printable,
-    .ai-usage-log__printable * {
-        box-sizing: border-box !important;
-        max-width: 100% !important;
-        min-width: 0 !important;
-        overflow: visible !important;
-    }
-
-    .ai-usage-log__printable .card {
-        border: 0 !important;
-        box-shadow: none !important;
-        padding: 0 0 1rem !important;
     }
 }
 </style>
@@ -438,7 +418,6 @@ function printSelectedSession(): void {
     }
 
     .breadcrumb,
-    .admin-container > div.small-12 > h1,
     #footer {
         display: none !important;
     }
