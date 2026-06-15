@@ -732,7 +732,6 @@ class Controller extends Base
                     'published' => [
                         'normalisedMark' => $normalisedMark,
                         'humanReadableMark' => $humanReadableMark,
-                        'selectedDescriptorText' => $row['descriptor_name'],
                     ],
                     /* Normalised and human-readable marks from the most recent feedback: these would typically be draft
                      * marks, but could end up being the same as the Published ones by sheer coincidence.
@@ -740,7 +739,6 @@ class Controller extends Base
                     'draft' => [
                         'normalisedMark' => null,
                         'humanReadableMark' => null,
-                        'selectedDescriptorText' => null,
                     ],
                     'indicators' => []
                 ];
