@@ -200,11 +200,9 @@ export default {
             },
             customButtons: {
                 customNext: {
-                    icon: "chevron-right",
                     click: this.clickNext,
                 },
                 customPrev: {
-                    icon: "chevron-left",
                     click: this.clickPrev,
                 },
                 customToday: {
@@ -248,6 +246,9 @@ export default {
             this.calendarApi.setOption("contentHeight", this.fullCalendarHelper_contentHeight());
         });
         document.addEventListener("assessment-calendar__onFilterChange", this.onFilterChange);
+
+        this.fullCalendarHelper_replaceButtonIcon("fc-customPrev-button", "previous");
+        this.fullCalendarHelper_replaceButtonIcon("fc-customNext-button", "next");
     },
 
     methods: {
@@ -739,6 +740,9 @@ export default {
          * whether they're available.
          */
         datesSet(datesRenderInfo) {
+            if (this.$el === null) {
+                return;
+            }
             let todayButton = this.$el.querySelector("button.fc-customToday-button"),
                 nextButton = this.$el.querySelector("button.fc-customNext-button"),
                 prevButton = this.$el.querySelector("button.fc-customPrev-button"),
