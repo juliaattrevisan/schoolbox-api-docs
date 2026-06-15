@@ -4,10 +4,10 @@
  * Includes the student's IB candidate number and manual registration metadata.
  */
 import IbReportSubjectLabels from "./ib-report-subject-labels.vue";
-import type { StudentRow } from "../../js/types/ibReportTypes";
+import type { RegisteredRow } from "../../js/types/ibReportTypes";
 
 interface Props {
-    students: StudentRow[];
+    students: RegisteredRow[];
 }
 defineProps<Props>();
 

@@ -98,7 +98,6 @@ class ControllerTest extends TestCase
                     'registrationSessionStudentId' => 456,
                     'status' => RegistrationSessionStudentModel::STATUS_CONFIRMED,
                     'userName' => 'Nguyen, Alex',
-                    'ibCandidateNumber' => null,
                     'hasMissingDetails' => false,
                     'missingFields' => [],
                     'session' => '',
@@ -196,7 +195,6 @@ class ControllerTest extends TestCase
                     'registrationSessionStudentId' => 789,
                     'status' => RegistrationSessionStudentModel::STATUS_FAILED,
                     'userName' => 'Patel, Sam',
-                    'ibCandidateNumber' => null,
                     'hasMissingDetails' => false,
                     'missingFields' => [],
                     'session' => '',
@@ -2181,6 +2179,13 @@ class ControllerTest extends TestCase
                 if ($route === 'internationalBaccalaureate.sessionResetDetails') {
                     return sprintf(
                         '/adminv2/international-baccalaureate/registrations/sessions/%d/reset-details',
+                        $params['sessionId']
+                    );
+                }
+
+                if ($route === 'internationalBaccalaureate.sessionMarkAsManuallyRegistered') {
+                    return sprintf(
+                        '/adminv2/international-baccalaureate/registrations/sessions/%d/mark-as-manually-registered',
                         $params['sessionId']
                     );
                 }
