@@ -418,6 +418,7 @@ function printSelectedSession(): void {
     }
 
     .breadcrumb,
+    .admin-container > .small-12 > h1,
     #footer {
         display: none !important;
     }
