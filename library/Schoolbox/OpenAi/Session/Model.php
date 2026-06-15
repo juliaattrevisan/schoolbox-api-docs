@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Schoolbox\OpenAi\Session;
 
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\OpenAi\Feature;
 use Schoolbox\User;
 
 class Model

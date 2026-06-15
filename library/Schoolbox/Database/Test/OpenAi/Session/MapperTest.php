@@ -11,7 +11,7 @@ namespace Schoolbox\Database\Test\OpenAi\Session;
 
 use Alaress\Database\Test\TestConnectorTrait;
 use PHPUnit\Framework\TestCase;
-use Schoolbox\OpenAi\Session\Feature;
+use Schoolbox\OpenAi\Feature;
 use Schoolbox\OpenAi\Session\Mapper;
 use Schoolbox\OpenAi\Session\Model;
 use Schoolbox\UserMapper;

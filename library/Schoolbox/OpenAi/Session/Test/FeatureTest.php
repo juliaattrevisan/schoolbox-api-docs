@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\OpenAi\Session\Test;
 
 use PHPUnit\Framework\TestCase;
-use Schoolbox\OpenAi\Session\Feature;
+use Schoolbox\OpenAi\Feature;
 
 /**
  * Unit tests for the {@see Feature} enum.

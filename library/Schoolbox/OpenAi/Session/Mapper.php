@@ -14,6 +14,7 @@ namespace Schoolbox\OpenAi\Session;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\OpenAi\Feature;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 

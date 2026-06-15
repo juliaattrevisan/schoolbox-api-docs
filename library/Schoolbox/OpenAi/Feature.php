@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\OpenAi\Session;
+namespace Schoolbox\OpenAi;
 
 enum Feature: string
 {

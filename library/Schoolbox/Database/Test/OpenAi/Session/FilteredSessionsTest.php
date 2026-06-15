@@ -14,7 +14,7 @@ use Schoolbox\Editor\OpenAI\Log\LogFormat;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\OpenAi\Session\Feature;
+use Schoolbox\OpenAi\Feature;
 use Schoolbox\OpenAi\Session\Log\Mapper as LogMapper;
 use Schoolbox\OpenAi\Session\Log\Model as LogModel;
 use Schoolbox\OpenAi\Session\Mapper;

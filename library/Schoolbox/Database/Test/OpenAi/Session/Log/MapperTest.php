@@ -12,7 +12,7 @@ namespace Schoolbox\Database\Test\OpenAi\Session\Log;
 use Alaress\Database\Test\TestConnectorTrait;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Editor\OpenAI\Log\LogFormat;
-use Schoolbox\OpenAi\Session\Feature;
+use Schoolbox\OpenAi\Feature;
 use Schoolbox\OpenAi\Session\Log\Mapper;
 use Schoolbox\OpenAi\Session\Log\Model;
 use Schoolbox\OpenAi\Session\Mapper as SessionMapper;
