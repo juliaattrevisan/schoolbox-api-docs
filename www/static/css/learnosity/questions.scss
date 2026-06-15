@@ -100,7 +100,7 @@
 .lrn_widget .lrn_btn_sort:focus.lrn_active {
     box-shadow:
         inset 0 0 0 1px var(--content-ui-selected),
-    inset 0 0 0 3px var(--sbx-color-foreground-primary, #fff);
+        inset 0 0 0 3px var(--sbx-color-foreground-primary, #fff);
 }
 
 /* updated the drop down styles*/
@@ -401,7 +401,7 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 .lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton:focus {
     box-shadow:
         inset 0 0 0 1px var(--sbx-config-color-accent, var(--content-ui-foreground)),
-    inset 0 0 0 2px var(--sbx-color-foreground-primary, #fff),
+        inset 0 0 0 2px var(--sbx-color-foreground-primary, #fff),
         0 0 0 2px var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton.lrn_active {
@@ -411,7 +411,7 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 .lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton.lrn_active:focus {
     box-shadow:
         inset 0 0 0 1px var(--sbx-config-color-accent, var(--content-ui-foreground)),
-    inset 0 0 0 2px var(--sbx-color-foreground-primary, #fff),
+        inset 0 0 0 2px var(--sbx-color-foreground-primary, #fff),
         0 0 0 2px var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 
