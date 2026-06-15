@@ -11,7 +11,7 @@ import type { GeneralHtmlSupportConfig } from "ckeditor5";
  * "object[id,name,width,height];" +
  * "param[name,value];" +
  * "embed[src,type,allowscriptaccess,allowfullscreen,wmode,width,height];" +
- * "a[id,href,target,data-portal,title];" +
+ * "a[id,href,rel,target,data-portal,title];" +
  * "map[!name];" +
  * "area[!shape,!coords,!href,target,!alt];" +
  * "img[usemap];"
@@ -134,12 +134,13 @@ export function getHTMLSupportSettings(): { htmlSupport: GeneralHtmlSupportConfi
                         height: true,
                     },
                 },
-                // "a[id,href,target,data-portal,title];"
+                // "a[id,href,rel,target,data-portal,title];"
                 {
                     name: "a",
                     attributes: {
                         id: true,
                         href: true,
+                        rel: true,
                         target: true,
                         "data-portal": true,
                         title: true,
