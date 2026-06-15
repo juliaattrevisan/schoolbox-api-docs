@@ -19,7 +19,7 @@ body.sbx-body {
     .scrollable,
     .cover-photo,
     .cr-results-grid,
-    .tile,
+    .island section:not(:has(.component-action)) .tile,
     #activity-feed {
         box-shadow: var(--sbx-config-container-drop-shadow);
     }
@@ -29,7 +29,8 @@ body.sbx-body {
     .reveal-modal *,
     .modal *,
     .island section section,
-    .island section:has(.tileList),
+    .island section:not(:has(.component-action)):has(.tileList),
+    .island section:has(.component-action) .tile,
     #permissions .scrollable,
     .sortable .empty-state,
     .content-overlay .empty-state-flex-centered,
