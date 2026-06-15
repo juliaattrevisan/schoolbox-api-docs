@@ -64,14 +64,9 @@ $app = new class extends CliTool\App {
             'ib_moderator'           => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_IB_COORDINATOR . ' AND type=' . UserAccess::ACCESS_FULL,
 
             //IBIS
-            // Registration sessions
             'ib_registration_sessions'              => 'SELECT COUNT(*) FROM ib_registration_sessions',
-            // Registration students
-            // Students from deleted sessions will not appear.
             'ib_registration_students'              => 'SELECT COUNT(*) FROM ib_registration_session_student',
-            // Registered students
             'ib_registration_students_registered'   => 'SELECT COUNT(*) FROM ib_registration_session_student WHERE status = ' . RegistrationSessionStudentModel::STATUS_REGISTERED,
-            // Students with candidate numbers
             'ib_students_with_candidate_numbers'    => 'SELECT COUNT(*) FROM user u WHERE u.ib_candidate_number IS NOT NULL AND u.ib_candidate_number != ""',
 
             //Logins
