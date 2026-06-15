@@ -46,9 +46,13 @@ class Mapper extends BaseMapper
     /**
      * Find the session for a caller-supplied UUID, or create it if absent.
      *
-     * The id is minted in memory by the frontend/controller before any row exists,
-     * so possession of an id never implies the row exists. `INSERT IGNORE` makes
-     * "create vs reuse" atomic; the first writer's feature/created_by/created_at win.
+     * Note the ai_session table is unusual in that its ID is a UUID.  For that reason, session IDs are typically
+     * created before the ai_session rows exist, and so the existence of a session ID does not imply the existence of
+     * an ai_session row.
+     *
+     * Wherever a session ID is to be used for database actions therefore, the question of whether the ai_session row
+     * exists will arise.  This function allows both possibilities (the row does or does not exist) to be treated the
+     * same way.
      *
      * @param string    $id      The session UUID (the ai_session primary key).
      * @param string    $feature The owning feature, as a {@see Feature} value.
