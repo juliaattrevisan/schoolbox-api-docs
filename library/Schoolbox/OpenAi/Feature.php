@@ -2,6 +2,8 @@
 
 /**
  * The AI features that own a session, mirroring the `ai_session`.`feature` DB enum.
+ * This is the authoritative place for these constants.  A duplicated enum exists for front-end code.
+ * @see Admin/OpenAI/Usage/templates/payload.ts
  *
  * @copyright Copyright 2026, Schoolbox Pty Ltd
  * @link      https://schoolbox.education/

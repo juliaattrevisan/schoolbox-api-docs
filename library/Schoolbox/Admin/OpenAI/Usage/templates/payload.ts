@@ -13,6 +13,10 @@ import type { UserAuthor } from "@schoolboxLibrary/types/User";
  */
 export type AiSessionId = string;
 
+/**
+ * A value for each AI feature.
+ * @see /library/Schoolbox/OpenAI/Feature.php
+ */
 export enum AiFeature {
     CHAT = "chat",
     LESSON_PLAN = "lessonplan",
