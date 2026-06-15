@@ -13,8 +13,7 @@ body.sbx-body {
     .island,
     .component,
     .island section,
-    .empty-state,
-    .empty-state-flex-centered,
+    .empty-state:not(:has(.empty-state-flex-centered)),
     .modal,
     .modal-content,
     .reveal-modal,
@@ -45,6 +44,11 @@ body.sbx-body {
     .audience-grid li,
     .attachment-browser-container {
         border-radius: var(--sbx-config-container-corner-radius);
+    }
+
+    // remove from elements that are children within a container
+    .empty-state.content-overlay {
+        border-radius: 0;
     }
 
     // when we need to ensure the border radius is applied correctly to the content,
