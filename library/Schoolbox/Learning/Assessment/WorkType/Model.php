@@ -419,6 +419,15 @@ class Model implements ISoftDeletable, Sequential
         $this->permittedReportingActivity = $permittedReportingActivity;
     }
 
+    /**
+     * Checks whether this work type is permitted for an assessment type.
+     *
+     * Permission flags must be true to permit an assessment type; null and false are treated as not permitted.
+     *
+     * @param string $assessmentType The assessment type to check
+     * @return bool
+     * @throws \InvalidArgumentException
+     */
     public function isPermittedForAssessmentType(string $assessmentType): bool
     {
         return match ($assessmentType) {

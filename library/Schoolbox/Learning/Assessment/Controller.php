@@ -1104,6 +1104,15 @@ abstract class Controller extends ListController implements IAssessmentControlle
     abstract protected function getAssessmentTwigData(IAssessable $assessment): array;
 
 
+    /**
+     * Finds the work types that can be selected for an assessment.
+     *
+     * If the assessment already uses a work type that is no longer permitted, it is kept in the collection so the
+     * activity can continue saving without forcing a different work type.
+     *
+     * @param IAssessable $assessment The assessment that the work types will be used for
+     * @return Collection
+     */
     private function getWorkTypesPermittedForAssessment(IAssessable $assessment): Collection
     {
         $workTypes = $this->workTypeMapper->findPermittedForAssessment($assessment);
