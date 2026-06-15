@@ -12,6 +12,7 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Admin\OpenAI\Config;
+use Schoolbox\OpenAi\Feature;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
@@ -63,16 +64,16 @@ $app = new class extends CliTool\App {
         $this->getLogger()->notice(
             sprintf(
                 "Migrating AI config for module '%s' into '%s', provider: %s",
-                Helper::FEATURE_IMAGE,
+                Feature::IMAGE->value,
                 ConfigMapper::NAME_AI_IMAGE_GENERATION,
                 $newConfig['provider']['value'] ?? 'unknown',
             )
         );
-        $this->getLogger()->debug("New config: " . $config->encode($newConfig, Helper::FEATURE_IMAGE));
+        $this->getLogger()->debug("New config: " . $config->encode($newConfig, Feature::IMAGE->value));
         $query->execute(
             [
                 'name'  => ConfigMapper::NAME_AI_IMAGE_GENERATION,
-                'value' => $config->encode($newConfig, Helper::FEATURE_IMAGE),
+                'value' => $config->encode($newConfig, Feature::IMAGE->value),
             ]
         );
     }
@@ -105,9 +106,9 @@ $app = new class extends CliTool\App {
         $configHelper = new Config();
         // start with a blank config
         $config = [Config::FIELD_PROVIDER => ['value' => Helper::ENDPOINT_TYPE_OFF]];
-        $config[Helper::ENDPOINT_TYPE_GENERAL] = $configHelper->initGeneral(Helper::FEATURE_IMAGE);
-        $config[Helper::ENDPOINT_TYPE_OPENAI] = $configHelper->initOpenAi(Helper::FEATURE_IMAGE);
-        $config[Helper::ENDPOINT_TYPE_AZURE] = $configHelper->initAzure(Helper::FEATURE_IMAGE);
+        $config[Helper::ENDPOINT_TYPE_GENERAL] = $configHelper->initGeneral(Feature::IMAGE->value);
+        $config[Helper::ENDPOINT_TYPE_OPENAI] = $configHelper->initOpenAi(Feature::IMAGE->value);
+        $config[Helper::ENDPOINT_TYPE_AZURE] = $configHelper->initAzure(Feature::IMAGE->value);
 
         $config[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_AIKEY]['value'] = $key ?? '';
         $config[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value']  = $systemPrompt ?? '';
