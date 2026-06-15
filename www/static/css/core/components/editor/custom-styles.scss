@@ -502,11 +502,12 @@ article .todo-list {
     list-style: none;
     margin-left: 0.5rem;
     .todo-list__label {
-        align-items: center;
+        align-items: flex-start;
         display: flex;
     }
     /* force the checkboxes to display */
     input[type="checkbox"] {
+        flex: 0 0 auto; // Ensure checkboxes don't shrink if the label text is long
         height: var(--sbx-form-checkbox-size, 1.5rem) !important;
         margin: 0 !important;
         opacity: 1 !important;
