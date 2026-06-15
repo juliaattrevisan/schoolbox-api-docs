@@ -128,8 +128,7 @@ HELP;
         $moderationResult = $interactionModeration->request(null, $moderationSessionId, $logs);
 
         /* persist the result (for both flagged and non-flagged sessions) */
-        // TODO: it would be good if $moderationResult was a well-defined object instead of an untyped array
-        $status = $moderationResult['needs_human_review']
+        $status = $moderationResult->getNeedsHumanReview()
             ? ModerationEventStatus::REQUIRES_ATTENTION
             : ModerationEventStatus::NO_ACTION_REQUIRED; // TODO: this might actually be 'null' (the col currently isn't nullable) - depends on if we need to distinguish "not flagged" vs "user marked as no action required"
 
@@ -137,7 +136,7 @@ HELP;
             ->setAiSessionId($moderationSessionId)
             ->setTargetAiSessionId($targetSessionId)
             ->setStatus($status)
-            ->setModerationDetails(json_encode($moderationResult, JSON_THROW_ON_ERROR));
+            ->setModerationDetails($moderationResult);
 
         $this->moderationEventMapper->save($event);
 

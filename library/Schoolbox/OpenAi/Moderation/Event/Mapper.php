@@ -36,7 +36,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('ai_session_id', self::TYPE_STRING);
         $this->uses('target_ai_session_id', self::TYPE_STRING);
         $this->uses('status', self::TYPE_STRING, self::COLUMN_ENUM, null, [...array_column(Status::cases(), 'value'), null]);
-        $this->uses('moderation_details', self::TYPE_STRING);
+        $this->uses('moderation_details', self::TYPE_JSON);
         $this->joins('reviewed_by', UserMapper::class, 'id', null, null, 'reviewedBy', 'reviewedBy');
         $this->uses('reviewed_at', self::TYPE_DATETIME);
         $this->joins('resolved_by', UserMapper::class, 'id', null, null, 'resolvedBy', 'resolvedBy');

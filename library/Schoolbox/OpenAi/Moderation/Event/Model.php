@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\OpenAi\Moderation\Event;
 
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
+use Schoolbox\OpenAi\Moderation\Result\Result;
 use Schoolbox\User;
 
 /**
@@ -42,9 +43,10 @@ class Model
     private ?string $status = null;
 
     /**
-     * @var string
+     * @var Result|null
+     * @see /library/Schoolbox/Editor/OpenAI/Payload/InteractionModeration.php RESPONSE_FORMAT
      */
-    private string $moderationDetails = '';
+    private ?Result $moderationDetails = null;
 
     /**
      * @var User|null
@@ -126,19 +128,22 @@ class Model
     }
 
     /**
-     * @param string $moderationDetails
+     * @param Result|array|null $moderationDetails
      * @return self
      */
-    public function setModerationDetails(string $moderationDetails): self
+    public function setModerationDetails(Result|array|null $moderationDetails): self
     {
-        $this->moderationDetails = $moderationDetails;
+        $this->moderationDetails = \is_array($moderationDetails)
+            ? Result::fromArray($moderationDetails)
+            : $moderationDetails;
+
         return $this;
     }
 
     /**
-     * @return string
+     * @return Result|null
      */
-    public function getModerationDetails(): string
+    public function getModerationDetails(): ?Result
     {
         return $this->moderationDetails;
     }
