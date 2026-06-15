@@ -56,7 +56,7 @@
                         </div>
                         <div class="small-2 columns">
                             <label>Preview</label>
-                            <div id="icon-preview" style="margin-button:5px" class="size-32 icon-{{ item.icon ?? '' }}"></div>
+                            <sbx-icon id="icon-preview" style="margin-button:5px" name="{{ item.icon ?? '' }}" size="2rem"></sbx-icon>
                         </div>
                     </fieldset>
                     <fieldset class="content">
@@ -257,10 +257,7 @@
          * @param string icon
          */
         function updateIconPreview(icon) {
-            // Remove existing icon-* class and add the new one
-            $('#icon-preview').removeClass(function(index, className) {
-               return (className.match (/(^|\s)icon-\S+/g) || []).join(' ');
-            }).addClass('icon-' + icon);
+            $('#icon-preview').attr('name', icon);
         }
 
         // Update icon preview on page load

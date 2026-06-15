@@ -70,48 +70,53 @@
                                 <div class="grip"></div>
                                 <div class="list-item">
                                     <div class="card small-12 wrap-down">
-                                        <a>
-                                            <div class="icon-{{ item.icon }} size-64"></div>
-                                            <h3>{{ item.text }}</h3>
-                                        </a>
+                                        <div style="display:flex; align-items:flex-start; gap:1rem;">
+                                            <sbx-icon name="{{ item.icon }}" size="4rem"></sbx-icon>
 
-                                        <p class="meta">
-                                            {% if roleAvailabilitySelected[item.id]|length and campusAvailabilitySelected[item.id]|length %}
-                                                Available on profiles for
-                                                <strong>{{ macro.checkboxString(item, roles, roleAvailabilitySelected) }}</strong> role(s)
-                                                within
-                                                <strong>{{ macro.checkboxString(item, campuses, campusAvailabilitySelected) }}</strong>
-                                                campus
-                                            {% elseif roleAvailabilitySelected[item.id]|length and not campusAvailabilitySelected[item.id]|length %}
-                                                This button won't appear on profile screens; no campus availability was selected.
-                                            {% elseif not roleAvailabilitySelected[item.id]|length and campusAvailabilitySelected[item.id]|length %}
-                                                This button won't appear on profile screens; no role availability was selected.
-                                            {% else %}
-                                                This button won't appear on profile screens; no campus/role availability was selected.
-                                            {% endif %}
-                                        </p>
+                                            <div>
+                                                <a>
+                                                    <h3>{{ item.text }}</h3>
+                                                </a>
 
-                                        <p class="meta">
-                                            {% if roleVisibilitySelected[item.id]|length and campusVisibilitySelected[item.id]|length %}
-                                                Visible to
-                                                {% if item.selfEnabled %}
-                                                    <strong>users for their own profile</strong> and
-                                                {% endif %}
-                                                viewers in
-                                                <strong>{{ macro.checkboxString(item, roles, roleVisibilitySelected) }}</strong> role(s)
-                                                within
-                                                <strong>{{ macro.checkboxString(item, campuses, campusVisibilitySelected) }}</strong>
-                                                campus
-                                            {% elseif item.selfEnabled %}
-                                                Visible to <strong>users for their own profile</strong> only.
-                                            {% elseif roleVisibilitySelected[item.id]|length and not campusVisibilitySelected[item.id]|length %}
-                                                This button won't appear on profile screens; no campus visibility was selected.
-                                            {% elseif not roleVisibilitySelected[item.id]|length and campusVisibilitySelected[item.id]|length %}
-                                                This button won't appear on profile screens; no role visibility was selected.
-                                            {% else %}
-                                                This button won't appear on profile screens; no campus/role visibility was selected.
-                                            {% endif %}
-                                        </p>
+                                                <p class="meta">
+                                                    {% if roleAvailabilitySelected[item.id]|length and campusAvailabilitySelected[item.id]|length %}
+                                                        Available on profiles for
+                                                        <strong>{{ macro.checkboxString(item, roles, roleAvailabilitySelected) }}</strong> role(s)
+                                                        within
+                                                        <strong>{{ macro.checkboxString(item, campuses, campusAvailabilitySelected) }}</strong>
+                                                        campus
+                                                    {% elseif roleAvailabilitySelected[item.id]|length and not campusAvailabilitySelected[item.id]|length %}
+                                                        This button won't appear on profile screens; no campus availability was selected.
+                                                    {% elseif not roleAvailabilitySelected[item.id]|length and campusAvailabilitySelected[item.id]|length %}
+                                                        This button won't appear on profile screens; no role availability was selected.
+                                                    {% else %}
+                                                        This button won't appear on profile screens; no campus/role availability was selected.
+                                                    {% endif %}
+                                                </p>
+
+                                                <p class="meta">
+                                                    {% if roleVisibilitySelected[item.id]|length and campusVisibilitySelected[item.id]|length %}
+                                                        Visible to
+                                                        {% if item.selfEnabled %}
+                                                            <strong>users for their own profile</strong> and
+                                                        {% endif %}
+                                                        viewers in
+                                                        <strong>{{ macro.checkboxString(item, roles, roleVisibilitySelected) }}</strong> role(s)
+                                                        within
+                                                        <strong>{{ macro.checkboxString(item, campuses, campusVisibilitySelected) }}</strong>
+                                                        campus
+                                                    {% elseif item.selfEnabled %}
+                                                        Visible to <strong>users for their own profile</strong> only.
+                                                    {% elseif roleVisibilitySelected[item.id]|length and not campusVisibilitySelected[item.id]|length %}
+                                                        This button won't appear on profile screens; no campus visibility was selected.
+                                                    {% elseif not roleVisibilitySelected[item.id]|length and campusVisibilitySelected[item.id]|length %}
+                                                        This button won't appear on profile screens; no role visibility was selected.
+                                                    {% else %}
+                                                        This button won't appear on profile screens; no campus/role visibility was selected.
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <nav>
