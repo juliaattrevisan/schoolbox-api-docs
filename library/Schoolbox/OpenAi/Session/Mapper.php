@@ -249,8 +249,7 @@ class Mapper extends BaseMapper
         ?\Alaress_Date_Format $start,
         ?\Alaress_Date_Format $end,
     ): int {
-        [$where, $params] = $this->buildSessionFilter($keyword, $feature, $user, $start, $end);
-        $where = $this->requireSessionLog($where);
+        [$where, $params] = $this->buildSessionFilter($keyword, $feature, $user, $start, $end, true);
 
         $statement = $this->getDatabase()->prepare(
             "SELECT COUNT(*) FROM `{$this->table}` {$where}"
@@ -264,26 +263,6 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Require at least one child log for session counts.
-     *
-     * Session rows without logs cannot open the usage-log details route, because
-     * the route preload resolves a first ai_session_log row from the session id.
-     */
-    private function requireSessionLog(string $where): string
-    {
-        $hasLog = 'EXISTS (
-            SELECT 1 FROM `ai_session_log` l
-            WHERE l.ai_session_id = `' . $this->table . '`.id
-        )';
-
-        if ('' === $where) {
-            return 'WHERE ' . $hasLog;
-        }
-
-        return $where . "\nAND " . $hasLog;
-    }
-
-    /**
      * Build the shared WHERE clause and bound params for the session list/count.
      * See docblock for $this->getFilteredSessions() for descriptions of filter params.
      *
@@ -292,6 +271,7 @@ class Mapper extends BaseMapper
      * @param User|null                 $user
      * @param \Alaress_Date_Format|null $start
      * @param \Alaress_Date_Format|null $end
+     * @param bool                      $requireSessionLog Whether to exclude sessions without logs.
      * @return array{0: string, 1: array<string, mixed>}
      */
     private function buildSessionFilter(
@@ -300,6 +280,7 @@ class Mapper extends BaseMapper
         ?User $user,
         ?\Alaress_Date_Format $start,
         ?\Alaress_Date_Format $end,
+        bool $requireSessionLog = false,
     ): array {
         $pb = $this->getPredicateBuilder();
         $keywordPredicate = null;
@@ -339,11 +320,19 @@ class Mapper extends BaseMapper
         if ($logClauses) {
             $pb->rawWhere(
                 'EXISTS (
-                SELECT 1 FROM `ai_session_log` l
-                WHERE l.ai_session_id = `' . $this->table . '`.id
-                AND ' . implode("\nAND ", $logClauses) . '
-            )',
+                    SELECT 1 FROM `ai_session_log` l
+                    WHERE l.ai_session_id = `' . $this->table . '`.id
+                    AND ' . implode("\nAND ", $logClauses) . '
+                )',
                 $logParams
+            );
+        } elseif ($requireSessionLog) {
+            $pb->rawWhere(
+                'EXISTS (
+                    SELECT 1 FROM `ai_session_log` l
+                    WHERE l.ai_session_id = `' . $this->table . '`.id
+                )',
+                []
             );
         }
 

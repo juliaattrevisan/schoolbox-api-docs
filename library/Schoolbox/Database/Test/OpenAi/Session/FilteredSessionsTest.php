@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Database\Test\OpenAi\Session;
 
+use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Quoter\IQuoter;
 use Alaress\Database\Test\TestConnectorTrait;
 use Schoolbox\Editor\OpenAI\Log\LogFormat;
 use PHPUnit\Framework\TestCase;
