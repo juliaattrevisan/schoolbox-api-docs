@@ -374,15 +374,17 @@ button.submit {
     }
 }
 
-//a button with SVG icons that displays inline with text
-.button.sbx-button {
+// a button with <sbx-icon> that displays inline with text
+.button.sbx-button,
+.sbx-button--has-icon {
     align-items: center;
     display: inline-flex;
     gap: var(--spacing-s);
 }
 
 // center align submit buttons
-.button.sbx-button.submit {
+.button.sbx-button.submit,
+.button.sbx-button--has-icon {
     justify-content: center;
 }
 
@@ -392,20 +394,4 @@ button.submit {
     display: flex;
     gap: var(--spacing-s);
     justify-content: left;
-}
-
-.f-dropdown :is(a, button).sbx-button--has-icon sbx-icon {
-    line-height: 1;
-}
-.sbx-button--has-icon {
-    align-items: center;
-    display: inline-flex;
-    gap: var(--spacing-s);
-}
-.button.sbx-button--has-icon {
-    justify-content: center;
-}
-
-.sbx-button--has-icon sbx-icon {
-    line-height: 1;
 }
