@@ -1135,16 +1135,12 @@ class DataSource
         $this->indicatorMarkMapper->deleteFeedbackMarks($feedbackId, $rubricInstance, $mapper->getTable());
         $this->capabilityMarkMapper->deleteFeedbackMarks($feedbackId, $rubricInstance, $mapper->getTable());
 
-        // Create list of cap/ind marks that will be saved
-        $capabilityMarksToSave = $this->capabilityMarkMapper->createCollection();
-        $indicatorMarksToSave  = $this->indicatorMarkMapper->createCollection();
-
         foreach ($markedGrid->getCapabilityMarks() as $capabilityMark) {
             // Create cap mark
             $capabilityId = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
             $capabilityModel = $this->capabilityMapper->findById($capabilityId);
 
-            $capabilityMarksToSave[$capabilityId] = $capabilityMarkModel = $this->capabilityMarkMapper->createModel()
+            $capabilityMarkModel = $this->capabilityMarkMapper->createModel()
                 ->setRubricInstance($rubricInstance)
                 ->setFeedbackId($feedback->getId())
                 ->setFeedbackTable($mapper->getTable())
@@ -1173,13 +1169,17 @@ class DataSource
                     continue;
                 }
 
-                $indicatorMarksToSave[$indicatorId] = $this->indicatorMarkMapper->createModel()
+                $indicatorMarkModel = $this->indicatorMarkMapper->createModel()
                     ->setCapabilityMark($capabilityMarkModel)
                     ->setDescriptor($descriptorModel)
                     ->setValue($indicatorMark->getValue())
                     ->setValid(true);
 
-                $this->indicatorMarkMapper->save($indicatorMarksToSave[$indicatorId]);
+                /* For some reason this has become integral: we can't just save the collection at the end.
+                 * I have to save them in situ as I progress: must be something to do with the object-by-reference nature
+                 * of what we're building here.
+                 */
+                $this->indicatorMarkMapper->save($indicatorMarkModel);
             }
         }
     }
