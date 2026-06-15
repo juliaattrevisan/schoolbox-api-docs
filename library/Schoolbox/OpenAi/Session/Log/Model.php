@@ -288,6 +288,12 @@ class Model
         return $this;
     }
 
+    /**
+     * Trim to a specified number of bytes, taking care not to split multi-byte characters.
+     * @param string $value
+     * @param int    $maxBytes
+     * @return string
+     */
     private static function trimToMaxBytes(string $value, int $maxBytes): string
     {
         if (strlen($value) <= $maxBytes) {
