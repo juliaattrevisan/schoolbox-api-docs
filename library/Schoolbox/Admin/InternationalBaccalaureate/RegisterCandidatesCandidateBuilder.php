@@ -50,7 +50,7 @@ class RegisterCandidatesCandidateBuilder
             'firstname' => $user->getFirstname(),
             'lastname' => $user->getLastname(),
             'email' => $user->getEmail(),
-            'gender' => $gender === null ? null : ($gender),
+            'gender' => $gender === null ? null : strtoupper($gender),
             'language1' => $languageCodes[0] ?? null,
             'language2' => $languageCodes[1] ?? null,
             'nationality1' => $nationalityCodes[0] ?? null,
