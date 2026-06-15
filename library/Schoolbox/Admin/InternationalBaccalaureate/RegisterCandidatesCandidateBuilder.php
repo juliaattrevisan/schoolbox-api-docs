@@ -55,7 +55,9 @@ class RegisterCandidatesCandidateBuilder
             'language2' => $languageCodes[1] ?? null,
             'nationality1' => $nationalityCodes[0] ?? null,
             'nationality2' => $nationalityCodes[1] ?? null,
-            'reference_code' => $user->getId() === null ? null : (string) $user->getId(),
+            'reference_code' => $user->getId() === null
+                ? null
+                : str_pad((string) $user->getId(), 6, '0', STR_PAD_LEFT),
         ];
 
         $missingFields = [];
