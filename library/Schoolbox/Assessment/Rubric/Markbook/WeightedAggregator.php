@@ -76,7 +76,7 @@ class WeightedAggregator
         }
 
         $val = ($assessmentWeight / $assessmentTotalWeight) * ($gridWeight / $gridTotalWeight) * $normalisedMark;
-        $val = (float)number_format($val, self::PRECISION);
+        $val = round($val, self::PRECISION);
 
         /* Diagnostic
          */
