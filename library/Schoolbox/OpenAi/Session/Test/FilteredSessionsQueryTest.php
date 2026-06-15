@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace Schoolbox\OpenAi\Session\Test;
 
 use Alaress\Database\Connector\NullConnector;
+use Alaress\Database\Quoter\IQuoter;
+use Alaress\Database\Quoter\Mysql\Quoter;
 use PDOStatement;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\OpenAi\Session\Mapper;
@@ -50,6 +52,17 @@ class FilteredSessionsQueryTest extends TestCase
         $this->assertStringContainsString('l.ai_session_id = `ai_session`.id', $sql);
     }
 
+    public function testKeywordFilterUsesPredicateBuilderForLogColumns(): void
+    {
+        $sql = $this->capturePreparedSql(
+            fn(Mapper $mapper) => $mapper->getFilteredSessions('keyword', null, null, null, null)
+        );
+
+        $this->assertStringContainsString('`l`.`prompt` LIKE :l_prompt', $sql);
+        $this->assertStringContainsString('`l`.`response` LIKE :l_response', $sql);
+        $this->assertStringNotContainsString('l.prompt LIKE :keyword', $sql);
+    }
+
     /**
      * @param callable(Mapper): void $query
      */
@@ -57,6 +70,11 @@ class FilteredSessionsQueryTest extends TestCase
     {
         $connector = new class extends NullConnector {
             public ?string $preparedStatement = null;
+
+            public function getQuoter(): IQuoter
+            {
+                return new Quoter();
+            }
 
             public function prepare(string $statement, array $driverOptions = []): PDOStatement
             {

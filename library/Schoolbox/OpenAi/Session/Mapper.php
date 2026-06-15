@@ -296,37 +296,38 @@ class Mapper extends BaseMapper
         ?\Alaress_Date_Format $start,
         ?\Alaress_Date_Format $end,
     ): array {
-        $clauses = [];
-        $params  = [];
+        $pb = $this->getPredicateBuilder();
 
         if ('' !== trim((string)$keyword)) {
             $like = '%' . $this->getDatabase()->getQuoter()->escapeForLike($keyword) . '%';
-            $clauses[] = 'EXISTS (
+            $keywordPredicate = $this->getPredicateBuilder()
+                ->like('l.prompt', $like)
+                ->like('l.response', $like);
+
+            $pb->rawWhere(
+                'EXISTS (
                 SELECT 1 FROM `ai_session_log` l
                 WHERE l.ai_session_id = `' . $this->table . '`.id
-                  AND (l.prompt LIKE :keyword OR l.response LIKE :keyword)
-            )';
-            $params['keyword'] = $like;
+                AND (' . implode(' OR ', $keywordPredicate->getWhere()) . ')
+            )',
+                $keywordPredicate->getParams()
+            );
         }
         if ('' !== trim((string)$feature)) {
-            $clauses[] = '`' . $this->table . '`.feature = :feature';
-            $params['feature'] = $feature;
+            $pb->equals('feature', $feature);
         }
         if (null !== $user) {
-            $clauses[] = '`' . $this->table . '`.created_by = :userId';
-            $params['userId'] = $user->getId();
+            $pb->equals('created_by', $user->getId());
         }
         if (null !== $start) {
-            $clauses[] = '`' . $this->table . '`.created_at >= :startAt';
-            $params['startAt'] = $start->getDatabase();
+            $pb->greaterThanOrEqualTo('created_at', $start->getDatabase());
         }
         if (null !== $end) {
-            $clauses[] = '`' . $this->table . '`.created_at <= :endAt';
-            $params['endAt'] = $end->getDatabase();
+            $pb->lessThanOrEqualTo('created_at', $end->getDatabase());
         }
 
-        $where = $clauses ? 'WHERE ' . implode("\nAND ", $clauses) : '';
+        $where = $pb->getWhere() ? 'WHERE ' . implode("\nAND ", $pb->getWhere()) : '';
 
-        return [$where, $params];
+        return [$where, $pb->getParams()];
     }
 }
