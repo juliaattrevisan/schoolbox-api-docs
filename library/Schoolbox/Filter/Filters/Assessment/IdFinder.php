@@ -138,7 +138,7 @@ class IdFinder extends Filter\AbstractIdFinder
             $termDJoin,
             $termCJoin,
         ];
-//        new \Alaress_Probe($nonContextJoins);
+
         $nonContextJoin = implode("\n", $nonContextJoins);
 
         // Build the non-context WHERE clauses.
@@ -155,7 +155,7 @@ class IdFinder extends Filter\AbstractIdFinder
             $deletedWhere,
             $yearLevelWhere,
         ];
-//        new \Alaress_Probe($nonContextWhereClauses);;
+
         $nonContextWhereClause = implode(' AND ', $nonContextWhereClauses);
 
         // Merge all the params
@@ -285,7 +285,7 @@ class IdFinder extends Filter\AbstractIdFinder
                     ";
             }
         }
-//new \Alaress_Probe($subQueries);
+
         return [implode("\n\n\tUNION\n\n", $subQueries), $params];
     }
 
