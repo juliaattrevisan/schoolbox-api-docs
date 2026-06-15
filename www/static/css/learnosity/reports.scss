@@ -1,8 +1,11 @@
 /* Result page styles update*/
 table.lrn-report-table {
+    background: var(--sbx-color-foreground-primary, #fff);
     border: none !important;
+    color: var(--sbx-color-text-primary, inherit);
 }
 td.lrn-report-area {
+    color: var(--sbx-color-text-primary, inherit);
     font-weight: bold;
 }
 .lrn .table-bordered > thead > tr > th,
@@ -11,20 +14,30 @@ td.lrn-report-area {
 .lrn .table-bordered > tbody > tr > td,
 .lrn .table-bordered > tfoot > tr > th,
 .lrn .table-bordered > tfoot > tr > td {
+    background: var(--sbx-color-foreground-primary, #fff);
     border-bottom: 1px solid var(--sbx-color-border, var(--body-background));
     border-left: 0px;
     border-right: 0px;
     border-top: 0px;
+    color: var(--sbx-color-text-primary, inherit);
 }
 .lrn .table-striped > tbody > tr:nth-child(odd) > td,
 .lrn .table-striped > tbody > tr:nth-child(odd) > th,
 .lrn .table-striped > tbody > tr:nth-child(even) > td,
 .lrn .table-striped > tbody > tr:nth-child(even) > th {
-    background-color: #fff;
-    color: #000000;
+    background: var(--sbx-color-foreground-primary, #fff);
+    color: var(--sbx-color-text-primary, #000000);
     font-size: 0.8125rem;
     line-height: 1.125rem;
     padding: 0.625rem;
+}
+
+.lrn .table-striped > thead > tr > th,
+.lrn .table-striped > thead > tr > td,
+.lrn .table-striped > tfoot > tr > th,
+.lrn .table-striped > tfoot > tr > td {
+    background: var(--sbx-color-foreground-primary, #fff);
+    color: var(--sbx-color-text-primary, inherit);
 }
 
 /* shown in horizontal and vertical marking, remove the margins from the item mark */

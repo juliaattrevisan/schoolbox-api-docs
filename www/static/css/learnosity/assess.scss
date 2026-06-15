@@ -1,9 +1,9 @@
 /* general button,like previous question or resume quiz */
 .lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn,
 .lrn.lrn-assess .dialogs .lrn_btn {
-    background-color: var(--content-ui-background);
-    border: none;
-    border-radius: 0;
+    background-color: var(--sbx-color-foreground-primary, var(--content-ui-background));
+    border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    border-radius: var(--sbx-config-field-corner-radius, 0px);
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     min-height: auto;
 }
@@ -18,56 +18,57 @@
 /* general button on hover */
 .lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn:hover:not(:disabled),
 .lrn.lrn-assess .dialogs .lrn_btn:hover:not(:disabled) {
-    background-color: var(--sbx-config-color-active, var(--content-ui-hover));
+    background: var(--sbx-color-foreground-primary, var(--content-ui-background));
+    border-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 
 /* general button on focus */
 .lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn:focus,
 .lrn.lrn-assess .dialogs .lrn_btn:focus {
-    border: none;
+    border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
 
 /* primary action button, like next question or confirmation  */
 .lrn .lrn_btn_blue,
 .lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn_blue,
 .lrn.lrn-assess .dialogs .lrn_btn_blue {
-    background-color: var(--content-ui-submit-background);
+    background-color: var(--sbx-config-color-accent, var(--content-ui-submit-background));
     border: none;
-    border-radius: 0;
-    color: var(--content-ui-submit-foreground);
+    border-radius: var(--sbx-config-field-corner-radius, 0px);
+    color: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground));
     font-weight: 600;
 }
 
 /* primary action button on hover */
 .lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn_blue:hover:not(:disabled),
 .lrn.lrn-assess .dialogs .lrn_btn_blue:hover:not(:disabled) {
-    background-color: rgba(
-        calc(var(--content-ui-submit-background-r) + (255 - var(--content-ui-submit-background-r)) * 0.2),
-        calc(var(--content-ui-submit-background-g) + (255 - var(--content-ui-submit-background-g)) * 0.2),
-        calc(var(--content-ui-submit-background-b) + (255 - var(--content-ui-submit-background-b)) * 0.2),
-        var(--content-ui-submit-background-a)
-    );
-    color: var(--content-ui-submit-foreground);
+    background: var(--sbx-config-color-accent, var(--content-ui-submit-background));
+    color: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground));
 }
 
 /* primary action button on active */
 .lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn_blue:active,
 .lrn.lrn-assess .dialogs .lrn_btn_blue:active {
-    background-color: var(--content-ui-submit-background);
-    color: var(--content-ui-submit-foreground);
+    background-color: var(--sbx-config-color-accent, var(--content-ui-submit-background));
+    color: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground));
 }
 
 /* primary action button on focus */
 .lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn_blue:focus,
 .lrn.lrn-assess .dialogs .lrn_btn_blue:focus {
-    background-color: var(--content-ui-submit-background);
+    background: var(--sbx-config-color-accent, var(--content-ui-submit-background));
+    color: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground));
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
 
 /* primary action button on disabled */
 .lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn_blue:disabled,
 .lrn.lrn-assess .dialogs .lrn_btn_blue:disabled {
-    background-color: var(--content-ui-submit-background);
+    background-color: var(--sbx-config-color-accent, var(--content-ui-submit-background));
     border: none;
 }
 
@@ -89,7 +90,7 @@
 
 /* the vertical menu running down the right hand side */
 .lrn.lrn-assess .lrn-right-region .right-wrapper .menu-overlay {
-    background-color: var(--content-ui-background);
+    background: var(--sbx-color-foreground-primary, var(--content-ui-background));
 }
 
 /* remove the background from the review screen */
@@ -116,7 +117,7 @@
 
 /* upadet active menu button style */
 .lrn.lrn-assess .toc .lrn-pager li.pagination-active a {
-    background: var(--content-ui-background);
+    background: var(--sbx-color-foreground-primary, var(--content-ui-background));
 }
 
 /* add padding to the quiz title in the player view */
@@ -126,5 +127,6 @@
 
 /* Removed the dotted border for review h2 title in the player */
 .lrn.lrn-assess .app-panel.review-screen .panel-header > h2:focus {
-    outline: unset;
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
