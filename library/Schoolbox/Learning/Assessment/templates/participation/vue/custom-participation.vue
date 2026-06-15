@@ -51,6 +51,10 @@ const { onlyShowDP, customisationFilter, customisationOptions, filteredParticipa
     useFilterParticipants(allParticipants);
 const { showCheckboxes, selectedList, allSelected, isIndeterminate } = useSelectedList(filteredParticipants);
 
+window.Vue.watch([customisationFilter, onlyShowDP], () => {
+    selectedList.value = [];
+});
+
 /**
  * We only want to show the column on certain assessment types and when differentiation and AI features are enabled
  */
