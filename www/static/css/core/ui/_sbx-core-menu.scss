@@ -157,6 +157,7 @@ body.sbx-body {
 
             .profile-options,
             .profile-options-mobile {
+                background: var(--sbx-color-foreground-primary);
                 a {
                     color: var(--sbx-config-color-accent);
                     border-radius: var(--sbx-config-field-corner-radius);
@@ -173,6 +174,7 @@ body.sbx-body {
             }
 
             .switch-user {
+                background: var(--sbx-color-foreground-primary);
                 // switch user list
                 li.user {
                     border-radius: var(--sbx-config-field-corner-radius);
