@@ -280,7 +280,7 @@ function printSelectedSession(): void {
                     </thead>
 
                     <tbody>
-                        <tr v-for="session in usageSessions" :key="session.id ?? undefined">
+                        <tr v-for="session in usageSessions" :key="session.id">
                             <td>
                                 {{ formatSessionDate(session) }}
                             </td>
@@ -300,13 +300,7 @@ function printSelectedSession(): void {
                             </td>
                             <td>{{ session.hasError ? "Error" : "" }}</td>
                             <td class="actions-small-1">
-                                <nav
-                                    v-if="
-                                        session.id !== null &&
-                                        session.logFormat !== null &&
-                                        session._routes.getSessionLogs
-                                    "
-                                >
+                                <nav v-if="session.logFormat !== null && session._routes.getSessionLogs">
                                     <button
                                         type="button"
                                         class="sbx-icon-only-button f-no-margins"

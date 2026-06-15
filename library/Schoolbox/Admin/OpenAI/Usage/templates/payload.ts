@@ -61,8 +61,7 @@ export type AiSessionLog = {
 
 /** @see /library/Schoolbox/Editor/OpenAI/Log/Translator/ModelToArray.php */
 export type AiSession<TLogFormat extends AiLogFormat = AiLogFormat, TFeature extends AiFeature = AiFeature> = {
-    /** The session ID can be null for legacy records which never had a session ID before we added those */
-    id: AiSessionId | null;
+    id: AiSessionId;
     feature: TFeature;
     logFormat: TLogFormat | null;
     createdAt: DateRFC3339;
