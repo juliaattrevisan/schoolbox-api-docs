@@ -12,6 +12,7 @@ use Schoolbox\Admin\OpenAI\Config as OpenAiConfig;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\IB\Registrations\Sessions\Student\Model as RegistrationSessionStudentModel;
 
 require_once __DIR__ . '/../conf/core/require.php';
 
@@ -69,7 +70,7 @@ $app = new class extends CliTool\App {
             // Students from deleted sessions will not appear.
             'ib_registration_students'              => 'SELECT COUNT(*) FROM ib_registration_session_student',
             // Registered students
-            'ib_registration_students_registered'   => 'SELECT COUNT(*) FROM ib_registration_session_student WHERE status = 5',
+            'ib_registration_students_registered'   => 'SELECT COUNT(*) FROM ib_registration_session_student WHERE status = ' . RegistrationSessionStudentModel::STATUS_REGISTERED,
             // Students with candidate numbers
             'ib_students_with_candidate_numbers'    => 'SELECT COUNT(*) FROM user u WHERE u.ib_candidate_number IS NOT NULL AND u.ib_candidate_number != ""',
 
