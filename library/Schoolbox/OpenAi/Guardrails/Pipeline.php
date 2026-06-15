@@ -13,6 +13,7 @@ namespace Schoolbox\OpenAi\Guardrails;
 use Schoolbox\GenericCollection;
 use Schoolbox\Editor\OpenAI\Log\LogFormat;
 use Schoolbox\OpenAi\Exception\GuardrailFlagged;
+use Schoolbox\OpenAi\Feature;
 use Schoolbox\OpenAi\Guardrails\Check\ICheck;
 use Schoolbox\OpenAi\IClient;
 use Schoolbox\User;
@@ -41,13 +42,13 @@ class Pipeline
     /**
      * @param IClient $client The AI provider client which should be used to create logs
      * @param User $user
-     * @param string $feature
+     * @param Feature $feature
      * @param string $sessionId
      */
     public function __construct(
         private IClient $client,
         private User $user,
-        private string $feature,
+        private Feature $feature,
         private string $sessionId,
     ) {
         $this->inputChecks = new GenericCollection(ICheck::class);

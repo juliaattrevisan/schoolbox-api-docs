@@ -99,7 +99,7 @@ class DifferentiationProfileGeneration
             $payload,
             null,
             $user,
-            \Schoolbox\OpenAi\Feature::DIFFERENTIATION->value,
+            \Schoolbox\OpenAi\Feature::DIFFERENTIATION,
             $aiSessionId,
             null, // These requests can't be restored in the AI Usage Log yet
         );

@@ -67,7 +67,7 @@ class ImageGeneration
             $payload,
             $prompt,
             $user,
-            \Schoolbox\OpenAi\Feature::IMAGE->value,
+            \Schoolbox\OpenAi\Feature::IMAGE,
             $sessionId,
             AgentChat::getLogFormat(),
         );

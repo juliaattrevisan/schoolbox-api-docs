@@ -57,7 +57,7 @@ class FilteredSessionsTest extends TestCase
     public function testReturnsSessionWithDerivedFirstLogValues(): void
     {
         $id = Uuid::uuid4()->toString();
-        Mapper::getInstance()->findOrCreate($id, Feature::CHAT->value, null);
+        Mapper::getInstance()->findOrCreate($id, Feature::CHAT, null);
 
         // First log (earliest) is the one whose log_format/return_code should surface.
         LogMapper::getInstance()->save(
@@ -97,7 +97,7 @@ class FilteredSessionsTest extends TestCase
     public function testKeywordFilterMatchesLogText(): void
     {
         $id = Uuid::uuid4()->toString();
-        Mapper::getInstance()->findOrCreate($id, Feature::CHAT->value, null);
+        Mapper::getInstance()->findOrCreate($id, Feature::CHAT, null);
         LogMapper::getInstance()->save(
             new LogModel()->setAiSessionId($id)->setPrompt('a unique needle phrase')
         );

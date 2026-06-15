@@ -51,7 +51,7 @@ class FindOrCreateTest extends TestCase
     {
         $id = Uuid::uuid4()->toString();
 
-        $session = Mapper::getInstance()->findOrCreate($id, Feature::CHAT->value, null);
+        $session = Mapper::getInstance()->findOrCreate($id, Feature::CHAT, null);
 
         $this->assertInstanceOf(Model::class, $session);
         $this->assertSame($id, $session->getId());
@@ -70,7 +70,7 @@ class FindOrCreateTest extends TestCase
         $this->assertNotNull($user, 'Test DB is expected to contain at least one user');
 
         $id = Uuid::uuid4()->toString();
-        Mapper::getInstance()->findOrCreate($id, Feature::CHAT->value, $user);
+        Mapper::getInstance()->findOrCreate($id, Feature::CHAT, $user);
 
         $reloaded = Mapper::getInstance()->findById($id);
         $this->assertNotNull($reloaded->getUser());
@@ -85,8 +85,8 @@ class FindOrCreateTest extends TestCase
     {
         $id = Uuid::uuid4()->toString();
 
-        Mapper::getInstance()->findOrCreate($id, Feature::CHAT->value, null);
-        Mapper::getInstance()->findOrCreate($id, Feature::DIALOG_AGENT->value, null);
+        Mapper::getInstance()->findOrCreate($id, Feature::CHAT, null);
+        Mapper::getInstance()->findOrCreate($id, Feature::DIALOG_AGENT, null);
 
         $matches = Mapper::getInstance()->findByColumn('id', $id);
         $this->assertCount(1, $matches, 'No duplicate session row should be created');

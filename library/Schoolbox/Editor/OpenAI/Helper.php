@@ -308,7 +308,7 @@ class Helper
         /* Ensure the ai_session row exists (carrying the feature) before logging
          * against it, then build the log for this request.
          */
-        $this->sessionMapper->findOrCreate($aiSessionId, $feature, $user);
+        $this->sessionMapper->findOrCreate($aiSessionId, Feature::from($feature), $user);
 
         $log = $this->logMapper->createModel()
             ->setUser($user)
@@ -490,7 +490,7 @@ class Helper
             /* Log what the user tried to do if we made a vaguely-successful request
              * and didn't somehow die long the way
              */
-            $this->sessionMapper->findOrCreate($aiSessionId, Feature::CHAT->value, $user);
+            $this->sessionMapper->findOrCreate($aiSessionId, Feature::CHAT, $user);
 
             $log = $this->logMapper->createModel()
                 ->setUser($user)

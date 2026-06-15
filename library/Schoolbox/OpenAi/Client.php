@@ -197,7 +197,7 @@ class Client implements IClient
         array $payload,
         ?string $inputText,
         ?User $user,
-        string $feature,
+        Feature $feature,
         string $aiSessionId,
         ?LogFormat $logFormat = null,
     ): Log\Model {

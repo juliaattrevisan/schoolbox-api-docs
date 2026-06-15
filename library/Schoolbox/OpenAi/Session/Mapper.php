@@ -55,22 +55,19 @@ class Mapper extends BaseMapper
      * same way.
      *
      * @param string    $id      The session UUID (the ai_session primary key).
-     * @param string    $feature The owning feature, as a {@see Feature} value.
+     * @param Feature   $feature The owning feature.
      * @param User|null $user    The creating user (for created_by), if known.
      * @return Model The persisted (existing or newly created) session.
-     * @throws \ValueError If $feature is not a valid Feature value.
      * @throws BaseMapper\Exception
      */
-    public function findOrCreate(string $id, string $feature, ?User $user): Model
+    public function findOrCreate(string $id, Feature $feature, ?User $user): Model
     {
-        $feature = Feature::from($feature)->value;
-
         $statement = $this->getDatabase()->prepare(
             'INSERT IGNORE INTO `ai_session` (`id`, `feature`, `created_by`, `created_at`)
              VALUES (:id, :feature, :createdBy, NOW())'
         );
         $statement->bindValue('id', $id);
-        $statement->bindValue('feature', $feature);
+        $statement->bindValue('feature', $feature->value);
         $createdBy = $user?->getId();
         $statement->bindValue(
             'createdBy',

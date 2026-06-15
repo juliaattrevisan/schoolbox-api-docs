@@ -12,6 +12,7 @@ namespace Schoolbox\OpenAi\Test;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use Schoolbox\OpenAi\Client;
+use Schoolbox\OpenAi\Feature;
 use Schoolbox\OpenAi\IClient;
 use Schoolbox\OpenAi\Session\Mapper as SessionMapper;
 
@@ -28,7 +29,7 @@ class ClientContractTest extends TestCase
         foreach ([IClient::class, Client::class] as $className) {
             $parameters = $this->getMethodParameters($className, 'createLog');
 
-            $this->assertRequiredStringParameter($parameters['feature']);
+            $this->assertRequiredParameterType($parameters['feature'], Feature::class);
             $this->assertRequiredStringParameter($parameters['aiSessionId']);
         }
     }
@@ -40,7 +41,7 @@ class ClientContractTest extends TestCase
     {
         $parameters = $this->getMethodParameters(SessionMapper::class, 'findOrCreate');
 
-        $this->assertRequiredStringParameter($parameters['feature']);
+        $this->assertRequiredParameterType($parameters['feature'], Feature::class);
     }
 
     /**
@@ -59,8 +60,13 @@ class ClientContractTest extends TestCase
 
     private function assertRequiredStringParameter(\ReflectionParameter $parameter): void
     {
+        $this->assertRequiredParameterType($parameter, 'string');
+    }
+
+    private function assertRequiredParameterType(\ReflectionParameter $parameter, string $type): void
+    {
         $this->assertFalse($parameter->isOptional());
         $this->assertFalse($parameter->allowsNull());
-        $this->assertSame('string', (string)$parameter->getType());
+        $this->assertSame($type, (string)$parameter->getType());
     }
 }

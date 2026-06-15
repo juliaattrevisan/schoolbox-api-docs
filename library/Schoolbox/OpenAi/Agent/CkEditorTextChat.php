@@ -63,7 +63,7 @@ class CkEditorTextChat
             $payload,
             $this->extractUserInput($payload),
             $user,
-            \Schoolbox\OpenAi\Feature::CHAT->value,
+            \Schoolbox\OpenAi\Feature::CHAT,
             $aiSessionId,
             null, // TODO: should be able to use the AgentChat log format
         );
