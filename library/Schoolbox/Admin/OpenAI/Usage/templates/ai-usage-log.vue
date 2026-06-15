@@ -18,6 +18,7 @@ import type {
     AiSessionLogApiResponse,
 } from "./payload";
 import AulAgentChat from "./aul-agent-chat.vue";
+import AulModerationIndicator from "./aul-moderation-indicator.vue";
 
 interface Props {
     routeSearch: string;
@@ -89,6 +90,15 @@ function closeSessionDetails(): void {
     sessionLoadError.value = null;
     selectedSessionId.value = null;
     selectedSessionLog.value = null;
+}
+
+/**
+ * Determine if it is possible to view a session's logs
+ * @param session The session to check
+ * @returns true if the session's logs can be viewed
+ */
+function canViewSessionLogs(session: AiSession): boolean {
+    return session.logFormat !== null && session._routes.getSessionLogs !== undefined;
 }
 
 /**
@@ -299,9 +309,16 @@ function printSelectedSession(): void {
                                 </component>
                             </td>
                             <td>{{ session.hasError ? "Error" : "" }}</td>
-                            <td class="actions-small-1">
-                                <nav v-if="session.logFormat !== null && session._routes.getSessionLogs">
+                            <td
+                                :class="`actions-small-${session.moderationStatus && canViewSessionLogs(session) ? 2 : 1}`"
+                            >
+                                <nav v-if="session.moderationStatus || canViewSessionLogs(session)">
+                                    <aul-moderation-indicator
+                                        v-if="session.moderationStatus"
+                                        :status="session.moderationStatus"
+                                    />
                                     <button
+                                        v-if="canViewSessionLogs(session)"
                                         type="button"
                                         class="sbx-icon-only-button f-no-margins"
                                         title="View session details"
