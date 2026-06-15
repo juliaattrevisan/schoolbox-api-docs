@@ -43,4 +43,20 @@ class FeatureTest extends TestCase
         $this->assertSame(Feature::CHAT, Feature::from('chat'));
         $this->assertSame(Feature::AI_MODERATION_AGENT, Feature::from('aimoderationagent'));
     }
+
+    /**
+     * Only features with AI moderation support expose that capability.
+     */
+    public function testSupportsAiModeration(): void
+    {
+        $this->assertTrue(Feature::DIALOG_AGENT->supportsAiModeration());
+
+        foreach (Feature::cases() as $feature) {
+            if (Feature::DIALOG_AGENT === $feature) {
+                continue;
+            }
+
+            $this->assertFalse($feature->supportsAiModeration());
+        }
+    }
 }

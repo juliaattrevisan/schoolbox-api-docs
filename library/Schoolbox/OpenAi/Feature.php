@@ -22,4 +22,15 @@ enum Feature: string
     case DIALOG_AGENT = 'dialogagent';
     case LEARNING_ACTIVITY_CUSTOMISATION = 'learningactivitycustomisation';
     case AI_MODERATION_AGENT = 'aimoderationagent';
+
+    /**
+     * Whether this feature can be configured to use AI moderation.
+     */
+    public function supportsAiModeration(): bool
+    {
+        return match ($this) {
+            self::DIALOG_AGENT => true,
+            default => false,
+        };
+    }
 }

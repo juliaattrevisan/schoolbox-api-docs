@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\OpenAI;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as SchoolboxException;
+use Schoolbox\OpenAi\Feature;
 
 /**
  * Configuration options for AI features.
@@ -733,7 +734,7 @@ class Config
         $formInputs[self::FIELD_DEPLOYMENT_MODEL]['recommendedOptions'] = $splitOptions['recommended'];
         $formInputs[self::FIELD_DEPLOYMENT_MODEL]['options']            = $splitOptions['others'];
 
-        if (\in_array($feature, Helper::FEATURES_WITH_AI_MODERATION, true)) {
+        if (Feature::tryFrom($feature)?->supportsAiModeration()) {
             // Any feature with AI moderation support gets a config for it
             $formInputs[self::FIELD_AI_MODERATION] = [
                 'type'    => self::FIELD_TYPE_CHECKBOX,

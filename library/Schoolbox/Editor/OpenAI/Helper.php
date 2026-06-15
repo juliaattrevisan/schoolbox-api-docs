@@ -61,13 +61,6 @@ class Helper
     public const int DIFFERENTIATION_PROFILE_CACHE_DEFAULT_TTL = 604800; // 7 days
 
     /**
-     * The features which support AI moderation
-     */
-    public const array FEATURES_WITH_AI_MODERATION = [
-        Feature::DIALOG_AGENT->value,
-    ];
-
-    /**
      * Controller constructor.
      */
     #[\Deprecated('Use \Schoolbox\OpenAi\ClientFactory::buildForFeature to create a client')]
