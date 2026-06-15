@@ -750,7 +750,7 @@ CREATE TABLE `clipboard_import_log` (
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `finish_at_idx` (`finish_at`,`status`)
-) ENGINE=InnoDB AUTO_INCREMENT=17448 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17434 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1126,7 +1126,7 @@ CREATE TABLE `config` (
   KEY `config_type_id` (`type_id`),
   CONSTRAINT `fk_config_field_id` FOREIGN KEY (`field_id`) REFERENCES `lu_config_field` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_config_type_id` FOREIGN KEY (`type_id`) REFERENCES `lu_config_type` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=786 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=783 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3226,7 +3226,7 @@ CREATE TABLE `ib_registration_session_student` (
   CONSTRAINT `fk_ib_rss_registration_session` FOREIGN KEY (`registration_session_id`) REFERENCES `ib_registration_sessions` (`id`),
   CONSTRAINT `fk_ib_rss_subject_confirmed_updated_by_user` FOREIGN KEY (`subject_confirmed_by`) REFERENCES `user` (`id`),
   CONSTRAINT `fk_ib_rss_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3281,7 +3281,7 @@ CREATE TABLE `ib_registration_sessions` (
   CONSTRAINT `fk_ib_registration_sessions_deleted_by` FOREIGN KEY (`deleted_by`) REFERENCES `user` (`id`),
   CONSTRAINT `fk_ib_registration_sessions_system_purpose` FOREIGN KEY (`system_purpose_id`) REFERENCES `ib_system_purposes` (`id`),
   CONSTRAINT `fk_ib_registration_sessions_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3555,7 +3555,7 @@ CREATE TABLE `login_log` (
   PRIMARY KEY (`id`),
   KEY `username` (`username`),
   KEY `date` (`date`)
-) ENGINE=InnoDB AUTO_INCREMENT=2126 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2123 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6083,6 +6083,7 @@ CREATE TABLE `resource` (
   `max_reservation_time` mediumint(8) unsigned NOT NULL DEFAULT 86400,
   `current_term_restriction` tinyint(1) NOT NULL DEFAULT 0,
   `allow_clash_bookings` tinyint(1) NOT NULL DEFAULT 0,
+  `capacity` int(11) NOT NULL DEFAULT 1,
   `created_at` datetime NOT NULL,
   `modified_at` datetime NOT NULL,
   `deleted_at` datetime DEFAULT NULL,
@@ -6115,6 +6116,7 @@ CREATE TABLE `resource_booking` (
   `resource_id` int(11) NOT NULL,
   `name` varchar(255) DEFAULT NULL,
   `notes` text DEFAULT NULL,
+  `quantity` int(11) NOT NULL DEFAULT 1,
   `created_at` datetime NOT NULL,
   `modified_at` datetime NOT NULL,
   `deleted_at` datetime DEFAULT NULL,
@@ -7534,7 +7536,7 @@ CREATE TABLE `submission_box` (
   `use_rubric` int(1) unsigned NOT NULL DEFAULT 0,
   `rubric_capability_mark_type_id` int(11) DEFAULT NULL,
   `rubric_capability_grade_group_id` int(11) DEFAULT NULL,
-  `rubric_mark_range` int(1) unsigned NOT NULL DEFAULT 0,
+  `_rubric_mark_range` int(1) unsigned NOT NULL DEFAULT 0,
   `self_reviewability` enum('none','reflect-only','full') NOT NULL,
   `similarity_check_enabled` tinyint(4) NOT NULL DEFAULT 0,
   `external_id` varchar(32) DEFAULT NULL COMMENT 'External-system specific identifier',
@@ -8630,7 +8632,7 @@ CREATE TABLE `user_assume_log` (
   `ip` varchar(39) CHARACTER SET ascii COLLATE ascii_general_ci DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1047 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1046 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -8746,7 +8748,7 @@ CREATE TABLE `user_qualification` (
   UNIQUE KEY `unique_user_qualification` (`user_id`,`qualification_id`),
   KEY `idx_user_id` (`user_id`),
   KEY `idx_qualification_id` (`qualification_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -9302,4 +9304,4 @@ CREATE TABLE `wikiRevision` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2026-06-11  5:34:28
+-- Dump completed on 2026-06-15  7:01:04
