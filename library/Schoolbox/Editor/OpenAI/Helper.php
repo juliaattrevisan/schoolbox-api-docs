@@ -20,6 +20,7 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\OpenAi\Session\Log\Mapper as SessionLogMapper;
 use Schoolbox\OpenAi\Session\Log\Model as SessionLogModel;
 use Schoolbox\OpenAi\Session\Mapper as SessionMapper;
+use Schoolbox\OpenAi\Feature;
 use Schoolbox\User;
 
 class Helper
@@ -49,31 +50,6 @@ class Helper
     public const ENDPOINT_TYPE_OFF = 'Off';
 
     /**
-     * Feature types (both for logging and identifying in schoolbox code)
-     */
-    public const string FEATURE_CHAT = 'chat';
-    public const string FEATURE_LESSONPLAN = 'lessonplan';
-    public const string FEATURE_IMAGE = 'image';
-    // Discussion Learning Activity
-    public const string FEATURE_DIALOGAGENT = 'dialogagent';
-    // Differentiation Profiles
-    public const string FEATURE_DIFFERENTIATION = 'differentiation';
-    /**
-     * Learning Activity Customisation
-     * Independent from FEATURE_DIFFERENTIATION, but usually follows it in a workflow
-     * Since differentiation can be populated without AI involvement, this is separate so it can still be used
-     * This also allows schools to disable customisation while keeping differentiation enabled (or vice-versa) if they want to
-     */
-    public const string FEATURE_LEARNING_ACTIVITY_CUSTOMISATION = 'learningactivitycustomisation';
-
-    /**
-     * SA-21768
-     * Moderation of AI interactions
-     * automatic moderation agent, to flag ai interactions that require moderation (human inspection and approval, or investigation)
-     */
-    public const string FEATURE_AI_MODERATION_AGENT = 'aimoderationagent';
-
-    /**
      * When an image is omitted from the request/response, we replace the base64 data with this const
      */
     private const IMAGE_DATA_OMITTED = 'omitted';
@@ -88,13 +64,11 @@ class Helper
      * The features which support AI moderation
      */
     public const array FEATURES_WITH_AI_MODERATION = [
-        self::FEATURE_DIALOGAGENT,
+        Feature::DIALOG_AGENT->value,
     ];
 
     /**
      * Controller constructor.
-     *
-     * Whilst this class is deprecated, its constants have not yet been.
      */
     #[\Deprecated('Use \Schoolbox\OpenAi\ClientFactory::buildForFeature to create a client')]
     public function __construct(
@@ -201,7 +175,7 @@ class Helper
             $inputTokens = null;
             $outputTokens = null;
 
-            if ($type === self::FEATURE_CHAT) {
+            if ($type === Feature::CHAT->value) {
                 $model = $item['model'] ?? null;
                 $inputTokens = $item['usage']['prompt_tokens'] ?? null;
                 $outputTokens = $item['usage']['completion_tokens'] ?? null;
@@ -263,7 +237,7 @@ class Helper
                 $this->appendChunkToLog($event, $log, $type);
 
                 // Don't echo an 'error' chunk if this isn't going to ckeditor as it won't follow the format of an ApiProblem
-                if ($type === self::FEATURE_CHAT || $event['type'] !== 'error') {
+                if ($type === Feature::CHAT->value || $event['type'] !== 'error') {
                     echo "{$chunk}\n\n";
                 }
 
@@ -508,7 +482,7 @@ class Helper
 
         $log = null;
         try {
-            $openAiRequest = new Request('POST', $this->getEndpoint(self::FEATURE_CHAT), array_merge(
+            $openAiRequest = new Request('POST', $this->getEndpoint(Feature::CHAT->value), array_merge(
                 $this->getAuthorization(),
                 ['Content-Type' => 'application/json'],
             ), $payload);
@@ -516,14 +490,14 @@ class Helper
             /* Log what the user tried to do if we made a vaguely-successful request
              * and didn't somehow die long the way
              */
-            $this->sessionMapper->findOrCreate($aiSessionId, self::FEATURE_CHAT, $user);
+            $this->sessionMapper->findOrCreate($aiSessionId, Feature::CHAT->value, $user);
 
             $log = $this->logMapper->createModel()
                 ->setUser($user)
                 ->setPrompt($payload)
                 ->setModel($this->openAiModel)
                 ->setAiSessionId($aiSessionId)
-                ->setEndpoint($this->getEndpoint(self::FEATURE_CHAT));
+                ->setEndpoint($this->getEndpoint(Feature::CHAT->value));
 
             $promise = $this->client->sendAsync($openAiRequest, ['stream' => true]);
 
@@ -549,7 +523,7 @@ class Helper
                     ob_end_flush();
 
                     $stream = $response->getBody();
-                    $this->readStream($stream, $log, self::FEATURE_CHAT);
+                    $this->readStream($stream, $log, Feature::CHAT->value);
                 },
                 function ($reason) use ($log): void {
                     $returnCode = $reason->getCode();
@@ -599,7 +573,7 @@ class Helper
             case self::ENDPOINT_TYPE_OPENAI:
                 /* Little Robot Dude
                  */
-                if (self::FEATURE_CHAT === $type) {
+                if (Feature::CHAT->value === $type) {
                     return self::ENDPOINT_HOST_OPENAI_CHAT;
                 }
 
@@ -613,7 +587,7 @@ class Helper
 
                 /* Little Robot Dude
                  */
-                if (self::FEATURE_CHAT === $type) {
+                if (Feature::CHAT->value === $type) {
                     return sprintf(
                         self::ENDPOINT_HOST_AZURE_CHAT,
                         $this->openAiAzureResourceName,

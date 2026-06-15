@@ -67,7 +67,7 @@ class LearningActivityCustomisationGeneration
         );
 
         $payload = $payloadGenerator->generate();
-        $log = $this->client->createLog($payload, null, $user, Helper::FEATURE_LEARNING_ACTIVITY_CUSTOMISATION, $aiSessionId);
+        $log = $this->client->createLog($payload, null, $user, \Schoolbox\OpenAi\Feature::LEARNING_ACTIVITY_CUSTOMISATION->value, $aiSessionId);
         $response = $this->client->createResponse($payload, $log);
 
         $data = json_decode($response->getBody()->getContents(), true);

@@ -16,7 +16,6 @@ use JsonException;
 use Schoolbox\Admin\OpenAI;
 use UnexpectedValueException;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\OpenAi\Session\Log\Mapper;
 use Schoolbox\OpenAi\Session\Mapper as SessionMapper;
 use Schoolbox\IConfigLoader;
@@ -72,7 +71,7 @@ class ClientFactory
     /**
      * Build a client for a given feature.
      *
-     * @param string&Helper::FEATURE_* $feature The feature to build for.
+     * @param value-of<Feature> $feature The feature to build for.
      * @return IClient
      * @throws Exception\Runtime if something went wrong with building the
      *                           provider, e.g.:
@@ -109,7 +108,7 @@ class ClientFactory
         // Azure: build client depending on feature
         if ($providerEnum === Provider::Azure) {
             switch ($feature) {
-                case Helper::FEATURE_CHAT:
+                case \Schoolbox\OpenAi\Feature::CHAT->value:
                     // Chat does use deployment ID
                     return $this->buildAzure(
                         $apiKey,
@@ -117,7 +116,7 @@ class ClientFactory
                         $aiConfig[OpenAi\Config::SECTION_AZURE][OpenAI\Config::FIELD_DEPLOYMENT_ID]['value'] ?? '',
                         '2023-12-01-preview',
                     );
-                case Helper::FEATURE_IMAGE:
+                case \Schoolbox\OpenAi\Feature::IMAGE->value:
                     throw new Exception\FeatureNotSupportedByProvider('Image feature for Azure is not implemented');
                 default:
                     // Default does not use deployment ID

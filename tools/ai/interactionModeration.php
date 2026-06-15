@@ -14,7 +14,6 @@ use Schoolbox\Admin\OpenAI\Config as AIConfig;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\OpenAi\Session\Log\Mapper as AILogMapper;
 use Schoolbox\OpenAi\Agent\InteractionModeration;
 use Schoolbox\OpenAi\ClientFactory;
@@ -106,7 +105,7 @@ HELP;
         );
 
         $interactionModeration = new InteractionModeration(
-            $this->clientFactory->buildForFeature(Helper::FEATURE_AI_MODERATION_AGENT),
+            $this->clientFactory->buildForFeature(\Schoolbox\OpenAi\Feature::AI_MODERATION_AGENT->value),
             $agentConfig,
         );
 

@@ -336,7 +336,7 @@ class Client implements IClient
                 // I think that after an error's raised then there's no point
                 // outputting any further?
 //                // Don't echo an 'error' chunk if this isn't going to ckeditor as it won't follow the format of an ApiProblem
-//                if ($type === self::FEATURE_CHAT || $event['type'] !== 'error') {
+//                if ($type === Feature::CHAT->value || $event['type'] !== 'error') {
 //                    echo "{$chunk}\n\n";
 //                }
             }

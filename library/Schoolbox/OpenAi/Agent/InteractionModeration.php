@@ -69,7 +69,7 @@ class InteractionModeration
             $payload,
             null, // no meaningful input text unique to this log atm, it's all in the payload if you need to debug
             $user,
-            Helper::FEATURE_AI_MODERATION_AGENT,
+            \Schoolbox\OpenAi\Feature::AI_MODERATION_AGENT->value,
             $sessionId,
             null, // These requests can't be restored in the AI Usage Log yet
         );

@@ -81,7 +81,7 @@ Your teacher has been notified.";
         $pipeline = new Guardrails\Pipeline(
             $this->client,
             $user,
-            Helper::FEATURE_DIALOGAGENT,
+            \Schoolbox\OpenAi\Feature::DIALOG_AGENT->value,
             $sessionId,
         );
 
@@ -179,7 +179,7 @@ Your teacher has been notified.";
             $payload,
             $userPrompt,
             $user,
-            Helper::FEATURE_DIALOGAGENT,
+            \Schoolbox\OpenAi\Feature::DIALOG_AGENT->value,
             $sessionId,
             AgentChat::getLogFormat(),
         );

@@ -316,7 +316,7 @@ class Controller extends Base
         $agentConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_DIALOGAGENT));
 
         $agent = new OpenAI\Agent\DialogAgentConfigureFields(
-            $this->aiClientFactory->buildForFeature(\Schoolbox\Editor\OpenAI\Helper::FEATURE_DIALOGAGENT),
+            $this->aiClientFactory->buildForFeature(\Schoolbox\OpenAi\Feature::DIALOG_AGENT->value),
             $agentConfig,
         );
 
@@ -640,7 +640,7 @@ class Controller extends Base
             : null;
 
         $agent = new OpenAI\Agent\DialogAgentChat(
-            $this->aiClientFactory->buildForFeature(\Schoolbox\Editor\OpenAI\Helper::FEATURE_DIALOGAGENT),
+            $this->aiClientFactory->buildForFeature(\Schoolbox\OpenAi\Feature::DIALOG_AGENT->value),
             $moderationClient,
             $agentConfig,
             $this->dialogAgentResponseMapper,
@@ -730,7 +730,7 @@ class Controller extends Base
             : null;
 
         $agent = new OpenAI\Agent\DialogAgentChat(
-            $this->aiClientFactory->buildForFeature(\Schoolbox\Editor\OpenAI\Helper::FEATURE_DIALOGAGENT),
+            $this->aiClientFactory->buildForFeature(\Schoolbox\OpenAi\Feature::DIALOG_AGENT->value),
             $moderationClient,
             $agentConfig,
             $this->dialogAgentResponseMapper,
@@ -1154,7 +1154,7 @@ class Controller extends Base
         $agentConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_DIALOGAGENT));
 
         $agent = new OpenAI\Agent\DialogAgentFeedback(
-            $this->aiClientFactory->buildForFeature(\Schoolbox\Editor\OpenAI\Helper::FEATURE_DIALOGAGENT),
+            $this->aiClientFactory->buildForFeature(\Schoolbox\OpenAi\Feature::DIALOG_AGENT->value),
             $agentConfig,
             $this->aiLogMapper,
         );

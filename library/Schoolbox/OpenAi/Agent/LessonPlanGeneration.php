@@ -104,7 +104,7 @@ class LessonPlanGeneration
             $payload,
             null,
             $user,
-            Helper::FEATURE_LESSONPLAN,
+            \Schoolbox\OpenAi\Feature::LESSON_PLAN->value,
             $aiSessionId,
             null, // These requests can't be restored in the AI Usage Log yet
         );

@@ -74,7 +74,7 @@ class DialogAgentFeedback
             $payload,
             (string)$response->getId(), // for debugging purposes, this links the log back to the response ID
             $user,
-            Helper::FEATURE_DIALOGAGENT,
+            \Schoolbox\OpenAi\Feature::DIALOG_AGENT->value,
             $sessionId,
             null, // These requests can't be restored in the AI Usage Log yet
         );
