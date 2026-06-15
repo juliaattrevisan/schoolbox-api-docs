@@ -139,18 +139,20 @@ class Mapper extends BaseMapper
     /**
      * Fetch a page of sessions with logs for the admin usage log, newest first.
      *
-     * Filters: keyword (matched against the logs' prompt/response via EXISTS),
-     * feature, creating user, and created_at date range. logFormat/returnCode are
-     * derived from each session's first log (earliest created_at, then id).
-     * This is a summary hint for the admin list, not a guarantee that every log in the session has this format.
+     * The logFormat and returnCode values are derived from each session's first log, ordered by earliest created_at
+     * and then id. This is a summary hint for the admin list, not a guarantee that every log in the session has this format.
      *
-     * @param string|null               $keyword
-     * @param string|null               $feature
-     * @param User|null                 $user
-     * @param \Alaress_Date_Format|null $start
-     * @param \Alaress_Date_Format|null $end
-     * @param int|null                  $limit
-     * @param int|null                  $offset
+     * @param string|null               $keyword This filters sessions to those with at least one log whose prompt or
+     *                                           response contains this text.
+     * @param string|null               $feature This filters sessions to those created for this AI feature.
+     * @param User|null                 $user    This filters sessions to those created by this user.
+     * @param \Alaress_Date_Format|null $start   This filters sessions to those with at least one log created on or
+     *                                           after this date.
+     * @param \Alaress_Date_Format|null $end     The end date filters sessions to those with at least one log created
+     *                                           on or before this date.
+     * @param int|null                  $limit   The limit controls the maximum number of sessions returned.
+     * @param int|null                  $offset  The offset controls how many matching sessions are skipped before
+     *                                           results are returned.
      * @return GenericCollection<Model>
      * @throws Exception
      */
@@ -229,6 +231,7 @@ class Mapper extends BaseMapper
 
     /**
      * Count all sessions with logs matching the same filters, ignoring limit/offset.
+     * See docblock for $this->getFilteredSessions() for descriptions of filter params.
      *
      * @param string|null               $keyword
      * @param string|null               $feature
@@ -281,6 +284,7 @@ class Mapper extends BaseMapper
 
     /**
      * Build the shared WHERE clause and bound params for the session list/count.
+     * See docblock for $this->getFilteredSessions() for descriptions of filter params.
      *
      * @param string|null               $keyword
      * @param string|null               $feature
@@ -297,21 +301,21 @@ class Mapper extends BaseMapper
         ?\Alaress_Date_Format $end,
     ): array {
         $pb = $this->getPredicateBuilder();
+        $keywordPredicate = null;
 
         if ('' !== trim((string)$keyword)) {
             $like = '%' . $this->getDatabase()->getQuoter()->escapeForLike($keyword) . '%';
             $keywordPredicate = $this->getPredicateBuilder()
                 ->like('l.prompt', $like)
                 ->like('l.response', $like);
+        }
 
-            $pb->rawWhere(
-                'EXISTS (
-                SELECT 1 FROM `ai_session_log` l
-                WHERE l.ai_session_id = `' . $this->table . '`.id
-                AND (' . implode(' OR ', $keywordPredicate->getWhere()) . ')
-            )',
-                $keywordPredicate->getParams()
-            );
+        $logClauses = [];
+        $logParams = [];
+
+        if (null !== $keywordPredicate) {
+            $logClauses[] = '(' . implode(' OR ', $keywordPredicate->getWhere()) . ')';
+            $logParams = array_merge($logParams, $keywordPredicate->getParams());
         }
         if ('' !== trim((string)$feature)) {
             $pb->equals('feature', $feature);
@@ -319,11 +323,27 @@ class Mapper extends BaseMapper
         if (null !== $user) {
             $pb->equals('created_by', $user->getId());
         }
-        if (null !== $start) {
-            $pb->greaterThanOrEqualTo('created_at', $start->getDatabase());
+        if (null !== $start || null !== $end) {
+            $datePredicate = $this->getPredicateBuilder();
+            if (null !== $start) {
+                $datePredicate->greaterThanOrEqualTo('l.created_at', $start->getDatabase());
+            }
+            if (null !== $end) {
+                $datePredicate->lessThanOrEqualTo('l.created_at', $end->getDatabase());
+            }
+            $logClauses = array_merge($logClauses, $datePredicate->getWhere());
+            $logParams = array_merge($logParams, $datePredicate->getParams());
         }
-        if (null !== $end) {
-            $pb->lessThanOrEqualTo('created_at', $end->getDatabase());
+
+        if ($logClauses) {
+            $pb->rawWhere(
+                'EXISTS (
+                SELECT 1 FROM `ai_session_log` l
+                WHERE l.ai_session_id = `' . $this->table . '`.id
+                AND ' . implode("\nAND ", $logClauses) . '
+            )',
+                $logParams
+            );
         }
 
         $where = $pb->getWhere() ? 'WHERE ' . implode("\nAND ", $pb->getWhere()) : '';

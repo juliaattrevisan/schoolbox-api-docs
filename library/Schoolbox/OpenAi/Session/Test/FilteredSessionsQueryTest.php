@@ -63,6 +63,23 @@ class FilteredSessionsQueryTest extends TestCase
         $this->assertStringNotContainsString('l.prompt LIKE :keyword', $sql);
     }
 
+    public function testDateFilterUsesSessionLogCreatedAt(): void
+    {
+        $start = new \Alaress_Date_Format('2026-06-10 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT);
+        $end = new \Alaress_Date_Format('2026-06-11 23:59:59', \Alaress_Date_Format::DATABASE_FORMAT);
+
+        $sql = $this->capturePreparedSql(
+            fn(Mapper $mapper) => $mapper->getFilteredSessions(null, null, null, $start, $end)
+        );
+
+        $this->assertStringContainsString('FROM `ai_session_log` l', $sql);
+        $this->assertStringContainsString('l.ai_session_id = `ai_session`.id', $sql);
+        $this->assertStringContainsString('`l`.`created_at` >= :l_created_at_0', $sql);
+        $this->assertStringContainsString('`l`.`created_at` <= :l_created_at_1', $sql);
+        $this->assertStringNotContainsString('`ai_session`.`created_at` >=', $sql);
+        $this->assertStringNotContainsString('`ai_session`.`created_at` <=', $sql);
+    }
+
     /**
      * @param callable(Mapper): void $query
      */
