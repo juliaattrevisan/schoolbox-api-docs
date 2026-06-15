@@ -1288,7 +1288,9 @@ class Controller extends Assessment\Controller
         )->generate(
             $assessment->getRubricInstances(),
             null,
-            null,
+            /* Intentionally simulate a staff-given feedback by cramming a self-graded feedback here.
+             */
+            $feedback,
         );
 
         $this->response = $this->responseFromTemplate(
