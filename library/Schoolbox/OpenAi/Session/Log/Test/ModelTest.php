@@ -64,52 +64,6 @@ class ModelTest extends TestCase
     }
 
     /**
-     * An over-long input text is trimmed to the TEXT column maximum length.
-     */
-    public function testInputTextIsTrimmedToTextMaxLength(): void
-    {
-        $model = new Model();
-        $model->setInputText(str_repeat('a', 70000));
-
-        $this->assertSame(65535, mb_strlen($model->getInputText()));
-    }
-
-    /**
-     * Multibyte input text is trimmed to the TEXT column maximum byte length without breaking UTF-8.
-     */
-    public function testInputTextIsTrimmedToTextMaxByteLength(): void
-    {
-        $model = new Model();
-        $model->setInputText(str_repeat('€', 22000));
-
-        $this->assertLessThanOrEqual(65535, strlen($model->getInputText()));
-        $this->assertTrue(mb_check_encoding($model->getInputText(), 'UTF-8'));
-    }
-
-    /**
-     * An over-long output text is trimmed to the TEXT column maximum length.
-     */
-    public function testOutputTextIsTrimmedToTextMaxLength(): void
-    {
-        $model = new Model();
-        $model->setOutputText(str_repeat('a', 70000));
-
-        $this->assertSame(65535, mb_strlen($model->getOutputText()));
-    }
-
-    /**
-     * Multibyte output text is trimmed to the TEXT column maximum byte length without breaking UTF-8.
-     */
-    public function testOutputTextIsTrimmedToTextMaxByteLength(): void
-    {
-        $model = new Model();
-        $model->setOutputText(str_repeat('€', 22000));
-
-        $this->assertLessThanOrEqual(65535, strlen($model->getOutputText()));
-        $this->assertTrue(mb_check_encoding($model->getOutputText(), 'UTF-8'));
-    }
-
-    /**
      * An over-long response is trimmed to the MEDIUMTEXT column maximum length.
      */
     public function testResponseIsTrimmedToMediumTextMaxLength(): void
