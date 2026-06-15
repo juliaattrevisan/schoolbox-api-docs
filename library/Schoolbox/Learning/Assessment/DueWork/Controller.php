@@ -573,6 +573,10 @@ class Controller extends Assessment\Controller
             $this->getUser()
         );
 
+        /* If the student doesn't have a feedback atm, we still need to have this var
+         */
+        $twigData['rubricGridPayloadsHistory'] = [];
+
         foreach ($participant->getAllFeedbacks() as $feedback) {
             $twigData['rubricGridPayloadsHistory'][$feedback->getId()] = $payloadGenerator->generate(
                 $assessment->getRubricInstances(),

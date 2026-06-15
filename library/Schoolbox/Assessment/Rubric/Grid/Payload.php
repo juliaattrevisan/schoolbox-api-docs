@@ -67,26 +67,42 @@ class Payload
     ): string {
         $struct = [];
 
+        /* Converts the grid structure
+         */
+        $rubricGridTranslator = new \Schoolbox\Assessment\Rubric\Grid\Translator\ModelToArray\Base($this->rubricShowPoints);
+
+        /* TODO: similar to Grid->jsonSerialize, this is not final and will be easier to figure out what needs
+         *  to be changed once we can see all the payloads for the builder/readonly/markable grids in action.
+         *  There's also the assessment API to consider, i'm ignoring it for now as we'll need to change it regardless to accommodate multi rubrics
+         *  To avoid passing thru a translator down very deep twig file chains in a lot of places, we can do it here for now
+         */
+
+        /* TODO: ensure access controls (particularly whether students can see mark info assuming there's cases when they shouldn't?) are handled correctly;
+         *  there are more notes both in this translator and in the Grid translators about addressing this.
+         */
+        $rubricMarkedGridTranslator = new \Schoolbox\Assessment\Rubric\MarkedGrid\Translator\ModelToArray(
+            $this->viewer,
+            $this->rubricShowPoints,
+        );
+
         /** @var \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance */
         foreach ($rubricInstances as $rubricInstance) {
-            $grid = $rubricInstance->getGrid()?->toArray($this->rubricShowPoints);
+            $grid = $rubricGridTranslator($rubricInstance->getGrid());
             $selfGradedGrid = null;
             $markedGrid = null;
 
             /* Self-graded feedback is optional here too
              */
             if (null !== $selfGradedFeedback) {
-                $selfGradedGrid = $this->rubricMapper
-                    ->retrieveMarkedGrid($selfGradedFeedback, $rubricInstance)
-                    ->toArray($this->viewer, $this->rubricShowPoints);
+                $selfGradedGrid = $rubricMarkedGridTranslator($this->rubricMapper
+                    ->retrieveMarkedGrid($selfGradedFeedback, $rubricInstance));
             }
 
             /* Feedback is optional here
              */
             if (null !== $authoritativeFeedback) {
-                $markedGrid = $this->rubricMapper
-                    ->retrieveMarkedGrid($authoritativeFeedback, $rubricInstance)
-                    ->toArray($this->viewer, $this->rubricShowPoints);
+                $markedGrid = $rubricMarkedGridTranslator($this->rubricMapper
+                    ->retrieveMarkedGrid($authoritativeFeedback, $rubricInstance));
             }
 
             $struct[] = [
@@ -95,7 +111,7 @@ class Payload
                 'markedGrid' => $markedGrid,
             ];
         }
-
+new \Alaress_Probe($struct);
         return json_encode($struct);
     }
 }
