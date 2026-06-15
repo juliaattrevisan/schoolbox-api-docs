@@ -111,6 +111,7 @@ class Mapper extends BaseMapper
      *
      * @param \PDOStatement $statement
      * @return GenericCollection<Model>
+     * @throws BaseMapper\Exception
      */
     protected function hydrateSelect(\PDOStatement $statement)
     {
@@ -119,20 +120,16 @@ class Mapper extends BaseMapper
         $collection = $this->createCollection();
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            try {
-                $session = $this->hydrate($row);
+            $session = $this->hydrate($row);
 
-                /** @var \Schoolbox\User $user */
-                $user = $userMapper->hydrate($row, 'u');
+            /** @var \Schoolbox\User $user */
+            $user = $userMapper->hydrate($row, 'u');
 
-                if ($user) {
-                    $session->setUser($user);
-                }
-
-                $collection->add($session);
-            } catch (BaseMapper\Exception $e) {
-                // noop, couldn't hydrate for some reason
+            if ($user) {
+                $session->setUser($user);
             }
+
+            $collection->add($session);
         }
 
         return $collection;
