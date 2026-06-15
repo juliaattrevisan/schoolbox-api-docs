@@ -1,46 +1,38 @@
 <script setup lang="ts">
 import type { Template } from "@js/editor/types/editorTypes";
+import { listenForFilterLoad, listenForFilterLoading } from "@schoolboxLibrary/Filter/templates/ts/filterEvent";
+import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import { useMarkbookStore } from "./store/markbookStore";
+import type { Markbook } from "./types/payload";
+import type { MarkbookType } from "./types/types";
 import MarkbookInner from "./markbook-inner.vue";
 import MarkbookPopout from "./markbook-popout.vue";
 
 interface Props {
-    type: "course" | "class";
+    /** The target markbook rendering type, specifically either the course or class markbook (ones which use filters) */
+    type: MarkbookType;
     filterEventKey: string;
-    editorTemplates: Template[];
+    editorTemplates?: Template[];
 }
 
 const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
 
 window.Vue.onMounted(() => {
-    mbStore.init(props.filterEventKey, props.editorTemplates);
+    mbStore.init(props.editorTemplates ?? []);
 
     /**
-     * Ensure tooltips are reflowed when the markbook is changed
+     * Listen to the filter overlords which control what we show and when we show it
      */
-    window.Vue.watch(
-        () => [mbStore.showDisplayMarks, mbStore.showDrafts],
-        () => {
-            if (document.readyState !== "complete") {
-                // If the document isn't ready, we can't reflow tooltips yet
-                return;
-            }
+    listenForFilterLoading(props.filterEventKey, mbStore.onLoading);
 
-            // When a setting is added after the page is loaded, we need to tell foundation to fix the tooltips
-            window.jQuery(document).foundation("tooltip", "reflow");
-        },
-        { immediate: true },
-    );
+    mbStore.onLoading();
+    listenForFilterLoad<Markbook>(props.filterEventKey, (detail) => mbStore.onMarkbookLoaded(detail.content));
 });
 </script>
 
 <template>
-    <div v-if="mbStore.data === null" class="markbook-loader small-12 island">
-        <section class="content">
-            <div class="loader"></div>
-        </section>
-    </div>
+    <loading-table v-if="mbStore.data === null" />
     <div v-else-if="mbStore.data.classImpls.length === 0" class="empty-state">
         <sbx-icon name="curriculum" size="2.5rem"></sbx-icon>
         <p>
@@ -49,7 +41,7 @@ window.Vue.onMounted(() => {
                 v-if="mbStore.data._routes['courseImport.getImport']"
                 :href="mbStore.data._routes['courseImport.getImport']"
             >
-                Import this course </a
+                Import this course</a
             >.
         </p>
     </div>
@@ -61,11 +53,3 @@ window.Vue.onMounted(() => {
 
     <markbook-popout />
 </template>
-
-<style scoped>
-/* getting around some chaotic other styles for the loader to stay in the right place */
-.markbook-loader {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-}
-</style>

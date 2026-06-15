@@ -210,9 +210,9 @@ $app = new class extends CliTool\BaseApp
             // Process assessments
 
             $assessmentList = $assessmentDataSource->findAllByFolderIdForReview(
-                $folder->getId(),
-                null,
-                [
+                folderId: $folder->getId(),
+                users: null,
+                options: [
                     'due_after' => $startTime,
                     'due_before' => $endTime,
                 ]

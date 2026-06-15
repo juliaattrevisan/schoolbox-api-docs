@@ -346,7 +346,7 @@ class Controller extends Base
          */
         $this->participantDataSource->loadParticipationIntoAssessment(
             $assessment,
-            $learner
+            new \Schoolbox\Collection()->add($learner),
         );
 
         $plan = $participant->getPlan();

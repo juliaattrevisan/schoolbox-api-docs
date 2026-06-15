@@ -255,16 +255,16 @@ class Controller extends WebController\Base
 
             $terms = $this->termMapper->findAll(['order' => ['start' => 'ASC']]);
 
+            $unitAssessmentsTranslator = new UnitAssessments(
+                $this->routeGenerator,
+                $this->getAuthorizer(),
+                $this->getUser(),
+                $this->getUser(),
+            );
+
             $data = [
                 'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $courseMarkbook->getRanking() : null,
-                'assessments' => $courseMarkbook->getCollapsedAssessments()->reindex()->map(function (IAssessable $assessment, $sequence) use ($courseMarkbook, $unitSpecs) {
-                    $unitAssessmentsTranslator = new UnitAssessments(
-                        $this->routeGenerator,
-                        $this->getAuthorizer(),
-                        $this->getUser(),
-                        $this->getUser(),
-                    );
-
+                'assessments' => $courseMarkbook->getCollapsedAssessments()->reindex()->map(function (IAssessable $assessment, $sequence) use ($courseMarkbook, $unitSpecs, $unitAssessmentsTranslator) {
                     return [
                         'id'                => $assessment->getId(),
                         'title'             => $assessment->getTitle(),

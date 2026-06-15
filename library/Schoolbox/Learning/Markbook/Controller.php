@@ -13,6 +13,8 @@ namespace Schoolbox\Learning\Markbook;
 use Alaress\Web\Controller\Base;
 use Alaress\HTMLPurifier\IPurifier;
 use Aura\Router\Exception\RouteNotFound;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
@@ -33,6 +35,8 @@ use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
 use Schoolbox\Learning\MarkScheme\Factory;
 use Schoolbox\Learning\DueWork\State;
 use Schoolbox\Learning\DueWork\StateMapper;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
@@ -126,23 +130,20 @@ class Controller extends Base
             $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
             $markbook      = $this->buildMarkbook($assessmentIds, $folder);
 
-            /**
-             * need to get an list of the students by id, with their ranking
-             */
-            $rank = $markbook->getRanking();
-
             $terms = $this->termMapper->findAll(['order' => ['start' => 'ASC']]);
 
-            $data = [
-                'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $rank : null,
-                'assessments' => $markbook->getAssessments()->reindex()->map(function (IAssessable $assessment, $sequence) {
-                    $unitAssessmentsTranslator = new UnitAssessments(
-                        $this->routeGenerator,
-                        $this->getAuthorizer(),
-                        $this->getUser(),
-                        $this->getUser(),
-                    );
+            $unitAssessmentsTranslator = new UnitAssessments(
+                $this->routeGenerator,
+                $this->getAuthorizer(),
+                $this->getUser(),
+                $this->getUser(),
+            );
 
+            $data = [
+                /* Only show class ranking if the config allows it. It seemingly ranks based on Student Weighted Average.
+                 */
+                'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $markbook->getRanking() : null,
+                'assessments' => $markbook->getAssessments()->reindex()->map(function (IAssessable $assessment, $sequence) use ($unitAssessmentsTranslator) {
                     $unitSpec = null;
                     $base = $assessment->getBaseContext();
                     if ($base instanceof \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model) {
@@ -693,9 +694,13 @@ class Controller extends Base
     /**
      * Builds a markbook for this folder.
      *
-     * @param array       $assessmentIds
+     * @param array $assessmentIds
      * @param FolderModel $folder
      * @return Markbook
+     * @throws Exception
+     * @throws NotFound
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     private function buildMarkbook(array $assessmentIds, FolderModel $folder): Markbook
     {
@@ -703,10 +708,11 @@ class Controller extends Base
         if (empty($assessmentIds)) {
             $assessments = $this->assessmentMapperProxy->createCollection();
         } else {
+            // load the folder's info
             $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview(
-                $folder->getId(),
-                null,
-                ['ids' => $assessmentIds]
+                folderId: $folder->getId(),
+                users: null,
+                options: ['ids' => $assessmentIds],
             );
         }
 
@@ -716,6 +722,7 @@ class Controller extends Base
 
         $markbook = new Markbook($assessments, $overallMarkScheme, $this->getUser());
         $markbook->sortAssessables();
+
         return $markbook;
     }
 
@@ -749,10 +756,11 @@ class Controller extends Base
      *
      * Will be false if assessment's folder is archived, or if user lacks WRITE+ perm to folder
      *
-     * @param User                           $user
-     * @param IAssessable                    $assessment
-     * @param GenericCollection|Term\Model[] $terms
+     * @param User $user
+     * @param IAssessable $assessment
+     * @param GenericCollection<Term\Model> $terms
      * @return bool
+     * @throws Exception
      */
     private function isAssessmentMarkable(User $user, IAssessable $assessment, GenericCollection $terms): bool
     {

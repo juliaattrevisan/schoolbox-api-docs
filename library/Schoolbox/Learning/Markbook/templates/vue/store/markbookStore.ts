@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { useEventBus } from "@vueuse/core";
 import type { EventBusKey } from "@vueuse/core";
 import type { Template } from "@js/editor/types/editorTypes";
-import { listenForFilterLoad, listenForFilterLoading } from "@schoolboxLibrary/Filter/templates/ts/filterEvent";
+import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 import type {
     Markbook,
     MarkbookActivity,
@@ -20,6 +20,7 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
     const showDisplayMarks = window.Vue.ref(false);
     const showDrafts = window.Vue.ref(false);
     const showAverages = window.Vue.ref(false);
+    const participantSearchFilter = window.Vue.ref("");
 
     const isPopoutLoading = window.Vue.ref(false);
     const popoutLoadError = window.Vue.ref(false);
@@ -47,7 +48,7 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
     });
 
     /**
-     * When we start loading new markbood data, we reset the data to null to show the loading state
+     * When we start loading new markbook data, we reset the data to null to show the loading state
      */
     function onLoading(): void {
         data.value = null; // Reset the data to show loading state
@@ -65,15 +66,9 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
 
     /**
      * Initialise the store
-     * @param filterKey - The key of the filter to listen for loading events
      * @param $editorTemplates - The editor templates to use
      */
-    function init(filterKey: string, $editorTemplates: Template[]): void {
-        /**
-         * Listen to the filter overlords which control what we show and when we show it
-         */
-        listenForFilterLoading(filterKey, onLoading);
-        listenForFilterLoad<Markbook>(filterKey, (detail) => onMarkbookLoaded(detail.content));
+    function init($editorTemplates: Template[]): void {
         editorTemplates.value = $editorTemplates;
     }
 
@@ -95,21 +90,52 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         });
 
         const groups: {
+            id: number;
             unitSpec: MarkbookActivity["unitSpec"];
             activities: MarkbookActivity[];
+            /**
+             * Whether to show a separate comments column for each activity within this group,
+             * it will force the activity to the far right and not show regular headers for the group.
+             *
+             * NOTE: this is only designed to look reasonable for the single reporting activity
+             * that shows up on the reporting markbook representing the status page's current activity.
+             */
+            splitComments: boolean;
         }[] = [];
 
         assessments.forEach((activity) => {
+            // each group needs a unique ID for vue rendering, use the unit spec ID where possible or fall back to a new negative one
+            const minGroupId = Math.min(...groups.map((g) => g.id), 0);
+
+            if (activity.splitComments) {
+                // The target reporting assessment should be in its own group at the very end, separate from everything else.
+                // *yeah this is a bit jank, but it avoids having to do a lot of other special cases elsewhere*
+                groups.push({
+                    id: minGroupId,
+                    unitSpec: null,
+                    activities: [activity],
+                    splitComments: true,
+                });
+                return;
+            }
+
             let group = groups.find((g) => g.unitSpec?.id === activity.unitSpec?.id);
             if (!group) {
                 group = {
+                    id: activity.unitSpec?.id ?? minGroupId - 1,
                     unitSpec: activity.unitSpec,
                     activities: [],
+                    splitComments: false,
                 };
                 groups.push(group);
             }
 
             group.activities.push(activity);
+        });
+
+        // ensure any groups with splitComments are at the end
+        groups.sort((a, b) => {
+            return (a.splitComments ? 1 : 0) - (b.splitComments ? 1 : 0);
         });
 
         return groups;
@@ -144,10 +170,34 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
      * @returns ordered students
      */
     function orderedClassImplStudents(classImpl: MarkbookClassImpl): MarkbookClassImpl["students"][number][] {
-        // alphabetical order by lastName then givenName
-        return Object.values(classImpl.students).sort(
-            (a, b) => a.lastName.localeCompare(b.lastName) || a.givenName.localeCompare(b.givenName),
-        );
+        let students = Object.values(classImpl.students);
+
+        // apply filters (if any)
+        const filteredStudents = students.filter((student) => {
+            // TODO: status filter probably goes here
+
+            const searchTerm = participantSearchFilter.value.trim().toLowerCase();
+            if (searchTerm.length) {
+                const possibleNames = [student.givenName, student.lastName].filter(
+                    (name) => name !== null && name !== undefined,
+                );
+
+                if (!possibleNames.some((name) => name.toLowerCase().includes(searchTerm))) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+
+        // use filtered students, unless everyone got filtered out
+        // TODO: probably add an empty state instead of this, but empty states seem to cause chaos in the table, so let's avoid that for now
+        if (filteredStudents.length > 0) {
+            students = filteredStudents;
+        }
+
+        // sort in alphabetical order by lastName then givenName
+        return students.sort((a, b) => a.lastName.localeCompare(b.lastName) || a.givenName.localeCompare(b.givenName));
     }
 
     /**
@@ -238,13 +288,62 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         Object.assign(participant.marks.published, participant.extraInfo.marks.published);
     }
 
+    /**
+     * Whether an activity using "splitComments" mode should show the mark and/or comments columns
+     * @param activity - The activity to check
+     * @returns whether to show the mark and comment columns
+     */
+    function getSplitColumnVisibility(activity: MarkbookActivity): { mark: boolean; comment: boolean } {
+        if (!activity.splitComments) {
+            return { mark: false, comment: false };
+        }
+
+        const classImpls = data.value?.classImpls ?? [];
+        const activityImpls = classImpls
+            .map((classImpl) => classImpl.assessments[activity.id])
+            .filter((aImpl) => aImpl !== undefined && aImpl !== null);
+
+        return {
+            mark: activityImpls.some((aImpl) => aImpl.instructorMarkScheme.mode !== MarkTypeSlug.NONE),
+            comment: activityImpls.some((aImpl) => aImpl.feedbackCommentsEnable),
+        };
+    }
+
+    /**
+     * The "Student Weighted Average" column should always appear unless we're
+     * on the reporting markbook and there's no activities to show that aren't the reporting activity.
+     * aka, hide it if the single activity showing is one with splitComments enabled.
+     */
+    const showWeightedAverageColumn = window.Vue.computed(() => {
+        if (data.value === null) {
+            return false;
+        }
+
+        return activityGroups.value.length === 0 || activityGroups.value.some((group) => !group.splitComments);
+    });
+
+    /**
+     * The rank column should only appear if there are ranks available (The backend determines when that is the case).
+     * also the weighted average column must be showing, otherwise there's no basis for the ranks in the first place.
+     */
+    const showRankColumn = window.Vue.computed(() => {
+        if (data.value === null) {
+            return false;
+        }
+
+        return showWeightedAverageColumn.value && data.value.rank !== null;
+    });
+
     return {
         init,
         data,
+        onLoading,
+        onMarkbookLoaded,
         isDegraded,
         showDisplayMarks,
         showDrafts,
         showAverages,
+        participantSearchFilter,
         activityGroups,
         orderedActivities,
         orderedClassImplActivities,
@@ -261,5 +360,8 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         setFeedbackSelectedCell,
         feedbackDrawerEventBus,
         updateExtraInfo,
+        getSplitColumnVisibility,
+        showWeightedAverageColumn,
+        showRankColumn,
     };
 });
