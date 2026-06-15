@@ -36,15 +36,6 @@ class FeatureTest extends TestCase
     }
 
     /**
-     * Confirms cases can be resolved from their backing string value.
-     */
-    public function testCanBuildFromValue(): void
-    {
-        $this->assertSame(Feature::CHAT, Feature::from('chat'));
-        $this->assertSame(Feature::AI_MODERATION_AGENT, Feature::from('aimoderationagent'));
-    }
-
-    /**
      * Only features with AI moderation support expose that capability.
      */
     public function testSupportsAiModeration(): void

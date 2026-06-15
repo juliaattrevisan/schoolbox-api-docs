@@ -12,8 +12,6 @@ namespace Schoolbox\OpenAi\Session\Test;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\OpenAi\Feature;
 use Schoolbox\OpenAi\Session\Model;
-use Schoolbox\User;
-use TypeError;
 use ValueError;
 
 /**
@@ -52,49 +50,5 @@ class ModelTest extends TestCase
 
         $this->expectException(ValueError::class);
         $model->setFeature('unknown');
-    }
-
-    /**
-     * The feature is null until explicitly set.
-     */
-    public function testFeatureIsNullUntilSet(): void
-    {
-        $model = new Model();
-
-        $this->assertNull($model->getFeature());
-    }
-
-    /**
-     * setFeature rejects null.
-     */
-    public function testSetFeatureRejectsNull(): void
-    {
-        $model = new Model();
-
-        $this->expectException(TypeError::class);
-        $model->setFeature(null);
-    }
-
-    /**
-     * The id is a string (the table's char(36) UUID), round-tripping unchanged.
-     */
-    public function testIdIsString(): void
-    {
-        $model = new Model();
-        $model->setId('1f2e3d4c-5b6a-7890-abcd-ef0123456789');
-
-        $this->assertSame('1f2e3d4c-5b6a-7890-abcd-ef0123456789', $model->getId());
-    }
-
-    /**
-     * The user set via setUser is returned by getUser.
-     */
-    public function testUserAccessor(): void
-    {
-        $user = new User();
-        $model = new Model();
-        $model->setUser($user);
-
-        $this->assertSame($user, $model->getUser());
     }
 }

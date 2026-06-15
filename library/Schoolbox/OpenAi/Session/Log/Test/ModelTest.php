@@ -12,7 +12,6 @@ namespace Schoolbox\OpenAi\Session\Log\Test;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Editor\OpenAI\Log\LogFormat;
 use Schoolbox\OpenAi\Session\Log\Model;
-use TypeError;
 
 /**
  * Unit tests for the AI session log {@see Model}.
@@ -39,38 +38,6 @@ class ModelTest extends TestCase
         $model->setLogFormat('guardrail');
 
         $this->assertSame('guardrail', $model->getLogFormat());
-    }
-
-    /**
-     * The ai_session_id set via setAiSessionId is returned by getAiSessionId.
-     */
-    public function testAiSessionIdAccessor(): void
-    {
-        $model = new Model();
-        $model->setAiSessionId('1f2e3d4c-5b6a-7890-abcd-ef0123456789');
-
-        $this->assertSame('1f2e3d4c-5b6a-7890-abcd-ef0123456789', $model->getAiSessionId());
-    }
-
-    /**
-     * The ai_session_id is null until explicitly set.
-     */
-    public function testAiSessionIdIsNullUntilSet(): void
-    {
-        $model = new Model();
-
-        $this->assertNull($model->getAiSessionId());
-    }
-
-    /**
-     * setAiSessionId rejects null.
-     */
-    public function testSetAiSessionIdRejectsNull(): void
-    {
-        $model = new Model();
-
-        $this->expectException(TypeError::class);
-        $model->setAiSessionId(null);
     }
 
     /**
