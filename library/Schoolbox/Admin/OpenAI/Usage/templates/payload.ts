@@ -6,6 +6,7 @@ import type { DateRFC3339 } from "@js/util/dateUtils";
 import type { PaginationMeta } from "@js/util/sbx/apiUtils";
 import type { AgentChatLogEntry } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
+import type { AiModerationStatus } from "./moderationEvent";
 
 /**
  * A unique guid for an AI session, used to group related requests such as a chat conversation together
@@ -68,6 +69,8 @@ export type AiSession<TLogFormat extends AiLogFormat = AiLogFormat, TFeature ext
     createdBy?: UserAuthor;
     returnCode: number | null; // HTTP return code from OpenAI API
     hasError: boolean;
+    /** The highest-priority active moderation status for the session, or null when there is no active concern */
+    moderationStatus: AiModerationStatus | null;
     _routes: {
         getSessionLogs?: string | null;
     };
