@@ -15,7 +15,7 @@ export type AiSessionId = string;
 
 /**
  * A value for each AI feature.
- * @see /library/Schoolbox/OpenAI/Feature.php
+ * @see /library/Schoolbox/OpenAi/Feature.php
  */
 export enum AiFeature {
     CHAT = "chat",
