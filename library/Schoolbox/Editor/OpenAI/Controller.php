@@ -32,6 +32,7 @@ use Schoolbox\OpenAi\Agent\LearningActivityCustomisationGeneration;
 use Schoolbox\OpenAi\Agent\LessonPlanGeneration;
 use Schoolbox\OpenAi\ClientFactory;
 use Schoolbox\OpenAi\Exception as AiException;
+use Schoolbox\OpenAi\Feature;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Presidio\Client;
@@ -95,7 +96,7 @@ class Controller extends Base
             $aiSessionId = (string)Uuid::uuid4();
 
             $lessonPlanAgent = new LessonPlanGeneration(
-                $this->clientFactory->buildForFeature(\Schoolbox\OpenAi\Feature::LESSON_PLAN->value),
+                $this->clientFactory->buildForFeature(Feature::LESSON_PLAN),
                 $lpConfig,
                 trim((string)$this->getConfigLoader()->get('spellcheck_language')),
                 $this->curriculumNodeMapper,
@@ -179,7 +180,7 @@ class Controller extends Base
                 (string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_IMAGE_GENERATION)
             );
             $agent = new ImageGeneration(
-                $this->clientFactory->buildForFeature(\Schoolbox\OpenAi\Feature::IMAGE->value),
+                $this->clientFactory->buildForFeature(Feature::IMAGE),
                 $imageGenerationConfig,
             );
             try {
@@ -251,7 +252,7 @@ class Controller extends Base
         $aiSessionId = (string)Uuid::uuid4();
 
         $agent = new CkEditorTextChat(
-            $this->clientFactory->buildForFeature(\Schoolbox\OpenAi\Feature::CHAT->value),
+            $this->clientFactory->buildForFeature(Feature::CHAT),
             $chatConfig,
             new Html2Text(),
         );
@@ -358,7 +359,7 @@ class Controller extends Base
             }
 
             $agent = new DifferentiationProfileGeneration(
-                $this->clientFactory->buildForFeature(\Schoolbox\OpenAi\Feature::DIFFERENTIATION->value),
+                $this->clientFactory->buildForFeature(Feature::DIFFERENTIATION),
                 $diffConfig,
                 $this->filesystemProxy,
                 $this->parserFactory,
@@ -506,7 +507,7 @@ class Controller extends Base
             $course = $this->folderMapper->findById($assessment->getContext()->getFolder()->getParent()->getId());
 
             $agent = new LearningActivityCustomisationGeneration(
-                $this->clientFactory->buildForFeature(\Schoolbox\OpenAi\Feature::LEARNING_ACTIVITY_CUSTOMISATION->value),
+                $this->clientFactory->buildForFeature(Feature::LEARNING_ACTIVITY_CUSTOMISATION),
                 $diffConfig,
                 $this->filesystemProxy,
                 $this->parserFactory,

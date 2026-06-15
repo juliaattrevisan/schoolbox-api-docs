@@ -71,24 +71,24 @@ class ClientFactory
     /**
      * Build a client for a given feature.
      *
-     * @param value-of<Feature> $feature The feature to build for.
+     * @param Feature $feature The feature to build for.
      * @return IClient
      * @throws Exception\Runtime if something went wrong with building the
      *                           provider, e.g.:
      *                           * it is not implemented
      *                           * it is but doesn't implement the feature
      */
-    public function buildForFeature(string $feature): IClient
+    public function buildForFeature(Feature $feature): IClient
     {
         // Each feature maps to a config which holds the API key and provider
-        $configKey = OpenAI\Config::ALL_MODULES[$feature] ?? null;
+        $configKey = OpenAI\Config::ALL_MODULES[$feature->value] ?? null;
         if ($configKey === null) {
-            throw new Exception\FeatureNotImplemented(sprintf('AI feature "%s" is not implemented', $feature));
+            throw new Exception\FeatureNotImplemented(sprintf('AI feature "%s" is not implemented', $feature->value));
         }
         try {
             $aiConfig = new OpenAI\Config()->decode((string)$this->config->get($configKey));
         } catch (JsonException $e) {
-            throw new Exception\FeatureNotImplemented(sprintf('AI feature "%s" configuration cannot be parsed', $feature), 0, $e);
+            throw new Exception\FeatureNotImplemented(sprintf('AI feature "%s" configuration cannot be parsed', $feature->value), 0, $e);
         }
         $apiKey   = $aiConfig[OpenAi\Config::SECTION_GENERAL][OpenAI\Config::FIELD_AIKEY]['value'] ?? '';
         $provider = $aiConfig[OpenAI\Config::FIELD_PROVIDER]['value'] ?? '';
@@ -108,7 +108,7 @@ class ClientFactory
         // Azure: build client depending on feature
         if ($providerEnum === Provider::Azure) {
             switch ($feature) {
-                case \Schoolbox\OpenAi\Feature::CHAT->value:
+                case Feature::CHAT:
                     // Chat does use deployment ID
                     return $this->buildAzure(
                         $apiKey,
@@ -116,7 +116,7 @@ class ClientFactory
                         $aiConfig[OpenAi\Config::SECTION_AZURE][OpenAI\Config::FIELD_DEPLOYMENT_ID]['value'] ?? '',
                         '2023-12-01-preview',
                     );
-                case \Schoolbox\OpenAi\Feature::IMAGE->value:
+                case Feature::IMAGE:
                     throw new Exception\FeatureNotSupportedByProvider('Image feature for Azure is not implemented');
                 default:
                     // Default does not use deployment ID

@@ -12,6 +12,7 @@ namespace Schoolbox\OpenAi\Test;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use Schoolbox\OpenAi\Client;
+use Schoolbox\OpenAi\ClientFactory;
 use Schoolbox\OpenAi\Feature;
 use Schoolbox\OpenAi\IClient;
 use Schoolbox\OpenAi\Session\Mapper as SessionMapper;
@@ -40,6 +41,16 @@ class ClientContractTest extends TestCase
     public function testFindOrCreateRequiresFeature(): void
     {
         $parameters = $this->getMethodParameters(SessionMapper::class, 'findOrCreate');
+
+        $this->assertRequiredParameterType($parameters['feature'], Feature::class);
+    }
+
+    /**
+     * buildForFeature requires a known AI feature.
+     */
+    public function testBuildForFeatureRequiresFeature(): void
+    {
+        $parameters = $this->getMethodParameters(ClientFactory::class, 'buildForFeature');
 
         $this->assertRequiredParameterType($parameters['feature'], Feature::class);
     }
