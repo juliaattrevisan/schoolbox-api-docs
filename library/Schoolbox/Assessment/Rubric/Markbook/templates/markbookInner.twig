@@ -240,7 +240,7 @@
                                      #}
                                     {% for studentId, studentData in students %}
                                         {% set publishedMarks = overall[capabilityId].students[studentId].published ?? null %}
-                                        {% set draftMarks = overall[capabilityId].students[studentId].published.draft ?? null %}
+                                        {% set draftMarks = overall[capabilityId].students[studentId].draft ?? null %}
 
                                         {# Diagnostic reasoning #}
                                         {% set publishedReasoning = overall[capabilityId].students[studentId].published.reasoning ?? [] %}
