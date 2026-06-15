@@ -283,40 +283,31 @@ $masonry-drop-background: $input-focus-bg-color;
 }
 
 // Eportfolio masonry icons
-.icon-masonry-Component_Eportfolio_AdvancedListController:before {
-    @extend .icon-advanced-list;
+sbx-icon.icon-masonry.icon-masonry-Component_Eportfolio_AdvancedListController {
     color: $icon-color-advanced-list;
 }
-.icon-masonry-Component_Eportfolio_BasicListController:before {
-    @extend .icon-list;
+sbx-icon.icon-masonry.icon-masonry-Component_Eportfolio_BasicListController {
     color: $icon-color-basic-list;
 }
-.icon-masonry-Schoolbox_Blog_Eportfolio_Component_Controller:before {
-    @extend .icon-blog;
+sbx-icon.icon-masonry.icon-masonry-Schoolbox_Blog_Eportfolio_Component_Controller {
     color: $icon-color-blog;
 }
-.icon-masonry-Component_Eportfolio_FileListController:before {
-    @extend .icon-files;
+sbx-icon.icon-masonry.icon-masonry-Component_Eportfolio_FileListController {
     color: $icon-color-files;
 }
-.icon-masonry-Component_Eportfolio_ImageController:before {
-    @extend .icon-image;
+sbx-icon.icon-masonry.icon-masonry-Component_Eportfolio_ImageController {
     color: $icon-color-image;
 }
-.icon-masonry-Component_Eportfolio_ImageListController:before {
-    @extend .icon-image-gallery;
+sbx-icon.icon-masonry.icon-masonry-Component_Eportfolio_ImageListController {
     color: $icon-color-image-gallery;
 }
-.icon-masonry-Component_Eportfolio_LinkListController:before {
-    @extend .icon-link;
+sbx-icon.icon-masonry.icon-masonry-Component_Eportfolio_LinkListController {
     color: $icon-color-links;
 }
-.icon-masonry-Component_Eportfolio_TextboxController:before {
-    @extend .icon-textbox;
+sbx-icon.icon-masonry.icon-masonry-Component_Eportfolio_TextboxController {
     color: $icon-color-text-box;
 }
-.icon-masonry-Component_Eportfolio_VideoController:before {
-    @extend .icon-video;
+sbx-icon.icon-masonry.icon-masonry-Component_Eportfolio_VideoController {
     color: $icon-color-video-player;
 }
 

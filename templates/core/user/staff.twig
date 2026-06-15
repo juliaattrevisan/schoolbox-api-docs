@@ -163,7 +163,7 @@
 
                                 {% if route %}
                                     <li>
-                                        <a href="{{ route }}" title="{{ button.title }}" class="icon-{{ button.icon }} {{ button.css }}" target="{{ button.target }}">{{ text }}</a>
+                                        <a href="{{ route }}" title="{{ button.title }}" class="sbx-button--has-icon {{ button.css }}" target="{{ button.target }}"><sbx-icon name="{{ button.icon }}"></sbx-icon>{{ text }}</a>
                                     </li>
                                 {% endif %}
                             {% endif %}
