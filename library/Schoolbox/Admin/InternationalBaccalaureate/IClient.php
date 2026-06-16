@@ -14,4 +14,6 @@ namespace Schoolbox\Admin\InternationalBaccalaureate;
 interface IClient
 {
     public function registerCandidates(RegisterCandidatesRequest $request): RegisterCandidatesResponse;
+
+    public function registerSessions(RegisterSessionsRequest $request): RegisterSessionsResponse;
 }

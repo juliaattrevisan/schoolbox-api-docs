@@ -38,7 +38,8 @@ class ClientFactory
         return new Client(
             $this->httpClient,
             new Uri($endpoint),
-            new RegisterCandidatesEnvelopeBuilder()
+            new RegisterCandidatesEnvelopeBuilder(),
+            new RegisterSessionsEnvelopeBuilder()
         );
     }
 
@@ -63,6 +64,33 @@ class ClientFactory
             $schoolCode,
             $candidates
         );
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $sessions
+     */
+    public function buildRegisterSessionsRequest(array $sessions): RegisterSessionsRequest
+    {
+        $secretKey = $this->stringConfig(ConfigMapper::NAME_IBIS_SECRET_KEY);
+        if ($secretKey === '') {
+            throw new UnexpectedValueException('IBIS secret key is not configured.');
+        }
+
+        return new RegisterSessionsRequest(
+            $this->stringConfig(ConfigMapper::NAME_IBIS_APP_ID, self::DEFAULT_APP_ID),
+            $this->getMsgIdGenerator()->generate($secretKey),
+            $sessions
+        );
+    }
+
+    public function getSchoolCode(): string
+    {
+        $schoolCode = $this->stringConfig(ConfigMapper::NAME_IB_SCHOOL_CODE);
+        if ($schoolCode === '') {
+            throw new UnexpectedValueException('IB school code is not configured.');
+        }
+
+        return $schoolCode;
     }
 
     private function getMsgIdGenerator(): MsgIdGenerator

@@ -17,11 +17,13 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Admin\InternationalBaccalaureate\ClientFactory;
 use Schoolbox\Admin\InternationalBaccalaureate\RegisterCandidatesCandidateBuilder;
+use Schoolbox\Admin\InternationalBaccalaureate\RegisterSessionsSessionBuilder;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\IB\Registrations\Sessions\Student\Mapper as RegistrationSessionStudentMapper;
 use Schoolbox\IB\Registrations\Sessions\Student\Model as RegistrationSessionStudentModel;
 use Schoolbox\MapperFactory;
+use Schoolbox\UserMapper;
 use Throwable;
 
 class RegisterCandidatesTool extends CliTool\App
@@ -99,6 +101,8 @@ class RegisterCandidatesTool extends CliTool\App
         $mapperFactory = $this->getDi()->get('mapperFactory');
         /** @var RegistrationSessionStudentMapper $studentMapper */
         $studentMapper = $mapperFactory->get(RegistrationSessionStudentMapper::class);
+        /** @var UserMapper $userMapper */
+        $userMapper = $mapperFactory->get(UserMapper::class);
         /** @var \External_UserInterface $externalUser */
         $externalUser = $this->getDi()->get('externalUser');
 
@@ -109,9 +113,16 @@ class RegisterCandidatesTool extends CliTool\App
             return CliKernelAbstract::EXIT_STATUS_OK;
         }
 
+        /** @var ClientFactory $clientFactory */
+        $clientFactory = $this->getDi()->get('ib.clientFactory');
+
         $candidateBuilder = new RegisterCandidatesCandidateBuilder();
+        $sessionBuilder = new RegisterSessionsSessionBuilder();
         $candidates = [];
-        $studentsByReferenceCode = [];
+        $sessions = [];
+        $studentsByCandidateId = [];
+        $studentsByUserId = [];
+        $schoolCode = $clientFactory->getSchoolCode();
         $failed = 0;
 
         foreach ($students as $student) {
@@ -120,12 +131,25 @@ class RegisterCandidatesTool extends CliTool\App
             }
 
             try {
+                $user = $student->getUser();
+                if ($user === null) {
+                    throw new InvalidArgumentException('Selected candidate is missing required IBIS data.');
+                }
+
+                $candidateId = trim((string) ($user->getIbCandidateNumber() ?? ''));
+                if ($candidateId !== '') {
+                    $session = $sessionBuilder->build($student, $candidateId, $schoolCode);
+                    $sessions[] = $session;
+                    $studentsByCandidateId[$candidateId] = $student;
+                    continue;
+                }
+
                 $candidate = $candidateBuilder->build(
                     $student,
                     $this->findExternalStudent($externalUser, $student)
                 );
                 $candidates[] = $candidate;
-                $studentsByReferenceCode[$candidate['reference_code']] = $student;
+                $studentsByUserId[(string) $user->getId()] = $student;
             } catch (InvalidArgumentException $e) {
                 $failed++;
                 $this->getLogger()->warning(sprintf(
@@ -141,34 +165,99 @@ class RegisterCandidatesTool extends CliTool\App
             }
         }
 
-        if ($candidates === []) {
-            $this->getLogger()->notice('No valid pending candidates to submit.');
+        if ($candidates === [] && $sessions === []) {
+            $this->getLogger()->notice('No valid pending candidates or sessions to submit.');
             return $failed > 0 ? CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR : CliKernelAbstract::EXIT_STATUS_OK;
         }
 
         if (!$this->perform()) {
-            $this->getLogger()->notice(sprintf('Would submit %d candidate(s) to IBIS.', count($candidates)));
+            $this->getLogger()->notice(sprintf(
+                'Would submit %d candidate(s) and %d candidate session registration(s) to IBIS.',
+                count($candidates),
+                count($sessions)
+            ));
             return CliKernelAbstract::EXIT_STATUS_OK;
         }
 
-        /** @var ClientFactory $clientFactory */
-        $clientFactory = $this->getDi()->get('ib.clientFactory');
+        if ($candidates !== []) {
+            try {
+                $request = $clientFactory->buildRegisterCandidatesRequest($candidates);
+                $response = $clientFactory->build()->registerCandidates($request);
+            } catch (Throwable $e) {
+                $this->getLogger()->error('IBIS candidate registration submission failed.', ['exception' => $e]);
+                return CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR;
+            }
 
-        try {
-            $request = $clientFactory->buildRegisterCandidatesRequest($candidates);
-            $response = $clientFactory->build()->registerCandidates($request);
-        } catch (Throwable $e) {
-            $this->getLogger()->error('IBIS candidate registration submission failed.', ['exception' => $e]);
+            if (!$response->isSuccess()) {
+                $this->getLogger()->warning(sprintf(
+                    'IBIS did not accept all candidate registrations: %s',
+                    $response->getErrorSummary() ?? 'unknown fault'
+                ));
+            }
+
+            $candidateResponses = $response->getCandidateResponses();
+
+            if ($candidateResponses === []) {
+                foreach ($studentsByUserId as $student) {
+                    $student->setStatus(RegistrationSessionStudentModel::STATUS_FAILED);
+                    $studentMapper->save($student);
+                }
+
+                return CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR;
+            }
+
+            foreach ($candidateResponses as $candidateResponse) {
+                $referenceId = $candidateResponse['referenceId'];
+                $candidateId = $candidateResponse['candidateId'];
+                $userId = $this->normaliseReferenceIdToUserId($referenceId);
+                if ($userId === null || !isset($studentsByUserId[$userId])) {
+                    $failed++;
+                    continue;
+                }
+
+                $student = $studentsByUserId[$userId];
+
+                if (!$candidateResponse['successful'] || $candidateId === null || $candidateId === '') {
+                    $failed++;
+                    $student->setStatus(RegistrationSessionStudentModel::STATUS_FAILED);
+                    $studentMapper->save($student);
+                    continue;
+                }
+
+                try {
+                    $user = $student->getUser();
+                    if ($user !== null) {
+                        $user->setIbCandidateNumber($candidateId);
+                        $userMapper->save($user);
+                    }
+                    $session = $sessionBuilder->build($student, $candidateId, $schoolCode);
+                    $sessions[] = $session;
+                    $studentsByCandidateId[$candidateId] = $student;
+                } catch (InvalidArgumentException $e) {
+                    $failed++;
+                    $this->getLogger()->warning(sprintf(
+                        'Candidate #%s is missing required IBIS session data: %s',
+                        $student->getId() ?? 'unknown',
+                        $e->getMessage()
+                    ));
+                    $student->setStatus(RegistrationSessionStudentModel::STATUS_FAILED);
+                    $studentMapper->save($student);
+                }
+            }
+        }
+
+        if ($sessions === []) {
+            $this->getLogger()->notice('No valid registered candidates to submit to IBIS sessions.');
             return CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR;
         }
 
-        if (!$response->isSuccess()) {
-            $this->getLogger()->warning(sprintf(
-                'IBIS rejected the candidate registration batch: %s',
-                $response->getErrorSummary() ?? 'unknown fault'
-            ));
+        try {
+            $sessionRequest = $clientFactory->buildRegisterSessionsRequest($sessions);
+            $sessionResponse = $clientFactory->build()->registerSessions($sessionRequest);
+        } catch (Throwable $e) {
+            $this->getLogger()->error('IBIS session registration submission failed.', ['exception' => $e]);
 
-            foreach ($studentsByReferenceCode as $student) {
+            foreach ($studentsByCandidateId as $student) {
                 $student->setStatus(RegistrationSessionStudentModel::STATUS_FAILED);
                 $studentMapper->save($student);
             }
@@ -176,14 +265,60 @@ class RegisterCandidatesTool extends CliTool\App
             return CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR;
         }
 
-        foreach ($studentsByReferenceCode as $student) {
-            $student->setStatus(RegistrationSessionStudentModel::STATUS_REGISTERED);
+        if (!$sessionResponse->isSuccess()) {
+            $this->getLogger()->warning(sprintf(
+                'IBIS did not accept all session registrations: %s',
+                $sessionResponse->getErrorSummary() ?? 'unknown fault'
+            ));
+        }
+
+        $handledCandidateIds = [];
+        $sessionResponses = $sessionResponse->getSessionResponses();
+
+        if ($sessionResponses === []) {
+            foreach ($studentsByCandidateId as $student) {
+                $failed++;
+                $student->setStatus(RegistrationSessionStudentModel::STATUS_FAILED);
+                $studentMapper->save($student);
+            }
+
+            return CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR;
+        }
+
+        foreach ($sessionResponses as $sessionResponseItem) {
+            $candidateId = $sessionResponseItem['candidateId'];
+            if ($candidateId === null || !isset($studentsByCandidateId[$candidateId])) {
+                $failed++;
+                continue;
+            }
+
+            $handledCandidateIds[$candidateId] = $candidateId;
+            $student = $studentsByCandidateId[$candidateId];
+            $student->setStatus(
+                $sessionResponseItem['successful']
+                    ? RegistrationSessionStudentModel::STATUS_REGISTERED
+                    : RegistrationSessionStudentModel::STATUS_FAILED
+            );
+            $studentMapper->save($student);
+
+            if (!$sessionResponseItem['successful']) {
+                $failed++;
+            }
+        }
+
+        foreach ($studentsByCandidateId as $candidateId => $student) {
+            if (isset($handledCandidateIds[$candidateId])) {
+                continue;
+            }
+
+            $failed++;
+            $student->setStatus(RegistrationSessionStudentModel::STATUS_FAILED);
             $studentMapper->save($student);
         }
 
         $this->getLogger()->notice(sprintf(
-            'Submitted %d candidate(s) to IBIS.',
-            count($studentsByReferenceCode)
+            'Submitted %d candidate session registration(s) to IBIS.',
+            count($studentsByCandidateId)
         ));
 
         return $failed > 0 ? CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR : CliKernelAbstract::EXIT_STATUS_OK;
@@ -203,6 +338,17 @@ class RegisterCandidatesTool extends CliTool\App
         }
 
         return $externalUser->getStudent($externalId);
+    }
+
+    private function normaliseReferenceIdToUserId(?string $referenceId): ?string
+    {
+        if ($referenceId === null) {
+            return null;
+        }
+
+        $userId = ltrim($referenceId, '0');
+
+        return $userId === '' ? '0' : $userId;
     }
 
     private function displayHelp(): void

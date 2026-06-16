@@ -28,7 +28,8 @@ class Client implements IClient
     public function __construct(
         private HttpClient $httpClient,
         private UriInterface $baseUrl,
-        private RegisterCandidatesEnvelopeBuilder $envelopeBuilder
+        private RegisterCandidatesEnvelopeBuilder $candidateEnvelopeBuilder,
+        private ?RegisterSessionsEnvelopeBuilder $sessionEnvelopeBuilder = null
     ) {
     }
 
@@ -41,7 +42,7 @@ class Client implements IClient
                 'Content-Type' => 'text/xml; charset=utf-8',
                 'SOAPAction' => '""',
             ],
-            $this->envelopeBuilder->build($request)
+            $this->candidateEnvelopeBuilder->build($request)
         );
 
         try {
@@ -92,10 +93,79 @@ class Client implements IClient
         return $response;
     }
 
+    public function registerSessions(RegisterSessionsRequest $request): RegisterSessionsResponse
+    {
+        $httpRequest = new Request(
+            'POST',
+            $this->generateUrl(),
+            [
+                'Content-Type' => 'text/xml; charset=utf-8',
+                'SOAPAction' => '""',
+            ],
+            $this->getSessionEnvelopeBuilder()->build($request)
+        );
+
+        try {
+            $httpResponse = $this->httpClient->send($httpRequest, [
+                RequestOptions::ALLOW_REDIRECTS => false,
+                RequestOptions::CONNECT_TIMEOUT => self::CONNECT_TIMEOUT,
+                RequestOptions::TIMEOUT => self::TIMEOUT,
+            ]);
+        } catch (GuzzleException $e) {
+            throw new SchoolboxException(
+                'IBIS session registration request failed.',
+                0,
+                $e,
+                502
+            );
+        }
+
+        $statusCode = $httpResponse->getStatusCode();
+        if ($statusCode < 200 || $statusCode >= 300) {
+            throw new SchoolboxException(
+                sprintf('IBIS session registration failed with HTTP status %d.', $statusCode),
+                0,
+                null,
+                502
+            );
+        }
+
+        try {
+            $response = RegisterSessionsResponse::fromXml((string)$httpResponse->getBody());
+        } catch (UnexpectedValueException $e) {
+            throw new SchoolboxException(
+                'IBIS session registration returned invalid XML.',
+                0,
+                $e,
+                502
+            );
+        }
+
+        if ($response->isFault()) {
+            throw new SchoolboxException(
+                'IBIS SOAP fault: ' . ($response->getFaultString() ?? 'Unknown SOAP fault.'),
+                0,
+                null,
+                502
+            );
+        }
+
+        return $response;
+    }
+
     private function generateUrl(): string
     {
         return (string)$this->baseUrl->withPath(
             rtrim($this->baseUrl->getPath(), '/') . self::ENDPOINT_REGISTER_CANDIDATES
         );
+    }
+
+    private function getSessionEnvelopeBuilder(): RegisterSessionsEnvelopeBuilder
+    {
+        if ($this->sessionEnvelopeBuilder === null) {
+            $this->sessionEnvelopeBuilder = new RegisterSessionsEnvelopeBuilder();
+        }
+
+        return $this->sessionEnvelopeBuilder;
     }
 }

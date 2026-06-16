@@ -788,7 +788,7 @@ class Controller extends ConfigController
 
         $systemPurposeId = $post->getInt('systemPurposeId');
         $academicYear = trim((string) $post->get('academicYear'));
-        $examSession = trim((string) $post->get('examSession'));
+        $examSession = strtoupper(trim((string) $post->get('examSession')));
 
         if (
             null === $systemPurposeId ||
