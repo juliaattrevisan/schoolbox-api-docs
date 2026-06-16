@@ -170,6 +170,8 @@ class ControllerTest extends TestCase
                         'SL' => [],
                         'Core' => [],
                     ],
+                    'manuallyRegisteredBy'  => null,
+                    'manuallyRegisteredAt'  => null,
                     'candidateConfirmed'   => false,
                     'subjectConfirmed'     => false,
                     'candidateConfirmedAt' => null,
@@ -265,6 +267,8 @@ class ControllerTest extends TestCase
                         'SL' => [],
                         'Core' => [],
                     ],
+                    'manuallyRegisteredBy'  => null,
+                    'manuallyRegisteredAt'  => null,
                     'candidateConfirmed'   => false,
                     'subjectConfirmed'     => false,
                     'candidateConfirmedAt' => null,
@@ -2175,6 +2179,13 @@ class ControllerTest extends TestCase
                 if ($route === 'internationalBaccalaureate.sessionResetDetails') {
                     return sprintf(
                         '/adminv2/international-baccalaureate/registrations/sessions/%d/reset-details',
+                        $params['sessionId']
+                    );
+                }
+
+                if ($route === 'internationalBaccalaureate.sessionMarkAsManuallyRegistered') {
+                    return sprintf(
+                        '/adminv2/international-baccalaureate/registrations/sessions/%d/mark-as-manually-registered',
                         $params['sessionId']
                     );
                 }
