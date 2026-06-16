@@ -340,4 +340,12 @@ class Mapper extends BaseMapper
 
         return [$where, $pb->getParams()];
     }
+
+    /**
+     * @return string[]
+     */
+    protected function getDefaultOrderByParams(): array
+    {
+        return ['created_at' => 'ASC'];
+    }
 }
