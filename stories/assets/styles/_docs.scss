@@ -9,8 +9,10 @@
 /**
  * Increase the font sizes a bit
  */
-ul li,
-code {
+.sbdocs p,
+.sbdocs ul li,
+.sbdocs td,
+.sbdocs code {
     font-size: 16px !important;
 }
 
