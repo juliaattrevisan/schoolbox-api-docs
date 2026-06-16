@@ -581,7 +581,7 @@ class Cursor implements ICursor
         }
 
         throw new UnexpectedValueException(
-            "Viewer with userId {$this->viewer->getId()} does not fit expected categories."
+            "Viewer with userId {$this->viewer->getId()} has unexpected role."
         );
     }
 
