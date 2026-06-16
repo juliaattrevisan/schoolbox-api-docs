@@ -59,7 +59,7 @@ trait TestConnectorTrait
 
         $this->schoolbox = $factory->createMysql();
         return $this->schoolbox->connect(
-            '127.0.0.1',
+            'localhost',
             'schoolbox',
             'schoolboxvagrant',
             'abc123'
