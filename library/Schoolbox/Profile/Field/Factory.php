@@ -134,7 +134,7 @@ class Factory
                             'periodName' => $event->getPeriod(),
                             'periodCancelled' => $event->getPeriodCancelled(),
                             'location' => $event->getLocation(),
-                            'staff' => $event->getStaff(), // [id => name][]
+                            'staff' => $event->getStaff(), // [schoolbox user id => name][]
                             'startTime' => $event->getStartTime(),
                             'endTime' => $event->getEndTime(),
                         ];
