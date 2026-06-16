@@ -112,11 +112,14 @@ In order to migrate an app which still extends `App`:
 - note what this method echoes: it will be needed for filling in some abstract methods
 - populate the following abstract methods:
   - `getName`: find something which looks like a name in help content, and return it here
+    - if no name found, use the name of the executable in `tools`
   - `getDescription`: find something which looks like a name in help content, and return it here
+    - if no description found, infer the script's purpose and write it here
   - `setOptions`:
     - find all options defined in `getShortOpts` and `getLongOpts`
       - excluding output help options: this is auto-handled
     - attempt to match them up with something mentioned in the description
+      - if no description found, infer the option's purpose and write it here
     - add a line thus:
       ```php
       $this->addOption(${shortOptOrNull}, ${longOptOrNull}, ${description});
