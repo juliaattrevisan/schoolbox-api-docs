@@ -168,6 +168,10 @@ class Helper
 
     public function getGroupSubjectLevel(GroupSubjectModel $groupSubject): string
     {
+        if ($groupSubject->getGroup()?->getName() === self::LEVEL_CORE) {
+            return self::LEVEL_CORE;
+        }
+
         return $groupSubject->getLevel() ?: self::LEVEL_CORE;
     }
 
