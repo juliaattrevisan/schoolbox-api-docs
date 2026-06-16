@@ -42,6 +42,8 @@ class HttpClient
 
     private string $baseUrl;
 
+    private \Closure $sleep;
+
     /** @var array<string,int> */
     private array $urlUsage = [];
 
@@ -53,9 +55,16 @@ class HttpClient
      * @param string $schoolId School ID
      * @param string $token Schoolbox API token
      */
-    public function __construct(string $host, private string $schoolId = '', #[SensitiveParameter] private string $token = '')
-    {
+    public function __construct(
+        string $host,
+        private string $schoolId = '',
+        #[SensitiveParameter] private string $token = '',
+        ?\Closure $sleep = null
+    ) {
         $this->baseUrl = rtrim($host, '/');
+        $this->sleep = $sleep ?? static function (int $seconds): void {
+            sleep($seconds);
+        };
         $this->client = new Client([
             RequestOptions::TIMEOUT => self::DEFAULT_TIMEOUT,
             RequestOptions::HTTP_ERRORS => false,
@@ -145,7 +154,7 @@ class HttpClient
                     );
                 }
             }
-            sleep(self::NAP_TIMEOUT);
+            ($this->sleep)(self::NAP_TIMEOUT);
         }
     }
 

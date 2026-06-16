@@ -8,14 +8,6 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Socs;
-
-if (!function_exists(__NAMESPACE__ . '\sleep')) {
-    function sleep(int $seconds): void
-    {
-    }
-}
-
 namespace Schoolbox\Socs\Test;
 
 use GuzzleHttp\Client;
@@ -200,7 +192,8 @@ class HttpClientTest extends TestCase
      */
     private function createHttpClient(Client $guzzle): HttpClient
     {
-        $client = new HttpClient('https://socs.example.test', 'school', 'token');
+        $client = new HttpClient('https://socs.example.test', 'school', 'token', static function (): void {
+        });
         $clientProperty = new \ReflectionProperty($client, 'client');
         $clientProperty->setValue($client, $guzzle);
 
