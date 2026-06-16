@@ -1,14 +1,25 @@
+{##
+ # Marking Guide: Rubric grid(s)
+ #
+ # @param IAssessable $assessment            A fully hydrated learning activity instance
+ # @param bool $markVisibility               Whether this feedback is visible to the current user.
+ # @param User $learner                      The learner whose submission history you're viewing
+ # @param IFeedback $selfAssessmentFeedback  A self-graded feedback instance, if extant
+ # @param string $rubricGridPayloads         A json-encoded representation of the rubric grid structure, marked grid, self graded grid
+ # @param bool $showGroupTotal               An arbitrary decision about whether Capability Marks could display here, if extant.
+ # @param bool $showRubricTotal              An arbitrary decision about whether Rubric Grid Totals could display here, if extant
+ #}
+
 <div class="row">
     <div class="small-12 island">
-
         {% include '@rubric/grid.twig' with {
-            rubricGrid: assessment.rubricGrid,
-            rubricMarkedGrid: markVisibility ? rubricMarkedGrid : null,
+            assessment: assessment,
             markVisibility: markVisibility ?? participant.assessable.isFeedbackVisibleToUser(USER),
+            learner: participant ? participant.user : null,
             selfAssessmentFeedback: selfAssessmentFeedback,
+            rubricGridPayloads: rubricGridPayloads,
             showGroupTotal: showGroupTotal,
             showRubricTotal: showRubricTotal,
-            learner: participant ? participant.user : null
         } only %}
     </div>
 </div>

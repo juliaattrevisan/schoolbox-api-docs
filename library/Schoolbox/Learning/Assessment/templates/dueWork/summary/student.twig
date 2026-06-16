@@ -114,6 +114,7 @@
     } %}
 {% else %}
     {% include '@learningAssessment/dueWork/summary/markingGuide.twig' with {
+        assessment: assessment,
         participant: participant,
         selfAssessmentFeedback: selfAssessmentFeedback,
     } %}
