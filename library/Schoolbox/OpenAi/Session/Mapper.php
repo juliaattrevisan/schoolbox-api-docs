@@ -111,6 +111,14 @@ class Mapper extends BaseMapper
     /**
      * @inheritDoc
      *
+     * TODO:
+     * The derived properties in this class are not hydrated by this function.
+     * There ought to be a way to get the derived properties hydrated.
+     * Possibilities:
+     *  1. Add hydration of the derived fields to this function so findById() would return a fullly hydrated object.
+     *  2. Add a findByIdWithDerivedProperties() function as an alternative to findById()
+     *  3. Add a hydrateDerivedProperties() function that could be used to hyrdate an object returned by findById().
+     *
      * @param \PDOStatement $statement
      * @return GenericCollection<Model>
      * @throws BaseMapper\Exception
