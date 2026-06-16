@@ -12,7 +12,6 @@ namespace Schoolbox\OpenAi\Agent;
 use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
-use Schoolbox\OpenAi\Session\Log;
 use Schoolbox\Editor\OpenAI\Log\Translator\Format\AgentChat;
 use Schoolbox\Editor\OpenAI\Payload\DialogAgentChat as PayloadGenerator;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Role;

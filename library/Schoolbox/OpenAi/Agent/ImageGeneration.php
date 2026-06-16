@@ -11,7 +11,6 @@ namespace Schoolbox\OpenAi\Agent;
 
 use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Admin\OpenAI\Config;
-use Schoolbox\OpenAi\Session\Log;
 use Schoolbox\Editor\OpenAI\Log\Translator\Format\AgentChat;
 use Schoolbox\Editor\OpenAI\Payload\ImageGeneration as PayloadGenerator;
 use Schoolbox\OpenAi\AgentChat\EventStream\ResponseListener;

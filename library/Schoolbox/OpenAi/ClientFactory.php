@@ -9,12 +9,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\OpenAi;
 
-use DomainException;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\Uri;
 use JsonException;
 use Schoolbox\Admin\OpenAI;
-use UnexpectedValueException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\OpenAi\Session\Log\Mapper;
 use Schoolbox\OpenAi\Session\Mapper as SessionMapper;
