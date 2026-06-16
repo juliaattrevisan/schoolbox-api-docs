@@ -18,7 +18,7 @@ require_once __DIR__ . '/../../conf/core/require.php';
 /**
  * Deletes all user sessions from Redis.
  */
-$app = new class extends CliTool\App
+$app = new class extends CliTool\BaseApp
 {
     /**
      * Does not touch any files, so user is not important
@@ -26,6 +26,26 @@ $app = new class extends CliTool\App
     public function runAsRoot(): ?bool
     {
         return null;
+    }
+
+    protected function getName(): string
+    {
+        return 'deleteAllUserSessions';
+    }
+
+    protected function getDescription(): string
+    {
+        return 'Deletes all user sessions from Redis.';
+    }
+
+    protected function setOptions(): self
+    {
+        return $this;
+    }
+
+    protected function hasPerformMode(): bool
+    {
+        return false;
     }
 
     /** Hands off execution over to the App */
