@@ -6,7 +6,7 @@
      * Show draft data in markbook cells.
      */
     const showDrafts = function () {
-        $("[data-draft-mark]").not('[data-reasoning]').show();
+        $("[data-draft-mark]").not("[data-reasoning]").show();
         $("[data-actual-mark]").hide();
         $("[data-student-average]").each(function (idx, elem) {
             let $elem = $(elem);
@@ -20,7 +20,7 @@
      */
     const hideDrafts = function () {
         $("[data-draft-mark]").hide();
-        $("[data-actual-mark]").not('[data-reasoning]').show();
+        $("[data-actual-mark]").not("[data-reasoning]").show();
         $("[data-student-average]").each(function (idx, elem) {
             let $elem = $(elem);
             $elem.removeClass($elem.attr("data-on-class"));

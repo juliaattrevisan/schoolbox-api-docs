@@ -142,7 +142,6 @@ class Factory
                 );
 
                 $markedGrid->getCapabilityMarks()->add($capabilityMark);
-
             }
 
             /* The Capability Mark initial state is null until otherwise determined, I guess, from the post payload
