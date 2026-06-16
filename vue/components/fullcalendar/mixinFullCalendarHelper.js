@@ -184,7 +184,9 @@ export default {
          * @returns void
          */
         fullCalendarHelper_replaceButtonIcon(buttonClassName, iconName) {
-            const button = document.getElementsByClassName(buttonClassName)[0];
+            const selector = buttonClassName.startsWith(".") ? buttonClassName : `.${buttonClassName}`;
+            const rootEl = this && this.$el ? this.$el : document;
+            const button = rootEl.querySelector ? rootEl.querySelector(selector) : document.querySelector(selector);
             if (!button) {
                 return;
             }
