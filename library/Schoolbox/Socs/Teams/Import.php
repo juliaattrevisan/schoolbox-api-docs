@@ -55,7 +55,7 @@ class Import implements IStrategy
         }
 
         if (false === $response) {
-            $this->log->info('SOCS fixtures feed returned an empty payload');
+            $this->log->info('SOCS teams feed returned an empty payload');
             return;
         }
 
