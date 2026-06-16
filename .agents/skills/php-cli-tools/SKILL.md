@@ -87,7 +87,9 @@ class ${classname} extends BaseApp
 
     protected function setOptions(): self
     {
-        // add calls to $this->optionCollection->add() to add options
+        // add calls to $this->addOption($shortOpt, $longOpt, $description) to add options
+        // (fall back to $this->optionCollection->add() directly only if you need to chain
+        // modifiers such as ->defaultValue() or ->incremental())
         return $this;
     }
 
@@ -113,13 +115,13 @@ In order to migrate an app which still extends `App`:
 - populate the following abstract methods:
   - `getName`: find something which looks like a name in help content, and return it here
     - if no name found, use the name of the executable in `tools`
-  - `getDescription`: find something which looks like a name in help content, and return it here
+  - `getDescription`: find something which looks like a description in help content, and return it here
     - if no description found, infer the script's purpose and write it here
   - `setOptions`:
     - find all options defined in `getShortOpts` and `getLongOpts`
       - excluding output help options: this is auto-handled
-    - attempt to match them up with something mentioned in the description
-      - if no description found, infer the option's purpose and write it here
+    - attempt to match them up with something mentioned in the help content
+      - if no option description found, infer the option's purpose and write it here
     - add a line thus:
       ```php
       $this->addOption(${shortOptOrNull}, ${longOptOrNull}, ${description});
