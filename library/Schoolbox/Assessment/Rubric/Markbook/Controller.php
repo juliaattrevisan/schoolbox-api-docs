@@ -148,25 +148,30 @@ class Controller extends Base
             $overallMarks
         ] = $this->buildMarkbookData($folder, $queryArgs, $assessmentIds);
 
+        /* Optional params from the frontend. The Show Drafts checkbox state is obeyed.
+         */
+        $showDrafts = (bool)($queryArgs['showDrafts'] ?? false);
+        $descriptorsOnly = (bool)($queryArgs['descriptorsOnly'] ?? false);
+
         $csv = new Export\Csv(
-            $studentMarks,
             $assessments,
             $exclusions,
+            $studentMarks,
             $overallMarks,
             $this->translator,
-            empty($queryArgs['descriptorsOnly']),
-        );
-
-        $showDrafts = (bool)($queryArgs['showDrafts'] ?? false);
-
-        $csv->export(
-            sprintf(
-                '%s%s - Rubric Markbook.csv',
-                $showDrafts ? 'Draft - ' : '',
-                $folder->getNameWithCodes()
-            ),
+            $descriptorsOnly,
             $showDrafts,
         );
+
+        /* TODO replace with the Filename Codec usage which for some reason I can't find in this branch
+         */
+        $filename = sprintf(
+            '%s%s - Rubric Markbook.csv',
+            $showDrafts ? 'Draft - ' : '',
+            $folder->getNameWithCodes()
+        );
+
+        $csv->export($filename);
 
         exit;
     }
@@ -727,7 +732,6 @@ class Controller extends Base
                     'published' => [
                         'normalisedMark' => $normalisedMark,
                         'humanReadableMark' => $humanReadableMark,
-                        'selectedDescriptorText' => $row['descriptor_name'],
                     ],
                     /* Normalised and human-readable marks from the most recent feedback: these would typically be draft
                      * marks, but could end up being the same as the Published ones by sheer coincidence.
@@ -735,7 +739,6 @@ class Controller extends Base
                     'draft' => [
                         'normalisedMark' => null,
                         'humanReadableMark' => null,
-                        'selectedDescriptorText' => null,
                     ],
                     'indicators' => []
                 ];
