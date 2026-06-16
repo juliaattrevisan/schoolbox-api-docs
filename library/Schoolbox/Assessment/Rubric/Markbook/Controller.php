@@ -11,13 +11,14 @@ namespace Schoolbox\Assessment\Rubric\Markbook;
 
 use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Predicate\Builder;
 use Alaress\Web\Controller\Base;
 use Aura\Router;
+use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use InvalidArgumentException;
 use LogicException;
 use PDOException;
-use RangeException;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Column\Decimal;
@@ -29,13 +30,15 @@ use Schoolbox\L10n\RosettaStone as Translator;
 use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Learning\MarkScheme\Factory;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\Model;
+use Twig\Error\Error;
 use UnderflowException;
 use UnexpectedValueException;
 
-use function array_key_exists;
 use function array_keys;
 use function array_merge;
 use function count;
@@ -49,34 +52,15 @@ use function uasort;
 class Controller extends Base
 {
     /**
-     * @var IConnector
+     * @var Decimal
      */
-    private $internalDb;
-
-    /**
-     * Data source for group lists
-     *
-     * @var UserAccessMapper
-     */
-    private $userAccessMapper;
-
-    /** @var Filter\IFactoryFactory */
-    private $filterFactoryFactory;
-
-    /** @var Filter\Selection\Mapper */
-    private $filterSelectionMapper;
-
-    /** @var Filter\Filters\Assessment\IdFinder */
-    private $assessmentIdFinder;
-
-    /** @var Filter\Mapper */
-    private $filterMapper;
+    private Decimal $decimalHydrator;
 
 
     /**
-     * @var Translator
+     * @var MarkScheme\TotalMarkFractional
      */
-    private $translator;
+    private MarkScheme\TotalMarkFractional $totalMarkScheme;
 
 
     /**
@@ -91,38 +75,29 @@ class Controller extends Base
      * @param Translator                         $translator
      */
     public function __construct(
-        IConnector $internalDb,
-        UserAccessMapper $userAccessMapper,
-        Filter\IFactoryFactory $filterFactoryFactory,
-        Filter\Selection\Mapper $filterSelectionMapper,
-        Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
-        Filter\Mapper $filterMapper,
-        Translator $translator
+        private IConnector $internalDb,
+        private UserAccessMapper $userAccessMapper,
+        private Filter\IFactoryFactory $filterFactoryFactory,
+        private Filter\Selection\Mapper $filterSelectionMapper,
+        private Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
+        private Filter\Mapper $filterMapper,
+        private Translator $translator
     ) {
-        $this->internalDb            = $internalDb;
-        $this->userAccessMapper      = $userAccessMapper;
-        $this->filterFactoryFactory  = $filterFactoryFactory;
-        $this->filterSelectionMapper = $filterSelectionMapper;
-        $this->assessmentIdFinder    = $assessmentIdFinder;
-        $this->filterMapper          = $filterMapper;
-        $this->translator            = $translator;
+        /* Used to calculate human-readable and normalised marks for each student for capabilities and indicators
+         */
+        $this->decimalHydrator = new Decimal();
+        $this->totalMarkScheme = new MarkScheme\TotalMarkFractional();
     }
 
 
     /**
      * Renders a filter panel and placeholder that will asynchronously load the rubric report
      *
-     * @api   GET /learning/rubricMarkbook/{folderId}
+     * @param Model $folder Folder for this class
+     * @throws RouteNotFound
+     * @throws Error
      * @since 190
-     * @param Folder\Model $folder Folder for this class
-     * @throws Database\Predicate\InvalidColumnException
-     * @throws InvalidArgumentException
-     * @throws Mapper\DefinitionException
-     * @throws Mapper\Exception
-     * @throws Router\Exception\RouteNotFound
-     * @throws UnderflowException
-     * @throws DomainException
-     * @throws UnexpectedValueException
+     * @api   GET /learning/rubricMarkbook/{folderId}
      */
     public function getMarkbook(Folder\Model $folder): void
     {
@@ -149,9 +124,11 @@ class Controller extends Base
      * Output the rubric report as a cool CSV for extra-Schoolbox data wrangling,
      * for those that are into that sort of thing.
      *
-     * @api   GET /learning/rubricMarkbook/export/{folderId}
+     * @param Model $folder Folder for this class
+     * @throws Exception
+     * @throws RouteNotFound
      * @since 192
-     * @param Folder\Model $folder Folder for this class
+     * @api   GET /learning/rubricMarkbook/export/{folderId}
      */
     public function getMarkbookExport(Folder\Model $folder): void
     {
@@ -159,29 +136,38 @@ class Controller extends Base
         $this->extendExecutionTime();
 
         $queryArgs = $this->requestQuery->getArrayCopy();
+
         unset($queryArgs['page']);
+
         $assessmentIds = $this->getAssessmentIds($folder->getId(), $queryArgs);
 
         [
             $assessments,
             $exclusions,
-            $students,
+            $studentMarks,
             $overallMarks
         ] = $this->buildMarkbookData($folder, $queryArgs, $assessmentIds);
 
         $csv = new Export\Csv(
-            $students,
+            $studentMarks,
             $assessments,
             $exclusions,
             $overallMarks,
             $this->translator,
             empty($queryArgs['descriptorsOnly']),
         );
+
         $showDrafts = (bool)($queryArgs['showDrafts'] ?? false);
+
         $csv->export(
-            ($showDrafts ? 'Draft - ' : '') . $folder->getNameWithCodes() . ' - Rubric Markbook.csv',
+            sprintf(
+                '%s%s - Rubric Markbook.csv',
+                $showDrafts ? 'Draft - ' : '',
+                $folder->getNameWithCodes()
+            ),
             $showDrafts,
         );
+
         exit;
     }
 
@@ -189,21 +175,12 @@ class Controller extends Base
     /**
      * Displays a list of rubric marks for students and learners associated with the specified folder
      *
+     * @param Model $folder Folder for this class
+     * @throws Error
+     * @throws Exception
+     * @throws RouteNotFound
      * @api   POST /learning/rubricMarkbook/{folderId}
      * @since 190
-     * @param Folder\Model $folder Folder for this class
-     * @throws Database\Exception
-     * @throws Database\Predicate\InvalidColumnException
-     * @throws DomainException
-     * @throws InvalidArgumentException
-     * @throws Mapper\DefinitionException
-     * @throws Mapper\Exception
-     * @throws PDOException
-     * @throws UnderflowException
-     * @throws UnexpectedValueException
-     * @throws LogicException
-     * @throws Router\Exception\RouteNotFound
-     * @throws RangeException
      */
     public function postMarkbook(Folder\Model $folder): void
     {
@@ -333,7 +310,13 @@ class Controller extends Base
 
 
     /**
-     * Fetch assessment data, and return it indexed by assessment ID
+     * Create a hash lookup of assessment details along with the rubric grid structure (caps, indicators) that were used
+     * in each grid in each assessment. The lookup contains assessment weighting and links etc. common to all students
+     * who undertook the assessment.
+     *
+     * The feedback grids for each student should align with the structure defined here: anything outside the set would
+     * have been either bad data or invalidated data due to the grid changing structure midway through students doing
+     * the assessment.
      *
      * @param int[]      $assessmentIds
      * @param null|array $selectedCapabilities Null if rubricUsage filter not enabled for page
@@ -378,88 +361,137 @@ class Controller extends Base
 
         $sql  = "
             SELECT
-                vr.assessment_id                             AS assessment_id,
-                vr.assessment_grade_group_id                 AS assessment_grade_group_id,
-                vr.assessment_title                          AS assessment_name,
-                vr.assessment_max_mark                       AS assessment_max_mark,
-                vr.assessment_mark_type                      AS assessment_mark_type,
-                vr.assessment_grade_group_id                 AS assessment_grade_group_id,
-                vr.assessment_weight                         AS assessment_weight,
-                vr.capability_id                             AS capability_id,
-                vr.capability_name                           AS capability_name,
-                vr.capability_max_value                      AS capability_max_value,
-                vr.capability_mark_type_id                   AS capability_mark_type_id,
-                vr.capability_grade_group_id                 AS capability_grade_group_id,
-                IF(vr.capability_mark_type_id = :none, 0, 1) AS assessment_is_mark_per_capability,
-                vr.indicator_id                              AS indicator_id,
-                vr.indicator_name                            AS indicator_name,
-                vr.indicator_max_value                       AS indicator_max_value
+                vr.assessment_id                               AS assessment_id,
+                vr.assessment_grade_group_id                   AS assessment_grade_group_id,
+                vr.assessment_title                            AS assessment_name,
+                vr.assessment_max_mark                         AS assessment_max_mark,
+                vr.assessment_mark_type                        AS assessment_mark_type,
+                vr.assessment_grade_group_id                   AS assessment_grade_group_id,
+                vr.assessment_weight                           AS assessment_weight,
+                rubric_instance.id                             AS rubric_instance_id,
+                rubric_instance.title                          AS rubric_instance_title,
+                rubric_instance.rubric_capability_mark_type_id AS rubric_capability_mark_type_id,
+                rubric_instance.weight                         AS rubric_instance_weight,
+                vr.capability_id                               AS capability_id,
+                vr.capability_name                             AS capability_name,
+                vr.capability_max_value                        AS capability_max_value,
+                vr.indicator_id                                AS indicator_id,
+                vr.indicator_name                              AS indicator_name,
+                vr.indicator_max_value                         AS indicator_max_value
             FROM v_rubric vr
+            INNER JOIN rubric_instance ON vr.rubric_instance_id = rubric_instance.id
             WHERE {$whereClause}
             ORDER BY
                 vr.assessment_id,
+                vr.rubric_instance_id,
                 vr.capability_sequence,
                 vr.capability_id,
                 vr.indicator_sequence,
                 vr.indicator_id
         ";
-        $stmt = $this->internalDb->prepareQuery($sql, ['none' => MarkType::TYPE_NONE] + $pb->getParams());
 
-        $capabilities = [];
-        $indicators   = [];
+        $stmt = $this->internalDb->prepareQuery($sql, $pb->getParams());
 
-        $lastObservedAssessmentId = null;
-        $lastObservedCapabilityId = null;
-        $decimalHydrator          = new Decimal();
-        $integerHydrator          = new Integer();
+        $decimalHydrator = new Decimal();
+        $integerHydrator = new Integer();
 
         foreach ($stmt->getIterator() as $row) {
-            if ($lastObservedAssessmentId !== $row['assessment_id']) {
-                // Has the assessment we're looking at changed? Reset the capabilities
-                $capabilities = [];
-            }
-
-            if ($lastObservedCapabilityId !== $row['capability_id'] || $lastObservedAssessmentId !== $row['assessment_id']) {
-                // Has the capability we're looking at changed? Reset the indicators
-                $indicators = [];
-            }
-
-            if ($selectedIndicators === null || in_array((int)$row['indicator_id'], $selectedIndicators, true)) {
-                $indicators[$row['indicator_id']] = [
-                    'name' => $row['indicator_name'],
+            /* First time seeing this assessment id - set up a container struct
+             * We should only need to do this once per assessment
+             */
+            if (!isset($assessments[$row['assessment_id']])) {
+                $assessments[$row['assessment_id']] = [
+                    'name' => $row['assessment_name'],
+                    'statusLink' => $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $row['assessment_id']]),
+                    'maxMark' => $row['assessment_max_mark'],
+                    'markType' => $row['assessment_mark_type'],
+                    'weight' => $integerHydrator->hydrate($row['assessment_weight']),
+                    /* gridData is a struct containing capability and indicators, grouped by assessment and rubric
+                     * instance ids, like this:
+                     *
+                     * gridData => [
+                     *         rubric instance id => [
+                     *             rubric instance settings, like
+                     *                 - is mark per capability
+                     *                 - capability mark type id
+                     *                 - capability grade group id
+                     *             capabilities (capability data) => [
+                     *                 capability mark type info
+                     *                 indicators (indicator data) => [
+                     *                 ]
+                     *             ]
+                     *         ]
+                     *     ]
+                     * ]
+                     */
+                    'gridData' => []
                 ];
             }
 
-            $capabilityMaxValue                  = $decimalHydrator->hydrate($row['capability_max_value']);
-            $capabilities[$row['capability_id']] = [
-                'name'         => $row['capability_name'],
-                'indicators'   => $indicators,
-                'show'         => $capabilityMaxValue && ($selectedCapabilities === null || in_array((int)$row['capability_id'], $selectedCapabilities, true)),
-            ];
-            ;
-            // Stuff everything about the assessment into an array
-            $assessments[$row['assessment_id']] = [
-                'name'           => $row['assessment_name'],
-                'statusLink'     => $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $row['assessment_id']]),
-                'maxMark'        => $row['assessment_max_mark'],
-                'markType'       => $row['assessment_mark_type'],
-                'capabilityMarkTypeId'     => $row['capability_mark_type_id'],
-                'capabilityGradeGroupId'   => $row['capability_grade_group_id'],
-                'isMarkPerCapability' => $row['assessment_is_mark_per_capability'],
-                'weight'         => $integerHydrator->hydrate($row['assessment_weight']),
-                'capabilities'   => $capabilities,
-            ];
+            /* Set up this rubric instance container just once
+             */
+            if (!isset($assessments[$row['assessment_id']]['gridData'][$row['rubric_instance_id']])) {
+                $assessments[$row['assessment_id']]['gridData'][$row['rubric_instance_id']] = [
+                    'title' => $row['rubric_instance_title'],
+                    'weight' => $row['rubric_instance_weight'],
+                    /* Mark Per Capability is used when the capability mark type is set to something other than None
+                     * Be careful of this fact, cos it's easy to === instead of !== if you're not paying attention
+                     */
+                    'isMarkPerCapability' => MarkType::SLUG_NONE !== MarkType::idToSlug($row['rubric_capability_mark_type_id']),
+                    'capabilities' => []
+                ];
+            }
 
-            $lastObservedAssessmentId = $row['assessment_id'];
-            $lastObservedCapabilityId = $row['capability_id'];
+            /* Set up this capability container just once
+             */
+            if (!isset($assessments[$row['assessment_id']]['gridData'][$row['rubric_instance_id']]['capabilities'][$row['capability_id']])) {
+                /* Why is this even needed? Some reduction of $row['capability_max_value'] must result in something
+                 * falsy (such as bad data) but idk what we saw in the wild to reinforce this theory.
+                 */
+                // $capabilityMaxValue = $decimalHydrator->hydrate($row['capability_max_value']);
+
+                $assessments[$row['assessment_id']]['gridData'][$row['rubric_instance_id']]['capabilities'][$row['capability_id']] = [
+                    'id' => $row['capability_id'],
+                    'name' => $row['capability_name'],
+                    'max' => $decimalHydrator->hydrate($row['capability_max_value']),
+                    /* "We care about this capability, even if we never show it to humans in the ui"
+                     *
+                     * We need this node to accumualte data even if we never intend to show it to humans in the ui.
+                     * This .show node only has meaning to humans if Capability Mark Type was something other than None,
+                     * and/or we chose it in the Filters settings.
+                     */
+                    'show' => $assessments[$row['assessment_id']]['gridData'][$row['rubric_instance_id']]['isMarkPerCapability'] && ($selectedCapabilities === null || in_array((int)$row['capability_id'], $selectedCapabilities, true)),
+                    'indicators' => [],
+                ];
+            }
+
+            /* Check whether the indicator was in the filter selections. If it was chosen, or if none of the filters
+             * were chosen, then we need to include it in that stack. As per andyland filters, filtering nothing means
+             * include everything.
+             */
+            if ($selectedIndicators === null || in_array((int)$row['indicator_id'], $selectedIndicators, true)) {
+                if (!isset($assessments[$row['assessment_id']]['gridData'][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']])) {
+                    $assessments[$row['assessment_id']]['gridData'][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']] = [
+                        'name' => $row['indicator_name'],
+                        'max' => $decimalHydrator->hydrate($row['indicator_max_value']),
+                    ];
+                }
+            }
         }
 
+        /* Apparently assessments are sorted alphabetically rather than by due date, which is a bit interesting: most of
+         * the time we sort by due date. Jez concurs:
+         *
+         * > jez.gray 4/6/2026
+         * > I had never noticed. Seems strange to me now that you point it out
+         */
         uasort(
             $assessments,
             static function (array $a, array $b): int {
                 return strnatcmp($a['name'], $b['name']);
             }
         );
+
         return $assessments;
     }
 
@@ -468,16 +500,20 @@ class Controller extends Base
      * Find each student in a folder and their marks (if extant), and return an array indexed by student ID
      *
      * @param array<int,array> $assessments
-     * @param null|array       $selectedCapabilities Null if rubricUsage filter not enabled for page
-     * @param null|array       $selectedIndicators   Null if rubricUsage filter not enabled for page
+     * @param null|array $selectedCapabilities Null if rubricUsage filter not enabled for page
+     * @param null|array $selectedIndicators Null if rubricUsage filter not enabled for page
+     * @param array $exclusions
+     * @param array $students
      * @return array
-     * @throws Database\Exception
-     * @throws Database\Predicate\InvalidColumnException
-     * @throws UnderflowException
+     * @throws RouteNotFound
      */
-    private function retrieveDatabaseMarks(array $assessments, ?array $selectedCapabilities, ?array $selectedIndicators): array
-    {
-        $students = [];
+    private function retrievePublishedMarks(
+        array $assessments,
+        ?array $selectedCapabilities,
+        ?array $selectedIndicators,
+        array $exclusions,
+        array $students
+    ): array {
         // Don't load marks if no assessments.
         if (!count($assessments)) {
             return $students;
@@ -491,13 +527,12 @@ class Controller extends Base
             return $assessments;
         }
 
-        $innerPb    = (new Database\Predicate\Builder($this->internalDb->getQuoter(), ''))
-            ->isNull('sr.deleted_at')
-            ->notNull('sr.published_at')
-            ->equals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
-            ->in('sb.assessment_id', array_keys($assessments));
+        /* Effectively a safe shortcut to an IN() clause
+         */
+        $assessmentIds = array_keys($assessments);
 
-        $innerWhere = implode(' AND ', $innerPb->getWhere());
+        $assessmentsPlaceholder = Builder::getArrayPlaceholders($assessmentIds, 'assessmentIds');
+        $assessmentsParameters = Builder::getArrayParameters($assessmentIds, 'assessmentIds');
 
         $outerPb = (new Database\Predicate\Builder($this->internalDb->getQuoter(), ''))
             ->equals('vrm.feedback_type', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
@@ -518,21 +553,27 @@ class Controller extends Base
         $getAuthoritativeMarksQuery = $this->internalDb->prepareQuery(
             "
                 SELECT
-                    vrm.assessment_id                  AS assessment_id,
-                    vrm.student_id                     AS student_id,
-                    u.firstname                        AS student_firstname,
-                    u.preferred_name                   AS student_preferred_name,
-                    u.lastname                         AS student_lastname,
-                    vrm.capability_id                  AS capability_id,
-                    vrm.capability_mark                AS capability_mark,
-                    vrm.capability_human_readable_mark AS capability_human_readable_mark,
-                    vrm.capability_max_value           AS capability_max_value,
-                    vrm.capability_mark_type_id        AS capability_mark_type_id,
-                    vrm.capability_grade_group_id      AS capability_grade_group_id,
-                    vrm.descriptor_name                AS descriptor_name,
-                    vrm.indicator_id                   AS indicator_id,
-                    vrm.indicator_mark                 AS indicator_mark,
-                    vrm.indicator_max_value            AS indicator_max_value
+                    vrm.assessment_id                              AS assessment_id,
+                    vrm.student_id                                 AS student_id,
+                    u.firstname                                    AS student_firstname,
+                    u.preferred_name                               AS student_preferred_name,
+                    u.lastname                                     AS student_lastname,
+                    rubric_instance.id                             AS rubric_instance_id,
+                    rubric_instance.title                          AS rubric_instance_title,
+                    rubric_instance.rubric_capability_mark_type_id AS rubric_capability_mark_type_id,
+                    rubric_instance.weight                         AS rubric_instance_weight,
+                    vrm.capability_id                              AS capability_id,
+                    vrm.capability_name                            AS capability_name,
+                    vrm.capability_mark                            AS capability_mark,
+                    vrm.capability_human_readable_mark             AS capability_human_readable_mark,
+                    vrm.capability_max_value                       AS capability_max_value,
+                    vrm.capability_mark_type_id                    AS capability_mark_type_id,
+                    vrm.capability_grade_group_id                  AS capability_grade_group_id,
+                    vrm.descriptor_name                            AS descriptor_name,
+                    vrm.indicator_id                               AS indicator_id,
+                    vrm.indicator_name                             AS indicator_name,
+                    vrm.indicator_mark                             AS indicator_mark,
+                    vrm.indicator_max_value                        AS indicator_max_value
                 FROM (
                     SELECT
                         sb.assessment_id,
@@ -540,105 +581,230 @@ class Controller extends Base
                         MAX(sr.published_at) AS max_published_at
                     FROM submission_return sr
                     INNER JOIN submission_box sb on sr.box_id = sb.id
-                    WHERE {$innerWhere}
+                    WHERE sr.deleted_at IS NULL
+                    AND sr.published_at IS NOT NULL
+                    AND sr.review_route = :reviewRoute
+                    AND sb.assessment_id IN {$assessmentsPlaceholder}
                     GROUP BY sb.assessment_id, sr.owner
-                ) latest_feedback
+                ) latest_published_feedback
                 INNER JOIN v_rubric_mark vrm ON
-                    vrm.feedback_date = latest_feedback.max_published_at AND
-                    vrm.assessment_id = latest_feedback.assessment_id AND
-                    vrm.student_id    = latest_feedback.owner
+                    vrm.feedback_date = latest_published_feedback.max_published_at AND
+                    vrm.assessment_id = latest_published_feedback.assessment_id AND
+                    vrm.student_id    = latest_published_feedback.owner
+                INNER JOIN rubric_instance ON vrm.rubric_instance_id = rubric_instance.id
                 INNER JOIN user u ON vrm.student_id = u.id
                 WHERE {$outerWhere}
+                AND rubric_instance.deleted_at IS NULL
                 ORDER BY vrm.student_id, vrm.assessment_id, vrm.capability_id, vrm.indicator_id
             ",
-            array_merge($innerPb->getParams(), $outerPb->getParams()),
+            array_merge(
+                $assessmentsParameters,
+                $outerPb->getParams(),
+                [
+                    'reviewRoute' => ReturnedWork::REVIEW_ROUTE_INSTRUCTOR
+                ]
+            ),
         );
 
-        $assessmentsForStudent = [];
-        $capabilityMarks       = [];
-        $indicatorMarks        = [];
-
-        $lastObservedAssessmentId = null;
-        $lastObservedCapabilityId = null;
-        $lastObservedStudentId    = null;
-
         foreach ($getAuthoritativeMarksQuery->getIterator() as $i => $row) {
-            if ($lastObservedStudentId !== $row['student_id']) {
-                // Has the student we're looking at changed? Reset the list of assessments for them
-                $assessmentsForStudent = [];
-            }
-
-            if ($lastObservedAssessmentId !== $row['assessment_id']) {
-                // Has the assessment we're looking at changed? Reset the capabilities
-                $capabilityMarks = [];
-            }
-
-            if ($lastObservedCapabilityId !== $row['capability_id']) {
-                // Has the capability we're looking at changed? Reset the indicators
-                $indicatorMarks = [];
-            }
-
-            if ($selectedIndicators === null || in_array((int)$row['indicator_id'], $selectedIndicators, true)) {
-                $indicatorMarks[$row['indicator_id']] = [
-                    'databaseMark'           => $row['indicator_mark'],
-                    'maxMark'                => $row['indicator_max_value'],
-                    'selectedDescriptorText' => $row['descriptor_name'],
+            /* Set up a student node if it didn't already exist; we only need to set it up once
+             */
+            if (!isset($students[$row['student_id']])) {
+                $students[$row['student_id']] = [
+                    'firstname' => $row['student_firstname'],
+                    'preferred_name' => $row['student_preferred_name'],
+                    'lastname' => $row['student_lastname'],
+                    'profileLink' => sprintf(
+                        '/search/user/%s',
+                        $row['student_id']
+                    ),
+                    /* gridData is a struct containing capability and indicator marks, grouped by assessment and rubric
+                     * instance ids, like this:
+                     *
+                     * gridData => [
+                     *     assessment id => [
+                     *         rubric instance id => [
+                     *             rubric instance settings, like
+                     *                 - is mark per capability
+                     *                 - capability mark type id
+                     *                 - capability grade group id
+                     *             capabilities (capability data) => [
+                     *                 capability mark type info
+                     *                 capability mark values if relevant to this grid's settings
+                     *                 indicators (indicator data) => [
+                     *                     database marks
+                     *                     max marks
+                     *                     selected descriptor text
+                     *                 ]
+                     *             ]
+                     *         ]
+                     *     ]
+                     * ]
+                     */
+                    'gridData' => []
                 ];
             }
 
-            $capData = [
-                'indicators' => $indicatorMarks,
-            ];
-            $isMarkPerCapability = $assessments[$row['assessment_id']]['isMarkPerCapability'] ?? false;
-            if ($assessments[$row['assessment_id']]['capabilities'][$row['capability_id']]['show']) {
-                $capData['databaseMark']      = $isMarkPerCapability ? $row['capability_mark'] : null;
-                $capData['humanReadableMark'] = $isMarkPerCapability ? $row['capability_human_readable_mark'] : null;
-                $capData['maxMark']           = $row['capability_max_value'];
-
-                /* Capabilities' Mark Type and Grade Group can be represented differently to
-                 * their Assessments' Mark Type and Grade Group
-                 */
-                $capData['capabilityMarkTypeId'] = $row['capability_mark_type_id'];
-                $capData['capabilityGradeGroupId'] = $row['capability_grade_group_id'];
+            /* Cram in a link to the assessment's summary screen for a particular student if it didn't already exist
+             */
+            if (!isset($students[$row['student_id']]['assessments'][$row['assessment_id']])) {
+                $students[$row['student_id']]['assessments'][$row['assessment_id']] = [
+                    'summaryLink' => $this->routeGenerator->generate(
+                        'learningAssessment.getSummary',
+                        [
+                            'studentId' => $row['student_id'],
+                            'assessmentId' => $row['assessment_id'],
+                        ],
+                    )
+                ];
             }
-            $capabilityMarks[$row['capability_id']] = $capData;
 
-            $assessmentsForStudent[$row['assessment_id']] = [
-                'capabilities' => $capabilityMarks,
-            ];
+            /* If this student's been excluded, we can skip processing their data if it exists.
+             *
+             * TODO you can probably find a way to convert this to a ->notIn clause to restrict the database's result
+             *  set instead of fetching it only to ignore it
+             */
+            if (isset($exclusions[$row['assessment_id']][$row['student_id']])) {
+                continue;
+            }
 
-            // Stuff everything about the students marks into an array
-            $students[$row['student_id']] = [
-                'firstname'      => $row['student_firstname'],
-                'preferred_name' => $row['student_preferred_name'],
-                'lastname'       => $row['student_lastname'],
-                'assessmentsPublished'    => $assessmentsForStudent,
-                'profileLink'    => '/search/user/' . $row['student_id'],
-            ];
+            /* Remember settings for the rubric instance that we're encountering, such as the rubric instance's mark per
+             * capability setting, etc. if it hasn't already been set. We only need to set it up once.
+             */
+            if (!isset($students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']])) {
+                $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']] = [
+                    /* Obviously so you can see which grid is which, by its name, on the user interface
+                     */
+                    'title' => $row['rubric_instance_title'],
+                    /* Mark Per Capability is used when the capability mark type is set to something other than None
+                     * Be careful of this fact, cos it's easy to === instead of !== if you're not paying attention
+                     */
+                    'isMarkPerCapability' => MarkType::SLUG_NONE !== MarkType::idToSlug($row['rubric_capability_mark_type_id']),
+                    /* Capabilities' Mark Type and Grade Group can be represented differently to their Assessments'
+                     * Mark Type and Grade Group
+                     */
+                    'capabilityMarkTypeId' => $row['capability_mark_type_id'],
+                    'capabilityGradeGroupId' => $row['capability_grade_group_id'],
+                    /* Capability Mark values. This would be relevant if you chose a Capability Mark Type to be
+                     * something other than NONE such as Percent, Letter Grade, Total Mark, etc.
+                     */
+                    'capabilities' => [
+                        /* This contains the descriptors that were selected for each indicator and exists per
+                         * capability: it's here for illustrative purposes and commented out for this reason
+                         */
+                        // 'indicators' => []
+                    ],
+                ];
+            }
 
-            $lastObservedAssessmentId = $row['assessment_id'];
-            $lastObservedCapabilityId = $row['capability_id'];
-            $lastObservedStudentId    = $row['student_id'];
+            /* Remember capability mark type output per grid: we only need to set this up once per capability
+             */
+            if (!isset($students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']])) {
+                $isMarkPerCapability = $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['isMarkPerCapability'];
+
+                /* Calculate normalised and human-readable marks if relevant: depends on $isMarkPerCapability being true
+                 */
+                $humanReadableMark = null;
+                $normalisedMark = null;
+
+                if ($isMarkPerCapability) {
+                    $marks = $this->generateMarkTuple(
+                        $this->decimalHydrator->hydrate($row['capability_mark'] ?? null),
+                        $this->decimalHydrator->hydrate($row['capability_max_value'] ?? null),
+                    );
+
+                    $normalisedMark = $marks['normalisedMark'];
+
+                    /* This is already extant from our db rows: we don't need to reverse engineer it for capabilities
+                     */
+                    $humanReadableMark = $row['capability_human_readable_mark'];
+                }
+
+                $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']] = [
+                    'name' => $row['capability_name'],
+                    /* Published normalised and human-readable marks from the authoritative feedback
+                     */
+                    'published' => [
+                        'normalisedMark' => $normalisedMark,
+                        'humanReadableMark' => $humanReadableMark,
+                        'selectedDescriptorText' => $row['descriptor_name'],
+                    ],
+                    /* Normalised and human-readable marks from the most recent feedback: these would typically be draft
+                     * marks, but could end up being the same as the Published ones by sheer coincidence.
+                     */
+                    'draft' => [
+                        'normalisedMark' => null,
+                        'humanReadableMark' => null,
+                        'selectedDescriptorText' => null,
+                    ],
+                    'indicators' => []
+                ];
+            }
+
+            /* Check whether the indicator was in the filter selections. If it was chosen, or if none of the filters
+             * were chosen, then we need to include it in that stack. As per andyland filters, filtering nothing means
+             * include everything.
+             */
+            if ($selectedIndicators === null || in_array((int)$row['indicator_id'], $selectedIndicators, true)) {
+                if (!isset($students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']])) {
+                    $marks = $this->generateMarkTuple(
+                        $this->decimalHydrator->hydrate($row['indicator_mark'] ?? null),
+                        $this->decimalHydrator->hydrate($row['indicator_max_value'] ?? null),
+                    );
+
+                    $normalisedMark = $marks['normalisedMark'];
+                    $humanReadableMark = $marks['humanReadableMark'];
+
+                    $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']] = [
+                        'name' => $row['indicator_name'],
+                        /* Published normalised and human-readable marks from the authoritative feedback
+                         */
+                        'published' => [
+                            'normalisedMark' => $normalisedMark,
+                            'humanReadableMark' => $humanReadableMark,
+                            'selectedDescriptorText' => $row['descriptor_name'],
+                        ],
+                        /* Normalised and human-readable marks from the most recent feedback: these would typically be draft
+                         * marks, but could end up being the same as the Published ones by sheer coincidence.
+                         */
+                        'draft' => [
+                            'normalisedMark' => null,
+                            'humanReadableMark' => null,
+                            'selectedDescriptorText' => null,
+                        ],
+                    ];
+                }
+            }
         }
+
         return $students;
     }
 
     /**
-     * Find each student in a folder and their draft marks (if extant), and return an array indexed by student ID
+     * Synonymously with how retrievePublishedMarks() worked, but it takes the result of that method and fills in the
+     * draft marks for capabilities and indicators using an almost-identical query, basically appending extra data to
+     * the result of retrievePublishedMarks().
      *
-     * dupe of retrieveDatabaseMarks
+     * v_most_recent_rubric_mark view is used instead of v_rubric_mark. Joining two views is probably a costly affair,
+     * but it's cheaper than doing it any other way.
+     *
+     * TODO This is an egregious mega copypasta which surely could be refactored for brevity
      *
      * @param array<int,array> $assessments
-     * @param null|array       $selectedCapabilities Null if rubricUsage filter not enabled for page
-     * @param null|array       $selectedIndicators   Null if rubricUsage filter not enabled for page
-     * @param array            $students             The array of student values which will already contian published, we are adding only the draft marks
+     * @param null|array $selectedCapabilities Null if rubricUsage filter not enabled for page
+     * @param null|array $selectedIndicators Null if rubricUsage filter not enabled for page
+     * @param array $exclusions
+     * @param array $students The array of student values which will already contian published, we are adding only the draft marks
      * @return array
-     * @throws Database\Exception
-     * @throws Database\Predicate\InvalidColumnException
-     * @throws UnderflowException
+     * @throws RouteNotFound
      */
-    private function retrieveDatabaseDraftMarks(array $assessments, ?array $selectedCapabilities, ?array $selectedIndicators, array $students): array
-    {
+    private function retrieveDraftMarks(
+        array $assessments,
+        ?array $selectedCapabilities,
+        ?array $selectedIndicators,
+        array $exclusions,
+        array $students
+    ): array {
         // Don't load marks if no assessments.
         if (!count($assessments)) {
             return $students;
@@ -652,12 +818,12 @@ class Controller extends Base
             return $assessments;
         }
 
-        $innerPb    = (new Database\Predicate\Builder($this->internalDb->getQuoter(), ''))
-            ->isNull('sr.deleted_at')
-            ->equals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
-            ->in('sb.assessment_id', array_keys($assessments));
+        /* Effectively a safe shortcut to an IN() clause
+         */
+        $assessmentIds = array_keys($assessments);
 
-        $innerWhere = implode(' AND ', $innerPb->getWhere());
+        $assessmentsPlaceholder = Builder::getArrayPlaceholders($assessmentIds, 'assessmentIds');
+        $assessmentsParameters = Builder::getArrayParameters($assessmentIds, 'assessmentIds');
 
         $outerPb = (new Database\Predicate\Builder($this->internalDb->getQuoter(), ''))
             ->equals('vrm.feedback_type', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
@@ -678,22 +844,28 @@ class Controller extends Base
         $getAuthoritativeMarksQuery = $this->internalDb->prepareQuery(
             "
                 SELECT
-                    vrm.assessment_id                  AS assessment_id,
-                    vrm.student_id                     AS student_id,
-                    u.firstname                        AS student_firstname,
-                    u.preferred_name                   AS student_preferred_name,
-                    u.lastname                         AS student_lastname,
-                    vrm.capability_id                  AS capability_id,
-                    vrm.capability_mark                AS capability_mark,
-                    vrm.capability_human_readable_mark AS capability_human_readable_mark,
-                    vrm.capability_max_value           AS capability_max_value,
-                    vrm.capability_mark_type_id        AS capability_mark_type_id,
-                    vrm.capability_grade_group_id      AS capability_grade_group_id,
-                    vrm.descriptor_name                AS descriptor_name,
-                    vrm.indicator_id                   AS indicator_id,
-                    vrm.indicator_mark                 AS indicator_mark,
-                    vrm.indicator_max_value            AS indicator_max_value,
-                    vrm.feedback_date                  AS feedback_date
+                    vrm.assessment_id                              AS assessment_id,
+                    vrm.student_id                                 AS student_id,
+                    u.firstname                                    AS student_firstname,
+                    u.preferred_name                               AS student_preferred_name,
+                    u.lastname                                     AS student_lastname,
+                    rubric_instance.id                             AS rubric_instance_id,
+                    rubric_instance.title                          AS rubric_instance_title,
+                    rubric_instance.rubric_capability_mark_type_id AS rubric_capability_mark_type_id,
+                    rubric_instance.weight                         AS rubric_instance_weight,
+                    vrm.capability_id                              AS capability_id,
+                    vrm.capability_name                            AS capability_name,
+                    vrm.capability_mark                            AS capability_mark,
+                    vrm.capability_human_readable_mark             AS capability_human_readable_mark,
+                    vrm.capability_max_value                       AS capability_max_value,
+                    vrm.capability_mark_type_id                    AS capability_mark_type_id,
+                    vrm.capability_grade_group_id                  AS capability_grade_group_id,
+                    vrm.descriptor_name                            AS descriptor_name,
+                    vrm.indicator_id                               AS indicator_id,
+                    vrm.indicator_name                             AS indicator_name,
+                    vrm.indicator_mark                             AS indicator_mark,
+                    vrm.indicator_max_value                        AS indicator_max_value,
+                    vrm.feedback_date                              AS feedback_date
                 FROM (
                     SELECT
                         sb.assessment_id,
@@ -701,113 +873,225 @@ class Controller extends Base
                         MAX(sr.updated_at) AS max_updated_at
                     FROM submission_return sr
                     INNER JOIN submission_box sb on sr.box_id = sb.id
-                    WHERE {$innerWhere}
+                    WHERE sr.deleted_at IS NULL
+                    AND sr.review_route = :reviewRoute
+                    AND sb.assessment_id IN {$assessmentsPlaceholder}
                     GROUP BY sb.assessment_id, sr.owner
-                ) latest_feedback
+                ) latest_draft_feedback
                 INNER JOIN v_most_recent_rubric_mark vrm ON
-                    vrm.updated_date = latest_feedback.max_updated_at AND
-                    vrm.assessment_id = latest_feedback.assessment_id AND
-                    vrm.student_id    = latest_feedback.owner AND
-                    vrm.feedback_date is null
+                    vrm.updated_date = latest_draft_feedback.max_updated_at AND
+                    vrm.assessment_id = latest_draft_feedback.assessment_id AND
+                    vrm.student_id    = latest_draft_feedback.owner AND
+                    vrm.feedback_date IS NULL
+                INNER JOIN rubric_instance ON vrm.rubric_instance_id = rubric_instance.id
                 INNER JOIN user u ON vrm.student_id = u.id
                 WHERE {$outerWhere}
+                AND rubric_instance.deleted_at IS NULL
                 ORDER BY vrm.student_id, vrm.assessment_id, vrm.capability_id, vrm.indicator_id
             ",
-            array_merge($innerPb->getParams(), $outerPb->getParams()),
+            array_merge(
+                $assessmentsParameters,
+                $outerPb->getParams(),
+                [
+                    'reviewRoute' => ReturnedWork::REVIEW_ROUTE_INSTRUCTOR
+                ]
+            ),
         );
 
-        $assessmentsForStudent = [];
-        $capabilityMarks       = [];
-        $indicatorMarks        = [];
-
-        $lastObservedAssessmentId = null;
-        $lastObservedCapabilityId = null;
-        $lastObservedStudentId    = null;
-
+        /* This adds draft marks into the $students struct we built earlier.
+         *
+         * We should be able to assume that $students already contains the superset of this data struct; a row from
+         * v_most_recent_rubric_mark must be a subset of v_rubric_mark. Anything else seems broken to me
+         *
+         * TODO this repeats calculations that are destined to be the same; implement a skip-if-already-calculated to
+         *  save some cycles, ie. a (student, assessment, capability id) and (student, assessment, indicator id)
+         *  hash lookup so we can skip repeatedly calculating the same data
+         */
         foreach ($getAuthoritativeMarksQuery->getIterator() as $i => $row) {
-            if ($lastObservedStudentId !== $row['student_id']) {
-                // Has the student we're looking at changed? Reset the list of assessments for them
-                $assessmentsForStudent = [];
-            }
-
-            if ($lastObservedAssessmentId !== $row['assessment_id']) {
-                // Has the assessment we're looking at changed? Reset the capabilities
-                $capabilityMarks = [];
-            }
-
-            if ($lastObservedCapabilityId !== $row['capability_id']) {
-                // Has the capability we're looking at changed? Reset the indicators
-                $indicatorMarks = [];
-            }
-
-            if ($selectedIndicators === null || in_array((int)$row['indicator_id'], $selectedIndicators, true)) {
-                $indicatorMarks[$row['indicator_id']] = [
-                    'databaseMark'           => $row['indicator_mark'],
-                    'maxMark'                => $row['indicator_max_value'],
-                    'selectedDescriptorText' => $row['descriptor_name'],
-                ];
-            }
-
-            $capData = [
-                'indicators' => $indicatorMarks,
-            ];
-            $isMarkPerCapability = $assessments[$row['assessment_id']]['isMarkPerCapability'] ?? false;
-            if ($assessments[$row['assessment_id']]['capabilities'][$row['capability_id']]['show']) {
-                    $capData['databaseMark']      = $isMarkPerCapability ? $row['capability_mark'] : null;
-                    $capData['humanReadableMark'] = $isMarkPerCapability ? $row['capability_human_readable_mark'] : null;
-                    $capData['maxMark']           = $row['capability_max_value'];
-
-                    /* Capabilities' Mark Type and Grade Group can be represented differently to
-                     * their Assessments' Mark Type and Grade Group
-                     */
-                    $capData['capabilityMarkTypeId']   = $row['capability_mark_type_id'];
-                    $capData['capabilityGradeGroupId'] = $row['capability_grade_group_id'];
-            }
-            $capabilityMarks[$row['capability_id']] = $capData;
-
-            $assessmentsForStudent[$row['assessment_id']] = [
-                'capabilities' => $capabilityMarks,
-            ];
-
-            if (isset($students[$row['student_id']])) {
-                /**
-                 * student array already exists (they have some published marks, just add these draft marks)
-                 * Stuff everything about the students marks into an array
-                 */
-                $students[$row['student_id']]['assessmentsLatest'] = $assessmentsForStudent;
-            } else {
-                /**
-                 * Student doesn't exist (only has draft marks, need to build the base student array
-                 */
+            /* Set up a student node if it didn't already exist; we only need to set it up once
+             */
+            if (!isset($students[$row['student_id']])) {
                 $students[$row['student_id']] = [
-                    'firstname'      => $row['student_firstname'],
+                    'firstname' => $row['student_firstname'],
                     'preferred_name' => $row['student_preferred_name'],
-                    'lastname'       => $row['student_lastname'],
-                    'assessmentsLatest'    => $assessmentsForStudent,
-                    'profileLink'    => '/search/user/' . $row['student_id'],
+                    'lastname' => $row['student_lastname'],
+                    'profileLink' => sprintf(
+                        '/search/user/%s',
+                        $row['student_id']
+                    ),
+                    /* gridData is a struct containing capability and indicator marks, grouped by assessment and rubric
+                     * instance ids, like this:
+                     *
+                     * gridData => [
+                     *     assessment id => [
+                     *         rubric instance id => [
+                     *             rubric instance settings, like
+                     *                 - is mark per capability
+                     *                 - capability mark type id
+                     *                 - capability grade group id
+                     *             capabilities (capability data) => [
+                     *                 capability mark type info
+                     *                 capability mark values if relevant to this grid's settings
+                     *                 indicators (indicator data) => [
+                     *                     database marks
+                     *                     max marks
+                     *                     selected descriptor text
+                     *                 ]
+                     *             ]
+                     *         ]
+                     *     ]
+                     * ]
+                     */
+                    'gridData' => []
                 ];
             }
 
-            $lastObservedAssessmentId = $row['assessment_id'];
-            $lastObservedCapabilityId = $row['capability_id'];
-            $lastObservedStudentId    = $row['student_id'];
-        }
-        return $students;
-    }
+            /* Cram in a link to the assessment's summary screen for a particular student if it didn't already exist
+             */
+            if (!isset($students[$row['student_id']]['assessments'][$row['assessment_id']])) {
+                $students[$row['student_id']]['assessments'][$row['assessment_id']] = [
+                    'summaryLink' => $this->routeGenerator->generate(
+                        'learningAssessment.getSummary',
+                        [
+                            'studentId' => $row['student_id'],
+                            'assessmentId' => $row['assessment_id'],
+                        ],
+                    )
+                ];
+            }
 
+            /* If this student's been excluded, we can skip processing their data if it exists.
+             *
+             * TODO you can probably find a way to convert this to a ->notIn clause to restrict the database's result
+             *  set instead of fetching it only to ignore it
+             */
+            if (isset($exclusions[$row['assessment_id']][$row['student_id']])) {
+                continue;
+            }
 
-    /**
-     * Collate the human readable marks for both published and latest (draft) student marks then return them in a student marks array
-     *
-     * @param array $students
-     * @param array $assessments
-     * @return array
-     */
-    private function collateHumanReadableMarks(array $students, array $assessments): array
-    {
-        foreach ($students as $studentId => $student) {
-            $students = $this->generateHumanReadableMarks($students, $student['assessmentsPublished'] ?? [], $studentId, 'assessmentsPublished');
-            $students = $this->generateHumanReadableMarks($students, $student['assessmentsLatest'] ?? [], $studentId, 'assessmentsLatest');
+            /* Remember settings for the rubric instance that we're encountering, such as the rubric instance's mark per
+             * capability setting, etc. if it hasn't already been set. We only need to set it up once.
+             */
+            if (!isset($students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']])) {
+                $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']] = [
+                    /* Obviously so you can see which grid is which, by its name, on the user interface
+                     */
+                    'title' => $row['rubric_instance_title'],
+                    /* Mark Per Capability is used when the capability mark type is set to something other than None
+                     * Be careful of this fact, cos it's easy to === instead of !== if you're not paying attention
+                     */
+                    'isMarkPerCapability' => MarkType::SLUG_NONE !== MarkType::idToSlug($row['rubric_capability_mark_type_id']),
+                    /* Capabilities' Mark Type and Grade Group can be represented differently to their Assessments'
+                     * Mark Type and Grade Group
+                     */
+                    'capabilityMarkTypeId' => $row['capability_mark_type_id'],
+                    'capabilityGradeGroupId' => $row['capability_grade_group_id'],
+                    /* Capability Mark values. This would be relevant if you chose a Capability Mark Type to be
+                     * something other than NONE such as Percent, Letter Grade, Total Mark, etc.
+                     */
+                    'capabilities' => [
+                        /* This contains the descriptors that were selected for each indicator and exists per
+                         * capability: it's here for illustrative purposes and commented out for this reason
+                         */
+                        // 'indicators' => []
+                    ],
+                ];
+            }
+
+            /* Remember capability mark type output per grid: we only need to set this up once per capability
+             * Establish this node in the hash lookup if it didn't already exist: this occurs when there is no prior
+             * published feedback (only a draft feedback exists)
+             */
+            if (!isset($students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']])) {
+                $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']] = [
+                    'name' => $row['capability_name'],
+                    /* Published normalised and human-readable marks from the authoritative feedback
+                     */
+                    'published' => [
+                        'normalisedMark' => null,
+                        'humanReadableMark' => null,
+                        'selectedDescriptorText' => null,
+                    ],
+                    /* Normalised and human-readable marks from the most recent feedback: these would typically be draft
+                     * marks, but could end up being the same as the Published ones by sheer coincidence.
+                     */
+                    'draft' => [
+                        'normalisedMark' => null,
+                        'humanReadableMark' => null,
+                        'selectedDescriptorText' => null,
+                    ],
+                    'indicators' => []
+                ];
+            }
+
+            $isMarkPerCapability = $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['isMarkPerCapability'];
+
+            /* Calculate normalised and human-readable marks if relevant: depends on $isMarkPerCapability being true
+             */
+            $humanReadableMark = null;
+            $normalisedMark = null;
+
+            if ($isMarkPerCapability) {
+                $marks = $this->generateMarkTuple(
+                    $this->decimalHydrator->hydrate($row['capability_mark'] ?? null),
+                    $this->decimalHydrator->hydrate($row['capability_max_value'] ?? null),
+                );
+
+                $normalisedMark = $marks['normalisedMark'];
+
+                /* This is already extant from our db rows: we don't need to reverse engineer it for capabilities
+                 */
+                $humanReadableMark = $row['capability_human_readable_mark'];
+            }
+
+            $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['draft'] = [
+                'normalisedMark' => $normalisedMark,
+                'humanReadableMark' => $humanReadableMark,
+            ];
+
+            /* Check whether the indicator was in the filter selections. If it was chosen, or if none of the filters
+             * were chosen, then we need to include it in that stack. As per andyland filters, filtering nothing means
+             * include everything.
+             */
+            if ($selectedIndicators === null || in_array((int)$row['indicator_id'], $selectedIndicators, true)) {
+                /* Establish this node in the hash lookup if it didn't already exist: this occurs when there is no prior
+                 * published feedback (only a draft feedback exists)
+                 */
+                if (!isset($students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']])) {
+                    $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']] = [
+                        'name' => $row['indicator_name'],
+                        /* Published normalised and human-readable marks from the authoritative feedback
+                         */
+                        'published' => [
+                            'normalisedMark' => null,
+                            'humanReadableMark' => null,
+                            'selectedDescriptorText' => null,
+                        ],
+                        /* Normalised and human-readable marks from the most recent feedback: these would typically be draft
+                         * marks, but could end up being the same as the Published ones by sheer coincidence.
+                         */
+                        'draft' => [
+                            'normalisedMark' => null,
+                            'humanReadableMark' => null,
+                            'selectedDescriptorText' => null,
+                        ],
+                    ];
+                }
+
+                $marks = $this->generateMarkTuple(
+                    $this->decimalHydrator->hydrate($row['indicator_mark'] ?? null),
+                    $this->decimalHydrator->hydrate($row['indicator_max_value'] ?? null),
+                );
+
+                $normalisedMark = $marks['normalisedMark'];
+                $humanReadableMark = $marks['humanReadableMark'];
+
+                $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['draft'] = [
+                    'normalisedMark' => $normalisedMark,
+                    'humanReadableMark' => $humanReadableMark,
+                    'selectedDescriptorText' => $row['descriptor_name']
+                ];
+            }
         }
 
         return $students;
@@ -817,7 +1101,6 @@ class Controller extends Base
     /**
      * Combine users who have marks with students and learners who are in the class or group, but have no marks yet
      *
-     * @param array        $studentMarks
      * @param Folder\Model $folder
      * @return array
      * @throws Database\Predicate\InvalidColumnException
@@ -827,17 +1110,31 @@ class Controller extends Base
      * @throws PDOException
      * @throws UnderflowException
      */
-    private function insertFolderMembers(array $studentMarks, Folder\Model $folder): array
+    private function insertFolderMembers(Folder\Model $folder): array
     {
         $studentsAndLearners = $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, true, true);
+
+        $studentMarks = [];
+
         foreach ($studentsAndLearners as $user) {
             $userId = $user->getId();
+
             if (!isset($studentMarks[$userId])) {
+                /* Note that this is supposed to be the same data struct as seen i retrievePublishedMarks() and
+                 * retrieveDraftMarks() where it progressively builds a hash lookup
+                 *
+                 * This method adds guys who didn't have any database marks (draft or otherwise) to ensure nobody is
+                 * left out of the rubric markbook
+                 */
                 $studentMarks[$userId] = [
-                    'firstname'   => $user->getFirstname(),
-                    'lastname'    => $user->getLastname(),
-                    'profileLink' => '/search/user/' . $userId,
-                    'assessments' => [],
+                    'firstname' => $user->getFirstname(),
+                    'preferred_name' => $user->getPreferredName(),
+                    'lastname' => $user->getLastname(),
+                    'profileLink' => sprintf(
+                        '/search/user/%s',
+                        $userId
+                    ),
+                    'gridData' => [],
                 ];
             }
         }
@@ -867,12 +1164,13 @@ class Controller extends Base
     private function getExclusions(array $assessmentIds): array
     {
         $exclusions = [];
+
         if (!count($assessmentIds)) {
             return $exclusions;
         }
 
         $bindings = Database\Predicate\Builder::getBindings($assessmentIds, 'a_id');
-        $sql      = "
+        $sql = "
             SELECT
                 a.id      AS assessment_id,
                 p.user_id AS user_id
@@ -887,44 +1185,15 @@ class Controller extends Base
         ";
 
         $statement = $this->internalDb->executeQuery($sql, $bindings->getParams());
+
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch()) {
-            $exclusions[$row['assessment_id']][] = (int)$row['user_id'];
+            $userId = (int)$row['user_id'];
+
+            $exclusions[$row['assessment_id']][$userId] = $userId;
         }
+
         return $exclusions;
-    }
-
-
-    /**
-     * Insert summary page links for each student/assessment
-     *
-     * @param mixed[] $studentMarks  Indexed by userId
-     * @param int[]   $assessmentIds Indexed by assessmentId
-     * @param int[][] $exclusions    Indexed by assessmentId, userId
-     * @return array
-     * @throws Router\Exception\RouteNotFound
-     */
-    private function insertSummaryPageLinks(array $studentMarks, array $assessmentIds, array $exclusions): array
-    {
-        // Ensure each student has a summary link, even if they have no marks
-        foreach (array_keys($studentMarks) as $studentId) {
-            foreach ($assessmentIds as $assessmentId) {
-                if (array_key_exists($assessmentId, $exclusions) && in_array($studentId, $exclusions[$assessmentId], true)) {
-                    unset($studentMarks[$studentId]['assessments'][$assessmentId]);
-                    continue;
-                }
-                $summaryLink = $this->routeGenerator->generate(
-                    'learningAssessment.getSummary',
-                    [
-                        'studentId'    => $studentId,
-                        'assessmentId' => $assessmentId,
-                    ]
-                );
-                $studentMarks[$studentId]['assessments'][$assessmentId]['summaryLink'] = $summaryLink;
-            }
-        }
-
-        return $studentMarks;
     }
 
 
@@ -932,26 +1201,32 @@ class Controller extends Base
      * Iterates student individual marks to return overall student marks for capabilities and indicators
      *
      * @param array $assessments
-     * @param array $linkedMarks
-     * @param Folder\Model $folder
+     * @param array $studentMarks
+     * @param array $exclusions
+     * @param Model $folder
+     * @param bool $includeDiagnostics Adds the individual calculations as a frontend payload so you can see it in prod
      * @return array
-     * @throws InvalidArgumentException
-     * @throws RangeException
      */
-    private function buildOverallMarks(array $assessments, array $linkedMarks, Folder\Model $folder): array
-    {
-        $overallMarks = $this->aggregateMarks($assessments, $linkedMarks);
+    private function buildOverallMarks(
+        array $assessments,
+        array $studentMarks,
+        array $exclusions,
+        Folder\Model $folder,
+        bool $includeDiagnostics = false
+    ): array {
+        $overallMarks = $this->aggregateMarks($assessments, $studentMarks, $exclusions, $folder, $includeDiagnostics);
 
-        $summated = $this->summateAggregatedMarks($overallMarks, $folder);
-
-        foreach ($summated as &$capability) {
+        foreach ($overallMarks as &$capability) {
             uasort($capability['indicators'], [$this, 'sortByName']);
         }
-        unset($capability);
-        uasort($summated, [$this, 'sortByName']);
 
-        return $summated;
+        unset($capability);
+
+        uasort($overallMarks, [$this, 'sortByName']);
+
+        return $overallMarks;
     }
+
 
     /**
      * Quick alpha sort function for indicators and capabilities summary section
@@ -959,22 +1234,360 @@ class Controller extends Base
      * @param array $b
      * @return int
      */
-    private function sortByName($a, $b)
+    private function sortByName(array $a, array $b): int
     {
         return strnatcasecmp($a['name'], $b['name']);
     }
 
+
     /**
-     * Resolves the aggregated counts to summate final capability/indicator marks
+     * Iterates individual student marks to build the weighted sums per capability and indicator
      *
-     * @param array $overallMarks
-     * @param Folder\Model $folder
+     * @param array $assessments
+     * @param array $studentMarks
+     * @param array $exclusions
+     * @param Model $folder
+     * @param bool $includeDiagnostic
      * @return array
-     * @throws InvalidArgumentException
-     * @throws RangeException
      */
-    private function summateAggregatedMarks(array $overallMarks, Folder\Model $folder): array
+    private function aggregateMarks(array $assessments, array $studentMarks, array $exclusions, Folder\Model $folder, bool $includeDiagnostic): array
     {
+        /* Non-iterable Coefficients Lookup
+         *
+         * Coefficients of a weighted sum algorithm are tabulated here, per student, for convenience.
+         * This saves you having to constantly traverse data sets to get something for the WeightedAggregator formula.
+         *
+         * NOTE That this is intended as a HASH LOOKUP ONLY.
+         * IT IS NOT intended for you to foreach() because of its intentional structure.
+         *
+         * I didn't really have the time or inclination to convert this to a tightly-typed struct with limited access.
+         * The next evolution of this would be a defined object, Coefficients, which is immutable: pass $assessments
+         * as a dependency, ->generate(), and only have read methods to a coordinate in the struct. This would make it
+         * effectively readonly once generated.
+         */
+
+        /* $coefficients is a set of supposedly-convenient values that we can quickly reference
+         *
+        $coefficient['assessments'][$assessmentId]
+          The weight of an individual assessment.
+
+        $coefficients['grids'][$rubricInstanceId]
+          The weight of a particular rubric grid.
+
+        $coefficients['grids']['assessments'][$assessmentId]
+          The total weight of the rubric grids in $assessmentId. This is used to calculate a weight sum of each rubric
+          grid's contribution to the overall value.
+
+        $coefficients[capability][$capabilityId][student][$studentId]['totalAssessmentWeight']['published']
+          The total weight of the capability's usages across all the assessments where the student had a mark.
+          This aggregates toward a denominator for "assessment total weight" for this constituent of a rubric grid.
+          It only accumulates if a student had a mark in it; this denominator is specifically for a particular guy
+          There's a "published" and "draft" variants of this
+
+        $coefficients[capability][$capabilityId][indicators][student][$studentId]['totalAssessmentWeight']['published']
+          The total weight of the indicator's usages across all the assessments where the student had a mark.
+          This aggregates toward a denominator for "assessment total weight" for this constituent of a rubric grid.
+          It only accumulates if a student had a mark in it; this denominator is specifically for a particular guy
+          There's a "published" and "draft" variants of this
+        */
+        $coefficients = [];
+
+        /* Precalculate all the coefficients now that we have assembled $assessments in its entirety with all its
+         * capabilities and indicators and their max_values.
+         */
+        $overallMarks = [];
+
+        foreach ($assessments as $assessmentId => $assessmentData) {
+            $coefficients['assessments'][$assessmentId] = $assessmentData['weight'];
+
+            foreach ($assessmentData['gridData'] as $rubricInstanceId => $rubricGridData) {
+                if (!isset($coefficients['grids']['assessments'][$assessmentId])) {
+                    $coefficients['grids']['assessments'][$assessmentId] = [
+                        'totalGridWeight' => 0,
+                    ];
+                }
+
+                /* Total weight of all the grids in a particular assessment
+                 */
+                $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'] += $rubricGridData['weight'];
+                $coefficients['grids'][$rubricInstanceId] = $rubricGridData['weight'] ? (float)$rubricGridData['weight'] : null;
+
+                /* Set up OverallMarks struct
+                 *
+                 * This pre-compiles capability/indicator structs while we're traversing this $assessments struct.
+                 * It used to be split out into its own traversal
+                 */
+                foreach ($rubricGridData['capabilities'] as $capabilityId => $capabilityData) {
+                    if (!isset($overallMarks[$capabilityId])) {
+                        $overallMarks[$capabilityId] = [
+                            'name' => $capabilityData['name'],
+                            /* What each student got for this capability
+                             * Contains a "published" and "draft" node
+                             */
+                            'students' => [],
+                            /* The indicators used in this capability
+                             */
+                            'indicators' => [],
+                        ];
+                    }
+
+                    foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
+                        if (!isset($overallMarks[$capabilityId]['indicators'][$indicatorId])) {
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId] = [
+                                'name' => $indicatorData['name'],
+                                /* What each student got for this indicator
+                                 * Contains a "published" and "draft" node
+                                 */
+                                'students' => []
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+
+        /* Precompute denominators for each student's capabilities and indicators
+         */
+        foreach ($studentMarks as $studentId => $studentData) {
+            foreach ($studentData['gridData'] as $assessmentId => $rubricInstanceData) {
+                foreach ($rubricInstanceData as $rubricInstanceId => $rubricGridData) {
+                    foreach ($rubricGridData['capabilities'] as $capabilityId => $capabilityData) {
+                        if (null !== $capabilityData['published']['normalisedMark']) {
+                            /* Initialise and add it to the published capability total for this guy
+                             */
+                            if (!isset($coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['published'])) {
+                                $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['published'] = 0;
+                            }
+
+                            $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['published'] += $coefficients['assessments'][$assessmentId];
+                        }
+
+                        if (null !== $capabilityData['draft']['normalisedMark']) {
+                            /* Initialise and add it to the draft capability total for this guy
+                             */
+                            if (!isset($coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['draft'])) {
+                                $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['draft'] = 0;
+                            }
+
+                            $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['draft'] += $coefficients['assessments'][$assessmentId];
+                        }
+
+                        foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
+                            if (null !== $indicatorData['published']['normalisedMark']) {
+                                /* Initialise and add it to the published indicator total for this guy
+                                 */
+                                if (!isset($coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['published'])) {
+                                    $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['published'] = 0;
+                                }
+
+                                $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['published'] += $coefficients['assessments'][$assessmentId];
+                            }
+
+                            if (null !== $indicatorData['draft']['normalisedMark']) {
+                                /* Initialise and add it to the draft indicator total for this guy
+                                 */
+                                if (!isset($coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['draft'])) {
+                                    $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['draft'] = 0;
+                                }
+
+                                $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['draft'] += $coefficients['assessments'][$assessmentId];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /* Now precompute overall marks for each student.
+         *
+         * This is something of a dirty secret but the normalised mark we compute for each capability and indicator are
+         * converted into a Letter Grade equivalent for human-readable values. These are defined in admin via the Year
+         * Level lists: there's a doodad that lets you choose a grade group to for Overall Grade values.
+         *
+         * It just so happens that this Letter Grade equivalent might actually be a number which is why, at first glance,
+         * the rubric markbook data might "look wrong" but actually isn't.
+         *
+         * This is a massive configuration at a distance and totally not obvious lol unless you're an actual teacher...
+         */
+        $aggregator = new WeightedAggregator();
+
+        foreach ($studentMarks as $studentId => $studentData) {
+            foreach ($studentData['gridData'] as $assessmentId => $rubricInstanceData) {
+                foreach ($rubricInstanceData as $rubricInstanceId => $rubricGridData) {
+                    foreach ($rubricGridData['capabilities'] as $capabilityId => $capabilityData) {
+                        /* Excluded guys get null for this calculation
+                         */
+                        if (!isset($overallMarks[$capabilityId]['students'][$studentId])) {
+                            $overallMarks[$capabilityId]['students'][$studentId] = [
+                                'published' => [
+                                    'normalisedMark' => null,
+                                    'humanReadableMark' => null,
+                                    'reasoning' => [],
+
+                                ],
+                                'draft' => [
+                                    'normalisedMark' => null,
+                                    'humanReadableMark' => null,
+                                    'reasoning' => [],
+                                ],
+                            ];
+                        }
+
+                        if (!isset($exclusions[$assessmentId][$studentId])) {
+                            /* Published capability mark for this student
+                             */
+                            $val = $aggregator->calculate(
+                                $coefficients['assessments'][$assessmentId],
+                                $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['published'] ?? null,
+                                $coefficients['grids'][$rubricInstanceId],
+                                $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'],
+                                /* This is a value between 0-100; $aggregator does the division internally to convert this
+                                 * value appropriately. It's a byproduct of assembling data that we've augmented earlier.
+                                 */
+                                $capabilityData['published']['normalisedMark'],
+                                sprintf(
+                                    'Assessment %s',
+                                    $assessmentId,
+                                ),
+                            );
+
+                            /* Only aggregate if not null
+                             */
+                            if (null !== $val) {
+                                $overallMarks[$capabilityId]['students'][$studentId]['published']['normalisedMark'] += $val['val'];
+
+                                /* You could compound $val's diagnostic here if you wanted to expose it on the frontend as a tooltip or something
+                                 * because debugging this in prod will not be easy without being able to see the math behind it.
+                                 */
+                                if ($includeDiagnostic) {
+                                    $overallMarks[$capabilityId]['students'][$studentId]['published']['reasoning'][] = $val['diagnostic'];
+                                }
+                            }
+
+                            /* Draft capability mark for this student
+                             */
+                            $val = $aggregator->calculate(
+                                $coefficients['assessments'][$assessmentId],
+                                $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['draft'] ?? null,
+                                $coefficients['grids'][$rubricInstanceId],
+                                $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'],
+                                /* This is a value between 0-100; $aggregator does the division internally to convert this
+                                 * value appropriately. It's a byproduct of assembling data that we've augmented earlier.
+                                 */
+                                $capabilityData['draft']['normalisedMark'],
+                                sprintf(
+                                    'Assessment %s (draft)',
+                                    $assessmentId,
+                                ),
+                            );
+
+                            /* Only aggregate if not null
+                             */
+                            if (null !== $val) {
+                                $overallMarks[$capabilityId]['students'][$studentId]['draft']['normalisedMark'] += $val['val'];
+
+                                /* You could compound $val's diagnostic here if you wanted to expose it on the frontend as a tooltip or something
+                                 * because debugging this in prod will not be easy without being able to see the math behind it.
+                                 */
+                                if ($includeDiagnostic) {
+                                    $overallMarks[$capabilityId]['students'][$studentId]['draft']['reasoning'][] = $val['diagnostic'];
+                                }
+                            }
+                        }
+
+                        /* Now dig into each indicator within this capability and aggregate their values in a very
+                         * similar fashion.
+                         */
+                        foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
+                            /* Excluded guys get null for this calculation
+                             */
+                            if (!isset($overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId])) {
+                                $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId] = [
+                                    'published' => [
+                                        'normalisedMark' => null,
+                                        'humanReadableMark' => null,
+                                        'reasoning' => [],
+                                    ],
+                                    'draft' => [
+                                        'normalisedMark' => null,
+                                        'humanReadableMark' => null,
+                                        'reasoning' => [],
+                                    ],
+                                ];
+                            }
+
+                            if (!isset($exclusions[$assessmentId][$studentId])) {
+                                /* Published indicator mark for this student
+                                 */
+                                $val = $aggregator->calculate(
+                                    $coefficients['assessments'][$assessmentId],
+                                    $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['published'] ?? null,
+                                    $coefficients['grids'][$rubricInstanceId],
+                                    $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'],
+                                    /* This is a value between 0-100; $aggregator does the division internally to convert this
+                                     * value appropriately. It's a byproduct of assembling data that we've augmented earlier.
+                                     */
+                                    $indicatorData['published']['normalisedMark'],
+                                    sprintf(
+                                        'Assessment %s',
+                                        $assessmentId,
+                                    ),
+                                );
+
+                                /* Only aggregate if not null
+                                 */
+                                if (null !== $val) {
+                                    $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['published']['normalisedMark'] += $val['val'];
+
+                                    /* You could compound $val's diagnostic here if you wanted to expose it on the frontend as a tooltip or something
+                                     * because debugging this in prod will not be easy without being able to see the math behind it.
+                                     */
+                                    if ($includeDiagnostic) {
+                                        $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['published']['reasoning'][] = $val['diagnostic'];
+                                    }
+                                }
+
+                                /* Draft indicator mark for this student
+                                 */
+                                $val = $aggregator->calculate(
+                                    $coefficients['assessments'][$assessmentId],
+                                    $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['draft'] ?? null,
+                                    $coefficients['grids'][$rubricInstanceId],
+                                    $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'],
+                                    /* This is a value between 0-100; $aggregator does the division internally to convert this
+                                     * value appropriately. It's a byproduct of assembling data that we've augmented earlier.
+                                     */
+                                    $indicatorData['draft']['normalisedMark'],
+                                    sprintf(
+                                        'Assessment %s (draft)',
+                                        $assessmentId,
+                                    ),
+                                );
+
+                                /* Only aggregate if not null
+                                 */
+                                if (null !== $val) {
+                                    $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['draft']['normalisedMark'] += $val['val'];
+
+                                    /* You could compound $val's diagnostic here if you wanted to expose it on the frontend as a tooltip or something
+                                     * because debugging this in prod will not be easy without being able to see the math behind it.
+                                     */
+                                    if ($includeDiagnostic) {
+                                        $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['draft']['reasoning'][] = $val['diagnostic'];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /* lol in $overallMarks, all the normalisedMark values are represented as fractions of 100, e.g. 0.99
+         * This needs to be converted to is non-fractional equivalent: i.e. 99 instead of 0.99
+         *
+         * This is for compatibility with MarkScheme classes that are used to derive human-readable values.
+         */
         /**
          * Logic for the mark scheme...
          *
@@ -985,212 +1598,90 @@ class Controller extends Base
         $markSchemeFactory = new Factory($this->getConfigLoader());
         $markScheme = $markSchemeFactory->spawnForFolder($folder, true);
 
-        foreach ($overallMarks as $capabilityId => $capabilityMarks) {
-            foreach ($capabilityMarks['marks'] as $studentId => $sums) {
-                $sumNormalised      = $sums['sumNormalised'];
-                $sumWeight          = $sums['sumWeight'];
-                $latestSumNormalised = $sums['latestSumNormalised'];
-                $latestSumWeight     = $sums['latestSumWeight'];
-                if (!$sumWeight && !$latestSumWeight) {
-                    // nothing exists, so remove this...
-                    unset($overallMarks[$capabilityId]['marks'][$studentId]);
-                } else {
-                    // only dump things into the array that actually exist...
-                    $overallMarks[$capabilityId]['marks'][$studentId] = [];
-                    if ($sumWeight) {
-                        $normalised = $sumNormalised / $sumWeight;
-                        $overallMarks[$capabilityId]['marks'][$studentId]['normalised'] = $normalised;
-                        $overallMarks[$capabilityId]['marks'][$studentId]['humanReadable'] = $markScheme->getHumanReadableMark($normalised);
-                        $overallMarks[$capabilityId]['marks'][$studentId]['latestNormalised'] = $normalised;
-                        $overallMarks[$capabilityId]['marks'][$studentId]['latestHumanReadable'] = $markScheme->getHumanReadableMark($normalised);
-                    }
-                    if ($latestSumWeight) {
-                        $latestNormalised                                  = $latestSumNormalised / $latestSumWeight;
-                        $overallMarks[$capabilityId]['marks'][$studentId]['latestNormalised'] = $latestNormalised;
-                        $overallMarks[$capabilityId]['marks'][$studentId]['latestHumanReadable'] = $markScheme->getHumanReadableMark($latestNormalised);
-                    }
+        foreach ($overallMarks as $capabilityId => &$capabilityData) {
+            foreach ($capabilityData['students'] as &$studentCapabilityData) {
+                if (null !== $studentCapabilityData['published']['normalisedMark']) {
+                    $studentCapabilityData['published']['humanReadableMark'] = $markScheme->getHumanReadableMark((float)$studentCapabilityData['published']['normalisedMark']);
+                }
+
+                if (null !== $studentCapabilityData['draft']['normalisedMark']) {
+                    $studentCapabilityData['draft']['humanReadableMark'] = $markScheme->getHumanReadableMark((float)$studentCapabilityData['draft']['normalisedMark']);
                 }
             }
-            foreach ($capabilityMarks['indicators'] as $indicatorId => $indicatorMarks) {
-                foreach ($indicatorMarks['marks'] as $studentId => $sums) {
-                    $sumNormalised = $sums['sumNormalised'];
-                    $sumWeight     = $sums['sumWeight'];
-                    $latestSumNormalised = $sums['latestSumNormalised'];
-                    $latestSumWeight     = $sums['latestSumWeight'];
-                    if (!$sumWeight && !$latestSumWeight) {
-                        // nothing exists, so remove this...
-                        unset($overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]);
-                    } else {
-                        // only dump things into the array that actually exist...
-                        $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId] = [];
-                        if ($sumWeight) {
-                            $normalised = $sumNormalised / $sumWeight;
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['normalised'] = $normalised;
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['humanReadable'] = $markScheme->getHumanReadableMark($normalised);
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestNormalised'] = $normalised;
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestHumanReadable'] = $markScheme->getHumanReadableMark($normalised);
-                        }
-                        if ($latestSumWeight) {
-                            $latestNormalised = $latestSumNormalised / $latestSumWeight;
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestNormalised'] = $latestNormalised;
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestHumanReadable'] = $markScheme->getHumanReadableMark($latestNormalised);
-                        }
+
+            foreach ($capabilityData['indicators'] as &$indicatorStudentData) {
+                foreach ($indicatorStudentData['students'] as &$studentIndicatorData) {
+                    if (null !== $studentIndicatorData['published']['normalisedMark']) {
+                        $studentIndicatorData['published']['humanReadableMark'] = $markScheme->getHumanReadableMark((float)$studentIndicatorData['published']['normalisedMark']);
+                    }
+
+                    if (null !== $studentIndicatorData['draft']['normalisedMark']) {
+                        $studentIndicatorData['draft']['humanReadableMark'] = $markScheme->getHumanReadableMark((float)$studentIndicatorData['draft']['normalisedMark']);
                     }
                 }
             }
         }
+
+        unset($capabilityData, $studentCapabilityData, $studentIndicatorData);
+
         return $overallMarks;
     }
 
 
     /**
-     * Iterates individual student marks to build the weighted sums per capability and indicator
+     * Generates a struct containing a (normalised, human-readable) value corresponding to the numerator/denominator.
+     * This is the exact same math that you can use for capability marks and indicator marks (idk why it was originally
+     * copypasted) but do note that Capability Marks already come with their human-readable equivalent from the db.
      *
-     * @param array $assessments
-     * @param array $linkedMarks
+     * TODO Split to utility class
+     * In future this can probably be split into its own utility class with a unit test so you can feed in a mark scheme
+     * instead of assuming the Total Mark implementation.
+     *
+     * @param float|null $numerator
+     * @param float|null $denominator
      * @return array
      */
-    private function aggregateMarks(array $assessments, array $linkedMarks): array
+    private function generateMarkTuple(?float $numerator, ?float $denominator): array
     {
-        $overallMarks = [];
+        /* Set up initial conditions: by default these start as null
+         */
+        $marks = [
+            'normalisedMark' => null,
+            'humanReadableMark' => null,
+        ];
 
-        foreach ($assessments as $assessmentId => $assessmentData) {
-            $assessmentWeight = $assessmentData['weight'];
-            foreach ($assessmentData['capabilities'] as $capabilityId => $capabilityData) {
-                // First time we've seen this capability?
-                if (!array_key_exists($capabilityId, $overallMarks)) {
-                    $overallMarks[$capabilityId] = [
-                        'name'       => $capabilityData['name'],
-                        'show'       => $capabilityData['show'],
-                        'marks'      => [],
-                        'indicators' => [],
-                    ];
-                }
-
-                // Show the capability if we are showing it for any assessment
-                $overallMarks[$capabilityId]['show'] = $overallMarks[$capabilityId]['show'] || $capabilityData['show'];
-
-                // Only calculate capability marks if the assessment has weight and we are rendering the capability.
-                if ($assessmentWeight && $overallMarks[$capabilityId]['show']) {
-                    foreach ($linkedMarks as $studentId => $studentData) {
-                        // First time we've see this student for this capability?
-                        if (!array_key_exists($studentId, $overallMarks[$capabilityId]['marks'])) {
-                            $overallMarks[$capabilityId]['marks'][$studentId] = [
-                                'sumNormalised'      => null,
-                                'sumWeight'          => null,
-                                'latestSumNormalised' => null,
-                                'latestSumWeight'     => null,
-                            ];
-                        }
-                        // Does student have a mark for this capability for this assessment?
-                        $capabilityMark = $studentData['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark'] ?? null;
-                        if ($capabilityMark !== null) {
-                            $overallMarks[$capabilityId]['marks'][$studentId]['sumNormalised'] += $capabilityMark * $assessmentWeight;
-                            $overallMarks[$capabilityId]['marks'][$studentId]['sumWeight']     += $assessmentWeight;
-                            $overallMarks[$capabilityId]['marks'][$studentId]['latestSumNormalised'] += $capabilityMark * $assessmentWeight;
-                            $overallMarks[$capabilityId]['marks'][$studentId]['latestSumWeight']     += $assessmentWeight;
-                        }
-                        // Latest Marks
-                        $latestCapabilityMark = $studentData['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark'] ?? null;
-                        if ($latestCapabilityMark !== null) {
-                            $overallMarks[$capabilityId]['marks'][$studentId]['latestSumNormalised'] += $latestCapabilityMark * $assessmentWeight;
-                            $overallMarks[$capabilityId]['marks'][$studentId]['latestSumWeight']     += $assessmentWeight;
-                        }
-                    }
-                }
-
-                foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
-                    // First time we've seen this indicator?
-                    if (!array_key_exists($indicatorId, $overallMarks[$capabilityId]['indicators'])) {
-                        $overallMarks[$capabilityId]['indicators'][$indicatorId] = [
-                            'name'  => $indicatorData['name'],
-                            'marks' => [],
-                        ];
-                    }
-                    if (!$assessmentWeight) {
-                        // Don't aggregate marks if the assessment lacks weighting
-                        continue;
-                    }
-
-                    foreach ($linkedMarks as $studentId => $studentData) {
-                        // First time we've see this student for this indicator?
-                        if (!array_key_exists($studentId, $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'])) {
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId] = [
-                                'sumNormalised'      => null,
-                                'sumWeight'          => null,
-                                'latestSumNormalised' => null,
-                                'latestSumWeight'     => null,
-                            ];
-                        }
-                        // Does student have a mark for this indicator for this assessment?
-                        $indicatorMark = $studentData['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['normalisedMark'] ?? null;
-                        if ($indicatorMark !== null) {
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['sumNormalised'] += $indicatorMark * $assessmentWeight;
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['sumWeight']     += $assessmentWeight;
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestSumNormalised'] += $indicatorMark * $assessmentWeight;
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestSumWeight']     += $assessmentWeight;
-                        }
-                        // Latest Marks
-                        $latestIndicatorMark = $studentData['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['normalisedMark'] ?? null;
-                        if ($latestIndicatorMark !== null) {
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestSumNormalised'] += $latestIndicatorMark * $assessmentWeight;
-                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['latestSumWeight']     += $assessmentWeight;
-                        }
-                    }
-                }
-            }
+        /* ...so we can exit early in the case that the denominator is null, hopefully preventing a mathematically
+         * embarrassing runtime fatal in a randomly broken data set. Anything falsey will die here.
+         */
+        if (!$denominator) {
+            return $marks;
         }
-        return $overallMarks;
+
+        /* The numerator might be null, so exit early in that case as well. It wasn't meaningful.
+         * Note that zero is a perfectly valid value, so check for null specifically
+         */
+        if (null === $numerator) {
+            return $marks;
+        }
+
+        /* We have meaningful numerator and denominators so it's time to math the numbers to do the stuff
+         * TODO maybe we can round this to 3 decimals places but it probably has side effects in elsewhere
+         */
+        $normalisedMark = 100 * $numerator / $denominator;
+
+        /* Note that this is circumstantially disregarded when used in capability mark aggregation: the capability's
+         * human-readable mark already came from the database. Indicator human-readable marks, however, use this
+         */
+        $humanReadableMark = $this->totalMarkScheme
+            ->setTotalMark($denominator)
+            ->getHumanReadableMark($normalisedMark);
+
+        return [
+            'normalisedMark' => $normalisedMark,
+            'humanReadableMark' => $humanReadableMark,
+        ];
     }
 
-    /**
-     * Work out the human readable marks from the raw marks and insert them into the student marks array
-     *
-     * @param array  $students      array of students and marks calculate and build onto
-     * @param array  $studentMarks  array of the database marks for the student
-     * @param int    $studentId     tmp student ID to work out where to put these marks info
-     * @param string $field         string of the mark type (published / latest (draft))
-     * @return array
-     */
-    private function generateHumanReadableMarks(array $students, array $studentMarks, int $studentId, string $field): array
-    {
-        $decimalHydrator = new Decimal();
-        $totalMarkScheme = new MarkScheme\TotalMarkFractional();
-        foreach (($studentMarks) as $assessmentId => $assessmentMarks) {
-            foreach (($assessmentMarks['capabilities'] ?? []) as $capabilityId => $capabilityMarks) {
-                $capabilityDatabaseMark      = $decimalHydrator->hydrate($capabilityMarks['databaseMark'] ?? null);
-                $capabilityMaxMark           = $decimalHydrator->hydrate($capabilityMarks['maxMark'] ?? null);
-                $humanReadableCapabilityMark = null;
-                $normalisedCapabilityMark    = null;
-                if ($capabilityMaxMark) {
-                    $normalisedCapabilityMark = $capabilityDatabaseMark !== null
-                        ? ($capabilityDatabaseMark / $capabilityMaxMark) * 100
-                        : null;
-                    $humanReadableCapabilityMark = $capabilityMarks['humanReadableMark'] ?? null;
-                }
-                $students[$studentId][$field][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = $humanReadableCapabilityMark;
-                $students[$studentId][$field][$assessmentId]['capabilities'][$capabilityId]['normalisedMark']    = $normalisedCapabilityMark;
-
-                foreach (($capabilityMarks['indicators'] ?? []) as $indicatorId => $indicatorMarks) {
-                    $indicatorDatabaseMark      = $decimalHydrator->hydrate($indicatorMarks['databaseMark'] ?? null);
-                    $indicatorMaxMark           = $decimalHydrator->hydrate($indicatorMarks['maxMark'] ?? null);
-                    $humanReadableIndicatorMark = null;
-                    $normalisedIndicatorMark    = null;
-
-                    if ($indicatorMaxMark) {
-                        $normalisedIndicatorMark    = $indicatorDatabaseMark !== null
-                            ? ($indicatorDatabaseMark / $indicatorMaxMark) * 100
-                            : null;
-                        $humanReadableIndicatorMark = $totalMarkScheme->setTotalMark($indicatorMaxMark)->getHumanReadableMark($normalisedIndicatorMark);
-                    }
-
-                    $students[$studentId][$field][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['humanReadableMark'] = $humanReadableIndicatorMark;
-                    $students[$studentId][$field][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['normalisedMark']    = $normalisedIndicatorMark;
-                }
-            }
-        }
-        return $students;
-    }
 
     /**
      * Build data required by both the HTML and CSV form of the rubric markbook.
@@ -1208,18 +1699,66 @@ class Controller extends Base
      * @throws Mapper\Exception
      * @throws Router\Exception\RouteNotFound
      */
-    private function buildMarkbookData(Folder\Model $folder, array $request, $assessmentIds): array
+    private function buildMarkbookData(Folder\Model $folder, array $request, array $assessmentIds): array
     {
+        /* These are the filter selections that were used from the ui
+         */
         [$selectedCapabilities, $selectedIndicators] = $this->getRubricUsageSelections($request);
-        $assessments   = $this->buildAssessmentData($assessmentIds, $selectedCapabilities, $selectedIndicators);
-        $databaseMarks = $this->retrieveDatabaseMarks($assessments, $selectedCapabilities, $selectedIndicators);
-        $databaseMarks = $this->retrieveDatabaseDraftMarks($assessments, $selectedCapabilities, $selectedIndicators, $databaseMarks);
 
-        $derivedMarks  = $this->collateHumanReadableMarks($databaseMarks, $assessments);
-        $studentMarks  = $this->insertFolderMembers($derivedMarks, $folder);
-        $exclusions    = $this->getExclusions($assessmentIds);
-        $linkedMarks   = $this->insertSummaryPageLinks($studentMarks, $assessmentIds, $exclusions);
-        $overallMarks  = $this->buildOverallMarks($assessments, $linkedMarks, $folder);
-        return [$assessments, $exclusions, $linkedMarks, $overallMarks];
+        /* Find a list of students who have been excluded from the set of assessments; we don't need to process their
+         * results if they had any. We can skip them entirely
+         */
+        $exclusions = $this->getExclusions($assessmentIds);
+
+        /* Construct each rubric grid's "structure" (capabilities and indicators) that students' feedbacks are supposed
+         * to fulfil; some feedbacks might be incomplete, nonexistent, or uses an older version of a structure. This
+         * ensures their feedbacks align as best as possible to what it is supposed to be -now-
+         */
+        $assessments = $this->buildAssessmentData($assessmentIds, $selectedCapabilities, $selectedIndicators);
+
+        /* Set up the list of students who are in the class list at the moment; this is the basis of the $studentMarks
+         * hash lookup that we'll progressively populate.
+         *
+         * This eventually manifests as a union of "guys who are in the class" and "guys who received feedback" for
+         * the assessments in this folder. If we encounter feedback for a student who *was* in this class, a node will
+         * spawn for them and proceed as if they *were* in the class right now.
+         *
+         * This process is repeated twice, almost verbatim, for published and draft marks.
+         * TODO find a way to dedupe all this insanity
+         */
+        $studentMarks = $this->insertFolderMembers($folder);
+
+        /* Augment $studentMarks with published data
+         */
+        $studentMarks = $this->retrievePublishedMarks(
+            $assessments,
+            $selectedCapabilities,
+            $selectedIndicators,
+            $exclusions,
+            $studentMarks
+        );
+
+        /* Augment $studentMarks with draft data
+         */
+        $studentMarks = $this->retrieveDraftMarks(
+            $assessments,
+            $selectedCapabilities,
+            $selectedIndicators,
+            $exclusions,
+            $studentMarks
+        );
+
+        /* At the bottom of the rubric markbook is a section called "Overall" which compiles the outcome per capability
+         * and indicator combination from all the rubric grids. This aggregation should potentially be weighted against
+         * the rubric weighting -per grid- but we'll get to that later.
+         */
+        $overallMarks = $this->buildOverallMarks($assessments, $studentMarks, $exclusions, $folder, true);
+
+        return [
+            $assessments,
+            $exclusions,
+            $studentMarks,
+            $overallMarks
+        ];
     }
 }

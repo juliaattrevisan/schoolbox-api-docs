@@ -503,15 +503,15 @@ class Factory
     {
         if ($folder && $folder->getYearLevels() && $folder->getYearLevels()->count() > 0) {
             // Get overall grade settings from year level, when all the settings are the same
-            $overAllGrades     = array_unique($folder->getYearLevels()->getPropertyValues('overallGrade'));
+            $overallGrades     = array_unique($folder->getYearLevels()->getPropertyValues('overallGrade'));
             $showOverallGrades = array_unique($folder->getYearLevels()->getPropertyValues('showOverallGrade'));
 
-            $overAllGrade     = count($overAllGrades) === 1 ? $overAllGrades[0] : null;
+            $overallGrade     = count($overallGrades) === 1 ? $overallGrades[0] : null;
             $showOverallGrade = count($showOverallGrades) === 1 ? $showOverallGrades[0] : null;
         }
 
         // Otherwise fall back to config
-        $overAllGrade     = $overAllGrade ?? $this->config->get('overall_grade');
+        $overallGrade     = $overallGrade ?? $this->config->get('overall_grade');
         $showOverallGrade = $showOverallGrade ?? $this->config->get('show_overall_grade');
 
         // If the grade is hidden
@@ -522,7 +522,7 @@ class Factory
         $gradeGroups = $this->getGradeLevelGroupMapper()->findAllForAdminOption();
 
         /** @var Group\Model|null $gradeGroup */
-        $gradeGroup  = $gradeGroups->getBy('id', $overAllGrade);
+        $gradeGroup = $gradeGroups->getBy('id', $overallGrade);
 
         if (empty($gradeGroup) || $gradeGroup->getId() === $this->getGradeLevelGroupMapper()::GRADE_GROUP_ID_NONE) {
             return new None();
