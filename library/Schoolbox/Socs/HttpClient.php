@@ -78,7 +78,7 @@ class HttpClient
      * @param array<string,string> $query Non-secret query parameters; ID and key are added automatically.
      *
      * @return false|SimpleXMLElement
-     * @throws \JsonException|SOCSFatalException|\RuntimeException
+     * @throws \JsonException|\RuntimeException
      */
     public function get(string $path, array $query): false|SimpleXMLElement
     {
@@ -122,7 +122,7 @@ class HttpClient
                 // known errors
                 // incorrect CREDS:
                 if (self::NOT_AVAILABLE === $content) {
-                    throw new SOCSFatalException(sprintf(
+                    throw new \RuntimeException(sprintf(
                         'SOCS endpoint returned known error string; aborting. %s',
                         self::NOT_AVAILABLE
                     ));
