@@ -291,7 +291,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         }
 
         $data = [
-            'assessmentTypes'      => AssessmentType::getEnabledOptions($this->getConfigLoader()),
+            'assessmentTypes'      => AssessmentType::getPermittedOptions($this->getConfigLoader(), $this->getUser()),
             'filterList'           => $this->filterList,
             'readOnly'             => $this->readOnly,
             'canWrite'             => $this->canWrite,
