@@ -25,7 +25,7 @@ use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
 use Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
 use Schoolbox\Fixtures\Venue\Mapper as VenueMapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\Socs\Fixtures\Lookup\PersonLookup;
+use Schoolbox\Socs\Fixtures\Lookup\Person;
 use Schoolbox\UserMapper;
 use SensitiveParameter;
 use Symfony\Component\Lock\LockInterface;
@@ -127,7 +127,7 @@ class Factory
                 $teamCoachMapper,
                 $coachMapper,
                 false,
-                new PersonLookup($userMapper)
+                new Person($userMapper)
             ))
             ->add(new Fixtures\Import( // import again, this time with humans attached to the fixtures
                 $this->log,
@@ -141,7 +141,7 @@ class Factory
                 $teamCoachMapper,
                 $coachMapper,
                 true,
-                new PersonLookup($userMapper)
+                new Person($userMapper)
             ))
             ->add(new Fixtures\Cleanup(
                 $this->log,

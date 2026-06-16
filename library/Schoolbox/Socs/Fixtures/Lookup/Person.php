@@ -20,23 +20,13 @@ use Schoolbox\Role;
 class Person
 {
     /**
-     * @var \Schoolbox\UserMapper
-     */
-    private \Schoolbox\UserMapper $userMapper;
-
-
-    /**
      * @var array|null
      */
     protected ?array $lookup = null;
 
 
-    /**
-     * @param \Schoolbox\UserMapper $userMapper
-     */
-    public function __construct(\Schoolbox\UserMapper $userMapper)
+    public function __construct(private \Schoolbox\UserMapper $userMapper)
     {
-        $this->userMapper = $userMapper;
     }
 
 
@@ -96,5 +86,17 @@ class Person
         $this->lookup = $lookup;
 
         return $lookup;
+    }
+
+    /**
+     * Find a user id based on their external ID.
+     */
+    public function fetchUser(string $externalId): ?int
+    {
+        if (null === $this->lookup) {
+            $this->lookup = $this->generate();
+        }
+
+        return $this->lookup[$externalId] ?? null;
     }
 }

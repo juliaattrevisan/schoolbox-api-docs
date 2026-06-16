@@ -16,7 +16,7 @@ use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
 use Schoolbox\Fixtures\Matchup\Model as MatchupModel;
 use Schoolbox\Fixtures\Team\Coach\Mapper as TeamCoachMapper;
 use Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
-use Schoolbox\Socs\Fixtures\Lookup\PersonLookup;
+use Schoolbox\Socs\Fixtures\Lookup\Person;
 use Schoolbox\Socs\HttpClient;
 use Schoolbox\Socs\IStrategy;
 use Schoolbox\UserMapper;
@@ -48,7 +48,7 @@ class Import implements IStrategy
         private TeamCoachMapper $teamCoachMapper,
         private CoachMapper $coachMapper,
         private bool $importHumans,
-        private PersonLookup $personLookup
+        private Person $personLookup
     ) {
     }
 
@@ -290,33 +290,26 @@ class Import implements IStrategy
 
             $userId = $this->personLookup->fetchUser($externalId);
             if (null === $userId) {
-                /**
-                 * SOCS only gives us a CSV user ID list, no other identifing data for humans, so if we don't have that coach ID, in schoolbox, then we can't identify them...
-                 */
                 $this->log->debug(sprintf(
-                    'SOCS staff external id %s does not have a corresponding schoolbox user record; manually creating',
+                    'SOCS staff external id %s does not have a corresponding schoolbox user record; skipping',
                     $externalId
                 ));
 
-                // create a dummy user
-                $user = $this->userMapper->createModel()
-                    ->setPreferredName(sprintf("Coach: %s", $externalId))
-                    ->setLastname('')
-                    ->setExternalId($externalId);
-            } else {
-                try {
-                    $user = $this->userMapper->findById($userId);
-                } catch (\Schoolbox\Mapper\Exception $e) {
-                    $this->log->debug(
-                        sprintf(
-                            'SOCS staff external id %s maps to user id %d, but user record could not be loaded; skipping',
-                            $externalId,
-                            $userId
-                        )
-                    );
+                continue;
+            }
 
-                    continue;
-                }
+            try {
+                $user = $this->userMapper->findById($userId);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $this->log->debug(
+                    sprintf(
+                        'SOCS staff external id %s maps to user id %d, but user record could not be loaded; skipping',
+                        $externalId,
+                        $userId
+                    )
+                );
+
+                continue;
             }
 
             $coachName = trim(sprintf(
@@ -340,24 +333,14 @@ class Import implements IStrategy
                     $this->coachMapper->save($coach);
                 }
 
-                if (null === $userId) {
-                    $this->log->info(
-                        sprintf(
-                            'Created SOCS coach %s with no schoolbox user for external id (%s)',
-                            $coachName,
-                            $externalId,
-                        )
-                    );
-                } else {
-                    $this->log->info(
-                        sprintf(
-                            'Created SOCS coach %s (%s) for schoolbox user %d',
-                            $coachName,
-                            $externalId,
-                            $userId
-                        )
-                    );
-                }
+                $this->log->info(
+                    sprintf(
+                        'Created SOCS coach %s (%s) for schoolbox user %d',
+                        $coachName,
+                        $externalId,
+                        $userId
+                    )
+                );
             }
 
             try {
