@@ -9,10 +9,13 @@
         'markbook'               Markbook         Filtered markbook
         'canSeeGraph'            bool
         'canSeeInstructorMarks'  bool
+        'canViewInstructorMarks' bool             Whether instructor-only marks should be rendered.
+        'effectiveViewer'        User             The user whose feedback visibility rules apply.
         'graph'                  array
         'returnUrlSuffix'        string
         'conversationsPerFolder' Conversation[]   Conversations of selected folders, indexed by folder.id
         'longitudinalRubric'     array TODO either define array structure, or upgrade to object
+        'progressTicksReadOnly'  bool             Whether progress ticks should render as read-only.
         'transitions'            array            Used by progressTickForm.
 #}
 
@@ -58,7 +61,7 @@
 </div>
 {% endif %}
 {% endblock %}
-{% if markbook.assessments | length %}
+{% if markbook.assessments | length and not progressTicksReadOnly %}
 <script type="text/javascript">
     window.sbProps.injectScriptsIfNotLoaded({
         srcList: ["{{ CDN_PREFIX }}/js/submissions/task/jquery.progressTickForm.js?v={{ config.site_version }}"],
@@ -74,6 +77,8 @@
         }
     });
 </script>
+{% endif %}
+{% if markbook.assessments | length %}
 <div class="row">
     <div class="small-12 island">
         <section>
@@ -104,7 +109,9 @@
                                     {% include '@learningGrades/fragments/assessmentGrade.twig' with {
                                         assessment:  assessment.assessment,
                                         student:     student,
-                                        canViewInstructorMarks: canViewInstructorMarks
+                                        canViewInstructorMarks: canViewInstructorMarks,
+                                        effectiveViewer: effectiveViewer,
+                                        progressTicksReadOnly: progressTicksReadOnly
                                     } only %}
                                     <ul>
                                         {% for projectAssessment in assessment.assessments %}
@@ -112,7 +119,9 @@
                                             {% include '@learningGrades/fragments/assessmentGrade.twig' with {
                                                 assessment:  projectAssessment,
                                                 student:     student,
-                                                canViewInstructorMarks: canViewInstructorMarks
+                                                canViewInstructorMarks: canViewInstructorMarks,
+                                                effectiveViewer: effectiveViewer,
+                                                progressTicksReadOnly: progressTicksReadOnly
                                             } only %}
                                         </li>
                                         {% endfor %}
@@ -123,7 +132,9 @@
                                     {% include '@learningGrades/fragments/assessmentGrade.twig' with {
                                         assessment:  assessment.assessment,
                                         student:     student,
-                                        canViewInstructorMarks: canViewInstructorMarks
+                                        canViewInstructorMarks: canViewInstructorMarks,
+                                        effectiveViewer: effectiveViewer,
+                                        progressTicksReadOnly: progressTicksReadOnly
                                     } only %}
                                 </li>
                                 {% endif %}

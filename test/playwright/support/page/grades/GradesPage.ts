@@ -1,14 +1,11 @@
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import type { Page, Locator } from "@playwright/test";
 import { expect } from "@playwright/test";
-import Common from "@schoolboxTest/playwright/support/page/Common";
 
 export default class GradesPage {
     private tester: AcceptanceTester;
 
     private page: Page;
-
-    private common: Common;
 
     static readonly URL = "/learning/grades/{id}";
 
@@ -16,15 +13,7 @@ export default class GradesPage {
 
     static readonly DATA_TEST_GRADES_SUBJECT_HEADING = "grades-subject-heading";
 
-    static readonly DATA_TEST_JELLY_TOT = "sbx-pop-out-header-options-button";
-
-    static readonly SELECTOR_VIEW_INSTRUCTOR_GRADES = '[data-has-student-view="student"]';
-
-    static readonly SELECTOR_VIEW_STUDENT_GRADES = '[data-has-student-view="staff"]';
-
     static readonly SELECTOR_ASSESSMENT = ".activity-list li.assessment";
-
-    static readonly SELECTOR_HAS_STUDENT_VIEW_META = "[data-has-student-view-meta]";
 
     static readonly SELECTOR_LEARNER_OR_INSTRUCTOR_MARK =
         "div[data-learner-mark]:visible, div[data-instructor-mark]:visible";
@@ -32,7 +21,6 @@ export default class GradesPage {
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
-        this.common = new Common(page);
     }
 
     /**
@@ -53,21 +41,36 @@ export default class GradesPage {
         await subject.click();
     }
 
-    /**
-     * Change the current grades visibility to "View Instructor Grades"
-     */
-    async viewInstructorGrades(): Promise<void> {
-        await this.common.clickJellyTot();
-        await this.page.locator(GradesPage.SELECTOR_VIEW_INSTRUCTOR_GRADES).click();
+    async viewAs(mode: "staff" | "student" | "parent"): Promise<void> {
+        // The switcher links to the same route with ?viewMode=<mode>. Short-circuit when the
+        // requested mode is already active so callers can use viewAs() idempotently.
+        const viewModeLink = this.page.locator(`[data-grades-view-mode="${mode}"]`);
+        if ((await viewModeLink.getAttribute("aria-current")) === "page") {
+            return;
+        }
+        await Promise.all([this.page.waitForURL(new RegExp(`[?&]viewMode=${mode}(?:&|$)`)), viewModeLink.click()]);
     }
 
     /**
-     * Change the current grades visibility to "View Student Grades"
+     * Check the current grades view mode is selected in the view-mode switcher.
+     * @param mode - The expected grades view mode
+     */
+    async expectGradesViewMode(mode: "staff" | "student" | "parent"): Promise<void> {
+        await expect(this.page.locator(`[data-grades-view-mode="${mode}"]`)).toHaveAttribute("aria-current", "page");
+    }
+
+    /**
+     * Change the current grades visibility to staff view mode.
+     */
+    async viewInstructorGrades(): Promise<void> {
+        await this.viewAs("staff");
+    }
+
+    /**
+     * Change the current grades visibility to student view mode.
      */
     async viewStudentGrades(): Promise<void> {
-        await this.common.clickJellyTot();
-        await this.page.locator(GradesPage.SELECTOR_VIEW_STUDENT_GRADES).click();
-        await this.common.clickJellyTot();
+        await this.viewAs("student");
     }
 
     /**
@@ -75,11 +78,7 @@ export default class GradesPage {
      * @param expectedVisibility - The expected visibility
      */
     async expectGradesVisibility(expectedVisibility: "student" | "instructor"): Promise<void> {
-        const meta = this.page.locator(GradesPage.SELECTOR_HAS_STUDENT_VIEW_META);
-
-        await expect(meta).toContainText(
-            expectedVisibility === "student" ? "Viewing student grades" : "Viewing instructor grades",
-        );
+        await this.expectGradesViewMode(expectedVisibility === "student" ? "student" : "staff");
     }
 
     /**

@@ -61,10 +61,16 @@ class Helper
      * @param User $viewer
      * @param User $viewee
      * @param Term $term
+     * @param bool|null $useStaffMarkScheme Whether the overall mark scheme should be spawned in staff
+     *                                      mode. When null, this is derived per-folder from whether
+     *                                      $viewer is an instructor of that folder.
+     *                                      Callers that use a view mode (e.g. the Grades summary) should
+     *                                      pass an explicit value to ensure the 'view as staff/student/parent'
+     *                                      feature works as expected.
      * @return array
      * @throws MapperException
      */
-    public function generateGrades(User $viewer, User $viewee, Term $term)
+    public function generateGrades(User $viewer, User $viewee, Term $term, ?bool $useStaffMarkScheme = null): array
     {
         // Add folders with response or feedback
         $folders = $this->folderMapper->findFoldersWithInteractionsForStudent($viewee, $term);
@@ -87,7 +93,29 @@ class Helper
             ->filter(function (IAssessable $a) use ($viewee) {
                 return $a->isPublished($viewee) && $a->isParticipant($viewee);
             });
-        $assessmentsPerFolder = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection(collection: $assessmentsPerFolder, users: null, removeExcluded: false, assumeParticipation: false)
+        $assessmentsPerFolder = $this->assessmentMapperProxy
+            ->loadParticipantsIntoAssessmentCollection(
+                collection: $assessmentsPerFolder,
+            );
+
+        /* Apply work-type / activity-audience visibility for the *viewer*.
+         *
+         * The set above is bounded to the student's (viewee's) published participations. This pass
+         * additionally applies Visibility::isVisibleToUser for the viewer, so the Grades summary's
+         * 'view as student/parent' hides activities whose work type excludes that role
+         * (is_visible_to_learners / is_visible_to_parents) - matching the subject report page
+         * (Controller::postReport), which already filters its markbook this way.
+         *
+         * For a staff viewer this is a no-op: the staff branch of isVisibleToUser returns true for
+         * every activity, so real staff and the Summative Report caller are unaffected. showClosed is
+         * true to mirror the subject report and preserve the summary's listing of closed-but-published
+         * activities.
+         */
+        $visibility           = new Visibility($this->access);
+        $assessmentsPerFolder = $assessmentsPerFolder
+            ->filter(function (IAssessable $a) use ($visibility, $viewer) {
+                return $visibility->isVisibleToUser($a, $viewer, true);
+            })
             ->groupByCallback(function (IAssessable $assessment) {
                 return $assessment->getBaseContext()->getFolder()->getId();
             });
@@ -113,7 +141,7 @@ class Helper
             if ($assessment instanceof IAssessable) {
                 $overallMarkScheme = $this->markSchemeFactory->spawnForFolder(
                     $folders->offsetGet($folderId),
-                    $this->access->isInstructor($viewer, $assessment->getBaseContext()->getFolder())
+                    $useStaffMarkScheme ?? $this->access->isInstructor($viewer, $assessment->getBaseContext()->getFolder())
                 );
                 $markbooks->setOffset($folderId, new Markbook($assessments, $overallMarkScheme, $viewer));
             }
