@@ -53,6 +53,11 @@ class Import implements IStrategy
     }
 
     /**
+     * @var array<int,true>
+     */
+    private array $clearedTeamMemberships = [];
+
+    /**
      * Import SOCS fixtures into Schoolbox matchups and synchronise team memberships.
      */
     public function import(): void
@@ -126,7 +131,9 @@ class Import implements IStrategy
 
             $team = $this->registry->recallTeam($teamName, $division);
 
-            $this->syncParticipantsWithTeam($fixture, $team);
+            if ($this->importHumans) {
+                $this->syncParticipantsWithTeam($fixture, $team);
+            }
 
             $venueName = $locationName !== '' ? $locationName : 'Unspecified location';
             $venue = $this->registry->recallVenue($venueName);
@@ -197,6 +204,12 @@ class Import implements IStrategy
         if ('' === $pupils && '' === $staff) {
             return;
         }
+
+        if (!$this->perform || !$team->getId()) {
+            return;
+        }
+
+        $this->clearTeamMembershipsOnce((int)$team->getId());
 
         if ('' !== $pupils) {
             $this->syncPupilsWithTeam($pupils, $team);
@@ -369,6 +382,25 @@ class Import implements IStrategy
                 $userId
             ));
         }
+    }
+
+    private function clearTeamMembershipsOnce(int $teamId): void
+    {
+        if (isset($this->clearedTeamMemberships[$teamId])) {
+            return;
+        }
+
+        $queries = StaleSql::buildTeamMembershipDeleteQueries(
+            $this->teamPlayerMapper->getTable(),
+            $this->teamCoachMapper->getTable(),
+            $teamId
+        );
+
+        foreach ($queries as $query) {
+            $this->teamPlayerMapper->getDatabase()->query($query);
+        }
+
+        $this->clearedTeamMemberships[$teamId] = true;
     }
 
     /**

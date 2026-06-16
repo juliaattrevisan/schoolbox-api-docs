@@ -113,10 +113,7 @@ class Factory
                 $seasonMapper,
                 $divisionMapper,
                 $teamMapper,
-                $venueMapper,
-                $schoolMapper,
-                $teamCoachMapper,
-                $teamPlayerMapper,
+                $venueMapper
             ))
             ->add(new Fixtures\Import(
                 $this->log,
@@ -155,8 +152,7 @@ class Factory
                 $seasonMapper,
                 $divisionMapper,
                 $teamMapper,
-                $venueMapper,
-                $schoolMapper,
+                $venueMapper
             ));
         }
 

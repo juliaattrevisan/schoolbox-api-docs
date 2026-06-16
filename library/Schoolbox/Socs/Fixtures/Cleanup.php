@@ -13,7 +13,6 @@ namespace Schoolbox\Socs\Fixtures;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
-use Schoolbox\Fixtures\School\Mapper as SchoolMapper;
 use Schoolbox\Fixtures\Season\Mapper as SeasonMapper;
 use Schoolbox\Fixtures\Sport\Mapper as SportMapper;
 use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
@@ -40,8 +39,7 @@ class Cleanup implements IStrategy
         private SeasonMapper $seasonMapper,
         private DivisionMapper $divisionMapper,
         private TeamMapper $teamMapper,
-        private VenueMapper $venueMapper,
-        private SchoolMapper $schoolMapper
+        private VenueMapper $venueMapper
     ) {
     }
 
@@ -57,19 +55,27 @@ class Cleanup implements IStrategy
         if ($this->perform) {
             $this->lock->refresh();
 
-            // Soft-delete SOCS matchups that were not touched during this
-            // import run. Their related results are removed via mapper
-            // callbacks when the matchup is soft-deleted.
-            $this->matchupMapper->getDatabase()->query("UPDATE {$this->matchupMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
-            // Soft-delete sports that were not touched during this import run.
-            $this->sportMapper->getDatabase()->query("UPDATE {$this->sportMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
-            $this->seasonMapper->getDatabase()->query("UPDATE {$this->seasonMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
-            $this->divisionMapper->getDatabase()->query("UPDATE {$this->divisionMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
-            $this->teamMapper->getDatabase()->query("UPDATE {$this->teamMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
-            $this->venueMapper->getDatabase()->query("UPDATE {$this->venueMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
-            $this->schoolMapper->getDatabase()->query("UPDATE {$this->schoolMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
+            $db = $this->matchupMapper->getDatabase();
+            foreach (StaleSql::buildCleanupQueries($this->getStaleTables()) as $query) {
+                $db->query($query);
+            }
         }
 
         $this->log->info('Soft-deleting SOCS matchups that did not appear in the import.');
+    }
+
+    /**
+     * @return array{matchup:string,sport:string,season:string,division:string,team:string,venue:string}
+     */
+    private function getStaleTables(): array
+    {
+        return [
+            'matchup' => $this->matchupMapper->getTable(),
+            'sport' => $this->sportMapper->getTable(),
+            'season' => $this->seasonMapper->getTable(),
+            'division' => $this->divisionMapper->getTable(),
+            'team' => $this->teamMapper->getTable(),
+            'venue' => $this->venueMapper->getTable(),
+        ];
     }
 }

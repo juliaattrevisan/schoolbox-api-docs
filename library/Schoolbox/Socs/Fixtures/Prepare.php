@@ -13,12 +13,9 @@ namespace Schoolbox\Socs\Fixtures;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
-use Schoolbox\Fixtures\School\Mapper as SchoolMapper;
 use Schoolbox\Fixtures\Season\Mapper as SeasonMapper;
 use Schoolbox\Fixtures\Sport\Mapper as SportMapper;
-use Schoolbox\Fixtures\Team\Coach\Mapper as TeamCoachMapper;
 use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
-use Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
 use Schoolbox\Fixtures\Venue\Mapper as VenueMapper;
 use Schoolbox\Socs\IStrategy;
 use Symfony\Component\Lock\LockInterface;
@@ -43,10 +40,7 @@ class Prepare implements IStrategy
         private SeasonMapper $seasonMapper,
         private DivisionMapper $divisionMapper,
         private TeamMapper $teamMapper,
-        private VenueMapper $venueMapper,
-        private SchoolMapper $schoolMapper,
-        private TeamCoachMapper $teamCoachMapper,
-        private TeamPlayerMapper $teamPlayerMapper,
+        private VenueMapper $venueMapper
     ) {
     }
 
@@ -62,22 +56,27 @@ class Prepare implements IStrategy
         if ($this->perform) {
             $this->lock->refresh();
 
-            // Mark existing data as "stale" until they are
-            // re-saved by the current import run.
-            $this->matchupMapper->getDatabase()->query("UPDATE {$this->matchupMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
-            $this->sportMapper->getDatabase()->query("UPDATE {$this->sportMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
-            $this->seasonMapper->getDatabase()->query("UPDATE {$this->seasonMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
-            $this->divisionMapper->getDatabase()->query("UPDATE {$this->divisionMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
-            $this->teamMapper->getDatabase()->query("UPDATE {$this->teamMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
-            $this->venueMapper->getDatabase()->query("UPDATE {$this->venueMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
-            $this->schoolMapper->getDatabase()->query("UPDATE {$this->schoolMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
-
-            /* Hard deletions for relationships that do not use updated_at. */
-            $db = $this->teamMapper->getDatabase();
-            $db->query("DELETE FROM {$this->teamCoachMapper->getTable()}");
-            $db->query("DELETE FROM {$this->teamPlayerMapper->getTable()}");
+            $db = $this->matchupMapper->getDatabase();
+            foreach (StaleSql::buildPrepareQueries($this->getStaleTables()) as $query) {
+                $db->query($query);
+            }
         }
 
         $this->log->info('Preparing previously-imported SOCS matchups for create/update.');
+    }
+
+    /**
+     * @return array{matchup:string,sport:string,season:string,division:string,team:string,venue:string}
+     */
+    private function getStaleTables(): array
+    {
+        return [
+            'matchup' => $this->matchupMapper->getTable(),
+            'sport' => $this->sportMapper->getTable(),
+            'season' => $this->seasonMapper->getTable(),
+            'division' => $this->divisionMapper->getTable(),
+            'team' => $this->teamMapper->getTable(),
+            'venue' => $this->venueMapper->getTable(),
+        ];
     }
 }

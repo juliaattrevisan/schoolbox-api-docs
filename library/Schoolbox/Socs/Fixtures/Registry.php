@@ -61,6 +61,8 @@ class Registry
 
     public const string EXTERNAL_ID_PREFIX = 'socs:';
 
+    public const string SOCS_DATE_FORMAT = 'j M Y';
+
     public const SOCS_FIXTURES = 'SOCS Fixtures';
 
     public function __construct(
