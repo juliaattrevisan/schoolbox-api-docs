@@ -984,6 +984,18 @@ class DataSource
             throw new \InvalidArgumentException('Unknown feedback table derived from feedback instance.');
         }
 
+        /* Severe headache warning:
+         *
+         * For this particular grid, retrieve the capability mark models that it uses, along with the indicator mark
+         * models that THOSE used. If you don't specify a rubric_instance_id you'll experience a geometric runaway
+         * as cap mark models/ind mark models tend to be accumulative in other areas.
+         *
+         * Not specifying a rubric instance identifier leads to geometric database expansion, unstable descriptor
+         * selections due to having WAY more rows than you were supposed to (since they go into the db in whatever order
+         * it felt like, some cells appear before others, so you can't even count on them being persisted in any
+         * consistent chronological order) and is really bad news bears for everyone.
+         */
+
         // What goes in the grid?
         // * Capability marks
         // * Descriptor marks
@@ -992,6 +1004,7 @@ class DataSource
         $capabilityMarkModels = $this->capabilityMarkMapper->findByColumnList([
             'feedback_id' => $feedback->getId(),
             'feedback_table' => $feedbackTable,
+            'rubric_instance_id' => $rubricInstance->getId(),
             'valid' => true,
         ]);
 
@@ -1135,6 +1148,7 @@ class DataSource
         $this->indicatorMarkMapper->deleteFeedbackMarks($feedbackId, $rubricInstance, $mapper->getTable());
         $this->capabilityMarkMapper->deleteFeedbackMarks($feedbackId, $rubricInstance, $mapper->getTable());
 
+        /** @var CapabilityMark $capabilityMark */
         foreach ($markedGrid->getCapabilityMarks() as $capabilityMark) {
             // Create cap mark
             $capabilityId = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
