@@ -407,7 +407,7 @@ class Factory
         $this->setDurationHours($durationHours);
         $this->setDurationMinutes($durationMinutes);
 
-        if ($post['visibility'] === '') {
+        if (isset($post['visibility']) && $post['visibility'] === '') {
             // This protects against the situation where the selected visibility option in visibility.twig is disabled.
             // If the form is submitted in that situation, $post['visibility'] will end up at a blank string.
             // Note a client-side fix has been added to visibility.twig.  This is the server-side fix.
