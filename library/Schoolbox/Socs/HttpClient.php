@@ -13,8 +13,6 @@ namespace Schoolbox\Socs;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Log\LoggerInterface;
 use SensitiveParameter;
 use SimpleXMLElement;
 
@@ -43,9 +41,6 @@ class HttpClient
     private string $baseUrl;
 
     private \Closure $sleep;
-
-    /** @var array<string,int> */
-    private array $urlUsage = [];
 
     // known error strings
     private const NOT_AVAILABLE = 'Not available.';
@@ -83,7 +78,6 @@ class HttpClient
     public function get(string $path, array $query): false|SimpleXMLElement
     {
         $url = $this->buildBaseUrl($path);
-        $this->noteUrlUsed($path, $query);
 
         $fullQuery = ['ID' => $this->schoolId, 'key' => $this->token] + $query;
         $fails = 0;
@@ -156,41 +150,6 @@ class HttpClient
             }
             ($this->sleep)(self::NAP_TIMEOUT);
         }
-    }
-
-    /**
-     * Log how many times each fully-qualified SOCS URL was requested.
-     */
-    public function logUrlUsage(LoggerInterface $logger): void
-    {
-        foreach ($this->urlUsage as $url => $count) {
-            $logger->info(sprintf('SOCS URL used %d time(s): %s', $count, $url));
-        }
-    }
-
-    /**
-     * Record a redacted SOCS URL usage entry for later logging.
-     *
-     * @param array<string,string> $query Non-secret query parameters to include in logs.
-     */
-    private function noteUrlUsed(string $path, array $query): void
-    {
-        $baseUrl = $this->buildBaseUrl($path);
-
-        $safeQuery = $query;
-        unset($safeQuery['ID'], $safeQuery['key']);
-
-        if ($safeQuery === []) {
-            $url = $baseUrl;
-        } else {
-            $url = $baseUrl . '?' . http_build_query($safeQuery);
-        }
-
-        if (!isset($this->urlUsage[$url])) {
-            $this->urlUsage[$url] = 0;
-        }
-
-        $this->urlUsage[$url]++;
     }
 
     /**

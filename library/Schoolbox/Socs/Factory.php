@@ -206,12 +206,6 @@ class Factory
             ));
         }
 
-        // Always log API usage statistics at the end
-        $bus->add(new ApiStatistics(
-            $this->log,
-            $this->httpClient
-        ));
-
         return $bus;
     }
 }
