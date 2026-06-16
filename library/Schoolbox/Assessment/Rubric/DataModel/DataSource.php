@@ -1246,6 +1246,9 @@ class DataSource
 
         foreach ($participant->getAllFeedbacks() as $feedback) {
             if (
+                /* TODO Remove requirement to be a due work feedback instance and check the validCapMarkCount
+                 *  against a feedback table too
+                 */
                 $feedback instanceof DueWorkFeedbackModel
                 && \in_array($feedback->getReviewRoute(), $feedbackTypes, true)
             ) {
