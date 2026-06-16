@@ -62,6 +62,7 @@ class WeightedAggregator
         }
 
         /* If the grid weight was falsey, it doesn't count toward anything and shouldn't be equated to zero.
+         * Exit early instead.
          */
         if (!$gridWeight) {
             return null;
