@@ -1,6 +1,6 @@
 ---
 name: php-cli-tools
-description: Use when developing command-line (CLI) tools in PHP.
+description: Use when developing command-line (CLI) tools in PHP, or migrating/porting an existing tool from the old `App` base class to `BaseApp`.
 ---
 
 # PHP command-line tools overview
