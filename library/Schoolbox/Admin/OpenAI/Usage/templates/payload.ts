@@ -67,6 +67,7 @@ export type AiSession<TLogFormat extends AiLogFormat = AiLogFormat, TFeature ext
     createdAt: DateRFC3339;
     createdBy?: UserAuthor;
     returnCode: number | null; // HTTP return code from OpenAI API
+    hasError: boolean;
     _routes: {
         getSessionLogs?: string | null;
     };

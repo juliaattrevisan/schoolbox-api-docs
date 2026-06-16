@@ -290,7 +290,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                                     {{ session.createdBy.fullName }}
                                 </component>
                             </td>
-                            <td>{{ 200 !== session.returnCode ? "Error" : "" }}</td>
+                            <td>{{ session.hasError ? "Error" : "" }}</td>
                             <td class="actions-small-1">
                                 <nav
                                     v-if="

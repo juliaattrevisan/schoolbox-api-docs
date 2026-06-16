@@ -141,7 +141,8 @@ class Mapper extends BaseMapper
      * Fetch a page of sessions with logs for the admin usage log, newest first.
      *
      * The logFormat and returnCode values are derived from each session's first log, ordered by earliest created_at
-     * and then id. This is a summary hint for the admin list, not a guarantee that every log in the session has this format.
+     * and then id. This is a summary hint for the admin list, not a guarantee that every log in the session has this
+     * format. The error flag is derived from all logs in the session.
      *
      * @param string|null               $keyword This filters sessions to those with at least one log whose prompt or
      *                                           response contains this text.
@@ -181,6 +182,12 @@ class Mapper extends BaseMapper
                 `{$this->table}`.created_at AS created_at,
                 firstLog.log_format AS derived_log_format,
                 firstLog.return_code AS derived_return_code,
+                EXISTS (
+                    SELECT 1 FROM `ai_session_log` errorLog
+                    WHERE errorLog.ai_session_id = `{$this->table}`.id
+                    AND errorLog.return_code IS NOT NULL
+                    AND errorLog.return_code <> 200
+                ) AS derived_has_error,
                 {$this->getJoinColumnString('user', 'u')}
             FROM `{$this->table}`
             LEFT JOIN {$this->getJoinSql('user', '', 'u', true)}
@@ -216,7 +223,8 @@ class Mapper extends BaseMapper
                 ->setDerivedLogFormat($row['derived_log_format'] ?? null)
                 ->setDerivedReturnCode(
                     isset($row['derived_return_code']) ? (int)$row['derived_return_code'] : null
-                );
+                )
+                ->setDerivedHasError((bool)$row['derived_has_error']);
 
             /** @var \Schoolbox\User|null $sessionUser */
             $sessionUser = $userMapper->hydrate($row, 'u');

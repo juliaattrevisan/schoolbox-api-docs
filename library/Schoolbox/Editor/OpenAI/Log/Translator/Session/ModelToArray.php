@@ -47,6 +47,7 @@ class ModelToArray
             'createdAt' => $session->getCreatedAt()?->getUsingFormat(DATE_ATOM),
             'createdBy' => $session->getUser() ? $this->userTranslator->__invoke($session->getUser()) : null,
             'returnCode' => $session->getDerivedReturnCode(),
+            'hasError' => $session->getDerivedHasError(),
             '_routes' => $routes,
         ];
     }

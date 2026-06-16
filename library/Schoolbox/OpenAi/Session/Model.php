@@ -57,6 +57,14 @@ class Model
     private ?int $derivedReturnCode = null;
 
     /**
+     * Whether any log in this session has a non-200 return code, for the admin list only.
+     * Not a column; populated by {@see Mapper::getFilteredSessions()}.
+     *
+     * @var bool
+     */
+    private bool $derivedHasError = false;
+
+    /**
      * @return string|null
      */
     public function getId(): ?string
@@ -150,6 +158,24 @@ class Model
     public function setDerivedReturnCode(?int $derivedReturnCode): self
     {
         $this->derivedReturnCode = $derivedReturnCode;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getDerivedHasError(): bool
+    {
+        return $this->derivedHasError;
+    }
+
+    /**
+     * @param bool $derivedHasError
+     * @return $this
+     */
+    public function setDerivedHasError(bool $derivedHasError): self
+    {
+        $this->derivedHasError = $derivedHasError;
         return $this;
     }
 }
