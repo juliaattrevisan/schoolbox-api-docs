@@ -29,8 +29,8 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends BaseMapper
 {
-    public const string EXAM_SESSION_MAY = 'May';
-    public const string EXAM_SESSION_NOVEMBER = 'November';
+    public const string EXAM_SESSION_MAY = 'MAY';
+    public const string EXAM_SESSION_NOVEMBER = 'NOVEMBER';
     public const array EXAM_SESSIONS = [
         self::EXAM_SESSION_MAY,
         self::EXAM_SESSION_NOVEMBER,
