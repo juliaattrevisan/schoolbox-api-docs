@@ -124,7 +124,7 @@ class Registry
 
         // update updated at, we have seen this, we need to record it
         // the season name and dates in case they have changed since the last import run
-        $season->setUpdatedAt(\Alaress_Date_Format::now())
+        $season->setUpdatedAt($now)
             ->setName(self::SOCS_FIXTURES)
             ->setStart($start)
             ->setEnd($end);
