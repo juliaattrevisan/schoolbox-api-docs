@@ -448,7 +448,7 @@ class Controller extends Base
                 /* Why is this even needed? Some reduction of $row['capability_max_value'] must result in something
                  * falsy (such as bad data) but idk what we saw in the wild to reinforce this theory.
                  */
-                $capabilityMaxValue = $decimalHydrator->hydrate($row['capability_max_value']);
+                // $capabilityMaxValue = $decimalHydrator->hydrate($row['capability_max_value']);
 
                 $assessments[$row['assessment_id']]['gridData'][$row['rubric_instance_id']]['capabilities'][$row['capability_id']] = [
                     'id' => $row['capability_id'],
