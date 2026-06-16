@@ -24,13 +24,13 @@ class Config
      * feature name => config name
      */
     public const array ALL_MODULES = [
-        \Schoolbox\OpenAi\Feature::CHAT->value                            => ConfigMapper::NAME_AI_TEXT_CHAT,
-        \Schoolbox\OpenAi\Feature::LESSON_PLAN->value                     => ConfigMapper::NAME_AI_LESSONPLAN,
-        \Schoolbox\OpenAi\Feature::DIFFERENTIATION->value                 => ConfigMapper::NAME_AI_DIFFERENTIATION,
-        \Schoolbox\OpenAi\Feature::DIALOG_AGENT->value                    => ConfigMapper::NAME_AI_DIALOGAGENT,
-        \Schoolbox\OpenAi\Feature::IMAGE->value                           => ConfigMapper::NAME_AI_IMAGE_GENERATION,
-        \Schoolbox\OpenAi\Feature::LEARNING_ACTIVITY_CUSTOMISATION->value => ConfigMapper::NAME_AI_LEARNING_ACTIVITY_CUSTOMISATION,
-        \Schoolbox\OpenAi\Feature::AI_MODERATION_AGENT->value             => ConfigMapper::NAME_AI_MODERATION_AGENT,
+        Feature::CHAT->value                            => ConfigMapper::NAME_AI_TEXT_CHAT,
+        Feature::LESSON_PLAN->value                     => ConfigMapper::NAME_AI_LESSONPLAN,
+        Feature::DIFFERENTIATION->value                 => ConfigMapper::NAME_AI_DIFFERENTIATION,
+        Feature::DIALOG_AGENT->value                    => ConfigMapper::NAME_AI_DIALOGAGENT,
+        Feature::IMAGE->value                           => ConfigMapper::NAME_AI_IMAGE_GENERATION,
+        Feature::LEARNING_ACTIVITY_CUSTOMISATION->value => ConfigMapper::NAME_AI_LEARNING_ACTIVITY_CUSTOMISATION,
+        Feature::AI_MODERATION_AGENT->value             => ConfigMapper::NAME_AI_MODERATION_AGENT,
     ];
 
     /**
@@ -85,26 +85,26 @@ class Config
      * Recommended models for each feature, split by text and image generation.
      */
     public const array RECOMMENDED_MODELS = [
-        \Schoolbox\OpenAi\Feature::CHAT->value => [
+        Feature::CHAT->value => [
             'text' => ['gpt-5.4-nano'],
         ],
-        \Schoolbox\OpenAi\Feature::LESSON_PLAN->value => [
+        Feature::LESSON_PLAN->value => [
             'text' => ['gpt-5.4-nano'],
         ],
-        \Schoolbox\OpenAi\Feature::DIFFERENTIATION->value => [
+        Feature::DIFFERENTIATION->value => [
             'text' => ['gpt-5.4-nano'],
         ],
-        \Schoolbox\OpenAi\Feature::DIALOG_AGENT->value => [
+        Feature::DIALOG_AGENT->value => [
             'text' => ['gpt-5.3-chat-latest'],
         ],
-        \Schoolbox\OpenAi\Feature::IMAGE->value => [
+        Feature::IMAGE->value => [
             'text'  => ['gpt-5.4-nano'],
             'image' => ['gpt-image-1.5'],
         ],
-        \Schoolbox\OpenAi\Feature::LEARNING_ACTIVITY_CUSTOMISATION->value => [
+        Feature::LEARNING_ACTIVITY_CUSTOMISATION->value => [
             'text' => ['gpt-5.4-nano'],
         ],
-        \Schoolbox\OpenAi\Feature::AI_MODERATION_AGENT->value => [
+        Feature::AI_MODERATION_AGENT->value => [
             'text' => ['gpt-5.4-nano'],
         ],
     ];
@@ -742,7 +742,7 @@ class Config
             ];
         }
 
-        if ($feature === \Schoolbox\OpenAi\Feature::IMAGE->value) {
+        if ($feature === Feature::IMAGE->value) {
             // Image feature:
             // * add output quality and image model
             // * remove Azure option
@@ -768,7 +768,7 @@ class Config
             unset($formInputs[self::FIELD_PROVIDER]['options'][Helper::ENDPOINT_TYPE_AZURE]);
         }
 
-        if ($feature === \Schoolbox\OpenAi\Feature::AI_MODERATION_AGENT->value) {
+        if ($feature === Feature::AI_MODERATION_AGENT->value) {
             // Ai Moderation agent:
             // * remove generation system prompt
             unset($formInputs[self::FIELD_SYSTEM_PROMPT]);
@@ -792,10 +792,10 @@ class Config
     public function buildReasoningEffortModelOptions(string $feature): array
     {
         $options = self::REASONING_EFFORT_MODEL_OPTIONS;
-        if ($feature === \Schoolbox\OpenAi\Feature::IMAGE->value) {
+        if ($feature === Feature::IMAGE->value) {
             $options = array_map(fn ($effortLevels) => array_values(array_diff($effortLevels, ['minimal'])), $options);
         }
-        if ($feature === \Schoolbox\OpenAi\Feature::CHAT->value) {
+        if ($feature === Feature::CHAT->value) {
             foreach ($options as $model => $effortLevels) {
                 if (in_array($model, self::GPT4_MODELS, true)) {
                     $options[$model] = array_values(array_diff($effortLevels, [self::REASONING_EFFORT_OPTION_NONE]));
