@@ -38,6 +38,7 @@ use Schoolbox\Learning\Assessment\Task\Decorator\Decorator as TaskDecorator;
 use Schoolbox\Learning\Assessment\Task\Decorator\TaskTrait;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -248,8 +249,7 @@ class Factory
             $this->setWorkType(null);
         } else {
             try {
-                // If an invalid work type has been supplied by the client, treat as information missing.
-                $this->setWorkType($this->workTypeMapper->findById($post['workType'])->getId());
+                $this->setWorkType($this->workTypeMapper->findById($post['workType'] ?? null)->getId());
             } catch (MapperException) {
                 throw $this->errorMapper->generateException(Error\Mapper::ERROR_INFORMATION_MISSING);
             }
@@ -582,6 +582,17 @@ class Factory
          */
         $courseManagedFields = new CourseManagedFields($this->creator, $assessment);
 
+        if (!$courseManagedFields->isReadonly() && $this->getWorkType() !== null) {
+            try {
+                $this->assertSubmittedWorkTypeCanBeSaved(
+                    $assessment,
+                    $this->workTypeMapper->findById($this->getWorkType()),
+                );
+            } catch (MapperException) {
+                throw $this->errorMapper->generateException(Error\Mapper::ERROR_INFORMATION_MISSING);
+            }
+        }
+
         if ($assessment instanceof Project) {
             $decorator = new ProjectDecorator(
                 $this->getMarkType(),
@@ -863,6 +874,17 @@ class Factory
     {
         $this->workType = $workType;
         return $this;
+    }
+
+
+    private function assertSubmittedWorkTypeCanBeSaved(IAssessable $assessment, WorkType $submittedWorkType): void
+    {
+        $currentWorkType = $assessment->getWorkType();
+        $workTypeChanged = $currentWorkType === null || $currentWorkType->getId() !== $submittedWorkType->getId();
+
+        if ($workTypeChanged && !$submittedWorkType->isPermittedForAssessmentType(AssessmentType::objectToString($assessment))) {
+            throw new UnexpectedValueException('The selected work type does not support the selected assessment type.');
+        }
     }
 
     /**
