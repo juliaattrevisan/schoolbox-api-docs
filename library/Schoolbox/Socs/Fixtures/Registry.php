@@ -78,6 +78,9 @@ class Registry
     /**
      * Find or create the shared "SOCS Fixtures" season spanning the current year and next.
      *
+     * SOCS imports deliberately use one rolling season rather than creating one Schoolbox season per SOCS season.
+     * This keeps imported fixtures grouped in a single integration-owned season across yearly boundaries.
+     *
      * @return SeasonModel
      * @throws Exception
      */
