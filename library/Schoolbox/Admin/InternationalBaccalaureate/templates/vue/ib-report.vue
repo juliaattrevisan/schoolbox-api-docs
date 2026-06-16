@@ -233,6 +233,10 @@ async function handleCompletePreparation(studentIds: number[]): Promise<void> {
         toast.timeout({
             text: `Preparation completed for ${studentIds.length} student${studentIds.length === 1 ? "" : "s"}.`,
         });
+        // Reload to get the real registrationSessionStudentId for students that didn't have a
+        // persisted row before completePreparation. Without this, subsequent actions (e.g. manual
+        // register) send the stale userId instead of the session-student ID and the backend rejects them.
+        void loadCandidates();
     } catch (e) {
         console.error("Failed to complete preparation", e);
         toast.timeout({ text: "Failed to complete preparation.", isSuccess: false });
