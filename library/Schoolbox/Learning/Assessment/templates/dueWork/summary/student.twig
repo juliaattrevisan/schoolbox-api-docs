@@ -8,6 +8,12 @@
 # @param null|DueWork\Feedback\Model  authoritativeFeedback
 # @param null|FullTimeline            timeline
 # @param bool                         canShowcase
+#
+# @param string $rubricGridPayloads        A json-encoded representation of the rubric grid structure, marked grid, self graded grid
+#                                          For the submission history, this is the most recently given authoritative and self-graded feedbacks.
+# @param array $rubricGridPayloadsHistory  A set of feedback-id indexed json strings corresponding to the rubric payload for a particular feedback
+#                                          Note that self-graded feedback will display like an instructor-given feedback.
+#                                          This is used to populate all the rubric grids in the entire history of someone's feedback
 #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
@@ -148,10 +154,16 @@
         student: student,
         returnUrl: returnUrl,
         returnUrlEncoded: returnUrlEncoded
-    } only%}
+    } only %}
 {% endif %}
 
-{% include '@learningAssessment/dueWork/history.twig' %}
+{% include '@learningAssessment/dueWork/history.twig' with {
+    participant: participant,
+    timeline: timeline,
+    turnitinApiEnabled: turnitinApiEnabled,
+    rubricGridPayloadsHistory: rubricGridPayloadsHistory,
+    viewRoute: viewRoute,
+} only %}
 
 {% if timeline is empty %}
     {% include '@learningAssessment/dueWork/summary/submitButton.twig' with {

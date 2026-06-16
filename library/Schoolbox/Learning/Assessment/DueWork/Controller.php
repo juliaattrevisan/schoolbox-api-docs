@@ -485,26 +485,29 @@ class Controller extends Assessment\Controller
         );
         $lastView->addNewView($assessment, $student, $this->getUser());
 
+        /* Various feedback entities
+         */
+        $authoritativeFeedback = $participant?->findAuthoritativeVisibleFeedback($this->getUser());
+        $selfAssessmentFeedback = $participant?->findMostRecentSelfAssessedPublishedFeedback();
+
         /* Find all the records spawned by $participant
          *
          * Order them by submitted time to find the most recent, and use that
          */
         $twigData = [
-            'lastViews'    => $lastView->getTwigViews($assessment, $student, $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder())),
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
-                [
-                    $assessment->getTitle(),
-                    '',
-                ]
-            ),
+            'lastViews' => $lastView->getTwigViews($assessment, $student, $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder())),
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([
+                $assessment->getTitle(),
+                '',
+            ]),
             'assessment'             => $assessment,
             'student'                => $student,
             'participant'            => $participant,
             'returnUrl'              => $returnUrl,                   // Unencoded URL for use in direct redirection (eg. <a href='{{ returnUrl }}'>)
             'returnUrlEncoded'       => Redirect::encode($returnUrl), // Encoded URL For use as a URL parameter (eg. '?returnUrl={{ returnUrlEncoded }}')
             'timeline'               => $participant ? (new FullTimeline($participant))->getForUser($this->getUser()) : null,
-            'authoritativeFeedback'  => $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null,
-            'selfAssessmentFeedback' => $participant ? $participant->findMostRecentSelfAssessedPublishedFeedback() : null,
+            'authoritativeFeedback'  => $authoritativeFeedback,
+            'selfAssessmentFeedback' => $selfAssessmentFeedback,
             'selfReflect'            => $participant ? (new ValidSelfReflectionWithResponse())->isSatisfiedBy($this->getUser(), $participant) : null,
             'selfAssess'             => $participant ? (new ValidSelfGradableWithResponse())->isSatisfiedBy($this->getUser(), $participant) : null,
 
@@ -547,6 +550,35 @@ class Controller extends Assessment\Controller
 
             // detect the combination of "accept none + self-assess" and allow ACK in this case
             $twigData['acknowledgementBlocked'] = false === ($assessment->isSelfAssessable() && $assessment->isAcceptNone());
+        }
+
+        /* The most recent authoritative and self-graded feedbacks appear here as usual
+         */
+        $twigData['rubricGridPayloads'] = new Payload(
+            $this->rubricMapper,
+            $this->getConfigLoader()->get(ConfigMapper::NAME_RUBRIC_SHOW_POINTS),
+            $this->getUser()
+        )->generate(
+            $assessment->getRubricInstances(),
+            $selfAssessmentFeedback,
+            $authoritativeFeedback,
+        );
+
+        /* Other Rubric Grid Payloads indexed by a feedback id. This is because the timeline displays multiple sets of
+         * rubric grids; it's not just the grids for one feedback anymore.
+         */
+        $payloadGenerator = new Payload(
+            $this->rubricMapper,
+            $this->getConfigLoader()->get(ConfigMapper::NAME_RUBRIC_SHOW_POINTS),
+            $this->getUser()
+        );
+
+        foreach ($participant->getAllFeedbacks() as $feedback) {
+            $twigData['rubricGridPayloadsHistory'][$feedback->getId()] = $payloadGenerator->generate(
+                $assessment->getRubricInstances(),
+                null,  // show self-graded feedback as if they were instructor-derived
+                $feedback,
+            );
         }
 
         $this->response = $this->responseFromTemplate(
@@ -1242,7 +1274,6 @@ class Controller extends Assessment\Controller
             'showGroupTotal' => null,
             'showRubricTotal' => $selfAssess
         ];
-
 
         /* Rubric Grid Payloads
          */
