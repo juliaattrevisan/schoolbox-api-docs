@@ -16,33 +16,41 @@ use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$app = new class extends CliTool\App {
+$app = new class extends CliTool\BaseApp {
     /** @inheritDoc */
     public function runAsRoot(): ?bool
     {
         return null;
     }
 
-    /** @inheritDoc */
-    public function getShortOpts(): array
+    protected function getName(): string
     {
-        return ['h'];
+        return 'cleanup-poison-msgs';
     }
 
-    /** @inheritDoc */
-    public function getLongOpts(): array
+    protected function getDescription(): string
     {
-        return ['help'];
+        return <<<DESC
+            This script is used to remove poisoned messages from the system PERMANENTLY. It will search the entire notification
+            message list and delete any messages which are not able to be converted to notifications.
+
+            Please ensure you do a dry run before you run the script as this is unrecoverable.
+            DESC;
+    }
+
+    protected function setOptions(): self
+    {
+        return $this;
+    }
+
+    protected function hasPerformMode(): bool
+    {
+        return true;
     }
 
     /** @inheritDoc */
     public function run(): void
     {
-        if ($this->getOpt('h') || $this->getOpt('help')) {
-            $this->printHelp();
-            exit(CliTool\Kernel::EXIT_STATUS_OK);
-        }
-
         $redis = Redis::getStorageClientInstance();
         if (!$redis) {
             $this->getLogger()->critical("Redis instance not available");
@@ -84,27 +92,6 @@ $app = new class extends CliTool\App {
         } else {
             $this->getLogger()->info("$acks poisoned messages found: run with -p to delete");
         }
-    }
-
-    /**
-     * Print a help message of available options
-     */
-    private function printHelp(): void
-    {
-        echo "
-This script is used to remove poisoned messages from the system PERMANENTLY. It will search the entire notification
-message list and delete any messages which are not able to be converted to notifications.
-
-Please ensure you do a dry run before you run the script as this is unrecoverable.
-
-Usage: cleanup-poison-msgs.php [-p]
-
-Options:
-    -h, --help
-        Print help message and exit.
-    -p, --perform
-        Without this flag, tool will not delete messages
-";
     }
 };
 

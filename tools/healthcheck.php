@@ -17,39 +17,33 @@ require_once __DIR__ . '/../conf/core/require.php';
 /**
  * Perform external database permission checks
  */
-$app = new class extends CliTool\App
+$app = new class extends CliTool\BaseApp
 {
-    // --help: print help
-    private const OPT_LONG_HELP = 'help';
-
-
-    /** @inheritdoc */
-    public function getLongOpts(): array
+    protected function getName(): string
     {
-        return [
-            self::OPT_LONG_HELP,
-        ];
+        return 'healthcheck';
     }
 
+    protected function getDescription(): string
+    {
+        return 'Checks access permissions to database tables and stored procedures in the external db. You only get visual feedback when you use verbose mode.';
+    }
+
+    protected function setOptions(): self
+    {
+        return $this;
+    }
+
+    protected function hasPerformMode(): bool
+    {
+        return false;
+    }
 
     /**
      * Run the cli tool
      */
     public function run(): void
     {
-        if ($this->getOpt(self::OPT_LONG_HELP)) {
-            echo <<<HELP
-
-Check access permissions to database tables and stored procedures in the external db.
-You only get visual feedback when you use verbose mode.
-
-Usage: healthcheck.php -vvv
-
-
-HELP;
-            exit;
-        }
-
         $this->getLogger()->info('Running health check script');
 
         if (!$this->getConfig()->get('external_enable')) {

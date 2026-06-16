@@ -13,12 +13,32 @@ use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$app = new class extends CliTool\App {
+$app = new class extends CliTool\BaseApp {
     private const P_INTERVAL = 'PT%dS';
     private const P_TIME     = '%dd %hh %im %ss';
     private const P_OUTPUT   = '%s TTL %s';
     private const PERSISTED  = 'NOT SET';
     private const NOT_EXIST  = 'DOES NOT EXIST';
+
+    protected function getName(): string
+    {
+        return 'reset-ttls';
+    }
+
+    protected function getDescription(): string
+    {
+        return 'Scans Redis notification message keys, logs their current TTL, and resets the expiry of any persisted (TTL-less) key based on the message\'s original timestamp.';
+    }
+
+    protected function setOptions(): self
+    {
+        return $this;
+    }
+
+    protected function hasPerformMode(): bool
+    {
+        return false;
+    }
 
     /** @inheritDoc */
     public function run(): void
