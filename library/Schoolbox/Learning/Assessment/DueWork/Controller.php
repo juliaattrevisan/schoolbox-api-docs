@@ -577,7 +577,7 @@ class Controller extends Assessment\Controller
          */
         $twigData['rubricGridPayloadsHistory'] = [];
 
-        foreach ($participant->getAllFeedbacks() as $feedback) {
+        foreach ($participant?->getAllFeedbacks() as $feedback) {
             $twigData['rubricGridPayloadsHistory'][$feedback->getId()] = $payloadGenerator->generate(
                 $assessment->getRubricInstances(),
                 null,  // show self-graded feedback as if they were instructor-derived

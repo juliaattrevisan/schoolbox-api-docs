@@ -111,7 +111,7 @@ class Payload
                 'markedGrid' => $markedGrid,
             ];
         }
-new \Alaress_Probe($struct);
+
         return json_encode($struct);
     }
 }
