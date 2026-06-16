@@ -62,7 +62,7 @@ defineEmits<{
                 :disabled="isLoading"
                 @click="$emit('manuallyRegister')"
             >
-                <sbx-icon name="approve"></sbx-icon>
+                <sbx-icon name="international-baccalaureate"></sbx-icon>
                 Mark as manually registered
             </button>
             <button
