@@ -259,7 +259,7 @@
                                                 >{{ publishedMarks.humanReadableMark|default('–') }}</a>
 
                                                 {# Diagnostic reasoning #}
-                                                <p data-actual-mark style="display:none">
+                                                <p data-actual-mark data-reasoning style="display:none">
                                                     {% for contribution in publishedReasoning %}
                                                         {{ contribution }}<br />
                                                     {% endfor %}
@@ -271,7 +271,7 @@
                                                    data-draft-mark
                                                 >{{ draftMarks.humanReadableMark|default('–') }}</a>
 
-                                                <p data-draft-mark style="display:none">
+                                                <p data-draft-mark data-reasoning style="display:none">
                                                     {% for contribution in draftReasoning %}
                                                         {{ contribution }}<br />
                                                     {% endfor %}
@@ -312,7 +312,7 @@
                                                     >{{ publishedMarks.humanReadableMark|default('–') }}</a>
 
                                                     {# Diagnostic reasoning #}
-                                                    <p data-actual-mark style="display:none">
+                                                    <p data-actual-mark data-reasoning style="display:none">
                                                         {% for contribution in publishedReasoning %}
                                                             {{ contribution }}<br />
                                                         {% endfor %}
@@ -325,7 +325,7 @@
                                                     >{{ draftMarks.humanReadableMark|default('–') }}</a>
 
                                                     {# Diagnostic reasoning #}
-                                                    <p data-draft-mark style="display:none">
+                                                    <p data-draft-mark data-reasoning style="display:none">
                                                         {% for contribution in draftReasoning %}
                                                             {{ contribution }}<br />
                                                         {% endfor %}
