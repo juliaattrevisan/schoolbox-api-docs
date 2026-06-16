@@ -1252,6 +1252,20 @@ class Controller extends Base
      */
     private function aggregateMarks(array $assessments, array $studentMarks, array $exclusions, Folder\Model $folder, bool $includeDiagnostic): array
     {
+        /* Non-iterable Coefficients Lookup
+         *
+         * Coefficients of a weighted sum algorithm are tabulated here, per student, for convenience.
+         * This saves you having to constantly traverse data sets to get something for the WeightedAggregator formula.
+         *
+         * NOTE That this is intended as a HASH LOOKUP ONLY.
+         * IT IS NOT intended for you to foreach() because of its intentional structure.
+         *
+         * I didn't really have the time or inclination to convert this to a tightly-typed struct with limited access.
+         * The next evolution of this would be a defined object, Coefficients, which is immutable: pass $assessments
+         * as a dependency, ->generate(), and only have read methods to a coordinate in the struct. This would make it
+         * effectively readonly once generated.
+         */
+
         /* $coefficients is a set of supposedly-convenient values that we can quickly reference
          *
         $coefficient['assessments'][$assessmentId]
