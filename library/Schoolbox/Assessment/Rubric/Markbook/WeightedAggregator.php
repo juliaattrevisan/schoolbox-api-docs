@@ -61,6 +61,12 @@ class WeightedAggregator
             return null;
         }
 
+        /* If the grid weight was falsey, it doesn't count toward anything and shouldn't be equated to zero.
+         */
+        if (!$gridWeight) {
+            return null;
+        }
+
         /* normalised mark is null; this doesn't count toward anything and shouldn't be equated to zero.
          * Exit early instead.
          */
