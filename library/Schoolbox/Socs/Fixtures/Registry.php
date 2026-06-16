@@ -61,6 +61,7 @@ class Registry
 
     public const string EXTERNAL_ID_PREFIX = 'socs:';
 
+    // Standard Results Feed date format (https://help.socscms.com/Page.asp?ID=276&CatID=13)
     public const string SOCS_DATE_FORMAT = 'j M Y';
 
     public const SOCS_FIXTURES = 'SOCS Fixtures';

@@ -51,7 +51,6 @@ class Import implements IStrategy
      */
     public function import(): void
     {
-        // Standard Results Feed date format (https://help.socscms.com/Page.asp?ID=276&CatID=13)
         $dateFormat = Registry::SOCS_DATE_FORMAT;
         $startDate = \Alaress_Date_Format::now()->addDays(self::FROM)->getUsingFormat($dateFormat);
         $endDate = \Alaress_Date_Format::now()->addDays(self::TO)->getUsingFormat($dateFormat);
