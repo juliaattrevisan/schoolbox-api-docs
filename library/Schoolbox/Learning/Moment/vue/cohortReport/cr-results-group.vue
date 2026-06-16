@@ -74,7 +74,7 @@ window.Vue.onMounted(() => {
 
 <template>
     <div class="l-flex-col">
-        <div class="c-card" :class="{ 'c-card--border-end': showExpandedBorder }">
+        <div class="c-card l-c-cr-top" :class="{ 'c-card--border-end': showExpandedBorder }">
             <div class="l-flex-row l-pad-s l-gap-s">
                 <div class="l-flex-col l-flex--justify-center f-no-margins l-pad-s--left">
                     <input
@@ -95,7 +95,7 @@ window.Vue.onMounted(() => {
             </div>
         </div>
 
-        <div ref="entryListRef" class="c-card">
+        <div ref="entryListRef" class="c-card l-c-cr-bottom">
             <div class="cr-results-grid l-grid l-gap-m l-pad-m">
                 <cr-results-group-entry
                     v-for="entry in props.entries"
