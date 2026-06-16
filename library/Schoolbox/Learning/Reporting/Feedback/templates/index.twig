@@ -138,12 +138,9 @@
                                             } only %}
                                         </label>
 
-{#                                        {% if assessment.useRubric and not readonly %}#}
-{#                                            {% include '@learningDueWorkResponse/inlineGrading/fragments/assignFromRubricButton.twig' with {#}
-{#                                                locale: locale,#}
-{#                                                rubricId: assessment.rubricGrid.id,#}
-{#                                            } only %}#}
-{#                                        {% endif %}#}
+{#                                         {% if assessment.rubricInstances.count and not readonly %} #}
+{#                                             {% include '@learningDueWorkResponse/inlineGrading/fragments/assignFromRubricButton.twig' with {} only %} #}
+{#                                         {% endif %} #}
                                     </div>
                                 {% endif %}
                             {% endblock %}
