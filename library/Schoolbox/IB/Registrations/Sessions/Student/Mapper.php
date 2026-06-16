@@ -719,6 +719,7 @@ class Mapper extends BaseMapper
                     g.sequence AS group_sequence,
                     s.id AS subject_id,
                     s.name AS subject_name,
+                    s.transcript_name as transcript_name,
                     l.id AS language_id,
                     l.code AS language_code,
                     l.name AS language_name
@@ -768,6 +769,7 @@ class Mapper extends BaseMapper
                     g.sequence AS group_sequence,
                     s.id AS subject_id,
                     s.name AS subject_name,
+                    s.transcript_name as transcript_name,
                     l.id AS language_id,
                     l.code AS language_code,
                     l.name AS language_name
@@ -824,6 +826,7 @@ class Mapper extends BaseMapper
                     (new IBSubjectModel())
                         ->setId((int) $row['subject_id'])
                         ->setName((string) $row['subject_name'])
+                        ->setTranscriptName((string) $row['transcript_name'])
                 )
                 ->setLanguages(new GenericCollection(GroupSubjectLanguageModel::class));
 
