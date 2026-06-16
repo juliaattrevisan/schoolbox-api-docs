@@ -439,6 +439,9 @@ window.Vue.onMounted((): void => {
                     :search-languages-endpoint="props.searchLanguagesEndpoint"
                     section="unconfirmed"
                     :active-selection-section="activeSelectionSection"
+                    @renotify-single="
+                        (userId) => handleRenotifySelected(unconfirmed.filter((s) => s.userId === userId))
+                    "
                     @approve-on-behalf-single="(id) => handleApproveOnBehalf(unconfirmed.filter((s) => s.id === id))"
                     @reset-details-single="(id) => promptResetDetails([id])"
                 />
