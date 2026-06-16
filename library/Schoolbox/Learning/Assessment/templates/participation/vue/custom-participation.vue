@@ -52,6 +52,7 @@ const { onlyShowDP, customisationFilter, customisationOptions, filteredParticipa
 const { showCheckboxes, selectedList, allSelected, isIndeterminate } = useSelectedList(filteredParticipants);
 
 window.Vue.watch([customisationFilter, onlyShowDP], () => {
+    // to avoid having participants selected that are not visible due to the filters, we clear the selection when filters change
     selectedList.value = [];
 });
 
