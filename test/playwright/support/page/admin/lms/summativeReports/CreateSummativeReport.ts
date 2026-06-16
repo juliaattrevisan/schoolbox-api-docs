@@ -12,6 +12,8 @@ export default class CreateSummativeReport {
 
     static readonly TITLE = "input#report-title";
 
+    static readonly DATA_TEST_VIEW_AS = `report-view-as`;
+
     static readonly SUMMARY_TOGGLE = `label[for="report-include-summary"]`;
 
     static readonly CLASS_TOGGLE = `label[for="report-include-class"]`;
@@ -79,6 +81,43 @@ export default class CreateSummativeReport {
      */
     async fillTitleField(title: string): Promise<void> {
         await this.page.fill(CreateSummativeReport.TITLE, title);
+    }
+
+    /**
+     * select the report visibility role
+     * @param viewAs - The role type to select
+     */
+    async selectViewAs(viewAs: "Staff" | "Student" | "Parent"): Promise<void> {
+        await this.page.getByTestId(CreateSummativeReport.DATA_TEST_VIEW_AS).selectOption({ label: viewAs });
+    }
+
+    /**
+     * create a summative report with summary and class pages enabled for a role view
+     * @param title - The title to fill in
+     * @param viewAs - The role type to select
+     * @param academicPeriod - The academic period to fill in
+     * @param yearLevel - The year level to fill in
+     * @param workTypes - The work types to show in summary and class pages
+     */
+    async createReportForViewAs(
+        title: string,
+        viewAs: "Staff" | "Student" | "Parent",
+        academicPeriod: string,
+        yearLevel: string,
+        workTypes: string[],
+    ): Promise<void> {
+        await this.goto();
+        await this.fillTitleField(title);
+        await this.selectViewAs(viewAs);
+        await this.fillPeriodsField(academicPeriod);
+        await this.fillStudentSelectionField("year-levels", yearLevel);
+        await this.toggleSummaryInclusion();
+        await this.toggleClassInclusion();
+        for (const workType of workTypes) {
+            await this.tickSummaryWorkTypeCheckboxes(workType, ["show"]);
+            await this.tickClassWorkTypeCheckboxes(workType, ["show"]);
+        }
+        await this.clickSaveButton();
     }
 
     /**
