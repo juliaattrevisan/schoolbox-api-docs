@@ -14,7 +14,7 @@ CREATE INDEX idx_lu_ib_subjects_name
 
 
 -- Updating the subjects table with the new subject names to match the subject list format
-UPDATE schoolbox.lu_ib_subjects AS subjects
+UPDATE lu_ib_subjects AS subjects
 JOIN (
     SELECT 22 AS id, 'CHEMISTRY' AS transcript_name, 'CHEMISTRY' AS name
     UNION ALL SELECT 35, 'THEORY KNOWL.', NULL
