@@ -77,10 +77,10 @@ class CoreContext
 //        }
 
         // feedback url
-        $this->context['config']['feedback_url_object'] = new \Url($conf->get('feedback_url'));
+        $this->context['config']['feedback_url_object'] = new \Url($conf->get('feedback_url'), $fqdn);
 
-        // Extract skin builder colors
-        $skinColors = [
+        // Extract skin builder config
+        $skinConfig = [
             'skin_colour_navigation_foreground',
             'skin_colour_navigation_background',
             'skin_colour_navigation_hover',
@@ -106,8 +106,8 @@ class CoreContext
             'skin_colour_accent_text',
             'skin_colour_active',
         ];
-        foreach ($skinColors as $skinColor) {
-            $this->context['colours'][$skinColor] = $conf->get($skinColor);
+        foreach ($skinConfig as $skinConfigKey) {
+            $this->context['skinConfig'][$skinConfigKey] = $conf->get($skinConfigKey);
         }
     }
 
