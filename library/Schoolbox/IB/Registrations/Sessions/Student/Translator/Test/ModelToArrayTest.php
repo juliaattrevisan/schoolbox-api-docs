@@ -43,7 +43,7 @@ class ModelToArrayTest extends TestCase
         $this->assertSame(123, $payload['userId']);
         $this->assertSame(456, $payload['registrationSessionStudentId']);
         $this->assertSame(RegistrationSessionStudentModel::STATUS_CONFIRMED, $payload['status']);
-        $this->assertNull($payload['registrationError']);
+        $this->assertNull($payload['errorMessage']);
         $this->assertSame('Nguyen, Alex', $payload['userName']);
         $this->assertNull($payload['ibCandidateNumber']);
         $this->assertFalse($payload['hasMissingDetails']);
@@ -321,7 +321,7 @@ class ModelToArrayTest extends TestCase
         );
     }
 
-    public function testBuildsPayloadWithRegistrationError(): void
+    public function testBuildsPayloadWitherrorMessage(): void
     {
         $payload = $this->createTranslator()(
             $this->buildStudent()->setStatus(RegistrationSessionStudentModel::STATUS_FAILED),
@@ -333,7 +333,7 @@ class ModelToArrayTest extends TestCase
             'Candidate rejected by IBIS'
         );
 
-        $this->assertSame('Candidate rejected by IBIS', $payload['registrationError']);
+        $this->assertSame('Candidate rejected by IBIS', $payload['errorMessage']);
     }
 
     private function createTranslator(): ModelToArray

@@ -178,7 +178,12 @@ async function loadCandidates(): Promise<void> {
         unconfirmed.value = (byKey["unconfirmed"] ?? []).map((s) => mapStudentRow(s, "unconfirmed", renotifyEndpoint));
         confirmed.value = (byKey["confirmed"] ?? []).map((s) => mapStudentRow(s, "confirmed"));
         inProgress.value = (byKey["inProgress"] ?? []).map((s) => mapStudentRow(s, "inProgress"));
-        failed.value = (byKey["failed"] ?? []).map((s) => mapStudentRow(s, "failed") as FailedRow);
+        failed.value = (byKey["failed"] ?? []).map(
+            (s): FailedRow => ({
+                ...mapStudentRow(s, "failed"),
+                errorMessage: s.errorMessage,
+            }),
+        );
         registered.value = (byKey["registered"] ?? []).map(
             (s): RegisteredRow => ({
                 ...mapStudentRow(s, "registered"),

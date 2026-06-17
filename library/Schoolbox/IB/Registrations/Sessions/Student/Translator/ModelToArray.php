@@ -68,7 +68,7 @@ class ModelToArray
             'userId' => $user?->getId(),
             'registrationSessionStudentId' => $student->getId(),
             'status' => $student->getStatus(),
-            'registrationError' => $registrationError,
+            'errorMessage' => $registrationError,
             'userName' => $userName,
             'ibCandidateNumber' => $this->formatNullableValue($user?->getIbCandidateNumber()),
             'hasMissingDetails' => $missingFields !== [],
