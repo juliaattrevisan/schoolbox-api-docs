@@ -1311,9 +1311,25 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $data['rubricGrids'] = [];
         $data['rubricGridsPayload'] = [];
 
-        /* Converts an object to a frontend-friendly payload
+        /* Converts an object to a frontend-friendly payload for displaying the rubric builder component
          */
         $rubricGridTranslator = new RubricGridTranslator\Full();
+
+        /* Converts an objet to a frontend-friendly payload for displaying a grid.twig
+         * Note that this translation is different to the $rubricGridTranslator which converts it for the builder;
+         * this converts a grid to a non-builder usage in the same area.
+         */
+        $data['rubricGridPayloads'] = new \Schoolbox\Assessment\Rubric\Grid\Payload(
+            $this->rubricMapper,
+            $this->getConfigLoader()->get(ConfigMapper::NAME_RUBRIC_SHOW_POINTS),
+            $this->getUser()
+        )->generate(
+            $assessment->getRubricInstances(),
+            /* Feedbacks aren't required in the create/modify areas, despite displaying a grid.twig
+             */
+            null,
+            null,
+        );
 
         /* Assemble each rubric grid via its instance, separately, for now. Maybe there's a shortcut to all this that
          * is cheaper, but this will be the simplest for the time being.
@@ -1334,7 +1350,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
                     ->add(new Level());
             }
 
-            $data['rubricGrids'][] = $rubricGrid;
             $data['rubricGridsPayload'][] = $rubricGridTranslator($rubricGrid);
         }
 

@@ -4,7 +4,8 @@
  # This is the assessment creational/updational section concerning the rubric grid.
  # It appears on the assessment modify screen at the bottom.
  #
- # @param Grid $rubricGrids                 Instances of Grid for each rubric grid attached to this assessment
+ # @param array $rubricGridsPayload         An array struct specifically for rubric-builder component
+ # @param string $rubricGridPayloads        A json-encoded representation of the rubric grid structure, marked grid, self graded grid
  # @param array $rubricAttachZone           An attachzone, for uploading rubric csvs
  # @param array $resultSets                 A Result Set chosen on the assessment modify screen to prepopulate rubric grid levels
  # @param IAssessable $assessment           An assessment instance
@@ -16,18 +17,16 @@
 
 {% if courseManagedReadonly %}
     <div class="row">
-        <div class="small-12 columns{% if not assessment.useRubric %} hide{% endif %}">
+        <div class="small-12 columns{% if not assessment.rubricInstances.count %} hide{% endif %}">
             <div class="small-12 columns no-pad">
-                {# TODO: deal with multiple readonly rubric grids #}
-                {% for rubricGrid in rubricGrids %}
-                    {% include '@rubric/grid.twig' with {
-                        rubricGrid: rubricGrid,
-                        folderId: assessment.context.folder.id,
-                        showRubricTotal: true,
-                        showGroupTotal: assessment.markPerCapability,
-                        rubricMarkedGrid: false,
-                    } only %}
-                {% endfor %}
+
+                {% include '@rubric/grid.twig' with {
+                    assessment: assessment,
+                    folderId: assessment.context.folder.id,
+                    rubricGridPayloads: rubricGridPayloads,
+                    showRubricTotal: true,
+                    showGroupTotal: true,
+                } only %}
             </div>
         </div>
     </div>
