@@ -26,6 +26,7 @@ use Report_Exporter;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IB\Registrations\Api\ResponseLog\Helper as RegistrationApiResponseLogHelper;
 use Schoolbox\IB\Group\Subject\Language\Mapper as GroupSubjectLanguageMapper;
 use Schoolbox\IB\Group\Subject\Language\Model as GroupSubjectLanguageModel;
 use Schoolbox\IB\Group\Subject\Mapper as IBGroupSubjectMapper;
@@ -77,6 +78,7 @@ class Controller extends ConfigController
         private RegistrationSessionStudentSubjectLanguageMapper $registrationSessionStudentSubjectLanguageMapper,
         private RegistrationSessionStudentModelToArray $registrationSessionStudentModelToArray,
         private RegistrationSessionStudentHelper $registrationSessionStudentHelper,
+        private RegistrationApiResponseLogHelper $registrationApiResponseLogHelper,
         private \External_UserInterface $externalUser,
         private UserMapper $userMapper,
         FieldStrategyFactory $fieldStrategyFactory,
@@ -954,12 +956,15 @@ class Controller extends ConfigController
         try {
             $schoolName = (string) ($this->getConfigLoader()->get(ConfigMapper::NAME_IB_SCHOOL_NAME) ?? '');
             $students = $this->registrationSessionStudentMapper->findStudentsForSession($sessionId);
+            $registrationErrorsByStudentId = $this->registrationApiResponseLogHelper
+                ->getLatestErrorMessagesByStudentId($sessionId);
             $studentPayloads = $students
                 ->map(
                     fn(RegistrationSessionStudentModel $student): array => ($this->registrationSessionStudentModelToArray)(
                         $student,
                         $this->findExternalStudent($student),
-                        $schoolName
+                        $schoolName,
+                        $student->getId() !== null ? ($registrationErrorsByStudentId[(int)$student->getId()] ?? null) : null
                     )
                 )
                 ->reindex()

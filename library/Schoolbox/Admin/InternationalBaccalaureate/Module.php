@@ -19,6 +19,8 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IB\Registrations\Api\ResponseLog\Helper as RegistrationApiResponseLogHelper;
+use Schoolbox\IB\Registrations\Api\ResponseLog\Mapper as RegistrationApiResponseLogMapper;
 use Schoolbox\IB\Group\Subject\Language\Mapper as IBGroupSubjectLanguageMapper;
 use Schoolbox\IB\Group\Subject\Mapper as IBGroupSubjectMapper;
 use Schoolbox\IB\Group\Mapper as IBGroupMapper;
@@ -129,6 +131,9 @@ class Module extends BaseModule
                 $this->injector->get('user'),
             ),
             $registrationSessionStudentHelper,
+            new RegistrationApiResponseLogHelper(
+                $this->getMapperFactory()->get(RegistrationApiResponseLogMapper::class)
+            ),
             $this->injector->get('externalUser'),
             $this->getMapperFactory()->get(UserMapper::class),
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),

@@ -27,6 +27,7 @@ use Schoolbox\Collection;
 use Schoolbox\Config\ArrayLoader;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\IB\Registrations\Api\ResponseLog\Helper as RegistrationApiResponseLogHelper;
 use Schoolbox\IB\Group\Mapper as IBGroupMapper;
 use Schoolbox\IB\Group\Subject\Language\Mapper as GroupSubjectLanguageMapper;
 use Schoolbox\IB\Group\Subject\Mapper as IBGroupSubjectMapper;
@@ -74,10 +75,18 @@ class ControllerTest extends TestCase
                 ['S234', ['StudentBirthDate' => '2008-09-24', 'StudentGender' => 'M']],
             ]);
 
+        $responseLogHelper = $this->createMock(RegistrationApiResponseLogHelper::class);
+        $responseLogHelper
+            ->expects($this->once())
+            ->method('getLatestErrorMessagesByStudentId')
+            ->with(12)
+            ->willReturn([789 => 'Candidate rejected by IBIS']);
+
         $controller = $this->buildController(
             $registrationSessionMapper,
             $registrationSessionStudentMapper,
-            $externalUser
+            $externalUser,
+            registrationApiResponseLogHelper: $responseLogHelper
         );
 
         $controller->getRegistrationSessionStudents(12);
@@ -97,6 +106,7 @@ class ControllerTest extends TestCase
                     'userId' => 123,
                     'registrationSessionStudentId' => 456,
                     'status' => RegistrationSessionStudentModel::STATUS_CONFIRMED,
+                    'registrationError' => null,
                     'userName' => 'Nguyen, Alex',
                     'ibCandidateNumber' => null,
                     'hasMissingDetails' => false,
@@ -194,6 +204,7 @@ class ControllerTest extends TestCase
                     'userId' => 234,
                     'registrationSessionStudentId' => 789,
                     'status' => RegistrationSessionStudentModel::STATUS_FAILED,
+                    'registrationError' => 'Candidate rejected by IBIS',
                     'userName' => 'Patel, Sam',
                     'ibCandidateNumber' => null,
                     'hasMissingDetails' => false,
@@ -2246,7 +2257,8 @@ class ControllerTest extends TestCase
         ?RegistrationSessionStudentSubjectLanguageMapper $subjectLanguageMapper = null,
         ?UserMapper $userMapper = null,
         ?User $currentUser = null,
-        ?Environment $twig = null
+        ?Environment $twig = null,
+        ?RegistrationApiResponseLogHelper $registrationApiResponseLogHelper = null
     ): Controller {
         $registrationSessionStudentHelper = new RegistrationSessionStudentHelper();
         $routeGenerator = $this->createStub(Generator::class);
@@ -2314,6 +2326,13 @@ class ControllerTest extends TestCase
                     );
                 }
 
+                if ($route === 'internationalBaccalaureate.sessionRegisterViaApi') {
+                    return sprintf(
+                        '/adminv2/international-baccalaureate/registrations/sessions/%d/register',
+                        $params['sessionId']
+                    );
+                }
+
                 if ($route === 'internationalBaccalaureate.sessionResetDetails') {
                     return sprintf(
                         '/adminv2/international-baccalaureate/registrations/sessions/%d/reset-details',
@@ -2362,6 +2381,12 @@ class ControllerTest extends TestCase
                 $currentUser,
             ),
             $registrationSessionStudentHelper,
+            $registrationApiResponseLogHelper ?? $this->createConfiguredMock(
+                RegistrationApiResponseLogHelper::class,
+                [
+                    'getLatestErrorMessagesByStudentId' => [],
+                ]
+            ),
             $externalUser,
             $userMapper ?? $this->createStub(UserMapper::class),
             $this->createStub(FieldStrategyFactory::class),
