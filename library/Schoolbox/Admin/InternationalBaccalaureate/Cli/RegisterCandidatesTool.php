@@ -463,15 +463,9 @@ class RegisterCandidatesTool extends CliTool\App
                 && $candidateId !== null
                 && $candidateId !== '';
 
-            $student->setStatus(
-                $candidateRegistrationSuccessful
-                    ? RegistrationSessionStudentModel::STATUS_REGISTERED
-                    : RegistrationSessionStudentModel::STATUS_FAILED
-            );
-            $studentMapper->save($student);
-
             if (!$candidateRegistrationSuccessful) {
                 $successful = false;
+                $this->markCandidateRegistrationFailed($student, $studentMapper);
                 continue;
             }
 
