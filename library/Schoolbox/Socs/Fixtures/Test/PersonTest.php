@@ -25,11 +25,19 @@ class PersonTest extends TestCase
 
             public function generate(): array
             {
-                return ['SOCS-123' => 456];
+                return [
+                    'SOCS-123' => [
+                        'id' => 456,
+                        'external_id' => 'SOCS-123',
+                        'firstname' => 'test first',
+                        'lastname' => 'last test',
+                        'preferred_name' => 'preferred test',
+                    ]
+                ];
             }
         };
 
-        $this->assertSame(456, $person->fetchUser('SOCS-123'));
+        $this->assertSame(456, $person->fetchUser('SOCS-123')['id']);
         $this->assertNull($person->fetchUser('missing'));
     }
 }
