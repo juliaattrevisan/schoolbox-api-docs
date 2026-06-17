@@ -119,6 +119,8 @@ class Mapper extends BaseMapper
      *  2. Add a findByIdWithDerivedProperties() function as an alternative to findById()
      *  3. Add a hydrateDerivedProperties() function that could be used to hyrdate an object returned by findById().
      *
+     * Note derived properties are hydrated by $this->getFilteredSessions().
+     *
      * @param \PDOStatement $statement
      * @return GenericCollection<Model>
      * @throws BaseMapper\Exception
