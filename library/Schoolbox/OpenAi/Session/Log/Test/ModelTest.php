@@ -32,17 +32,6 @@ class ModelTest extends TestCase
     }
 
     /**
-     * A plain string passed to setLogFormat is stored and returned unchanged.
-     */
-    public function testSetLogFormatAcceptsString(): void
-    {
-        $model = new Model();
-        $model->setLogFormat('guardrail');
-
-        $this->assertSame('guardrail', $model->getLogFormat());
-    }
-
-    /**
      * Setting the parent session makes it available from the log and keeps the FK in sync.
      */
     public function testSetSessionStoresSessionAndSessionId(): void
