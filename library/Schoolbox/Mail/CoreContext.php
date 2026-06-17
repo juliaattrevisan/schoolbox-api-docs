@@ -14,6 +14,13 @@ use Schoolbox\IConfigLoader;
 
 class CoreContext
 {
+    private const SKIN_CONTAINER_CORNER_RADIUS_VALUES = [
+        'var(--sbx-border-radius-none)' => '0',
+        'var(--sbx-border-radius-s)' => '0.25rem',
+        'var(--sbx-border-radius-m)' => '0.5rem',
+        'var(--sbx-border-radius-l)' => '0.75rem',
+    ];
+
     /** @var array */
     protected $context;
 
@@ -99,19 +106,37 @@ class CoreContext
             'skin_colour_accent_hover',
             'skin_colour_logo_background',
             'skin_colour_body_bg',
-            // add new Sonar UI colours, eventually those colours above should be replaced by these ones
+            // add new Sonar UI colours/settings, eventually those above should be replaced by these
             'skin_colour_menu_background',
             'skin_colour_menu_foreground',
             'skin_colour_accent',
             'skin_colour_accent_text',
             'skin_colour_active',
-
             'skin_container_corner_radius',
-            'skin_container_shadow',
         ];
         foreach ($skinConfig as $skinConfigKey) {
-            $this->context['skinConfig'][$skinConfigKey] = $conf->get($skinConfigKey);
+            $this->context['skinConfig'][$skinConfigKey] = $this->resolveSkinConfigValue(
+                $skinConfigKey,
+                $conf->get($skinConfigKey)
+            );
         }
+    }
+
+    /**
+     * Resolve values to the actual values, as CSS custom properties cannot be used in email templates,
+     * so we need to convert them to their actual values.
+     */
+    private function resolveSkinConfigValue(string $key, $value)
+    {
+        if (!is_string($value)) {
+            return $value;
+        }
+
+        if ($key === 'skin_container_corner_radius') {
+            return self::SKIN_CONTAINER_CORNER_RADIUS_VALUES[$value] ?? $value;
+        }
+
+        return $value;
     }
 
     public function getContext()
