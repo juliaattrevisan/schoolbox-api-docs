@@ -102,7 +102,7 @@ class RegisterSessionsEnvelopeBuilder
             $subjectName = $subjectValues['subject_name'] ?? '';
             /* Skip CAS
              */
-            if (!$subjectName || 'Creativity, Activity, Service (CAS)' === $subjectName || 'Extended Essay (EE)' === $subjectName) {
+            if (!$subjectName || 'Creativity, Activity, Service (CAS)' === $subjectName) {
                 continue;
             }
             $subject = $document->createElement('subject_details');
