@@ -184,9 +184,16 @@ class Mapper extends BaseMapper
         $limitSql  = null !== $limit ? 'LIMIT :limit' : '';
         $offsetSql = null !== $limit && null !== $offset ? 'OFFSET :offset' : '';
 
-        // Requiring anyLog here keeps orphan sessions off the admin list. The
-        // details button is controlled by firstViewableLog, because a session's
-        // first raw log may not have a format the admin UI can render.
+        // Notes
+        //  * Requiring anyLog here keeps orphan sessions off the admin list. The details button is controlled by
+        //    firstViewableLog, because a session's first raw log may not have a format the admin UI can render.
+        //  * derived_log_format is used to determine whether any log in the session is renderable (since rendering
+        //    requires a known log format - see aul-agent-chat.vue).  This usage makes sense, although the name does
+        //    not imply this usage.
+        //  * derived_return_code makes less sense because each log can have its own return_code, and so it is unclear
+        //    how one return_code could be representative of the entire session.
+        //    TODO: Revisit derived_return_code.  Maybe last_error_code would be more useful since then we could tell
+        //          which session ended with an error.
         $query = "
             SELECT
                 `{$this->table}`.id AS id,
