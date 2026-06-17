@@ -11,7 +11,9 @@ namespace Schoolbox\OpenAi\Session\Log\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Editor\OpenAI\Log\LogFormat;
+use Schoolbox\OpenAi\Feature;
 use Schoolbox\OpenAi\Session\Log\Model;
+use Schoolbox\OpenAi\Session\Model as SessionModel;
 
 /**
  * Unit tests for the AI session log {@see Model}.
@@ -38,6 +40,22 @@ class ModelTest extends TestCase
         $model->setLogFormat('guardrail');
 
         $this->assertSame('guardrail', $model->getLogFormat());
+    }
+
+    /**
+     * Setting the parent session makes it available from the log and keeps the FK in sync.
+     */
+    public function testSetSessionStoresSessionAndSessionId(): void
+    {
+        $session = (new SessionModel())
+            ->setId('b3c7f5d4-9c5e-4e0d-8f74-0a9a1d13d01a')
+            ->setFeature(Feature::CHAT);
+
+        $model = new Model();
+        $model->setSession($session);
+
+        $this->assertSame($session, $model->getSession());
+        $this->assertSame('b3c7f5d4-9c5e-4e0d-8f74-0a9a1d13d01a', $model->getAiSessionId());
     }
 
     /**

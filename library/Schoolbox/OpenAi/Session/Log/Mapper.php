@@ -14,6 +14,7 @@ namespace Schoolbox\OpenAi\Session\Log;
 use Schoolbox\Editor\OpenAI\Log\LogFormat;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\OpenAi\Session\Mapper as SessionMapper;
 use Schoolbox\UserMapper;
 
 /**
@@ -48,6 +49,11 @@ class Mapper extends BaseMapper
         $this->uses('response', self::TYPE_STRING);
         $this->uses('return_code', self::TYPE_INTEGER);
         $this->uses('error_message', self::TYPE_STRING);
+        $this->hasJoin('session', [
+            'mapper'    => SessionMapper::class,
+            'this_key'  => 'ai_session_id',
+            'other_key' => 'id',
+        ]);
         $this->joins('created_by', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
     }
@@ -59,11 +65,13 @@ class Mapper extends BaseMapper
      */
     protected function getSelectString(): string
     {
+        $sessionMapper = $this->getJoinMapper('session');
         $userMapper = $this->getJoinMapper('user');
 
         return "
             SELECT
                 {$this->getColumnString()},
+                {$sessionMapper->getColumnString('s')},
                 {$userMapper->getColumnString('u')}
         ";
     }
@@ -77,6 +85,7 @@ class Mapper extends BaseMapper
     {
         return "
             FROM `{$this->table}`
+            JOIN {$this->getJoinSql('session', '', 's', true)}
             LEFT JOIN {$this->getJoinSql('user', '', 'u', true)}
         ";
     }
@@ -90,12 +99,17 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(\PDOStatement $statement)
     {
+        $sessionMapper = $this->getJoinMapper('session');
         $userMapper = $this->getJoinMapper('user');
 
         $collection = $this->createCollection();
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $log = $this->hydrate($row);
+
+            /** @var \Schoolbox\OpenAi\Session\Model $session */
+            $session = $sessionMapper->hydrate($row, 's');
+            $log->setSession($session);
 
             /** @var \Schoolbox\User $user */
             $user = $userMapper->hydrate($row, 'u');

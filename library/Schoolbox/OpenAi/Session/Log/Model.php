@@ -13,6 +13,7 @@ namespace Schoolbox\OpenAi\Session\Log;
 
 use Schoolbox\Editor\OpenAI\Log\LogFormat;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
+use Schoolbox\OpenAi\Session\Model as SessionModel;
 use Schoolbox\User;
 
 class Model
@@ -21,6 +22,7 @@ class Model
     use ModelTrait\CreatedAtDate;
 
     private ?string $aiSessionId = null;
+    private ?SessionModel $session = null;
     private ?User $user = null;
     private string $prompt;
     private ?int $inputTokens = null;
@@ -58,6 +60,29 @@ class Model
     public function setAiSessionId(string $aiSessionId): self
     {
         $this->aiSessionId = $aiSessionId;
+        return $this;
+    }
+
+    /**
+     * @return SessionModel|null
+     */
+    public function getSession(): ?SessionModel
+    {
+        return $this->session;
+    }
+
+    /**
+     * @param SessionModel|null $session
+     * @return $this
+     */
+    public function setSession(?SessionModel $session): self
+    {
+        $this->session = $session;
+
+        if (null !== $session?->getId()) {
+            $this->aiSessionId = $session->getId();
+        }
+
         return $this;
     }
 
