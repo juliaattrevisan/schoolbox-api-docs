@@ -15,6 +15,10 @@ use Schoolbox\IConfigLoader;
 
 class CoreContext
 {
+
+    /**
+     * Mapping of skin config keys to their corresponding corner radius values, as CSS custom properties cannot be used in email templates,
+     */
     private const SKIN_CORNER_RADIUS_VALUES = [
         'var(--sbx-border-radius-none)' => '0',
         'var(--sbx-border-radius-s)' => '0.25rem',
@@ -22,6 +26,11 @@ class CoreContext
         'var(--sbx-border-radius-l)' => '0.75rem',
     ];
 
+    /**
+     * When Sonar UI is disabled, these Sonar skin config keys should fall back to legacy skin config values or hardcoded defaults,
+     * as the email templates still use these Sonar skin config keys but the legacy skin config values still need to be used while Sonar UI is disabled.
+     * This will be removed once Sonar UI is enabled for all schools and the legacy skin config values are no longer used anywhere in the codebase.
+     */
     private const DISABLED_SONAR_SKIN_CONFIG_FALLBACKS = [
         'skin_colour_menu_background' => ['config' => 'skin_colour_navigation_background'],
         'skin_colour_menu_foreground' => ['config' => 'skin_colour_navigation_foreground'],
