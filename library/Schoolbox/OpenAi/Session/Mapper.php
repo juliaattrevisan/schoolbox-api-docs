@@ -204,8 +204,13 @@ class Mapper extends BaseMapper
                 EXISTS (
                     SELECT 1 FROM `ai_session_log` errorLog
                     WHERE errorLog.ai_session_id = `{$this->table}`.id
-                    AND errorLog.return_code IS NOT NULL
-                    AND errorLog.return_code <> :successfulReturnCode
+                    AND (
+                        (
+                            errorLog.return_code IS NOT NULL
+                            AND errorLog.return_code <> :successfulReturnCode
+                        )
+                        OR errorLog.error_message IS NOT NULL
+                    )
                 ) AS derived_has_error,
                 {$this->getJoinColumnString('user', 'u')}
             FROM `{$this->table}`

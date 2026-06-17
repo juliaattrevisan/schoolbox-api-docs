@@ -57,7 +57,7 @@ class Model
     private ?int $derivedReturnCode = null;
 
     /**
-     * Whether any log in this session has a non-200 return code, for the admin list only.
+     * Whether any log in this session has an error condition, for the admin list only.
      * Not a column; populated by {@see Mapper::getFilteredSessions()}.
      *
      * @var bool
