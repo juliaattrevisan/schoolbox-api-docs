@@ -10,6 +10,7 @@
 namespace Schoolbox\Mail;
 
 use Schoolbox\Cdn\PrefixGenerator;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 
 class CoreContext
@@ -19,6 +20,15 @@ class CoreContext
         'var(--sbx-border-radius-s)' => '0.25rem',
         'var(--sbx-border-radius-m)' => '0.5rem',
         'var(--sbx-border-radius-l)' => '0.75rem',
+    ];
+
+    private const DISABLED_SONAR_SKIN_CONFIG_FALLBACKS = [
+        'skin_colour_menu_background' => ['config' => 'skin_colour_navigation_background'],
+        'skin_colour_menu_foreground' => ['config' => 'skin_colour_navigation_foreground'],
+        'skin_colour_accent' => ['config' => 'skin_colour_content_ui_submit_background'],
+        'skin_colour_accent_text' => ['config' => 'skin_colour_content_ui_submit_foreground'],
+        'skin_container_corner_radius' => ['value' => '0'],
+        'skin_field_corner_radius' => ['value' => '0'],
     ];
 
     /** @var array */
@@ -115,12 +125,31 @@ class CoreContext
             'skin_container_corner_radius',
             'skin_field_corner_radius',
         ];
+        $advancedUiEnabled = (bool) $conf->get(ConfigMapper::NAME_SONAR_UI_TOGGLE);
         foreach ($skinConfig as $skinConfigKey) {
             $this->context['skinConfig'][$skinConfigKey] = $this->resolveSkinConfigValue(
                 $skinConfigKey,
-                $conf->get($skinConfigKey)
+                $this->getSkinConfigValue($conf, $skinConfigKey, $advancedUiEnabled)
             );
         }
+    }
+
+    /**
+     * Email templates use Sonar skin config keys, but legacy skin config values still need to be used
+     * while Sonar UI is disabled.
+     */
+    private function getSkinConfigValue(IConfigLoader $conf, string $key, bool $advancedUiEnabled)
+    {
+        if ($advancedUiEnabled || !array_key_exists($key, self::DISABLED_SONAR_SKIN_CONFIG_FALLBACKS)) {
+            return $conf->get($key);
+        }
+
+        $fallback = self::DISABLED_SONAR_SKIN_CONFIG_FALLBACKS[$key];
+        if (array_key_exists('config', $fallback)) {
+            return $conf->get($fallback['config']);
+        }
+
+        return $fallback['value'];
     }
 
     /**
