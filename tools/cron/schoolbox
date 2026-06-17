@@ -172,6 +172,7 @@ MAILTO="ist+cron@schoolbox.com.au"
 0 7 * * * www-data /usr/local/bin/jitter 3600 php /usr/share/schoolbox/tools/canvas/import.php -p >> /var/log/schoolbox/canvas-data-sync.log 2>&1
 
 # International Baccalaureate Candidates
-*/1 * * * * www-data php /usr/share/schoolbox/tools/international-baccalaureate/register-candidates.php -vvv -p >> /var/log/schoolbox/ib-candidates.log 2>&1
+# runs every 3 minutes with some jitters
+*/3 * * * * www-data /usr/local/bin/jitter 300 php /usr/share/schoolbox/tools/international-baccalaureate/register-candidates.php -p >> /var/log/schoolbox/ib-candidates.log 2>&1
 
 # End of file - do not delete

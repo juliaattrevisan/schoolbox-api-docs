@@ -39,8 +39,8 @@ class RegisterCandidatesTool extends CliTool\App
     private const string OPT_LONG_BATCH_SIZE = 'batch-size:';
     private const string OPT_LONG_TIMEOUT = 'timeout:';
 
-    private const int DEFAULT_BATCH_SIZE = 50;
-    private const int DEFAULT_TIMEOUT = 180;
+    private const int DEFAULT_BATCH_SIZE = 5;
+    private const int DEFAULT_TIMEOUT = 300;
 
     public function getLongOpts(): array
     {
