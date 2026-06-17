@@ -217,81 +217,113 @@ class RegisterCandidatesTool extends CliTool\App
                 continue;
             }
 
-            $this->getLogger()->info(
-                sprintf(
-                    'Submitting candidate #%s %s to IBIS for %s %s Session registration.',
-                    $student->getId() ?? 'unknown',
-                    $student->getUser()?->getFullName() ?? 'unknown',
-                    $student->getRegistrationSession()->getExamSession(),
-                    $student->getRegistrationSession()->getAcademicYear(),
+            if (
+                !$this->registerCandidateSession(
+                    $student,
+                    $sessionBuilder,
+                    $clientFactory,
+                    $client,
+                    $studentMapper,
+                    $schoolCode
                 )
-            );
-
-            try {
-                $session = $sessionBuilder->build($student, $user->getIbCandidateNumber(), $schoolCode);
-                $sessionRequest = $clientFactory->buildRegisterSessionsRequest([$session]);
-                $sessionResponse = $client->registerSessions($sessionRequest);
-            } catch (Throwable $e) {
+            ) {
                 $failed++;
-                $this->getLogger()->error(
-                    sprintf(
-                        'IBIS session registration submission failed for candidate #%s %s.',
-                        $student->getId() ?? 'unknown',
-                        $student->getUser()?->getFullName() ?? 'unknown',
-                    ),
-                    ['exception' => $e]
-                );
-                $this->markCandidateRegistrationFailed($student, $studentMapper);
-                continue;
-            }
-
-            if (!$sessionResponse->isSuccess()) {
-                $this->getLogger()->warning(
-                    sprintf(
-                        'IBIS did not accept candidate #%s %s\'s session registration: %s',
-                        $student->getId() ?? 'unknown',
-                        $student->getUser()?->getFullName() ?? 'unknown',
-                        $sessionResponse->getErrorSummary() ?? 'unknown fault'
-                    )
-                );
-            }
-
-            $sessionResponses = $sessionResponse->getSessionResponses();
-            foreach ($sessionResponses as $sessionResponseItem) {
-                $success = $sessionResponseItem['successful'];
-                $student->setStatus(
-                    $success
-                        ? RegistrationSessionStudentModel::STATUS_REGISTERED
-                        : RegistrationSessionStudentModel::STATUS_FAILED
-                );
-                $studentMapper->save($student);
-
-                if (!$success) {
-                    $failed++;
-                    $this->getLogger()->warning(
-                        sprintf(
-                            'IBIS session registration failed for candidate #%s %s in %s %s IB session.',
-                            $student->getId() ?? 'unknown',
-                            $student->getUser()?->getFullName() ?? 'unknown',
-                            $student->getRegistrationSession()->getExamSession(),
-                            $student->getRegistrationSession()->getAcademicYear(),
-                        )
-                    );
-                } else {
-                    $this->getLogger()->notice(
-                        sprintf(
-                            'Successfully registered candidate #%s %s for %s %s IB session in IBIS.',
-                            $student->getId() ?? 'unknown',
-                            $student->getUser()?->getFullName() ?? 'unknown',
-                            $student->getRegistrationSession()->getExamSession(),
-                            $student->getRegistrationSession()->getAcademicYear(),
-                        )
-                    );
-                }
             }
         }
 
         return $failed > 0 ? CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR : CliKernelAbstract::EXIT_STATUS_OK;
+    }
+
+    /**
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function registerCandidateSession(
+        RegistrationSessionStudentModel $student,
+        RegisterSessionsSessionBuilder $sessionBuilder,
+        ClientFactory $clientFactory,
+        IClient $client,
+        RegistrationSessionStudentMapper $studentMapper,
+        string $schoolCode
+    ): bool {
+        $user = $student->getUser();
+        $candidateId = trim((string) ($user?->getIbCandidateNumber() ?? ''));
+
+        $this->getLogger()->info(
+            sprintf(
+                'Submitting candidate #%s %s to IBIS for %s %s Session registration.',
+                $student->getId() ?? 'unknown',
+                $user?->getFullName() ?? 'unknown',
+                $student->getRegistrationSession()->getExamSession(),
+                $student->getRegistrationSession()->getAcademicYear(),
+            )
+        );
+
+        try {
+            $session = $sessionBuilder->build($student, $candidateId, $schoolCode);
+            $sessionRequest = $clientFactory->buildRegisterSessionsRequest([$session]);
+            $sessionResponse = $client->registerSessions($sessionRequest);
+        } catch (Throwable $e) {
+            $this->getLogger()->error(
+                sprintf(
+                    'IBIS session registration submission failed for candidate #%s %s.',
+                    $student->getId() ?? 'unknown',
+                    $user?->getFullName() ?? 'unknown',
+                ),
+                ['exception' => $e]
+            );
+            $this->markCandidateRegistrationFailed($student, $studentMapper);
+
+            return false;
+        }
+
+        if (!$sessionResponse->isSuccess()) {
+            $this->getLogger()->warning(
+                sprintf(
+                    'IBIS did not accept candidate #%s %s\'s session registration: %s',
+                    $student->getId() ?? 'unknown',
+                    $user?->getFullName() ?? 'unknown',
+                    $sessionResponse->getErrorSummary() ?? 'unknown fault'
+                )
+            );
+        }
+
+        $successful = true;
+
+        foreach ($sessionResponse->getSessionResponses() as $sessionResponseItem) {
+            $sessionRegistrationSuccessful = $sessionResponseItem['successful'];
+            $student->setStatus(
+                $sessionRegistrationSuccessful
+                    ? RegistrationSessionStudentModel::STATUS_REGISTERED
+                    : RegistrationSessionStudentModel::STATUS_FAILED
+            );
+            $studentMapper->save($student);
+
+            if (!$sessionRegistrationSuccessful) {
+                $successful = false;
+                $this->getLogger()->warning(
+                    sprintf(
+                        'IBIS session registration failed for candidate #%s %s in %s %s IB session.',
+                        $student->getId() ?? 'unknown',
+                        $user?->getFullName() ?? 'unknown',
+                        $student->getRegistrationSession()->getExamSession(),
+                        $student->getRegistrationSession()->getAcademicYear(),
+                    )
+                );
+                continue;
+            }
+
+            $this->getLogger()->notice(
+                sprintf(
+                    'Successfully registered candidate #%s %s for %s %s IB session in IBIS.',
+                    $student->getId() ?? 'unknown',
+                    $user?->getFullName() ?? 'unknown',
+                    $student->getRegistrationSession()->getExamSession(),
+                    $student->getRegistrationSession()->getAcademicYear(),
+                )
+            );
+        }
+
+        return $successful;
     }
 
     /**
