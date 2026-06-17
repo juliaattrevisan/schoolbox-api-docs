@@ -64,7 +64,7 @@ VALUES (
 INSERT INTO config (`name`, `value`, `title`, `description`, `field_id`,  `type_id`, `editable`, `hidden`, `required`, `module`, sequence)
 VALUES (
            'socs_endpoint_id',
-           '2460', # We don't know if this the same for all schools or not, so make it editable just in case, but pre-populate with the value from our test creds
+           '',
            'SOCS Endpoint ID',
            'The ID for the URL Auth from the SOCS app that allows SOCS events to be imported into Fixtures.',
            (SELECT id FROM lu_config_field WHERE field = 'input'),
