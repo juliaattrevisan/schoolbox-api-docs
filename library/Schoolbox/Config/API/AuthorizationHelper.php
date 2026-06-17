@@ -132,7 +132,6 @@ class AuthorizationHelper
      */
     public static function canEditConfig(Config $config, array $serverParams, InstanceRegistryIssued $jwtParser): bool
     {
-        return true;
         // Instance Registry tokens can edit everything
         if (self::isInstanceRegistryTokenRequest($serverParams, $jwtParser)) {
             return true;
