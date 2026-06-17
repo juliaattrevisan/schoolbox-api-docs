@@ -10,7 +10,7 @@
  # @param Participant\Model $participant     A participant instance
  # @param bool $showGroupTotal               An arbitrary decision about whether Capability Marks could display here, if extant.
  # @param bool $showRubricTotal              An arbitrary decision about whether Rubric Grid Totals could display here, if extant
- # @param string $rubricGridPayloads         A json-encoded representation of the rubric grid structure, marked grid, self graded grid
+ # @param string $rubricMarkedGridPayloads   A json-encoded representation of the rubric grid structure, marked grid, self graded grid
  # @param IFeedback $selfAssessmentFeedback  "the self-assessed feedback, shouldst there be one"
  # @param bool $readonly                     A bool corresponding to whether a combobox is in readonly mode, such as when you revisit this screen but the academic period ended already
  # @param array $errors                      A stack of Submission States, contrary to its naming which is misleading (I know, I know...)
@@ -40,7 +40,7 @@
             selfAssess: selfAssess,
             selfReflect: selfReflect,
             selfAssessmentFeedback: selfAssessmentFeedback ?? null,
-            rubricGridPayloads: rubricGridPayloads,
+            rubricMarkedGridPayloads: rubricMarkedGridPayloads,
             showGroupTotal: showGroupTotal,
             showRubricTotal: showRubricTotal,
         } only %}

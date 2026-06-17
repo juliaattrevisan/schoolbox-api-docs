@@ -6,7 +6,7 @@
  # for an assessment.
  #
  # @param IAssessable $assessment                A fully hydrated learning activity instance
- # @param string $rubricGridPayloads             A json-encoded representation of the rubric grid structure, marked grid, self graded grid
+ # @param string $rubricMarkedGridPayloads       A json-encoded representation of the rubric grid structure, marked grid, self graded grid
  #
  #
  # ------------------------
@@ -281,7 +281,7 @@
                 learner: participant.user,
                 selfAssess: assessment.isSelfAssessable ?? false,
                 selfReflect: assessment.isSelfReflectionOnly ?? false,
-                rubricGridPayloads: rubricGridPayloads,
+                rubricMarkedGridPayloads: rubricMarkedGridPayloads,
                 showGroupTotal: showGroupTotal ?? false,
                 showRubricTotal: showRubricTotal ?? false,
                 collapsible: false

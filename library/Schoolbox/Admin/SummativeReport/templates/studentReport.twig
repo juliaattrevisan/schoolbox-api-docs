@@ -584,7 +584,7 @@
                             feedback: summaryAssessmentFeedbacks[assessment.id] ?? null,
                             page: 'subject-summary',
                             options: summaryOptions,
-                            rubricGridPayloads: rubricGridPayloadsHistorySummary[feedbackId] ?? null
+                            rubricMarkedGridPayloads: rubricMarkedGridPayloadsHistorySummary[feedbackId] ?? null
                         } only %}
                     {% endfor %}
                 {% endif %}
@@ -665,7 +665,7 @@
                             feedback: feedback,
                             page: 'subject',
                             options: classOptions,
-                            rubricGridPayloads: rubricGridPayloadsHistoryClass[feedbackId] ?? null
+                            rubricMarkedGridPayloads: rubricMarkedGridPayloadsHistoryClass[feedbackId] ?? null
                         } only %}
                     {% endfor %}
                 </div>

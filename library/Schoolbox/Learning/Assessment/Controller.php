@@ -1319,7 +1319,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
          * Note that this translation is different to the $rubricGridTranslator which converts it for the builder;
          * this converts a grid to a non-builder usage in the same area.
          */
-        $data['rubricGridPayloads'] = new \Schoolbox\Assessment\Rubric\Grid\Payload(
+        $data['rubricMarkedGridPayloads'] = new \Schoolbox\Assessment\Rubric\Grid\Payload(
             $this->rubricMapper,
             $this->getConfigLoader()->get(ConfigMapper::NAME_RUBRIC_SHOW_POINTS),
             $this->getUser()

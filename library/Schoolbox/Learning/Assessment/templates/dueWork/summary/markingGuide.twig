@@ -7,7 +7,7 @@
  # @param bool $markVisibility               Whether this feedback is visible to the current user.
  # @param Participant $participant           A participating learner (if extant)
  # @param IFeedback $selfAssessmentFeedback  A self-graded feedback instance, if extant
- # @param string $rubricGridPayloads         A json-encoded representation of the rubric grid structure, marked grid, self graded grid
+ # @param string $rubricMarkedGridPayloads   A json-encoded representation of the rubric grid structure, marked grid, self graded grid
  # @param bool $showGroupTotal               An arbitrary decision about whether Capability Marks could display here, if extant.
  # @param bool $showRubricTotal              An arbitrary decision about whether Rubric Grid Totals could display here, if extant
  #}
@@ -17,7 +17,7 @@
         markVisibility: selfAssessmentFeedback ? true : false,
         participant: participant,
         selfAssessmentFeedback: selfAssessmentFeedback,
-        rubricGridPaylods: null,
+        rubricMarkedGridPaylods: null,
         showGroupTotal: false,
         showRubricTotal: false
     } %}

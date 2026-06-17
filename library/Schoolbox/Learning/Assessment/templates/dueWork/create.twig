@@ -240,8 +240,11 @@
     {% set markTypeTotalMark = 3 %}
     {% set markTypeNone = 6 %}
 
+    {# lol rubricMarkedGridPayloads displays a readonly grid in the create/update screens for Course-Managed rubrics.
+     # Otherwise it displays the rubric builder vue component using the rubricGridsPayload array struct
+     #}
     {% include '@learningAssessment/fragments/rubric.twig' with {
-        rubricGridPayloads: rubricGridPayloads,
+        rubricMarkedGridPayloads: rubricMarkedGridPayloads,
         rubricGridsPayload: rubricGridsPayload,
         rubricBlankGrid: rubricBlankGrid,
         rubricAttachZone: rubricAttachZone,

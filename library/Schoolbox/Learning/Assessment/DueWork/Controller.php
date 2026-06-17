@@ -554,7 +554,7 @@ class Controller extends Assessment\Controller
 
         /* The most recent authoritative and self-graded feedbacks appear here as usual
          */
-        $twigData['rubricGridPayloads'] = new Payload(
+        $twigData['rubricMarkedGridPayloads'] = new Payload(
             $this->rubricMapper,
             $this->getConfigLoader()->get(ConfigMapper::NAME_RUBRIC_SHOW_POINTS),
             $this->getUser()
@@ -575,14 +575,14 @@ class Controller extends Assessment\Controller
 
         /* If the student doesn't have a feedback atm, we still need to have this var
          */
-        $twigData['rubricGridPayloadsHistory'] = [];
+        $twigData['rubricMarkedGridPayloadsHistory'] = [];
 
         /* Participant might be null here;
          * Even if extant, they might night have any feedbacks at all.
          * This results in a hilarious double-null-coalesce scenario
          */
         foreach ($participant?->getAllFeedbacks() ?? [] as $feedback) {
-            $twigData['rubricGridPayloadsHistory'][$feedback->getId()] = $payloadGenerator->generate(
+            $twigData['rubricMarkedGridPayloadsHistory'][$feedback->getId()] = $payloadGenerator->generate(
                 $assessment->getRubricInstances(),
                 null,  // show self-graded feedback as if they were instructor-derived
                 $feedback,
@@ -1285,7 +1285,7 @@ class Controller extends Assessment\Controller
 
         /* Rubric Grid Payloads
          */
-        $data['rubricGridPayloads'] = new Payload(
+        $data['rubricMarkedGridPayloads'] = new Payload(
             $this->rubricMapper,
             $this->getConfigLoader()->get(ConfigMapper::NAME_RUBRIC_SHOW_POINTS),
             $this->getUser()

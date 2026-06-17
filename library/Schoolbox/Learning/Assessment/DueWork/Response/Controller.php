@@ -311,7 +311,7 @@ class Controller extends Base
 
         /* Rubric Grid Payloads
          */
-        $data['rubricGridPayloads'] = new Payload(
+        $data['rubricMarkedGridPayloads'] = new Payload(
             $rubricMapper,
             $this->getConfigLoader()->get(ConfigMapper::NAME_RUBRIC_SHOW_POINTS),
             $this->getUser()

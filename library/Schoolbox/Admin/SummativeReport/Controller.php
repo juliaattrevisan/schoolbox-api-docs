@@ -1205,7 +1205,7 @@ class Controller extends ConfigController
                         }
                     }
 
-                    $data['rubricGridPayloadsHistorySummary'][$feedback->getId()] = $payloadGenerator->generate(
+                    $data['rubricMarkedGridPayloadsHistorySummary'][$feedback->getId()] = $payloadGenerator->generate(
                         $assessment->getRubricInstances(),
                         null,  // Don't care about self-graded feedback in this usage
                         $feedback,
@@ -1242,7 +1242,7 @@ class Controller extends ConfigController
                         }
                     }
 
-                    $data['rubricGridPayloadsHistoryClass'][$feedback->getId()] = $payloadGenerator->generate(
+                    $data['rubricMarkedGridPayloadsHistoryClass'][$feedback->getId()] = $payloadGenerator->generate(
                         $assessment->getRubricInstances(),
                         null,  // Don't care about self-graded feedback in this usage
                         $feedback,

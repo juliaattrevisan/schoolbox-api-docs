@@ -5,7 +5,7 @@
  # It appears on the assessment modify screen at the bottom.
  #
  # @param array $rubricGridsPayload         An array struct specifically for rubric-builder component
- # @param string $rubricGridPayloads        A json-encoded representation of the rubric grid structure, marked grid, self graded grid
+ # @param string $rubricMarkedGridPayloads  A json-encoded representation of the rubric grid structure, marked grid, self graded grid
  # @param array $rubricAttachZone           An attachzone, for uploading rubric csvs
  # @param array $resultSets                 A Result Set chosen on the assessment modify screen to prepopulate rubric grid levels
  # @param IAssessable $assessment           An assessment instance
@@ -23,7 +23,7 @@
                 {% include '@rubric/grid.twig' with {
                     assessment: assessment,
                     folderId: assessment.context.folder.id,
-                    rubricGridPayloads: rubricGridPayloads,
+                    rubricMarkedGridPayloads: rubricMarkedGridPayloads,
                     showRubricTotal: true,
                     showGroupTotal: true,
                 } only %}

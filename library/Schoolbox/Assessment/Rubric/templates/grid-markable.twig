@@ -36,7 +36,7 @@
  # @param bool $selfReflect                      Whether self-reflection can occur on this response instance
  # @param User $learner                          The person who submitted the response instance
  # @param $selfAssessmentFeedback                "the self-assessed feedback, shouldst there be one"
- # @param string $rubricGridPayloads             A json-encoded representation of the rubric grid structure, marked grid, self graded grid
+ # @param string $rubricMarkedGridPayloads       A json-encoded representation of the rubric grid structure, marked grid, self graded grid
  #}
 
 {% set showPoints = true %}
@@ -44,7 +44,7 @@
 
 <div data-vue-app="rubric-markable">
     <rubric-markable
-        :rubric-marked-grids-payload="{{ rubricGridPayloads }}"
+        :rubric-marked-grids-payload="{{ rubricMarkedGridPayloads }}"
         :assessment-mark-scheme="{{ markScheme.generateContext|json_encode }}"
         :participant-id="{{ not blindMode and learner.id ? learner.id : 'null' }}"
         {# TODO: these are signs of likely permission issues #}
