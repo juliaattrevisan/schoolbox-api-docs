@@ -36,8 +36,12 @@ class ModelToArray
      * @param array<string, mixed> $externalStudent
      * @return array<string, mixed>
      */
-    public function __invoke(Model $student, array $externalStudent, string $schoolName): array
-    {
+    public function __invoke(
+        Model $student,
+        array $externalStudent,
+        string $schoolName,
+        ?string $registrationError = null
+    ): array {
         $user = $student->getUser();
 
         $givenName = $this->helper->normalise($user?->getGivenName());
@@ -64,6 +68,7 @@ class ModelToArray
             'userId' => $user?->getId(),
             'registrationSessionStudentId' => $student->getId(),
             'status' => $student->getStatus(),
+            'registrationError' => $registrationError,
             'userName' => $userName,
             'ibCandidateNumber' => $this->formatNullableValue($user?->getIbCandidateNumber()),
             'hasMissingDetails' => $missingFields !== [],
