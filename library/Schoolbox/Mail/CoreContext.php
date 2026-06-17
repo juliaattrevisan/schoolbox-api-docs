@@ -14,7 +14,7 @@ use Schoolbox\IConfigLoader;
 
 class CoreContext
 {
-    private const SKIN_CONTAINER_CORNER_RADIUS_VALUES = [
+    private const SKIN_CORNER_RADIUS_VALUES = [
         'var(--sbx-border-radius-none)' => '0',
         'var(--sbx-border-radius-s)' => '0.25rem',
         'var(--sbx-border-radius-m)' => '0.5rem',
@@ -113,6 +113,7 @@ class CoreContext
             'skin_colour_accent_text',
             'skin_colour_active',
             'skin_container_corner_radius',
+            'skin_field_corner_radius',
         ];
         foreach ($skinConfig as $skinConfigKey) {
             $this->context['skinConfig'][$skinConfigKey] = $this->resolveSkinConfigValue(
@@ -132,8 +133,8 @@ class CoreContext
             return $value;
         }
 
-        if ($key === 'skin_container_corner_radius') {
-            return self::SKIN_CONTAINER_CORNER_RADIUS_VALUES[$value] ?? $value;
+        if ($key === 'skin_container_corner_radius' || $key === 'skin_field_corner_radius') {
+            return self::SKIN_CORNER_RADIUS_VALUES[$value] ?? $value;
         }
 
         return $value;
