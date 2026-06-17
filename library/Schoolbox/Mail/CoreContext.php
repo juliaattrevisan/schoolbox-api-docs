@@ -99,6 +99,12 @@ class CoreContext
             'skin_colour_accent_hover',
             'skin_colour_logo_background',
             'skin_colour_body_bg',
+            // add new Sonar UI colours, eventually those colours above should be replaced by these ones
+            'skin_colour_menu_background',
+            'skin_colour_menu_foreground',
+            'skin_colour_accent',
+            'skin_colour_accent_text',
+            'skin_colour_active',
         ];
         foreach ($skinColors as $skinColor) {
             $this->context['colours'][$skinColor] = $conf->get($skinColor);

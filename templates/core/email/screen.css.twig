@@ -50,11 +50,11 @@ img {
 }
 
 .header {
-    background-color: {{ colours.skin_colour_navigation_background }};
+    background-color: {{ colours.skin_colour_menu_background }};
 }
 
 .header img {
-    color: {{ colours.skin_colour_offcanvas_background }};
+    color: {{ colours.skin_colour_menu_foreground }};
     height: auto;
     max-height: 100px;
     max-width: 670px;
@@ -75,7 +75,7 @@ img {
 }
 
 .content a {
-    color: {{ colours.skin_colour_content_ui_foreground }};
+    color: {{ colours.skin_colour_accent }};
 }
 
 .content p {
@@ -92,8 +92,8 @@ img {
 }
 
 .content a.cta {
-    background-color: {{ colours.skin_colour_content_ui_submit_background }};
-    color: {{ colours.skin_colour_content_ui_submit_foreground }};
+    background-color: {{ colours.skin_colour_accent }};
+    color: {{ colours.skin_colour_accent_text }};
     padding: 8px 16px;
     font-size: 16px;
     font-weight: normal;
@@ -143,15 +143,15 @@ tr.underline td, td.underline {
 .work-month {
     text-transform: uppercase;
     font-size: 12px;
-    background-color: {{ colours.skin_colour_navigation_background }};
-    color: #fff;
+    background-color: {{ colours.skin_colour_active }};
+    color: {{ colours.skin_colour_accent }};
     border-bottom: solid 1px #fff;
 }
 
 .work-day {
     font-size: 22px;
     line-height: 35px;
-    color: {{ colours.skin_colour_navigation_background }};
+    color: #000;
     background-color: #fff;
 }
 
