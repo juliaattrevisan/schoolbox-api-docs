@@ -577,7 +577,11 @@ class Controller extends Assessment\Controller
          */
         $twigData['rubricGridPayloadsHistory'] = [];
 
-        foreach ($participant?->getAllFeedbacks() as $feedback) {
+        /* Participant might be null here;
+         * Even if extant, they might night have any feedbacks at all.
+         * This results in a hilarious double-null-coalesce scenario
+         */
+        foreach ($participant?->getAllFeedbacks() ?? [] as $feedback) {
             $twigData['rubricGridPayloadsHistory'][$feedback->getId()] = $payloadGenerator->generate(
                 $assessment->getRubricInstances(),
                 null,  // show self-graded feedback as if they were instructor-derived
