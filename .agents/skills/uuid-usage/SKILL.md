@@ -12,7 +12,11 @@ UUIDs may be used as primary keys, but are generally used as an alternative iden
 ## When to use UUIDs?
 
 Consider using UUIDs when:
-- the identifier is expected to be shared with external systems, not just used internally within Schoolbox
+- the identifier is expected to be shared with external systems (including other Schoolbox instances), not just used internally within Schoolbox
+
+## When not to use UUIDs?
+
+If the identifier for a database row is expected to be used only within the Schoolbox instance itself, then it's not necessary to use a UUID: instead, an auto-incrementing identifier can be used.
 
 ## Which UUID to use?
 
