@@ -1,6 +1,6 @@
 ---
 name: uuid-usage
-description: Use when generating a UUID
+description: Use when generating an identifier which may be shared with external systems, and when deciding upon how to generate and store that identifier
 ---
 
 # UUID Usage
