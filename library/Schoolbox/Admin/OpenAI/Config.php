@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\OpenAI;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as SchoolboxException;
+use Schoolbox\OpenAi\Feature;
 
 /**
  * Configuration options for AI features.
@@ -23,13 +24,13 @@ class Config
      * feature name => config name
      */
     public const array ALL_MODULES = [
-        Helper::FEATURE_CHAT                            => ConfigMapper::NAME_AI_TEXT_CHAT,
-        Helper::FEATURE_LESSONPLAN                      => ConfigMapper::NAME_AI_LESSONPLAN,
-        Helper::FEATURE_DIFFERENTIATION                 => ConfigMapper::NAME_AI_DIFFERENTIATION,
-        Helper::FEATURE_DIALOGAGENT                     => ConfigMapper::NAME_AI_DIALOGAGENT,
-        Helper::FEATURE_IMAGE                           => ConfigMapper::NAME_AI_IMAGE_GENERATION,
-        Helper::FEATURE_LEARNING_ACTIVITY_CUSTOMISATION => ConfigMapper::NAME_AI_LEARNING_ACTIVITY_CUSTOMISATION,
-        Helper::FEATURE_AI_MODERATION_AGENT             => ConfigMapper::NAME_AI_MODERATION_AGENT,
+        Feature::CHAT->value                            => ConfigMapper::NAME_AI_TEXT_CHAT,
+        Feature::LESSON_PLAN->value                     => ConfigMapper::NAME_AI_LESSONPLAN,
+        Feature::DIFFERENTIATION->value                 => ConfigMapper::NAME_AI_DIFFERENTIATION,
+        Feature::DIALOG_AGENT->value                    => ConfigMapper::NAME_AI_DIALOGAGENT,
+        Feature::IMAGE->value                           => ConfigMapper::NAME_AI_IMAGE_GENERATION,
+        Feature::LEARNING_ACTIVITY_CUSTOMISATION->value => ConfigMapper::NAME_AI_LEARNING_ACTIVITY_CUSTOMISATION,
+        Feature::AI_MODERATION_AGENT->value             => ConfigMapper::NAME_AI_MODERATION_AGENT,
     ];
 
     /**
@@ -84,26 +85,26 @@ class Config
      * Recommended models for each feature, split by text and image generation.
      */
     public const array RECOMMENDED_MODELS = [
-        Helper::FEATURE_CHAT                            => [
+        Feature::CHAT->value => [
             'text' => ['gpt-5.4-nano'],
         ],
-        Helper::FEATURE_LESSONPLAN                      => [
+        Feature::LESSON_PLAN->value => [
             'text' => ['gpt-5.4-nano'],
         ],
-        Helper::FEATURE_DIFFERENTIATION                 => [
+        Feature::DIFFERENTIATION->value => [
             'text' => ['gpt-5.4-nano'],
         ],
-        Helper::FEATURE_DIALOGAGENT                     => [
+        Feature::DIALOG_AGENT->value => [
             'text' => ['gpt-5.3-chat-latest'],
         ],
-        Helper::FEATURE_IMAGE                           => [
+        Feature::IMAGE->value => [
             'text'  => ['gpt-5.4-nano'],
             'image' => ['gpt-image-1.5'],
         ],
-        Helper::FEATURE_LEARNING_ACTIVITY_CUSTOMISATION => [
+        Feature::LEARNING_ACTIVITY_CUSTOMISATION->value => [
             'text' => ['gpt-5.4-nano'],
         ],
-        Helper::FEATURE_AI_MODERATION_AGENT             => [
+        Feature::AI_MODERATION_AGENT->value => [
             'text' => ['gpt-5.4-nano'],
         ],
     ];
@@ -733,7 +734,7 @@ class Config
         $formInputs[self::FIELD_DEPLOYMENT_MODEL]['recommendedOptions'] = $splitOptions['recommended'];
         $formInputs[self::FIELD_DEPLOYMENT_MODEL]['options']            = $splitOptions['others'];
 
-        if (\in_array($feature, Helper::FEATURES_WITH_AI_MODERATION, true)) {
+        if (Feature::tryFrom($feature)?->supportsAiModeration()) {
             // Any feature with AI moderation support gets a config for it
             $formInputs[self::FIELD_AI_MODERATION] = [
                 'type'    => self::FIELD_TYPE_CHECKBOX,
@@ -741,7 +742,7 @@ class Config
             ];
         }
 
-        if ($feature === Helper::FEATURE_IMAGE) {
+        if ($feature === Feature::IMAGE->value) {
             // Image feature:
             // * add output quality and image model
             // * remove Azure option
@@ -767,7 +768,7 @@ class Config
             unset($formInputs[self::FIELD_PROVIDER]['options'][Helper::ENDPOINT_TYPE_AZURE]);
         }
 
-        if ($feature === Helper::FEATURE_AI_MODERATION_AGENT) {
+        if ($feature === Feature::AI_MODERATION_AGENT->value) {
             // Ai Moderation agent:
             // * remove generation system prompt
             unset($formInputs[self::FIELD_SYSTEM_PROMPT]);
@@ -791,10 +792,10 @@ class Config
     public function buildReasoningEffortModelOptions(string $feature): array
     {
         $options = self::REASONING_EFFORT_MODEL_OPTIONS;
-        if ($feature === Helper::FEATURE_IMAGE) {
+        if ($feature === Feature::IMAGE->value) {
             $options = array_map(fn ($effortLevels) => array_values(array_diff($effortLevels, ['minimal'])), $options);
         }
-        if ($feature === Helper::FEATURE_CHAT) {
+        if ($feature === Feature::CHAT->value) {
             foreach ($options as $model => $effortLevels) {
                 if (in_array($model, self::GPT4_MODELS, true)) {
                     $options[$model] = array_values(array_diff($effortLevels, [self::REASONING_EFFORT_OPTION_NONE]));

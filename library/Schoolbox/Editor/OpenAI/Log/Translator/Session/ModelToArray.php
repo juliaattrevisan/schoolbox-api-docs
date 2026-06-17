@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Editor\OpenAI\Log\Translator\Session;
 
 use Schoolbox\User;
-use Schoolbox\Editor\OpenAI\Log\Model;
+use Schoolbox\OpenAi\Session\Model;
 
 class ModelToArray
 {
@@ -27,31 +27,27 @@ class ModelToArray
     }
 
     /**
-     * Convert an AILog model to an array for API responses representing a session summary
+     * Convert an AI session model to an array for API responses representing a session summary
      *
-     * @param Model $log
+     * @param Model $session
      * @return array
      * @see /library/Schoolbox/Admin/OpenAI/Usage/templates/payload.ts AiSession
      */
-    public function __invoke(Model $log): array
+    public function __invoke(Model $session): array
     {
-        $routes = $this->linkTranslator->__invoke($log);
-
-        /**
-         * Note: $log only represents session-specific stuff, values representing an individual log
-         * such as $log->getPrompt() or $log->getOutputText() are intentially omitted to reduce memory overhead
-         */
+        $routes = $this->linkTranslator->__invoke($session);
 
         return [
-            'id' => $log->getSessionId(),
-            'feature' => $log->getFeature(),
-            // TODO: a session can have multiple log formats, but you'd need to always fetch all the data to determine that...
-            // We should probably have a Session Model that can handle this properly and avoid
-            // this ambiguity with the Log model being used for two separate ideas
-            'logFormat' => $log->getLogFormat(),
-            'createdAt' => $log->getCreatedAt()?->getUsingFormat(DATE_ATOM),
-            'createdBy' => $log->getUser() ? $this->userTranslator->__invoke($log->getUser()) : null,
-            'returnCode' => $log->getReturnCode(),
+            'id' => $session->getId(),
+            'feature' => $session->getFeature(),
+
+            // The admin UI currently needs a session-scope logFormat to choose a details renderer. This can be
+            // misleading for mixed-format sessions, but each log entry has its own logFormat and is rendered individually.
+            'logFormat' => $session->getDerivedLogFormat(),
+            'createdAt' => $session->getCreatedAt()?->getUsingFormat(DATE_ATOM),
+            'createdBy' => $session->getUser() ? $this->userTranslator->__invoke($session->getUser()) : null,
+            'returnCode' => $session->getDerivedReturnCode(),
+            'hasError' => $session->getDerivedHasError(),
             '_routes' => $routes,
         ];
     }

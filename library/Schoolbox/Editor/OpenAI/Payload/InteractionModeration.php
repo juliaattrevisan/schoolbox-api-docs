@@ -10,7 +10,7 @@ namespace Schoolbox\Editor\OpenAI\Payload;
 
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Log\LogFormat;
-use Schoolbox\Editor\OpenAI\Log\Model as LogModel;
+use Schoolbox\OpenAi\Session\Log\Model as LogModel;
 use Schoolbox\Editor\OpenAI\Log\Translator\Format\StrategyFactory;
 use Schoolbox\GenericCollection;
 

@@ -11,7 +11,7 @@ namespace Schoolbox\Editor\OpenAI\Log\Translator;
 
 use Schoolbox\Editor\OpenAI\Log\LogFormat;
 use Schoolbox\User;
-use Schoolbox\Editor\OpenAI\Log\Model;
+use Schoolbox\OpenAi\Session\Log\Model;
 use Schoolbox\Editor\OpenAI\Log\Translator\Format\StrategyFactory;
 
 class ModelToArray
@@ -44,8 +44,7 @@ class ModelToArray
 
         $translation = [
             'id' => $log->getId(),
-            'sessionId' => $log->getSessionId(),
-            'feature' => $log->getFeature(),
+            'sessionId' => $log->getAiSessionId(),
             'createdAt' => $log->getCreatedAt()?->getUsingFormat(DATE_ATOM),
             'createdBy' => $log->getUser() ? $this->userTranslator->__invoke($log->getUser()) : null,
             'logFormat' => $logFormat?->value,

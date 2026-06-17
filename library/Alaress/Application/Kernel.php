@@ -2466,9 +2466,10 @@ abstract class Kernel
             $di->lazyNew(
                 \Schoolbox\OpenAi\ClientFactory::class,
                 [
-                    'config'     => $di->lazyGet('config'),
-                    'logMapper'  => $mapperFactory->getLazy(\Schoolbox\Editor\OpenAI\Log\Mapper::class),
-                    'httpClient' => $di->lazyGet('httpClient'),
+                    'config'        => $di->lazyGet('config'),
+                    'logMapper'     => $mapperFactory->getLazy(\Schoolbox\OpenAi\Session\Log\Mapper::class),
+                    'httpClient'    => $di->lazyGet('httpClient'),
+                    'sessionMapper' => $mapperFactory->getLazy(\Schoolbox\OpenAi\Session\Mapper::class),
                 ]
             )
         );

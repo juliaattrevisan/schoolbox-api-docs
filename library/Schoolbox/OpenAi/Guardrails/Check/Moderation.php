@@ -12,7 +12,7 @@ namespace Schoolbox\OpenAi\Guardrails\Check;
 
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\OpenAi\IClient;
-use Schoolbox\Editor\OpenAI\Log;
+use Schoolbox\OpenAi\Session\Log;
 
 /**
  * Guardrail check to flag disallowed content categories using OpenAI's Moderations API.

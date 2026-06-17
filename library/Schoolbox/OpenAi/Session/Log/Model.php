@@ -1,16 +1,19 @@
 <?php
 
 /**
- * Model
+ * Model for a single AI session log (one row of the `ai_session_log` table).
  *
- * @author      James Leckie <james.leckie@schoolbox.education>
- * @copyright   Copyright 2024, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2026, Schoolbox Pty Ltd
+ * @link      https://schoolbox.education/
  */
 
-namespace Schoolbox\Editor\OpenAI\Log;
+declare(strict_types=1);
 
+namespace Schoolbox\OpenAi\Session\Log;
+
+use Schoolbox\Editor\OpenAI\Log\LogFormat;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
+use Schoolbox\OpenAi\Session\Model as SessionModel;
 use Schoolbox\User;
 
 class Model
@@ -18,6 +21,8 @@ class Model
     use ModelTrait\Id;
     use ModelTrait\CreatedAtDate;
 
+    private ?string $aiSessionId = null;
+    private ?SessionModel $session = null;
     private ?User $user = null;
     private string $prompt;
     private ?int $inputTokens = null;
@@ -26,12 +31,10 @@ class Model
     private ?string $outputText = null;
     private ?string $model = null;
     private ?string $endpoint = null;
-    private ?string $feature = null;
     private ?string $logFormat = null;
     private ?string $response = null;
     private ?int $returnCode = null;
     private ?string $errorMessage = null;
-    private ?string $sessionId = null;
 
     // TEXT max length, to trim the prompt, rather than die.
     private const PROMPT_MAX_LENGTH = 65535;
@@ -42,20 +45,57 @@ class Model
     // MEDIUM TEXT max length, to trim the response, rather than die.
     private const RESPONSE_MAX_LENGTH = 16777215;
 
-    public const MISSING_SESSIONID = 'no-session-';
-
+    /**
+     * @return string|null
+     */
+    public function getAiSessionId(): ?string
+    {
+        return $this->aiSessionId;
+    }
 
     /**
-     * @return null|User
+     * @param string $aiSessionId
+     * @return $this
+     */
+    public function setAiSessionId(string $aiSessionId): self
+    {
+        $this->aiSessionId = $aiSessionId;
+        return $this;
+    }
+
+    /**
+     * @return SessionModel|null
+     */
+    public function getSession(): ?SessionModel
+    {
+        return $this->session;
+    }
+
+    /**
+     * @param SessionModel|null $session
+     * @return $this
+     */
+    public function setSession(?SessionModel $session): self
+    {
+        $this->session = $session;
+
+        if (null !== $session?->getId()) {
+            $this->aiSessionId = $session->getId();
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return User|null
      */
     public function getUser(): ?User
     {
         return $this->user;
     }
 
-
     /**
-     * @param ?User $user
+     * @param User|null $user
      * @return $this
      */
     public function setUser(?User $user): self
@@ -63,7 +103,6 @@ class Model
         $this->user = $user;
         return $this;
     }
-
 
     /**
      * @return string
@@ -73,21 +112,15 @@ class Model
         return $this->prompt;
     }
 
-
     /**
      * @param string $prompt
      * @return $this
      */
     public function setPrompt(string $prompt): self
     {
-        // Limit the prompt length to prevent database errors
-        if ($prompt && mb_strlen($prompt) > self::PROMPT_MAX_LENGTH) {
-            $prompt = mb_substr($prompt, 0, self::PROMPT_MAX_LENGTH);
-        }
-        $this->prompt = $prompt;
+        $this->prompt = self::trimToMaxBytes($prompt, self::PROMPT_MAX_LENGTH);
         return $this;
     }
-
 
     /**
      * @return int|null
@@ -96,7 +129,6 @@ class Model
     {
         return $this->returnCode;
     }
-
 
     /**
      * @param int|null $returnCode
@@ -108,7 +140,6 @@ class Model
         return $this;
     }
 
-
     /**
      * @return string|null
      */
@@ -116,7 +147,6 @@ class Model
     {
         return $this->errorMessage;
     }
-
 
     /**
      * @param string|null $errorMessage
@@ -178,11 +208,9 @@ class Model
      */
     public function setInputText(?string $inputText): self
     {
-        // Limit the input text length to prevent database errors
-        if ($inputText && mb_strlen($inputText) > self::TEXT_MAX_LENGTH) {
-            $inputText = mb_substr($inputText, 0, self::TEXT_MAX_LENGTH);
-        }
-        $this->inputText = $inputText;
+        $this->inputText = null === $inputText
+            ? null
+            : self::trimToMaxBytes($inputText, self::TEXT_MAX_LENGTH);
         return $this;
     }
 
@@ -200,11 +228,9 @@ class Model
      */
     public function setOutputText(?string $outputText): self
     {
-        // Limit the output text length to prevent database errors
-        if ($outputText && mb_strlen($outputText) > self::TEXT_MAX_LENGTH) {
-            $outputText = mb_substr($outputText, 0, self::TEXT_MAX_LENGTH);
-        }
-        $this->outputText = $outputText;
+        $this->outputText = null === $outputText
+            ? null
+            : self::trimToMaxBytes($outputText, self::TEXT_MAX_LENGTH);
         return $this;
     }
 
@@ -247,30 +273,14 @@ class Model
     /**
      * @return string|null
      */
-    public function getFeature(): ?string
-    {
-        return $this->feature;
-    }
-
-    /**
-     * @param string|null $feature
-     * @return $this
-     */
-    public function setFeature(?string $feature): self
-    {
-        $this->feature = $feature;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
     public function getLogFormat(): ?string
     {
         return $this->logFormat;
     }
 
     /**
+     * Accepts either a {@see LogFormat} enum or its string value, and stores the string value.
+     *
      * @param string|LogFormat|null $logFormat
      * @return $this
      */
@@ -297,29 +307,24 @@ class Model
      */
     public function setResponse(?string $response): self
     {
-        // Limit the response length to prevent database errors
-        if ($response && mb_strlen($response) > self::RESPONSE_MAX_LENGTH) {
-            $response = mb_substr($response, 0, self::RESPONSE_MAX_LENGTH);
+        $this->response = null === $response
+            ? null
+            : self::trimToMaxBytes($response, self::RESPONSE_MAX_LENGTH);
+        return $this;
+    }
+
+    /**
+     * Trim to a specified number of bytes, taking care not to split multi-byte characters.
+     * @param string $value
+     * @param int    $maxBytes
+     * @return string
+     */
+    private static function trimToMaxBytes(string $value, int $maxBytes): string
+    {
+        if (strlen($value) <= $maxBytes) {
+            return $value;
         }
-        $this->response = $response;
-        return $this;
-    }
 
-    /**
-     * @return string|null
-     */
-    public function getSessionId(): ?string
-    {
-        return $this->sessionId;
-    }
-
-    /**
-     * @param string|null $sessionId
-     * @return $this
-     */
-    public function setSessionId(?string $sessionId): self
-    {
-        $this->sessionId = $sessionId;
-        return $this;
+        return mb_strcut($value, 0, $maxBytes, 'UTF-8');
     }
 }

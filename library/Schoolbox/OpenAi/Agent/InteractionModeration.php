@@ -14,7 +14,7 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
-use Schoolbox\Editor\OpenAI\Log;
+use Schoolbox\OpenAi\Session\Log;
 use Schoolbox\Editor\OpenAI\Payload\InteractionModeration as PayloadGenerator;
 use Schoolbox\OpenAi\IClient;
 use Schoolbox\GenericCollection;
@@ -69,7 +69,7 @@ class InteractionModeration
             $payload,
             null, // no meaningful input text unique to this log atm, it's all in the payload if you need to debug
             $user,
-            Helper::FEATURE_AI_MODERATION_AGENT,
+            \Schoolbox\OpenAi\Feature::AI_MODERATION_AGENT,
             $sessionId,
             null, // These requests can't be restored in the AI Usage Log yet
         );

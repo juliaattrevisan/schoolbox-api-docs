@@ -13,6 +13,7 @@ namespace Schoolbox\OpenAi\Guardrails;
 use Schoolbox\GenericCollection;
 use Schoolbox\Editor\OpenAI\Log\LogFormat;
 use Schoolbox\OpenAi\Exception\GuardrailFlagged;
+use Schoolbox\OpenAi\Feature;
 use Schoolbox\OpenAi\Guardrails\Check\ICheck;
 use Schoolbox\OpenAi\IClient;
 use Schoolbox\User;
@@ -41,13 +42,13 @@ class Pipeline
     /**
      * @param IClient $client The AI provider client which should be used to create logs
      * @param User $user
-     * @param string $feature
+     * @param Feature $feature
      * @param string $sessionId
      */
     public function __construct(
         private IClient $client,
         private User $user,
-        private string $feature,
+        private Feature $feature,
         private string $sessionId,
     ) {
         $this->inputChecks = new GenericCollection(ICheck::class);
@@ -82,7 +83,9 @@ class Pipeline
                 $this->user,
                 $this->feature,
                 $this->sessionId,
-                LogFormat::GUARDRAIL, // TODO: this might fool the usage log into thinking the whole session is a guardrail format?
+                // Guardrail logs share the conversation session, so session summaries can derive "guardrail"
+                // even when later logs in the same session are "agent_chat".
+                LogFormat::GUARDRAIL,
             );
 
             $outcome = $check->check($inputText, $log);
@@ -96,6 +99,9 @@ class Pipeline
                 $this->client->saveLog($log);
                 throw $e;
             }
+
+            // Note $log may or may not have a return code set.  This is expected, because some checks involve API
+            // calls and some do not (e.g. OpenAi/Guardrails/Check/CharacterLimit).
 
             $this->client->saveLog($log);
         }

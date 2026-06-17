@@ -14,7 +14,7 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Admin\DialogAgent\Scenario\Model as Scenario;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
-use Schoolbox\Editor\OpenAI\Log;
+use Schoolbox\OpenAi\Session\Log;
 use Schoolbox\Editor\OpenAI\Payload\DialogAgentFeedback as PayloadGenerator;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as Response;
 use Schoolbox\OpenAi\IClient;
@@ -74,7 +74,7 @@ class DialogAgentFeedback
             $payload,
             (string)$response->getId(), // for debugging purposes, this links the log back to the response ID
             $user,
-            Helper::FEATURE_DIALOGAGENT,
+            \Schoolbox\OpenAi\Feature::DIALOG_AGENT,
             $sessionId,
             null, // These requests can't be restored in the AI Usage Log yet
         );

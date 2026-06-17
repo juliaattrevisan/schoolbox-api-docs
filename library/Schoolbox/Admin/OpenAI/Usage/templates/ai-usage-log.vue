@@ -51,7 +51,7 @@ type AiSelectedSessionInfo<TFeature extends AiFeature = AiFeature> = {
     [KLogFormat in AiLogFormat]: {
         logFormat: KLogFormat;
         session: AiSession<KLogFormat, TFeature>;
-        log: AiSessionLogApiResponse<KLogFormat, TFeature>;
+        log: AiSessionLogApiResponse<KLogFormat>;
     };
 }[AiLogFormat];
 
@@ -77,6 +77,7 @@ const selectedSessionInfo = window.Vue.computed<AiSelectedSessionInfo | AiSelect
     // TODO: properly support sessions with multiple log formats, for now just filter out invalid logs
     const filteredLog = logInfo.filter((entry) => entry.logFormat !== null && entry.data !== null);
 
+    // sessionInfo.logFormat only selects the renderer; the renderer interprets each entry's own logFormat.
     const info = { logFormat: sessionInfo.logFormat, session: sessionInfo, log: filteredLog };
     return info satisfies Record<keyof AiSelectedSessionInfo, unknown> as AiSelectedSessionInfo;
 });
@@ -157,7 +158,7 @@ window.Vue.onMounted(async () => {
  * @param session The session to open
  */
 async function openSessionDetails(session: AiSession): Promise<void> {
-    if (!session._routes.getLog) {
+    if (!session._routes.getSessionLogs) {
         return; // no access to view the log
     }
 
@@ -167,7 +168,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
 
     const response = await apiRequest<AiSessionLogApiResponse>({
         method: "GET",
-        url: session._routes.getLog,
+        url: session._routes.getSessionLogs,
     });
 
     if (!response.success) {
@@ -297,9 +298,15 @@ function printSelectedSession(): void {
                                     {{ session.createdBy.fullName }}
                                 </component>
                             </td>
-                            <td>{{ 200 !== session.returnCode ? "Error" : "" }}</td>
+                            <td>{{ session.hasError ? "Error" : "" }}</td>
                             <td class="actions-small-1">
-                                <nav v-if="session.id !== null && session.logFormat !== null && session._routes.getLog">
+                                <nav
+                                    v-if="
+                                        session.id !== null &&
+                                        session.logFormat !== null &&
+                                        session._routes.getSessionLogs
+                                    "
+                                >
                                     <button
                                         type="button"
                                         class="sbx-icon-only-button f-no-margins"

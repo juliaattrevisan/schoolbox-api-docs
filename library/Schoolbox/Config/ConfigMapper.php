@@ -441,17 +441,17 @@ class ConfigMapper extends Mapper
 
     /* OpenAI
      */
-    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_* */
+    /* @deprecated now ai feature specific \Schoolbox\OpenAi\Feature values */
     public const string NAME_OPENAI_TEXT_ENDPOINT = 'openai_text_endpoint';
-    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_* */
+    /* @deprecated now ai feature specific \Schoolbox\OpenAi\Feature values */
     public const string NAME_OPENAI_TEXT_KEY = 'openai_text_key';
-    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_* */
+    /* @deprecated now ai feature specific \Schoolbox\OpenAi\Feature values */
     public const string NAME_OPENAI_TEXT_RESOURCE_NAME = 'openai_text_azure_resource_name';
-    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_* */
+    /* @deprecated now ai feature specific \Schoolbox\OpenAi\Feature values */
     public const string NAME_OPENAI_TEXT_DEPLOYMENT_ID = 'openai_text_azure_deployment_id';
-    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_* */
+    /* @deprecated now ai feature specific \Schoolbox\OpenAi\Feature values */
     public const string NAME_OPENAI_TEXT_MODEL = 'openai_text_model';
-    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_* */
+    /* @deprecated now ai feature specific \Schoolbox\OpenAi\Feature values */
     public const string NAME_OPENAI_TEXT_SYSTEM_PROMPT = 'openai_text_generation_system_prompt';
 
     // Text Feature json config
