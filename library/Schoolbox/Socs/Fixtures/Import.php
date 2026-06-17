@@ -404,15 +404,10 @@ class Import implements IStrategy
             return null;
         }
 
-        $time = strtolower($time);
+        $time = strtolower(trim($time));
         // SOCS documents unset time values as "tbc" or "N\A"; empty and
         // "N/A" are accepted as common variants so the fixture date survives.
         $timeIsUnset = $time === '' || $time === 'tbc' || $time === 'n\\a' || $time === 'n/a';
-        if ($timeIsUnset) {
-            $time = '00:00';
-        }
-
-        $raw = sprintf('%s %s', $date, $time);
 
         $dateTimeFormats = [
             // SOCS date range examples use "1 Sep 2025":
@@ -436,9 +431,13 @@ class Import implements IStrategy
             \Alaress_Date_Format::DATABASE_DATE_FORMAT . '|',
         ];
 
-        $attempts = [[$raw, $dateTimeFormats]];
+        $raw = sprintf('%s %s', $date, $timeIsUnset ? '00:00' : $time);
+        $attempts = [];
         if ($timeIsUnset) {
             $attempts[] = [$date, $dateOnlyFormats];
+            $attempts[] = [$raw, $dateTimeFormats];
+        } else {
+            $attempts[] = [$raw, $dateTimeFormats];
         }
 
         $lastException = null;
