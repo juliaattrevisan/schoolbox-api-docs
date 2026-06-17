@@ -9,7 +9,6 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
-use Schoolbox\Learning\Assessment\AssessmentType;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
@@ -69,101 +68,66 @@ HELP;
 
         $db = $this->getDatabaseInternal();
 
-        /**
-         * The value in this field is dependent on whether LTI is enabled and also changes ordering
-         * due to json encoding, so this can't just be done with a simple SQL update
-         */
-
-        /* We're going be doing this more than a few times: prepare it only once, for speed
-         */
-        $updateStatement = $db->prepareQuery("
-            UPDATE component_config_instance SET `value` = :value WHERE `id` = :id;
-        ");
-
-        /** Find all the component config instances for "assessmentTypes" in a course outline */
-        $query = "
-            SELECT cci.id, cci.value, ci.id AS component_id
-            FROM component_config_instance cci
-            -- must match the 'assessmentTypes' config type
-            INNER JOIN component_config_definition ccd ON
-                cci.component_config_definition_id = ccd.id
-                AND ccd.`key` = 'assessmentTypes'
-            -- must be a course outline component
-            INNER JOIN component_instance ci ON cci.component_instance_id = ci.id
-            INNER JOIN component_definition cd ON
-                ci.component_definition_id = cd.id
-                AND cd.class = 'Schoolbox\\\Learning\\\Assessment\\\Component\\\Homepage\\\Outline\\\Controller'
-        ";
-
-        $configInstances = $db->executeQuery($query)->fetchAll();
-
-        /** Reproduce how the instance would currently configure a new component config */
-        $assessmentTypeOptions = AssessmentType::getOptions();
-
         $ltiEnabled = $this->getConfig()->get('lti_assessments_enable');
-        if (!$ltiEnabled) {
-            unset($assessmentTypeOptions[AssessmentType::TYPE_LTI_ASSESSMENT]);
+
+        /**
+         * Update all course outline "assessmentTypes" config instances that are still at their
+         * default values (all non-reporting types enabled, nothing filtered out) to include
+         * Reporting Activity.
+         *
+         * Two query variants handle whether LTI is enabled: when LTI is disabled, default configs
+         * would not have "lti":"1", so we don't require it as part of the default check.
+         */
+        if ($ltiEnabled) {
+            $sql = "
+                UPDATE component_config_instance cci
+                INNER JOIN component_config_definition ccd
+                    ON cci.component_config_definition_id = ccd.id
+                    AND ccd.`key` = 'assessmentTypes'
+                INNER JOIN component_instance ci
+                    ON cci.component_instance_id = ci.id
+                INNER JOIN component_definition cd
+                    ON ci.component_definition_id = cd.id
+                    AND cd.class = 'Schoolbox\\\\Learning\\\\Assessment\\\\Component\\\\Homepage\\\\Outline\\\\Controller'
+                SET cci.value = JSON_SET(cci.value, '$.reporting', '1')
+                WHERE JSON_EXTRACT(cci.value, '$.project')     = '1'
+                  AND JSON_EXTRACT(cci.value, '$.dueWork')     = '1'
+                  AND JSON_EXTRACT(cci.value, '$.task')        = '1'
+                  AND JSON_EXTRACT(cci.value, '$.quiz')        = '1'
+                  AND JSON_EXTRACT(cci.value, '$.lessonPlan')  = '1'
+                  AND JSON_EXTRACT(cci.value, '$.dialogAgent') = '1'
+                  AND JSON_EXTRACT(cci.value, '$.lti')         = '1'
+                  AND (JSON_EXTRACT(cci.value, '$.reporting') IS NULL
+                    OR JSON_EXTRACT(cci.value, '$.reporting') != '1')
+            ";
+        } else {
+            $sql = "
+                UPDATE component_config_instance cci
+                INNER JOIN component_config_definition ccd
+                    ON cci.component_config_definition_id = ccd.id
+                    AND ccd.`key` = 'assessmentTypes'
+                INNER JOIN component_instance ci
+                    ON cci.component_instance_id = ci.id
+                INNER JOIN component_definition cd
+                    ON ci.component_definition_id = cd.id
+                    AND cd.class = 'Schoolbox\\\\Learning\\\\Assessment\\\\Component\\\\Homepage\\\\Outline\\\\Controller'
+                SET cci.value = JSON_SET(cci.value, '$.reporting', '1')
+                WHERE JSON_EXTRACT(cci.value, '$.project')     = '1'
+                  AND JSON_EXTRACT(cci.value, '$.dueWork')     = '1'
+                  AND JSON_EXTRACT(cci.value, '$.task')        = '1'
+                  AND JSON_EXTRACT(cci.value, '$.quiz')        = '1'
+                  AND JSON_EXTRACT(cci.value, '$.lessonPlan')  = '1'
+                  AND JSON_EXTRACT(cci.value, '$.dialogAgent') = '1'
+                  AND (JSON_EXTRACT(cci.value, '$.reporting') IS NULL
+                    OR JSON_EXTRACT(cci.value, '$.reporting') != '1')
+            ";
         }
-        unset($assessmentTypeOptions[AssessmentType::TYPE_REPORTING]);
 
-        $updated = 0;
-        foreach ($configInstances as $configInstance) {
-            /**
-             * If all keys in the config are enabled, then it's still the default
-             * The order might have changed, and LTI might not be there depending on the LTI config state over time
-             */
-            $currentFilters = json_decode(html_entity_decode($configInstance['value']), true);
-
-            if ($currentFilters === null || !is_array($currentFilters)) {
-                /** Couldn't decode? probably skip it */
-                $this->getLogger()->debug(sprintf(
-                    'Couldn\'t decode value for component config instance "%s", skipping',
-                    $configInstance['id']
-                ));
-                continue;
-            }
-
-            /**
-             * Parse the filter to only the entries that are selected
-             * then compare with the original list to see if we are actually filtering out anything
-             */
-            $assessmentTypes = array_keys(array_filter(
-                $currentFilters,
-                function ($v, $k) use ($assessmentTypeOptions) {
-                    return $v === "1" && key_exists($k, $assessmentTypeOptions);
-                },
-                ARRAY_FILTER_USE_BOTH
-            ));
-
-            if (count($assessmentTypes) < count($assessmentTypeOptions)) {
-                /** This component is being filtered, skip */
-                $this->getLogger()->debug(sprintf(
-                    'Component instance %s (component config instance %s) is being filtered (%s); skipping',
-                    $configInstance['component_id'],
-                    $configInstance['id'],
-                    $configInstance['value']
-                ));
-                continue;
-            }
-
-            $updated += 1;
-            $currentFilters[AssessmentType::TYPE_REPORTING] = '1';
-            $updateStatement->execute([
-                'value' => json_encode($currentFilters),
-                'id'    => $configInstance['id'],
-            ]);
-
-            $this->getLogger()->debug(sprintf(
-                'Component instance %s was updated to include %s',
-                $configInstance['component_id'],
-                AssessmentType::TYPE_REPORTING,
-            ));
-        }
+        $result = $db->executeQuery($sql);
 
         $this->getLogger()->info(sprintf(
-            '%s of %s course outline component config instances match defaults and have been updated to include Reporting Activity',
-            $updated,
-            count($configInstances),
+            '%s course outline component config instances matched defaults and have been updated to include Reporting Activity',
+            $result->rowCount(),
         ));
     }
 
