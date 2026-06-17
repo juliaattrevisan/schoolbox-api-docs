@@ -119,7 +119,7 @@ class Mapper extends BaseMapper
      * Possibilities:
      *  1. Add hydration of the derived fields to this function so findById() would return a fully hydrated object.
      *  2. Add a findByIdWithDerivedProperties() function as an alternative to findById()
-     *  3. Add a hydrateDerivedProperties() function that could be used to hyrdate an object returned by findById().
+     *  3. Add a hydrateDerivedProperties() function that could be used to hydrate an object returned by findById().
      *
      * Note derived properties are hydrated by $this->getFilteredSessions().
      *
