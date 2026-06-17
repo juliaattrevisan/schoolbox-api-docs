@@ -11,6 +11,13 @@ table {
     border-width: 0;
     border-collapse: collapse;
 }
+
+table.fullwidth {
+    border-collapse: separate;
+    border-radius: {{ skinConfig.skin_container_corner_radius }};
+    overflow: hidden;
+}
+
 td {
     padding: 0;
     font-family: Arial, sans-serif;
@@ -26,6 +33,12 @@ a[href] {
 
 img {
     display: block;
+}
+
+a img {
+    border-radius: {{ skinConfig.skin_field_corner_radius }};
+    height: auto;
+    width: 100%;
 }
 
 .wrap {
@@ -122,4 +135,3 @@ tr.underline td, td.underline {
     color: {{ skinConfig.skin_colour_navigation_background }};
     background-color: {{ skinConfig.skin_colour_offcanvas_background }};
 }
-
