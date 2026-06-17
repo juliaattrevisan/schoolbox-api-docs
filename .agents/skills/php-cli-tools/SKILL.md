@@ -42,6 +42,22 @@ $kernel = new CliTool\Kernel(new class extends CliTool\BaseApp {
     {
         // Implement the tool itself here
     }
+
+    public function runAsRoot(): ?bool
+    {
+        // Override this method to `return true` only if this tool must run as
+        // root, because it performs actions which must run as root:
+        // otherwise, do not override this method.
+    }
+
+    public function getRequiredProcessUser() : ?string
+    {
+        // Override this method to `return self::WEB_PROCESS_USER` only if this
+        // tool modifies Schoolbox's storage file system (i.e. its uploaded
+        // files, as managed by the `\Schoolbox\Resource\Storage` namespace), or
+        // anything in the `www/` directory:
+        // otherwise, do not override this method.
+    }
 });
 $kernel->runApp();
 ```
