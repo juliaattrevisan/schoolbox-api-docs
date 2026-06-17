@@ -59,11 +59,13 @@ class Mapper extends BaseMapper
             ORDER BY ranked.created_at DESC, ranked.id DESC
         ";
 
-        $statement = $this->getDatabase()->prepare($query);
-        $statement->execute([
-            'registrationSessionId' => $registrationSessionId,
-            'status' => Model::STATUS_ERROR,
-        ]);
+        $statement = $this->getDatabase()->executeQuery(
+            $query,
+            [
+                'registrationSessionId' => $registrationSessionId,
+                'status' => Model::STATUS_ERROR,
+            ]
+        );
 
         $logs = $this->createCollection();
 
