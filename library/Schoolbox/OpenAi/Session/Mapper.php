@@ -27,6 +27,8 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends BaseMapper
 {
+    private const int HTTP_STATUS_CODE_OK = 200;
+
     /**
      * @inheritDoc
      *
@@ -150,9 +152,9 @@ class Mapper extends BaseMapper
     /**
      * Fetch a page of sessions with logs for the admin usage log, newest first.
      *
-     * The logFormat and returnCode values are derived from each session's first log, ordered by earliest created_at
-     * and then id. This is a summary hint for the admin list, not a guarantee that every log in the session has this
-     * format. The error flag is derived from all logs in the session.
+     * The logFormat and returnCode values are derived from each session's first viewable log, ordered by earliest
+     * created_at and then id. This is a summary hint for the admin list, not a guarantee that every log in the session
+     * has this format. The error flag is derived from all logs in the session.
      *
      * @param string|null               $keyword This filters sessions to those with at least one log whose prompt or
      *                                           response contains this text.
@@ -182,28 +184,34 @@ class Mapper extends BaseMapper
         $limitSql  = null !== $limit ? 'LIMIT :limit' : '';
         $offsetSql = null !== $limit && null !== $offset ? 'OFFSET :offset' : '';
 
-        // The admin list emits a details route for each session, and that route
-        // preloads the first ai_session_log row. Requiring firstLog here keeps
-        // orphan sessions from appearing with a broken details link.
+        // Requiring anyLog here keeps orphan sessions off the admin list. The
+        // details button is controlled by firstViewableLog, because a session's
+        // first raw log may not have a format the admin UI can render.
         $query = "
             SELECT
                 `{$this->table}`.id AS id,
                 `{$this->table}`.feature AS feature,
                 `{$this->table}`.created_at AS created_at,
-                firstLog.log_format AS derived_log_format,
-                firstLog.return_code AS derived_return_code,
+                firstViewableLog.log_format AS derived_log_format,
+                firstViewableLog.return_code AS derived_return_code,
                 EXISTS (
                     SELECT 1 FROM `ai_session_log` errorLog
                     WHERE errorLog.ai_session_id = `{$this->table}`.id
                     AND errorLog.return_code IS NOT NULL
-                    AND errorLog.return_code <> 200
+                    AND errorLog.return_code <> :successfulReturnCode
                 ) AS derived_has_error,
                 {$this->getJoinColumnString('user', 'u')}
             FROM `{$this->table}`
             LEFT JOIN {$this->getJoinSql('user', '', 'u', true)}
-            JOIN `ai_session_log` firstLog ON firstLog.id = (
+            JOIN `ai_session_log` anyLog ON anyLog.id = (
                 SELECT id FROM `ai_session_log`
                 WHERE ai_session_id = `{$this->table}`.id
+                LIMIT 1
+            )
+            LEFT JOIN `ai_session_log` firstViewableLog ON firstViewableLog.id = (
+                SELECT id FROM `ai_session_log`
+                WHERE ai_session_id = `{$this->table}`.id
+                AND log_format IS NOT NULL
                 ORDER BY created_at ASC, id ASC
                 LIMIT 1
             )
@@ -217,6 +225,7 @@ class Mapper extends BaseMapper
         foreach ($params as $name => $value) {
             $statement->bindValue($name, $value);
         }
+        $statement->bindValue('successfulReturnCode', self::HTTP_STATUS_CODE_OK, \PDO::PARAM_INT);
         if (null !== $limit) {
             $statement->bindValue('limit', $limit, \PDO::PARAM_INT);
         }

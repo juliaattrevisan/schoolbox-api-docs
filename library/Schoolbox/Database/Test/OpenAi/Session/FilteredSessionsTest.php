@@ -98,6 +98,32 @@ class FilteredSessionsTest extends TestCase
     }
 
     /**
+     * A session with an unviewable first log derives its list summary from the first viewable log.
+     * @throws Exception
+     */
+    public function testReturnsSessionWithDerivedFirstViewableLogValues(): void
+    {
+        $id = Uuid::uuid4()->toString();
+        Mapper::getInstance()->findOrCreate($id, Feature::CHAT, null);
+
+        LogMapper::getInstance()->save(
+            new LogModel()->setAiSessionId($id)->setPrompt('unviewable')
+                ->setLogFormat(null)->setReturnCode(null)
+        );
+        LogMapper::getInstance()->save(
+            new LogModel()->setAiSessionId($id)->setPrompt('viewable')
+                ->setLogFormat(LogFormat::AGENT_CHAT)->setReturnCode(200)
+        );
+
+        $match = $this->findFilteredSession($id, Feature::CHAT);
+
+        $this->assertInstanceOf(Model::class, $match);
+        $this->assertSame('agent_chat', $match->getDerivedLogFormat());
+        $this->assertSame(200, $match->getDerivedReturnCode());
+        $this->assertFalse($match->getDerivedHasError());
+    }
+
+    /**
      * A session is not marked as an error when an early guardrail log has no return code and a later agent log succeeds.
      * @throws Exception
      */
