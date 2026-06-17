@@ -11,6 +11,7 @@ namespace Schoolbox\Editor\OpenAI\Log\Translator\Session\Test;
 
 use Alaress\Authorizer\Authorizer;
 use Aura\Router\Generator;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Editor\OpenAI\Log\Translator\Session\Links;
 use Schoolbox\OpenAi\Session\Model;
@@ -18,6 +19,12 @@ use Schoolbox\User;
 
 class LinksTest extends TestCase
 {
+    /**
+     * Tests that the session log route is returned when the current user is authorized to access it.
+     *
+     * @return void
+     * @throws Exception When PHPUnit cannot create a mock dependency.
+     */
     public function testSessionLogsRouteIsReturnedWhenAuthorized(): void
     {
         $session = (new Model())->setId('4e5947d2-1f2a-4d2c-9586-08d68e81d8f0');
@@ -52,7 +59,12 @@ class LinksTest extends TestCase
         );
     }
 
-
+    /**
+     * Tests that the session log route is null when the current user is not authorized to access it.
+     *
+     * @return void
+     * @throws Exception When PHPUnit cannot create a mock dependency.
+     */
     public function testSessionLogsRouteIsNullWhenUnauthorized(): void
     {
         $session = (new Model())->setId('4e5947d2-1f2a-4d2c-9586-08d68e81d8f0');
