@@ -24,7 +24,7 @@ v4 UUIDs (completely random values) are acceptable where they are already in use
 
 ### Within mappers
 
-A column may be auto-populated with a UUID by defining it like so in the mapper's `mapping` method:
+The constants below are defined in `\Schoolbox\Mapper`, which all mappers subclass. A column may be auto-populated with a UUID by defining it like so in the mapper's `mapping` method:
 ```php
 $this->uses($columnName, self::TYPE_STRING, self::COLUMN_AUTOGENERATE_UUID);
 ```
@@ -43,6 +43,9 @@ The database column `$columnName` should be a MariaDB `UUID` column: whilst UUID
 Use the `ramsey/uuid` library:
 
 ```php
-\Ramsey\Uuid\Uuid::uuid4();
+// Generate a v7 UUID: preferred for new code
 \Ramsey\Uuid\Uuid::uuid7();
+
+// Generate a v4 UUID: only when already in use
+\Ramsey\Uuid\Uuid::uuid4();
 ```
