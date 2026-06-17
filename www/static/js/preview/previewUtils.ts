@@ -186,8 +186,8 @@ export async function openFilePreview(
 
                     // As we have manipulated the contents of the lightbox ourselves, LightGallery
                     // will have no idea to change the download link to the correct URL, so we need
-                    // to do it ourselves. Uses optional chaining to ensure the download link exists.
-                    lightGallerySelector.querySelector("[download]")?.setAttribute("href", fileUrl);
+                    // to do it ourselves. The toolbar is a sibling of the inner content area.
+                    gallery.$toolbar.get().querySelector("[download]")?.setAttribute("href", fileUrl);
                 });
 
                 gallery.openGallery();
