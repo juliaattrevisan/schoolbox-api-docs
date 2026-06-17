@@ -95,15 +95,24 @@ class Controller extends Base
         $feature = $this->getRequestPost()->get('feature');
         $startDate = $this->getRequestPost()->get('startDate');
         $endDate = $this->getRequestPost()->get('endDate');
+        $page = $this->getRequestPost()->getInt('page', 1) ?? 1;
 
-        $page = $this->getRequestPost()->getInt('page', 1);
-        $limit = $this->getRequestPost()->getInt('limit', self::MAX_PAGE_SIZE);
+        if ($page <= 0) {
+            $page = 1;
+        }
+
+        $limit = $this->getRequestPost()->getInt('limit', self::MAX_PAGE_SIZE) ?? self::MAX_PAGE_SIZE;
 
         /* Ensure that in all cases:
          *   - limit is greater than zero
-         *   - less than MAX_PAGE_SIZE
+         *   - less than or equal to MAX_PAGE_SIZE
          */
-        $limit = min(max(0, $limit), self::MAX_PAGE_SIZE);
+        if ($limit <= 0) {
+            $limit = 1;
+        }
+        if ($limit > self::MAX_PAGE_SIZE) {
+            $limit = self::MAX_PAGE_SIZE;
+        }
 
         //ensure feature is one of the actual features...
         if ($feature) {
