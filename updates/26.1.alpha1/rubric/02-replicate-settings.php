@@ -111,27 +111,13 @@ HELP;
          * trash. I actually encountered this problem during development where a deleted assessment *didn't* have its
          * rubric instances which caused miscellaneous errors in the most basic workflow.
          */
-        $statement = $this->getDatabaseInternal()->prepare("
-            SELECT
-                sb.id,
-                sb.assessment_id,
-                a.title,
-                sb.rubric_capability_mark_type_id,
-                sb.rubric_capability_grade_group_id,
-                sb.rubric_mark_range
-            FROM submission_box sb
-            INNER JOIN assessment a on sb.assessment_id = a.id
-        ");
-
-        $statement->execute();
-
-        /* How many rows were eventually found in the result set
+        /* A timestamp for when this conceptually occurred
          */
-        $numFound = 0;
+        $now = \Alaress_Date_Format::now()->getDatabase();
 
-        /* Prepare a statement that we'll reuse throughout this loop
-         */
-        $insertStatement = $this->getDatabaseInternal()->prepare("
+        $start = microtime(true);
+
+        $numFound = $this->getDatabaseInternal()->executeQuery("
             INSERT INTO rubric_instance (
                 assessment_id,
                 title,
@@ -141,57 +127,23 @@ HELP;
                 rubric_mark_range,
                 created_at,
                 updated_at
-            ) VALUES (
-                :assessmentId,
-                :title,
+            )
+            SELECT
+                sb.assessment_id,
+                a.title,
                 :weight,
-                :rubricCapabilityMarkTypeId,
-                :rubricCapabilityGradeGroupId,
-                :rubricMarkRange,
+                sb.rubric_capability_mark_type_id,
+                sb.rubric_capability_grade_group_id,
+                sb.rubric_mark_range,
                 :createdAt,
                 :updatedAt
-            )
-        ");
-
-        /* A timestamp for when this conceptually occurred
-         */
-        $now = \Alaress_Date_Format::now()->getDatabase();
-
-        $start = microtime(true);
-
-        /* For each record in that result set, insert a new row into rubric_instance so that we:
-         *    - save a default title
-         *    - save a default weight
-         *    - save the rubric capability mark type setting
-         *    - save the rubric capability grade group setting
-         *    - save the mark range boolean setting
-         *    - save the corresponding assessment_id so we know which assessment has this grid
-         */
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $numFound++;
-
-            $insertStatement->execute([
-                'assessmentId' => $row['assessment_id'],
-                'title' => $row['title'],
-                'weight' => self::DEFAULT_WEIGHT,
-                'rubricCapabilityMarkTypeId' => $row['rubric_capability_mark_type_id'],
-                'rubricCapabilityGradeGroupId' => $row['rubric_capability_grade_group_id'],
-                'rubricMarkRange' => $row['rubric_mark_range'],
-                'createdAt' => $now,
-                'updatedAt' => $now,
-            ]);
-
-            $this->getLogger()->debug(sprintf(
-                'Submission box %s (assessment %s) had these rubric settings: title "%s", weight %s, mark type %s, grade group %s, use mark range %s',
-                $row['id'],
-                $row['assessment_id'],
-                $row['title'],
-                self::DEFAULT_WEIGHT,
-                $row['rubric_capability_mark_type_id'] ?: 'none',
-                $row['rubric_capability_grade_group_id'] ?: 'none',
-                $row['rubric_mark_range']
-            ));
-        }
+            FROM submission_box sb
+            INNER JOIN assessment a ON sb.assessment_id = a.id
+        ", [
+            'weight'    => self::DEFAULT_WEIGHT,
+            'createdAt' => $now,
+            'updatedAt' => $now,
+        ])->rowCount();
 
         /* Add a timer
          */
