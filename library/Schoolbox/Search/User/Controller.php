@@ -587,7 +587,11 @@ class Controller extends BaseController
              * See tabConstraintsRoleType
              */
             'contacts'     => true,
-            'registration' => $registrationPayload !== null,
+            'registration' => $registrationPayload !== null && (
+                $viewer->getSuperuser() ||
+                $viewer->getId() === $student->getId() ||
+                $viewer->hasServicePermission(UserAccess::SERVICE_IB_COORDINATOR, UserAccess::ACCESS_FULL)
+            ),
         ];
 
         /* Decide whether the Contacts tab should show for the viewer:
