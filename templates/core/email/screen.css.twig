@@ -11,7 +11,12 @@ body {
 table {
     border-spacing: 0;
     border-width: 0;
-    border-collapse: collapse;
+}
+
+table.fullwidth {
+    border-collapse: separate;
+    border-radius: {{ skinConfig.skin_container_corner_radius }};
+    overflow: hidden;
 }
 
 td {

@@ -105,6 +105,9 @@ class CoreContext
             'skin_colour_accent',
             'skin_colour_accent_text',
             'skin_colour_active',
+
+            'skin_container_corner_radius',
+            'skin_container_shadow',
         ];
         foreach ($skinConfig as $skinConfigKey) {
             $this->context['skinConfig'][$skinConfigKey] = $conf->get($skinConfigKey);
