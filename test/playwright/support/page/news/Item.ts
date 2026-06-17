@@ -1,6 +1,7 @@
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 
 /**
  * News item page object - this is related to when viewing a single news article
@@ -11,11 +12,11 @@ export default class Item {
 
     private page: Page;
 
+    private common: Common;
+
     static readonly URL = "/news/item/{id}";
 
     // Selectors
-
-    static readonly DATA_TEST_DOT_MENU_BUTTON = "sbx-pop-out-header-options-button";
 
     static readonly LINK_MODIFY = 'a:has(sbx-icon[name="modify"])';
 
@@ -44,6 +45,7 @@ export default class Item {
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
+        this.common = new Common(page);
     }
 
     /**
@@ -83,7 +85,7 @@ export default class Item {
      * Follow this article's modify link.
      */
     async modifyArticle(): Promise<void> {
-        await this.page.getByTestId(Item.DATA_TEST_DOT_MENU_BUTTON).click();
+        await this.common.clickJellyTot();
         await this.page.locator(Item.LINK_MODIFY).last().click();
         await expect(this.page.locator('h1:has-text("Update news")')).toBeVisible();
         await this.tester.common.waitForPageLoad();
@@ -93,10 +95,10 @@ export default class Item {
      * click unpublish article and confirm it
      */
     async unpublishArticle(): Promise<void> {
-        await this.page.getByTestId(Item.DATA_TEST_DOT_MENU_BUTTON).click();
+        await this.common.clickJellyTot();
         await this.page.locator('a[id="unpublish-article"]').click();
-        await expect(this.page.locator("div.reveal-modal.small.open")).toBeVisible();
-        await this.page.getByTestId("confirm-dialog-confirm-button").click();
+        await this.common.waitForModalToBeOpen();
+        await this.common.clickConfirmButton();
         await expect(this.page.locator('a[href="#awaiting-acceptance"]')).toBeVisible();
     }
 
@@ -112,7 +114,6 @@ export default class Item {
      * @param audience - The article to check
      */
     async seeArticleAudience(audience: string): Promise<void> {
-        // await expect(this.page.locator(`span#audience-info-container:has-text(${audience})`)).toBeVisible();
         await expect(this.page.locator(`span#audience-info-container`)).toContainText(audience);
     }
 
@@ -167,10 +168,10 @@ export default class Item {
      * @param articleId - The article id to delete
      */
     async deleteArticle(articleId: number): Promise<void> {
-        await this.page.getByTestId(Item.DATA_TEST_DOT_MENU_BUTTON).click();
+        await this.common.clickJellyTot();
         await this.page.locator(`a[href="/news/${articleId}/delete"]`).click();
-        await expect(this.page.locator("div.reveal-modal.small.open")).toBeVisible();
-        await this.page.getByTestId("confirm-dialog-confirm-button").click();
+        await this.common.waitForModalToBeOpen();
+        await this.common.clickConfirmButton();
         await expect(this.page.locator('div[id="news-component"]')).toBeVisible();
     }
 }

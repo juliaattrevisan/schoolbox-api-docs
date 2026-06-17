@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\WorkType;
 
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Sequential;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
@@ -416,5 +417,29 @@ class Model implements ISoftDeletable, Sequential
     public function setPermittedReportingActivity(bool $permittedReportingActivity): void
     {
         $this->permittedReportingActivity = $permittedReportingActivity;
+    }
+
+    /**
+     * Checks whether this work type is permitted for an assessment type.
+     *
+     * Permission flags must be true to permit an assessment type; null and false are treated as not permitted.
+     *
+     * @param string $assessmentType The assessment type to check
+     * @return bool
+     * @throws \InvalidArgumentException
+     */
+    public function isPermittedForAssessmentType(string $assessmentType): bool
+    {
+        return match ($assessmentType) {
+            AssessmentType::TYPE_PROJECT => $this->permittedProject === true,
+            AssessmentType::TYPE_DUE_WORK => $this->permittedDueWork === true,
+            AssessmentType::TYPE_TASK => $this->permittedTask === true,
+            AssessmentType::TYPE_QUIZ => $this->permittedQuiz === true,
+            AssessmentType::TYPE_LTI_ASSESSMENT => $this->permittedLti === true,
+            AssessmentType::TYPE_LESSON_PLAN => $this->permittedLessonPlan === true,
+            AssessmentType::TYPE_DIALOG_AGENT => $this->permittedDialogAgent === true,
+            AssessmentType::TYPE_REPORTING => $this->permittedReportingActivity === true,
+            default => throw new \InvalidArgumentException("Unknown assessment type: $assessmentType"),
+        };
     }
 }

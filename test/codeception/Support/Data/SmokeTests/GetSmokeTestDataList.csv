@@ -194,6 +194,18 @@ Admin,"Deploy ePortfolio",Superuser,/adminv2/eportfolio/deploy,200
 Admin,"Deploy ePortfolio",Teacher,/adminv2/eportfolio/deploy,401
 Admin,"Deploy ePortfolio",Student,/adminv2/eportfolio/deploy,401
 Admin,"Deploy ePortfolio",Parent,/adminv2/eportfolio/deploy,401
+Admin,"IB Configuration",Superuser,/adminv2/international-baccalaureate/configuration,200,IGNORE
+Admin,"IB Configuration",Teacher,/adminv2/international-baccalaureate/configuration,401,IGNORE
+Admin,"IB Configuration",Student,/adminv2/international-baccalaureate/configuration,401,IGNORE
+Admin,"IB Configuration",Parent,/adminv2/international-baccalaureate/configuration,401,IGNORE
+Admin,"IB Configuration","IB Moderator",/adminv2/international-baccalaureate/configuration,200,IGNORE
+Admin,"IB Configuration","News Moderator",/adminv2/international-baccalaureate/configuration,401,IGNORE
+Admin,"IB Registration Reports",Superuser,/adminv2/international-baccalaureate/registrations,200,IGNORE
+Admin,"IB Registration Reports",Teacher,/adminv2/international-baccalaureate/registrations,401,IGNORE
+Admin,"IB Registration Reports",Student,/adminv2/international-baccalaureate/registrations,401,IGNORE
+Admin,"IB Registration Reports",Parent,/adminv2/international-baccalaureate/registrations,401,IGNORE
+Admin,"IB Registration Reports","IB Moderator",/adminv2/international-baccalaureate/registrations,200,IGNORE
+Admin,"IB Registration Reports","LMS Moderator",/adminv2/international-baccalaureate/registrations,401,IGNORE
 Admin,"Config News",Superuser,/adminv2/news,200
 Admin,"Config News","Badges Moderator",/adminv2/news,401
 Admin,"Config News","CMS Moderator",/adminv2/news,401
@@ -226,6 +238,17 @@ Admin,"Configure security",Superuser,/adminv2/setting/Security,200
 Admin,"Configure security",Teacher,/adminv2/setting/Security,401
 Admin,"Configure security",Student,/adminv2/setting/Security,401
 Admin,"Configure security",Parent,/adminv2/setting/Security,401
+Admin,"Settings Data Retention",Superuser,/adminv2/data-retention,200
+Admin,"Settings Data Retention",Teacher,/adminv2/data-retention,401
+Admin,"Settings Data Retention",Student,/adminv2/data-retention,401
+Admin,"Settings Data Retention",Parent,/adminv2/data-retention,401
+Admin,"Settings Data Retention","LMS Moderator",/adminv2/data-retention,401
+Admin,"Configure skin",Superuser,/adminv2/setting/design/Assets,200
+Admin,"Configure skin",Teacher,/adminv2/setting/design/Assets,401
+Admin,"Configure skin",Student,/adminv2/setting/design/Assets,401
+Admin,"Configure skin",Parent,/adminv2/setting/design/Assets,401
+Admin,"Configure skin","Design Moderator",/adminv2/setting/design/Assets,200
+Admin,"Configure skin","Pastoral Moderator",/adminv2/setting/design/Assets,401
 Admin,"Configure skin",Superuser,/adminv2/setting/design/Skin%20Config,200
 Admin,"Configure skin","Badges Moderator",/adminv2/setting/design/Skin%20Config,401
 Admin,"Configure skin","CMS Moderator",/adminv2/setting/design/Skin%20Config,401
@@ -550,6 +573,21 @@ Admin,"Review house list",Superuser,/adminv2/lists/house,200
 Admin,"Review house list",Teacher,/adminv2/lists/house,401
 Admin,"Review house list",Student,/adminv2/lists/house,401
 Admin,"Review house list",Parent,/adminv2/lists/house,401
+Admin,"Lists Languages",Superuser,/adminv2/lists/language,200
+Admin,"Lists Languages",Teacher,/adminv2/lists/language,401
+Admin,"Lists Languages",Student,/adminv2/lists/language,401
+Admin,"Lists Languages",Parent,/adminv2/lists/language,401
+Admin,"Lists Languages","IB Moderator",/adminv2/lists/language,401
+Admin,"Lists Nationality",Superuser,/adminv2/lists/nationality,200
+Admin,"Lists Nationality",Teacher,/adminv2/lists/nationality,401
+Admin,"Lists Nationality",Student,/adminv2/lists/nationality,401
+Admin,"Lists Nationality",Parent,/adminv2/lists/nationality,401
+Admin,"Lists Nationality","IB Moderator",/adminv2/lists/nationality,401
+Admin,"Lists Qualifications",Superuser,/adminv2/lists/qualification,200
+Admin,"Lists Qualifications",Teacher,/adminv2/lists/qualification,401
+Admin,"Lists Qualifications",Student,/adminv2/lists/qualification,401
+Admin,"Lists Qualifications",Parent,/adminv2/lists/qualification,401
+Admin,"Lists Qualifications","IB Moderator",/adminv2/lists/qualification,401
 Admin,"Lists Learning Moments",Superuser,/adminv2/lists/evidence-tag,200
 Admin,"Lists Learning Moments",Teacher,/adminv2/lists/evidence-tag,401
 Admin,"Lists Learning Moments",Student,/adminv2/lists/evidence-tag,401
@@ -878,6 +916,12 @@ Admin,"Filters Course Markbook",Superuser,/adminv2/filters/courseMarkbook,200
 Admin,"Filters Course Markbook",Teacher,/adminv2/filters/courseMarkbook,401
 Admin,"Filters Course Markbook",Student,/adminv2/filters/courseMarkbook,401
 Admin,"Filters Course Markbook",Parent,/adminv2/filters/lms/courseMarkbook,401
+Admin,"Filters Customisation Record",Superuser,/adminv2/filters/lms/customisationRecord,200
+Admin,"Filters Customisation Record",Teacher,/adminv2/filters/lms/customisationRecord,401
+Admin,"Filters Customisation Record",Student,/adminv2/filters/lms/customisationRecord,401
+Admin,"Filters Customisation Record",Parent,/adminv2/filters/lms/customisationRecord,401
+Admin,"Filters Customisation Record","LMS Moderator",/adminv2/filters/lms/customisationRecord,200
+Admin,"Filters Customisation Record","Differentiation Moderator",/adminv2/filters/lms/customisationRecord,401
 Admin,"Filters Upcoming Due Work",Superuser,/adminv2/filters/lms/dueWorkCal,200
 Admin,"Filters Upcoming Due Work","Badges Moderator",/adminv2/filters/lms/dueWorkCal,401
 Admin,"Filters Upcoming Due Work","CMS Moderator",/adminv2/filters/lms/dueWorkCal,401
@@ -1335,6 +1379,11 @@ LMS,Create discussion,Superuser,/learning/unitspecs/5/assessments/new?type=dialo
 LMS,Create discussion,Teacher,/learning/unitspecs/5/assessments/new?type=dialogAgent&returnUrl=L2NvdXJzZS9wbGFuLzY=,200
 LMS,Create discussion,Student,/learning/unitspecs/5/assessments/new?type=dialogAgent&returnUrl=L2NvdXJzZS9wbGFuLzY=,401
 LMS,Create discussion,Parent,/learning/unitspecs/5/assessments/new?type=dialogAgent&returnUrl=L2NvdXJzZS9wbGFuLzY=,401
+LMS,Create reporting,Superuser,/learning/unitspecs/5/assessments/new?type=reporting&returnUrl=L2NvdXJzZS9wbGFuLzI=,200
+LMS,Create reporting,Teacher,/learning/unitspecs/5/assessments/new?type=reporting&returnUrl=L2NvdXJzZS9wbGFuLzI=,404
+LMS,Create reporting,Student,/learning/unitspecs/5/assessments/new?type=reporting&returnUrl=L2NvdXJzZS9wbGFuLzI=,401
+LMS,Create reporting,Parent,/learning/unitspecs/5/assessments/new?type=reporting&returnUrl=L2NvdXJzZS9wbGFuLzI=,401
+LMS,Create reporting,LMS Moderator,/learning/unitspecs/5/assessments/new?type=reporting&returnUrl=L2NvdXJzZS9wbGFuLzI=,200
 LMS,"View due work",Superuser,/learning/due,200
 LMS,"View due work",Teacher,/learning/due,200
 LMS,"View due work",Student,/learning/due,200
@@ -1387,6 +1436,10 @@ LMS,"Curriculum Coverage",Superuser,/curriculum/reports/coverage,200
 LMS,"Curriculum Coverage",Teacher,/curriculum/reports/coverage,200
 LMS,"Curriculum Coverage",Student,/curriculum/reports/coverage,403
 LMS,"Curriculum Coverage",Parent,/curriculum/reports/coverage,403
+LMS,"Customisation Logs",Superuser,/customisations/records,200
+LMS,"Customisation Logs",Teacher,/customisations/records,200
+LMS,"Customisation Logs",Student,/customisations/records,401
+LMS,"Customisation Logs",Parent,/customisations/records,401
 "Resource Booking","View all resources",Superuser,/resource-booking/item,200
 "Resource Booking","View all resources",Teacher,/resource-booking/item,200
 "Resource Booking","View all resources",Student,/resource-booking/item,200

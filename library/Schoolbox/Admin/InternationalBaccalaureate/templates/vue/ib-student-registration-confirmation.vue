@@ -24,7 +24,8 @@ const isSubmitted = window.Vue.ref<boolean>(props.initialConfirmationStatus === 
  * @returns The formatted date string.
  */
 function formatDate(isoString: string): string {
-    return window.dayjs(isoString).format(window.dateDisplayFormats.dayjsDatetime);
+    const d = window.dayjs(isoString);
+    return `${d.format(window.dateDisplayFormats.dayjsDateShort)} ${d.format(window.dateDisplayFormats.dayjsTime)}`;
 }
 
 const labelText =
@@ -74,42 +75,21 @@ async function toggle(value: boolean): Promise<void> {
 </script>
 
 <template>
-    <div class="ib-registration-section-confirm">
-        <label class="ib-registration-section-confirm__label">
+    <div class="small-12 l-mar-s--top">
+        <div class="checklist sbx-checkbox-radio-container">
             <input
+                :id="`confirmation-${props.section}`"
                 v-model="confirmed"
                 type="checkbox"
                 :disabled="isSaving || isSubmitted"
                 @change="toggle(confirmed)"
             />
-            {{ labelText }}
-        </label>
-        <p v-if="confirmedBy && confirmedAt" class="ib-registration-section-confirm__meta">
+            <label :for="`confirmation-${props.section}`">{{ labelText }}</label>
+        </div>
+        <p v-if="confirmedBy && confirmedAt" class="meta">
             Last updated by {{ confirmedBy }} on {{ formatDate(confirmedAt) }}
         </p>
     </div>
 </template>
 
-<style scoped>
-.ib-registration-section-confirm {
-    margin-top: 0.75rem;
-}
-
-.ib-registration-section-confirm__label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.ib-registration-section-confirm__label input[type="checkbox"]:disabled {
-    cursor: not-allowed;
-}
-
-.ib-registration-section-confirm__meta {
-    margin: 0.25rem 0 0 1.5rem;
-    font-size: 0.85rem;
-    color: #666;
-}
-</style>
+<style scoped></style>

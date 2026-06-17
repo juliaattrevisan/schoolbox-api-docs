@@ -1,5 +1,6 @@
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import type { Page } from "@playwright/test";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 
 export default class ManageAllTextbox {
     private tester: AcceptanceTester;
@@ -51,7 +52,7 @@ export default class ManageAllTextbox {
      * click Save All button
      */
     async clickSaveAll(): Promise<void> {
-        await this.page.click("input[type=submit]");
+        await this.page.locator(Common.INPUT_SUBMIT_BUTTON).click();
         await this.page.waitForTimeout(2000);
     }
 }

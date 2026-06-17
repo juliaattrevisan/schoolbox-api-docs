@@ -5,6 +5,11 @@
 
 @use "sbx-form";
 
+:root {
+    --sbx-form-radio-size: 1.5rem;
+    --sbx-form-checkbox-size: 1.5rem;
+}
+
 body.sbx-body {
     // Base radio button styles
     input[type="radio"] {
@@ -16,13 +21,17 @@ body.sbx-body {
         color: var(--sbx-config-color-accent);
         cursor: pointer;
         display: inline-grid;
-        height: 1.5rem !important; // ^foundation-fixes^ - won't need !important once _forms.scss is removed
+        height: var(
+            --sbx-form-radio-size
+        ) !important; // ^foundation-fixes^ - won't need !important once _forms.scss is removed
         margin: 0;
         min-height: auto !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
         opacity: 1 !important; // ^foundation-fixes^ - won't need !important once _forms.scss is removed
         place-content: center;
         position: static !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
-        width: 1.5rem !important; // ^foundation-fixes^ - won't need !important once _forms.scss is removed
+        width: var(
+            --sbx-form-radio-size
+        ) !important; // ^foundation-fixes^ - won't need !important once _forms.scss is removed
 
         &:hover:not(:disabled):not([readonly]) {
             background: var(--sbx-config-color-active);
@@ -98,6 +107,12 @@ body.sbx-body {
     }
 
     // the icon only radio - used in notification settings
+    input[type="radio"]:not(.plain) + label.input-toggle {
+        align-items: center;
+        color: var(--sbx-config-color-accent);
+        display: inline-flex;
+        justify-content: center;
+    }
     input[type="radio"]:not(.plain):checked + label.input-toggle {
         background-color: var(--sbx-config-color-accent);
         color: var(--sbx-config-color-accent-text);
@@ -114,14 +129,14 @@ body.sbx-body {
         color: var(--sbx-config-color-accent);
         cursor: pointer;
         display: inline-grid;
-        height: 1.5rem;
+        height: var(--sbx-form-checkbox-size);
         line-height: 1;
         margin: 0;
         min-height: auto;
         opacity: 1;
         place-content: center;
         position: static;
-        width: 1.5rem;
+        width: var(--sbx-form-checkbox-size);
 
         &:hover:not(:disabled):not([readonly]) {
             background: var(--sbx-config-color-active);
@@ -270,6 +285,12 @@ body.sbx-body {
     }
 
     // the icon only checkbox - used in notification settings
+    input[type="checkbox"]:not(.plain) + label.input-toggle {
+        align-items: center;
+        color: var(--sbx-config-color-accent);
+        display: inline-flex;
+        justify-content: center;
+    }
     input[type="checkbox"]:not(.plain):checked + label.input-toggle {
         background-color: var(--sbx-config-color-accent);
         color: var(--sbx-config-color-accent-text);

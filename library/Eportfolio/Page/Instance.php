@@ -223,6 +223,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
                     'EPORTFOLIO_COMPONENT_DEFINITION_ID'  => Scrub::text($component->getDefinitionId()),
                     'EPORTFOLIO_COMPONENT_COUNT'          => $component->getInstanceCount(),
                     'EPORTFOLIO_COMPONENT_CLASS'          => $class,
+                    'EPORTFOLIO_COMPONENT_ICON'           => $component->getDefinition()->getPaletteIconName(),
                     'EPORTFOLIO_COMPONENT_CATEGORY_ID'    => $previous->getIdentifier(),
                     'EPORTFOLIO_COMPONENT_MULTIPLE_STATE' => $multipleClass,
                     'EPORTFOLIO_COMPONENT_CATEGORY_CLASS' => $tabNumber === 0 ? 'active' : '',

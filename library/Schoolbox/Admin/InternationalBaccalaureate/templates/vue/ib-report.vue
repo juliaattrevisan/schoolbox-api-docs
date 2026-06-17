@@ -20,15 +20,19 @@ import type {
     ApiStudent,
     ApiSubject,
     ApiCandidatesResponse,
+    ApiManuallyRegisterResponse,
+    ApiUpdateConfirmationResponse,
 } from "../js/types/ibReportTypes";
 
 interface Props {
     candidatesEndpoint: string;
     candidateExportEndpoint: string;
+    candidateNumberUpdateRoute: string;
     searchLanguagesEndpoint: string;
     renotifyEndpoint: string;
     completePreparationEndpoint: string;
     resetDetailsEndpoint: string;
+    manuallyRegisterEndpoint: string;
     sessionTitle: string;
 }
 const props = defineProps<Props>();
@@ -89,6 +93,8 @@ window.Vue.watch(failedSelected, (newVal) => {
 
 const isCompleting = window.Vue.ref<boolean>(false);
 const isResetting = window.Vue.ref<boolean>(false);
+const isManuallyRegistering = window.Vue.ref<boolean>(false);
+const isApprovingOnBehalf = window.Vue.ref<boolean>(false);
 const resetModalOpen = window.Vue.ref<boolean>(false);
 const studentsToReset = window.Vue.ref<Pick<StudentRow, "id" | "userId" | "name">[]>([]);
 
@@ -124,6 +130,7 @@ function mapStudentRow(
         id: s.registrationSessionStudentId ?? s.userId,
         name: s.userName,
         userId: s.userId,
+        ibCandidateNumber: s.ibCandidateNumber,
         candidateDetailsStatus: s.hasMissingDetails ? "unconfirmed" : "confirmed",
         subjects: {
             hl: s.ibGroupSubjects.HL.map(mapSubjectEntry),
@@ -131,6 +138,7 @@ function mapStudentRow(
             core: s.ibGroupSubjects.Core.map(mapSubjectEntry),
         },
         updateLanguageEndpoint: s._routes.updateLanguages,
+        updateConfirmationEndpoint: s._routes.updateConfirmation,
         renotifyEndpoint: studentRenotifyEndpoint,
         stage,
     };
@@ -165,7 +173,13 @@ async function loadCandidates(): Promise<void> {
         confirmed.value = (byKey["confirmed"] ?? []).map((s) => mapStudentRow(s, "confirmed"));
         inProgress.value = (byKey["inProgress"] ?? []).map((s) => mapStudentRow(s, "inProgress"));
         failed.value = (byKey["failed"] ?? []).map((s) => mapStudentRow(s, "failed") as FailedRow);
-        registered.value = (byKey["registered"] ?? []).map((s) => mapStudentRow(s, "registered") as RegisteredRow);
+        registered.value = (byKey["registered"] ?? []).map(
+            (s): RegisteredRow => ({
+                ...mapStudentRow(s, "registered"),
+                manuallyRegisteredBy: s.manuallyRegisteredBy,
+                manuallyRegisteredAt: s.manuallyRegisteredAt,
+            }),
+        );
     } catch (e) {
         console.error("Failed to load candidates", e);
         loadError.value = "Failed to load registration report.";
@@ -219,6 +233,10 @@ async function handleCompletePreparation(studentIds: number[]): Promise<void> {
         toast.timeout({
             text: `Preparation completed for ${studentIds.length} student${studentIds.length === 1 ? "" : "s"}.`,
         });
+        // Reload to get the real registrationSessionStudentId for students that didn't have a
+        // persisted row before completePreparation. Without this, subsequent actions (e.g. manual
+        // register) send the stale userId instead of the session-student ID and the backend rejects them.
+        void loadCandidates();
     } catch (e) {
         console.error("Failed to complete preparation", e);
         toast.timeout({ text: "Failed to complete preparation.", isSuccess: false });
@@ -284,6 +302,134 @@ async function handleResetDetails(): Promise<void> {
     }
 }
 
+/**
+ * POSTs the given student IDs to the mark-as-manually-registered endpoint.
+ * On success, moves matched students from confirmed/failed into registered.
+ * @param studentIds The registration session student IDs to register.
+ */
+async function handleManuallyRegister(studentIds: number[]): Promise<void> {
+    if (isManuallyRegistering.value) return;
+    isManuallyRegistering.value = true;
+
+    const toast = window.sbProps.toastActivate("Marking as manually registered...");
+
+    try {
+        const response = await apiRequest<ApiManuallyRegisterResponse, { studentIds: number[] }>({
+            url: props.manuallyRegisterEndpoint,
+            method: "POST",
+            body: { studentIds },
+        });
+
+        if (!response.success) {
+            toast.timeout({
+                text: response.message ?? "Failed to mark as manually registered.",
+                isSuccess: false,
+            });
+            return;
+        }
+
+        const removedIds = new Set(studentIds);
+        const manuallyRegisteredBy = response.data?.manuallyRegisteredBy ?? null;
+        const manuallyRegisteredAt = response.data?.manuallyRegisteredAt ?? null;
+        const newRegistered = [
+            ...confirmed.value
+                .filter((s) => removedIds.has(s.id))
+                .map((s) => ({ ...s, stage: "registered" as const, manuallyRegisteredBy, manuallyRegisteredAt })),
+            ...failed.value
+                .filter((s) => removedIds.has(s.id))
+                .map((s) => ({ ...s, stage: "registered" as const, manuallyRegisteredBy, manuallyRegisteredAt })),
+        ];
+        confirmed.value = confirmed.value.filter((s) => !removedIds.has(s.id));
+        failed.value = failed.value.filter((s) => !removedIds.has(s.id));
+        registered.value = [...newRegistered, ...registered.value];
+        clearSelection();
+        toast.timeout({
+            text: `${studentIds.length} student${studentIds.length === 1 ? "" : "s"} marked as manually registered.`,
+        });
+    } catch (e) {
+        console.error("Failed to mark as manually registered", e);
+        toast.timeout({ text: "Failed to mark as manually registered.", isSuccess: false });
+    } finally {
+        isManuallyRegistering.value = false;
+    }
+}
+
+/**
+ * Confirms both candidate and subject details on behalf of the given students,
+ * then moves them from the Unconfirmed section to Confirmed.
+ * @param students The unconfirmed students to approve on behalf of.
+ */
+async function handleApproveOnBehalf(students: StudentRow[]): Promise<void> {
+    if (isApprovingOnBehalf.value) return;
+    isApprovingOnBehalf.value = true;
+
+    const toast = window.sbProps.toastActivate("Approving on behalf of student(s)...");
+
+    try {
+        const results = await Promise.allSettled(
+            students.map(async (student) => {
+                const endpoint = student.updateConfirmationEndpoint;
+                if (!endpoint) throw new Error(`No confirmation endpoint for student ${student.id}`);
+
+                const candidateResponse = await apiRequest<
+                    ApiUpdateConfirmationResponse,
+                    { section: string; confirmed: boolean }
+                >({
+                    url: endpoint,
+                    method: "PUT",
+                    body: { section: "candidate", confirmed: true },
+                });
+                if (!candidateResponse.success) {
+                    throw new Error(candidateResponse.message ?? "Failed to confirm candidate details.");
+                }
+
+                const subjectResponse = await apiRequest<
+                    ApiUpdateConfirmationResponse,
+                    { section: string; confirmed: boolean }
+                >({
+                    url: endpoint,
+                    method: "PUT",
+                    body: { section: "subject", confirmed: true },
+                });
+                if (!subjectResponse.success) {
+                    throw new Error(subjectResponse.message ?? "Failed to confirm subject details.");
+                }
+
+                return student;
+            }),
+        );
+
+        const succeededStudents = students.filter((_, i) => results[i].status === "fulfilled");
+        const failedCount = students.length - succeededStudents.length;
+
+        if (succeededStudents.length === 0) {
+            toast.timeout({ text: "Failed to approve on behalf of student.", isSuccess: false });
+            return;
+        }
+
+        const succeededIds = new Set(succeededStudents.map((s) => s.id));
+
+        unconfirmed.value = unconfirmed.value.filter((s) => !succeededIds.has(s.id));
+        confirmed.value = [
+            ...succeededStudents.map((s) => ({ ...s, stage: "confirmed" as const, renotifyEndpoint: null })),
+            ...confirmed.value,
+        ];
+
+        clearSelection();
+
+        const successText = `${succeededStudents.length} student${succeededStudents.length === 1 ? "" : "s"} approved on behalf.`;
+        toast.timeout({
+            text: failedCount > 0 ? `${successText} ${failedCount} failed.` : successText,
+            isSuccess: failedCount === 0,
+        });
+    } catch (e) {
+        console.error("Failed to approve on behalf", e);
+        toast.timeout({ text: "Failed to approve on behalf of student.", isSuccess: false });
+    } finally {
+        isApprovingOnBehalf.value = false;
+    }
+}
+
 window.Vue.onMounted((): void => {
     void loadCandidates();
 });
@@ -293,15 +439,22 @@ window.Vue.onMounted((): void => {
     <div class="small-12 island l-flex-col l-gap-m">
         <div class="l-flex l-flex--align-center l-flex--justify-space f-no-margins">
             <h2 class="subheader f-no-margins">{{ props.sessionTitle }}</h2>
-            <a
-                :href="props.candidateExportEndpoint"
-                class="sbx-icon-only-button"
-                aria-label="Download candidate details as CSV"
-                title="Download candidate details as CSV"
-            >
-                <sbx-icon name="download"></sbx-icon>
-            </a>
+            <sbx-pop-out content-id="ib-report-actions-dropdown"></sbx-pop-out>
         </div>
+        <ul id="ib-report-actions-dropdown" class="f-dropdown" data-dropdown-content aria-hidden="true">
+            <li>
+                <a :href="props.candidateExportEndpoint" class="sbx-button--has-icon">
+                    <sbx-icon name="download"></sbx-icon>
+                    Export to CSV
+                </a>
+            </li>
+            <li>
+                <a :href="props.candidateNumberUpdateRoute" class="sbx-button--has-icon">
+                    <sbx-icon name="modify"></sbx-icon>
+                    Update Candidate Numbers
+                </a>
+            </li>
+        </ul>
 
         <div v-if="isLoading" class="loader"></div>
 
@@ -327,6 +480,7 @@ window.Vue.onMounted((): void => {
                     :search-languages-endpoint="props.searchLanguagesEndpoint"
                     section="unconfirmed"
                     :active-selection-section="activeSelectionSection"
+                    @approve-on-behalf-single="(id) => handleApproveOnBehalf(unconfirmed.filter((s) => s.id === id))"
                     @reset-details-single="(id) => promptResetDetails([id])"
                 />
             </ib-report-section>
@@ -339,6 +493,7 @@ window.Vue.onMounted((): void => {
                     section="confirmed"
                     :active-selection-section="activeSelectionSection"
                     @reset-details-single="(id) => promptResetDetails([id])"
+                    @manually-register-single="(id) => handleManuallyRegister([id])"
                 />
             </ib-report-section>
 
@@ -352,6 +507,7 @@ window.Vue.onMounted((): void => {
                     :students="failed"
                     :active-selection-section="activeSelectionSection"
                     @reset-details-single="(id) => promptResetDetails([id])"
+                    @manually-register-single="(id) => handleManuallyRegister([id])"
                 />
             </ib-report-section>
 
@@ -379,12 +535,14 @@ window.Vue.onMounted((): void => {
                 confirmedSelected.length +
                 failedSelected.length
             "
-            :is-loading="isCompleting || isResetting"
+            :is-loading="isCompleting || isResetting || isManuallyRegistering || isApprovingOnBehalf"
             :active-section="activeSelectionSection"
             @complete-preparation="handleCompletePreparation(preparationSelected.map((s) => s.id))"
+            @approve-on-behalf="handleApproveOnBehalf(unconfirmedSelected)"
             @reset-details="
                 promptResetDetails([...unconfirmedSelected, ...confirmedSelected, ...failedSelected].map((s) => s.id))
             "
+            @manually-register="handleManuallyRegister([...confirmedSelected, ...failedSelected].map((s) => s.id))"
             @clear-selection="clearSelection"
         />
     </div>

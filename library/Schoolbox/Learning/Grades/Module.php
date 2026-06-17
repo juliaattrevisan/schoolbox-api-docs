@@ -172,6 +172,7 @@ class Module extends BaseModule
             $this->injector->get('filters.assessmentIdFinder'),
             $this->injector->get('filters.factoryFactory'),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\WorkType\Mapper::class),
+            new \Schoolbox\External\User(),
         );
     }
 

@@ -30,8 +30,10 @@ export type StudentRow = {
     name: string;
     userId: number;
     candidateDetailsStatus: CandidateDetailsStatus;
+    ibCandidateNumber: string | null;
     subjects: SubjectGroup;
     updateLanguageEndpoint: string | null;
+    updateConfirmationEndpoint: string | null;
     renotifyEndpoint: string | null;
     stage: "preparation" | "unconfirmed" | "confirmed" | "inProgress" | "failed" | "registered";
 };
@@ -54,10 +56,11 @@ export type InProgressRow = {
 };
 
 /**
- * A student row used in the Registered section, extending StudentRow with an IB candidate number.
+ * A student row used in the Registered section, extending StudentRow with registration metadata.
  */
 export type RegisteredRow = StudentRow & {
-    ibCandidateNumber?: string;
+    manuallyRegisteredBy?: string | null;
+    manuallyRegisteredAt?: string | null;
 };
 
 // ---------------------------------------------------------------------------
@@ -92,16 +95,34 @@ export type ApiStudent = {
     registrationSessionStudentId: number | null;
     status: number;
     userName: string;
+    ibCandidateNumber: string | null;
     hasMissingDetails: boolean;
     missingFields: string[];
+    manuallyRegisteredBy: string | null;
+    manuallyRegisteredAt: string | null;
     _routes: {
         updateLanguages: string | null;
+        manuallyRegister: string | null;
+        updateConfirmation: string | null;
     };
     ibGroupSubjects: {
         HL: ApiSubject[];
         SL: ApiSubject[];
         Core: ApiSubject[];
     };
+};
+
+/**
+ * Raw response from the update-confirmation endpoint.
+ */
+export type ApiUpdateConfirmationResponse = {
+    success: boolean;
+    section: string;
+    confirmed: boolean;
+    confirmationStatus: "confirmed" | "unconfirmed";
+    updatedAt: string;
+    updatedBy: { id: number; name: string };
+    message?: string;
 };
 
 /**
@@ -120,6 +141,17 @@ export type ApiCandidatesResponse = {
     success: true;
     students: Record<string, ApiStudent[]>;
     statuses: ApiStatus[];
+};
+
+/**
+ * Raw response from the mark-as-manually-registered endpoint.
+ */
+export type ApiManuallyRegisterResponse = {
+    success: boolean;
+    registeredCount: number;
+    manuallyRegisteredBy?: string;
+    manuallyRegisteredAt?: string;
+    message?: string;
 };
 
 /**

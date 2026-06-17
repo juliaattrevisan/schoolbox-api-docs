@@ -205,7 +205,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                 $assessments = $this->assessmentMapperProxy
                     ->findAllByUnitImplementationIdsForCourseOutline(
                         $uiIds,
-                        $user->getRole()->isParent() ? null : $user,
+                        $user->getRole()->isParent() ? null : (new \Schoolbox\Collection())->add($user),
                         $this->filterList ? ['type' => $assessmentTypes] : []
                     )
                     ->map([$mutator, 'map'])
@@ -291,7 +291,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         }
 
         $data = [
-            'assessmentTypes'      => AssessmentType::getEnabledOptions($this->getConfigLoader()),
+            'assessmentTypes'      => AssessmentType::getPermittedOptions($this->getConfigLoader(), $this->getUser()),
             'filterList'           => $this->filterList,
             'readOnly'             => $this->readOnly,
             'canWrite'             => $this->canWrite,

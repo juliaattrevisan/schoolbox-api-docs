@@ -12,6 +12,7 @@ use Schoolbox\Admin\OpenAI\Config as OpenAiConfig;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\IB\Registrations\Sessions\Student\Model as RegistrationSessionStudentModel;
 
 require_once __DIR__ . '/../conf/core/require.php';
 
@@ -60,6 +61,13 @@ $app = new class extends CliTool\App {
             'design_moderator'       => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_DESIGN . ' AND type=' . UserAccess::ACCESS_FULL,
             'lms_moderator'          => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_LMS . ' AND type=' . UserAccess::ACCESS_FULL,
             'impersonator_moderator' => 'SELECT count(distinct u.id) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_IMPERSONATOR . ' AND type=' . UserAccess::ACCESS_FULL, // distinct u.id, so we can see the count of humans, not service permissions.  A single human can have multiple Impersonator service permissions.
+            'ib_moderator'           => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_IB_COORDINATOR . ' AND type=' . UserAccess::ACCESS_FULL,
+
+            //IBIS
+            'ib_registration_sessions'              => 'SELECT COUNT(*) FROM ib_registration_sessions',
+            'ib_registration_students'              => 'SELECT COUNT(*) FROM ib_registration_session_student',
+            'ib_registration_students_registered'   => 'SELECT COUNT(*) FROM ib_registration_session_student WHERE status = ' . RegistrationSessionStudentModel::STATUS_REGISTERED,
+            'ib_students_with_candidate_numbers'    => 'SELECT COUNT(*) FROM user u WHERE u.ib_candidate_number IS NOT NULL AND u.ib_candidate_number != ""',
 
             //Logins
             'unique_logins_yesterday' => "SELECT COUNT(DISTINCT username) FROM login_log WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 1 DAY) AND date < DATE(NOW())",

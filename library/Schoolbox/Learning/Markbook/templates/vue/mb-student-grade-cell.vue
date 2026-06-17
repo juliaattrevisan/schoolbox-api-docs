@@ -53,6 +53,11 @@ const participant = window.Vue.computed(() => {
     return aImpl.value.participants[student.value.id] || null;
 });
 
+const canGiveFeedbackMarks = window.Vue.computed(
+    () => aImpl.value && aImpl.value.instructorMarkScheme.mode !== MarkTypeSlug.NONE,
+);
+const canGiveFeedbackComments = window.Vue.computed(() => aImpl.value && aImpl.value.feedbackCommentsEnable);
+
 /**
  * To determine whether the pop-out menu should be available for this cell
  */
@@ -148,15 +153,17 @@ function formatMark(mark: NonNullable<typeof participant.value>["marks"]["publis
 }
 
 const cellEl = window.Vue.useTemplateRef<HTMLTableCellElement>("cellRef");
+const commentCellEl = window.Vue.useTemplateRef<HTMLTableCellElement>("commentCellRef");
 
 const DOUBLE_CLICK_INTERVAL = 500; // ms
 const lastClick = window.Vue.ref<number>(0);
 
 /**
  * When the user clicks the cell, open the pop-out menu if available, otherwise do nothing
+ * @param referenceElement The element to anchor the pop-out to
  */
-async function onClickCell(): Promise<void> {
-    if (!hasPopOutMenu.value || !cellEl.value) {
+async function onClickCell(referenceElement: HTMLTableCellElement | null): Promise<void> {
+    if (!hasPopOutMenu.value || referenceElement === null) {
         return; // must have access to the pop-out and a mounted cell element
     }
 
@@ -195,7 +202,7 @@ async function onClickCell(): Promise<void> {
         mbStore.popoutSelectedCell = null;
 
         /* you must have the ability to either enter a mark or a comment (reporting can disable both at once) */
-        if (aImpl.value.feedbackCommentsEnable || aImpl.value.instructorMarkScheme.mode !== MarkTypeSlug.NONE) {
+        if (canGiveFeedbackMarks.value || canGiveFeedbackComments.value) {
             mbStore.setFeedbackSelectedCell(selectedFeedbackInfo);
         }
 
@@ -206,7 +213,7 @@ async function onClickCell(): Promise<void> {
         classImplId: props.classImplId,
         studentId: props.studentId,
         activityId: props.assessmentId,
-        referenceElement: cellEl.value,
+        referenceElement,
     };
 
     lastClick.value = Date.now();
@@ -259,20 +266,33 @@ const plaintextComments = window.Vue.computed(() => {
 
     return comments;
 });
+
+// show the marks column if splitComments is disabled or if the user can give feedback marks
+const showMarksColumn = window.Vue.computed(() => {
+    if (assessment.value === null) return false;
+    return !assessment.value.splitComments || canGiveFeedbackMarks.value;
+});
+
+// show the comments column if splitComments is enabled and the user can give feedback comments
+const showCommentsColumn = window.Vue.computed(() => {
+    if (assessment.value === null) return false;
+    return assessment.value.splitComments && canGiveFeedbackComments.value;
+});
 </script>
 
 <template>
     <td
-        v-if="mbStore.data && classImpl && assessment && student"
+        v-if="mbStore.data && classImpl && assessment && student && showMarksColumn"
         ref="cellRef"
         class="student-grade-cell"
         :class="{
             excluded: !participant || participant.isExcluded,
-            'is-selected': isSelectedPopout || isSelectedFeedback,
+            'is-selected':
+                isSelectedFeedback || (isSelectedPopout && mbStore.popoutSelectedCell?.referenceElement === cellEl),
         }"
         :data-test="`markbook-cell-${assessment.id}-${student.id}`"
         :data-pop-out-menu="hasPopOutMenu || undefined"
-        @click="onClickCell"
+        @click="onClickCell(cellEl)"
     >
         <template v-if="participant === null || participant.isExcluded"></template>
         <div v-else-if="participant.progressTick" style="display: flex; justify-content: center">
@@ -325,7 +345,47 @@ const plaintextComments = window.Vue.computed(() => {
             </span>
         </template>
     </td>
-    <td v-else class="na"></td>
+    <td v-else-if="showMarksColumn" class="na"></td>
+
+    <!-- Reporting Markbook: Split comments field for the reporting activity being viewed -->
+    <td
+        v-if="mbStore.data && classImpl && assessment && student && showCommentsColumn"
+        ref="commentCellRef"
+        class="mb-student-grade-cell-comment"
+        :class="{
+            excluded: !participant || participant.isExcluded,
+            'is-selected':
+                isSelectedFeedback ||
+                (isSelectedPopout && mbStore.popoutSelectedCell?.referenceElement === commentCellEl),
+        }"
+        :data-test="`markbook-cell-${assessment.id}-${student.id}-comment`"
+        :data-pop-out-menu="hasPopOutMenu || undefined"
+        @click="onClickCell(commentCellEl)"
+    >
+        <template v-if="participant === null || participant.isExcluded"></template>
+
+        <!-- eslint-disable vue/no-v-html -- scrubbed in the backend -->
+        <span
+            v-else-if="mbStore.showDrafts && participant.marks.draft.responseId !== null"
+            class="meta"
+            v-html="participant.marks.draft.comment"
+        />
+        <!-- eslint-enable vue/no-v-html -->
+        <!-- eslint-disable vue/no-v-html -- scrubbed in the backend -->
+        <span
+            v-else-if="participant.marks.published.responseId !== null"
+            v-html="participant.marks.published.comment"
+        />
+        <!-- eslint-enable vue/no-v-html -->
+
+        <span v-else>–</span>
+    </td>
+    <td v-else-if="showCommentsColumn" class="na"></td>
 </template>
 
-<style scoped></style>
+<style scoped>
+.mb-student-grade-cell-comment {
+    min-width: 40rem;
+    white-space: normal !important;
+}
+</style>

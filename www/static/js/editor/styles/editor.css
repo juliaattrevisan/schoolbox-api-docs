@@ -58,6 +58,9 @@
         var(--content-ui-submit-background-a)
     );
     --ck-color-button-action-text: var(--content-ui-submit-foreground);
+
+    /* Make larger to match our checkbox style */
+    --ck-todo-list-checkmark-size: 1.5rem;
 }
 
 /* CKEditor border radius follows Advanced UI field roundness */
@@ -215,16 +218,23 @@ body.ck-fullscreen {
 }
 
 /**
- * Our foundation styles does some funky things with
+ * Our foundation styles do some funky things with
  * checkboxes, hiding the <input> and using the <label>
  * instead, so we need to revert them to a
  * reasonable display state for the todo-list
  * https://ckeditor.com/docs/ckeditor5/latest/features/lists/todo-lists.html
+ * We also need to tweak further to accommodate the new Sonar UI styles
+ * We'll need to revisit these styles again once Sonar becomes the default
  */
 .ck.ck-editor .todo-list {
-    margin-left: 0.5rem;
+    margin-left: 1.5rem;
 }
 
+.ck-content .todo-list li {
+    margin-bottom: 0.5rem;
+}
+
+/* show the checkboxes that are hidden by our foundation styles and apply some custom spacing to fit with our new UI */
 .ck.ck-editor .todo-list input[type="checkbox"] {
     height: var(--ck-todo-list-checkmark-size);
     left: -0.5rem;
@@ -235,13 +245,45 @@ body.ck-fullscreen {
     width: var(--ck-todo-list-checkmark-size);
 }
 
-.ck.ck-editor .todo-list__label {
-    display: inline;
+/* style the checkboxes to match our own */
+.ck-editor__editable.ck-content .todo-list .todo-list__label > span[contenteditable="false"] > input::before {
+    border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    border-radius: min(var(--sbx-config-field-corner-radius, 0), var(--sbx-border-radius-m, 0));
 }
 
-.ck.ck-editor .todo-list .todo-list__label > input[checked]:before {
-    background: var(--content-ui-background);
-    border-color: var(--content-ui-background);
+/* match our hover styles for checkboxes */
+.ck-editor__editable.ck-content .todo-list .todo-list__label > span[contenteditable="false"] > input:hover::before,
+.ck-editor__editable.ck-content
+    .todo-list
+    .todo-list__label
+    > span[contenteditable="false"]
+    > input:checked:hover::before {
+    background: var(--sbx-config-color-active, var(--content-ui-background));
+    box-shadow: none;
+}
+
+/* match our checked styles for checkboxes */
+.ck-editor__editable.ck-content .todo-list .todo-list__label > span[contenteditable="false"] > input:checked::before {
+    background: var(--sbx-color-foreground-primary, var(--content-ui-background));
+    border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+}
+
+/* match our checked + hover styles for checkboxes */
+.ck-editor__editable.ck-content .todo-list .todo-list__label > span[contenteditable="false"] > input:checked::after {
+    border-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
+}
+
+/* adjust the spacing of the checkboxes to fit with our new UI */
+body.sbx-body .ck.ck-editor .todo-list input[type="checkbox"] {
+    place-content: normal;
+}
+
+/* clear the funky clip paths that are not required with Sonar UI and were causing issues with our custom styles */
+body.sbx-body .ck.ck-editor .todo-list input[type="checkbox"]::before {
+    background-color: var(--sbx-color-foreground-primary);
+    box-shadow: none;
+    clip-path: none;
+    transform: none;
 }
 
 /**
@@ -339,7 +381,6 @@ body.ck-fullscreen {
  *  property. SASS has no access to custom properties as it's a preprocessor and custom
  *  property values aren't resolved until runtime.
 **/
-
 .ck.ck-button:not([aria-disabled="true"]) {
     cursor: pointer;
 }
@@ -424,7 +465,6 @@ turned on */
  * They ensure that the editor takes up the full screen displays
  * in a 'page less' style, stretching across the entire screen
  */
-
 .ck.ck-fullscreen__main-wrapper .ck-fullscreen__sidebar {
     display: none;
 }
@@ -446,7 +486,6 @@ turned on */
 /**
  * Remove the image that sits alongside template options as we don't use them
  */
-
 .ck.ck-template-form > .ck-search__results > .ck.ck-list.ck-template-list > .ck.ck-list__item > .ck.ck-button {
     grid-template-areas: "ck-template-content";
     grid-template-columns: 1fr;

@@ -13,6 +13,7 @@ const selectedList = defineModel<FailedRow[]>("selectedList", { default: () => [
 
 const emit = defineEmits<{
     resetDetailsSingle: [studentId: number];
+    manuallyRegisterSingle: [studentId: number];
 }>();
 
 const updateLanguageStore = useIbReportUpdateLanguageStore();
@@ -66,6 +67,7 @@ function openModal(student: FailedRow): void {
                         name="alert"
                         color="var(--sbx-color-warning, #e67e22)"
                         aria-label="Candidate details unconfirmed"
+                        title="Missing required candidate details."
                     ></sbx-icon>
                 </td>
                 <td><ib-report-subject-labels :entry="student.subjects.hl" /></td>
@@ -96,6 +98,15 @@ function openModal(student: FailedRow): void {
                             >
                                 <sbx-icon name="undo"></sbx-icon>
                                 Reset All Details
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                class="sbx-button--has-icon"
+                                @click.prevent="emit('manuallyRegisterSingle', student.id)"
+                            >
+                                <sbx-icon name="approve"></sbx-icon>
+                                Mark as manually registered
                             </button>
                         </li>
                     </ul>

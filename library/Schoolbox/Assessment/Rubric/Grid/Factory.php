@@ -86,7 +86,7 @@ class Factory
             ->setId($rubricData['capabilityGradeGroup']);
 
         $grid->getRubricInstance()
-            ->setTitle($rubricData['title'])
+            ->setTitle(trim($rubricData['title']))
             ->setWeight($rubricData['weight'])
             ->setCapabilityMarkType($newCapabilityMarkType)
             ->setCapabilityGradeGroup($newCapabilityGradeGroup)

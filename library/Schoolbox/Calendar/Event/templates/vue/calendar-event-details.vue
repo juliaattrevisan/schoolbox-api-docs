@@ -125,6 +125,7 @@ export default {
     },
 
     created() {
+        this.ATTENDANCE_STATUS = ATTENDANCE_STATUS;
         this.ENDPOINTS = ENDPOINTS;
         this.canRsvp = checks.canRsvp;
         this.showRsvpButtons = checks.showRsvpButtons;
@@ -645,16 +646,21 @@ export default {
                                             :src="'/portrait.php?id=' + guest.id + '&size=square64'"
                                             alt="portrait photo"
                                         />
-
-                                        <p
-                                            :class="{
-                                                pending: isPending(guest.status),
-                                                accepted: isAccepted(guest.status),
-                                                declined: isDeclined(guest.status),
-                                            }"
-                                        >
-                                            {{ guest.name }}<span class="status-icon"></span>
-                                        </p>
+                                        <div class="l-flex l-flex--align-center l-gap-s">
+                                            <p>
+                                                {{ guest.name }}
+                                            </p>
+                                            <sbx-label
+                                                v-if="guest.status === ATTENDANCE_STATUS.ACCEPTED"
+                                                sentiment="success"
+                                                icon="approve"
+                                            ></sbx-label>
+                                            <sbx-label
+                                                v-else-if="guest.status === ATTENDANCE_STATUS.DECLINED"
+                                                sentiment="alert"
+                                                icon="close"
+                                            ></sbx-label>
+                                        </div>
                                     </a>
                                 </div>
                                 <nav>

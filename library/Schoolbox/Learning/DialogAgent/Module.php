@@ -636,14 +636,6 @@ class Module extends BaseModule
 
 
     /**
-     * {@inheritdoc}
-     */
-    public function initTemplatePaths(IChainLoader $templateLoader): void
-    {
-    }
-
-
-    /**
      * @return AssessmentMapperProxy
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface

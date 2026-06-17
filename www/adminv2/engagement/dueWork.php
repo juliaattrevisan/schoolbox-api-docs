@@ -22,7 +22,10 @@ $currentMonth = clone $start;
 
 $report = new Schoolbox\Engagement\DueWork($this->getDi()->get('databaseInternalRead'));
 
-$visibilityTable = createVisibilityTable($months);
+$visibilityTable = [];
+foreach (IAssessable::MARK_VISIBILITY_STRINGS as $label) {
+    $visibilityTable[$label] = array_fill(0, $months, 0);
+}
 
 for ($i = 0; $i < $months; $i++) {
     $this->setVar('MONTH', $currentMonth->getUsingFormat('F Y'));
@@ -47,7 +50,10 @@ for ($i = 0; $i < $months; $i++) {
     $this->parse('returned_month_body_block', 'returned_month_body', true);
 
     $visibility = $report->visibility($currentMonth, $endMonth);
-    $visibilityTable = addVisibilityTotalsToTable($visibilityTable, $visibility, $i);
+    foreach ($visibility as $row) {
+        $label = IAssessable::MARK_VISIBILITY_STRINGS[$row['mark_visibility']];
+        $visibilityTable[$label][$i] = $row['total'];
+    }
 
     $currentMonth->addMonths(1);
 }
@@ -62,35 +68,4 @@ foreach ($visibilityTable as $visibility => $monthTotal) {
 
     $this->parse('visibility_block', 'visibility', true);
     $this->setVar('visibility_month_block', '');
-}
-
-/**
- * @param int $months
- * @return array
- */
-function createVisibilityTable(int $months): array
-{
-    $visibilityTable = [];
-
-    foreach (IAssessable::MARK_VISIBILITY_STRINGS as $label) {
-        $visibilityTable[$label] = array_fill(0, $months, 0);
-    }
-
-    return $visibilityTable;
-}
-
-/**
- * @param array $visibilityTable
- * @param array $visibilityTotals
- * @param int   $monthIndex
- * @return array
- */
-function addVisibilityTotalsToTable(array $visibilityTable, array $visibilityTotals, int $monthIndex): array
-{
-    foreach ($visibilityTotals as $row) {
-        $label = IAssessable::MARK_VISIBILITY_STRINGS[$row['mark_visibility']];
-        $visibilityTable[$label][$monthIndex] = $row['total'];
-    }
-
-    return $visibilityTable;
 }

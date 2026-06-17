@@ -18,6 +18,10 @@ test.describe.serial("Admin User Management - Lists: Qualifications", () => {
 
     const qualificationName = "Test Qualification PLW";
 
+    test.beforeAll(async ({ db }) => {
+        await db.updateInDatabase("config", { value: "1" }, { "name like": "ib_enabled" });
+    });
+
     test.beforeEach(async ({ tester, page }) => {
         qualificationList = new QualificationList(tester, page);
         await tester.loginAsAdmin();
@@ -103,18 +107,18 @@ test.describe.serial("Admin User Management - Lists: Qualifications", () => {
                 "navigate to the Qualifications list, resort the items and verify the order is persisted after save and page reload",
             );
             const item1 = 1;
-            const item2 = 3;
+            const item2 = 2;
 
             await qualificationList.goto();
 
             const initialItemsOrder = await qualificationList.getItemsOrder();
 
-            tester.isGoingTo("Verify Pre-unit Quiz to be above Post to Forum: Prologue in the initial order");
+            tester.isGoingTo("Verify the qualifications are presented in the proper order");
             expect(initialItemsOrder.indexOf(item1.toString())).toBeLessThan(
                 initialItemsOrder.indexOf(item2.toString()),
             );
 
-            tester.isGoingTo("drag the the item VCE above DP Year 1");
+            tester.isGoingTo("drag the the item Diploma Course above Diploma Programme");
             await qualificationList.dragAndDropItem(item2, item1);
             const newItemOrder = await qualificationList.getItemsOrder();
 
@@ -127,8 +131,8 @@ test.describe.serial("Admin User Management - Lists: Qualifications", () => {
             expect(finalItemOrder).toEqual(newItemOrder);
         } finally {
             tester.isGoingTo("reorder the items back to the initial order to not impact other tests");
-            await db.updateInDatabase("lu_qualification", { sequence: 1 }, { "name like": "DP Year 1" });
-            await db.updateInDatabase("lu_qualification", { sequence: 3 }, { "name like": "VCE" });
+            await db.updateInDatabase("lu_qualification", { sequence: 1 }, { "name like": "Diploma Programme" });
+            await db.updateInDatabase("lu_qualification", { sequence: 2 }, { "name like": "Diploma Course" });
         }
     });
 
@@ -158,5 +162,6 @@ test.describe.serial("Admin User Management - Lists: Qualifications", () => {
             { deleted_at: "2022-01-15 11:22:34" },
             { "name like": "Test Qualification PLW%", deleted_at: null },
         );
+        await db.updateInDatabase("config", { value: "0" }, { "name like": "ib_enabled" });
     });
 });

@@ -21,7 +21,19 @@ const emit = defineEmits<{
     (event: "back"): void;
 }>();
 
-const typePicked = window.Vue.ref("modify"); // to track the type of customisation picked
+type CustomisationType = "modify" | "copy" | "new";
+
+/**
+ * Choose the first available customisation type for the initial radio selection.
+ * @returns The first available customisation type.
+ */
+function getDefaultType(): CustomisationType {
+    if (props.routes.getLearningPlanNewUrl) return "modify";
+    if (props.routes.getAssessmentParticipationCopyActivity) return "copy";
+    return "new";
+}
+
+const typePicked = window.Vue.ref<CustomisationType>(getDefaultType()); // to track the type of customisation picked
 const proceedText = window.Vue.ref("Proceed");
 const loadError = window.Vue.ref<string | null>(null);
 const { includeParticipants } = useIncludeParticipant(loadError);
@@ -42,11 +54,11 @@ async function onConfirm(): Promise<void> {
         await includeParticipants([props.participant]);
     }
     const studentId = props.participant?.user.id ?? null;
-    if (typePicked.value === "modify") {
+    if (typePicked.value === "modify" && props.routes.getLearningPlanNewUrl) {
         window.location.href = `${props.routes.getLearningPlanNewUrl}?student=${studentId}&${getReturnUrl()}`;
-    } else if (typePicked.value === "copy") {
+    } else if (typePicked.value === "copy" && props.routes.getAssessmentParticipationCopyActivity) {
         window.location.href = `${props.routes.getAssessmentParticipationCopyActivity}?student=${studentId}&original=${props.assessmentId}&${getReturnUrl()}`;
-    } else if (typePicked.value === "new") {
+    } else if (typePicked.value === "new" && props.routes.getAssessmentParticipationNewActivity) {
         window.location.href = `${props.routes.getAssessmentParticipationNewActivity}?student=${studentId}&original=${props.assessmentId}&${getReturnUrl()}`;
     }
 }
@@ -60,7 +72,7 @@ async function onConfirm(): Promise<void> {
         <fieldset class="checklist u-no-border l-pad--0 f-no-margins">
             <legend class="t-visually-hidden">Choose the type of customisation to apply:</legend>
             <ul class="option-list">
-                <li>
+                <li v-if="props.routes.getLearningPlanNewUrl">
                     <input id="cp-modify" v-model="typePicked" type="radio" value="modify" />
                     <label for="cp-modify">
                         <span class="icon-modify f-no-icon-color">
@@ -76,7 +88,7 @@ async function onConfirm(): Promise<void> {
                         </span>
                     </label>
                 </li>
-                <li>
+                <li v-if="props.routes.getAssessmentParticipationNewActivity">
                     <input id="cp-new" v-model="typePicked" type="radio" value="new" />
                     <label for="cp-new">
                         <span class="icon-submissions f-no-icon-color">

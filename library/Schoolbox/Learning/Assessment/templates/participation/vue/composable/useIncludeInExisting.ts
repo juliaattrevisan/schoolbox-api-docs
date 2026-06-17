@@ -1,6 +1,6 @@
 import type { Ref } from "vue";
 import { postIncludeExistingParticipant } from "../../js/types/customParticipationPayload";
-import type { CustomisedPlan, Participant, Plan } from "../../js/types/customParticipationTypes";
+import type { CustomisedPlan, OptionalRoute, Participant, Plan } from "../../js/types/customParticipationTypes";
 
 /**
  * Composable for including participants in existing customisations
@@ -13,7 +13,7 @@ import type { CustomisedPlan, Participant, Plan } from "../../js/types/customPar
 export function useIncludeInExisting(
     loadError: Ref<string | null>,
     customisations: (Plan | CustomisedPlan)[],
-    includeInExistingCustomisationUrl: string,
+    includeInExistingCustomisationUrl: OptionalRoute,
     selectedList: Ref<Participant[]>,
 ): {
     isIncludeInExistingOpen: Ref<boolean>;
@@ -32,6 +32,7 @@ export function useIncludeInExisting(
      * Add all the selected participants to an existing customisation plan.
      */
     async function includeParticipantInExistingPlan(): Promise<void> {
+        if (!includeInExistingCustomisationUrl) return;
         if (includeInExistingActivityId.value === null) return;
         const activity = customisations.find((plan) => plan.id === includeInExistingActivityId.value);
         if (!activity) return;

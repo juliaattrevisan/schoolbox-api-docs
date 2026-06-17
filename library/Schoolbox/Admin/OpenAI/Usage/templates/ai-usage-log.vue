@@ -27,6 +27,7 @@ interface Props {
 const PAGE_SIZE = 30;
 
 const UNKNOWN_FEATURE_TEXT = "Unknown Feature";
+const SELECTED_SESSION_ACTIONS_ID = "ai-usage-log-selected-session-actions";
 
 const props = defineProps<Props>();
 
@@ -176,10 +177,17 @@ async function openSessionDetails(session: AiSession): Promise<void> {
 
     selectedSessionLog.value = response.data;
 }
+
+/**
+ * Print the currently selected AI session log.
+ */
+function printSelectedSession(): void {
+    window.print();
+}
 </script>
 
 <template>
-    <div class="row">
+    <div class="row no-print">
         <div class="small-12 island">
             <section>
                 <fieldset class="content">
@@ -240,7 +248,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
         </div>
     </div>
 
-    <div>
+    <div class="no-print">
         <div class="list-item">
             <h2 class="subheader">
                 Activity<template v-if="!isLoading">: {{ usageSessions.length }} events</template>
@@ -249,7 +257,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
     </div>
 
     <div class="row">
-        <div class="small-12 medium-6 columns l-mar-m--bottom" :class="{ island: isLoading }">
+        <div class="small-12 medium-6 columns l-mar-m--bottom no-print" :class="{ island: isLoading }">
             <div v-if="loadError" data-alert class="alert-box alert">
                 {{ loadError }}
             </div>
@@ -315,35 +323,53 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                 @page-change="changePage"
             />
         </div>
-        <div class="small-12 medium-6 island">
+        <div class="small-12 medium-6 island ai-usage-log__viewer">
             <div v-if="sessionLoadError" data-alert class="alert-box alert">
                 {{ sessionLoadError }}
             </div>
             <section v-else-if="selectedSessionInfo !== null">
-                <div class="card small-12">
-                    <span>
-                        <user-photo
-                            v-if="selectedSessionInfo.session.createdBy"
-                            :user-id="selectedSessionInfo.session.createdBy.id || 0"
-                            render="small"
-                        />
-                        <h3>
-                            {{ props.features[selectedSessionInfo.session.feature]?.title ?? UNKNOWN_FEATURE_TEXT }}
-                        </h3>
-                    </span>
-                    <p class="meta">
-                        <span v-if="!selectedSessionInfo.session.createdBy"> Created </span>
-                        <template v-else>
-                            Created by
-                            <component
-                                :is="selectedSessionInfo.session.createdBy._links.profile ? 'a' : 'span'"
-                                :href="selectedSessionInfo.session.createdBy._links.profile ?? undefined"
+                <div class="card small-12 actions-small-1">
+                    <div class="list-item">
+                        <span>
+                            <user-photo
+                                v-if="selectedSessionInfo.session.createdBy"
+                                :user-id="selectedSessionInfo.session.createdBy.id || 0"
+                                render="small"
+                            />
+                            <h3>
+                                {{ props.features[selectedSessionInfo.session.feature]?.title ?? UNKNOWN_FEATURE_TEXT }}
+                            </h3>
+                        </span>
+                        <p class="meta">
+                            <span v-if="!selectedSessionInfo.session.createdBy"> Created </span>
+                            <template v-else>
+                                Created by
+                                <component
+                                    :is="selectedSessionInfo.session.createdBy._links.profile ? 'a' : 'span'"
+                                    :href="selectedSessionInfo.session.createdBy._links.profile ?? undefined"
+                                >
+                                    {{ selectedSessionInfo.session.createdBy.fullName }}
+                                </component>
+                            </template>
+                            <relative-time :datetime="selectedSessionInfo.session.createdAt" full-diff></relative-time>
+                        </p>
+                    </div>
+                    <nav class="no-print">
+                        <sbx-pop-out :content-id="SELECTED_SESSION_ACTIONS_ID"></sbx-pop-out>
+                    </nav>
+                    <ul :id="SELECTED_SESSION_ACTIONS_ID" class="f-dropdown no-print" data-dropdown-content>
+                        <li>
+                            <a
+                                href="#"
+                                class="sbx-button--has-icon"
+                                data-test="ai-usage-log-print-session"
+                                @click.prevent="printSelectedSession"
                             >
-                                {{ selectedSessionInfo.session.createdBy.fullName }}
-                            </component>
-                        </template>
-                        <relative-time :datetime="selectedSessionInfo.session.createdAt" full-diff></relative-time>
-                    </p>
+                                <sbx-icon name="print"></sbx-icon>
+                                Print / Save as PDF
+                            </a>
+                        </li>
+                    </ul>
                 </div>
                 <div class="clearfix"></div>
 
@@ -370,4 +396,31 @@ async function openSessionDetails(session: AiSession): Promise<void> {
     </div>
 </template>
 
-<style scoped></style>
+<style scoped lang="scss">
+/* styles for printing (scoped) */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    .ai-usage-log__viewer {
+        width: 100% !important;
+    }
+}
+</style>
+
+<style>
+/* styles for printing (global) */
+@media print {
+    #container,
+    .island {
+        padding: 0; /* to get more of the page estate */
+    }
+
+    .breadcrumb,
+    .admin-container > .small-12 > h1,
+    #footer {
+        display: none !important;
+    }
+}
+</style>

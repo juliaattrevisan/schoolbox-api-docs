@@ -28,6 +28,8 @@ use function count;
 use function implode;
 use function preg_match;
 use function preg_replace;
+use function strtr;
+use function trim;
 
 /**
  * Responsible for the logical link between a Canvas CourseSection.SisSourceId and a Schoolbox Folder.FolderCode
@@ -233,6 +235,57 @@ class CourseSection
 
 
     /**
+     * Format the configured Canvas SIS Source ID template for a Schoolbox class folder.
+     *
+     * @param string            $template
+     * @param Folder\Model      $folder
+     * @param Folder\Model|null $parentFolder
+     * @param string|null       $folderCode
+     * @return string
+     */
+    public static function formatSisSourceIdTemplate(
+        string $template,
+        Folder\Model $folder,
+        ?Folder\Model $parentFolder,
+        ?string $folderCode = null
+    ): string {
+        return strtr(
+            $template,
+            [
+                '{folderCode}' => trim($folderCode ?? preg_replace("#^[^/]+/#", '', $folder->getCodeString())),
+                '{parentCode}' => self::getParentCode($parentFolder),
+                '{folderName}' => trim($folder->getName()),
+            ]
+        );
+    }
+
+
+    /**
+     * Return the parent folder code, falling back to the year embedded in the folder name.
+     *
+     * @param Folder\Model|null $parentFolder
+     * @return string
+     */
+    private static function getParentCode(?Folder\Model $parentFolder): string
+    {
+        if ($parentFolder === null) {
+            return '';
+        }
+
+        $parentCode = trim($parentFolder->getCodeString());
+        if ($parentCode !== '') {
+            return $parentCode;
+        }
+
+        if (preg_match('/(\d{4})/', $parentFolder->getName(), $matches)) {
+            return $matches[1];
+        }
+
+        return '';
+    }
+
+
+    /**
      * Fetches all current and historical folder codes
      *
      * @throws Database\Exception
@@ -388,9 +441,22 @@ class CourseSection
         // Now strip the campus prefix
         /** @var Folder\Model[][] $yearAndUnPrefixedCodeToFolderMap */
         $yearAndUnPrefixedCodeToFolderMap = [];
+        /** @var Folder\Model[][] $yearAndSisSourceIdTemplateToFolderMap */
+        $yearAndSisSourceIdTemplateToFolderMap = [];
         foreach ($yearAndFolderCodeToFolderMap as $year => $folderCodeToFolderMap) {
             foreach ($folderCodeToFolderMap as $folderCode => $folder) {
-                $yearAndUnPrefixedCodeToFolderMap[$year][preg_replace("#^[^/]+/#", '', (string)$folderCode)] = $folder;
+                $unPrefixedFolderCode = preg_replace("#^[^/]+/#", '', (string)$folderCode);
+                $yearAndUnPrefixedCodeToFolderMap[$year][$unPrefixedFolderCode] = $folder;
+
+                /** @var Folder\Model|null $parentFolder */
+                $parentFolder = $this->folderTree?->getParent($folder);
+                $templateSisSourceId = self::formatSisSourceIdTemplate(
+                    $this->canvasDb->sissourceid_template,
+                    $folder,
+                    $parentFolder,
+                    $unPrefixedFolderCode
+                );
+                $yearAndSisSourceIdTemplateToFolderMap[$year][$templateSisSourceId] = $folder;
             }
         }
 
@@ -424,7 +490,9 @@ class CourseSection
                 continue;
             }
 
-            $folder = $yearAndUnPrefixedCodeToFolderMap[$year][$subjectCode] ?? null;
+            $folder = $yearAndSisSourceIdTemplateToFolderMap[$year][$sisSourceId]
+                ?? $yearAndUnPrefixedCodeToFolderMap[$year][$subjectCode]
+                ?? null;
 
             // No match found in Schoolbox?
             if (!$folder) {

@@ -14,6 +14,11 @@
      title="This controls who can view feedback for this {{ locale.translate('activity', false, false)}}. Feedback can only be shown to roles included in the Activity Audience.">
      ?
     </span>
+    {% set allOptionValues = allOptions|keys %}
+    {% set selectedIsDisabled = selected in allOptionValues and selected not in availableVisibilities %}
+    {% if selectedIsDisabled %}
+        <input type="hidden" name="visibility" value="{{ selected }}" />
+    {% endif %}
     <select name="visibility" data-test="assessment-form-select-visibility">
         {% for currentOption, label in allOptions %}
             <option value="{{ currentOption }}"

@@ -20,6 +20,7 @@ import { addResource, exitLinkContext, insertSoftBreak } from "@js/editor/plugin
 import ResourceUI from "@js/editor/plugin/resource/ResourceUI";
 import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
 import { EditorToolbar } from "@js/editor/types/editorTypes";
+import { getLightboxRel, LIGHTBOX_LINK_ATTRIBUTE } from "./lightboxLinkUtils";
 
 /**
  * Returns `true` if non-empty `text/html` is included in the data transfer.
@@ -106,6 +107,8 @@ export default class ResourceEditing extends Plugin {
             this.editor.model.change((writer) => {
                 writer.setAttribute("alt", data.name, imageElement);
                 writer.setAttribute("linkHref", data.default, imageElement);
+                // add a rel tag so we can trigger the light gallery
+                writer.setAttribute(LIGHTBOX_LINK_ATTRIBUTE, getLightboxRel(this.editor), imageElement);
 
                 const insertPosition = writer.createPositionAfter(imageElement);
 

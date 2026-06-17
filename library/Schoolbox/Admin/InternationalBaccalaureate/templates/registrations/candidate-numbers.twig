@@ -1,0 +1,65 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 island">
+            <h2 class="subheader">Update Candidate Numbers - {{ sessionTitle }}</h2>
+            {% if candidates is empty %}
+                <div class="empty-state-flex-centered f-no-margins">
+                    <sbx-icon name="integration-student" size="2.5rem"></sbx-icon>
+                    <slot>
+                        <p>No students are currently included in this report.</p>
+                        <a class="button" href="{{ _routes.report }}">Return to Report</a>
+                    </slot>
+                </div>
+            {% else %}
+                <form id="ib-candidate-numbers-form" action="{{ _routes.save }}" method="post">
+                    <section>
+                        <fieldset class="content">
+                            <table class="tiger-stripe">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">IB Candidate Number</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for candidate in candidates %}
+                                        <tr>
+                                            <td><p>{{ candidate.name }}</p></td>
+                                            <td>
+                                                <label class="t-visually-hidden" for="ib-candidate-number-{{ candidate.userId }}">
+                                                    IB Candidate Number for {{ candidate.name }}
+                                                </label>
+                                                <input
+                                                    id="ib-candidate-number-{{ candidate.userId }}"
+                                                    name="candidateNumbers[{{ candidate.userId }}]"
+                                                    type="text"
+                                                    maxlength="255"
+                                                    value="{{ candidate.ibCandidateNumber }}"
+                                                />
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </fieldset>
+                    </section>
+                    <ul class="flex-list buttons">
+                        <li>
+                            <a href="{{ _routes.report }}" class="button secondary">Cancel</a>
+                        </li>
+                        <li>
+                            <input data-test="ib-candidate-numbers-save" type="submit" value="Save">
+                        </li>
+                    </ul>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</div>

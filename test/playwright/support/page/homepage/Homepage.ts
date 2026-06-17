@@ -63,7 +63,7 @@ export default class Homepage {
 
     static readonly ELEMENT_COMPONENT_EDIT_HEADING = 'input[name="componentname"]';
 
-    static readonly ELEMENT_COMPONENT_UPDATE_BUTTON = 'input[value="Update"]';
+    static readonly DATA_TEST_UPDATE_BUTTON = "homepage-component-update-button";
 
     static readonly REMOVE_BUTTON_CONFIRMATION_MESSAGE = "Remove";
 
@@ -254,8 +254,8 @@ export default class Homepage {
      * @param component - The locator of the component to update
      */
     public static async clickComponentUpdateButton(component: Locator): Promise<void> {
-        await component.locator(Homepage.ELEMENT_COMPONENT_UPDATE_BUTTON).click();
-        await expect(component.locator(Homepage.ELEMENT_COMPONENT_UPDATE_BUTTON)).toBeHidden();
+        await component.getByTestId(Homepage.DATA_TEST_UPDATE_BUTTON).click();
+        await expect(component.getByTestId(Homepage.DATA_TEST_UPDATE_BUTTON)).toBeHidden();
     }
 
     /**
@@ -272,6 +272,16 @@ export default class Homepage {
     async typeTextBoxHeading(headingText: string): Promise<void> {
         await this.page.waitForSelector(Homepage.ELEMENT_COMPONENT_EDIT_HEADING);
         await this.page.fill(Homepage.ELEMENT_COMPONENT_EDIT_HEADING, headingText);
+    }
+
+    /**
+     * Type a heading text into a component's heading field
+     * @param component - The locator of the component to update
+     * @param headingText - The text to type into the heading field.
+     */
+    public static async typeComponentHeading(component: Locator, headingText: string): Promise<void> {
+        await component.locator(Homepage.ELEMENT_COMPONENT_EDIT_HEADING).waitFor();
+        await component.locator(Homepage.ELEMENT_COMPONENT_EDIT_HEADING).fill(headingText);
     }
 
     /**

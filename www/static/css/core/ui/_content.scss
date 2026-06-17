@@ -44,6 +44,10 @@
     }
 }
 
+.upcoming-work-classes .information-list > li:first-child .card {
+    padding-bottom: 0.5rem;
+}
+
 .empty-state-flex-centered {
     @extend .empty-state;
     align-items: center;

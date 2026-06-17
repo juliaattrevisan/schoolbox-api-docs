@@ -101,6 +101,10 @@
         <article>
             {{ article.body|purify }}
         </article>
+        <script>
+            // the article body may contain images that need to be processed into lightbox galleries
+            if (window.sbProps.lightGalleryInit) { window.sbProps.lightGalleryInit(); }
+        </script>
 
         {% include ('@commsNews/layout/file-list.twig') with {
             article: article,

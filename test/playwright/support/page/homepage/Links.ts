@@ -1,11 +1,15 @@
 import { expect } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import Common from "@schoolboxTest/playwright/support/page/Common";
+import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 
 export default class Links {
     private tester: AcceptanceTester;
 
     private page: Page;
+
+    private common: Common;
 
     static readonly ELEMENT_TITLE_TEXTBOX = 'input[id="description"]';
 
@@ -28,6 +32,7 @@ export default class Links {
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
+        this.common = new Common(page);
     }
 
     /**
@@ -121,7 +126,7 @@ export default class Links {
     public static async sortLinks(linkComponent: Locator, sortBy: string, sortingOrder: string): Promise<void> {
         await linkComponent.locator('select[name="sort"]').selectOption(sortBy);
         await linkComponent.locator('select[name="sortdir"]').selectOption(sortingOrder);
-        await linkComponent.locator('input[value="Update"]').click();
+        await Homepage.clickComponentUpdateButton(linkComponent);
         await expect(linkComponent.locator('select[name="sort"]')).toBeHidden();
     }
 
@@ -132,7 +137,7 @@ export default class Links {
      */
     public static async setLinkLimit(linkComponent: Locator, Limit: string): Promise<void> {
         await linkComponent.locator("select[name='size']").selectOption(Limit);
-        await linkComponent.locator('input[value="Update"]').click();
+        await Homepage.clickComponentUpdateButton(linkComponent);
         await expect(linkComponent.locator('select[name="sort"]')).toBeHidden();
     }
 
@@ -152,7 +157,7 @@ export default class Links {
         await linkComponent.locator("select[name='size']").selectOption(limit);
         await linkComponent.locator('label[for$="-compactMode"]').click();
         if (showTitle) await linkComponent.locator(`label[for="component${componentId}-showComponentTitle"]`).click();
-        await linkComponent.locator('input[value="Update"]').click();
+        await Homepage.clickComponentUpdateButton(linkComponent);
         await expect(linkComponent.locator("select[name='size']")).toBeHidden();
     }
 
@@ -206,7 +211,7 @@ export default class Links {
             .click();
         const locatorEng = linkComponent.locator("div.source a", { hasText: subSrcFolder });
         await expect(locatorEng).toBeVisible();
-        await linkComponent.locator('input[type="submit"][value="Update"]').click();
+        await Homepage.clickComponentUpdateButton(linkComponent);
         await expect(locatorEng).toBeHidden();
     }
 
@@ -217,7 +222,7 @@ export default class Links {
      */
     public async deleteLink(linkComponent: Locator, linkTitle: string): Promise<void> {
         await linkComponent.locator(`a[title='${linkTitle}']`).click();
-        await this.page.getByTestId("sbx-pop-out-header-options-button").click();
+        await this.common.clickJellyTot();
         await this.page.getByText("Delete Link").click();
         await this.page.getByTestId("confirm-dialog-confirm-button").click();
     }

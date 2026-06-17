@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { useMarkbookStore } from "./store/markbookStore";
 import type { MarkbookActivity } from "./types/payload";
+import { MarkbookType } from "./types/types";
 import MbTableHead from "./mb-table-head.vue";
 import MbFeedback from "./mb-feedback.vue";
 import MbClassimplRows from "./mb-classimpl-rows.vue";
 import MbTableHeadActivityDropdown from "./mb-table-head-activity-dropdown.vue";
 
 interface Props {
-    type: "course" | "class";
+    type: MarkbookType;
 }
 
 const props = defineProps<Props>();
@@ -40,11 +41,34 @@ window.Vue.onMounted(() => {
     // Initialize the ResizeObserver
     resizeObserver.value = new ResizeObserver(updateContainerHeight);
     resizeObserver.value.observe(document.querySelector("#container")!);
-    resizeObserver.value.observe(document.querySelector("#markbook-outer-container")!);
+
+    const outerContainer = activityHeaderDropdownEl.value?.closest("[data-markbook-outer-container]");
+    if (outerContainer) {
+        resizeObserver.value.observe(outerContainer);
+    } else {
+        console.warn("missing [data-markbook-outer-container] element");
+    }
 
     // Set the initial height, and update it again when the DOM is fully loaded to ensure the footer is included
     updateContainerHeight();
     window.addEventListener("DOMContentLoaded", updateContainerHeight, { once: true });
+
+    /**
+     * Ensure tooltips are reflowed when the markbook is changed
+     */
+    window.Vue.watch(
+        () => [mbStore.showDisplayMarks, mbStore.showDrafts],
+        () => {
+            if (document.readyState !== "complete") {
+                // If the document isn't ready, we can't reflow tooltips yet
+                return;
+            }
+
+            // When a setting is added after the page is loaded, we need to tell foundation to fix the tooltips
+            window.jQuery(document).foundation("tooltip", "reflow");
+        },
+        { immediate: true },
+    );
 });
 
 window.Vue.onUnmounted(() => {
@@ -86,7 +110,7 @@ const exportReportRoute = window.Vue.computed(() => {
 </script>
 
 <template>
-    <div v-if="mbStore.data" :class="{ 'actions-small-1': exportReportRoute !== null }">
+    <div class="l-flex l-flex-row l-flex--align-end l-flex--justify-end l-gap-m">
         <div class="legend">
             <div class="indicators">
                 <p class="meta"><span class="legend-indicator indicator-none"></span>Unmarked</p>
@@ -113,20 +137,18 @@ const exportReportRoute = window.Vue.computed(() => {
             <input id="show-drafts" v-model="mbStore.showDrafts" type="checkbox" />
             <label for="show-drafts">Show Drafts</label>
         </div>
-        <template v-if="exportReportRoute">
-            <nav>
-                <sbx-pop-out content-id="header-options"></sbx-pop-out>
-            </nav>
-            <ul id="header-options" class="f-dropdown" data-dropdown-content>
-                <li class="separator">Report</li>
-                <li>
-                    <a :href="exportReportRoute" class="sbx-button--has-icon"
-                        ><sbx-icon name="download"></sbx-icon> Download Spreadsheet
-                    </a>
-                </li>
-            </ul>
-        </template>
+        <nav v-if="exportReportRoute">
+            <sbx-pop-out content-id="header-options"></sbx-pop-out>
+        </nav>
     </div>
+    <ul v-if="exportReportRoute" id="header-options" class="f-dropdown" data-dropdown-content>
+        <li class="separator">Report</li>
+        <li>
+            <a :href="exportReportRoute" class="sbx-button--has-icon"
+                ><sbx-icon name="download"></sbx-icon> Download Spreadsheet
+            </a>
+        </li>
+    </ul>
 
     <div v-if="mbStore.isDegraded">
         <div class="small-12 column list-item">
@@ -144,21 +166,22 @@ const exportReportRoute = window.Vue.computed(() => {
         v-if="mbStore.data"
         ref="tableContainerRef"
         class="diagonal-headings-table-container small-12 island"
-        :style="{
-            '--markbook-height-offset': `${markbookHeightOffset}px`,
-            marginBottom: mbStore.feedbackSelectedCell !== null ? FEEDBACK_DRAWER_HEIGHT : '0px',
-        }"
+        :style="{ '--markbook-height-offset': `${markbookHeightOffset}px` }"
     >
         <table class="diagonal-headings-table marksheet">
             <mb-table-head :type="props.type" />
             <tbody>
-                <tr v-if="props.type === 'course'" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }">
+                <!-- Course Average Row - Course Markbook Only -->
+                <tr
+                    v-if="props.type === MarkbookType.COURSE"
+                    :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }"
+                >
                     <th class="course-row class-row-heading fixed-left">
                         Course Average
                         <span data-tooltip class="hint has-tip tip-top" title="Average student cohort mark">?</span>
                     </th>
-                    <th class="course-row fixed-left"></th>
-                    <th v-if="mbStore.data.rank !== null" class="course-row"></th>
+                    <th v-if="mbStore.showWeightedAverageColumn" class="course-row fixed-left"></th>
+                    <th v-if="mbStore.showRankColumn" class="course-row"></th>
                     <template v-for="assessment in mbStore.orderedActivities" :key="assessment.id">
                         <td v-if="assessment.stats !== null" class="course-row">
                             <span v-if="mbStore.showDrafts && mbStore.hasDraftMarks(assessment)" class="meta">
@@ -172,6 +195,7 @@ const exportReportRoute = window.Vue.computed(() => {
                     </template>
                 </tr>
 
+                <!-- All class impl rows -->
                 <mb-classimpl-rows
                     v-for="(_, classImplId) in mbStore.data.classImpls"
                     :key="classImplId"

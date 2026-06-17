@@ -126,21 +126,21 @@ class DataSource
      *       as it is more efficient when loading responses and feedbacks.
      *
      * @param IAssessable $assessment
-     * @param null|User   $user    If specified, only load this user's interactions
-     * @param array       $options Options for findByColumnList
+     * @param Collection<\Schoolbox\User>|null $users If specified, only load this user's interactions
+     * @param array $options Options for findByColumnList
      * @return IAssessable $assessment, with participation loaded.
      * @throws UnexpectedValueException If unable to derive project participant collection
      * @throws DomainException If user has interaction but not participant record
      * @throws DefinitionException If unable to locate a specified mapper join
      */
-    public function loadParticipationIntoAssessment(IAssessable $assessment, ?User $user = null, array $options = []): IAssessable
+    public function loadParticipationIntoAssessment(IAssessable $assessment, ?Collection $users = null, array $options = []): IAssessable
     {
         $this->loadParticipationIntoAssessmentCollection(
-            new GenericCollection(IAssessable::class, [$assessment]),
-            $user,
-            false,
-            false,
-            $options
+            assessments: new GenericCollection(IAssessable::class, [$assessment]),
+            users: $users,
+            removeExcluded: false,
+            assumeParticipation: false,
+            options: $options
         );
         return $assessment;
     }
@@ -151,31 +151,38 @@ class DataSource
      *
      * This includes records for responses and feedbacks for every participant in each assessment.
      *
-     * @param GenericCollection|IAssessable[] $assessments
-     * @param User|null                $user                If specified, only load this user's interactions
-     * @param bool                     $removeExcluded      Set to true to exclude excluded non-member participants
-     * @param bool                     $assumeParticipation if true, assume $user is a participant in the assessment
-     *                                                      without checking the assessment's folder.
-     * @param array                    $options Options for findByColumnList
-     * @return GenericCollection|IAssessable[] $assessments, with participation loaded.
+     * @param GenericCollection<IAssessable> $assessments
+     * @param Collection<\Schoolbox\User>|null $users If specified, only load this user's interactions
+     * @param bool $removeExcluded Set to true to exclude excluded non-member participants
+     * @param bool $assumeParticipation if true, assume $user is a participant in the assessment without checking the assessment's folder.
+     * @param bool $includeResponses If true, hydrate Response instances
+     * @param array $options Options for findByColumnList
+     * @return GenericCollection<IAssessable> $assessments, with participation loaded.
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws DomainException If user has interaction but not participant record
      * @throws UnexpectedValueException If unable to derive project participant collection
      */
     public function loadParticipationIntoAssessmentCollection(
         GenericCollection $assessments,
-        ?User $user = null,
+        ?Collection $users = null,
         bool $removeExcluded = false,
         bool $assumeParticipation = false,
-        array $options = []
+        bool $includeResponses = true,
+        array $options = [],
     ): GenericCollection {
         /** @var GenericCollection|IAssessable[] $assessableWithDescendants */
         $assessableWithDescendants = new GenericCollection(IAssessable::class);
         $this->mergeSubAssessments($assessableWithDescendants, $assessments);
 
         // Load participants for all assessments, plus activities in projects
-        $this->findForAssessmentCollection($assessableWithDescendants, $user, $removeExcluded, $assumeParticipation, $options);
-
+        $this->findForAssessmentCollection(
+            assessments: $assessableWithDescendants,
+            users: $users,
+            removeExcluded: $removeExcluded,
+            assumeParticipation: $assumeParticipation,
+            includeResponses: $includeResponses,
+            options: $options,
+        );
         // Insert project participant objects into any project
         foreach ($assessableWithDescendants as $assessable) {
             if ($assessable instanceof Project) {
@@ -197,11 +204,11 @@ class DataSource
      *
      * This method sets the participants into each $assessment
      *
-     * @param IAssessable[]|GenericCollection $assessments         Indexed by assessment.id
-     * @param User|null                       $user                If specified, only load this user's interactions
-     * @param bool                            $removeExcluded      if true, exclude excluded non-member participants
-     * @param bool                            $assumeParticipation if true, assume $user is a participant in the
-     *                                                             assessment without checking the assessment's folder.
+     * @param GenericCollection<IAssessable> $assessments Indexed by assessment.id
+     * @param Collection<\Schoolbox\User>|null $users If specified, only load this user's interactions
+     * @param bool $removeExcluded  if true, exclude excluded non-member participants
+     * @param bool $assumeParticipation if true, assume $user is a participant in the assessment without checking the assessment's folder.
+     * @param bool $includeResponses If true, hydrate Response instances
      * @throws UnexpectedValueException If unable to merge student collections
      * @throws DomainException If user has interaction but not participant record
      * @throws DefinitionException If unable to locate a specified mapper join
@@ -209,15 +216,16 @@ class DataSource
      */
     protected function findForAssessmentCollection(
         GenericCollection $assessments,
-        ?User $user = null,
+        ?Collection $users = null,
         bool $removeExcluded = false,
         bool $assumeParticipation = false,
-        array $options = []
+        bool $includeResponses = true,
+        array $options = [],
     ): void {
         // Clear all participation from $assessments
         $this->clearParticipants($assessments);
 
-        $this->loadPlansAndParticipants($assessments);
+        $this->loadPlansAndParticipants($assessments, $users);
 
         $dynamicPlans = new GenericCollection(PlanObject::class);
         foreach ($assessments as $assessment) {
@@ -231,20 +239,27 @@ class DataSource
             }
         }
 
-        // We do need excluded participants to be present to determine whether to whether to
+        // We do need excluded participants to be present to determine whether to
         // insert students as dynamic participants.
-        $this->loadDynamicPlanParticipants($dynamicPlans, $user, $assumeParticipation);
+        $this->loadDynamicPlanParticipants($dynamicPlans, $users, $assumeParticipation);
 
-        // Add Responses
-        $this->loadResponses(
-            $assessments,
-            $this->responseDataSource->findForAssessmentCollection($assessments, $user, $options)
-        );
+        /* TODO: take $participantUsers and shove it deeper into responseDataSource and feedbackDataSource
+         *  implementations of findForAssessmentCollection()
+         */
+
+        /* Add responses conditionally to save some computation if you never needed them
+         */
+        if ($includeResponses) {
+            $this->loadResponses(
+                $assessments,
+                $this->responseDataSource->findForAssessmentCollection($assessments, $users, $options)
+            );
+        }
 
         // Add Feedback
         $this->loadFeedbacks(
             $assessments,
-            $this->feedbackDataSource->findForAssessmentCollection($assessments, $user, $options)
+            $this->feedbackDataSource->findForAssessmentCollection($assessments, $users, $options)
         );
 
         if ($removeExcluded) {
@@ -257,44 +272,58 @@ class DataSource
      * Adds participation objects for students who have a class/group relationship
      * to the assessment's folder and do not have an explicit participation record.
      *
-     * @param PlanObject[]|GenericCollection $dynamicPlans
-     * @param User|null                      $user                If provided, load only this user's participation
-     * @param bool                           $assumeParticipation if true, assume $user is a participant in the
-     *                                                            assessment without checking the assessment's folder.
-     *                                                            Some places which may have called this may have
-     *                                                            already loaded a student's folders, so they already
-     *                                                            know $user is a participant.
+     * @param GenericCollection<PlanObject> $dynamicPlans
+     * @param Collection<\Schoolbox\User>|null $users If provided, load only this user's participation
+     * @param bool $assumeParticipation if true, assume $user is a participant in the
+     *                                  assessment without checking the assessment's folder.
+     *                                  Some places which may have called this may have
+     *                                  already loaded a student's folders, so they already
+     *                                  know $user is a participant.
      * @throws UnexpectedValueException If unable to merge student collections
      */
     private function loadDynamicPlanParticipants(
         GenericCollection $dynamicPlans,
-        ?User $user = null,
-        bool $assumeParticipation = false
+        ?Collection $users = null,
+        bool $assumeParticipation = false,
     ): void {
         // Load dynamic participants into dynamic plans
         foreach ($dynamicPlans as $dynamicPlan) {
             $assessment = $dynamicPlan->getAssessable();
             $explicitParticipants = $assessment->getAllParticipants();
 
-            if ($user && $assumeParticipation) {
+            /* Specifically operates when you gave one person
+             */
+            if ($users && 1 === $users->count() && $assumeParticipation) {
                 // For efficiency reasons:
                 // bypass findAllStudentsForAssessment and assume that $user is
                 // a participant of this plan
-                if (!$explicitParticipants->keyExists($user->getId())) {
-                    $dynamicPlan->getParticipants()[$user->getId()] = new ParticipantObject($user, $dynamicPlan, $this->projectResultCacheMapper);
+                if (!$explicitParticipants->keyExists($users->first()->getId())) {
+                    $dynamicPlan->getParticipants()[$users->first()->getId()] = new ParticipantObject($users->first(), $dynamicPlan, $this->projectResultCacheMapper);
                 }
             } else {
+                if (null === $users) {
+                    $hasParticipantUsers = false;
+                } else {
+                    $hasParticipantUsers = $users->count();
+                }
+
                 // It's acceptable to findAllStudents in a loop for now, because the list is cached
                 foreach ($this->findAllStudentsForAssessment($assessment) as $student) {
+                    $user = $users?->getBy('id', $student->getId());
+
+                    /* Not a person whose contents we care to hydrate
+                     */
+                    if ($hasParticipantUsers && !$user) {
+                        continue;
+                    }
+
                     // Is this user already an explicit participant? (Either an inclusion or exclusion)
                     if ($explicitParticipants->keyExists($student->getId())) {
                         continue;
                     }
 
                     // If a user was provided: only load their participation
-                    if (!$user || $user->getId() === $student->getId()) {
-                        $dynamicPlan->getParticipants()[$student->getId()] = new ParticipantObject($student, $dynamicPlan, $this->projectResultCacheMapper);
-                    }
+                    $dynamicPlan->getParticipants()[$student->getId()] = new ParticipantObject($student, $dynamicPlan, $this->projectResultCacheMapper);
                 }
             }
         }
@@ -525,20 +554,25 @@ class DataSource
     /**
      * Loads all Plans and Participants (including exclusions) into the Assessables
      *
-     * @param IAssessable[]|GenericCollection $assessables Indexed by assessment.id
+     * @param GenericCollection<IAssessable> $assessables Indexed by assessment.id
+     * @param Collection<\Schoolbox\User>|null $users
      * @throws DefinitionException If unable to locate a specified mapper join
      */
-    private function loadPlansAndParticipants(GenericCollection $assessables): void
+    private function loadPlansAndParticipants(GenericCollection $assessables, ?Collection $users): void
     {
         // Find all participant and plan models for the assessments
         $planMapper = $this->planMapper;
         $planModels = $planMapper->findPlansAndParticipantsForAssessments($assessables->keys());
 
+        /* Decide if we need to filter participants to particular people to hydrate the minimum data
+         */
+        $hasParticipantUsers = $users instanceof \Traversable && $users->count();
+
         foreach ($planModels as $planModel) {
             $assessable = $assessables[$planModel->getAssessment()->getId()];
 
             // Create a Plan Domain Object
-            $planObject                                  = new PlanObject($assessable);
+            $planObject = new PlanObject($assessable);
             $assessable->getPlans()[$planModel->getId()] = $planObject;
 
             // Copy all attributes from data model to domain object
@@ -560,7 +594,14 @@ class DataSource
                 // Is this student already participating?
                 // Don't load them if they are already, otherwise remove
                 // from existing participation.
-                $user                = $participantModel->getUser();
+                $user = $participantModel->getUser();
+
+                /* Not a person whose contents we care to hydrate
+                 */
+                if ($hasParticipantUsers && !$users->getBy('id', $user->getId())) {
+                    continue;
+                }
+
                 $existingParticipant = $assessable->getParticipantIfExtant($user);
                 if ($existingParticipant) {
                     if ($existingParticipant->getUpdatedAt()->gt($participantModel->getUpdatedAt())) {
@@ -570,7 +611,7 @@ class DataSource
                 }
 
                 // Create a Participant Domain object
-                $participantObject                             = new ParticipantObject($user, $planObject, $this->projectResultCacheMapper);
+                $participantObject = new ParticipantObject($user, $planObject, $this->projectResultCacheMapper);
                 $planObject->getParticipants()[$user->getId()] = $participantObject;
 
                 // Copy all attributes from data model to domain object

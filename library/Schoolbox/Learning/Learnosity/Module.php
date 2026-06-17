@@ -265,9 +265,9 @@ class Module extends BaseModule
 
         /* Older exploratory urls that aren't part of our conventional workflow
          */
-        $this->register('GET', '/activityList', 'getActivityList', $instructorPerms, null);
-        $this->register('GET', '/items', 'getItems', $instructorPerms, null);
-        $this->register('GET', '/sessionList', 'getSessionListReport', $instructorPerms, null);
+        // $this->register('GET', '/activityList', 'getActivityList', $instructorPerms, null);
+        // $this->register('GET', '/items', 'getItems', $instructorPerms, null);
+        // $this->register('GET', '/sessionList', 'getSessionListReport', $instructorPerms, null);
 
         /* Archive a set of reference identifiers in Learnosity
          */

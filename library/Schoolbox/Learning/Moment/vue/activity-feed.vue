@@ -591,7 +591,7 @@ window.Vue.onMounted(async () => {
             <section class="activity-feed">
                 <div class="VueTables">
                     <div class="filters">
-                        <div class="checklist">
+                        <div class="checklist l-pad-s--left">
                             <label class="title">Filter to:</label>
                             <ul class="option-list l-flex-row l-gap-l">
                                 <li v-if="showLearningMoments">
@@ -1241,10 +1241,6 @@ window.Vue.onMounted(async () => {
 .anchor-style {
     cursor: pointer;
     text-decoration: underline;
-}
-
-.checklist {
-    padding-left: 0.5rem;
 }
 
 .checklist > label,

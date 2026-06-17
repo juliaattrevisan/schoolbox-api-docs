@@ -2,9 +2,17 @@
  # @learningAssessment/fragments/progressTick.twig
  #
  # Params:
- # * assessment:  IAssessable  - The assessment object
- # * student:     User         - The relevant student
+ # * assessment:  IAssessable      - The assessment object
+ # * student:     User             - The relevant student
+ # * viewer:      User  (optional) - The user whose visibility rules apply. Defaults to the
+ #                                   logged-in USER. Pass the effective viewer here so staff
+ #                                   impersonating a student/parent see that role's affordances.
+ # * readonly:    bool  (optional) - Whether to render static status only, even if the logged-in
+ #                                   user is authorized to update the task.
  #}
+
+{% set viewer = viewer is defined ? viewer : USER %}
+{% set readonly = readonly is defined ? readonly : false %}
 
 {# Find the user's participation record
  #
@@ -31,16 +39,16 @@
     {# The 'incomplete' status should only be shown to students for self-assessable tasks.  Always show to staff however. #}
     {% set loggedInUserShouldSeeIncompleteStatus = (
         participant.isResponseRequired and (
-            USER.role.isStaff or (
-            USER.id == student.id and
+            viewer.role.isStaff or (
+            viewer.id == student.id and
                 assessment is task and
-                assessment.isOpen(USER) and
+                assessment.isOpen(viewer) and
                 assessment.isSelfAssessable
             )
         )
     ) %}
 
-    {% if postRoute %} {# Note routeLookupIfAuthorized() can return '', so postRoute can be either '' or null. #}
+    {% if postRoute and not readonly %} {# Note routeLookupIfAuthorized() can return '', so postRoute can be either '' or null. #}
         {# The progress tick is a button for tasks for which the logged-in user is authorized to change the status. #}
 
         <form action="{{ postRoute }}"

@@ -37,7 +37,7 @@ class Controller extends Base
     public function getTemplates(int $categoryId): void
     {
         try {
-            $templates = $this->templateMapper->findByColumn('category_id', $categoryId);
+            $templates = $this->templateMapper->findByCategoryIdOrderedByTitle($categoryId);
             $translator = new ModelToArray(
                 new \Schoolbox\User\Translator\Author\ModelToArray(),
                 $this->userMapper,

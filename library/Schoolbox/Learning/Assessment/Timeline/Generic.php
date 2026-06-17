@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Timeline;
 
 use Closure;
-use LogicException;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
@@ -41,6 +40,7 @@ class Generic extends Full
      * @param bool $includeUnpublishedInstructorFeedback
      * @param bool $includeDraftResponses
      * @param array $allowedVisibilities
+     * @throws \UnexpectedValueException if an unexpected assessment type is encountered.
      */
     protected function recombine(
         $includeUnpublishedSelfReflectionFeedback,
@@ -78,7 +78,7 @@ class Generic extends Full
                 $assessment instanceof Reporting\Model  => IAssessable::MARK_VISIBILITY_PRIVATE,
 
                 // This should never execute, but handle it for completeness.
-                default => throw new LogicException(
+                default => throw new \UnexpectedValueException(
                     'Unhandled assessment type with null mark visibility: ' . $assessment::class
                 )
             };

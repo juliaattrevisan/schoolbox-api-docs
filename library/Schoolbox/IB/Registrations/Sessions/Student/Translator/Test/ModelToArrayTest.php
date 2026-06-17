@@ -43,7 +43,8 @@ class ModelToArrayTest extends TestCase
         $this->assertSame(123, $payload['userId']);
         $this->assertSame(456, $payload['registrationSessionStudentId']);
         $this->assertSame(RegistrationSessionStudentModel::STATUS_CONFIRMED, $payload['status']);
-        $this->assertSame('Alex, Nguyen', $payload['userName']);
+        $this->assertSame('Nguyen, Alex', $payload['userName']);
+        $this->assertNull($payload['ibCandidateNumber']);
         $this->assertFalse($payload['hasMissingDetails']);
         $this->assertSame([], $payload['missingFields']);
         $this->assertSame('May 2026', $payload['session']);
@@ -137,6 +138,23 @@ class ModelToArrayTest extends TestCase
         $this->assertSame('confirmed', $payload['confirmationStatus']);
     }
 
+    public function testBuildsPayloadWithIbCandidateNumber(): void
+    {
+        $student = $this->buildStudent();
+        $student->getUser()?->setIbCandidateNumber(' CAND-123 ');
+
+        $payload = $this->createTranslator()(
+            $student,
+            [
+                'StudentBirthDate' => '2009-04-12',
+                'StudentGender' => 'F',
+            ],
+            'Example School'
+        );
+
+        $this->assertSame('CAND-123', $payload['ibCandidateNumber']);
+    }
+
     public function testBuildsConfirmationStateWhenBothSectionsConfirmed(): void
     {
         $candidateAt = \Alaress_Date_Format::newDatabaseDate('2026-06-01 10:30:00');
@@ -181,7 +199,7 @@ class ModelToArrayTest extends TestCase
 
         $payload = $this->createTranslator()($student, [], '');
 
-        $this->assertSame(', Nguyen', $payload['userName']);
+        $this->assertSame('Nguyen,', $payload['userName']);
         $this->assertTrue($payload['hasMissingDetails']);
         $candidateDetailsByKey = array_column(
             $payload['candidateDetails'],

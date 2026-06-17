@@ -104,28 +104,19 @@ const isCreating = window.Vue.ref(false); // whether we're currently creating a 
 const newCapabilityName = window.Vue.ref("");
 
 /**
- * When a key is pressed in the "add capability" or "add indicator" textarea,
- * if it's a non-shift return (i.e. shift+return is ignored), add a new capability/indicator to the grid
- * @param event the keydown event
+ * Add a new capability/indicator to the grid
  * @param type the type of item to add, either capability or indicator
  * @param capability if adding an indicator, the capability to add the new item to (will push to capability.indicators)
  * @param nameRef a ref pointing to the name of the new item
  */
-async function onAddKeydown<TType extends "capability" | "indicator">(
-    event: KeyboardEvent,
+async function createCapabilityOrIndicator<TType extends "capability" | "indicator">(
     type: TType,
     capability: TType extends "indicator" ? RubricGridCapability : null,
     nameRef: Ref<string, string>,
 ): Promise<void> {
-    if (event.key !== "Enter" || event.shiftKey) {
-        return;
-    }
-
-    event.preventDefault();
-
     const name = nameRef.value.trim();
     if (name.length === 0 || isCreating.value) {
-        return; // prevent blank and double-fire from keydown to blue
+        return; // prevent blank and double-fire from keydown / blur
     }
 
     /**
@@ -203,12 +194,44 @@ async function onAddKeydown<TType extends "capability" | "indicator">(
 }
 
 /**
+ * When a key is pressed in the "add capability" or "add indicator" textarea,
+ * if it's a non-shift return (i.e. shift+return is ignored), add a new capability/indicator to the grid
+ * @param event the keydown event
+ * @param type the type of item to add, either capability or indicator
+ * @param capability if adding an indicator, the capability to add the new item to (will push to capability.indicators)
+ * @param nameRef a ref pointing to the name of the new item
+ */
+async function onAddKeydown<TType extends "capability" | "indicator">(
+    event: KeyboardEvent,
+    type: TType,
+    capability: TType extends "indicator" ? RubricGridCapability : null,
+    nameRef: Ref<string, string>,
+): Promise<void> {
+    // shift+return is ignored so that you can add new lines
+    if (event.key !== "Enter" || event.shiftKey) {
+        return;
+    }
+
+    event.preventDefault();
+
+    await createCapabilityOrIndicator(type, capability, nameRef);
+}
+
+/**
  * When the return key is pressed, add a new capability to the grid
  * (this needs to exist as the ref can't be passed directly when inside <template>)
  * @param event the keydown event
  */
 async function onAddCapabilityKeydown(event: KeyboardEvent): Promise<void> {
     await onAddKeydown(event, "capability", null, newCapabilityName);
+}
+
+/**
+ * When focus is removed from the "add capability" textarea, add a new capability to the grid
+ * (this needs to exist as the ref can't be passed directly when inside <template>)
+ */
+async function onAddCapabilityBlur(): Promise<void> {
+    await createCapabilityOrIndicator("capability", null, newCapabilityName);
 }
 
 /** The total number of columns in the grid */
@@ -324,6 +347,7 @@ window.Vue.onMounted(() => {
                     :can-move-next="index < rubricGridCapabilities.length - 1"
                     @move="(dir) => shiftArrayItem(rubricGridCapabilities, index, dir)"
                     @add-indicator-keydown="(e, nameRef) => onAddKeydown(e, 'indicator', capability, nameRef)"
+                    @add-indicator-blur="(nameRef) => createCapabilityOrIndicator('indicator', capability, nameRef)"
                 />
 
                 <tr class="rb-group-header rb-new-group">
@@ -335,6 +359,7 @@ window.Vue.onMounted(() => {
                             :maxlength="MAX_CAPABILITY_LENGTH"
                             :disabled="isCreating || undefined"
                             @keydown="(e) => onAddCapabilityKeydown(e)"
+                            @blur="onAddCapabilityBlur"
                         ></textarea>
                     </th>
                 </tr>
