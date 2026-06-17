@@ -17,6 +17,10 @@ type PreviewApiResponse = {
     fragment: string | null;
 };
 
+type LightGalleryToolbarCollection = {
+    get(index: number): HTMLElement | undefined;
+};
+
 /**
  * Open a preview for a file, or redirect to download if not previewable
  * @param fileUrl the URL of the file to preview
@@ -187,7 +191,10 @@ export async function openFilePreview(
                     // As we have manipulated the contents of the lightbox ourselves, LightGallery
                     // will have no idea to change the download link to the correct URL, so we need
                     // to do it ourselves. The toolbar is a sibling of the inner content area.
-                    gallery.$toolbar.get().querySelector("[download]")?.setAttribute("href", fileUrl);
+                    (gallery.$toolbar as unknown as LightGalleryToolbarCollection)
+                        .get(0)
+                        ?.querySelector("[download]")
+                        ?.setAttribute("href", fileUrl);
                 });
 
                 gallery.openGallery();
