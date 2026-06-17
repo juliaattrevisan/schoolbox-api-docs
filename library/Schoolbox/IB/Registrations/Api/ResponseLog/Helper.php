@@ -116,7 +116,7 @@ class Helper
             }
 
             $studentId = $log->getRegistrationSessionStudent()?->getId();
-            $message = trim((string)($log->getMessage() ?? ''));
+            $message = trim((string)($log->getMessage() ?: 'Registration failed. Please review the student details and try again.'));
 
             if ($studentId !== null && $message !== '') {
                 $messages[(int)$studentId] = $message;
