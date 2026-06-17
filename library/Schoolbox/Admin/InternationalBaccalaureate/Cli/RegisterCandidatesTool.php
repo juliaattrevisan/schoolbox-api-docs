@@ -21,6 +21,9 @@ use Schoolbox\Admin\InternationalBaccalaureate\RegisterCandidatesCandidateBuilde
 use Schoolbox\Admin\InternationalBaccalaureate\RegisterSessionsSessionBuilder;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
+use Schoolbox\IB\Registrations\Api\ResponseLog\Helper as RegistrationApiResponseLogHelper;
+use Schoolbox\IB\Registrations\Api\ResponseLog\Mapper as RegistrationApiResponseLogMapper;
+use Schoolbox\IB\Registrations\Api\ResponseLog\Model as RegistrationApiResponseLogModel;
 use Schoolbox\IB\Registrations\Sessions\Student\Mapper as RegistrationSessionStudentMapper;
 use Schoolbox\IB\Registrations\Sessions\Student\Model as RegistrationSessionStudentModel;
 use Schoolbox\MapperFactory;
@@ -103,6 +106,9 @@ class RegisterCandidatesTool extends CliTool\App
         $mapperFactory = $this->getDi()->get('mapperFactory');
         /** @var RegistrationSessionStudentMapper $studentMapper */
         $studentMapper = $mapperFactory->get(RegistrationSessionStudentMapper::class);
+        /** @var RegistrationApiResponseLogMapper $responseLogMapper */
+        $responseLogMapper = $mapperFactory->get(RegistrationApiResponseLogMapper::class);
+        $responseLogHelper = new RegistrationApiResponseLogHelper($responseLogMapper);
         /** @var UserMapper $userMapper */
         $userMapper = $mapperFactory->get(UserMapper::class);
         /** @var \External_UserInterface $externalUser */
@@ -186,6 +192,7 @@ class RegisterCandidatesTool extends CliTool\App
                             $candidate,
                             $clientFactory,
                             $client,
+                            $responseLogHelper,
                             $studentMapper,
                             $userMapper
                         )
@@ -223,6 +230,7 @@ class RegisterCandidatesTool extends CliTool\App
                     $sessionBuilder,
                     $clientFactory,
                     $client,
+                    $responseLogHelper,
                     $studentMapper,
                     $schoolCode
                 )
@@ -242,6 +250,7 @@ class RegisterCandidatesTool extends CliTool\App
         RegisterSessionsSessionBuilder $sessionBuilder,
         ClientFactory $clientFactory,
         IClient $client,
+        RegistrationApiResponseLogHelper $responseLogHelper,
         RegistrationSessionStudentMapper $studentMapper,
         string $schoolCode
     ): bool {
@@ -258,11 +267,33 @@ class RegisterCandidatesTool extends CliTool\App
             )
         );
 
+        $sessionRequest = null;
+
         try {
             $session = $sessionBuilder->build($student, $candidateId, $schoolCode);
             $sessionRequest = $clientFactory->buildRegisterSessionsRequest([$session]);
             $sessionResponse = $client->registerSessions($sessionRequest);
         } catch (Throwable $e) {
+            if ($sessionRequest !== null) {
+                try {
+                    $responseLogHelper->saveRequestError(
+                        (int)$student->getRegistrationSession()->getId(),
+                        $student,
+                        $sessionRequest->getMsgId(),
+                        RegistrationApiResponseLogModel::REQUEST_TYPE_REGISTER_SESSIONS,
+                        $e
+                    );
+                } catch (Throwable $logException) {
+                    $this->getLogger()->error(
+                        sprintf(
+                            'Saving IBIS session registration request error log failed for candidate #%s.',
+                            $student->getId() ?? 'unknown'
+                        ),
+                        ['exception' => $logException]
+                    );
+                }
+            }
+
             $this->getLogger()->error(
                 sprintf(
                     'IBIS session registration submission failed for candidate #%s %s.',
@@ -288,8 +319,21 @@ class RegisterCandidatesTool extends CliTool\App
         }
 
         $successful = true;
+        $msgId = $sessionRequest->getMsgId();
 
         foreach ($sessionResponse->getSessionResponses() as $sessionResponseItem) {
+            try {
+                $responseLogHelper->saveSessionResponse($student, $msgId, $sessionResponseItem);
+            } catch (Throwable $e) {
+                $this->getLogger()->error(
+                    sprintf(
+                        'Saving IBIS session registration response log failed for candidate #%s.',
+                        $student->getId() ?? 'unknown'
+                    ),
+                    ['exception' => $e]
+                );
+            }
+
             $sessionRegistrationSuccessful = $sessionResponseItem['successful'];
             $student->setStatus(
                 $sessionRegistrationSuccessful
@@ -337,6 +381,7 @@ class RegisterCandidatesTool extends CliTool\App
         array $candidate,
         ClientFactory $clientFactory,
         IClient $client,
+        RegistrationApiResponseLogHelper $responseLogHelper,
         RegistrationSessionStudentMapper $studentMapper,
         UserMapper $userMapper
     ): bool {
@@ -348,10 +393,32 @@ class RegisterCandidatesTool extends CliTool\App
             )
         );
 
+        $request = null;
+
         try {
             $request  = $clientFactory->buildRegisterCandidatesRequest([$candidate]);
             $response = $client->registerCandidates($request);
         } catch (Throwable $e) {
+            if ($request !== null) {
+                try {
+                    $responseLogHelper->saveRequestError(
+                        (int)$student->getRegistrationSession()->getId(),
+                        $student,
+                        $request->getMsgId(),
+                        RegistrationApiResponseLogModel::REQUEST_TYPE_REGISTER_CANDIDATES,
+                        $e
+                    );
+                } catch (Throwable $logException) {
+                    $this->getLogger()->error(
+                        sprintf(
+                            'Saving IBIS candidate registration request error log failed for candidate #%s.',
+                            $student->getId() ?? 'unknown'
+                        ),
+                        ['exception' => $logException]
+                    );
+                }
+            }
+
             $this->getLogger()->error(
                 sprintf(
                     'IBIS candidate registration submission failed for candidate #%s.',
@@ -376,8 +443,21 @@ class RegisterCandidatesTool extends CliTool\App
         }
 
         $successful = true;
+        $msgId = $request->getMsgId();
 
         foreach ($response->getCandidateResponses() as $candidateResponse) {
+            try {
+                $responseLogHelper->saveCandidateResponse($student, $msgId, $candidateResponse);
+            } catch (Throwable $e) {
+                $this->getLogger()->error(
+                    sprintf(
+                        'Saving IBIS candidate registration response log failed for candidate #%s.',
+                        $student->getId() ?? 'unknown'
+                    ),
+                    ['exception' => $e]
+                );
+            }
+
             $candidateId = $candidateResponse['candidateId'];
             $candidateRegistrationSuccessful = $candidateResponse['successful']
                 && $candidateId !== null
