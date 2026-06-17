@@ -235,8 +235,8 @@ class Import implements IStrategy
         foreach ($externalIds as $externalId) {
             $this->lock->refresh();
 
-            $userId = $this->personLookup->fetchUser($externalId);
-            if (null === $userId) {
+            $user = $this->personLookup->fetchUser($externalId);
+            if (null === $user) {
                 $this->log->debug(sprintf(
                     'SOCS pupil external id %s does not have a corresponding schoolbox user record; skipping',
                     $externalId
@@ -246,16 +246,19 @@ class Import implements IStrategy
             }
 
             $sequence++;
-            $user = $this->userMapper->createModel()->setId((int)$userId);
-
             try {
                 $this->teamPlayerMapper->findOneByColumnList([
-                    'user_id' => $user->getId(),
+                    'user_id' => $user['id'],
                     'team_id' => $team->getId(),
                 ]);
             } catch (\Schoolbox\Mapper\Exception $e) {
+                $userObj = $this->userMapper->createModel()->setId((int)$user['id'])
+                    ->setExternalId($user['external_id'])
+                    ->setFirstname($user['firstname'])
+                    ->setLastname($user['lastname'])
+                    ->setPreferredName($user['preferred_name']);
                 $teamPlayer = $this->teamPlayerMapper->createModel()
-                    ->setUser($user)
+                    ->setUser($userObj)
                     ->setTeam($team)
                     ->setSequence($sequence);
 
@@ -268,7 +271,7 @@ class Import implements IStrategy
                 'Assigned SOCS pupil %s to team %s using schoolbox user %d',
                 $externalId,
                 $team->getName(),
-                $userId
+                $user['id']
             ));
         }
     }
@@ -287,8 +290,8 @@ class Import implements IStrategy
         foreach ($externalIds as $externalId) {
             $this->lock->refresh();
 
-            $userId = $this->personLookup->fetchUser($externalId);
-            if (null === $userId) {
+            $user = $this->personLookup->fetchUser($externalId);
+            if (null === $user) {
                 $this->log->debug(sprintf(
                     'SOCS staff external id %s does not have a corresponding schoolbox user record; skipping',
                     $externalId
@@ -297,24 +300,10 @@ class Import implements IStrategy
                 continue;
             }
 
-            try {
-                $user = $this->userMapper->findById($userId);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $this->log->debug(
-                    sprintf(
-                        'SOCS staff external id %s maps to user id %d, but user record could not be loaded; skipping',
-                        $externalId,
-                        $userId
-                    )
-                );
-
-                continue;
-            }
-
             $coachName = trim(sprintf(
                 '%s %s',
-                $user->getPreferredName() ?: $user->getFirstname(),
-                $user->getLastname()
+                $user['preferred_name'] ?: $user['firstname'],
+                $user['lastname']
             ));
 
             if ('' === $coachName) {
@@ -322,11 +311,16 @@ class Import implements IStrategy
             }
 
             try {
-                $coach = $this->coachMapper->findOneByColumn('user_id', $user->getId());
+                $coach = $this->coachMapper->findOneByColumn('user_id', $user['id']);
             } catch (\Schoolbox\Mapper\Exception $e) {
+                $userObj = $this->userMapper->createModel()->setId((int)$user['id'])
+                                         ->setExternalId($user['external_id'])
+                                         ->setFirstname($user['firstname'])
+                                         ->setLastname($user['lastname'])
+                                         ->setPreferredName($user['preferred_name']);
                 $coach = $this->coachMapper->createModel()
                     ->setName($coachName)
-                    ->setUser($user);
+                    ->setUser($userObj);
 
                 if ($this->perform) {
                     $this->coachMapper->save($coach);
@@ -337,7 +331,7 @@ class Import implements IStrategy
                         'Created SOCS coach %s (%s) for schoolbox user %d',
                         $coachName,
                         $externalId,
-                        $userId
+                        $user['id']
                     )
                 );
             }
@@ -361,7 +355,7 @@ class Import implements IStrategy
                 'Assigned SOCS staff %s as coach to team %s using schoolbox user %d',
                 $externalId,
                 $team->getName(),
-                $userId
+                $user['id']
             ));
         }
     }

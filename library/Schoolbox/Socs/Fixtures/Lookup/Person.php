@@ -108,8 +108,16 @@ class Person
 
     /**
      * Find a user id based on their external ID.
+     * @param string $externalId
+     * @return ?array{
+     *      id:int|string,
+     *      external_id:string,
+     *      firstname:string,
+     *      lastname:string,
+     *      preferred_name:string
+     *      }
      */
-    public function fetchUser(string $externalId): ?int
+    public function fetchUser(string $externalId): ?array
     {
         if (null === $this->lookup) {
             $this->lookup = $this->generate();
