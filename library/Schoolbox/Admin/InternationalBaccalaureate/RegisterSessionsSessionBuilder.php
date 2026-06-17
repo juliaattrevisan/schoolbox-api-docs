@@ -91,7 +91,7 @@ class RegisterSessionsSessionBuilder
             }
 
             $subjects[] = [
-                'subject_name' => str_replace('[LANGUAGE]', strtoUpper($subjectLanguage), $subjectName),
+                'subject_name' => str_replace('[LANGUAGE]', strtoupper($subjectLanguage), $subjectName),
                 'subject_language' => $subjectLanguage,
                 'subject_level' => $subjectLevel,
             ];
