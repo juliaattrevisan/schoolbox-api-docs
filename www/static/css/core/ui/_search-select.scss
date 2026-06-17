@@ -104,9 +104,9 @@
     }
     &__name-button,
     &__remove-button {
-        background: none;
+        background: none !important; // ^foundation-fixes^ - needs to be important to override specific styles in www/static/css/core/ui/button/_dropdown.scss
         min-height: 0;
-        padding: 0;
+        padding: 0 !important; // ^foundation-fixes^ - needs to be important to override specific styles in www/static/css/core/ui/button/_dropdown.scss
         &:hover {
             background: none;
         }

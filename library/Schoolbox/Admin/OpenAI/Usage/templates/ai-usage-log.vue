@@ -375,7 +375,7 @@ function printSelectedSession(): void {
 
                 <div v-if="!('log' in selectedSessionInfo)" class="loader"></div>
                 <div v-else-if="selectedSessionInfo.log.length === 0" class="empty-state">
-                    <sbx-icon name="hidden" size="2rem" />
+                    <sbx-icon name="hidden" size="xl" />
                     <p>
                         The {{ props.features[selectedSessionInfo.session.feature].title }} feature does not support
                         previews for this session.

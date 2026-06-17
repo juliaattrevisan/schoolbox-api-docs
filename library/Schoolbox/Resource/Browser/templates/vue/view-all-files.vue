@@ -560,7 +560,7 @@ export default {
                         />
                         <div class="VueTables__table-footer" ref="tableFooter"></div>
                         <div v-if="canEdit" class="component-action">
-                            <section>
+                            <section class="l-c-cr-bottom">
                                 <p>
                                     <a :href="`/cms/file/new/${this.sourceFolderId}`" title="Select a file"
                                         >Select a file</a

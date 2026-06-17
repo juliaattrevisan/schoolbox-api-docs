@@ -17,6 +17,9 @@ body.sbx-body {
         .tab-bar {
             border-radius: var(--sbx-config-container-corner-radius);
             box-shadow: var(--sbx-config-container-drop-shadow);
+            @media only print, screen and (max-width: 40em) {
+                border-radius: 0;
+            }
         }
 
         // make the width of the menu items dynamic to better allow for varying text lengths
@@ -154,6 +157,7 @@ body.sbx-body {
 
             .profile-options,
             .profile-options-mobile {
+                background: var(--sbx-color-foreground-primary);
                 a {
                     color: var(--sbx-config-color-accent);
                     border-radius: var(--sbx-config-field-corner-radius);
@@ -170,6 +174,7 @@ body.sbx-body {
             }
 
             .switch-user {
+                background: var(--sbx-color-foreground-primary);
                 // switch user list
                 li.user {
                     border-radius: var(--sbx-config-field-corner-radius);
@@ -218,6 +223,7 @@ body.sbx-body {
 
     // Left menu styles
     #left-menu {
+        background: var(--sbx-color-foreground-primary);
         h3 {
             color: var(--sbx-color-text-primary);
             text-transform: none;
@@ -268,6 +274,10 @@ body.sbx-body {
             right: 1rem;
             top: 1rem;
         }
+    }
+
+    #msgs {
+        background: var(--sbx-color-foreground-primary);
     }
 
     // Message list styles

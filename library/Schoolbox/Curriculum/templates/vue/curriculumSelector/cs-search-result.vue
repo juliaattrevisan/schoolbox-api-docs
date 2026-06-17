@@ -126,7 +126,7 @@ function onSelected(event) {
 }
 
 input[type="checkbox"]:not(.plain) + label {
-    margin: 0;
+    margin: 0 !important; // margin is not required in this context, as spacing is handled by parent element
 }
 
 aside {

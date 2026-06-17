@@ -109,7 +109,7 @@ function getIconName(iconClass: string): string {
                 Upcoming Tasks (Action required)
             </h3>
             <div v-if="upcoming.length === 0" class="empty-state">
-                <sbx-icon name="paperly-forms" size="2rem" />
+                <sbx-icon name="paperly-forms" size="xl" />
                 <p>There are currently no upcoming tasks that require action.</p>
             </div>
             <pdc-upcoming-item

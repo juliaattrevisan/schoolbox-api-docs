@@ -7,6 +7,16 @@
 }
 
 /**
+ * Increase the font sizes a bit
+ */
+.sbdocs p,
+.sbdocs ul li,
+.sbdocs td,
+.sbdocs code {
+    font-size: 16px !important;
+}
+
+/**
  * These styles overwrite the heavy handed table styles in our core.css file,
  * so the tables display better in the Storybook docs using the dark theme
  */

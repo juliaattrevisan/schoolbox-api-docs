@@ -98,7 +98,7 @@ window.Vue.onMounted(async () => {
                 <sbx-icon
                     name="notifications"
                     color="var(--navigation-foreground)"
-                    size="2rem"
+                    size="xl"
                     data-birthday-bell
                 ></sbx-icon>
             </div>

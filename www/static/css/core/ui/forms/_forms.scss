@@ -747,8 +747,8 @@ td {
 
 // Radio button blocks
 .button-block {
-    display: block;
-    background-color: $white;
+    display: inline-flex;
+    background-color: var(--sbx-color-foreground-primary, $white);
     border: $input-border-width solid $content-ui-background;
     color: var(--sbx-config-color-accent, $content-ui-foreground);
     margin: 0 0 1rem 0;
@@ -756,18 +756,12 @@ td {
     width: 100%;
     font-size: $base-font-size;
     font-weight: $font-weight-normal;
+    gap: var(--sbx-size-s, 0.5rem);
     line-height: 2;
     text-align: left;
     transition: all 0.1s ease-in;
-    :is(i, sbx-icon) {
-        @extend .size-32;
-        color: var(--sbx-config-color-accent, $content-ui-foreground);
-        padding-right: 0.35rem;
-        float: left;
-        line-height: 1;
-    }
     &:hover {
-        background-color: $content-ui-background;
+        background-color: var(--sbx-config-color-active, $content-ui-background);
         color: var(--sbx-config-color-accent, $content-ui-foreground);
         cursor: pointer;
     }
@@ -775,10 +769,6 @@ td {
 input[type="radio"] {
     + .block {
         @extend .button-block;
-
-        :is(i, sbx-icon) {
-            padding-right: 1rem;
-        }
     }
     &:checked + .block {
         background-color: var(--sbx-config-color-accent, $content-ui-foreground);
