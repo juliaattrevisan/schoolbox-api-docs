@@ -15,6 +15,6 @@ VALUES
     (
         'ibis_secret_key',
         'IB Secret Key',
-        (SELECT id FROM lu_config_field WHERE field = 'input'),
+        (SELECT id FROM lu_config_field WHERE field = 'password'),
         (SELECT id FROM lu_config_type WHERE type = 'International Baccalaureate')
     );
