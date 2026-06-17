@@ -20,7 +20,13 @@ use Schoolbox\Role;
 class Person
 {
     /**
-     * @var array|null
+     * @var array<string, array{
+     *     id:int|string,
+     *     external_id:string,
+     *     firstname:string,
+     *     lastname:string,
+     *     preferred_name:string
+     * }|int>|null
      */
     protected ?array $lookup = null;
 
@@ -33,7 +39,13 @@ class Person
     /**
      * Get a list of (external_id, user_id) tuples
      *
-     * @return array
+     * @return array<string, array{
+     *     id:int|string,
+     *     external_id:string,
+     *     firstname:string,
+     *     lastname:string,
+     *     preferred_name:string
+     * }|int>
      * @throws \PDOException
      */
     public function generate(): array
@@ -49,7 +61,7 @@ class Person
          */
         $statement = $this->userMapper->getDatabase()->executeQuery(
             "
-            SELECT u.synergy_id, u.id
+            SELECT u.synergy_id, u.id, u.firstname, u.lastname, u.preferred_name
             FROM {$this->userMapper->getTable()} u
             INNER JOIN groups g ON g.id = u.group_id
             WHERE g.group_type = :group_type
@@ -66,7 +78,7 @@ class Person
         }
 
         $statement = $this->userMapper->getDatabase()->query("
-            SELECT synergy_id, id
+            SELECT synergy_id, id, firstname, lastname, preferred_name
             FROM {$this->userMapper->getTable()}
             WHERE deleted_at IS NULL
             AND synergy_id IS NOT NULL
@@ -78,7 +90,13 @@ class Person
             /* Find the rest of the users
              */
             if (!isset($lookup[$row['synergy_id']])) {
-                $lookup[(string)$row['synergy_id']] = $row['id'];
+                $lookup[(string)$row['synergy_id']] = [
+                    'id' => $row['id'],
+                    'external_id' => $row['synergy_id'],
+                    'firstname' => $row['firstname'],
+                    'lastname' => $row['lastname'],
+                    'preferred_name' => $row['preferred_name'],
+                ];
             }
         }
         /* Remember this for later
