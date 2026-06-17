@@ -15,6 +15,9 @@ use Schoolbox\IB\Registrations\Sessions\Model as RegistrationSessionModel;
 use Schoolbox\IB\Registrations\Sessions\Student\Model as RegistrationSessionStudentModel;
 use Throwable;
 
+/**
+ * Persists and reads IBIS registration API response logs.
+ */
 class Helper
 {
     public function __construct(private Mapper $mapper)
@@ -22,7 +25,14 @@ class Helper
     }
 
     /**
-     * @param array{candidateId?: string|null, referenceId?: string|null, text?: string|null, successful: bool} $candidateResponse
+     * Save one IBIS register-candidates response for a registration session student.
+     *
+     * @param array{
+     *     candidateId?: string|null,
+     *     referenceId?: string|null,
+     *     text?: string|null,
+     *     successful: bool
+     * } $candidateResponse
      */
     public function saveCandidateResponse(
         RegistrationSessionStudentModel $student,
@@ -39,7 +49,15 @@ class Helper
     }
 
     /**
-     * @param array{candidateId?: string|null, month?: string|null, year?: string|null, text?: string|null, successful: bool} $sessionResponse
+     * Save one IBIS register-sessions response for a registration session student.
+     *
+     * @param array{
+     *     candidateId?: string|null,
+     *     month?: string|null,
+     *     year?: string|null,
+     *     text?: string|null,
+     *     successful: bool
+     * } $sessionResponse
      */
     public function saveSessionResponse(
         RegistrationSessionStudentModel $student,
@@ -55,6 +73,12 @@ class Helper
         );
     }
 
+    /**
+     * Save a failed IBIS request when no structured response row was returned.
+     *
+     * @param RegistrationSessionStudentModel|null $student Candidate row related to the failure, if known.
+     * @param Throwable|string $error Exception or raw error message to store.
+     */
     public function saveRequestError(
         int $registrationSessionId,
         ?RegistrationSessionStudentModel $student,
@@ -78,6 +102,8 @@ class Helper
     }
 
     /**
+     * Return the latest non-empty error message for each student in a registration session.
+     *
      * @return array<int, string>
      */
     public function getLatestErrorMessagesByStudentId(int $registrationSessionId): array
@@ -100,6 +126,11 @@ class Helper
         return $messages;
     }
 
+    /**
+     * Build and persist a response log row shared by candidate and session responses.
+     *
+     * @throws \InvalidArgumentException When the student or its registration session has not been persisted.
+     */
     private function saveStudentResponse(
         RegistrationSessionStudentModel $student,
         string $msgId,
