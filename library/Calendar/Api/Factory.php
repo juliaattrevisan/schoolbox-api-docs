@@ -330,6 +330,15 @@ class Calendar_Api_Factory
                 return new Calendar_Api_EventType_Event_Schoolbox_Personal($connectorId, $user, $viewer);
             case Calendar_Api_EventType_Event_Schoolbox_Type::class:
                 return new Calendar_Api_EventType_Event_Schoolbox_Type($connectorId, $user, $viewer);
+            case Calendar_Api_EventType_Event_Socs_Default::class:
+                return new Calendar_Api_EventType_Event_Socs_Default(
+                    $connectorId,
+                    $user,
+                    $viewer,
+                    $this->configLoader,
+                    \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                    \Schoolbox\CampusMapper::getInstance(),
+                );
             case Calendar_Api_EventType_Event_Vcal_Default::class:
                 return new Calendar_Api_EventType_Event_Vcal_Default($connectorId, $user, $viewer, $this->redis, $this->cache);
             case Calendar_Api_EventType_ResourceBooking_Booking_Default::class:

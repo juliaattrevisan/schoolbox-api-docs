@@ -60,6 +60,10 @@ class ApiHierarchyGenerator
             foreach ($subDirNames as $subDirName) {
                 $connectorClassFilename = basename($subDirName);
 
+                if (in_array($connectorClassFilename, ['Socs'], true)) {
+                    continue;
+                }
+
                 $className = "Calendar_Api_Config_Connector_{$connectorClassFilename}";
                 $config    = new $className();
 

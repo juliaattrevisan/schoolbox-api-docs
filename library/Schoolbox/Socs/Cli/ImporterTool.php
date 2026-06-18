@@ -66,6 +66,11 @@ class ImporterTool extends CliTool\App
             return;
         }
 
+        if (!$this->getConfig()->get(ConfigMapper::NAME_SOCS_IMPORT_SPORTS_FIXTURES)) {
+            $logger->info('SOCS sports fixture import is not enabled; exiting');
+            return;
+        }
+
         try {
             $lock = $this->acquireLock(self::LOCK_NAME, self::LOCK_TTL);
         } catch (\RuntimeException $e) {

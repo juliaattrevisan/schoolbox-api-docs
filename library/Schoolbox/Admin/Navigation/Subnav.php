@@ -874,6 +874,13 @@ class Subnav
                         'searchable' => true,
                         'children' => []
                     ],
+                    '/adminv2/socs' => [
+                        'name' => 'SOCS Connector',
+                        'visible' => true,
+                        'description' => 'Configure the connection to SOCS and its imported feeds.',
+                        'searchable' => true,
+                        'children' => []
+                    ],
 
                     '/adminv2/setting/Debugging' => [
                         'name'        => 'Debugging',
