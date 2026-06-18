@@ -20,8 +20,6 @@ require_once __DIR__ . '/../../conf/core/require.php';
  */
 $kernel = new CliTool\Kernel(new class extends CliTool\BaseApp
 {
-    private const TTL_NOT_SET = "not set";
-
     /** @var string if not specified INSTANCE_ID will be used */
     private const OPT_LONG_INSTANCE_ID = 'instance-id:';
 
