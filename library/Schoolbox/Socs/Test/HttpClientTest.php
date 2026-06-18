@@ -192,8 +192,7 @@ class HttpClientTest extends TestCase
      */
     private function createHttpClient(Client $guzzle): HttpClient
     {
-        $client = new HttpClient('https://socs.example.test', 'school', 'token', static function (): void {
-        });
+        $client = new HttpClient('https://socs.example.test', 'school', 'token');
         $clientProperty = new \ReflectionProperty($client, 'client');
         $clientProperty->setValue($client, $guzzle);
 

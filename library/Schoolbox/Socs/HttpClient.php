@@ -40,8 +40,6 @@ class HttpClient
 
     private string $baseUrl;
 
-    private \Closure $sleep;
-
     // known error strings
     private const NOT_AVAILABLE = 'Not available.';
 
@@ -54,12 +52,8 @@ class HttpClient
         string $host,
         private string $schoolId = '',
         #[SensitiveParameter] private string $token = '',
-        ?\Closure $sleep = null
     ) {
         $this->baseUrl = rtrim($host, '/');
-        $this->sleep = $sleep ?? static function (int $seconds): void {
-            sleep($seconds);
-        };
         $this->client = new Client([
             RequestOptions::TIMEOUT => self::DEFAULT_TIMEOUT,
             RequestOptions::HTTP_ERRORS => false,
@@ -148,7 +142,7 @@ class HttpClient
                     );
                 }
             }
-            ($this->sleep)(self::NAP_TIMEOUT);
+            sleep(self::NAP_TIMEOUT);
         }
     }
 
