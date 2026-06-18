@@ -3,7 +3,13 @@
  * at least still persist and behave the same way in display view.
  */
 
-import { Plugin, type Editor, type ViewAttributeElement, type DowncastConversionApi, type ViewElement } from "ckeditor5";
+import {
+    Plugin,
+    type Editor,
+    type ViewAttributeElement,
+    type DowncastConversionApi,
+    type ViewElement,
+} from "ckeditor5";
 
 /**
  * Referenced from: https://github.com/ckeditor/ckeditor5/blob/96d53e7cfca358d54d4a154dd9f6fd7f5f2cc524/packages/ckeditor5-link/src/utils.js
