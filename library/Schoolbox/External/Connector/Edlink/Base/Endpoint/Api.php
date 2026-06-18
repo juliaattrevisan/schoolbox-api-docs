@@ -126,7 +126,7 @@ class Api implements IApi
     {
         $response = null;
         $fails = 0;
-
+        $e = null;
         while ($fails < self::NUM_RETRY) {
             try {
                 $options = [];
