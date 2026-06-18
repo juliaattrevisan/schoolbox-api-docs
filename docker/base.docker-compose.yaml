@@ -5,6 +5,7 @@
 # it must be combined with a docker-compose which defines:
 # * schoolbox-frankenphp
 # * schoolbox-taskd
+# * schoolbox-toolsd
 # * schoolbox-cli
 
 services:
@@ -514,3 +515,6 @@ configs:
     file: ./base-images/php-frankenphp/config/php/${ENV}/02-env-settings.ini
   schoolbox-cli-php:
     file: ./schoolbox-cli/config/php/03-cli-settings.ini
+  # Toolsd's config is somewhere in Schoolbox: it may be moved?
+  toolsd:
+    file: ../library/Schoolbox/ToolsDaemon/conf/
