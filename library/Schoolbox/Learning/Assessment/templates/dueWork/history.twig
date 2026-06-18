@@ -1,3 +1,14 @@
+{##
+ # Submission History
+ #
+ # @param Participant $participant
+ # @param array $timeline
+ # @param bool $turnitinApiEnabled   Whether turnitin was configured correctly; used in feedback files in the timeline
+ #
+ # @param array $rubricMarkedGridPayloadsHistory  A set of feedback-id indexed json strings corresponding to the rubric payload for a particular feedback
+ #                                                Note that self-graded feedback will display like an instructor-given feedback.
+ #                                                This is used to populate all the rubric grids in the entire history of someone's feedback
+ #}
 {% import '@learning/macro/urgency.twig' as urgency %}
 
 <script type="application/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.kami-export.js?v={{ config.site_version }}"></script>
@@ -59,15 +70,19 @@
                     {% include '@learningAssessment/dueWork/summary/interaction/response.twig' with {
                         currentInteraction: currentInteraction,
                         participant: participant,
+                        rubricMarkedGridPayloadsHistory: rubricMarkedGridPayloadsHistory,
+                        viewRoute: viewRoute,
                     } %}
                 {% elseif currentInteraction is feedback %}
                     {% set hasCollapser = currentInteraction.allFiles.count or currentInteraction.comment | length > 0 or currentInteraction.rubricMarkedGrids.count %}
                     {% include '@learningAssessment/dueWork/summary/interaction/feedback.twig' with {
+                        assessment: assessment,
                         currentFeedback: currentInteraction,
                         participant: participant,
                         hasCollapser: hasCollapser,
                         collapsed: true,
                         deleteIcon: true,
+                        rubricMarkedGridPayloads: rubricMarkedGridPayloadsHistory[currentInteraction.id],
                     } %}
                 {% endif %}
                 </section>

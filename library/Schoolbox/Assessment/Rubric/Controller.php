@@ -445,7 +445,13 @@ class Controller extends BaseController
         /* Note that some of these settings are overridden by rb-rubric-download.vue implementation in frontend...
          * ...in case you were trying to debug why you couldn't change the filename lol
          */
-        $filename = (new Filename())->generate($rubricInstance->getTitle(), 'csv');
+        $title = $assessment->getTitle();
+
+        if ('' !== trim((string)$rubricInstance->getTitle())) {
+            $title = $rubricInstance->getTitle();
+        }
+
+        $filename = (new Filename())->generate($title, 'csv');
 
         $this->response = $this->responseFromContent($content)
             ->withHeader('Pragma', ' ')
