@@ -1,0 +1,24 @@
+tour:
+  title: '26.1 Release Admin Enhancements'
+  description: 'Introduce staff users to new features of the 26.1 release when they visit the administration page'
+  roles:
+    - staff
+  trigger:
+    urlRegex: '^/adminv2/home'
+    selector: body
+    event: tourReady
+  steps:
+    - step:
+        title: What's New
+        type: modal
+        content: "<img src='{CDN_PREFIX}/images/tour/26.1/26.1_WhatsNewModal_Artwork_1920x1080_SonarUI.png' style='width:100%;margin-bottom:16px;'>
+                  <p>Take a first look at the future of Schoolbox. Sonar UI introduces a cleaner, more accessible experience with updated navigation, components, typography, and visual design.</p>
+                  <p>Learn more in the <a href='/help/sso/send?returnUrl=/homepage/5680' target='_blank'>Release Notes</a>.</p>"
+        class: introjs-whatsnewmodal
+    - step:
+        title: What's New
+        type: modal
+        content: "<img src='{CDN_PREFIX}/images/tour/26.1/26.1_WhatsNewModal_Artwork_1920x1080_DataRetention.png' style='width:100%;margin-bottom:16px;'>
+                  <p>Configure how long deleted information is retained before permanent removal. Data Retention Control helps schools reduce data risk, support compliance requirements, and maintain a healthier long-term data footprint. Existing schools can enable this feature when ready.</p>
+                  <p>Learn more in the <a href='/help/sso/send?returnUrl=/homepage/5680' target='_blank'>Release Notes</a>.</p>"
+        class: introjs-whatsnewmodal
