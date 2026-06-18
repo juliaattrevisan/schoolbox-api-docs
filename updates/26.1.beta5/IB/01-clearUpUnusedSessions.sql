@@ -34,9 +34,12 @@ WHERE (system_purpose_id, academic_year, exam_session) IN (
    (3, '2025', 'May')
 );
 
--- Removing the Diploma Programme Year 1 system purpose.
-DELETE
-FROM ib_system_purposes
-WHERE name = 'Diploma Programme Year 1';
+-- Removing the Diploma Programme Year 1 system purpose (only if unused).
+DELETE sp
+FROM ib_system_purposes sp
+LEFT JOIN ib_registration_sessions rs
+    ON rs.system_purpose_id = sp.id
+WHERE sp.name = 'Diploma Programme Year 1'
+  AND rs.id IS NULL;
 
 
