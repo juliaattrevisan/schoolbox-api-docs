@@ -11,7 +11,11 @@ Add 4 new fields to both the GET (`/api/assessment/{id}`) and LIST (`/api/assess
 | `specificationAssessmentId` | `assessment_specification_implementation.specification_assessment_id` | All | No specification link exists |
 | `markVisibility` | `submission_box.mark_visibility` / `assess.mark_visibility` / `project.mark_visibility` / `lti_assessment.mark_visibility` | dueWork, quiz, project, LTI | lessonPlan, task, dialogAgent |
 | `markType` | `submission_mark_type.slug` (via dueWork/quiz/project joins) | dueWork, quiz, project | lessonPlan, task, LTI, dialogAgent |
-| `description` | `assessment.description` | All | No description set |
+| `description` | `assessment.description` | All (**GET single only**) | No description set; never returned by the LIST endpoint |
+
+> **`markVisibility` is a string ENUM**, not an integer. As of [SA-22007](https://github.com/alaress/schoolbox/pull/34805) the `mark_visibility` columns are `ENUM('staffOnly','staffAndStudent','staffAndParent','staffStudentAndParent')`. The API passes the raw column value through (nullable for LTI).
+>
+> **`description` is omitted from the LIST endpoint** (`/api/assessment`) to keep the list payload small. It is only fetched and returned for the single GET (`/api/assessment/{id}`).
 
 ## Implementation
 
@@ -40,10 +44,12 @@ The existing `markTypeTable.hr_name AS markType` is replaced by the COALESCE abo
 
 ```php
 'specificationAssessmentId' => $row['specificationAssessmentId'] !== null ? (int)$row['specificationAssessmentId'] : null,
-'markVisibility'            => $row['markVisibility'] !== null ? (int)$row['markVisibility'] : null,
+'markVisibility'            => $row['markVisibility'] ?? null, // ENUM string, passed through (nullable for LTI)
 'markType'                  => $row['markType'] ?? null,
-'description'               => $row['description'] !== '' ? $row['description'] : null,
+// description added separately, only when $includeDescription is true (single GET)
 ```
+
+`description` is selected and emitted only when `$includeDescription` is `true`. `searchForAssessments()` and `buildSearch()` take a `bool $includeDescription = false` parameter; `getAssessment()` (the single GET path) passes `true`, while the LIST endpoint uses the default `false`.
 
 ### File: `openapi/components/schemas/assessment-item.yaml` (schoolbox-api-docs repo)
 
@@ -51,10 +57,11 @@ Add 4 new properties to the schema:
 
 **`specificationAssessmentId`** — integer, nullable. The ID of the specification assessment this was created from. Enables identifying common assessments across classes.
 
-**`markVisibility`** — integer, nullable, enum `[0, 1, 2]`.
-- `0`: Staff Only
-- `1`: Staff & Student
-- `2`: Staff, Student & Parent
+**`markVisibility`** — string, nullable, enum `[staffOnly, staffAndStudent, staffAndParent, staffStudentAndParent]`.
+- `staffOnly`: Staff Only
+- `staffAndStudent`: Staff & Student
+- `staffAndParent`: Staff & Parents
+- `staffStudentAndParent`: Staff, Student & Parent
 
 Applicable to dueWork, quiz, project, LTI. Null for other types.
 

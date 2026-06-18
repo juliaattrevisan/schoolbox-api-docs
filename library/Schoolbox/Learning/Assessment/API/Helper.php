@@ -57,7 +57,7 @@ class Helper
      */
     public function getAssessment(string $assessmentId): array | null
     {
-        $assessments = $this->searchForAssessments(['assessmentId' => $assessmentId], 0, 0);
+        $assessments = $this->searchForAssessments(['assessmentId' => $assessmentId], 0, 0, true);
 
         if (count($assessments) === 0) {
             throw new NotFound();
@@ -71,12 +71,15 @@ class Helper
      * filter can include:
      * assessmentId, assessmentType, folderId, weighted, weightType (id / name)
      * dueDate (from/to), yearLevel (id / name), title
+     *
+     * $includeDescription controls whether each assessment's description is returned. It is omitted from the list
+     * endpoint (the default) to keep the payload small, and only included when fetching a single assessment.
      */
-    public function searchForAssessments(array $filter, int $limit, int $cursor): array
+    public function searchForAssessments(array $filter, int $limit, int $cursor, bool $includeDescription = false): array
     {
         $output = [];
 
-        [$query, $params] = $this->buildSearch($filter);
+        [$query, $params] = $this->buildSearch($filter, $includeDescription);
 
         if (0 !== $cursor) {
             $query .= "\nAND assessment.id > :cursor ";
@@ -170,10 +173,15 @@ class Helper
                         (AssessmentType::TYPE_LESSON_PLAN === $row['assessmentType']) ? null : []
                     ),
                     'specificationAssessmentId' => $row['specificationAssessmentId'] !== null ? (int)$row['specificationAssessmentId'] : null,
-                    'markVisibility'            => $row['markVisibility'] !== null ? (int)$row['markVisibility'] : null,
+                    // markVisibility is an ENUM string (e.g. 'staffOnly', 'staffAndStudent'); null for types without a mark.
+                    'markVisibility'            => $row['markVisibility'] ?? null,
                     'markType'                  => $row['markType'] ?? null,
-                    'description'               => $row['description'] ?? null,
                 ];
+
+                // Description is only fetched/returned when requesting a single assessment, to keep the list payload small.
+                if ($includeDescription) {
+                    $output[$assessmentId]['description'] = $row['description'] ?? null;
+                }
             }
         }
 
@@ -223,14 +231,18 @@ class Helper
      * dueDate (from/to), yearLevel (id / name), title
      *
      * @param array $filter
+     * @param bool  $includeDescription whether to select assessment.description (omitted from the list for payload size)
      * @return array [sql query, param (param key => param value)]
      */
-    private function buildSearch(array $filter)
+    private function buildSearch(array $filter, bool $includeDescription = false)
     {
         $params = [];
         //for filter Builder::getBindings
         $folderCodes = [];
         $folderIds = [];
+
+        // Only fetch the (potentially large) description when a single assessment is requested.
+        $descriptionColumn = $includeDescription ? "assessment.description,\n                " : '';
 
         $select = "
             SELECT
@@ -267,8 +279,7 @@ class Helper
                     LEFT JOIN folder_year_level ON folder_year_level.year_level_id = lu_year_level.id
                     WHERE folder_year_level.folder_id = mv_assessment_relation.folder_id
                 ) AS `yearLevelId`,
-                assessment.description,
-                asi.specification_assessment_id AS specificationAssessmentId,
+                {$descriptionColumn}asi.specification_assessment_id AS specificationAssessmentId,
                 COALESCE(submission_box.mark_visibility, assess.mark_visibility, project.mark_visibility, lti_assessment.mark_visibility) AS markVisibility,
                 COALESCE(markTypeTable.slug, quizMarkType.slug, projectMarkType.slug) AS markType,
                 projectParent.assessment_id AS `project`
