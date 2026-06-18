@@ -440,6 +440,13 @@ $app = new class extends CliTool\App {
             'openai_dialogagent' => "SELECT count(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'dialogagent'",
             'openai_learning_customisation' => "SELECT count(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'learningactivitycustomisation'",
 
+            // AI moderation
+            'ai_moderation_events' => 'SELECT COUNT(id) FROM ai_moderation_event',
+            'ai_moderation_events_no_action_required' => "SELECT COUNT(id) FROM ai_moderation_event WHERE status = 'no_action_required'",
+            'ai_moderation_events_requires_attention' => "SELECT COUNT(id) FROM ai_moderation_event WHERE status = 'requires_attention'",
+            'ai_moderation_events_further_action_required' => "SELECT COUNT(id) FROM ai_moderation_event WHERE status = 'further_action_required'",
+            'ai_moderation_events_further_action_taken' => "SELECT COUNT(id) FROM ai_moderation_event WHERE status = 'further_action_taken'",
+
             //Packages
             'package_installed' => 'SELECT COUNT(*) FROM package WHERE installed = 1',
 
