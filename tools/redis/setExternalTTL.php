@@ -91,7 +91,12 @@ $app = new class extends CliTool\BaseApp {
      */
     private function getLikeCacheKey(): string
     {
-        return sprintf("%s:%s:%s", Redis::FUNCTION_CALL_CACHE_PREFIX, INSTANCE_ID, self::EXTERNAL_DB_KEY_PATTERN);
+        return sprintf(
+            "%s.%s.%s:*",
+            Redis::FUNCTION_CALL_CACHE_PREFIX,
+            self::EXTERNAL_DB_KEY_PATTERN,
+            INSTANCE_ID,
+        );
     }
 };
 

@@ -22,8 +22,9 @@ services:
     command: [
       src/main.py, api,
       -p, '8080',
-      --tools-config, /usr/share/schoolbox/library/Schoolbox/ToolsDaemon/conf/tools.yaml,
-      --pools-config, /usr/share/schoolbox/library/Schoolbox/ToolsDaemon/conf/pools.yaml,
+      --working-dir, /usr/share/schoolbox,
+      --tools-config, library/Schoolbox/ToolsDaemon/conf/tools.yaml,
+      --pools-config, library/Schoolbox/ToolsDaemon/conf/pools.yaml,
     ]
     volumes:
       - code:/usr/share/schoolbox
@@ -49,8 +50,9 @@ services:
     command: [
       src/main.py, worker,
       -Q, default,
-      --tools-config, /usr/share/schoolbox/library/Schoolbox/ToolsDaemon/conf/tools.yaml,
-      --pools-config, /usr/share/schoolbox/library/Schoolbox/ToolsDaemon/conf/pools.yaml,
+      --working-dir, /usr/share/schoolbox,
+      --tools-config, library/Schoolbox/ToolsDaemon/conf/tools.yaml,
+      --pools-config, library/Schoolbox/ToolsDaemon/conf/pools.yaml,
       -vv,
     ]
     volumes:
@@ -86,8 +88,9 @@ services:
     command: [
       src/main.py, worker,
       -Q, ups,
-      --tools-config, /usr/share/schoolbox/library/Schoolbox/ToolsDaemon/conf/tools.yaml,
-      --pools-config, /usr/share/schoolbox/library/Schoolbox/ToolsDaemon/conf/pools.yaml,
+      --working-dir, /usr/share/schoolbox,
+      --tools-config, library/Schoolbox/ToolsDaemon/conf/tools.yaml,
+      --pools-config, library/Schoolbox/ToolsDaemon/conf/pools.yaml,
       -vv,
     ]
     volumes:
