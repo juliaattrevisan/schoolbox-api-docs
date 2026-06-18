@@ -11,7 +11,7 @@ import type { Page } from "@playwright/test";
  * Execute DOCKER=1 npx playwright test test/playwright/acceptance/admin/lms/summativeReports/summativeReportsVisibility.spec.ts
  */
 
-test.describe("Admin LMS - Summative Reports Visibility", () => {
+test.describe("Admin LMS - Summative Reports Visibility - View As field", () => {
     let summativeReportList: SummativeList;
     let createSummativeReport: CreateSummativeReport;
 
