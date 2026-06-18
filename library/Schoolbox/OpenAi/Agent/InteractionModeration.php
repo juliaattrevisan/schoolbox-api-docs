@@ -16,6 +16,7 @@ use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\OpenAi\Session\Log;
 use Schoolbox\Editor\OpenAI\Payload\InteractionModeration as PayloadGenerator;
+use Schoolbox\OpenAi\Moderation\Result\Result;
 use Schoolbox\OpenAi\IClient;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
@@ -47,7 +48,7 @@ class InteractionModeration
      * @param ?User    $user      The user making the request, if any.
      * @param string   $sessionId The session ID against which this request should be logged.
      * @param GenericCollection<Log\Model> $interactionFeed The chronological feed of AI interaction logs for a session to moderate
-     * @return array
+     * @return Result
      * @throws ClientExceptionInterface
      * @throws SchoolboxException
      */
@@ -55,7 +56,7 @@ class InteractionModeration
         ?User $user,
         string $sessionId,
         GenericCollection $interactionFeed
-    ): array {
+    ): Result {
         $payload = new PayloadGenerator(
             trim($this->config[Config::FIELD_PROVIDER]['value']),
             trim($this->config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
@@ -83,10 +84,10 @@ class InteractionModeration
     /**
      * Handle the response from the AI for a request
      * @param string $moderationResponseData
-     * @return array
+     * @return Result
      * @throws SchoolboxException
      */
-    private function parseResponse(string $moderationResponseData): array
+    private function parseResponse(string $moderationResponseData): Result
     {
         // This response used to need special handling of its return, because it
         // was not guaranteed to be valid JSON.
@@ -117,10 +118,15 @@ class InteractionModeration
             throw new SchoolboxException('Invalid response', 0, $e);
         }
 
-        /* TODO: determine if we need to refine this further, probably want to make some class to represent the result
-         * instead of tying the internal structure of the JSON response anywhere else in the system outside of this agent
-         */
 
-        return $moderationResult;
+        try {
+            /* theoretically the structured output from the AI should always align with
+             * the spec since strict=true, a ValueError would only be thrown if somehow
+             * an enum value didn't match
+             */
+            return Result::fromArray($moderationResult);
+        } catch (\ValueError $e) {
+            throw new SchoolboxException('Invalid response format', 0, $e);
+        }
     }
 }
