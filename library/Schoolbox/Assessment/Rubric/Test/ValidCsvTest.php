@@ -59,7 +59,7 @@ class ValidCsvTest extends TestCase
              */
 
             'no-levels-+-no-descriptors-rubric.csv' => [
-'"capabilityMarkType: none","useMarkRange: Off",,,,,
+                '"capabilityMarkType: none","useMarkRange: Off",,,,,
 "Approaches to Learning",Engaged,,,,,
 ,,4,3,2,1,
 ,Persistent,,,,,
@@ -74,7 +74,7 @@ Knowledge,Chemistry,,,,,
             ],
 
             'no-levels-+-no-points-rubric.csv' => [
-'"capabilityMarkType: none","useMarkRange: Off",,,,,
+                '"capabilityMarkType: none","useMarkRange: Off",,,,,
 "Approaches to Learning",Engaged,"Was highly engaged","Was mostly engaged","Was somewhat engaged","Was rarely engaged",
 ,,,,,,
 ,Persistent,"Was highly persistent","Was mostly persistent","Was somewhat persistent","Was rarely persistent",
@@ -89,7 +89,7 @@ Knowledge,Chemistry,A,B,C,D,E
             ],
 
             'no-levels-+-no-descriptors-weird-alignments-rubric.csv' => [
-'"capabilityMarkType: none","useMarkRange: Off",,,,,
+                '"capabilityMarkType: none","useMarkRange: Off",,,,,
 "Approaches to Learning",Engaged,,,,,
 ,,,4,3,2,1
 ,Persistent,,,,,
@@ -113,7 +113,7 @@ Knowledge,Chemistry,,,,,
             ],
 
             'Worktype csv' => [
-'"Work Type","Display on Grades Page",Visible
+                '"Work Type","Display on Grades Page",Visible
 "Learning Activity",No,staffAndStudentsAndParents
 "Approach to Learning",Yes,staffAndStudentsAndParents
 "Formative Assessment Task",No,staffAndStudentsAndParents
@@ -130,18 +130,18 @@ Observation,No,staffOnly
             ],
 
             'no capability' => [
-'"capabilityMarkType: none","useMarkRange: Off"',
+                '"capabilityMarkType: none","useMarkRange: Off"',
                 false
             ],
 
             'no indicator' => [
-'"capabilityMarkType: none","useMarkRange: Off",,,,,
+                '"capabilityMarkType: none","useMarkRange: Off",,,,,
 "Approaches to Learning",,,,,,',
                 false
             ],
 
             'no descriptor' => [
-'"capabilityMarkType: none","useMarkRange: Off",,,,,
+                '"capabilityMarkType: none","useMarkRange: Off",,,,,
 "Approaches to Learning",Engaged,,,,,
 ,,,,,,
 ,,,,,,
@@ -151,28 +151,28 @@ Observation,No,staffOnly
             ],
 
             'bad capability 1' => [
-'"capabilityMarkType: none","useMarkRange: Off",,,,,
+                '"capabilityMarkType: none","useMarkRange: Off",,,,,
 "",Engaged,,,,,
 ,,,4,3,2,1',
                 false
             ],
 
             'bad capability 2' => [
-'"capabilityMarkType: none","useMarkRange: Off",,,,,
+                '"capabilityMarkType: none","useMarkRange: Off",,,,,
 "         ",Engaged,,,,,
 ,,,4,3,2,1',
                 false
             ],
 
             'bad indicator 1' => [
-'"capabilityMarkType: none","useMarkRange: Off",,,,,
+                '"capabilityMarkType: none","useMarkRange: Off",,,,,
 "Approaches to Learning","",,,,,
 ,,,4,3,2,1',
                 false
             ],
 
             'bad indicator 2' => [
-'"capabilityMarkType: none","useMarkRange: Off",,,,,
+                '"capabilityMarkType: none","useMarkRange: Off",,,,,
 "Approaches to Learning","                            ",,,,,
 ,,,4,3,2,1',
                 false
