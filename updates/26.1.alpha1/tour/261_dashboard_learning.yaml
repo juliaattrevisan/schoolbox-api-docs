@@ -25,7 +25,8 @@ tour:
     - step:
         title: What's New
         type: modal
-        content: "<p>Schoolbox now automatically tracks all adjustments made to student learning activities. Access complete adjustment histories on student profiles and generate filterable reports for quick, reliable auditing and insight.</p>
+        content: "<img src='{CDN_PREFIX}/images/tour/26.1/26.1_WhatsNewModal_Artwork_1920x1080_CustomParticipationLog.png' style='width:100%;margin-bottom:16px;'>
+                  <p>Schoolbox now automatically tracks all adjustments made to student learning activities. Access complete adjustment histories on student profiles and generate filterable reports for quick, reliable auditing and insight.</p>
                   <p>Learn more in the <a href='/help/sso/send?returnUrl=/homepage/5680' target='_blank'>Release Notes</a>.</p>"
         class: introjs-whatsnewmodal
     - step:
