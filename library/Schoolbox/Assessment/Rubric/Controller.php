@@ -300,6 +300,15 @@ class Controller extends BaseController
      */
     public function postImport(File $file): void
     {
+        /* See if $file was valid before even TRYING to do anything here
+         */
+        $isValid = (new ValidCsv())->isSatisfiedBy($this->getDi()->get('filesystem.storageProxy')->readStream($file));
+
+        if (!$isValid) {
+            $this->response = $this->responseAsJson('This file is not a valid rubric csv file.')->withStatus(400);
+            return;
+        }
+
         $post = $this->requestPost;
 
         try {
