@@ -2,7 +2,7 @@
  * Handles the toggling on/off to make the selected media full width
  */
 
-import { Command, type Editor, type Element, type ImageResizeHandles, type ImageResizeButtons } from "ckeditor5";
+import { Command, type Editor, type ModelElement, type ImageResizeHandles, type ImageResizeButtons } from "ckeditor5";
 
 export default class ToggleFullWidthCommand extends Command {
     /**
@@ -24,7 +24,7 @@ export default class ToggleFullWidthCommand extends Command {
         const { editor } = this;
         const { model } = editor;
         const imageUtils = editor.plugins.get("ImageUtils");
-        const imageElement = imageUtils.getClosestSelectedImageElement(model.document.selection) as Element;
+        const imageElement = imageUtils.getClosestSelectedImageElement(model.document.selection) as ModelElement;
         if (imageElement.getAttribute("data-schoolboxresource-fullwidth") === "true") {
             // if the image is full width, remove the full width styling
             editor.execute("resizeImage", { width: null });

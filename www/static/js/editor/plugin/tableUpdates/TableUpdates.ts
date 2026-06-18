@@ -6,7 +6,7 @@
 import {
     Plugin,
     type DowncastInsertEvent,
-    type Element,
+    type ModelElement,
     type ViewElement,
     type TableAlignmentCommand,
 } from "ckeditor5";
@@ -59,7 +59,6 @@ export default class TableUpdates extends Plugin {
                 key: this.isCK5Attribute,
             },
             model: {
-                name: "table",
                 key: this.isCK5Attribute,
                 value: undefined,
             },
@@ -80,7 +79,7 @@ export default class TableUpdates extends Plugin {
                 "insert:table",
                 (event, data, conversionApi) => {
                     const viewWriter = conversionApi.writer;
-                    const modelTable = data.item as Element;
+                    const modelTable = data.item as ModelElement;
                     const viewElement = conversionApi.mapper.toViewElement(modelTable) as ViewElement;
                     const viewTable = viewElement.is("element", "table")
                         ? viewElement
@@ -98,7 +97,7 @@ export default class TableUpdates extends Plugin {
      * Get the currently selected table
      * @returns The currently selected table
      */
-    getSelectedTable(): Element | null | undefined {
+    getSelectedTable(): ModelElement | null | undefined {
         const { selection } = this.editor.model.document;
         const table = selection.getFirstPosition()?.findAncestor("table");
         return table;
