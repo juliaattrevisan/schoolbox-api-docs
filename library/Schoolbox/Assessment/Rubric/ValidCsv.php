@@ -102,7 +102,7 @@ class ValidCsv
             return false;
         }
 
-        /* empty string/whitespace only: exit early
+        /* no columns, for whatever reason
          */
         if (!\count($firstRow)) {
             return false;
