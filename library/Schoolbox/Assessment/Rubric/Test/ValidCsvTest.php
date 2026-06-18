@@ -26,7 +26,7 @@ class ValidCsvTest extends TestCase
 {
     /**
      * @param mixed $input
-     * @param int   $expected
+     * @param bool   $expected
      */
     #[DataProvider('providerValidCsv')]
     public function testValidCsv($input, $expected)
@@ -42,9 +42,9 @@ class ValidCsvTest extends TestCase
 
         $outcome = (new ValidCsv())->isSatisfiedBy($stream);
 
-        $this->assertEquals($expected, $outcome);
-
         fclose($stream);
+
+        $this->assertEquals($expected, $outcome);
     }
 
     /**
