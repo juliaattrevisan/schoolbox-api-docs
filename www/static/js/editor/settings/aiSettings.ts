@@ -1,26 +1,24 @@
-import type { AIAssistantConfig } from "ckeditor5-premium-features";
+import type { AIConfig } from "ckeditor5-premium-features";
 
-interface SbxAIAssistantConfig {
-    ai: {
-        openAI: {
-            apiUrl: string;
-        };
-        aiAssistant: AIAssistantConfig;
-        useTheme: boolean;
-    };
+interface SbxAIConfig {
+    ai: AIConfig;
 }
 
 /**
  * Returns the settings for the AI assistant
  * @returns - the AI Assistant settings
  */
-export function getAISettings(): SbxAIAssistantConfig {
+export function getAISettings(): SbxAIConfig {
     return {
         ai: {
-            openAI: {
-                apiUrl: "/openai",
-            },
-            aiAssistant: {
+            assistant: {
+                adapter: {
+                    openAI: {
+                        apiUrl: "/openai",
+                    },
+                },
+                // Disable the default feature's theme.
+                useTheme: false,
                 // Define the commands list from scratch.
                 commands: [
                     {
@@ -188,8 +186,6 @@ export function getAISettings(): SbxAIAssistantConfig {
                     },
                 ],
             },
-            // Disable the default feature's theme.
-            useTheme: false,
         },
     };
 }

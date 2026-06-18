@@ -7,9 +7,9 @@
  *
  */
 
-import { AbstractEditorHandler, type InlineEditor } from "ckeditor5";
+import { FullscreenAbstractEditorHandler, type InlineEditor } from "ckeditor5";
 
-export default class CustomEditorHandler extends AbstractEditorHandler {
+export default class CustomEditorHandler extends FullscreenAbstractEditorHandler {
     protected override readonly _editor: InlineEditor;
 
     // Assign the custom editor class.
