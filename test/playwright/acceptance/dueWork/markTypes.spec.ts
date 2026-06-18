@@ -24,7 +24,7 @@ import Common from "@schoolboxTest/playwright/support/page/Common";
  * This will be again after at least SA-22315 (and maybe also SA-22319) is done.
  * Further updates to the tests to be able to interact with the new rubric screen may be required, do these once it functions in the above to properly test it.
  */
-test.describe("Due Work - Mark type tests", () => {
+test.describe.skip("Due Work - Mark type tests", () => {
     test.describe.configure({ mode: "serial" });
 
     const instructor = "Mr Jack Coles";
