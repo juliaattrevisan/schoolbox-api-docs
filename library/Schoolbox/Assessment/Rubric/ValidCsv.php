@@ -10,8 +10,48 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric;
 
+use Schoolbox\Resource\Exception;
+
 class ValidCsv
 {
+    /**
+     * Field delimiter for the CSV file
+     *
+     * @var string
+     */
+    private const string DELIMITER = ',';
+
+
+    /**
+     * Field enclosure for the CSV file
+     *
+     * @var string
+     */
+    private const string ENCLOSURE = '"';
+
+
+    /**
+     * Field escaper for the CSV file
+     *
+     * As of 8.4, this is an empty string:
+     *
+     * @var string
+     */
+    private const string ESCAPE = '';
+
+
+    /**
+     * A unique value of a cell
+     */
+    private const string IDENTIFIER_CAPABILITY = 'capabilityMarkType:';
+
+
+    /**
+     * Another unique value of a cell
+     */
+    private const string IDENTIFIER_MARK_RANGE = 'useMarkRange:';
+
+
     /**
      * For the given file contents $input, figure out if it's valid rubric csv contents.
      *
@@ -21,42 +61,117 @@ class ValidCsv
      * Further analysis can be added to ensure not only that the csv was a rubric csv, but that its contents were also
      * meaningful: however, the depth of that meaningfulness might be too strict for how the schools naturally operate.
      *
-     * @param string|null $input
+     * ->isSatisfiedBy($this->filesystemProxy->readStream($this->file))
+     *
+     * @param resource $filePointer
      * @return bool
+     * @throws Exception
      */
-    public function isSatisfiedBy(?string $input): bool
+    public function isSatisfiedBy($filePointer): bool
     {
         /* Primary checks
          * These must pass in order for us to even THINK about importing csv contents
          */
 
-        /* null input: exit early
+        /* $filePointer is a return from readStream() but we have to skip some OS-specific stuffs first
          */
+        $fp = (new \Alaress\Csv\ValidCSV($filePointer))->skipBom();
+
+        $metadata = stream_get_meta_data($fp);
+
+        // @phpstan-ignore-next-line: stream_get_meta_data _can_ contain seekable
+        $seekable = $metadata['seekable'] ?? false;
+
+        /* TODO Find out what this meant: I assume it's important because of its contextual usage in Reader
+         *  from where I lifted this idea, although ValidCSV already rewinds pointers already. Not entirely sure what
+         *  seekable was meant to provide atm: see SA-11675. It must be that we presume the ability to use fseek
+         *  somewhere else in a csv processing, although in our use case, it's a one way trip.
+         */
+        if (!$seekable) {
+            throw new \RuntimeException('File stream does not support seeking');
+        }
+
+        /* Find the first row
+         * The docblock for fgetcsv suggests array|false, but also array|false|null
+         */
+        $firstRow = fgetcsv($fp, 0, self::DELIMITER, self::ENCLOSURE, self::ESCAPE);
+
+        /* falsey input: exit early
+         */
+        if (false === $firstRow) {
+            return false;
+        }
 
         /* empty string/whitespace only: exit early
          */
+        if (!\count($firstRow)) {
+            return false;
+        }
 
         /* A1 and B1 cells do not contain unique rubric signature: exit early
          */
+        if (!isset($firstRow[0]) || !isset($firstRow[1])) {
+            return false;
+        }
+
+        /* First unique marker not present: exit early
+         */
+        if (!str_contains($firstRow[0], self::IDENTIFIER_CAPABILITY)) {
+            return false;
+        }
+
+        /* Second unique marker not present: exit early
+         */
+        if (!str_contains($firstRow[1], self::IDENTIFIER_MARK_RANGE)) {
+            return false;
+        }
 
         /* only one row detected: exit early
          */
+        $secondRow = fgetcsv($fp, 0, self::DELIMITER, self::ENCLOSURE, self::ESCAPE);
 
-        /* Secondary checks
-         * These are more nuanced "requirements" that might make things too difficult for actual schools on a daily
-         * basis as it thwarts what they are familiar with doing. Add (or remove) secondary checks as needed.
-         */
+        if (!$secondRow) {
+            return false;
+        }
 
-        /* At least one capability is mentioned
+        /* The first two columns of the second row (a capability and an indicator, respectively) were set and meaningful
+         * which denotes a -close enough- start to making a grid.
          */
+        if (isset($secondRow[0]) && isset($secondRow[1])) {
+            /* A meaningful capability wasn't mentioned
+             */
+            if ('' === trim((string)$secondRow[0])) {
+                return false;
+            }
 
-        /* At least one indicator is mentioned
-         */
+            /* A meaningful indicator wasn't mentioned
+             */
+            if ('' === trim((string)$secondRow[1])) {
+                return false;
+            }
 
-        /* At least one of the following is mentioned:
-         *     - A cell with descriptor text
-         *     - A cell with descriptor points
-         *     - Two cells to fulfil both of the above
+            /* Secondary checks
+             * These are more nuanced "requirements" that might make things too difficult for actual schools on a daily
+             * basis as it thwarts what they are familiar with doing. Add (or remove) secondary checks as needed.
+             */
+
+            /* At least one capability is mentioned
+             */
+
+            /* At least one indicator is mentioned
+             */
+
+            /* At least one of the following is mentioned:
+             *     - A cell with descriptor text
+             *     - A cell with descriptor points
+             *     - Two cells to fulfil both of the above
+             */
+
+            return true;
+        }
+
+        /* Deny by default
          */
+        return false;
     }
 }
