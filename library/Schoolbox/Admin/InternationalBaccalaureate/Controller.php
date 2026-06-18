@@ -728,6 +728,9 @@ class Controller extends ConfigController
     public function getRegistrationSessions(): void
     {
         try {
+            $systemPurposeMapper = $this->registrationSessionMapper->getJoinMapper('systemPurpose');
+            $systemPurposes = $systemPurposeMapper->findAll();
+
             $sessions = $this->registrationSessionMapper->findAll();
             $sessionsBySystemPurpose = [];
 
@@ -745,13 +748,21 @@ class Controller extends ConfigController
                 $hasRegistered = $this->registrationSessionStudentMapper->hasRegisteredStudents($session->getId());
                 $deleteEndpoint = ($deleteRoute !== null && !$hasRegistered) ? $deleteRoute : null;
 
-                $sessionsBySystemPurpose[$systemPurpose->getId()][] = array_merge(
-                    $session->jsonSerialize(),
-                    ['deleteEndpoint' => $deleteEndpoint]
-                );
+                $sessionsBySystemPurpose[$systemPurpose->getId()][] = [
+                    ...$session->jsonSerialize(),
+                    'deleteEndpoint' => $deleteEndpoint
+                ];
             }
 
-            $this->response = $this->responseAsJson($sessionsBySystemPurpose);
+            $this->response = $this->responseAsJson([
+                'data' => $sessionsBySystemPurpose,
+                'systemPurposes' => $systemPurposes->map(
+                    fn($sp) => [
+                        'id' => $sp->getId(),
+                        'name' => $sp->getName(),
+                    ]
+                )->getAll()
+            ]);
         } catch (Exception $e) {
             $this->response = $this->responseAsJson(
                 [
