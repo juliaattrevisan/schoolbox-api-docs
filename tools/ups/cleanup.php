@@ -21,8 +21,28 @@ use Schoolbox\Resource\Storage\RelationalDelete\RelationalDelete;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new CliTool\Kernel(new class extends CliTool\App
+$kernel = new CliTool\Kernel(new class extends CliTool\BaseApp
 {
+    protected function getName(): string
+    {
+        return 'cleanup';
+    }
+
+    protected function getDescription(): string
+    {
+        return 'Removes all UPS logs older than 1 month.';
+    }
+
+    protected function setOptions(): self
+    {
+        return $this;
+    }
+
+    protected function hasPerformMode(): bool
+    {
+        return true;
+    }
+
     public function run(): void
     {
         $removeDate = Alaress_Date_Format::newFromTimestamp(strtotime('-1 month'));

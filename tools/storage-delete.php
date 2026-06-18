@@ -21,18 +21,31 @@ use Schoolbox\Resource\Storage\RelationalDelete\RelationalDelete;
 
 require_once __DIR__ . '/../conf/core/require.php';
 
-$kernel = new CliTool\Kernel(new class extends CliTool\App
+$kernel = new CliTool\Kernel(new class extends CliTool\BaseApp
 {
     private const HASH = 'hash:';
 
     private $hash;
 
-    /** @inheritdoc */
-    public function getLongOpts(): array
+    protected function getName(): string
     {
-        return [
-            self::HASH
-        ];
+        return 'storage-delete';
+    }
+
+    protected function getDescription(): string
+    {
+        return 'Removes a file from storage by the provided hash.';
+    }
+
+    protected function setOptions(): self
+    {
+        $this->addOption(null, self::HASH, 'The hash of the file to delete from storage');
+        return $this;
+    }
+
+    protected function hasPerformMode(): bool
+    {
+        return true;
     }
 
     /** @inheritDoc */

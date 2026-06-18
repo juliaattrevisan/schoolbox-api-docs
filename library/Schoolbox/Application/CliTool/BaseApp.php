@@ -13,6 +13,7 @@ use GetOptionKit\Option;
 use GetOptionKit\OptionCollection;
 use GetOptionKit\OptionParser;
 use GetOptionKit\OptionResult;
+use InvalidArgumentException;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliKernelAbstract;
@@ -150,9 +151,7 @@ abstract class BaseApp extends App
         foreach ($shortOptions as $shortOption) {
             // What type of option is this?
             // No value, mandatory value, optional value?
-            if (str_ends_with($shortOption, '::')) {
-                $shortOption = rtrim($shortOption, ':') . '?';
-            }
+            $shortOption = $this->convertGetoptOption($shortOption);
             $this->optionCollection->add($shortOption, 'Undocumented short option: please set in setOptions instead');
         }
 
@@ -164,11 +163,66 @@ abstract class BaseApp extends App
             );
         }
         foreach ($longOptions as $longOption) {
-            if (str_ends_with($longOption, '::')) {
-                $longOption = rtrim($longOption, ':') . '?';
-            }
+            $longOption = $this->convertGetoptOption($longOption);
             $this->optionCollection->add($longOption, 'Undocumented long option: please set in setOptions instead');
         }
+    }
+
+    /**
+     * Helper method for setting an option.
+     *
+     * Makes use of Schoolbox's existing convention of short and long opt
+     * constants, which may be suffixed with `:` (for options which must have a
+     * value) or `::` (for options which may have a value).
+     *
+     * @param string|null $shortOption The short option name.
+     * @param string|null $longOption  The long option name.
+     * @param string      $description
+     * @return self
+     * @throws InvalidArgumentException if neither `$shortOption` or
+     *                                  `$longOption` are set
+     * @throws InvalidArgumentException if both `$shortOption` or `$longOption`
+     *                                  are set, but are incompatible
+     */
+    protected function addOption(?string $shortOption, ?string $longOption, string $description): self
+    {
+        if (!isset($shortOption) && !isset($longOption)) {
+            throw new InvalidArgumentException('Either one of `$shortOption` or `$longOption` must be set');
+        }
+
+        if (!isset($shortOption)) {
+            $mergedOptions = $longOption;
+        } elseif (!isset($longOption)) {
+            $mergedOptions = $shortOption;
+        } else {
+            // Both options are set:
+            // merge and test compatibility at the same time
+            $convertedShortOption = $this->convertGetoptOption($shortOption);
+            $convertedLongOption  = $this->convertGetoptOption($longOption);
+
+            // Extract option and modifier from converted options
+            $modifierRegexp = '/^(?P<opt>[a-z-])+(?P<mod>.*)$/';
+            preg_match($modifierRegexp, $convertedShortOption, $matches);
+            $shortOpt = $matches['opt'];
+            $shortMod = $matches['mod'];
+            preg_match($modifierRegexp, $convertedLongOption, $matches);
+            $longOpt = $matches['opt'];
+            $longMod = $matches['mod'];
+            if ($shortMod !== $longMod) {
+                throw new InvalidArgumentException(
+                    sprintf(
+                        'Modifiers for short option "%s" and long option %s do not match',
+                        $shortOption,
+                        $longOption,
+                    )
+                );
+            }
+            $mergedOptions = sprintf('%s|%s%s', $shortOpt, $longOpt, $shortMod);
+        }
+
+        // Finally add option
+        $this->optionCollection->add($mergedOptions, $description);
+        return $this;
     }
 
     /**
@@ -331,5 +385,20 @@ abstract class BaseApp extends App
 
         // Otherwise return nothing
         return null;
+    }
+
+    /**
+     * Converts `$optionString` from `getopt` format to one which `GetOptionKit`
+     * can understand.
+     *
+     * @param string $optionString
+     * @return string
+     */
+    private function convertGetoptOption(string $optionString): string
+    {
+        if (str_ends_with($optionString, '::')) {
+            $optionString = rtrim($optionString, ':') . '?';
+        }
+        return $optionString;
     }
 }

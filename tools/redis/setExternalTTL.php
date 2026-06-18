@@ -19,8 +19,28 @@ require __DIR__ . '/../../conf/core/require.php';
  * Scans redis data for External DB cache and sets their TTL's
  * respecting the current config.
  */
-$app = new class extends CliTool\App {
+$app = new class extends CliTool\BaseApp {
     private const EXTERNAL_DB_KEY_PATTERN = 'External_*';
+
+    protected function getName(): string
+    {
+        return 'setExternalTTL';
+    }
+
+    protected function getDescription(): string
+    {
+        return 'Scans redis data for External DB cache and sets their TTLs respecting the current config.';
+    }
+
+    protected function setOptions(): self
+    {
+        return $this;
+    }
+
+    protected function hasPerformMode(): bool
+    {
+        return false;
+    }
 
     /** @inheritDoc */
     public function run(): void

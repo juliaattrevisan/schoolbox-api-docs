@@ -20,7 +20,7 @@ use Schoolbox\Application\CliTool;
 require __DIR__ . '/../../../conf/core/require.php';
 
 $kernel = new CliTool\Kernel(
-    new class extends CliTool\App
+    new class extends CliTool\BaseApp
     {
         /**
          * If provided: run for this instance ID. Default to `INSTANCE_ID`.
@@ -32,15 +32,31 @@ $kernel = new CliTool\Kernel(
          */
         private const OPT_LONG_USER_ID  = 'userId:';
 
-        /**
-         * @inheritdoc
-         */
-        public function getLongOpts(): array
+        protected function getName(): string
         {
-            return [
-                self::OPT_LONG_INSTANCE,
-                self::OPT_LONG_USER_ID,
-            ];
+            return 'refresh-binding-cache';
+        }
+
+        protected function getDescription(): string
+        {
+            return <<<DESC
+                Calculates the set of bindings for a specified instance. It will:
+                - calculate ALL bindings for the instance
+                - cache the set, replacing any previously cached set
+                - broadcast a SIGHUP (which advises `routed` instances to reload from cache)
+                DESC;
+        }
+
+        protected function setOptions(): self
+        {
+            $this->addOption(null, self::OPT_LONG_INSTANCE, 'Instance ID to calculate bindings for; defaults to INSTANCE_ID');
+            $this->addOption(null, self::OPT_LONG_USER_ID, 'Only calculate bindings for this user ID; defaults to all users');
+            return $this;
+        }
+
+        protected function hasPerformMode(): bool
+        {
+            return false;
         }
 
         /**

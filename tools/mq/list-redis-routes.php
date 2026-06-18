@@ -18,10 +18,8 @@ require_once __DIR__ . '/../../conf/core/require.php';
  * Lists all notification route in cache.
  * It is recommended to use subscriptions.php.
  */
-$kernel = new CliTool\Kernel(new class extends CliTool\App
+$kernel = new CliTool\Kernel(new class extends CliTool\BaseApp
 {
-    private const TTL_NOT_SET = "not set";
-
     /** @var string if not specified INSTANCE_ID will be used */
     private const OPT_LONG_INSTANCE_ID = 'instance-id:';
 
@@ -31,14 +29,26 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
     /** @var string $instanceId */
     private $instanceId;
 
-    /** @inheritdoc */
-    public function getLongOpts(): array
+    protected function getName(): string
     {
-        return [
-            self::OPT_LONG_INSTANCE_ID
-        ];
+        return 'list-redis-routes';
     }
 
+    protected function getDescription(): string
+    {
+        return 'Lists all notification routes in cache. It is recommended to use subscriptions.php instead.';
+    }
+
+    protected function setOptions(): self
+    {
+        $this->addOption(null, self::OPT_LONG_INSTANCE_ID, 'Notification route instance ID to use; defaults to INSTANCE_ID if not specified');
+        return $this;
+    }
+
+    protected function hasPerformMode(): bool
+    {
+        return false;
+    }
 
     /**
      * @inheritDoc

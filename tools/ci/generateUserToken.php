@@ -15,10 +15,8 @@ require_once __DIR__ . '/../../conf/core/require.php';
  * Generates a JWT token for a given user
  * Used in Acceptance tests to retrieve a token to run API calls instead of direct DB modifications
  */
-$app = new class extends CliTool\App
+$app = new class extends CliTool\BaseApp
 {
-    private const OPT_LONG_HELP   = 'help';
-
     private const OPT_LONG_USER  = 'user:';
 
     private const OPT_LONG_EFFECTOR = 'effector:';
@@ -27,23 +25,33 @@ $app = new class extends CliTool\App
 
     private const DEFAULT_EXPIRY = 3600; // 1 hour;
 
-    /**
-     * @inheritdoc
-     */
-    public function getLongOpts(): array
-    {
-        return [
-            self::OPT_LONG_HELP,
-            self::OPT_LONG_USER,
-            self::OPT_LONG_EFFECTOR,
-            self::OPT_LONG_EXPIRY,
-        ];
-    }
-
     /** @inheritDoc */
     public function runAsRoot(): ?bool
     {
         return null;
+    }
+
+    protected function getName(): string
+    {
+        return 'generateUserToken';
+    }
+
+    protected function getDescription(): string
+    {
+        return 'Generates a JWT token for a given user. Used in Acceptance tests to retrieve a token to run API calls instead of direct DB modifications.';
+    }
+
+    protected function setOptions(): self
+    {
+        $this->addOption(null, self::OPT_LONG_USER, 'ID of the user to generate a token for');
+        $this->addOption(null, self::OPT_LONG_EFFECTOR, 'ID of the user who generated the token');
+        $this->addOption(null, self::OPT_LONG_EXPIRY, sprintf('The amount of time (in seconds) the token is valid for, defaults to %d', self::DEFAULT_EXPIRY));
+        return $this;
+    }
+
+    protected function hasPerformMode(): bool
+    {
+        return false;
     }
 
     /**
@@ -51,21 +59,6 @@ $app = new class extends CliTool\App
      */
     public function run(): void
     {
-        if ($this->getOpt(self::OPT_LONG_HELP)) {
-            $defaultExpiry = self::DEFAULT_EXPIRY;
-            echo <<<HELP
-
-Generate a JWT token for a given user
-
-Usage: generateUserToken.php [--user] [--effector] [--expiry]
-    --user: ID of the user to generate a token for
-    --effector: ID of the user who generated the token
-    --expiry: The amount of time (in seconds) the token is valid for, defaults to $defaultExpiry
-
-HELP;
-            return;
-        }
-
         $userId = $this->getOpt(self::OPT_LONG_USER);
         if (!isset($userId)) {
             $this->getLogger()->error('A user ID must be provided');

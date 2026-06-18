@@ -18,41 +18,38 @@ require_once __DIR__ . '/../../conf/core/require.php';
 /**
  * Export assessment data for Accellerus import
  */
-$app = new class extends CliTool\App
+$app = new class extends CliTool\BaseApp
 {
-    // --help: print help
-    private const OPT_LONG_HELP = 'help';
-
-
-    /** @inheritdoc */
-    public function getLongOpts(): array
+    protected function getName(): string
     {
-        return [
-            self::OPT_LONG_HELP,
-        ];
+        return 'csv';
     }
 
+    protected function getDescription(): string
+    {
+        return <<<DESC
+            Exports assessment results into a csv format containing:
+            (student's external id, folder code, assessment name, assessment item code, result)
+
+            Contents relate only to assessments due in the current year.
+            DESC;
+    }
+
+    protected function setOptions(): self
+    {
+        return $this;
+    }
+
+    protected function hasPerformMode(): bool
+    {
+        return false;
+    }
 
     /**
      * Run the cli tool
      */
     public function run(): void
     {
-        if ($this->getOpt(self::OPT_LONG_HELP)) {
-            echo <<<HELP
-
-Exports assessment results into a csv format containing:
-(student's external id, folder code, assessment name, assessment item code, result)
-
-Contents relate only to assessments due in the current year.
-
-Usage: csv.php
-
-
-HELP;
-            exit;
-        }
-
         /** @var Filter\Filters\Assessment\IdFinder $idFinder */
         $idFinder = $this->getDi()->get('filters.assessmentIdFinder');
         /** @var Assessment\MapperProxy $assessmentDataSource */

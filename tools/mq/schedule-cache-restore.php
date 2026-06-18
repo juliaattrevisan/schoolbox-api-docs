@@ -18,32 +18,34 @@ use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$app = new class extends CliTool\App
+$app = new class extends CliTool\BaseApp
 {
-    private const OPT_LONG_HELP = 'help';
-
-    /** @inheritdoc */
-    public function getLongOpts(): array
+    protected function getName(): string
     {
-        return [
-            self::OPT_LONG_HELP,
-        ];
+        return 'schedule-cache-restore';
+    }
+
+    protected function getDescription(): string
+    {
+        return <<<DESC
+            Restore the Schedule cache, held in Redis, back into RabbitMQ.
+            IF the schedule queue ALREADY exists in RabbitMQ, this script is to do nothing.
+            DESC;
+    }
+
+    protected function setOptions(): self
+    {
+        return $this;
+    }
+
+    protected function hasPerformMode(): bool
+    {
+        return false;
     }
 
     /** @inheritDoc */
     public function run(): void
     {
-        if ($this->getOpt(self::OPT_LONG_HELP)) {
-            echo <<<HELP
-            Usage: tools/mq/schedule-cache-restore.php
-
-            Restore the Schedule cache, held in Redis, back into RabbitMQ
-            IF the schedule queue ALREADY exists in RabbitMQ, this script is to do nothing.
-
-            HELP;
-                exit;
-        }
-
         // the passive part is important:
         // it means the queue won't be created if it doesn't already exist
         $mq = (new ConnectorFactory($this->getConfig()))->build(['passive' => true]);
