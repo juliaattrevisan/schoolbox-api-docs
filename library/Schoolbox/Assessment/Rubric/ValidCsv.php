@@ -153,21 +153,56 @@ class ValidCsv
             /* Secondary checks
              * These are more nuanced "requirements" that might make things too difficult for actual schools on a daily
              * basis as it thwarts what they are familiar with doing. Add (or remove) secondary checks as needed.
+             *
+             * If this is too strict, we can exit even earlier right here.
              */
+            // return true;
 
-            /* At least one capability is mentioned
-             */
-
-            /* At least one indicator is mentioned
-             */
-
-            /* At least one of the following is mentioned:
+            /* Otherwise, keep interrogating deeper.
+             *
+             * At least one of the following is mentioned:
              *     - A cell with descriptor text
              *     - A cell with descriptor points
              *     - Two cells to fulfil both of the above
+             *
+             * I think this gets a bit more nuanced because a descriptor can exist anywhere in a row.
+             * This, I think, also starts limiting what kind of csv contents you can import, especially if you are trying
+             * to propagate grid settings rather than grid contents.
              */
 
-            return true;
+            /* Look for the first descriptor.
+             * It's in the second row if it's a text-based descriptor.
+             * Otherwise, it's in the third row for a points-only based descriptor
+             */
+            $n = count($secondRow);
+
+            for ($i = 2; $i < $n; $i++) {
+                $cell = $secondRow[$i];
+
+                /* Found a descriptor text somewhere in this row
+                 */
+                if ('' !== trim((string)$cell)) {
+                    return true;
+                }
+            }
+
+            /* Otherwise, try looking in the third row; a descriptor's points might be here.
+             */
+            $thirdRow = fgetcsv($fp, 0, self::DELIMITER, self::ENCLOSURE, self::ESCAPE);
+
+            if ($thirdRow) {
+                $n = count($thirdRow);
+
+                for ($i = 2; $i < $n; $i++) {
+                    $cell = $thirdRow[$i];
+
+                    /* Found a descriptor points somewhere in this row
+                     */
+                    if ('' !== trim((string)$cell)) {
+                        return true;
+                    }
+                }
+            }
         }
 
         /* Deny by default
