@@ -199,7 +199,7 @@ ul.lrn-author-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable 
 .lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-part {
     background-color: var(--content-ui-background);
     border: none;
-    border-radius: var(--sbx-config-field-corner-radius, 0px);
+    border-radius: var(--sbx-config-field-corner-radius, 0px) !important;
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     font-size: 1rem;
 }
@@ -244,7 +244,7 @@ ul.lrn-author-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable 
 button.lrn-author-activity-button.lrn-author-btn-i-xs.lrn-author-col-xs-none.lrn-author-col-sm-none.lrn-author-disabled {
     background-color: var(--sbx-color-foreground-primary, var(--content-ui-background));
     border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
-    border-radius: var(--sbx-config-field-corner-radius, 0px);
+    border-radius: var(--sbx-config-field-corner-radius, 0px) !important;
     box-shadow: none;
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     cursor: default;
@@ -272,10 +272,12 @@ ul.lrn-author-nav.lrn-author-nav-tabs.lrn-author-ui-no-preview {
 button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-outline.lrn-author-btn-icon-left.lrn-author-btn-responsive.lrn-author-btn-i-xs.lrn-btn {
     display: none;
 }
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-left,
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-right,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-left,
 .lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-right {
     background: var(--sbx-color-foreground-primary, var(--content-ui-background));
-    border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    border: none;
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-btn.lrn-qe-checkbox-btn,
@@ -297,6 +299,16 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 .lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-button {
     background-color: var(--sbx-color-foreground-primary, var(--content-ui-background));
     border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-left,
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-right,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-left,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-right {
+    border: none;
+}
+.lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-left,
+.lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-right {
+    border: none;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-active,
 .lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-active {
@@ -334,7 +346,7 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 .lrn .lrn-author-ui .lrn-author-validate-questions-toggle.checked,
 .lrn .lrn-author-ui .lrn-author-validate-questions-toggle.checked:hover {
     background-color: var(--sbx-color-foreground-primary, var(--content-ui-background));
-    border-radius: var(--sbx-config-field-corner-radius, 0px);
+    border-radius: var(--sbx-config-field-corner-radius, 0px) !important;
     border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     font-family:
@@ -375,7 +387,7 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 .cke_dialog_container_qe .cke_dialog_ui_button_cancel:focus,
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-button:focus,
 .lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-button:focus {
-    border-radius: var(--sbx-config-field-corner-radius, 0px);
+    border-radius: var(--sbx-config-field-corner-radius, 0px) !important;
     outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground));
     outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
@@ -419,7 +431,7 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 .lrn-qe .lrn-qe-ui .lrn-qe-btn-primary {
     background-color: var(--sbx-config-color-accent, var(--content-ui-submit-background)) !important;
     background: var(--sbx-config-color-accent, var(--content-ui-submit-background));
-    border-radius: var(--sbx-config-field-corner-radius, 0px);
+    border-radius: var(--sbx-config-field-corner-radius, 0px) !important;
     border: none;
     color: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground)) !important;
     font-family:
@@ -590,13 +602,13 @@ span.lrn-qe-i-trash {
 /* change create and find card positions */
 button.lrn-author-activity-button.lrn-author-activity-button-legacy.lrn-author-btn-i-xs.lrn-author-btn-sec.lrn-author-btn-sec-legacy.lrn-author-col-xs-none.lrn-author-col-sm-none {
     position: absolute;
-    right: 150px;
+    right: 160px;
     top: 50px;
     z-index: var(--sbx-depth-default);
 }
 button.lrn-author-activity-button.lrn-author-btn-i-xs.lrn-author-btn-primary.lrn-author-col-xs-none.lrn-author-col-sm-none {
     position: absolute;
-    right: 0px;
+    right: 10px;
     top: 50px;
     z-index: var(--sbx-depth-default);
 }
@@ -626,10 +638,6 @@ span.lrn-author-name-wrapper {
     background: var(--content-ui-selected);
     border-left-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
-.lrn-qe .lrn-qe-ui .lrn-qe-nav-pills .lrn-qe-nav-link {
-    border-radius: var(--sbx-config-field-corner-radius, 0px);
-}
-
 /* search pages styles */
 li.lrn-author-list-view-item.lrn-author-flyout-wrapper {
     background: var(--sbx-color-foreground-primary, #fff);
@@ -888,7 +896,7 @@ button.lrn-btn.lrn-author-btn-default.lrn-author-btn-full-width::before {
 .lrn .lrn-author-ui .lrn-author-btn-primary[disabled]:focus {
     background-color: var(--sbx-config-color-accent, var(--content-ui-submit-background));
     border-color: var(--sbx-config-color-accent, transparent);
-    border-radius: var(--sbx-config-field-corner-radius, 0px);
+    border-radius: var(--sbx-config-field-corner-radius, 0px) !important;
     box-shadow: none;
     color: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground));
     cursor: default;
@@ -972,7 +980,7 @@ button.lrn-h3.lrn-author-list-view-heading.lrn-ellipses.lrn-author-editable-item
 /* Fixed the preview icon hover color and positions */
 .lrn.lrn-author .lrn-item-for-activity-list .lrn-author-list-view-item .lrn-author-btn-default:hover {
     background: var(--sbx-color-foreground-primary, var(--content-ui-background)) !important;
-    border-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
+    border: none;
     color: var(--sbx-config-color-accent, var(--content-ui-foreground)) !important;
 }
 .lrn.lrn-author .lrn-item-for-activity-list .lrn-author-list-view-item .lrn-author-btn-default.lrn-close-preview {
@@ -1103,6 +1111,16 @@ button.lrn-author-btn-old.lrn-author-btn-old-legacy.lrn-author-btn-sec.lrn-autho
 .lrn-author .lrn-author-ui a.lrn-author-btn-old-legacy:focus {
     outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground));
     outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
+}
+.lrn-author
+    .lrn-author-ui
+    .lrn-author-pagination-btn:is(
+        [data-authorapi-selector="pagination-previous"],
+        [data-authorapi-selector="pagination-prev"],
+        [data-authorapi-selector="pagination-next"]
+    ):focus {
+    border: none;
+    outline: none;
 }
 /* Fixed the mobile version for the search page */
 @media #{$small-only} {

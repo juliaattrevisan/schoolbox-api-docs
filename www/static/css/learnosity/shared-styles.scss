@@ -15,6 +15,21 @@ h3.lrn-report-item-title {
         sans-serif;
 }
 
+.lrn button,
+.lrn .lrn_btn,
+.lrn .lrn-btn,
+.lrn .lrn-author-ui a.lrn-btn,
+.lrn .lrn-author-activity-button,
+.lrn .lrn-author-toggle-part,
+.lrn .lrn-author-toolbar-button,
+.lrn-qe button,
+.lrn-qe .lrn-qe-btn,
+.lrn-qe .lrn-qe-toolbar-button,
+.lrn-qe .lrn-qe-toolbar-control,
+.lds-btn-secondary {
+    border-radius: var(--sbx-config-field-corner-radius, 0px) !important;
+}
+
 /* bring it back as we negative margin our own */
 .lrn legend {
     margin-left: 0;

@@ -532,7 +532,7 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
     z-index: 3;
 }
 .lrn.lrn-assess .app-layout .lrn_btn_blue:after {
-    border-radius: var(--sbx-config-field-corner-radius, 0px);
+    border-radius: var(--sbx-config-field-corner-radius, 0px) !important;
 }
 
 /* remove the relevant disabled styles on a student response elements within horizontal marking */
@@ -597,7 +597,7 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
 .lrn .lrn_btn:is(.lds-btn-secondary) {
     background-color: var(--sbx-color-foreground-primary, var(--content-ui-background));
     border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
-    border-radius: var(--sbx-config-field-corner-radius, 0px);
+    border-radius: var(--sbx-config-field-corner-radius, 0px) !important;
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     min-height: auto;
 }

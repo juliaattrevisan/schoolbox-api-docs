@@ -3,7 +3,7 @@
 .lrn.lrn-assess .dialogs .lrn_btn {
     background-color: var(--sbx-color-foreground-primary, var(--content-ui-background));
     border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
-    border-radius: var(--sbx-config-field-corner-radius, 0px);
+    border-radius: var(--sbx-config-field-corner-radius, 0px) !important;
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     min-height: auto;
 }
@@ -37,7 +37,7 @@
 .lrn.lrn-assess .dialogs .lrn_btn_blue {
     background-color: var(--sbx-config-color-accent, var(--content-ui-submit-background));
     border: none;
-    border-radius: var(--sbx-config-field-corner-radius, 0px);
+    border-radius: var(--sbx-config-field-corner-radius, 0px) !important;
     color: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground));
     font-weight: 600;
 }
