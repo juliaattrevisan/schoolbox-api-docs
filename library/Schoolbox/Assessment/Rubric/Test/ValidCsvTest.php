@@ -141,12 +141,40 @@ Observation,No,staffOnly
             ],
 
             'no descriptor' => [
-                '"capabilityMarkType: none","useMarkRange: Off",,,,,
+'"capabilityMarkType: none","useMarkRange: Off",,,,,
 "Approaches to Learning",Engaged,,,,,
 ,,,,,,
 ,,,,,,
 ,,,,,,
 ,,,,,,',
+                false
+            ],
+
+            'bad capability 1' => [
+'"capabilityMarkType: none","useMarkRange: Off",,,,,
+"",Engaged,,,,,
+,,,4,3,2,1',
+                false
+            ],
+
+            'bad capability 2' => [
+'"capabilityMarkType: none","useMarkRange: Off",,,,,
+"         ",Engaged,,,,,
+,,,4,3,2,1',
+                false
+            ],
+
+            'bad indicator 1' => [
+'"capabilityMarkType: none","useMarkRange: Off",,,,,
+"Approaches to Learning","",,,,,
+,,,4,3,2,1',
+                false
+            ],
+
+            'bad indicator 2' => [
+'"capabilityMarkType: none","useMarkRange: Off",,,,,
+"Approaches to Learning","                            ",,,,,
+,,,4,3,2,1',
                 false
             ],
         ];
