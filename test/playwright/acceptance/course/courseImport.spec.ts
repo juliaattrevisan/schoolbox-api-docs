@@ -15,7 +15,7 @@ import EditorTemplate from "@schoolboxTest/playwright/support/page/admin/design/
 import UnitPlanner from "@schoolboxTest/playwright/support/page/unitPlanner/UnitPlanner";
 import Common from "@schoolboxTest/playwright/support/page/Common";
 
-test.describe.skip("Course import tests", () => {
+test.describe("Course import tests", () => {
     // Run tests serially, as tests rely on prior tests to have been run
     test.describe.configure({ mode: "serial" });
 
