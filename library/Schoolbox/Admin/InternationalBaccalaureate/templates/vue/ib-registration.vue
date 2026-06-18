@@ -46,6 +46,7 @@ const isCreateModalOpen = window.Vue.computed<boolean>({
     },
 });
 
+/** Get the heading for a registration section based on the system purpose. */
 function getSectionHeading(systemPurpose: SystemPurpose): string {
     return `Student Registration Information for ${systemPurpose.name}`;
 }
