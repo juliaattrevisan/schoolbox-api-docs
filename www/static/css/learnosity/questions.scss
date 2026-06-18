@@ -24,6 +24,34 @@
     background-color: var(--content-ui-selected);
 }
 
+/* keep visible radio control and answer text on the same row */
+.lrn_widget.lrn_mcq .lrn_response .lrn_mcqgroup-block .lrn-mcq-option,
+.lrn_widget.lrn_mcq .lrn_response .lrn_mcqgroup-horizontal .lrn-mcq-option {
+    align-items: center !important;
+    column-gap: 0.5rem;
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr);
+}
+
+.lrn_widget.lrn_mcq .lrn_response .lrn_mcqgroup-block .lrn-mcq-option > input.lrn-input[type="radio"],
+.lrn_widget.lrn_mcq .lrn_response .lrn_mcqgroup-horizontal .lrn-mcq-option > input.lrn-input[type="radio"] {
+    align-self: center;
+    grid-column: 1;
+    margin: 0;
+}
+
+.lrn_widget.lrn_mcq .lrn_response .lrn_mcqgroup-block .lrn-mcq-option > .lrn-label,
+.lrn_widget.lrn_mcq .lrn_response .lrn_mcqgroup-horizontal .lrn-mcq-option > .lrn-label {
+    grid-column: 2;
+    margin: 0;
+    min-width: 0;
+}
+
+.lrn_widget.lrn_mcq .lrn_response .lrn_mcqgroup-block .lrn-mcq-option + .lrn-mcq-option,
+.lrn_widget.lrn_mcq .lrn_response .lrn_mcqgroup-horizontal .lrn-mcq-option + .lrn-mcq-option {
+    margin-top: 0.5rem;
+}
+
 /* update border color in the mutiplechoice-block layout */
 .lrn_widget.lrn_mcq
     .lrn_response
@@ -107,6 +135,7 @@
 .lrn_widget .lrn_response.lrn_cloze .lrn_combobox select.lrn-cloze-select {
     background-color: var(--sbx-color-foreground-primary, #fff);
     border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    border-radius: var(--sbx-config-field-corner-radius, 0px);
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     margin: 10px 0;
     padding: 0 20px 0 10px;
@@ -130,6 +159,7 @@
 .lrn_widget textarea,
 .lrn_widget .lrn_texteditor_editable {
     border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    border-radius: var(--sbx-config-field-corner-radius, 0px);
 }
 .lrn_cloze .lrn_response_input .lrn_textinput input,
 .lrn_cloze .lrn_response_input .lrn_textinput textarea {
