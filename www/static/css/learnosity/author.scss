@@ -465,8 +465,8 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
     border-color: var(--sbx-config-color-accent, var(--form-border-color)) !important;
     box-shadow: none !important;
     color: var(--sbx-color-text-primary, #000);
-    outline: none !important;
-    outline-color: transparent !important;
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--form-border-color)) !important;
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px) !important;
 }
 
 .lrn-qe .lrn-qe-ui .lrn-qe-form-control:focus-visible,
@@ -474,8 +474,8 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 .lrn-qe .lrn-qe-ui input[data-lrn-qe-form-control]:focus-visible {
     border-color: var(--sbx-config-color-accent, var(--form-border-color)) !important;
     box-shadow: none !important;
-    outline: none !important;
-    outline-color: transparent !important;
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--form-border-color)) !important;
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px) !important;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-form-el-reorderable .lrn-qe-form-el-reorder-handle {
     border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
@@ -542,13 +542,15 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
     background: var(--sbx-color-foreground-primary, var(--content-ui-background));
     border-color: var(--sbx-config-color-accent, var(--form-border-color)) !important;
     border-radius: var(--sbx-config-field-corner-radius, 0px);
-    outline: none;
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--form-border-color)) !important;
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px) !important;
 }
 
 .lrn-qe .lrn-qe-ui .lrn-qe-form-control-ckeditor:focus-within {
     border-color: var(--sbx-config-color-accent, var(--form-border-color)) !important;
     box-shadow: none !important;
-    outline: none !important;
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--form-border-color)) !important;
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px) !important;
 }
 
 .lrn-qe .lrn-qe-ui .lrn-qe-form-control-ckeditor .cke_editable:focus,
@@ -557,7 +559,8 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 .lrn-qe .lrn-qe-ui .lrn-qe-form-control-ckeditor .cke_textarea_inline.cke_focus {
     border-color: var(--sbx-config-color-accent, var(--form-border-color)) !important;
     box-shadow: none !important;
-    outline: none !important;
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--form-border-color)) !important;
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px) !important;
 }
 
 /* keep shared border between field and reorder handle square */
@@ -638,15 +641,15 @@ span.lrn-qe-i-trash {
     border-color: var(--sbx-config-color-accent, var(--form-border-color)) !important;
     box-shadow: none !important;
     color: var(--sbx-color-text-primary, #000);
-    outline: none !important;
-    outline-color: transparent !important;
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--form-border-color)) !important;
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px) !important;
 }
 
 .lrn-qe .lrn-qe-ui .lrn-qe-custom-select select:focus-visible {
     border-color: var(--sbx-config-color-accent, var(--form-border-color)) !important;
     box-shadow: none !important;
-    outline: none !important;
-    outline-color: transparent !important;
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--form-border-color)) !important;
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px) !important;
 }
 
 .lrn-qe .lrn-qe-ui .lrn-qe-custom-select:focus-within,
@@ -654,7 +657,8 @@ span.lrn-qe-i-trash {
 .lrn-qe .lrn-qe-ui .lrn-qe-form-el-wrapper:focus-within {
     border-color: var(--sbx-config-color-accent, var(--form-border-color)) !important;
     box-shadow: none !important;
-    outline: none !important;
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--form-border-color)) !important;
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px) !important;
 }
 
 /*hide layout and selection, extra and more options, sections */
