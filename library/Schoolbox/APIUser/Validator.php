@@ -45,7 +45,7 @@ class Validator
         if (!ctype_digit($limit)) {
             // The API docs say 'integer' here, but the value will always be a string because it comes from the URL.
             throw new SchoolboxException(
-                "Parameter 'limit' should have a positive integer or postive integer string value."
+                "Parameter 'limit' should have a positive integer or positive integer string value."
             );
         }
         $limit = (int)$limit; // Set type to that expected according to the API docs.
