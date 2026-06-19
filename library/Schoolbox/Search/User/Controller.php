@@ -590,7 +590,7 @@ class Controller extends BaseController
             'registration' => $registrationPayload !== null && $this->getRouteIfAuthorized(
                 'internationalBaccalaureate.updateRegistrationSessionStudentConfirmation',
                 [
-                    'sessionId' => $registrationSessionStudent?->getRegistrationSession()?->getId(),
+                    'sessionId' => $registrationSessionStudent->getRegistrationSession()?->getId(),
                     'studentId' => $student->getId(),
                 ]
             ) !== null,
