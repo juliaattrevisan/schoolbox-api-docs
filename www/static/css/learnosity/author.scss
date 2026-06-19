@@ -1171,6 +1171,16 @@ button.lrn-author-activity-button.lrn-author-btn-i-xs.lrn-author-btn-sec {
     color: var(--sbx-config-color-accent, var(--content-ui-foreground)) !important;
     text-decoration: none !important;
 }
+.lrn .lrn-author-ui-no-preview .lrn-author-label-group-btn.lrn-author-i-cross,
+.lrn .lrn-author-ui-no-preview .lrn-author-label-group-btn.lrn-author-i-cross:hover,
+.lrn .lrn-author-ui-no-preview .lrn-author-label-group-btn.lrn-author-i-cross:focus {
+    background: var(--sbx-color-foreground-primary, #fff) !important;
+    border-radius: 0 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
 .lrn .lrn-author-ui .lrn-dl-inline dt {
     margin-left: 0px;
 }
