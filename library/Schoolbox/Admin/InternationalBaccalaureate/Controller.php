@@ -759,7 +759,7 @@ class Controller extends ConfigController
                 'systemPurposes' => $systemPurposes->map(
                     fn($sp) => [
                         'id' => $sp->getId(),
-                        'name' => $sp->getName(),
+                        'name' => sprintf('%s [%s]', $sp->getName(), $sp->getCategory()->getName()),
                     ]
                 )->getAll()
             ]);

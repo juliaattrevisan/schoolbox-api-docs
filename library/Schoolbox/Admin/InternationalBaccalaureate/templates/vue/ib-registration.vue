@@ -65,7 +65,7 @@ async function loadRegistrationSessions(): Promise<void> {
     });
 
     isLoading.value = false;
-    console.log(response.data);
+
     if (!response.success || typeof response.data !== "object" || response.data === null) {
         return;
     }
