@@ -284,8 +284,18 @@
                             depends: isRepeating,
                         },
                     },
+                    maxAttendees: {
+                        digits: true,
+                        min: 1,
+                    },
                     publishDate: {
                         datepickerDate: true,
+                    },
+                },
+                messages: {
+                    maxAttendees: {
+                        digits: "Please enter a positive whole number, or leave this blank.",
+                        min: "Please enter a positive whole number, or leave this blank.",
                     },
                 },
 

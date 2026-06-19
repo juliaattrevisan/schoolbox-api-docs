@@ -196,6 +196,12 @@ class Validator
                 if (!is_int($value) && !(is_string($value) && ctype_digit($value))) {
                     throw new SchoolboxException("Value for key '$integerKey' should be an integer.");
                 }
+                // Extra validation for integer key 'maxAttendees' (if supplied).
+                if ($integerKey === 'maxAttendees') {
+                    if ((int)$value < 1) {
+                        throw new SchoolboxException("Value for key '$integerKey' should be a positive integer.");
+                    }
+                }
                 // Extra validation for integer key 'level'.
                 if ($integerKey === 'level') {
                     if (!in_array($value, [Event::ACCESS_PERSONAL, Event::ACCESS_GROUP, Event::ACCESS_CAMPUS])) {
