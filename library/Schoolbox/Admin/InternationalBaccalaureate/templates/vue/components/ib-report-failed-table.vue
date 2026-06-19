@@ -105,7 +105,7 @@ function openModal(student: FailedRow): void {
                                 class="sbx-button--has-icon"
                                 @click.prevent="emit('manuallyRegisterSingle', student.id)"
                             >
-                                <sbx-icon name="approve"></sbx-icon>
+                                <sbx-icon name="international-baccalaureate"></sbx-icon>
                                 Mark as manually registered
                             </button>
                         </li>
