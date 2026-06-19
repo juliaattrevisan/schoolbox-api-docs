@@ -74,7 +74,13 @@ class Person
         );
 
         foreach ($statement as $user) {
-            $lookup[(string)$user['synergy_id']] = $user['id'];
+            $lookup[(string)$user['synergy_id']] = [
+                'id' => $user['id'],
+                'external_id' => $user['synergy_id'],
+                'firstname' => $user['firstname'],
+                'lastname' => $user['lastname'],
+                'preferred_name' => $user['preferred_name'],
+            ];
         }
 
         $statement = $this->userMapper->getDatabase()->query("
