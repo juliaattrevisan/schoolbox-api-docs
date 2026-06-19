@@ -99,11 +99,6 @@ class Import implements IStrategy
             return;
         }
 
-        if (false === $response) {
-            $this->log->info('SOCS fixtures feed returned an empty payload');
-            return;
-        }
-
         $imported = 0;
 
         foreach ($response->children() as $fixture) {

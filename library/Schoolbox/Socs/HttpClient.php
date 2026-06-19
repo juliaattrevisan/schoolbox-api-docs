@@ -66,10 +66,10 @@ class HttpClient
      * @param string               $path
      * @param array<string,string> $query Non-secret query parameters; ID and key are added automatically.
      *
-     * @return false|SimpleXMLElement
+     * @return SimpleXMLElement
      * @throws \JsonException|\RuntimeException
      */
-    public function get(string $path, array $query): false|SimpleXMLElement
+    public function get(string $path, array $query): SimpleXMLElement
     {
         $url = $this->buildBaseUrl($path);
 
@@ -104,7 +104,13 @@ class HttpClient
                 $content = $response->getBody()->getContents();
 
                 if ('' === $content) {
-                    return false;
+                    throw new \RuntimeException(
+                        sprintf(
+                            'SOCS endpoint %s: returned an empty payload',
+                            $path
+                        ),
+                        $response->getStatusCode(),
+                    );
                 }
 
                 // known errors

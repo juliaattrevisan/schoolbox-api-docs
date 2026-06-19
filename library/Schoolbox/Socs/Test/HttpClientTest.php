@@ -62,7 +62,7 @@ class HttpClientTest extends TestCase
      * @throws \ReflectionException
      * @throws \JsonException
      */
-    public function testGetReturnsFalseForEmptyResponse(): void
+    public function testGetExceptionForEmptyResponse(): void
     {
         $guzzle = $this->getMockBuilder(Client::class)
             ->onlyMethods(['request'])
@@ -74,7 +74,10 @@ class HttpClientTest extends TestCase
 
         $client = $this->createHttpClient($guzzle);
 
-        $this->assertFalse($client->get('fixturecalendar.ashx', []));
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('SOCS endpoint fixturecalendar.ashx: returned an empty payload');
+
+        $client->get('fixturecalendar.ashx', []);
     }
 
     /**

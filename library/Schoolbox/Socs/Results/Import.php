@@ -73,11 +73,6 @@ class Import implements IStrategy
             return;
         }
 
-        if (false === $response) {
-            $this->log->info('SOCS results feed returned an empty payload');
-            return;
-        }
-
         $imported = 0;
 
         foreach ($response->children() as $resultNode) {

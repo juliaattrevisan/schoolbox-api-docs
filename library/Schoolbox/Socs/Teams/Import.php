@@ -54,11 +54,6 @@ class Import implements IStrategy
             return;
         }
 
-        if (false === $response) {
-            $this->log->info('SOCS teams feed returned an empty payload');
-            return;
-        }
-
         /** @var \SimpleXMLElement[]|false $teams */
         $teams = $response->xpath('//team');
         if (false === $teams || [] === $teams) {
