@@ -193,7 +193,8 @@ class Validator
                         continue; // Null is okay for 'maxAttendees'.
                     }
                 }
-                if (!is_int($value) && !(is_string($value) && ctype_digit($value))) {
+                // Note preg_match() is used below because e.g. '-1' is an integer.
+                if (!is_int($value) && !(is_string($value) && preg_match('/^-?\d+$/', $value) === 1)) {
                     throw new SchoolboxException("Value for key '$integerKey' should be an integer.");
                 }
                 // Extra validation for integer key 'maxAttendees' (if supplied).
@@ -475,7 +476,7 @@ class Validator
         }
         $idValue = $value['id'];
         if (!is_int($idValue) && !(is_string($idValue) && ctype_digit($idValue))) {
-            throw new SchoolboxException("Value for '$key.id' should be an integer.");
+            throw new SchoolboxException("Value for '$key.id' should be a positive integer.");
         }
         $value['id'] = (int)$idValue;
 
