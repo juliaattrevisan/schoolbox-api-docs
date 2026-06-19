@@ -475,11 +475,25 @@ class Validator
             throw new SchoolboxException("Object stub for key '$key' is missing an 'id' key.");
         }
         $idValue = $value['id'];
-        if (!is_int($idValue) && !(is_string($idValue) && ctype_digit($idValue))) {
+        if (!$this->isPositiveIntegerValue($idValue)) {
             throw new SchoolboxException("Value for '$key.id' should be a positive integer.");
         }
         $value['id'] = (int)$idValue;
 
         return $value;
+    }
+
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    private function isPositiveIntegerValue(mixed $value): bool
+    {
+        if (is_int($value)) {
+            return $value > 0;
+        }
+
+        // Note must still check > 0, because '0' is a digit.
+        return is_string($value) && ctype_digit($value) && (int)$value > 0;
     }
 }
