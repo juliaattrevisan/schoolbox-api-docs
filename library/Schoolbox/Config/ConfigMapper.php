@@ -53,6 +53,7 @@ class ConfigMapper extends Mapper
     public const string MODULE_IB = 'ib';
 
     // IB config name constants
+    public const string NAME_IB_ENABLED     = 'ib_enabled';
     public const string NAME_IB_SCHOOL_NAME = 'ib_school_name';
     public const string NAME_IB_SCHOOL_CODE = 'ib_school_code';
 
