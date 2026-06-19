@@ -44,7 +44,9 @@ class Validator
 
         if (!ctype_digit($limit)) {
             // The API docs say 'integer' here, but the value will always be a string because it comes from the URL.
-            throw new SchoolboxException("Parameter 'limit' should have an integer or integer string value.");
+            throw new SchoolboxException(
+                "Parameter 'limit' should have a positive integer or postive integer string value."
+            );
         }
         $limit = (int)$limit; // Set type to that expected according to the API docs.
 
@@ -53,7 +55,9 @@ class Validator
             // has a templated docblock, and cursors in general can be strings.  So the API docs are fine, and we
             // must cope with that.  This specific cursor should be an integer string, which is also fine and doesn't
             // contradict the API docs.  A blank string cursor is equivalent to no cursor value.
-            throw new SchoolboxException("Parameter 'cursor' should have an integer or integer string value.");
+            throw new SchoolboxException(
+                "Parameter 'cursor' should have a positive integer or positive integer string value."
+            );
         }
         $cursor = (string)$cursor; // Set type to that expected according to the API docs.
 
@@ -159,7 +163,9 @@ class Validator
                 if (array_key_exists('id', $array)) {
                     $id = $array['id'];
                     if (!is_int($id) && !(is_string($id) && ctype_digit($id))) {
-                        throw new SchoolboxException("Filter '$arrayName' property 'id' must have an integer value.");
+                        throw new SchoolboxException(
+                            "Filter '$arrayName' property 'id' must have a positive integer value."
+                        );
                     }
                 } elseif (array_key_exists('name', $array)) {
                     $name = $array['name'];

@@ -33,7 +33,7 @@ class Validator
             switch ($key) {
                 case 'assessmentId':
                     if (!is_int($value) && !ctype_digit($value)) {
-                        throw new SchoolboxException("Filter 'assessmentId' must have an integer value.");
+                        throw new SchoolboxException("Filter 'assessmentId' must have a positive integer value.");
                     }
                     break;
                 case 'title':
@@ -130,7 +130,7 @@ class Validator
                 );
             }
             if (!is_int($value['id']) && !ctype_digit($value['id'])) {
-                throw new SchoolboxException("Filter 'folder' property 'id' must have an integer value.");
+                throw new SchoolboxException("Filter 'folder' property 'id' must have a positive integer value.");
             }
         } else {
             // Expect $value to contain an array like the following.
@@ -158,7 +158,9 @@ class Validator
                     switch ($key) {
                         case 'id':
                             if (!is_int($subValue) && !ctype_digit($subValue)) {
-                                throw new SchoolboxException("Filter 'folder' item property 'id' must have an integer value.");
+                                throw new SchoolboxException(
+                                    "Filter 'folder' item property 'id' must have a positive integer value."
+                                );
                             }
                             break;
                         case 'code':
@@ -218,7 +220,9 @@ class Validator
             switch ($key) {
                 case 'id':
                     if (!is_int($value) && !ctype_digit($value)) {
-                        throw new SchoolboxException("Filter '$arrayName' property 'id' must have an integer value.");
+                        throw new SchoolboxException(
+                            "Filter '$arrayName' property 'id' must have a positive integer value."
+                        );
                     }
                     break;
                 case 'name':
