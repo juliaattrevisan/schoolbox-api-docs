@@ -133,7 +133,7 @@ class Activity
             "
                 SELECT COUNT(*) AS wikicount
                 FROM wiki INNER JOIN wikiRevision ON wiki.wikiID = wikiRevision.wikiID
-                WHERE wiki.categoryID = ? AND wiki.deleted != true AND wikiRevision.created >= ?
+                WHERE wiki.categoryID = ? AND wiki.deleted_at IS NULL AND wikiRevision.created >= ?
             ",
             [$id, $lastcatvisit],
         );

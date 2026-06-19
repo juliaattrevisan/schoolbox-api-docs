@@ -150,7 +150,7 @@ class ModelToArrayTest extends TestCase
         $testRouter->getMap()->route('textbox.updateTextbox', '/textbox/update/{id}');
         $testRouter->getMap()->route('textbox.deleteTextbox', '/textbox/update/{id}');
 
-        /** @var Authorizer|MockObject $testAuthorizer */
+        /** @var Authorizer&MockObject $testAuthorizer */
         $testAuthorizer = $this->createMock(Authorizer::class);
         $testAuthorizer
             ->method('isPathAuthorizedForUser')

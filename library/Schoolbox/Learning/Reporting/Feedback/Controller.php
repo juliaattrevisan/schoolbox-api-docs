@@ -11,15 +11,21 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Reporting\Feedback;
 
 use Alaress\Web\Controller\Base;
+use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Reporting;
 use Schoolbox\Learning\Assessment\Reporting\Model;
+use Schoolbox\Learning\Assessment\Reporting\Feedback\Model as Feedback;
 use Schoolbox\Learning\DueWork\StateMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Twig\Error\Error;
 
@@ -36,6 +42,9 @@ class Controller extends Base
         private StateMapper $stateMapper,
         private Participant\DataSource $participantDataSource,
         private IFeedbackDataSource $feedbackDataSource,
+        private \Schoolbox\Learning\Assessment\DataModel\Reporting\Feedback\Mapper $feedbackDataMapper,
+        private AssessmentDataSource $assessmentDataSource,
+        private Project\ResultCache\Mapper $projectResultCacheMapper,
     ) {
         /* TODO Technical Uplift Candidate
          *  StateMapper.
@@ -268,12 +277,19 @@ class Controller extends Base
         $instructorScheme = $assessment->getInstructorMarkScheme();
         $learnerScheme = $assessment->getMarkScheme();
 
-        $normalisedMark = null;
-        $learnerHumanReadableMark = null;
 
         /* This human readable mark is given by the instructor, from which we derive the normalised mark
+         * This may be unset if the activity's instructor mark type is set to None
          */
-        $instructorHumanReadableMark = $post['mark'] ?? '';
+        $mark = trim((string)($post['mark'] ?? ''));
+
+        /* Default values
+         * Note that $mark might be empty string at this point:
+         * this occurs when you add a comment before the grade, in the Quiz Quickmark screen (and for reporting, likely at least the markbook)
+         */
+        $normalisedMark = null;
+        $learnerHumanReadableMark = null;
+        $instructorHumanReadableMark = null;
 
         /* Apparently this is how you detect a Submission State: an exception is thrown
          * trying to interpret it as one of the Mark Schemes. No wonder it was classified
@@ -282,24 +298,30 @@ class Controller extends Base
          * Shanked from Learning/Assessment/DueWork/Feedback/Factory.php::210
          */
         try {
-            $normalisedMark = $instructorScheme->getNormalisedMark($instructorHumanReadableMark);
+            /* Determine the normalised mark based on the expected mark type being used for input.
+             * Reporting assumes that the mark is always entered against the instructor scheme,
+             * as there's no self-assessment like due work.
+             */
+            $normalisedMark = $instructorScheme->getNormalisedMark($mark);
 
-            /* Find out what the learner's version would have been and save that too
-             * Arguably you could skip this derivation, only doing it if $instructor scheme was different to $learner scheme
+            /* Always rederive/sanitise both the learner and instructor human readable marks, even if they're the same.
+             * For example, this ensures a value of "5" using a percentage mark type becomes "5 %"
              */
             $learnerHumanReadableMark = $learnerScheme->getHumanReadableMark($normalisedMark);
+            $instructorHumanReadableMark = $instructorScheme->getHumanReadableMark($normalisedMark);
         } catch (\InvalidArgumentException $e) {
-            if ('' !== $instructorHumanReadableMark) {
+            if ('' !== $mark) {
                 /* If it's a Submission State, save the text as the human readable mark
                  * and derive its normalised mark from the uh Lists in admin
                  */
-                $code = $this->stateMapper->findOneByColumn('display_as', $instructorHumanReadableMark);
+                $code = $this->stateMapper->findOneByColumn('display_as', $mark);
 
                 $normalisedMark = $code->getNormaliseAs();
 
                 /* There isn't a learner-specific Submission State: it's the same for both parties.
                  */
-                $learnerHumanReadableMark = $instructorHumanReadableMark;
+                $learnerHumanReadableMark = $mark;
+                $instructorHumanReadableMark = $mark;
             }
         }
 
@@ -324,7 +346,7 @@ class Controller extends Base
          */
         $this->participantDataSource->loadParticipationIntoAssessment(
             $assessment,
-            $learner
+            new \Schoolbox\Collection()->add($learner),
         );
 
         $plan = $participant->getPlan();
@@ -348,5 +370,98 @@ class Controller extends Base
         ];
 
         $this->response = $this->responseAsJson($data);
+    }
+
+
+    /**
+     * Submit multiple feedbacks in single call
+     *
+     * This is a dueWork/reporting-only route
+     *
+     * Reporting only supports implementations, for now (for specs we need to properly
+     * consider the differences in permissions for reporting activities, for implementations
+     * the route checks are enough to verify you have access to $assessment)
+     *
+     * @param Reporting\Model $assessment
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     */
+    public function postParticipantFeedbacks(Reporting\Model $assessment)
+    {
+        /** @var int[] $draftFeedbackIds */
+        $draftFeedbackIds = $this->requestPost->get('drafts', []);
+        $now              = Alaress_Date_Format::now();
+        $results = [];
+        $projectCache = (new Project\ResultCache\ResultCache($this->projectResultCacheMapper));
+
+        foreach ($draftFeedbackIds as $draftFeedbackId) {
+            // Verify that this feedback is for this assessment
+            $feedback = $this->feedbackDataMapper->findById($draftFeedbackId);
+            $publishSuccess   = false;
+
+            if ($feedback->getReporting()->getAssessmentModel()->getId() !== $assessment->getId()) {
+                $results[$draftFeedbackId] = ['publishSuccess' => false, 'error' => 'Feedback not for this assessment'];
+                continue;
+            }
+
+            $feedback
+                ->setPublishedAt($now)
+                ->setPublishedBy($this->getUser()->getId());
+
+            try {
+                $this->feedbackDataMapper->save($feedback);
+                $publishSuccess = true;
+
+                /* Update project result cache when Publish All is used
+                 */
+                $projectCache->refresh($this->assessmentDataSource, $assessment, $feedback->getLearner());
+            } catch (\PDOException | \DomainException | \InvalidArgumentException | \LogicException | \UnexpectedValueException $e) {
+                // TODO: ^ do we reallllly need to catch all of those? surely we want to know about some of this stuff
+                $publishSuccess = false;
+            }
+
+            $results[$draftFeedbackId] = ['publishSuccess'   => $publishSuccess];
+        }
+
+        $this->response = $this->responseAsJson($results);
+    }
+
+
+    /**
+     * Publish last draft feedback for a participant.
+     *
+     * This is a dueWork/reporting-only route. It is not applicable to Project, Quiz, Task, or Dialog Agent.
+     *
+     * @param Reporting\Model $assessment
+     * @param User $learner
+     */
+    public function postPublishFeedback(Reporting\Model $assessment, User $learner)
+    {
+        $participant = $assessment->getParticipant($learner);
+        /** @var null|Feedback */
+        $feedback = $participant->findMostRecentInstructorGivenFeedback();
+
+        if (null === $feedback) {
+            throw new NotFound("No Feedback for assessment.");
+        }
+
+        if (!$feedback->isPublished()) {
+            // publish this
+            $feedback
+                ->setPublishedAt(Alaress_Date_Format::now())
+                ->setPublishedBy($this->getUser()->getId());
+        }
+
+        $this->feedbackDataSource->save($feedback);
+
+        // Update project mark as the published feedback may affect the project cache
+        (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))
+            ->refresh($this->assessmentDataSource, $assessment, $learner);
+
+        $this->response = $this->responseAsJson([
+            'success' => true,
+            'message' => 'OK',
+            'id'      => $feedback->getId(),
+        ]);
     }
 }

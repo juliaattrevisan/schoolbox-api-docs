@@ -349,7 +349,6 @@ interface External_UserInterface extends External\IConnector
      *
      * @param string   $externalUserId
      * @return string[][]
-     * @var string|int $return[idx]['RelatedID']
      */
     public function getEnrolledStudents(string $externalUserId): array;
 

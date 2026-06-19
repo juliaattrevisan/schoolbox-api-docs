@@ -335,7 +335,7 @@ class Controller extends Base
         $termActualStart = [];
 
         // Skip 1 day if Sunday, 2 days if Saturday
-        $dateOffset = !$date->isWeekend() ? 0 : (8 % $date->getWeekDayNumber());
+        $dateOffset = !$date->isWeekend() ? 0 : (8 % (int)$date->getWeekDayNumber());
 
         if ($date->isWeekend()) {
             // It is Sunday

@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\OpenAi\Guardrails\Check;
 
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Schoolbox\Editor\OpenAI\Log;
+use Schoolbox\OpenAi\Session\Log;
 
 interface ICheck
 {

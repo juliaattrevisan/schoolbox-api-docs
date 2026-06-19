@@ -10,6 +10,8 @@ export default class Form {
 
     private page: Page;
 
+    private common: Common;
+
     static readonly URL = "/news/create";
 
     static readonly ARTICLE_TITLE_CKEDITOR = 'input[name="title"]';
@@ -41,6 +43,7 @@ export default class Form {
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
+        this.common = new Common(page);
     }
 
     /**
@@ -166,7 +169,7 @@ export default class Form {
      */
     async selectAudienceOption(audienceBrick: string): Promise<void> {
         await this.page.locator("button.button:has(sbx-icon[name='drag-drop'])").click();
-        await expect(this.page.locator('div[class="reveal-modal no-pad open"]')).toBeVisible();
+        await this.common.waitForModalToBeOpen();
         await this.page.locator(`button.button-block:has-text("${audienceBrick}")`).click();
         await expect(this.page.getByTestId(Form.DATA_TEST_AUDIENCE_LIST_ITEM).first()).toBeVisible();
     }
@@ -193,7 +196,7 @@ export default class Form {
      * click Add Audience in the modal
      */
     async clickAddAudience(): Promise<void> {
-        await this.page.locator("button.button.submit").first().click();
+        await this.page.locator(Common.MODAL_SUBMIT_BUTTON).first().click();
         await this.waitForDraftToast();
     }
 
@@ -249,9 +252,8 @@ export default class Form {
         audienceType2: string[],
     ): Promise<void> {
         await this.page.locator("button.button:has(sbx-icon[name='drag-drop'])").click();
-        await expect(this.page.locator('div[class="reveal-modal no-pad open"]')).toBeVisible();
+        await this.common.waitForModalToBeOpen();
         await this.page.locator("a:has-text('Create Composite Audience')").click();
-        // await this.page.waitForTimeout(2000);
         await this.page
             .locator("legend")
             .filter({ hasText: "Audience Type 1:" })
@@ -266,7 +268,7 @@ export default class Form {
             .selectOption({ label: dropdown2 });
         await this.tickCheckboxes(audienceType2);
 
-        await this.page.locator("button.button.submit").last().click();
+        await this.page.locator(Common.MODAL_SUBMIT_BUTTON).last().click();
         await this.tester.common.waitForModalToBeClosed();
     }
 

@@ -197,7 +197,7 @@ export default {
             </dl>
         </template>
         <template v-else-if="this.data.categories">
-            <section class="awards">
+            <section class="awards l-c-cr-bottom">
                 <template v-for="category in this.data.categories">
                     <div class="content">
                         <h2 class="subheader" :title="'Category: ' + category.name">{{ category.name }}</h2>

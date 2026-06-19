@@ -124,10 +124,6 @@ class ImageGeneration
             /* An ordered list of instructions for OpenAi
              */
             'input' => [],
-            /* Which variant of OpenAI to use (text model)
-             * This is different to the image model, since we also need a text model to do responses
-             */
-            'model' => $this->textModel,
             /* Make the image generation tool available and force it to be used
              * since we're asking the AI to reject non-image requests, sometimes it shouldn't be forced - hence this is removed for now
              */
@@ -210,7 +206,13 @@ class ImageGeneration
 
         // For now: image generation is supported only by OpenAI.
         // This may change in the future.
-        return new ModelParser()->filterPayload($payload, $this->textModel, Helper::ENDPOINT_TYPE_OPENAI);
+        return new PayloadFinaliser()->finalise(
+            $payload,
+            Helper::ENDPOINT_TYPE_OPENAI,
+            $this->textModel,
+            '',
+            '',
+        );
     }
 
     /**

@@ -171,9 +171,6 @@ $inline-list-default-float-list-margin: rem-calc($base-font-size);
     }
     > li {
         @extend %information-li;
-        &:first-child {
-            padding-top: 0;
-        }
         &:last-child {
             border-bottom: 0;
         }
@@ -444,6 +441,7 @@ ul.meta {
         padding-left: $meta-indent;
 
         &:has(sbx-icon) {
+            align-items: start;
             display: flex;
             gap: var(--spacing-s);
             padding-left: 0;

@@ -208,7 +208,7 @@ class Kernel extends WebKernelAbstract
         // Database connection factory
         $di->set(
             'databaseFactory',
-            function () use ($di) {
+            function () {
                 return SchoolboxDatabaseFactory::getInstance();
             }
         );

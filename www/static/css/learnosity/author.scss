@@ -116,7 +116,7 @@ button.lrn-author-btn-save.lrn-author-btn-old.lrn-author-btn-old-legacy.lrn-auth
 
 ul.lrn-author-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
     background: #fff;
-    border-bottom: 1px solid var(--body-background) !important;
+    border-bottom: 1px solid var(--sbx-color-border, var(--body-background)) !important;
     list-style: none;
     max-width: none;
     overflow: visible;
@@ -490,7 +490,7 @@ span.lrn-qe-i-trash {
     .lrn-item-for-activity-list.lrn-item-for-activity-list-edit
     .lrn-author-list-view-item
     .lrn-author-list-view-col-first {
-    border-right: 1px solid var(--body-background);
+    border-right: 1px solid var(--sbx-color-border, var(--body-background));
 }
 .lrn.lrn-author .lrn-author-item-for-activity-list .lrn-author-check-box-wrapper .lrn-author-check-box-span {
     background: none;
@@ -579,7 +579,7 @@ span.lrn-author-name-wrapper {
 /* search pages styles */
 li.lrn-author-list-view-item.lrn-author-flyout-wrapper {
     background: #fff;
-    border-bottom: 1px solid var(--body-background) !important;
+    border-bottom: 1px solid var(--sbx-color-border, var(--body-background)) !important;
     list-style: none;
     max-width: none;
     overflow: visible;
@@ -992,7 +992,7 @@ li.lrn-item-for-activity-list.lrn-col-xs-10.lrn-col-md-11 {
 
 ul.lrn-author-list-view.lrn-author-list-unstyled.lrn-author-list-divider.lrn-author-draggable {
     background: #fff;
-    border-bottom: 1px solid var(--body-background) !important;
+    border-bottom: 1px solid var(--sbx-color-border, var(--body-background)) !important;
     list-style: none;
     max-width: none;
     overflow: visible;
@@ -1001,14 +1001,14 @@ ul.lrn-author-list-view.lrn-author-list-unstyled.lrn-author-list-divider.lrn-aut
     width: auto;
 }
 .lrn-author-list-view-col.lrn-author-col-xs-2.lrn-author-col-md-1.lrn-author-list-view-col-first.lrn-author-ui-no-preview {
-    border-right: 1px solid var(--body-background);
+    border-right: 1px solid var(--sbx-color-border, var(--body-background));
 }
 .lrn-author.lrn-author .lrn-author-list-activity-item-view-extended .lrn-author-activity-preview {
     overflow: hidden;
 }
 .lrn-author .lrn-author-ui .lrn-author-activity-edit [data-tab-content="items"] .lrn-author-list-divider > li {
     margin-bottom: 1px;
-    border-bottom: 1px solid var(--body-background) !important;
+    border-bottom: 1px solid var(--sbx-color-border, var(--body-background)) !important;
 }
 .lrn-author.lrn-author
     .lrn-author-item-for-activity-list

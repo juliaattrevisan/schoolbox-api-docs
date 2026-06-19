@@ -550,7 +550,7 @@ window.Vue.onMounted(async () => {
                             data-reveal-id="shareLearningMoment"
                             data-test="learning-moment-evidence-share"
                         >
-                            <sbx-icon name="share" size="2rem"></sbx-icon>
+                            <sbx-icon name="share" size="xl"></sbx-icon>
                             <span>Share Learning</span>
                         </a>
                         <a
@@ -559,7 +559,7 @@ window.Vue.onMounted(async () => {
                             title="Set goals"
                             class="goals"
                         >
-                            <sbx-icon name="goal" size="2rem"></sbx-icon>
+                            <sbx-icon name="goal" size="xl"></sbx-icon>
                             <span>Set Goals</span>
                         </a>
                         <a
@@ -568,7 +568,7 @@ window.Vue.onMounted(async () => {
                             title="Set goals"
                             class="goals"
                         >
-                            <sbx-icon name="goal" size="2rem"></sbx-icon>
+                            <sbx-icon name="goal" size="xl"></sbx-icon>
                             <span>Set My Goals</span>
                         </a>
                         <a
@@ -577,7 +577,7 @@ window.Vue.onMounted(async () => {
                             title="Award achievement"
                             class="achievement"
                         >
-                            <sbx-icon name="achievement" size="2rem"></sbx-icon>
+                            <sbx-icon name="achievement" size="xl"></sbx-icon>
                             <span>Award Achievement</span>
                         </a>
                     </div>
@@ -593,7 +593,7 @@ window.Vue.onMounted(async () => {
                     <div class="filters">
                         <div class="checklist l-pad-s--left">
                             <label class="title">Filter to:</label>
-                            <ul class="option-list l-flex-row l-gap-s">
+                            <ul class="option-list l-flex-row l-gap-l">
                                 <li v-if="showLearningMoments">
                                     <input
                                         id="filter-learningMoments"

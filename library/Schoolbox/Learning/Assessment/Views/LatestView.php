@@ -203,15 +203,13 @@ class LatestView
 
         // Note class instructors can see feedback on that class' assessments.
         if ($viewer->getRole()->isStaff() || $this->access->isInstructor($viewer, $assessment->getContext()->getFolder())) {
-            if ($markVisibility >= IAssessable::MARK_VISIBILITY_PRIVATE) {
-                return true;
-            }
+            return true;
         } else if ($viewer->getRole()->isStudent() && $participant->getId() === $viewer->getId()) {
-            if ($markVisibility >= IAssessable::MARK_VISIBILITY_STUDENT) {
+            if (in_array($markVisibility, [IAssessable::MARK_VISIBILITY_STUDENT, IAssessable::MARK_VISIBILITY_PARENT_STUDENT])) {
                 return true;
             }
         } else if ($viewer->getRole()->isParent() && $viewer->isParentOf($participant)) {
-            if ($markVisibility >= IAssessable::MARK_VISIBILITY_PARENT_STUDENT) {
+            if (in_array($markVisibility, [IAssessable::MARK_VISIBILITY_PARENT, IAssessable::MARK_VISIBILITY_PARENT_STUDENT])) {
                 return true;
             }
         }

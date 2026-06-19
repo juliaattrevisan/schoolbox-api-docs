@@ -237,7 +237,7 @@ class CommandLineTool extends App
             // are within one of the NCCD information courses.
             /** @var MapperProxy $assessmentDataSource */
             $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
-            $assessments          = $assessmentDataSource->findAllByFolderIdForReview($row['id']);
+            $assessments          = $assessmentDataSource->findAllByFolderIdForReview(folderId: $row['id']);
             foreach ($assessments as $assessment) {
                 $context = $assessment->getContext();
                 if (
@@ -429,7 +429,7 @@ class CommandLineTool extends App
         foreach ($assessment->getAllParticipants() as $participant) {
             $participantFiles = [];
             foreach ($participant->getSubmittedResponses() as $response) {
-                /** @var array<string, array{storage: DueWorkResponseFile, filename: string, filemtime: int}> $participantFiles */
+                /** @var array<string, array{storage: DueWorkResponseFile, filename: string, filemtime: int, comment: string|null}> $participantFiles */
                 if ($response instanceof DueWorkResponse) {
                     if ($response->getAllFiles()->count()) {
                         $feedback = $participant->findMostRecentInstructorGivenPublishedFeedback();

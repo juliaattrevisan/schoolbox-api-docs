@@ -18,6 +18,7 @@ use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\ISelfAssessable;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Resource\File\Codec\Filename;
 use UnexpectedValueException;
 use Schoolbox\Assessment\Rubric\DataModel\Capability;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator;
@@ -428,7 +429,7 @@ class Controller extends BaseController
          */
         $rubricInstance = $this->rubricInstanceMapper->createModel()
             ->setId(null) // Yep, that's a null right there
-            ->setTitle($rubric['title'])
+            ->setTitle(trim($rubric['title']))
             ->setCapabilityMarkType($markType)
             ->setCapabilityGradeGroup($gradeGroup)
             ->setMarkedUsingRange($rubric['useMarkRange'] ?? false);
@@ -444,10 +445,13 @@ class Controller extends BaseController
         /* Note that some of these settings are overridden by rb-rubric-download.vue implementation in frontend...
          * ...in case you were trying to debug why you couldn't change the filename lol
          */
-        $filename = sprintf(
-            "%s.csv",
-            (new Url($rubricInstance->getTitle()))->getSlug()
-        );
+        $title = $assessment->getTitle();
+
+        if ('' !== trim((string)$rubricInstance->getTitle())) {
+            $title = $rubricInstance->getTitle();
+        }
+
+        $filename = (new Filename())->generate($title, 'csv');
 
         $this->response = $this->responseFromContent($content)
             ->withHeader('Pragma', ' ')

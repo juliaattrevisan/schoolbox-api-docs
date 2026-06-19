@@ -10,6 +10,7 @@ namespace Assess\Import\Parser;
 
 use Alaress_Date_Format;
 use Evaluation\Import\Parser\Base as EvaluationParser;
+use Schoolbox\Learning\Assessment\IAssessable;
 
 /**
  * Quiz-specific implementation.
@@ -84,11 +85,16 @@ class V160 extends EvaluationParser implements IParser
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getMarkVisibility()
+    public function getMarkVisibility(): string
     {
-        return (int)$this->getXml()->markvisibility;
+        return match ((int) $this->getXml()->markvisibility) {
+            1 => IAssessable::MARK_VISIBILITY_STUDENT,
+            2 => IAssessable::MARK_VISIBILITY_PARENT_STUDENT,
+            // Note '3 => MARK_VISIBILITY_PARENT' did not exist in version 16, so should not be encountered during import.
+            default => IAssessable::MARK_VISIBILITY_PRIVATE,
+        };
     }
 
     /**

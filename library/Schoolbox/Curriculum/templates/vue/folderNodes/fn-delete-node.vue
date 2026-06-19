@@ -85,11 +85,12 @@ function onModalClosed(): void {
             </li>
             <li>
                 <button
-                    class="button icon-close"
+                    class="button sbx-button--has-icon"
                     data-test-cancel-delete-node
                     :disabled="store().isProcessing"
                     @click.prevent="onModalClosed"
                 >
+                    <sbx-icon name="close"></sbx-icon>
                     Cancel
                 </button>
             </li>

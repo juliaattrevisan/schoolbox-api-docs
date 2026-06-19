@@ -167,7 +167,7 @@ async function openLightbox(file: StorageFile, event: MouseEvent): Promise<void>
                     <span v-html="props.entry.blurb"></span>
                     <span v-if="props.entry.showReadMore" class="l-mar-s--top">
                         <a @click.prevent="crmStore.openModal(props.entry, CohortReportModalType.READ_MORE)">
-                            READ MORE
+                            Read more
                         </a>
                     </span>
                 </p>
@@ -220,7 +220,7 @@ async function openLightbox(file: StorageFile, event: MouseEvent): Promise<void>
 
     &:not(.cr-evidence-button-selected):hover {
         cursor: pointer;
-        background-color: var(--content-ui-background);
+        background-color: var(--sbx-config-color-active, var(--content-ui-background));
     }
 }
 
@@ -233,7 +233,7 @@ async function openLightbox(file: StorageFile, event: MouseEvent): Promise<void>
     }
 
     &--draft {
-        border-color: $neutral-foreground;
+        border-color: var(--sbx-color-foreground-secondary, $neutral-foreground);
     }
 
     &--submitted {

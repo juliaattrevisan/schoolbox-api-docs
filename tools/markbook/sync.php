@@ -14,6 +14,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 use External\IConnector;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
@@ -24,10 +26,8 @@ use Schoolbox\Resource\Folder\Model as Folder;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$app = new class extends CliTool\App
+$app = new class extends CliTool\BaseApp
 {
-    private const OPT_LONG_HELP = 'help';
-    private const OPT_SHORT_HELP = 'h';
     private const OPT_LONG_START = 'start:';
     private const OPT_LONG_END = 'end:';
     private const OPT_LONG_YEAR = 'year:';
@@ -35,24 +35,34 @@ $app = new class extends CliTool\App
     private const OPT_LONG_UPDATE_ONLY = 'update-only';
     private const OPT_LONG_PARENT = 'parent:';
 
-    /** @inheritDoc */
-    public function getShortOpts(): array
+    /** @inheritdoc */
+    protected function getName(): string
     {
-        return [self::OPT_SHORT_HELP];
+        return 'Schoolbox Markbook Sync Script';
     }
 
     /** @inheritdoc */
-    public function getLongOpts(): array
+    protected function getDescription(): string
     {
-        return [
-            self::OPT_LONG_HELP,
-            self::OPT_LONG_START,
-            self::OPT_LONG_END,
-            self::OPT_LONG_YEAR,
-            self::OPT_LONG_SEMESTER,
-            self::OPT_LONG_UPDATE_ONLY,
-            self::OPT_LONG_PARENT,
-        ];
+        return 'Syncs existing markbook data from Schoolbox into Synergetic.';
+    }
+
+    /** @inheritdoc */
+    protected function setOptions(): CliTool\BaseApp
+    {
+        $this->optionCollection->add(self::OPT_LONG_PARENT, 'Schoolbox ID of parent folder to start traversal, defaults to 0 (format: --parent=237)');
+        $this->optionCollection->add(self::OPT_LONG_START, 'Only sync work due after this date (format: yyyy-mm-dd), defaults to current semester');
+        $this->optionCollection->add(self::OPT_LONG_END, 'Only sync work due before this date (format: yyyy-mm-dd), defaults to current semester');
+        $this->optionCollection->add(self::OPT_LONG_YEAR, 'FileYear into which to export (format: --year=2016, must be used with --semester)');
+        $this->optionCollection->add(self::OPT_LONG_SEMESTER, 'FileSemester into which to export (format: --semester=1, must be used with --year)');
+        $this->optionCollection->add(self::OPT_LONG_UPDATE_ONLY, 'Only update existing items in the remote system, do not create new ones');
+        return $this;
+    }
+
+    /** @inheritdoc */
+    protected function hasPerformMode(): bool
+    {
+        return true;
     }
 
     /**
@@ -78,45 +88,6 @@ $app = new class extends CliTool\App
         return $catsWithCodes;
     }
 
-    /**
-     * Display help text
-     *
-     * @param string $externalType
-     */
-    private function help(string $externalType)
-    {
-        $additionalParameters = "";
-        $addParamsShort = "";
-
-        // Synergetic receives some additional options around FileYear/FileSemester
-        if ($externalType === IConnector::EXTERNAL_TYPE_SYNERGETIC) {
-            $additionalParameters .= "    --year=yyyy          Synergetic FileYear into which to export the markbook and student marks, format --year=2016 (must be used with semester parameter)\n";
-            $additionalParameters .= "    --semester=s         Synergetic FileSemester into which to export the markbook and student marks, --semester=1 (must be used with year parameter)\n";
-            $addParamsShort = "[--year=yyyy] [--semester=s] ";
-        }
-
-        // Get pretty uppercased SIS name
-
-        $remoteSystemName = ucwords($externalType);
-
-            echo <<<HELP
-
-    Schoolbox Markbook Sync Script
-
-    Description:   Syncs existing markbook data from Schoolbox into {$remoteSystemName}
-    Usage:         php sync.php --parent=[folderID] {$addParamsShort}[--start=yyyy-mm-dd] [--end=yyyy-mm-dd] [--perform] [--update-only]
-
-        --parent=xxx         the Schoolbox ID of parent folder to start the traversal, defaults to 0, format --parent=237
-        --start=yyyy-mm-dd   Only sync work due after this date, format --start=2016-04-20, defaults to current semester
-        --end=yyyy-mm-dd     Only sync work due before this date, format --end=2016-08-15, default to current semester
-        -p, --perform:       if set, will actually update anything in the remote system, otherwise just a dry run
-        --update-only:       if set, will not create any new items in the remote system, only updates existing markbooks
-    {$additionalParameters}
-
-    HELP;
-    }
-
-
     public function run(): void
     {
         $parentId = $this->getOptAsInt(self::OPT_LONG_PARENT, 0);
@@ -135,11 +106,6 @@ $app = new class extends CliTool\App
             exit(1);
         }
 
-        if ($this->getOpt(self::OPT_LONG_HELP) || $this->getOpt(self::OPT_SHORT_HELP)) {
-            $this->help($externalType);
-            exit(0);
-        }
-
         /** @var AssessmentDataSource $assessmentDataSource */
         $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
 
@@ -150,10 +116,15 @@ $app = new class extends CliTool\App
         // Synergetic Markbook uses FileYear/FileSemester and exposes command line parameters not available to other connectors.
         if ($externalType === IConnector::EXTERNAL_TYPE_SYNERGETIC) {
             try {
-                $markbookExternal = new External_Synergetic_Markbook($config->get('synergetic_mark_sync_value'), $this->getLogger(), $year, $semester);
+                $markbookExternal = new External_Synergetic_Markbook(
+                    (int)$config->get('synergetic_mark_sync_value'),
+                    $this->getLogger(),
+                    $year,
+                    $semester,
+                );
             } catch (InvalidArgumentException $e) {
                 $this->getLogger()->error("ERROR: {$e->getMessage()}");
-                $this->help($externalType);
+                $this->outputHelpIfOptionProvided();
                 exit(1);
             }
         } else {
@@ -161,8 +132,7 @@ $app = new class extends CliTool\App
         }
 
         // Determine the time period we want to sync
-
-
+        $currentYear = (int)date('Y');
         if ($start && $end) {
             // Start and end range passed on commandline, use supplied dates
 
@@ -188,14 +158,14 @@ $app = new class extends CliTool\App
             // If we have gone past June- assume a fake "Semester 2" and use the last six months of the year
             $startTime = new Alaress_Date_Format();
             $endTime = new Alaress_Date_Format();
-            $startTime->setDate(date('Y'), 7, 1)->setTime(0, 0, 0);
-            $endTime->setDate(date('Y'), 12, 30)->setTime(23, 59, 59);
+            $startTime->setDate($currentYear, 7, 1)->setTime(0, 0, 0);
+            $endTime->setDate($currentYear, 12, 30)->setTime(23, 59, 59);
         } else {
             // Otherwise use a fake "Semester 1" and use the first six months of the year
             $startTime = new Alaress_Date_Format();
             $endTime = new Alaress_Date_Format();
-            $startTime->setDate(date('Y'), 1, 1)->setTime(0, 0, 0);
-            $endTime->setDate(date('Y'), 6, 30)->setTime(23, 59, 59);
+            $startTime->setDate($currentYear, 1, 1)->setTime(0, 0, 0);
+            $endTime->setDate($currentYear, 6, 30)->setTime(23, 59, 59);
         }
 
         // Retrieve all of the folders that we are going to traverse
@@ -244,9 +214,9 @@ $app = new class extends CliTool\App
             // Process assessments
 
             $assessmentList = $assessmentDataSource->findAllByFolderIdForReview(
-                $folder->getId(),
-                null,
-                [
+                folderId: $folder->getId(),
+                users: null,
+                options: [
                     'due_after' => $startTime,
                     'due_before' => $endTime,
                 ]

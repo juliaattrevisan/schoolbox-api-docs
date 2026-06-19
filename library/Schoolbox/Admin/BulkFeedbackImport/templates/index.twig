@@ -65,25 +65,33 @@
                     <p>Before you begin:</p>
 
                     <ul>
-                        <li>Use the exact {{ locale.dueWork.proper }} title from class pages.</li>
+                        <li>Use the exact {{ locale.dueWork.proper }} or {{ locale.reporting.proper }} title from class pages.</li>
                         <li>Match Work Type and Class Codes exactly.</li>
                         <li>Add feedback using Student External IDs.</li>
+                        <li>
+                            {{ locale.grades.proper }} can be entered using either normalised marks or human readable grades. Ensure you use the correct template.
+                            <ul>
+                                <li>Using the normalised marks option will then convert the value into a human readable percentage, total mark or letter grade.</li>
+                                <li>Using the human readable grade option will attempt to convert the string into a normalised value. It will also support the use of submission states and the free text mark type.</li>
+                            </ul>
+                        </li>
                         <li>Normalised marks must be between 0-100.</li>
-                        <li>Comments must follow formatting rules.</li>
+                        <li>Comments are optional but must follow formatting rules.</li>
                         <li>Publish Date must be in the <a href="/adminv2/setting/Localisation#date_local">Numerical Date Format</a> or just leave it empty to use the current datetime.</li>
                         <li>Download and complete the CSV template.</li>
                         <li>Upload and preview the file.</li>
                     </ul>
 
                     <div class="alert-box highlight f-no-margins">
-                        Note: Errors may occur if class codes or student IDs don't match, or if marks are out of range.
+                        Note: Errors may occur if class codes or student IDs don't match, or if {{ locale.grades.plural }} use invalid values.
                         <br>
                         Read full import instructions <a href="/help/sso/send?returnUrl=/homepage/2725#component502080" target="_blank">here</a>.
                     </div>
                 </div>
                 <div class="component-action">
                     <section>
-                        <a href="{{ CDN_PREFIX }}/adminv2/bulk-feedback-import/bulkFeedbackImportTemplate.csv" class="button">Download Template</a>
+                        <a href="{{ CDN_PREFIX }}/adminv2/bulk-feedback-import/bulkFeedback-humanreadable.csv" class="button">Download Human Readable Grades Template</a>
+                        <a href="{{ CDN_PREFIX }}/adminv2/bulk-feedback-import/bulkFeedback-normalised.csv" class="button">Download Normalised Marks Template</a>
                     </section>
                 </div>
             </section>
@@ -96,7 +104,7 @@
                     <fieldset class="content">
                         <div class="small-12 columns">
                             <label for="assessmentTitle">
-                                <span class="required-with-tip">{{ locale.dueWork.proper }} Title</span>
+                                <span class="required-with-tip">{{ locale.dueWork.proper }} or {{ locale.reporting.proper }} Title</span>
                                 <span class="hint has-tip tip-top" data-tooltip title="Enter a clear and concise title for the {{ locale.dueWork.proper }}. This will be visible to students and staff.">?</span>
                             </label>
                             <input id="assessmentTitle" type="text" name="assessmentTitle" value='' />

@@ -100,6 +100,14 @@ $cdn-prefix: "/static";
     background: var(--sbx-color-foreground-primary, #fff);
 }
 
+body.sbx-body {
+    .VueTables__table-footer {
+        .VuePagination__pagination {
+            margin-bottom: 0;
+        }
+    }
+}
+
 .VueTables__limit {
     //rows per page control
     margin-right: 30px;

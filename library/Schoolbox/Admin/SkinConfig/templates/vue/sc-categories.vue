@@ -173,7 +173,7 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
                         <div class="small-12 medium-4 large-3">
                             <div class="checklist l-flex-col l-gap-s">
                                 <label class="title">Filter</label>
-                                <ul class="option-list l-flex-row l-gap-s">
+                                <ul class="option-list l-flex-row l-gap-l">
                                     <li data-v-40e5173a="">
                                         <input id="waiting-list" type="checkbox" checked />
                                         <label for="waiting-list">Waiting List</label>
@@ -190,8 +190,8 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
                             <div class="switch">
                                 <input id="useDualMarkTypes" name="useDualMarkTypes" type="checkbox" />
                                 <label for="useDualMarkTypes" data-test="assessment-form-checkbox-dualMarkTypes">
-                                    <span class="icon-approve"></span>
-                                    <span class="icon-cancel"></span>
+                                    <span><sbx-icon name="approve" size="m" color="currentColor"></sbx-icon></span>
+                                    <span><sbx-icon name="close" size="m" color="currentColor"></sbx-icon></span>
                                 </label>
                             </div>
                         </div>
@@ -292,7 +292,8 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
                             <div id="fileImage-zone" class="attachzone s64">
                                 <label></label>
                                 <ul data-dz-previews="" class="az-list"></ul>
-                                <div id="FileImageZone" class="dzone icon-attach">
+                                <div id="FileImageZone" class="dzone">
+                                    <sbx-icon class="icon-attach" name="attach" size="l"></sbx-icon>
                                     <span>Click or drag here to attach files</span>
                                 </div>
                             </div>

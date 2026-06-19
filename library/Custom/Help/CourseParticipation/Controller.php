@@ -507,7 +507,7 @@ class Controller extends Base
 
 
     /**
-     * @return UserMapper|Mapper
+     * @return UserMapper
      * @throws Mapper\DefinitionException
      */
     private function getUserMapper(): UserMapper
@@ -517,7 +517,7 @@ class Controller extends Base
 
 
     /**
-     * @return RoleMapper|Mapper
+     * @return RoleMapper
      * @throws Mapper\DefinitionException
      */
     private function getRoleMapper(): RoleMapper
@@ -527,7 +527,7 @@ class Controller extends Base
 
 
     /**
-     * @return CampusMapper|Mapper
+     * @return CampusMapper
      * @throws Mapper\DefinitionException
      */
     private function getCampusMapper(): CampusMapper

@@ -117,7 +117,7 @@ test.describe("Manage Differentiation Profiles", () => {
             tester.isGoingTo("Click on the name filter button");
             await page.getByTestId("sbx-pop-out-filter-component-36-button").click();
             tester.isGoingTo("Type 'reed' in the name filter input");
-            await page.locator('input[name="filter_selection[36][]"]').fill("reed");
+            await page.getByTestId("ss-query-input").fill("reed");
             tester.isGoingTo("Click apply filters button");
             await page.getByTestId("panel-apply-filters-button").click();
             await page.getByTestId("panel-apply-filters-button").click(); // click twice as first click closes the filter pop out

@@ -56,6 +56,10 @@
                     resource_category_id: {
                         min: 1
                     },
+                    capacity: {
+                        digits: true,
+                        range: [1,999]
+                    },
                     "min_lead_time[day]": {
                         digits: true
                     },
@@ -92,6 +96,7 @@
                 },
                 messages: {
                     resource_category_id:           "Please select a category.",
+                    capacity:                       "Number of bookable items must be a whole number from 1 to 999.",
                     "min_reservation_time[day]":    "If entered, day count must be a number.",
                     "max_reservation_time[day]":    "If entered, day count must be a number.",
                     "min_lead_time[hour]":          "If entered, hour count must be a number from 0 to 23",
@@ -254,13 +259,21 @@
                         </label>
                     </div>
                 </fieldset>
-
                 <fieldset class="content">
-                    <legend>
-                        Allow Conflicting Booking Requests
-                        <span class="hint has-tip tip-top" data-tooltip title="If toggled to ON, users can request a booking where the time is already taken. Only one booking can be an approved booking for a given time.">?</span>
-                    </legend>
-                    <div class="small-12 columns">
+                    <div class="small-12 medium-6 columns">
+                        <div class="clear-fieldset">
+                            <label for="capacity" class="required">
+                                Number of Bookable Items
+                                <span class="hint has-tip tip-top" data-tooltip title="The maximum number of bookings that can use this resource at the same time. Use 1 when only one booking should be available at a time.">?</span>
+                            </label>
+                            <input name="capacity" id="capacity" type="text" inputmode="numeric" pattern="[0-9]*" value="{{ item.capacity|default(1) }}" required />
+                        </div>
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label for="allow_clash_bookings">
+                            Allow Conflicting Booking Requests
+                            <span class="hint has-tip tip-top" data-tooltip title="If enabled, users can request bookings even when capacity is full. Only bookings within the available capacity can be approved.">?</span>
+                        </label>
                         <div class="switch">
                             <input type="checkbox" value="1" {% if item.allowClashBookings %}checked{% endif %} id="allow_clash_bookings" name="allow_clash_bookings">
                             <label for="allow_clash_bookings">
@@ -399,12 +412,12 @@
                         </label>
                     </div>
                 </fieldset>
-                <fieldset>
-                    <legend>
-                        Restrict bookings to current {{ locale.term }}
-                        <span class='hint has-tip tip-top' data-tooltip title="If this is set, this item cannot be reserved outside of the current {{ locale.term }}">?</span>
-                    </legend>
+                <fieldset class="content">
                     <div class="small-12 columns">
+                        <label for="current_term_restriction">
+                            Restrict Bookings to Current {{ locale.term|split(' ')|map(word => word|capitalize)|join(' ') }}
+                            <span class='hint has-tip tip-top' data-tooltip title="If this is set, this item cannot be reserved outside of the current {{ locale.term }}">?</span>
+                        </label>
                         <div class="switch">
                             <input type="checkbox" value="1" {% if item.currentTermRestriction %}checked{% endif %} id="current_term_restriction" name="current_term_restriction">
                             <label for="current_term_restriction">

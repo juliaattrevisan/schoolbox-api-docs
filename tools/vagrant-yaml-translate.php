@@ -13,7 +13,7 @@ require_once __DIR__ . '/../conf/core/require.php';
  * Simple script for converting vagrant.yaml to a .env file, and outputting to
  * stdout.
  */
-$kernel = new CliTool\Kernel(new class extends CliTool\App {
+$kernel = new CliTool\Kernel(new class extends CliTool\BaseApp {
     /**
      * The vagrant.yaml file to translate.
      */
@@ -71,9 +71,26 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App {
      */
     private const ENV_FILE_FORMAT = "%s=%s";
 
-    /**
-     * @return void
-     */
+    protected function getName(): string
+    {
+        return 'vagrant-yaml-translate';
+    }
+
+    protected function getDescription(): string
+    {
+        return 'Converts vagrant.yaml to a .env file and outputs to stdout.';
+    }
+
+    protected function setOptions(): self
+    {
+        return $this;
+    }
+
+    protected function hasPerformMode(): bool
+    {
+        return false;
+    }
+
     public function run(): void
     {
         $output = [];

@@ -37,9 +37,3 @@ const emit = defineEmits<{
         </div>
     </div>
 </template>
-
-<style scoped lang="scss">
-:deep(*) {
-    @import "@css/core/base/icon-colours";
-}
-</style>

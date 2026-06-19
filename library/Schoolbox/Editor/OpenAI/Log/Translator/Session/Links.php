@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Editor\OpenAI\Log\Translator\Session;
 
 use Schoolbox\API\Translator\AbstractLinks;
-use Schoolbox\Editor\OpenAI\Log\Model;
+use Schoolbox\OpenAi\Session\Model;
 
 /**
  * AI Log Session Links
@@ -20,15 +20,15 @@ use Schoolbox\Editor\OpenAI\Log\Model;
 class Links extends AbstractLinks
 {
     /**
-     * @param Model $log
+     * @param Model $session
      * @return array
      */
-    public function __invoke(Model $log): array
+    public function __invoke(Model $session): array
     {
         $translation = [];
 
-        $translation['getLog'] = $this->getRouteIfAuthorized('openAIUsage.getLog', [
-            'sessionId' => $log->getSessionId()
+        $translation['getSessionLogs'] = $this->getRouteIfAuthorized('openAIUsage.getSessionLogs', [
+            'sessionId' => $session->getId(),
         ]);
 
         return $translation;

@@ -1,4 +1,5 @@
 import type { Page } from "@playwright/test";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 
 export default class ManageGroup {
     private page: Page;
@@ -8,8 +9,6 @@ export default class ManageGroup {
     static readonly URL_GROUP_ID = "{group_id}";
 
     static readonly SUBMIT_BUTTON = "input[type=submit][value=Submit]";
-
-    static readonly UPDATE_BUTTON = "button.button.submit";
 
     static readonly ELEMENT_SEARCH = "#manage-group-search";
 
@@ -50,7 +49,7 @@ export default class ManageGroup {
      * Click update button
      */
     async clickUpdateButton(): Promise<void> {
-        await this.page.locator(ManageGroup.UPDATE_BUTTON).getByText("Update").click();
+        await this.page.locator(Common.MODAL_SUBMIT_BUTTON).getByText("Update").click();
     }
 
     /**

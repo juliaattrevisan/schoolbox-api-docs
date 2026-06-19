@@ -4,7 +4,6 @@ namespace Schoolbox\Editor\OpenAI\Payload;
 
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Curriculum\Node\Mapper;
-use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -127,7 +126,8 @@ class LessonPlan
      *
      * @param string $openAiEndpoint
      * @param string $openAiModel
-     * @param string $openAiDeploymentId
+     * @param string $azureDeploymentId
+     * @param string $azureDeploymentModel
      * @param string $textSystemPrompt
      * @param string $reasoningEffort The reasoning effort level from admin config
      * @param string $textVerbosity The text verbosity level from admin config
@@ -137,7 +137,8 @@ class LessonPlan
     public function __construct(
         private string $openAiEndpoint,
         private string $openAiModel,
-        private string $openAiDeploymentId,
+        private string $azureDeploymentId,
+        private string $azureDeploymentModel,
         private string $textSystemPrompt,
         private string $reasoningEffort,
         private string $textVerbosity,
@@ -274,16 +275,6 @@ class LessonPlan
             $additionalContext,
         );
 
-        /* OpenAI uses the model name from our ui.
-         * Azure uses the Deployment ID instead.
-         * Disgusting.
-         */
-        $model = $this->openAiModel;
-
-        if (Helper::ENDPOINT_TYPE_AZURE === $this->openAiEndpoint) {
-            $model = $this->openAiDeploymentId;
-        }
-
         $payload = [
             /* An ordered list of instructions for OpenAi
              */
@@ -297,11 +288,6 @@ class LessonPlan
                     "content" => $prompt['user'],
                 ],
             ],
-            /* Which variant of OpenAI to use
-             * Each has their own way of producing results in varying ways
-             * (pick one)
-             */
-            "model" => $model,
             /* A kind of OpenAI currency to use in this request
              */
             "max_output_tokens" => self::MAX_OUTPUT_TOKENS,
@@ -336,7 +322,13 @@ class LessonPlan
             ]);
         }
 
-        return new ModelParser()->filterPayload($payload, $this->openAiModel, $this->openAiEndpoint);
+        return new PayloadFinaliser()->finalise(
+            $payload,
+            $this->openAiEndpoint,
+            $this->openAiModel,
+            $this->azureDeploymentId,
+            $this->azureDeploymentModel,
+        );
     }
 
 

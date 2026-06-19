@@ -584,13 +584,16 @@ td {
     }
 
     span {
+        align-items: center;
+        display: inline-flex;
         position: absolute;
-        top: 0.2rem;
-        line-height: 1.625rem;
+        top: 50%;
+        line-height: normal;
         font-weight: 100;
         text-transform: uppercase;
         font-size: rem-calc($base-font-size - 3);
         text-indent: 0;
+        transform: translateY(-50%);
         transition: opacity $switch-paddle-transition-speed $switch-paddle-transition-ease;
     }
 }
@@ -744,8 +747,8 @@ td {
 
 // Radio button blocks
 .button-block {
-    display: block;
-    background-color: $white;
+    display: inline-flex;
+    background-color: var(--sbx-color-foreground-primary, $white);
     border: $input-border-width solid $content-ui-background;
     color: var(--sbx-config-color-accent, $content-ui-foreground);
     margin: 0 0 1rem 0;
@@ -753,18 +756,12 @@ td {
     width: 100%;
     font-size: $base-font-size;
     font-weight: $font-weight-normal;
+    gap: var(--sbx-size-s, 0.5rem);
     line-height: 2;
     text-align: left;
     transition: all 0.1s ease-in;
-    :is(i, sbx-icon) {
-        @extend .size-32;
-        color: var(--sbx-config-color-accent, $content-ui-foreground);
-        padding-right: 0.35rem;
-        float: left;
-        line-height: 1;
-    }
     &:hover {
-        background-color: $content-ui-background;
+        background-color: var(--sbx-config-color-active, $content-ui-background);
         color: var(--sbx-config-color-accent, $content-ui-foreground);
         cursor: pointer;
     }
@@ -818,6 +815,11 @@ input[type="radio"] {
             background-color: $hover-background-color;
         }
 
+        sbx-icon {
+            margin-right: 0;
+            vertical-align: middle;
+        }
+
         [class^="icon-"]:before {
             padding-right: 0;
         }
@@ -827,7 +829,8 @@ input[type="radio"] {
         + #{$label-selector} {
             background-color: $active-color;
             color: $active-text-color;
-            [class^="icon-"] {
+            [class^="icon-"],
+            sbx-icon {
                 color: $active-text-color;
             }
         }

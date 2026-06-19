@@ -74,6 +74,7 @@ function clearSelection(): void {
             </template>
             <template v-else>
                 <button
+                    v-if="props.routes.getLearningPlanNewUrl"
                     class="button l-flex__item--1-auto sbx-button--has-icon"
                     @click.prevent="
                         handleActionSelected(
@@ -93,7 +94,7 @@ function clearSelection(): void {
                     Exclude {{ selectedList.length === 1 ? "Student" : "Students" }}
                 </button>
                 <button
-                    v-if="props.customisations.length > 0"
+                    v-if="props.customisations.length > 0 && props.routes.includeInExistingCustomisation"
                     class="button l-flex__item--1-auto sbx-button--has-icon"
                     @click.prevent="handleOpenIncludeInExistingModal"
                 >
@@ -115,6 +116,7 @@ function clearSelection(): void {
                     Create Copy of {{ locale.activity.translate(false, true) }}
                 </button>
                 <button
+                    v-if="props.routes.getAssessmentParticipationNewActivity"
                     class="button l-flex__item--1-auto sbx-button--has-icon"
                     @click.prevent="
                         handleActionSelected(

@@ -4,35 +4,42 @@
  # Padding-bottom (height): gridWidth*aspectRatioY/aspectRatioX
  #
  # Column Layout:
- # Tile width: 100/column_count
- # Padding-bottom (height): 100/column_count*aspectRatioY/aspectRatioX
+ # Gap: derived from column_padding as a percentage of the base column width
+ # Tile width: remaining width after gaps divided by column_count
+ # Padding-bottom (height): tileWidth*aspectRatioY/aspectRatioX
  #}
 {% if layout.aspectRatioY > 0 and layout.aspectRatioX > 0 %}
     {% set aspectRatio = (layout.aspectRatioY/layout.aspectRatioX) %}
 {% else %}
     {% set aspectRatio = 1 %}
 {% endif %}
+{# Guard against these variables not being set correctly in the database #}
+{% set gridWidth = layout.gridWidth > 0 ? layout.gridWidth : layout.DEFAULT_GRID_WIDTH %}
+
+{% if layout.isGridLayoutType %}
+    {% set tileGap = layout.getGridPadding ~ "px" %}
+    {% set tileWidth = gridWidth ~ "px" %}
+    {% set paddingBottom = gridWidth * aspectRatio ~ "px" %}
+{% else %}
+    {# Assume layout isColumnLayoutType since there are only two types (and guard against bad data in tile_layout.layout_type). #}
+    {% set tileGap = layout.columnGapPercentage ~ "%" %}
+    {% set tileWidth = layout.columnTileWidthPercentage %}
+    {% set paddingBottom = tileWidth * aspectRatio ~ "%" %}
+    {% set tileWidth = tileWidth ~ "%" %}
+{% endif %}
 <style>
-#tileList-{{ layout.id }}.tileList .tile {
-    {# Guard against these variables not being set correctly in the database #}
-    {% set gridWidth = layout.gridWidth > 0 ? layout.gridWidth : layout.DEFAULT_GRID_WIDTH %}
-    {% set columnCount = layout.columnCount > 0 ? layout.columnCount : layout.DEFAULT_COLUMN_COUNT %}
-
+#tileList-{{ layout.id }}.tileList {
     {% if layout.isGridLayoutType %}
-        width: {{ gridWidth|e('css') }}px;
-        margin: {{ layout.getGridPadding|e('css') }}px;
-        {% set paddingBottom = gridWidth * aspectRatio ~ "px" %}
+    gap: {{ tileGap }};
     {% else %}
-        {# Assume layout isColumnLayoutType since there are only two types (and guard against bad data in tile_layout.layout_type). #}
-        {% set baseColumnWidth   = (100 / columnCount) %}
-        {% set paddingPercentage = (layout.columnPadding / 100) %}
-        {% set tilePadding       = baseColumnWidth * paddingPercentage %}
-        {% set tileWidth         = baseColumnWidth - tilePadding %}
-        width: {{ tileWidth }}%;
-        margin: {{ (tilePadding / 2) }}%;
-        {% set paddingBottom = tileWidth * aspectRatio ~ "%" %}
+    column-gap: {{ tileGap }};
+    row-gap: 0;
     {% endif %}
+}
 
+#tileList-{{ layout.id }}.tileList .tile {
+    width: {{ tileWidth }};
+    margin: 0;
     padding-bottom: {{ paddingBottom }};
 }
 </style>
@@ -43,7 +50,12 @@
 {% apply spaceless %}
 {% if (tileList|length > 0) or editable %}
 {# Store aspect-ration on each <ul> for access within www/static/js/tiles/jquery.tile-resize.js #}
-<ul id="tileList-{{ layout.id }}" class="tileList" data-tile-list data-aspect-ratio="{{ aspectRatio }}">
+<ul id="tileList-{{ layout.id }}"
+    class="tileList"
+    data-tile-list
+    data-aspect-ratio="{{ aspectRatio }}"
+    {% if layout.isColumnLayoutType %}data-column-gap-percentage="{{ layout.columnGapPercentage }}"{% endif %}
+>
     {% for tile in tileList %}
         {% include '@tile/sub/tile.twig' with {
             componentId: 'component' ~ componentId,

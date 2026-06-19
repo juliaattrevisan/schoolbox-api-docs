@@ -11,6 +11,7 @@ import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 import AssessmentPage from "@schoolboxTest/playwright/support/page/dueWork/AssessmentPage";
 import SubmitForm from "@schoolboxTest/playwright/support/page/dueWork/SubmitForm";
 import StatusPage from "@schoolboxTest/playwright/support/page/dueWork/StatusPage";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 
 const teacher = "Jack Coles";
 const teacherId = 22;
@@ -218,6 +219,7 @@ test.describe("Submission States functionality tests", () => {
         const folderId = (await db.grabFromDatabase("folder", "id", { deleted_at: null, name: folderName })) as string;
         const homepage = new Homepage(tester, page);
         const statusPage = new StatusPage(tester, page);
+        const common = new Common(page);
 
         tester.isGoingTo("as tecaher: checking class view visibility via due work component on homepage");
         await tester.impersonate(teacher);
@@ -228,7 +230,7 @@ test.describe("Submission States functionality tests", () => {
 
         tester.isGoingTo("check class view is visble on view status page");
         await statusPage.goto(dueWork1Id);
-        await statusPage.clickJellyTot();
+        await common.clickJellyTot();
         await expect(page.locator("#kamiWorksheet")).toBeVisible();
     });
 

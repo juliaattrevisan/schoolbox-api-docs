@@ -45,7 +45,7 @@ window.Vue.watch(
     () => searchStore.filteredResults,
     () => {
         window.Vue.nextTick(() => {
-            const targetHeight = searchResultsEl.value.offsetHeight;
+            const targetHeight = searchResultsEl.value.offsetHeight + 1; // +1 to ensure border is visible
             gsap.to(searchResultsContainerEl.value, {
                 duration: 0.3,
                 height: targetHeight,
@@ -94,7 +94,7 @@ window.Vue.watch(
 }
 
 .search-results {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    // box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     max-height: 400px;
     overflow: auto;
     width: 100%;

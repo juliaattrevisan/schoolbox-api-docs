@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\OpenAi\Agent\DialogAgentChat;
 
 use Alaress_Date_Format;
-use Schoolbox\Editor\OpenAI\Log;
+use Schoolbox\OpenAi\Session\Log;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as ResponseModel;
 use Schoolbox\Mapper\Exception as MapperException;

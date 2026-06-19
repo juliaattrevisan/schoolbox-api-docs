@@ -23,7 +23,7 @@ $app    = new class extends CliTool\App {
     private const MONTHLY_PREFIX                 = "backups/monthly/";
     private const DAILY_BACKUP_PRUNE_THRESHOLD   = "7";  // delete backups older than 7 days
     private const WEEKLY_BACKUP_PRUNE_THRESHOLD  = "56";  // delete backups older than 7 * 8 days
-    private const MONTHLY_BACKUP_PRUNE_THRESHOLD = "180"; // delete backups older than 30 * 6 days
+    private const MONTHLY_BACKUP_PRUNE_THRESHOLD = "365"; // delete backups older than 30 * 12 days
 
     private function setOTFSCredentials(): void
     {

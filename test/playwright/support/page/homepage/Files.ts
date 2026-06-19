@@ -2,6 +2,7 @@ import { expect } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import type DatabaseHelper from "@schoolboxTest/playwright/support/DatabaseHelper";
+import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 
 export default class Files {
     private tester: AcceptanceTester;
@@ -13,10 +14,6 @@ export default class Files {
     static readonly ELEMENT_FILE_DESCRIPTION_TEXTBOX = "#comment";
 
     static readonly ELEMENT_POST_FILE_BUTTON = 'input[value="Post File"]';
-
-    static readonly ELEMENT_SELECTOR_UPDATE_BUTTON = 'input[value="Update"]';
-
-    static readonly ELEMENT_SELECTOR_COMPONENTNAME_INPUT = 'input[name="componentname"]';
 
     static readonly ELEMENT_ATTACH_FILE = "#CmsZone";
 
@@ -132,7 +129,7 @@ export default class Files {
         await filesComponent.locator(Files.ELEMENT_FILTER_AUDIO).click();
         await filesComponent.locator(Files.ELEMENT_FILTER_VIDEO).click();
         await filesComponent.locator(Files.ELEMENT_FILTER_OTHER).click();
-        await filesComponent.locator(Files.ELEMENT_SELECTOR_UPDATE_BUTTON).click();
+        await Homepage.clickComponentUpdateButton(filesComponent);
         await expect(filesComponent.locator(Files.ELEMENT_SELECTOR_SORT)).toBeHidden();
     }
 
@@ -144,7 +141,7 @@ export default class Files {
         await filesComponent.locator(Files.ELEMENT_FILTER_DOCUMENT).click();
         await filesComponent.locator(Files.ELEMENT_FILTER_VIDEO).click();
         await filesComponent.locator(Files.ELEMENT_FILTER_IMAGE).click();
-        await filesComponent.locator(Files.ELEMENT_SELECTOR_UPDATE_BUTTON).click();
+        await Homepage.clickComponentUpdateButton(filesComponent);
         await expect(filesComponent.locator(Files.ELEMENT_SELECTOR_SORT)).toBeHidden();
     }
 
@@ -170,7 +167,7 @@ export default class Files {
         await filesComponent.locator(Files.ELEMENT_FILTER_OTHER).click();
         await filesComponent.locator(Files.ELEMENT_SELECTOR_SORT).selectOption(sortBy);
         await filesComponent.locator(Files.ELEMENT_SELECTOR_SORTDIR).selectOption(sortingOrder);
-        await filesComponent.locator(Files.ELEMENT_SELECTOR_UPDATE_BUTTON).click();
+        await Homepage.clickComponentUpdateButton(filesComponent);
         await expect(filesComponent.locator(Files.ELEMENT_SELECTOR_SORT)).toBeHidden();
     }
 
@@ -183,7 +180,7 @@ export default class Files {
     public static async sortFilesDesc(filesComponent: Locator, sortBy: string, sortingOrder: string): Promise<void> {
         await filesComponent.locator(Files.ELEMENT_SELECTOR_SORT).selectOption(sortBy);
         await filesComponent.locator(Files.ELEMENT_SELECTOR_SORTDIR).selectOption(sortingOrder);
-        await filesComponent.locator(Files.ELEMENT_SELECTOR_UPDATE_BUTTON).click();
+        await Homepage.clickComponentUpdateButton(filesComponent);
         await expect(filesComponent.locator(Files.ELEMENT_SELECTOR_SORT)).toBeHidden();
     }
 
@@ -194,7 +191,7 @@ export default class Files {
      */
     public static async setFileLimit(fileComponent: Locator, limit: string): Promise<void> {
         await fileComponent.locator(Files.ELEMENT_SELECTOR_SIZE).selectOption(limit);
-        await fileComponent.locator(Files.ELEMENT_SELECTOR_UPDATE_BUTTON).click();
+        await Homepage.clickComponentUpdateButton(fileComponent);
         await expect(fileComponent.locator(Files.ELEMENT_SELECTOR_SORT)).toBeHidden();
     }
 
@@ -207,7 +204,7 @@ export default class Files {
     public static async updateFileComponentSetting(fileComponent: Locator): Promise<void> {
         await fileComponent.locator('label[for$="-compactMode"]').click();
         await fileComponent.locator('label[for$="-showComponentTitle"]').click();
-        await fileComponent.locator(Files.ELEMENT_SELECTOR_UPDATE_BUTTON).click();
+        await Homepage.clickComponentUpdateButton(fileComponent);
         await expect(fileComponent.locator(Files.ELEMENT_SELECTOR_SIZE)).toBeHidden();
     }
 
@@ -273,7 +270,7 @@ export default class Files {
             .click();
         const locatorEng = fileComponent.locator("div.source a", { hasText: subSrcFolder });
         await expect(locatorEng).toBeVisible();
-        await fileComponent.locator(Files.ELEMENT_SELECTOR_UPDATE_BUTTON).click();
+        await Homepage.clickComponentUpdateButton(fileComponent);
         await expect(locatorEng).toBeHidden();
     }
 
@@ -290,8 +287,8 @@ export default class Files {
         classPageId: number,
         newHeading: string = "Automation Heading Test",
     ): Promise<void> {
-        await filesComponent.locator(Files.ELEMENT_SELECTOR_COMPONENTNAME_INPUT).fill(newHeading);
-        await filesComponent.locator(Files.ELEMENT_SELECTOR_UPDATE_BUTTON).click();
+        await Homepage.typeComponentHeading(filesComponent, newHeading);
+        await Homepage.clickComponentUpdateButton(filesComponent);
         await filesComponent.getByTestId(Files.DATA_TEST_VIEW_ALL_FILES_BUTTON).click();
 
         // e.g. /resources/folder/4905/files/83
@@ -312,8 +309,8 @@ export default class Files {
         classPageId: number,
         expectedHeading: string = "Files",
     ): Promise<void> {
-        await filesComponent.locator(Files.ELEMENT_SELECTOR_COMPONENTNAME_INPUT).fill("");
-        await filesComponent.locator(Files.ELEMENT_SELECTOR_UPDATE_BUTTON).click();
+        await Homepage.typeComponentHeading(filesComponent, "");
+        await Homepage.clickComponentUpdateButton(filesComponent);
         await filesComponent.getByTestId(Files.DATA_TEST_VIEW_ALL_FILES_BUTTON).click();
         await expect(page).toHaveURL(new RegExp(`/resources/folder/\\d+/files/${classPageId}$`));
         await expect(page.locator("ul.breadcrumb > li.active > span")).toContainText(expectedHeading);

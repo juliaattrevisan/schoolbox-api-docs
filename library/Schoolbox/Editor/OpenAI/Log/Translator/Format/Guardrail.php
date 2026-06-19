@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Editor\OpenAI\Log\Translator\Format;
 
 use Schoolbox\Editor\OpenAI\Log\LogFormat;
-use Schoolbox\Editor\OpenAI\Log\Model;
+use Schoolbox\OpenAi\Session\Log\Model;
 
 /**
  * Converts a stored AI log entry which uses the Guardrail format into a structured array that can be used by the frontend

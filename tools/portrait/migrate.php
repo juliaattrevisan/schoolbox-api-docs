@@ -18,24 +18,32 @@ require_once __DIR__ . '/../../conf/core/require.php';
 /**
  * Migrate portraits on the local filesystem into Storage
  */
-$app = new class extends CliTool\App
+$app = new class extends CliTool\BaseApp
 {
-    // --help: print help
-    private const OPT_LONG_HELP = 'help';
-
-
-    /** @inheritdoc */
-    public function getLongOpts(): array
-    {
-        return [
-            self::OPT_LONG_HELP,
-        ];
-    }
-
     /** @inheritDoc */
     public function getRequiredProcessUser(): string
     {
         return 'www-data';
+    }
+
+    protected function getName(): string
+    {
+        return 'migrate';
+    }
+
+    protected function getDescription(): string
+    {
+        return 'Migrate portraits from filesystem portrait_dir into Storage and associate them with schoolbox user accounts.';
+    }
+
+    protected function setOptions(): self
+    {
+        return $this;
+    }
+
+    protected function hasPerformMode(): bool
+    {
+        return false;
     }
 
     /**
@@ -43,19 +51,6 @@ $app = new class extends CliTool\App
      */
     public function run(): void
     {
-        if ($this->getOpt(self::OPT_LONG_HELP)) {
-            echo <<<HELP
-
-Migrate portraits from filesystem portrait_dir into Storage and associate them
-with schoolbox user accounts
-
-Usage: migrate.php
-
-
-HELP;
-            exit;
-        }
-
         /* Migrate into storage
          */
         (new MigrateToStorage(

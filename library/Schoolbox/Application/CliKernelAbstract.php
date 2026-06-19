@@ -43,10 +43,35 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
     public const OPTION_LEVEL     = 'level';   // If specified, kernel will not log at a lower verbosity than this.
 
     // Command line options common to all CLI Kernels
-    public const OPT_LONG_PORCELAIN      = 'porcelain'; // Should log items be formatted for text file rather than TTL?
-                                                        // If set, causes field name to be prefixed to field value to enable logs to be parsable by scripts
-                                                        // eg '[!][2019-02-26 00:29:22.72907][13746]' would become '[!][@550][2019-02-26 00:29:22.72907][pid:13746]'
-    public const OPT_SHORT_VERBOSITY     = 'v';         // What level of verbosity should be logged
+
+    /**
+     * Should log items be formatted for text file rather than terminal?
+     *
+     * If set, adds the following so that logs may be made parsable by scripts:
+     * * severity level (as per the values of the `\Monolog\Level`)
+     * * field name to be prefixed to field value
+     *
+     * Comparison:
+     * * without porcelain: '[!][2019-02-26 00:29:22.72907][13746]'
+     * * with porcelain:    '[!][@550][2019-02-26 00:29:22.72907][pid:13746]'
+     */
+    public const OPT_LONG_PORCELAIN = 'porcelain';
+
+    /**
+     * What level of log messages should be output?
+     *
+     * May be provided more than once:
+     * * not provided: `\Monolog\Level::Error`
+     * * -v:           `\Monolog\Level::Notice`
+     * * -vv:          `\Monolog\Level::Info`
+     * * -vvv:         `\Monolog\Level::Debug`
+     *
+     * May be set to a minimum higher level by providing the
+     * `\Schoolbox\Application\CliKernelAbstract::OPTION_LEVEL` value
+     * (as a `\Monolog\Level` enum value) to the
+     * `\Schoolbox\Application\CliTool\Kernel` constructor.
+     */
+    public const OPT_SHORT_VERBOSITY = 'v';
 
     /** @var LoggerInterface */
     private $logger;

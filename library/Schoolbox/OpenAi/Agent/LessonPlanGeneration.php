@@ -60,7 +60,7 @@ class LessonPlanGeneration
      * @param array<int>  $curriculumNodeIds List of related nodes to provide context for.
      * @param string      $additionalContext Any additional context provided for the lesson plan.
      * @param string|null $generateForField  If provided: generate context for this field only.
-     * @param string|null $aiSessionId       If provided: associate the log with this session ID.
+     * @param string      $aiSessionId       The AI session ID used to associate logs with this request.
      * @return array{0: array, 1: int} 0: response body, 1: status
      * @throws ClientExceptionInterface
      * @throws MapperException
@@ -75,12 +75,13 @@ class LessonPlanGeneration
         array $curriculumNodeIds,
         string $additionalContext,
         ?string $generateForField,
-        ?string $aiSessionId = null
+        string $aiSessionId
     ): array {
         $payloadGenerator = new LessonPlan(
             trim($this->config[Config::FIELD_PROVIDER]['value']),
             trim($this->config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
             trim($this->config[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
+            trim($this->config[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_MODEL]['value'] ?? ''),
             trim($this->config[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'] ?? ''),
             trim($this->config[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_REASONING_EFFORT]['value'] ?? '') ?: Config::REASONING_EFFORT_OPTION_DEFAULT,
             trim($this->config[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_TEXT_VERBOSITY]['value'] ?? '') ?: Config::TEXT_VERBOSITY_OPTION_DEFAULT,
@@ -103,7 +104,7 @@ class LessonPlanGeneration
             $payload,
             null,
             $user,
-            Helper::FEATURE_LESSONPLAN,
+            \Schoolbox\OpenAi\Feature::LESSON_PLAN,
             $aiSessionId,
             null, // These requests can't be restored in the AI Usage Log yet
         );

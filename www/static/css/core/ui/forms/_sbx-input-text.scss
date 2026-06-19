@@ -61,6 +61,7 @@ body.sbx-body {
     // When a text input is immediately followed by a button or link, remove the border radius on the right side of the input to visually connect them
     .input-group:has(a, button) {
         input,
+        select,
         .selectize-input {
             border-radius: var(--sbx-config-field-corner-radius) 0 0 var(--sbx-config-field-corner-radius);
             // this is the same as $small-only, which we can't currently import in this context

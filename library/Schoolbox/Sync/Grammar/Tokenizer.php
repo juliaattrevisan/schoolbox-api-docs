@@ -75,7 +75,7 @@ class Tokenizer extends Super
     {
         $context = strtolower($this->prefix);
 
-        $this->addToken(new Token($key, "The $context's $label", function ($entity, $settings) use ($key) {
+        $this->addToken(new Token($key, "The $context's $label", function ($entity, $settings) {
             $reader = new ObjectReader();
             return $reader->read($entity, $settings[0]);
         }));

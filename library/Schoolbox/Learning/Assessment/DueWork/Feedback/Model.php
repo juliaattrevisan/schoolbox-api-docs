@@ -54,14 +54,6 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
 
 
     /**
-     * The marked rubric grids for this feedback.
-     *
-     * @var null|\Schoolbox\GenericCollection<MarkedGrid>
-     */
-    private ?\Schoolbox\GenericCollection $rubricMarkedGrids = null;
-
-
-    /**
      * The id of the feedback's publisher, which isn't necessarily
      * the same person as the $reviewer. Currently this is an id,
      * but the naming allows you to hydrate it one day without
@@ -223,26 +215,6 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
     public function setReviewRoute(string $reviewRoute): self
     {
         $this->reviewRoute = $reviewRoute;
-        return $this;
-    }
-
-
-    /**
-     * @return null|\Schoolbox\GenericCollection<MarkedGrid>
-     */
-    public function getRubricMarkedGrids(): ?\Schoolbox\GenericCollection
-    {
-        return $this->rubricMarkedGrids;
-    }
-
-
-    /**
-     * @param \Schoolbox\GenericCollection<MarkedGrid> $rubricMarkedGrids
-     * @return static
-     */
-    public function setRubricMarkedGrids(\Schoolbox\GenericCollection $rubricMarkedGrids): self
-    {
-        $this->rubricMarkedGrids = $rubricMarkedGrids;
         return $this;
     }
 

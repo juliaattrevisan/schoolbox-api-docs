@@ -22,6 +22,7 @@ use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\DialogAgent;
+use Schoolbox\Learning\Assessment\Reporting;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
 
@@ -69,7 +70,7 @@ class Full
      */
     public function getForParent()
     {
-        return $this->getTimeline(false, false, false, AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT);
+        return $this->getTimeline(false, false, false, [AbstractAssessment::MARK_VISIBILITY_PARENT, AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT]);
     }
 
     /**
@@ -84,7 +85,7 @@ class Full
      */
     public function getForTeacher()
     {
-        return $this->getTimeline(false, true, true, AbstractAssessment::MARK_VISIBILITY_PRIVATE);
+        return $this->getTimeline(false, true, true, [AbstractAssessment::MARK_VISIBILITY_PRIVATE, AbstractAssessment::MARK_VISIBILITY_STUDENT, AbstractAssessment::MARK_VISIBILITY_PARENT, AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT]);
     }
 
 
@@ -100,7 +101,7 @@ class Full
      */
     public function getForStudent()
     {
-        return $this->getTimeline(true, false, true, AbstractAssessment::MARK_VISIBILITY_STUDENT);
+        return $this->getTimeline(true, false, true, [AbstractAssessment::MARK_VISIBILITY_STUDENT, AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT]);
     }
 
 
@@ -114,7 +115,7 @@ class Full
      */
     public function getForAdmin()
     {
-        return $this->getTimeline(true, true, true, AbstractAssessment::MARK_VISIBILITY_PRIVATE);
+        return $this->getTimeline(true, true, true, [AbstractAssessment::MARK_VISIBILITY_PRIVATE, AbstractAssessment::MARK_VISIBILITY_STUDENT, AbstractAssessment::MARK_VISIBILITY_PARENT, AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT]);
     }
 
 
@@ -159,14 +160,14 @@ class Full
      * @param bool $includeUnpublishedSelfReflectionFeedback
      * @param bool $includeUnpublishedInstructorFeedback
      * @param bool $includeDraftResponses
-     * @param int  $minimumVisibility          Assessment mark's visibility must be at least this
+     * @param array $allowedVisibilities        Assessment mark's visibility must be one of these
      * @return Collection
      */
     protected function getTimeline(
         $includeUnpublishedSelfReflectionFeedback,
         $includeUnpublishedInstructorFeedback,
         $includeDraftResponses,
-        $minimumVisibility
+        $allowedVisibilities
     ) {
         // TODO evaluate the appropriateness of caching here
 //        if (!$this->getHasRecombined()) {
@@ -174,7 +175,7 @@ class Full
             $includeUnpublishedSelfReflectionFeedback,
             $includeUnpublishedInstructorFeedback,
             $includeDraftResponses,
-            $minimumVisibility
+            $allowedVisibilities
         );
 //            $this->setHasRecombined(true);
 //        }
@@ -191,24 +192,32 @@ class Full
      * @param bool $includeUnpublishedSelfReflectionFeedback
      * @param bool $includeUnpublishedInstructorFeedback
      * @param bool $includeDraftResponses
-     * @param int  $minimumVisibility
+     * @param array $allowedVisibilities
      */
     protected function recombine(
         $includeUnpublishedSelfReflectionFeedback,
         $includeUnpublishedInstructorFeedback,
         $includeDraftResponses,
-        $minimumVisibility
+        $allowedVisibilities
     ) {
         $processedFeedback = [];
 
-        $isFeedbackVisible = $this->getParticipant()->getAssessable()->getMarkVisibility() >= $minimumVisibility;
+        $isFeedbackVisible = in_array(
+            $this->getParticipant()->getAssessable()->getMarkVisibility(),
+            $allowedVisibilities
+        );
 
-        // Filter for feedback display:
-        // If somehow not due work feedback: exclude
-        // If a self-assess:                 if published show,
-        //                                   if not respect $includeUnpublishedSelfReflectionFeedback
-        // If instructor:                    if published respect $isFeedbackVisible,
-        //                                   if not respect $includeUnpublishedInstructorFeedback
+        /* Filter for feedback display:
+         * If due work:
+         *   - If a self-assess:    if published, show
+         *                          if not respect $includeUnpublishedSelfReflectionFeedback
+         *   - If instructor:       if published, show
+         *                          if not respect $includeUnpublishedInstructorFeedback
+         * If reporting activity:
+         *   - If instructor:       if published, show
+         *                          if not respect $includeUnpublishedInstructorFeedback
+         * otherwise, if neither a due work or reporting, exclude
+         */
         $feedbackFilter = function (IFeedback $feedback) use (
             $includeUnpublishedSelfReflectionFeedback,
             $includeUnpublishedInstructorFeedback,
@@ -221,6 +230,11 @@ class Full
                     }
                     return $includeUnpublishedSelfReflectionFeedback;
                 }
+                if ($feedback->isPublished()) {
+                    return $isFeedbackVisible;
+                }
+                return $includeUnpublishedInstructorFeedback;
+            } else if ($feedback instanceof Reporting\Feedback\Model) {
                 if ($feedback->isPublished()) {
                     return $isFeedbackVisible;
                 }

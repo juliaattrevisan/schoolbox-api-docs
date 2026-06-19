@@ -98,7 +98,7 @@ export default class AcceptanceTester extends BaseTester {
         await this.common.waitForPageLoad();
 
         this.isGoingTo("click the options button and impersonate the user");
-        await this.page.getByTestId("sbx-pop-out-header-options-button").click();
+        await this.common.clickJellyTot();
         await this.page.getByTestId("user-profile-impersonate").click();
 
         await this.skipWhatsNewTour();
@@ -115,7 +115,6 @@ export default class AcceptanceTester extends BaseTester {
     async searchForUser(fullname: string): Promise<void> {
         this.isGoingTo(`search for a user by the name of ${fullname}`);
         await this.page.getByTestId("search-input-button").click();
-        // await this.page.getByTestId("search-input-field").fill(fullname);
         await this.page.getByTestId("search-input-field").click();
         await this.page.keyboard.type(fullname, { delay: 500 });
         await this.page.getByTestId(`header-search-user-result-link-${fullname}`).click();

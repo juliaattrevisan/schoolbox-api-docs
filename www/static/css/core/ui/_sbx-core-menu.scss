@@ -17,6 +17,9 @@ body.sbx-body {
         .tab-bar {
             border-radius: var(--sbx-config-container-corner-radius);
             box-shadow: var(--sbx-config-container-drop-shadow);
+            @media only print, screen and (max-width: 40em) {
+                border-radius: 0;
+            }
         }
 
         // make the width of the menu items dynamic to better allow for varying text lengths
@@ -107,21 +110,21 @@ body.sbx-body {
                 > sbx-icon {
                     align-items: center;
                     display: inline-flex;
-                    flex: 0 0 1rem;
-                    height: 1rem;
+                    flex: 0 0 var(--sbx-size-m);
+                    height: var(--sbx-size-m);
                     justify-content: center;
-                    width: 1rem;
+                    width: var(--sbx-size-m);
                 }
 
                 > [data-unread-count] {
                     align-items: center;
                     background: var(--sbx-color-alert);
                     border-radius: 999px;
-                    box-shadow: 0 0.125rem 0.375rem rgb(0 0 0 / 0.25);
+                    box-shadow: var(--sbx-shadow-s);
                     color: var(--sbx-config-color-menu-foreground, var(--navigation-foreground));
                     display: inline-flex;
-                    font-size: 0.625rem;
-                    font-weight: 600;
+                    font-size: var(--sbx-font-size-xs, 0.625rem);
+                    font-weight: var(--sbx-font-weight-heading);
                     inset-inline-end: -0.25rem;
                     justify-content: center;
                     line-height: 1;
@@ -148,12 +151,13 @@ body.sbx-body {
             & .separator {
                 color: var(--sbx-color-text-primary);
                 font-size: var(--sbx-font-size-s);
-                font-weight: 600;
+                font-weight: var(--sbx-font-weight-heading);
                 text-transform: none;
             }
 
             .profile-options,
             .profile-options-mobile {
+                background: var(--sbx-color-foreground-primary);
                 a {
                     color: var(--sbx-config-color-accent);
                     border-radius: var(--sbx-config-field-corner-radius);
@@ -164,12 +168,13 @@ body.sbx-body {
                     & [class^="icon"] {
                         color: var(--sbx-config-color-accent);
                         font-size: var(--sbx-font-size-s);
-                        line-height: 1.2;
+                        line-height: var(--sbx-line-height-tight);
                     }
                 }
             }
 
             .switch-user {
+                background: var(--sbx-color-foreground-primary);
                 // switch user list
                 li.user {
                     border-radius: var(--sbx-config-field-corner-radius);
@@ -218,6 +223,7 @@ body.sbx-body {
 
     // Left menu styles
     #left-menu {
+        background: var(--sbx-color-foreground-primary);
         h3 {
             color: var(--sbx-color-text-primary);
             text-transform: none;
@@ -270,17 +276,13 @@ body.sbx-body {
         }
     }
 
+    #msgs {
+        background: var(--sbx-color-foreground-primary);
+    }
+
     // Message list styles
     #message-list {
         padding: var(--sbx-size-xs);
-
-        & li:has(:is(#msg-bar, section, .button)) {
-            padding-inline: 0.6rem;
-        }
-
-        & li:has(section) {
-            padding-block: 1rem 0.6rem;
-        }
 
         & :where(#right-menu-dock, #notification-toggle-full, .settings-button) {
             color: var(--sbx-config-color-accent);

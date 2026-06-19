@@ -107,7 +107,7 @@ class GroupController extends Component_Dashboard_ControllerAbstract
     }
 
     /**
-     * @param Collection $classList
+     * @param Collection $groupList
      */
 
     public function setGroupList(Collection $groupList)

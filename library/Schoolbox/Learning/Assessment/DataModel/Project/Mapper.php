@@ -37,7 +37,7 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('summator', self::TYPE_STRING);
-        $this->uses('mark_visibility', self::TYPE_INTEGER);
+        $this->uses('mark_visibility', self::TYPE_STRING);
         $this->uses('require_all_activities', self::TYPE_BOOLEAN);
         $this->joins('owner_id', UserMapper::class);
         $this->joins('mark_type_id', MarkTypeMapper::class, 'mark_type_id', null, null, 'markType');

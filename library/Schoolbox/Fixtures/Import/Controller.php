@@ -1240,7 +1240,6 @@ class Controller extends Base
                             'division_id' => $division->getId()
                         ], $this->disableCache);
                     } catch (MapperException $e) {
-                        /** @var Team $teamHome */
                         $teamHome = null;
                     }
 
@@ -1250,7 +1249,6 @@ class Controller extends Base
                             'division_id' => $division->getId()
                         ], $this->disableCache);
                     } catch (MapperException $e) {
-                        /** @var Team $teamAway */
                         $teamAway = null;
                     }
 
@@ -1261,7 +1259,6 @@ class Controller extends Base
                             'name' => $row[8]
                         ], $this->disableCache);
                     } catch (MapperException $e) {
-                        /** @var School $schoolHome */
                         $schoolHome = null;
                     }
 
@@ -1270,7 +1267,6 @@ class Controller extends Base
                             'name' => $row[9]
                         ], $this->disableCache);
                     } catch (MapperException $e) {
-                        /** @var School $schoolAway */
                         $schoolAway = null;
                     }
 

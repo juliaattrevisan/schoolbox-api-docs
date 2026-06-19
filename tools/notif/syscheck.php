@@ -20,9 +20,29 @@ error_reporting(E_ALL);
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$app = new class extends CliTool\App {
+$app = new class extends CliTool\BaseApp {
     private const OPT_LONG_MAIL = 'mail';
-    private const OPT_LONG_HELP = 'help';
+
+    protected function getName(): string
+    {
+        return 'syscheck';
+    }
+
+    protected function getDescription(): string
+    {
+        return 'Checks whether all external dependencies (MariaDB, Redis, RabbitMQ) are up and running.';
+    }
+
+    protected function setOptions(): self
+    {
+        $this->addOption(null, self::OPT_LONG_MAIL, 'Send an alert notification if services are offline');
+        return $this;
+    }
+
+    protected function hasPerformMode(): bool
+    {
+        return false;
+    }
 
     /** @inheritdoc */
     public function runAsRoot(): ?bool
@@ -30,24 +50,10 @@ $app = new class extends CliTool\App {
         return null;
     }
 
-    /** @inheritdoc */
-    public function getLongOpts(): array
-    {
-        return [
-            self::OPT_LONG_MAIL,
-            self::OPT_LONG_HELP,
-        ];
-    }
-
     public function run(): void
     {
         $errors = array();
         $mail = $this->getOpt(self::OPT_LONG_MAIL);
-
-        if ($this->getOpt(self::OPT_LONG_HELP)) {
-            echo "Usage: syscheck.php [--mail] [--help]\n";
-            exit(0);
-        }
 
         try {
             /** @var Logger $d */

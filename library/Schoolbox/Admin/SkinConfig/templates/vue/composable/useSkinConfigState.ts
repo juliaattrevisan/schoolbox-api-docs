@@ -4,7 +4,7 @@
  */
 
 import type { Ref } from "vue";
-import type { SkinConfigData } from "../../js/types/skinConfigTypes";
+import type { SkinConfigData, SkinConfigOption } from "../../js/types/skinConfigTypes";
 
 /**
  * Serialize the current config state for dirty-state comparison.
@@ -22,6 +22,21 @@ function serializeConfigs(value: SkinConfigData): string {
  */
 function cloneConfigs(value: SkinConfigData): SkinConfigData {
     return JSON.parse(serializeConfigs(value)) as SkinConfigData;
+}
+
+/**
+ * Build a lookup of active colour config options by config name.
+ * @param value The current Skin Config payload.
+ * @returns Colour options from the currently active Skin Config section.
+ */
+function getActiveColourOptionsByName(value: SkinConfigData): Map<string, SkinConfigOption> {
+    const activeConfigs = value.toggle.enabled ? value.sonar : value.existing;
+    const colourOptions = Object.values(activeConfigs)
+        .flatMap((subcategories) => subcategories)
+        .flatMap((subcategory) => subcategory.options)
+        .filter((option) => option.type === "colour");
+
+    return new Map(colourOptions.map((option) => [option.name, option]));
 }
 
 /**
@@ -55,15 +70,18 @@ export function useSkinConfigState(
      */
     async function initialiseColourPickers(): Promise<void> {
         await window.Vue.nextTick();
+        const colourOptionsByName = getActiveColourOptionsByName(configs.value);
         document.querySelectorAll("[data-colour-picker]").forEach((element) => {
             if (!(element instanceof HTMLInputElement) || element.id === "") {
                 return;
             }
+            const option = colourOptionsByName.get(element.name);
             document.dispatchEvent(
                 new CustomEvent("colourPickerInitialise", {
                     detail: {
                         el: `#${element.id}`,
                         format: "rgb",
+                        alpha: option?.hasAlpha !== false,
                     },
                 }),
             );

@@ -383,11 +383,8 @@ class ListController extends Web\Controller\Base
      */
     public function postReorderAssessments(AssessmentContext $context)
     {
-        /**
-         * @var IAssessable[] $allAssessments
-         * @var IAssessable[] $sortedAssessments
-         */
-        $allAssessments    = $this->getAssessmentMapper()->findAllByContext($context)->indexBy('id');
+        /** @var IAssessable[] $allAssessments */
+        $allAssessments = $this->getAssessmentMapper()->findAllByContext($context)->indexBy('id');
         $sortedAssessments = new GenericCollection(IAssessable::class);
         foreach ($this->requestPost->get('id', []) as $assessmentId) {
             if (isset($allAssessments[$assessmentId])) {
@@ -509,10 +506,30 @@ class ListController extends Web\Controller\Base
      */
     public function updateVisibility(IAssessable $assessment): void
     {
-        $visibility            = (int)$this->requestPost['visibility'];
-        $availableVisibilities = FeedbackVisibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max'));
-        if (!in_array($visibility, $availableVisibilities)) {
+        $visibility            = (string) $this->requestPost['visibility'];
+        $currentVisibility     = $assessment->getMarkVisibility();
+        $availableVisibilities = FeedbackVisibility::getAvailableVisibilities(
+            (bool) $this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_STUDENTS),
+            (bool) $this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_PARENTS),
+        );
+
+        // Only check whether $visibility is in $availableVisibilities if $visibility has changed.
+        // Reasoning:
+        // It may be that the current visibility is not in the currently available set due to changes in LMS policy
+        // settings (config.mark_visibility_allow_students, config.mark_visibility_allow_parents).  If that is the case,
+        // that is a problem, but it is probably not the logged-in user's problem.  They probably did not cause it, and
+        // should not be expected to fix it.
+        if (
+            $visibility !== $currentVisibility
+            && !in_array($visibility, $availableVisibilities, true)
+        ) {
             $this->response = $this->responseAsJson(['error' => 'Invalid visibility'])->withStatus(500);
+            return;
+        }
+
+        if ($visibility === $currentVisibility) {
+            // The mark visibility has not changed, so there is no need to update the database.
+            $this->response = $this->responseAsJson(['message' => 'Loaded successfully']);
             return;
         }
 
@@ -1092,7 +1109,7 @@ class ListController extends Web\Controller\Base
             if ($includeResponse) {
                 /* Forces refresh of participation data, before returning the updated participation info
                  */
-                $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
+                $this->participantDataSource->loadParticipationIntoAssessment($assessment, (new \Schoolbox\Collection())->add($student));
                 $participation           = $assessment->getParticipantIfExtant($student);
                 $this->response = $this->responseAsJson(
                     [
@@ -1450,7 +1467,7 @@ class ListController extends Web\Controller\Base
     {
         // hydrate participant
         $assessments = $this->getAssessmentMapper()->createCollection([$assessment]);
-        $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, $student, true);
+        $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection(collection: $assessments, users: (new \Schoolbox\Collection())->add($student), removeExcluded: true);
 
         $participant = $assessment->getParticipantIfExtant($student);
 
@@ -1611,6 +1628,8 @@ class ListController extends Web\Controller\Base
                 } elseif ($latestFeedback instanceof \Schoolbox\Learning\Assessment\Lti\Feedback\Model) {
                     $feedback['scoreGiven'] = $latestFeedback->getScoreGiven();
                     $feedback['scoreMaximum'] = $latestFeedback->getScoreMaximum();
+                } elseif ($latestFeedback instanceof \Schoolbox\Learning\Assessment\Reporting\Feedback\Model) {
+                    $feedback['humanReadableInstructorMark'] = $latestFeedback->getHumanReadableInstructorMark();
                 }
 
                 // coalesce humanReadableInstructorMark with humanReadable if humanReadableInstructorMark wasn't set

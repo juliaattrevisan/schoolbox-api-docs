@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\OpenAi\Agent\CkEditorTextChat;
 
 use Html2Text\Html2Text;
-use Schoolbox\Editor\OpenAI\Log;
+use Schoolbox\OpenAi\Session\Log;
 use Schoolbox\OpenAi\EventStream\Message;
 use Schoolbox\OpenAi\LogHandler\IListener;
 use UnexpectedValueException;

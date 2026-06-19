@@ -537,12 +537,12 @@ export default {
                     <template #edit="props">
                         <nav class="edit">
                             <button
-                                :class="`button-toggle-visibility ${
-                                    props.row.hidden ? 'icon-view-hollow' : 'icon-view'
-                                }`"
+                                class="button-toggle-visibility"
                                 @click.prevent="onToggleVisibilitySelected(props.row)"
                                 :title="getVisibilityAction(props.row)"
+                                :aria-label="getVisibilityAction(props.row)"
                             >
+                                <sbx-icon :name="props.row.hidden ? 'view-hollow' : 'view'"></sbx-icon>
                                 {{ getVisibilityAction(props.row) }}
                             </button>
                             <a :href="props.row.editUrl" title="Modify File" class="sbx-icon-only-button"
@@ -560,7 +560,7 @@ export default {
                         />
                         <div class="VueTables__table-footer" ref="tableFooter"></div>
                         <div v-if="canEdit" class="component-action">
-                            <section>
+                            <section class="l-c-cr-bottom">
                                 <p>
                                     <a :href="`/cms/file/new/${this.sourceFolderId}`" title="Select a file"
                                         >Select a file</a
@@ -641,8 +641,10 @@ body:not(.sbx-body) {
 }
 
 .button-toggle-visibility {
+    align-items: center;
     background: none;
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
+    display: inline-flex;
     font-size: 0rem;
     line-height: 2.5;
     padding: 0px 2px 0px 10px;

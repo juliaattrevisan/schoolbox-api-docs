@@ -63,7 +63,8 @@ config:
   lms_resubmit_window: { hide: true }
   restrict_parent_duework_access: { value: true, hide: true }
   restrict_student_submissions: { value: true, hide: true }
-  submission_visibility_max: { hide: true }
+  mark_visibility_allow_students: { hide: true }
+  mark_visibility_allow_parents: { hide: true }
   submission_access: { hide: true }
   similarity_check_student_visible: { hide: true }
   similarity_check_allow_students_report_access: { hide: true }

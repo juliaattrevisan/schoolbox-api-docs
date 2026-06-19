@@ -16,11 +16,8 @@ use Schoolbox\MapperFactory;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$app = new class extends CliTool\App
+$app = new class extends CliTool\BaseApp
 {
-    // --help: print help
-    private const OPT_LONG_HELP = 'help';
-
     /**
      * Self-signed cert valid for this many days
      * Default is 3650 days (10 years)
@@ -32,13 +29,24 @@ $app = new class extends CliTool\App
      */
     private const DIGEST_ALGORITHM = 'sha256';
 
-
-    /** @inheritdoc */
-    public function getLongOpts(): array
+    protected function getName(): string
     {
-        return [
-            self::OPT_LONG_HELP,
-        ];
+        return 'createKeys';
+    }
+
+    protected function getDescription(): string
+    {
+        return 'Regenerates SAML certificates for saml_private_cert and saml_public_cert fields in config table.';
+    }
+
+    protected function setOptions(): self
+    {
+        return $this;
+    }
+
+    protected function hasPerformMode(): bool
+    {
+        return false;
     }
 
     /**
@@ -52,18 +60,6 @@ $app = new class extends CliTool\App
     /** @inheritDoc */
     public function run(): void
     {
-        if ($this->getOpt(self::OPT_LONG_HELP)) {
-            echo <<<HELP
-
-Regenerate SAML certificates for saml_private_cert and saml_public_cert fields in config table.
-
-Usage: createKeys.php -vvv
-
-
-HELP;
-            exit;
-        }
-
         $conf   = $this->getConfig();
         $config = [
             'digest_alg' => self::DIGEST_ALGORITHM,

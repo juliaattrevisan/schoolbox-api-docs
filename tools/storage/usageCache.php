@@ -18,43 +18,38 @@ require_once __DIR__ . '/../../conf/core/require.php';
 /**
  * Re generates usage cache for /adminv2/usage
  */
-$app = new class extends CliTool\App {
-// --help: print help
-    private const OPT_LONG_HELP = 'help';
-
-
-    /** @inheritdoc */
-    public function getLongOpts(): array
-    {
-        return [
-            self::OPT_LONG_HELP,
-        ];
-    }
-
+$app = new class extends CliTool\BaseApp {
     /** @inheritdoc */
     public function runAsRoot(): ?bool
     {
         return false;
     }
 
+    protected function getName(): string
+    {
+        return 'usageCache';
+    }
+
+    protected function getDescription(): string
+    {
+        return 'Recalculates the storage usage and stores the calculations in redis.';
+    }
+
+    protected function setOptions(): self
+    {
+        return $this;
+    }
+
+    protected function hasPerformMode(): bool
+    {
+        return false;
+    }
 
     /**
      * Run the cli tool
      */
     public function run(): void
     {
-        if ($this->getOpt(self::OPT_LONG_HELP)) {
-            echo <<<HELP
-Re Calculates the storage usage and stores the calculations in redis
-
-Usage: tools/usageCache.php [-v] [-p]
-        -v Verbose mode (may be provided up to 3 times for increasing verbosity)
-
-HELP;
-            exit;
-        }
-
-
         /** @var IConnector $database */
         $database = $this->getDi()->get('databaseInternalRead');
 

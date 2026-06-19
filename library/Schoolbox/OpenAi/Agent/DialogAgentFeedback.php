@@ -14,7 +14,7 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Admin\DialogAgent\Scenario\Model as Scenario;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
-use Schoolbox\Editor\OpenAI\Log;
+use Schoolbox\OpenAi\Session\Log;
 use Schoolbox\Editor\OpenAI\Payload\DialogAgentFeedback as PayloadGenerator;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as Response;
 use Schoolbox\OpenAi\IClient;
@@ -63,6 +63,7 @@ class DialogAgentFeedback
             trim($this->config[Config::FIELD_PROVIDER]['value']),
             trim($this->config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
             trim($this->config[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
+            trim($this->config[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_MODEL]['value'] ?? ''),
             trim($this->config[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'] ?? ''),
             trim($this->config[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_REASONING_EFFORT]['value'] ?? '') ?: Config::REASONING_EFFORT_OPTION_DEFAULT,
             trim($this->config[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_TEXT_VERBOSITY]['value'] ?? '') ?: Config::TEXT_VERBOSITY_OPTION_DEFAULT,
@@ -73,7 +74,7 @@ class DialogAgentFeedback
             $payload,
             (string)$response->getId(), // for debugging purposes, this links the log back to the response ID
             $user,
-            Helper::FEATURE_DIALOGAGENT,
+            \Schoolbox\OpenAi\Feature::DIALOG_AGENT,
             $sessionId,
             null, // These requests can't be restored in the AI Usage Log yet
         );

@@ -319,7 +319,7 @@ class Module extends BaseModule
 
 
     /**
-     * @return \Schoolbox\Mapper|Mapper
+     * @return Mapper
      * @throws \InvalidArgumentException If cannot find mapper class
      */
     private function getArticleMapper(): Mapper
@@ -329,7 +329,7 @@ class Module extends BaseModule
 
 
     /**
-     * @return StrategyFactory|object
+     * @return StrategyFactory
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     private function getStrategyFactory(): StrategyFactory

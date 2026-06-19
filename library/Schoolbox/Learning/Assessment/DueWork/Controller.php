@@ -28,6 +28,7 @@ use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use RangeException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Rubric\Grid\Payload;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper;
 use Schoolbox\File\MimetypeMapper;
@@ -484,26 +485,29 @@ class Controller extends Assessment\Controller
         );
         $lastView->addNewView($assessment, $student, $this->getUser());
 
+        /* Various feedback entities
+         */
+        $authoritativeFeedback = $participant?->findAuthoritativeVisibleFeedback($this->getUser());
+        $selfAssessmentFeedback = $participant?->findMostRecentSelfAssessedPublishedFeedback();
+
         /* Find all the records spawned by $participant
          *
          * Order them by submitted time to find the most recent, and use that
          */
         $twigData = [
-            'lastViews'    => $lastView->getTwigViews($assessment, $student, $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder())),
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
-                [
-                    $assessment->getTitle(),
-                    '',
-                ]
-            ),
+            'lastViews' => $lastView->getTwigViews($assessment, $student, $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder())),
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([
+                $assessment->getTitle(),
+                '',
+            ]),
             'assessment'             => $assessment,
             'student'                => $student,
             'participant'            => $participant,
             'returnUrl'              => $returnUrl,                   // Unencoded URL for use in direct redirection (eg. <a href='{{ returnUrl }}'>)
             'returnUrlEncoded'       => Redirect::encode($returnUrl), // Encoded URL For use as a URL parameter (eg. '?returnUrl={{ returnUrlEncoded }}')
             'timeline'               => $participant ? (new FullTimeline($participant))->getForUser($this->getUser()) : null,
-            'authoritativeFeedback'  => $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null,
-            'selfAssessmentFeedback' => $participant ? $participant->findMostRecentSelfAssessedPublishedFeedback() : null,
+            'authoritativeFeedback'  => $authoritativeFeedback,
+            'selfAssessmentFeedback' => $selfAssessmentFeedback,
             'selfReflect'            => $participant ? (new ValidSelfReflectionWithResponse())->isSatisfiedBy($this->getUser(), $participant) : null,
             'selfAssess'             => $participant ? (new ValidSelfGradableWithResponse())->isSatisfiedBy($this->getUser(), $participant) : null,
 
@@ -546,6 +550,43 @@ class Controller extends Assessment\Controller
 
             // detect the combination of "accept none + self-assess" and allow ACK in this case
             $twigData['acknowledgementBlocked'] = false === ($assessment->isSelfAssessable() && $assessment->isAcceptNone());
+        }
+
+        /* The most recent authoritative and self-graded feedbacks appear here as usual
+         */
+        $twigData['rubricMarkedGridPayloads'] = new Payload(
+            $this->rubricMapper,
+            $this->getConfigLoader()->get(ConfigMapper::NAME_RUBRIC_SHOW_POINTS),
+            $this->getUser()
+        )->generate(
+            $assessment->getRubricInstances(),
+            $selfAssessmentFeedback,
+            $authoritativeFeedback,
+        );
+
+        /* Other Rubric Grid Payloads indexed by a feedback id. This is because the timeline displays multiple sets of
+         * rubric grids; it's not just the grids for one feedback anymore.
+         */
+        $payloadGenerator = new Payload(
+            $this->rubricMapper,
+            $this->getConfigLoader()->get(ConfigMapper::NAME_RUBRIC_SHOW_POINTS),
+            $this->getUser()
+        );
+
+        /* If the student doesn't have a feedback atm, we still need to have this var
+         */
+        $twigData['rubricMarkedGridPayloadsHistory'] = [];
+
+        /* Participant might be null here;
+         * Even if extant, they might night have any feedbacks at all.
+         * This results in a hilarious double-null-coalesce scenario
+         */
+        foreach ($participant?->getAllFeedbacks() ?? [] as $feedback) {
+            $twigData['rubricMarkedGridPayloadsHistory'][$feedback->getId()] = $payloadGenerator->generate(
+                $assessment->getRubricInstances(),
+                null,  // show self-graded feedback as if they were instructor-derived
+                $feedback,
+            );
         }
 
         $this->response = $this->responseFromTemplate(
@@ -1140,7 +1181,6 @@ class Controller extends Assessment\Controller
                             ->setKamiDocumentId($kamiFile)
                             ->setStatusDone();
                         $this->kamiMapper->save($kamiModel);
-                        /** @var SubmissionFile $kamiFile */
                         $kamiSubmissionFile = $this->submissionFileMapper->createModel()
                             ->setFilename($worksheetName)
                             ->setKami($kamiModel)
@@ -1194,10 +1234,8 @@ class Controller extends Assessment\Controller
          *  and $assessment->isSelfAssessable() (self grading) - you can already figure out the answer without needing
          *  these extra $selfAssess and $selfReflect vars. I wonder why those were ever necessary...
          */
-        /* TODO probably superfluous (and always was?)
-         */
-//        $selfReflect = $reviewRoute === ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION;
-//        $selfAssess = $reviewRoute === ReturnedWork::REVIEW_ROUTE_SELF_GRADING;
+        $selfReflect = $assessment->isSelfReflectionOnly();
+        $selfAssess = $assessment->isSelfGradable();
 
         if ($this->requestQuery->get(Redirect::RETURN_URL)) {
             $returnUrl = Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL));
@@ -1229,10 +1267,8 @@ class Controller extends Assessment\Controller
             'policy'         => $assessment->getEnablePolicy() ? $this->getConfigLoader()->get('lms_student_policy') : '', // only use the policy, if this assessment is showing the policy
             'errorMessage'   => $errorMessage,
             'readonly'       => $isInteractionLocked,
-            /* TODO probably superfluous (and always was?)
-             */
-//            'selfReflect'    => $selfReflect,
-//            'selfAssess'     => $selfAssess,
+            'selfReflect'    => $selfReflect,
+            'selfAssess'     => $selfAssess,
             'acceptsOnline'  => $acceptsOnlineSubmissions,
             'returnUrl'      => $returnUrl,
             'kamiSession'    => $kamiSession,
@@ -1240,11 +1276,26 @@ class Controller extends Assessment\Controller
             'editorTemplates' => $this->activityTemplateHelper !== null ? $this->activityTemplateHelper->getTemplatesForCategory() : [],
 
             /* Only show these things if the assessment is self-gradable */
-            /* TODO probably superfluous (and always was?)
+            /* TODO showGroupTotal is a property of the rubric instance now...I think these are wrong to implement here
+             *  in this manner. Snake lord I'll have to work it out with you one day
              */
-//            'showGroupTotal'      => $selfAssess && ($assessment->getCapabilityMarkType() !== SubmissionBox\MarkType::SLUG_NONE),
-//            'showRubricTotal'     => $selfAssess
+            'showGroupTotal' => null,
+            'showRubricTotal' => $selfAssess
         ];
+
+        /* Rubric Grid Payloads
+         */
+        $data['rubricMarkedGridPayloads'] = new Payload(
+            $this->rubricMapper,
+            $this->getConfigLoader()->get(ConfigMapper::NAME_RUBRIC_SHOW_POINTS),
+            $this->getUser()
+        )->generate(
+            $assessment->getRubricInstances(),
+            null,
+            /* Intentionally simulate a staff-given feedback by cramming a self-graded feedback here.
+             */
+            $feedback,
+        );
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/dueWork/createSubmission.twig',

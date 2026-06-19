@@ -50,13 +50,12 @@ register();
 const preview = {
     parameters: {
         backgrounds: {
-            default: "demo",
-            values: [
-                {
+            options: {
+                demo: {
                     name: "demo",
-                    value: "var(--sbx-color-background)",
+                    value: "var(--sbx-storybook-docs-background)",
                 },
-            ],
+            },
         },
         chromatic: {
             pauseAnimationAtEnd: true, // Notifies Chromatic to pause the animations when they finish at a global level.
@@ -90,7 +89,14 @@ const preview = {
             },
         },
     },
+
     tags: ["autodocs"],
+
+    initialGlobals: {
+        backgrounds: {
+            value: "demo",
+        },
+    },
 };
 
 export default preview;

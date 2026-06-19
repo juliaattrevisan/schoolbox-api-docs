@@ -2087,7 +2087,7 @@ abstract class Kernel
                         new Filter\Filters\Badge\FactoryFactory($mapperFactory, $config),
                         new Filter\Filters\Award\FactoryFactory($mapperFactory, $config),
                         new Filter\Filters\Pastoral\FactoryFactory($mapperFactory, $config),
-                        new Filter\Filters\DifferentiationProfile\FactoryFactory($mapperFactory, $config),
+                        new Filter\Filters\DifferentiationProfile\FactoryFactory($mapperFactory, $config, $rosettaStone),
                         new Filter\Filters\CustomisationRecord\FactoryFactory($mapperFactory, $config, $rosettaStone),
                     );
                 }
@@ -2204,7 +2204,7 @@ abstract class Kernel
             $di->lazy(function () use ($di) {
                 /** @var IConfigLoader $config */
                 $config = $di->get('config');
-                /** @var ToolModel[] $ltiTools */
+                /** @var Collection|ToolModel[] $ltiTools */
                 $ltiTools = $di->get('lti.tools');
                 return new KeyChainRepositoryFactory($config)->build($ltiTools);
             })
@@ -2218,7 +2218,7 @@ abstract class Kernel
                 $generator = $di->get('router.generator');
                 /** @var KeyChainRepositoryInterface $keyChains */
                 $keyChains = $di->get('lti.keyChains');
-                /** @var ToolModel[] $ltiTools */
+                /** @var Collection|ToolModel[] $ltiTools */
                 $ltiTools = $di->get('lti.tools');
                 $registrationRepositoryFactory = new RegistrationRepositoryFactory(
                     $config,
@@ -2466,11 +2466,26 @@ abstract class Kernel
             $di->lazyNew(
                 \Schoolbox\OpenAi\ClientFactory::class,
                 [
-                    'config'     => $di->lazyGet('config'),
-                    'logMapper'  => $mapperFactory->getLazy(\Schoolbox\Editor\OpenAI\Log\Mapper::class),
-                    'httpClient' => $di->lazyGet('httpClient'),
+                    'config'        => $di->lazyGet('config'),
+                    'logMapper'     => $mapperFactory->getLazy(\Schoolbox\OpenAi\Session\Log\Mapper::class),
+                    'httpClient'    => $di->lazyGet('httpClient'),
+                    'sessionMapper' => $mapperFactory->getLazy(\Schoolbox\OpenAi\Session\Mapper::class),
                 ]
             )
+        );
+
+        // Tools daemon client
+        $di->set(
+            'toolsDaemon.client',
+            $di->lazy(
+                function () use ($di) {
+                    $factory = new \Schoolbox\ToolsDaemon\ClientFactory(
+                        $di->get('httpClient'),
+                        $di->get('config')
+                    );
+                    return $factory->build();
+                },
+            ),
         );
 
         return $di;

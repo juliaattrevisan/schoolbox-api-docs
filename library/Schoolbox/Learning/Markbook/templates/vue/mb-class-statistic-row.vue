@@ -2,6 +2,17 @@
 import { useMarkbookStore } from "./store/markbookStore";
 import type { MarkbookClassImplActivity, MarkbookClassImpl, MarkbookActivity } from "./types/payload";
 
+type SelectOption = {
+    value: string | number;
+    /** WARNING: This label is output as v-html to allow for icons, so ensure sanitization occurs beforehand */
+    label: string;
+    /** An icon to display if the mark is readonly, if unset will show a disabled input field */
+    readonlyIcon?: string;
+    disabled?: boolean;
+};
+
+type SelectOptions = SelectOption[] | ((aImpl: MarkbookClassImplActivity) => SelectOption[]);
+
 export interface Props {
     label: string;
     statsKey: keyof MarkbookClassImplActivity["stats"];
@@ -10,13 +21,7 @@ export interface Props {
     input?: {
         allowCourseManaged?: boolean;
         key: keyof MarkbookClassImplActivity;
-        selectOptions?: {
-            value: number;
-            /** WARNING: This label is output as v-html to allow for icons, so ensure sanitization occurs beforehand */
-            label: string;
-            /** An icon to display if the mark is readonly, if unset will show a disabled input field */
-            readonlyIcon?: string;
-        }[];
+        selectOptions?: SelectOptions;
         /**
          * Parameters for the fetch request to persist the change
          */
@@ -43,13 +48,24 @@ const activities = window.Vue.computed(() =>
         }
 
         const inputOptions = props.input;
-        const selectOption = inputOptions?.selectOptions?.find((opt) => opt.value === aImpl[inputOptions.key]);
+
+        // Resolve the row-specific option list first, then use it to find the current value
+        // so readonly states can still show the matching icon or disabled option.
+        const selectOptions =
+            typeof inputOptions?.selectOptions === "function"
+                ? inputOptions.selectOptions(aImpl)
+                : inputOptions?.selectOptions;
+        const selectOption =
+            inputOptions === undefined
+                ? undefined
+                : selectOptions?.find((opt) => opt.value === aImpl[inputOptions.key]);
 
         return {
             assessment,
             aImpl,
             stat: aImpl.stats[props.statsKey] ?? null,
             readonly: !aImpl.writable || inputOptions?.readonlyForTypes?.includes(assessment.assessmentType),
+            selectOptions,
             selectOption,
         };
     }),
@@ -108,10 +124,10 @@ async function onValueChange(activityId: number, aImpl: MarkbookClassImplActivit
 <template>
     <tr v-if="mbStore.data !== null" class="sub-row" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }">
         <th class="fixed-left">{{ label }}</th>
-        <th class="fixed-left">&nbsp;</th>
-        <td v-if="mbStore.data.rank !== null"></td>
+        <th v-if="mbStore.showWeightedAverageColumn" class="fixed-left">&nbsp;</th>
+        <td v-if="mbStore.showRankColumn"></td>
         <td
-            v-for="{ assessment, aImpl, stat, readonly, selectOption } in activities"
+            v-for="{ assessment, aImpl, stat, readonly, selectOption, selectOptions } in activities"
             :key="assessment.id"
             class="student-grade-cell"
             :data-assessment="assessment.id"
@@ -119,14 +135,14 @@ async function onValueChange(activityId: number, aImpl: MarkbookClassImplActivit
             <template v-if="stat === null || aImpl === null"></template>
             <template v-else-if="props.input && (props.input.allowCourseManaged || !aImpl.courseManaged)">
                 <span
-                    v-if="props.input?.selectOptions && readonly && selectOption"
+                    v-if="selectOptions && readonly && selectOption"
                     :class="selectOption.readonlyIcon"
                     :title="selectOption.label"
                 >
                     <!-- This field is a select and not writable, but has a readonlyIcon available to use - so use it -->
                 </span>
                 <select
-                    v-else-if="props.input?.selectOptions"
+                    v-else-if="selectOptions"
                     v-model="aImpl[props.input.key]"
                     :name="props.statsKey"
                     @change="onValueChange(assessment.id, aImpl)"
@@ -134,9 +150,10 @@ async function onValueChange(activityId: number, aImpl: MarkbookClassImplActivit
                     <!-- eslint-disable vue/no-v-html -- we can't use <sbx-icon> in a select since html spec
                     -- doesn't allow elements in options, so the whole thing is v-html'd instead... -->
                     <option
-                        v-for="option in props.input.selectOptions"
+                        v-for="option in selectOptions"
                         :key="option.value"
                         :value="option.value"
+                        :disabled="option.disabled || undefined"
                         v-html="option.label"
                     ></option>
                     <!-- eslint-enable vue/no-v-html -->

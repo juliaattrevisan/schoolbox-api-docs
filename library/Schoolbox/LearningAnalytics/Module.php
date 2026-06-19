@@ -116,17 +116,21 @@ class Module extends BaseModule
      * Loads model graph.
      *
      * @param array $params
-     * @var int     $params ['courseSpecId']
-     * @var int     $params ['termCode']
-     * @var int     $params ['folderId']                Optional
-     * @var int     $params ['submissionType']          Optional
+     *
+     * Parameter keys:
+     * - int courseSpecId
+     * - int termCode
+     * - int folderId Optional
+     * - int submissionType Optional
      *
      * @return array
-     * @var string[]                               return['params']
-     * @var CourseSpecification                    return['courseSpecification']
-     * @var GenericCollection|UnitImplementation[] return['unitImplementations']
-     * @var Term                                   return['term']
-     * @var null|Folder                            return['selectedClassFolder']
+     *
+     * Return data:
+     * - string[] params
+     * - CourseSpecification courseSpecification
+     * - GenericCollection|UnitImplementation[] unitImplementations
+     * - Term term
+     * - null|Folder selectedClassFolder
      * @throws ApplicationException
      * @throws MapperException
      * @throws Mapper\DefinitionException

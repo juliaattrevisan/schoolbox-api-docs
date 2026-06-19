@@ -81,8 +81,7 @@ class SubmissionBoxMapper extends BaseMapper
         $this->uses('use_rubric', self::TYPE_BOOLEAN);
         $this->joins('rubric_capability_mark_type_id', SubmissionBox\MarkTypeMapper::class, 'mark_type_id', null, null, 'capabilityMarkType');
         $this->joins('rubric_capability_grade_group_id', SubmissionBox\GradeLevel\Group\Mapper::class, 'id', null, null, 'capabilityGradeGroup');
-        $this->uses('rubric_mark_range', self::TYPE_BOOLEAN, null, 'markedUsingRange');
-        $this->uses('mark_visibility', self::TYPE_INTEGER);
+        $this->uses('mark_visibility', self::TYPE_STRING);
         $this->uses('skip_unsubmitted', self::TYPE_BOOLEAN);
         $this->uses('self_reviewability', self::TYPE_STRING);
         $this->uses('similarity_check_enabled', self::TYPE_BOOLEAN);

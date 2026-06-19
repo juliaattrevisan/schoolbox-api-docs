@@ -180,7 +180,7 @@ test.describe("Test the pastoral care modules expiry feature", () => {
             await pastoralProfile.goto(25);
 
             tester.isGoingTo("Check that three records are visible");
-            expect(await pastoralProfile.getRecords()).toHaveLength(3);
+            await pastoralProfile.expectRecordCount(3);
 
             tester.isGoingTo("Modify the expired at date of the 'Out of uniform' record to 2010");
             await pastoralProfile.clickModifyIcon(25, 1);
@@ -189,11 +189,11 @@ test.describe("Test the pastoral care modules expiry feature", () => {
 
             tester.isGoingTo("Check that two records are now visible");
             await pastoralProfile.goto(25);
-            expect(await pastoralProfile.getRecords()).toHaveLength(2);
+            await pastoralProfile.expectRecordCount(2);
 
             tester.isGoingTo("Toggle the show archived records and check that all three records are visible again");
             await pastoralProfile.clickShowArchivedRecordsToggle();
-            expect(await pastoralProfile.getRecords()).toHaveLength(3);
+            await pastoralProfile.expectRecordCount(3);
         } finally {
             await db.updateInDatabase("pastoral", { expires_at: null }, { heading: "Out of uniform" });
         }

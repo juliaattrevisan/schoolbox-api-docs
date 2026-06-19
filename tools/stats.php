@@ -12,6 +12,7 @@ use Schoolbox\Admin\OpenAI\Config as OpenAiConfig;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\IB\Registrations\Sessions\Student\Model as RegistrationSessionStudentModel;
 
 require_once __DIR__ . '/../conf/core/require.php';
 
@@ -60,6 +61,13 @@ $app = new class extends CliTool\App {
             'design_moderator'       => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_DESIGN . ' AND type=' . UserAccess::ACCESS_FULL,
             'lms_moderator'          => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_LMS . ' AND type=' . UserAccess::ACCESS_FULL,
             'impersonator_moderator' => 'SELECT count(distinct u.id) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_IMPERSONATOR . ' AND type=' . UserAccess::ACCESS_FULL, // distinct u.id, so we can see the count of humans, not service permissions.  A single human can have multiple Impersonator service permissions.
+            'ib_moderator'           => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_IB_COORDINATOR . ' AND type=' . UserAccess::ACCESS_FULL,
+
+            //IBIS
+            'ib_registration_sessions'              => 'SELECT COUNT(*) FROM ib_registration_sessions',
+            'ib_registration_students'              => 'SELECT COUNT(*) FROM ib_registration_session_student',
+            'ib_registration_students_registered'   => 'SELECT COUNT(*) FROM ib_registration_session_student WHERE status = ' . RegistrationSessionStudentModel::STATUS_REGISTERED,
+            'ib_students_with_candidate_numbers'    => 'SELECT COUNT(*) FROM user u WHERE u.ib_candidate_number IS NOT NULL AND u.ib_candidate_number != ""',
 
             //Logins
             'unique_logins_yesterday' => "SELECT COUNT(DISTINCT username) FROM login_log WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 1 DAY) AND date < DATE(NOW())",
@@ -297,6 +305,13 @@ $app = new class extends CliTool\App {
             //Curriculum
             'curriculum'                    => 'SELECT count(*) FROM curriculum_node WHERE deleted_at IS NULL',
             'curriculum_assessment'         => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa on curriculum_node.id = cnfa.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
+            'curriculum_assessment_project' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN project p ON p.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND p.deleted_at IS NULL',
+            'curriculum_assessment_due_work' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN submission_box sb ON sb.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL',
+            'curriculum_assessment_quiz' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN assess q ON q.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND q.availability = "assess" AND q.deleted_at IS NULL',
+            'curriculum_assessment_task' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN task t ON t.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND t.deleted_at IS NULL',
+            'curriculum_assessment_lti' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN lti_assessment la ON la.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL',
+            'curriculum_assessment_lesson_plan' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN lesson_plan lp ON lp.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND lp.deleted_at IS NULL',
+            'curriculum_assessment_dialog_agent' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN dialog_agent da ON da.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND da.deleted_at IS NULL',
             'curriculum_rubric_indicator'   => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_rubric_indicator cnfri on curriculum_node.id = cnfri.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
             'curriculum_rubric_capability'  => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_rubric_capability cnfrc on curriculum_node.id = cnfrc.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
             'curriculum_folder'             => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_category cnfc on curriculum_node.id = cnfc.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
@@ -406,24 +421,24 @@ $app = new class extends CliTool\App {
             'whats_new_completed' => 'SELECT COUNT(*) FROM tour_status INNER JOIN tour ON tour_status.tour_uuid = tour.uuid WHERE tour.title like "%Release" AND tour.deleted_at IS NULL AND tour_status.status = "' . Schoolbox\Tour\Status\Model::STATUS_COMPLETED . '"',
 
             //AI Usage
-            'openai_success'    => 'SELECT COUNT(*) FROM openai_log WHERE return_code = 200',
-            'openai_error'      => 'SELECT COUNT(*) FROM openai_log WHERE return_code != 200',
-            'openai_input_tokens' => 'SELECT SUM(input_tokens) FROM openai_log WHERE return_code = 200',
-            'openai_output_tokens' => 'SELECT SUM(output_tokens) FROM openai_log WHERE return_code = 200',
-            'openai_tokens' => 'SELECT SUM(output_tokens) + SUM(input_tokens) FROM openai_log WHERE return_code = 200',
+            'openai_success'    => 'SELECT COUNT(*) FROM ai_session_log WHERE return_code = 200',
+            'openai_error'      => 'SELECT COUNT(*) FROM ai_session_log WHERE return_code != 200',
+            'openai_input_tokens' => 'SELECT SUM(input_tokens) FROM ai_session_log WHERE return_code = 200',
+            'openai_output_tokens' => 'SELECT SUM(output_tokens) FROM ai_session_log WHERE return_code = 200',
+            'openai_tokens' => 'SELECT SUM(output_tokens) + SUM(input_tokens) FROM ai_session_log WHERE return_code = 200',
 
             //image tokens
-            'openai_input_tokens_image' => 'SELECT SUM(input_tokens) FROM openai_log WHERE return_code = 200 AND feature = "image"',
-            'openai_output_tokens_image' => 'SELECT SUM(output_tokens) FROM openai_log WHERE return_code = 200 AND feature = "image"',
-            'openai_tokens_image' => 'SELECT SUM(output_tokens) + SUM(input_tokens) FROM openai_log WHERE return_code = 200 AND feature = "image"',
+            'openai_input_tokens_image' => 'SELECT SUM(input_tokens) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE return_code = 200 AND s.feature = "image"',
+            'openai_output_tokens_image' => 'SELECT SUM(output_tokens) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE return_code = 200 AND s.feature = "image"',
+            'openai_tokens_image' => 'SELECT SUM(output_tokens) + SUM(input_tokens) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE return_code = 200 AND s.feature = "image"',
 
             // AI feature usage
-            'openai_chat' => "SELECT count(*) FROM openai_log WHERE feature = 'chat'",
-            'openai_lessonplan' => "SELECT count(*) FROM openai_log WHERE feature = 'lessonplan'",
-            'openai_image' => "SELECT count(*) FROM openai_log WHERE feature = 'image'",
-            'openai_differentiation' => "SELECT count(*) FROM openai_log WHERE feature = 'differentiation'",
-            'openai_dialogagent' => "SELECT count(*) FROM openai_log WHERE feature = 'dialogagent'",
-            'openai_learning_customisation' => "SELECT count(*) FROM openai_log WHERE feature = 'learningactivitycustomisation'",
+            'openai_chat' => "SELECT count(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'chat'",
+            'openai_lessonplan' => "SELECT count(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'lessonplan'",
+            'openai_image' => "SELECT count(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'image'",
+            'openai_differentiation' => "SELECT count(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'differentiation'",
+            'openai_dialogagent' => "SELECT count(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'dialogagent'",
+            'openai_learning_customisation' => "SELECT count(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'learningactivitycustomisation'",
 
             //Packages
             'package_installed' => 'SELECT COUNT(*) FROM package WHERE installed = 1',
@@ -453,27 +468,27 @@ $app = new class extends CliTool\App {
             }
 
             $queryList['openai_model_' . $model] = [
-                "SELECT COUNT(*) FROM openai_log WHERE " . implode(' AND ', $queryParts),
+                "SELECT COUNT(*) FROM ai_session_log WHERE " . implode(' AND ', $queryParts),
                 $queryParams,
             ];
         }
 
         // Build the unknown model query
         $queryList['openai_model_unknown'] = [
-            "SELECT COUNT(*) FROM openai_log WHERE " . implode(' AND ', array_map(fn ($model) => 'model NOT LIKE ?', OpenAiConfig::AI_MODELS)),
+            "SELECT COUNT(*) FROM ai_session_log WHERE " . implode(' AND ', array_map(fn ($model) => 'model NOT LIKE ?', OpenAiConfig::AI_MODELS)),
             array_map(fn ($model) => $model . '%', OpenAiConfig::AI_MODELS),
         ];
 
         // Query image model usage
         foreach (OpenAiConfig::AI_IMAGE_MODELS as $imageModel) {
             $queryList['openai_image_model_' . $imageModel] = [
-                "SELECT COUNT(*) FROM openai_log WHERE feature = 'image' AND JSON_VALUE(prompt, '$.tools[0].model') = ?",
+                "SELECT COUNT(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'image' AND JSON_VALUE(prompt, '$.tools[0].model') = ?",
                 [$imageModel],
             ];
         }
         $queryList['openai_image_model_unknown'] = [
             sprintf(
-                "SELECT COUNT(*) FROM openai_log WHERE feature = 'image' AND COALESCE(JSON_VALUE(prompt, '$.tools[0].model'), '') NOT IN (%s)",
+                "SELECT COUNT(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'image' AND COALESCE(JSON_VALUE(prompt, '$.tools[0].model'), '') NOT IN (%s)",
                 implode(',', array_fill(0, count(OpenAiConfig::AI_IMAGE_MODELS), '?')),
             ),
             OpenAiConfig::AI_IMAGE_MODELS,

@@ -500,16 +500,16 @@ class DataSource
     /**
      * Retrieves the grid contents of a particular rubric instance, $rubricInstance.
      *
-     * @param $assessment
-     * @param \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance
+     * @param IAssessable $assessment
+     * @param Model $rubricInstance
      * @param bool $getUsages
      * @param bool $cloneNewRubric
      * @return Grid
      * @throws MapperException
      */
     public function retrieveOneGrid(
-        $assessment,
-        \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance,
+        IAssessable $assessment,
+        Model $rubricInstance,
         bool $getUsages,
         bool $cloneNewRubric = false
     ): Grid {
@@ -630,7 +630,7 @@ class DataSource
                     $levelIndex++;
                 }
 
-                $indicatorUsage->applyDescriptorMinValues($assessment->getUseMarkRange());
+                $indicatorUsage->applyDescriptorMinValues($rubricInstance->getMarkedUsingRange());
 
                 $capabilityUsage->getIndicatorUsages()[$indicatorId] = $indicatorUsage;
             }
@@ -984,6 +984,18 @@ class DataSource
             throw new \InvalidArgumentException('Unknown feedback table derived from feedback instance.');
         }
 
+        /* Severe headache warning:
+         *
+         * For this particular grid, retrieve the capability mark models that it uses, along with the indicator mark
+         * models that THOSE used. If you don't specify a rubric_instance_id you'll experience a geometric runaway
+         * as cap mark models/ind mark models tend to be accumulative in other areas.
+         *
+         * Not specifying a rubric instance identifier leads to geometric database expansion, unstable descriptor
+         * selections due to having WAY more rows than you were supposed to (since they go into the db in whatever order
+         * it felt like, some cells appear before others, so you can't even count on them being persisted in any
+         * consistent chronological order) and is really bad news bears for everyone.
+         */
+
         // What goes in the grid?
         // * Capability marks
         // * Descriptor marks
@@ -992,6 +1004,7 @@ class DataSource
         $capabilityMarkModels = $this->capabilityMarkMapper->findByColumnList([
             'feedback_id' => $feedback->getId(),
             'feedback_table' => $feedbackTable,
+            'rubric_instance_id' => $rubricInstance->getId(),
             'valid' => true,
         ]);
 
@@ -1125,16 +1138,23 @@ class DataSource
          */
         $feedback = $mapper->findById($feedbackId);
 
-        // Create list of cap/ind marks that will be saved
-        $capabilityMarksToSave = $this->capabilityMarkMapper->createCollection();
-        $indicatorMarksToSave  = $this->indicatorMarkMapper->createCollection();
+        /* Remove previous marks
+         *
+         * Use the derived mapper and the derived feedbackId to delete any rubric pieces that were previously associated
+         * with it which essentially cleanses the slate. Although, I think you'd be better off deleting them immediately
+         * prior to saving, in case something died during the construction of whatever you were going to save. That
+         * would have left you in a half-baked state, deleting previous data but not persisting current data.
+         */
+        $this->indicatorMarkMapper->deleteFeedbackMarks($feedbackId, $rubricInstance, $mapper->getTable());
+        $this->capabilityMarkMapper->deleteFeedbackMarks($feedbackId, $rubricInstance, $mapper->getTable());
 
+        /** @var CapabilityMark $capabilityMark */
         foreach ($markedGrid->getCapabilityMarks() as $capabilityMark) {
             // Create cap mark
             $capabilityId = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
             $capabilityModel = $this->capabilityMapper->findById($capabilityId);
 
-            $capabilityMarksToSave[$capabilityId] = $capabilityMarkModel = $this->capabilityMarkMapper->createModel()
+            $capabilityMarkModel = $this->capabilityMarkMapper->createModel()
                 ->setRubricInstance($rubricInstance)
                 ->setFeedbackId($feedback->getId())
                 ->setFeedbackTable($mapper->getTable())
@@ -1142,6 +1162,12 @@ class DataSource
                 ->setValue($capabilityMark->getValue())
                 ->setHumanReadableValue($capabilityMark->getHumanReadableValue())
                 ->setValid(true);
+
+            /* For some reason this has become integral: we can't just save the collection at the end.
+             * I have to save them in situ as I progress: must be something to do with the object-by-reference nature
+             * of what we're building here.
+             */
+            $this->capabilityMarkMapper->save($capabilityMarkModel);
 
             // Create ind marks
             foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
@@ -1157,28 +1183,19 @@ class DataSource
                     continue;
                 }
 
-                $indicatorMarksToSave[$indicatorId] = $this->indicatorMarkMapper->createModel()
+                $indicatorMarkModel = $this->indicatorMarkMapper->createModel()
                     ->setCapabilityMark($capabilityMarkModel)
                     ->setDescriptor($descriptorModel)
                     ->setValue($indicatorMark->getValue())
                     ->setValid(true);
+
+                /* For some reason this has become integral: we can't just save the collection at the end.
+                 * I have to save them in situ as I progress: must be something to do with the object-by-reference nature
+                 * of what we're building here.
+                 */
+                $this->indicatorMarkMapper->save($indicatorMarkModel);
             }
         }
-
-        /* Remove previous marks
-         *
-         * Use the derived mapper and the derived feedbackId to delete any rubric pieces that were previously associated
-         * with it which essentially cleanses the slate. Although, I think you'd be better off deleting them immediately
-         * prior to saving, in case something died during the construction of whatever you were going to save. That
-         * would have left you in a half-baked state, deleting previous data but not persisting current data.
-         */
-        $this->indicatorMarkMapper->deleteFeedbackMarks($feedbackId, $rubricInstance, $mapper->getTable());
-        $this->capabilityMarkMapper->deleteFeedbackMarks($feedbackId, $rubricInstance, $mapper->getTable());
-
-        /* Save the updated cap/ind marks
-         */
-        $this->capabilityMarkMapper->save($capabilityMarksToSave);
-        $this->indicatorMarkMapper->save($indicatorMarksToSave);
     }
 
 
@@ -1229,6 +1246,9 @@ class DataSource
 
         foreach ($participant->getAllFeedbacks() as $feedback) {
             if (
+                /* TODO Remove requirement to be a due work feedback instance and check the validCapMarkCount
+                 *  against a feedback table too
+                 */
                 $feedback instanceof DueWorkFeedbackModel
                 && \in_array($feedback->getReviewRoute(), $feedbackTypes, true)
             ) {
@@ -2290,8 +2310,10 @@ class DataSource
      * @param string $parentType
      *
      * @return array
-     * @var string   $indicators[rc.id]['grouping']
-     * @var string   $indicators[rc.id]['name']
+     *
+     * Return data:
+     * - string indicators[rc.id]['grouping']
+     * - string indicators[rc.id]['name']
      */
     public function getAvailableIndicators(array $parentIds, $parentType = CapabilityModel::PARENT_TYPE_CATEGORY): array
     {

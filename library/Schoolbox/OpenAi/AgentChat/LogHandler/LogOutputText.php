@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\OpenAi\AgentChat\LogHandler;
 
 use Crell\ApiProblem\ApiProblem;
-use Schoolbox\Editor\OpenAI\Log;
+use Schoolbox\OpenAi\Session\Log;
 use Schoolbox\OpenAi\AgentChat\MessageEventType;
 use Schoolbox\OpenAi\EventStream\Message;
 use Schoolbox\OpenAi\LogHandler\IListener;

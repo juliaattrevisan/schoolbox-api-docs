@@ -330,9 +330,18 @@ abstract class Controller extends ListController implements IAssessmentControlle
          */
         $data['curriculumNodes'] = [];
 
-        /* Default Visibility comes from an LMS Policy setting in config
+        /* Default Visibility comes from an LMS Policy setting in config.
+         * If the default is not allowed by other config settings, the default becomes 'staff only'.
          */
-        $data['markVisibility'] = $this->getConfigLoader()->get('submission_access');
+        $data['markVisibility'] = (
+            in_array(
+                $this->getConfigLoader()->get('submission_access'),
+                $this->getAvailableFeedbackVisibilities(),
+                true
+            )
+            ? $this->getConfigLoader()->get('submission_access')
+            : IAssessable::MARK_VISIBILITY_PRIVATE
+        );
 
         // Did the caller request a returnUrl?
         $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
@@ -635,6 +644,29 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 $data['rubricGrids'] = [$rubricGrid];
                 $data['rubricGridsPayload'] = [$rubricGridTranslator($rubricGrid)];
             }
+        }
+
+        /* Reporting Activity specific settings/data are here
+         */
+        if ($assessment instanceof Reporting\Model) {
+            /* You have to fulfil these preconditions to alter something about a reporting activity
+             * Normally we'd exit earlier, but this assessment controller is obese and needs refactoring: SA-21446
+             */
+            if (!(new ValidManageActivity())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE), $this->getUser())) {
+                throw new \Schoolbox\Mapper\Exception\NotFound();
+            }
+
+            /* Reporting activities need to know about all the available Work Types that could be selected
+             */
+            $data['reporting']['workTypes'] = $this->workTypeMapper->findAll();
+
+            /* Reporting activities can constrain the mega markbook to certain kinds of folders
+             */
+            $data['reporting']['availableFolderOptions'] = Folder::lookup();
+
+            /* There are numerous date range options of which numerous could be enabled
+             */
+            $data['reporting']['availableRangeOptions'] = Range::lookup();
         }
 
         $student = explode(',', $this->requestQuery->get('student', ''));
@@ -1096,6 +1128,28 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
 
     /**
+     * Finds the work types that can be selected for an assessment.
+     *
+     * If the assessment already uses a work type that is no longer permitted, it is kept in the collection so the
+     * activity can continue saving without forcing a different work type.
+     *
+     * @param IAssessable $assessment The assessment that the work types will be used for
+     * @return Collection
+     */
+    private function getWorkTypesPermittedForAssessment(IAssessable $assessment): Collection
+    {
+        $workTypes = $this->workTypeMapper->findPermittedForAssessment($assessment);
+
+        $currentWorkType = $assessment->getWorkType();
+        if ($currentWorkType !== null && !in_array($currentWorkType->getId(), $workTypes->getPropertyValues('id'), true)) {
+            $workTypes->add($currentWorkType)->sortBy('sequence', 'asc')->reindex();
+        }
+
+        return $workTypes;
+    }
+
+
+    /**
      * @param AssessmentContext $context
      * @param IAssessable       $assessment
      * @return array
@@ -1161,8 +1215,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'folder'                   => $context->getFolder(),
             'assessmentType'           => AssessmentType::objectToString($assessment),
             'markVisibility'           => $assessment->getMarkVisibility(),
-            'availableVisibilities'    => FeedbackVisibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max')),
-            'allWorkTypes'             => $this->workTypeMapper->findAll(['order' => ['sequence' => 'asc']]),
+            'availableVisibilities'    => $this->getAvailableFeedbackVisibilities(),
+            'allWorkTypes'             => $this->getWorkTypesPermittedForAssessment($assessment),
 
             /* Capabilities happen to have the same mark types as its DueWork IAssessable container,
              * so we don't need a different method than the existing getAllMarkTypes
@@ -1257,9 +1311,25 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $data['rubricGrids'] = [];
         $data['rubricGridsPayload'] = [];
 
-        /* Converts an object to a frontend-friendly payload
+        /* Converts an object to a frontend-friendly payload for displaying the rubric builder component
          */
         $rubricGridTranslator = new RubricGridTranslator\Full();
+
+        /* Converts an objet to a frontend-friendly payload for displaying a grid.twig
+         * Note that this translation is different to the $rubricGridTranslator which converts it for the builder;
+         * this converts a grid to a non-builder usage in the same area.
+         */
+        $data['rubricMarkedGridPayloads'] = new \Schoolbox\Assessment\Rubric\Grid\Payload(
+            $this->rubricMapper,
+            $this->getConfigLoader()->get(ConfigMapper::NAME_RUBRIC_SHOW_POINTS),
+            $this->getUser()
+        )->generate(
+            $assessment->getRubricInstances(),
+            /* Feedbacks aren't required in the create/modify areas, despite displaying a grid.twig
+             */
+            null,
+            null,
+        );
 
         /* Assemble each rubric grid via its instance, separately, for now. Maybe there's a shortcut to all this that
          * is cheaper, but this will be the simplest for the time being.
@@ -1280,7 +1350,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
                     ->add(new Level());
             }
 
-            $data['rubricGrids'][] = $rubricGrid;
             $data['rubricGridsPayload'][] = $rubricGridTranslator($rubricGrid);
         }
 
@@ -1457,10 +1526,17 @@ abstract class Controller extends ListController implements IAssessmentControlle
         );
 
         $data['allParticipants'] = $assessment->getAllParticipants()->map($participationModelToArray)->reindex();
+
+        /* The module permissions for getAssessmentParticipationLearningPlan are actually shared among other routes,
+         * such as Exclude Student, etc. which (for the majority of learning activities) which makes it a bit hard to
+         * apply for particular activities in particular contexts in a convenient manner. We don't have branching
+         * if/else in authentication rules.
+         */
         $data['learningPlanNew'] = $this->getRouteIfAuthorized('learningAssessment.getAssessmentParticipationLearningPlan', [
             'assessment' => $assessment,
             'assessmentId' => $assessment->getId(),
         ]);
+
         $data['assessment'] = $assessment;
 
         $context = $assessment->getContext();
@@ -1653,7 +1729,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
             // hydrate participants
             if ($hydrateParticipants) {
-                $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, null, true);
+                $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection(collection: $assessments, users: null, removeExcluded: true);
             }
         }
         return $assessments;
@@ -1710,6 +1786,17 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $studentId
         );
         return $this->aiCache?->get($cacheKey);
+    }
+
+    /**
+     * @return array
+     */
+    private function getAvailableFeedbackVisibilities(): array
+    {
+        return FeedbackVisibility::getAvailableVisibilities(
+            (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_STUDENTS),
+            (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_PARENTS),
+        );
     }
 
     /**

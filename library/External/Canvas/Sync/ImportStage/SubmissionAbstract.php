@@ -95,7 +95,7 @@ abstract class SubmissionAbstract
         $assessmentCollection = $this->assessmentDataSource->createCollection()
                                                            ->add($assessmentImpl);
         try {
-            $result = $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($assessmentCollection);
+            $result = $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection(collection: $assessmentCollection);
         } catch (\Exception $e) {
             $this->log->warning('Failed to load participant: ' . $e->getMessage() . ' ' . $e->getTraceAsString());
             return null;

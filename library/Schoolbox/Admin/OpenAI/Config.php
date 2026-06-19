@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\OpenAI;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as SchoolboxException;
+use Schoolbox\OpenAi\Feature;
 
 /**
  * Configuration options for AI features.
@@ -23,13 +24,13 @@ class Config
      * feature name => config name
      */
     public const array ALL_MODULES = [
-        Helper::FEATURE_CHAT                            => ConfigMapper::NAME_AI_TEXT_CHAT,
-        Helper::FEATURE_LESSONPLAN                      => ConfigMapper::NAME_AI_LESSONPLAN,
-        Helper::FEATURE_DIFFERENTIATION                 => ConfigMapper::NAME_AI_DIFFERENTIATION,
-        Helper::FEATURE_DIALOGAGENT                     => ConfigMapper::NAME_AI_DIALOGAGENT,
-        Helper::FEATURE_IMAGE                           => ConfigMapper::NAME_AI_IMAGE_GENERATION,
-        Helper::FEATURE_LEARNING_ACTIVITY_CUSTOMISATION => ConfigMapper::NAME_AI_LEARNING_ACTIVITY_CUSTOMISATION,
-        Helper::FEATURE_AI_MODERATION_AGENT             => ConfigMapper::NAME_AI_MODERATION_AGENT,
+        Feature::CHAT->value                            => ConfigMapper::NAME_AI_TEXT_CHAT,
+        Feature::LESSON_PLAN->value                     => ConfigMapper::NAME_AI_LESSONPLAN,
+        Feature::DIFFERENTIATION->value                 => ConfigMapper::NAME_AI_DIFFERENTIATION,
+        Feature::DIALOG_AGENT->value                    => ConfigMapper::NAME_AI_DIALOGAGENT,
+        Feature::IMAGE->value                           => ConfigMapper::NAME_AI_IMAGE_GENERATION,
+        Feature::LEARNING_ACTIVITY_CUSTOMISATION->value => ConfigMapper::NAME_AI_LEARNING_ACTIVITY_CUSTOMISATION,
+        Feature::AI_MODERATION_AGENT->value             => ConfigMapper::NAME_AI_MODERATION_AGENT,
     ];
 
     /**
@@ -70,9 +71,48 @@ class Config
     ];
 
     /**
+     * These models are in the GPT-4 family: they might not support all
+     * settings for verbosity and reasoning for all features.
+     */
+    private const array GPT4_MODELS = [
+        "gpt-4o",
+        "gpt-4o-mini",
+        "gpt-4.1",
+        "gpt-4.1-mini",
+    ];
+
+    /**
+     * Recommended models for each feature, split by text and image generation.
+     */
+    public const array RECOMMENDED_MODELS = [
+        Feature::CHAT->value => [
+            'text' => ['gpt-5.4-nano'],
+        ],
+        Feature::LESSON_PLAN->value => [
+            'text' => ['gpt-5.4-nano'],
+        ],
+        Feature::DIFFERENTIATION->value => [
+            'text' => ['gpt-5.4-nano'],
+        ],
+        Feature::DIALOG_AGENT->value => [
+            'text' => ['gpt-5.3-chat-latest'],
+        ],
+        Feature::IMAGE->value => [
+            'text'  => ['gpt-5.4-nano'],
+            'image' => ['gpt-image-1.5'],
+        ],
+        Feature::LEARNING_ACTIVITY_CUSTOMISATION->value => [
+            'text' => ['gpt-5.4-nano'],
+        ],
+        Feature::AI_MODERATION_AGENT->value => [
+            'text' => ['gpt-5.4-nano'],
+        ],
+    ];
+
+    /**
      * The default image generation model.
      */
-    public const string IMAGE_MODEL_DEFAULT = 'gpt-image-1';
+    public const string IMAGE_MODEL_DEFAULT = 'gpt-image-1.5';
 
     /**
      * The models which may be selected for image generation.
@@ -312,6 +352,7 @@ class Config
     public const string FIELD_AIKEY = 'ai_key';
     public const string FIELD_RESOURCE_NAME = 'resource_name';
     public const string FIELD_DEPLOYMENT_ID = 'deployment_id';
+    public const string FIELD_DEPLOYMENT_MODEL = 'deployment_model';
     public const string FIELD_MODEL = 'model';
     public const string FIELD_AI_MODERATION = 'ai_moderation';
     public const string FIELD_SYSTEM_PROMPT  = 'system_prompt';
@@ -335,6 +376,7 @@ class Config
         self::FIELD_AIKEY => self::FIELD_AIKEY,
         self::FIELD_RESOURCE_NAME => self::FIELD_RESOURCE_NAME,
         self::FIELD_DEPLOYMENT_ID => self::FIELD_DEPLOYMENT_ID,
+        self::FIELD_DEPLOYMENT_MODEL => self::FIELD_DEPLOYMENT_MODEL,
         self::FIELD_MODEL => self::FIELD_MODEL,
         self::FIELD_SYSTEM_PROMPT => self::FIELD_SYSTEM_PROMPT,
     ];
@@ -350,22 +392,24 @@ class Config
      * section they occur within so they are restricted to that provider.
      *
      * Also, add a title and description within `manifest` in
-     * `templates/config.twig`.
+     * `templates/formInput.twig`.
      */
-    public const array DEFAULT_FORM_INPUTS = [
-        self::FIELD_PROVIDER      => [
-            'type'    => self::FIELD_TYPE_SELECT,
-            'options' => self::PROVIDERS,
-            'section' => null,
+    private const array DEFAULT_FORM_INPUTS = [
+        self::FIELD_PROVIDER => [
+            'type'            => self::FIELD_TYPE_SELECT,
+            'options'         => self::PROVIDERS,
+            'section'         => null,
+            'allowUnselected' => false,
         ],
-        self::FIELD_AIKEY         => [
+        self::FIELD_AIKEY => [
             'type'    => self::FIELD_TYPE_INPUT,
             'section' => self::SECTION_GENERAL,
         ],
-        self::FIELD_MODEL         => [
-            'type'    => self::FIELD_TYPE_SELECT,
-            'options' => self::AI_MODELS,
-            'section' => self::SECTION_OPENAI,
+        self::FIELD_MODEL => [
+            'type'            => self::FIELD_TYPE_SELECT,
+            'options'         => self::AI_MODELS,
+            'section'         => self::SECTION_OPENAI,
+            'allowUnselected' => false,
         ],
         self::FIELD_RESOURCE_NAME => [
             'type'    => self::FIELD_TYPE_INPUT,
@@ -375,19 +419,29 @@ class Config
             'type'    => self::FIELD_TYPE_INPUT,
             'section' => self::SECTION_AZURE,
         ],
+        self::FIELD_DEPLOYMENT_MODEL => [
+            'type'            => self::FIELD_TYPE_SELECT,
+            'options'         => self::AI_MODELS,
+            'section'         => self::SECTION_AZURE,
+            'allowUnselected' => true,
+        ],
         self::FIELD_SYSTEM_PROMPT => [
             'type'    => self::FIELD_TYPE_TEXTAREA,
             'section' => self::SECTION_GENERAL,
         ],
         self::FIELD_REASONING_EFFORT => [
-            'type'    => self::FIELD_TYPE_SELECT,
-            'options' => self::REASONING_EFFORT_OPTIONS,
-            'section' => self::SECTION_GENERAL,
+            'type'            => self::FIELD_TYPE_SELECT,
+            'options'         => self::REASONING_EFFORT_OPTIONS,
+            'section'         => self::SECTION_GENERAL,
+            'allowUnselected' => false,
+            'advanced'        => true,
         ],
         self::FIELD_TEXT_VERBOSITY => [
-            'type'    => self::FIELD_TYPE_SELECT,
-            'options' => self::TEXT_VERBOSITY_OPTIONS,
-            'section' => self::SECTION_GENERAL,
+            'type'            => self::FIELD_TYPE_SELECT,
+            'options'         => self::TEXT_VERBOSITY_OPTIONS,
+            'section'         => self::SECTION_GENERAL,
+            'allowUnselected' => false,
+            'advanced'        => true,
         ],
     ];
 
@@ -569,7 +623,8 @@ class Config
      *    },
      *    Azure: array{
      *      resource_name: array{value: string},
-     *      deployment_id: array{value: string}
+     *      deployment_id: array{value: string},
+     *      deployment_model: array{value: string},
      *    }
      *  }|null
      * @throws \JsonException
@@ -637,6 +692,21 @@ class Config
     }
 
     /**
+     * Split options into recommended and other options
+     *
+     * @param array<string> $options         All available options
+     * @param array<string> $recommendations A subset of `$options` which is recommended for use
+     * @return array{recommended: array<string>, others: array<string>}
+     */
+    private function splitOptions(array $options, array $recommendations): array
+    {
+        return [
+            'recommended' => $recommendations,
+            'others'      => array_diff($options, $recommendations),
+        ];
+    }
+
+    /**
      * Build form inputs for this feature.
      *
      * @param string $feature
@@ -645,7 +715,26 @@ class Config
     private function buildFormInputs(string $feature): array
     {
         $formInputs = self::DEFAULT_FORM_INPUTS;
-        if (\in_array($feature, Helper::FEATURES_WITH_AI_MODERATION, true)) {
+
+        // Set recommended vs. all models
+        $splitOptions = $this->splitOptions(
+            $formInputs[self::FIELD_MODEL]['options'],
+            self::RECOMMENDED_MODELS[$feature]['text'] ?? [],
+        );
+        $formInputs[self::FIELD_MODEL]['recommendedOptions'] = $splitOptions['recommended'];
+        $formInputs[self::FIELD_MODEL]['options']            = $splitOptions['others'];
+
+        // Set recommended vs. all for Azure deployment models too:
+        // whilst this setting must follow their deployment, it might inform
+        // users that they should deploy a recommended model.
+        $splitOptions = $this->splitOptions(
+            $formInputs[self::FIELD_DEPLOYMENT_MODEL]['options'],
+            self::RECOMMENDED_MODELS[$feature]['text'] ?? [],
+        );
+        $formInputs[self::FIELD_DEPLOYMENT_MODEL]['recommendedOptions'] = $splitOptions['recommended'];
+        $formInputs[self::FIELD_DEPLOYMENT_MODEL]['options']            = $splitOptions['others'];
+
+        if (Feature::tryFrom($feature)?->supportsAiModeration()) {
             // Any feature with AI moderation support gets a config for it
             $formInputs[self::FIELD_AI_MODERATION] = [
                 'type'    => self::FIELD_TYPE_CHECKBOX,
@@ -653,24 +742,33 @@ class Config
             ];
         }
 
-        if ($feature === Helper::FEATURE_IMAGE) {
+        if ($feature === Feature::IMAGE->value) {
             // Image feature:
             // * add output quality and image model
             // * remove Azure option
             $formInputs[self::FIELD_OUTPUT_QUALITY] = [
-                'type'    => self::FIELD_TYPE_SELECT,
-                'options' => self::OUTPUT_QUALITY_OPTIONS,
-                'section' => self::SECTION_OPENAI,
+                'type'            => self::FIELD_TYPE_SELECT,
+                'options'         => self::OUTPUT_QUALITY_OPTIONS,
+                'section'         => self::SECTION_OPENAI,
+                'allowUnselected' => false,
             ];
-            $formInputs[self::FIELD_IMAGE_MODEL] = [
-                'type'    => self::FIELD_TYPE_SELECT,
-                'options' => self::AI_IMAGE_MODELS,
-                'section' => self::SECTION_OPENAI,
+
+            // Set recommended vs. all options for image model too
+            $splitOptions = $this->splitOptions(
+                self::AI_IMAGE_MODELS,
+                self::RECOMMENDED_MODELS[$feature]['image'],
+            );
+            $formInputs[self::FIELD_IMAGE_MODEL]    = [
+                'type'               => self::FIELD_TYPE_SELECT,
+                'recommendedOptions' => $splitOptions['recommended'],
+                'options'            => $splitOptions['others'],
+                'section'            => self::SECTION_OPENAI,
+                'allowUnselected'    => false,
             ];
             unset($formInputs[self::FIELD_PROVIDER]['options'][Helper::ENDPOINT_TYPE_AZURE]);
         }
 
-        if ($feature === Helper::FEATURE_AI_MODERATION_AGENT) {
+        if ($feature === Feature::AI_MODERATION_AGENT->value) {
             // Ai Moderation agent:
             // * remove generation system prompt
             unset($formInputs[self::FIELD_SYSTEM_PROMPT]);
@@ -682,8 +780,11 @@ class Config
     /**
      * Build available reasoning effort levels for this feature.
      *
-     * This ensures the `minimal` effort level is stripped from the image
-     * feature, because this effort is not supported when generating images.
+     * This ensures that:
+     * * the `minimal` effort level is stripped from the image feature, because
+     *   this effort is not supported when generating images
+     * * the `none` effort level is stripped from the chat feature for GPT-4
+     *   family models, because it's not supported in that feature
      *
      * @param string $feature
      * @return array|array[]
@@ -691,8 +792,15 @@ class Config
     public function buildReasoningEffortModelOptions(string $feature): array
     {
         $options = self::REASONING_EFFORT_MODEL_OPTIONS;
-        if ($feature === Helper::FEATURE_IMAGE) {
+        if ($feature === Feature::IMAGE->value) {
             $options = array_map(fn ($effortLevels) => array_values(array_diff($effortLevels, ['minimal'])), $options);
+        }
+        if ($feature === Feature::CHAT->value) {
+            foreach ($options as $model => $effortLevels) {
+                if (in_array($model, self::GPT4_MODELS, true)) {
+                    $options[$model] = array_values(array_diff($effortLevels, [self::REASONING_EFFORT_OPTION_NONE]));
+                }
+            }
         }
         return $options;
     }

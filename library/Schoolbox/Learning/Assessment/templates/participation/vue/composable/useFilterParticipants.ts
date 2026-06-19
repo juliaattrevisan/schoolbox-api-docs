@@ -26,7 +26,7 @@ export function useFilterParticipants(participants: Ref<Participant[]>): {
         let filtered = participants.value;
 
         if (onlyShowDP.value) {
-            filtered = filtered.filter((participant) => participant._links.differentiationProfile);
+            filtered = filtered.filter((participant) => participant._links?.differentiationProfile);
         }
 
         if (customisationFilter.value === "excluded") {

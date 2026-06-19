@@ -65,7 +65,7 @@ class Component extends Filter\BaseComponent
      * @param null|GenericCollection|Filter\Selection\Model[] $urlOverrides
      * @param Filter\Selection\Mapper                         $filterSelectionMapper
      * @param Codec                                           $codec
-     * @param null|GenericCollection|CapabilityModel[]        $capabilities
+     * @param GenericCollection|CapabilityModel[]             $capabilities
      * @param bool                                            $showCapabilities
      * @param bool                                            $showIndicators
      * @throws InvalidArgumentException If neither $capabilities or $indicators are supplied
@@ -147,7 +147,7 @@ class Component extends Filter\BaseComponent
     public function toContext(): array
     {
         return array_merge(parent::toContext(), [
-            'keyNone'          => DEFINITION::KEY_NONE,
+            'keyNone'          => Definition::KEY_NONE,
             'capabilities'     => $this->contextData,
             'showCapabilities' => $this->showCapabilities,
             'showIndicators'   => $this->showIndicators,

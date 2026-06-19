@@ -193,7 +193,7 @@
             success:function(data) {
                 let html = '<h2 class=subheader>Recent Updates</h2>';
                 if (data.length > 0) {
-                    html  += '<section><ul class="information-list">';
+                    html  += '<section class="u-overflow-hidden"><ul class="information-list">';
                     for (let row in data) {
                         let pubDate = new Date(data[row].pubDate.date);
                         options = {
@@ -389,7 +389,7 @@
 
                     <h2 class="subheader">Status of Services</h2>
                     <section>
-                        <ul class="information-list">
+                        <ul id="service-status-list" class="information-list">
                             {% if external_db and external_db != 'Schoolbox' %}
                             <li>
                                 <div class="small-5 columns content">

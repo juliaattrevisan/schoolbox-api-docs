@@ -395,7 +395,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
 
 
     /**
-     * @return Schoolbox\Mapper|SubmissionBoxMapper
+     * @return SubmissionBoxMapper
      * @throws Schoolbox\Mapper\DefinitionException
      */
     private function getSubmissionBoxMapper(): SubmissionBoxMapper

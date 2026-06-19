@@ -219,7 +219,7 @@ final class ReturnedWorkNotifierVisibilityTest extends TestCase implements Trigg
 
         $box = (new SubmissionBox())
             ->setId(self::BOX_ID)
-            ->setMarkVisibility(SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT);
+            ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $box->setAssessmentModel($assessment);
 
         return $box;

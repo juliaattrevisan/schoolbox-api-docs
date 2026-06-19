@@ -32,72 +32,66 @@ use Schoolbox\Learning\Analytics\BoxPlot\Summary;
 class Markbook
 {
     /**
-     * The assessments that are a part of this markbook.
+     * A list of assessments to operate upon
      *
-     * @var Collection|IAssessable[]
+     * @var GenericCollection<IAssessable>
      */
-    protected $assessments;
+    private GenericCollection $assessments;
+
 
     /**
      * Students that are a part of this markbook.
      *
      * @var Collection
      */
-    private $students;
+    private Collection $students;
+
 
     /**
      * Assessments part of this markbook on the top level (not including assessments inside projects)
      *
-     * @var Collection|IAssessable[]
+     * @var Collection<IAssessable>
      */
-    protected $topLevelAssessments;
+    protected Collection $topLevelAssessments;
 
-    /**
-     * The mark scheme to use when summarising a student's overall grade for these assessments.
-     *
-     * @var IMarkScheme
-     */
-    protected $defaultMarkScheme;
-
-    /**
-     * The user viewing the markbook, usually whoever is logged in
-     *
-     * @var User
-     */
-    protected $viewingUser;
 
     /**
      * @var int
      */
-    private $totalWeight = 0;
+    private int $totalWeight = 0;
+
 
     /**
      * Normalised (0.0 - 100.0) average mark for all assessments in this markbook
      *
-     * @var float
+     * @var null|float
      */
-    private $normalisedMean;
+    private ?float $normalisedMean = null;
+
 
     /**
      * Normalised (0.0 - 100.0) average mark for all draft assessments in this markbook
      *
-     * @var float
+     * @var null|float
      */
-    private $draftNormalisedMean;
+    private ?float $draftNormalisedMean = null;
+
 
     /**
      * Human readable weighted average mark for all assessments in this markbook
      *
-     * @var string
+     * @var null|string
      */
-    private $weightedMean;
+    private ?string $weightedMean = null;
+
 
     /**
      * Human readable weighted average mark for all draft assessments in this markbook
      *
-     * @var string
+     * @var null|string
      */
-    private $draftWeightedMean;
+    private ?string $draftWeightedMean = null;
+
 
     /**
      * Statistics for each assessment.
@@ -107,7 +101,8 @@ class Markbook
      *
      * @var array
      */
-    protected $assessmentStatistics = [];
+    protected array $assessmentStatistics = [];
+
 
     /**
      * Statistics for each student.
@@ -117,7 +112,8 @@ class Markbook
      *
      * @var array
      */
-    protected $studentStatistics = [];
+    protected array $studentStatistics = [];
+
 
     /**
      * Whether draft exists for student & assessment combination
@@ -125,48 +121,151 @@ class Markbook
      * key: assessment ID, student ID
      * @var array
      */
-    private $hasDraft = [];
+    private array $hasDraft = [];
+
 
     /**
      * Build a markbook out of a list of assessments.
      *
      * This assumes that all participants, responses and feedbacks have been filled out.
      *
-     * @param GenericCollection|IAssessable[] $assessments
-     * @param IMarkScheme              $defaultMarkScheme
-     * @param User                     $viewingUser
+     *
+     * There are three optional reductive filters: $studentIds, $curriculumCodes, $folderIds
+     *
+     * Any of those could be provided (or not provided) and they work in conjunction with one another.
+     * For this Markbook class, these three filtration options operate on $assessments which is typically fulfilled
+     * and prehydrated from somewhere else and $assessments could be reused by some other part of the app beyond
+     * markbook calculations.
+     *
+     * The three filters here basically pick-and-choose what parts of $assessments needs to be operated upon without
+     * affecting anything else that might want to operate on the full set of $assessments.
+     *
+     * @param GenericCollection<IAssessable> $assessments The assessments that are a part of this markbook.
+     * @param IMarkScheme $defaultMarkScheme The mark scheme to use when summarising a student's overall grade for these assessments.
+     * @param User $viewingUser The user viewing the markbook, usually whoever is logged in
+     * @param bool|null $overallStatistics Optionally accumulate statistic values (mean, stdev, etc) for assessments
+     * @param array|null $studentIds A reductive filter that operates on $assessments: a set of user ids
+     * @param array|null $curriculumCodes A reductive filter that operates on $assessments: a set of curriculum codes
+     * @param array|null $folderIds A reductive filter that operates on $assessments: a set of folder ids
      */
-    public function __construct(GenericCollection $assessments, IMarkScheme $defaultMarkScheme, User $viewingUser)
-    {
-        $this->assessments       = $assessments;
-        $this->defaultMarkScheme = $defaultMarkScheme;
-        $this->viewingUser       = $viewingUser;
-        $this->topLevelAssessments = $assessments->filter(function (IAssessable $assessment) {
+    public function __construct(
+        GenericCollection $assessments,
+        private IMarkScheme $defaultMarkScheme,
+        private User $viewingUser,
+        private ?bool $overallStatistics = true,
+        private ?array $studentIds = null,
+        private ?array $curriculumCodes = null,
+        private ?array $folderIds = null
+    ) {
+        /* We'll reduce this set further by applying the reductive filters for student ids, curric codes and folder ids
+         */
+        $this->assessments = $assessments;
+
+        /* Check if we had a specific set of $curriculumCodes to care about:
+         * if we did, and this activity doesn't use one of them, skip it
+         */
+        $this->assessments = $this->assessments->filter(function (IAssessable $assessment) {
+            return $this->isFilteredCurriculumCode($assessment->getCurriculumNodes()->getPropertyValues('code'));
+        });
+
+        /* Check if we had a specific set of $folderIds to care about:
+         * if we did, and this activity isn't in one of them, skip it
+         */
+        $this->assessments = $this->assessments->filter(function (IAssessable $assessment) {
+            return $this->isFilteredFolder($assessment->getBaseContext()->getFolder()->getId());
+        });
+
+        /* Find all the Project instances within the set of $assessments that we might already have filtered out
+         */
+        $this->topLevelAssessments = $this->assessments->filter(function (IAssessable $assessment) {
             return !$assessment->getContext() instanceof Project;
         });
 
         $this->collateStatistics();
     }
 
-    /**
-     * Get all assessments in this collection.
-     *
-     * @return Collection|IAssessable[]
-     */
-    public function getAssessments()
-    {
-        return $this->assessments;
-    }
 
     /**
-     * Get all top level assessments in this collection.
+     * Check if we had a specific set of $studentIds to care about: if we did, and this user isn't one of those
+     * people, skip them
      *
-     * @return Collection|IAssessable[]
+     * @param int $studentId
+     * @return bool
      */
-    public function getTopLevelAssessments()
+    private function isFilteredStudent(int $studentId): bool
     {
-        return $this->topLevelAssessments;
+        /* No specific people to care about? Everyone's included
+         */
+        if (null === $this->studentIds || !count($this->studentIds)) {
+            return true;
+        }
+
+        /* We only care about specific people: check that $studentId is one of them
+         */
+        if (\in_array($studentId, $this->studentIds)) {
+            return true;
+        }
+
+        /* This person should be skipped
+         */
+        return false;
     }
+
+
+    /**
+     * Check if we had a specific set of $curriculumCodes to care about: if we did, and this activity doesn't have at
+     * least one of them, skip this activity
+     *
+     * @param array $curriculumCodes
+     * @return bool
+     */
+    private function isFilteredCurriculumCode(array $curriculumCodes): bool
+    {
+        /* No specific curriculum codes to care about? Everything's included
+         */
+        if (null === $this->curriculumCodes || !count($this->curriculumCodes)) {
+            return true;
+        }
+
+        /* We only care about specific activities that share curriculum codes with the ones we're interested in:
+         * check for overlaps. If at least one activity curric code matches our curric code filter, we're in
+         */
+        if (count(array_intersect($curriculumCodes, $this->curriculumCodes))) {
+            return true;
+        }
+
+        /* This activity should be skipped
+         */
+        return false;
+    }
+
+
+    /**
+     * Check if we had a specific set of $folderIds to care about: if we did, and this activity isn't in one of them,
+     * skip this activity
+     *
+     * @param int $folderId
+     * @return bool
+     */
+    private function isFilteredFolder(int $folderId): bool
+    {
+        /* No specific folder ids to care about? Everything's included
+         */
+        if (null === $this->folderIds || !count($this->folderIds)) {
+            return true;
+        }
+
+        /* We only care about specific activities that are in the folders we're interested in
+         */
+        if (\in_array($folderId, $this->folderIds)) {
+            return true;
+        }
+
+        /* This activity should be skipped
+         */
+        return false;
+    }
+
 
     /**
      * Retrieves all students who have participated in any of the assessments in the markbook.
@@ -180,6 +279,14 @@ class Markbook
             foreach ($this->getAssessments() as $assessment) {
                 foreach ($assessment->getAllParticipants() as $participant) {
                     $student = $participant->getUser();
+
+                    /* Check if we had a specific set of $studentIds to care about:
+                     * if we did, and this user isn't one of those people, skip them
+                     */
+                    if (!$this->isFilteredStudent($student->getId())) {
+                        continue;
+                    }
+
                     if (!$participants->offsetExists($student->getId())) {
                         $participants->setOffset($student->getId(), $student);
                     }
@@ -191,30 +298,11 @@ class Markbook
         return $this->students;
     }
 
-    /**
-     * Gets all stats for the assessments in this markbook.
-     *
-     * @return array
-     */
-    public function getAssessmentStatistics(): array
-    {
-        return $this->assessmentStatistics;
-    }
-
-    /**
-     * Gets all stats for the students in this markbook.
-     *
-     * @return array
-     */
-    public function getStudentStatistics()
-    {
-        return $this->studentStatistics;
-    }
 
     /**
      * Collates statistics for each assessment, student and the overall markbook.
      */
-    protected function collateStatistics()
+    protected function collateStatistics(): void
     {
         // Collate all assessment statistics
         foreach ($this->assessments as $assessment) {
@@ -227,17 +315,19 @@ class Markbook
         }
 
         // Collate weight percent for each top-level assessment
-        if ($this->totalWeight > 0) {
-            foreach ($this->getTopLevelAssessments() as $assessment) {
-                $assessmentId = $assessment->getId();
-                $this->assessmentStatistics[$assessmentId]['weightPercent'] =
-                    $this->assessmentStatistics[$assessmentId]['weight'] / $this->totalWeight * 100;
+        if ($this->overallStatistics) {
+            if ($this->totalWeight > 0) {
+                foreach ($this->getTopLevelAssessments() as $assessment) {
+                    $assessmentId = $assessment->getId();
+                    $this->assessmentStatistics[$assessmentId]['weightPercent'] =
+                        $this->assessmentStatistics[$assessmentId]['weight'] / $this->totalWeight * 100;
+                }
             }
         }
 
         // Summate student's statistics as an average, weighted by each assessment's weight.
         // Render as whatever the default grade group is
-        $weightedSummator  = new WeightedAverage();
+        $weightedSummator = new WeightedAverage();
 
         // Not all assessables are used in stats:
         // only ones for which feedback is visible, and are not project sub-assessments, are usable.
@@ -247,6 +337,13 @@ class Markbook
 
         $visibleAssessmentIds = $visibleAssessments->getPropertyValues('id');
         foreach ($this->getStudents() as $student) {
+            /* Check if we had a specific set of $studentIds to care about:
+             * if we did, and this user isn't one of those people, skip them
+             */
+            if (!$this->isFilteredStudent($student->getId())) {
+                continue;
+            }
+
             // Check whether latest feedback is draft
             $statsHasDraft = false;
             foreach ($this->assessments as $assessment) {
@@ -263,7 +360,7 @@ class Markbook
                     $weightedSummator->summateAllAssessablesForUser($visibleAssessments, $student, true)
                 );
             $this->studentStatistics[$student->getId()]['meanNormalised'] =
-                    $weightedSummator->summate($visibleAssessments, $student, true);
+                $weightedSummator->summate($visibleAssessments, $student, true);
 
             $this->studentStatistics[$student->getId()]['draftWeightedMean'] = null;
             $this->studentStatistics[$student->getId()]['meanDraftNormalised'] = null;
@@ -282,21 +379,24 @@ class Markbook
         // Then, summate the result as an average, weighted by each assessment's weight.
         // Render as whatever the default grade group is
 
-        $this->normalisedMean = $weightedSummator->summateAllAssessables(
-            $visibleAssessments,
-            true,
-            new Average()
-        );
+        if ($this->overallStatistics) {
+            $this->normalisedMean = $weightedSummator->summateAllAssessables(
+                $visibleAssessments,
+                true,
+                new Average()
+            );
 
-        $this->draftNormalisedMean = $weightedSummator->summateAllAssessables(
-            $visibleAssessments,
-            false,
-            new Average()
-        );
+            $this->draftNormalisedMean = $weightedSummator->summateAllAssessables(
+                $visibleAssessments,
+                false,
+                new Average()
+            );
 
-        $this->weightedMean = $this->defaultMarkScheme->getHumanReadableMark($this->normalisedMean);
-        $this->draftWeightedMean = $this->defaultMarkScheme->getHumanReadableMark($this->draftNormalisedMean);
+            $this->weightedMean = $this->defaultMarkScheme->getHumanReadableMark($this->normalisedMean);
+            $this->draftWeightedMean = $this->defaultMarkScheme->getHumanReadableMark($this->draftNormalisedMean);
+        }
     }
+
 
     /**
      * Is the most recent feedback on `$assessment` a draft?
@@ -333,53 +433,43 @@ class Markbook
         return false;
     }
 
-    /**
-     * @return array
-     */
-    public function getHasDraft(): array
-    {
-        return $this->hasDraft;
-    }
-
-    /**
-     * @return float
-     */
-    public function getNormalisedMean()
-    {
-        return $this->normalisedMean;
-    }
-
-    /**
-     * @return float
-     */
-    public function getDraftNormalisedMean()
-    {
-        return $this->draftNormalisedMean;
-    }
-
-    /**
-     * @return string
-     */
-    public function getWeightedMean()
-    {
-        return $this->weightedMean;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDraftWeightedMean()
-    {
-        return $this->draftWeightedMean;
-    }
 
     /**
      * Collates statistics for a single assessment.
      *
      * @param IAssessable $assessment
      */
-    protected function collateAssessmentStatistics(IAssessable $assessment)
+    protected function collateAssessmentStatistics(IAssessable $assessment): void
     {
+        /* Just exit early if you -didn't- turn on overallStatistics
+         * Maybe think about standardising this data struct somewhere, one day: it's arbitrarily defined
+         */
+        if (!$this->overallStatistics) {
+            $this->assessmentStatistics[$assessment->getId()] = [
+                'mean'          => null,
+                'sd'            => null,
+                'min'           => null,
+                'minNormalized' => null,
+                'max'           => null,
+                'maxNormalized' => null,
+                'count'         => null,
+                'quartile1'     => null,
+                'quartile2'     => null,
+                'quartile3'     => null,
+                /* These are just randomly appended during calculations
+                 */
+                'weight'        => null,
+                'draftMean'     => null,
+                'sdNormalized'  => null,
+                /* Project stuff
+                 */
+                'weightInProject' => null,
+                'projectTotalWeight' => null,
+            ];
+
+            return;
+        }
+
         $meanSummator  = new Average();
         $stdevSummator = new StandardDeviation();
         $minSummator   = new Minimum();
@@ -397,6 +487,20 @@ class Markbook
         // Only collate stats for assessments whose feedback may be viewed by this user
         if ($assessment->isFeedbackVisibleToUser($this->viewingUser)) {
             foreach ($assessment->getAllParticipants() as $participant) {
+                /* Check if we had a specific set of $studentIds to care about:
+                 * if we did, and this user isn't one of those people, skip them
+                 *
+                 * FIXME Maybe controversial: applying filters here basically reduces the universe. You'll be making
+                 *  boxplots for a subset of people and might not be indicative of the entire *actual* class/cohort,
+                 *  which might be somewhat misleading unless you think about this mindfully. If your class/cohort had
+                 *  20 people in it, but 3 people are in your student filter, is the class average based on:
+                 *    - those 20 people, or
+                 *    - just those 3 people?
+                 */
+                if (!$this->isFilteredStudent($participant->getUser()->getId())) {
+                    continue;
+                }
+
                 $normMarks[]      = $participant->getNormalisedMark(true);
                 $draftNormMarks[] = $participant->getNormalisedMark(false);
             }
@@ -405,23 +509,22 @@ class Markbook
         $fivePoints = (new Summary($normMarks))->getSummary();
 
         $statistics = [
-            'mean'              => null,
-            'sd'                => null,
-            'min'               => $markScheme->getHumanReadableMark($minSummator->summateList($normMarks)),
-            'minNormalized'     => $fivePoints['min'],
-            'max'               => $markScheme->getHumanReadableMark($maxSummator->summateList($normMarks)),
-            'maxNormalized'     => $fivePoints['max'],
-            'count'             => $countSummator->summateList($normMarks),
-            'quartile1'         => $fivePoints['quartile1'],
-            'quartile2'         => $fivePoints['quartile2'],
-            'quartile3'         => $fivePoints['quartile3']
+            'mean'          => null,
+            'sd'            => null,
+            'min'           => $markScheme->getHumanReadableMark($minSummator->summateList($normMarks)),
+            'minNormalized' => $fivePoints['min'],
+            'max'           => $markScheme->getHumanReadableMark($maxSummator->summateList($normMarks)),
+            'maxNormalized' => $fivePoints['max'],
+            'count'         => $countSummator->summateList($normMarks),
+            'quartile1'     => $fivePoints['quartile1'],
+            'quartile2'     => $fivePoints['quartile2'],
+            'quartile3'     => $fivePoints['quartile3']
         ];
 
         /* $assessment might or might not be in a Project
          * (Projects are assessments too)
          *
-         * If it's in a Project, we need to inspect its siblings' weights
-         * to do an additional analysis
+         * If it's in a Project, we need to inspect its siblings' weights to do an additional analysis
          */
         if ($assessment->getContext() instanceof Project) {
             $statistics['weightInProject'] = $assessment->getWeight();
@@ -430,14 +533,11 @@ class Markbook
              */
             $statistics['projectTotalWeight'] = 0;
 
-            /* If $assessment is inside a Project, it needs to know
-             * about the weights of its siblings so that $assessment
-             * can be represented as a proportion of the siblings'
-             * combined weights
+            /* If $assessment is inside a Project, it needs to know about the weights of its siblings so that $assessment
+             * can be represented as a proportion of the siblings' combined weights
              *
-             * Note that this might be repeated a bit, for every assessment
-             * in the project itself but there's probably nothing convenient
-             * we can do to address that right now
+             * Note that this might be repeated a bit, for every assessment in the project itself but there's probably
+             * nothing convenient we can do to address that right now
              */
             foreach ($assessment->getContext()->getAssessables() as $projectAssessment) {
                 $statistics['projectTotalWeight'] += $projectAssessment->getWeight();
@@ -454,22 +554,23 @@ class Markbook
 
         // mean and SD are only meaningful for quantitative marks
         if ($assessment->getMarkScheme()->isQuantitative()) {
-            $statistics['mean']             = $markScheme->getHumanReadableMark($meanSummator->summateList($normMarks));
-            $statistics['draftMean']        = $markScheme->getHumanReadableMark($meanSummator->summateList($draftNormMarks));
-            $statistics['sd']               = $markScheme->getHumanReadableMark($stdevSummator->summateList($normMarks));
-            $statistics['sdNormalized']     = $stdevSummator->summateList($normMarks);
+            $statistics['mean']         = $markScheme->getHumanReadableMark($meanSummator->summateList($normMarks));
+            $statistics['draftMean']    = $markScheme->getHumanReadableMark($meanSummator->summateList($draftNormMarks));
+            $statistics['sd']           = $markScheme->getHumanReadableMark($stdevSummator->summateList($normMarks));
+            $statistics['sdNormalized'] = $stdevSummator->summateList($normMarks);
         }
 
         $this->assessmentStatistics[$assessment->getId()] = $statistics;
     }
 
+
     /**
      * Retrieves a generator which iterates all assessments, and drills down into project
      * sub-assessments.
      *
-     * @return \Generator|IAssessable[]
+     * @return \Generator<IAssessable>
      */
-    public function getAssessmentsWithProjectContents()
+    public function getAssessmentsWithProjectContents(): \Generator
     {
         foreach ($this->getTopLevelAssessments() as $assessment) {
             yield $assessment;
@@ -498,6 +599,7 @@ class Markbook
         $this->assessments->sortByCallback($comparator->getCallable());
         return $this;
     }
+
 
     /**
      * Build student ranking
@@ -542,5 +644,98 @@ class Markbook
         }
 
         return $rank;
+    }
+
+
+    /* Getters/Setters
+     */
+
+
+    /**
+     * Get all assessments in this collection.
+     *
+     * @return Collection<IAssessable>
+     */
+    public function getAssessments(): Collection
+    {
+        return $this->assessments;
+    }
+
+
+    /**
+     * Get all top level assessments in this collection.
+     *
+     * @return Collection<IAssessable>
+     */
+    public function getTopLevelAssessments(): Collection
+    {
+        return $this->topLevelAssessments;
+    }
+
+
+    /**
+     * Gets all stats for the assessments in this markbook.
+     *
+     * @return array
+     */
+    public function getAssessmentStatistics(): array
+    {
+        return $this->assessmentStatistics;
+    }
+
+
+    /**
+     * Gets all stats for the students in this markbook.
+     *
+     * @return array
+     */
+    public function getStudentStatistics(): array
+    {
+        return $this->studentStatistics;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getHasDraft(): array
+    {
+        return $this->hasDraft;
+    }
+
+
+    /**
+     * @return float|null
+     */
+    public function getNormalisedMean(): float|null
+    {
+        return $this->normalisedMean;
+    }
+
+
+    /**
+     * @return float|null
+     */
+    public function getDraftNormalisedMean(): float|null
+    {
+        return $this->draftNormalisedMean;
+    }
+
+
+    /**
+     * @return null|string
+     */
+    public function getWeightedMean(): ?string
+    {
+        return $this->weightedMean;
+    }
+
+
+    /**
+     * @return null|string
+     */
+    public function getDraftWeightedMean(): ?string
+    {
+        return $this->draftWeightedMean;
     }
 }

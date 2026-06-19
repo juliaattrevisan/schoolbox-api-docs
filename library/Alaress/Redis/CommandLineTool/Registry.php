@@ -17,13 +17,6 @@ use Schoolbox\Resource\Storage\GC\Check\Storage;
 class Registry
 {
     /**
-     * Set key for old cache
-     *
-     * @deprecated This will eventually be removed
-     */
-    private const SET_KEY = '__set';
-
-    /**
      * Template var for instance ID: this will match any instance ID in a Redis
      * key.
      */
@@ -36,23 +29,38 @@ class Registry
         // Cache-only patterns go here
         Redis::INSTANCE_CACHE   => [
             // Scrub
+            '^fc\\.scrub\\.html\\.' . self::INSTANCE_ID_MATCH,
+            '^fc\\.htmlAbsoluteUri\\.html\\.' . self::INSTANCE_ID_MATCH,
+            // Old keys
             '^fc:' . self::INSTANCE_ID_MATCH . ':scrub.html:',
             '^fc:' . self::INSTANCE_ID_MATCH . ':scrub.htmlAbsoluteUri:',
 
             // Verso API
+            '^fc\\.verso_api\\.' . self::INSTANCE_ID_MATCH,
+            // Old keys
             '^fc:' . self::INSTANCE_ID_MATCH . ':verso_api:',
 
             // External
+            '^fc\\.External_Class\\.\\w+\\.' . self::INSTANCE_ID_MATCH,
+            '^fc\\.External_Timetable\\.\\w+\\.' . self::INSTANCE_ID_MATCH,
+            '^fc\\.External_User\\.\\w+\\.' . self::INSTANCE_ID_MATCH,
+            // Old keys
             '^fc:' . self::INSTANCE_ID_MATCH . ':External_',
 
+            // Cached function calls for timetable users, as called in
+            // `\Schoolbox\External\Event\TimetableUsers`
+            '^fc\\.findTeachersForClassCode\\.' . self::INSTANCE_ID_MATCH,
+            '^fc\\.findClassCodesForUser\\.' . self::INSTANCE_ID_MATCH,
+            '^fc\\.findCommonOverrides\\.' . self::INSTANCE_ID_MATCH,
+            '^fc\\.findForUser\\.' . self::INSTANCE_ID_MATCH,
+
             // vCal cache
+            "^vcal\\." . self::INSTANCE_ID_MATCH . ":[0-9a-f]{64}",
+            // Old keys
             "^vcal:" . self::INSTANCE_ID_MATCH . ":[0-9a-f]{64}",
 
             // Locks
             '^lock:' . self::INSTANCE_ID_MATCH . ':',
-
-            // Atlas API?
-            '^atlasApi:' . self::INSTANCE_ID_MATCH . '.',
 
             // Aura route and module caches
             'routeCache:' . self::INSTANCE_ID_MATCH,
@@ -63,31 +71,20 @@ class Registry
             //   oAuth/OIDC provider
             CacheHelper::BASE_CLIENT_KEY . '\\.' . self::INSTANCE_ID_MATCH . ':' . IsamsCacheHelper::REGISTERS_CACHE_KEY,
             CacheHelper::BASE_CLIENT_KEY . '\\.' . self::INSTANCE_ID_MATCH . ':',
-            // Old keys: will eventually be removed
-            CacheHelper::BASE_CLIENT_KEY . ':' . self::INSTANCE_ID_MATCH . ':isams_registers',
-            CacheHelper::BASE_CLIENT_KEY . ':' . self::INSTANCE_ID_MATCH . ':' . self::SET_KEY,
-            CacheHelper::BASE_CLIENT_KEY . ':' . self::INSTANCE_ID_MATCH . ':',
 
             // ClickView (Homepage Component) cache
             'component\\.homepage\\.clickview\\.' . self::INSTANCE_ID_MATCH . ':',
-            // Old key
-            'component.homepage.clickview:' . self::INSTANCE_ID_MATCH . ':' . self::SET_KEY,
-            'component.homepage.clickview:' . self::INSTANCE_ID_MATCH . ':',
 
             // Paperly cache
             'paperly\\.' . self::INSTANCE_ID_MATCH . ':paperly_dashboard_user',
-            // Old key
-            'paperly' . ':' . self::INSTANCE_ID_MATCH . ':paperly_dashboard_user',
-            'paperly' . ':' . self::INSTANCE_ID_MATCH . ':' . self::SET_KEY,
 
             // Storage cache
+            '^fc\\.system_usage_\w+\\.' . self::INSTANCE_ID_MATCH,
+            // Old keys
             '^fc:' . self::INSTANCE_ID_MATCH . ':system_usage_',
 
             // HTTP client cache
             'httpClient\\.' . self::INSTANCE_ID_MATCH . ':',
-            // Old key
-            'httpClient:' . self::INSTANCE_ID_MATCH . ':' . self::SET_KEY,
-            'httpClient:' . self::INSTANCE_ID_MATCH . ':',
 
             // Storage hashes within storage file content:
             // used so that storage file content does not need to be looked up
@@ -133,9 +130,6 @@ class Registry
 
             // Access tokens for LTI assessments
             '^accessToken\\.' . self::INSTANCE_ID_MATCH . ':.+',
-            // Old key
-            '^accessToken:' . self::INSTANCE_ID_MATCH . ':' . self::SET_KEY,
-            '^accessToken:' . self::INSTANCE_ID_MATCH . ':.+',
 
             // Etherpad patterns
             '^pad:g\.',
@@ -159,9 +153,6 @@ class Registry
             // * nonces
             // * refresh tokens
             CacheHelper::BASE_SERVER_KEY . '\\.' . self::INSTANCE_ID_MATCH . ':',
-            // Old keys
-            CacheHelper::BASE_SERVER_KEY . ':' . self::INSTANCE_ID_MATCH . ':' . self::SET_KEY,
-            CacheHelper::BASE_SERVER_KEY . ':' . self::INSTANCE_ID_MATCH . ':',
         ],
         // Queue patterns go here
         // (Note that queue is the same instance as cache, so it's not an issue

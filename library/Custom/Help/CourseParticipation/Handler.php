@@ -364,7 +364,7 @@ class Handler
 
 
     /**
-     * @return UserMapper|Mapper
+     * @return UserMapper
      * @throws Mapper\DefinitionException
      */
     private function getUserMapper(): UserMapper
@@ -374,7 +374,7 @@ class Handler
 
 
     /**
-     * @return RoleMapper|Mapper
+     * @return RoleMapper
      * @throws Mapper\DefinitionException
      */
     private function getRoleMapper(): RoleMapper
@@ -384,7 +384,7 @@ class Handler
 
 
     /**
-     * @return CampusMapper|Mapper
+     * @return CampusMapper
      * @throws Mapper\DefinitionException
      */
     private function getCampusMapper(): CampusMapper

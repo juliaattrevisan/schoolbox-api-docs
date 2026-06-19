@@ -179,7 +179,9 @@ async function onSave(): Promise<void> {
             </div>
             <div v-else class="content-overlay empty-state no-print">
                 <empty-state icon="icon-list">
-                    <button @click.prevent="onModify">Add {{ headerStore.getTitleByKey(props.headerKey) }}</button>
+                    <button class="sbx-link-button" @click.prevent="onModify">
+                        Add {{ headerStore.getTitleByKey(props.headerKey) }}
+                    </button>
                 </empty-state>
             </div>
             <div ref="componentActionEl">

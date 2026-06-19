@@ -78,7 +78,7 @@
         <h1>{{ sport.name }}</h1>
         {%  if sport.url %}
         <ul class="meta">
-            <li class="icon-home"><a href="{{ sport.url }}">{{ sport.url }}</a></li>
+            <li><sbx-icon name="home"></sbx-icon><a href="{{ sport.url }}">{{ sport.url }}</a></li>
         </ul>
         {% endif %}
     </div>
@@ -124,22 +124,31 @@
                 <li data-division>
                     <div class="actions-small-1">
                         {% if teamCount %}
-                        <div class="expander" data-collapser="division-{{ division.id }}"></div>
+                        <a
+                            href="#"
+                            class="expander sbx-icon-only-button"
+                            data-collapser="division-{{ division.id }}"
+                            aria-label="Toggle {{ division.name }} teams"
+                        >
+                            <sbx-icon name="down-arrow"></sbx-icon>
+                        </a>
                         {% endif %}
                         <div class="card small-12 list-item">
                             <a href="{{ routeLookup('sportsfixturesDivision.getLobby', { entityId: division.id }) }}" title="Go to {{ division.name }} lobby">
                                 <sbx-icon name="division"></sbx-icon>
-                                <h3>{{ division.name }}</h3>
+                                <div class="card-copy">
+                                    <h3>{{ division.name }}</h3>
+                                    <p class="meta">
+                                        {%- if teamCount == 1 -%}
+                                            One team
+                                        {%- elseif teamCount -%}
+                                            {{ teamCount }} teams
+                                        {%- else -%}
+                                            No teams
+                                        {%- endif -%}
+                                    </p>
+                                </div>
                             </a>
-                            <p class="meta">
-                                {%- if teamCount == 1 -%}
-                                    One team
-                                {%- elseif teamCount -%}
-                                    {{ teamCount }} teams
-                                {%- else -%}
-                                    No teams
-                                {%- endif -%}
-                            </p>
                         </div>
                         <nav>
                             <sbx-pop-out content-id="division-{{ division.id }}-dropdown"></sbx-pop-out>
@@ -184,7 +193,7 @@
                                                 }) %}
                                                 {% if routeModifyTeam %}
                                                     <div>
-                                                        <span class="icon-team"></span>
+                                                        <sbx-icon name="team"></sbx-icon>
                                                         <a href="{{ routeModifyTeam }}">{{ team.name }}</a>
                                                         {% if team.coaches | length %}
                                                             <span class="pipe meta">({{ team.coaches | column('name') | join(', ') }})</span>

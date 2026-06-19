@@ -91,7 +91,6 @@ class DevMonitor extends AbstractLogger implements IMonitor
             for ($i = 0; $i < count($matches[0]); ++$i) {
                 $aliases[$matches[2][$i]] = $matches[1][$i];
             }
-            true;
         }
 
         foreach ($where as $clause) {

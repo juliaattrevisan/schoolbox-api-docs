@@ -146,10 +146,7 @@ class Validator
                     explode(',', $requestPost['guests'])
                 )
             );
-            /**
-             * Without this hint, PHPStan warns in foreach loop below "string does not accept array<string, int>."
-             * @var array $requestPost['guests']
-             */
+            // Keep the normalized guests payload as a list of object stubs for the API mapper.
             $requestPost['guests'] = [];
             foreach ($guestIds as $guestId) {
                 $requestPost['guests'][] = ['id' => $guestId];

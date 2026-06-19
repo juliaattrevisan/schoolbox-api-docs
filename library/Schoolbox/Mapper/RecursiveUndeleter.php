@@ -512,7 +512,7 @@ class RecursiveUndeleter
     private function getMapperClassAndForeignKeyFromRegistryPair(IMapper $parentMapper, $key, $val): array
     {
         if (is_string($key)) {
-            /** @var IMapper $key */
+            /** @var class-string<IMapper> $key */
             $childMapper = $key::getInstance();
             $foreignKey  = $val;
         } else {

@@ -51,6 +51,11 @@ const { onlyShowDP, customisationFilter, customisationOptions, filteredParticipa
     useFilterParticipants(allParticipants);
 const { showCheckboxes, selectedList, allSelected, isIndeterminate } = useSelectedList(filteredParticipants);
 
+window.Vue.watch([customisationFilter, onlyShowDP], () => {
+    // to avoid having participants selected that are not visible due to the filters, we clear the selection when filters change
+    selectedList.value = [];
+});
+
 /**
  * We only want to show the column on certain assessment types and when differentiation and AI features are enabled
  */
@@ -58,6 +63,7 @@ const canSuggestCustomisation = window.Vue.computed(() => {
     return (
         props.differentiationEnabled &&
         sbProps.aiFeatures.learningactivitycustomisation?.enabled &&
+        !!props.routes.genAI &&
         (props.assessmentType === ACTIVITY_TYPE_DUE_WORK || props.assessmentType === ACTIVITY_TYPE_TASK)
     );
 });
@@ -249,7 +255,7 @@ function onViewSuggestedCustomisation(participant: Participant): void {
         @confirm="onConfirmActionSelected"
     />
     <cp-suggested-customisation-modal
-        v-if="props.differentiationEnabled && sbProps.aiFeatures.learningactivitycustomisation?.enabled"
+        v-if="canSuggestCustomisation"
         v-model:participant="currentParticipant"
         :routes="props.routes"
         :assessment-id="props.assessmentId"

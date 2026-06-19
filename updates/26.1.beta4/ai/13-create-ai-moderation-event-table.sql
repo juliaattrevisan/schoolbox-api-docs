@@ -1,0 +1,22 @@
+CREATE TABLE `ai_moderation_event` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `ai_session_id` char(36) NOT NULL COMMENT 'The moderation session that produced the event',
+    `target_ai_session_id` char(36) NOT NULL COMMENT 'the AI session being moderated',
+    `status` enum('no_action_required', 'requires_attention', 'further_action_required', 'further_action_taken') NOT NULL,
+    `moderation_details` text NOT NULL DEFAULT '',
+    `reviewed_by` int(10) unsigned DEFAULT NULL COMMENT 'Set when a user reviews the event',
+    `reviewed_at` datetime DEFAULT NULL,
+    `resolved_by` int(10) unsigned DEFAULT NULL COMMENT 'Set when follow-up action is completed/resolved',
+    `resolved_at` datetime DEFAULT NULL COMMENT 'Set when follow-up action is completed/resolved',
+    `created_at` datetime NOT NULL,
+    `updated_at` datetime NOT NULL,
+    PRIMARY KEY (`id`),
+    KEY `ai_moderation_event_reviewed_at_idx` (`reviewed_at`),
+    KEY `ai_moderation_event_resolved_at_idx` (`resolved_at`),
+    KEY `ai_moderation_event_created_at_idx` (`created_at`),
+    KEY `ai_moderation_event_updated_at_idx` (`updated_at`),
+    CONSTRAINT `ai_moderation_event_ai_session_id_fk` FOREIGN KEY (`ai_session_id`) REFERENCES `ai_session` (`id`),
+    CONSTRAINT `ai_moderation_event_target_ai_session_id_fk` FOREIGN KEY (`target_ai_session_id`) REFERENCES `ai_session` (`id`),
+    CONSTRAINT `ai_moderation_event_reviewed_by_fk` FOREIGN KEY (`reviewed_by`) REFERENCES `user` (`id`),
+    CONSTRAINT `ai_moderation_event_resolved_by_fk` FOREIGN KEY (`resolved_by`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

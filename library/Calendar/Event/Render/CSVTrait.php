@@ -33,7 +33,6 @@ trait CSVTrait
          */
         $fd = fopen('php://temp/maxmemory:100000', 'rw');
 
-        /** @var Event $event */
         $event = $this->event;
         $data  = [
             $event->getStartTime()->getLocalShort(),

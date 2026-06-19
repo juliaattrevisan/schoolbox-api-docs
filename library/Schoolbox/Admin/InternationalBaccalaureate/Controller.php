@@ -46,6 +46,7 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception\NotFound as MapperNotFound;
 use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 use Schoolbox\Resource\Folder\Code\Model as FolderCodeModel;
+use Schoolbox\UserMapper;
 
 class Controller extends ConfigController
 {
@@ -76,6 +77,7 @@ class Controller extends ConfigController
         private RegistrationSessionStudentModelToArray $registrationSessionStudentModelToArray,
         private RegistrationSessionStudentHelper $registrationSessionStudentHelper,
         private \External_UserInterface $externalUser,
+        private UserMapper $userMapper,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
         CacheInterface $oidcCache
@@ -587,22 +589,15 @@ class Controller extends ConfigController
     /**
      * Diploma Programme Year 2 Registration Report page
      *
+     * @throws RouteNotFound|\Twig\Error\Error
      * @api GET /adminv2/international-baccalaureate/registrations/sessions/{sessionId}
      */
-    public function getReport(int $sessionId): void
+    public function getReport(RegistrationSessionModel $registrationSession): void
     {
-        try {
-            $session = $this->registrationSessionMapper->findById($sessionId);
-        } catch (MapperNotFound) {
-            $this->response = $this->responseAsJson([
-                'success' => false,
-                'message' => 'Registration session not found.',
-            ])->withStatus(404);
-            return;
-        }
-
+        $sessionId = (int) $registrationSession->getId();
         $pageCurrent = '/adminv2/international-baccalaureate/registrations';
-        $this->response = $this->responseDependentOnRequest(
+
+        $this->response = $this->responseFromTemplate(
             '@internationalBaccalaureate/registrations/report.twig',
             [
                 'pageCurrent' => $pageCurrent,
@@ -613,9 +608,113 @@ class Controller extends ConfigController
                     'searchLanguages' => $this->getRouteIfAuthorized('internationalBaccalaureate.searchLanguages'),
                     'completePreparation' => $this->getRouteIfAuthorized('internationalBaccalaureate.sessionCompletePreparation', ['sessionId' => $sessionId]),
                     'renotifyUnconfirmed' => $this->getRouteIfAuthorized('internationalBaccalaureate.renotifyUnconfirmed', ['sessionId' => $sessionId]),
+                    'resetDetails' => $this->getRouteIfAuthorized('internationalBaccalaureate.sessionResetDetails', ['sessionId' => $sessionId]),
+                    'manuallyRegister' => $this->getRouteIfAuthorized('internationalBaccalaureate.sessionMarkAsManuallyRegistered', ['sessionId' => $sessionId]),
+                    'candidateNumberUpdateRoute' => $this->getRouteIfAuthorized(
+                        'internationalBaccalaureate.getRegistrationSessionCandidateNumbers',
+                        ['sessionId' => $sessionId]
+                    ),
                 ],
-                'sessionTitle' => $session->jsonSerialize()['title'],
+                'sessionTitle' => $registrationSession->jsonSerialize()['title'],
             ]
+        );
+    }
+
+    /**
+     * Manually update candidate numbers for students in this registration report.
+     *
+     * @api GET /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/candidates/candidate-numbers
+     */
+    public function getRegistrationSessionCandidateNumbers(RegistrationSessionModel $registrationSession): void
+    {
+        $sessionId = (int) $registrationSession->getId();
+        $pageCurrent = '/adminv2/international-baccalaureate/registrations';
+        $reportRoute = $this->getRouteIfAuthorized(
+            'internationalBaccalaureate.getReport',
+            ['sessionId' => $sessionId]
+        );
+
+        $this->response = $this->responseFromTemplate(
+            '@internationalBaccalaureate/registrations/candidate-numbers.twig',
+            [
+                'pageCurrent' => $pageCurrent,
+                'allBreadcrumbs' => array_merge(
+                    (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($pageCurrent),
+                    [['Update Candidate Numbers', null]]
+                ),
+                'sessionTitle' => $registrationSession->jsonSerialize()['title'],
+                'candidates' => $this->buildCandidateNumberRows(
+                    $this->findReportCandidateStudents($sessionId)
+                ),
+                '_routes' => [
+                    'save' => $this->getRouteIfAuthorized(
+                        'internationalBaccalaureate.postRegistrationSessionCandidateNumbers',
+                        ['sessionId' => $sessionId]
+                    ),
+                    'report' => $reportRoute ?? '/adminv2/international-baccalaureate/registrations',
+                ],
+            ]
+        );
+    }
+
+    /**
+     * Persist manually entered candidate numbers to student profile records.
+     *
+     * @api POST /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/candidates/candidate-numbers
+     */
+    public function postRegistrationSessionCandidateNumbers(RegistrationSessionModel $registrationSession): void
+    {
+        $sessionId = (int) $registrationSession->getId();
+        $candidateNumbers = $this->requestPost->get('candidateNumbers');
+
+        if (is_array($candidateNumbers)) {
+            $studentsByUserId = [];
+
+            foreach ($this->findReportCandidateStudents($sessionId) as $student) {
+                $userId = $student->getUser()?->getId();
+
+                if ($userId !== null) {
+                    $studentsByUserId[$userId] = $student;
+                }
+            }
+
+            foreach ($candidateNumbers as $userId => $candidateNumber) {
+                $userId = (int) $userId;
+                $candidateNumber = trim((string) $candidateNumber);
+
+                if ($userId <= 0 || !isset($studentsByUserId[$userId])) {
+                    continue;
+                }
+
+                $student = $studentsByUserId[$userId];
+                $user = $student->getUser();
+
+                if ($user === null) {
+                    continue;
+                }
+
+                if ($candidateNumber === '') {
+                    if ($this->registrationSessionStudentHelper->normalise($user->getIbCandidateNumber()) === '') {
+                        continue;
+                    }
+
+                    $user->setIbCandidateNumber(null);
+                    $this->userMapper->save($user);
+                    continue;
+                }
+
+                $this->persistRegistrationSessionStudent($sessionId, $userId);
+                $user->setIbCandidateNumber($candidateNumber);
+                $this->userMapper->save($user);
+            }
+        }
+
+        $reportRoute = $this->getRouteIfAuthorized(
+            'internationalBaccalaureate.getReport',
+            ['sessionId' => $sessionId]
+        );
+        $this->response = $this->redirectAfterPost(
+            $reportRoute ?? '/adminv2/international-baccalaureate/registrations'
         );
     }
 
@@ -880,7 +979,7 @@ class Controller extends ConfigController
         int $sessionId,
         int $studentId
     ): void {
-        $subjects = new Values($this->request->getParsedBody() ?? [])->get('subjects');
+        $subjects = (new Values($this->request->getParsedBody() ?? []))->get('subjects');
 
         if (!is_array($subjects)) {
             $this->response = $this->responseAsJson([
@@ -1007,6 +1106,7 @@ class Controller extends ConfigController
     {
         $post       = $this->requestPost;
         $studentIds = $post->get('studentIds');
+        $studentsToTransition = [];
 
         try {
             $studentIds = $this->normalisePreparationStudentIds($studentIds);
@@ -1031,16 +1131,217 @@ class Controller extends ConfigController
 
             $database->commit();
             $transactionStarted = false;
-
-            $this->response = $this->responseAsJson([
-                                                        'success'           => true,
-                                                        'transitionedCount' => count($studentsToTransition),
-                                                    ]);
         } catch (\InvalidArgumentException $e) {
             if ($transactionStarted) {
                 $database->rollBack();
             }
             $this->sendJsonError($e->getMessage(), 400);
+            return;
+        } catch (Exception) {
+            if ($transactionStarted) {
+                $database->rollBack();
+            }
+            $this->sendJsonError('Something has gone wrong. Please try again later.', 500);
+            return;
+        }
+
+        try {
+            foreach ($studentsToTransition as $student) {
+                $this->registrationSessionStudentMapper->propagate(
+                    $this->getUser(),
+                    BaseMapper::METHOD_UPDATE,
+                    $student,
+                    [
+                        'status' => [
+                            RegistrationSessionStudentModel::STATUS_UNCONFIRMED,
+                            RegistrationSessionStudentModel::STATUS_PREPARATION,
+                        ],
+                    ]
+                );
+            }
+        } catch (Exception) {
+            //Ignore exceptions from notifications, as the transition has already been completed and can be retried later if needed
+        }
+
+        $this->response = $this->responseAsJson(
+            [
+                'success' => true,
+                'transitionedCount' => count($studentsToTransition),
+            ]
+        );
+    }
+
+    /**
+     * Resets the given eligible students back to Preparation, clearing their language overrides.
+     * Eligible statuses: Unconfirmed, Confirmed, Failed.
+     *
+     * @return void
+     * @api POST /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/reset-details
+     */
+    public function sessionResetDetails(RegistrationSessionModel $registrationSession): void
+    {
+        $post       = $this->requestPost;
+        $studentIds = $post->get('studentIds');
+
+        try {
+            $studentIds = $this->normalisePreparationStudentIds($studentIds);
+        } catch (\InvalidArgumentException $e) {
+            $this->sendJsonError($e->getMessage(), 400);
+            return;
+        }
+
+        $eligibleStatuses = [
+            RegistrationSessionStudentModel::STATUS_UNCONFIRMED,
+            RegistrationSessionStudentModel::STATUS_CONFIRMED,
+            RegistrationSessionStudentModel::STATUS_FAILED,
+        ];
+
+        $database           = $this->registrationSessionStudentMapper->getDatabase();
+        $transactionStarted = false;
+
+        try {
+            $allStudents        = $this->registrationSessionStudentMapper->findStudentsForSession((int) $registrationSession->getId());
+            $studentsByAnyId    = [];
+
+            foreach ($allStudents as $student) {
+                if ($student->getId() !== null) {
+                    $studentsByAnyId[(int) $student->getId()] = $student;
+                }
+
+                if ($student->getUser()?->getId() !== null) {
+                    $studentsByAnyId[(int) $student->getUser()->getId()] = $student;
+                }
+            }
+
+            $seen            = [];
+            $studentsToReset = [];
+
+            foreach ($studentIds as $studentId) {
+                $student = $studentsByAnyId[$studentId] ?? null;
+
+                if (
+                    $student !== null
+                    && !isset($seen[$student->getId()])
+                    && in_array($student->getStatus(), $eligibleStatuses, true)
+                ) {
+                    $seen[$student->getId()] = true;
+                    $studentsToReset[]       = $student;
+                }
+            }
+
+            if ($studentsToReset === []) {
+                $this->sendJsonError('No eligible students found for reset.', 400);
+                return;
+            }
+
+            $transactionStarted = $database->beginTransaction();
+
+            $resetIds = array_map(fn($s) => (int) $s->getId(), $studentsToReset);
+            /* Removing the subject language overrides for the given students when resetting their details.
+             */
+            $this->registrationSessionStudentSubjectLanguageMapper->deleteByColumn(
+                'registration_session_student_id',
+                $resetIds
+            );
+
+            foreach ($studentsToReset as $student) {
+                $student->setStatus(RegistrationSessionStudentModel::STATUS_PREPARATION);
+                $this->registrationSessionStudentMapper->save($student);
+            }
+
+            $database->commit();
+            $transactionStarted = false;
+
+            $this->response = $this->responseAsJson([
+                'success'           => true,
+                'transitionedCount' => count($studentsToReset),
+            ]);
+        } catch (Exception) {
+            if ($transactionStarted) {
+                $database->rollBack();
+            }
+            $this->sendJsonError('Something has gone wrong. Please try again later.', 500);
+        }
+    }
+
+    /**
+     * Mark selected candidates as manually registered in IBIS outside the API workflow.
+     * Records the staff member and timestamp for audit purposes.
+     *
+     * @api POST /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/mark-as-manually-registered
+     */
+    public function sessionMarkAsManuallyRegistered(RegistrationSessionModel $registrationSession): void
+    {
+        $post       = $this->requestPost;
+        $studentIds = $post->get('studentIds');
+
+        try {
+            $studentIds = $this->normalisePreparationStudentIds($studentIds);
+        } catch (\InvalidArgumentException $e) {
+            $this->sendJsonError($e->getMessage(), 400);
+            return;
+        }
+
+        $eligibleStatuses = [
+            RegistrationSessionStudentModel::STATUS_CONFIRMED,
+            RegistrationSessionStudentModel::STATUS_FAILED,
+        ];
+
+        $database           = $this->registrationSessionStudentMapper->getDatabase();
+        $transactionStarted = false;
+
+        try {
+            $allStudents     = $this->registrationSessionStudentMapper->findStudentsForSession((int) $registrationSession->getId());
+            $studentsById = [];
+
+            foreach ($allStudents as $student) {
+                if ($student->getId() !== null) {
+                    $studentsById[(int) $student->getId()] = $student;
+                }
+            }
+
+            $seen               = [];
+            $studentsToRegister = [];
+
+            foreach ($studentIds as $studentId) {
+                $student = $studentsById[$studentId] ?? null;
+
+                if (
+                    $student !== null
+                    && !isset($seen[$student->getId()])
+                    && in_array($student->getStatus(), $eligibleStatuses, true)
+                ) {
+                    $seen[$student->getId()] = true;
+                    $studentsToRegister[]    = $student;
+                }
+            }
+
+            if ($studentsToRegister === []) {
+                $this->sendJsonError('No eligible students found for manual registration.', 400);
+                return;
+            }
+
+            $registeredBy       = $this->getUser();
+            $registeredAt       = \Alaress_Date_Format::now();
+            $transactionStarted = $database->beginTransaction();
+
+            foreach ($studentsToRegister as $student) {
+                $student
+                    ->setStatus(RegistrationSessionStudentModel::STATUS_REGISTERED)
+                    ->setManuallyRegisteredBy($registeredBy)
+                    ->setManuallyRegisteredAt($registeredAt);
+                $this->registrationSessionStudentMapper->save($student);
+            }
+
+            $database->commit();
+            $transactionStarted = false;
+
+            $this->response = $this->responseAsJson([
+                'success'               => true,
+                'registeredCount'       => count($studentsToRegister),
+                'manuallyRegisteredBy'  => $registeredBy->getFullName(),
+                'manuallyRegisteredAt'  => $registeredAt->toIso8601String(),
+            ]);
         } catch (Exception) {
             if ($transactionStarted) {
                 $database->rollBack();
@@ -1122,6 +1423,49 @@ class Controller extends ConfigController
         } catch (Exception $e) {
             $this->sendJsonError('Something has gone wrong. Please try again later.', 500);
         }
+    }
+
+    /**
+     * @return RegistrationSessionStudentModel[]
+     */
+    private function findReportCandidateStudents(int $sessionId): array
+    {
+        $studentsByUserId = [];
+
+        foreach ($this->registrationSessionStudentMapper->findStudentsForSession($sessionId) as $student) {
+            if (!$student instanceof RegistrationSessionStudentModel) {
+                continue;
+            }
+
+            $user = $student->getUser();
+            $userId = $user?->getId();
+
+            if ($userId === null) {
+                continue;
+            }
+
+            $studentsByUserId[$userId] = $student;
+        }
+
+        return array_values($studentsByUserId);
+    }
+
+    /**
+     * @param RegistrationSessionStudentModel[] $students
+     * @return array<int, array{userId: int, name: string, ibCandidateNumber: string}>
+     */
+    private function buildCandidateNumberRows(array $students): array
+    {
+        return array_map(
+            fn(RegistrationSessionStudentModel $student): array => [
+                'userId' => (int) $student->getUser()?->getId(),
+                'name' => $student->getUser()?->formatName('{lastname}, {preferredname}') ?? '',
+                'ibCandidateNumber' => $this->registrationSessionStudentHelper->normalise(
+                    $student->getUser()?->getIbCandidateNumber()
+                ),
+            ],
+            $students
+        );
     }
 
     /**

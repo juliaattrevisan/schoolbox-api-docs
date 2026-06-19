@@ -13,7 +13,7 @@ body.sbx-body {
     .island,
     .component,
     .island section,
-    .empty-state,
+    .empty-state:not(:has(.empty-state-flex-centered)),
     .empty-state-flex-centered,
     .modal,
     .modal-content,
@@ -33,22 +33,29 @@ body.sbx-body {
     .fc-event,
     .swiper-horizontal,
     .scrollable.show-for-medium-up,
-    .Schoolbox_Tile_Component_DashboardTileController .tileList .tile,
     .row:has(> #filter_panel),
     .c-header-search__results,
     .side-nav,
-    .side-nav .flyout,
     .cover-photo,
     .cr-results-grid,
     .introjs-whatsnewmodal,
     .az-list li,
     .az-error-list li,
-    .audience-grid li {
+    .audience-grid li,
+    .attachment-browser-container {
         border-radius: var(--sbx-config-container-corner-radius);
     }
 
-    // so the image at the top of the what's new modal respects the rounded corners
-    .introjs-whatsnewmodal {
+    // remove from elements that are children within a container
+    .empty-state.content-overlay {
+        border-radius: 0;
+    }
+
+    // when we need to ensure the border radius is applied correctly to the content,
+    .introjs-whatsnewmodal,
+    .attachment-browser-container,
+    #activity-feed,
+    .island section:not(:has(sbx-pop-out)) {
         overflow: hidden;
     }
 
@@ -72,7 +79,8 @@ body.sbx-body {
 
     // bottom only rounded elements
     .reveal-modal .component-action section,
-    .VueTables__table-footer {
+    .VueTables__table-footer,
+    .island .tabs-content {
         border-radius: 0 0 var(--sbx-config-container-corner-radius) var(--sbx-config-container-corner-radius);
     }
 
@@ -98,5 +106,26 @@ body.sbx-body {
     }
     tbody tr:last-child td:last-child {
         border-bottom-right-radius: var(--sbx-config-container-corner-radius);
+    }
+
+    // utility classes for rounding containers that don't fit the above selectors
+    .l-c-cr {
+        border-radius: var(--sbx-config-container-corner-radius);
+    }
+
+    // to only round the top
+    .l-c-cr-top {
+        border-bottom-left-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        border-top-left-radius: var(--sbx-config-container-corner-radius) !important;
+        border-top-right-radius: var(--sbx-config-container-corner-radius) !important;
+    }
+
+    // to only round the bottom
+    .l-c-cr-bottom {
+        border-bottom-left-radius: var(--sbx-config-container-corner-radius) !important;
+        border-bottom-right-radius: var(--sbx-config-container-corner-radius) !important;
+        border-top-left-radius: 0 !important;
+        border-top-right-radius: 0 !important;
     }
 }

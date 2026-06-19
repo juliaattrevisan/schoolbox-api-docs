@@ -113,6 +113,7 @@ window.Vue.onMounted(() => {
                 v-model="isDescriptorSelected"
                 :data-test="`rubric-descriptor-${props.descriptor.id}`"
                 type="checkbox"
+                data-rubric-descriptor-checkbox
             />
 
             <label :for="`descriptor-${props.descriptor.id}-${componentId}`">

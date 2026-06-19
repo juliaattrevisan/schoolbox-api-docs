@@ -107,7 +107,7 @@ class Loader implements IConfigLoader
     /**
      * Does this config setting exist or not?
      *
-     * @param  mixed $name
+     * @param  string $name
      * @return bool
      */
     public function __isset(string $name): bool

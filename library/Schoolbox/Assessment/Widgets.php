@@ -12,6 +12,8 @@
 
 namespace Schoolbox\Assessment;
 
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Learning\Assessment\IAssessable;
 
 class Widgets
@@ -20,13 +22,13 @@ class Widgets
      * Outputs the visibility dropdown for this page.
      *
      * @param \SitePage $page
-     * @param int $value The value of the dropdown to show.
+     * @param string $value The value of the dropdown to show.
      */
     public function outputVisibilityDropdown(\SitePage $page, $value)
     {
         $page->dropDown(
             'mark_visibility_drop',
-            $this->getAvailableOptions(),
+            self::getAvailableOptions(),
             $value,
             'marktype',
             array(
@@ -41,25 +43,13 @@ class Widgets
      *
      * @return array
      */
-    public static function getAvailableOptions()
+    public static function getAvailableOptions(): array
     {
-        $options = self::getOptions();
-        switch (\Config::get('submission_visibility_max')) {
-            case IAssessable::MARK_VISIBILITY_PRIVATE:
-                // drop MARK_VISIBILITY_PARENT_STUDENT, MARK_VISIBILITY_STUDENT
-                array_pop($options);
-                array_pop($options);
-                break;
-            case IAssessable::MARK_VISIBILITY_STUDENT:
-                // drop MARK_VISIBILITY_PARENT_STUDENT
-                array_pop($options);
-                break;
-            case IAssessable::MARK_VISIBILITY_PARENT_STUDENT:
-            default:
-                // drop nothing
-                break;
-        }
-        return $options;
+        $configLoader  = ConfigLoader::getInstance();
+        $allowStudents = (bool)$configLoader->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_STUDENTS);
+        $allowParents  = (bool)$configLoader->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_PARENTS);
+        $available     = \Schoolbox\Learning\Assessment\Feedback\Visibility::getAvailableVisibilities($allowStudents, $allowParents);
+        return array_intersect_key(self::getOptions(), array_flip($available));
     }
 
     /**
@@ -67,27 +57,30 @@ class Widgets
      *
      * @return array
      */
-    public static function getOptions()
+    public static function getOptions(): array
     {
-        $options = array(
-            array(
+        return [
+            IAssessable::MARK_VISIBILITY_PRIVATE => [
                 'id'   => IAssessable::MARK_VISIBILITY_PRIVATE,
                 'name' => html_entity_decode('&#xe66b;&nbsp;&nbsp;Staff Only'),
-                'css' => 'icon-locked',
-            ),
-            array(
+                'css'  => 'icon-locked',
+            ],
+            IAssessable::MARK_VISIBILITY_STUDENT => [
                 'id'   => IAssessable::MARK_VISIBILITY_STUDENT,
                 'name' => html_entity_decode('&#xe667;&nbsp;&nbsp;Staff and Students'),
-                'css' => 'icon-staff-students',
-            ),
-            array(
+                'css'  => 'icon-staff-students',
+            ],
+            IAssessable::MARK_VISIBILITY_PARENT => [
+                'id'   => IAssessable::MARK_VISIBILITY_PARENT,
+                'name' => html_entity_decode('&#xe666;&nbsp;&nbsp;Staff and Parents'),
+                'css'  => 'icon-staff',
+            ],
+            IAssessable::MARK_VISIBILITY_PARENT_STUDENT => [
                 'id'   => IAssessable::MARK_VISIBILITY_PARENT_STUDENT,
                 'name' => html_entity_decode('&#xe666;&nbsp;&nbsp;Staff, Students and their Parents'),
-                'css' => 'icon-staff',
-            ),
-        );
-
-        return $options;
+                'css'  => 'icon-staff',
+            ],
+        ];
     }
 
     /**

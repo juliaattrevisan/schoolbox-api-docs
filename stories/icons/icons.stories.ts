@@ -150,6 +150,7 @@ const icons: IconStoryEntry[] = [
     { name: "schoolbox", label: "schoolbox" },
     { name: "screen-capture", label: "screen-capture" },
     { name: "search", label: "search" },
+    { name: "send", label: "send" },
     { name: "settings", label: "settings" },
     { name: "share", label: "share" },
     { name: "showcase", label: "showcase | achievement | trophy" },

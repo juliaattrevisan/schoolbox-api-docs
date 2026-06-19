@@ -50,7 +50,7 @@
             {% elseif section.section == 'groups' and section.visible %}
                 <li id="side-menu-mygroups" {% if groups | length == 0 %}class="hide"{% endif %}>
                     <h3 class="side-menu-heading-link">
-                        <a href="{{ routeLookup('groups.getNewGroups') }}#my-favourite-groups" class="sbx-button--has-icon" title="Modify">
+                        <a href="{{ routeLookup('groups.getNewGroups') }}#my-favourite-groups" class="sbx-button--has-icon l-width-100" title="Modify">
                             <sbx-icon name="modify"></sbx-icon>
                             {{ section.title }}
                         </a>

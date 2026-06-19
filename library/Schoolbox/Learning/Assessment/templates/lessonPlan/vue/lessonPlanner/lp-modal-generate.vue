@@ -47,8 +47,8 @@ window.Vue.onMounted(() => {
         </label>
         <ul id="lp-generate-fields" class="option-list">
             <li v-if="lpStore.fields.length > 1">
-                <input id="lp-generate-select-all" v-model="selectAll" type="checkbox" />
-                <label for="lp-generate-select-all" class="checkbox-label" @click="onSelectAllClick">Select All</label>
+                <input id="lp-generate-select-all" v-model="selectAll" type="checkbox" @change="onSelectAllClick" />
+                <label for="lp-generate-select-all" class="checkbox-label">Select All</label>
             </li>
             <li v-for="field in lpStore.fields" :key="field.id">
                 <input :id="`lp-generate-field-${field.id}`" v-model="field.selected" type="checkbox" />

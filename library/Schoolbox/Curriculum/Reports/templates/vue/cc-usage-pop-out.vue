@@ -194,10 +194,10 @@ window.Vue.watch(
 }
 
 .section-title {
-    border-bottom: 2px solid var(--body-background);
+    border-bottom: 2px solid var(--sbx-color-border, var(--body-background));
 }
 
 .section-sub-title {
-    border-bottom: 1px solid var(--body-background);
+    border-bottom: 1px solid var(--sbx-color-border, var(--body-background));
 }
 </style>

@@ -14,7 +14,9 @@ import {
     ACTIVITY_TYPE_DUE_WORK,
     ACTIVITY_TYPE_QUIZ,
     ACTIVITY_TYPE_DIALOG_AGENT,
+    ACTIVITY_TYPE_REPORTING,
 } from "@schoolboxAssessment/Types/assessmentTypes";
+import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import { usePopOut } from "@schoolboxVue/composables/popOut/usePopOut";
 import SmallCard from "@schoolboxVue/components/card/small-card.vue";
@@ -125,16 +127,14 @@ const routes = window.Vue.computed(() => {
         infoEndpoint: studentRoutes?.["learningAssessment.getInfo"] ?? null,
         updateRoute: studentRoutes?.["learningDueWorkResponse.getParticularResponse"] ?? null,
         reviewRoute: studentRoutes?.["learningDueWorkResponse.getParticularResponse"] ?? null,
-        publishRoute: studentRoutes?.["learningDueWorkFeedback.postPublishFeedback"] ?? null,
+        publishRoute: studentRoutes?.postPublishFeedback ?? null,
         excludeRoute: studentRoutes?.["learningAssessment.postExclude"] ?? null,
         includeRoute: studentRoutes?.["learningAssessment.postInclude"] ?? null,
-        historyRoute: studentRoutes?.["learningAssessment.getSummary"] ?? null,
+        historyRoute: studentRoutes?.historyRoute ?? null,
         postFeedback: studentRoutes?.postFeedback ?? null,
         getAssessmentParticipationForm: studentRoutes?.getAssessmentParticipationForm ?? null,
     };
 });
-
-const markbookElement = window.Vue.ref<HTMLDivElement | null>(null);
 
 // Exclude confirm, popout
 const excludeModalEl = window.Vue.ref<InstanceType<typeof RevealModal> | null>(null);
@@ -199,25 +199,28 @@ const viewAllText = window.Vue.computed(() => {
 });
 
 /**
- * Used to determine the text shown for the view status link / menu
+ * Used to determine the text shown for the view submission history link / menu
  */
-const viewStatusText = window.Vue.computed(() => {
+const viewHistoryText = window.Vue.computed(() => {
     if (cellInfo.value === null) {
         return "";
     }
-    if (cellInfo.value.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK) {
-        return "Submission History";
+    switch (cellInfo.value.activity.assessmentType) {
+        case ACTIVITY_TYPE_DUE_WORK:
+            return "Submission History";
+        case ACTIVITY_TYPE_QUIZ:
+            return "Attempt History";
+        case ACTIVITY_TYPE_DIALOG_AGENT:
+            return `${locale.dialogAgent.proper()} History`;
+        case ACTIVITY_TYPE_TASK:
+            return "Student View";
+        case ACTIVITY_TYPE_PROJECT:
+            return "View Progress";
+        case ACTIVITY_TYPE_REPORTING:
+            return "View"; // TODO: figure out what this is eventually, but can wait til' we have the place it goes to sorted out
+        default:
+            return "View Attempts";
     }
-    if (cellInfo.value.activity.assessmentType === ACTIVITY_TYPE_DIALOG_AGENT) {
-        return `${locale.dialogAgent.proper()} History`;
-    }
-    if (cellInfo.value.activity.assessmentType === ACTIVITY_TYPE_TASK) {
-        return "Student View";
-    }
-    if (cellInfo.value.activity.assessmentType === ACTIVITY_TYPE_PROJECT) {
-        return "View Progress";
-    }
-    return "View Attempts";
 });
 
 /**
@@ -234,7 +237,7 @@ const hasVisibleMenuItems = window.Vue.computed(() => {
     const hasParticipantMenuItems =
         participant &&
         !participant.isExcluded &&
-        (activity.assessmentType === ACTIVITY_TYPE_DUE_WORK || activity.assessmentType === ACTIVITY_TYPE_QUIZ);
+        [ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ, ACTIVITY_TYPE_REPORTING].includes(activity.assessmentType);
 
     const hasIncludeMenuItem =
         participant && participant.isExcluded && routes.value.getAssessmentParticipationForm === null;
@@ -285,7 +288,9 @@ async function getActivity(): Promise<void> {
          * but for now this is far more convenient and simple
          */
         if (
-            [ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ].includes(cellInfo.value.activity.assessmentType) &&
+            [ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ, ACTIVITY_TYPE_REPORTING].includes(
+                cellInfo.value.activity.assessmentType,
+            ) &&
             cellInfo.value.participant
         ) {
             await mbStore.updateExtraInfo(infoRoute, cellInfo.value.participant);
@@ -378,9 +383,12 @@ async function onMenuItemSelected(target: string | null, action: string | null =
 
             // If including student reload the activity list
             if (
-                [ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ, ACTIVITY_TYPE_DIALOG_AGENT].includes(
-                    activity.assessmentType,
-                )
+                [
+                    ACTIVITY_TYPE_DUE_WORK,
+                    ACTIVITY_TYPE_QUIZ,
+                    ACTIVITY_TYPE_DIALOG_AGENT,
+                    ACTIVITY_TYPE_REPORTING,
+                ].includes(activity.assessmentType)
             ) {
                 await getActivity();
             } else {
@@ -404,12 +412,47 @@ async function onMenuItemSelected(target: string | null, action: string | null =
     }
 }
 
+const canUpdateFeedback = window.Vue.computed(() => {
+    if (cellInfo.value === null) {
+        return false;
+    }
+
+    const { participant, aImpl, activity } = cellInfo.value;
+
+    // must be a due work, reporting, or quiz activity
+    const validActivityTypes = [ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ, ACTIVITY_TYPE_REPORTING];
+    if (!validActivityTypes.includes(activity.assessmentType)) {
+        return false;
+    }
+
+    // participant must exist and not be excluded
+    if (participant === null || participant.isExcluded) {
+        return false;
+    }
+
+    // must have a postFeedback route
+    if (!routes.value.postFeedback) {
+        return false;
+    }
+
+    /* you must have the ability to either enter a mark or a comment (reporting can disable both at once) */
+    if (!aImpl.feedbackCommentsEnable && aImpl.instructorMarkScheme.mode === MarkTypeSlug.NONE) {
+        return false;
+    }
+
+    return true;
+});
+
 /**
  * Trigger the update feedback UI to appear for this cell
  */
 function onUpdateFeedbackSelected(): void {
     if (cellInfo.value === null) {
         throw new Error("No selected cell to update feedback for");
+    }
+
+    if (!canUpdateFeedback.value) {
+        return;
     }
 
     // Close the popout
@@ -558,7 +601,7 @@ function onToggleSelected(): void {
         <div v-else-if="mbStore.isPopoutLoading || cellInfo === null" class="pop-out-menu__loader">
             <div class="loader"></div>
         </div>
-        <div v-else ref="markbookElement" class="pop-out-menu" :class="{ 'is-expanded': isExpanded }">
+        <div v-else class="pop-out-menu" :class="{ 'is-expanded': isExpanded }">
             <div class="collapsible">
                 <small-card v-for="(activityItem, index) in activityItems" :key="index">
                     <user-photo :user-id="activityItem.effector.id" render="tiny" rounded-corners></user-photo>
@@ -587,7 +630,7 @@ function onToggleSelected(): void {
                     <template v-if="cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK">
                         <pop-out-menu-item
                             v-if="!cellInfo.participant.isExcluded"
-                            :class="{ 'is-disabled': !routes.postFeedback }"
+                            :class="{ 'is-disabled': !canUpdateFeedback }"
                             :link="routes.updateRoute ? getReturnUrl(routes.updateRoute) : undefined"
                             force-callback
                             @selected="onUpdateFeedbackSelected"
@@ -609,13 +652,32 @@ function onToggleSelected(): void {
                         </pop-out-menu-item>
                     </template>
                     <template v-else-if="cellInfo.activity.assessmentType === ACTIVITY_TYPE_QUIZ">
+                        <!-- notable omission of :link, routes.updateRoute is due work only it seems -->
                         <pop-out-menu-item
                             v-if="!cellInfo.participant.isExcluded"
-                            :class="{ 'is-disabled': !routes.postFeedback }"
+                            :class="{ 'is-disabled': !canUpdateFeedback }"
                             force-callback
                             @selected="onUpdateFeedbackSelected"
                         >
                             Update Feedback
+                        </pop-out-menu-item>
+                    </template>
+                    <template v-else-if="cellInfo.activity.assessmentType === ACTIVITY_TYPE_REPORTING">
+                        <!-- notable omission of :link, routes.updateRoute is due work only it seems -->
+                        <pop-out-menu-item
+                            v-if="!cellInfo.participant.isExcluded"
+                            :class="{ 'is-disabled': !canUpdateFeedback }"
+                            force-callback
+                            @selected="onUpdateFeedbackSelected"
+                        >
+                            Update Feedback
+                        </pop-out-menu-item>
+                        <!-- TODO: make this publish logic the same as the rest I guess -->
+                        <pop-out-menu-item
+                            :class="{ 'is-disabled': !routes.publishRoute || isActivityEmpty || !hasDraftFeedback }"
+                            @selected="onMenuItemSelected(routes.publishRoute, 'publish')"
+                        >
+                            Publish Feedback
                         </pop-out-menu-item>
                     </template>
                 </template>
@@ -649,11 +711,12 @@ function onToggleSelected(): void {
                             !routes.historyRoute ||
                             cellInfo.participant.isExcluded ||
                             (isActivityEmpty && cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK) ||
-                            (isActivityEmpty && cellInfo.activity.assessmentType === ACTIVITY_TYPE_DIALOG_AGENT),
+                            (isActivityEmpty && cellInfo.activity.assessmentType === ACTIVITY_TYPE_DIALOG_AGENT) ||
+                            (isActivityEmpty && cellInfo.activity.assessmentType === ACTIVITY_TYPE_REPORTING),
                     }"
                     :link="routes.historyRoute ? getReturnUrl(routes.historyRoute) : undefined"
                 >
-                    {{ viewStatusText }}
+                    {{ viewHistoryText }}
                 </pop-out-menu-item>
             </div>
         </div>

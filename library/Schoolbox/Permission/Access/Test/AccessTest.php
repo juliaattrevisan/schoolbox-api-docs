@@ -1129,7 +1129,7 @@ class AccessTest extends TestCase
      * Builds and returns a folder tree
      *
      * @param array $folderData
-     * @return ObjectTree<Folder\Model>
+     * @return ObjectTree
      */
     private static function buildFolderTree(array $folderData): ObjectTree
     {
@@ -1174,7 +1174,7 @@ class AccessTest extends TestCase
      * Returns a collection of roles, indexed by role.id
      *
      * @param array $roleData
-     * @return GenericCollection<Role>|Role[]
+     * @return GenericCollection
      * @throws UnexpectedValueException
      */
     private static function buildRoles(array $roleData): GenericCollection
@@ -1196,9 +1196,9 @@ class AccessTest extends TestCase
     /**
      * Returns a collection of users, indexed by user.id
      *
-     * @param GenericCollection<Role>|Role[] $roles
-     * @param array                          $userData
-     * @return GenericCollection<User>|User[]
+     * @param GenericCollection $roles
+     * @param array             $userData
+     * @return GenericCollection
      * @throws UnexpectedValueException
      */
     private static function buildUsers(GenericCollection $roles, array $userData): GenericCollection
@@ -1221,14 +1221,14 @@ class AccessTest extends TestCase
     /**
      * Returns a mock UserAccessMapper with hard-coded method return values
      *
-     * @param GenericCollection<User>|User[] $users          Indexed by user.id
-     * @param array|null                     $userAccessData If specified, overrides default data
+     * @param GenericCollection $users          Indexed by user.id
+     * @param array|null       $userAccessData If specified, overrides default data
      * @return UserAccessMapper
      * @throws Framework\Exception
      */
     private function getMockUserAccessMapper(GenericCollection $users, ?array $userAccessData): UserAccessMapper
     {
-        /** @var MockObject|UserAccessMapper $userAccessMapper */
+        /** @var MockObject&UserAccessMapper $userAccessMapper */
         $userAccessMapper = $this->createMock(UserAccessMapper::class);
 
         /** @var UserAccess[][][][] $allUserAccess */
@@ -1288,7 +1288,7 @@ class AccessTest extends TestCase
      */
     private function getMockFolderMapper(ObjectTree $folderTree): Folder\Mapper
     {
-        /** @var MockObject|Folder\Mapper $folderMapper */
+        /** @var MockObject&Folder\Mapper $folderMapper */
         $folderMapper = $this->createMock(Folder\Mapper::class);
 
         /** @see \Schoolbox\Resource\Folder\Mapper::findCheaplyById */
@@ -1319,7 +1319,7 @@ class AccessTest extends TestCase
      */
     private function getMockFolderCodeMapper(ObjectTree $folderTree, array $folderCodeData): Folder\Code\Mapper
     {
-        /** @var MockObject|Folder\Code\Mapper $folderCodeMapper */
+        /** @var MockObject&Folder\Code\Mapper $folderCodeMapper */
         $folderCodeMapper = $this->createMock(Folder\Code\Mapper::class);
 
         /** @var Folder\Model $folder */
@@ -1361,7 +1361,7 @@ class AccessTest extends TestCase
      */
     private function getMockExternalUserInterface(array $externalUserData): External_UserInterface
     {
-        /** @var MockObject|External_UserInterface $externalUserInterface */
+        /** @var MockObject&External_UserInterface $externalUserInterface */
         $externalUserInterface = $this->createMock(External_UserInterface::class);
 
         $subjectLists = [];
@@ -1405,7 +1405,7 @@ class AccessTest extends TestCase
      */
     private function getMockRoleAccessMapper(ObjectTree $folderTree, GenericCollection $roles, array $roleAccessData): RoleAccessMapper
     {
-        /** @var MockObject|RoleAccessMapper $roleAccessMapper */
+        /** @var MockObject&RoleAccessMapper $roleAccessMapper */
         $roleAccessMapper = $this->createMock(RoleAccessMapper::class);
 
         /**

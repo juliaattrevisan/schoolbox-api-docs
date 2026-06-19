@@ -9,7 +9,6 @@
 
 namespace Alaress\Async\AMQP;
 
-use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Message\AMQPMessage;
 
 /**
@@ -55,7 +54,7 @@ interface AMQPInterface
      * @param string $routingKey
      * @param string $exchangeName
      * @param string $channelId
-     * @return AMQPChannel
+     * @return self
      */
     public function bindQueue($queueName, $routingKey, $exchangeName = '', $channelId = null);
 
@@ -67,7 +66,7 @@ interface AMQPInterface
      * @param string $routingKey
      * @param string $exchangeName
      * @param string $channelId
-     * @return AMQPChannel
+     * @return self
      */
     public function unbindQueue($queueName, $routingKey, $exchangeName = '', $channelId = null);
 
@@ -78,7 +77,7 @@ interface AMQPInterface
      * @param string $exchangeName
      * @param string $routingKey
      * @param string $channelId
-     * @return AMQPChannel
+     * @return self
      */
     public function unbindExchange($exchangeName, $routingKey, $channelId = null);
 

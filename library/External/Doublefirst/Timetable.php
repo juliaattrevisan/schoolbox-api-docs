@@ -852,7 +852,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
 
     /**
-     * @var IConnector $database
+     * @param IConnector $database
      */
     private function setDatabase($database)
     {

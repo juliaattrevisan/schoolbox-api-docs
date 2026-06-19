@@ -5,12 +5,14 @@ import type { Locator } from "@playwright/test";
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 import Folders from "@schoolboxTest/playwright/support/page/homepage/FolderComponent";
+import CreateFolder from "@schoolboxTest/playwright/support/page/folder/CreateFolder";
 
 test.describe("Folders Component Tests", () => {
     test.describe.configure({ mode: "serial" });
 
     let homepage: Homepage;
     let folders: Folders;
+    let createFolder: CreateFolder;
     let folderComponent: Locator;
     let componentId: number | undefined;
     let componentHomepageId: number | undefined;
@@ -25,6 +27,7 @@ test.describe("Folders Component Tests", () => {
     test.beforeEach(async ({ tester, page }) => {
         homepage = new Homepage(tester, page);
         folders = new Folders(tester, page);
+        createFolder = new CreateFolder(tester, page);
         await tester.loginAsAdmin();
     });
 
@@ -49,8 +52,8 @@ test.describe("Folders Component Tests", () => {
         await folders.clickAddFolder(folderComponent);
 
         tester.isGoingTo("Create folder");
-        await folders.fillFolderName(folderTitle);
-        await folders.submitCreateFolder();
+        await createFolder.typeName(folderTitle);
+        await createFolder.submit();
 
         tester.isGoingTo("Verify created folder is shown");
         await homepage.goto(homepageId);
@@ -217,7 +220,7 @@ test.describe("Folders Component Tests", () => {
         await homepage.clickComponentsTab(Homepage.ELEMENT_LOCK_TOGGLE);
         await Homepage.clickComponentSettings(folderComponent);
         await folders.clickShowComponentTitle(folderComponent);
-        await folders.saveComponentSettings(folderComponent);
+        await Homepage.clickComponentUpdateButton(folderComponent);
 
         tester.isGoingTo("Impersonate Jana Reed");
         await tester.impersonate("Jana Reed");

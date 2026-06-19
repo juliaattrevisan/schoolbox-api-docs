@@ -6,7 +6,7 @@
 import locale from "@js/terminology/rosettaStone";
 import type { Node, Usage } from "@schoolboxCurriculum/types/Node";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
-import { getSpecificUsages } from "@schoolboxCurriculum/js/nodeUtils";
+import { getSpecificUsages, getLearningActivityUsages, UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import NodeUsageDetailsDescription from "./node-usage-details-description.vue";
 import NodeUsageDetailsItem from "./node-usage-details-item.vue";
@@ -16,6 +16,7 @@ interface Props {
     depth: number; // to gradually add more marginLeft to indicate node level depth
     isProcessing: boolean; // whether we are currently loading the node usage
     hasLoadError: boolean; // whether there was an error loading the node usage
+    folderId?: number; // to display only the usage within that folder (unit)
 }
 
 const props = defineProps<Props>();
@@ -35,11 +36,38 @@ function onRefreshSelected(): void {
 }
 
 /**
- * Whether we should show the usage lists
+ * If there's a folder ID, we currently check for learning activities linked to that folder,
+ * otherwise we check if there's any usage at all
  * @returns { boolean }
  */
 const hasUsage = window.Vue.computed(() => {
-    return props.node.usage && props.node.usage.length > 0;
+    const folderId = props.folderId;
+    if (folderId !== undefined && folderId !== UNSET_ID) {
+        return getLearningActivityUsages(props.node.usage ?? [], folderId).length > 0;
+    }
+    return Boolean(props.node.usage?.length);
+});
+
+/**
+ * To only show usages linked specifically to a unit,
+ * currently only checking for learning activities
+ * @returns { Array }
+ */
+const usagesWithinUnit = window.Vue.computed(() => {
+    const folderId = props.folderId;
+    if (folderId === undefined || folderId === UNSET_ID) {
+        return [];
+    }
+    return getLearningActivityUsages(props.node.usage ?? [], folderId);
+});
+
+/**
+ * To change the title based on whether we are showing all usages or just those linked to a unit
+ * @returns { string }
+ */
+const title = window.Vue.computed(() => {
+    const isWithinUnit = usagesWithinUnit.value[0];
+    return isWithinUnit ? `Usage within ${isWithinUnit.object.unit.title}` : "Total Usage";
 });
 
 /**
@@ -57,32 +85,41 @@ type ActiveUsageType = {
  */
 const activeUsages = window.Vue.computed(() => {
     const usages: ActiveUsageType[] = [];
+    const learningActivityUsages = usagesWithinUnit.value;
+    if (learningActivityUsages.length > 0) {
+        usages.push({
+            title: `Learning ${locale.activity.properPlural()}`,
+            count: learningActivityUsages.length,
+            usages: learningActivityUsages,
+        });
+        return usages;
+    }
     if (props.node._usageCounts.course > 0) {
         usages.push({
             title: "Courses",
             count: props.node._usageCounts.course,
-            usages: getSpecificUsages(props.node.usage as Usage[], ActivityTypes.COURSE),
+            usages: getSpecificUsages(props.node.usage ?? [], ActivityTypes.COURSE),
         });
     }
     if (props.node._usageCounts.unit > 0) {
         usages.push({
             title: locale.unit.properPlural(),
             count: props.node._usageCounts.unit,
-            usages: getSpecificUsages(props.node.usage as Usage[], ActivityTypes.UNIT),
+            usages: getSpecificUsages(props.node.usage ?? [], ActivityTypes.UNIT),
         });
     }
     if (props.node._usageCounts.assessment > 0) {
         usages.push({
             title: `Learning ${locale.activity.properPlural()}`,
             count: props.node._usageCounts.assessment,
-            usages: getSpecificUsages(props.node.usage as Usage[], ActivityTypes.LEARNING_ACTIVITY),
+            usages: getSpecificUsages(props.node.usage ?? [], ActivityTypes.LEARNING_ACTIVITY),
         });
     }
     if (props.node._usageCounts.badge > 0) {
         usages.push({
             title: "Badges",
             count: props.node._usageCounts.badge,
-            usages: getSpecificUsages(props.node.usage as Usage[], ActivityTypes.BADGE),
+            usages: getSpecificUsages(props.node.usage ?? [], ActivityTypes.BADGE),
         });
     }
     return usages;
@@ -112,7 +149,7 @@ const hasContent = window.Vue.computed(() => hasUsage.value || props.node.descri
             <fieldset class="content">
                 <node-usage-details-description :node="props.node" />
                 <div v-if="hasUsage" class="usage-list-container">
-                    <h2 class="">Total Usage</h2>
+                    <h2>{{ title }}</h2>
                     <div v-for="activeUsage in activeUsages" :key="activeUsage.title">
                         <h4>{{ activeUsage.title }} ({{ activeUsage.count }})</h4>
                         <ul class="usage-list">

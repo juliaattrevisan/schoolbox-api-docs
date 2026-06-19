@@ -18,6 +18,7 @@ use Calendar\Event\Type\EventInterface;
 use Calendar_Api_Composite;
 use Schoolbox\GenericCollection;
 use Calendar\Event\Type\Day\Event as Event;
+use Schoolbox\ResourceBooking\Booking\CapacityAllocation;
 use Schoolbox\ResourceBooking\Category;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\ResourceBooking\Item\Mapper;
@@ -114,6 +115,7 @@ class Controller extends Base
         // Build the list of events (slowly)
         $showClasses = $this->requestQuery->getBool('classes', true);
         $clashesOnly = $this->requestQuery->getBool('clashesOnly', false);
+        $capacityAllocation = new CapacityAllocation();
 
         $this->api->add(
             $this->apiFactory->buildFromResourceCollection(
@@ -151,6 +153,26 @@ class Controller extends Base
             }
             // Step 2: For each resource, sort events by start time and check for overlaps
             foreach ($eventsByResource as $resourceEvents) {
+                $resourceBookingEvents = array_values(array_filter(
+                    $resourceEvents,
+                    static fn ($event): bool => $event instanceof \Calendar\Event\Type\ResourceBooking\Event
+                ));
+
+                foreach ($resourceBookingEvents as $resourceBookingEvent) {
+                    $blockingEvents = $capacityAllocation->getBlockingApprovedBookingEvents(
+                        $resourceBookingEvent,
+                        $resourceBookingEvents
+                    );
+                    if (count($blockingEvents) === 0) {
+                        continue;
+                    }
+
+                    $clashesOnlyList[spl_object_hash($resourceBookingEvent)] = $resourceBookingEvent;
+                    foreach ($blockingEvents as $blockingEvent) {
+                        $clashesOnlyList[spl_object_hash($blockingEvent)] = $blockingEvent;
+                    }
+                }
+
                 // Sort by start time
                 usort($resourceEvents, function ($a, $b) {
                     return $a->getStartTime()->compare($b->getStartTime());
@@ -168,7 +190,13 @@ class Controller extends Base
                             break;
                         }
 
-                        if ($eventA->isClash($eventB)) {
+                        if (
+                            !(
+                                $eventA instanceof \Calendar\Event\Type\ResourceBooking\Event
+                                && $eventB instanceof \Calendar\Event\Type\ResourceBooking\Event
+                            )
+                            && $eventA->isClash($eventB)
+                        ) {
                             $eventBHash = spl_object_hash($eventB);
                             // Add both events to the clash list
                             $clashesOnlyList[$eventAHash] = $eventA;
@@ -184,13 +212,13 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate(
             '@resourceBookingReport/index.twig',
             [
-                'categoryList' => $categoryList,
-                'eventList'    => $eventList,
-                'search'       => [
-                    'start'    => $start,
-                    'end'      => $end,
-                    'category' => $selectedCategories,
-                    'classes'  => $showClasses,
+                'categoryList'     => $categoryList,
+                'eventList'        => $eventList,
+                'search'           => [
+                    'start'        => $start,
+                    'end'          => $end,
+                    'category'     => $selectedCategories,
+                    'classes'      => $showClasses,
                     'clashesOnly'  => $clashesOnly,
                 ],
             ],

@@ -27,6 +27,7 @@ interface Props {
 const PAGE_SIZE = 30;
 
 const UNKNOWN_FEATURE_TEXT = "Unknown Feature";
+const SELECTED_SESSION_ACTIONS_ID = "ai-usage-log-selected-session-actions";
 
 const props = defineProps<Props>();
 
@@ -50,7 +51,7 @@ type AiSelectedSessionInfo<TFeature extends AiFeature = AiFeature> = {
     [KLogFormat in AiLogFormat]: {
         logFormat: KLogFormat;
         session: AiSession<KLogFormat, TFeature>;
-        log: AiSessionLogApiResponse<KLogFormat, TFeature>;
+        log: AiSessionLogApiResponse<KLogFormat>;
     };
 }[AiLogFormat];
 
@@ -76,6 +77,7 @@ const selectedSessionInfo = window.Vue.computed<AiSelectedSessionInfo | AiSelect
     // TODO: properly support sessions with multiple log formats, for now just filter out invalid logs
     const filteredLog = logInfo.filter((entry) => entry.logFormat !== null && entry.data !== null);
 
+    // sessionInfo.logFormat only selects the renderer; the renderer interprets each entry's own logFormat.
     const info = { logFormat: sessionInfo.logFormat, session: sessionInfo, log: filteredLog };
     return info satisfies Record<keyof AiSelectedSessionInfo, unknown> as AiSelectedSessionInfo;
 });
@@ -156,7 +158,7 @@ window.Vue.onMounted(async () => {
  * @param session The session to open
  */
 async function openSessionDetails(session: AiSession): Promise<void> {
-    if (!session._routes.getLog) {
+    if (!session._routes.getSessionLogs) {
         return; // no access to view the log
     }
 
@@ -166,7 +168,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
 
     const response = await apiRequest<AiSessionLogApiResponse>({
         method: "GET",
-        url: session._routes.getLog,
+        url: session._routes.getSessionLogs,
     });
 
     if (!response.success) {
@@ -176,10 +178,17 @@ async function openSessionDetails(session: AiSession): Promise<void> {
 
     selectedSessionLog.value = response.data;
 }
+
+/**
+ * Print the currently selected AI session log.
+ */
+function printSelectedSession(): void {
+    window.print();
+}
 </script>
 
 <template>
-    <div class="row">
+    <div class="row no-print">
         <div class="small-12 island">
             <section>
                 <fieldset class="content">
@@ -240,7 +249,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
         </div>
     </div>
 
-    <div>
+    <div class="no-print">
         <div class="list-item">
             <h2 class="subheader">
                 Activity<template v-if="!isLoading">: {{ usageSessions.length }} events</template>
@@ -249,7 +258,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
     </div>
 
     <div class="row">
-        <div class="small-12 medium-6 columns l-mar-m--bottom" :class="{ island: isLoading }">
+        <div class="small-12 medium-6 columns l-mar-m--bottom no-print" :class="{ island: isLoading }">
             <div v-if="loadError" data-alert class="alert-box alert">
                 {{ loadError }}
             </div>
@@ -289,9 +298,15 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                                     {{ session.createdBy.fullName }}
                                 </component>
                             </td>
-                            <td>{{ 200 !== session.returnCode ? "Error" : "" }}</td>
+                            <td>{{ session.hasError ? "Error" : "" }}</td>
                             <td class="actions-small-1">
-                                <nav v-if="session.id !== null && session.logFormat !== null && session._routes.getLog">
+                                <nav
+                                    v-if="
+                                        session.id !== null &&
+                                        session.logFormat !== null &&
+                                        session._routes.getSessionLogs
+                                    "
+                                >
                                     <button
                                         type="button"
                                         class="sbx-icon-only-button f-no-margins"
@@ -315,41 +330,59 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                 @page-change="changePage"
             />
         </div>
-        <div class="small-12 medium-6 island">
+        <div class="small-12 medium-6 island ai-usage-log__viewer">
             <div v-if="sessionLoadError" data-alert class="alert-box alert">
                 {{ sessionLoadError }}
             </div>
             <section v-else-if="selectedSessionInfo !== null">
-                <div class="card small-12">
-                    <span>
-                        <user-photo
-                            v-if="selectedSessionInfo.session.createdBy"
-                            :user-id="selectedSessionInfo.session.createdBy.id || 0"
-                            render="small"
-                        />
-                        <h3>
-                            {{ props.features[selectedSessionInfo.session.feature]?.title ?? UNKNOWN_FEATURE_TEXT }}
-                        </h3>
-                    </span>
-                    <p class="meta">
-                        <span v-if="!selectedSessionInfo.session.createdBy"> Created </span>
-                        <template v-else>
-                            Created by
-                            <component
-                                :is="selectedSessionInfo.session.createdBy._links.profile ? 'a' : 'span'"
-                                :href="selectedSessionInfo.session.createdBy._links.profile ?? undefined"
+                <div class="card small-12 actions-small-1">
+                    <div class="list-item">
+                        <span>
+                            <user-photo
+                                v-if="selectedSessionInfo.session.createdBy"
+                                :user-id="selectedSessionInfo.session.createdBy.id || 0"
+                                render="small"
+                            />
+                            <h3>
+                                {{ props.features[selectedSessionInfo.session.feature]?.title ?? UNKNOWN_FEATURE_TEXT }}
+                            </h3>
+                        </span>
+                        <p class="meta">
+                            <span v-if="!selectedSessionInfo.session.createdBy"> Created </span>
+                            <template v-else>
+                                Created by
+                                <component
+                                    :is="selectedSessionInfo.session.createdBy._links.profile ? 'a' : 'span'"
+                                    :href="selectedSessionInfo.session.createdBy._links.profile ?? undefined"
+                                >
+                                    {{ selectedSessionInfo.session.createdBy.fullName }}
+                                </component>
+                            </template>
+                            <relative-time :datetime="selectedSessionInfo.session.createdAt" full-diff></relative-time>
+                        </p>
+                    </div>
+                    <nav class="no-print">
+                        <sbx-pop-out :content-id="SELECTED_SESSION_ACTIONS_ID"></sbx-pop-out>
+                    </nav>
+                    <ul :id="SELECTED_SESSION_ACTIONS_ID" class="f-dropdown no-print" data-dropdown-content>
+                        <li>
+                            <a
+                                href="#"
+                                class="sbx-button--has-icon"
+                                data-test="ai-usage-log-print-session"
+                                @click.prevent="printSelectedSession"
                             >
-                                {{ selectedSessionInfo.session.createdBy.fullName }}
-                            </component>
-                        </template>
-                        <relative-time :datetime="selectedSessionInfo.session.createdAt" full-diff></relative-time>
-                    </p>
+                                <sbx-icon name="print"></sbx-icon>
+                                Print / Save as PDF
+                            </a>
+                        </li>
+                    </ul>
                 </div>
                 <div class="clearfix"></div>
 
                 <div v-if="!('log' in selectedSessionInfo)" class="loader"></div>
                 <div v-else-if="selectedSessionInfo.log.length === 0" class="empty-state">
-                    <sbx-icon name="hidden" size="2rem" />
+                    <sbx-icon name="hidden" size="xl" />
                     <p>
                         The {{ props.features[selectedSessionInfo.session.feature].title }} feature does not support
                         previews for this session.
@@ -370,4 +403,31 @@ async function openSessionDetails(session: AiSession): Promise<void> {
     </div>
 </template>
 
-<style scoped></style>
+<style scoped lang="scss">
+/* styles for printing (scoped) */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    .ai-usage-log__viewer {
+        width: 100% !important;
+    }
+}
+</style>
+
+<style>
+/* styles for printing (global) */
+@media print {
+    #container,
+    .island {
+        padding: 0; /* to get more of the page estate */
+    }
+
+    .breadcrumb,
+    .admin-container > .small-12 > h1,
+    #footer {
+        display: none !important;
+    }
+}
+</style>

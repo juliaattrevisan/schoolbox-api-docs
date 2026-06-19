@@ -150,6 +150,21 @@ export default class SummativePreview {
     }
 
     /**
+     * check the feedback containers for the specific assessments are presented the expected number of times
+     * @param assessmentNames - The assessment names to check the feedback containers for
+     * @param expectedCount - The expected number of matching feedback containers
+     */
+    async checkFeedbackContainersForAssessmentsCount(assessmentNames: string[], expectedCount: number): Promise<void> {
+        for (const assessmentName of assessmentNames) {
+            await expect(
+                this.page.getByTestId(
+                    SummativePreview.DATA_TEST_SUMMARY_RESULTS_CONTAINER.replace("{assessmentName}", assessmentName),
+                ),
+            ).toHaveCount(expectedCount);
+        }
+    }
+
+    /**
      * check whether or not the feedback container for the specific assessment contains: grade, comment and/or rubric according to the options provided in the preview page
      * pass true to check the feedback container contains the specific option, pass false to check the feedback container does not contain the specific option
      * @param assessmentName - The assessment name to check the feedback container for

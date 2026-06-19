@@ -346,7 +346,8 @@ class Series
             // Update the purpose and notes for this booking
             $booking
                 ->setName($item->getName())
-                ->setNotes($item->getNotes());
+                ->setNotes($item->getNotes())
+                ->setQuantity($item->getQuantity());
 
             $event    = $booking->getEvent();
             $newStart = $event->getStartDateTime()->getDateTimeObject()->add(
@@ -366,7 +367,6 @@ class Series
             // Set up bookings for related items
             $existingRelatedBookings = $this->getBookingMapper()->findRelatedBookings($booking->getId());
             foreach ($booking->getResource()->getRelatedResourceList() as $relatedResource) {
-                /** @var Booking $relatedBooking */
                 $relatedBooking = null;
                 foreach ($existingRelatedBookings as $existing) {
                     if ($existing->getResource()->getId() == $relatedResource->getId()) {
@@ -392,6 +392,7 @@ class Series
                         $relatedBooking = $this->getBookingMapper()->createModel();
                         $relatedBooking
                             ->setResource($relatedResource)
+                            ->setQuantity(Model::DEFAULT_QUANTITY)
                             ->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING));
                     }
                     $relatedBooking

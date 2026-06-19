@@ -163,9 +163,10 @@ class Controller extends Base\Base
      *
      * @api   POST /course/import/classes
      * @since 160
-     * @var int      $_POST [course_spec_id]    The course to import
-     * @var string   $_POST ['import_folders']  CSV folder ids to import to
-     * @var null|int $_POST ['component_id']    The component to import into
+     * POST parameters:
+     * - int course_spec_id The course to import
+     * - string import_folders CSV folder ids to import to
+     * - null|int component_id The component to import into
      * @throws Base\Exception
      * @throws MapperException
      * @throws RouteNotFound
@@ -238,17 +239,18 @@ class Controller extends Base\Base
      * @api   POST /course/import/units
      * @since 160
      *
-     * @var string   $_POST ['encodedReturnUrl']         Optional. Return URL set by caller.
-     * @var string   $_POST ['action']                   {'import'|'modify'}
-     * @var int      $_POST ['course_spec_id']
-     * @var int      $_POST ['course_impl_id']
-     * @var int      $_POST ['component_id']
-     * @var string   $_POST ['import_folders']           Comma-separated list of folderId:userId, eg '176:151,43:151'
-     * @var array    $_POST ['unit']
-     * @var int      $_POST ['unit'][]['unit_spec_id']
-     * @var int|null $_POST ['unit'][]['unit_impl_id']
-     * @var string   $_POST ['unit'][]['open_date']
-     * @var string   $_POST ['unit'][]['close_date']
+     * POST parameters:
+     * - string encodedReturnUrl Optional. Return URL set by caller.
+     * - string action {'import'|'modify'}
+     * - int course_spec_id
+     * - int course_impl_id
+     * - int component_id
+     * - string import_folders Comma-separated list of folderId:userId, eg '176:151,43:151'
+     * - array unit
+     * - int unit[]['unit_spec_id']
+     * - int|null unit[]['unit_impl_id']
+     * - string unit[]['open_date']
+     * - string unit[]['close_date']
      *
      * @throws Base\Exception
      * @throws MapperException
@@ -422,25 +424,28 @@ class Controller extends Base\Base
      *
      * @api   POST /course/import/activities
      * @since 160
-     * @var string   $query [Redirect::RETURN_URL]                              Optional return URL set by caller
-     * @var string   $post  ['action']                                           {'import' | 'modify'}
-     * @var int      $post  ['course_spec_id']
-     * @var int|null $post  ['course_impl_id']
-     * @var int|null $post  ['component_id']
-     * @var string   $post  ['import_folders']                                   comma-separated folderIds to import to
-     * @var array    $post  ['unit']  Indexed by unitSpec.id
-     * @var int      $post  ['unit'][unitSpecId]['unit_spec_id']
-     * @var int|null $post  ['unit'][unitSpecId]['unit_impl_id']
-     * @var string   $post  ['unit'][unitSpecId]['open_date']                    UnitImpl's Open Date
-     * @var string   $post  ['unit'][unitSpecId]['close_date']                   UnitImpl's Close Date
-     * @var array    $post  ['unit'][unitSpecId]['a']                            UnitImpl's Indexed by Assessment.id
-     * @var int      $post  ['unit'][unitSpecId]['a'][assId]['specId']
-     * @var int      $post  ['unit'][unitSpecId]['a'][assId]['implId']
-     * @var bool     $post  ['unit'][unitSpecId]['a'][assId]['checked']
-     * @var string   $post  ['unit'][unitSpecId]['a'][assId]['dates']['publish']
-     * @var string   $post  ['unit'][unitSpecId]['a'][assId]['dates']['open']
-     * @var string   $post  ['unit'][unitSpecId]['a'][assId]['dates']['due']
-     * @var string   $post  ['unit'][unitSpecId]['a'][assId]['dates']['date']
+     * Query parameters:
+     * - string Redirect::RETURN_URL Optional return URL set by caller
+     *
+     * POST parameters:
+     * - string action {'import' | 'modify'}
+     * - int course_spec_id
+     * - int|null course_impl_id
+     * - int|null component_id
+     * - string import_folders Comma-separated folder IDs to import to
+     * - array unit Indexed by unitSpec.id
+     * - int unit[unitSpecId]['unit_spec_id']
+     * - int|null unit[unitSpecId]['unit_impl_id']
+     * - string unit[unitSpecId]['open_date'] UnitImpl's Open Date
+     * - string unit[unitSpecId]['close_date'] UnitImpl's Close Date
+     * - array unit[unitSpecId]['a'] UnitImpl's Indexed by Assessment.id
+     * - int unit[unitSpecId]['a'][assId]['specId']
+     * - int unit[unitSpecId]['a'][assId]['implId']
+     * - bool unit[unitSpecId]['a'][assId]['checked']
+     * - string unit[unitSpecId]['a'][assId]['dates']['publish']
+     * - string unit[unitSpecId]['a'][assId]['dates']['open']
+     * - string unit[unitSpecId]['a'][assId]['dates']['due']
+     * - string unit[unitSpecId]['a'][assId]['dates']['date']
      * @throws Base\Exception
      */
     public function postAssessments()
@@ -473,11 +478,12 @@ class Controller extends Base\Base
      *
      * @param AssessmentContext $context
      * @param array             $data
-     * @var null|int            $data['spec_id']    Will be null if not imported from a Spec
-     * @var null|int            $data['impl_id']    Will be null if not yet imported
-     * @var null|int            $data['checked']     Did user check the item?
-     * @var null|string[]       $data['dates']
-     * @var null|mixed[]        $data['a']          If this assessment is a Project, the data for its sub-assessables
+     * Data keys:
+     * - null|int spec_id Will be null if not imported from a Spec
+     * - null|int impl_id Will be null if not yet imported
+     * - null|int checked Did user check the item?
+     * - null|string[] dates
+     * - null|mixed[] a If this assessment is a Project, the data for its sub-assessables
      * @throws MapperException
      */
     protected function parseAssessmentForm(AssessmentContext $context, array $data)
@@ -867,24 +873,25 @@ class Controller extends Base\Base
      *
      * @param Values $post POST data
      *
-     * @var string   $post  ['action']                                           {'import' | 'modify'}
-     * @var int      $post  ['course_spec_id']
-     * @var int|null $post  ['course_impl_id']
-     * @var int|null $post  ['component_id']
-     * @var string   $post  ['import_folders']                                   comma-separated folderIds to import to
-     * @var array    $post  ['unit']  Indexed by unitSpec.id
-     * @var int      $post  ['unit'][unitSpecId]['unit_spec_id']
-     * @var int|null $post  ['unit'][unitSpecId]['unit_impl_id']
-     * @var string   $post  ['unit'][unitSpecId]['open_date']                    UnitImpl's Open Date
-     * @var string   $post  ['unit'][unitSpecId]['close_date']                   UnitImpl's Close Date
-     * @var array    $post  ['unit'][unitSpecId]['a']                            UnitImpl's Indexed by Assessment.id
-     * @var int      $post  ['unit'][unitSpecId]['a'][assId]['specId']
-     * @var int      $post  ['unit'][unitSpecId]['a'][assId]['implId']
-     * @var bool     $post  ['unit'][unitSpecId]['a'][assId]['checked']
-     * @var string   $post  ['unit'][unitSpecId]['a'][assId]['dates']['publish']
-     * @var string   $post  ['unit'][unitSpecId]['a'][assId]['dates']['open']
-     * @var string   $post  ['unit'][unitSpecId]['a'][assId]['dates']['due']
-     * @var string   $post  ['unit'][unitSpecId]['a'][assId]['dates']['date']
+     * POST parameters:
+     * - string action {'import' | 'modify'}
+     * - int course_spec_id
+     * - int|null course_impl_id
+     * - int|null component_id
+     * - string import_folders Comma-separated folder IDs to import to
+     * - array unit Indexed by unitSpec.id
+     * - int unit[unitSpecId]['unit_spec_id']
+     * - int|null unit[unitSpecId]['unit_impl_id']
+     * - string unit[unitSpecId]['open_date'] UnitImpl's Open Date
+     * - string unit[unitSpecId]['close_date'] UnitImpl's Close Date
+     * - array unit[unitSpecId]['a'] UnitImpl's Indexed by Assessment.id
+     * - int unit[unitSpecId]['a'][assId]['specId']
+     * - int unit[unitSpecId]['a'][assId]['implId']
+     * - bool unit[unitSpecId]['a'][assId]['checked']
+     * - string unit[unitSpecId]['a'][assId]['dates']['publish']
+     * - string unit[unitSpecId]['a'][assId]['dates']['open']
+     * - string unit[unitSpecId]['a'][assId]['dates']['due']
+     * - string unit[unitSpecId]['a'][assId]['dates']['date']
      *
      * @throws MapperException
      * @throws MapperException\Deleted

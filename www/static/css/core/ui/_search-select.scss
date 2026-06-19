@@ -11,18 +11,6 @@
     }
 }
 
-.sbx-scroll-container {
-    border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
-    border-radius: var(--sbx-config-field-roundness, 0px);
-    max-height: 400px;
-    overflow: auto;
-    padding: var(--sbx-size-xs, var(--spacing-s));
-    width: 100%;
-    &--smaller {
-        max-height: 200px;
-    }
-}
-
 .sbx-checkbox-radio-group-scroll {
     border: 0 !important; // important to override .mage > section > fieldset fieldset ~ fieldset
     display: flex;
@@ -37,17 +25,30 @@
         margin: 0;
         padding: 0;
     }
+    // temporary non Sonar UI fix to remove spacing between checkboxes and radios, which is currently being handled by the parent flex container, but is added by the base form styles
+    .checklist.sbx-checkbox-radio-container {
+        margin: 0 !important; // foundation-fix: spacing is handled by parent flex
+        input[type="checkbox"] + label {
+            margin: 0 !important; // foundation-fix: spacing is handled by parent flex
+        }
+    }
+}
+
+.sbx-scroll-container {
+    border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
+    border-radius: var(--sbx-config-field-corner-radius, 0px);
+    max-height: 400px;
+    overflow: auto;
+    padding: var(--sbx-size-xs, var(--spacing-s));
+    width: 100%;
     &__status {
         background: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
         font-size: var(--sbx-font-size-xs, 0.825rem);
         font-style: italic;
         margin: 0;
     }
-    // temporary non Sonar UI fix to remove spacing between checkboxes and radios, which is currently being handled by the parent flex container, but is added by the base form styles
-    .checklist.sbx-checkbox-radio-container {
-        input[type="checkbox"] + label {
-            margin: 0 !important ; // foundation-fix: spacing is handled by parent flex
-        }
+    &--smaller {
+        max-height: 200px;
     }
 }
 
@@ -84,7 +85,7 @@
 
 .sbx-tag {
     background: var(--sbx-config-color-active, var(--body-background));
-    border-radius: var(--sbx-config-field-roundness, 0px);
+    border-radius: var(--sbx-config-field-corner-radius, 0px);
     color: var(--sbx-color-text-primary, #000);
     font-size: var(--sbx-font-size-xs, 0.8125rem);
     padding: var(--sbx-size-xxs, var(--spacing-s)) var(--sbx-size-xs, var(--spacing-s));
@@ -103,9 +104,9 @@
     }
     &__name-button,
     &__remove-button {
-        background: none;
+        background: none !important; // ^foundation-fixes^ - needs to be important to override specific styles in www/static/css/core/ui/button/_dropdown.scss
         min-height: 0;
-        padding: 0;
+        padding: 0 !important; // ^foundation-fixes^ - needs to be important to override specific styles in www/static/css/core/ui/button/_dropdown.scss
         &:hover {
             background: none;
         }

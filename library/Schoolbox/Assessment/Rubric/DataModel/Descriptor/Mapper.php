@@ -160,8 +160,9 @@ class Mapper extends Schoolbox\Mapper
                     ->setDescriptors($this->createCollection()));
             }
 
-            /** @var Level\Model $level */
             $level = $levels->getOffset($levelId);
+            /** @var Level\Model $level */
+
 
             // First time we've encountered this indicator?
             if (!$indicators->getOffset($indicatorId)) {
@@ -171,17 +172,18 @@ class Mapper extends Schoolbox\Mapper
                 }
 
                 // Set the capability as well
-                /** @var Capability\Model $capability */
                 $capability = $capabilities->getOffset($capabilityId);
+                /** @var Capability\Model $capability */
 
-                /** @var Indicator\Model $indicator */
                 $indicator = $this->hydrateJoin($row, 'indicator', 'i');
+                /** @var Indicator\Model $indicator */
 
                 $indicator->setCapability($capability);
                 $indicators->setOffset($indicatorId, $indicator);
             }
 
             $indicator = $indicators->getOffset($indicatorId);
+            /** @var Indicator\Model $indicator */
 
             $descriptor = $this->hydrate($row);
             $descriptors->setOffset($descriptor->getId(), $descriptor);

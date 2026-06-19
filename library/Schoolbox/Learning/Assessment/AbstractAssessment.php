@@ -150,9 +150,9 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * If published, then who can see the feedback for this Assessment.
      *
-     * One of { MARK_VISIBILITY_PRIVATE | MARK_VISIBILITY_STUDENT | MARK_VISIBILITY_PARENT_STUDENT }
+     * One of { MARK_VISIBILITY_PRIVATE | MARK_VISIBILITY_STUDENT | MARK_VISIBILITY_PARENT | MARK_VISIBILITY_PARENT_STUDENT }
      *
-     * @var int
+     * @var string
      */
     private $markVisibility;
 
@@ -674,9 +674,10 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function getHumanReadableInstructorMark(Participant $participant, $publishedOnly)
     {
-        // For all non-due work assessments, this falls back to getHumanReadableMark (the due work model overrides this)
+        // For all non due work/reporting assessments, this falls back to getHumanReadableMark (the models override this)
         // This avoids having to do a ton of instanceof checks everywhere and as I expect we will introduce
         // this functionality for more assessment types in the future, this makes it easier to do so.
+        // ^ oh look, we did. although definitely have thoughts on how this was approached now 1.5 years later...
 
         return $this->getHumanReadableMark($participant, $publishedOnly);
     }
@@ -705,6 +706,9 @@ abstract class AbstractAssessment implements IAssessable
 
             case self::MARK_VISIBILITY_STUDENT:
                 return $roleType === Role::STAFF || $roleType === Role::STUDENT;
+
+            case self::MARK_VISIBILITY_PARENT:
+                return $roleType === Role::STAFF || $roleType === Role::PARENT;
 
             case self::MARK_VISIBILITY_PRIVATE:
             default:
@@ -834,7 +838,6 @@ abstract class AbstractAssessment implements IAssessable
      */
     protected function assertDateSequence(array $dates): void
     {
-        /** @var Alaress_Date_Format $previousAdf */
         $previousAdf   = null;
         $previousLabel = '';
 
@@ -1255,7 +1258,7 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
-     * @return int
+     * @return string
      */
     public function getMarkVisibility()
     {
@@ -1264,7 +1267,7 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
-     * @param int $markVisibility
+     * @param string $markVisibility
      * @return static
      */
     public function setMarkVisibility($markVisibility)

@@ -38,7 +38,7 @@ abstract class Condition
     public function test($_ = null)
     {
         try {
-            return $this->negate ^ call_user_func_array($this->test, func_get_args());
+            return $this->negate !== (bool)call_user_func_array($this->test, func_get_args());
         } catch (\DomainException $e) {
             return false;
         }

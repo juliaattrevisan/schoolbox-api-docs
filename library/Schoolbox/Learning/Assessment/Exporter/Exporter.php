@@ -96,7 +96,7 @@ class Exporter
 
             // Load participation
             $singleCollection  = new GenericCollection(get_class($assessment), [$assessment]);
-            $assessment = $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($singleCollection)->first();
+            $assessment = $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection(collection: $singleCollection)->first();
 
             foreach ($assessment->getAllParticipants() as $participant) {
                 /** @var Participant $participant */
@@ -184,11 +184,9 @@ class Exporter
 
         // Order assessments by folder code
         $sortFunction = function (IAssessable $left, IAssessable $right) {
-            /**
-             * @var Folder\Code\Model $leftFolderCode
-             * @var Folder\Code\Model $rightFolderCode
-             */
-            $leftFolderCode  = $left->getBaseContext()->getFolder()->getCodes()->first();
+            /** @var Folder\Code\Model $leftFolderCode */
+            $leftFolderCode = $left->getBaseContext()->getFolder()->getCodes()->first();
+            /** @var Folder\Code\Model $rightFolderCode */
             $rightFolderCode = $right->getBaseContext()->getFolder()->getCodes()->first();
             return strcmp($leftFolderCode->getCode(), $rightFolderCode->getCode());
         };

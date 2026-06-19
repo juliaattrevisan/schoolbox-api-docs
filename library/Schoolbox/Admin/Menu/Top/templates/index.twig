@@ -10,7 +10,7 @@
         {% if menu | length == 0 %}
         <div class="small-12 island">
             <div class="empty-state">
-                <sbx-icon name="month-view" size="2rem"></sbx-icon>
+                <sbx-icon name="month-view" size="xl"></sbx-icon>
                 <p>Your top menu is empty.</p>
                 <p><a href="{{ routeLookup('adminMenuTop.getCreate') }}" title="Post some news">Create first top menu item</a></p>
             </div>
@@ -18,7 +18,7 @@
         {% else %}
         <div class="small-12 hide" data-tabs-empty>
             <div class="empty-state">
-                <sbx-icon name="month-view" size="2rem"></sbx-icon>
+                <sbx-icon name="month-view" size="xl"></sbx-icon>
                 <p>Your top menu is empty.</p>
                 <p><a href="{{ routeLookup('adminMenuTop.getCreate') }}" title="Post some news">Create first top menu item</a></p>
             </div>
@@ -38,7 +38,7 @@
                 </nav>
             </div>
 
-            <section>
+            <section class="u-overflow-hidden">
                 <ul class="information-list sortable-card ui-sortable" data-sortable="">
                     {% for item in menu %}
                         <li data-menu-top="{{ item.id }}">

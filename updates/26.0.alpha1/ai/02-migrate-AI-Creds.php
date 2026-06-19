@@ -12,6 +12,7 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Admin\OpenAI\Config;
+use Schoolbox\OpenAi\Feature;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
@@ -47,11 +48,11 @@ $app = new class extends CliTool\App {
         // insert new config into DB: but only for a particular set of modules
         // (image generation is migrated in the next step)
         $modulesToMigrate = [
-            Helper::FEATURE_CHAT                            => ConfigMapper::NAME_AI_TEXT_CHAT,
-            Helper::FEATURE_LESSONPLAN                      => ConfigMapper::NAME_AI_LESSONPLAN,
-            Helper::FEATURE_DIFFERENTIATION                 => ConfigMapper::NAME_AI_DIFFERENTIATION,
-            Helper::FEATURE_DIALOGAGENT                     => ConfigMapper::NAME_AI_DIALOGAGENT,
-            Helper::FEATURE_LEARNING_ACTIVITY_CUSTOMISATION => ConfigMapper::NAME_AI_LEARNING_ACTIVITY_CUSTOMISATION,
+            Feature::CHAT->value                            => ConfigMapper::NAME_AI_TEXT_CHAT,
+            Feature::LESSON_PLAN->value                     => ConfigMapper::NAME_AI_LESSONPLAN,
+            Feature::DIFFERENTIATION->value                 => ConfigMapper::NAME_AI_DIFFERENTIATION,
+            Feature::DIALOG_AGENT->value                    => ConfigMapper::NAME_AI_DIALOGAGENT,
+            Feature::LEARNING_ACTIVITY_CUSTOMISATION->value => ConfigMapper::NAME_AI_LEARNING_ACTIVITY_CUSTOMISATION,
         ];
         foreach ($modulesToMigrate as $module => $moduleKey) {
             $newConfig = $this->migrate(

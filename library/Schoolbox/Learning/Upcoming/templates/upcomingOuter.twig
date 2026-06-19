@@ -112,7 +112,7 @@
         <h2 class="subheader">{{ locale.class.properPlural }}</h2>
         {% if subjects|length %}
             <div class="row">
-                <div class="small-12 island">
+                <div class="small-12 island upcoming-work-classes">
                     {% for subject in subjects %}
                         <section>
                             <ul class="information-list">
@@ -121,15 +121,22 @@
                                         {% set gradePath = routeLookupIfAuthorized('learningGrades.getGradesForSubject', {viewee: student, userId: student.id, term: currentTerm, termCode: currentTerm.code, subject: subject.folder, subjectId: subject.folder.id}) %}
                                         <div class="small-{{ subject.grade ? 8 : 12 }} card">
                                             {% if gradePath %}
-                                                <a href="{{ gradePath }}" title="View {{ locale.grades.properPlural }}">
-                                                    <sbx-icon name="home" size="2rem"></sbx-icon>
-                                                    <p>{{ subject.folder.title }}</p>
+                                                <a href="{{ gradePath }}" title="View {{ locale.grades.properPlural }}" class="l-flex-row l-flex--no-wrap l-flex--align-center l-gap-m">
+                                                    <sbx-icon name="home" size="xl"></sbx-icon>
+                                                    <div class="l-flex-col l-gap-s">
+                                                        <p>{{ subject.folder.title }}</p>
+                                                        <p class="meta">{{ subject.folder.codeString }}</p>
+                                                    </div>
                                                 </a>
                                             {% else %}
-                                                <span class="icon-home size-32" title="{{ subject.folder.title }}"></span>
-                                                <p>{{ subject.folder.title }}</p>
+                                                <div class="l-flex-row l-flex--no-wrap l-flex--align-center l-gap-m">
+                                                    <span class="icon-home size-32" title="{{ subject.folder.title }}"></span>
+                                                    <div class="l-flex-col l-gap-s">
+                                                        <p>{{ subject.folder.title }}</p>
+                                                        <p class="meta">{{ subject.folder.codeString }}</p>
+                                                    </div>
+                                                </div>
                                             {% endif %}
-                                            <p class="meta">{{ subject.folder.codeString }}</p>
                                         </div>
 
                                         {% if subject.grade %}
@@ -156,11 +163,13 @@
                                     <li class="actions-small-1">
                                         <div class="list-item">
                                             <div class="small-12 card">
-                                                <a href="/search/user/{{ teacher.id }}" title="">
+                                                <a href="/search/user/{{ teacher.id }}" title="" class="l-flex-row l-flex--no-wrap l-flex--align-start l-gap-m">
                                                     {% include 'include/portrait.twig' with {user: teacher, description: teacher.fullName} only %}
-                                                    <p>{{ teacher.formatName }}</p>
+                                                    <div class="l-flex-col l-gap-xs">
+                                                        <p>{{ teacher.formatName }}</p>
+                                                        <p class="meta">{{ teacher.role.name }}</p>
+                                                    </div>
                                                 </a>
-                                                <p class="meta">{{ teacher.role.name }}</p>
                                             </div>
 
                                         </div>

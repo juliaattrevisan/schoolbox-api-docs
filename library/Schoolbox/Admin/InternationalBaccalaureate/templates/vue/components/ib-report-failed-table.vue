@@ -1,12 +1,21 @@
 <script setup lang="ts">
 import IbReportSubjectLabels from "./ib-report-subject-labels.vue";
 import { useIbReportUpdateLanguageStore } from "../store/ibReportUpdateLanguageStore";
-import type { FailedRow } from "../../js/types/ibReportTypes";
+import type { FailedRow, StudentRow } from "../../js/types/ibReportTypes";
 
 interface Props {
     students: FailedRow[];
+    activeSelectionSection: StudentRow["stage"] | null;
 }
-defineProps<Props>();
+const props = defineProps<Props>();
+
+const selectedList = defineModel<FailedRow[]>("selectedList", { default: () => [] });
+
+const emit = defineEmits<{
+    resetDetailsSingle: [studentId: number];
+    manuallyRegisterSingle: [studentId: number];
+}>();
+
 const updateLanguageStore = useIbReportUpdateLanguageStore();
 
 /**
@@ -35,12 +44,15 @@ function openModal(student: FailedRow): void {
         <tbody>
             <tr v-for="student in students" :key="student.id">
                 <td class="checklist">
-                    <input
-                        :id="`select-${student.id}`"
-                        type="checkbox"
-                        disabled
-                        :aria-label="`Select ${student.name}`"
-                    /><label class="checkbox-label" :for="`select-${student.id}`"></label>
+                    <template v-if="props.activeSelectionSection === null || props.activeSelectionSection === 'failed'">
+                        <input
+                            :id="`select-${student.id}`"
+                            v-model="selectedList"
+                            type="checkbox"
+                            :value="student"
+                            :aria-label="`Select ${student.name}`"
+                        /><label class="checkbox-label" :for="`select-${student.id}`"></label>
+                    </template>
                 </td>
                 <td>{{ student.name }}</td>
                 <td>
@@ -55,6 +67,7 @@ function openModal(student: FailedRow): void {
                         name="alert"
                         color="var(--sbx-color-warning, #e67e22)"
                         aria-label="Candidate details unconfirmed"
+                        title="Missing required candidate details."
                     ></sbx-icon>
                 </td>
                 <td><ib-report-subject-labels :entry="student.subjects.hl" /></td>
@@ -76,6 +89,24 @@ function openModal(student: FailedRow): void {
                             <button class="sbx-button--has-icon" @click.prevent="openModal(student)">
                                 <sbx-icon name="modify"></sbx-icon>
                                 Update Language Selection
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                class="sbx-button--has-icon"
+                                @click.prevent="emit('resetDetailsSingle', student.id)"
+                            >
+                                <sbx-icon name="undo"></sbx-icon>
+                                Reset All Details
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                class="sbx-button--has-icon"
+                                @click.prevent="emit('manuallyRegisterSingle', student.id)"
+                            >
+                                <sbx-icon name="approve"></sbx-icon>
+                                Mark as manually registered
                             </button>
                         </li>
                     </ul>

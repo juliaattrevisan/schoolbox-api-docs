@@ -18,8 +18,8 @@ use Schoolbox\Filter\Page\LabelBuilder;
 use Schoolbox\Filter\Page\Model as FilterPageModel;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\OpenAi\Feature;
 use Schoolbox\User;
-use Schoolbox\Editor\OpenAI;
 use Twig\Environment;
 use Twig\Extension\DebugExtension;
 use Twig\Loader\FilesystemLoader;
@@ -163,6 +163,7 @@ class Subnav
         $userHasServicePermissionIbCoordinator = (
             $this->user->hasServicePermission(UserAccess::SERVICE_IB_COORDINATOR, UserAccess::ACCESS_FULL)
         );
+        $ibEnabled = (bool)$this->configLoader->get(ConfigMapper::NAME_IB_ENABLED);
         $userHasAnyModeratorServicePermission = (
             $userHasServicePermissionNews ||
             $userHasServicePermissionCalendar ||
@@ -172,10 +173,8 @@ class Subnav
             $userHasServicePermissionCms ||
             $userHasServicePermissionDesign ||
             $userHasServicePermissionTimetable ||
+            $userHasServicePermissionIbCoordinator ||
             $userHasServicePermissionDifferentiationProfile
-        );
-        $userHasServicePermissionIBCoordinator = (
-            $this->user->hasServicePermission(UserAccess::SERVICE_IB_COORDINATOR, UserAccess::ACCESS_FULL)
         );
 
         /* Keys of this array uniquely identify a page and its subpages
@@ -423,7 +422,7 @@ class Subnav
             ],
             '/adminv2/international-baccalaureate' => [
                 'name'       => 'IB',
-                'visible'    => $userIsSuperuser || $userHasServicePermissionIBCoordinator,
+                'visible'    => self::isIbVisible($ibEnabled, $userIsSuperuser, $userHasServicePermissionIbCoordinator),
                 'searchable' => false,
                 'children'   => [
                     '/adminv2/international-baccalaureate/configuration' => [
@@ -829,32 +828,32 @@ class Subnav
                         'description' => 'Enable and configure OpenAI integration to enable AI services to be made available to users.',
                         'searchable' => true,
                         'children' => [
-                            '/adminv2/ai-services#ai_' . OpenAi\Helper::FEATURE_CHAT => [
+                            '/adminv2/ai-services#ai_' . Feature::CHAT->value => [
                                 'name' => 'AI Text Chat',
                                 'visible' => true,
                                 'description' => 'Configure AI settings for interactive text editors.',
                             ],
-                            '/adminv2/ai-services#ai_' . OpenAi\Helper::FEATURE_LESSONPLAN => [
+                            '/adminv2/ai-services#ai_' . Feature::LESSON_PLAN->value => [
                                 'name' => 'AI Lesson Plan',
                                 'visible' => true,
                                 'description' => 'Configure AI settings for generating lesson plan content.',
                             ],
-                            '/adminv2/ai-services#ai_' . OpenAi\Helper::FEATURE_DIALOGAGENT => [
+                            '/adminv2/ai-services#ai_' . Feature::DIALOG_AGENT->value => [
                                 'name' => 'AI Discussion Activity',
                                 'visible' => true,
                                 'description' => 'Configure AI settings for discussion learning activities.',
                             ],
-                            '/adminv2/ai-services#ai_' . OpenAi\Helper::FEATURE_DIFFERENTIATION => [
+                            '/adminv2/ai-services#ai_' . Feature::DIFFERENTIATION->value => [
                                 'name' => 'AI Differentiation Profiles',
                                 'visible' => true,
                                 'description' => 'Configure AI settings for differentiation profile support in discussion learning activities.',
                             ],
-                            '/adminv2/ai-services#ai_' . OpenAi\Helper::FEATURE_IMAGE => [
+                            '/adminv2/ai-services#ai_' . Feature::IMAGE->value => [
                                 'name' => 'AI Image Generation',
                                 'visible' => true,
                                 'description' => 'Configure AI settings for image generation.',
                             ],
-                            '/adminv2/ai-services#ai_' . OpenAi\Helper::FEATURE_LEARNING_ACTIVITY_CUSTOMISATION => [
+                            '/adminv2/ai-services#ai_' . Feature::LEARNING_ACTIVITY_CUSTOMISATION->value => [
                                 'name' => 'AI Learning Activity Customisation',
                                 'visible' => true,
                                 'description' => 'Configure AI settings for learning activity customisation.',
@@ -1242,5 +1241,19 @@ class Subnav
         ]);
 
         return $this;
+    }
+
+    /**
+     * Determines whether the IB (International Baccalaureate) section is visible.
+     *
+     * @param bool $ibEnabled                             Indicates if the IB feature is enabled.
+     * @param bool $userIsSuperuser                       Indicates if the user has superuser privileges.
+     * @param bool $userHasServicePermissionIbCoordinator Indicates if the user has the IB Coordinator service permission.
+     *
+     * @return bool Returns true if the IB section is visible, otherwise false.
+     */
+    public static function isIbVisible(bool $ibEnabled, bool $userIsSuperuser, bool $userHasServicePermissionIbCoordinator): bool
+    {
+        return $ibEnabled && ($userIsSuperuser || $userHasServicePermissionIbCoordinator);
     }
 }

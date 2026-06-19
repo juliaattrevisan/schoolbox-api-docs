@@ -127,7 +127,8 @@
         "phpoffice/phpword": "^1.4",
         "ext-gd": "*",
         "embed/embed": "^4.4",
-        "ozdemirburak/iris": "^4.1"
+        "ozdemirburak/iris": "^4.1",
+        "corneltek/getoptionkit": "^2.7"
     },
     "autoload-dev": {
       "psr-4": {

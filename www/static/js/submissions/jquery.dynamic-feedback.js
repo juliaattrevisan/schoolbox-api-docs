@@ -444,7 +444,7 @@
 
             // Don't ignore if an:
             // * attachzone
-            // * rubric mark
+            // * rubric descriptor checkbox (as they don't have a value attribute to compare to a preval)
             // * resubmit required checkbox
             // * Kami document
             // Otherwise, ignore if its value hasn't changed since last save
@@ -453,7 +453,7 @@
                     !(
                         $this.is(".attachzone") ||
                         $this.is('[name="resubmissionRequired"]') ||
-                        $this.is('[name^="rubric"]')
+                        $this.is("[data-rubric-descriptor-checkbox]")
                     )
                 ) {
                     if ($this.val() === $this.data("preval")) {

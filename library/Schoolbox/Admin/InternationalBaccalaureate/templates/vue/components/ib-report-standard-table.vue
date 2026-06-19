@@ -7,8 +7,10 @@ import type { ApiRenotifyResponse, StudentRow } from "../../js/types/ibReportTyp
 interface Props {
     students: StudentRow[];
     searchLanguagesEndpoint: string;
+    section: StudentRow["stage"];
+    activeSelectionSection: StudentRow["stage"] | null;
 }
-defineProps<Props>();
+const props = defineProps<Props>();
 
 const selectedList = defineModel<StudentRow[]>("selectedList", { default: () => [] });
 
@@ -17,6 +19,9 @@ const renotifyingStudentIds = window.Vue.ref<Set<number>>(new Set());
 
 const emit = defineEmits<{
     completePreparationSingle: [studentId: number];
+    resetDetailsSingle: [studentId: number];
+    manuallyRegisterSingle: [studentId: number];
+    approveOnBehalfSingle: [studentId: number];
 }>();
 
 /**
@@ -93,14 +98,18 @@ function isRenotifying(student: StudentRow): boolean {
         <tbody>
             <tr v-for="student in students" :key="student.id">
                 <td class="checklist">
-                    <input
-                        :id="`select-${student.id}`"
-                        v-model="selectedList"
-                        type="checkbox"
-                        :value="student"
-                        :disabled="student.stage !== 'preparation'"
-                        :aria-label="`Select ${student.name}`"
-                    /><label class="checkbox-label" :for="`select-${student.id}`"></label>
+                    <template
+                        v-if="props.activeSelectionSection === null || props.activeSelectionSection === props.section"
+                    >
+                        <input
+                            :id="`select-${student.id}`"
+                            v-model="selectedList"
+                            type="checkbox"
+                            :value="student"
+                            :disabled="student.stage !== props.section"
+                            :aria-label="`Select ${student.name}`"
+                        /><label class="checkbox-label" :for="`select-${student.id}`"></label>
+                    </template>
                 </td>
                 <td>{{ student.name }}</td>
                 <td>
@@ -115,6 +124,7 @@ function isRenotifying(student: StudentRow): boolean {
                         name="alert"
                         color="var(--sbx-color-warning, #e67e22)"
                         aria-label="Candidate details unconfirmed"
+                        title="Missing required candidate details."
                     ></sbx-icon>
                 </td>
                 <td><ib-report-subject-labels :entry="student.subjects.hl" /></td>
@@ -154,6 +164,33 @@ function isRenotifying(student: StudentRow): boolean {
                             >
                                 <sbx-icon name="notifications-hollow"></sbx-icon>
                                 Complete Preparation
+                            </button>
+                        </li>
+                        <li v-if="student.stage === 'unconfirmed'">
+                            <button
+                                class="sbx-button--has-icon"
+                                @click.prevent="emit('approveOnBehalfSingle', student.id)"
+                            >
+                                <sbx-icon name="approve"></sbx-icon>
+                                Approve on behalf of student
+                            </button>
+                        </li>
+                        <li v-if="student.stage === 'unconfirmed' || student.stage === 'confirmed'">
+                            <button
+                                class="sbx-button--has-icon"
+                                @click.prevent="emit('resetDetailsSingle', student.id)"
+                            >
+                                <sbx-icon name="undo"></sbx-icon>
+                                Reset All Details
+                            </button>
+                        </li>
+                        <li v-if="student.stage === 'confirmed'">
+                            <button
+                                class="sbx-button--has-icon"
+                                @click.prevent="emit('manuallyRegisterSingle', student.id)"
+                            >
+                                <sbx-icon name="international-baccalaureate"></sbx-icon>
+                                Mark as manually registered
                             </button>
                         </li>
                     </ul>

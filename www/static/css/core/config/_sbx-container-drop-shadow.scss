@@ -18,7 +18,9 @@ body.sbx-body {
     .side-nav,
     .scrollable,
     .cover-photo,
-    .cr-results-grid {
+    .cr-results-grid,
+    .island section:not(:has(.component-action)) .tile,
+    #activity-feed {
         box-shadow: var(--sbx-config-container-drop-shadow);
     }
 
@@ -27,10 +29,14 @@ body.sbx-body {
     .reveal-modal *,
     .modal *,
     .island section section,
+    .island section:not(:has(.component-action)):has(.tileList),
+    .island section:has(.component-action) .tile,
     #permissions .scrollable,
     .sortable .empty-state,
     .content-overlay .empty-state-flex-centered,
-    .off-canvas-list section {
+    .off-canvas-list section,
+    #activity-feed section,
+    .c-island .scrollable {
         box-shadow: none;
     }
 

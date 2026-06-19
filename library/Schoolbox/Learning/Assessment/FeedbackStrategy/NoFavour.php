@@ -40,7 +40,6 @@ class NoFavour implements IFeedbackTraversalStrategy
      */
     public function getMostRecentFeedback(Participant $participant, $publishedOnly)
     {
-        /** @var IFeedback $mostRecentFeedback */
         $mostRecentFeedback = null;
 
         foreach ($participant->getAllFeedbacks() as $feedback) {

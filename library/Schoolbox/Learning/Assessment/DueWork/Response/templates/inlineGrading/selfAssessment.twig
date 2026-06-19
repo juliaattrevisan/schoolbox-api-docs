@@ -8,8 +8,9 @@
  # @param bool $selfAssess                   A bool corresponding to whether Self Assessment was enabled in the Due Work settings and can occur for this response instance
  # @param IFeedback $feedback                A feedback instance for Due Work
  # @param Participant\Model $participant     A participant instance
- # @param bool $showGroupTotal               A bool corresponding to whether Capability Mark Type was meaningfully set to something other than None
- # @param bool $showRubricTotal              Shows the total value of the rubric grid's selected descriptors; shown to instructors and self-graders
+ # @param bool $showGroupTotal               An arbitrary decision about whether Capability Marks could display here, if extant.
+ # @param bool $showRubricTotal              An arbitrary decision about whether Rubric Grid Totals could display here, if extant
+ # @param string $rubricMarkedGridPayloads   A json-encoded representation of the rubric grid structure, marked grid, self graded grid
  # @param IFeedback $selfAssessmentFeedback  "the self-assessed feedback, shouldst there be one"
  # @param bool $readonly                     A bool corresponding to whether a combobox is in readonly mode, such as when you revisit this screen but the academic period ended already
  # @param array $errors                      A stack of Submission States, contrary to its naming which is misleading (I know, I know...)
@@ -27,35 +28,22 @@
 {# Feedback form section #}
 <section id="self-assessment-feedback">
     <fieldset class="content">
+        {% set rubricTemplate = readonly ? 'grid.twig' : 'grid-markable.twig' %}
+
         {# Render each rubric grid in a giant stack, I guess: there isn't much of an alternative to the mega scroll #}
-        {% for rubricInstance in assessment.rubricInstances %}
-
-            {% set rubricTemplate = readonly ? 'grid.twig' : 'grid-markable.twig' %}
-
-            {# Marked Grids might not exist yet #}
-            {% set rubricMarkedGrid = null %}
-
-            {% if feedback is not null and feedback.rubricMarkedGrids[rubricInstance.id] is defined and feedback.rubricMarkedGrids[rubricInstance.id] is not null %}
-                {% set rubricMarkedGrid = feedback.rubricMarkedGrids[rubricInstance.id] %}
-            {% endif %}
-
-            {% include '@rubric/' ~ rubricTemplate with {
-                assessment: assessment,
-                rubricInstance: rubricInstance,
-                showGroupTotal: rubricInstance.isMarkPerCapability,
-                showRubricTotal: showRubricTotal,
-                markVisibility: participant.assessable.isFeedbackVisibleToUser(USER),
-                blindMode: false,
-                studentView: true,
-                selfAssess: selfAssess,
-                selfReflect: selfReflect,
-                learner: participant.user,
-                selfAssessmentFeedback: selfAssessmentFeedback ?? null,
-                rubricGrid: rubricInstance.grid,
-                rubricMarkedGrid: rubricMarkedGrid,
-                rubricSelfGradedGrid: selfAssessmentFeedback.rubricMarkedGrids[rubricInstance.id] ?? null
-            } only %}
-        {% endfor %}
+        {% include '@rubric/' ~ rubricTemplate with {
+            assessment: assessment,
+            markVisibility: participant.assessable.isFeedbackVisibleToUser(USER),
+            blindMode: false,
+            studentView: true,
+            learner: participant.user,
+            selfAssess: selfAssess,
+            selfReflect: selfReflect,
+            selfAssessmentFeedback: selfAssessmentFeedback ?? null,
+            rubricMarkedGridPayloads: rubricMarkedGridPayloads,
+            showGroupTotal: showGroupTotal,
+            showRubricTotal: showRubricTotal,
+        } only %}
     </fieldset>
 
     {# Grades input combobox #}
@@ -74,10 +62,7 @@
             </label>
 
             {% if assessment.useRubric and not readonly %}
-                {% include '@learningDueWorkResponse/inlineGrading/fragments/assignFromRubricButton.twig' with {
-                    locale: locale,
-                    rubricId: assessment.rubricGrid.id,
-                } only %}
+                {% include '@learningDueWorkResponse/inlineGrading/fragments/assignFromRubricButton.twig' with {} only %}
             {% endif %}
         </div>
     {% endif %}

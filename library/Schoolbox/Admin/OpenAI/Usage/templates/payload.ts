@@ -13,6 +13,10 @@ import type { UserAuthor } from "@schoolboxLibrary/types/User";
  */
 export type AiSessionId = string;
 
+/**
+ * A value for each AI feature.
+ * @see /library/Schoolbox/OpenAi/Feature.php
+ */
 export enum AiFeature {
     CHAT = "chat",
     LESSON_PLAN = "lessonplan",
@@ -49,7 +53,6 @@ export type AiSessionLog = {
     sessionId: AiSessionId;
     createdAt: DateRFC3339;
     createdBy?: UserAuthor;
-    feature: AiFeature;
 } & (
     | { [K in AiLogFormat]: { logFormat: K; data: AiLogFormatDataMap[K] } }[AiLogFormat]
     | { logFormat: null; data: null }
@@ -64,8 +67,9 @@ export type AiSession<TLogFormat extends AiLogFormat = AiLogFormat, TFeature ext
     createdAt: DateRFC3339;
     createdBy?: UserAuthor;
     returnCode: number | null; // HTTP return code from OpenAI API
+    hasError: boolean;
     _routes: {
-        getLog?: string | null;
+        getSessionLogs?: string | null;
     };
 };
 
@@ -84,7 +88,6 @@ export type AiUsageLogApiResponse = {
     metadata: PaginationMeta;
 };
 
-export type AiSessionLogApiResponse<
-    TLogFormat extends AiLogFormat = AiLogFormat,
-    TFeature extends AiFeature = AiFeature,
-> = (AiSessionLog & { logFormat: TLogFormat; feature: TFeature })[];
+export type AiSessionLogApiResponse<TLogFormat extends AiLogFormat = AiLogFormat> = (AiSessionLog & {
+    logFormat: TLogFormat;
+})[];

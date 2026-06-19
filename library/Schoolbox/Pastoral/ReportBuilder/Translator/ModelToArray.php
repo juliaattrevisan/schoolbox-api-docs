@@ -82,7 +82,7 @@ class ModelToArray
                         'name' => $tag->getName(),
                     ];
                 }
-            ),
+            )->reindex(),
             // Ownership, last modifying user and time
             'owner' => $this->translateUser($model->getOwner()),
             'createdAt' => [
@@ -98,7 +98,7 @@ class ModelToArray
 
             'attachmentsPublic'  => $model->getAttachments()->filterBy('private', false)->map($this->attachmentTranslator)->reindex(),
 
-            'comments'            => $model->getComments()->map($this->commentTranslator)
+            'comments'            => $model->getComments()->map($this->commentTranslator)->reindex(),
         ];
     }
 

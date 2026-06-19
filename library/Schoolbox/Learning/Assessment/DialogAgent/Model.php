@@ -30,7 +30,7 @@ class Model extends AbstractAssessment
      *
      * TODO Rename to whatever this is canonically called
      */
-    private const string DEFAULT_TYPE_NAME = 'Dialog Agent';
+    private const string DEFAULT_TYPE_NAME = 'Discussion';
 
 
     /**

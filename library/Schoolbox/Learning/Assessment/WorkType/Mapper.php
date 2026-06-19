@@ -10,7 +10,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\WorkType;
 
+use InvalidArgumentException;
 use Schoolbox;
+use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\AssessmentType;
+use Schoolbox\Learning\Assessment\IAssessable;
 
 /**
  * @method Model findById($identifierValue)
@@ -112,6 +116,34 @@ class Mapper extends Schoolbox\Mapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+    }
+
+    /**
+     * Finds the work types that are permitted for a given assessment, based on the assessment type.
+     *
+     * @param IAssessable $assessment The assessment for which to find permitted work types
+     * @param array       $options    Additional options to pass to the query
+     * @return Collection
+     * @throws InvalidArgumentException
+     */
+    public function findPermittedForAssessment(IAssessable $assessment, array $options = []): Collection
+    {
+        $assessmentType = AssessmentType::objectToString($assessment);
+        $permittedColumn = match ($assessmentType) {
+            AssessmentType::TYPE_PROJECT => 'permitted_project',
+            AssessmentType::TYPE_DUE_WORK => 'permitted_due_work',
+            AssessmentType::TYPE_TASK => 'permitted_task',
+            AssessmentType::TYPE_QUIZ => 'permitted_quiz',
+            AssessmentType::TYPE_LTI_ASSESSMENT => 'permitted_lti',
+            AssessmentType::TYPE_LESSON_PLAN => 'permitted_lesson_plan',
+            AssessmentType::TYPE_DIALOG_AGENT => 'permitted_dialog_agent',
+            AssessmentType::TYPE_REPORTING => 'permitted_reporting_activity',
+            default => throw new InvalidArgumentException("Unknown assessment type: $assessmentType"),
+        };
+
+        $options['order'] ??= ['sequence' => 'asc'];
+
+        return $this->findByColumn($permittedColumn, true, $options);
     }
 
     /** @inheritDoc */

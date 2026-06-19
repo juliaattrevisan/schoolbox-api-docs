@@ -41,7 +41,7 @@ class DifferentiationProfileGeneration
      * @param Collection  $pastoralRecords
      * @param Collection  $enabledFields
      * @param User        $student
-     * @param string|null $aiSessionId
+     * @param string      $aiSessionId The AI session ID used to associate logs with this request.
      * @return array
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
@@ -50,7 +50,7 @@ class DifferentiationProfileGeneration
         Collection $pastoralRecords,
         Collection $enabledFields,
         User $student,
-        ?string $aiSessionId = null,
+        string $aiSessionId,
     ): array {
 
         $attachments = $this->generateFilePrompts($pastoralRecords);
@@ -85,6 +85,7 @@ class DifferentiationProfileGeneration
             trim($this->config[Config::FIELD_PROVIDER]['value']),
             trim($this->config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
             trim($this->config[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
+            trim($this->config[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_MODEL]['value'] ?? ''),
             trim($this->config[Config::SECTION_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'] ?? ''),
             trim($this->config[Config::SECTION_GENERAL][Config::FIELD_REASONING_EFFORT]['value'] ?? '') ?: Config::REASONING_EFFORT_OPTION_DEFAULT,
             trim($this->config[Config::SECTION_GENERAL][Config::FIELD_TEXT_VERBOSITY]['value'] ?? '') ?: Config::TEXT_VERBOSITY_OPTION_DEFAULT,
@@ -98,7 +99,7 @@ class DifferentiationProfileGeneration
             $payload,
             null,
             $user,
-            Helper::FEATURE_DIFFERENTIATION,
+            \Schoolbox\OpenAi\Feature::DIFFERENTIATION,
             $aiSessionId,
             null, // These requests can't be restored in the AI Usage Log yet
         );

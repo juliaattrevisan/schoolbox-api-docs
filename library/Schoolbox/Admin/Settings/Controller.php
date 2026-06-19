@@ -9,10 +9,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Settings;
 
+use Alaress\Module\Cache\Rebuilder;
 use Alaress\Redis;
 use Alaress_Byte_Format;
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
+use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Config\Config;
@@ -21,11 +23,31 @@ use Schoolbox\Error\Mapper;
 use Schoolbox\GenericCollection;
 use Alaress\Database\Predicate;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\ToolsDaemon;
 use Schoolbox\User;
 use Twig\Error\Error;
 
 class Controller extends ConfigController
 {
+    /**
+     * Constructor
+     *
+     * @param ConfigMapper         $configMapper
+     * @param FieldStrategyFactory $fieldStrategyFactory
+     * @param Rebuilder            $rebuilder
+     * @param CacheInterface       $oidcCache
+     * @param ToolsDaemon\IClient  $toolsDaemonClient
+     */
+    public function __construct(
+        ConfigMapper $configMapper,
+        FieldStrategyFactory $fieldStrategyFactory,
+        Rebuilder $rebuilder,
+        CacheInterface $oidcCache,
+        private ToolsDaemon\IClient $toolsDaemonClient,
+    ) {
+        parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder, $oidcCache);
+    }
+
     /**
      * Renders an admin settings page for settings with the specified type
      *
@@ -225,6 +247,8 @@ class Controller extends ConfigController
         $reloadMobileDaemon   = false;
         $rebuildModules       = false;
         $clearOidcCache       = false;
+        $clearExternalCache   = false;
+        $setExternalCacheTtl  = false;
 
         foreach ($postedValues as $name => $value) {
             $existingConfig  = $existingConfigs[$name];
@@ -260,12 +284,19 @@ class Controller extends ConfigController
                 if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_OAUTH, true)) {
                     $clearOidcCache = true;
                 }
+                if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_EXTERNAL_CACHE_CONTENT, true)) {
+                    $clearExternalCache = true;
+                }
+                if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_EXTERNAL_CACHE_TTL, true)) {
+                    $setExternalCacheTtl = true;
+                }
                 $existingConfig->setValue(trim((string)$newValue));
                 $this->getConfigMapper()->save($existingConfig);
             }
         }
 
         if ($reloadRouteDaemon || $reloadScheduleDaemon || $reloadMobileDaemon) {
+            // TODO inject this
             $redisClient = Redis::getSignalQueueClientInstance();
             if ($redisClient && $reloadRouteDaemon) {
                 $redisClient->publish('scheduled.' . INSTANCE_ID . '.reload', '');
@@ -278,12 +309,37 @@ class Controller extends ConfigController
             }
         }
         if ($rebuildModules) {
+            // TODO send this and anything else which uses post-output callbacks to toolsd
             $this->postOutputCallbacks[] = $this->buildRebuildModuleCacheCallback();
             // After everything else: reload the route table
             $this->response = $this->responseEmpty();
         }
         if ($clearOidcCache) {
             $this->oidcCache->clear();
+        }
+        if ($clearExternalCache) {
+            try {
+                // Don't need to wait for toolsd to run the job
+                $this->toolsDaemonClient->run(new ToolsDaemon\JobRequest('clearExternalCache', INSTANCE_ID));
+            } catch (ToolsDaemon\ClientException $e) {
+                // log an error to stdout, but continue?
+                $this->spawnLogger('toolsd.' . INSTANCE_ID)->warning(
+                    sprintf('Tools daemon request failed (message: %s)', $e->getMessage()),
+                    ['exception' => $e],
+                );
+            }
+        }
+        if ($setExternalCacheTtl) {
+            try {
+                // Don't need to wait for toolsd to run the job
+                $this->toolsDaemonClient->run(new ToolsDaemon\JobRequest('setExternalCacheTtl', INSTANCE_ID));
+            } catch (ToolsDaemon\ClientException $e) {
+                // log an error to stdout, but continue?
+                $this->spawnLogger('toolsd.' . INSTANCE_ID)->warning(
+                    sprintf('Tools daemon request failed (message: %s)', $e->getMessage()),
+                    ['exception' => $e],
+                );
+            }
         }
 
         $this->response = $this->redirectAfterPost($this->getRouteUrlFromTypeLabel($typeLabel));

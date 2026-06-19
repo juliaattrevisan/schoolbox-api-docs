@@ -2,24 +2,37 @@
 
 {% block filterName %}Name{% endblock %}
 
+{% block dropdownClass %} f-dropdown--wider{% endblock %}
+
 {% block filterComponent %}
     {% set isDisabled = false %}
     {{ parent() }}
 {% endblock filterComponent %}
 
 {% block userOptions %}
-    {# Empty input is required so that filter works if not user-configurable, or
-       nothing is selected #}
     <li>
-        <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="" />
-
         {% if isUserConfigurable %}
-            <input type="text"
-                placeholder="Enter a full or partial student name"
-                name="filter_selection[{{ definition.filter.id }}][]"
-                value="{{ searchQuery }}"
-                data-value-default="" />
+            <sbx-search-select
+                id="search-{{ definition.filter.id }}"
+                class="l-width-100"
+                label="Search"
+                label-id="search-label-{{ definition.filter.id }}"
+                form-value-name="filter_selection[{{ definition.filter.id }}]"
+                endpoint="/ajax/user.php?roleTypeID=student&"
+                for-filter-panel
+                placeholder="Search for students...">
+            </sbx-search-select>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const searchSelect = document.getElementById('search-{{ definition.filter.id }}');
+                    // Pre-populating the search select with any existing user selection
+                    searchSelect.selected = {{ userSelectionIds | json_encode | raw }};
+                });
+            </script>
         {% else %}
+            {# Empty input is required so that filter works if not user-configurable, or
+            nothing is selected #}
+            <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="" />
             {{ parent() }}
         {% endif %}
     </li>

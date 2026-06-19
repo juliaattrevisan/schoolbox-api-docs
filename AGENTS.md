@@ -98,6 +98,7 @@ In order to ensure frontend code quality, these commands should be run with the 
 ```bash
 npm run build                  # verify that frontend code still compiles after files have changed
 npx eslint [FILE]...           # verify file still passes ESLint
+npm run typecheck              # verify that typecheck still passes
 npx prettier --check [FILE]... # verify that file still meets auto-format standards
 npx prettier --write [FILE]... # auto-format file
 npm test                       # verify all unit tests still pass, not just those changed
@@ -202,6 +203,10 @@ where:
 - `26.1.alpha1` is the 1st pre-release alpha for the 2nd major version released in 2026
   - remember, alpha and beta version counts start from 1
 - `26.1.beta2` is the 2nd preview version for the 2nd major version released in 2026
+
+### Point release notes
+
+When preparing point release notes, use the `point-release-notes` skill in `.agents/skills/point-release-notes/SKILL.md`.
 
 ---
 
