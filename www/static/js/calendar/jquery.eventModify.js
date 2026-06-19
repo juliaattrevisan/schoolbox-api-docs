@@ -292,12 +292,6 @@
                         datepickerDate: true,
                     },
                 },
-                messages: {
-                    maxAttendees: {
-                        digits: "Please enter a positive whole number, or leave this blank.",
-                        min: "Please enter a positive whole number, or leave this blank.",
-                    },
-                },
 
                 /**
                  * Executes when form is valid
