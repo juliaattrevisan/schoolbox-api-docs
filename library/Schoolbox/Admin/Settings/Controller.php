@@ -174,8 +174,15 @@ class Controller extends ConfigController
 
         $foundConfig = $this->getConfigMapper()->findByPredicates($pb);
 
+        $isSonarEnabled = (bool) $this->getConfigLoader()->get(ConfigMapper::NAME_SONAR_UI_TOGGLE);
+        $excludedSkinConfigTypeId = $isSonarEnabled ? ConfigMapper::TYPE_SKIN_CONFIG : ConfigMapper::TYPE_SONAR_SKIN_CONFIG;
+
         /** @var Config $config */
         foreach ($foundConfig as $config) {
+            if ($config->getType()?->getId() === $excludedSkinConfigTypeId) {
+                continue;
+            }
+
             $module = $config->getModule();
 
             $type = $config->getType() ? $config->getType()->getType() : '';
@@ -412,7 +419,8 @@ class Controller extends ConfigController
                 return match ($type) {
                     'Resources'           => "/adminv2/setting/cms/$typeEncoded",      // E.g. /adminv2/setting/cms/Resources
                     'Assets',
-                    'Skin Config'         => "/adminv2/setting/design/$typeEncoded",   // E.g. /adminv2/setting/design/Skin%20Config
+                    'Skin Config'         => "/adminv2/setting/design/$typeEncoded",      // E.g. /adminv2/setting/design/Skin%20Config
+                    'Sonar Skin Configs'  => '/adminv2/setting/design/Skin%20Config',    // Sonar configs live on the same page
                     'LMS Policy',
                     'Document Management' => "/adminv2/setting/lms/$typeEncoded",      // E.g. /adminv2/setting/lms/LMS%20Policy
                     'Pastoral Care'       => "/adminv2/setting/pastoral/$typeEncoded", // E.g. /adminv2/setting/pastoral/Pastoral%20Care
@@ -460,8 +468,9 @@ class Controller extends ConfigController
                     'Resources' => $user->hasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL),
                     // This is for the settings in 'Admin -> Design -> Assets'.
                     'Assets',
-                    // This is for the settings in 'Admin -> Design -> Skin Config'.
-                    'Skin Config' => $user->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL),
+                    // This is for the settings in 'Admin -> Design -> Skin Config' (legacy and Sonar both render on the same page).
+                    'Skin Config',
+                    'Sonar Skin Configs' => $user->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL),
 
                     // This is for the settings in 'Admin -> LMS -> LMS Policy' and 'Admin -> LMS -> Document Management'.
                     'LMS Policy', 'Document Management' => $user->hasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL),
