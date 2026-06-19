@@ -9,53 +9,31 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Markbook;
 
-use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
-use Alaress\Database\Predicate\Builder;
 use Alaress\Web\Controller\Base;
-use Aura\Router;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use InvalidArgumentException;
 use LogicException;
-use PDOException;
-use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Column\Decimal;
-use Schoolbox\Column\Integer;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
-use Schoolbox\Filter\Filters\Assessment\RubricUsage;
 use Schoolbox\L10n\RosettaStone as Translator;
 use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Learning\MarkScheme\Factory;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Model;
 use Twig\Error\Error;
-use UnderflowException;
 use UnexpectedValueException;
 
-use function array_keys;
 use function array_merge;
-use function count;
 use function func_get_args;
-use function implode;
-use function in_array;
-use function is_array;
-use function strnatcmp;
-use function uasort;
 
 class Controller extends Base
 {
-
-
-
-
-
     /**
      * Constructor
      *
