@@ -34,7 +34,6 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\Reporting\Model as Reporting;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\Learning\Assessment\Lti\Model as Lti;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
@@ -1200,13 +1199,6 @@ class Controller extends Base
                     ],
                     'permittedLti' => [
                         'caption'    => Lti::getDefaultTypeName(),
-                        'checkbox'   => true,
-                        'mandatory'  => true,
-                        'default'    => false,
-                        'popOutList' => 'permittedActivities',
-                    ],
-                    'permittedLessonPlan' => [
-                        'caption'    => LessonPlan::getDefaultTypeName(),
                         'checkbox'   => true,
                         'mandatory'  => true,
                         'default'    => false,
