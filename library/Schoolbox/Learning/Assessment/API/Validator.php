@@ -32,8 +32,8 @@ class Validator
         foreach ($filter as $key => $value) {
             switch ($key) {
                 case 'assessmentId':
-                    if (!is_int($value) && !ctype_digit($value)) {
-                        throw new SchoolboxException("Filter 'assessmentId' must have an integer value.");
+                    if (!$this->isPositiveIntegerValue($value)) {
+                        throw new SchoolboxException("Filter 'assessmentId' must have a positive integer value.");
                     }
                     break;
                 case 'title':
@@ -129,8 +129,8 @@ class Validator
                     "  If key 'id' is present there should be no other items."
                 );
             }
-            if (!is_int($value['id']) && !ctype_digit($value['id'])) {
-                throw new SchoolboxException("Filter 'folder' property 'id' must have an integer value.");
+            if (!$this->isPositiveIntegerValue($value['id'])) {
+                throw new SchoolboxException("Filter 'folder' property 'id' must have a positive integer value.");
             }
         } else {
             // Expect $value to contain an array like the following.
@@ -157,8 +157,10 @@ class Validator
                 foreach ($subArray as $key => $subValue) {
                     switch ($key) {
                         case 'id':
-                            if (!is_int($subValue) && !ctype_digit($subValue)) {
-                                throw new SchoolboxException("Filter 'folder' item property 'id' must have an integer value.");
+                            if (!$this->isPositiveIntegerValue($subValue)) {
+                                throw new SchoolboxException(
+                                    "Filter 'folder' item property 'id' must have a positive integer value."
+                                );
                             }
                             break;
                         case 'code':
@@ -217,8 +219,10 @@ class Validator
         foreach ($array as $key => $value) {
             switch ($key) {
                 case 'id':
-                    if (!is_int($value) && !ctype_digit($value)) {
-                        throw new SchoolboxException("Filter '$arrayName' property 'id' must have an integer value.");
+                    if (!$this->isPositiveIntegerValue($value)) {
+                        throw new SchoolboxException(
+                            "Filter '$arrayName' property 'id' must have a positive integer value."
+                        );
                     }
                     break;
                 case 'name':
@@ -230,5 +234,19 @@ class Validator
                     throw new SchoolboxException("Filter '$arrayName' contains unexpected key '$key'.");
             }
         }
+    }
+
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    private function isPositiveIntegerValue(mixed $value): bool
+    {
+        if (is_int($value)) {
+            return $value > 0;
+        }
+
+        // Note must still check > 0, because '0' is a digit.
+        return is_string($value) && ctype_digit($value) && (int)$value > 0;
     }
 }

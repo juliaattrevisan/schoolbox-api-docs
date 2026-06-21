@@ -284,6 +284,10 @@
                             depends: isRepeating,
                         },
                     },
+                    maxAttendees: {
+                        digits: true,
+                        min: 1,
+                    },
                     publishDate: {
                         datepickerDate: true,
                     },
