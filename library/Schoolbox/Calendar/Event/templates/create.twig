@@ -348,8 +348,8 @@
                                     </script>
                                 </div>
                                 <div class="small-12 medium-6 columns">
-                                    <label>Maximum Attendees <span class="hint has-tip tip-top" title="The maximum amount of people who can attend your event" data-tooltip>?</span></label>
-                                    <input name="maxAttendees" maxlength="5" type="number" inputmode="numeric" min="1" step="1" value="{{ event.maxAttendees }}" />
+                                    <label for="maxAttendees">Maximum Attendees <span class="hint has-tip tip-top" title="The maximum amount of people who can attend your event" data-tooltip>?</span></label>
+                                    <input id="maxAttendees" name="maxAttendees" maxlength="5" type="text" inputmode="numeric" pattern="[0-9]" min="1" step="1" value="{{ event.maxAttendees }}" />
                                 </div>
                                 <div class="small-12 medium-6 columns">
                                     <label for="showAttendees" class="inline-block">
