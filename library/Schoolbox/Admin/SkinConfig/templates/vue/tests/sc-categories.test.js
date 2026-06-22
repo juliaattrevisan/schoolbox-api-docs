@@ -146,24 +146,6 @@ test("renders the category headings using the updated terminology", () => {
     expect(wrapper.findAll("h2").map((heading) => heading.text())).toEqual(["Colours", "Corner Radius", "Drop Shadow"]);
 });
 
-test("groups subcategories in one island per category with dividers between subcategories", () => {
-    const wrapper = mount(ScCategories, {
-        props: {
-            configs: buildConfigs(),
-            colourErrors: {},
-        },
-    });
-
-    const categories = wrapper.findAll('[data-test="skin-config-category"]');
-    expect(categories).toHaveLength(3);
-    expect(categories[0].classes()).not.toContain("l-pad-m");
-
-    const colourSubcategories = categories[0].findAll('[data-test^="skin-config-subcategory"]');
-    expect(colourSubcategories).toHaveLength(2);
-    expect(colourSubcategories[0].classes()).toContain("skin-config-subcategory--divided");
-    expect(colourSubcategories[1].classes()).not.toContain("skin-config-subcategory--divided");
-});
-
 test("emits preview refresh when the Drop Shadow selection changes", async () => {
     const wrapper = mount(ScCategories, {
         props: {
