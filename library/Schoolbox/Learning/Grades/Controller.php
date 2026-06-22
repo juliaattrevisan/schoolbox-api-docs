@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\Grades;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
@@ -16,10 +17,12 @@ use DomainException;
 use InvalidArgumentException;
 use LogicException;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Assessment\Rubric\Markbook\OverallDataset;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Model;
 use Schoolbox\Collection;
+use Schoolbox\Column\Decimal;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\User as ExternalUser;
 use Schoolbox\Filter;
@@ -32,7 +35,6 @@ use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -41,10 +43,12 @@ use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Grades\Cohort\ClassResults;
 use Schoolbox\Learning\Grades\Cohort\ValidUseCohortMarks;
 use Schoolbox\Learning\Markbook\Markbook;
+use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Learning\MarkScheme\Factory;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Mapper;
 use Schoolbox\User;
@@ -68,6 +72,10 @@ class Controller extends Base
      * @param IdFinder $assessmentIdFinder
      * @param IFactoryFactory $filterFactoryFactory
      * @param WorkType\Mapper $workTypeMapper
+     * @param ExternalUser $externalUser
+     * @param IConnector $internalDb
+     * @param UserAccessMapper $userAccessMapper
+     * @param Filter\Mapper $filterMapper
      */
     public function __construct(
         private AssessmentMapperProxy $assessmentMapperProxy,
@@ -80,6 +88,9 @@ class Controller extends Base
         private Filter\IFactoryFactory $filterFactoryFactory,
         private WorkType\Mapper $workTypeMapper,
         ExternalUser $externalUser,
+        private IConnector $internalDb,
+        private UserAccessMapper $userAccessMapper,
+        private Filter\Mapper $filterMapper,
     ) {
         $this->viewMode = new ViewMode($externalUser);
     }
@@ -523,14 +534,14 @@ class Controller extends Base
         $longitudinalRubric   = [];
         $rubricAssessmentList = [];
         if ($canSeeRubricGrade || $canSeeCapabilityGrade || $canSeeProgression) {
-            $includeComparison = $viewModeContext->viewModeValue === ViewModeValue::STAFF
-                || $viewee->getDisplayGradeGraph();
-            $longitudinalRubric   = $this->getLongitudinalRubricData(
+            $includeComparison = $viewModeContext->viewModeValue === ViewModeValue::STAFF || $viewee->getDisplayGradeGraph();
+            $longitudinalRubric = $this->getLongitudinalRubricData(
                 $assessments,
                 $viewee,
                 $viewModeContext->effectiveViewer,
                 $includeComparison,
-                $subject
+                $subject,
+                $request
             );
             $rubricAssessmentList = $longitudinalRubric['assessments'] ?? [];
             unset($longitudinalRubric['assessments']);
@@ -687,27 +698,27 @@ class Controller extends Base
     }
 
     /**
-     * @param GenericCollection|IAssessable[] $assessments
-     * @param User                            $student
-     * @param User                            $viewer            Effective viewer for feedback visibility checks
-     * @param bool                            $includeComparison Include other students results for comparison
-     * @param Folder\Model                    $folder
+     * @param GenericCollection<IAssessable> $activities
+     * @param User $student
+     * @param User $viewer Effective viewer for feedback visibility checks
+     * @param bool $includeComparison Include other students results for comparison
+     * @param Folder\Model $folder
+     * @param array $request
      * @return array
-     * @throws DomainException
-     * @throws InvalidColumnException
-     * @throws \RangeException
-     * @throws \UnderflowException
+     * @throws MapperException
+     * @throws RouteNotFound
      */
     private function getLongitudinalRubricData(
-        GenericCollection $assessments,
+        GenericCollection $activities,
         User $student,
         User $viewer,
         bool $includeComparison,
-        Folder\Model $folder
+        Folder\Model $folder,
+        array $request
     ): array {
-        // Filter to dueWork with marks visible to the selected view mode.
-        $dueWorksWithVisibleMarks = $assessments->filter(function (IAssessable $assessment) use ($viewer) {
-            return $assessment instanceof DueWork\Model && $assessment->isFeedbackVisibleToUser($viewer);
+        // Filter to activities with marks visible to the selected view mode.
+        $activitiesWithVisibleMarks = $activities->filter(function (IAssessable $assessment) use ($viewer) {
+            return $assessment->isFeedbackVisibleToUser($viewer);
         });
 
         /* Attempt to process statistics for Cohort aggregation for each capability/indicator/descriptor
@@ -724,7 +735,78 @@ class Controller extends Base
 //            ))->collate($student);
 //        }
 
-        return $this->rubricMapper->getLongitudinal($dueWorksWithVisibleMarks, $student, $includeComparison);
+        [
+            $assessments,
+            $exclusions,
+            $studentMarks,
+            $overallMarks
+        ] = (new OverallDataset(
+            $this->internalDb,
+            new Decimal(),
+            new MarkScheme\TotalMarkFractional(),
+            new \Schoolbox\Learning\MarkScheme\Factory($this->getConfigLoader()),
+            $this->filterMapper,
+            $this->userAccessMapper,
+            $this->routeGenerator
+        ))->buildMarkbookData($folder, $request, $activitiesWithVisibleMarks->indexBy('id')->keys());
+
+        $data = $studentMarks[$student->getid()] ?? null;
+
+        /* Student doesn't have any data; exit earlyish
+         */
+        if (null === $data) {
+            return [];
+        }
+
+        /* Transpose this rubric markbook data
+         */
+        $stack = [];
+
+        foreach ($data['gridData'] as $assessmentId => $rubricInstanceData) {
+            foreach ($rubricInstanceData as $rubricInstanceId => $rubricGridData) {
+                foreach ($rubricGridData['capabilities'] as $capabilityId => $capabilityData) {
+                    if (!isset($stack[$capabilityId])) {
+                        $stack[$capabilityId] = [
+                            'name' => $capabilityData['name'],
+                            /* We only care about published data here; these are results for a student indexed by
+                             * their assessment id and grid id
+                             */
+                            'assessmentResults' => [],
+                            'indicators' => [],
+                        ];
+                    }
+
+                    /* Chuck in this student's result, indexed by assessment identifier
+                     */
+                    $stack[$capabilityId]['assessmentResults'][$assessmentId]['grid'][$rubricInstanceId] = $capabilityData['published'];
+
+                    foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
+                        if (!isset($stack[$capabilityId]['indicators'][$indicatorId])) {
+                            $stack[$capabilityId]['indicators'][$indicatorId] = [
+                                'name' => $indicatorData['name'],
+                                /* We only care about published data here; these are results for a student indexed by
+                                 * the assessment id and contains descriptor values
+                                 */
+                                'assessmentResults' => [],
+                            ];
+                        }
+
+                        /* Chuck in this student's result, indexed by assessment identifier
+                         */
+                        $stack[$capabilityId]['indicators'][$indicatorId]['assessmentResults'][$assessmentId]['grid'][$rubricInstanceId] = $indicatorData['published'];
+                    }
+                }
+            }
+        }
+
+        /* The $assessments node is an array of assessment metadata which we can use to make the heading row; each
+         * node in $assessments knows about its grid settings so we can make a hash lookup to quickly build this table:
+         * foreach capability in the stack, process each assessment's result.
+         */
+        return [
+            $assessments,
+            $stack,
+        ];
     }
 
     /**
