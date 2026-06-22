@@ -481,7 +481,7 @@ class Module extends BaseModule
         // exclude user from assessment
         $this->register('POST', "$assRoute/$studentParam/exclude", 'postExclude', $canModifyCustomParticipation, $preloadParticipant);
 
-        $this->register('GET', "$assRoute/$studentParam/info", 'getInfo', $canModify, $preloadParticipant);
+        $this->register('GET', "$assRoute/$studentParam/info", 'getInfo', $canViewStatus, $preloadParticipant);
 
         // Due work: Teacher interactive worksheet view
         $this->register(self::METHOD_GET, "$assRoute/worksheet", 'getWorksheet', $canModifyWorksheet, $preloadAssessment);
