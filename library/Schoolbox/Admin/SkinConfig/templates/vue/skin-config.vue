@@ -220,6 +220,7 @@ window.Vue.onMounted(() => {
                 sentiment="alert"
                 icon="alert"
                 text="Colour contrast issues must be addressed before saving."
+                is-full-width
             />
             <div class="l-flex l-flex--justify l-gap-xs">
                 <button v-if="hasUnsavedChanges" type="button" class="button l-flex__item--1" @click="onUndoChanges">

@@ -43,6 +43,10 @@ interface Props {
      */
     isButton?: boolean;
     /**
+     * Whether the label should fill the available parent container width
+     */
+    isFullWidth?: boolean;
+    /**
      * The size of the label
      */
     size?: "m" | "l";
@@ -58,6 +62,7 @@ const props = withDefaults(defineProps<Props>(), {
     href: undefined,
     text: undefined,
     isButton: false,
+    isFullWidth: false,
     size: "m",
 });
 
@@ -65,14 +70,19 @@ const emit = defineEmits<{
     select: [{ href: string | undefined; title: string | undefined }];
 }>();
 
-const labelClasses = computed(() => ["sbx-label", `sbx-label--${props.sentiment}`, `sbx-label--${props.size}`]);
+const labelClasses = computed(() => [
+    "sbx-label",
+    `sbx-label--${props.sentiment}`,
+    `sbx-label--${props.size}`,
+    { "sbx-label--full-width": props.isFullWidth },
+]);
 </script>
 
 <template>
     <button
         v-if="props.isButton"
         type="button"
-        class="sbx-label-button"
+        :class="['sbx-label-button', { 'sbx-label-button--full-width': props.isFullWidth }]"
         :title="props.title"
         @click="emit('select', { href: props.href, title: props.title })"
     >
@@ -93,7 +103,12 @@ const labelClasses = computed(() => ["sbx-label", `sbx-label--${props.sentiment}
             {{ props.text }}
         </span>
     </button>
-    <a v-else-if="props.href" :href="props.href" class="sbx-label-link" :title="props.title">
+    <a
+        v-else-if="props.href"
+        :href="props.href"
+        :class="['sbx-label-link', { 'sbx-label-link--full-width': props.isFullWidth }]"
+        :title="props.title"
+    >
         <span
             :class="labelClasses"
             :title="props.title"
@@ -134,6 +149,7 @@ const labelClasses = computed(() => ["sbx-label", `sbx-label--${props.sentiment}
 <style scoped>
 .sbx-label {
     align-items: center;
+    box-sizing: border-box;
     border-radius: var(--sbx-config-field-corner-radius, 0);
     color: white;
     display: inline-flex;
@@ -152,6 +168,10 @@ const labelClasses = computed(() => ["sbx-label", `sbx-label--${props.sentiment}
     padding: var(--spacing-s) var(--spacing-m);
 }
 
+.sbx-label--full-width {
+    width: 100%;
+}
+
 /* Lean into the span styles instead, so remove the default button styles */
 .sbx-label-button {
     background: none;
@@ -159,6 +179,12 @@ const labelClasses = computed(() => ["sbx-label", `sbx-label--${props.sentiment}
     cursor: pointer;
     font: inherit;
     padding: 0;
+}
+
+.sbx-label-button--full-width,
+.sbx-label-link--full-width {
+    display: inline-flex;
+    width: 100%;
 }
 
 .sbx-label-button:focus {

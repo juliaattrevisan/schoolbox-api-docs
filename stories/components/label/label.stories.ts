@@ -15,6 +15,7 @@ import StorybookSlot from "../../../vue/components/storybook-slot.vue";
  * | `href`      | `string` | The URL to navigate to when the label is clicked                | `""`      |                                          |
  * | `icon`      | `string` | The icon to display in the label                                | `""`      | Any icon name from the icon library      |
  * | `isButton`  | `boolean` | Can be used as a button                                         | `false`   | `true` or `false`                        |
+ * | `isFullWidth` | `boolean` | Whether the label should fill the available width             | `false`   | `true` or `false`                        |
  * | `sentiment` | `string` | The sentiment of the label, which impacts the color of the label | `"neutral"` | `"success"`, `"warning"`, `"alert"`, `"neutral"` |
  * | `size`      | `string` | The size of the label                                           | `"m"`     | `"m"`, `"l"` |
  * | `text`      | `string` | The text to display in the label                                | `""`      | |
@@ -57,6 +58,20 @@ export const LargeSize: Story = {
         components: { StorybookSlot },
         template: `
             <sbx-label text="Large Label" size="l"></sbx-label>
+        `,
+    }),
+};
+
+/**
+ * The label can fill its available width by adding the `is-full-width` property.
+ */
+export const FullWidth: Story = {
+    render: () => ({
+        components: { StorybookSlot },
+        template: `
+            <div style="width: 20rem;">
+                <sbx-label text="Full width label" is-full-width></sbx-label>
+            </div>
         `,
     }),
 };
