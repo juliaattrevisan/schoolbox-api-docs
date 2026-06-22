@@ -277,15 +277,28 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
                             </div>
                             <div class="small-12 medium-4">
                                 <label for="news-topics-selectized">Topics</label>
-                                <div class="selectize-control multi plugin-remove_button">
-                                    <div class="selectize-input items not-full has-options has-items">
-                                        <div class="item" data-value="1">
-                                            General Notices<a class="remove" title="Remove">×</a>
-                                        </div>
-                                        <div class="item" data-value="3">
-                                            Community<a class="remove" title="Remove">×</a>
-                                        </div>
-                                        <input type="text" autofill="no" tabindex="" style="width: 4px" />
+                                <div class="l-flex-row l-gap-s">
+                                    <div class="sbx-tag">
+                                        <button type="button" class="sbx-tag__name-button">General Notices</button>
+                                        <button
+                                            type="button"
+                                            class="sbx-tag__remove-button"
+                                            title="Remove General Notices"
+                                            aria-label="Remove General Notices"
+                                        >
+                                            <sbx-icon name="close"></sbx-icon>
+                                        </button>
+                                    </div>
+                                    <div class="sbx-tag">
+                                        <button type="button" class="sbx-tag__name-button">Community</button>
+                                        <button
+                                            type="button"
+                                            class="sbx-tag__remove-button"
+                                            title="Remove Community"
+                                            aria-label="Remove Community"
+                                        >
+                                            <sbx-icon name="close"></sbx-icon>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
