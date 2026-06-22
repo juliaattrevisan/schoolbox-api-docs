@@ -800,6 +800,11 @@ class Controller extends Base
                         /* Chuck in this student's result, indexed by assessment identifier
                          */
                         $stack[$capabilityId]['indicators'][$indicatorId]['assessmentResults'][$assessmentId]['grid'][$rubricInstanceId]['published'] = $indicatorData['published'];
+
+                        /* If $includeComparison is truthy, also accumulate a five-point-summary for the boxplots in
+                         * the user interface. This requires you to collect everyone's value for an indicator.
+                         * You'll have to iterate over everyone else's indicator value to chuck into the boxplot summary.
+                         */
                     }
                 }
             }
