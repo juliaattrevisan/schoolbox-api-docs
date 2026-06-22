@@ -188,15 +188,13 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('user.userCampus', 'u', 'c')}
             INNER JOIN userCampus sc ON u.id = sc.uid
             INNER JOIN assessment a ON pp.assessment_id = a.id AND a.deleted_at IS NULL
-            LEFT JOIN (
-                SELECT p.assessment_id projectAssessmentId, pa.assessment_id
-                FROM project_assessment pa
-                     INNER JOIN project p ON p.id = pa.project_id AND p.deleted_at IS NULL
-            ) pa ON a.id = pa.assessment_id
-            LEFT JOIN assessment_course_unit_implementation ui ON a.id = ui.assessment_id or pa.projectAssessmentId = ui.assessment_id
-            LEFT JOIN course_unit_implementation cui ON ui.course_unit_implementation_id = cui.id
-            LEFT JOIN course_implementation ci ON cui.course_implementation_id = ci.id
-            LEFT JOIN folder f ON ci.folder_id = f.id
+            LEFT JOIN mv_assessment_relation mvar
+                ON mvar.assessment_id = a.id
+               AND mvar.course_specification_id IS NULL
+               AND mvar.course_unit_specification_id IS NULL
+            LEFT JOIN course_unit_implementation cui ON mvar.course_unit_implementation_id = cui.id
+            LEFT JOIN course_implementation ci ON mvar.course_implementation_id = ci.id
+            LEFT JOIN folder f ON mvar.folder_id = f.id
             LEFT JOIN folder_code fc ON f.id = fc.folder_id AND fc.deleted_at IS NULL
             LEFT JOIN assessment oa ON a.original_assessment_id = oa.id
             LEFT JOIN lu_work_type wt ON a.work_type_id = wt.id
