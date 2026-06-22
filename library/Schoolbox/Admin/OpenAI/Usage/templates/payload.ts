@@ -66,7 +66,6 @@ export type AiSession<TLogFormat extends AiLogFormat = AiLogFormat, TFeature ext
     logFormat: TLogFormat | null;
     createdAt: DateRFC3339;
     createdBy?: UserAuthor;
-    returnCode: number | null; // HTTP return code from OpenAI API
     hasError: boolean;
     /** The highest-priority active moderation status for the session, or null when there is no active concern */
     moderationStatus: AiModerationStatus | null;
