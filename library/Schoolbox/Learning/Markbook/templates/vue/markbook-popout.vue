@@ -710,7 +710,7 @@ function onToggleSelected(): void {
                     v-if="
                         cellInfo.participant &&
                         cellInfo.participant.isExcluded &&
-                        hasActionRoute(routes.includeRoute &&
+                        hasActionRoute(routes.includeRoute) &&
                         routes.getAssessmentParticipationForm === null
                     "
                     :class="{ 'is-disabled': !cellInfo.participant.isExcluded }"
