@@ -10,27 +10,27 @@
     --ck-border-radius: 0px;
 
     /* -- Border colours */
-    --ck-color-toolbar-border: var(--sbx-config-color-accent, var(--form-border-color));
+    --ck-color-toolbar-border: var(--sbx-color-border, var(--form-border-color));
     --ck-color-base-border: var(--sbx-config-color-accent, var(--form-border-color));
 
     /* Button hover colour */
     --ck-color-button-default-hover-background: var(--form-bg-hover-color);
 
     /* Change the colour of the mentions */
-    --ck-color-mention-background: var(--accent-background);
-    --ck-color-mention-text: #222222;
+    --ck-color-mention-background: var(--sbx-config-color-accent, var(--accent-background));
+    --ck-color-mention-text: var(--sbx-color-text-primary, #222222);
 
     /* resolve depth issues */
     --ck-z-modal: var(--sbx-depth-pop-over);
     --ck-z-panel: var(--sbx-depth-pop-over);
 
     /* The colours that are referenced in the overrides below */
-    --sb-ck-active: #cae3fa;
-    --sb-ck-active-grey: #e8e8e8;
-    --sb-ck-active-highlight: #daedff;
-    --sb-ck-button-grid-border: #bbbbbb;
-    --sb-ck-disabled: #dddddd;
-    --sb-ck-icon-colour: rgb(51, 51, 51);
+    --sb-ck-active: var(--sbx-config-color-active, #cae3fa);
+    --sb-ck-active-grey: var(--sbx-config-color-active, #e8e8e8);
+    --sb-ck-active-highlight: var(--sbx-config-color-active, #daedff);
+    --sb-ck-button-grid-border: var(--sbx-color-border, #bbbbbb);
+    --sb-ck-disabled: var(--sbx-color-foreground-secondary, #dddddd);
+    --sb-ck-icon-colour: var(--sbx-color-text-primary, rgb(51, 51, 51));
 
     /* Overrides of default CK colours */
     --ck-color-base-active: var(--sb-ck-active-grey);
@@ -48,16 +48,16 @@
     --ck-color-list-button-on-background-focus: var(--sb-ck-active-grey);
     --ck-color-switch-button-on-background: var(--sb-ck-active);
     --ck-color-switch-button-on-hover-background: var(--sb-ck-active);
+    --ck-color-dropdown-panel-border: var(--sbx-config-color-accent, var(--form-border-color));
+    --ck-color-focus-border: var(--sbx-config-color-accent, var(--form-border-color));
+    --ck-color-focus-outer-shadow: var(--sbx-config-color-accent, var(--form-border-color));
+    --ck-focus-outer-shadow-geometry: 0 0 0 1px;
+    --ck-color-button-action-disabled-background: var(--sbx-color-text-secondary, #525252);
 
     /* Override primary action button to match our submit button colours */
-    --ck-color-button-action-background: var(--content-ui-submit-background);
-    --ck-color-button-action-hover-background: rgba(
-        calc(var(--content-ui-submit-background-r) + (255 - var(--content-ui-submit-background-r)) * 0.2),
-        calc(var(--content-ui-submit-background-g) + (255 - var(--content-ui-submit-background-g)) * 0.2),
-        calc(var(--content-ui-submit-background-b) + (255 - var(--content-ui-submit-background-b)) * 0.2),
-        var(--content-ui-submit-background-a)
-    );
-    --ck-color-button-action-text: var(--content-ui-submit-foreground);
+    --ck-color-button-action-background: var(--sbx-config-color-accent, var(--content-ui-submit-background));
+    --ck-color-button-action-hover-background: var(--sbx-config-color-active, var(--content-ui-submit-background));
+    --ck-color-button-action-text: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground));
 
     /* Make larger to match our checkbox style */
     --ck-todo-list-checkmark-size: 1.5rem;

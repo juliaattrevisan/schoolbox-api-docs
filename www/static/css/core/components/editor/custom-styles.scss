@@ -457,18 +457,6 @@ p.sb-ck-code-block {
 }
 
 /**
- *  Skin config logic for the editor. Why is it out here? Because
- *  we need to use things like css-darken and we can't do that in
- *  a .css file, so some of the rules are here.
-**/
-
-.ck.ck-content.ck-editor__editable.ck-focused,
-.ck.ck-editor__main .ck-source-editing-area textarea:focus {
-    // editor.css is loaded in after our file, so we need to use !important...
-    border: 1px solid css-darken($form-border-color, 15%) !important;
-}
-
-/**
  * Sometimes we put editors in a <label>,
  * to ensure the cursor still behaves correctly, we enforce it here
  */
@@ -483,7 +471,7 @@ p.sb-ck-code-block {
 .ck.ck-ai-form .ck-ai-form-content::after {
     content: "AI sometimes gets things wrong — please check important details.";
     font-style: italic;
-    color: $body-foreground;
+    color: var(--sbx-color-text-secondary, $body-foreground);
 }
 
 /**
