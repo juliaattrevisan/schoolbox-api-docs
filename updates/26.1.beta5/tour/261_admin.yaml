@@ -12,7 +12,7 @@ tour:
         title: What's New
         type: modal
         content: "<img src='{CDN_PREFIX}/images/tour/26.1/26.1_WhatsNewModal_Artwork_1920x1080_SonarUI.png' style='width:100%;margin-bottom:16px;'>
-                  <p>Take a first look at the future of Schoolbox. Sonar UI introduces a cleaner, more accessible experience with updated navigation, components, typography, and visual design.</p>
+                  <p>Take a first look at the future of Schoolbox. Sonar UI introduces a cleaner, more accessible experience with updated navigation, components, typography, and visual design. Over the next six months, admins can preview the new look and prepare their community before enabling it for everyone.</p>
                   <p>Learn more in the <a href='/help/sso/send?returnUrl=/homepage/5680' target='_blank'>Release Notes</a>.</p>"
         class: introjs-whatsnewmodal
     - step:
