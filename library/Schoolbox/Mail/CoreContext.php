@@ -15,7 +15,6 @@ use Schoolbox\IConfigLoader;
 
 class CoreContext
 {
-
     /**
      * Mapping of skin config keys to their corresponding corner radius values, as CSS custom properties cannot be used in email templates,
      */
