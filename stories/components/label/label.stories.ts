@@ -16,6 +16,7 @@ import StorybookSlot from "../../../vue/components/storybook-slot.vue";
  * | `icon`      | `string` | The icon to display in the label                                | `""`      | Any icon name from the icon library      |
  * | `isButton`  | `boolean` | Can be used as a button                                         | `false`   | `true` or `false`                        |
  * | `sentiment` | `string` | The sentiment of the label, which impacts the color of the label | `"neutral"` | `"success"`, `"warning"`, `"alert"`, `"neutral"` |
+ * | `size`      | `string` | The size of the label                                           | `"m"`     | `"m"`, `"l"` |
  * | `text`      | `string` | The text to display in the label                                | `""`      | |
  * | `textColor` | `string` | To have total control of the text color of the label  | `undefined` | Any color allowed in the CSS spec |
  * | `title`     | `string` | The title to display when hovering over the label                | `""`      | |
@@ -44,6 +45,18 @@ export const Default: Story = {
         components: { StorybookSlot },
         template: `
             <sbx-label text="Label"></sbx-label>
+        `,
+    }),
+};
+
+/**
+ * The label can be displayed in a larger size by setting `size` to `l`.
+ */
+export const LargeSize: Story = {
+    render: () => ({
+        components: { StorybookSlot },
+        template: `
+            <sbx-label text="Large Label" size="l"></sbx-label>
         `,
     }),
 };
