@@ -61,9 +61,9 @@ test("shows the colour contrast warning label when Sonar has colour errors", () 
 
     const warningLabel = wrapper.get("sbx-label");
     expect(warningLabel.attributes("size")).toBe("l");
-    expect(warningLabel.attributes("sentiment")).toBe("warning");
+    expect(warningLabel.attributes("sentiment")).toBe("alert");
     expect(warningLabel.attributes("icon")).toBe("alert");
-    expect(warningLabel.attributes("text")).toBe("Colour contrast issues detected. Resolve these before saving.");
+    expect(warningLabel.attributes("text")).toBe("Resolve all colour contrast issues to save the Skin Config.");
 });
 
 test("hides the colour contrast warning label when Sonar colours are readable", () => {

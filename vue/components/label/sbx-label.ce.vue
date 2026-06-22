@@ -100,6 +100,7 @@ const labelClasses = window.Vue.computed(() => [
                 :name="props.icon"
                 class="sbx-label__icon"
                 :color="props.iconColor || undefined"
+                :size="props.size"
             />
             {{ props.text }}
         </span>
@@ -123,6 +124,7 @@ const labelClasses = window.Vue.computed(() => [
                 :name="props.icon"
                 class="sbx-label__icon"
                 :color="props.iconColor || undefined"
+                :size="props.size"
             />
             {{ props.text }}
         </span>
