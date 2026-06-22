@@ -61,7 +61,7 @@ test("reports low contrast errors with the current and target readability ratios
     const { colourErrors, hasColourErrors } = useSkinConfigContrastValidation(configs);
 
     expect(colourErrors.value).toEqual({
-        101: "Must contrast sufficiently against Page background (current: 2.85, target: 4.5).",
+        101: "Insufficient contrast against Page background. Ratio: 2.85 (Minimum: 4.5 required).",
     });
     expect(hasColourErrors.value).toBe(true);
 });
