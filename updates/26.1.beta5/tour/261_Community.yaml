@@ -11,8 +11,8 @@ tour:
     - step:
         title: What's New
         type: modal
-        content: "<img src='{CDN_PREFIX}/images/tour/26.1/26.1_WhatsNewModal_Artwork_1920x1080_SonarUI.png' style='width:100%;margin-bottom:16px;'>
-                  <p><strong>Sonar UI</strong></p>
-                  <p>Take a first look at the future of Schoolbox. Sonar UI introduces a cleaner, more accessible experience with updated navigation, components, typography, and visual design.</p>
+        content: "<img src='{CDN_PREFIX}/images/tour/26.1/26.1_WhatsNewModal_Artwork_1920x1080_ResourceBookingCapacity.png' style='width:100%;margin-bottom:16px;'>
+                  <p><strong>Resource booking capacity</strong></p>
+                  <p>Manage resources that can be booked by multiple people at the same time. Set a capacity for rooms, equipment, and shared resources, then track availability and bookings without creating duplicate resources.</p>
                   <p>Learn more in the <a href='/help/sso/send?returnUrl=/homepage/5680' target='_blank'>Release Notes</a>.</p>"
         class: introjs-whatsnewmodal
