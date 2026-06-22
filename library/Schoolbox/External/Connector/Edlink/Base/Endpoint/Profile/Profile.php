@@ -256,9 +256,14 @@ class Profile implements IStrategy
             ->setFirstnamePreferred($firstnamePreferred)
             ->setLastname($lastname);
 
-        /* Download photo if available and photo import is enabled
+        /* Download photo if available, photo import is enabled, and the photo has
+         * changed since we last stored it (gated on the person's updated_date)
          */
-        if ($this->includePhoto && !empty($person['picture_url'])) {
+        if (
+            $this->includePhoto
+            && !empty($person['picture_url'])
+            && $this->shouldDownloadPhoto($studentBaseProfile, $person)
+        ) {
             $this->downloadPhoto($studentBaseProfile, $person['picture_url']);
         }
 
@@ -367,9 +372,14 @@ class Profile implements IStrategy
             ->setFirstnamePreferred($firstnamePreferred)
             ->setLastname($lastname);
 
-        /* Download photo if available and photo import is enabled
+        /* Download photo if available, photo import is enabled, and the photo has
+         * changed since we last stored it (gated on the person's updated_date)
          */
-        if ($this->includePhoto && !empty($person['picture_url'])) {
+        if (
+            $this->includePhoto
+            && !empty($person['picture_url'])
+            && $this->shouldDownloadPhoto($staffBaseProfile, $person)
+        ) {
             $this->downloadPhoto($staffBaseProfile, $person['picture_url']);
         }
 
@@ -633,6 +643,33 @@ class Profile implements IStrategy
     /**
      * Download a photo from an Edlink-signed URL and attach it to the base profile.
      */
+    /**
+     * Decide whether to (re)download a person's photo this sync.
+     *
+     * Edlink has no photo-specific modified date, so we gate on the person-level
+     * updated_date: skip the download when the stored portrait is at least as new
+     * as the source record. Degrades to always-download when either timestamp is
+     * unavailable.
+     *
+     * @param array<string,mixed> $person
+     */
+    private function shouldDownloadPhoto(UserProfile\Model $baseProfile, array $person): bool
+    {
+        $storedAt = $baseProfile->getPortrait()?->getCreatedAt();
+        $sourceUpdatedAt = $this->parseEdlinkDate(trim((string)($person['updated_date'] ?? '')));
+
+        $needsDownload = PhotoFreshness::needsDownload($storedAt, $sourceUpdatedAt);
+
+        if (!$needsDownload) {
+            $this->log->debug(sprintf(
+                'Skipping unchanged Edlink photo for %s',
+                $baseProfile->getExternalId()
+            ));
+        }
+
+        return $needsDownload;
+    }
+
     private function downloadPhoto(UserProfile\Model $baseProfile, string $url): void
     {
         try {
