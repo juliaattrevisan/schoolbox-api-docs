@@ -51,7 +51,7 @@ defineEmits<{
                     :disabled="isLoading"
                     @click="$emit('confirm')"
                 >
-                    Reset All Details
+                    Reset all details
                 </button>
             </div>
         </div>

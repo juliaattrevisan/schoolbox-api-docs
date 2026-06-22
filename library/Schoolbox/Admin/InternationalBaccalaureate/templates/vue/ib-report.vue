@@ -451,7 +451,7 @@ window.Vue.onMounted((): void => {
             <li>
                 <a :href="props.candidateNumberUpdateRoute" class="sbx-button--has-icon">
                     <sbx-icon name="modify"></sbx-icon>
-                    Update Candidate Numbers
+                    Update candidate numbers
                 </a>
             </li>
         </ul>

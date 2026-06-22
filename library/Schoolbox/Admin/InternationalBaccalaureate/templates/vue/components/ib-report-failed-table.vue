@@ -88,7 +88,7 @@ function openModal(student: FailedRow): void {
                         <li v-if="student.updateLanguageEndpoint !== null">
                             <button class="sbx-button--has-icon" @click.prevent="openModal(student)">
                                 <sbx-icon name="modify"></sbx-icon>
-                                Update Language Selection
+                                Update language selection
                             </button>
                         </li>
                         <li>
@@ -97,7 +97,7 @@ function openModal(student: FailedRow): void {
                                 @click.prevent="emit('resetDetailsSingle', student.id)"
                             >
                                 <sbx-icon name="undo"></sbx-icon>
-                                Reset All Details
+                                Reset all details
                             </button>
                         </li>
                         <li>

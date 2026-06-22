@@ -14,7 +14,7 @@ const updateLanguageStore = useIbReportUpdateLanguageStore();
             class="l-flex-col l-gap-m f-no-margins"
             @submit.prevent="updateLanguageStore.save"
         >
-            <h2>Update Language Selection</h2>
+            <h2>Update language selection</h2>
             <p class="f-no-margins">Manually assigning languages for: {{ updateLanguageStore.activeStudent.name }}</p>
 
             <div class="sbx-vert-scroll-container l-flex-col l-gap-s">
