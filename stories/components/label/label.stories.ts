@@ -69,9 +69,7 @@ export const FullWidth: Story = {
     render: () => ({
         components: { StorybookSlot },
         template: `
-            <div style="width: 20rem;">
-                <sbx-label text="Full width label" is-full-width></sbx-label>
-            </div>
+            <sbx-label text="Full width label" is-full-width></sbx-label>
         `,
     }),
 };
