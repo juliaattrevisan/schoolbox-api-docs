@@ -13,6 +13,7 @@ import type {
 } from "../../js/types/skinConfigTypes";
 
 const INVALID_COLOUR_ERROR = "Enter a valid colour.";
+const MINIMUM_READABILITY_RATIO = 4.5;
 type ContrastTarget = {
     label: string;
     value: string | null;
@@ -21,10 +22,11 @@ type ContrastTarget = {
 /**
  * Build the low contrast validation message for a colour option.
  * @param contrastTarget The option or design token that the edited colour must contrast against.
+ * @param readabilityRatio The current contrast ratio between the edited colour and its contrast target.
  * @returns The user-facing validation message.
  */
-function getLowContrastError(contrastTarget: ContrastTarget): string {
-    return `Must contrast sufficiently against ${contrastTarget.label}`;
+function getLowContrastError(contrastTarget: ContrastTarget, readabilityRatio: number): string {
+    return `Insufficient contrast against ${contrastTarget.label}. Ratio: ${readabilityRatio.toFixed(2)} (Minimum: ${MINIMUM_READABILITY_RATIO} required).`;
 }
 
 /**
@@ -124,8 +126,9 @@ export function useSkinConfigContrastValidation(configs: Ref<SkinConfigData>): {
                 return;
             }
 
-            if (!tinycolor.isReadable(option.value, contrastTarget.value, { level: "AA", size: "small" })) {
-                errors[option.id] = getLowContrastError(contrastTarget);
+            const readabilityRatio = tinycolor.readability(option.value, contrastTarget.value);
+            if (readabilityRatio < MINIMUM_READABILITY_RATIO) {
+                errors[option.id] = getLowContrastError(contrastTarget, readabilityRatio);
             }
         });
 
