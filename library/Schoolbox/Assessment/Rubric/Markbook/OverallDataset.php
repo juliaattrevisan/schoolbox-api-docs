@@ -13,41 +13,35 @@ namespace Schoolbox\Assessment\Rubric\Markbook;
 use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
-use Alaress\Web\Controller\Base;
 use Aura\Router;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
-use DomainException;
 use InvalidArgumentException;
-use LogicException;
 use PDOException;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Column\Decimal;
 use Schoolbox\Column\Integer;
 use Schoolbox\Filter;
-use Schoolbox\Filter\Codec;
 use Schoolbox\Filter\Filters\Assessment\RubricUsage;
-use Schoolbox\L10n\RosettaStone as Translator;
 use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Learning\MarkScheme\Factory;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Mapper;
-use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Model;
-use Twig\Error\Error;
 use UnderflowException;
 use UnexpectedValueException;
 
-class Dataset
+class OverallDataset
 {
     /**
      * @param IConnector $internalDb
      * @param Decimal $decimalHydrator Used to calculate human-readable and normalised marks for each student for capabilities and indicators
      * @param TotalMarkFractional $totalMarkScheme Used to calculate human-readable and normalised marks for each student for capabilities and indicators
+     * @param Factory $markSchemeFactory
      * @param Filter\Mapper $filterMapper
      * @param UserAccessMapper $userAccessMapper
      * @param Generator $routeGenerator

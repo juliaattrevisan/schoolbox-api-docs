@@ -113,7 +113,7 @@ class Controller extends Base
             $exclusions,
             $studentMarks,
             $overallMarks
-        ] = (new Dataset(
+        ] = (new OverallDataset(
             $this->internalDb,
             new Decimal(),
             new MarkScheme\TotalMarkFractional(),
@@ -176,7 +176,7 @@ class Controller extends Base
             $exclusions,
             $studentMarks,
             $overallMarks
-        ] = (new Dataset(
+        ] = (new OverallDataset(
             $this->internalDb,
             new Decimal(),
             new MarkScheme\TotalMarkFractional(),
