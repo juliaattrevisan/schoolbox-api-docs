@@ -3,7 +3,7 @@
  * and add the insertResource command to the editor
  */
 
-import { Plugin, type ResizeImageCommand, type Element, type ViewElement } from "ckeditor5";
+import { Plugin, type ResizeImageCommand, type ModelElement, type ViewElement } from "ckeditor5";
 import { ResourceType, getExtraAttributes } from "@js/resource/resourceUtils";
 import InsertResourceCommand from "./InsertResourceCommand";
 import { LIGHTBOX_LINK_ATTRIBUTE } from "./lightboxLinkUtils";
@@ -58,7 +58,6 @@ export default class ResourceEditing extends Plugin {
                     key: attribute,
                 },
                 model: {
-                    name: "imageInline",
                     key: attribute,
                     value: undefined,
                 },
@@ -71,7 +70,7 @@ export default class ResourceEditing extends Plugin {
                 name: "imageInline",
                 key: LIGHTBOX_LINK_ATTRIBUTE,
             },
-            view: (rel, { writer }, { item }: { item: Element }) => {
+            view: (rel, { writer }, { item }: { item: ModelElement }) => {
                 if (rel === null || rel === undefined || !item.hasAttribute("linkHref")) {
                     return null;
                 }
@@ -110,7 +109,7 @@ export default class ResourceEditing extends Plugin {
         const imageUtils = editor.plugins.get("ImageUtils");
         const resizeImageCommand = editor.commands.get("resizeImage") as ResizeImageCommand;
         resizeImageCommand.on("execute", (eventInfo) => {
-            const imageElement = imageUtils.getClosestSelectedImageElement(model.document.selection) as Element;
+            const imageElement = imageUtils.getClosestSelectedImageElement(model.document.selection) as ModelElement;
             if (
                 imageElement.hasAttribute("data-schoolboxresource-type") &&
                 imageElement.getAttribute("data-schoolboxresource-type") === ResourceType.VIDEO

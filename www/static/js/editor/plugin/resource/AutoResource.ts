@@ -5,14 +5,14 @@
  */
 
 import {
-    type Element,
+    type ModelElement,
     Plugin,
     createImageTypeRegExp,
     type ImageUploadCompleteEvent,
     type FileLoader,
     type FileRepository,
     type ViewDocumentClipboardInputEvent,
-    type DataTransfer,
+    type ViewDataTransfer,
 } from "ckeditor5";
 import { slideUp } from "@js/util/animateUtils";
 import type { Resource } from "@js/resource/resourceUtils";
@@ -27,7 +27,7 @@ import { getLightboxRel, LIGHTBOX_LINK_ATTRIBUTE } from "./lightboxLinkUtils";
  * @param dataTransfer - the data transfer object
  * @returns - whether the data transfer object includes text/html
  */
-function isHtmlIncluded(dataTransfer: DataTransfer): boolean {
+function isHtmlIncluded(dataTransfer: ViewDataTransfer): boolean {
     return Array.from(dataTransfer.types).includes("text/html") && dataTransfer.getData("text/html") !== "";
 }
 
@@ -38,7 +38,7 @@ function isHtmlIncluded(dataTransfer: DataTransfer): boolean {
  * @param imageElement - the uploaded image element
  * @returns whether the selection is still on the uploaded image
  */
-function isSelectionStillAtUploadedImage(editor: Plugin["editor"], imageElement: Element): boolean {
+function isSelectionStillAtUploadedImage(editor: Plugin["editor"], imageElement: ModelElement): boolean {
     const { selection } = editor.model.document;
     const positionAfterImage = editor.model.createPositionAfter(imageElement);
 
