@@ -741,6 +741,7 @@ class OverallDataset
                             'normalisedMark' => $normalisedMark,
                             'humanReadableMark' => $humanReadableMark,
                             'selectedDescriptorText' => $row['descriptor_name'],
+                            'selectedDescriptorValue' => $row['indicator_mark'],
                         ],
                         /* Normalised and human-readable marks from the most recent feedback: these would typically be draft
                          * marks, but could end up being the same as the Published ones by sheer coincidence.
@@ -749,6 +750,7 @@ class OverallDataset
                             'normalisedMark' => null,
                             'humanReadableMark' => null,
                             'selectedDescriptorText' => null,
+                            'selectedDescriptorValue' => null,
                         ],
                     ];
                 }
@@ -990,6 +992,7 @@ class OverallDataset
                         'normalisedMark' => null,
                         'humanReadableMark' => null,
                         'selectedDescriptorText' => null,
+                        'selectedDescriptorValue' => null,
                     ],
                     /* Normalised and human-readable marks from the most recent feedback: these would typically be draft
                      * marks, but could end up being the same as the Published ones by sheer coincidence.
@@ -998,6 +1001,7 @@ class OverallDataset
                         'normalisedMark' => null,
                         'humanReadableMark' => null,
                         'selectedDescriptorText' => null,
+                        'selectedDescriptorValue' => null,
                     ],
                     'indicators' => []
                 ];
@@ -1045,6 +1049,7 @@ class OverallDataset
                             'normalisedMark' => null,
                             'humanReadableMark' => null,
                             'selectedDescriptorText' => null,
+                            'selectedDescriptorValue' => null,
                         ],
                         /* Normalised and human-readable marks from the most recent feedback: these would typically be draft
                          * marks, but could end up being the same as the Published ones by sheer coincidence.
@@ -1053,6 +1058,7 @@ class OverallDataset
                             'normalisedMark' => null,
                             'humanReadableMark' => null,
                             'selectedDescriptorText' => null,
+                            'selectedDescriptorValue' => null,
                         ],
                     ];
                 }
@@ -1068,7 +1074,8 @@ class OverallDataset
                 $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['draft'] = [
                     'normalisedMark' => $normalisedMark,
                     'humanReadableMark' => $humanReadableMark,
-                    'selectedDescriptorText' => $row['descriptor_name']
+                    'selectedDescriptorText' => $row['descriptor_name'],
+                    'selectedDescriptorValue' => $row['indicator_mark'],
                 ];
             }
         }

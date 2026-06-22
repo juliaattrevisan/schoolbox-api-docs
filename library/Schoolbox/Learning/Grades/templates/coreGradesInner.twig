@@ -46,7 +46,7 @@
                 {% else %}
                     <div class="content {% if key == selectedTab %}active{% endif %}" id="{{ key }}">
                         {# TODO only works for Capability Marks panel for now #}
-                        {% if key == 'capabilities' %}
+                        {% if key == 'capabilities' or key == 'descriptors' %}
                             {% include '@learningGrades/fragments/'~ key ~'.twig' with {
                                 longitudinalAssessments: longitudinalAssessments,
                                 longitudinalStudentMarks: longitudinalStudentMarks,
