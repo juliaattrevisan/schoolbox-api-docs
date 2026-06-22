@@ -53,7 +53,8 @@ export type AiSessionLog = {
     id: number;
     sessionId: AiSessionId;
     createdAt: DateRFC3339;
-    createdBy?: UserAuthor;
+    /** createdBy may be null if the log entry was system-generated */
+    createdBy: UserAuthor | null;
 } & (
     | { [K in AiLogFormat]: { logFormat: K; data: AiLogFormatDataMap[K] } }[AiLogFormat]
     | { logFormat: null; data: null }
@@ -65,7 +66,8 @@ export type AiSession<TLogFormat extends AiLogFormat = AiLogFormat, TFeature ext
     feature: TFeature;
     logFormat: TLogFormat | null;
     createdAt: DateRFC3339;
-    createdBy?: UserAuthor;
+    /** createdBy may be null if the log entry was system-generated */
+    createdBy: UserAuthor | null;
     hasError: boolean;
     /** The highest-priority active moderation status for the session, or null when there is no active concern */
     moderationStatus: AiModerationStatus | null;
