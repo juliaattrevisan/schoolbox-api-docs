@@ -7,57 +7,69 @@
     {% set msg = row.messages|first %}
 
     <table cellpadding="0" cellspacing="0" border="0" align="center" width="100%">
-    <tr>
-        <td width="670" colspan="2" class="fullwidth">
-            <h1>Hi {{ recipient }},</h1>
-        </td>
-    </tr>
-    <tr class="island">
-        {% if msg.icon %}
-        <td width="64" valign="top">
-            <table>
-                <tr>
-                    <td><img src="{{ msg.icon }}" width="64" /></td>
-                </tr>
-            </table>
-        </td>
-        {% endif %}
-        <td valign="middle">
-            <table>
-                <tr>
-                    {# raw HTML NOT sanctioned - this should never be HTML, so it shouldn't be necessary #}
-                    <td>{{ msg.title | raw }}</td>
-                </tr>
-                {% if msg.meta %}
-                <tr>
-                    <td>
-                        <p>
-                            {# raw HTML NOT sanctioned - this should never be HTML, so it shouldn't be necessary #}
-                            <em>{{ (msg.meta.byline ?? '') | raw }}</em>
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        {% if msg.meta.blurb is defined and (msg.meta.blurb | length > 0) %}
-                            {{ msg.meta.blurb | purifyAbsoluteUri('https://'~config.fqdn) }}
-                        {% elseif msg.meta.body is defined %}
-                            <p>{{ msg.meta.body | cutSentence(300, true) }}</p>
-                        {% endif %}
+        <tr>
+            <td width="670" colspan="2" class="fullwidth">
+                <h1>Hi {{ recipient }},</h1>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <table width="670" class="fullwidth">
+                    <tr>
+                        <td>
+                            <table width="670" class="fullwidth">
+                                <tr class="island">
+                                    {% if msg.icon %}
+                                    <td width="50" valign="top">
+                                        <table>
+                                            <tr>
+                                                <td><img src="{{ msg.icon }}" width="50" /></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    {% endif %}
+                                    <td valign="middle">
+                                        <table>
+                                            <tr>
+                                                {# raw HTML NOT sanctioned - this should never be HTML, so it shouldn't be necessary #}
+                                                <td>{{ msg.title | raw }}</td>
+                                            </tr>
+                                            {% if msg.meta %}
+                                            <tr>
+                                                <td>
+                                                    <p>
+                                                        {# raw HTML NOT sanctioned - this should never be HTML, so it shouldn't be necessary #}
+                                                        <em>{{ (msg.meta.byline ?? '') | raw }}</em>
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    {% if msg.meta.blurb is defined and (msg.meta.blurb | length > 0) %}
+                                                        {{ msg.meta.blurb | purifyAbsoluteUri('https://'~config.fqdn) }}
+                                                    {% elseif msg.meta.body is defined %}
+                                                        <p>{{ msg.meta.body | cutSentence(300, true) }}</p>
+                                                    {% endif %}
 
-                        {% if msg.meta.readMore is defined and msg.meta.readMore.available %}
-                            <a href="{{ msg.href }}" class="more">{{ msg.meta.readMore.string }}</a>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endif %}
-            </table>
-        </td>
-    </tr>
-    <tr class="island padding">
-        <td width="670" colspan="2" class="fullwidth">
-          <a class="cta" href="{{ msg.href }}">View in {{ config.title }}</a>
-        </td>
-    </tr>
-</table>
+                                                    {% if msg.meta.readMore is defined and msg.meta.readMore.available %}
+                                                        <a href="{{ msg.href }}" class="more">{{ msg.meta.readMore.string }}</a>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endif %}
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr class="island padding">
+                                    <td width="670" colspan="{{ msg.icon ? 2 : 1 }}" class="fullwidth">
+                                    <a class="cta" href="{{ msg.href }}">View in {{ config.title }}</a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 {% endblock %}
