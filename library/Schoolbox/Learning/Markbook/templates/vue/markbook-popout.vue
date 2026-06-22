@@ -290,7 +290,7 @@ async function getActivity(): Promise<void> {
     mbStore.isPopoutLoading = true;
 
     try {
-        if (timelineRoute === null || infoRoute === null) {
+        if (hasActionRoute(timelineRoute)|| hasActionRoute(infoRoute)) {
             throw new Error("Unable to find timelineRoute/infoRoute for retrieving activity items");
         }
 
