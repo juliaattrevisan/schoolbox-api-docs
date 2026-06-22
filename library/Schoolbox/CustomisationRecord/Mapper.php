@@ -241,6 +241,67 @@ class Mapper extends BaseMapper
         ?array $order = null,
         ?int $limit = null
     ): GenericCollection {
+        $pb = $this->buildFiltersPredicate(
+            $nameSearch,
+            $yearLevelIds,
+            $campusIds,
+            $adjustmentCategories,
+            $adjustmentLevels,
+            $termIds,
+            $workTypeIds,
+            $cursorParams,
+            $order
+        );
+
+        $option = [];
+
+        if (null !== $limit) {
+            $option['limit'] = $limit;
+        }
+
+        if (!empty($order)) {
+            $option['order'] = $order;
+        }
+
+        return $this->findByPredicates(
+            $pb,
+            $option,
+        );
+    }
+
+    public function countByFilters(
+        ?array $nameSearch,
+        ?array $yearLevelIds,
+        ?array $campusIds,
+        ?array $adjustmentCategories,
+        ?array $adjustmentLevels,
+        ?array $termIds,
+        ?array $workTypeIds = null,
+    ): int {
+        return $this->countByPredicates(
+            $this->buildFiltersPredicate(
+                $nameSearch,
+                $yearLevelIds,
+                $campusIds,
+                $adjustmentCategories,
+                $adjustmentLevels,
+                $termIds,
+                $workTypeIds,
+            )
+        );
+    }
+
+    private function buildFiltersPredicate(
+        ?array $nameSearch,
+        ?array $yearLevelIds,
+        ?array $campusIds,
+        ?array $adjustmentCategories,
+        ?array $adjustmentLevels,
+        ?array $termIds,
+        ?array $workTypeIds = null,
+        ?array $cursorParams = null,
+        ?array $order = null
+    ): Builder {
         $pb = $this->getPredicateBuilder();
         if (!empty($nameSearch)) {
             $pb = $this->buildNameSearchPredicate($pb, $nameSearch);
@@ -286,20 +347,7 @@ class Mapper extends BaseMapper
             );
         }
 
-        $option = [];
-
-        if (null !== $limit) {
-            $option['limit'] = $limit;
-        }
-
-        if (!empty($order)) {
-            $option['order'] = $order;
-        }
-
-        return $this->findByPredicates(
-            $pb,
-            $option,
-        );
+        return $pb;
     }
 
     /**
