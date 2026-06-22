@@ -40,7 +40,10 @@
                 {% for activityId, activity in longitudinalAssessments %}
                     {% for rubricInstanceId, rubricInstanceData in activity.gridData %}
                         <td>
-                            {% if capabilityData.assessmentResults is defined and capabilityData.assessmentResults[activityId] is defined %}
+                            {# If mark-per-capability is enabled, show values; having Capability Mark Type set to None
+                             # basically means capabilities don't have marks, and thus, end up showing nothing here
+                             #}
+                            {% if rubricInstanceData.isMarkPerCapability %}
                                 {{ capabilityData.assessmentResults[activityId].grid[rubricInstanceId].published.humanReadableMark ?? null }}
                             {% else %}
                                 &nbsp;
