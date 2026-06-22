@@ -219,7 +219,7 @@ window.Vue.onMounted(() => {
                 size="l"
                 sentiment="alert"
                 icon="alert"
-                text="Colour contrast issues must be addressed before saving."
+                text="Resolve all colour contrast issues to save the Skin Config."
                 is-full-width
             />
             <div class="l-flex l-flex--justify l-gap-xs">
