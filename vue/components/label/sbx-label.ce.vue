@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { computed } from "vue";
-
 /**
  * To display a label
  */
@@ -70,7 +68,10 @@ const emit = defineEmits<{
     select: [{ href: string | undefined; title: string | undefined }];
 }>();
 
-const labelClasses = computed(() => [
+/**
+ * Compute the classes to apply to the label based on the props
+ */
+const labelClasses = window.Vue.computed(() => [
     "sbx-label",
     `sbx-label--${props.sentiment}`,
     `sbx-label--${props.size}`,
