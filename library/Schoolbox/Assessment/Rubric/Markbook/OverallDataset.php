@@ -553,7 +553,8 @@ class OverallDataset
                     vrm.indicator_id                               AS indicator_id,
                     vrm.indicator_name                             AS indicator_name,
                     vrm.indicator_mark                             AS indicator_mark,
-                    vrm.indicator_max_value                        AS indicator_max_value
+                    vrm.indicator_max_value                        AS indicator_max_value,
+                    rl.name                                        AS level_name
                 FROM (
                     SELECT
                         sb.assessment_id,
@@ -573,6 +574,8 @@ class OverallDataset
                     vrm.student_id    = latest_published_feedback.owner
                 INNER JOIN rubric_instance ON vrm.rubric_instance_id = rubric_instance.id
                 INNER JOIN user u ON vrm.student_id = u.id
+                LEFT JOIN rubric_descriptor rd ON vrm.descriptor_id = rd.id AND rd.rubric_indicator_id = vrm.indicator_id
+                LEFT JOIN rubric_level rl ON rd.level_id = rl.id
                 WHERE {$outerWhere}
                 AND rubric_instance.deleted_at IS NULL
                 ORDER BY vrm.student_id, vrm.assessment_id, vrm.capability_id, vrm.indicator_id
@@ -740,6 +743,7 @@ class OverallDataset
                         'published' => [
                             'normalisedMark' => $normalisedMark,
                             'humanReadableMark' => $humanReadableMark,
+                            'selectedLevel' => $row['level_name'],
                             'selectedDescriptorText' => $row['descriptor_name'],
                             'selectedDescriptorValue' => $row['indicator_mark'],
                         ],
@@ -749,6 +753,7 @@ class OverallDataset
                         'draft' => [
                             'normalisedMark' => null,
                             'humanReadableMark' => null,
+                            'selectedLevel' => null,
                             'selectedDescriptorText' => null,
                             'selectedDescriptorValue' => null,
                         ],
@@ -846,6 +851,7 @@ class OverallDataset
                     vrm.indicator_name                             AS indicator_name,
                     vrm.indicator_mark                             AS indicator_mark,
                     vrm.indicator_max_value                        AS indicator_max_value,
+                    rl.name                                        AS level_name,
                     vrm.feedback_date                              AS feedback_date
                 FROM (
                     SELECT
@@ -866,6 +872,8 @@ class OverallDataset
                     vrm.feedback_date IS NULL
                 INNER JOIN rubric_instance ON vrm.rubric_instance_id = rubric_instance.id
                 INNER JOIN user u ON vrm.student_id = u.id
+                LEFT JOIN rubric_descriptor rd ON vrm.descriptor_id = rd.id AND rd.rubric_indicator_id = vrm.indicator_id
+                LEFT JOIN rubric_level rl ON rd.level_id = rl.id
                 WHERE {$outerWhere}
                 AND rubric_instance.deleted_at IS NULL
                 ORDER BY vrm.student_id, vrm.assessment_id, vrm.capability_id, vrm.indicator_id
@@ -991,6 +999,7 @@ class OverallDataset
                     'published' => [
                         'normalisedMark' => null,
                         'humanReadableMark' => null,
+                        'selectedLevel' => null,
                         'selectedDescriptorText' => null,
                         'selectedDescriptorValue' => null,
                     ],
@@ -1000,6 +1009,7 @@ class OverallDataset
                     'draft' => [
                         'normalisedMark' => null,
                         'humanReadableMark' => null,
+                        'selectedLevel' => null,
                         'selectedDescriptorText' => null,
                         'selectedDescriptorValue' => null,
                     ],
@@ -1048,6 +1058,7 @@ class OverallDataset
                         'published' => [
                             'normalisedMark' => null,
                             'humanReadableMark' => null,
+                            'selectedLevel' => null,
                             'selectedDescriptorText' => null,
                             'selectedDescriptorValue' => null,
                         ],
@@ -1057,6 +1068,7 @@ class OverallDataset
                         'draft' => [
                             'normalisedMark' => null,
                             'humanReadableMark' => null,
+                            'selectedLevel' => null,
                             'selectedDescriptorText' => null,
                             'selectedDescriptorValue' => null,
                         ],
@@ -1074,6 +1086,7 @@ class OverallDataset
                 $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['draft'] = [
                     'normalisedMark' => $normalisedMark,
                     'humanReadableMark' => $humanReadableMark,
+                    'selectedLevel' => $row['level_name'],
                     'selectedDescriptorText' => $row['descriptor_name'],
                     'selectedDescriptorValue' => $row['indicator_mark'],
                 ];

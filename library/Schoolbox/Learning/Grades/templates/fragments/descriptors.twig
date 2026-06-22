@@ -52,22 +52,30 @@
                         {% for activityId, activity in longitudinalAssessments %}
                             {% for rubricInstanceId, rubricInstanceData in activity.gridData %}
                                 <td>
-                                    <div>
-                                        <span class="rb-description markdown">
-                                            {{ (indicatorData.assessmentResults[activityId].grid[rubricInstanceId].published.selectedDescriptorText ?? '') | markdown }}
+                                    {# Shortcuts to marks of various types #}
+                                    {% set publishedMarks = indicatorData.assessmentResults[activityId].grid[rubricInstanceId].published ?? null %}
 
-{#                                            {% if activity %}<b>{{ activity.level ?? '' }}</b><br />{% endif %}#}
-{#                                            {{ (activity.descriptor ?? '') | markdown }}#}
+                                    {% if publishedMarks is not null %}
+                                        <div>
+                                            <span class="rb-description markdown">
+                                                {# If there's a meaningful level name, show that too #}
+                                                {% if publishedMarks.selectedLevel ?? null %}
+                                                    <strong>{{ publishedMarks.selectedLevel }}</strong><br />
+                                                {% endif %}
 
-                                            {% set numerator = indicatorData.assessmentResults[activityId].grid[rubricInstanceId].published.selectedDescriptorValue ?? null %}
-                                            {% set denominator = activity.gridData[rubricInstanceId].capabilities[capabilityId].indicators[indicatorId].max ?? null %}
+                                                {# Show the selected descriptor's text #}
+                                                {{ (publishedMarks.selectedDescriptorText ?? '') | markdown }}
 
-                                            <pre>{{ dump(activity) }}</pre>
-                                            {% if numerator and denominator and showRubricPoints %}
-                                                ({{ numerator|round }}/{{ denominator|round }})
-                                            {% endif %}
-                                        </span>
-                                    </div>
+                                                {# Calculate a fractional points score, if possible #}
+                                                {% set numerator = publishedMarks.selectedDescriptorValue ?? null %}
+                                                {% set denominator = activity.gridData[rubricInstanceId].capabilities[capabilityId].indicators[indicatorId].max ?? null %}
+
+                                                {% if numerator and denominator and showRubricPoints %}
+                                                    ({{ numerator|round }}/{{ denominator|round }})
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                    {% endif %}
                                 </td>
                             {% endfor %}
                         {% endfor %}
