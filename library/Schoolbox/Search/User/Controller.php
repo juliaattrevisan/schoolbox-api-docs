@@ -590,10 +590,10 @@ class Controller extends BaseController
             'registration' => $registrationPayload !== null && $this->getRouteIfAuthorized(
                 'internationalBaccalaureate.updateRegistrationSessionStudentConfirmation',
                 [
-                    'sessionId' => $registrationSessionStudent->getRegistrationSession()?->getId(),
-                    'studentId' => $student->getId(),
+                    'registrationSession' => $registrationSessionStudent->getRegistrationSession(),
+                    'studentId'           => $student->getId(),
                 ]
-            ) !== null,
+            ),
         ];
 
         /* Decide whether the Contacts tab should show for the viewer:
