@@ -481,6 +481,7 @@ class Module extends BaseModule
         // exclude user from assessment
         $this->register('POST', "$assRoute/$studentParam/exclude", 'postExclude', $canModifyCustomParticipation, $preloadParticipant);
 
+        // markbook popout
         $this->register('GET', "$assRoute/$studentParam/info", 'getInfo', $canViewStatus, $preloadParticipant);
 
         // Due work: Teacher interactive worksheet view
