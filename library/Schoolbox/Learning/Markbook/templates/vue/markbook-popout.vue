@@ -258,10 +258,16 @@ const hasVisibleMenuItems = window.Vue.computed(() => {
         [ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ, ACTIVITY_TYPE_REPORTING].includes(activity.assessmentType);
 
     const hasIncludeMenuItem =
-        participant && participant.isExcluded && routes.value.getAssessmentParticipationForm === null;
+        participant &&
+        participant.isExcluded &&
+        routes.value.includeRoute !== false &&
+        routes.value.getAssessmentParticipationForm === null;
 
     const hasExcludeMenuItem =
-        participant && !participant.isExcluded && activity.assessmentType !== ACTIVITY_TYPE_PROJECT;
+        participant &&
+        !participant.isExcluded &&
+        routes.value.excludeRoute !== false &&
+        activity.assessmentType !== ACTIVITY_TYPE_PROJECT;
 
     const hasHistoryMenuItem = participant && !participant.isExcluded;
 
@@ -704,6 +710,7 @@ function onToggleSelected(): void {
                     v-if="
                         cellInfo.participant &&
                         cellInfo.participant.isExcluded &&
+                        routes.includeRoute !== false &&
                         routes.getAssessmentParticipationForm === null
                     "
                     :class="{ 'is-disabled': !cellInfo.participant.isExcluded }"
@@ -715,6 +722,7 @@ function onToggleSelected(): void {
                     v-if="
                         cellInfo.participant &&
                         !cellInfo.participant.isExcluded &&
+                        routes.excludeRoute !== false &&
                         cellInfo.activity.assessmentType !== ACTIVITY_TYPE_PROJECT
                     "
                     :class="{ 'is-disabled': !routes.excludeRoute && !cellInfo.participant.isExcluded }"
