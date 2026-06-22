@@ -1617,13 +1617,13 @@ class DataSource
      *
      * @return array $longitude
      */
-    public function getLongitudinal(GenericCollection $dueWorks, User $student, bool $includeComparison): array
-    {
-        /* DEPRECATED
-         * TODO remove once you get the boxplot going
-         */
-        return [];
-
+//    public function getLongitudinal(GenericCollection $dueWorks, User $student, bool $includeComparison): array
+//    {
+//        /* DEPRECATED
+//         * TODO remove once you get the boxplot going
+//         */
+//        return [];
+//
 //        if (0 === $dueWorks->count()) {
 //            return [];
 //        }
@@ -1812,7 +1812,7 @@ class DataSource
 //        }
 //
 //        return $longitude;
-    }
+//    }
 
 
     /**
@@ -2364,72 +2364,72 @@ class DataSource
     }
 
 
-    /**
-     * Gets feedback ids for the due works which uses rubric
-     * @param GenericCollection $dueWorks
-     * @param User              $student
-     * @param bool              $includeComparison
-     * @return array
-     */
-    private function getFeedbackIdsWithRubric(GenericCollection $dueWorks, User $student, bool $includeComparison): array
-    {
-        $pb = new Builder($this->database->getQuoter(), '');
-        $pb->in('a.id', $dueWorks->getPropertyValues('id'))
-           ->isNull('a.deleted_at')
-           ->isTrue('sb.use_rubric')
-           ->equals('sr.review_route', SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
-           ->notNull('sr.published_at')
-           ->isNull('sr.deleted_at');
+//    /**
+//     * Gets feedback ids for the due works which uses rubric
+//     * @param GenericCollection $dueWorks
+//     * @param User              $student
+//     * @param bool              $includeComparison
+//     * @return array
+//     */
+//    private function getFeedbackIdsWithRubric(GenericCollection $dueWorks, User $student, bool $includeComparison): array
+//    {
+//        $pb = new Builder($this->database->getQuoter(), '');
+//        $pb->in('a.id', $dueWorks->getPropertyValues('id'))
+//           ->isNull('a.deleted_at')
+//           ->isTrue('sb.use_rubric')
+//           ->equals('sr.review_route', SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+//           ->notNull('sr.published_at')
+//           ->isNull('sr.deleted_at');
+//
+//        if (!$includeComparison) {
+//            $pb->equals('sr.owner', $student->getId());
+//        }
+//
+//        $where = implode(' AND ', $pb->getWhere());
+//
+//        /* TODO tis submission_return idea must go away here
+//         */
+//        $feedbackStatement = $this->database->prepare("
+//            SELECT
+//                sr.id    AS feedbackId,
+//                a.id     AS assessmentId,
+//                sr.owner AS studentUserId
+//            FROM submission_return sr
+//            INNER JOIN submission_box sb ON sr.box_id = sb.id
+//            INNER JOIN assessment      a ON sb.assessment_id = a.id
+//            WHERE {$where}
+//            ORDER BY sr.published_at ASC
+//        ");
+//
+//        $feedbackStatement->execute($pb->getParams());
+//
+//        $allFeedbackIds     = [];
+//        $studentFeedbackIds = [];
+//
+//        foreach ($feedbackStatement as $row) {
+//            if ((int)$row['studentUserId'] === $student->getId()) {
+//                $studentFeedbackIds[$row['assessmentId']] = $row['feedbackId'];
+//            }
+//
+//            if ($includeComparison) {
+//                $allFeedbackIds[] = $row['feedbackId'];
+//            }
+//        }
+//
+//        return [$studentFeedbackIds, $allFeedbackIds];
+//    }
 
-        if (!$includeComparison) {
-            $pb->equals('sr.owner', $student->getId());
-        }
 
-        $where = implode(' AND ', $pb->getWhere());
-
-        /* TODO tis submission_return idea must go away here
-         */
-        $feedbackStatement = $this->database->prepare("
-            SELECT
-                sr.id    AS feedbackId,
-                a.id     AS assessmentId,
-                sr.owner AS studentUserId
-            FROM submission_return sr
-            INNER JOIN submission_box sb ON sr.box_id = sb.id
-            INNER JOIN assessment      a ON sb.assessment_id = a.id
-            WHERE {$where}
-            ORDER BY sr.published_at ASC
-        ");
-
-        $feedbackStatement->execute($pb->getParams());
-
-        $allFeedbackIds     = [];
-        $studentFeedbackIds = [];
-
-        foreach ($feedbackStatement as $row) {
-            if ((int)$row['studentUserId'] === $student->getId()) {
-                $studentFeedbackIds[$row['assessmentId']] = $row['feedbackId'];
-            }
-
-            if ($includeComparison) {
-                $allFeedbackIds[] = $row['feedbackId'];
-            }
-        }
-
-        return [$studentFeedbackIds, $allFeedbackIds];
-    }
-
-
-    /**
-     * Quick alpha sort function for indicators and capabilities summary section
-     * (this method duped from the Rubric Markbook Controller)
-     *
-     * @param array $a
-     * @param array $b
-     * @return int
-     */
-    private function sortByName(array $a, array $b): int
-    {
-        return strnatcasecmp($a['name'], $b['name']);
-    }
+//    /**
+//     * Quick alpha sort function for indicators and capabilities summary section
+//     * (this method duped from the Rubric Markbook Controller)
+//     *
+//     * @param array $a
+//     * @param array $b
+//     * @return int
+//     */
+//    private function sortByName(array $a, array $b): int
+//    {
+//        return strnatcasecmp($a['name'], $b['name']);
+//    }
 }
