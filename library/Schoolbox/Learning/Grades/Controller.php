@@ -530,12 +530,15 @@ class Controller extends Base
          */
         $canSeeGraph = $hasPermissionsAndSettings && $hasDataToShow;
 
-        /* Get Rubric Data for display */
-        $longitudinalRubric   = [];
-        $rubricAssessmentList = [];
+        /* These data structs inform the Capability Marks panel
+         */
+        $longitudinalAssessments = [];
+        $longitudinalStudentMarks = [];
+
         if ($canSeeRubricGrade || $canSeeCapabilityGrade || $canSeeProgression) {
             $includeComparison = $viewModeContext->viewModeValue === ViewModeValue::STAFF || $viewee->getDisplayGradeGraph();
-            $longitudinalRubric = $this->getLongitudinalRubricData(
+
+            [$longitudinalAssessments, $longitudinalStudentMarks] = $this->getLongitudinalRubricData(
                 $assessments,
                 $viewee,
                 $viewModeContext->effectiveViewer,
@@ -543,8 +546,6 @@ class Controller extends Base
                 $subject,
                 $request
             );
-            $rubricAssessmentList = $longitudinalRubric['assessments'] ?? [];
-            unset($longitudinalRubric['assessments']);
         }
 
         /* Build tabs for grade report */
@@ -555,7 +556,10 @@ class Controller extends Base
         }
 
         $showRubricPoints = false;
-        if ($longitudinalRubric) {
+
+        /* Only show Capability Marks, Learning Levels, Progression panels if there's something to meaningful to see
+         */
+        if (!empty($longitudinalStudentMarks)) {
             if ($canSeeRubricGrade) {
                 $tabs['descriptors'] = ['label' => 'Learning Levels'];
                 $showRubricPoints = $this->isTabEnabled('rubricPoints', $subject);
@@ -620,19 +624,19 @@ class Controller extends Base
                 'canViewInstructorMarks' => $viewModeContext->canViewInstructorMarks,
                 'effectiveViewer'       => $viewModeContext->effectiveViewer,
                 'graph'                 => $graph,
-                'longitudinalRubric'    => $longitudinalRubric,
                 'showRubricPoints'      => $showRubricPoints,
-                'rubricAssessmentList'  => $rubricAssessmentList,
                 'progressTicksReadOnly' => $viewModeContext->progressTicksReadOnly,
                 'transitions'           => (
-                    $viewModeContext->progressTicksReadOnly
-                    ? []
-                    : ViewMode::tickTransitions(
+                    $viewModeContext->progressTicksReadOnly ? [] : ViewMode::tickTransitions(
                         $viewModeContext->viewModeValue,
                         $this->access->isInstructor($viewModeContext->effectiveViewer, $subject)
                     )
                 ),
                 'returnUrlSuffix'       => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($_SERVER['REQUEST_URI']),
+                /* Capability Marks panel
+                 */
+                'longitudinalAssessments' => $longitudinalAssessments,
+                'longitudinalStudentMarks' => $longitudinalStudentMarks,
             ])->getBody()->getContents(),
         ]);
     }
@@ -750,7 +754,9 @@ class Controller extends Base
             $this->routeGenerator
         ))->buildMarkbookData($folder, $request, $activitiesWithVisibleMarks->indexBy('id')->keys());
 
-        $data = $studentMarks[$student->getid()] ?? null;
+        /* We only need data for this one particular student
+         */
+        $data = $studentMarks[$student->getId()] ?? null;
 
         /* Student doesn't have any data; exit earlyish
          */
@@ -778,7 +784,7 @@ class Controller extends Base
 
                     /* Chuck in this student's result, indexed by assessment identifier
                      */
-                    $stack[$capabilityId]['assessmentResults'][$assessmentId]['grid'][$rubricInstanceId] = $capabilityData['published'];
+                    $stack[$capabilityId]['assessmentResults'][$assessmentId]['grid'][$rubricInstanceId]['published'] = $capabilityData['published'];
 
                     foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
                         if (!isset($stack[$capabilityId]['indicators'][$indicatorId])) {
@@ -793,15 +799,31 @@ class Controller extends Base
 
                         /* Chuck in this student's result, indexed by assessment identifier
                          */
-                        $stack[$capabilityId]['indicators'][$indicatorId]['assessmentResults'][$assessmentId]['grid'][$rubricInstanceId] = $indicatorData['published'];
+                        $stack[$capabilityId]['indicators'][$indicatorId]['assessmentResults'][$assessmentId]['grid'][$rubricInstanceId]['published'] = $indicatorData['published'];
                     }
                 }
             }
         }
 
+        /* Sort capabilities alphabetically
+         */
+        uasort($stack, static function ($a, $b) {
+            return $a['name'] <=> $b['name'];
+        });
+
+        /* Sort indicators alphabetically
+         */
+        foreach ($stack as $capabilityId => &$capability) {
+            uasort($capability['indicators'], static function ($a, $b) {
+                return $a['name'] <=> $b['name'];
+            });
+        }
+
         /* The $assessments node is an array of assessment metadata which we can use to make the heading row; each
          * node in $assessments knows about its grid settings so we can make a hash lookup to quickly build this table:
          * foreach capability in the stack, process each assessment's result.
+         *
+         * $stack eventually becomes known as $longitudinalStudentMarks once we leave this method
          */
         return [
             $assessments,

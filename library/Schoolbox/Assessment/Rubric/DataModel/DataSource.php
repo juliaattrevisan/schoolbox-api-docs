@@ -1619,9 +1619,10 @@ class DataSource
      */
     public function getLongitudinal(GenericCollection $dueWorks, User $student, bool $includeComparison): array
     {
-        $longitude[123]['name'] = 'cat';
-        $longitude[123]['indicators'][456]['name'] = 'horse';
-        return $longitude;
+        /* DEPRECATED
+         * TODO remove once you get the boxplot going
+         */
+        return [];
 
 //        if (0 === $dueWorks->count()) {
 //            return [];
