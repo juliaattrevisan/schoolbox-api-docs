@@ -291,7 +291,7 @@ class Mapper extends BaseMapper
         ?\Alaress_Date_Format $end,
         GenericCollection $moderationStatuses,
     ): int {
-        [$where, $params] = $this->buildSessionFilter($keyword, $feature, $user, $start, $end, $moderationStatuses);
+        [$where, $params] = $this->buildSessionFilter($keyword, $feature, $user, $start, $end, $moderationStatuses, true);
 
         $statement = $this->getDatabase()->prepare(
             "SELECT COUNT(*) FROM `{$this->table}` {$where}"
