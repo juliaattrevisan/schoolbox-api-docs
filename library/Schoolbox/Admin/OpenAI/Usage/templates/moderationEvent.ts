@@ -1,3 +1,6 @@
+import type { DateRFC3339 } from "@js/util/dateUtils";
+import type { UserAuthor } from "@schoolboxLibrary/types/User";
+
 /**
  * Possible statuses for an AI Interaction Moderation Event.
  * @see /library/Schoolbox/OpenAi/Moderation/Event/Status.php
@@ -19,4 +22,30 @@ export const STATUS_LABELS: Record<AiModerationStatus, string> = {
     [AiModerationStatus.NO_ACTION_REQUIRED]: "No action required",
     [AiModerationStatus.FURTHER_ACTION_REQUIRED]: "Further action required",
     [AiModerationStatus.FURTHER_ACTION_TAKEN]: "Further action taken",
+};
+
+/**
+ * A subset of an AI moderation result's data
+ * @see /library/Schoolbox/OpenAi/Moderation/Result/Result.php
+ */
+type AiModerationEventResult = {
+    /** A short plain English summary explaining why the interaction was or was not flagged. */
+    summary: string;
+};
+
+/**
+ * Information about a particular AI Interaction Moderation event.
+ * @see /library/Schoolbox/OpenAi/Moderation/Event/Translator/ModelToArray.php
+ */
+export type AiModerationEvent = {
+    status: AiModerationStatus;
+    result: AiModerationEventResult;
+    reviewedBy: UserAuthor | null;
+    resolvedBy: UserAuthor | null;
+    createdAt: DateRFC3339;
+    _routes: {
+        postNoActionRequired?: string | null;
+        postFurtherActionRequired?: string | null;
+        postFurtherActionTaken?: string | null;
+    };
 };
