@@ -834,5 +834,6 @@ li.feed-item article ol {
 //this highlights the selected section
 .highlight-selection {
     background-color: var(--sbx-color-highlight, #ffa);
+    border-radius: var(--sbx-config-field-corner-radius, 0);
     color: var(--sbx-color-highlight-text, #000);
 }

@@ -40,6 +40,14 @@ interface Props {
      * Can be used as a button
      */
     isButton?: boolean;
+    /**
+     * Whether the label should fill the available parent container width
+     */
+    isFullWidth?: boolean;
+    /**
+     * The size of the label
+     */
+    size?: "m" | "l";
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -52,23 +60,35 @@ const props = withDefaults(defineProps<Props>(), {
     href: undefined,
     text: undefined,
     isButton: false,
+    isFullWidth: false,
+    size: "m",
 });
 
 const emit = defineEmits<{
     select: [{ href: string | undefined; title: string | undefined }];
 }>();
+
+/**
+ * Compute the classes to apply to the label based on the props
+ */
+const labelClasses = window.Vue.computed(() => [
+    "sbx-label",
+    `sbx-label--${props.sentiment}`,
+    `sbx-label--${props.size}`,
+    { "sbx-label--full-width": props.isFullWidth },
+]);
 </script>
 
 <template>
     <button
         v-if="props.isButton"
         type="button"
-        class="sbx-label-button"
+        :class="['sbx-label-button', { 'sbx-label-button--full-width': props.isFullWidth }]"
         :title="props.title"
         @click="emit('select', { href: props.href, title: props.title })"
     >
         <span
-            :class="`sbx-label sbx-label--${props.sentiment}`"
+            :class="labelClasses"
             :title="props.title"
             :style="{
                 backgroundColor: props.backgroundColor || undefined,
@@ -80,13 +100,19 @@ const emit = defineEmits<{
                 :name="props.icon"
                 class="sbx-label__icon"
                 :color="props.iconColor || undefined"
+                :size="props.size"
             />
             {{ props.text }}
         </span>
     </button>
-    <a v-else-if="props.href" :href="props.href" class="sbx-label-link" :title="props.title">
+    <a
+        v-else-if="props.href"
+        :href="props.href"
+        :class="['sbx-label-link', { 'sbx-label-link--full-width': props.isFullWidth }]"
+        :title="props.title"
+    >
         <span
-            :class="`sbx-label sbx-label--${props.sentiment}`"
+            :class="labelClasses"
             :title="props.title"
             :style="{
                 backgroundColor: props.backgroundColor || undefined,
@@ -98,39 +124,55 @@ const emit = defineEmits<{
                 :name="props.icon"
                 class="sbx-label__icon"
                 :color="props.iconColor || undefined"
+                :size="props.size"
             />
             {{ props.text }}
         </span>
     </a>
     <span
         v-else
-        :class="`sbx-label sbx-label--${props.sentiment}`"
+        :class="labelClasses"
         :title="props.title"
         :style="{
             backgroundColor: props.backgroundColor || undefined,
             color: props.textColor || undefined,
         }"
     >
-        <sbx-icon v-if="props.icon" :name="props.icon" class="sbx-label__icon" :color="props.iconColor || undefined" />
+        <sbx-icon
+            v-if="props.icon"
+            :name="props.icon"
+            class="sbx-label__icon"
+            :color="props.iconColor || undefined"
+            :size="props.size"
+        />
         {{ props.text }}
     </span>
 </template>
 
 <style scoped>
-/*
-For now these colors are just predefined based on what's in the system currently.
-Long term they will reference the design colour tokens
-*/
 .sbx-label {
     align-items: center;
+    box-sizing: border-box;
     border-radius: var(--sbx-config-field-corner-radius, 0);
     color: white;
     display: inline-flex;
-    font-size: var(--sbx-font-size-xs, 0.75rem);
     gap: var(--sbx-size-xs, 0.5rem);
-    padding: var(--spacing-xs) var(--spacing-s);
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+}
+
+.sbx-label--m {
+    font-size: var(--sbx-font-size-xs, 0.875rem);
+    padding: var(--spacing-xs) var(--spacing-s);
+}
+
+.sbx-label--l {
+    font-size: var(--sbx-font-size-s, 0.9375rem);
+    padding: var(--spacing-s) var(--spacing-m);
+}
+
+.sbx-label--full-width {
+    width: 100%;
 }
 
 /* Lean into the span styles instead, so remove the default button styles */
@@ -138,7 +180,14 @@ Long term they will reference the design colour tokens
     background: none;
     border: none;
     cursor: pointer;
+    font: inherit;
     padding: 0;
+}
+
+.sbx-label-button--full-width,
+.sbx-label-link--full-width {
+    display: inline-flex;
+    width: 100%;
 }
 
 .sbx-label-button:focus {

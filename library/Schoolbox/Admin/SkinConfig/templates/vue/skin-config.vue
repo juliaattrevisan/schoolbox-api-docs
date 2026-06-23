@@ -214,6 +214,14 @@ window.Vue.onMounted(() => {
                 :colour-errors="colourErrors"
                 @preview-refresh="schedulePreviewRefresh"
             />
+            <sbx-label
+                v-if="editableConfigs.toggle.enabled && hasColourErrors"
+                size="l"
+                sentiment="alert"
+                icon="alert"
+                text="Resolve all colour contrast issues to save the Skin Config."
+                is-full-width
+            />
             <div class="l-flex l-flex--justify l-gap-xs">
                 <button v-if="hasUnsavedChanges" type="button" class="button l-flex__item--1" @click="onUndoChanges">
                     Undo Changes
