@@ -9,6 +9,7 @@ import {
 import type { AgentChatLogEntry } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import { AiFeature, AiLogFormat } from "./payload";
 import type { AiSessionLogApiResponse } from "./payload";
+import { AiModerationStatus } from "./moderationEvent";
 import type { AiModerationEvent } from "./moderationEvent";
 
 interface Props {
@@ -19,6 +20,28 @@ interface Props {
 
 const props = defineProps<Props>();
 const acStore = useAgentChatStore();
+
+/**
+ * Get a human-readable description for a particular moderation event, depending on its status.
+ * @param event - moderation event
+ * @returns relevant description, or null to exclude the event
+ */
+function getModerationEventDescription(event: AiModerationEvent): string | null {
+    switch (event.status) {
+        case AiModerationStatus.NO_BEHAVIOUR_FLAGGED:
+            return null; // these shouldn't be rendered as they are not a concern
+        case AiModerationStatus.REQUIRES_ATTENTION:
+            return "Current Status: Requires attention";
+        case AiModerationStatus.NO_ACTION_REQUIRED:
+            return `Deemed no further action required by ${event.reviewedBy?.fullName ?? "Unknown"}`;
+        case AiModerationStatus.FURTHER_ACTION_REQUIRED:
+            return `Further action required by ${event.reviewedBy?.fullName ?? "Unknown"}`;
+        case AiModerationStatus.FURTHER_ACTION_TAKEN:
+            return `Resolved by ${event.resolvedBy?.fullName ?? "Unknown"}`;
+        default:
+            return assertUnreachable(event.status);
+    }
+}
 
 const sessionFeed = window.Vue.computed<ReturnType<typeof acStore.parseFeed>>(() => {
     const firstLog = props.sessionLogs[0];
@@ -82,13 +105,18 @@ const sessionFeed = window.Vue.computed<ReturnType<typeof acStore.parseFeed>>(()
 
     /* jam in any flagged moderation events as if they were guardrail violations */
     for (const event of props.moderationEvents) {
+        const eventDescription = getModerationEventDescription(event);
+        if (eventDescription === null) {
+            continue; // skip events that aren't a concern
+        }
+
         feed.push({
             createdAt: event.createdAt,
             type: AgentChatMessageType.ALERT,
             data: {
                 side: AgentChatMessageType.RESPONSE,
                 severity: "warning",
-                message: event.result.summary,
+                message: eventDescription,
             },
         });
     }
