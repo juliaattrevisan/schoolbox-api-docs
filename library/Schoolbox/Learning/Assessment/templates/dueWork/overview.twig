@@ -5,7 +5,7 @@
  # There's a draft mode toggle here so we support both: the csv export reflects the setting chosen.
  #
  # @param IAssessable $assessment  The fully-hydrated learning activity being examined
- # @param array $capabilities      A set of capabilities and indicators that were in this learning activity, grouped by rubric instance id
+ # @param array $grids             A set of capabilities and indicators that were in this learning activity, grouped by rubric instance id
  # @param array $studentMarks      The marks obtained by all the students who got feedback for this learning activity
  #}
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.marksheet.js?v={{ config.site_version }}"></script>
@@ -44,19 +44,58 @@
     <div class="small-12 columns">
         <div class="scrollable">
             <table class="rb rb-report">
-                <tbody>
+                <thead>
                     <tr>
-                        <th rowspan="2" class="rb-group-name markdown">&nbsp;</th>
-
-                        {% for ca %}
-
+                        <th rowspan="4" class="rb-group-name markdown">&nbsp;</th>
                     </tr>
+                    <tr>
+                        {% for rubricInstanceId, rubricInstanceData in grids %}
+                            {% set gridColspan = 1 %}
+
+                            {# Each grid spans N indicators which are found among all its capabilities
+                             # (i.e. the total number of indicators used in the entire grid
+                             #
+                             # Look ahead to find out how many exist
+                             #}
+                            {% for rubricInstanceId, rubricInstanceData in grids %}
+                                {% for capabilityId, capabilityData in rubricInstanceData.capabilities %}
+                                    {% set gridColspan = gridColspan + capabilityData.indicators|length %}
+                                {% endfor %}
+                            {% endfor %}
+
+                            <th colspan="{{ gridColspan }}" class="markdown">
+                                {{ rubricInstanceData.title }}
+                            </th>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        {% for rubricInstanceId, rubricInstanceData in grids %}
+                            {% for capabilityId, capabilityData in rubricInstanceData.capabilities %}
+                                <th colspan="{{ capabilityData.indicators|length }}" class="markdown">
+                                    {{ capabilityData.name|markdown }}
+                                </th>
+                            {% endfor %}
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        {% for rubricInstanceId, rubricInstanceData in grids %}
+                            {% for capabilityId, capabilityData in rubricInstanceData.capabilities %}
+                                {% for indicatorId, indicatorData in capabilityData.indicators %}
+                                    <th class="markdown">
+                                        {{ indicatorData.name|markdown }}
+                                    </th>
+                                {% endfor %}
+                            {% endfor %}
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+
                 </tbody>
             </table>
         </div>
     </div>
 </div>
-
 
 
 

@@ -699,7 +699,7 @@ class Controller extends Assessment\Controller
                     ])
                     ->add(['Rubric Report', '']),
                 'assessment' => $assessment,
-                'capabilities' => $assessments[$assessment->getId()]['gridData'],
+                'grids' => $assessments[$assessment->getId()]['gridData'],
                 'studentMarks' => $studentMarks,
             ],
             'Rubric Report'
