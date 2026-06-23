@@ -16,13 +16,13 @@ namespace Schoolbox\OpenAi\Moderation\Event;
 enum Status: string
 {
     /**
+     * A new incoming moderation event that was flagged but has not yet been reviewed by school staff.
+    */
+    case REQUIRES_ATTENTION = 'requires_attention';
+    /**
      * When a school staff member has reviewed and deemed that there is no further action required for this event.
      */
     case NO_ACTION_REQUIRED = 'no_action_required';
-    /**
-     * A new incoming moderation event that was flagged but has not yet been reviewed by school staff.
-     */
-    case REQUIRES_ATTENTION = 'requires_attention';
     /**
      * When a school staff member has reviewed and deemed that further action is required, but that action has not yet been taken.
      */
