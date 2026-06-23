@@ -30,6 +30,15 @@ window.Vue.onMounted(() => {
         // If the document isn't ready, we can't reflow tooltips yet
         // As vue loads the template after foundation has been initialised, we need to reinitialise the tooltips
         window.jQuery(document).foundation("tooltip", "reflow");
+    } else {
+        /* i've never needed this part before, it seems specific to this area
+         * (always mounts at 'interactive' rather than 'complete', and foundation never loads the tooltips...)
+         * we *could* just remove the document.readyState check, but that risks it triggering the foundation error
+         * which will crash the template... sooo this is a workaround I suppose.
+         */
+        window.addEventListener("load", () => window.jQuery(document).foundation("tooltip", "reflow"), {
+            once: true,
+        });
     }
 });
 </script>
