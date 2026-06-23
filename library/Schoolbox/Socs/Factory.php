@@ -115,7 +115,7 @@ class Factory
                 $venueMapper,
                 $teamMapper,
             ))
-            ->add(new Fixtures\Import(
+            ->add(new Fixtures\Import(  // its own special endpoint `fixturecalendar.ashx`, which contains teams, venues, and matchups for the season
                 $this->log,
                 $this->perform,
                 $this->lock,
@@ -143,7 +143,7 @@ class Factory
                 true,
                 new Person($userMapper)
             ))
-            ->add(new Teams\Import(
+            ->add(new Teams\Import( // its own special endpoint `mso-sport.ashx`, which contains ONLY teams
                 $this->log,
                 $this->perform,
                 $this->lock,
