@@ -61,7 +61,7 @@ class Factory
      * @throws DomainException
      * @throws InvalidArgumentException
      */
-    public function produce(bool $fixtures, bool $results, bool $teams): GenericCollection
+    public function produce(bool $fixtures, bool $results): GenericCollection
     {
         if ('' === $this->host) {
             throw new DomainException('Missing SOCS endpoint host; exiting SOCS importer');
@@ -103,15 +103,6 @@ class Factory
 
         $bus = new GenericCollection(IStrategy::class);
 
-        if ($fixtures || $teams) {
-            $bus->add(new Teams\Prepare(
-                $this->log,
-                $this->perform,
-                $this->lock,
-                $seasonMapper,
-                $teamMapper
-            ));
-        }
         if ($fixtures) {
             $bus->add(new Fixtures\Prepare(
                 $this->log,
@@ -121,7 +112,8 @@ class Factory
                 $sportMapper,
                 $seasonMapper,
                 $divisionMapper,
-                $venueMapper
+                $venueMapper,
+                $teamMapper,
             ))
             ->add(new Fixtures\Import(
                 $this->log,
@@ -151,6 +143,13 @@ class Factory
                 true,
                 new Person($userMapper)
             ))
+            ->add(new Teams\Import(
+                $this->log,
+                $this->perform,
+                $this->lock,
+                $this->httpClient,
+                $fixturesRegistry
+            ))
             ->add(new Fixtures\Cleanup(
                 $this->log,
                 $this->perform,
@@ -159,7 +158,8 @@ class Factory
                 $sportMapper,
                 $seasonMapper,
                 $divisionMapper,
-                $venueMapper
+                $venueMapper,
+                $teamMapper
             ));
         }
 
@@ -183,24 +183,6 @@ class Factory
                 $this->perform,
                 $this->lock,
                 $resultMapper
-            ));
-        }
-
-        if ($teams) {
-            $bus->add(new Teams\Import(
-                $this->log,
-                $this->perform,
-                $this->lock,
-                $this->httpClient,
-                $fixturesRegistry
-            ));
-        }
-        if ($fixtures || $teams) {
-            $bus->add(new Teams\Cleanup(
-                $this->log,
-                $this->perform,
-                $this->lock,
-                $teamMapper
             ));
         }
 

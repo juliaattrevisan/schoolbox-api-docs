@@ -31,7 +31,6 @@ class ImporterTool extends CliTool\App
     private const string OPT_LONG_INSTANCE = 'instance:';
     private const string OPT_LONG_FIXTURES = 'fixtures';
     private const string OPT_LONG_RESULTS = 'results';
-    private const string OPT_LONG_TEAMS = 'teams';
     private const int LOCK_TTL = 120;
     private const int DEFAULT_TIMEOUT = 3600;
 
@@ -47,7 +46,6 @@ class ImporterTool extends CliTool\App
             self::OPT_LONG_INSTANCE,
             self::OPT_LONG_FIXTURES,
             self::OPT_LONG_RESULTS,
-            self::OPT_LONG_TEAMS,
         ];
     }
 
@@ -79,11 +77,10 @@ class ImporterTool extends CliTool\App
 
         $runFixtures = (bool)$this->getOpt(self::OPT_LONG_FIXTURES);
         $runResults = (bool)$this->getOpt(self::OPT_LONG_RESULTS);
-        $runTeams = (bool)$this->getOpt(self::OPT_LONG_TEAMS);
 
         // if nothing is set, run them all
-        if (!$runFixtures && !$runResults && !$runTeams) {
-            $runFixtures = $runResults = $runTeams = true;
+        if (!$runFixtures && !$runResults) {
+            $runFixtures = $runResults = true;
         }
 
         $host = (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_HOST);
@@ -101,9 +98,6 @@ class ImporterTool extends CliTool\App
         if ($runResults) {
             $scriptParts[] = 'results';
         }
-        if ($runTeams) {
-            $scriptParts[] = 'teams';
-        }
         $scriptName = sprintf('socs:%s', implode('+', $scriptParts));
 
         try {
@@ -116,8 +110,7 @@ class ImporterTool extends CliTool\App
                 $token
             ))->produce(
                 $runFixtures,
-                $runResults,
-                $runTeams
+                $runResults
             );
         } catch (\DomainException $e) {
             if ($this->perform()) {
@@ -182,12 +175,12 @@ Import SOCS sport fixtures into the Schoolbox Fixtures module using the
 SOCS XML fixtures feed, synchronise SOCS results via the results feed,
 and synchronise SOCS teams via the mso-sport feed.
 
-Usage: php importer.php [--perform] [--fixtures] [--results] [--teams]
+Usage: php importer.php [--perform] [--fixtures] [--results]
 
 When --perform is omitted, the importer will run in planning mode and
 log what would happen without persisting any changes.
 
-When none of --fixtures, --results or --teams are provided, all
+When none of --fixtures or --results are provided, all
 synchronisations will run. When one or more are provided, only the
 selected synchronisations will run.
 

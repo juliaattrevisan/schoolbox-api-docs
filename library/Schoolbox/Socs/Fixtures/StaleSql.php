@@ -30,6 +30,7 @@ class StaleSql
             self::buildMarkStaleBySeasonName($tables['season']),
             self::buildMarkStaleByExternalId($tables['division']),
             self::buildMarkStaleByExternalId($tables['venue']),
+            self::buildMarkStaleByExternalId($tables['team']),
         ];
     }
 
@@ -49,6 +50,7 @@ class StaleSql
             self::buildSoftDeleteBySeasonName($tables['season']),
             self::buildSoftDeleteByExternalId($tables['division']),
             self::buildSoftDeleteByExternalId($tables['venue']),
+            self::buildSoftDeleteByExternalId($tables['team']),
         ];
     }
 

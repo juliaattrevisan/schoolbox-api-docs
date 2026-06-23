@@ -39,7 +39,8 @@ class Prepare implements IStrategy
         private SportMapper $sportMapper,
         private SeasonMapper $seasonMapper,
         private DivisionMapper $divisionMapper,
-        private VenueMapper $venueMapper
+        private VenueMapper $venueMapper,
+        private TeamMapper $teamsMapper,
     ) {
     }
 
@@ -75,6 +76,7 @@ class Prepare implements IStrategy
             'season' => $this->seasonMapper->getTable(),
             'division' => $this->divisionMapper->getTable(),
             'venue' => $this->venueMapper->getTable(),
+            'team' => $this->teamsMapper->getTable(),
         ];
     }
 }
