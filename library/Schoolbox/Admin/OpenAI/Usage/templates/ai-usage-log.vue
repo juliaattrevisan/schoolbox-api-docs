@@ -164,6 +164,15 @@ async function changePage(page: number): Promise<void> {
 }
 
 /**
+ * Apply the current filters, and invalidate pageInfo cache (go back to the first page)
+ * to avoid ending up on a page that no longer exists.
+ */
+async function applyFilters(): Promise<void> {
+    pageInfo.value = null;
+    await loadUsageLogs();
+}
+
+/**
  * Reset the filters to their default values (show everything)
  */
 function resetFilters(): void {
@@ -177,7 +186,7 @@ function resetFilters(): void {
 
 window.Vue.onMounted(async () => {
     resetFilters();
-    await loadUsageLogs();
+    await applyFilters();
 });
 
 /**
@@ -287,7 +296,7 @@ function printSelectedSession(): void {
             </section>
             <div class="row">
                 <div class="small-12 columns">
-                    <button class="button submit" @click="loadUsageLogs">Filter</button>
+                    <button class="button submit" @click="applyFilters">Filter</button>
                 </div>
             </div>
         </div>
@@ -378,7 +387,7 @@ function printSelectedSession(): void {
                         @click.prevent="
                             () => {
                                 resetFilters();
-                                void loadUsageLogs();
+                                void applyFilters();
                             }
                         "
                         >show everything</a
