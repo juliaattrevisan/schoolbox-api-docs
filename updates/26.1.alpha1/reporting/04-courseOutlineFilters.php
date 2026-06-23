@@ -77,6 +77,13 @@ HELP;
          *
          * Two query variants handle whether LTI is enabled: when LTI is disabled, default configs
          * would not have "lti":"1", so we don't require it as part of the default check.
+         *
+         * Note: component_config_instance.value is a shared varchar(2048) column that also stores
+         * non-JSON values for other config keys. The multi-table UPDATE optimiser evaluates the
+         * predicates against rows before the key/class joins fully filter them, so JSON_EXTRACT
+         * would raise "Syntax error in JSON text" (error 4038) on those non-JSON values. JSON_VALUE
+         * is lenient (returns NULL on invalid JSON) and also unquotes the scalar, so its result
+         * compares correctly against '1'. Do not switch these back to JSON_EXTRACT.
          */
         if ($ltiEnabled) {
             $sql = "
@@ -90,15 +97,15 @@ HELP;
                     ON ci.component_definition_id = cd.id
                     AND cd.class = 'Schoolbox\\\\Learning\\\\Assessment\\\\Component\\\\Homepage\\\\Outline\\\\Controller'
                 SET cci.value = JSON_SET(cci.value, '$.reporting', '1')
-                WHERE JSON_EXTRACT(cci.value, '$.project')     = '1'
-                  AND JSON_EXTRACT(cci.value, '$.dueWork')     = '1'
-                  AND JSON_EXTRACT(cci.value, '$.task')        = '1'
-                  AND JSON_EXTRACT(cci.value, '$.quiz')        = '1'
-                  AND JSON_EXTRACT(cci.value, '$.lessonPlan')  = '1'
-                  AND JSON_EXTRACT(cci.value, '$.dialogAgent') = '1'
-                  AND JSON_EXTRACT(cci.value, '$.lti')         = '1'
-                  AND (JSON_EXTRACT(cci.value, '$.reporting') IS NULL
-                    OR JSON_EXTRACT(cci.value, '$.reporting') != '1')
+                WHERE JSON_VALUE(cci.value, '$.project')     = '1'
+                  AND JSON_VALUE(cci.value, '$.dueWork')     = '1'
+                  AND JSON_VALUE(cci.value, '$.task')        = '1'
+                  AND JSON_VALUE(cci.value, '$.quiz')        = '1'
+                  AND JSON_VALUE(cci.value, '$.lessonPlan')  = '1'
+                  AND JSON_VALUE(cci.value, '$.dialogAgent') = '1'
+                  AND JSON_VALUE(cci.value, '$.lti')         = '1'
+                  AND (JSON_VALUE(cci.value, '$.reporting') IS NULL
+                    OR JSON_VALUE(cci.value, '$.reporting') != '1')
             ";
         } else {
             $sql = "
@@ -112,14 +119,14 @@ HELP;
                     ON ci.component_definition_id = cd.id
                     AND cd.class = 'Schoolbox\\\\Learning\\\\Assessment\\\\Component\\\\Homepage\\\\Outline\\\\Controller'
                 SET cci.value = JSON_SET(cci.value, '$.reporting', '1')
-                WHERE JSON_EXTRACT(cci.value, '$.project')     = '1'
-                  AND JSON_EXTRACT(cci.value, '$.dueWork')     = '1'
-                  AND JSON_EXTRACT(cci.value, '$.task')        = '1'
-                  AND JSON_EXTRACT(cci.value, '$.quiz')        = '1'
-                  AND JSON_EXTRACT(cci.value, '$.lessonPlan')  = '1'
-                  AND JSON_EXTRACT(cci.value, '$.dialogAgent') = '1'
-                  AND (JSON_EXTRACT(cci.value, '$.reporting') IS NULL
-                    OR JSON_EXTRACT(cci.value, '$.reporting') != '1')
+                WHERE JSON_VALUE(cci.value, '$.project')     = '1'
+                  AND JSON_VALUE(cci.value, '$.dueWork')     = '1'
+                  AND JSON_VALUE(cci.value, '$.task')        = '1'
+                  AND JSON_VALUE(cci.value, '$.quiz')        = '1'
+                  AND JSON_VALUE(cci.value, '$.lessonPlan')  = '1'
+                  AND JSON_VALUE(cci.value, '$.dialogAgent') = '1'
+                  AND (JSON_VALUE(cci.value, '$.reporting') IS NULL
+                    OR JSON_VALUE(cci.value, '$.reporting') != '1')
             ";
         }
 
