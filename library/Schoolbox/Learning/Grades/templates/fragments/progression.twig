@@ -163,16 +163,27 @@
                             {% endfor %}
                         ];
 
-                        var ranges = [
-{#                            {% for activityId, activity in longitudinalAssessments %}#}
-{#                                {% set activity = indicator.activities[activityId] is defined ? indicator.activities[activity_id] : null %}#}
+                        let ranges = [
+                            {% for activityId, activity in longitudinalAssessments %}
+                                {% for rubricInstanceId, rubricInstanceData in activity.gridData %}
+                                    {# Shortcuts to marks of various types #}
+                                    {% set publishedMarks = indicatorData.assessmentResults[activityId].grid[rubricInstanceId].published ?? null %}
 
-{#                                {% if activity.max_value ?? 0 > 0 and activity.statistics is defined %}#}
-{#                                    ["{{ activity.name  }}",{{ (activity.statistics.min / activity.max_value) * 100 }}, {{ (activity.statistics.quartile1 / activity.max_value) * 100 }}, {{ (activity.statistics.quartile2 / activity.max_value) * 100 }}, {{ (activity.statistics.quartile3 / activity.max_value) * 100 }}, {{ (activity.statistics.max / activity.max_value) * 100 }}],#}
-{#                                {% else %}#}
-{#                                    '',#}
-{#                                {% endif %}#}
-{#                            {% endfor %}#}
+                                    {% if publishedMarks.statistics is defined and publishedMarks.statistics %}
+
+                                        [
+                                            "{{ activity.name }}<br />{{ rubricInstanceData.title }}",
+                                            {{ publishedMarks.statistics.min }},
+                                            {{ publishedMarks.statistics.quartile1 }},
+                                            {{ publishedMarks.statistics.quartile2 }},
+                                            {{ publishedMarks.statistics.quartile3 }},
+                                            {{ publishedMarks.statistics.max }}
+                                        ],
+                                    {% else %}
+                                        '',
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
                         ];
 
                         $('#rubricGraph{{ indicatorId }}').highcharts('boxLine', {
