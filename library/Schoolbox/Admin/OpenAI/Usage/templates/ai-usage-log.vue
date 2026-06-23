@@ -2,12 +2,11 @@
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import type { PaginationMeta } from "@js/util/sbx/apiUtils";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
-import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import { EMPTY_DATE } from "@schoolboxVue/components/dateTimePicker/datePickerTypes";
-import DateRange from "@schoolboxVue/components/dateTimePicker/date-range.vue";
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import RelativeTime from "@schoolboxVue/components/relativeTime/relative-time.vue";
 import PaginatorButtons from "@schoolboxVue/components/paginator-buttons.vue";
+import type { AiModerationEvent, AiModerationStatus } from "./moderationEvent";
 import { AiLogFormat } from "./payload";
 import type {
     AiSessionId,
@@ -18,9 +17,8 @@ import type {
     AiSessionLogApiResponse,
 } from "./payload";
 import AulAgentChat from "./aul-agent-chat.vue";
+import AulFilters from "./aul-filters.vue";
 import AulModerationIndicator from "./aul-moderation-indicator.vue";
-import { STATUS_LABELS } from "./moderationEvent";
-import type { AiModerationEvent, AiModerationStatus } from "./moderationEvent";
 
 interface Props {
     routeSearch: string;
@@ -232,79 +230,16 @@ function printSelectedSession(): void {
 <template>
     <div class="row no-print">
         <div class="small-12 island">
-            <section>
-                <fieldset class="content">
-                    <legend>Filter</legend>
-                    <div class="small-12 columns l-flex-col l-gap-m">
-                        <label>
-                            Keyword
-                            <input
-                                v-model="keywordFilter"
-                                class="f-no-margins"
-                                type="text"
-                                name="keyword"
-                                placeholder="Filter by keyword"
-                            />
-                        </label>
-                        <div class="l-flex-row l-flex--no-wrap l-gap-m">
-                            <div class="l-flex-col l-flex__item--1">
-                                <label>
-                                    Feature
-                                    <select v-model="featureFilter" name="feature" class="f-no-margins">
-                                        <option :value="null">All</option>
-                                        <option
-                                            v-for="(featureConf, feature) in props.features"
-                                            :key="feature"
-                                            :value="feature"
-                                        >
-                                            {{ featureConf.title }}
-                                        </option>
-                                    </select>
-                                </label>
-                            </div>
-                            <div class="l-flex-col l-flex__item--1">
-                                <search-select
-                                    v-model:selected="userFilter"
-                                    label="User"
-                                    label-id="users"
-                                    endpoint="/ajax/user.php?groupID=0&"
-                                    :is-single-select="true"
-                                    placeholder="Search for user..."
-                                />
-                            </div>
-                        </div>
-
-                        <date-range
-                            ref="dateRangeRef"
-                            v-model:start-date="startDateFilter"
-                            v-model:end-date="endDateFilter"
-                            id-prefix="ai-usage-log-filter"
-                        />
-
-                        <div>
-                            <label>Moderation Status</label>
-                            <div class="l-flex-row l-gap-m">
-                                <div v-for="(label, status) in STATUS_LABELS" :key="status">
-                                    <input
-                                        :id="`ai-usage-log-moderation-${status}`"
-                                        v-model="moderationStatusFilter"
-                                        type="checkbox"
-                                        :value="status"
-                                    />
-                                    <label :for="`ai-usage-log-moderation-${status}`" class="checkbox-label">
-                                        {{ label }}
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </fieldset>
-            </section>
-            <div class="row">
-                <div class="small-12 columns">
-                    <button class="button submit" @click="applyFilters">Filter</button>
-                </div>
-            </div>
+            <aul-filters
+                v-model:keyword-filter="keywordFilter"
+                v-model:feature-filter="featureFilter"
+                v-model:user-filter="userFilter"
+                v-model:start-date-filter="startDateFilter"
+                v-model:end-date-filter="endDateFilter"
+                v-model:moderation-status-filter="moderationStatusFilter"
+                :features="props.features"
+                @apply-filters="applyFilters"
+            />
         </div>
     </div>
 
