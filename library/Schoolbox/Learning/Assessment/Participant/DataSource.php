@@ -513,6 +513,45 @@ class DataSource
 
 
     /**
+     * Finds a page of users participating in this assessment by class/group membership.
+     *
+     * @param IAssessable $assessment
+     * @param int $cursor Last user ID from the previous page, or 0 for the first page
+     * @param int $count
+     * @return array{users: Collection<User>, nextCursor: int|null, total: int}
+     * @throws UnexpectedValueException If unable to merge student collections
+     */
+    public function findParticipantUserPage(IAssessable $assessment, int $cursor, int $count): array
+    {
+        $students = $this->findAllStudentsForAssessment($assessment);
+        $total = $students->count();
+        $offset = 0;
+
+        if ($cursor > 0) {
+            $studentIds = $students->keys();
+            $cursorOffset = array_search($cursor, $studentIds);
+
+            if ($cursorOffset !== false) {
+                $offset = $cursorOffset + 1;
+            }
+        }
+
+        $users = $students->slice($offset, $count, true);
+        $lastUserId = null;
+
+        foreach ($users->keys() as $userId) {
+            $lastUserId = (int)$userId;
+        }
+
+        return [
+            'users' => $users,
+            'nextCursor' => $offset + $users->count() < $total ? $lastUserId : null,
+            'total' => $total,
+        ];
+    }
+
+
+    /**
      * Removes participation objects for students who are excluded and
      * don't have a class/group relationship to the assessment's folder.
      *

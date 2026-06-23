@@ -8,7 +8,7 @@
  #       'assessment'       IAssessable
  #       'participantStats' ParticipantStatistics[] Indexed by user.id
  #       'participantCount' int Total number of participants in the class (not just in this chunk)
- #       'participantCursor' int Cursor for pagination, indicating the offset for the next chunk of participants to load
+ #       'participantCursor' int|null Cursor for pagination, indicating the last user ID to continue after when loading the next chunk
  #   ]
  # @param bool $isSpecification         Whether to show classes as groups (course level), or just a flat list (class level)
 #}
