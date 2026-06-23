@@ -29,6 +29,8 @@ use RangeException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Rubric\Grid\Payload;
+use Schoolbox\Assessment\Rubric\Markbook\OverallDataset;
+use Schoolbox\Column\Decimal;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper;
 use Schoolbox\File\MimetypeMapper;
@@ -47,6 +49,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplem
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\DueWork\StateMapper;
+use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
@@ -83,6 +86,8 @@ use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\TaskDaemon\Producer;
@@ -659,44 +664,44 @@ class Controller extends Assessment\Controller
      */
     public function getOverview(IAssessable $assessment): void
     {
-        // Sort participant by lastname, firstname, and id
-        $participants = $assessment->getParticipantUsers()->sortByCallback(
-            static function (User $participantA, User $participantB) {
-                return strnatcasecmp($participantA->getLastname() ?? '', $participantB->getLastname() ?? '')
-                    ?: strnatcasecmp($participantA->getFirstname(), $participantB->getFirstname())
-                        ?: strnatcasecmp($participantA->getId(), $participantB->getId());
-            }
-        );
+        /* The folder where this assessment lives can be found in the base context instance.
+         */
+        $folder = $assessment->getBaseContext()->getFolder();
 
-        $data = [
-            'breadcrumbs'  => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
-                                   ->add(
-                                       [
-                                           $assessment->getTitle(),
-                                           $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]),
-                                       ]
-                                   )
-                                   ->add(['Rubric Report', '']),
-            'dueWork'      => $assessment,
-            'participants' => $participants,
-        ];
+        /* Brutal reuse of the rubric markbook calcs
+         */
+        [
+            $assessments,
+            $exclusions,
+            $studentMarks,
+            $overallMarks
+        ] = (new OverallDataset(
+            $this->getDi()->get('databaseInternal'),
+            new Decimal(),
+            new MarkScheme\TotalMarkFractional(),
+            new \Schoolbox\Learning\MarkScheme\Factory($this->getConfigLoader()),
+            $this->filterMapper,
+            UserAccessMapper::getInstance(), // TODO inject this, which is amega change in the constructor across all learning activities' controllers lol
+            $this->routeGenerator
+        ))->buildMarkbookData($folder, [], [$assessment->getId()]);
 
-        if ($assessment->getUseRubric()) {
-            $rubricGrid = $this->rubricMapper->retrieveGrid($assessment, false);
-            $assessment = $this->participantMapper->loadParticipationIntoAssessment($assessment);
-
-            $data = array_merge(
-                $data,
-                [
-                'headers' => $this->getRubricHeaders($rubricGrid),
-                'marks'   => $this->getMarks($assessment->getAllParticipants()),
-                ]
-            );
-        }
+//        new \Alaress_Probe(
+//            $assessments[$assessment->getId()]['gridData'],
+//            $studentMarks,
+//        );
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/dueWork/overview.twig',
-            $data,
+            [
+                'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([
+                        $assessment->getTitle(),
+                        $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]),
+                    ])
+                    ->add(['Rubric Report', '']),
+                'assessment' => $assessment,
+                'capabilities' => $assessments[$assessment->getId()]['gridData'],
+                'studentMarks' => $studentMarks,
+            ],
             'Rubric Report'
         );
     }
