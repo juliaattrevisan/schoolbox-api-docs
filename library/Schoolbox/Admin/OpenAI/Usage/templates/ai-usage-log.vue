@@ -163,7 +163,20 @@ async function changePage(page: number): Promise<void> {
     await loadUsageLogs();
 }
 
+/**
+ * Reset the filters to their default values (show everything)
+ */
+function resetFilters(): void {
+    keywordFilter.value = "";
+    featureFilter.value = null;
+    userFilter.value = [];
+    startDateFilter.value = EMPTY_DATE;
+    endDateFilter.value = EMPTY_DATE;
+    moderationStatusFilter.value = [];
+}
+
 window.Vue.onMounted(async () => {
+    resetFilters();
     await loadUsageLogs();
 });
 
@@ -355,6 +368,24 @@ function printSelectedSession(): void {
                     </tbody>
                 </table>
             </div>
+
+            <div v-else class="empty-state">
+                <sbx-icon name="ai" size="2.5rem"></sbx-icon>
+                <p>
+                    No logs match the current filters. Try another filter or
+                    <a
+                        href="#"
+                        @click.prevent="
+                            () => {
+                                resetFilters();
+                                void loadUsageLogs();
+                            }
+                        "
+                        >show everything</a
+                    >.
+                </p>
+            </div>
+
             <paginator-buttons
                 v-if="pageInfo !== null && pageInfo.pagination.pages > 1"
                 :page-count="pageInfo.pagination.pages"
