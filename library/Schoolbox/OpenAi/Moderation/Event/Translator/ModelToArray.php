@@ -12,6 +12,7 @@ namespace Schoolbox\OpenAi\Moderation\Event\Translator;
 
 use Schoolbox\User;
 use Schoolbox\OpenAi\Moderation\Event\Model;
+use Schoolbox\OpenAi\Moderation\Result;
 
 class ModelToArray
 {
@@ -40,6 +41,10 @@ class ModelToArray
             'result' => [
                 'summary' => $event->getModerationDetails()->getSummary(),
                 'needsHumanReview' => $event->getModerationDetails()->getNeedsHumanReview(),
+                'categories' => $event->getModerationDetails()
+                    ->getCategories()
+                    ->map(fn(Result\Category $category) => $category->getCategory())
+                    ->jsonSerialize(),
             ],
             'reviewedBy' => $event->getReviewedBy() ? $this->userTranslator->__invoke($event->getReviewedBy()) : null,
             'resolvedBy' => $event->getResolvedBy() ? $this->userTranslator->__invoke($event->getResolvedBy()) : null,

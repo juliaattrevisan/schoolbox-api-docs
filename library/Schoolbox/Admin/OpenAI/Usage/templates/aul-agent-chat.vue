@@ -116,6 +116,7 @@ const sessionFeed = window.Vue.computed<ReturnType<typeof acStore.parseFeed>>(()
             data: {
                 side: AgentChatMessageType.RESPONSE,
                 severity: "warning",
+                title: `Moderation identified ${event.result.categories.join(", ")}:`,
                 message: eventDescription,
             },
         });

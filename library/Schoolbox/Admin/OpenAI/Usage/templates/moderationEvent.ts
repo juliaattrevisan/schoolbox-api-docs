@@ -33,6 +33,8 @@ type AiModerationEventResult = {
     summary: string;
     /** true if any concern exists that should be reviewed by a staff member. */
     needsHumanReview: boolean;
+    /** A list of detected concern categories. An empty array if no concerns are found. */
+    categories: string[];
 };
 
 /**
