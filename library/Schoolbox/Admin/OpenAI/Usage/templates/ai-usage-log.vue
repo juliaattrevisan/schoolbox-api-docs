@@ -20,7 +20,7 @@ import type {
 import AulAgentChat from "./aul-agent-chat.vue";
 import AulModerationIndicator from "./aul-moderation-indicator.vue";
 import { STATUS_LABELS } from "./moderationEvent";
-import type { AiModerationStatus } from "./moderationEvent";
+import type { AiModerationEvent, AiModerationStatus } from "./moderationEvent";
 
 interface Props {
     routeSearch: string;
@@ -55,7 +55,8 @@ type AiSelectedSessionInfo<TFeature extends AiFeature = AiFeature> = {
     [KLogFormat in AiLogFormat]: {
         logFormat: KLogFormat;
         session: AiSession<KLogFormat, TFeature>;
-        log: AiSessionLogApiResponse<KLogFormat>;
+        sessionLogs: AiSessionLogApiResponse<KLogFormat>["logs"];
+        moderationEvents: AiModerationEvent[];
     };
 }[AiLogFormat];
 
@@ -79,10 +80,15 @@ const selectedSessionInfo = window.Vue.computed<AiSelectedSessionInfo | AiSelect
     }
 
     // TODO: properly support sessions with multiple log formats, for now just filter out invalid logs
-    const filteredLog = logInfo.filter((entry) => entry.logFormat !== null && entry.data !== null);
+    const filteredLogs = logInfo.logs.filter((entry) => entry.logFormat !== null && entry.data !== null);
 
     // sessionInfo.logFormat only selects the renderer; the renderer interprets each entry's own logFormat.
-    const info = { logFormat: sessionInfo.logFormat, session: sessionInfo, log: filteredLog };
+    const info = {
+        logFormat: sessionInfo.logFormat,
+        session: sessionInfo,
+        sessionLogs: filteredLogs,
+        moderationEvents: logInfo.moderationEvents,
+    };
     return info satisfies Record<keyof AiSelectedSessionInfo, unknown> as AiSelectedSessionInfo;
 });
 
@@ -457,8 +463,8 @@ function printSelectedSession(): void {
                 </div>
                 <div class="clearfix"></div>
 
-                <div v-if="!('log' in selectedSessionInfo)" class="loader"></div>
-                <div v-else-if="selectedSessionInfo.log.length === 0" class="empty-state">
+                <div v-if="!('logFormat' in selectedSessionInfo)" class="loader"></div>
+                <div v-else-if="selectedSessionInfo.sessionLogs.length === 0" class="empty-state">
                     <sbx-icon name="hidden" size="xl" />
                     <p>
                         The {{ props.features[selectedSessionInfo.session.feature].title }} feature does not support
@@ -472,7 +478,8 @@ function printSelectedSession(): void {
                             selectedSessionInfo.logFormat === AiLogFormat.GUARDRAIL
                         "
                         :feature="selectedSessionInfo.session.feature"
-                        :session-log="selectedSessionInfo.log"
+                        :session-logs="selectedSessionInfo.sessionLogs"
+                        :moderation-events="selectedSessionInfo.moderationEvents"
                     />
                 </div>
             </section>

@@ -39,6 +39,7 @@ class ModelToArray
             'status' => $event->getStatus(),
             'result' => [
                 'summary' => $event->getModerationDetails()->getSummary(),
+                'needsHumanReview' => $event->getModerationDetails()->getNeedsHumanReview(),
             ],
             'reviewedBy' => $event->getReviewedBy() ? $this->userTranslator->__invoke($event->getReviewedBy()) : null,
             'resolvedBy' => $event->getResolvedBy() ? $this->userTranslator->__invoke($event->getResolvedBy()) : null,

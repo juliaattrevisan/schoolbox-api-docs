@@ -20,7 +20,9 @@ use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\Admin\OpenAI\Config as AIConfig;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\OpenAi\Moderation\Event\Mapper as ModerationEventMapper;
 use Schoolbox\OpenAi\Moderation\Event\Status as ModerationEventStatus;
+use Schoolbox\OpenAi\Moderation\Event\Translator\ModelToArray as ModerationEventTranslator;
 use Schoolbox\OpenAi\Session\Mapper as SessionMapper;
 use Schoolbox\OpenAi\Session\Log\Mapper as SessionLogMapper;
 use Schoolbox\OpenAi\Session\Model as SessionModel;
@@ -42,12 +44,14 @@ class Controller extends Base
      * @param SessionLogMapper $sessionLogMapper
      * @param ConfigMapper $configMapper
      * @param UserMapper $userMapper
+     * @param ModerationEventMapper $moderationEventMapper
      */
     public function __construct(
         private SessionMapper $sessionMapper,
         private SessionLogMapper $sessionLogMapper,
         private ConfigMapper $configMapper,
         private UserMapper $userMapper,
+        private ModerationEventMapper $moderationEventMapper,
     ) {
     }
 
@@ -309,9 +313,22 @@ class Controller extends Base
         $userTranslator = new User\Translator\Author\ModelToArray();
         $strategyFactory = new Log\Translator\Format\StrategyFactory();
         $logTranslator = new Log\Translator\ModelToArray($userTranslator, $strategyFactory);
+        $moderationEventTranslator = new ModerationEventTranslator($userTranslator);
 
-        $logEntriesArray = $logEntries->map($logTranslator);
+        /* Retrieve the hydrated moderation events for the session (if any exist)
+         */
+        /* TODO: this is cursed and should probably be part of the session payload via a join?
+         * OR a separate endpoint (perhaps in the Schoolbox\OpenAi\Moderation namespace?) that takes
+         * a session ID and returns all the moderation events for that session.
+         * Need to consider in relation to how hydration of the other random data on Session should work too.
+         */
+        $moderationEvents = $this->moderationEventMapper->findByColumn('target_ai_session_id', $session->getId(), [
+            'order' => [ 'created_at' => 'ASC' ],
+        ]);
 
-        $this->response = $this->responseAsJson($logEntriesArray);
+        $this->response = $this->responseAsJson([
+            'logs' => $logEntries->map($logTranslator),
+            'moderationEvents' => $moderationEvents->map($moderationEventTranslator),
+        ]);
     }
 }

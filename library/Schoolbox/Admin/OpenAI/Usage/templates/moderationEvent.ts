@@ -31,6 +31,8 @@ export const STATUS_LABELS: Record<AiModerationStatus, string> = {
 type AiModerationEventResult = {
     /** A short plain English summary explaining why the interaction was or was not flagged. */
     summary: string;
+    /** true if any concern exists that should be reviewed by a staff member. */
+    needsHumanReview: boolean;
 };
 
 /**

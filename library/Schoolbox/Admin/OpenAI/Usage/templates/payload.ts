@@ -6,7 +6,7 @@ import type { DateRFC3339 } from "@js/util/dateUtils";
 import type { PaginationMeta } from "@js/util/sbx/apiUtils";
 import type { AgentChatLogEntry } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
-import type { AiModerationStatus } from "./moderationEvent";
+import type { AiModerationEvent, AiModerationStatus } from "./moderationEvent";
 
 /**
  * A unique guid for an AI session, used to group related requests such as a chat conversation together
@@ -92,6 +92,7 @@ export type AiUsageLogApiResponse = {
     metadata: PaginationMeta;
 };
 
-export type AiSessionLogApiResponse<TLogFormat extends AiLogFormat = AiLogFormat> = (AiSessionLog & {
-    logFormat: TLogFormat;
-})[];
+export type AiSessionLogApiResponse<TLogFormat extends AiLogFormat = AiLogFormat> = {
+    logs: (AiSessionLog & { logFormat: TLogFormat })[];
+    moderationEvents: AiModerationEvent[];
+};

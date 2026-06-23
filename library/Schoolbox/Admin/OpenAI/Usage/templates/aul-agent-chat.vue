@@ -9,23 +9,25 @@ import {
 import type { AgentChatLogEntry } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import { AiFeature, AiLogFormat } from "./payload";
 import type { AiSessionLogApiResponse } from "./payload";
+import type { AiModerationEvent } from "./moderationEvent";
 
 interface Props {
     feature: AiFeature;
-    sessionLog: AiSessionLogApiResponse<AiLogFormat.AGENT_CHAT | AiLogFormat.GUARDRAIL>;
+    sessionLogs: AiSessionLogApiResponse<AiLogFormat.AGENT_CHAT | AiLogFormat.GUARDRAIL>["logs"];
+    moderationEvents: AiModerationEvent[];
 }
 
 const props = defineProps<Props>();
 const acStore = useAgentChatStore();
 
 const sessionFeed = window.Vue.computed<ReturnType<typeof acStore.parseFeed>>(() => {
-    const firstLog = props.sessionLog[0];
+    const firstLog = props.sessionLogs[0];
     if (firstLog === undefined) {
         return [];
     }
 
     const feed: AgentChatLogEntry[] = [];
-    for (const entry of props.sessionLog) {
+    for (const entry of props.sessionLogs) {
         if (entry.logFormat === AiLogFormat.AGENT_CHAT) {
             /** An agent chat message can be directly pushed to the feed */
             feed.push(entry.data.input);
@@ -76,6 +78,19 @@ const sessionFeed = window.Vue.computed<ReturnType<typeof acStore.parseFeed>>(()
         } else {
             assertUnreachable(entry);
         }
+    }
+
+    /* jam in any flagged moderation events as if they were guardrail violations */
+    for (const event of props.moderationEvents) {
+        feed.push({
+            createdAt: event.createdAt,
+            type: AgentChatMessageType.ALERT,
+            data: {
+                side: AgentChatMessageType.RESPONSE,
+                severity: "warning",
+                message: event.result.summary,
+            },
+        });
     }
 
     return acStore.parseFeed(feed, firstLog.createdBy);
