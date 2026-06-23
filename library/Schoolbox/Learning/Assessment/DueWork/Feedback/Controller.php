@@ -247,7 +247,13 @@ class Controller extends Base
                 continue;
             }
 
-            $submissionReturn->setPublishedAt($now);
+            if (!$submissionReturn->isPublished()) {
+                $submissionReturn->setPublishedAt($now);
+
+                if (null !== $this->getUser()->getId()) {
+                    $submissionReturn->setPublishedBy($this->getUser()->getId());
+                }
+            }
 
             try {
                 $this->returnedWorkMapper->save($submissionReturn);

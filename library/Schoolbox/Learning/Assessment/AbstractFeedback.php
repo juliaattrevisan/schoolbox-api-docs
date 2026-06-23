@@ -107,6 +107,8 @@ abstract class AbstractFeedback implements IFeedback
      */
     public function isPublished()
     {
+        // We do not compare the publishedAt time with now() here because feedback does not
+        // support scheduled publishing. UI publish flows for feedback just set published_at to now.
         return $this->getPublishedAt() !== null;
     }
 

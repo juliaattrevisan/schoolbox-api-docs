@@ -397,16 +397,19 @@ class Controller extends Base
         foreach ($draftFeedbackIds as $draftFeedbackId) {
             // Verify that this feedback is for this assessment
             $feedback = $this->feedbackDataMapper->findById($draftFeedbackId);
-            $publishSuccess   = false;
 
             if ($feedback->getReporting()->getAssessmentModel()->getId() !== $assessment->getId()) {
                 $results[$draftFeedbackId] = ['publishSuccess' => false, 'error' => 'Feedback not for this assessment'];
                 continue;
             }
 
-            $feedback
-                ->setPublishedAt($now)
-                ->setPublishedBy($this->getUser()->getId());
+            if (!$feedback->isPublished()) {
+                $feedback->setPublishedAt($now);
+
+                if (null !== $this->getUser()->getId()) {
+                    $feedback->setPublishedBy($this->getUser()->getId());
+                }
+            }
 
             try {
                 $this->feedbackDataMapper->save($feedback);

@@ -232,6 +232,17 @@ class Model implements ISoftDeletable
 
 
     /**
+     * @return bool
+     */
+    public function isPublished(): bool
+    {
+        // We do not compare the publishedAt time with now() here because reporting feedback does not
+        // support scheduled publishing. UI publish flows for feedback just set published_at to now.
+        return $this->getPublishedAt() !== null;
+    }
+
+
+    /**
      * @param \Alaress_Date_Format|null $publishedAt
      * @return $this
      */
