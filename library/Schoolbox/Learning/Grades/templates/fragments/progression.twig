@@ -136,11 +136,24 @@
                                     {# Shortcuts to marks of various types #}
                                     {% set publishedMarks = indicatorData.assessmentResults[activityId].grid[rubricInstanceId].published ?? null %}
 
+                                    {# Calculate a fractional points score, if possible #}
+                                    {% set fractional = null %}
+
+                                    {# Conditionally throw in the fractional representation of descriptor value/max #}
+                                    {% if showRubricPoints %}
+                                        {% set numerator = publishedMarks.selectedDescriptorValue ?? null %}
+                                        {% set denominator = activity.gridData[rubricInstanceId].capabilities[capabilityId].indicators[indicatorId].max ?? null %}
+
+                                        {% if numerator and denominator %}
+                                            {% set fractional = '(' ~ numerator|round ~ '/' ~ denominator|round ~ ')' %}
+                                        {% endif %}
+                                    {% endif %}
+
                                     {% if publishedMarks is not null and publishedMarks.normalisedMark is not null %}
                                         {
                                             y: {{ publishedMarks.normalisedMark }},
-                                            desc: "{{ (publishedMarks.selectedDescriptorText ?? '') | markdown | escape('js') }}",
-                                            title: "{{ activity.name }}",
+                                            desc: "{{ (publishedMarks.selectedDescriptorText ?? '') | markdown | escape('js') }}{{ fractional }}",
+                                            title: "<strong>{{ activity.name }}</strong><br />{{ rubricInstanceData.title }}",
                                             level: "{{ publishedMarks.selectedLevel }}"
                                         },
                                     {% else %}
