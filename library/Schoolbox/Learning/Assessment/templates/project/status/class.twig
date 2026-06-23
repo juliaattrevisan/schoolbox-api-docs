@@ -12,7 +12,8 @@
  #   ]
  # @param bool $isSpecification         Whether to show classes as groups (course level), or just a flat list (class level)
 #}
-{% if aImpl.participantCount %}
+{% set participants = aImpl.participants ?? aImpl.assessment.allParticipants %}
+{% if participants | length %}
     <section
             {% if isSpecification %}
                 data-collapse-state="uncollapsed"
