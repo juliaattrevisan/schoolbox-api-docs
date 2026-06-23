@@ -523,16 +523,22 @@ class DataSource
      */
     public function findParticipantUserPage(IAssessable $assessment, int $cursor, int $count): array
     {
-        $students = $this->findAllStudentsForAssessment($assessment);
+        $students = clone $this->findAllStudentsForAssessment($assessment);
+        $students->sortByCallback(
+            static fn(User $a, User $b): int => $a->getId() <=> $b->getId(),
+            true
+        );
+
         $total = $students->count();
         $offset = 0;
 
         if ($cursor > 0) {
-            $studentIds = $students->keys();
-            $cursorOffset = array_search($cursor, $studentIds);
+            foreach ($students->keys() as $studentId) {
+                if ((int)$studentId > $cursor) {
+                    break;
+                }
 
-            if ($cursorOffset !== false) {
-                $offset = $cursorOffset + 1;
+                $offset++;
             }
         }
 
