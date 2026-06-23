@@ -63,6 +63,7 @@
                                 /* Concatenate everything
                                  */
                                 if (typeof this.points[0].x !== 'undefined') {
+                                    console.log(this.points);
                                     let tooltipContent = template;
                                     let desc = this.points[0].point.desc ?? ''
                                     let level = this.points[0].point.level ?? '';
@@ -80,7 +81,7 @@
                                         content = '<p>' + level + desc + '</p>';
                                     }
 
-                                    tooltipContent = tooltipContent.replace(/{NAME}/, this.points[0].x);
+                                    tooltipContent = tooltipContent.replace(/{NAME}/, this.points[0].title);
                                     tooltipContent = tooltipContent.replace(/{CONTENT}/, content);
 
                                     return tooltipContent;
