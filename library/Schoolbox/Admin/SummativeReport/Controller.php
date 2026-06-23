@@ -11,6 +11,7 @@ namespace Schoolbox\Admin\SummativeReport;
 
 use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
+use Alaress\Web\Request\Values;
 use Aura\Router\Exception\RouteNotFound;
 use DebugBar\DebugBarException;
 use Interop\Queue\Exception\InvalidDestinationException;
@@ -1142,6 +1143,16 @@ class Controller extends ConfigController
             $govtStudentNumber = $externalUser['StudentGovernmentStudentNumber'] ?? null;
         }
 
+        /* There's currently two custom CSS inputs depending on whether Sonar UI is enabled or not,
+         * so we need to check which one to pull from based on the Sonar UI toggle config option
+         */
+        $sonarUiEnabled = (new Values([
+            ConfigMapper::NAME_SONAR_UI_TOGGLE => $this->getConfigLoader()->get(ConfigMapper::NAME_SONAR_UI_TOGGLE),
+        ]))->getBool(ConfigMapper::NAME_SONAR_UI_TOGGLE, false) ?? false;
+        $customCssConfigName = $sonarUiEnabled
+            ? ConfigMapper::NAME_SONAR_SKIN_CUSTOM_CSS
+            : ConfigMapper::NAME_SKIN_CUSTOM_CSS;
+
         /* Build it
          */
         $data = [
@@ -1172,7 +1183,7 @@ class Controller extends ConfigController
             /* Extract any custom summative report styles from Admin Skin Config
              * and slam them in here so schools can tweak our designs
              */
-            'customReportStyle'          => (new CustomStyleExtractor())->extract((string)$this->getConfigLoader()->get('skin_custom_css'))
+            'customReportStyle'          => (new CustomStyleExtractor())->extract((string)$this->getConfigLoader()->get($customCssConfigName))
         ];
 
         /* Start assembling a hash lookup of rubric payload json structs; mega wow

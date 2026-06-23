@@ -20,8 +20,6 @@ use Schoolbox\IConfigLoader;
 
 class Helper
 {
-    private const string NAME_SONAR_SKIN_CUSTOM_CSS = 'skin_sonar_custom_css';
-
     public function __construct(
         private ConfigMapper $configMapper,
         private IConfigLoader $configLoader,
@@ -246,7 +244,7 @@ class Helper
     private function getCustomCssConfigName(int $typeId): string
     {
         return $typeId === ConfigMapper::TYPE_SONAR_SKIN_CONFIG
-            ? self::NAME_SONAR_SKIN_CUSTOM_CSS
+            ? ConfigMapper::NAME_SONAR_SKIN_CUSTOM_CSS
             : ConfigMapper::NAME_SKIN_CUSTOM_CSS;
     }
 

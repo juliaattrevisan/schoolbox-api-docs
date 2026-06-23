@@ -397,6 +397,8 @@ class ConfigMapper extends Mapper
     public const string NAME_EMAIL_BANNER_IMAGE = 'email_banner_image';
     public const string NAME_SKIN_FAVICON = 'skin_favicon';
     public const string NAME_SONAR_UI_TOGGLE = 'advanced_ui_enabled';
+    public const string NAME_SONAR_SKIN_CUSTOM_CSS = 'skin_sonar_custom_css';
+
 
     /* Skin Config Categories
      */
