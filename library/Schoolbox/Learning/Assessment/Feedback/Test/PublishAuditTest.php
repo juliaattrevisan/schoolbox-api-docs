@@ -167,7 +167,10 @@ class PublishAuditTest extends TestCase
                     && $savedReturn->getPublishedBy() === self::CURRENT_DUE_WORK_PUBLISHER_ID
             ));
 
-        $controller = $this->buildDueWorkController($returnedWorkMapper);
+        $controller = $this->buildDueWorkController(
+            $returnedWorkMapper,
+            $this->createStub(IFeedbackDataSource::class),
+        );
         $controller->setRequestPost(new Values(['drafts' => [self::DUE_WORK_DRAFT_RETURNED_WORK_ID]]));
         $controller->setUser(new User()->setId(self::CURRENT_DUE_WORK_PUBLISHER_ID));
 
@@ -212,7 +215,10 @@ class PublishAuditTest extends TestCase
                     && $savedReturn->getPublishedBy() === self::ORIGINAL_DUE_WORK_PUBLISHER_ID
             ));
 
-        $controller = $this->buildDueWorkController($returnedWorkMapper);
+        $controller = $this->buildDueWorkController(
+            $returnedWorkMapper,
+            $this->createStub(IFeedbackDataSource::class),
+        );
         $controller->setRequestPost(new Values(['drafts' => [self::DUE_WORK_PUBLISHED_RETURNED_WORK_ID]]));
         $controller->setUser(new User()->setId(self::CURRENT_DUE_WORK_PUBLISHER_ID));
 
@@ -315,15 +321,15 @@ class PublishAuditTest extends TestCase
      * Builds a due work feedback controller with the supplied returned work mapper.
      *
      * @param ReturnedWorkMapper $returnedWorkMapper
-     * @param IFeedbackDataSource|null $feedbackDataSource
+     * @param IFeedbackDataSource $feedbackDataSource
      * @return DueWork\Feedback\Controller
      */
     private function buildDueWorkController(
         ReturnedWorkMapper $returnedWorkMapper,
-        ?IFeedbackDataSource $feedbackDataSource = null,
+        IFeedbackDataSource $feedbackDataSource,
     ): DueWork\Feedback\Controller {
         $controller = new DueWork\Feedback\Controller(
-            $feedbackDataSource ?? $this->createStub(IFeedbackDataSource::class),
+            $feedbackDataSource,
             $this->createStub(ParticipantDataSource::class),
             $this->createStub(AssessmentDataSource::class),
             $this->createStub(ResponseDataSource::class),
