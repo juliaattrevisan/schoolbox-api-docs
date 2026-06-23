@@ -30,6 +30,13 @@ use Schoolbox\User;
 #[CoversClass(CampusMatcher::class)]
 class DefaultTest extends TestCase
 {
+    public function testSocsMusicCalendarClassesAutoload(): void
+    {
+        self::assertTrue(class_exists('Calendar_Api_Config_Connector_SocsMusic'));
+        self::assertTrue(class_exists('Calendar_Api_EventType_Event_SocsMusic_Default'));
+    }
+
+
     public function testEventsAreCampusFilterable(): void
     {
         $seniorCampus = (new Campus())->setId(11)->setName('Seniors (Y7-Y11)');

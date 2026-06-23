@@ -340,6 +340,14 @@ class Calendar_Api_Factory
                     $viewer,
                     $this->configLoader,
                     \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                    \Schoolbox\CampusMapper::getInstance(),
+                    new \Schoolbox\Socs\HttpClient(
+                        (string)$this->configLoader->get(\Schoolbox\Config\ConfigMapper::NAME_SOCS_ENDPOINT_HOST),
+                        (string)$this->configLoader->get(\Schoolbox\Config\ConfigMapper::NAME_SOCS_ENDPOINT_ID),
+                        (string)$this->configLoader->get(\Schoolbox\Config\ConfigMapper::NAME_SOCS_ENDPOINT_TOKEN),
+                        $this->httpClient,
+                        $this->cache,
+                    ),
                 );
             case Calendar_Api_EventType_Event_Socs_Default::class:
                 return new Calendar_Api_EventType_Event_Socs_Default(

@@ -36,7 +36,7 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
         int $connectorId,
         User $user,
         User $viewer,
-        private IConfigLoader $configLoader,
+        protected IConfigLoader $configLoader,
         private EventTypeMapper $eventTypeMapper,
         private CampusMapper $campusMapper,
         private HttpClient $httpClient,
@@ -128,7 +128,7 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
     /**
      * Determine whether the SOCS calendar feed has enough configuration to be queried.
      */
-    private function isConfigured(): bool
+    protected function isConfigured(): bool
     {
         return (bool)$this->configLoader->get(ConfigMapper::NAME_SOCS_ENABLED)
             && (bool)$this->configLoader->get(ConfigMapper::NAME_SOCS_IMPORT_CALENDAR_EVENTS)
@@ -145,7 +145,7 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
      */
     private function readEvents(?int $startTimestamp = null, ?int $endTimestamp = null): array
     {
-        $xml = $this->httpClient->getCached(self::CALENDAR_PATH, $this->buildFeedQuery($startTimestamp, $endTimestamp));
+        $xml = $this->httpClient->getCached(static::CALENDAR_PATH, $this->buildFeedQuery($startTimestamp, $endTimestamp));
 
         return (new Parser())->parse($xml);
     }
@@ -206,7 +206,7 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
     /**
      * Return the configured Schoolbox calendar category for SOCS events.
      */
-    private function getConfiguredEventTypeId(): int
+    protected function getConfiguredEventTypeId(): int
     {
         return (int)$this->configLoader->get(ConfigMapper::NAME_SOCS_CALENDAR_DEFAULT_EVENT_TYPE);
     }
