@@ -50,7 +50,7 @@ export enum ActivityTypes {
     LEARNING_ACTIVITY_LESSON_PLAN = "lessonPlan",
     LEARNING_ACTIVITY_LTI = "lti",
     LEARNING_ACTIVITY_DIALOG_AGENT = "dialogAgent",
-    LEARNING_ACTIVITY_REPORTING_ACTIVITY = "reportingActivity",
+    LEARNING_ACTIVITY_REPORTING_ACTIVITY = "reporting",
     BADGE = "badge",
     FOLDER = "folder",
 }
