@@ -20,9 +20,11 @@ class ModelToArray
      * Constructor
      *
      * @param User\Translator\Author\ModelToArray $userTranslator
+     * @param Links $linkTranslator
      */
     public function __construct(
         private User\Translator\Author\ModelToArray $userTranslator,
+        private Links $linkTranslator,
     ) {
     }
 
@@ -48,11 +50,7 @@ class ModelToArray
             'reviewedBy' => $event->getReviewedBy() ? $this->userTranslator->__invoke($event->getReviewedBy()) : null,
             'resolvedBy' => $event->getResolvedBy() ? $this->userTranslator->__invoke($event->getResolvedBy()) : null,
             'createdAt' => $event->getCreatedAt()?->getUsingFormat(DATE_ATOM),
-            '_routes' => [
-                'postNoActionRequired' => null, // TODO: links translator
-                'postFurtherActionRequired' => null, // TODO: links translator
-                'postFurtherActionTaken' => null, // TODO: links translator
-            ],
+            '_routes' => $this->linkTranslator->__invoke($event),
         ];
     }
 }
