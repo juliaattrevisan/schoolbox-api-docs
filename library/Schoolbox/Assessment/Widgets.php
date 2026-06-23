@@ -77,8 +77,8 @@ class Widgets
             ],
             IAssessable::MARK_VISIBILITY_PARENT_STUDENT => [
                 'id'   => IAssessable::MARK_VISIBILITY_PARENT_STUDENT,
-                'name' => html_entity_decode('&#xe666;&nbsp;&nbsp;Staff, Students and their Parents'),
-                'css'  => 'icon-staff',
+                'name' => html_entity_decode('&#xe630;&nbsp;&nbsp;Staff, Students and their Parents'),
+                'css'  => 'icon-group',
             ],
         ];
     }
