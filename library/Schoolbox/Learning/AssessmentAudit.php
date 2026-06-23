@@ -193,7 +193,7 @@ class AssessmentAudit
     {
         return "
 SELECT
-    mv_assessment_relation.assessment_id AS AssessmentId,
+    folder_scoped_assessment_relation.assessment_id AS AssessmentId,
     CASE
         WHEN project.id IS NOT NULL THEN 'Project'
         WHEN lti_assessment.id IS NOT NULL THEN '3rd Party Assessment'
@@ -202,21 +202,10 @@ SELECT
         WHEN submission_box.id IS NOT NULL THEN 'Due Work'
     END AS ActivityType,
     assessment.title AS AssessmentTitle,
-    mv_assessment_relation.folder_id AS FolderId,
+    folder_scoped_assessment_relation.folder_id AS FolderId,
     folder.name AS FolderName,
-    (
-        SELECT GROUP_CONCAT(DISTINCT lu_year_level.name ORDER BY lu_year_level.sequence SEPARATOR ',')
-        FROM folder_year_level
-        JOIN lu_year_level ON folder_year_level.year_level_id = lu_year_level.id
-        WHERE folder_year_level.folder_id = mv_assessment_relation.folder_id
-        AND lu_year_level.deleted_at IS NULL
-    ) AS PageYearLevel,
-    (
-        SELECT GROUP_CONCAT(folder_code.code ORDER BY folder_code.code SEPARATOR ',')
-        FROM folder_code
-        WHERE folder_code.folder_id = mv_assessment_relation.folder_id
-        AND folder_code.deleted_at IS NULL
-    ) AS ClassCode,
+    folder_year_level_table.PageYearLevel,
+    folder_code_table.ClassCode,
 
     COALESCE(course_specification.folder_id, course_imp_spec.folder_id) AS CourseFolderId,
     COALESCE(course_spec_folder.name, course_imp_spec_folder.name) AS CourseName,
@@ -402,22 +391,84 @@ END AS SpecificationImplementation,
         'False'
     ) AS ParentObjectDeleted
 
-FROM mv_assessment_relation
-JOIN assessment ON mv_assessment_relation.assessment_id = assessment.id
-JOIN folder ON mv_assessment_relation.folder_id = folder.id
+FROM (
+    SELECT *
+    FROM mv_assessment_relation
+    WHERE mv_assessment_relation.folder_id IN ($folderIds)
+) folder_scoped_assessment_relation
+JOIN assessment ON folder_scoped_assessment_relation.assessment_id = assessment.id
+JOIN folder ON folder_scoped_assessment_relation.folder_id = folder.id
+JOIN (
+    SELECT submission_box.assessment_id
+    FROM submission_box
+    UNION
+    SELECT project.assessment_id
+    FROM project
+    WHERE project.deleted_at IS NULL
+    UNION
+    SELECT assess.assessment_id
+    FROM assess
+    WHERE assess.deleted_at IS NULL
+    UNION
+    SELECT reporting.assessment_id
+    FROM reporting
+    WHERE reporting.deleted_at IS NULL
+    UNION
+    SELECT lti_assessment.assessment_id
+    FROM lti_assessment
+    JOIN assessment lti_assessment_soft_delete_assessment
+        ON lti_assessment.assessment_id = lti_assessment_soft_delete_assessment.id
+    WHERE lti_assessment_soft_delete_assessment.deleted_at IS NULL
+) active_activity ON active_activity.assessment_id = assessment.id
 LEFT JOIN lu_work_type ON assessment.work_type_id = lu_work_type.id
+
+LEFT JOIN (
+    SELECT
+        folder_year_level.folder_id,
+        GROUP_CONCAT(DISTINCT lu_year_level.name ORDER BY lu_year_level.sequence SEPARATOR ',') AS PageYearLevel
+    FROM folder_year_level
+    JOIN lu_year_level ON folder_year_level.year_level_id = lu_year_level.id
+    WHERE folder_year_level.folder_id IN ($folderIds)
+    AND lu_year_level.deleted_at IS NULL
+    GROUP BY folder_year_level.folder_id
+) folder_year_level_table ON folder_year_level_table.folder_id = folder_scoped_assessment_relation.folder_id
+LEFT JOIN (
+    SELECT
+        folder_code.folder_id,
+        GROUP_CONCAT(folder_code.code ORDER BY folder_code.code SEPARATOR ',') AS ClassCode
+    FROM folder_code
+    WHERE folder_code.folder_id IN ($folderIds)
+    AND folder_code.deleted_at IS NULL
+    GROUP BY folder_code.folder_id
+) folder_code_table ON folder_code_table.folder_id = folder_scoped_assessment_relation.folder_id
 
 LEFT JOIN submission_box ON assessment.id = submission_box.assessment_id
 LEFT JOIN project ON assessment.id = project.assessment_id AND project.deleted_at IS NULL
 LEFT JOIN assess ON assessment.id = assess.assessment_id AND assess.deleted_at IS NULL
 LEFT JOIN reporting ON assessment.id = reporting.assessment_id AND reporting.deleted_at IS NULL
 LEFT JOIN lti_assessment ON assessment.id = lti_assessment.assessment_id AND assessment.deleted_at IS NULL
+LEFT JOIN (
+    SELECT DISTINCT task.assessment_id
+    FROM task
+    WHERE task.deleted_at IS NULL
+) active_task ON active_task.assessment_id = assessment.id
+LEFT JOIN (
+    SELECT DISTINCT lesson_plan.assessment_id
+    FROM lesson_plan
+    WHERE lesson_plan.deleted_at IS NULL
+) active_lesson_plan ON active_lesson_plan.assessment_id = assessment.id
 
 LEFT JOIN (
     SELECT
         rubric_instance.assessment_id,
         COUNT(*) AS rubric_count
     FROM rubric_instance
+    JOIN (
+        SELECT DISTINCT mv_assessment_relation.assessment_id
+        FROM mv_assessment_relation
+        WHERE mv_assessment_relation.folder_id IN ($folderIds)
+    ) folder_scoped_rubric_assessment
+        ON rubric_instance.assessment_id = folder_scoped_rubric_assessment.assessment_id
     WHERE rubric_instance.deleted_at IS NULL
     GROUP BY rubric_instance.assessment_id
 ) rubric_counts ON assessment.id = rubric_counts.assessment_id
@@ -451,17 +502,17 @@ LEFT JOIN submission_grade_group reporting_display_grade_group_table
     ON reporting.grade_group_id = reporting_display_grade_group_table.id
 
 LEFT JOIN assessment_course_unit_implementation
-    ON mv_assessment_relation.assessment_id = assessment_course_unit_implementation.assessment_id
+    ON folder_scoped_assessment_relation.assessment_id = assessment_course_unit_implementation.assessment_id
 LEFT JOIN course_specification
-    ON mv_assessment_relation.course_specification_id = course_specification.id
+    ON folder_scoped_assessment_relation.course_specification_id = course_specification.id
 LEFT JOIN course_implementation
-    ON mv_assessment_relation.course_implementation_id = course_implementation.id
+    ON folder_scoped_assessment_relation.course_implementation_id = course_implementation.id
 LEFT JOIN course_specification course_imp_spec
     ON course_implementation.course_specification_id = course_imp_spec.id
 LEFT JOIN course_unit_specification
-    ON mv_assessment_relation.course_unit_specification_id = course_unit_specification.id
+    ON folder_scoped_assessment_relation.course_unit_specification_id = course_unit_specification.id
 LEFT JOIN course_unit_implementation
-    ON mv_assessment_relation.course_unit_implementation_id = course_unit_implementation.id
+    ON folder_scoped_assessment_relation.course_unit_implementation_id = course_unit_implementation.id
 LEFT JOIN course_unit_specification course_unit_implementation_out
     ON course_unit_implementation.course_unit_specification_id = course_unit_implementation_out.id
 LEFT JOIN folder unit_spec_folder
@@ -473,27 +524,9 @@ LEFT JOIN folder course_imp_spec_folder
 LEFT JOIN folder course_spec_folder
     ON course_specification.folder_id = course_spec_folder.id
 
-WHERE mv_assessment_relation.folder_id IN ($folderIds)
-AND assessment.deleted_at IS NULL
-AND NOT EXISTS (
-    SELECT 1
-    FROM task
-    WHERE task.assessment_id = assessment.id
-    AND task.deleted_at IS NULL
-)
-AND NOT EXISTS (
-    SELECT 1
-    FROM lesson_plan
-    WHERE lesson_plan.assessment_id = assessment.id
-    AND lesson_plan.deleted_at IS NULL
-)
-AND (
-    project.id IS NOT NULL
-    OR lti_assessment.id IS NOT NULL
-    OR assess.assess_id IS NOT NULL
-    OR reporting.id IS NOT NULL
-    OR submission_box.id IS NOT NULL
-)";
+WHERE assessment.deleted_at IS NULL
+AND active_task.assessment_id IS NULL
+AND active_lesson_plan.assessment_id IS NULL";
     }
 
     private function getRubricAuditQuery(string $folderIds): string
@@ -502,21 +535,10 @@ AND (
 SELECT
     assessment.id AS AssessmentId,
     assessment.title AS AssessmentTitle,
-    mv_assessment_relation.folder_id AS FolderId,
+    folder_scoped_assessment_relation.folder_id AS FolderId,
     folder.name AS FolderName,
-    (
-        SELECT GROUP_CONCAT(DISTINCT lu_year_level.name ORDER BY lu_year_level.sequence SEPARATOR ',')
-        FROM folder_year_level
-        JOIN lu_year_level ON folder_year_level.year_level_id = lu_year_level.id
-        WHERE folder_year_level.folder_id = mv_assessment_relation.folder_id
-        AND lu_year_level.deleted_at IS NULL
-    ) AS PageYearLevel,
-    (
-        SELECT GROUP_CONCAT(folder_code.code ORDER BY folder_code.code SEPARATOR ',')
-        FROM folder_code
-        WHERE folder_code.folder_id = mv_assessment_relation.folder_id
-        AND folder_code.deleted_at IS NULL
-    ) AS ClassCode,
+    folder_year_level_table.PageYearLevel,
+    folder_code_table.ClassCode,
     COALESCE(course_specification.folder_id, course_imp_spec.folder_id) AS CourseFolderId,
     COALESCE(course_spec_folder.name, course_imp_spec_folder.name) AS CourseName,
     COALESCE(course_specification.subject_code, course_imp_spec.subject_code) AS SubjectCode,
@@ -533,11 +555,57 @@ SELECT
         ELSE 'Null'
     END AS CapabilityGradeGroup
 
-FROM rubric_instance
-JOIN assessment ON rubric_instance.assessment_id = assessment.id
-JOIN mv_assessment_relation ON assessment.id = mv_assessment_relation.assessment_id
-JOIN folder ON mv_assessment_relation.folder_id = folder.id
+FROM (
+    SELECT *
+    FROM mv_assessment_relation
+    WHERE mv_assessment_relation.folder_id IN ($folderIds)
+) folder_scoped_assessment_relation
+JOIN assessment ON folder_scoped_assessment_relation.assessment_id = assessment.id
+JOIN folder ON folder_scoped_assessment_relation.folder_id = folder.id
+JOIN (
+    SELECT submission_box.assessment_id
+    FROM submission_box
+    UNION
+    SELECT project.assessment_id
+    FROM project
+    WHERE project.deleted_at IS NULL
+    UNION
+    SELECT assess.assessment_id
+    FROM assess
+    WHERE assess.deleted_at IS NULL
+    UNION
+    SELECT reporting.assessment_id
+    FROM reporting
+    WHERE reporting.deleted_at IS NULL
+    UNION
+    SELECT lti_assessment.assessment_id
+    FROM lti_assessment
+    JOIN assessment lti_assessment_soft_delete_assessment
+        ON lti_assessment.assessment_id = lti_assessment_soft_delete_assessment.id
+    WHERE lti_assessment_soft_delete_assessment.deleted_at IS NULL
+) active_activity ON active_activity.assessment_id = assessment.id
+JOIN rubric_instance ON rubric_instance.assessment_id = assessment.id AND rubric_instance.deleted_at IS NULL
 LEFT JOIN lu_work_type ON assessment.work_type_id = lu_work_type.id
+
+LEFT JOIN (
+    SELECT
+        folder_year_level.folder_id,
+        GROUP_CONCAT(DISTINCT lu_year_level.name ORDER BY lu_year_level.sequence SEPARATOR ',') AS PageYearLevel
+    FROM folder_year_level
+    JOIN lu_year_level ON folder_year_level.year_level_id = lu_year_level.id
+    WHERE folder_year_level.folder_id IN ($folderIds)
+    AND lu_year_level.deleted_at IS NULL
+    GROUP BY folder_year_level.folder_id
+) folder_year_level_table ON folder_year_level_table.folder_id = folder_scoped_assessment_relation.folder_id
+LEFT JOIN (
+    SELECT
+        folder_code.folder_id,
+        GROUP_CONCAT(folder_code.code ORDER BY folder_code.code SEPARATOR ',') AS ClassCode
+    FROM folder_code
+    WHERE folder_code.folder_id IN ($folderIds)
+    AND folder_code.deleted_at IS NULL
+    GROUP BY folder_code.folder_id
+) folder_code_table ON folder_code_table.folder_id = folder_scoped_assessment_relation.folder_id
 
 LEFT JOIN submission_mark_type rubric_mark_type_table
     ON rubric_instance.rubric_capability_mark_type_id = rubric_mark_type_table.mark_type_id
@@ -545,17 +613,17 @@ LEFT JOIN submission_grade_group rubric_grade_group_table
     ON rubric_instance.rubric_capability_grade_group_id = rubric_grade_group_table.id
 
 LEFT JOIN assessment_course_unit_implementation
-    ON mv_assessment_relation.assessment_id = assessment_course_unit_implementation.assessment_id
+    ON folder_scoped_assessment_relation.assessment_id = assessment_course_unit_implementation.assessment_id
 LEFT JOIN course_specification
-    ON mv_assessment_relation.course_specification_id = course_specification.id
+    ON folder_scoped_assessment_relation.course_specification_id = course_specification.id
 LEFT JOIN course_implementation
-    ON mv_assessment_relation.course_implementation_id = course_implementation.id
+    ON folder_scoped_assessment_relation.course_implementation_id = course_implementation.id
 LEFT JOIN course_specification course_imp_spec
     ON course_implementation.course_specification_id = course_imp_spec.id
 LEFT JOIN course_unit_specification
-    ON mv_assessment_relation.course_unit_specification_id = course_unit_specification.id
+    ON folder_scoped_assessment_relation.course_unit_specification_id = course_unit_specification.id
 LEFT JOIN course_unit_implementation
-    ON mv_assessment_relation.course_unit_implementation_id = course_unit_implementation.id
+    ON folder_scoped_assessment_relation.course_unit_implementation_id = course_unit_implementation.id
 LEFT JOIN course_unit_specification course_unit_implementation_out
     ON course_unit_implementation.course_unit_specification_id = course_unit_implementation_out.id
 LEFT JOIN folder unit_spec_folder
@@ -572,28 +640,19 @@ LEFT JOIN project ON assessment.id = project.assessment_id AND project.deleted_a
 LEFT JOIN assess ON assessment.id = assess.assessment_id AND assess.deleted_at IS NULL
 LEFT JOIN reporting ON assessment.id = reporting.assessment_id AND reporting.deleted_at IS NULL
 LEFT JOIN lti_assessment ON assessment.id = lti_assessment.assessment_id AND assessment.deleted_at IS NULL
-
-WHERE mv_assessment_relation.folder_id IN ($folderIds)
-AND assessment.deleted_at IS NULL
-AND rubric_instance.deleted_at IS NULL
-AND NOT EXISTS (
-    SELECT 1
+LEFT JOIN (
+    SELECT DISTINCT task.assessment_id
     FROM task
-    WHERE task.assessment_id = assessment.id
-    AND task.deleted_at IS NULL
-)
-AND NOT EXISTS (
-    SELECT 1
+    WHERE task.deleted_at IS NULL
+) active_task ON active_task.assessment_id = assessment.id
+LEFT JOIN (
+    SELECT DISTINCT lesson_plan.assessment_id
     FROM lesson_plan
-    WHERE lesson_plan.assessment_id = assessment.id
-    AND lesson_plan.deleted_at IS NULL
-)
-AND (
-    project.id IS NOT NULL
-    OR lti_assessment.id IS NOT NULL
-    OR assess.assess_id IS NOT NULL
-    OR reporting.id IS NOT NULL
-    OR submission_box.id IS NOT NULL
-)";
+    WHERE lesson_plan.deleted_at IS NULL
+) active_lesson_plan ON active_lesson_plan.assessment_id = assessment.id
+
+WHERE assessment.deleted_at IS NULL
+AND active_task.assessment_id IS NULL
+AND active_lesson_plan.assessment_id IS NULL";
     }
 }
