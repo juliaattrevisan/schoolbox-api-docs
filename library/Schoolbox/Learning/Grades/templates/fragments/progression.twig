@@ -101,88 +101,99 @@
     });
 </script>
 <table class="rb">
+    {% for capabilityId, capabilityData in longitudinalStudentMarks %}
+    <tr>
+        <th class="rubric-progression-capability markdown" rowspan="{{ capabilityData.indicators|length }}">{{ (capabilityData.name ?? '') | markdown }}</th>
 
+        {% for indicatorId, indicatorData in capabilityData.indicators %}
+            {# mystical html table witchery #}
+            {% if not loop.first %}
+                </tr>
+                <tr>
+            {% endif %}
 
+            <th class="rubric-progression-indicator markdown">{{ (indicatorData.name ?? '') | markdown }}</th>
+            <td class="rubric-progression-graph">
+                <div id="rubricGraph{{ indicatorId }}"></div>
 
-{#    {% for capability in longitudinalRubric %}#}
-{#        <tr><th class="rubric-progression-capability markdown">{{ (capability.name ?? '') | markdown }}</th>#}
-{#        {% for indicatorId,indicator in capability.indicators %}#}
-{#            {% if not loop.first %}#}
-{#                <tr><th class="rubric-progression-capability">&nbsp;</th>#}
-{#            {% endif %}#}
-{#            <th class="rubric-progression-indicator markdown">{{ (indicator.name ?? '') | markdown }}</th>#}
-{#            <td class="rubric-progression-graph">#}
-{#                <div id="rubricGraph{{ indicatorId }}"></div>#}
-{#                <script type="application/javascript">#}
-{#                    $(function() {#}
-{#                        const rootStyles = getComputedStyle(document.documentElement); // Get the computed styles of the :root element#}
-{#                        const depthDefault = parseInt(rootStyles.getPropertyValue('--sbx-depth-default')); // Get the default depth for the graph#}
-{#                        var assessments = [#}
-{#                            {% for activity_id, activity in rubricAssessmentList %}#}
-{#                            "{{ activity.name }}",#}
+                <script type="application/javascript">
+                    $(function() {
+                        const rootStyles = getComputedStyle(document.documentElement); // Get the computed styles of the :root element
+                        const depthDefault = parseInt(rootStyles.getPropertyValue('--sbx-depth-default')); // Get the default depth for the graph
+
+                        let assessments = [
+                            {% for activityId, activity in longitudinalAssessments %}
+                                {% for rubricInstanceId, rubricInstanceData in activity.gridData %}
+                                    "{{ activity.name }}<br />{{ rubricInstanceData.title }}",
+                                {% endfor %}
+                            {% endfor %}
+                        ];
+
+                        let grades = [
+                            {% for activityId, activity in longitudinalAssessments %}
+                                {% for rubricInstanceId, rubricInstanceData in activity.gridData %}
+                                    {# Shortcuts to marks of various types #}
+                                    {% set publishedMarks = indicatorData.assessmentResults[activityId].grid[rubricInstanceId].published ?? null %}
+
+                                    {% if publishedMarks is not null and publishedMarks.normalisedMark is not null %}
+                                        {
+                                            y: {{ publishedMarks.normalisedMark }},
+                                            desc: "{{ (publishedMarks.selectedDescriptorText ?? '') | markdown | escape('js') }}",
+                                            title: "{{ activity.name }}",
+                                            level: "{{ publishedMarks.selectedLevel }}"
+                                        },
+                                    {% else %}
+                                        '',
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                        ];
+
+                        var ranges = [
+{#                            {% for activityId, activity in longitudinalAssessments %}#}
+{#                                {% set activity = indicator.activities[activityId] is defined ? indicator.activities[activity_id] : null %}#}
+
+{#                                {% if activity.max_value ?? 0 > 0 and activity.statistics is defined %}#}
+{#                                    ["{{ activity.name  }}",{{ (activity.statistics.min / activity.max_value) * 100 }}, {{ (activity.statistics.quartile1 / activity.max_value) * 100 }}, {{ (activity.statistics.quartile2 / activity.max_value) * 100 }}, {{ (activity.statistics.quartile3 / activity.max_value) * 100 }}, {{ (activity.statistics.max / activity.max_value) * 100 }}],#}
+{#                                {% else %}#}
+{#                                    '',#}
+{#                                {% endif %}#}
 {#                            {% endfor %}#}
-{#                        ];#}
-{#                        var grades = [#}
-{#                            {% for activity_id, activity in rubricAssessmentList %}#}
-{#                            {% set activity_name = activity.name %}#}
-{#                            {% set activity = indicator.activities[activity_id] is defined ? indicator.activities[activity_id] : null %}#}
-{#                            {% if activity.max_value ?? 0 > 0  %}#}
-{#                            {#}
-{#                                y: {{ activity.value is defined ? ((activity.value / activity.max_value) * 100) : 'null' }},#}
-{#                                desc: "{{ (activity.descriptor ?? '') | markdown | escape('js') }}",#}
-{#                                title: "{{ activity_name }}",#}
-{#                                level: "{{ activity.level ?? '' }}"#}
-{#                            },#}
-{#                            {% else %}#}
-{#                            '',#}
-{#                            {% endif %}#}
-{#                            {% endfor %}#}
-{#                        ];#}
-{#                        var ranges = [#}
-{#                            {% for activity_id, activity in rubricAssessmentList %}#}
-{#                            {% set activity = indicator.activities[activity_id] is defined ? indicator.activities[activity_id] : null %}#}
-{#                            {% if activity.max_value ?? 0 > 0 and activity.statistics is defined %}#}
-{#                            ["{{ activity.name  }}",{{ (activity.statistics.min / activity.max_value) * 100 }}, {{ (activity.statistics.quartile1 / activity.max_value) * 100 }}, {{ (activity.statistics.quartile2 / activity.max_value) * 100 }}, {{ (activity.statistics.quartile3 / activity.max_value) * 100 }}, {{ (activity.statistics.max / activity.max_value) * 100 }}],#}
-{#                            {% else %}#}
-{#                            '',#}
-{#                            {% endif %}#}
-{#                            {% endfor %}#}
-{#                        ];#}
-{#                        $('#rubricGraph{{ indicatorId }}').highcharts('boxLine', {#}
-{#                            xAxis: [{#}
-{#                                categories: assessments,#}
-{#                                visible: false,#}
-{#                                title: {#}
-{#                                    text: null#}
-{#                                }#}
-{#                            }],#}
-{#                            series: [{#}
-{#                                name: 'Marks',#}
-{#                                data: grades,#}
-{#                                zIndex: depthDefault,#}
-{#                                connectNulls: true,#}
-{#                                color: 'rgb(255, 87, 87)',#}
-{#                            }, {#}
-{#                                name: 'Range',#}
-{#                                data: ranges,#}
-{#                                type: 'boxplot',#}
-{#                                pointWidth: 40,#}
-{#                                linkedTo: ':previous',#}
-{#                                color: Highcharts.getOptions().colors[0],#}
-{#                                fillOpacity: 0.3,#}
-{#                                zIndex: depthDefault-1,#}
-{#                                marker: {#}
-{#                                    enabled: false#}
-{#                                }#}
-{#                            }#}
-{#                            ]#}
-{#                        })#}
-{#                    });#}
-{#                </script>#}
-{#            </td>#}
-{#            </tr>#}
-{#        {% endfor %}#}
-{#    {% endfor %}#}
+                        ];
+
+                        $('#rubricGraph{{ indicatorId }}').highcharts('boxLine', {
+                            xAxis: [{
+                                categories: assessments,
+                                visible: false,
+                                title: {
+                                    text: null
+                                }
+                            }],
+                            series: [{
+                                name: 'Marks',
+                                data: grades,
+                                zIndex: depthDefault,
+                                connectNulls: true,
+                                color: 'rgb(255, 87, 87)',
+                            }, {
+                                name: 'Range',
+                                data: ranges,
+                                type: 'boxplot',
+                                pointWidth: 40,
+                                linkedTo: ':previous',
+                                color: Highcharts.getOptions().colors[0],
+                                fillOpacity: 0.3,
+                                zIndex: depthDefault-1,
+                                marker: {
+                                    enabled: false
+                                }
+                            }]
+                        });
+                    });
+                </script>
+            </td>
+        {% endfor %}
+    {% endfor %}
 </table>
 
 <style>

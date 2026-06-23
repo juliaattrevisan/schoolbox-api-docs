@@ -33,6 +33,42 @@ class LongitudinalDataset
      *     - progression panel
      *     - etc.
      *
+     * Produces a struct like this:
+     *
+     * [
+     *     capability id => [
+     *         capability name
+     *         assessment results => [
+     *             assessment id => [
+     *                 grid => [
+     *                     rubric instance id => [
+     *                         published => [
+     *                             normalised mark
+     *                         ]
+     *                     ]
+     *                 ]
+     *             ]
+     *         ]
+     *         indicators => [
+     *             indicator id => [
+     *                 indicator name
+     *                 assessment results => [
+     *                     assessment id => [
+     *                         grid => [
+     *                             rubric instance id => [
+     *                                 published => [
+     *                                     normalised mark,
+     *                                     optionally a five point summary for boxplots
+     *                                 ]
+     *                             ]
+     *                         ]
+     *                     ]
+     *                 ]
+     *             ]
+     *         ]
+     *     ]
+     * ]
+     *
      * @param User $student
      * @param array $studentMarks
      * @return array
