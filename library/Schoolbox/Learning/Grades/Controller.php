@@ -634,7 +634,8 @@ class Controller extends Base
                     )
                 ),
                 'returnUrlSuffix'       => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($_SERVER['REQUEST_URI']),
-                /* Capability Marks panel
+                /* Capability Marks Panel,
+                 * Learning Levels panel
                  */
                 'longitudinalAssessments' => $longitudinalAssessments,
                 'longitudinalStudentMarks' => $longitudinalStudentMarks,
