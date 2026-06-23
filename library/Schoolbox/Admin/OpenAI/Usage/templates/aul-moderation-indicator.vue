@@ -15,11 +15,11 @@ const indicator = window.Vue.computed<null | { icon: string; class: string; labe
     if (props.status === AiModerationStatus.FURTHER_ACTION_TAKEN) return null;
 
     if (props.status === AiModerationStatus.REQUIRES_ATTENTION) {
-        return { icon: "danger", class: "alert", label: "Moderation: Requires attention" };
+        return { icon: "alert", class: "warning", label: "Moderation: Requires attention" };
     }
 
     if (props.status === AiModerationStatus.FURTHER_ACTION_REQUIRED) {
-        return { icon: "alert", class: "warning", label: "Moderation: Further action required" };
+        return { icon: "alert", class: "alert", label: "Moderation: Further action required" };
     }
 
     assertUnreachable(props.status);
