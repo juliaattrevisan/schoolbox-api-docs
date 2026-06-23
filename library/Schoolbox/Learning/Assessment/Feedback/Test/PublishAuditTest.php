@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Assessment\Feedback\Test;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Request\Values;
 use Alaress\Web\Response\Factory as ResponseFactory;
+use Alaress\Specification\ISpecification;
 use Alaress_Date_Format;
 use GuzzleHttp\Psr7\HttpFactory;
 use PHPUnit\Framework\TestCase;
@@ -22,6 +23,7 @@ use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Rubric\Instance\Mapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\AbstractFeedback;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
@@ -29,7 +31,9 @@ use Schoolbox\Learning\Assessment\DataModel\Reporting;
 use Schoolbox\Learning\Assessment\DataModel\Reporting\Feedback\Mapper as ReportingFeedbackMapper;
 use Schoolbox\Learning\Assessment\DataModel\Reporting\Feedback\Model as ReportingFeedback;
 use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper as ProjectResultCacheMapper;
 use Schoolbox\Learning\Assessment\Reporting\Model;
@@ -59,8 +63,11 @@ class PublishAuditTest extends TestCase
     private const int CURRENT_REPORTING_PUBLISHER_ID = 601;
 
     private const int DUE_WORK_ASSESSMENT_ID = 84;
+    private const int DUE_WORK_STUDENT_ID = 92;
     private const int DUE_WORK_DRAFT_RETURNED_WORK_ID = 2001;
     private const int DUE_WORK_PUBLISHED_RETURNED_WORK_ID = 2002;
+    private const int DUE_WORK_DRAFT_FEEDBACK_ID = 3001;
+    private const int DUE_WORK_PUBLISHED_FEEDBACK_ID = 3002;
     private const int ORIGINAL_DUE_WORK_PUBLISHER_ID = 502;
     private const int CURRENT_DUE_WORK_PUBLISHER_ID = 602;
 
@@ -213,6 +220,69 @@ class PublishAuditTest extends TestCase
     }
 
     /**
+     * Verifies due work single publish records who published a draft feedback item.
+     */
+    public function testDueWorkSinglePublishSetsPublishedAuditFieldsWhenDraftIsPublished(): void
+    {
+        $student = new User()->setId(self::DUE_WORK_STUDENT_ID);
+        $feedback = new DueWorkFeedback()
+            ->setId(self::DUE_WORK_DRAFT_FEEDBACK_ID)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
+
+        $assessment = $this->createDueWorkAssessmentWithFeedback($student, $feedback);
+        $feedbackDataSource = $this->createMock(IFeedbackDataSource::class);
+        $feedbackDataSource
+            ->expects($this->once())
+            ->method('save')
+            ->with(self::callback(
+                static fn(DueWorkFeedback $savedFeedback): bool =>
+                    $savedFeedback->getPublishedAt() instanceof Alaress_Date_Format
+                    && $savedFeedback->getPublishedBy() === self::CURRENT_DUE_WORK_PUBLISHER_ID
+            ));
+
+        $controller = $this->buildDueWorkController(
+            $this->createStub(ReturnedWorkMapper::class),
+            $feedbackDataSource,
+        );
+        $controller->setUser(new User()->setId(self::CURRENT_DUE_WORK_PUBLISHER_ID));
+
+        $controller->postPublishFeedback($assessment, $student);
+    }
+
+    /**
+     * Verifies due work single publish does not overwrite existing published audit fields.
+     */
+    public function testDueWorkSinglePublishPreservesExistingPublishedAuditFields(): void
+    {
+        $student = new User()->setId(self::DUE_WORK_STUDENT_ID);
+        $originalPublishedAt = Alaress_Date_Format::now()->modify('-1 day');
+        $feedback = new DueWorkFeedback()
+            ->setId(self::DUE_WORK_PUBLISHED_FEEDBACK_ID)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+            ->setPublishedAt($originalPublishedAt)
+            ->setPublishedBy(self::ORIGINAL_DUE_WORK_PUBLISHER_ID);
+
+        $assessment = $this->createDueWorkAssessmentWithFeedback($student, $feedback);
+        $feedbackDataSource = $this->createMock(IFeedbackDataSource::class);
+        $feedbackDataSource
+            ->expects($this->once())
+            ->method('save')
+            ->with(self::callback(
+                static fn(DueWorkFeedback $savedFeedback): bool =>
+                    $savedFeedback->getPublishedAt() === $originalPublishedAt
+                    && $savedFeedback->getPublishedBy() === self::ORIGINAL_DUE_WORK_PUBLISHER_ID
+            ));
+
+        $controller = $this->buildDueWorkController(
+            $this->createStub(ReturnedWorkMapper::class),
+            $feedbackDataSource,
+        );
+        $controller->setUser(new User()->setId(self::CURRENT_DUE_WORK_PUBLISHER_ID));
+
+        $controller->postPublishFeedback($assessment, $student);
+    }
+
+    /**
      * Builds a reporting feedback controller with the supplied feedback mapper.
      *
      * @param ReportingFeedbackMapper $feedbackMapper
@@ -245,12 +315,15 @@ class PublishAuditTest extends TestCase
      * Builds a due work feedback controller with the supplied returned work mapper.
      *
      * @param ReturnedWorkMapper $returnedWorkMapper
+     * @param IFeedbackDataSource|null $feedbackDataSource
      * @return DueWork\Feedback\Controller
      */
-    private function buildDueWorkController(ReturnedWorkMapper $returnedWorkMapper): DueWork\Feedback\Controller
-    {
+    private function buildDueWorkController(
+        ReturnedWorkMapper $returnedWorkMapper,
+        ?IFeedbackDataSource $feedbackDataSource = null,
+    ): DueWork\Feedback\Controller {
         $controller = new DueWork\Feedback\Controller(
-            $this->createStub(IFeedbackDataSource::class),
+            $feedbackDataSource ?? $this->createStub(IFeedbackDataSource::class),
             $this->createStub(ParticipantDataSource::class),
             $this->createStub(AssessmentDataSource::class),
             $this->createStub(ResponseDataSource::class),
@@ -270,6 +343,31 @@ class PublishAuditTest extends TestCase
     }
 
     /**
+     * Builds a due work assessment stub that returns a participant with the supplied feedback.
+     *
+     * @param User $student
+     * @param AbstractFeedback $feedback
+     * @return DueWork\Model
+     */
+    private function createDueWorkAssessmentWithFeedback(User $student, AbstractFeedback $feedback): DueWork\Model
+    {
+        $participant = $this->createMock(Participant::class);
+        $participant
+            ->expects($this->once())
+            ->method('findMostRecentInstructorGivenFeedback')
+            ->willReturn($feedback);
+
+        $assessment = $this->createMock(DueWork\Model::class);
+        $assessment
+            ->expects($this->once())
+            ->method('getParticipant')
+            ->with($student)
+            ->willReturn($participant);
+
+        return $assessment;
+    }
+
+    /**
      * Configures the response factory required by JSON controller responses.
      *
      * @param Base $controller
@@ -277,6 +375,20 @@ class PublishAuditTest extends TestCase
     private function configureControllerResponseFactory(Base $controller): void
     {
         $httpFactory = new HttpFactory();
+        $isJsonSpec = $this->createStub(ISpecification::class);
+        $isJsonSpec
+            ->method('isSatisfiedBy')
+            ->willReturn(true);
+        $isXhrSpec = $this->createStub(ISpecification::class);
+        $isXhrSpec
+            ->method('isSatisfiedBy')
+            ->willReturn(false);
+
+        $controller
+            ->setRequest($httpFactory->createServerRequest('POST', '/'))
+            ->setIsJsonSpec($isJsonSpec)
+            ->setIsXhrSpec($isXhrSpec);
+
         $controller->setResponseFactory(new ResponseFactory(
             $httpFactory,
             $httpFactory,

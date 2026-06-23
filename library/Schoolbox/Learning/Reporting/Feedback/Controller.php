@@ -404,11 +404,9 @@ class Controller extends Base
             }
 
             if (!$feedback->isPublished()) {
-                $feedback->setPublishedAt($now);
-
-                if (null !== $this->getUser()->getId()) {
-                    $feedback->setPublishedBy($this->getUser()->getId());
-                }
+                $feedback
+                    ->setPublishedAt($now)
+                    ->setPublishedBy($this->getUser()->getId());
             }
 
             try {

@@ -248,11 +248,9 @@ class Controller extends Base
             }
 
             if (!$submissionReturn->isPublished()) {
-                $submissionReturn->setPublishedAt($now);
-
-                if (null !== $this->getUser()->getId()) {
-                    $submissionReturn->setPublishedBy($this->getUser()->getId());
-                }
+                $submissionReturn
+                    ->setPublishedAt($now)
+                    ->setPublishedBy($this->getUser()->getId());
             }
 
             try {
@@ -648,6 +646,7 @@ class Controller extends Base
     public function postPublishFeedback(DueWork\Model $assessment, User $student)
     {
         $participant = $assessment->getParticipant($student);
+        /** @var Model|null $feedback */
         $feedback = $participant->findMostRecentInstructorGivenFeedback();
 
         if (null === $feedback) {
@@ -656,7 +655,9 @@ class Controller extends Base
 
         if (!$feedback->isPublished()) {
             // publish this
-            $feedback->setPublishedAt(\Alaress_Date_Format::now());
+            $feedback
+                ->setPublishedAt(\Alaress_Date_Format::now())
+                ->setPublishedBy($this->getUser()->getId());
         }
 
         $this->getFeedbackDataSource()->save($feedback);
