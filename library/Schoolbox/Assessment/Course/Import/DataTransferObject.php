@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Course\Import;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Reporting\Model as Reporting;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Alaress_Date_Format;
@@ -304,7 +305,7 @@ class DataTransferObject
 
                 // Base case: non-project
                 if (!$spec instanceof Project) {
-                    $openSpan = $spec->getDefaultOpenSpan();
+                    $openSpan = $this->getDefaultOpenSpanForDateAssignment($spec);
                 } else {
                     // Recursive case: Project
                     // Does any assessment inside this project have a null open_span?
@@ -423,10 +424,11 @@ class DataTransferObject
         foreach ($projectSpec->getAssessables() as $subAssessment) {
             // Base Case: non-project
             if (!$subAssessment instanceof Project) {
-                if (null === $subAssessment->getDefaultOpenSpan()) {
+                $openSpan = $this->getDefaultOpenSpanForDateAssignment($subAssessment);
+                if (null === $openSpan) {
                     return null;
                 }
-                $totalOpenSpan += $subAssessment->getDefaultOpenSpan();
+                $totalOpenSpan += $openSpan;
             } else {
                 // Recursive Case: project
                 $openSpan = $this->recursiveGetDefaultOpenSpan($subAssessment);
@@ -437,6 +439,15 @@ class DataTransferObject
             }
         }
         return $totalOpenSpan;
+    }
+
+
+    private function getDefaultOpenSpanForDateAssignment(IAssessable $assessment): ?int
+    {
+        if ($assessment instanceof Reporting) {
+            return null;
+        }
+        return $assessment->getDefaultOpenSpan();
     }
 
 
