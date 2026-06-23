@@ -52,17 +52,15 @@
                     </tr>
                     <tr>
                         {% for rubricInstanceId, rubricInstanceData in grids %}
-                            {% set gridColspan = 1 %}
-
                             {# Each grid spans N indicators which are found among all its capabilities
                              # (i.e. the total number of indicators used in the entire grid
                              #
                              # Look ahead to find out how many exist
                              #}
-                            {% for rubricInstanceId, rubricInstanceData in grids %}
-                                {% for capabilityId, capabilityData in rubricInstanceData.capabilities %}
-                                    {% set gridColspan = gridColspan + capabilityData.indicators|length %}
-                                {% endfor %}
+                            {% set gridColspan = 1 %}
+
+                            {% for capabilityId, capabilityData in rubricInstanceData.capabilities %}
+                                {% set gridColspan = gridColspan + capabilityData.indicators|length %}
                             {% endfor %}
 
                             <th colspan="{{ gridColspan }}" class="markdown">
