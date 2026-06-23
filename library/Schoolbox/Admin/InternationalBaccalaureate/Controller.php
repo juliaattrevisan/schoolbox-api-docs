@@ -640,7 +640,7 @@ class Controller extends ConfigController
                 'pageCurrent' => $pageCurrent,
                 'allBreadcrumbs' => array_merge(
                     (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($pageCurrent),
-                    [['Update Candidate Numbers', null]]
+                    [['Update candidate numbers', null]]
                 ),
                 'sessionTitle' => $registrationSession->jsonSerialize()['title'],
                 'candidates' => $this->buildCandidateNumberRows(

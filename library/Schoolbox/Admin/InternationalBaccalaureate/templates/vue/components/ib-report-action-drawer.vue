@@ -33,7 +33,7 @@ defineEmits<{
                 @click="$emit('completePreparation')"
             >
                 <sbx-icon name="notifications-hollow"></sbx-icon>
-                Complete Preparation
+                Complete preparation
             </button>
             <button
                 v-if="activeSection === 'unconfirmed'"
@@ -53,7 +53,7 @@ defineEmits<{
                 @click="$emit('resetDetails')"
             >
                 <sbx-icon name="undo"></sbx-icon>
-                Reset All Details
+                Reset all details
             </button>
             <button
                 v-if="activeSection === 'confirmed' || activeSection === 'failed'"
