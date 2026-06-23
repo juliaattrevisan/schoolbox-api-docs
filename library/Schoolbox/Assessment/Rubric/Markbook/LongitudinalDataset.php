@@ -52,6 +52,7 @@ class LongitudinalDataset
         /* Transpose this rubric markbook data
          */
         $stack = [];
+        $summaryIterator = null;
 
         foreach ($data['gridData'] as $assessmentId => $rubricInstanceData) {
             foreach ($rubricInstanceData as $rubricInstanceId => $rubricGridData) {
@@ -93,11 +94,16 @@ class LongitudinalDataset
                          * Reuse this old "statistics" node, for familiarity I guess
                          */
                         if ($this->includeComparison) {
-                            /* TODO somehow accumulate a doodad here
-                             *  All the normalised marks for this $indicatorId go into a data set, which then gets
+                            /* Only spawn this once
+                             */
+                            if (null === $summaryIterator) {
+                                $summaryIterator = (new SummaryIterator($studentMarks));
+                            }
+
+                            /*  All the normalised marks for this $indicatorId go into a data set, which then gets
                              *  pumped into a new Summary() instance's constructor.
                              */
-                            $stack[$capabilityId]['indicators'][$indicatorId]['assessmentResults'][$assessmentId]['grid'][$rubricInstanceId]['published']['statistics'] = null;
+                            $stack[$capabilityId]['indicators'][$indicatorId]['assessmentResults'][$assessmentId]['grid'][$rubricInstanceId]['published']['statistics'] = $summaryIterator->accumulate($assessmentId, $rubricInstanceId, $capabilityId, $indicatorId);;
                         }
                     }
                 }
