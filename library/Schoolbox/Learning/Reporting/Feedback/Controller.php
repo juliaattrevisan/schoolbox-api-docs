@@ -268,7 +268,9 @@ class Controller extends Base
         /* Feedback Comments are optional based on the Reporting toggle
          */
         if ($assessment->getFeedbackCommentsEnable()) {
-            $feedback->setComment(self::replaceStudentTokensInComment($post['comment'] ?? '', $learner));
+            $feedback->setComment(
+                (new TokenReplacer\Student(new TokenReplacer\Simple()))->replace($post['comment'] ?? '', $learner)
+            );
         }
 
         /** Get mark schemes
@@ -363,6 +365,7 @@ class Controller extends Base
             'normalisedMark'              => $feedback->getNormalisedMark(),
             'humanReadableMark'           => $feedback->getHumanReadableMark(),
             'humanReadableInstructorMark' => $feedback->getHumanReadableInstructorMark(),
+            'comment'                     => $feedback->getComment(),
             'plan' => [
                 'isDynamic' => $plan->getIsDynamic(),
                 'name' => $plan->getName(),
@@ -371,12 +374,6 @@ class Controller extends Base
         ];
 
         $this->response = $this->responseAsJson($data);
-    }
-
-
-    private static function replaceStudentTokensInComment(string $comment, User $learner): string
-    {
-        return (new TokenReplacer\Student(new TokenReplacer\Simple()))->replace($comment, $learner);
     }
 
 
