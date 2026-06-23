@@ -411,7 +411,7 @@ LEFT JOIN submission_box ON assessment.id = submission_box.assessment_id
 LEFT JOIN project ON assessment.id = project.assessment_id AND project.deleted_at IS NULL
 LEFT JOIN assess ON assessment.id = assess.assessment_id AND assess.deleted_at IS NULL
 LEFT JOIN reporting ON assessment.id = reporting.assessment_id AND reporting.deleted_at IS NULL
-LEFT JOIN lti_assessment ON assessment.id = lti_assessment.assessment_id
+LEFT JOIN lti_assessment ON assessment.id = lti_assessment.assessment_id AND assessment.deleted_at IS NULL
 
 LEFT JOIN (
     SELECT
@@ -571,7 +571,7 @@ LEFT JOIN submission_box ON assessment.id = submission_box.assessment_id
 LEFT JOIN project ON assessment.id = project.assessment_id AND project.deleted_at IS NULL
 LEFT JOIN assess ON assessment.id = assess.assessment_id AND assess.deleted_at IS NULL
 LEFT JOIN reporting ON assessment.id = reporting.assessment_id AND reporting.deleted_at IS NULL
-LEFT JOIN lti_assessment ON assessment.id = lti_assessment.assessment_id
+LEFT JOIN lti_assessment ON assessment.id = lti_assessment.assessment_id AND assessment.deleted_at IS NULL
 
 WHERE mv_assessment_relation.folder_id IN ($folderIds)
 AND assessment.deleted_at IS NULL
