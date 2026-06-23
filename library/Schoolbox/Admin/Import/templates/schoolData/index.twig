@@ -194,10 +194,18 @@
 
             /* Some data sources always hit a fixed host (e.g. Edlink talks to
              * ed.link); hide the shared Endpoint Host field for those so the
-             * admin isn't asked for something the connector ignores.
+             * admin isn't asked for something the connector ignores. The field
+             * is only hidden, not disabled, so a stale value left over from
+             * another connector would still be submitted - and the Edlink Api
+             * treats any non-empty host as an override of ed.link, breaking
+             * requests. Clear it when hiding, and re-show it otherwise.
              */
+            const hostField = $('#schooldata_import_endpoint_host');
             if (hostlessDataSources.indexOf(dataSource) !== -1) {
-                $('#schooldata_import_endpoint_host').parent('div').hide();
+                hostField.val('');
+                hostField.parent('div').hide();
+            } else {
+                hostField.parent('div').show();
             }
         }
 
