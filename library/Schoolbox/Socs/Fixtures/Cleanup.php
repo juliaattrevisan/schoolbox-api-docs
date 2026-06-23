@@ -38,7 +38,6 @@ class Cleanup implements IStrategy
         private SportMapper $sportMapper,
         private SeasonMapper $seasonMapper,
         private DivisionMapper $divisionMapper,
-        private TeamMapper $teamMapper,
         private VenueMapper $venueMapper
     ) {
     }
@@ -74,7 +73,6 @@ class Cleanup implements IStrategy
             'sport' => $this->sportMapper->getTable(),
             'season' => $this->seasonMapper->getTable(),
             'division' => $this->divisionMapper->getTable(),
-            'team' => $this->teamMapper->getTable(),
             'venue' => $this->venueMapper->getTable(),
         ];
     }

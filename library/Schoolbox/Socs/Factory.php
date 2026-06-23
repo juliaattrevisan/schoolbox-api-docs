@@ -103,6 +103,15 @@ class Factory
 
         $bus = new GenericCollection(IStrategy::class);
 
+        if ($fixtures || $teams) {
+            $bus->add(new Teams\Prepare(
+                $this->log,
+                $this->perform,
+                $this->lock,
+                $seasonMapper,
+                $teamMapper
+            ));
+        }
         if ($fixtures) {
             $bus->add(new Fixtures\Prepare(
                 $this->log,
@@ -112,7 +121,6 @@ class Factory
                 $sportMapper,
                 $seasonMapper,
                 $divisionMapper,
-                $teamMapper,
                 $venueMapper
             ))
             ->add(new Fixtures\Import(
@@ -151,7 +159,6 @@ class Factory
                 $sportMapper,
                 $seasonMapper,
                 $divisionMapper,
-                $teamMapper,
                 $venueMapper
             ));
         }
@@ -180,21 +187,16 @@ class Factory
         }
 
         if ($teams) {
-            $bus->add(new Teams\Prepare(
-                $this->log,
-                $this->perform,
-                $this->lock,
-                $seasonMapper,
-                $teamMapper
-            ))
-            ->add(new Teams\Import(
+            $bus->add(new Teams\Import(
                 $this->log,
                 $this->perform,
                 $this->lock,
                 $this->httpClient,
                 $fixturesRegistry
-            ))
-            ->add(new Teams\Cleanup(
+            ));
+        }
+        if ($fixtures || $teams) {
+            $bus->add(new Teams\Cleanup(
                 $this->log,
                 $this->perform,
                 $this->lock,
