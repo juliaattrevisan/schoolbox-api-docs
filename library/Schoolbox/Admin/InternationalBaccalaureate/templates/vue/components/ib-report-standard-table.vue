@@ -17,7 +17,7 @@ const updateLanguageStore = useIbReportUpdateLanguageStore();
 
 const emit = defineEmits<{
     completePreparationSingle: [studentId: number];
-    renotifySingle: [studentId: number];
+    renotifySingle: [userId: number];
     resetDetailsSingle: [studentId: number];
     approveOnBehalfSingle: [studentId: number];
 }>();

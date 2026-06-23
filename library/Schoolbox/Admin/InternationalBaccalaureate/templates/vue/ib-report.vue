@@ -92,6 +92,7 @@ window.Vue.watch(failedSelected, (newVal) => {
 const isCompleting = window.Vue.ref<boolean>(false);
 const isResetting = window.Vue.ref<boolean>(false);
 const isApprovingOnBehalf = window.Vue.ref<boolean>(false);
+const isRenotifying = window.Vue.ref<boolean>(false);
 const resetModalOpen = window.Vue.ref<boolean>(false);
 const studentsToReset = window.Vue.ref<Pick<StudentRow, "id" | "userId" | "name">[]>([]);
 
@@ -369,16 +370,17 @@ async function handleApproveOnBehalf(students: StudentRow[]): Promise<void> {
  * @param students The students to renotify.
  */
 async function handleRenotifySelected(students: StudentRow[]): Promise<void> {
-    if (!renotifyEndpoint || students.length === 0) return;
+    if (isRenotifying.value || !renotifyEndpoint || students.length === 0) return;
+    isRenotifying.value = true;
 
     const toast = window.sbProps.toastActivate("Renotifying student(s)...");
 
     try {
-        const response = (await apiRequest<ApiRenotifyResponse, { studentIds: number[] }>({
+        const response = await apiRequest<ApiRenotifyResponse, { studentIds: number[] }>({
             url: renotifyEndpoint,
             method: "POST",
             body: { studentIds: students.map((s) => s.userId) },
-        })) as ApiRenotifyResponse;
+        });
 
         if (!response.success) {
             toast.timeout({ text: response.message ?? "Failed to renotify student(s).", isSuccess: false });
@@ -387,12 +389,14 @@ async function handleRenotifySelected(students: StudentRow[]): Promise<void> {
 
         clearSelection();
         toast.timeout({
-            text: response.message ?? `${students.length} student${students.length === 1 ? "" : "s"} renotified.`,
-            isSuccess: !response.partial,
+            text: response.data.message ?? `${students.length} student${students.length === 1 ? "" : "s"} renotified.`,
+            isSuccess: !response.data.partial,
         });
     } catch (e) {
         console.error("Failed to renotify students", e);
         toast.timeout({ text: "Failed to renotify student(s).", isSuccess: false });
+    } finally {
+        isRenotifying.value = false;
     }
 }
 
@@ -495,7 +499,7 @@ window.Vue.onMounted((): void => {
                 confirmedSelected.length +
                 failedSelected.length
             "
-            :is-loading="isCompleting || isResetting || isApprovingOnBehalf"
+            :is-loading="isCompleting || isResetting || isApprovingOnBehalf || isRenotifying"
             :active-section="activeSelectionSection"
             @complete-preparation="handleCompletePreparation(preparationSelected.map((s) => s.id))"
             @renotify="handleRenotifySelected(unconfirmedSelected)"
