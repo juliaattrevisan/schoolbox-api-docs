@@ -78,6 +78,20 @@ class Module extends BaseModule
 
         $this->register('GET', '/class/{folderId}', 'getClassListPage', $this->canAccessClassLists(), $preloadFolder);
         $this->register('GET', '/assessment-audit/{folderId}', 'getAssessmentAudit', new Rule\IsSuperuser(), $preloadFolder);
+        $this->register(
+            'GET',
+            '/assessment-audit/{folderId}/assessment.csv',
+            'getAssessmentAuditCsv',
+            new Rule\IsSuperuser(),
+            $preloadFolder
+        );
+        $this->register(
+            'GET',
+            '/assessment-audit/{folderId}/rubric.csv',
+            'getAssessmentRubricAuditCsv',
+            new Rule\IsSuperuser(),
+            $preloadFolder
+        );
     }
 
     /**
@@ -216,6 +230,8 @@ class Module extends BaseModule
             $this->injector->get('externalClass'),
             $this->injector->get('l10n'),
             $this->injector->get('databaseInternal'),
+            $this->injector->get('taskd.downloadPagesMessageFactory'),
+            $this->injector->get('taskd.messageProducer'),
         );
     }
 

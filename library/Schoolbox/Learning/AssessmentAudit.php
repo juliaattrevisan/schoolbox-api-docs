@@ -13,11 +13,9 @@
 namespace Schoolbox\Learning;
 
 use Alaress\Database\Connector\IConnector;
-use RuntimeException;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use ZipArchive;
 
 class AssessmentAudit
 {
@@ -102,47 +100,61 @@ class AssessmentAudit
     }
 
     /**
-     * Downloads csvs of all assessments within a folder.
-     *
-     *
-     * @api   GET /learning/assessment-audit/{folder}
-     *
      * @param Folder\Model $folder
      */
-    public function getAssessmentAudit(Folder\Model $folder): void
+    public function streamAssessmentAudit(Folder\Model $folder): void
+    {
+        $folderIds = $this->getFolderIds($folder);
+
+        $this->streamCsv(
+            $this->getAssessmentAuditQuery($folderIds),
+            self::ASSESSMENT_AUDIT_HEADINGS,
+        );
+    }
+
+    /**
+     * @param Folder\Model $folder
+     */
+    public function streamRubricAudit(Folder\Model $folder): void
+    {
+        $folderIds = $this->getFolderIds($folder);
+
+        $this->streamCsv(
+            $this->getRubricAuditQuery($folderIds),
+            self::RUBRIC_AUDIT_HEADINGS,
+        );
+    }
+
+    public function getAssessmentAuditFilename(string $timestamp): string
+    {
+        return sprintf('assessment-audit-%s-%s.csv', $this->schoolCode, $timestamp);
+    }
+
+    public function getRubricAuditFilename(string $timestamp): string
+    {
+        return sprintf('rubric-audit-%s-%s.csv', $this->schoolCode, $timestamp);
+    }
+
+    public function getAssessmentAuditZipFilename(string $timestamp): string
+    {
+        return sprintf('assessment-audit-%s-%s.zip', $this->schoolCode, $timestamp);
+    }
+
+    private function getFolderIds(Folder\Model $folder): string
     {
         $childrenFolders = $this->folderMapper->findAllChildren($folder->getId(), true);
         $allFolders = new Collection([$folder]);
         $allFolders = $allFolders->merge($childrenFolders);
 
-        $folderIds = implode(',', array_map('intval', $allFolders->getPropertyValues('id')));
-        $timestamp = \Alaress_Date_Format::now()->toIso8601String();
-
-        $assessmentCsv = $this->buildCsv(
-            $this->getAssessmentAuditQuery($folderIds),
-            self::ASSESSMENT_AUDIT_HEADINGS,
-        );
-        $rubricCsv = $this->buildCsv(
-            $this->getRubricAuditQuery($folderIds),
-            self::RUBRIC_AUDIT_HEADINGS,
-        );
-
-        $assessmentFilename = sprintf('assessment-audit-%s-%s.csv', $this->schoolCode, $timestamp);
-        $rubricFilename = sprintf('rubric-audit-%s-%s.csv', $this->schoolCode, $timestamp);
-        $zipFilename = sprintf('assessment-audit-%s-%s.zip', $this->schoolCode, $timestamp);
-
-        $this->downloadZip($zipFilename, [
-            $assessmentFilename => $assessmentCsv,
-            $rubricFilename => $rubricCsv,
-        ]);
+        return implode(',', array_map('intval', $allFolders->getPropertyValues('id')));
     }
 
-    private function buildCsv(string $query, array $headings): string
+    private function streamCsv(string $query, array $headings): void
     {
         $statement = $this->database->prepareQuery($query);
         $statement->execute();
 
-        $fp = fopen('php://temp', 'w+');
+        $fp = fopen('php://output', 'w');
         fputcsv($fp, $headings, escape: '');
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
@@ -156,37 +168,7 @@ class AssessmentAudit
             );
         }
 
-        rewind($fp);
-        $csv = stream_get_contents($fp);
         fclose($fp);
-
-        return $csv;
-    }
-
-    private function downloadZip(string $filename, array $files): void
-    {
-        $zipPath = tempnam(sys_get_temp_dir(), 'assessment-audit-');
-        if (false === $zipPath) {
-            throw new RuntimeException('Unable to create assessment audit zip file.');
-        }
-
-        $zipArchive = new ZipArchive();
-        $zipStatus = $zipArchive->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
-        if (true !== $zipStatus) {
-            throw new RuntimeException('Unable to open assessment audit zip file.');
-        }
-
-        foreach ($files as $fileName => $contents) {
-            $zipArchive->addFromString($fileName, $contents);
-        }
-        $zipArchive->close();
-
-        header('Content-Type: application/zip');
-        header("Content-Disposition: attachment; filename=\"$filename\"");
-        header('Content-Length: ' . filesize($zipPath));
-
-        readfile($zipPath);
-        unlink($zipPath);
     }
 
     private function getAssessmentAuditQuery(string $folderIds): string
