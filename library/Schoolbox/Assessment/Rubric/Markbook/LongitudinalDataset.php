@@ -136,10 +136,10 @@ class LongitudinalDataset
                                 $summaryIterator = (new SummaryIterator($studentMarks));
                             }
 
-                            /*  All the normalised marks for this $indicatorId go into a data set, which then gets
-                             *  pumped into a new Summary() instance's constructor.
+                            /* All the normalised marks for this $indicatorId go into a data set, which then gets
+                             * pumped into a new Summary() instance's constructor.
                              */
-                            $stack[$capabilityId]['indicators'][$indicatorId]['assessmentResults'][$assessmentId]['grid'][$rubricInstanceId]['published']['statistics'] = $summaryIterator->accumulate($assessmentId, $rubricInstanceId, $capabilityId, $indicatorId);;
+                            $stack[$capabilityId]['indicators'][$indicatorId]['assessmentResults'][$assessmentId]['grid'][$rubricInstanceId]['published']['statistics'] = $summaryIterator->accumulate($assessmentId, $rubricInstanceId, $capabilityId, $indicatorId);
                         }
                     }
                 }
