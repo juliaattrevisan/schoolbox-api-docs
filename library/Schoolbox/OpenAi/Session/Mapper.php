@@ -370,7 +370,7 @@ class Mapper extends BaseMapper
                 'EXISTS (
                     SELECT 1 FROM `ai_moderation_event` me
                     WHERE me.target_ai_session_id = `' . $this->table . '`.id
-                    AND me.status IN ' . Builder::getArrayPlaceholders($statusValues, 'moderation_status'). '
+                    AND me.status IN ' . Builder::getArrayPlaceholders($statusValues, 'moderation_status') . '
                 )',
                 Builder::getArrayParameters($statusValues, 'moderation_status')
             );
