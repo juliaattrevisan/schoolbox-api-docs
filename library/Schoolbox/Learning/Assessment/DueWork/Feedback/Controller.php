@@ -246,6 +246,9 @@ class Controller extends Base
                 continue;
             }
 
+            // Editing an existing published feedback on the Activity Status page creates a new feedback row
+            // (see DueWork\Feedback\Factory->produce()). Therefore bulk publishing an already-published row
+            // should preserve its original publishedAt/By audit fields.
             if (!$submissionReturn->isPublished()) {
                 $submissionReturn
                     ->setPublishedAt($now)
