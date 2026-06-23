@@ -484,6 +484,9 @@ class Controller extends Base
             )
             ->setFailureCallbackParams([
                 'message' => 'Your assessment audit could not be downloaded (reason: :message)',
+                'messageParams' => [
+                    'message' => '{{response.message}}',
+                ],
                 'from'    => call_user_func($userSerializer, $this->getUser()),
                 'to'      => call_user_func($userSerializer, $this->getUser()),
             ])
