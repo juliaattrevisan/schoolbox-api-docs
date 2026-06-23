@@ -874,10 +874,7 @@ class Classes implements IStrategy
         try {
             $dateTime = new \DateTimeImmutable($dateString);
 
-            return Alaress_Date_Format::newDatabaseDate(
-                $dateTime->format('Y-m-d H:i:s'),
-                new \DateTimeZone($dateTime->format('e') !== 'Z' ? $dateTime->format('e') : 'UTC')
-            );
+            return Alaress_Date_Format::newFromTimestamp($dateTime->getTimestamp());
         } catch (\Exception $e) {
             $this->log->warning(sprintf('Could not parse Edlink date: %s', $dateString));
             return null;
