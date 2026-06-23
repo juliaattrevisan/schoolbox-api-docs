@@ -515,6 +515,8 @@ class DataSource
     /**
      * Finds a page of users participating in this assessment by class/group membership.
      *
+     * The total value is the roster size before participant hydration filters.
+     *
      * @param IAssessable $assessment
      * @param int $cursor Last user ID from the previous page, or 0 for the first page
      * @param int $count
