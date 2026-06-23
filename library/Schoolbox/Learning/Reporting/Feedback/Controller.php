@@ -26,6 +26,7 @@ use Schoolbox\Learning\Assessment\Reporting\Model;
 use Schoolbox\Learning\Assessment\Reporting\Feedback\Model as Feedback;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\TokenReplacer;
 use Schoolbox\User;
 use Twig\Error\Error;
 
@@ -267,7 +268,7 @@ class Controller extends Base
         /* Feedback Comments are optional based on the Reporting toggle
          */
         if ($assessment->getFeedbackCommentsEnable()) {
-            $feedback->setComment($post['comment'] ?? '');
+            $feedback->setComment(self::replaceStudentTokensInComment($post['comment'] ?? '', $learner));
         }
 
         /** Get mark schemes
@@ -370,6 +371,12 @@ class Controller extends Base
         ];
 
         $this->response = $this->responseAsJson($data);
+    }
+
+
+    private static function replaceStudentTokensInComment(string $comment, User $learner): string
+    {
+        return (new TokenReplacer\Student(new TokenReplacer\Simple()))->replace($comment, $learner);
     }
 
 
