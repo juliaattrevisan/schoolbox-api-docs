@@ -1,10 +1,21 @@
-{#
-    Render a bar graph of a single student's assessment results
-
-    Usage:
-        rubricAssessmentList  array
-        longitudinalRubric    array
-#}
+{##
+ # Progression panel on a student's Grades page
+ #
+ # Show sthe value obtained by a student for each indicator.
+ #
+ # This student's indicator value is charted against their peers using a John Tukey Five Point Summary
+ # sans outliers; this tracks the progression/evolution of someone's indicator(s) over a series of grids
+ # and their corresponding assessments, ordered by due date.
+ #
+ # Indicators that are repated within an assessment via multiple grids might show some variance and this is
+ # left to the human to interpret.
+ #
+ # @param array $longitudinalAssessments  A set of array-represented activity metadata (these are not object instances)
+ # @param array $longitudinalStudentMarks A set of (student, grid outcome) tuples; stolen from the rubric markbook struct
+ # @param User $student                   The student whose grades page we are viewing
+ # @param GenericCollection $assessments  A collection of IAssessable instances indexed by assessment id
+ # @param string $returnUrlSuffix         A redirect fragment
+ #}
 <script type="text/javascript">
     $(function() {
         Highcharts.boxLine = function (a, b, c) {
@@ -90,86 +101,90 @@
     });
 </script>
 <table class="rb">
-    {% for capability in longitudinalRubric %}
-        <tr><th class="rubric-progression-capability markdown">{{ (capability.name ?? '') | markdown }}</th>
-        {% for indicatorId,indicator in capability.indicators %}
-            {% if not loop.first %}
-                <tr><th class="rubric-progression-capability">&nbsp;</th>
-            {% endif %}
-            <th class="rubric-progression-indicator markdown">{{ (indicator.name ?? '') | markdown }}</th>
-            <td class="rubric-progression-graph">
-                <div id="rubricGraph{{ indicatorId }}"></div>
-                <script type="application/javascript">
-                    $(function() {
-                        const rootStyles = getComputedStyle(document.documentElement); // Get the computed styles of the :root element
-                        const depthDefault = parseInt(rootStyles.getPropertyValue('--sbx-depth-default')); // Get the default depth for the graph
-                        var assessments = [
-                            {% for activity_id, activity in rubricAssessmentList %}
-                            "{{ activity.name }}",
-                            {% endfor %}
-                        ];
-                        var grades = [
-                            {% for activity_id, activity in rubricAssessmentList %}
-                            {% set activity_name = activity.name %}
-                            {% set activity = indicator.activities[activity_id] is defined ? indicator.activities[activity_id] : null %}
-                            {% if activity.max_value ?? 0 > 0  %}
-                            {
-                                y: {{ activity.value is defined ? ((activity.value / activity.max_value) * 100) : 'null' }},
-                                desc: "{{ (activity.descriptor ?? '') | markdown | escape('js') }}",
-                                title: "{{ activity_name }}",
-                                level: "{{ activity.level ?? '' }}"
-                            },
-                            {% else %}
-                            '',
-                            {% endif %}
-                            {% endfor %}
-                        ];
-                        var ranges = [
-                            {% for activity_id, activity in rubricAssessmentList %}
-                            {% set activity = indicator.activities[activity_id] is defined ? indicator.activities[activity_id] : null %}
-                            {% if activity.max_value ?? 0 > 0 and activity.statistics is defined %}
-                            ["{{ activity.name  }}",{{ (activity.statistics.min / activity.max_value) * 100 }}, {{ (activity.statistics.quartile1 / activity.max_value) * 100 }}, {{ (activity.statistics.quartile2 / activity.max_value) * 100 }}, {{ (activity.statistics.quartile3 / activity.max_value) * 100 }}, {{ (activity.statistics.max / activity.max_value) * 100 }}],
-                            {% else %}
-                            '',
-                            {% endif %}
-                            {% endfor %}
-                        ];
-                        $('#rubricGraph{{ indicatorId }}').highcharts('boxLine', {
-                            xAxis: [{
-                                categories: assessments,
-                                visible: false,
-                                title: {
-                                    text: null
-                                }
-                            }],
-                            series: [{
-                                name: 'Marks',
-                                data: grades,
-                                zIndex: depthDefault,
-                                connectNulls: true,
-                                color: 'rgb(255, 87, 87)',
-                            }, {
-                                name: 'Range',
-                                data: ranges,
-                                type: 'boxplot',
-                                pointWidth: 40,
-                                linkedTo: ':previous',
-                                color: Highcharts.getOptions().colors[0],
-                                fillOpacity: 0.3,
-                                zIndex: depthDefault-1,
-                                marker: {
-                                    enabled: false
-                                }
-                            }
-                            ]
-                        })
-                    });
-                </script>
-            </td>
-            </tr>
-        {% endfor %}
-    {% endfor %}
+
+
+
+{#    {% for capability in longitudinalRubric %}#}
+{#        <tr><th class="rubric-progression-capability markdown">{{ (capability.name ?? '') | markdown }}</th>#}
+{#        {% for indicatorId,indicator in capability.indicators %}#}
+{#            {% if not loop.first %}#}
+{#                <tr><th class="rubric-progression-capability">&nbsp;</th>#}
+{#            {% endif %}#}
+{#            <th class="rubric-progression-indicator markdown">{{ (indicator.name ?? '') | markdown }}</th>#}
+{#            <td class="rubric-progression-graph">#}
+{#                <div id="rubricGraph{{ indicatorId }}"></div>#}
+{#                <script type="application/javascript">#}
+{#                    $(function() {#}
+{#                        const rootStyles = getComputedStyle(document.documentElement); // Get the computed styles of the :root element#}
+{#                        const depthDefault = parseInt(rootStyles.getPropertyValue('--sbx-depth-default')); // Get the default depth for the graph#}
+{#                        var assessments = [#}
+{#                            {% for activity_id, activity in rubricAssessmentList %}#}
+{#                            "{{ activity.name }}",#}
+{#                            {% endfor %}#}
+{#                        ];#}
+{#                        var grades = [#}
+{#                            {% for activity_id, activity in rubricAssessmentList %}#}
+{#                            {% set activity_name = activity.name %}#}
+{#                            {% set activity = indicator.activities[activity_id] is defined ? indicator.activities[activity_id] : null %}#}
+{#                            {% if activity.max_value ?? 0 > 0  %}#}
+{#                            {#}
+{#                                y: {{ activity.value is defined ? ((activity.value / activity.max_value) * 100) : 'null' }},#}
+{#                                desc: "{{ (activity.descriptor ?? '') | markdown | escape('js') }}",#}
+{#                                title: "{{ activity_name }}",#}
+{#                                level: "{{ activity.level ?? '' }}"#}
+{#                            },#}
+{#                            {% else %}#}
+{#                            '',#}
+{#                            {% endif %}#}
+{#                            {% endfor %}#}
+{#                        ];#}
+{#                        var ranges = [#}
+{#                            {% for activity_id, activity in rubricAssessmentList %}#}
+{#                            {% set activity = indicator.activities[activity_id] is defined ? indicator.activities[activity_id] : null %}#}
+{#                            {% if activity.max_value ?? 0 > 0 and activity.statistics is defined %}#}
+{#                            ["{{ activity.name  }}",{{ (activity.statistics.min / activity.max_value) * 100 }}, {{ (activity.statistics.quartile1 / activity.max_value) * 100 }}, {{ (activity.statistics.quartile2 / activity.max_value) * 100 }}, {{ (activity.statistics.quartile3 / activity.max_value) * 100 }}, {{ (activity.statistics.max / activity.max_value) * 100 }}],#}
+{#                            {% else %}#}
+{#                            '',#}
+{#                            {% endif %}#}
+{#                            {% endfor %}#}
+{#                        ];#}
+{#                        $('#rubricGraph{{ indicatorId }}').highcharts('boxLine', {#}
+{#                            xAxis: [{#}
+{#                                categories: assessments,#}
+{#                                visible: false,#}
+{#                                title: {#}
+{#                                    text: null#}
+{#                                }#}
+{#                            }],#}
+{#                            series: [{#}
+{#                                name: 'Marks',#}
+{#                                data: grades,#}
+{#                                zIndex: depthDefault,#}
+{#                                connectNulls: true,#}
+{#                                color: 'rgb(255, 87, 87)',#}
+{#                            }, {#}
+{#                                name: 'Range',#}
+{#                                data: ranges,#}
+{#                                type: 'boxplot',#}
+{#                                pointWidth: 40,#}
+{#                                linkedTo: ':previous',#}
+{#                                color: Highcharts.getOptions().colors[0],#}
+{#                                fillOpacity: 0.3,#}
+{#                                zIndex: depthDefault-1,#}
+{#                                marker: {#}
+{#                                    enabled: false#}
+{#                                }#}
+{#                            }#}
+{#                            ]#}
+{#                        })#}
+{#                    });#}
+{#                </script>#}
+{#            </td>#}
+{#            </tr>#}
+{#        {% endfor %}#}
+{#    {% endfor %}#}
 </table>
+
 <style>
 /* Adjust Highcharts tooltip z-index to match our pop-over depth */
 .highcharts-tooltip-container {
