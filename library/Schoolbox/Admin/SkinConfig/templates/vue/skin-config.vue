@@ -173,12 +173,12 @@ window.Vue.onMounted(() => {
 <template>
     <div data-test="skin-config-container" class="l-flex-col l-gap-l l-pad-m--horiz">
         <div class="l-flex-col l-gap-m">
-            <img
-                :src="sonarImgSrc"
-                alt="Sonar UI is now available. We encourage you to enable it on your Staging server now to review your skin settings and custom CSS before it becomes the only option in v26.2."
-                class="l-c-cr"
-            />
-            <a href="/help/sso/send?returnUrl=/homepage/5808" target="_blank" class="button"
+            <img :src="sonarImgSrc" alt="" class="l-c-cr" aria-hidden="true" />
+            <p class="t-visually-hidden">
+                Sonar UI is now available. We encourage you to enable it on your Staging server now to review your skin
+                settings and custom CSS before it becomes the only option in v26.2.
+            </p>
+            <a href="/help/sso/send?returnUrl=/homepage/5808" target="_blank" rel="noopener noreferrer" class="button"
                 >Read the Transition Guide</a
             >
         </div>
