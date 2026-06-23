@@ -403,6 +403,8 @@ class Controller extends Base
                 continue;
             }
 
+            // Editing an existing published feedback creates a new row (see Controller->postParticularFeedback()).
+            // Therefore any already published feedback should preserve its original publish audit fields.
             if (!$feedback->isPublished()) {
                 $feedback
                     ->setPublishedAt($now)
