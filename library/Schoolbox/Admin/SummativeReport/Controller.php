@@ -1143,12 +1143,12 @@ class Controller extends ConfigController
             $govtStudentNumber = $externalUser['StudentGovernmentStudentNumber'] ?? null;
         }
 
-        /* There's currently two custom CSS inputs depending on whether Sonar UI is enabled or not,
+        /* There are currently two custom CSS inputs depending on whether Sonar UI is enabled or not,
          * so we need to check which one to pull from based on the Sonar UI toggle config option
          */
         $sonarUiEnabled = (new Values([
             ConfigMapper::NAME_SONAR_UI_TOGGLE => $this->getConfigLoader()->get(ConfigMapper::NAME_SONAR_UI_TOGGLE),
-        ]))->getBool(ConfigMapper::NAME_SONAR_UI_TOGGLE, false) ?? false;
+        ]))->getBool(ConfigMapper::NAME_SONAR_UI_TOGGLE) ?? false;
         $customCssConfigName = $sonarUiEnabled
             ? ConfigMapper::NAME_SONAR_SKIN_CUSTOM_CSS
             : ConfigMapper::NAME_SKIN_CUSTOM_CSS;
