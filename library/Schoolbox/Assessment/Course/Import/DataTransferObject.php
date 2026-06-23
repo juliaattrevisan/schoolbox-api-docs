@@ -442,6 +442,12 @@ class DataTransferObject
     }
 
 
+    /**
+     * Reporting activities do not expose Activity Duration on their create/modify form.
+     *
+     * Treat any persisted duration as absent during import date assignment so existing hidden values do not continue
+     * sequencing imported activities after the field has been removed from the UI.
+     */
     private function getDefaultOpenSpanForDateAssignment(IAssessable $assessment): ?int
     {
         if ($assessment instanceof Reporting) {
