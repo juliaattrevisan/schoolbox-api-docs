@@ -377,6 +377,7 @@ Data:
                     // initialise any load more button rendered on the first page
                     $('[data-click-load-more]').on('click', loadMoreParticipants);
 
+                    {% if isSpecification %}
                     // when a user clicks the text in data-click-load
                     // we should async fetch the participants and add it to the div
                     $('[data-click-load]').on('click', function (event) {
@@ -427,6 +428,7 @@ Data:
                                 toast.toastTimeout({text: 'Unable to load more participants.', css: 'alert'});
                         });
                     });
+                    {% endif %}
                 });
         </script>
     </div>
