@@ -304,9 +304,10 @@ class OverallDataset
                 vr.indicator_max_value                         AS indicator_max_value
             FROM v_rubric vr
             INNER JOIN rubric_instance ON vr.rubric_instance_id = rubric_instance.id
+            INNER JOIN assessment a ON vr.assessment_id = a.id
             WHERE {$whereClause}
             ORDER BY
-                vr.assessment_id,
+                a.due_date,
                 vr.rubric_instance_id,
                 vr.capability_sequence,
                 vr.capability_id,
@@ -409,12 +410,12 @@ class OverallDataset
          * > jez.gray 4/6/2026
          * > I had never noticed. Seems strange to me now that you point it out
          */
-        uasort(
-            $assessments,
-            static function (array $a, array $b): int {
-                return strnatcmp($a['name'], $b['name']);
-            }
-        );
+//        uasort(
+//            $assessments,
+//            static function (array $a, array $b): int {
+//                return strnatcmp($a['name'], $b['name']);
+//            }
+//        );
 
         return $assessments;
     }
