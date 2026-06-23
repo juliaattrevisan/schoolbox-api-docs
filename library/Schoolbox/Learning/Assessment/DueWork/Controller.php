@@ -669,7 +669,7 @@ class Controller extends Assessment\Controller
         $folder = $assessment->getBaseContext()->getFolder();
 
         // Sort participant by lastname, firstname, and id
-        $participants = $assessment->getParticipantUsers()->sortByCallback(
+        $participantUsers = $assessment->getParticipantUsers()->sortByCallback(
             static function (User $participantA, User $participantB) {
                 return strnatcasecmp($participantA->getLastname() ?? '', $participantB->getLastname() ?? '')
                     ?: strnatcasecmp($participantA->getFirstname(), $participantB->getFirstname())
@@ -708,7 +708,7 @@ class Controller extends Assessment\Controller
                     ])
                     ->add(['Rubric Report', '']),
                 'assessment' => $assessment,
-                'participants' => $participants,
+                'participantUsers' => $participantUsers,
                 'grids' => $assessments[$assessment->getId()]['gridData'],
                 'studentMarks' => $studentMarks,
             ],
