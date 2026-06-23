@@ -756,7 +756,7 @@ class Controller extends Base
 
         /* Rotate this $student's data into a nicer format for these longitudinal areas
          */
-        $stack = (new LongitudinalDataset())->generate($student, $studentMarks);
+        $stack = (new LongitudinalDataset($includeComparison))->generate($student, $studentMarks);
 
         /* The $assessments node is an array of assessment metadata which we can use to make the heading row; each
          * node in $assessments knows about its grid settings so we can make a hash lookup to quickly build this table:
