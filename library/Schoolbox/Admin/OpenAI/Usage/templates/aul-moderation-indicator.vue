@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { assertUnreachable } from "@js/util/errorUtils";
-import { AiModerationStatus } from "./moderationEvent";
+import { AiModerationStatus, STATUS_LABELS } from "./moderationEvent";
 
 interface Props {
     /** The session's highest-priority active moderation status, or null when there is no active concern */
@@ -9,17 +9,17 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const indicator = window.Vue.computed<null | { icon: string; class: string; label: string }>(() => {
+const indicator = window.Vue.computed<null | { class: string; status: AiModerationStatus }>(() => {
     if (props.status === null) return null;
     if (props.status === AiModerationStatus.NO_ACTION_REQUIRED) return null;
     if (props.status === AiModerationStatus.FURTHER_ACTION_TAKEN) return null;
 
     if (props.status === AiModerationStatus.REQUIRES_ATTENTION) {
-        return { icon: "alert", class: "warning", label: "Moderation: Requires attention" };
+        return { class: "warning", status: props.status };
     }
 
     if (props.status === AiModerationStatus.FURTHER_ACTION_REQUIRED) {
-        return { icon: "alert", class: "alert", label: "Moderation: Further action required" };
+        return { class: "alert", status: props.status };
     }
 
     assertUnreachable(props.status);
@@ -44,8 +44,13 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <span v-if="indicator" :class="indicator.class" :title="indicator.label" data-tooltip>
-        <sbx-icon :name="indicator.icon" />
+    <span
+        v-if="indicator"
+        :class="indicator.class"
+        :title="`Moderation: ${STATUS_LABELS[indicator.status]}`"
+        data-tooltip
+    >
+        <sbx-icon name="alert" />
     </span>
 </template>
 
