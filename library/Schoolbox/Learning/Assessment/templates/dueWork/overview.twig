@@ -117,16 +117,29 @@
                                 {% for capabilityId, capabilityData in rubricInstanceData.capabilities %}
                                     {% for indicatorId, indicatorData in capabilityData.indicators %}
                                         <td>
-                                            {# A shortcut to various marks #}
+                                            {# Shortcuts to marks of various types #}
                                             {% set publishedMarks = studentMarks[user.id].gridData[assessment.id][rubricInstanceId].capabilities[capabilityId].indicators[indicatorId].published ?? null %}
+                                            {% set draftMarks = studentMarks[user.id].gridData[assessment.id][rubricInstanceId].capabilities[capabilityId].indicators[indicatorId].draft ?? null %}
 
+                                            {# Published Marks #}
                                             {% if publishedMarks is not null and publishedMarks.humanReadableMark is not null %}
-                                                {{ publishedMarks.selectedDescriptorText ?? null }}
+                                                <p data-actual-mark>{{ publishedMarks.selectedDescriptorText ?? null }}</p>
 
                                                 {% set max = rubricInstanceData.capabilities[capabilityId].indicators[indicatorId].max ?? null %}
 
                                                 {% if max and max > 0 %}
-                                                    <p>{{ publishedMarks.selectedDescriptorValue|round }} / {{ max }}</p>
+                                                    <p data-actual-mark>{{ publishedMarks.selectedDescriptorValue|round }} / {{ max }}</p>
+                                                {% endif %}
+                                            {% endif %}
+
+                                            {# Draft Marks #}
+                                            {% if draftMarks is not null and draftMarks.humanReadableMark is not null %}
+                                                <p data-draft-mark>{{ draftMarks.selectedDescriptorText ?? null }}</p>
+
+                                                {% set max = rubricInstanceData.capabilities[capabilityId].indicators[indicatorId].max ?? null %}
+
+                                                {% if max and max > 0 %}
+                                                    <p data-draft-mark>{{ draftMarks.selectedDescriptorValue|round }} / {{ max }}</p>
                                                 {% endif %}
                                             {% endif %}
                                         </td>
