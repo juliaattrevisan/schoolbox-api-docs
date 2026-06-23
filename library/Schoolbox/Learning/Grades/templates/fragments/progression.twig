@@ -101,7 +101,7 @@
         }
     });
 </script>
-<table class="rb">
+<table class="rb rubric-progression">
     {% for capabilityId, capabilityData in longitudinalStudentMarks %}
     <tr>
         <th class="rubric-progression-capability markdown" rowspan="{{ capabilityData.indicators|length }}">{{ (capabilityData.name ?? '') | markdown }}</th>
