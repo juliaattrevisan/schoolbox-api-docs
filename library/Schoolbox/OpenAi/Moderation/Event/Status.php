@@ -16,6 +16,15 @@ namespace Schoolbox\OpenAi\Moderation\Event;
 enum Status: string
 {
     /**
+     * A new incoming moderation event that was NOT flagged by the Interaction Moderation agent,
+     * and therefore does not require any attention from school staff.
+     * We keep track of these so that the nightly cron can detect if it needs to re-run against new AI session logs or not.
+     *
+     * The term "No Behaviour Flagged" is to avoid us saying that there's "no action required" when in fact the agent
+     * just failed to detect a real issue (which could be a problem if schools complain that we told them it was fine when it wasn't).
+     */
+    case NO_BEHAVIOUR_FLAGGED = 'no_behaviour_flagged';
+    /**
      * A new incoming moderation event that was flagged but has not yet been reviewed by school staff.
     */
     case REQUIRES_ATTENTION = 'requires_attention';
