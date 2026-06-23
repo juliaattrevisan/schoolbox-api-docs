@@ -333,6 +333,14 @@ class Calendar_Api_Factory
                 return new Calendar_Api_EventType_Event_Schoolbox_Personal($connectorId, $user, $viewer);
             case Calendar_Api_EventType_Event_Schoolbox_Type::class:
                 return new Calendar_Api_EventType_Event_Schoolbox_Type($connectorId, $user, $viewer);
+            case Calendar_Api_EventType_Event_SocsMusic_Default::class:
+                return new Calendar_Api_EventType_Event_SocsMusic_Default(
+                    $connectorId,
+                    $user,
+                    $viewer,
+                    $this->configLoader,
+                    \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                );
             case Calendar_Api_EventType_Event_Socs_Default::class:
                 return new Calendar_Api_EventType_Event_Socs_Default(
                     $connectorId,

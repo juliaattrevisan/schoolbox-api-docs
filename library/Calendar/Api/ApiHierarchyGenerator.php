@@ -62,7 +62,7 @@ class ApiHierarchyGenerator
 
                 // SOCS is configured from the SOCS admin screen, so it should not be listed
                 // with user-managed calendar subscriptions.
-                if (in_array($connectorClassFilename, ['Socs'], true)) {
+                if (in_array($connectorClassFilename, ['Socs', 'SocsMusic'], true)) {
                     continue;
                 }
 

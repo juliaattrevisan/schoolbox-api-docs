@@ -100,7 +100,11 @@ class Javascript extends Base
                     'visible' => $this->getEvent()->getActive() ? $cssClass : 'strike',
                 ],
                 'attendance' => $this->renderEventAttendance(),
-                'bookings' => $this->renderBookings($this->getEvent()),
+                'bookings'    => $this->renderBookings($this->getEvent()),
+                'socsMusic'  => [
+                    'staff'    => $this->getEvent()->getSocsMusicStaff(),
+                    'students' => $this->getEvent()->getSocsMusicStudents(),
+                ],
             ],
         ];
 

@@ -123,6 +123,14 @@ class Event extends EventBase
     protected $attendanceStatus;
 
     /**
+     * @var array<string, array<int, array{id: int, name: string, url: string}>>
+     */
+    private array $socsMusicParticipants = [
+        'staff' => [],
+        'students' => [],
+    ];
+
+    /**
      * Can someone attend this event
      *
      * @return bool
@@ -431,6 +439,37 @@ class Event extends EventBase
         return $this;
     }
 
+    /**
+     * @param array<int, array{id: int, name: string, url: string}> $staff
+     */
+    public function setSocsMusicStaff(array $staff): void
+    {
+        $this->socsMusicParticipants['staff'] = $staff;
+    }
+
+    /**
+     * @return array<int, array{id: int, name: string, url: string}>
+     */
+    public function getSocsMusicStaff(): array
+    {
+        return $this->socsMusicParticipants['staff'];
+    }
+
+    /**
+     * @param array<int, array{id: int, name: string, url: string}> $students
+     */
+    public function setSocsMusicStudents(array $students): void
+    {
+        $this->socsMusicParticipants['students'] = $students;
+    }
+
+    /**
+     * @return array<int, array{id: int, name: string, url: string}>
+     */
+    public function getSocsMusicStudents(): array
+    {
+        return $this->socsMusicParticipants['students'];
+    }
 
     /**
      * @return string[]
