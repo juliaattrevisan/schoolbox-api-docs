@@ -15,8 +15,21 @@ namespace Schoolbox\OpenAi\Moderation\Event;
  */
 enum Status: string
 {
+    /**
+     * When a school staff member has reviewed and deemed that there is no further action required for this event.
+     */
     case NO_ACTION_REQUIRED = 'no_action_required';
+    /**
+     * A new incoming moderation event that was flagged but has not yet been reviewed by school staff.
+     */
     case REQUIRES_ATTENTION = 'requires_attention';
+    /**
+     * When a school staff member has reviewed and deemed that further action is required, but that action has not yet been taken.
+     */
     case FURTHER_ACTION_REQUIRED = 'further_action_required';
+    /**
+     * When a school staff member resolves the 'further action required' request.
+     * (workflow would be: event received as REQUIRES_ATTENTION -> deemed as FURTHER_ACTION_REQUIRED -> resolved to FURTHER_ACTION_TAKEN).
+     */
     case FURTHER_ACTION_TAKEN = 'further_action_taken';
 }
