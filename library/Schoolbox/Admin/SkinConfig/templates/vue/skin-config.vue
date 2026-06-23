@@ -172,31 +172,15 @@ window.Vue.onMounted(() => {
 
 <template>
     <div data-test="skin-config-container" class="l-flex-col l-gap-l l-pad-m--horiz">
-        <!-- <div class="alert-box warning f-no-margins">
-            <strong>Sonar UI is now available.</strong> We encourage you to enable it on your
-            <strong>Staging server</strong> now to review your skin settings and custom CSS before it becomes the only
-            option in <strong>v26.2.</strong><br />
-            <br />
-            <a href="/help/sso/send?returnUrl=/homepage/5808" target="_blank">Read the Transition Guide</a>
-        </div> -->
         <div class="l-flex-col l-gap-m">
             <img
                 :src="sonarImgSrc"
                 alt="Sonar UI is now available. We encourage you to enable it on your Staging server now to review your skin settings and custom CSS before it becomes the only option in v26.2."
                 class="l-c-cr"
             />
-            <ul class="flex-list buttons">
-                <li>
-                    <a href="/adminv2/setting/design/Skin%20Config" class="button submit"
-                        >Try Sonar UI in Skin Config</a
-                    >
-                </li>
-                <li>
-                    <a href="/help/sso/send?returnUrl=/homepage/5808" target="_blank" class="button"
-                        >Read the Transition Guide</a
-                    >
-                </li>
-            </ul>
+            <a href="/help/sso/send?returnUrl=/homepage/5808" target="_blank" class="button"
+                >Read the Transition Guide</a
+            >
         </div>
         <div v-if="loadError" data-test="skin-config-load-error">
             <request-error :further-info="loadError" />
