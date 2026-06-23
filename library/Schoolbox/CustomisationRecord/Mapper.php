@@ -108,16 +108,16 @@ class Mapper extends BaseMapper
             $assessmentContext = $assessmentMapper->hydrateJoin($row, 'assessment_course_unit_implementation', 'cui');
             /** @var \Schoolbox\Learning\Course\DataModel\Implementation\Model $courseImplementation */
             $courseImplementation = $assessmentMapper->hydrateJoin($row, 'assessment_course_unit_implementation.course', 'ci');
-                $folder = $assessmentMapper->hydrateJoin($row, 'assessment_course_unit_implementation.course.folder', 'f');
-                /* Always create a new collection for folder codes as there
-                 * might be multiple folder codes for the same folder depending on the number
-                 * of records returned from the query
-                 */
-                $folderCodeCollection = FolderCode::createCollection();
-                if (null !== $folderCode) {
-                    $folderCodeCollection->add($folderCode);
-                }
-                $folder->setCodes($folderCodeCollection);
+            $folder = $assessmentMapper->hydrateJoin($row, 'assessment_course_unit_implementation.course.folder', 'f');
+            /* Always create a new collection for folder codes as there
+             * might be multiple folder codes for the same folder depending on the number
+             * of records returned from the query
+             */
+            $folderCodeCollection = FolderCode::createCollection();
+            if (null !== $folderCode) {
+                $folderCodeCollection->add($folderCode);
+            }
+            $folder->setCodes($folderCodeCollection);
 
             if (null !== $courseImplementation) {
                 /* Hydrating folder for class details
@@ -446,7 +446,7 @@ class Mapper extends BaseMapper
         /** @var \Schoolbox\Assessment\Term\Model $term */
         foreach ($terms as $term) {
             $tempPb = $this->getPredicateBuilder()
-                ->greaterThanOrEqualTo('created_at', $term->getStart()->getDatabase());
+                           ->greaterThanOrEqualTo('created_at', $term->getStart()->getDatabase());
 
             if (null !== $term->getActualFinish()) {
                 $tempPb->lessThanOrEqualTo('created_at', $term->getActualFinish()->getDatabase());
