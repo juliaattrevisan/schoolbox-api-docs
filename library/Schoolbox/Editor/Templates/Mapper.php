@@ -22,6 +22,18 @@ use Schoolbox\GenericCollection;
 class Mapper extends \Schoolbox\Mapper
 {
     /**
+     * Find templates for a category ordered by title.
+     *
+     * @return GenericCollection|Model[]
+     */
+    public function findByCategoryIdOrderedByTitle(int $categoryId): GenericCollection
+    {
+        return $this->findByColumn('category_id', $categoryId, [
+            'order' => ['title' => 'asc'],
+        ]);
+    }
+
+    /**
      * @inheritdoc
      */
     protected function mapping(): void

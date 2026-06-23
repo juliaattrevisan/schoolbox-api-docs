@@ -46,6 +46,7 @@ class Validation
 {
     const string START_PERIOD_ERRORS = 'start_period_errors'; // A key for errors pertaining to the start of the booking period.
     const string END_PERIOD_ERRORS = 'end_period_errors'; // A key for errors pertaining to the end of the booking period.
+    const string QUANTITY_ERRORS = 'quantity';
     const ERROR_INVALID = 'invalid';
     const ERROR_BEFORE_START = 'before_start';
     const ERROR_IN_PAST = 'in_past';
@@ -101,6 +102,8 @@ class Validation
      */
     private \Schoolbox\External\Event\Mapper $eventMapper;
 
+    private CapacityAllocation $capacityAllocation;
+
     /**
      * cache key for $this->conflictingBookings
      * Format:
@@ -143,6 +146,7 @@ class Validation
         $this->setCampusMapper($campusMapper);
         $this->setConfigLoader($configLoader);
         $this->setEventMapper($eventMapper);
+        $this->capacityAllocation = new CapacityAllocation();
     }
 
     /**
@@ -155,6 +159,7 @@ class Validation
      *            'override_validation' => '1' or blank or unset
      *            'startDate' => datetime in local format (e.g. '02/12/2025 12:00pm')
      *            'endDate' => datetime in local format (e.g. '02/12/2025 12:00pm')
+     *            'quantity' => number of resource units requested
      *            'campus' => 0 or campusId
      *            'repeat_until' => date in local format (e.g. 02/12/2025)
      *            'related_item' => array of ['resource_id' => int, 'notes' => string]
@@ -197,6 +202,7 @@ class Validation
         $errors        = [];
         $startDate     = null;
         $endDate       = null;
+        $quantity      = $this->getQuantityFromPostData($postData, $existingBooking);
 
         // Only users allowed to moderate this item may override validation
         $override = (
@@ -221,7 +227,10 @@ class Validation
             return $errors;
         }
 
-        $errors = $this->validateSimpleRules($resource, $startDate, $endDate, $override);
+        $errors = array_merge_recursive(
+            $this->validateQuantity($resource, $quantity, $existingBooking),
+            $this->validateSimpleRules($resource, $startDate, $endDate, $override),
+        );
 
         $series = new Series($this->getBookingMapper(), $this->getStatusMapper(), $this->getExternalTimetableHandler());
 
@@ -243,6 +252,7 @@ class Validation
                 $campus
             );
             $validationResults = [];
+            $allocationPeriodsByResourceId = [];
             foreach ($dateParts as $check) {
                 /** @var Item\Model $thisResource */
                 [$thisResource, $thisStart, $thisEnd] = $check;
@@ -255,12 +265,38 @@ class Validation
                 // Validate for clashes even if $override is true.
                 // The clash validation results will allow us to find and reject the clashing bookings.
                 // See $this->validateBookingIgnoringClashesIfClashesAllowed().
-                $validationResults[] = $this->validateForClashes($thisResource, $thisStart, $thisEnd);
+                $clashValidationResult = $this->validateForClashesWithAdditionalApprovedPeriods(
+                    $thisResource,
+                    $thisStart,
+                    $thisEnd,
+                    additionalApprovedPeriods: $allocationPeriodsByResourceId[$thisResource->getId()] ?? [],
+                    quantity: $thisResource->getId() === $resource->getId()
+                        ? $quantity
+                        : BookingModel::DEFAULT_QUANTITY,
+                );
+                $validationResults[] = $clashValidationResult;
+
+                $allocationQuantity = $thisResource->getId() === $resource->getId()
+                    ? $quantity
+                    : BookingModel::DEFAULT_QUANTITY;
+                if (
+                    count($this->getAllErrorStringsAsFlatArray($clashValidationResult)) === 0
+                    && $this->newResourceBookingWouldConsumeCapacityWithoutClash($thisResource, $override)
+                ) {
+                    $this->addAllocationPeriod(
+                        $allocationPeriodsByResourceId,
+                        $thisResource->getId(),
+                        new Alaress_Date_Format($thisStart),
+                        new Alaress_Date_Format($thisEnd),
+                        $allocationQuantity,
+                    );
+                }
             }
             $errors = array_merge_recursive($errors, ...$validationResults);
         } else {
             // existing booking: Validate related and recurrent bookings
             $validationResults = [];
+            $allocationPeriodsByResourceId = [];
             foreach (
                 $series->getExistingSeries(
                     $existingBooking,
@@ -281,12 +317,79 @@ class Validation
                 // Validate for clashes even if $override is true.
                 // The clash validation results will allow us to find and reject the clashing bookings.
                 // See $this->validateBookingIgnoringClashesIfClashesAllowed().
-                $validationResults[] = $this->validateForClashes($thisResource, $thisStart, $thisEnd, $thisBooking);
+                $clashValidationResult = $this->validateForClashesWithAdditionalApprovedPeriods(
+                    $thisResource,
+                    $thisStart,
+                    $thisEnd,
+                    $thisBooking,
+                    $allocationPeriodsByResourceId[$thisResource->getId()] ?? [],
+                    $thisResource->getId() === $resource->getId()
+                        ? $quantity
+                        : $thisBooking->getQuantity(),
+                );
+                $validationResults[] = $clashValidationResult;
+
+                $allocationQuantity = $thisResource->getId() === $resource->getId()
+                    ? $quantity
+                    : $thisBooking->getQuantity();
+                if (
+                    count($this->getAllErrorStringsAsFlatArray($clashValidationResult)) === 0
+                    && (
+                        $override
+                        || $this->resourceEventBookingWouldConsumeCapacityWithoutClash($thisResource, $thisBooking->getEvent())
+                    )
+                ) {
+                    $this->addAllocationPeriod(
+                        $allocationPeriodsByResourceId,
+                        $thisResource->getId(),
+                        new Alaress_Date_Format($thisStart),
+                        new Alaress_Date_Format($thisEnd),
+                        $allocationQuantity,
+                    );
+                }
             }
             $errors = array_merge_recursive($errors, ...$validationResults);
         }
 
         return $errors;
+    }
+
+    public function getQuantityFromPostData(Values|array $postData, ?BookingModel $existingBooking = null): int
+    {
+        $quantity = $postData['quantity'] ?? $existingBooking?->getQuantity() ?? BookingModel::DEFAULT_QUANTITY;
+
+        if (is_string($quantity)) {
+            $quantity = trim($quantity);
+        }
+
+        return filter_var($quantity, FILTER_VALIDATE_INT) === false ? 0 : (int)$quantity;
+    }
+
+    public function validateBookingQuantity(
+        BookingItemModel $resource,
+        int $quantity,
+        ?BookingModel $existingBooking = null
+    ): array {
+        return $this->validateQuantity($resource, $quantity, $existingBooking);
+    }
+
+    private function validateQuantity(
+        BookingItemModel $resource,
+        int $quantity,
+        ?BookingModel $existingBooking = null
+    ): array {
+        $maxQuantity = max($resource->getCapacity(), $existingBooking?->getQuantity() ?? BookingModel::DEFAULT_QUANTITY);
+        if ($quantity >= BookingModel::DEFAULT_QUANTITY && $quantity <= $maxQuantity) {
+            return [];
+        }
+
+        return [
+            self::QUANTITY_ERRORS => [
+                self::ERROR_INVALID => [
+                    self::ERROR_INVALID,
+                ],
+            ],
+        ];
     }
 
     /**
@@ -455,21 +558,28 @@ class Validation
                 $booking->getResource(),
                 $bookingStartAt->getDateTimeObject(),
                 $bookingEndAt->getDateTimeObject(),
-                $booking
+                $booking,
+                $booking->getQuantity(),
             ),
             default => [],
         };
     }
 
     /**
-     * Validates whether a booking for this resource clashes with any bookings that already exist.
-     * Note clashes include ERROR_CONFLICT and ERROR_TIMETABLED_CLASS errors.
+     * Validates whether a proposed booking period conflicts with resource or room availability.
      *
-     * @param Item\Model $resource
-     * @param DateTime   $startDate
-     * @param DateTime   $endDate
-     * @param Model|null $existingBooking
-     * @return array
+     * The booking being validated has not necessarily been saved yet. Existing approved
+     * bookings are loaded from the database and compared with the proposed period. When
+     * an existing booking is supplied during an update, it represents the stored version
+     * of the proposed booking and is excluded from the conflict set so the booking does
+     * not conflict with itself.
+     *
+     * @param Item\Model $resource Resource being booked.
+     * @param DateTime $startDate Proposed booking start.
+     * @param DateTime $endDate Proposed booking end.
+     * @param Model|null $existingBooking Stored version of the proposed booking when updating an existing booking.
+     * @param int $quantity Quantity requested by the proposed booking.
+     * @return array Validation errors keyed by period field and date.
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
      */
@@ -477,18 +587,67 @@ class Validation
         Item\Model $resource,
         DateTime $startDate,
         DateTime $endDate,
-        ?Model $existingBooking = null
+        ?Model $existingBooking = null,
+        int $quantity = BookingModel::DEFAULT_QUANTITY,
+    ): array {
+        return $this->validateForClashesWithAdditionalApprovedPeriods(
+            $resource,
+            $startDate,
+            $endDate,
+            $existingBooking,
+            quantity: $quantity,
+        );
+    }
+
+    /**
+     * Validates clashes while also considering approved periods that have not been persisted yet.
+     *
+     * Recurring booking validation checks a series one period at a time. A period that
+     * passed validation earlier in the loop is not yet in the database, so it will not
+     * be returned by the conflict query for later periods in the same series. The
+     * additional approved periods parameter carries those soft-approved allocations
+     * forward so later periods count them against capacity.
+     *
+     * @param Item\Model $resource Resource being booked.
+     * @param DateTime $startDate Proposed booking start.
+     * @param DateTime $endDate Proposed booking end.
+     * @param Model|null $existingBooking Stored version of the proposed booking when updating an existing booking.
+     * @param array<int, array{startDatetime: Alaress_Date_Format, endDatetime: Alaress_Date_Format, quantity?: int}> $additionalApprovedPeriods Soft-approved periods from the current validation loop.
+     * @param int $quantity Quantity requested by the proposed booking.
+     * @return array Validation errors keyed by period field and date.
+     */
+    private function validateForClashesWithAdditionalApprovedPeriods(
+        Item\Model $resource,
+        DateTime $startDate,
+        DateTime $endDate,
+        ?Model $existingBooking = null,
+        array $additionalApprovedPeriods = [],
+        int $quantity = BookingModel::DEFAULT_QUANTITY,
     ): array {
         $errors = [];
 
         /** @var Collection|Model[] $conflictingBookings */
         $conflictingBookings = $this->getConflictingBookings($resource, $startDate, $endDate, $existingBooking);
+        $approvedPeriods = array_merge(
+            $this->getAllocationPeriodsForBookings($conflictingBookings),
+            $additionalApprovedPeriods,
+        );
 
-        // Anything still in list of conflicts? We have a conflict
-        if (count($conflictingBookings)) {
-            $startDateKey = $startDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
+        $startDateKey = $startDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
+
+        if (
+            $this->capacityAllocation->periodWouldExceedCapacity(
+                $this->getResourceWithEffectiveCapacity($resource, $quantity, $existingBooking),
+                new Alaress_Date_Format($startDate),
+                new Alaress_Date_Format($endDate),
+                $approvedPeriods,
+                $quantity,
+            )
+        ) {
             $errors[self::START_PERIOD_ERRORS][$startDateKey][] = self::ERROR_CONFLICT;
-        } elseif (strlen($resource->getRoomCode() ?? '') > 0) {
+        }
+
+        if (strlen($resource->getRoomCode() ?? '') > 0) {
             // Check if there's a timetabled class here, too.
             $roomEvents = $this->getTimetableRoomEvents(
                 $resource->getRoomCode(),
@@ -503,6 +662,67 @@ class Validation
         }
 
         return $errors;
+    }
+
+    /**
+     * Converts booking models into capacity allocation periods.
+     *
+     * Booking-specific start and end times are used when present. Bookings that do not
+     * override their period use the event start and end times instead.
+     *
+     * @param iterable<Model> $bookings Bookings to convert into allocation periods.
+     * @return array<int, array{startDatetime: Alaress_Date_Format, endDatetime: Alaress_Date_Format, quantity: int}> Allocation periods for capacity checks.
+     */
+    private function getAllocationPeriodsForBookings(iterable $bookings): array
+    {
+        $periods = [];
+        foreach ($bookings as $booking) {
+            $startDateTime = $booking->getBookingStartAt() ?? $booking->getEvent()->getStartDateTime();
+            $endDateTime = $booking->getBookingEndAt() ?? $booking->getEvent()->getEndDateTime();
+
+            if ($startDateTime === null || $endDateTime === null) {
+                continue;
+            }
+
+            $periods[] = [
+                'startDatetime' => $startDateTime,
+                'endDatetime' => $endDateTime,
+                'quantity' => $booking->getQuantity(),
+            ];
+        }
+
+        return $periods;
+    }
+
+    /**
+     * Returns the resource to use for capacity checks while editing an existing booking.
+     *
+     * If an administrator lowers a resource capacity after a booking was approved, a
+     * later edit that keeps or reduces the original quantity should not fail solely
+     * because the stored booking already exceeds the new capacity. In that case this
+     * method clones the resource and temporarily raises its effective capacity to the
+     * existing booking quantity for this validation only.
+     *
+     * @param Item\Model $resource Resource being booked.
+     * @param int $quantity Quantity requested by the proposed booking.
+     * @param Model|null $existingBooking Stored version of the proposed booking when updating an existing booking.
+     * @return Item\Model Original resource, or a clone with adjusted capacity for validation.
+     */
+    private function getResourceWithEffectiveCapacity(
+        Item\Model $resource,
+        int $quantity,
+        ?Model $existingBooking
+    ): Item\Model {
+        if (
+            $existingBooking instanceof Model
+            && $quantity <= $existingBooking->getQuantity()
+            && $resource->getCapacity() < $existingBooking->getQuantity()
+        ) {
+            $resource = clone $resource;
+            $resource->setCapacity($existingBooking->getQuantity());
+        }
+
+        return $resource;
     }
 
     /**
@@ -627,7 +847,17 @@ class Validation
                 $booking,
             );
 
-            $allConflictingBookings = $allConflictingBookings->merge($conflictingBookings);
+            if (
+                $this->capacityAllocation->bookingWouldExceedCapacity(
+                    $this->getResourceWithEffectiveCapacity($booking->getResource(), $booking->getQuantity(), $booking),
+                    $startDatetime->getDateTimeObject(),
+                    $endDatetime->getDateTimeObject(),
+                    $conflictingBookings,
+                    $booking->getQuantity(),
+                )
+            ) {
+                $allConflictingBookings = $allConflictingBookings->merge($conflictingBookings);
+            }
         }
 
         return $allConflictingBookings->getUnique('id'); // Return a de-duplicated collection of bookings.
@@ -821,6 +1051,11 @@ class Validation
         );
     }
 
+    public function validationErrorsContainHardBlockers(array $errorsStruct): bool
+    {
+        return in_array(self::ERROR_TIMETABLED_CLASS, $this->getAllErrorStringsAsFlatArray($errorsStruct), true);
+    }
+
     /**
      * This function was added for backward-compatibility, so the total number of errors can be easily counted.
      * (As they could be before the date keys were added to the errors data structure.)
@@ -876,11 +1111,11 @@ class Validation
 
         $clashBookingStartDatesAsKeys = [];
         if (count($errorsStruct) > 0) {
-            // Remember the start dates of clash bookings.
-            // Note clash errors always use the Validation::START_PERIOD_ERRORS key (see Validation->validateForClashes()).
+            // Remember the start dates of capacity conflicts.
+            // Note conflict errors always use the Validation::START_PERIOD_ERRORS key (see Validation->validateForClashes()).
             foreach ($errorsStruct[self::START_PERIOD_ERRORS] ?? [] as $startDate => $errors) {
                 foreach ($errors as $error) {
-                    if (in_array($error, [self::ERROR_CONFLICT, self::ERROR_TIMETABLED_CLASS], true)) {
+                    if ($error === self::ERROR_CONFLICT) {
                         $clashBookingStartDatesAsKeys[$startDate] = null;
                         break; // Once a clash error is found for this start date, no need to check remaining errors.
                     }
@@ -893,15 +1128,16 @@ class Validation
                 $item->getAllowClashBookings() ||
                 (!empty($bookingDetailsForItem['override_validation']) && $item->canUserModerateThisItem($this->user))
             ) {
-                // Clear all the clash-related errors from the $errorsStruct array,
+                // Clear capacity conflict errors from the $errorsStruct array,
                 // leaving only errors that cannot be overridden.
-                // The clash-related errors will have been left in by $this->validateBookingFromPostData()
+                // The conflict errors will have been left in by $this->validateBookingFromPostData()
                 // to allow us to find the start dates of clash bookings (as has been done above).
+                // Timetabled class errors remain hard blockers and cannot create pending bookings.
                 $errorsStructFiltered = [];
                 foreach ($errorsStruct as $key => $errorsByDate) {
                     foreach ($errorsByDate as $date => $errors) {
                         foreach ($errors as $error) {
-                            if (!in_array($error, [self::ERROR_CONFLICT, self::ERROR_TIMETABLED_CLASS], true)) {
+                            if ($error !== self::ERROR_CONFLICT) {
                                 if (!array_key_exists($key, $errorsStructFiltered)) {
                                     $errorsStructFiltered[$key] = [];
                                 }
@@ -956,26 +1192,40 @@ class Validation
             // Exclude the moved bookings themselves when finding periods of approved bookings that potentially clash.
             bookingIdsToExclude: $movedBookings->map(fn ($movedBooking) => $movedBooking->getId(), $movedBookings)->getAll()
         );
+        $allocationPeriodsByResourceId = $periodsOfApprovedBookingsByResourceId;
 
         // For each booking, check for clashes with existing approved bookings of the same resource.
         /** @var BookingModel $movedBooking*/
         foreach ($movedBookings as $movedBooking) {
-            $isClashByBookingId[$movedBooking->getId()] = false; // Assume no clash until a clash is found.
-            $periodsOfApprovedBookings = $periodsOfApprovedBookingsByResourceId[$movedBooking->getResource()->getId()] ?? [];
-            foreach ($periodsOfApprovedBookings as $period) {
-                if ($period['startDatetime']->gt($movedBooking->getBookingEndAt())) {
-                    // The $periods are sorted by start datetime ascending,
-                    // so we can be sure that no other periods will clash with $movedBooking.
-                    break;
-                }
+            $resourceId = $movedBooking->getResource()->getId();
+            $resource = $resourceById[$resourceId] ?? $movedBooking->getResource();
+            $bookingStartAt = $movedBooking->getBookingStartAt() ?? $movedBooking->getEvent()->getStartDateTime();
+            $bookingEndAt = $movedBooking->getBookingEndAt() ?? $movedBooking->getEvent()->getEndDateTime();
 
-                if (
-                    $period['startDatetime']->lt($movedBooking->getBookingEndAt()) &&
-                    $period['endDatetime']->gt($movedBooking->getBookingStartAt())
-                ) {
-                    // If $movedBooking was persisted, it would clash with an approved booking for $period.
-                    $isClashByBookingId[$movedBooking->getId()] = true;
-                }
+            if ($bookingStartAt === null || $bookingEndAt === null) {
+                $isClashByBookingId[$movedBooking->getId()] = false;
+                continue;
+            }
+
+            $isClashByBookingId[$movedBooking->getId()] = $this->capacityAllocation->periodWouldExceedCapacity(
+                $this->getResourceWithEffectiveCapacity($resource, $movedBooking->getQuantity(), $movedBooking),
+                $bookingStartAt,
+                $bookingEndAt,
+                $allocationPeriodsByResourceId[$resourceId] ?? [],
+                $movedBooking->getQuantity(),
+            );
+
+            if (
+                !$isClashByBookingId[$movedBooking->getId()]
+                && $this->bookingWouldConsumeCapacityWithoutClash($movedBooking)
+            ) {
+                $this->addAllocationPeriod(
+                    $allocationPeriodsByResourceId,
+                    $resourceId,
+                    $bookingStartAt,
+                    $bookingEndAt,
+                    $movedBooking->getQuantity(),
+                );
             }
         }
 
@@ -996,12 +1246,14 @@ class Validation
      *
      * @param GenericCollection<int, BookingItemModel> $resourceById - Resources indexed by resourceId.
      * @param GenericCollection<int, Event> $eventById - Events indexed by eventId.
+     * @param array<int, array<int>> $bookedResourceIdsByEventId - Existing bookings that will not be recreated.
      * @return array<int, array<int, bool>>
      *  - For each event, for each resource id, whether a clash was detected.
      */
     public function checkForClashesIfResourceBookingsAddedToEvents(
         GenericCollection $resourceById,
-        GenericCollection $eventById
+        GenericCollection $eventById,
+        array $bookedResourceIdsByEventId = [],
     ): array {
         $isClashByResourceIdByEventId = [];
 
@@ -1010,30 +1262,50 @@ class Validation
             $resourceById->keys(),
             sortByStartDatetimeAsc: true
         );
+        $allocationPeriodsByResourceId = $periodsOfApprovedBookingsByResourceId;
 
         // For each event in the series, check for clash bookings if each resource is booked at a time matching the event time.
         /** @var Event $event */
         foreach ($eventById as $eventId => $event) {
             // For each resource, check for existing approved bookings of that resource that overlap the event period.
             foreach ($resourceById as $resourceId => $resource) {
-                $periodsOfApprovedBookings = $periodsOfApprovedBookingsByResourceId[$resourceId] ?? [];
-                foreach ($periodsOfApprovedBookings as $period) {
-                    if ($period['startDatetime']->gt($event->getEndDateTime())) {
-                        // The $periods are sorted by start datetime ascending, so we can be sure that no other periods will clash with event.
-                        break;
+                if (in_array($resourceId, $bookedResourceIdsByEventId[$eventId] ?? [], false)) {
+                    continue;
+                }
+
+                if ($event->getStartDateTime() === null || $event->getEndDateTime() === null) {
+                    continue;
+                }
+
+                if (
+                    $this->capacityAllocation->periodWouldExceedCapacity(
+                        $resource,
+                        $event->getStartDateTime(),
+                        $event->getEndDateTime(),
+                        $allocationPeriodsByResourceId[$resourceId] ?? [],
+                    )
+                ) {
+                    if (!array_key_exists($eventId, $isClashByResourceIdByEventId)) {
+                        $isClashByResourceIdByEventId[$eventId] = [];
                     }
 
-                    if (
-                        $period['startDatetime']->lt($event->getEndDateTime()) &&
-                        $period['endDatetime']->gt($event->getStartDateTime())
-                    ) {
-                        if (!array_key_exists($eventId, $isClashByResourceIdByEventId)) {
-                            $isClashByResourceIdByEventId[$eventId] = [];
-                        }
+                    $isClashByResourceIdByEventId[$eventId][$resourceId] = true;
+                    continue;
+                }
 
-                        // If $resource was booked for $event, that booking would clash with an approved booking for $period.
-                        $isClashByResourceIdByEventId[$eventId][$resourceId] = true;
-                    }
+                $booking = (new BookingModel())
+                    ->setEvent($event)
+                    ->setResource($resource)
+                    ->setBookingStartAt(null)
+                    ->setBookingEndAt(null);
+
+                if ($this->bookingWouldConsumeCapacityWithoutClash($booking)) {
+                    $this->addAllocationPeriod(
+                        $allocationPeriodsByResourceId,
+                        $resourceId,
+                        $event->getStartDateTime(),
+                        $event->getEndDateTime(),
+                    );
                 }
             }
         }
@@ -1106,38 +1378,170 @@ class Validation
         return $this->getStatusIdForNonClashBooking($booking, $user);
     }
 
+    public function getNewStatusIdForUpdatedBooking(
+        BookingModel $booking,
+        bool $isClash,
+        User $user,
+        int $originalQuantity,
+        bool $periodChanged,
+        bool $overrideValidation = false,
+    ): int {
+        $status = $booking->getStatus();
+        if (
+            !$overrideValidation
+            && !$periodChanged
+            && !$isClash
+            && $booking->getQuantity() <= $originalQuantity
+            && $status !== null
+        ) {
+            return $status->getId();
+        }
+
+        return $this->getNewStatusIdForBooking($booking, $isClash, $user, $overrideValidation);
+    }
+
+    private function bookingWouldConsumeCapacityWithoutClash(BookingModel $booking): bool
+    {
+        $resource = $booking->getResource();
+        $bookingStartAt = $booking->getBookingStartAt() ?? $booking->getEvent()->getStartDateTime();
+        $bookingEndAt = $booking->getBookingEndAt() ?? $booking->getEvent()->getEndDateTime();
+
+        if ($bookingStartAt === null || $bookingEndAt === null) {
+            return false;
+        }
+
+        $errors = $this->validateSimpleRules(
+            $resource,
+            $bookingStartAt->getDateTimeObject(),
+            $bookingEndAt->getDateTimeObject(),
+            false,
+        );
+
+        if ($resource->getCurrentTermRestriction()) {
+            $errors = array_merge_recursive(
+                $errors,
+                $this->validateCurrentTermRestriction($bookingEndAt->getDateTimeObject(), $this->getCurrentTerm())
+            );
+        }
+
+        if (count($errors) > 0) {
+            return false;
+        }
+
+        return $this->resourceEventBookingWouldConsumeCapacityWithoutClash($resource, $booking->getEvent());
+    }
+
     /**
      * Return the status to be set for a new booking that does not clash with any existing booking.
-     * Note bookings that clash with existing bookings should be given status 'pending'.
+     * Note bookings that clash with existing bookings should be given status pending.
      *
-     * @param BookingModel $booking
-     * @param User $user
-     * @return int
+     * This must stay consistent with resourceEventBookingWouldConsumeCapacityWithoutClash()
+     * and newResourceBookingWouldConsumeCapacityWithoutClash(). A non-clashing booking consumes
+     * capacity when it would be approved immediately: open resources, or moderated resources
+     * where the current user moderates the resource and authored the booking.
+     *
+     * @param BookingModel $booking Booking being assigned a non-clashing status.
+     * @param User $user Current user creating or updating the booking.
+     * @return int Booking status ID for the non-clashing booking.
      */
     private function getStatusIdForNonClashBooking(
         BookingModel $booking,
         User $user,
     ): int {
-        $resource = $booking->getResource();
-        $event = $booking->getEvent();
+        return (
+            $this->nonClashingBookingWouldBeApproved(
+                $booking->getResource(),
+                $booking->getEvent()->getAuthor(),
+                $user,
+            )
+            ? BookingStatusModel::STATUS_APPROVED
+            : BookingStatusModel::STATUS_PENDING
+        );
+    }
 
-        // What about the resource? If it's an open resource, confirm the booking immediately.
-        if ($resource->getModerationType()->getId() === BookingModerationTypeModel::TYPE_OPEN) {
-            return BookingStatusModel::STATUS_APPROVED;
-        }
-
+    /**
+     * Returns whether an existing event-backed booking would consume capacity when it does not clash.
+     *
+     * This mirrors getStatusIdForNonClashBooking(): only bookings that would be approved immediately
+     * should be counted as soft-approved capacity allocations during validation.
+     */
+    private function resourceEventBookingWouldConsumeCapacityWithoutClash(
+        BookingItemModel $resource,
+        ?Event $event
+    ): bool {
+        $moderationType = $resource->getModerationType();
         if (
-            $resource->isUserModerator($user)
-            && (int)$event->getAuthor()->getId() === (int)$user->getId()
+            $moderationType === null
+            || $moderationType->getId() === BookingModerationTypeModel::TYPE_OPEN
         ) {
-            /* If you're a Moderator and can moderate this request,
-             * and you created the booking in the first place,
-             * set it to Approved - otherwise you'll end up approving your own request anyway
-             */
-            return BookingStatusModel::STATUS_APPROVED;
+            return $this->nonClashingBookingWouldBeApproved($resource, null, $this->user);
         }
 
-        return BookingStatusModel::STATUS_PENDING;
+        return $this->nonClashingBookingWouldBeApproved($resource, $event?->getAuthor(), $this->user);
+    }
+
+    /**
+     * Returns whether a new resource booking would consume capacity when it does not clash.
+     *
+     * This path validates resource-booking form submissions before the event model exists, so the
+     * current user is the only possible author available here. Event-backed bookings must use
+     * resourceEventBookingWouldConsumeCapacityWithoutClash() so moderator bookings on behalf of
+     * another author are not counted as approved capacity.
+     */
+    private function newResourceBookingWouldConsumeCapacityWithoutClash(
+        BookingItemModel $resource,
+        bool $overrideValidation
+    ): bool {
+        return $this->nonClashingBookingWouldBeApproved($resource, $this->user, $this->user, $overrideValidation);
+    }
+
+    /**
+     * Returns whether a non-clashing booking would be approved immediately for capacity purposes.
+     */
+    private function nonClashingBookingWouldBeApproved(
+        BookingItemModel $resource,
+        ?User $author,
+        User $user,
+        bool $overrideValidation = false,
+    ): bool {
+        if ($overrideValidation) {
+            return true;
+        }
+
+        $moderationType = $resource->getModerationType();
+        if (
+            $moderationType === null
+            || $moderationType->getId() === BookingModerationTypeModel::TYPE_OPEN
+        ) {
+            return true;
+        }
+
+        return (
+            $author !== null
+            && $resource->isUserModerator($user)
+            && (int)$author->getId() === (int)$user->getId()
+        );
+    }
+
+    /**
+     * @param array<int, array<int, array{startDatetime: Alaress_Date_Format, endDatetime: Alaress_Date_Format, quantity: int}>> $periodsByResourceId
+     */
+    private function addAllocationPeriod(
+        array &$periodsByResourceId,
+        int $resourceId,
+        Alaress_Date_Format $startDateTime,
+        Alaress_Date_Format $endDateTime,
+        int $quantity = BookingModel::DEFAULT_QUANTITY,
+    ): void {
+        if (!array_key_exists($resourceId, $periodsByResourceId)) {
+            $periodsByResourceId[$resourceId] = [];
+        }
+
+        $periodsByResourceId[$resourceId][] = [
+            'startDatetime' => $startDateTime,
+            'endDatetime' => $endDateTime,
+            'quantity' => $quantity,
+        ];
     }
 
 
@@ -1158,7 +1562,20 @@ class Validation
         ?Model $existingBooking = null
     ): Collection {
         $conflictingBookings = new Collection();
-        $conflictingBookings = $conflictingBookings->merge($this->getConflictingBookings($resource, $startDate, $endDate, $existingBooking));
+        $approvedBookings = $this->getConflictingBookings($resource, $startDate, $endDate, $existingBooking);
+        $quantity = $existingBooking?->getQuantity() ?? BookingModel::DEFAULT_QUANTITY;
+
+        if (
+            $this->capacityAllocation->bookingWouldExceedCapacity(
+                $this->getResourceWithEffectiveCapacity($resource, $quantity, $existingBooking),
+                $startDate,
+                $endDate,
+                $approvedBookings,
+                $quantity
+            )
+        ) {
+            $conflictingBookings = $conflictingBookings->merge($approvedBookings);
+        }
 
         if (strlen($resource->getRoomCode() ?? '') > 0) {
             // Check if there's a timetabled class here, too.

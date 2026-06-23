@@ -12,6 +12,7 @@ use Schoolbox\Admin\OpenAI\Config as OpenAiConfig;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\IB\Registrations\Sessions\Student\Model as RegistrationSessionStudentModel;
 
 require_once __DIR__ . '/../conf/core/require.php';
 
@@ -60,6 +61,13 @@ $app = new class extends CliTool\App {
             'design_moderator'       => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_DESIGN . ' AND type=' . UserAccess::ACCESS_FULL,
             'lms_moderator'          => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_LMS . ' AND type=' . UserAccess::ACCESS_FULL,
             'impersonator_moderator' => 'SELECT count(distinct u.id) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_IMPERSONATOR . ' AND type=' . UserAccess::ACCESS_FULL, // distinct u.id, so we can see the count of humans, not service permissions.  A single human can have multiple Impersonator service permissions.
+            'ib_moderator'           => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_IB_COORDINATOR . ' AND type=' . UserAccess::ACCESS_FULL,
+
+            //IBIS
+            'ib_registration_sessions'              => 'SELECT COUNT(*) FROM ib_registration_sessions',
+            'ib_registration_students'              => 'SELECT COUNT(*) FROM ib_registration_session_student',
+            'ib_registration_students_registered'   => 'SELECT COUNT(*) FROM ib_registration_session_student WHERE status = ' . RegistrationSessionStudentModel::STATUS_REGISTERED,
+            'ib_students_with_candidate_numbers'    => 'SELECT COUNT(*) FROM user u WHERE u.ib_candidate_number IS NOT NULL AND u.ib_candidate_number != ""',
 
             //Logins
             'unique_logins_yesterday' => "SELECT COUNT(DISTINCT username) FROM login_log WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 1 DAY) AND date < DATE(NOW())",
@@ -297,6 +305,13 @@ $app = new class extends CliTool\App {
             //Curriculum
             'curriculum'                    => 'SELECT count(*) FROM curriculum_node WHERE deleted_at IS NULL',
             'curriculum_assessment'         => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa on curriculum_node.id = cnfa.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
+            'curriculum_assessment_project' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN project p ON p.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND p.deleted_at IS NULL',
+            'curriculum_assessment_due_work' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN submission_box sb ON sb.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL',
+            'curriculum_assessment_quiz' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN assess q ON q.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND q.availability = "assess" AND q.deleted_at IS NULL',
+            'curriculum_assessment_task' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN task t ON t.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND t.deleted_at IS NULL',
+            'curriculum_assessment_lti' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN lti_assessment la ON la.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL',
+            'curriculum_assessment_lesson_plan' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN lesson_plan lp ON lp.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND lp.deleted_at IS NULL',
+            'curriculum_assessment_dialog_agent' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN dialog_agent da ON da.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND da.deleted_at IS NULL',
             'curriculum_rubric_indicator'   => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_rubric_indicator cnfri on curriculum_node.id = cnfri.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
             'curriculum_rubric_capability'  => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_rubric_capability cnfrc on curriculum_node.id = cnfrc.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
             'curriculum_folder'             => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_category cnfc on curriculum_node.id = cnfc.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',

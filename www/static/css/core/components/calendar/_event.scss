@@ -73,49 +73,6 @@
     }
 }
 
-// Attendance Guest list
-.attendance-guest-list {
-    // Special style for removing attendance records
-    .actions-small-1 > nav a[class^="icon-"] {
-        line-height: 3.1;
-    }
-
-    [class^="icon-"]:before {
-        font-size: 0.5rem;
-    }
-
-    // Status icons
-    .status-icon:after {
-        border-radius: 1rem;
-        font-family: $font-family-icon;
-        font-size: 0.5rem;
-        font-weight: bold;
-        margin-left: 0.5rem;
-        padding: 0.25rem;
-    }
-
-    // Pending state doesn't have an icon, it's just translucent
-    .pending {
-        opacity: 0.4;
-    }
-
-    .accepted {
-        .status-icon:after {
-            background-color: tint($success-color, 74%);
-            color: var(--sbx-color-success, $success-color);
-            content: "\e604"; //.icon-approve
-        }
-    }
-
-    .declined {
-        .status-icon:after {
-            background-color: tint($alert-color, 74%);
-            color: var(--sbx-color-alert, $alert-color);
-            content: "\e60d"; //.icon-close
-        }
-    }
-}
-
 // RSVP Buttons
 .component-action {
     .rsvp {

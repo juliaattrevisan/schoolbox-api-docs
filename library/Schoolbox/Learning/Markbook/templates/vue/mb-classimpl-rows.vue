@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import locale from "@js/terminology/rosettaStone";
+import { ACTIVITY_TYPE_REPORTING, ACTIVITY_TYPE_TASK } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useMarkbookStore } from "./store/markbookStore";
 import MbClassStatisticRow from "./mb-class-statistic-row.vue";
 import MbClassimplRowStudent from "./mb-classimpl-row-student.vue";
 import { getMarkVisibilityOptions } from "./markVisibilityOptions";
 import type { Props as MbClassStatisticRowProps } from "./mb-class-statistic-row.vue";
 import type { MarkbookClassImplActivity } from "./types/payload";
-import { ACTIVITY_TYPE_REPORTING, ACTIVITY_TYPE_TASK } from "@schoolboxAssessment/Types/assessmentTypes";
+import { MarkbookType } from "./types/types";
 
 interface Props {
-    type: "course" | "class";
+    type: MarkbookType;
     classImplId: number;
 }
 
@@ -74,13 +75,14 @@ const orderedClassImplStudents = window.Vue.computed(() => {
 
 <template>
     <template v-if="mbStore.data !== null && classImpl !== null">
-        <tr v-if="props.type === 'course'" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }">
+        <!-- Class Separator Row / Class Averages - Course Markbook Only -->
+        <tr v-if="props.type === MarkbookType.COURSE" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }">
             <th class="class-row class-row-heading fixed-left">
                 <!-- you may not have access to this folder... and will get hit with an error page... so we may need to look at routes or perms for this... -->
                 <a :href="`/homepage/${classImpl.folder.id}`">{{ classImpl.folder.title }}</a>
             </th>
-            <th class="class-row fixed-left"></th>
-            <td v-if="mbStore.data.rank !== null" class="class-row"></td>
+            <th v-if="mbStore.showWeightedAverageColumn" class="class-row fixed-left"></th>
+            <td v-if="mbStore.showRankColumn" class="class-row"></td>
             <template v-for="{ activity, aImpl } in orderedClassImplActivities" :key="activity.id">
                 <td v-if="aImpl !== null && aImpl.stats" class="class-row">
                     <a :href="aImpl._routes['learningAssessment.getStatus']">
@@ -96,7 +98,8 @@ const orderedClassImplStudents = window.Vue.computed(() => {
             </template>
         </tr>
 
-        <template v-if="props.type === 'class' && mbStore.showAverages">
+        <!-- Class Average Statistic Rows - Class Markbook only  -->
+        <template v-if="props.type === MarkbookType.CLASS && mbStore.showAverages">
             <mb-class-statistic-row
                 v-for="row in classStatisticRows"
                 :key="row.statsKey"
@@ -109,7 +112,9 @@ const orderedClassImplStudents = window.Vue.computed(() => {
             />
         </template>
 
+        <!-- Visibility Controls - Course/Class Markbook only -->
         <mb-class-statistic-row
+            v-if="[MarkbookType.CLASS, MarkbookType.COURSE].includes(props.type)"
             :class-impl="classImpl"
             label="Visibility"
             stats-key="markVisibility"
@@ -126,6 +131,7 @@ const orderedClassImplStudents = window.Vue.computed(() => {
             }"
         />
 
+        <!-- All student rows for this class impl -->
         <mb-classimpl-row-student
             v-for="student in orderedClassImplStudents"
             :key="student.id"

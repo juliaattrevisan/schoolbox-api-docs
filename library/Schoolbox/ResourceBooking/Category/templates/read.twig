@@ -48,11 +48,17 @@
         resourceColumns: [{
             headerContent: 'Resource',
             cellContent: function(args) {
+                let resourceDetails = document.createElement('span');
+                resourceDetails.setAttribute('class', 'meta');
+                resourceDetails.innerText = ' · Capacity: ' + args.resource.extendedProps.capacity
+                    + ' · Conflicts ' + (args.resource.extendedProps.allowClashBookings ? 'Allowed' : 'Not Allowed');
+
                 let link = document.createElement('a');
                 link.setAttribute('href', '/resource-booking/item/' + args.fieldValue);
                 link.setAttribute('class', 'resource-link');
                 link.innerText = args.resource.extendedProps.name;
-                return { domNodes: [ link ] }
+
+                return { domNodes: [ link, resourceDetails ] }
             }
         }],
         resources: {{ resources|json_encode|raw }},

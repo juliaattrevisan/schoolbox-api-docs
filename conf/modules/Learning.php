@@ -37,6 +37,7 @@ use Schoolbox\Learning\Moment\Module as EvidenceModule;
 use Schoolbox\Learning\Moment\StudentToolkit\Module as StudentToolkitModule;
 use Schoolbox\Learning\Quiz\Attempt\Module as QuizAttemptModule;
 use Schoolbox\Learning\Quiz\Module as QuizModule;
+use Schoolbox\Learning\Reporting\Module as ReportingModule;
 use Schoolbox\Learning\Reporting\Feedback\Module as ReportingFeedbackModule;
 use Schoolbox\Learning\Student\Module as StudentCourseModule;
 use Schoolbox\Learning\Turnitin\Module as TurnitinModule;
@@ -77,6 +78,7 @@ class Learning extends ModuleLoader
              *  served in the /commentary/* namespace instead, to disambiguate this new learning activity
              */
             $this->loadModule($di, DialogAgentModule::class, "/{$namespace}/discussion");
+            $this->loadModule($di, ReportingModule::class, "/{$namespace}/reporting");
             $this->loadModule($di, ReportingFeedbackModule::class, "/{$namespace}/reporting");
         }
 

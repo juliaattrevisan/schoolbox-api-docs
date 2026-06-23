@@ -65,10 +65,12 @@ $(function() {
                 <li class="actions-small-2">
                     <div class="list-item">
                         <div class="card small-12">
-                            <a href="{MYLINK_URL}">
+                            <a href="{MYLINK_URL}" class="l-flex-row l-flex--no-wrap l-flex--align-center l-gap-m">
                                 <sbx-icon name="link" size="2rem"></sbx-icon>
-                                <p>{MYLINK_DESCRIPTION}</p>
-                                <p class="meta">{MYLINK_URL}</p>
+                                <div class="l-flex-col l-gap-s">
+                                    <p>{MYLINK_DESCRIPTION}</p>
+                                    <p class="meta">{MYLINK_URL}</p>
+                                </div>
                             </a>
                         </div>
                     </div>

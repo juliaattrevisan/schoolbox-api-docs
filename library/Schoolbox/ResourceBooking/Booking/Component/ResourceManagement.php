@@ -73,6 +73,7 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
             return false;
         }
         $bookingEvents = $bookingApi->getEvents($startTime, $endTime);
+        $capacityAllocation = new Booking\CapacityAllocation();
 
         // Group bookings by their item, and order within that list by date
         // (They should be date-ordered already)
@@ -119,15 +120,9 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
                         'clash' => []
                     ];
 
-                    // now check for clashes with pending bookings
-                    foreach ($resourceEvents as $eventB) {
-                        /** @var Event $eventB */
-
-                        // only record clashes if eventB is approved, we don't care about pending vs pending clashes
-                        if ($eventB->isClash($eventA) && $eventB->getBooking()->getStatus()->isApproved()) {
-                            $eventAHash = spl_object_hash($eventA);
-                            $groupedBookings[$resourceID]['bookingEvents'][$eventA->getStartTime()->getDateOnly()]['events'][$eventAHash]['clash'][] = $eventB;
-                        }
+                    $blockingEvents = $capacityAllocation->getBlockingApprovedBookingEvents($eventA, $resourceEvents);
+                    foreach ($blockingEvents as $blockingEvent) {
+                        $groupedBookings[$resourceID]['bookingEvents'][$eventA->getStartTime()->getDateOnly()]['events'][$eventAHash]['clash'][] = $blockingEvent;
                     }
                 }
 

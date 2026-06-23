@@ -80,12 +80,12 @@ abstract class AbstractSubSource implements IFeedbackDataSource
     }
 
     /**
-     * @param Collection|IAssessable[] $assessments
-     * @param User|null                $student If set, only return this student's responses
+     * @param Collection<IAssessable>  $assessments
+     * @param Collection<\Schoolbox\User>|null $users If set, only return this student's responses
      * @param array                    $options Options for findByColumnList
      * @return Collection|IFeedback[][]
      */
-    public function findForAssessmentCollection(Collection $assessments, ?User $student = null, array $options = [])
+    public function findForAssessmentCollection(Collection $assessments, ?Collection $users = null, array $options = [])
     {
         // Find feedback which belong to any assessments this recognizes
         $recognizedIds = $assessments->filter([$this, 'recognizes'])->getPropertyValues('id');
@@ -96,8 +96,15 @@ abstract class AbstractSubSource implements IFeedbackDataSource
 
         // Only fetch for student if provided
         $columns = ['assessment_id' => $recognizedIds,];
-        if ($student instanceof User) {
-            $columns[$this->studentField] = $student->getId();
+
+        if ($users instanceof \Traversable && $users->count()) {
+            foreach ($users as $user) {
+                /* SOMEWHERE this can spawn a collection of a singular null value
+                 */
+                if ($user instanceof \Schoolbox\User) {
+                    $columns[$this->studentField][] = $user->getId();
+                }
+            }
         }
 
         // Group feedback by assessment

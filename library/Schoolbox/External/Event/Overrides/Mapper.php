@@ -121,7 +121,7 @@ class Mapper extends \Schoolbox\Mapper
             /* This corresponds to a 'clear' mutation in the overrides
              * It has no user relationships
              */
-            if (Model::CLEAR === $override->getAction()) {
+            if (in_array($override->getAction(), [Model::CLEAR, Model::CLEAR_STAFF], true)) {
                 $stack->add($override);
                 continue;
             }

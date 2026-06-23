@@ -48,13 +48,7 @@ mbStore.feedbackDrawerEventBus.on(({ drawerRect }) => {
 </script>
 
 <template>
-    <tr
-        v-if="mbStore.data !== null"
-        ref="studentRowRef"
-        :class="{
-            'markbook-faded': isFaded,
-        }"
-    >
+    <tr v-if="mbStore.data !== null" ref="studentRowRef" :class="{ 'markbook-faded': isFaded }">
         <th class="profile-cell fixed-left white">
             <div class="c-card">
                 <div class="l-flex-row l-gap-m l-pad-s">
@@ -69,6 +63,7 @@ mbStore.feedbackDrawerEventBus.on(({ drawerRect }) => {
         </th>
 
         <th
+            v-if="mbStore.showWeightedAverageColumn"
             class="fixed-left student-grade-cell"
             :class="
                 getGradient(
@@ -97,8 +92,8 @@ mbStore.feedbackDrawerEventBus.on(({ drawerRect }) => {
                 {{ student.stats.weightedMean ?? "–" }}
             </a>
         </th>
-        <td v-if="mbStore.data.rank !== null">
-            <span v-if="mbStore.data.rank[student.id] !== undefined && student.stats.weightedMean">
+        <td v-if="mbStore.showRankColumn">
+            <span v-if="mbStore.data.rank && mbStore.data.rank[student.id] !== undefined && student.stats.weightedMean">
                 {{ mbStore.data.rank[student.id] }}
             </span>
             <span v-else>–</span>

@@ -10,13 +10,13 @@
             </a>
             <p class="meta">
                 {% if report.notificationEnabled %}
-                    <i title="Notification Enabled" class="icon-bell"></i>
+                    <sbx-icon name="notifications" title="Notification Enabled"></sbx-icon>
                 {% endif %}
                 {% set firstGroup = true %}
                 {% for access in report.access %}
                     {% if access.group %}
                         {% if firstGroup %}
-                            <i title="{{ locale.pastoral.proper }} Groups" class="icon-group"></i>
+                            <sbx-icon name="group" title="{{ locale.pastoral.proper }} Groups"></sbx-icon>
                             {% set firstGroup = false %}
                         {% endif %}
                         {{ access.group.name }}{% if not loop.last %},{% endif %}
@@ -32,7 +32,7 @@
                type="checkbox">
         <label for="report-dashboard-{{ report.id }}" class="input-toggle"
                title="Show report on dashboard">
-            <span class="icon-star alert"></span>
+            <sbx-icon name="favourite"></sbx-icon>
         </label>
         {% if canEdit %}
                 <a class="sbx-icon-only-button no-text"

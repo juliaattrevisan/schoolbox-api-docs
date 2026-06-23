@@ -2,7 +2,7 @@ import { ProgressTickClass } from "./progressTick";
 
 /**
  * The possible actions that can be done on a response
- * @see /library/Schoolbox/Learning/Assessment/DialogAgent/Response/Lookup/Status.php
+ * @see /library/Schoolbox/Learning/Assessment/DialogAgent/Response/Status.php
  */
 export enum DialogAgentResponseAction {
     ACTION_VIEW = "view",
@@ -17,7 +17,7 @@ export enum DialogAgentResponseAction {
 /**
  * A representation of the current status a response should show as,
  * this usually correlates to what the progress tick should show alongside a given response
- * @see /library/Schoolbox/Learning/Assessment/DialogAgent/Response/Lookup/Status.php
+ * @see /library/Schoolbox/Learning/Assessment/DialogAgent/Response/Status.php
  */
 export enum DialogAgentResponseStatus {
     INCOMPLETE = "incomplete",

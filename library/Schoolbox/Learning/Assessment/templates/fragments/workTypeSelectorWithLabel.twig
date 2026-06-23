@@ -9,12 +9,47 @@
 <select id="workTypeSelector" name="workType" data-test="assessment-form-select-workType" {% if selectIsDisabled %}disabled{% else %}required{% endif %}>
     <option value="" disabled{% if not assessment.workType %} selected="selected"{% endif %}>Select work type</option>
     {% for workType in allWorkTypes %}
+        {% if workType.isVisibleToLearners and workType.isVisibleToParents %}
+            {% set workTypeVisibilityAlert = "This work type sets the " ~ locale.activity.proper ~ " Audience to staff, students, and parents (they can access this " ~ locale.activity ~ "). Feedback Visibility is configured separately." %}
+        {% elseif workType.isVisibleToLearners %}
+            {% set workTypeVisibilityAlert = "This work type sets the " ~ locale.activity.proper ~ " Audience to staff and students. Parents cannot access this " ~ locale.activity ~ " or view any feedback. Feedback Visibility is configured separately and options including parents will have no effect." %}
+        {% elseif workType.isVisibleToParents %}
+            {% set workTypeVisibilityAlert = "This work type sets the " ~ locale.activity.proper ~ " Audience to staff and parents. Students cannot access this " ~ locale.activity ~ " or view any feedback. Feedback Visibility is configured separately and options including students will have no effect." %}
+        {% else %}
+            {% set workTypeVisibilityAlert = "This work type sets the " ~ locale.activity.proper ~ " Audience to staff only. Students and parents cannot access this " ~ locale.activity ~ " or view any feedback. Feedback Visibility is configured separately and options including students or parents will have no effect." %}
+        {% endif %}
         <option value="{{ workType.id }}"
+            data-work-type-visibility-message="{{ workTypeVisibilityAlert|e('html_attr') }}"
             {% if assessment.workType.id ?? '' == workType.id %}selected="selected"{% endif %}
             {% if courseManaged.isReadonly %}disabled{% endif %}
         >{{ workType.name }}</option>
     {% endfor %}
 </select>
+<div id="workTypeVisibilityAlert" class="alert-box" style="display:none"></div>
+<script>
+    (function() {
+        const selector = document.getElementById("workTypeSelector");
+        const alert = document.getElementById("workTypeVisibilityAlert");
+
+        if (!selector || !alert) {
+            throw new Error("Work type selector visibility alert elements are missing.");
+        }
+
+        /**
+         * Updates the selected work type visibility alert message.
+         */
+        function updateWorkTypeVisibilityAlert() {
+            const option = selector.options[selector.selectedIndex];
+            const message = option ? option.dataset.workTypeVisibilityMessage : "";
+
+            alert.textContent = message || "";
+            alert.style.display = message ? "" : "none";
+        }
+
+        selector.addEventListener("change", updateWorkTypeVisibilityAlert);
+        updateWorkTypeVisibilityAlert();
+    }());
+</script>
 {% if selectIsDisabled %}
 
 {# The workType selector is a required field, so if the select is disabled it must be replaced by a hidden input.

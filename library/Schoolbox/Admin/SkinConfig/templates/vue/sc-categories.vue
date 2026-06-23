@@ -292,7 +292,8 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
                             <div id="fileImage-zone" class="attachzone s64">
                                 <label></label>
                                 <ul data-dz-previews="" class="az-list"></ul>
-                                <div id="FileImageZone" class="dzone icon-attach">
+                                <div id="FileImageZone" class="dzone">
+                                    <sbx-icon class="icon-attach" name="attach" size="l"></sbx-icon>
                                     <span>Click or drag here to attach files</span>
                                 </div>
                             </div>

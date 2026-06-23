@@ -1109,7 +1109,7 @@ class ListController extends Web\Controller\Base
             if ($includeResponse) {
                 /* Forces refresh of participation data, before returning the updated participation info
                  */
-                $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
+                $this->participantDataSource->loadParticipationIntoAssessment($assessment, (new \Schoolbox\Collection())->add($student));
                 $participation           = $assessment->getParticipantIfExtant($student);
                 $this->response = $this->responseAsJson(
                     [
@@ -1467,7 +1467,7 @@ class ListController extends Web\Controller\Base
     {
         // hydrate participant
         $assessments = $this->getAssessmentMapper()->createCollection([$assessment]);
-        $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, $student, true);
+        $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection(collection: $assessments, users: (new \Schoolbox\Collection())->add($student), removeExcluded: true);
 
         $participant = $assessment->getParticipantIfExtant($student);
 

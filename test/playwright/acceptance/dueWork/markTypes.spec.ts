@@ -487,7 +487,7 @@ test.describe.skip("Due Work - Mark type tests", () => {
         tester.isGoingTo("click the row for the relevant homepage (9A English)");
         await gradesPage.clickSubject("9A English");
 
-        await gradesPage.expectGradesVisibility("instructor");
+        await gradesPage.expectGradesViewMode("staff");
 
         await test.step("Input Mark Type (initial load)", async () => {
             await gradesPage.expectAssessmentMark(dueWorkName1, "75 %");
@@ -495,15 +495,20 @@ test.describe.skip("Due Work - Mark type tests", () => {
             await gradesPage.expectAssessmentMark(dueWorkName3, "50 %");
         });
 
-        await test.step("Display Mark Type", async () => {
+        await test.step("Display Mark Type (student view mode)", async () => {
             await gradesPage.viewStudentGrades();
             await gradesPage.expectAssessmentMark(dueWorkName1, "B+");
             await gradesPage.expectAssessmentMark(dueWorkName2, "50 %");
             await gradesPage.expectAssessmentMark(dueWorkName3, null);
         });
 
+        await test.step("Parent View Mode", async () => {
+            await gradesPage.viewAs("parent");
+            await gradesPage.expectGradesViewMode("parent");
+        });
+
         // Then re-check input mark type via the button
-        await test.step("Input Mark Type", async () => {
+        await test.step("Input Mark Type (staff view mode)", async () => {
             await gradesPage.viewInstructorGrades();
             await gradesPage.expectAssessmentMark(dueWorkName1, "75 %");
             await gradesPage.expectAssessmentMark(dueWorkName2, "2 / 4");

@@ -30,6 +30,7 @@ export type StudentRow = {
     name: string;
     userId: number;
     candidateDetailsStatus: CandidateDetailsStatus;
+    ibCandidateNumber: string | null;
     subjects: SubjectGroup;
     updateLanguageEndpoint: string | null;
     updateConfirmationEndpoint: string | null;
@@ -55,10 +56,11 @@ export type InProgressRow = {
 };
 
 /**
- * A student row used in the Registered section, extending StudentRow with an IB candidate number.
+ * A student row used in the Registered section, extending StudentRow with registration metadata.
  */
 export type RegisteredRow = StudentRow & {
-    ibCandidateNumber?: string;
+    manuallyRegisteredBy?: string | null;
+    manuallyRegisteredAt?: string | null;
 };
 
 // ---------------------------------------------------------------------------
@@ -93,10 +95,14 @@ export type ApiStudent = {
     registrationSessionStudentId: number | null;
     status: number;
     userName: string;
+    ibCandidateNumber: string | null;
     hasMissingDetails: boolean;
     missingFields: string[];
+    manuallyRegisteredBy: string | null;
+    manuallyRegisteredAt: string | null;
     _routes: {
         updateLanguages: string | null;
+        manuallyRegister: string | null;
         updateConfirmation: string | null;
     };
     ibGroupSubjects: {
@@ -135,6 +141,17 @@ export type ApiCandidatesResponse = {
     success: true;
     students: Record<string, ApiStudent[]>;
     statuses: ApiStatus[];
+};
+
+/**
+ * Raw response from the mark-as-manually-registered endpoint.
+ */
+export type ApiManuallyRegisterResponse = {
+    success: boolean;
+    registeredCount: number;
+    manuallyRegisteredBy?: string;
+    manuallyRegisteredAt?: string;
+    message?: string;
 };
 
 /**

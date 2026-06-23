@@ -59,6 +59,8 @@ class Mapper extends BaseMapper
         $this->uses('subject_confirmed', self::TYPE_BOOLEAN, null, 'subjectConfirmed');
         $this->uses('subject_confirmed_at', self::TYPE_DATETIME, null, 'subjectConfirmedAt');
         $this->joins('subject_confirmed_by', UserMapper::class, 'id', null, null, 'subjectConfirmedBy', 'subjectConfirmedBy');
+        $this->uses('manually_registered_at', self::TYPE_DATETIME, null, 'manuallyRegisteredAt');
+        $this->joins('manually_registered_by', UserMapper::class, 'id', null, null, 'manuallyRegisteredBy', 'manuallyRegisteredBy');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
     }
@@ -79,7 +81,8 @@ class Mapper extends BaseMapper
                    {$this->getJoinColumnString('registrationSession.deletedBy', 'ud')},
                    {$this->getJoinColumnString('user', 'u')},
                    {$this->getJoinColumnString('candidateConfirmedBy', 'ucc')},
-                   {$this->getJoinColumnString('subjectConfirmedBy', 'usc')}
+                   {$this->getJoinColumnString('subjectConfirmedBy', 'usc')},
+                   {$this->getJoinColumnString('manuallyRegisteredBy', 'umrb')}
         ";
     }
 
@@ -100,6 +103,7 @@ class Mapper extends BaseMapper
             INNER JOIN {$this->getJoinSql('user', '', 'u')}
             LEFT JOIN {$this->getJoinSql('candidateConfirmedBy', '', 'ucc')}
             LEFT JOIN {$this->getJoinSql('subjectConfirmedBy', '', 'usc')}
+            LEFT JOIN {$this->getJoinSql('manuallyRegisteredBy', '', 'umrb')}
         ";
     }
 
@@ -119,6 +123,8 @@ class Mapper extends BaseMapper
         $candidateConfirmedByMapper = $this->getJoinMapper('candidateConfirmedBy');
         /** @var UserMapper $subjectConfirmedByMapper */
         $subjectConfirmedByMapper = $this->getJoinMapper('subjectConfirmedBy');
+        /** @var UserMapper $manuallyRegisteredByMapper */
+        $manuallyRegisteredByMapper = $this->getJoinMapper('manuallyRegisteredBy');
         $students = $this->createCollection();
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
@@ -175,6 +181,12 @@ class Mapper extends BaseMapper
 
                 if ($subjectConfirmedBy) {
                     $student->setSubjectConfirmedBy($subjectConfirmedBy);
+                }
+
+                $manuallyRegisteredBy = $manuallyRegisteredByMapper->hydrate($row, 'umrb');
+
+                if ($manuallyRegisteredBy) {
+                    $student->setManuallyRegisteredBy($manuallyRegisteredBy);
                 }
 
                 $students[$student->getId()] = $student;
@@ -312,7 +324,7 @@ class Mapper extends BaseMapper
         }
 
         // Start from qualified student users so students without an existing session-student row are included.
-        // Exclude users who already have an IB candidate number or are registered in another session for this system purpose.
+        // Exclude unpersisted users who already have an IB candidate number or are registered in another session for this system purpose.
         $statement = $this->getDatabase()->executeQuery("
             SELECT DISTINCT
                 {$this->getColumnString('ss')},
@@ -328,7 +340,7 @@ class Mapper extends BaseMapper
                 ON ss.registration_session_id = :registrationSessionId
                 AND ss.user_id = u.id
             WHERE u.deleted_at IS NULL
-              AND (u.ib_candidate_number IS NULL OR u.ib_candidate_number = '')
+              AND (ss.id IS NOT NULL OR u.ib_candidate_number IS NULL OR u.ib_candidate_number = '')
               AND g.group_type = :studentRoleType
               AND q.system_purpose_id = :systemPurposeId
               AND NOT EXISTS (
@@ -370,6 +382,23 @@ class Mapper extends BaseMapper
             $usersById[$user->getId()] = $user;
         }
 
+        $manuallyRegisteredByIds = array_values(array_unique(array_filter(
+            array_map('intval', array_column($rows, 'ss.manually_registered_by')),
+            fn (int $id) => $id !== 0
+        )));
+
+        $manuallyRegisteredByUsersById = [];
+
+        if ($manuallyRegisteredByIds !== []) {
+            $manuallyRegisteredByUsers = $userMapper->findByPredicates(
+                $userMapper->getPredicateBuilder()->in('id', $manuallyRegisteredByIds)
+            );
+
+            foreach ($manuallyRegisteredByUsers as $user) {
+                $manuallyRegisteredByUsersById[$user->getId()] = $user;
+            }
+        }
+
         $ibGroupSubjectsByUserId = $this->findIbGroupSubjectsForUsers(
             $usersById,
             $registrationSession->getSystemPurpose()->getId()
@@ -384,6 +413,12 @@ class Mapper extends BaseMapper
 
             if (isset($usersById[$userId])) {
                 $student->setUser($usersById[$userId]);
+            }
+
+            $manuallyRegisteredById = (int) ($row['ss.manually_registered_by'] ?? 0);
+
+            if ($manuallyRegisteredById !== 0 && isset($manuallyRegisteredByUsersById[$manuallyRegisteredById])) {
+                $student->setManuallyRegisteredBy($manuallyRegisteredByUsersById[$manuallyRegisteredById]);
             }
 
             $student->setIbGroupSubjects(

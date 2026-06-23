@@ -12,12 +12,20 @@ test.describe("Folder homepage template modify form", () => {
         await tester.loginAsAdmin();
     });
 
-    test("shows the current homepage template name in the keep existing option", async ({ page }) => {
-        await page.goto("/resource/folder/13/modify");
+    const templateFolders = [
+        { folderId: 66, templateName: "Blank" },
+        { folderId: 98, templateName: "Unit" },
+    ];
 
-        const homepageTemplateSelect = page.getByTestId(CreateFolder.DATA_TEST_FOLDER_FORM_SELECT_TEMPLATE);
-        await expect(homepageTemplateSelect).toHaveValue("0");
-        await expect(homepageTemplateSelect.locator("option:checked")).toHaveText("Keep Existing (Course)");
-        await expect(homepageTemplateSelect.locator("option", { hasText: "Keep Existing (Course)" })).toHaveCount(1);
-    });
+    for (const { folderId, templateName } of templateFolders) {
+        test(`shows ${templateName} as the current homepage template name`, async ({ page }) => {
+            await page.goto(`/resource/folder/${folderId}/modify`);
+
+            const homepageTemplateSelect = page.getByTestId(CreateFolder.DATA_TEST_FOLDER_FORM_SELECT_TEMPLATE);
+            const keepExistingLabel = `Keep Existing (${templateName})`;
+            await expect(homepageTemplateSelect).toHaveValue("0");
+            await expect(homepageTemplateSelect.locator("option:checked")).toHaveText(keepExistingLabel);
+            await expect(homepageTemplateSelect.locator("option", { hasText: keepExistingLabel })).toHaveCount(1);
+        });
+    }
 });

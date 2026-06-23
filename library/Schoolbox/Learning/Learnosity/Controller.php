@@ -1768,54 +1768,54 @@ class Controller extends Base
     }
 
 
-    /**
-     * A list of all the Learnosity Quizzes
-     *
-     * This was an experimental first step, but I ended up using it
-     * to micromanage all our test content (mostly for mass deleting)
-     */
-    public function getActivityList(): void
-    {
-        $payload = [
-            'mode' => 'activity_list',
-            'config' => [
-                'activity_list' => [
-                    'title' => [
-                        'show' => true,
-                        'show_reference' => true
-                    ]
-                ],
-                'activity_edit' => [
-                    'item' => [
-                        'title' => [
-                            'show' => true
-                        ]
-                    ],
-                    'item_search' => [
-                        'title' => [
-                            'show' => true,
-                        ],
-                    ],
-                    'reference' => [
-                        'show' => false,
-                    ],
-                ]
-            ],
-            'user' => [
-                'id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $this->getUser()->getId()),
-                /* These fields are superfluous and are presumably used for auditing
-                 * (we don't have a screen for this, it's in Learnosity somewhere else)
-                 */
-                'firstname' => 'Schoolbox',
-                'lastname'  => 'Schoolbox',
-                'email'     => 'schoolbox@schoolbox.com.au'
-            ]
-        ];
-
-        $this->response = $this->responseFromTemplate('@learnosity/activityList.twig', [
-            'initOptions' => $this->api->initOptions('author', $payload)
-        ], 'Example Activity List');
-    }
+//    /**
+//     * A list of all the Learnosity Quizzes
+//     *
+//     * This was an experimental first step, but I ended up using it
+//     * to micromanage all our test content (mostly for mass deleting)
+//     */
+//    public function getActivityList(): void
+//    {
+//        $payload = [
+//            'mode' => 'activity_list',
+//            'config' => [
+//                'activity_list' => [
+//                    'title' => [
+//                        'show' => true,
+//                        'show_reference' => true
+//                    ]
+//                ],
+//                'activity_edit' => [
+//                    'item' => [
+//                        'title' => [
+//                            'show' => true
+//                        ]
+//                    ],
+//                    'item_search' => [
+//                        'title' => [
+//                            'show' => true,
+//                        ],
+//                    ],
+//                    'reference' => [
+//                        'show' => false,
+//                    ],
+//                ]
+//            ],
+//            'user' => [
+//                'id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $this->getUser()->getId()),
+//                /* These fields are superfluous and are presumably used for auditing
+//                 * (we don't have a screen for this, it's in Learnosity somewhere else)
+//                 */
+//                'firstname' => 'Schoolbox',
+//                'lastname'  => 'Schoolbox',
+//                'email'     => 'schoolbox@schoolbox.com.au'
+//            ]
+//        ];
+//
+//        $this->response = $this->responseFromTemplate('@learnosity/activityList.twig', [
+//            'initOptions' => $this->api->initOptions('author', $payload)
+//        ], 'Example Activity List');
+//    }
 
 
     /**

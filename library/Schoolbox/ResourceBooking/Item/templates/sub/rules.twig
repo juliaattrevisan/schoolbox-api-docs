@@ -1,5 +1,8 @@
 {# Booking rules for a resource. #}
 <ul>
+    <li>Conflict bookings: {{ item.allowClashBookings ? 'Allowed' : 'Not allowed' }}</li>
+    <li>Capacity: {{ item.capacity|default(1) }} concurrent bookings</li>
+
     {% if item.minLeadTime.minuteTotal %}
         <li>
             Must be booked at least

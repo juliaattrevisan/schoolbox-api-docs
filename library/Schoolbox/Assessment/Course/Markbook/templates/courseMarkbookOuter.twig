@@ -27,7 +27,7 @@
     quickload: false,
 } only %}
 
-<div id="markbook-outer-container" class="marksheet-wrapper row">
+<div id="markbook-outer-container" class="marksheet-wrapper row" data-markbook-outer-container>
     <markbook-outer type='course' filter-event-key="{{ filterEventKey }}"
         {% if editorTemplates is defined %}
             :editor-templates="{{ editorTemplates|json_encode }}"

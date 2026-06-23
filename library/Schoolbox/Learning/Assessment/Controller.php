@@ -1128,6 +1128,28 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
 
     /**
+     * Finds the work types that can be selected for an assessment.
+     *
+     * If the assessment already uses a work type that is no longer permitted, it is kept in the collection so the
+     * activity can continue saving without forcing a different work type.
+     *
+     * @param IAssessable $assessment The assessment that the work types will be used for
+     * @return Collection
+     */
+    private function getWorkTypesPermittedForAssessment(IAssessable $assessment): Collection
+    {
+        $workTypes = $this->workTypeMapper->findPermittedForAssessment($assessment);
+
+        $currentWorkType = $assessment->getWorkType();
+        if ($currentWorkType !== null && !in_array($currentWorkType->getId(), $workTypes->getPropertyValues('id'), true)) {
+            $workTypes->add($currentWorkType)->sortBy('sequence', 'asc')->reindex();
+        }
+
+        return $workTypes;
+    }
+
+
+    /**
      * @param AssessmentContext $context
      * @param IAssessable       $assessment
      * @return array
@@ -1194,7 +1216,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'assessmentType'           => AssessmentType::objectToString($assessment),
             'markVisibility'           => $assessment->getMarkVisibility(),
             'availableVisibilities'    => $this->getAvailableFeedbackVisibilities(),
-            'allWorkTypes'             => $this->workTypeMapper->findAll(['order' => ['sequence' => 'asc']]),
+            'allWorkTypes'             => $this->getWorkTypesPermittedForAssessment($assessment),
 
             /* Capabilities happen to have the same mark types as its DueWork IAssessable container,
              * so we don't need a different method than the existing getAllMarkTypes
@@ -1692,7 +1714,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
             // hydrate participants
             if ($hydrateParticipants) {
-                $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, null, true);
+                $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection(collection: $assessments, users: null, removeExcluded: true);
             }
         }
         return $assessments;

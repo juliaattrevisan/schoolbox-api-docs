@@ -65,6 +65,7 @@ class ModelToArray
             'registrationSessionStudentId' => $student->getId(),
             'status' => $student->getStatus(),
             'userName' => $userName,
+            'ibCandidateNumber' => $this->formatNullableValue($user?->getIbCandidateNumber()),
             'hasMissingDetails' => $missingFields !== [],
             'missingFields' => $missingFields,
             'session' => $this->buildSession($student),
@@ -84,7 +85,9 @@ class ModelToArray
                 ],
                 $missingFields
             ),
-            'ibGroupSubjects' => $this->helper->buildIbGroupSubjects($student->getIbGroupSubjects()),
+            'ibGroupSubjects'           => $this->helper->buildIbGroupSubjects($student->getIbGroupSubjects()),
+            'manuallyRegisteredBy'      => $student->getManuallyRegisteredBy()?->getFullName(),
+            'manuallyRegisteredAt'      => $student->getManuallyRegisteredAt()?->toIso8601String(),
             'candidateConfirmed'   => $student->getCandidateConfirmed(),
             'subjectConfirmed'     => $student->getSubjectConfirmed(),
             'candidateConfirmedAt' => $student->getCandidateConfirmedAt()?->toIso8601String(),
@@ -178,6 +181,13 @@ class ModelToArray
         return $name !== '' && $code !== ''
             ? "{$name} ({$code})"
             : $name . $code;
+    }
+
+    private function formatNullableValue(mixed $value): ?string
+    {
+        $normalised = $this->helper->normalise($value);
+
+        return $normalised !== '' ? $normalised : null;
     }
 
     private function buildUpdateLanguagesRoute(Model $student): ?string

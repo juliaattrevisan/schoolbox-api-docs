@@ -289,15 +289,9 @@ Usage:
                                             } only %}
                                         </label>
 
-                                        {# TODO I don't think we can assignFromRubricButton with a one-grid assumption
-                                         #  anymore: it has to be the aggregated total of all grids which we haven't
-                                         #  implemented yet.
-                                         #}
-{#                                        {% if assessment.rubricInstances.count and not readonly %}#}
-{#                                            {% include '@learningDueWorkResponse/inlineGrading/fragments/assignFromRubricButton.twig' with {#}
-{#                                                locale: locale,#}
-{#                                            } only %}#}
-{#                                        {% endif %}#}
+                                       {% if assessment.rubricInstances.count and not readonly %}
+                                           {% include '@learningDueWorkResponse/inlineGrading/fragments/assignFromRubricButton.twig' with {} only %}
+                                       {% endif %}
                                     </div>
                                 {% endif %}
                             {% endblock %}

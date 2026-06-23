@@ -20,6 +20,11 @@ export type MarkbookActivity = Pick<Activity, "id" | "title" | "assessmentType">
         title: string;
     } | null;
     sequence: number;
+    /**
+     * special reporting markbook specific flag.
+     * true for the reporting activity that should have its marks/comments shown at the end of the table
+     */
+    splitComments: boolean;
     /** stats and the summary link are currently only relevant for specs */
     isSpecification: boolean;
     stats: {
@@ -70,6 +75,7 @@ export type MarkbookClassImplActivityParticipant = {
 export type MarkbookClassImplActivity = {
     id: number;
     participants: Partial<Record<ParticipantId, MarkbookClassImplActivityParticipant>>;
+    /* activity impl stats are only relevant for the class/course markbooks */
     stats: {
         mean?: string | null;
         draftMean?: string | null;
@@ -80,15 +86,15 @@ export type MarkbookClassImplActivity = {
         max?: string | null;
         maxNormalised?: number | null;
         count?: number | null;
-        quartile1: number | null;
-        quartile2: number | null;
-        quartile3: number | null;
+        quartile1?: number | null;
+        quartile2?: number | null;
+        quartile3?: number | null;
         weight?: number | null;
         weightInProject?: number | null;
-        sdNormalized: number | null;
+        sdNormalized?: number | null;
         weightPercent?: number | null;
         projectWeightPercent?: number | null;
-        markVisibility: string;
+        markVisibility?: string;
     };
     _routes: {
         "learningAssessment.getStatus": string;
@@ -164,7 +170,9 @@ export interface Markbook {
     classImpls: MarkbookClassImpl[];
     /** Relevant routes */
     _routes: {
+        /* class/course markbook only */
         exportReport: string | null;
+        /* course markbook only */
         "courseImport.getImport": string | null;
     };
     /** A list of available visibilities, currently only used on the class markbook */

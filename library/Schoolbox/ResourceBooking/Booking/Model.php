@@ -26,6 +26,8 @@ class Model implements ISoftDeletable, JsonSerializable
     use CreatedAtDate;
     use DeletedAtDate;
 
+    public const int DEFAULT_QUANTITY = 1;
+
     /**
      * @var int
      */
@@ -45,6 +47,11 @@ class Model implements ISoftDeletable, JsonSerializable
      * @var string
      */
     protected $notes;
+
+    /**
+     * @var int
+     */
+    protected int $quantity = self::DEFAULT_QUANTITY;
 
     /**
      * @var Item\Model
@@ -296,6 +303,17 @@ class Model implements ISoftDeletable, JsonSerializable
         return $this;
     }
 
+    public function getQuantity(): int
+    {
+        return $this->quantity;
+    }
+
+    public function setQuantity(int $quantity): self
+    {
+        $this->quantity = max(self::DEFAULT_QUANTITY, $quantity);
+        return $this;
+    }
+
     /**
      * @return ?Alaress_Date_Format
      */
@@ -405,6 +423,7 @@ class Model implements ISoftDeletable, JsonSerializable
             'id'       => $this->getId(),
             'name'     => $this->getName(),
             'notes'    => $this->getNotes(),
+            'quantity' => $this->getQuantity(),
             'resource' => $this->getResource()->jsonSerialize(),
             'event'    => [
                 'start' => $this->getEvent()->getStartDateTime()?->toIso8601String(),

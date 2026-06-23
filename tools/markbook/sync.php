@@ -116,7 +116,12 @@ $app = new class extends CliTool\BaseApp
         // Synergetic Markbook uses FileYear/FileSemester and exposes command line parameters not available to other connectors.
         if ($externalType === IConnector::EXTERNAL_TYPE_SYNERGETIC) {
             try {
-                $markbookExternal = new External_Synergetic_Markbook($config->get('synergetic_mark_sync_value'), $this->getLogger(), $year, $semester);
+                $markbookExternal = new External_Synergetic_Markbook(
+                    (int)$config->get('synergetic_mark_sync_value'),
+                    $this->getLogger(),
+                    $year,
+                    $semester,
+                );
             } catch (InvalidArgumentException $e) {
                 $this->getLogger()->error("ERROR: {$e->getMessage()}");
                 $this->outputHelpIfOptionProvided();
@@ -127,8 +132,7 @@ $app = new class extends CliTool\BaseApp
         }
 
         // Determine the time period we want to sync
-
-
+        $currentYear = (int)date('Y');
         if ($start && $end) {
             // Start and end range passed on commandline, use supplied dates
 
@@ -154,14 +158,14 @@ $app = new class extends CliTool\BaseApp
             // If we have gone past June- assume a fake "Semester 2" and use the last six months of the year
             $startTime = new Alaress_Date_Format();
             $endTime = new Alaress_Date_Format();
-            $startTime->setDate(date('Y'), 7, 1)->setTime(0, 0, 0);
-            $endTime->setDate(date('Y'), 12, 30)->setTime(23, 59, 59);
+            $startTime->setDate($currentYear, 7, 1)->setTime(0, 0, 0);
+            $endTime->setDate($currentYear, 12, 30)->setTime(23, 59, 59);
         } else {
             // Otherwise use a fake "Semester 1" and use the first six months of the year
             $startTime = new Alaress_Date_Format();
             $endTime = new Alaress_Date_Format();
-            $startTime->setDate(date('Y'), 1, 1)->setTime(0, 0, 0);
-            $endTime->setDate(date('Y'), 6, 30)->setTime(23, 59, 59);
+            $startTime->setDate($currentYear, 1, 1)->setTime(0, 0, 0);
+            $endTime->setDate($currentYear, 6, 30)->setTime(23, 59, 59);
         }
 
         // Retrieve all of the folders that we are going to traverse
@@ -210,9 +214,9 @@ $app = new class extends CliTool\BaseApp
             // Process assessments
 
             $assessmentList = $assessmentDataSource->findAllByFolderIdForReview(
-                $folder->getId(),
-                null,
-                [
+                folderId: $folder->getId(),
+                users: null,
+                options: [
                     'due_after' => $startTime,
                     'due_before' => $endTime,
                 ]

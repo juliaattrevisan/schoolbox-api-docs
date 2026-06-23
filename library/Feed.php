@@ -7,6 +7,7 @@
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\WorkType\Helper as WorkTypeHelper;
@@ -829,8 +830,12 @@ class Feed
         // participation records for the logged-in user and his/her children.  The loadParticipationIntoAssessmentCollection()
         // function gets participation records for either one user or all users, so for the case where the logged-in
         // user has children (where we set $participantUser as null below), we are overhydrating here.
-        $participantUser = $this->shouldLoadAllParticipantsForRows($rows) ? null : $this->user;
-        $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($assessments, $participantUser, true);
+        $participantUsers = $this->shouldLoadAllParticipantsForRows($rows) ? null : (new Collection())->add($this->user);
+        $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection(
+            collection: $assessments,
+            users: $participantUsers,
+            removeExcluded: true
+        );
         return $assessments->indexBy('id')->getAll();
     }
 

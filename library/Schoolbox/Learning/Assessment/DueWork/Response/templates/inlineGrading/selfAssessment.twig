@@ -74,10 +74,7 @@
             </label>
 
             {% if assessment.useRubric and not readonly %}
-                {% include '@learningDueWorkResponse/inlineGrading/fragments/assignFromRubricButton.twig' with {
-                    locale: locale,
-                    rubricId: assessment.rubricGrid.id,
-                } only %}
+                {% include '@learningDueWorkResponse/inlineGrading/fragments/assignFromRubricButton.twig' with {} only %}
             {% endif %}
         </div>
     {% endif %}
