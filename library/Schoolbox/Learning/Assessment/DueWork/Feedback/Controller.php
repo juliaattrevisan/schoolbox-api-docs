@@ -236,7 +236,6 @@ class Controller extends Base
         foreach ($draftFeedbackIds as $draftFeedbackId) {
             // Verify that this return is for this assessment
             $submissionReturn = $this->returnedWorkMapper->findById($draftFeedbackId);
-            $publishSuccess   = false;
 
             // hydrate the duework assessment, not just the feedback joined assessment minimal modal.
             /** @var \Schoolbox\Learning\Assessment\DueWork\Model $assessment */
