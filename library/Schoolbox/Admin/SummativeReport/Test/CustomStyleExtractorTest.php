@@ -155,6 +155,10 @@ class CustomStyleExtractorTest extends TestCase
                 self::CSS_SLAB_2_INPUT,
                 ''
             ],
+            'Wrapped import extraction' => [
+                ".summative-report { @import url('https://fonts.googleapis.com/css2?family=Playwrite+GB+J:ital,wght@0,100..400;1,100..400&display=swap'); }",
+                "@import url('https://fonts.googleapis.com/css2?family=Playwrite+GB+J:ital,wght@0,100..400;1,100..400&display=swap');"
+            ],
         ];
     }
 }
