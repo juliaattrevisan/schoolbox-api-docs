@@ -19,85 +19,85 @@
 <script type="text/javascript">
     $(function() {
         Highcharts.boxLine = function (a, b, c) {
-            var hasRenderToArg = typeof a === 'string' || a.nodeName,
-                    options = arguments[hasRenderToArg ? 1 : 0],
-                    defaultOptions = {
-                        chart: {
-                            renderTo: (options.chart && options.chart.renderTo) || this,
-                            height: 80,
-                            borderWidth: 0,
-                            margin: 0,
-                        },
+            let hasRenderToArg = typeof a === 'string' || a.nodeName,
+                options = arguments[hasRenderToArg ? 1 : 0],
+                defaultOptions = {
+                    chart: {
+                        renderTo: (options.chart && options.chart.renderTo) || this,
+                        height: 80,
+                        borderWidth: 0,
+                        margin: 0,
+                    },
+                    title: {
+                        text: ''
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    yAxis: {
+                        min: -15,
+                        max: 115,
+                        visible: false,
                         title: {
-                            text: ''
+                            text: null
                         },
-                        credits: {
-                            enabled: false
-                        },
-                        yAxis: {
-                            min: -15,
-                            max: 115,
-                            visible: false,
-                            title: {
-                                text: null
-                            },
-                            endOnTick: false,
-                            startOnTick: false,
-                            tickPositions: [0, 25, 50, 75, 100],
+                        endOnTick: false,
+                        startOnTick: false,
+                        tickPositions: [0, 25, 50, 75, 100],
 
-                        },
-                        tooltip: {
-                            crosshairs: false,
-                            useHTML: true,
-                            shared: true,
-                            outside: true,
-                            valueSuffix: '',
-                            hideDelay: 0,
-                            formatter: function() {
-                                let template =
-                                        '<div style="width:250px!important;overflow:auto;white-space:normal !important;">' +
-                                        '<h2>{NAME}</h2>' +
-                                        '{CONTENT}' +
-                                        '</div>';
+                    },
+                    tooltip: {
+                        crosshairs: false,
+                        useHTML: true,
+                        shared: true,
+                        outside: true,
+                        valueSuffix: '',
+                        hideDelay: 0,
+                        formatter: function() {
+                            let template =
+                                '<div style="width:250px!important;overflow:auto;white-space:normal !important;">' +
+                                '<h2>{NAME}</h2>' +
+                                '{CONTENT}' +
+                                '</div>';
 
-                                /* Concatenate everything
+                            /* Concatenate everything
+                             */
+                            if (typeof this.points[0].x !== 'undefined') {
+                                console.log(this.points);
+                                let tooltipContent = template;
+                                let desc = this.points[0].point.desc ?? ''
+                                let level = this.points[0].point.level ?? '';
+                                let content = '';
+
+                                /* Decorate with more html
                                  */
-                                if (typeof this.points[0].x !== 'undefined') {
-                                    console.log(this.points);
-                                    let tooltipContent = template;
-                                    let desc = this.points[0].point.desc ?? ''
-                                    let level = this.points[0].point.level ?? '';
-                                    let content = '';
-
-                                    /* Decorate with more html
-                                     */
-                                    if ('' !== level) {
-                                        level = '<b>' + level + '</b><br />';
-                                    }
-
-                                    /* Something to show
-                                     */
-                                    if ('' !== level || '' !== desc) {
-                                        content = '<p>' + level + desc + '</p>';
-                                    }
-
-                                    tooltipContent = tooltipContent.replace(/{NAME}/, this.points[0].title);
-                                    tooltipContent = tooltipContent.replace(/{CONTENT}/, content);
-
-                                    return tooltipContent;
+                                if ('' !== level) {
+                                    level = '<b>' + level + '</b><br />';
                                 }
+
+                                /* Something to show
+                                 */
+                                if ('' !== level || '' !== desc) {
+                                    content = '<p>' + level + desc + '</p>';
+                                }
+
+                                tooltipContent = tooltipContent.replace(/{NAME}/, this.points[0].title);
+                                tooltipContent = tooltipContent.replace(/{CONTENT}/, content);
+
+                                return tooltipContent;
                             }
-                        },
-                        legend: {
-                            enabled: false
                         }
-                    };
+                    },
+                    legend: {
+                        enabled: false
+                    }
+                };
 
             options = Highcharts.merge(defaultOptions, options);
 
             return hasRenderToArg ?
-                    new Highcharts.Chart(a, options, c) :
-                    new Highcharts.Chart(options, b);
+                new Highcharts.Chart(a, options, c) :
+                new Highcharts.Chart(options, b);
         }
     });
 </script>
