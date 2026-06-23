@@ -71,7 +71,7 @@ $app = new class extends CliTool\App
 Replicate settings for rubric grids
 
 This clones out settings for each submission_box's rubric settings into rubric_instance, mapping submission_box.id to
-its corresponding assessment_id. Capability settings are simply copied into rubric_instance accordingly. 
+its corresponding assessment_id. Capability settings are simply copied into rubric_instance accordingly.
 
 The use_rubric column is ignored because in sales data set we found that rubric_capability_usage held usages for a
 submission box that presently doesn't use rubrics, but once upon a time DID use rubrics. These rows weren't given
@@ -112,8 +112,8 @@ HELP;
          * rubric instances which caused miscellaneous errors in the most basic workflow.
          */
         $statement = $this->getDatabaseInternal()->prepare("
-            SELECT 
-                sb.id, 
+            SELECT
+                sb.id,
                 sb.assessment_id,
                 a.title,
                 sb.rubric_capability_mark_type_id,
@@ -244,8 +244,8 @@ HELP;
          *       never null in most normal use cases afaik; only really edge case/broken data would have that.
          */
         $result = $this->getDatabaseInternal()->executeQuery("
-            SELECT 
-                sb.id, 
+            SELECT
+                sb.id,
                 sb.assessment_id,
                 ri.id AS rubric_instance_id,
                 sb.rubric_capability_mark_type_id AS submission_box_rubric_capability_mark_type_id,
@@ -256,7 +256,7 @@ HELP;
                 ri.rubric_mark_range AS rubric_instance_rubric_mark_range
             FROM submission_box sb
             INNER JOIN assessment a ON sb.assessment_id = a.id
-            LEFT JOIN rubric_instance ri ON sb.assessment_id = ri.assessment_id 
+            LEFT JOIN rubric_instance ri ON sb.assessment_id = ri.assessment_id
             WHERE
             (
                 ri.id IS NULL
@@ -278,16 +278,12 @@ HELP;
 
 
     /**
-     * FIXME Decide whether this script must be run as root
-     *  By default, this returns false (see CliTool\App) but if you're using methods that require
-     *  access to special folders (such as when you're creating files) you need to run this as root.
-     *  Otherwise it'll fail with a generic error that might mislead you
      *
      * @return bool|null
      */
     public function runAsRoot(): ?bool
     {
-        return false;
+        return null;
     }
 };
 

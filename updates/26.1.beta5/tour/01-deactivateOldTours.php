@@ -26,6 +26,7 @@ $app = new class extends \Schoolbox\Tour\Prepare
         '25.1 Release General Enhancements',
         '25.1 Release Pastoral Enhancements',
         '26.0 Release General Enhancements',
+        'Help Chatbot Tour',
     ];
 };
 
