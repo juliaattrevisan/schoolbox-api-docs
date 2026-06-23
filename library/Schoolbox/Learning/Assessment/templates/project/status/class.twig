@@ -7,8 +7,9 @@
  #   [
  #       'assessment'       IAssessable
  #       'participantStats' ParticipantStatistics[] Indexed by user.id
- #       'participantCount' int Total roster users considered for cursor paging; can include users filtered during participant hydration
- #       'participantCursor' int|null Cursor for async course/spec class pagination, indicating the last user ID to continue after
+ #       'participantCount' int Number of participants rendered in this chunk
+ #       'participantIndexCount' int Total roster users considered for cursor paging
+ #       'participantCursor' int|null Cursor for pagination, indicating the last user ID to continue after
  #   ]
  # @param bool $isSpecification         Whether to show classes as groups (course level), or just a flat list (class level)
 #}

@@ -8,8 +8,9 @@
  #    [
  #       'assessment'       IAssessable
  #       'participantStats' ParticipantStatistics[] Indexed by user.id
- #       'participantCount' int Total roster users considered for cursor paging; can include users filtered during participant hydration
- #       'participantCursor' int|null Cursor for async course/spec class pagination, indicating the last user ID to continue after
+ #       'participantCount' int Number of participants rendered in this chunk
+ #       'participantIndexCount' int Total roster users considered for cursor paging
+ #       'participantCursor' int|null Cursor for pagination, indicating the last user ID to continue after
  #   ]
  # @param bool $isSpecification         Whether to show classes as groups (course level), or just a flat list (class level)
 #}
@@ -50,8 +51,7 @@
     </li>
     {% endif %}
 {% endfor %}
-{# Only course/spec class panes are fetched through the async chunk route; flat class status pages are fully loaded by getStatus. #}
-{% if isSpecification and aImpl.participantCursor is not null %}
+{% if aImpl.participantCursor is not null %}
     {# there are more participants to show, we should show a load more (that triggers a new chunk, managed by `@learningAssessment/project/status/staff.twig::loadMoreParticipants` #}
     <li data-class-chunk-href="{{ routeLookup('learningAssessment.getClassStatusChunk', {
         assessmentId: assessment.id,
