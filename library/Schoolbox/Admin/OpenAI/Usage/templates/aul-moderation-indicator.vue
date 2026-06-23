@@ -11,8 +11,9 @@ const props = defineProps<Props>();
 
 const indicator = window.Vue.computed<null | { class: string; status: AiModerationStatus }>(() => {
     if (props.status === null) return null;
-    if (props.status === AiModerationStatus.NO_ACTION_REQUIRED) return null;
+    if (props.status === AiModerationStatus.NO_BEHAVIOUR_FLAGGED) return null;
     if (props.status === AiModerationStatus.FURTHER_ACTION_TAKEN) return null;
+    if (props.status === AiModerationStatus.NO_ACTION_REQUIRED) return null;
 
     if (props.status === AiModerationStatus.REQUIRES_ATTENTION) {
         return { class: "warning", status: props.status };
