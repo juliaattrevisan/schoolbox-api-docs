@@ -179,83 +179,84 @@ window.Vue.onMounted((): void => {
                 <p>No registration session types are available.</p>
             </empty-state>
 
-            <template
-                v-else
-                v-for="section in registrationSections"
-                :key="section.systemPurpose.id"
-                class="registration-section l-flex-col l-gap-s f-no-margins"
-                :data-test="`ib-registration-system-purpose-${section.systemPurpose.id}`"
-            >
-                <empty-state v-if="section.sessions.length === 0" icon="icon-add">
-                    <p>{{ getSectionHeading(section.systemPurpose) }}</p>
-                    <p>
-                        No registration sessions exist.
-                        <button
-                            type="button"
-                            class="button"
-                            :data-test="`ib-registration-system-purpose-${section.systemPurpose.id}-add-link`"
-                            @click.prevent="openCreateModal(section.systemPurpose)"
-                        >
-                            Create a new session
-                        </button>
-                    </p>
-                </empty-state>
-
-                <template v-else>
-                    <div class="l-flex l-flex--align-center l-flex--justify-space f-no-margins">
-                        <h2 class="subheader f-no-margins">
-                            {{ getSectionHeading(section.systemPurpose) }}
-                        </h2>
-                        <button
-                            type="button"
-                            class="sbx-icon-only-button"
-                            style="font-size: 1.5rem; line-height: 1"
-                            :data-test="`ib-registration-system-purpose-${section.systemPurpose.id}-add`"
-                            :aria-label="`Create new ${section.systemPurpose.name} examination session`"
-                            @click.prevent="openCreateModal(section.systemPurpose)"
-                        >
-                            +
-                        </button>
-                    </div>
-
-                    <div class="session-list-box">
-                        <ul
-                            class="session-list"
-                            :data-test="`ib-registration-system-purpose-${section.systemPurpose.id}-list`"
-                        >
-                            <li
-                                v-for="session in section.sessions"
-                                :key="session.id"
-                                class="session-item"
-                                :data-test="`ib-registration-system-purpose-${section.systemPurpose.id}-session-${session.id}`"
+            <template v-else>
+                <div
+                    v-for="section in registrationSections"
+                    :key="section.systemPurpose.id"
+                    class="registration-section l-flex-col l-gap-s f-no-margins"
+                    :data-test="`ib-registration-system-purpose-${section.systemPurpose.id}`"
+                >
+                    <empty-state v-if="section.sessions.length === 0" icon="icon-add">
+                        <p>{{ getSectionHeading(section.systemPurpose) }}</p>
+                        <p>
+                            No registration sessions exist.
+                            <button
+                                type="button"
+                                class="button"
+                                :data-test="`ib-registration-system-purpose-${section.systemPurpose.id}-add-link`"
+                                @click.prevent="openCreateModal(section.systemPurpose)"
                             >
-                                <div class="l-flex l-flex--align-center l-flex--justify-space l-gap-xs">
-                                    <div class="l-flex-col">
-                                        <a v-if="reportBaseUrl" :href="`${reportBaseUrl}/${session.id}`">{{
-                                            session.title
-                                        }}</a>
-                                        <span v-else>{{ session.title }}</span>
-                                        <small
-                                            >Session created by {{ session.createdBy }} on
-                                            {{ new Date(session.createdAt).toLocaleDateString() }},
-                                            {{ new Date(session.createdAt).toLocaleTimeString() }}</small
+                                Create a new session
+                            </button>
+                        </p>
+                    </empty-state>
+
+                    <template v-else>
+                        <div class="l-flex l-flex--align-center l-flex--justify-space f-no-margins">
+                            <h2 class="subheader f-no-margins">
+                                {{ getSectionHeading(section.systemPurpose) }}
+                            </h2>
+                            <button
+                                type="button"
+                                class="sbx-icon-only-button"
+                                style="font-size: 1.5rem; line-height: 1"
+                                :data-test="`ib-registration-system-purpose-${section.systemPurpose.id}-add`"
+                                :aria-label="`Create new ${section.systemPurpose.name} examination session`"
+                                @click.prevent="openCreateModal(section.systemPurpose)"
+                            >
+                                +
+                            </button>
+                        </div>
+
+                        <div class="session-list-box">
+                            <ul
+                                class="session-list"
+                                :data-test="`ib-registration-system-purpose-${section.systemPurpose.id}-list`"
+                            >
+                                <li
+                                    v-for="session in section.sessions"
+                                    :key="session.id"
+                                    class="session-item"
+                                    :data-test="`ib-registration-system-purpose-${section.systemPurpose.id}-session-${session.id}`"
+                                >
+                                    <div class="l-flex l-flex--align-center l-flex--justify-space l-gap-xs">
+                                        <div class="l-flex-col">
+                                            <a v-if="reportBaseUrl" :href="`${reportBaseUrl}/${session.id}`">{{
+                                                session.title
+                                            }}</a>
+                                            <span v-else>{{ session.title }}</span>
+                                            <small
+                                                >Session created by {{ session.createdBy }} on
+                                                {{ new Date(session.createdAt).toLocaleDateString() }},
+                                                {{ new Date(session.createdAt).toLocaleTimeString() }}</small
+                                            >
+                                        </div>
+                                        <button
+                                            v-if="session.deleteEndpoint"
+                                            type="button"
+                                            class="sbx-icon-only-button"
+                                            :aria-label="`Delete session ${session.title}`"
+                                            :title="`Delete session ${session.title}`"
+                                            @click="openDeleteConfirm(section.systemPurpose.id, session)"
                                         >
+                                            <sbx-icon name="delete"></sbx-icon>
+                                        </button>
                                     </div>
-                                    <button
-                                        v-if="session.deleteEndpoint"
-                                        type="button"
-                                        class="sbx-icon-only-button"
-                                        :aria-label="`Delete session ${session.title}`"
-                                        :title="`Delete session ${session.title}`"
-                                        @click="openDeleteConfirm(section.systemPurpose.id, session)"
-                                    >
-                                        <sbx-icon name="delete"></sbx-icon>
-                                    </button>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </template>
+                                </li>
+                            </ul>
+                        </div>
+                    </template>
+                </div>
             </template>
         </template>
 
