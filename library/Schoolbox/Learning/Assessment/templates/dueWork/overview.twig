@@ -4,7 +4,9 @@
  # Shows a set of all the existing capabilities/indicators for an assessment and what each student received.
  # There's a draft mode toggle here so we support both: the csv export reflects the setting chosen.
  #
+ # @param array $breadcrumbs       Breadcrumb nodes
  # @param IAssessable $assessment  The fully-hydrated learning activity being examined
+ # @param Collection $participants Students who were involved in this learning activity
  # @param array $grids             A set of capabilities and indicators that were in this learning activity, grouped by rubric instance id
  # @param array $studentMarks      The marks obtained by all the students who got feedback for this learning activity
  #}
@@ -90,7 +92,30 @@
                     </tr>
                 </thead>
                 <tbody>
-
+                    {% for participant in participants %}
+                        <tr>
+                            <td>
+                                <div class="wrap-down small-12 ">
+                                    <a href="{{ routeLookup('learningAssessment.getSummary', {
+                                        assessmentId: assessment.id,
+                                        studentId: participant.id
+                                    }) }}" title="View Profile" class="l-flex l-flex-col l-flex--center">
+                                        <div class="c-img c-img--m c-img--round">
+                                            <div class="c-img__wrapper">
+                                                {% include 'include/portrait.twig' with {
+                                                    user: participant,
+                                                    description: participant.fullName,
+                                                    class: "rubric-profile"
+                                                } only %}
+                                            </div>
+                                        </div>
+                                        <p>{{ participant.fullname}}</p>
+                                    </a>
+                                </div>
+                            </td>
+                            {# Slap in all their results here #}
+                        </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
