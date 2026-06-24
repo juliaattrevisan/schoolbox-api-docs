@@ -75,7 +75,7 @@ class Mapper extends BaseMapper
                 /** @var Model $participation */
                 $participation = $collection[$participant->getId()];
                 /** @var \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model|null $assessmentContext */
-                $assessmentContext = $participation->getPlan()->getAssessment()->getAssessmentContext();
+                $assessmentContext = $participation->getPlan()->getAssessment()->getContextUnitImplementation();
                 $folder = $assessmentContext?->getCourse()->getFolder() ?? $participation->getPlan()->getAssessment()->getContextFolder();
                 /* Append folder code
                  */
@@ -108,6 +108,7 @@ class Mapper extends BaseMapper
             $assessmentContext = $assessmentMapper->hydrateJoin($row, 'assessment_course_unit_implementation', 'cui');
             /** @var \Schoolbox\Learning\Course\DataModel\Implementation\Model $courseImplementation */
             $courseImplementation = $assessmentMapper->hydrateJoin($row, 'assessment_course_unit_implementation.course', 'ci');
+            /** @var \Schoolbox\Resource\Folder\Model $folder */
             $folder = $assessmentMapper->hydrateJoin($row, 'assessment_course_unit_implementation.course.folder', 'f');
             /* Always create a new collection for folder codes as there
              * might be multiple folder codes for the same folder depending on the number
@@ -124,11 +125,12 @@ class Mapper extends BaseMapper
                  */
                 $courseImplementation->setFolder($folder);
                 $assessmentContext->setCourse($courseImplementation);
+                $assessment->setAssessmentContext($assessmentContext);
+            } else {
+                /* When the assessment is within the class that are not assigned to a unit/course
+                 */
+                $assessment->setContextFolder($folder);
             }
-            $assessment->setAssessmentContext($assessmentContext);
-            /* When the assessment is within the class that are not assigned to a unit/course
-             */
-            $assessment->setContextFolder($folder);
 
             $plan->setAssessment($assessment);
             /* Hydrate user
