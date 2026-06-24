@@ -211,6 +211,31 @@
     opacity: 0.5;
 }
 
+.fc.sbx-related-events-active .fc-event {
+    transition:
+        opacity 0.15s ease,
+        filter 0.15s ease,
+        box-shadow 0.15s ease,
+        transform 0.15s ease;
+}
+
+.fc-event.sbx-related-event-match {
+    box-shadow: 0 0.25rem 0.75rem rgba($black, 0.18);
+    position: relative;
+    transform: translateY(-1px) scale(1.02);
+    z-index: 2;
+}
+
+.fc-event.sbx-related-event-muted {
+    filter: grayscale(35%);
+    opacity: 0.38;
+}
+
+.fc-list .fc-event.sbx-related-event-match {
+    box-shadow: none;
+    transform: none;
+}
+
 .fc-agenda-slots td div {
     height: 31px;
 }

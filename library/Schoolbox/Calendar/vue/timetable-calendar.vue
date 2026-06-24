@@ -438,7 +438,7 @@ export default {
             /* Filters Modal doesn't exist in the Timetable Calendar special screen
              * Everything always renders
              */
-            return true;
+            return this.fullCalendarHelper_eventRender(eventRenderInfo);
         },
 
         /**

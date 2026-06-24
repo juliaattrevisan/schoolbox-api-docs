@@ -5,6 +5,11 @@
 
 import { EVENT_VARIANTS } from "@schoolboxCalendarEvent/event-variants";
 
+const RELATED_EVENT_ACTIVE_CLASS = "sbx-related-events-active";
+const RELATED_EVENT_MATCH_CLASS = "sbx-related-event-match";
+const RELATED_EVENT_MUTED_CLASS = "sbx-related-event-muted";
+const RELATED_EVENT_RELATION_ATTRIBUTE = "data-calendar-event-relation";
+
 export default {
     methods: {
         /**
@@ -57,9 +62,83 @@ export default {
                 eventRenderInfo.el.classList.add(calEvent?.extendedProps?.data?.styles?.visible);
             }
 
+            this.fullCalendarHelper_attachRelatedEventHighlighting(eventRenderInfo);
+
             calEvent.setProp("display", "block");
 
             return true;
+        },
+
+        fullCalendarHelper_attachRelatedEventHighlighting(eventRenderInfo) {
+            const relationKey = this.fullCalendarHelper_getRelatedEventKey(eventRenderInfo.event);
+
+            if (!relationKey) {
+                return;
+            }
+
+            eventRenderInfo.el.setAttribute(RELATED_EVENT_RELATION_ATTRIBUTE, relationKey);
+            eventRenderInfo.el.addEventListener("mouseenter", this.fullCalendarHelper_highlightRelatedEvents);
+            eventRenderInfo.el.addEventListener("focusin", this.fullCalendarHelper_highlightRelatedEvents);
+            eventRenderInfo.el.addEventListener("mouseleave", this.fullCalendarHelper_clearRelatedEventHighlights);
+            eventRenderInfo.el.addEventListener("focusout", this.fullCalendarHelper_clearRelatedEventHighlights);
+        },
+
+        fullCalendarHelper_getRelatedEventKey(event) {
+            const data = event?.extendedProps?.data;
+            const categoryId = data?.links?.category?.id;
+            if (categoryId) {
+                return `category:${categoryId}`;
+            }
+
+            const timetableCode = data?.timetable?.code;
+            if (timetableCode) {
+                return `class:${timetableCode}`;
+            }
+
+            const groupClass = event?.classNames?.find((className) => /^group\d+$/u.test(className));
+            if (groupClass) {
+                return groupClass.replace(/^group/u, "group:");
+            }
+
+            const eventTypeId = data?.meta?.eventTypeId;
+            if (eventTypeId) {
+                return `type:${eventTypeId}`;
+            }
+
+            return null;
+        },
+
+        fullCalendarHelper_highlightRelatedEvents(event) {
+            const relationKey = event.currentTarget.getAttribute(RELATED_EVENT_RELATION_ATTRIBUTE);
+            const calendar = event.currentTarget.closest(".fc");
+
+            if (!relationKey || !calendar || event.currentTarget.closest(".fc-list")) {
+                return;
+            }
+
+            calendar.classList.add(RELATED_EVENT_ACTIVE_CLASS);
+            calendar.querySelectorAll(`[${RELATED_EVENT_RELATION_ATTRIBUTE}]`).forEach((calendarEvent) => {
+                if (calendarEvent.getAttribute(RELATED_EVENT_RELATION_ATTRIBUTE) === relationKey) {
+                    calendarEvent.classList.add(RELATED_EVENT_MATCH_CLASS);
+                    calendarEvent.classList.remove(RELATED_EVENT_MUTED_CLASS);
+                } else {
+                    calendarEvent.classList.add(RELATED_EVENT_MUTED_CLASS);
+                    calendarEvent.classList.remove(RELATED_EVENT_MATCH_CLASS);
+                }
+            });
+        },
+
+        fullCalendarHelper_clearRelatedEventHighlights(event) {
+            const calendar = event.currentTarget.closest(".fc");
+
+            if (!calendar) {
+                return;
+            }
+
+            calendar.classList.remove(RELATED_EVENT_ACTIVE_CLASS);
+            calendar.querySelectorAll(`[${RELATED_EVENT_RELATION_ATTRIBUTE}]`).forEach((calendarEvent) => {
+                calendarEvent.classList.remove(RELATED_EVENT_MATCH_CLASS, RELATED_EVENT_MUTED_CLASS);
+            });
         },
 
         /**

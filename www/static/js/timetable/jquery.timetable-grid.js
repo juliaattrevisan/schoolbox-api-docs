@@ -11,6 +11,7 @@
 
         showFirstTimetable();
         showSelectedTimetable();
+        registerRelatedClassHighlighting();
 
         /* Set up event listener for resizeEnd
          */
@@ -125,6 +126,41 @@
              */
             $(config.wrapper.data).addClass("hide");
             $(config.target).html("");
+        }
+
+        function registerRelatedClassHighlighting() {
+            $(document)
+                .off(".timetableHighlight")
+                .on(
+                    "mouseenter.timetableHighlight focusin.timetableHighlight",
+                    "[data-timetable-class-code]",
+                    function () {
+                        var classCode = $(this).attr("data-timetable-class-code");
+                        var container = $(this).closest(config.wrapper.data + ", " + config.target);
+
+                        if (!classCode || !container.length) {
+                            return;
+                        }
+
+                        container.find("[data-timetable-class-code]").each(function () {
+                            if ($(this).attr("data-timetable-class-code") === classCode) {
+                                $(this).addClass("sbx-related-event-match").removeClass("sbx-related-event-muted");
+                            } else {
+                                $(this).addClass("sbx-related-event-muted").removeClass("sbx-related-event-match");
+                            }
+                        });
+                    },
+                )
+                .on(
+                    "mouseleave.timetableHighlight focusout.timetableHighlight",
+                    "[data-timetable-class-code]",
+                    function () {
+                        $(this)
+                            .closest(config.wrapper.data + ", " + config.target)
+                            .find("[data-timetable-class-code]")
+                            .removeClass("sbx-related-event-match sbx-related-event-muted");
+                    },
+                );
         }
     };
 
