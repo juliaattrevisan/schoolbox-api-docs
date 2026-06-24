@@ -6,8 +6,8 @@
  * overwrite existing ckeditor vars
  */
 :root {
-    /* Remove the border radius */
-    --ck-border-radius: 0px;
+    /* Match the field corner radius */
+    --ck-border-radius: var(--sbx-config-field-corner-radius, 0px);
 
     /* -- Border colours */
     --ck-color-toolbar-border: var(--sbx-color-border, var(--form-border-color));
@@ -17,8 +17,8 @@
     --ck-color-button-default-hover-background: var(--form-bg-hover-color);
 
     /* Change the colour of the mentions */
-    --ck-color-mention-background: var(--sbx-config-color-accent, var(--accent-background));
-    --ck-color-mention-text: var(--sbx-color-text-primary, #222222);
+    --ck-content-color-mention-background: var(--sbx-config-color-active, var(--accent-background));
+    --ck-content-color-mention-text: var(--sbx-config-color-accent, #222222);
 
     /* resolve depth issues */
     --ck-z-modal: var(--sbx-depth-pop-over);
@@ -60,17 +60,11 @@
     --ck-color-button-action-text: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground));
 
     /* Make larger to match our checkbox style */
-    --ck-todo-list-checkmark-size: 1.5rem;
-}
-
-/* CKEditor border radius follows Advanced UI field roundness */
-.sbx-body,
-.sbx-body .ck-body-wrapper {
-    --ck-border-radius: var(--sbx-config-field-corner-radius, 0);
+    --ck-content-todo-list-checkmark-size: 1.5rem;
 }
 
 /* Keep table insert grid buttons in the toolbar square */
-.sbx-body .ck.ck-toolbar .ck-insert-table-dropdown-grid-box {
+.ck.ck-toolbar .ck-insert-table-dropdown-grid-box {
     border-radius: 0;
 }
 
