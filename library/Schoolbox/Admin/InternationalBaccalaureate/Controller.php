@@ -40,6 +40,7 @@ use Schoolbox\IB\Registrations\Sessions\Student\Mapper as RegistrationSessionStu
 use Schoolbox\IB\Registrations\Sessions\Student\Model as RegistrationSessionStudentModel;
 use Schoolbox\IB\Registrations\Sessions\Student\Subject\Language\Mapper as RegistrationSessionStudentSubjectLanguageMapper;
 use Schoolbox\IB\Registrations\Sessions\Student\Translator\ModelToArray as RegistrationSessionStudentModelToArray;
+use Schoolbox\IB\SystemPurpose\Model as SystemPurposeModel;
 use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Language\Model as LanguageModel;
 use Schoolbox\Mapper as BaseMapper;
@@ -757,9 +758,9 @@ class Controller extends ConfigController
             $this->response = $this->responseAsJson([
                 'data' => $sessionsBySystemPurpose,
                 'systemPurposes' => $systemPurposes->map(
-                    fn($sp) => [
+                    fn(SystemPurposeModel $sp) => [
                         'id' => $sp->getId(),
-                        'name' => sprintf('%s [%s]', $sp->getName(), $sp->getCategory()->getName()),
+                        'name' => sprintf('%s [%s]', $sp->getName(), $sp->getCategory()?->getName() ?? ''),
                     ]
                 )->getAll()
             ]);
