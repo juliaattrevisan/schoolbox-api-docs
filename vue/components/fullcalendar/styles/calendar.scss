@@ -217,11 +217,6 @@
         filter 0.15s ease;
 }
 
-.fc-event.sbx-related-event-match {
-    position: relative;
-    z-index: 2;
-}
-
 .fc-event.sbx-related-event-muted {
     filter: grayscale(35%);
     opacity: 0.38;

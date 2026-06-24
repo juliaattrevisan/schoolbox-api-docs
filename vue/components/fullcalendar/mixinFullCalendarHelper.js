@@ -119,8 +119,7 @@ export default {
             calendar.classList.add(RELATED_EVENT_ACTIVE_CLASS);
             calendar.querySelectorAll(`[${RELATED_EVENT_RELATION_ATTRIBUTE}]`).forEach((calendarEvent) => {
                 if (calendarEvent.getAttribute(RELATED_EVENT_RELATION_ATTRIBUTE) === relationKey) {
-                    calendarEvent.classList.add(RELATED_EVENT_MATCH_CLASS);
-                    calendarEvent.classList.remove(RELATED_EVENT_MUTED_CLASS);
+                    calendarEvent.classList.remove(RELATED_EVENT_MATCH_CLASS, RELATED_EVENT_MUTED_CLASS);
                 } else {
                     calendarEvent.classList.add(RELATED_EVENT_MUTED_CLASS);
                     calendarEvent.classList.remove(RELATED_EVENT_MATCH_CLASS);
