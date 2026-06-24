@@ -58,7 +58,7 @@ CREATE TABLE `ai_moderation_event` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `ai_session_id` char(36) NOT NULL COMMENT 'The moderation session that produced the event',
   `target_ai_session_id` char(36) NOT NULL COMMENT 'the AI session being moderated',
-  `status` enum('no_action_required','requires_attention','further_action_required','further_action_taken') NOT NULL,
+  `status` enum('no_behaviour_flagged','requires_attention','no_action_required','further_action_required','further_action_taken') NOT NULL,
   `moderation_details` text NOT NULL DEFAULT '',
   `reviewed_by` int(10) unsigned DEFAULT NULL COMMENT 'Set when a user reviews the event',
   `reviewed_at` datetime DEFAULT NULL,
@@ -867,7 +867,7 @@ CREATE TABLE `clipboard_import_log` (
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `finish_at_idx` (`finish_at`,`status`)
-) ENGINE=InnoDB AUTO_INCREMENT=17484 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17434 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1243,7 +1243,7 @@ CREATE TABLE `config` (
   KEY `config_type_id` (`type_id`),
   CONSTRAINT `fk_config_field_id` FOREIGN KEY (`field_id`) REFERENCES `lu_config_field` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_config_type_id` FOREIGN KEY (`type_id`) REFERENCES `lu_config_type` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=784 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=785 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3403,7 +3403,7 @@ CREATE TABLE `ib_registration_sessions` (
   CONSTRAINT `fk_ib_registration_sessions_deleted_by` FOREIGN KEY (`deleted_by`) REFERENCES `user` (`id`),
   CONSTRAINT `fk_ib_registration_sessions_system_purpose` FOREIGN KEY (`system_purpose_id`) REFERENCES `ib_system_purposes` (`id`),
   CONSTRAINT `fk_ib_registration_sessions_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3677,7 +3677,7 @@ CREATE TABLE `login_log` (
   PRIMARY KEY (`id`),
   KEY `username` (`username`),
   KEY `date` (`date`)
-) ENGINE=InnoDB AUTO_INCREMENT=2132 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2123 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6546,7 +6546,7 @@ CREATE TABLE `search_index` (
   FULLTEXT KEY `search_index_title_index` (`title`),
   CONSTRAINT `search_index_folder_id_fk` FOREIGN KEY (`folder_id`) REFERENCES `folder` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `search_index_user_id_fk` FOREIGN KEY (`created_by`) REFERENCES `user` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=846856 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=846841 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6998,6 +6998,28 @@ CREATE TABLE `socialstream_post` (
   CONSTRAINT `fk_socialstream_post_image_hash` FOREIGN KEY (`cache_hash`) REFERENCES `storage` (`hash`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_socialstream_post_user_id` FOREIGN KEY (`owner_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `socs_import_log`
+--
+
+DROP TABLE IF EXISTS `socs_import_log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `socs_import_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `run_id` varchar(255) NOT NULL,
+  `script` varchar(255) NOT NULL,
+  `start_at` datetime NOT NULL,
+  `finish_at` datetime DEFAULT NULL,
+  `status` enum('running','complete','error') NOT NULL,
+  `error_message` text DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `finish_at_idx` (`finish_at`,`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -7519,7 +7541,7 @@ CREATE TABLE `storage` (
   KEY `deleted` (`expired_at`),
   KEY `ext` (`ext`),
   KEY `uploaded_on` (`uploaded_on`)
-) ENGINE=InnoDB AUTO_INCREMENT=2304 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2303 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -8198,7 +8220,7 @@ CREATE TABLE `tour_audience_role` (
   CONSTRAINT `tour_audience_role_moderator_user_id_fk` FOREIGN KEY (`moderator_user_id`) REFERENCES `user` (`id`),
   CONSTRAINT `tour_audience_role_role_id_fk` FOREIGN KEY (`role_id`) REFERENCES `groups` (`id`),
   CONSTRAINT `tour_audience_role_tour_uuid_fk` FOREIGN KEY (`tour_uuid`) REFERENCES `tour` (`uuid`)
-) ENGINE=InnoDB AUTO_INCREMENT=110 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=124 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -8545,7 +8567,7 @@ CREATE TABLE `ups_log` (
   PRIMARY KEY (`id`),
   KEY `ups_log_storage_hash_fk` (`hash`),
   CONSTRAINT `ups_log_storage_hash_fk` FOREIGN KEY (`hash`) REFERENCES `storage` (`hash`)
-) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -8723,7 +8745,7 @@ CREATE TABLE `user_assume_log` (
   `ip` varchar(39) CHARACTER SET ascii COLLATE ascii_general_ci DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1049 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1046 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -9395,4 +9417,4 @@ CREATE TABLE `wikiRevision` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2026-06-24  3:26:38
+-- Dump completed on 2026-06-24  3:33:33
