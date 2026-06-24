@@ -117,10 +117,6 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
     {
         try {
             $xml = $this->getHttpClient()->get(self::CALENDAR_PATH, []);
-            if (!$xml instanceof SimpleXMLElement) {
-                return [];
-            }
-
             return (new Parser())->parse($xml);
         } catch (Throwable) {
             return [];
