@@ -42,6 +42,7 @@ type AiModerationEventResult = {
  * @see /library/Schoolbox/OpenAi/Moderation/Event/Translator/ModelToArray.php
  */
 export type AiModerationEvent = {
+    id: number;
     status: AiModerationStatus;
     result: AiModerationEventResult;
     reviewedBy: UserAuthor | null;
