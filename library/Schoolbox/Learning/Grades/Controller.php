@@ -16,7 +16,6 @@ use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use InvalidArgumentException;
 use LogicException;
-use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Rubric\Markbook\OverallDataset;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Assessment\Term;
@@ -66,7 +65,6 @@ class Controller extends Base
      * @param AssessmentMapperProxy $assessmentMapperProxy
      * @param Mapper $folderMapper
      * @param Term\Mapper $termMapper
-     * @param RubricDataSource $rubricMapper
      * @param FilterSelection\Mapper $filterSelectionMapper
      * @param Access $access
      * @param IdFinder $assessmentIdFinder
@@ -81,7 +79,6 @@ class Controller extends Base
         private AssessmentMapperProxy $assessmentMapperProxy,
         private Folder\Mapper $folderMapper,
         private Term\Mapper $termMapper,
-        private RubricDataSource $rubricMapper,
         private FilterSelection\Mapper $filterSelectionMapper,
         private Access $access,
         private AssessmentFilters\IdFinder $assessmentIdFinder,
