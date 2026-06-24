@@ -74,8 +74,8 @@ class Mapper extends BaseMapper
             if ($collection->keyExists($participant->getId())) {
                 /** @var Model $participation */
                 $participation = $collection[$participant->getId()];
-                /** @var \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model|null $assessmentContext */
-                $assessmentContext = $participation->getPlan()->getAssessment()->getContextUnitImplementation();
+                /** @var \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model|\Schoolbox\Resource\Folder\Model|null $assessmentContext */
+                $assessmentContext = $participation->getPlan()->getAssessment()->getAssessmentContext();
                 $folder = $assessmentContext?->getCourse()->getFolder() ?? $participation->getPlan()->getAssessment()->getContextFolder();
                 /* Append folder code
                  */
