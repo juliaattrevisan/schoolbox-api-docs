@@ -37,8 +37,11 @@ export type AiModerationEvent = {
     resolvedBy: UserAuthor | null;
     createdAt: DateRFC3339;
     _routes: {
-        postNoActionRequired?: string | null;
-        postFurtherActionRequired?: string | null;
-        postFurtherActionTaken?: string | null;
+        /** Transition an AI Interaction Moderation event to the NO_ACTION_REQUIRED status. */
+        postDismissEvent?: string | null;
+        /** Transition an AI Interaction Moderation event to the FURTHER_ACTION_REQUIRED status. */
+        postConfirmEvent?: string | null;
+        /** Transition an AI Interaction Moderation event to the FURTHER_ACTION_TAKEN status. */
+        postResolveEvent?: string | null;
     };
 };

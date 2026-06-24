@@ -3,12 +3,15 @@ import { getDayjsDatetimeLong } from "@js/util/dateUtils";
 import { AiModerationStatus, STATUS_LABELS } from "./moderationEvent";
 import type { AiModerationEvent } from "./moderationEvent";
 import { RISK_LEVEL_LABELS, CATEGORY_LABELS } from "./moderationResult";
+import AulSessionInfoModerationEventActions from "./aul-session-info-moderation-event-actions.vue";
 
 interface Props {
     event: AiModerationEvent;
 }
 
 const props = defineProps<Props>();
+
+const componentId = window.Vue.useId();
 
 const timestamp = window.Vue.computed(() => {
     const date = window.dayjs(props.event.createdAt);
@@ -48,8 +51,11 @@ const STATUS_LABEL_CLASSES: Record<AiModerationStatus, string> = {
             <a class="sbx-icon-only-button">
                 <sbx-icon name="up-arrow"></sbx-icon>
             </a>
-            <!-- TODO: 3-dot menu for actions -->
+            <sbx-pop-out :content-id="`aul-session-info-moderation-event-${componentId}`"></sbx-pop-out>
         </nav>
+        <ul :id="`aul-session-info-moderation-event-${componentId}`" class="f-dropdown" data-dropdown-content>
+            <aul-session-info-moderation-event-actions :event="props.event" />
+        </ul>
 
         <article>{{ props.event.result.summary }}</article>
     </li>
