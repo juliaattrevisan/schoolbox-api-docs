@@ -696,7 +696,13 @@ span.lrn-qe-i-trash {
     border-radius: min(var(--sbx-config-field-corner-radius, 0px), var(--sbx-border-radius-m, 4px));
     color: transparent;
 }
-
+.lrn-author
+    .lrn-author-ui
+    .lrn-author-list-view-select-col
+    .lrn-author-check-box-wrapper
+    .lrn-author-check-box-span:before {
+    line-height: 1em !important;
+}
 /* change checkbox and rows selection background color */
 .lrn.lrn-author .lrn-item-for-activity-list .lrn-check-box-wrapper .lrn-check-box-input:checked + .lrn-check-box-span {
     color: var(--sbx-config-color-accent, var(--content-ui-foreground)) !important;
