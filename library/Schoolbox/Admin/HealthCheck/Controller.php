@@ -99,7 +99,22 @@ class Controller extends Base
                      */
                     //helper URL object
                     $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
-                    $this->taskDHelper->addSource('assessment', 'assessment', $urlBase->withPath($this->routeGenerator->generate('learning.getAssessmentAudit', ['folderId' => 0])));
+                    $this->taskDHelper->addSource(
+                        'assessment',
+                        'assessment-audit',
+                        $urlBase->withPath($this->routeGenerator->generate(
+                            'learning.getAssessmentAuditCsv',
+                            ['folderId' => 0]
+                        ))
+                    );
+                    $this->taskDHelper->addSource(
+                        'assessment',
+                        'rubric-audit',
+                        $urlBase->withPath($this->routeGenerator->generate(
+                            'learning.getAssessmentRubricAuditCsv',
+                            ['folderId' => 0]
+                        ))
+                    );
                     break;
                 case 'uxui':
                     /**

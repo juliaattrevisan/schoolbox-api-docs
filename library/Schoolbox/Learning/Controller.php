@@ -31,7 +31,10 @@ use Schoolbox\Learning\Students\StudentLists;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\TaskDaemon\Producer;
+use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory as DownloadPagesMessageFactory;
 use Schoolbox\User;
+use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\UserMapper;
 use Throwable;
@@ -74,6 +77,8 @@ class Controller extends Base
      * @param External_ClassInterface    $externalClass
      * @param RosettaStone               $rosettaStone
      * @param IConnector                 $database
+     * @param DownloadPagesMessageFactory $downloadMessageFactory
+     * @param Producer                   $messageProducer
      */
     public function __construct(
         private AssessmentMapperProxy $assessmentMapperProxy,
@@ -87,7 +92,9 @@ class Controller extends Base
         private Folder\Log\Mapper $logMapper,
         private External_ClassInterface $externalClass,
         private RosettaStone $rosettaStone,
-        private IConnector $database
+        private IConnector $database,
+        private DownloadPagesMessageFactory $downloadMessageFactory,
+        private Producer $messageProducer,
     ) {
     }
 
@@ -429,7 +436,7 @@ class Controller extends Base
     }
 
     /**
-     * downloads csv of all assessments within a folder
+     * Queues a zip of assessment audit CSVs for all assessments within a folder.
      *
      * @api   GET /learning/assessment-audit/{folder}
      *
@@ -437,8 +444,101 @@ class Controller extends Base
      */
     public function getAssessmentAudit(Folder\Model $folder): void
     {
-        $assessmentAudit = new AssessmentAudit($this->folderMapper, $this->database, $this->getConfigLoader()->get('site_school_code'));
-        $assessmentAudit->getAssessmentAudit($folder);
+        $assessmentAudit = $this->getAssessmentAuditHelper();
+        $timestamp = Alaress_Date_Format::now()->toIso8601String();
+        $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+        $userSerializer = new ModelToArray();
+
+        $message = $this->downloadMessageFactory
+            ->addFileContent(
+                $assessmentAudit->getAssessmentAuditFilename($timestamp),
+                (string)$urlBase->withPath($this->routeGenerator->generate(
+                    'learning.getAssessmentAuditCsv',
+                    ['folderId' => $folder->getId()]
+                ))
+            )
+            ->addFileContent(
+                $assessmentAudit->getRubricAuditFilename($timestamp),
+                (string)$urlBase->withPath($this->routeGenerator->generate(
+                    'learning.getAssessmentRubricAuditCsv',
+                    ['folderId' => $folder->getId()]
+                ))
+            )
+            ->setUser($this->getUser())
+            ->setCallbackUrl(
+                (string)$urlBase->withPath($this->routeGenerator->generate(
+                    'apiusernotify.apiUserNotify',
+                    ['userId' => $this->getUser()->getId()]
+                ))
+            )
+            ->setCallbackParams([
+                'message' => 'Your assessment audit is ready to download',
+                'from'    => call_user_func($userSerializer, $this->getUser()),
+                'to'      => call_user_func($userSerializer, $this->getUser()),
+            ])
+            ->setFailureCallbackUrl(
+                (string)$urlBase->withPath($this->routeGenerator->generate(
+                    'apiusernotify.apiUserNotify',
+                    ['userId' => $this->getUser()->getId()]
+                ))
+            )
+            ->setFailureCallbackParams([
+                'message' => 'Your assessment audit could not be downloaded (reason: :message)',
+                'messageParams' => [
+                    'message' => '{{response.message}}',
+                ],
+                'from'    => call_user_func($userSerializer, $this->getUser()),
+                'to'      => call_user_func($userSerializer, $this->getUser()),
+            ])
+            ->setOutfile($assessmentAudit->getAssessmentAuditZipFilename($timestamp))
+            ->build();
+
+        $this->messageProducer->send($message);
+        $this->response = $this->redirectFound('/');
+    }
+
+    /**
+     * Streams the assessment audit CSV for all assessments within a folder.
+     *
+     * @api   GET /learning/assessment-audit/{folder}/assessment.csv
+     *
+     * @param Folder\Model $folder
+     */
+    public function getAssessmentAuditCsv(Folder\Model $folder): void
+    {
+        $assessmentAudit = $this->getAssessmentAuditHelper();
+        $filename = $assessmentAudit->getAssessmentAuditFilename(Alaress_Date_Format::now()->toIso8601String());
+
+        header('Content-type: text/csv; charset=utf-8');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        $assessmentAudit->streamAssessmentAudit($folder);
         exit(1);
+    }
+
+    /**
+     * Streams the rubric audit CSV for all assessments within a folder.
+     *
+     * @api   GET /learning/assessment-audit/{folder}/rubric.csv
+     *
+     * @param Folder\Model $folder
+     */
+    public function getAssessmentRubricAuditCsv(Folder\Model $folder): void
+    {
+        $assessmentAudit = $this->getAssessmentAuditHelper();
+        $filename = $assessmentAudit->getRubricAuditFilename(Alaress_Date_Format::now()->toIso8601String());
+
+        header('Content-type: text/csv; charset=utf-8');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        $assessmentAudit->streamRubricAudit($folder);
+        exit(1);
+    }
+
+    private function getAssessmentAuditHelper(): AssessmentAudit
+    {
+        return new AssessmentAudit(
+            $this->folderMapper,
+            $this->database,
+            $this->getConfigLoader()->get('site_school_code'),
+        );
     }
 }
