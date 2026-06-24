@@ -161,19 +161,18 @@ async function applyFilters(): Promise<void> {
 /**
  * Reset the filters to their default values (show everything)
  */
-function resetFilters(): void {
+async function resetFilters(): Promise<void> {
     keywordFilter.value = "";
     featureFilter.value = null;
     userFilter.value = [];
     startDateFilter.value = EMPTY_DATE;
     endDateFilter.value = EMPTY_DATE;
     moderationStatusFilter.value = [];
+
+    await applyFilters();
 }
 
-window.Vue.onMounted(async () => {
-    resetFilters();
-    await applyFilters();
-});
+window.Vue.onMounted(resetFilters);
 
 /**
  * Open the details for a specific session
@@ -256,16 +255,7 @@ function printSelectedSession(): void {
                 <sbx-icon name="ai" size="2.5rem"></sbx-icon>
                 <p>
                     No logs match the current filters. Try another filter or
-                    <a
-                        href="#"
-                        @click.prevent="
-                            () => {
-                                resetFilters();
-                                void applyFilters();
-                            }
-                        "
-                        >show everything</a
-                    >.
+                    <a href="#" @click.prevent="resetFilters">show everything</a>.
                 </p>
             </div>
 
