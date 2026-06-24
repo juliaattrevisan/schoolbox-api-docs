@@ -82,7 +82,10 @@ class LongitudinalDataset
         /* Student doesn't have any data; exit earlyish
          */
         if (null === $data) {
-            return [];
+            return [
+                [],
+                [],
+            ];
         }
 
         /* Transpose this rubric markbook data
