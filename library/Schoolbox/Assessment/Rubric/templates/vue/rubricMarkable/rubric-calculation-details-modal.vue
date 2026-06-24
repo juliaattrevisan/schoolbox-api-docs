@@ -17,6 +17,8 @@ const props = defineProps<Props>();
 
 const { derivedRubricMarks, derivedTotalMark, totalRubricWeight } = useRubricMarks(
     // The derived total mark should always be a percentage in the context of this modal
+    // since we're trying to show the math behind how the normalised mark is calculated.
+    // If we wanted to show the next step (normalised -> assessment mark scheme), it'd be on a separate line.
     { mode: MarkTypeSlug.PERCENT },
     window.Vue.toRef(props.rubrics),
 );
