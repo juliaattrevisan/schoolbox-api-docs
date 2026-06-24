@@ -1278,6 +1278,23 @@ button.lrn-author-btn-old.lrn-author-btn-old-legacy.lrn-author-btn-sec.lrn-autho
     border: none;
     outline: none;
 }
+
+/* remove focus border from Learnosity buttons */
+.lrn .lrn-author-ui button:focus,
+.lrn .lrn-author-ui button:focus-visible,
+.lrn .lrn-author-ui .lrn-btn:focus,
+.lrn .lrn-author-ui .lrn-btn:focus-visible,
+.lrn-qe .lrn-qe-ui button:focus,
+.lrn-qe .lrn-qe-ui button:focus-visible,
+.lrn-qe .lrn-qe-ui .lrn-qe-btn:focus,
+.lrn-qe .lrn-qe-ui .lrn-qe-btn:focus-visible,
+.cke_dialog_container_qe .cke_dialog_ui_button:focus,
+.cke_dialog_container_qe .cke_dialog_ui_button:focus-visible {
+    border-color: inherit !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
 /* Fixed the mobile version for the search page */
 @media #{$small-only} {
     .lrn .lrn-author-ui .lrn-author-list-view-heading-wrapper {
@@ -1310,7 +1327,7 @@ button.lrn-author-btn-old.lrn-author-btn-old-legacy.lrn-author-btn-sec.lrn-autho
         display: none;
     }
 }
-/* update the section background and overflow for learnosity /
+/* update the section background and overflow for learnosity */
 body.sbx-body .island section:not(:has(sbx-pop-out)) {
     overflow: visible;
     background: #fff;
