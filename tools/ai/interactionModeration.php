@@ -127,10 +127,10 @@ HELP;
         $moderationSessionId = (string)Uuid::uuid4();
         $moderationResult = $interactionModeration->request(null, $moderationSessionId, $logs);
 
-        /* persist the result (for both flagged and non-flagged sessions) */
+        /* persist the result (for both flagged and non-flagged sessions so we can remember if we ran the agent against them already) */
         $status = $moderationResult->getNeedsHumanReview()
             ? ModerationEventStatus::REQUIRES_ATTENTION
-            : ModerationEventStatus::NO_ACTION_REQUIRED; // TODO: this might actually be 'null' (the col currently isn't nullable) - depends on if we need to distinguish "not flagged" vs "user marked as no action required"
+            : ModerationEventStatus::NO_BEHAVIOUR_FLAGGED;
 
         $event = $this->moderationEventMapper->createModel()
             ->setAiSessionId($moderationSessionId)
