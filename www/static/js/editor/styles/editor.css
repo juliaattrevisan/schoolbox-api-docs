@@ -17,8 +17,8 @@
     --ck-color-button-default-hover-background: var(--form-bg-hover-color);
 
     /* Change the colour of the mentions */
-    --ck-color-mention-background: var(--sbx-config-color-accent, var(--accent-background));
-    --ck-color-mention-text: var(--sbx-color-text-primary, #222222);
+    --ck-content-color-mention-background: var(--sbx-config-color-active, var(--accent-background));
+    --ck-content-color-mention-text: var(--sbx-config-color-accent, #222222);
 
     /* resolve depth issues */
     --ck-z-modal: var(--sbx-depth-pop-over);
