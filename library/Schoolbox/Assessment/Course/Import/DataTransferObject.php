@@ -11,7 +11,6 @@ namespace Schoolbox\Assessment\Course\Import;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Learning\Assessment\Reporting\Model as Reporting;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Alaress_Date_Format;
@@ -305,7 +304,7 @@ class DataTransferObject
 
                 // Base case: non-project
                 if (!$spec instanceof Project) {
-                    $openSpan = $this->getDefaultOpenSpanForDateAssignment($spec);
+                    $openSpan = $spec->getDefaultOpenSpan();
                 } else {
                     // Recursive case: Project
                     // Does any assessment inside this project have a null open_span?
@@ -424,7 +423,7 @@ class DataTransferObject
         foreach ($projectSpec->getAssessables() as $subAssessment) {
             // Base Case: non-project
             if (!$subAssessment instanceof Project) {
-                $openSpan = $this->getDefaultOpenSpanForDateAssignment($subAssessment);
+                $openSpan = $subAssessment->getDefaultOpenSpan();
                 if (null === $openSpan) {
                     return null;
                 }
@@ -439,21 +438,6 @@ class DataTransferObject
             }
         }
         return $totalOpenSpan;
-    }
-
-
-    /**
-     * Reporting activities do not expose Activity Duration on their create/modify form.
-     *
-     * Treat any persisted duration as absent during import date assignment so existing hidden values do not continue
-     * sequencing imported activities after the field has been removed from the UI.
-     */
-    private function getDefaultOpenSpanForDateAssignment(IAssessable $assessment): ?int
-    {
-        if ($assessment instanceof Reporting) {
-            return null;
-        }
-        return $assessment->getDefaultOpenSpan();
     }
 
 

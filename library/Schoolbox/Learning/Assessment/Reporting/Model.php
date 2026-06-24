@@ -124,6 +124,15 @@ class Model extends AbstractAssessment
 
 
     /**
+     *@return int|null
+     */
+    public function getDefaultOpenSpan()
+    {
+        return null;
+    }
+
+
+    /**
      * @inheritdoc
      */
     public function getHumanReadableInstructorMark(Participant $participant, $publishedOnly)
