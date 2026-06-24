@@ -1223,7 +1223,6 @@ li.lrn-item-for-activity-list.lrn-col-xs-10.lrn-col-md-11 {
 
 ul.lrn-author-list-view.lrn-author-list-unstyled.lrn-author-list-divider.lrn-author-draggable {
     background: var(--sbx-color-foreground-primary, #fff);
-    border-bottom: 1px solid var(--sbx-color-border, var(--body-background)) !important;
     list-style: none;
     max-width: none;
     overflow: visible;
@@ -1310,4 +1309,9 @@ button.lrn-author-btn-old.lrn-author-btn-old-legacy.lrn-author-btn-sec.lrn-autho
     .lrn_widget.lrn_sortlist .lrn_sortlist_soruce_trigger button {
         display: none;
     }
+}
+/* update the section background and overflow for learnosity /
+body.sbx-body .island section:not(:has(sbx-pop-out)) {
+    overflow: visible;
+    background: #fff;
 }
