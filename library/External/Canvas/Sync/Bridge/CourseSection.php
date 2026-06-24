@@ -241,13 +241,15 @@ class CourseSection
      * @param Folder\Model      $folder
      * @param Folder\Model|null $parentFolder
      * @param string|null       $folderCode
+     * @param string|null       $year
      * @return string
      */
     public static function formatSisSourceIdTemplate(
         string $template,
         Folder\Model $folder,
         ?Folder\Model $parentFolder,
-        ?string $folderCode = null
+        ?string $folderCode = null,
+        ?string $year = null
     ): string {
         return strtr(
             $template,
@@ -255,8 +257,25 @@ class CourseSection
                 '{folderCode}' => trim($folderCode ?? preg_replace("#^[^/]+/#", '', $folder->getCodeString())),
                 '{parentCode}' => self::getParentCode($parentFolder),
                 '{folderName}' => trim($folder->getName()),
+                '{year}' => trim($year ?? self::getYear($parentFolder)),
             ]
         );
+    }
+
+
+    /**
+     * Return the academic year embedded in the parent folder name.
+     *
+     * @param Folder\Model|null $parentFolder
+     * @return string
+     */
+    private static function getYear(?Folder\Model $parentFolder): string
+    {
+        if ($parentFolder !== null && preg_match('/(\d{4})/', $parentFolder->getName(), $matches)) {
+            return $matches[1];
+        }
+
+        return '';
     }
 
 
@@ -454,7 +473,8 @@ class CourseSection
                     $this->canvasDb->sissourceid_template,
                     $folder,
                     $parentFolder,
-                    $unPrefixedFolderCode
+                    $unPrefixedFolderCode,
+                    (string)$year
                 );
                 $yearAndSisSourceIdTemplateToFolderMap[$year][$templateSisSourceId] = $folder;
             }
@@ -601,7 +621,15 @@ class CourseSection
 
         // If template contains an explicit placeholder-like token, support it
         if (strpos($template, '{folderCode}') !== false) {
-            $pattern = '#^' . str_replace('\{folderCode\}', '(.+?)', preg_quote($template, '#')) . '$#';
+            $pattern = '#^' . strtr(
+                preg_quote($template, '#'),
+                [
+                    '\{folderCode\}' => '(.+?)',
+                    '\{year\}' => preg_quote($year, '#'),
+                    '\{parentCode\}' => '.+?',
+                    '\{folderName\}' => '.+?',
+                ]
+            ) . '$#';
             if (preg_match($pattern, $sisSourceId, $m)) {
                 return preg_replace("#^[^/]+/#", '', $m[1]);
             }

@@ -13,6 +13,7 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception;
 use Alaress\Database\Exception as DatabaseException;
 use External\Canvas\Importer\CanvasDb;
+use External\Canvas\Sync\Bridge\CourseSection;
 use PDOException;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -187,12 +188,10 @@ class AbstractRedirect
      */
     public function getCanvasCourseId(Folder $folder, Folder $parentFolder): ?int
     {
-        $courseCode = strtr(
-            $this->canvasDb->sissourceid_template, // now formattable string
-            [
-                '{folderCode}' => $folder->getCodeString(),
-                '{parentCode}' => $parentFolder->getCodeString()
-            ]
+        $courseCode = CourseSection::formatSisSourceIdTemplate(
+            $this->canvasDb->sissourceid_template,
+            $folder,
+            $parentFolder
         );
 
         // Figure out which column to search against
