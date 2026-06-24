@@ -18,9 +18,11 @@ use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error;
+use Schoolbox\Filter;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
@@ -173,6 +175,9 @@ class Module extends BaseModule
             $this->injector->get('filters.factoryFactory'),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\WorkType\Mapper::class),
             new \Schoolbox\External\User(),
+            $this->injector->get('databaseInternal'),
+            $this->getMapperFactory()->get(UserAccessMapper::class),
+            $this->getMapperFactory()->get(Filter\Mapper::class),
         );
     }
 
