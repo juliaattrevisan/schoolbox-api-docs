@@ -81,21 +81,14 @@ class RedisCache implements ICache
             // Unserialize
             $trigger = unserialize($uncompressedValue, []);
             if (!$trigger instanceof TriggerInterface) {
-                // TODO: this part can be removed once v23.1 is released
-                if ($trigger instanceof CrudEventInterface) {
-                    // delete
-                    $this->redis->del($itemKey);
-                    $this->log->debug(sprintf("Deleted key %s from v23.0", $itemKey));
-                } else {
-                    $this->log->warning(
-                        sprintf(
-                            "Error unserializing data in key %s (expected %s, received %s): cannot restore",
-                            $itemKey,
-                            TriggerInterface::class,
-                            is_object($trigger) ? get_class($trigger) : 'non-object',
-                        )
-                    );
-                }
+                $this->log->warning(
+                    sprintf(
+                        "Error unserializing data in key %s (expected %s, received %s): cannot restore",
+                        $itemKey,
+                        TriggerInterface::class,
+                        is_object($trigger) ? get_class($trigger) : 'non-object',
+                    )
+                );
                 continue;
             }
 
