@@ -96,7 +96,7 @@
                         {% for rubricInstanceId, rubricInstanceData in grids %}
                             {% for capabilityId, capabilityData in rubricInstanceData.capabilities %}
                                 {% for indicatorId, indicatorData in capabilityData.indicators %}
-                                    <th class="markdown">
+                                    <th class="rb-criterion-name markdown">
                                         {{ indicatorData.name|markdown }}
                                     </th>
                                 {% endfor %}
@@ -105,7 +105,7 @@
                                  # It's basically a hardcoded pseudo-indicator
                                  #}
                                 {% if rubricInstanceData.isMarkPerCapability %}
-                                    <th class="markdown">
+                                    <th class="rb-criterion-name markdown">
                                         <span title="Capability mark">Overall</span>
                                     </th>
                                 {% endif %}
