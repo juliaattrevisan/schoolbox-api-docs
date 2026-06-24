@@ -9,12 +9,12 @@ import PaginatorButtons from "@schoolboxVue/components/paginator-buttons.vue";
 import type { AiModerationEvent, AiModerationStatus } from "./moderationEvent";
 import { AiLogFormat } from "./payload";
 import type {
-    AiSessionId,
     AiFeature,
     AiSession,
+    AiSessionId,
+    AiSessionLogApiResponse,
     AiUsageLogApiRequest,
     AiUsageLogApiResponse,
-    AiSessionLogApiResponse,
 } from "./payload";
 import AulAgentChat from "./aul-agent-chat.vue";
 import AulFilters from "./aul-filters.vue";
@@ -22,7 +22,7 @@ import AulModerationIndicator from "./aul-moderation-indicator.vue";
 
 interface Props {
     routeSearch: string;
-    features: Record<string, { title: string }>;
+    features: Record<AiFeature, { title: string }>;
 }
 
 const PAGE_SIZE = 30;

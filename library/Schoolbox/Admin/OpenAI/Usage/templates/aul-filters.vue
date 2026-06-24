@@ -4,9 +4,10 @@ import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vu
 import DateRange from "@schoolboxVue/components/dateTimePicker/date-range.vue";
 import { STATUS_LABELS } from "./moderationEvent";
 import type { AiModerationStatus } from "./moderationEvent";
+import type { AiFeature } from "./payload";
 
 interface Props {
-    features: Record<string, { title: string }>;
+    features: Record<AiFeature, { title: string }>;
 }
 
 const props = defineProps<Props>();
