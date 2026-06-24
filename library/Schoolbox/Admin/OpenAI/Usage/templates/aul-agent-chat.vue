@@ -110,12 +110,21 @@ const sessionFeed = window.Vue.computed<ReturnType<typeof acStore.parseFeed>>(()
             continue; // skip events that aren't a concern
         }
 
+        // flagged events that haven't been dismissed are shown as warnings, otherwise just standard alerts
+        const eventSeverity = [
+            AiModerationStatus.REQUIRES_ATTENTION,
+            AiModerationStatus.FURTHER_ACTION_REQUIRED,
+            AiModerationStatus.FURTHER_ACTION_TAKEN,
+        ].includes(event.status)
+            ? "warning"
+            : "";
+
         feed.push({
             createdAt: event.createdAt,
             type: AgentChatMessageType.ALERT,
             data: {
                 side: AgentChatMessageType.RESPONSE,
-                severity: "warning",
+                severity: eventSeverity,
                 title: `Moderation identified ${event.result.categories.join(", ")}:`,
                 message: eventDescription,
             },
