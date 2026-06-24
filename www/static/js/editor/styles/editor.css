@@ -60,7 +60,7 @@
     --ck-color-button-action-text: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground));
 
     /* Make larger to match our checkbox style */
-    --ck-todo-list-checkmark-size: 1.5rem;
+    --ck-content-todo-list-checkmark-size: 1.5rem;
 }
 
 /* CKEditor border radius follows Advanced UI field roundness */
