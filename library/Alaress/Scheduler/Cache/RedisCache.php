@@ -35,7 +35,20 @@ class RedisCache implements ICache
      * by `restoreSchedule`: it's assumed that the schedule daemon is restarted
      * on a higher frequency than this window.)
      */
-    public const int EXPIRY_WINDOW = 345600;
+    public const int EXPIRY_WINDOW = 60 * 60 * 24 * 4;
+
+    /**
+     * The time window after which a trigger will no longer be restored by
+     * `restoreCache`: currently set to 7 days ago (60 * 60 * 24 * 7).
+     *
+     * If a trigger was supposed to happen more than this amount of time ago,
+     * assume that either:
+     * * it has triggered already, and somehow ended up back in the queue;
+     *   thus it should not be restored
+     * * it didn't trigger for whatever reason, and should be removed as it's
+     *   stale
+     */
+    public const int RESTORE_WINDOW = 60 * 60 * 24 * 7;
 
     /**
      * @param ClientInterface $redis
