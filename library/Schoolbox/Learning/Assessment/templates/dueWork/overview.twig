@@ -13,8 +13,9 @@
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.marksheet.js?v={{ config.site_version }}"></script>
 
 {% import '@learningAssessment/project/macro/icon.twig' as icon %}
-
+{% import '@learning/macro/urgency.twig' as urgency %}
 {% import 'sub/breadcrumbs.twig' as bread %}
+
 {{ bread.crumbsArray(breadcrumbs) }}
 
 <div class="actions-small-1 row">
@@ -152,7 +153,10 @@
                                                 {% set max = rubricInstanceData.capabilities[capabilityId].indicators[indicatorId].max ?? null %}
 
                                                 {% if max and max > 0 %}
-                                                    <p data-actual-mark>{{ publishedMarks.selectedDescriptorValue|round }} / {{ max }}</p>
+                                                    {# Colour the human readable mark using the normalised mark #}
+                                                    {% set gradientClass = urgency.marks(publishedMarks.normalisedMark) %}
+
+                                                    <p class="{{ gradientClass }}" data-actual-mark>{{ publishedMarks.selectedDescriptorValue|round }} / {{ max }}</p>
                                                 {% endif %}
                                             {% endif %}
 
@@ -179,7 +183,10 @@
                                         <td>
                                             {# Published Marks #}
                                             {% if publishedMarks is not null and publishedMarks.humanReadableMark is not null %}
-                                                <p data-actual-mark>{{ publishedMarks.humanReadableMark }}</p>
+                                                {# Colour the human readable mark using the normalised mark #}
+                                                {% set gradientClass = urgency.marks(publishedMarks.normalisedMark) %}
+
+                                                <p class="{{ gradientClass }}" data-actual-mark>{{ publishedMarks.humanReadableMark }}</p>
                                             {% endif %}
 
                                             {# Draft Marks #}
