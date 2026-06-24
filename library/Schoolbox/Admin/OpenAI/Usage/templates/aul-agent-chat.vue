@@ -11,6 +11,7 @@ import { AiFeature, AiLogFormat } from "./payload";
 import type { AiSessionLogApiResponse } from "./payload";
 import { AiModerationStatus } from "./moderationEvent";
 import type { AiModerationEvent } from "./moderationEvent";
+import { CATEGORY_LABELS } from "./moderationResult";
 
 interface Props {
     feature: AiFeature;
@@ -125,7 +126,7 @@ const sessionFeed = window.Vue.computed<ReturnType<typeof acStore.parseFeed>>(()
             data: {
                 side: AgentChatMessageType.RESPONSE,
                 severity: eventSeverity,
-                title: `Moderation identified ${event.result.categories.map((c) => c.category).join(", ")}:`,
+                title: `Moderation identified ${event.result.categories.map((c) => CATEGORY_LABELS[c.category]).join(", ")}:`,
                 message: eventDescription,
             },
         });

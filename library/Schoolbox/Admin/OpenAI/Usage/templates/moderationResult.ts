@@ -10,6 +10,14 @@ enum RiskLevel {
     CRITICAL = "critical",
 }
 
+export const RISK_LEVEL_LABELS: Record<RiskLevel, string> = {
+    [RiskLevel.NONE]: "None",
+    [RiskLevel.LOW]: "Low",
+    [RiskLevel.MEDIUM]: "Medium",
+    [RiskLevel.HIGH]: "High",
+    [RiskLevel.CRITICAL]: "Critical",
+};
+
 /**
  * The seriousness of an individual concern raised by the AI Interaction Moderation agent.
  * @see /library/Schoolbox/OpenAi/Moderation/Result/Severity.php
@@ -56,6 +64,27 @@ enum ConcernCategory {
     DISCIPLINE_CONCERN = "discipline_concern",
     OTHER = "other",
 }
+
+export const CATEGORY_LABELS: Record<ConcernCategory, string> = {
+    [ConcernCategory.SELF_HARM]: "Self-harm",
+    [ConcernCategory.WELLBEING_CONCERN]: "Wellbeing concern",
+    [ConcernCategory.BULLYING]: "Bullying",
+    [ConcernCategory.HARASSMENT]: "Harassment",
+    [ConcernCategory.HATE_SPEECH]: "Hate speech",
+    [ConcernCategory.ABUSE]: "Abuse",
+    [ConcernCategory.VIOLENCE]: "Violence",
+    [ConcernCategory.THREAT]: "Threat",
+    [ConcernCategory.SEXUAL_CONTENT]: "Sexual content",
+    [ConcernCategory.EXPLOITATION]: "Exploitation",
+    [ConcernCategory.GROOMING]: "Grooming",
+    [ConcernCategory.PRIVACY_RISK]: "Privacy risk",
+    [ConcernCategory.DANGEROUS_BEHAVIOUR]: "Dangerous behaviour",
+    [ConcernCategory.ACADEMIC_MISUSE]: "Academic misuse",
+    [ConcernCategory.AI_MISUSE]: "AI misuse",
+    [ConcernCategory.GUARDRAIL_EVASION]: "Guardrail evasion",
+    [ConcernCategory.DISCIPLINE_CONCERN]: "Discipline concern",
+    [ConcernCategory.OTHER]: "Other",
+};
 
 /**
  * Suggested school response level from the AI Interaction Moderation agent.

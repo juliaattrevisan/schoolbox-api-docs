@@ -4,6 +4,7 @@ import RelativeTime from "@schoolboxVue/components/relativeTime/relative-time.vu
 import { AiLogFormat } from "./payload";
 import type { AiFeature, AiSession, AiSessionLogApiResponse } from "./payload";
 import AulAgentChat from "./aul-agent-chat.vue";
+import AulSessionInfoModerationEvent from "./aul-session-info-moderation-event.vue";
 
 const UNKNOWN_FEATURE_TEXT = "Unknown Feature";
 
@@ -34,6 +35,7 @@ function printSelectedSession(): void {
 
 <template>
     <section>
+        <!-- Info card -->
         <div class="card small-12 actions-small-1">
             <div class="list-item">
                 <span>
@@ -79,6 +81,19 @@ function printSelectedSession(): void {
         </div>
         <div class="clearfix"></div>
 
+        <!-- Moderation Events -->
+        <ul
+            v-if="props.sessionInfo !== null && props.sessionInfo.moderationEvents.length > 0"
+            class="information-list threaded"
+        >
+            <aul-session-info-moderation-event
+                v-for="event in props.sessionInfo.moderationEvents"
+                :key="event.id"
+                :event="event"
+            />
+        </ul>
+
+        <!-- Session Logs -->
         <div v-if="props.sessionInfo === null" class="loader"></div>
         <div v-else-if="filteredLogs.length === 0" class="empty-state">
             <sbx-icon name="hidden" size="xl" />
