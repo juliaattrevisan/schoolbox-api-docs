@@ -18,7 +18,7 @@ import type {
 } from "./payload";
 import AulAgentChat from "./aul-agent-chat.vue";
 import AulFilters from "./aul-filters.vue";
-import AulModerationIndicator from "./aul-moderation-indicator.vue";
+import AulSessionList from "./aul-session-list.vue";
 
 interface Props {
     routeSearch: string;
@@ -42,7 +42,7 @@ const startDateFilter = window.Vue.ref<string>(EMPTY_DATE);
 const endDateFilter = window.Vue.ref<string>(EMPTY_DATE);
 const moderationStatusFilter = window.Vue.ref<AiModerationStatus[]>([]);
 
-const usageSessions = window.Vue.ref<AiSession[]>([]);
+const sessions = window.Vue.ref<AiSession[]>([]);
 const pageInfo = window.Vue.ref<PaginationMeta | null>(null);
 
 const sessionLoadError = window.Vue.ref<string | null>(null);
@@ -65,7 +65,7 @@ const selectedSessionInfo = window.Vue.computed<AiSelectedSessionInfo | AiSelect
         return null;
     }
 
-    const sessionInfo = usageSessions.value.find((s) => s.id === selectedSessionId.value);
+    const sessionInfo = sessions.value.find((s) => s.id === selectedSessionId.value);
     if (sessionInfo === undefined) {
         console.warn(`Session ID ${selectedSessionId.value} not found`); // shouldn't get here
         return null;
@@ -100,24 +100,6 @@ function closeSessionDetails(): void {
 }
 
 /**
- * Determine if it is possible to view a session's logs
- * @param session The session to check
- * @returns true if the session's logs can be viewed
- */
-function canViewSessionLogs(session: AiSession): boolean {
-    return session.logFormat !== null && session._routes.getSessionLogs !== undefined;
-}
-
-/**
- * Get the formatted createdAt date for a given AI session
- * @param session the given session
- * @returns The formatted createdAt date
- */
-function formatSessionDate(session: AiSession): string {
-    return window.dayjs(session.createdAt).format(window.dateDisplayFormats.dayjsDatetime);
-}
-
-/**
  * Load the usage logs for the current filters
  */
 async function loadUsageLogs(): Promise<void> {
@@ -126,7 +108,7 @@ async function loadUsageLogs(): Promise<void> {
 
     closeSessionDetails();
 
-    usageSessions.value = [];
+    sessions.value = [];
 
     const response = await apiRequest<AiUsageLogApiResponse, AiUsageLogApiRequest>({
         method: "POST",
@@ -150,7 +132,7 @@ async function loadUsageLogs(): Promise<void> {
         return;
     }
 
-    usageSessions.value = response.data.data;
+    sessions.value = response.data.data;
     pageInfo.value = response.data.metadata;
 }
 
@@ -246,7 +228,7 @@ function printSelectedSession(): void {
     <div class="no-print">
         <div class="list-item">
             <h2 class="subheader">
-                Activity<template v-if="!isLoading">: {{ usageSessions.length }} events</template>
+                Activity<template v-if="!isLoading">: {{ sessions.length }} events</template>
             </h2>
         </div>
     </div>
@@ -261,67 +243,13 @@ function printSelectedSession(): void {
                 <div class="loader"></div>
             </section>
 
-            <div v-else-if="usageSessions.length > 0">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Feature</th>
-                            <th>User</th>
-                            <th></th>
-                            <th></th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        <tr v-for="session in usageSessions" :key="session.id">
-                            <td>
-                                {{ formatSessionDate(session) }}
-                            </td>
-                            <td>
-                                {{ props.features[session.feature]?.title ?? UNKNOWN_FEATURE_TEXT }}
-                            </td>
-                            <td>
-                                <span v-if="!session.createdBy">System</span>
-                                <component
-                                    :is="session.createdBy._links.profile ? 'a' : 'span'"
-                                    v-else
-                                    :href="session.createdBy._links.profile ?? undefined"
-                                    :title="session.createdBy._links.profile ? 'View Profile' : undefined"
-                                >
-                                    {{ session.createdBy.fullName }}
-                                </component>
-                            </td>
-                            <td>{{ session.hasError ? "Error" : "" }}</td>
-                            <td
-                                :class="`actions-small-${session.moderationStatus && canViewSessionLogs(session) ? 2 : 1}`"
-                            >
-                                <!--
-                                Although this does handle a non-viewable session which has a moderation status,
-                                it is not actually possible to end up in that state normally, since only sessions with
-                                a logFormat (and therefore viewable) can have a moderation status set.
-                                -->
-                                <nav v-if="session.moderationStatus || canViewSessionLogs(session)">
-                                    <aul-moderation-indicator
-                                        v-if="session.moderationStatus"
-                                        :status="session.moderationStatus"
-                                    />
-                                    <button
-                                        v-if="canViewSessionLogs(session)"
-                                        type="button"
-                                        class="sbx-icon-only-button f-no-margins"
-                                        title="View session details"
-                                        aria-label="View session details"
-                                        :disabled="session.id.toString() === selectedSessionId?.toString()"
-                                        @click="() => openSessionDetails(session)"
-                                    >
-                                        <sbx-icon name="view" />
-                                    </button>
-                                </nav>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div v-else-if="sessions.length > 0">
+                <aul-session-list
+                    :features="props.features"
+                    :sessions="sessions"
+                    :selected-session-id="selectedSessionId"
+                    @open-session-details="openSessionDetails"
+                />
             </div>
 
             <div v-else class="empty-state">
