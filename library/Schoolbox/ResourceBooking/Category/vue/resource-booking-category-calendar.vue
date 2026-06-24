@@ -25,7 +25,14 @@ const FORMAT_DISPLAY_DATE = "ddd Do MMM";
 const FORMAT_DISPLAY_TIME = "h:mma";
 const FORMAT_DISPLAY_DATETIME = "ddd Do MMM, h:mma";
 const FORMAT_DISPLAY_WEEK_DAY = "ddd D/M";
-const DEFAULT_BOOKING_STATUS_FILTERS = [1, 2];
+
+/**
+ * If every status checkbox is cleared, treat that as no status filter rather than
+ * omitting the status query parameter. Sending all known statuses preserves a
+ * valid JSON calendar request while matching the filter semantics: no selected
+ * status filter means all booking statuses are included.
+ */
+const DEFAULT_BOOKING_STATUS_FILTERS = [1, 2, 3];
 
 export default {
     components: {
