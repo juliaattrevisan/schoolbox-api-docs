@@ -35,7 +35,7 @@ function getModerationEventDescription(event: AiModerationEvent): string | null 
         case AiModerationStatus.NO_ACTION_REQUIRED:
             return `Deemed no further action required by ${event.reviewedBy?.fullName ?? "Unknown"}`;
         case AiModerationStatus.FURTHER_ACTION_REQUIRED:
-            return `Further action required by ${event.reviewedBy?.fullName ?? "Unknown"}`;
+            return `Further action required, requested by ${event.reviewedBy?.fullName ?? "Unknown"}`;
         case AiModerationStatus.FURTHER_ACTION_TAKEN:
             return `Resolved by ${event.resolvedBy?.fullName ?? "Unknown"}`;
         default:
