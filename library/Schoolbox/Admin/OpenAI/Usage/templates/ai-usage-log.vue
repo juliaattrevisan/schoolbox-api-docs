@@ -3,21 +3,17 @@ import { apiRequest } from "@js/util/sbx/apiUtils";
 import type { PaginationMeta } from "@js/util/sbx/apiUtils";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 import { EMPTY_DATE } from "@schoolboxVue/components/dateTimePicker/datePickerTypes";
-import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
-import RelativeTime from "@schoolboxVue/components/relativeTime/relative-time.vue";
 import PaginatorButtons from "@schoolboxVue/components/paginator-buttons.vue";
-import type { AiModerationEvent, AiModerationStatus } from "./moderationEvent";
-import { AiLogFormat } from "./payload";
+import type { AiModerationStatus } from "./moderationEvent";
 import type {
     AiFeature,
     AiSession,
-    AiSessionId,
     AiSessionLogApiResponse,
     AiUsageLogApiRequest,
     AiUsageLogApiResponse,
 } from "./payload";
-import AulAgentChat from "./aul-agent-chat.vue";
 import AulFilters from "./aul-filters.vue";
+import AulSessionInfo from "./aul-session-info.vue";
 import AulSessionList from "./aul-session-list.vue";
 
 interface Props {
@@ -26,9 +22,6 @@ interface Props {
 }
 
 const PAGE_SIZE = 30;
-
-const UNKNOWN_FEATURE_TEXT = "Unknown Feature";
-const SELECTED_SESSION_ACTIONS_ID = "ai-usage-log-selected-session-actions";
 
 const props = defineProps<Props>();
 
@@ -46,57 +39,16 @@ const sessions = window.Vue.ref<AiSession[]>([]);
 const pageInfo = window.Vue.ref<PaginationMeta | null>(null);
 
 const sessionLoadError = window.Vue.ref<string | null>(null);
-const selectedSessionId = window.Vue.ref<AiSessionId | null>(null);
-const selectedSessionLog = window.Vue.ref<AiSessionLogApiResponse | null>(null);
-
-type AiSelectedSessionInfo<TFeature extends AiFeature = AiFeature> = {
-    [KLogFormat in AiLogFormat]: {
-        logFormat: KLogFormat;
-        session: AiSession<KLogFormat, TFeature>;
-        sessionLogs: AiSessionLogApiResponse<KLogFormat>["logs"];
-        moderationEvents: AiModerationEvent[];
-    };
-}[AiLogFormat];
-
-type AiSelectedSessionInfoLoading = Pick<AiSelectedSessionInfo, "session">;
-
-const selectedSessionInfo = window.Vue.computed<AiSelectedSessionInfo | AiSelectedSessionInfoLoading | null>(() => {
-    if (selectedSessionId.value === null) {
-        return null;
-    }
-
-    const sessionInfo = sessions.value.find((s) => s.id === selectedSessionId.value);
-    if (sessionInfo === undefined) {
-        console.warn(`Session ID ${selectedSessionId.value} not found`); // shouldn't get here
-        return null;
-    }
-
-    const logInfo = selectedSessionLog.value;
-    if (logInfo === null) {
-        // still loading
-        return { session: sessionInfo };
-    }
-
-    // TODO: properly support sessions with multiple log formats, for now just filter out invalid logs
-    const filteredLogs = logInfo.logs.filter((entry) => entry.logFormat !== null && entry.data !== null);
-
-    // sessionInfo.logFormat only selects the renderer; the renderer interprets each entry's own logFormat.
-    const info = {
-        logFormat: sessionInfo.logFormat,
-        session: sessionInfo,
-        sessionLogs: filteredLogs,
-        moderationEvents: logInfo.moderationEvents,
-    };
-    return info satisfies Record<keyof AiSelectedSessionInfo, unknown> as AiSelectedSessionInfo;
-});
+const selectedSession = window.Vue.ref<AiSession | null>(null);
+const selectedSessionInfo = window.Vue.ref<AiSessionLogApiResponse | null>(null);
 
 /**
  * Close the current session details pane
  */
 function closeSessionDetails(): void {
     sessionLoadError.value = null;
-    selectedSessionId.value = null;
-    selectedSessionLog.value = null;
+    selectedSession.value = null;
+    selectedSessionInfo.value = null;
 }
 
 /**
@@ -184,8 +136,8 @@ async function openSessionDetails(session: AiSession): Promise<void> {
     }
 
     sessionLoadError.value = null;
-    selectedSessionId.value = session.id;
-    selectedSessionLog.value = null;
+    selectedSession.value = session;
+    selectedSessionInfo.value = null;
 
     const response = await apiRequest<AiSessionLogApiResponse>({
         method: "GET",
@@ -197,14 +149,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
         return;
     }
 
-    selectedSessionLog.value = response.data;
-}
-
-/**
- * Print the currently selected AI session log.
- */
-function printSelectedSession(): void {
-    window.print();
+    selectedSessionInfo.value = response.data;
 }
 </script>
 
@@ -246,7 +191,7 @@ function printSelectedSession(): void {
                 <aul-session-list
                     :features="props.features"
                     :sessions="sessions"
-                    :selected-session-id="selectedSessionId"
+                    :selected-session-id="selectedSession?.id ?? null"
                     @open-session-details="openSessionDetails"
                 />
             </div>
@@ -270,72 +215,12 @@ function printSelectedSession(): void {
             <div v-if="sessionLoadError" data-alert class="alert-box alert">
                 {{ sessionLoadError }}
             </div>
-            <section v-else-if="selectedSessionInfo !== null">
-                <div class="card small-12 actions-small-1">
-                    <div class="list-item">
-                        <span>
-                            <user-photo
-                                v-if="selectedSessionInfo.session.createdBy"
-                                :user-id="selectedSessionInfo.session.createdBy.id || 0"
-                                render="small"
-                            />
-                            <h3>
-                                {{ props.features[selectedSessionInfo.session.feature]?.title ?? UNKNOWN_FEATURE_TEXT }}
-                            </h3>
-                        </span>
-                        <p class="meta">
-                            <span v-if="!selectedSessionInfo.session.createdBy"> Created </span>
-                            <template v-else>
-                                Created by
-                                <component
-                                    :is="selectedSessionInfo.session.createdBy._links.profile ? 'a' : 'span'"
-                                    :href="selectedSessionInfo.session.createdBy._links.profile ?? undefined"
-                                >
-                                    {{ selectedSessionInfo.session.createdBy.fullName }}
-                                </component>
-                            </template>
-                            <relative-time :datetime="selectedSessionInfo.session.createdAt" full-diff></relative-time>
-                        </p>
-                    </div>
-                    <nav class="no-print">
-                        <sbx-pop-out :content-id="SELECTED_SESSION_ACTIONS_ID"></sbx-pop-out>
-                    </nav>
-                    <ul :id="SELECTED_SESSION_ACTIONS_ID" class="f-dropdown no-print" data-dropdown-content>
-                        <li>
-                            <a
-                                href="#"
-                                class="sbx-button--has-icon"
-                                data-test="ai-usage-log-print-session"
-                                @click.prevent="printSelectedSession"
-                            >
-                                <sbx-icon name="print"></sbx-icon>
-                                Print / Save as PDF
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="clearfix"></div>
-
-                <div v-if="!('logFormat' in selectedSessionInfo)" class="loader"></div>
-                <div v-else-if="selectedSessionInfo.sessionLogs.length === 0" class="empty-state">
-                    <sbx-icon name="hidden" size="xl" />
-                    <p>
-                        The {{ props.features[selectedSessionInfo.session.feature].title }} feature does not support
-                        previews for this session.
-                    </p>
-                </div>
-                <div v-else class="l-mar-m">
-                    <aul-agent-chat
-                        v-if="
-                            selectedSessionInfo.logFormat === AiLogFormat.AGENT_CHAT ||
-                            selectedSessionInfo.logFormat === AiLogFormat.GUARDRAIL
-                        "
-                        :feature="selectedSessionInfo.session.feature"
-                        :session-logs="selectedSessionInfo.sessionLogs"
-                        :moderation-events="selectedSessionInfo.moderationEvents"
-                    />
-                </div>
-            </section>
+            <aul-session-info
+                v-if="selectedSession !== null"
+                :session="selectedSession"
+                :session-info="selectedSessionInfo"
+                :features="props.features"
+            />
         </div>
     </div>
 </template>
