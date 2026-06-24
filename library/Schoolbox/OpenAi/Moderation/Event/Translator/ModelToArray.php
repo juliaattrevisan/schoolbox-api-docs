@@ -40,7 +40,6 @@ class ModelToArray
             'status' => $event->getStatus(),
             'result' => [
                 'summary' => $event->getModerationDetails()->getSummary(),
-                'needsHumanReview' => $event->getModerationDetails()->getNeedsHumanReview(),
                 'categories' => $event->getModerationDetails()
                     ->getCategories()
                     ->map(fn(Result\Category $category) => $category->getCategory())
