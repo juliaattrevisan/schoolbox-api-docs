@@ -58,7 +58,7 @@ CREATE TABLE `ai_moderation_event` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `ai_session_id` char(36) NOT NULL COMMENT 'The moderation session that produced the event',
   `target_ai_session_id` char(36) NOT NULL COMMENT 'the AI session being moderated',
-  `status` enum('no_action_required','requires_attention','further_action_required','further_action_taken') NOT NULL,
+  `status` enum('no_behaviour_flagged','requires_attention','no_action_required','further_action_required','further_action_taken') NOT NULL,
   `moderation_details` text NOT NULL DEFAULT '',
   `reviewed_by` int(10) unsigned DEFAULT NULL COMMENT 'Set when a user reviews the event',
   `reviewed_at` datetime DEFAULT NULL,
@@ -1243,7 +1243,7 @@ CREATE TABLE `config` (
   KEY `config_type_id` (`type_id`),
   CONSTRAINT `fk_config_field_id` FOREIGN KEY (`field_id`) REFERENCES `lu_config_field` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_config_type_id` FOREIGN KEY (`type_id`) REFERENCES `lu_config_type` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=783 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=785 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -7001,6 +7001,28 @@ CREATE TABLE `socialstream_post` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `socs_import_log`
+--
+
+DROP TABLE IF EXISTS `socs_import_log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `socs_import_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `run_id` varchar(255) NOT NULL,
+  `script` varchar(255) NOT NULL,
+  `start_at` datetime NOT NULL,
+  `finish_at` datetime DEFAULT NULL,
+  `status` enum('running','complete','error') NOT NULL,
+  `error_message` text DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `finish_at_idx` (`finish_at`,`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `sportsfixtures_coach`
 --
 
@@ -8198,7 +8220,7 @@ CREATE TABLE `tour_audience_role` (
   CONSTRAINT `tour_audience_role_moderator_user_id_fk` FOREIGN KEY (`moderator_user_id`) REFERENCES `user` (`id`),
   CONSTRAINT `tour_audience_role_role_id_fk` FOREIGN KEY (`role_id`) REFERENCES `groups` (`id`),
   CONSTRAINT `tour_audience_role_tour_uuid_fk` FOREIGN KEY (`tour_uuid`) REFERENCES `tour` (`uuid`)
-) ENGINE=InnoDB AUTO_INCREMENT=110 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=124 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -8839,7 +8861,7 @@ CREATE TABLE `user_qualification` (
   UNIQUE KEY `unique_user_qualification` (`user_id`,`qualification_id`),
   KEY `idx_user_id` (`user_id`),
   KEY `idx_qualification_id` (`qualification_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -9395,4 +9417,4 @@ CREATE TABLE `wikiRevision` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2026-06-18  4:22:33
+-- Dump completed on 2026-06-24  3:33:33
