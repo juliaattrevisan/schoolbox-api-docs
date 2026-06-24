@@ -61,6 +61,14 @@
 
                             {% for capabilityId, capabilityData in rubricInstanceData.capabilities %}
                                 {% set gridColspan = gridColspan + capabilityData.indicators|length %}
+
+                                {# If the grid specified a meaningful Capability Mark Type then we need to inject another
+                                 # column in, called "Overall', which will house the capability mark as if it were an
+                                 # indicator; increment an extra column for each capability
+                                 #}
+                                {% if rubricInstanceData.isMarkPerCapability %}
+                                    {% set gridColspan = gridColspan + 1 %}
+                                {% endif %}
                             {% endfor %}
 
                             <th colspan="{{ gridColspan }}" class="markdown">
@@ -71,7 +79,14 @@
                     <tr>
                         {% for rubricInstanceId, rubricInstanceData in grids %}
                             {% for capabilityId, capabilityData in rubricInstanceData.capabilities %}
-                                <th colspan="{{ capabilityData.indicators|length }}" class="markdown">
+                                {% set indicatorColspan = capabilityData.indicators|length %}
+
+                                {# Increase the colspan to support the Capability Mark column that might be here #}
+                                {% if rubricInstanceData.isMarkPerCapability %}
+                                    {% set indicatorColspan = indicatorColspan + 1 %}
+                                {% endif %}
+
+                                <th colspan="{{ indicatorColspan }}" class="markdown">
                                     {{ capabilityData.name|markdown }}
                                 </th>
                             {% endfor %}
@@ -85,6 +100,15 @@
                                         {{ indicatorData.name|markdown }}
                                     </th>
                                 {% endfor %}
+
+                                {# This is the Capability Mark column, if supported by the grid
+                                 # It's basically a hardcoded pseudo-indicator
+                                 #}
+                                {% if rubricInstanceData.isMarkPerCapability %}
+                                    <th class="markdown">
+                                        <span title="Capability mark">Overall</span>
+                                    </th>
+                                {% endif %}
                             {% endfor %}
                         {% endfor %}
                     </tr>
@@ -144,6 +168,26 @@
                                             {% endif %}
                                         </td>
                                     {% endfor %}
+
+                                    {# This is the Capability Mark column, if supported by the grid
+                                     # It's basically a hardcoded pseudo-indicator
+                                     #}
+                                    {% if rubricInstanceData.isMarkPerCapability %}
+                                        {% set publishedMarks = studentMarks[user.id].gridData[assessment.id][rubricInstanceId].capabilities[capabilityId].published ?? null %}
+                                        {% set draftMarks = studentMarks[user.id].gridData[assessment.id][rubricInstanceId].capabilities[capabilityId].draft ?? null %}
+
+                                        <td>
+                                            {# Published Marks #}
+                                            {% if publishedMarks is not null and publishedMarks.humanReadableMark is not null %}
+                                                <p data-actual-mark>{{ publishedMarks.humanReadableMark }}</p>
+                                            {% endif %}
+
+                                            {# Draft Marks #}
+                                            {% if draftMarks is not null and draftMarks.humanReadableMark is not null %}
+                                                <p data-draft-mark>{{ draftMarks.humanReadableMark }}</p>
+                                            {% endif %}
+                                        </td>
+                                    {% endif %}
                                 {% endfor %}
                             {% endfor %}
                         </tr>
