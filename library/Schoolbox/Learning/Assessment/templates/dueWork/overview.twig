@@ -163,7 +163,7 @@
                                                 {% set max = rubricInstanceData.capabilities[capabilityId].indicators[indicatorId].max ?? null %}
 
                                                 {% if max and max > 0 %}
-                                                    <p data-draft-mark>{{ draftMarks.selectedDescriptorValue|round }} / {{ max }}</p>
+                                                    <p class="meta" data-draft-mark>{{ draftMarks.selectedDescriptorValue|round }} / {{ max }}</p>
                                                 {% endif %}
                                             {% endif %}
                                         </td>
@@ -184,7 +184,7 @@
 
                                             {# Draft Marks #}
                                             {% if draftMarks is not null and draftMarks.humanReadableMark is not null %}
-                                                <p data-draft-mark>{{ draftMarks.humanReadableMark }}</p>
+                                                <p class="meta" data-draft-mark>{{ draftMarks.humanReadableMark }}</p>
                                             {% endif %}
                                         </td>
                                     {% endif %}
