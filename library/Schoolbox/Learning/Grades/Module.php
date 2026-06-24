@@ -14,7 +14,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error;
@@ -168,7 +167,6 @@ class Module extends BaseModule
             $this->injector->get('assessmentDataSource'),
             $this->getMapperFactory()->get(Folder\Mapper::class),
             $this->getMapperFactory()->get(Term\Mapper::class),
-            $this->getMapperFactory()->get(RubricDataSource::class),
             $this->getMapperFactory()->get(FilterSelection\Mapper::class),
             $this->getMapperFactory()->get(Access::class),
             $this->injector->get('filters.assessmentIdFinder'),
