@@ -16,12 +16,12 @@ import AulFilters from "./aul-filters.vue";
 import AulSessionInfo from "./aul-session-info.vue";
 import AulSessionList from "./aul-session-list.vue";
 
+const PAGE_SIZE = 30;
+
 interface Props {
     routeSearch: string;
     features: Record<AiFeature, { title: string }>;
 }
-
-const PAGE_SIZE = 30;
 
 const props = defineProps<Props>();
 

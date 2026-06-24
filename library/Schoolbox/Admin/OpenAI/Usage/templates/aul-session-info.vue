@@ -5,13 +5,13 @@ import { AiLogFormat } from "./payload";
 import type { AiFeature, AiSession, AiSessionLogApiResponse } from "./payload";
 import AulAgentChat from "./aul-agent-chat.vue";
 
+const UNKNOWN_FEATURE_TEXT = "Unknown Feature";
+
 interface Props {
     session: AiSession<TLogFormat, TFeature>;
     sessionInfo: AiSessionLogApiResponse<TLogFormat> | null;
     features: Record<AiFeature, { title: string }>;
 }
-
-const UNKNOWN_FEATURE_TEXT = "Unknown Feature";
 
 const props = defineProps<Props>();
 

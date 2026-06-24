@@ -2,13 +2,13 @@
 import type { AiFeature, AiSession, AiSessionId } from "./payload";
 import AulModerationIndicator from "./aul-moderation-indicator.vue";
 
+const UNKNOWN_FEATURE_TEXT = "Unknown Feature";
+
 interface Props {
     features: Record<AiFeature, { title: string }>;
     sessions: AiSession[];
     selectedSessionId: AiSessionId | null;
 }
-
-const UNKNOWN_FEATURE_TEXT = "Unknown Feature";
 
 const props = defineProps<Props>();
 const emit = defineEmits(["openSessionDetails"]);
