@@ -11,7 +11,7 @@ import locale from "@js/terminology/rosettaStone";
 import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 import type { MarkScheme } from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/markScheme";
 import type { User } from "@schoolboxLibrary/types/User";
-import { applyMarkScheme, getPercentage } from "./rubricUtils";
+import { applyMarkScheme, deriveRubricMark, getPercentage } from "./rubricUtils";
 import type { RubricGrid, RubricMarkedGrid } from "./types";
 import RmGridCapability from "./rm-grid-capability.vue";
 import { translateMarkedGridToFormPayload } from "./payload";
@@ -58,28 +58,7 @@ const capabilities = window.Vue.computed(() => {
 /**
  * The mark of this rubric derived from the current scaled capability marks
  */
-const derivedRubricMark = window.Vue.computed(() => {
-    let total = 0;
-    let hasMeaningfulMark = false;
-
-    for (const capability of rubricMarkedGrid.value.capabilities) {
-        if (capability.scaledMark !== null) {
-            total += capability.scaledMark;
-            hasMeaningfulMark = true;
-        }
-    }
-
-    if (!hasMeaningfulMark) {
-        return null;
-    }
-
-    // if the total is not a whole number, round to 2dp
-    if (total % 1 !== 0) {
-        total = parseFloat(total.toFixed(2));
-    }
-
-    return total;
-});
+const derivedRubricMark = window.Vue.computed(() => deriveRubricMark(rubricMarkedGrid.value));
 
 /**
  * When a capability mark is updated, update the grid total
