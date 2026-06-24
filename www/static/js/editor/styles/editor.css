@@ -6,8 +6,8 @@
  * overwrite existing ckeditor vars
  */
 :root {
-    /* Remove the border radius */
-    --ck-border-radius: 0px;
+    /* Match the field corner radius */
+    --ck-border-radius: var(--sbx-config-field-corner-radius, 0px);
 
     /* -- Border colours */
     --ck-color-toolbar-border: var(--sbx-color-border, var(--form-border-color));
@@ -63,14 +63,8 @@
     --ck-content-todo-list-checkmark-size: 1.5rem;
 }
 
-/* CKEditor border radius follows Advanced UI field roundness */
-.sbx-body,
-.sbx-body .ck-body-wrapper {
-    --ck-border-radius: var(--sbx-config-field-corner-radius, 0);
-}
-
 /* Keep table insert grid buttons in the toolbar square */
-.sbx-body .ck.ck-toolbar .ck-insert-table-dropdown-grid-box {
+.ck.ck-toolbar .ck-insert-table-dropdown-grid-box {
     border-radius: 0;
 }
 
