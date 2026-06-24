@@ -25,6 +25,7 @@ const FORMAT_DISPLAY_DATE = "ddd Do MMM";
 const FORMAT_DISPLAY_TIME = "h:mma";
 const FORMAT_DISPLAY_DATETIME = "ddd Do MMM, h:mma";
 const FORMAT_DISPLAY_WEEK_DAY = "ddd D/M";
+const DEFAULT_BOOKING_STATUS_FILTERS = [1, 2];
 
 export default {
     components: {
@@ -182,6 +183,12 @@ export default {
             this.$refs.filter.open();
         },
 
+        getStatusFiltersForRequest() {
+            return this.config.selectedFilters.length > 0
+                ? this.config.selectedFilters
+                : DEFAULT_BOOKING_STATUS_FILTERS;
+        },
+
         /**
          * Event source.
          * @see https://fullcalendar.io/docs/events-function
@@ -194,7 +201,7 @@ export default {
             const params = {
                 start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
                 end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
-                status: this.config.selectedFilters,
+                status: this.getStatusFiltersForRequest(),
             };
             fetch(`${this.config.resourceBookingEndpoint}?${getSearchString(params)}`, {
                 headers: {
