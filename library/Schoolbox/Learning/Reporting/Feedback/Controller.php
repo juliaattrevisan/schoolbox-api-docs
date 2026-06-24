@@ -26,6 +26,7 @@ use Schoolbox\Learning\Assessment\Reporting\Model;
 use Schoolbox\Learning\Assessment\Reporting\Feedback\Model as Feedback;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\TokenReplacer;
 use Schoolbox\User;
 use Twig\Error\Error;
 
@@ -267,7 +268,9 @@ class Controller extends Base
         /* Feedback Comments are optional based on the Reporting toggle
          */
         if ($assessment->getFeedbackCommentsEnable()) {
-            $feedback->setComment($post['comment'] ?? '');
+            $feedback->setComment(
+                (new TokenReplacer\Student(new TokenReplacer\Simple()))->replace($post['comment'] ?? '', $learner)
+            );
         }
 
         /** Get mark schemes
@@ -362,6 +365,7 @@ class Controller extends Base
             'normalisedMark'              => $feedback->getNormalisedMark(),
             'humanReadableMark'           => $feedback->getHumanReadableMark(),
             'humanReadableInstructorMark' => $feedback->getHumanReadableInstructorMark(),
+            'comment'                     => $feedback->getComment(),
             'plan' => [
                 'isDynamic' => $plan->getIsDynamic(),
                 'name' => $plan->getName(),
