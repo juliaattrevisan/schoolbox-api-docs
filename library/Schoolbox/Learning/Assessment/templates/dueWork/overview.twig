@@ -57,7 +57,7 @@
                              #
                              # Look ahead to find out how many exist
                              #}
-                            {% set gridColspan = 1 %}
+                            {% set gridColspan = 0 %}
 
                             {% for capabilityId, capabilityData in rubricInstanceData.capabilities %}
                                 {% set gridColspan = gridColspan + capabilityData.indicators|length %}
