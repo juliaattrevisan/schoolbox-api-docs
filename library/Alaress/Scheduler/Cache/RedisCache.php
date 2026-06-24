@@ -133,6 +133,7 @@ class RedisCache implements ICache
                     )
                 );
                 $this->redis->del($itemKey);
+                $this->redis->srem($this->getNamespacedKey('index'), $itemKey);
                 continue;
             }
 
