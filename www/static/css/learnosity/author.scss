@@ -1338,3 +1338,12 @@ body.sbx-body .island section:not(:has(sbx-pop-out)) {
     overflow: visible;
     background: #fff;
 }
+
+/* update the review screen input */
+body.sbx-body .lrn.lrn-assess .app-panel.review-screen .panel-filters .lrn-assess-input {
+    position: relative;
+}
+body.sbx-body .lrn-assess-switch .lrn-assess-switch-trigger:before,
+body.sbx-body .lrn-assess-switch input.lrn-assess-input[aria-checked="true"] + .lrn-assess-switch-trigger:after {
+    display: none;
+}
