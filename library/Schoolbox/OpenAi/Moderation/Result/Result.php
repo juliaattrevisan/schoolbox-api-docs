@@ -101,6 +101,7 @@ class Result implements JsonSerializable
 
     /**
      * @inheritDoc
+     * @see /library/Schoolbox/Admin/OpenAI/Usage/templates/moderationResult.ts
      */
     public function jsonSerialize(): array
     {

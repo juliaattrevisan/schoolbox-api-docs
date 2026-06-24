@@ -125,7 +125,7 @@ const sessionFeed = window.Vue.computed<ReturnType<typeof acStore.parseFeed>>(()
             data: {
                 side: AgentChatMessageType.RESPONSE,
                 severity: eventSeverity,
-                title: `Moderation identified ${event.result.categories.join(", ")}:`,
+                title: `Moderation identified ${event.result.categories.map((c) => c.category).join(", ")}:`,
                 message: eventDescription,
             },
         });

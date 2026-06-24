@@ -1,5 +1,6 @@
 import type { DateRFC3339 } from "@js/util/dateUtils";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
+import type { AiModerationResult } from "./moderationResult";
 
 /**
  * Possible statuses for an AI Interaction Moderation Event.
@@ -25,24 +26,13 @@ export const STATUS_LABELS: Record<AiModerationStatus, string> = {
 };
 
 /**
- * A subset of an AI moderation result's data
- * @see /library/Schoolbox/OpenAi/Moderation/Result/Result.php
- */
-type AiModerationEventResult = {
-    /** A short plain English summary explaining why the interaction was or was not flagged. */
-    summary: string;
-    /** A list of detected concern categories. An empty array if no concerns are found. */
-    categories: string[];
-};
-
-/**
  * Information about a particular AI Interaction Moderation event.
  * @see /library/Schoolbox/OpenAi/Moderation/Event/Translator/ModelToArray.php
  */
 export type AiModerationEvent = {
     id: number;
     status: AiModerationStatus;
-    result: AiModerationEventResult;
+    result: AiModerationResult;
     reviewedBy: UserAuthor | null;
     resolvedBy: UserAuthor | null;
     createdAt: DateRFC3339;
