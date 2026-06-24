@@ -13,6 +13,8 @@ import { useSkinConfigContrastValidation } from "./composable/useSkinConfigContr
 import { useSkinConfigState } from "./composable/useSkinConfigState";
 import { useSkinPreview } from "./composable/useSkinPreview";
 
+const sonarImgSrc = `${window.cdnPrefix}/images/tour/26.1/26_1_SonarUI_AdminTile.png`;
+
 const props = defineProps<{
     routes: Routes;
     configs: SkinConfigData;
@@ -170,12 +172,15 @@ window.Vue.onMounted(() => {
 
 <template>
     <div data-test="skin-config-container" class="l-flex-col l-gap-l l-pad-m--horiz">
-        <div class="alert-box warning f-no-margins">
-            <strong>Sonar UI is now available.</strong> We encourage you to enable it on your
-            <strong>Staging server</strong> now to review your skin settings and custom CSS before it becomes the only
-            option in <strong>v26.2.</strong><br />
-            <br />
-            <a href="/help/sso/send?returnUrl=/homepage/5808" target="_blank">Read the Transition Guide</a>
+        <div class="l-flex-col l-gap-m">
+            <img :src="sonarImgSrc" alt="" class="l-c-cr" aria-hidden="true" />
+            <p class="t-visually-hidden">
+                Sonar UI is now available. We encourage you to enable it on your Staging server now to review your skin
+                settings and custom CSS before it becomes the only option in v26.2.
+            </p>
+            <a href="/help/sso/send?returnUrl=/homepage/5808" target="_blank" rel="noopener noreferrer" class="button"
+                >Read the Transition Guide</a
+            >
         </div>
         <div v-if="loadError" data-test="skin-config-load-error">
             <request-error :further-info="loadError" />
