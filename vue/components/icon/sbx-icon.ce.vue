@@ -1247,7 +1247,7 @@ function alertInvalidIconName(): false {
             <svg
                 v-else-if="props.name === 'paperly'"
                 class="sbx-icon__svg"
-                viewBox="0 0 20 20"
+                viewBox="3 1.5 14 17"
                 xmlns="http://www.w3.org/2000/svg"
             >
                 <path
