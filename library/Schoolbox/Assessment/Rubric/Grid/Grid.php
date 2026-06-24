@@ -333,7 +333,7 @@ class Grid
      */
     public function getCapabilityMarkScheme(): IMarkScheme
     {
-        return $this->markSchemeFactory->spawnForCapability($this->getAssessment());
+        return $this->markSchemeFactory->spawnForCapability($this->getRubricInstance());
     }
 
 

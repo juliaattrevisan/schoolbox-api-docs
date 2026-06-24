@@ -318,6 +318,10 @@ class Progression
         $markSchemeFactory = new MarkSchemeFactory();
 
         while ($row = $descriptorStatement->fetch(\PDO::FETCH_ASSOC)) {
+            /* TODO figure out what this screen does
+             */
+            continue;
+
             $specificationId = $this->tuples[$row['assessment_id']];
 
             $longitude[$row['capability_id']]['name']                        = $row['capability_name'];
@@ -328,7 +332,11 @@ class Progression
             // Create the cap mark
             if (!isset($longitude[$row['capability_id']]['mark'][$specificationId]) && $row['capability_max_value'] > 0 && isset($this->assessments[$row['assessment_id']])) {
                 $longitude[$row['capability_id']]['mark'][$specificationId] = $markSchemeFactory->spawnForCapability(
-                    $this->assessments[$row['assessment_id']],
+                    // $this->assessments[$row['assessment_id']],
+
+                    /* TODO somehow slap in a Rubric Instance somehow
+                     */
+
                     (float)$row['capability_max_value']
                 )->getHumanReadableMark(($row['capability_value'] / $row['capability_max_value']) * 100);
             }

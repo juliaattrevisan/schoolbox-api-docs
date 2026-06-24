@@ -110,7 +110,7 @@ class Generator
         foreach ($capabilityMarks as $capabilityId => $capabilityMark) {
             $capabilityUsageObject = $grid->retrieveCapabilityUsage($rowSet->retrieveCapability($capabilityId));
             $capabilityMaxValue    = $capabilityUsageObject->getMaxValue();
-            $capabilityMarkScheme  = $markSchemeFactory->spawnForCapability($grid->getAssessment(), $capabilityMaxValue);
+            $capabilityMarkScheme  = $markSchemeFactory->spawnForCapability($grid->getRubricInstance(), $capabilityMaxValue);
             $capabilityMarkObject  = new RubricMarkedGrid\CapabilityMark(
                 $capabilityUsageObject,
                 $capabilityMarkScheme
