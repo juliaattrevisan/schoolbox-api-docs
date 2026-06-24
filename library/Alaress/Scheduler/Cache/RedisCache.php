@@ -17,11 +17,25 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Schedule\Broker;
-use Schoolbox\Realtime\Schedule\Event\CrudEventInterface;
 
+/**
+ * Cache triggers in Redis.
+ */
 class RedisCache implements ICache
 {
-    const EXPIRY_WINDOW = 345600; // 60s * 60m * 24h * 4d
+    /**
+     * The expiry time for triggers cached by `storeCache`: currently set to 4
+     * days (60 * 60 * 24 * 4).
+     *
+     * Made public, because the schedule daemon must not schedule a timer for a
+     * trigger which would happen after this date: otherwise, the trigger may
+     * expire from cache when its timer runs.
+     *
+     * (The trigger is still written to cache, and can be restored and refreshed
+     * by `restoreSchedule`: it's assumed that the schedule daemon is restarted
+     * on a higher frequency than this window.)
+     */
+    public const int EXPIRY_WINDOW = 345600;
 
     /**
      * @param ClientInterface $redis
