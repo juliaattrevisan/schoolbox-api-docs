@@ -11,6 +11,7 @@ namespace Alaress\Scheduler\Cache;
 
 use Alaress\Async\Queue\RedisQueue;
 use Alaress\Scheduler\Trigger\TriggerInterface;
+use Alaress_Date_Format;
 use Predis;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
@@ -84,8 +85,8 @@ class RedisCache implements ICache
         }
 
         // setup ready to go
-        $i = 0;
-
+        $i                         = 0;
+        $restoreWindowMinTimestamp = time() - self::RESTORE_WINDOW;
         foreach ($itemKeys as $itemKey) {
             $this->log->debug(sprintf("Restoring %s", $itemKey));
 
@@ -116,6 +117,22 @@ class RedisCache implements ICache
                         is_object($trigger) ? get_class($trigger) : 'non-object',
                     )
                 );
+                continue;
+            }
+
+            // Check trigger's timestamp:
+            // if the trigger would've happened before the restore window,
+            // don't restore it (and delete it)
+            if ($trigger->getTimestamp() < $restoreWindowMinTimestamp) {
+                $this->log->warning(
+                    sprintf(
+                        'Timestamp for event in key %s was too long ago: refusing to restore (timestamp: %s, restore threshold: %s)',
+                        $itemKey,
+                        Alaress_Date_Format::newFromTimestamp($trigger->getTimestamp())->toRfc3339String(),
+                        Alaress_Date_Format::newFromTimestamp($restoreWindowMinTimestamp)->toRfc3339String(),
+                    )
+                );
+                $this->redis->del($itemKey);
                 continue;
             }
 
