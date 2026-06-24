@@ -24,8 +24,8 @@ use Schoolbox\Realtime\Schedule\Broker;
 class RedisCache implements ICache
 {
     /**
-     * The expiry time for triggers cached by `storeCache`: currently set to 4
-     * days (60 * 60 * 24 * 4).
+     * The time window for how long a trigger will be cached by `storeCache`:
+     * currently set to 4 days (60 * 60 * 24 * 4).
      *
      * Made public, because the schedule daemon must not schedule a timer for a
      * trigger which would happen after this date: otherwise, the trigger may
