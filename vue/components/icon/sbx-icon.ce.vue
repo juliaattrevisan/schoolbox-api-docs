@@ -1260,7 +1260,7 @@ function alertInvalidIconName(): false {
             <svg
                 v-else-if="props.name === 'paperly-excursions'"
                 class="sbx-icon__svg"
-                viewBox="0 0 20 20"
+                viewBox="1.5 1.5 17 17"
                 xmlns="http://www.w3.org/2000/svg"
             >
                 <path
@@ -1291,7 +1291,7 @@ function alertInvalidIconName(): false {
             <svg
                 v-else-if="props.name === 'paperly-forms'"
                 class="sbx-icon__svg"
-                viewBox="0 0 20 20"
+                viewBox="1.5 1.5 17 17"
                 xmlns="http://www.w3.org/2000/svg"
             >
                 <path
@@ -1322,7 +1322,7 @@ function alertInvalidIconName(): false {
             <svg
                 v-else-if="props.name === 'paperly-pti'"
                 class="sbx-icon__svg"
-                viewBox="0 0 20 20"
+                viewBox="1.5 1.5 17 17"
                 xmlns="http://www.w3.org/2000/svg"
             >
                 <path
@@ -1368,7 +1368,7 @@ function alertInvalidIconName(): false {
             <svg
                 v-else-if="props.name === 'paperly-details'"
                 class="sbx-icon__svg"
-                viewBox="0 0 20 20"
+                viewBox="1.5 1.5 17 17"
                 xmlns="http://www.w3.org/2000/svg"
             >
                 <path
