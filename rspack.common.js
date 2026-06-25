@@ -7,6 +7,7 @@
  */
 
 const path = require("path");
+const { CssExtractRspackPlugin } = require("@rspack/core");
 
 module.exports = {
     entry: {
@@ -303,7 +304,7 @@ module.exports = {
         //Sass (leave at the bottom)
         core: "./www/static/css/core/core.scss",
         "sbx-core": "./www/static/css/core/sbx-core.scss",
-        schoolboxCkStyles: "./www/static/css/core/schoolbox-ck-content.scss",
+        "schoolbox-ck-content": "./www/static/css/core/schoolbox-ck-content.scss",
         learnosity: "./www/static/css/learnosity/learnosity.scss",
     },
     output: {
@@ -387,14 +388,7 @@ module.exports = {
                     },
                     {
                         use: [
-                            {
-                                loader: "file-loader", // to emit the css `main` and `editor` into the /core directory
-                                options: {
-                                    name: "[name].css",
-                                    outputPath: "../../css/core/",
-                                },
-                            },
-                            { loader: "extract-loader" },
+                            CssExtractRspackPlugin.loader,
                             {
                                 loader: "css-loader",
                                 options: {
@@ -411,8 +405,13 @@ module.exports = {
             },
         ],
     },
+    plugins: [
+        new CssExtractRspackPlugin({
+            filename: "../../css/core/[name].css",
+        }),
+    ],
     experiments: {
-        css: false, // Leave off for now long term, as our CSS/SCSS is now pretty old, and rspack plans to make this default to true in the future https://rspack.rs/guide/tech/css
+        css: false, // Disabled — using CssExtractRspackPlugin for CSS extraction instead https://rspack.rs/guide/tech/css
     },
     externals: {
         vue: "Vue", // as Vue is loaded separately via a <script> tag, we need to notify webpack that it is available globally, so any .vue files will still bundle as expected
