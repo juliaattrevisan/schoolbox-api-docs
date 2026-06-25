@@ -826,7 +826,7 @@ class Mapper extends BaseMapper
                     (new IBSubjectModel())
                         ->setId((int) $row['subject_id'])
                         ->setName((string) $row['subject_name'])
-                        ->setTranscriptName((string) $row['transcript_name'])
+                        ->setTranscriptName($row['transcript_name'] ?? null)
                 )
                 ->setLanguages(new GenericCollection(GroupSubjectLanguageModel::class));
 
