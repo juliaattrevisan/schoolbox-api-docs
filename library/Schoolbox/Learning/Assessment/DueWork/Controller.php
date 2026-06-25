@@ -670,6 +670,8 @@ class Controller extends Assessment\Controller
         $folder = $assessment->getBaseContext()->getFolder();
 
         // Sort participant by lastname, firstname, and id
+        /* TODO surely we could reorder this inside OverallDataset::insertFolderMembers() instead...
+         */
         $participantUsers = $assessment->getParticipantUsers()->sortByCallback(
             static function (User $participantA, User $participantB) {
                 return strnatcasecmp($participantA->getLastname() ?? '', $participantB->getLastname() ?? '')
@@ -735,14 +737,38 @@ class Controller extends Assessment\Controller
         if (!$assessment->getRubricInstances()->count()) {
             throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_PAGE_NOT_FOUND);
         }
-//
-//        $rubricGrid = $this->rubricMapper->retrieveGrid($assessment, false);
-//        $assessment = $this->participantMapper->loadParticipationIntoAssessment($assessment);
-//
-//
-//        /** @var Model $assessment */
-//        $content  = $this->array2csv($this->collateResultSquare($rubricGrid->isMarkPerCapability(), $rubricGrid, $assessment->getAllParticipants()));
-//
+
+        // Sort participant by lastname, firstname, and id
+        /* TODO surely we could reorder this inside OverallDataset::insertFolderMembers() instead...
+         */
+        $participantUsers = $assessment->getParticipantUsers()->sortByCallback(
+            static function (User $participantA, User $participantB) {
+                return strnatcasecmp($participantA->getLastname() ?? '', $participantB->getLastname() ?? '')
+                    ?: strnatcasecmp($participantA->getFirstname(), $participantB->getFirstname())
+                        ?: strnatcasecmp($participantA->getId(), $participantB->getId());
+            }
+        );
+
+        /* The folder where this assessment lives can be found in the base context instance.
+         */
+        $folder = $assessment->getBaseContext()->getFolder();
+
+        /* Brutal reuse of the rubric markbook calcs
+         */
+        [
+            $assessments,
+            $exclusions,
+            $studentMarks,
+            $overallMarks
+        ] = (new OverallDataset(
+            $this->getDi()->get('databaseInternal'),
+            new Decimal(),
+            new MarkScheme\TotalMarkFractional(),
+            new \Schoolbox\Learning\MarkScheme\Factory($this->getConfigLoader()),
+            $this->filterMapper,
+            UserAccessMapper::getInstance(), // TODO inject this, which is amega change in the constructor across all learning activities' controllers lol
+            $this->routeGenerator
+        ))->buildMarkbookData($folder, [], [$assessment->getId()]);
 
         $content = '';
 
@@ -754,13 +780,12 @@ class Controller extends Assessment\Controller
             $assessment->getTitle()
         ), 'csv');
 
-
-        $this->response = $this->responseFromContent($content)
-            ->withHeader('Pragma', ' ')
-            ->withHeader('Cache-Control', ' ')
-            ->withHeader('Content-Type', 'text/csv')
-            ->withHeader('Content-Length', strlen($content))
-            ->withHeader('Content-Disposition', "attachment; filename=\"{$filename}.csv\"");
+//        $this->response = $this->responseFromContent($content)
+//            ->withHeader('Pragma', ' ')
+//            ->withHeader('Cache-Control', ' ')
+//            ->withHeader('Content-Type', 'text/csv')
+//            ->withHeader('Content-Length', strlen($content))
+//            ->withHeader('Content-Disposition', "attachment; filename=\"{$filename}.csv\"");
     }
 
 
