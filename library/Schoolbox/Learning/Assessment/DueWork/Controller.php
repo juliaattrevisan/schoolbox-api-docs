@@ -699,7 +699,7 @@ class Controller extends Assessment\Controller
         ))->buildMarkbookData($folder, [], [$assessment->getId()]);
 
         $this->response = $this->responseFromTemplate(
-            '@learningAssessment/dueWork/overview.twig',
+            '@rubric/overview.twig',
             [
                 'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([
                         $assessment->getTitle(),
