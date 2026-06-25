@@ -50,12 +50,19 @@ use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 use Schoolbox\Resource\Folder\Code\Model as FolderCodeModel;
 use Schoolbox\UserMapper;
 
+/**
+ * Handles the IB admin screens and JSON APIs for configuration and candidate
+ * registration workflows.
+ */
 class Controller extends ConfigController
 {
-    /* General Configuration ID
+    /**
+     * Pseudo-category ID used by the frontend for school-wide IB settings.
      */
     private const int GENERAL_CATEGORY_ID = 0;
-    /* Maximum academic year length
+
+    /**
+     * Maximum IB registration academic year length, for example "2026".
      */
     private const int REGISTRATION_SESSION_ACADEMIC_YEAR_MAX_LENGTH = 4;
     private const string CONFIRMATION_SECTION_CANDIDATE = 'candidate';
@@ -65,6 +72,10 @@ class Controller extends ConfigController
         self::CONFIRMATION_SECTION_SUBJECT,
     ];
 
+    /**
+     * @param External_ClassInterface $externalClass External SIS class lookup service.
+     * @param \External_UserInterface $externalUser External SIS student lookup service.
+     */
     public function __construct(
         ConfigMapper $configMapper,
         private IBGroupMapper $groupMapper,
@@ -89,7 +100,7 @@ class Controller extends ConfigController
     }
 
     /**
-     * DP Subject Configuration page
+     * Render the IB subject and general configuration page.
      *
      * @throws RouteNotFound|\Twig\Error\Error
      * @api GET /adminv2/international-baccalaureate/configuration
@@ -99,7 +110,7 @@ class Controller extends ConfigController
         $pageCurrent = '/adminv2/international-baccalaureate/configuration';
         $defaultLanguage = $this->getDefaultLanguage();
 
-        // Add General Configuration tab manually
+        // Add the school-wide General Configuration tab before subject groups.
         $categories = [
             [
                 'id' => self::GENERAL_CATEGORY_ID,
@@ -108,7 +119,7 @@ class Controller extends ConfigController
             ],
         ];
 
-        // Fetch IB groups from database
+        // Each IB group becomes a configuration category in the UI.
         $groupModels = $this->groupMapper->findAll();
 
         /** @var IBGroupModel $groupModel */
@@ -141,7 +152,7 @@ class Controller extends ConfigController
     }
 
     /**
-     * Search the IB language list using a cursor.
+     * Search the IB language list for async select fields.
      *
      * @api GET /adminv2/international-baccalaureate/configuration/api/languages
      */
@@ -189,7 +200,7 @@ class Controller extends ConfigController
     }
 
     /**
-     * Search class codes from folder_code.
+     * Search active folder class codes for subject-language configuration.
      *
      * @api GET /adminv2/international-baccalaureate/configuration/api/class-codes
      */
@@ -234,7 +245,7 @@ class Controller extends ConfigController
     }
 
     /**
-     * Get student counts for IB group subjects based on their stored class codes.
+     * Count external SIS students in configured class codes for each IB subject.
      *
      * @api GET /adminv2/international-baccalaureate/configuration/api/student-count
      */
@@ -251,7 +262,7 @@ class Controller extends ConfigController
             return;
         }
 
-        // Single ORM query for all language rows across all requested subjects
+        // Load all configured subject-language class-code rows in one query.
         $allLanguageRows = $this->groupSubjectLanguageMapper->findByColumn(
             'group_subject_id',
             $groupSubjectIds
@@ -275,7 +286,7 @@ class Controller extends ConfigController
             ]));
         }
 
-        // Build response
+        // Return both per-language counts and the total unique student count.
         $results = [];
         foreach ($groupSubjectIds as $gsId) {
             $byLanguage = [];
@@ -301,7 +312,7 @@ class Controller extends ConfigController
     }
 
     /**
-     * Get configuration data for a specific category
+     * Return saved configuration values for a category tab.
      *
      * @api GET /adminv2/international-baccalaureate/configuration/api/{categoryId}
      */
@@ -309,7 +320,8 @@ class Controller extends ConfigController
     {
         $configurations = [];
 
-        if ($categoryId === self::GENERAL_CATEGORY_ID) { // General tab - load from preloaded config
+        if ($categoryId === self::GENERAL_CATEGORY_ID) {
+            // General settings are stored in config rather than IB subject tables.
             $configLoader = $this->getConfigLoader();
 
             $configurations = [
@@ -336,7 +348,7 @@ class Controller extends ConfigController
     }
 
     /**
-     * Get subjects for a specific category
+     * Return subject-language configuration rows for an IB group.
      *
      * @api GET /adminv2/international-baccalaureate/configuration/api/subjects/{groupId}
      */
@@ -398,8 +410,7 @@ class Controller extends ConfigController
     }
 
     /**
-     * Get default language
-     * @return LanguageModel|null
+     * Return the preferred default language for new subject-language rows.
      */
     private function getDefaultLanguage(): ?LanguageModel
     {
@@ -415,7 +426,7 @@ class Controller extends ConfigController
     }
 
     /**
-     * Save configuration data
+     * Save school-wide IB settings or subject-language configuration rows.
      *
      * @api POST /adminv2/international-baccalaureate/configuration/api/save
      */
@@ -442,6 +453,8 @@ class Controller extends ConfigController
     }
 
     /**
+     * Replace the subject-language configuration for one IB group.
+     *
      * @param array<string, mixed> $data
      */
     private function saveSubjectLanguageConfiguration(array $data): void
@@ -514,6 +527,9 @@ class Controller extends ConfigController
         }
     }
 
+    /**
+     * Restrict config writes to the IB module namespace.
+     */
     private function buildIbConfigPredicate(): Predicate\Builder
     {
         return $this->getConfigMapper()
@@ -522,6 +538,8 @@ class Controller extends ConfigController
     }
 
     /**
+     * Extract configured class-code strings from a subject-language row.
+     *
      * @return string[]
      */
     private function getClassCodeValues(GroupSubjectLanguageModel $language): array
@@ -535,6 +553,8 @@ class Controller extends ConfigController
     }
 
     /**
+     * Count unique external SIS students enrolled in any of the class codes.
+     *
      * @param string[] $classCodes
      */
     private function countStudentsInClassCodes(array $classCodes): int
@@ -561,7 +581,7 @@ class Controller extends ConfigController
     }
 
     /**
-     * Registration Reports page
+     * Render the registration sessions landing page.
      *
      * @throws RouteNotFound|\Twig\Error\Error
      * @api GET /adminv2/international-baccalaureate/registrations
@@ -590,7 +610,7 @@ class Controller extends ConfigController
     }
 
     /**
-     * Diploma Programme Year 2 Registration Report page
+     * Render one registration session report page.
      *
      * @throws RouteNotFound|\Twig\Error\Error
      * @api GET /adminv2/international-baccalaureate/registrations/sessions/{sessionId}
@@ -625,7 +645,7 @@ class Controller extends ConfigController
     }
 
     /**
-     * Manually update candidate numbers for students in this registration report.
+     * Render the manual candidate-number update page for a registration session.
      *
      * @api GET /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/candidates/candidate-numbers
      */
@@ -723,11 +743,9 @@ class Controller extends ConfigController
     }
 
     /**
-     * Get the list of all the registration sessions
+     * Return registration sessions grouped by system purpose.
      *
-     * @return void
      * @api GET /adminv2/international-baccalaureate/registrations/sessions
-     *
      */
     public function getRegistrationSessions(): void
     {
@@ -778,11 +796,9 @@ class Controller extends ConfigController
     }
 
     /**
-     * Create registration sessions
+     * Create a registration session for one system purpose, year, and exam month.
      *
-     * @return void
      * @api POST /adminv2/international-baccalaureate/registrations/sessions
-     *
      */
     public function createRegistrationSession(): void
     {
@@ -809,7 +825,7 @@ class Controller extends ConfigController
             return;
         }
 
-        /* Validation for academic year length - to prevent excessively long values being entered which could cause issues with display and storage.
+        /* Prevent excessively long values that would not display or store well.
          */
         if (mb_strlen($academicYear) > self::REGISTRATION_SESSION_ACADEMIC_YEAR_MAX_LENGTH) {
             $this->response = $this->responseAsJson([
@@ -822,8 +838,8 @@ class Controller extends ConfigController
             return;
         }
 
-        /* Validate system purpose ID and load the system purpose model, as it's needed for creating the registration session.
-         * If the ID is invalid, return an error.
+        /* Load the system purpose model so the registration session can keep a
+         * proper mapper relationship instead of only a raw ID.
          */
         try {
             $systemPurpose = $this->registrationSessionMapper
@@ -884,7 +900,7 @@ class Controller extends ConfigController
     }
 
     /**
-     * Delete a registration session
+     * Soft-delete an empty registration session.
      *
      * @api DELETE /adminv2/international-baccalaureate/registrations/sessions/{sessionId}
      */
@@ -914,7 +930,7 @@ class Controller extends ConfigController
     }
 
     /**
-     * Export students for a registration session as a CSV.
+     * Export current candidate details for a registration session as CSV.
      *
      * @api GET /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/candidates/export/csv
      */
@@ -947,7 +963,7 @@ class Controller extends ConfigController
     }
 
     /**
-     * Get students for a registration session.
+     * Return candidates for a registration session, grouped by workflow status.
      *
      * @api GET /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/candidates
      */
@@ -989,7 +1005,7 @@ class Controller extends ConfigController
     }
 
     /**
-     * Manually override the language selected for a student's enrolled IB subjects.
+     * Override the selected language for a candidate's enrolled IB subjects.
      *
      * @api PUT /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/candidates/{studentId}/languages
      */
@@ -1056,7 +1072,8 @@ class Controller extends ConfigController
                     ->indexBy('id')
                     ->getAll();
 
-            /* Making sure that all the given data are valid before updating
+            /* Validate every requested subject/language before replacing the
+             * saved overrides.
              */
             if (count($groupSubjectsById) !== count($groupSubjectIds) || count($languagesById) !== count($languageIds)) {
                 $this->response = $this->responseAsJson([
@@ -1114,7 +1131,7 @@ class Controller extends ConfigController
     }
 
     /**
-     * Move selected candidates out of preparation.
+     * Move selected candidates from Preparation to Unconfirmed.
      *
      * Dynamic preparation rows are persisted before being transitioned.
      *
@@ -1190,7 +1207,7 @@ class Controller extends ConfigController
     }
 
     /**
-     * Queue selected confirmed candidates for API registration.
+     * Queue selected confirmed or failed candidates for API registration.
      *
      * @api POST /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/register
      */
@@ -1270,10 +1287,10 @@ class Controller extends ConfigController
     }
 
     /**
-     * Resets the given eligible students back to Preparation, clearing their language overrides.
+     * Reset eligible candidates to Preparation and clear language overrides.
+     *
      * Eligible statuses: Unconfirmed, Confirmed, Failed.
      *
-     * @return void
      * @api POST /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/reset-details
      */
     public function sessionResetDetails(RegistrationSessionModel $registrationSession): void
@@ -1335,7 +1352,8 @@ class Controller extends ConfigController
             $transactionStarted = $database->beginTransaction();
 
             $resetIds = array_map(fn($s) => (int) $s->getId(), $studentsToReset);
-            /* Removing the subject language overrides for the given students when resetting their details.
+            /* Language overrides are only meaningful after preparation, so
+             * clearing them returns the candidate to the configured defaults.
              */
             $this->registrationSessionStudentSubjectLanguageMapper->deleteByColumn(
                 'registration_session_student_id',
@@ -1370,7 +1388,8 @@ class Controller extends ConfigController
     }
 
     /**
-     * Mark selected candidates as manually registered in IBIS outside the API workflow.
+     * Mark selected candidates as manually registered outside the API workflow.
+     *
      * Records the staff member and timestamp for audit purposes.
      *
      * @api POST /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/mark-as-manually-registered
@@ -1456,7 +1475,7 @@ class Controller extends ConfigController
     }
 
     /**
-     *  Update a candidate or subject details confirmation checkbox for a registration session student.
+     * Update a candidate or subject details confirmation checkbox.
      *
      * @api PUT /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/candidates/{studentId}/confirmation
      */
@@ -1531,6 +1550,8 @@ class Controller extends ConfigController
     }
 
     /**
+     * Return persisted candidate rows for the manual candidate-number page.
+     *
      * @return RegistrationSessionStudentModel[]
      */
     private function findReportCandidateStudents(int $sessionId): array
@@ -1556,6 +1577,9 @@ class Controller extends ConfigController
     }
 
     /**
+     * Convert candidate rows into the template data needed by the manual
+     * candidate-number page.
+     *
      * @param RegistrationSessionStudentModel[] $students
      * @return array<int, array{userId: int, name: string, ibCandidateNumber: string}>
      */
@@ -1574,6 +1598,8 @@ class Controller extends ConfigController
     }
 
     /**
+     * Load external SIS details used in candidate display and CSV export.
+     *
      * @return array<string, mixed>
      */
     private function findExternalStudent(RegistrationSessionStudentModel $student): array
@@ -1588,9 +1614,11 @@ class Controller extends ConfigController
     }
 
     /**
-     * Persist a registration session student, creating the record if it doesn't exist. This is needed to ensure that
-     * there is a registration session student record to link the subject languages to,
-     * even if the student hasn't been fully registered yet.
+     * Persist a registration session student, creating the record if needed.
+     *
+     * Preparation candidates may be derived from external enrolment data before
+     * a Schoolbox row exists. Subject-language overrides and confirmation
+     * updates need a persisted row to reference.
      *
      * @throws MapperNotFound
      */
@@ -1645,7 +1673,8 @@ class Controller extends ConfigController
     }
 
     /**
-     * @param mixed $studentIds
+     * Normalise selected student IDs from request payloads.
+     *
      * @return int[]
      */
     private function normalisePreparationStudentIds(mixed $studentIds): array
@@ -1670,6 +1699,12 @@ class Controller extends ConfigController
     }
 
     /**
+     * Resolve selected preparation candidates and reject ambiguous IDs.
+     *
+     * Candidate rows may be addressed by registration-session-student ID or
+     * user ID, so this helper validates that each requested ID maps to exactly
+     * one preparation candidate.
+     *
      * @param iterable<mixed> $students
      * @param int[] $studentIds
      * @return RegistrationSessionStudentModel[]
@@ -1735,7 +1770,7 @@ class Controller extends ConfigController
     }
 
     /**
-     * Re-send the unconfirmed registration details notification to a student.
+     * Re-send registration details notifications to unconfirmed candidates.
      *
      * @api POST /adminv2/international-baccalaureate/registrations/sessions/{sessionId}/candidates/renotify
      */

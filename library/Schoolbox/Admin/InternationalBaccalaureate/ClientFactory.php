@@ -17,6 +17,12 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use UnexpectedValueException;
 
+/**
+ * Creates configured IBIS clients and request value objects.
+ *
+ * The factory centralises config validation so callers fail before building
+ * SOAP payloads when required IBIS settings are missing.
+ */
 class ClientFactory
 {
     private const string DEFAULT_APP_ID = 'SCHOOLBOX';
@@ -28,6 +34,10 @@ class ClientFactory
     ) {
     }
 
+    /**
+     * Build an IBIS client from the configured endpoint.
+     * @return IClient
+     */
     public function build(): IClient
     {
         $endpoint = $this->stringConfig(ConfigMapper::NAME_IBIS_ENDPOINT);
@@ -44,7 +54,10 @@ class ClientFactory
     }
 
     /**
+     * Create a register-candidates request with app ID, school code, and msgID.
+     *
      * @param array<int, array<string, string|null>> $candidates
+     * @return RegisterCandidatesRequest
      */
     public function buildRegisterCandidatesRequest(array $candidates): RegisterCandidatesRequest
     {
@@ -67,7 +80,10 @@ class ClientFactory
     }
 
     /**
+     * Create a register-sessions request with app ID and msgID.
+     *
      * @param array<int, array<string, mixed>> $sessions
+     * @return RegisterSessionsRequest
      */
     public function buildRegisterSessionsRequest(array $sessions): RegisterSessionsRequest
     {
@@ -83,6 +99,10 @@ class ClientFactory
         );
     }
 
+    /**
+     * Return the IB school code required by session registration payloads.
+     * @return string
+     */
     public function getSchoolCode(): string
     {
         $schoolCode = $this->stringConfig(ConfigMapper::NAME_IB_SCHOOL_CODE);
@@ -93,6 +113,10 @@ class ClientFactory
         return $schoolCode;
     }
 
+    /**
+     * Lazily create the msgID generator so tests can inject a deterministic one.
+     * @return MsgIdGenerator
+     */
     private function getMsgIdGenerator(): MsgIdGenerator
     {
         if ($this->msgIdGenerator === null) {
@@ -102,6 +126,12 @@ class ClientFactory
         return $this->msgIdGenerator;
     }
 
+    /**
+     * Read config values as strings while treating null/empty values as absent.
+     * @param string $name
+     * @param string $default
+     * @return string
+     */
     private function stringConfig(string $name, string $default = ''): string
     {
         $value = $this->config->get($name);

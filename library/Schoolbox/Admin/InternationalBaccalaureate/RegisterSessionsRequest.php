@@ -13,6 +13,12 @@ namespace Schoolbox\Admin\InternationalBaccalaureate;
 
 use InvalidArgumentException;
 
+/**
+ * Immutable register-sessions request data before it is converted to SOAP.
+ *
+ * The request validates candidate/session identity fields and the minimum
+ * subject details IBIS needs before the envelope builder emits XML.
+ */
 class RegisterSessionsRequest
 {
     private const int MSG_ID_LENGTH = 96;
@@ -31,7 +37,7 @@ class RegisterSessionsRequest
     ];
 
     /**
-     * @param array<int, array<string, mixed>> $sessions
+     * @param array<int, array<string, mixed>> $sessions Session rows keyed by IBIS field name.
      */
     public function __construct(
         private string $appId,
@@ -70,17 +76,25 @@ class RegisterSessionsRequest
         }
     }
 
+    /**
+     * Return the IBIS application identifier configured for the school.
+     */
     public function getAppId(): string
     {
         return $this->appId;
     }
 
+    /**
+     * Return the generated IBIS msgID used to authenticate this request.
+     */
     public function getMsgId(): string
     {
         return $this->msgId;
     }
 
     /**
+     * Return session rows ready to be serialised by the SOAP envelope builder.
+     *
      * @return array<int, array<string, mixed>>
      */
     public function getSessions(): array

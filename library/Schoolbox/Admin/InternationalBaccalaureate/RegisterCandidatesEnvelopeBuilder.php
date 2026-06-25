@@ -14,6 +14,10 @@ namespace Schoolbox\Admin\InternationalBaccalaureate;
 use DOMDocument;
 use DOMElement;
 
+/**
+ * Serialises register-candidates request data into the SOAP shape expected by
+ * the IBIS candidate_registration.cfc endpoint.
+ */
 class RegisterCandidatesEnvelopeBuilder
 {
     private const string NS_SOAP = 'http://schemas.xmlsoap.org/soap/envelope/';
@@ -36,6 +40,9 @@ class RegisterCandidatesEnvelopeBuilder
         'email',
     ];
 
+    /**
+     * Build the SOAP body containing one or more candidate profile rows.
+     */
     public function build(RegisterCandidatesRequest $request): string
     {
         $document = new DOMDocument('1.0', 'UTF-8');
@@ -75,6 +82,9 @@ class RegisterCandidatesEnvelopeBuilder
         return (string)$document->saveXML($document->documentElement);
     }
 
+    /**
+     * Append an element and preserve empty strings as empty XML elements.
+     */
     private function appendTextElement(
         DOMDocument $document,
         DOMElement $parent,

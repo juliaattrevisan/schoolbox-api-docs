@@ -19,6 +19,13 @@ use Psr\Http\Message\UriInterface;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use UnexpectedValueException;
 
+/**
+ * Low-level HTTP client for IBIS candidate and session registration calls.
+ *
+ * This class owns transport concerns only: building the SOAP HTTP request,
+ * enforcing timeouts/status handling, parsing the SOAP response XML, and
+ * converting transport failures into Schoolbox exceptions.
+ */
 class Client implements IClient
 {
     private const string ENDPOINT_REGISTER_CANDIDATES = '/research/api/candidate_registration.cfc';
@@ -33,6 +40,12 @@ class Client implements IClient
     ) {
     }
 
+    /**
+     * Send a register-candidates SOAP request and parse the returned candidate
+     * response rows.
+     * @param RegisterCandidatesRequest $request
+     * @return RegisterCandidatesResponse
+     */
     public function registerCandidates(RegisterCandidatesRequest $request): RegisterCandidatesResponse
     {
         $httpRequest = new Request(
@@ -93,6 +106,12 @@ class Client implements IClient
         return $response;
     }
 
+    /**
+     * Send a register-sessions SOAP request and parse the returned session
+     * response rows.
+     * @param RegisterSessionsRequest $request
+     * @return RegisterSessionsResponse
+     */
     public function registerSessions(RegisterSessionsRequest $request): RegisterSessionsResponse
     {
         $httpRequest = new Request(
@@ -153,6 +172,11 @@ class Client implements IClient
         return $response;
     }
 
+    /**
+     * Resolve the fixed IBIS candidate-registration CFC endpoint from the
+     * configured base URL.
+     * @return string
+     */
     private function generateUrl(): string
     {
         return (string)$this->baseUrl->withPath(
@@ -160,6 +184,11 @@ class Client implements IClient
         );
     }
 
+    /**
+     * Lazily create the session envelope builder when tests inject only the
+     * candidate builder.
+     * @return RegisterSessionsEnvelopeBuilder
+     */
     private function getSessionEnvelopeBuilder(): RegisterSessionsEnvelopeBuilder
     {
         if ($this->sessionEnvelopeBuilder === null) {

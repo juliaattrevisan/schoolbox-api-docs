@@ -37,12 +37,15 @@ use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+/**
+ * Wires the IB admin UI routes and controller dependencies.
+ */
 class Module extends BaseModule
 {
     protected $basename = 'internationalBaccalaureate';
 
     /**
-     * @return void
+     * @inheritdoc
      */
     protected function registerRoutes(): void
     {
@@ -55,7 +58,8 @@ class Module extends BaseModule
                 new Rule\HasServicePermission(UserAccess::SERVICE_IB_COORDINATOR, UserAccess::ACCESS_FULL)
             )
         );
-        /* IB Coordinator access is required to confirm details, but students can also confirm their own details.
+        /* IB Coordinator access is required for admin workflows, but students
+         * can confirm their own candidate and subject details.
          */
         $ruleIBConfirmingDetailsPerms = new Rule\Any(
             $ruleIBCoordinatorAccess,
@@ -151,7 +155,8 @@ class Module extends BaseModule
     }
 
     /**
-     * Preload an existing registration session
+     * Preload an existing registration session for routes that receive a
+     * session ID.
      *
      * @param array<string, mixed> $params
      * @return array<string, mixed>

@@ -31,6 +31,13 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Throwable;
 
+/**
+ * Batch CLI tool that submits pending IB candidates to IBIS.
+ *
+ * Candidates are processed in two phases: first registering candidate numbers
+ * when the user profile does not already have one, then registering the
+ * candidate for the configured IB exam session.
+ */
 class RegisterCandidatesTool extends CliTool\App
 {
     public const string LOCK_NAME = 'ib_register_candidates';
@@ -42,6 +49,9 @@ class RegisterCandidatesTool extends CliTool\App
     private const int DEFAULT_BATCH_SIZE = 5;
     private const int DEFAULT_TIMEOUT = 300;
 
+    /**
+     * @inheritdoc
+     */
     public function getLongOpts(): array
     {
         return [
@@ -51,11 +61,17 @@ class RegisterCandidatesTool extends CliTool\App
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getRequiredProcessUser(): ?string
     {
         return self::WEB_PROCESS_USER;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function run(): void
     {
         if ($this->getOpt(self::OPT_LONG_HELP)) {
@@ -96,6 +112,11 @@ class RegisterCandidatesTool extends CliTool\App
     }
 
     /**
+     * Process candidates currently queued with STATUS_IN_PROGRESS.
+     *
+     * Planning mode logs what would be submitted. Perform mode calls IBIS and
+     * updates each candidate's registration status.
+     *
      * @throws NotFoundExceptionInterface
      * @throws ContainerExceptionInterface
      * @throws \Schoolbox\Mapper\Exception
@@ -243,6 +264,8 @@ class RegisterCandidatesTool extends CliTool\App
     }
 
     /**
+     * Register an existing IB candidate number for a single exam session.
+     *
      * @throws \Schoolbox\Mapper\Exception
      */
     private function registerCandidateSession(
@@ -395,6 +418,8 @@ class RegisterCandidatesTool extends CliTool\App
     }
 
     /**
+     * Register a student with IBIS to receive and store their candidate number.
+     *
      * @param array<string, string|null> $candidate
      *
      * @throws \Schoolbox\Mapper\Exception
@@ -538,6 +563,8 @@ class RegisterCandidatesTool extends CliTool\App
     }
 
     /**
+     * Mark a queued registration as failed so it is no longer retried.
+     *
      * @throws \Schoolbox\Mapper\Exception
      */
     private function markCandidateRegistrationFailed(
@@ -549,6 +576,8 @@ class RegisterCandidatesTool extends CliTool\App
     }
 
     /**
+     * Load external SIS details needed for candidate registration payloads.
+     *
      * @return array<string, mixed>
      */
     private function findExternalStudent(
@@ -564,6 +593,9 @@ class RegisterCandidatesTool extends CliTool\App
         return $externalUser->getStudent($externalId);
     }
 
+    /**
+     * Print command usage for operators running the batch manually.
+     */
     private function displayHelp(): void
     {
         $batchSize = self::DEFAULT_BATCH_SIZE;

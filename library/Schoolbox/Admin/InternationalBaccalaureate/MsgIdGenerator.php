@@ -15,13 +15,25 @@ use Closure;
 use InvalidArgumentException;
 use RuntimeException;
 
+/**
+ * Builds the IBIS msgID value required by the registration SOAP endpoints.
+ */
 class MsgIdGenerator
 {
+    /**
+     * @param Closure|null $plainTextGenerator Test hook for deterministic msgID generation.
+     */
     public function __construct(
         private ?Closure $plainTextGenerator = null
     ) {
     }
 
+    /**
+     * Build the 96-character msgID from a 32-character IBIS secret key.
+     *
+     * IBIS expects the msgID to contain a 32-character random plaintext value
+     * followed by a SHA-256 hash of that value after AES encryption.
+     */
     public function generate(string $secretKeyHex): string
     {
         $secretKeyHex = strtoupper(trim($secretKeyHex));
@@ -43,6 +55,9 @@ class MsgIdGenerator
         return $plainText . strtoupper(hash('sha256', base64_encode($encryptedData)));
     }
 
+    /**
+     * Generate or validate the random plaintext portion of an IBIS msgID.
+     */
     private function generatePlainText(): string
     {
         if ($this->plainTextGenerator !== null) {

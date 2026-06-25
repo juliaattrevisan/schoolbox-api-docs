@@ -13,6 +13,13 @@ namespace Schoolbox\Admin\InternationalBaccalaureate;
 
 use InvalidArgumentException;
 
+/**
+ * Immutable register-candidates request data before it is converted to SOAP.
+ *
+ * The constructor validates only the fields that IBIS requires for every
+ * candidate. Optional fields are allowed through for the envelope builder to
+ * serialise as empty SOAP elements.
+ */
 class RegisterCandidatesRequest
 {
     private const int MSG_ID_LENGTH = 96;
@@ -28,7 +35,7 @@ class RegisterCandidatesRequest
     ];
 
     /**
-     * @param array<int, array<string, string|null>> $candidates
+     * @param array<int, array<string, string|null>> $candidates Candidate rows keyed by IBIS field name.
      */
     public function __construct(
         private string $appId,
@@ -55,22 +62,33 @@ class RegisterCandidatesRequest
         }
     }
 
+    /**
+     * Return the IBIS application identifier configured for the school.
+     */
     public function getAppId(): string
     {
         return $this->appId;
     }
 
+    /**
+     * Return the generated IBIS msgID used to authenticate this request.
+     */
     public function getMsgId(): string
     {
         return $this->msgId;
     }
 
+    /**
+     * Return the IB school code to include on each candidate payload.
+     */
     public function getSchoolCode(): string
     {
         return $this->schoolCode;
     }
 
     /**
+     * Return candidate rows ready to be serialised by the SOAP envelope builder.
+     *
      * @return array<int, array<string, string|null>>
      */
     public function getCandidates(): array

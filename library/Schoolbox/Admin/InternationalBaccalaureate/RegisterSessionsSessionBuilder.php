@@ -18,6 +18,9 @@ use Schoolbox\IB\Group\Subject\Model as GroupSubjectModel;
 use Schoolbox\IB\Registrations\Sessions\Student\Model as RegistrationSessionStudentModel;
 use TypeError;
 
+/**
+ * Builds one IBIS register-sessions row from a Schoolbox registration student.
+ */
 class RegisterSessionsSessionBuilder
 {
     private const array REQUIRED_FIELDS = [
@@ -31,6 +34,8 @@ class RegisterSessionsSessionBuilder
     ];
 
     /**
+     * Map registration session, school, and subject data into an IBIS session payload.
+     *
      * @return array<string, mixed>
      */
     public function build(RegistrationSessionStudentModel $student, string $candidateId, string $schoolCode): array
@@ -71,6 +76,9 @@ class RegisterSessionsSessionBuilder
     }
 
     /**
+     * Build subject rows using each group subject's configured transcript name
+     * and selected language.
+     *
      * @return array<int, array{subject_name: string, subject_language: string, subject_level: string|null}>
      */
     private function buildSubjects(GenericCollection $groupSubjects): array
@@ -100,6 +108,9 @@ class RegisterSessionsSessionBuilder
         return $subjects;
     }
 
+    /**
+     * Return the first configured subject language for the group subject.
+     */
     private function findSubjectLanguage(GroupSubjectModel $groupSubject): ?string
     {
         try {
@@ -119,6 +130,9 @@ class RegisterSessionsSessionBuilder
         return null;
     }
 
+    /**
+     * Normalise optional model values before required-field checks.
+     */
     private function stringOrNull(mixed $value): ?string
     {
         if ($value === null) {

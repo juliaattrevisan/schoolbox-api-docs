@@ -20,6 +20,9 @@ use Schoolbox\Collection;
 use Schoolbox\Language\Mapper as LanguageMapper;
 use ValueError;
 
+/**
+ * Cursor-backed search adapter for IB language options.
+ */
 class Cursor implements ICursor
 {
     public const LIMIT_MIN = 1;
@@ -28,6 +31,9 @@ class Cursor implements ICursor
 
     private ICodec $codec;
 
+    /**
+     * @throws ValueError When the requested page size is outside the allowed range.
+     */
     public function __construct(
         private LanguageMapper $languageMapper,
         private ?string $search,
@@ -57,26 +63,41 @@ class Cursor implements ICursor
         }
     }
 
+    /**
+     * @inheritdoc
+     */
     public function next(Collection $collection): ?string
     {
         return $this->buildCursor()->next($collection);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function current(Collection $collection): ?string
     {
         return $this->buildCursor()->current($collection);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function retrieveResultCount(): ?int
     {
         return $this->buildCursor()->retrieveResultCount();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function retrieveResults(?string $encodedCursor): Collection
     {
         return $this->buildCursor()->retrieveResults($encodedCursor);
     }
 
+    /**
+     * Build the shared mapper cursor with stable ordering by language ID.
+     */
     private function buildCursor(): MapperCursor
     {
         return new MapperCursor(
@@ -90,6 +111,9 @@ class Cursor implements ICursor
         );
     }
 
+    /**
+     * Build name/code search predicates for the language picker.
+     */
     private function buildPredicateBuilder(): Builder
     {
         $predicateBuilder = $this->languageMapper->getPredicateBuilder();

@@ -16,11 +16,24 @@ use DOMElement;
 use DOMXPath;
 use UnexpectedValueException;
 
+/**
+ * Parsed response from the IBIS register-sessions SOAP operation.
+ *
+ * IBIS can return SOAP faults, structured session rows, or free-form validation
+ * messages without session rows. Keeping those separate lets the CLI decide
+ * whether to update an individual candidate or log a request-level failure.
+ */
 class RegisterSessionsResponse
 {
     /**
-     * @param array<int, array{candidateId: string|null, month: string|null, year: string|null, text: string|null, successful: bool}> $sessionResponses
-     * @param string[] $messages
+     * @param array<int, array{
+     *     candidateId: string|null,
+     *     month: string|null,
+     *     year: string|null,
+     *     text: string|null,
+     *     successful: bool
+     * }> $sessionResponses Structured per-session response rows.
+     * @param string[] $messages Free-form validation messages returned without session identifiers.
      */
     public function __construct(
         private string $rawXml,
@@ -32,6 +45,9 @@ class RegisterSessionsResponse
     ) {
     }
 
+    /**
+     * Parse the raw SOAP XML returned by IBIS.
+     */
     public static function fromXml(string $xml): self
     {
         $document = new DOMDocument();
@@ -81,6 +97,10 @@ class RegisterSessionsResponse
             $text = self::firstChildText($xpath, $responseNode, 'text');
             $successful = $candidateId !== null && self::isSuccessText($text);
 
+            /* Rows with candidate/session identifiers are tied to a Schoolbox
+             * candidate. Rows with only text are request-level validation
+             * messages.
+             */
             if ($candidateId !== null || $month !== null || $year !== null) {
                 $sessionResponses[] = [
                     'candidateId' => $candidateId,
@@ -100,33 +120,51 @@ class RegisterSessionsResponse
         return new self($xml, $operationName, null, null, $sessionResponses, $messages);
     }
 
+    /**
+     * A response is successful only when IBIS returns at least one session row
+     * and every row is successful.
+     */
     public function isSuccess(): bool
     {
         return !$this->isFault() && $this->messages === [] && $this->sessionResponses !== []
             && count($this->getFailedSessionResponses()) === 0;
     }
 
+    /**
+     * Return the original response XML for diagnostic logging.
+     */
     public function getRawXml(): string
     {
         return $this->rawXml;
     }
 
+    /**
+     * Return the first SOAP body element name, if one could be identified.
+     */
     public function getOperationName(): ?string
     {
         return $this->operationName;
     }
 
+    /**
+     * Check whether the response used the SOAP Fault format.
+     */
     public function isFault(): bool
     {
         return $this->faultCode !== null || $this->faultString !== null;
     }
 
+    /**
+     * Return the SOAP fault message when IBIS returned a fault.
+     */
     public function getFaultString(): ?string
     {
         return $this->faultString;
     }
 
     /**
+     * Return structured session response rows from IBIS.
+     *
      * @return array<int, array{candidateId: string|null, month: string|null, year: string|null, text: string|null, successful: bool}>
      */
     public function getSessionResponses(): array
@@ -135,6 +173,8 @@ class RegisterSessionsResponse
     }
 
     /**
+     * Return session rows that IBIS explicitly rejected.
+     *
      * @return array<int, array{candidateId: string|null, month: string|null, year: string|null, text: string|null, successful: bool}>
      */
     public function getFailedSessionResponses(): array
@@ -145,6 +185,9 @@ class RegisterSessionsResponse
         ));
     }
 
+    /**
+     * Return the most useful human-readable error details for logs/UI.
+     */
     public function getErrorSummary(): ?string
     {
         if ($this->faultString !== null && $this->faultString !== '') {
@@ -170,11 +213,17 @@ class RegisterSessionsResponse
         return implode('; ', array_unique($messages));
     }
 
+    /**
+     * Interpret the IBIS text field convention for session row success.
+     */
     private static function isSuccessText(?string $text): bool
     {
         return $text === null || $text === '' || stripos($text, 'Success') === 0;
     }
 
+    /**
+     * Return trimmed text from the first child with the requested local name.
+     */
     private static function firstChildText(DOMXPath $xpath, DOMElement $parent, string $localName): ?string
     {
         $node = $xpath->query('*[local-name() = "' . $localName . '"]', $parent)->item(0);

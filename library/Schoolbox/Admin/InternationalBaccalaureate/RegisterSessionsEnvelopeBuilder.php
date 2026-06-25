@@ -14,6 +14,10 @@ namespace Schoolbox\Admin\InternationalBaccalaureate;
 use DOMDocument;
 use DOMElement;
 
+/**
+ * Serialises register-sessions request data into the SOAP shape expected by
+ * the IBIS candidate_registration.cfc endpoint.
+ */
 class RegisterSessionsEnvelopeBuilder
 {
     private const string NS_SOAP = 'http://schemas.xmlsoap.org/soap/envelope/';
@@ -43,6 +47,9 @@ class RegisterSessionsEnvelopeBuilder
         'email',
     ];
 
+    /**
+     * Build the SOAP body containing one or more candidate session registrations.
+     */
     public function build(RegisterSessionsRequest $request): string
     {
         $document = new DOMDocument('1.0', 'UTF-8');
@@ -91,7 +98,10 @@ class RegisterSessionsEnvelopeBuilder
     }
 
     /**
+     * Append the subject list that IBIS expects beneath each session row.
+     *
      * @param array<int, array<string, string>> $subjects
+     * @throws \DOMException
      */
     private function appendSubjects(DOMDocument $document, DOMElement $session, string $name, array $subjects): void
     {
@@ -100,7 +110,7 @@ class RegisterSessionsEnvelopeBuilder
 
         foreach ($subjects as $subjectValues) {
             $subjectName = $subjectValues['subject_name'] ?? '';
-            /* Skip CAS
+            /* CAS is tracked in Schoolbox but is not submitted as an IBIS exam subject.
              */
             if (!$subjectName || 'Creativity, Activity, Service (CAS)' === $subjectName) {
                 continue;
@@ -114,6 +124,8 @@ class RegisterSessionsEnvelopeBuilder
     }
 
     /**
+     * Check whether an optional IBIS field should be emitted into the SOAP XML.
+     *
      * @param array<string, mixed> $values
      */
     private function hasNonEmptyValue(array $values, string $field): bool
@@ -121,6 +133,9 @@ class RegisterSessionsEnvelopeBuilder
         return array_key_exists($field, $values) && $values[$field] !== null && $values[$field] !== '';
     }
 
+    /**
+     * Append an element and preserve empty strings as empty XML elements.
+     */
     private function appendTextElement(
         DOMDocument $document,
         DOMElement $parent,

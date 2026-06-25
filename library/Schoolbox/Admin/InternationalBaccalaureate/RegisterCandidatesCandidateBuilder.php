@@ -16,6 +16,9 @@ use Exception;
 use InvalidArgumentException;
 use Schoolbox\IB\Registrations\Sessions\Student\Model as RegistrationSessionStudentModel;
 
+/**
+ * Builds one IBIS register-candidates row from a Schoolbox registration student.
+ */
 class RegisterCandidatesCandidateBuilder
 {
     private const array REQUIRED_FIELDS = [
@@ -30,7 +33,9 @@ class RegisterCandidatesCandidateBuilder
     ];
 
     /**
-     * @param array<string, mixed> $externalStudent
+     * Map Schoolbox user/profile data into the IBIS candidate payload fields.
+     *
+     * @param array<string, mixed> $externalStudent External SIS student data keyed by external field name.
      * @return array<string, string|null>
      */
     public function build(RegistrationSessionStudentModel $student, array $externalStudent): array
@@ -41,15 +46,15 @@ class RegisterCandidatesCandidateBuilder
             throw new InvalidArgumentException('Selected candidate is missing required IBIS data.');
         }
 
-        /* Mapping the gender to the valid IBIS gender list
+        /* Map local gender values to IBIS' limited gender list.
          */
         $genderRaw = $this->stringOrNull($externalStudent['StudentGender'] ?? null);
         $gender = $genderRaw === null ? null : strtoupper($genderRaw);
         $gender = match ($gender) {
             'M', 'MALE' => 'MALE',
             'F', 'FEMALE' => 'FEMALE',
-            null => null, //forces the IBIS to validate and return error if gender is not defined
-            default => 'X', //otherwise all other genders including non-binary and other will be X
+            null => null, // Let IBIS validation report a missing gender.
+            default => 'X', // Map non-binary and other values to the IBIS X value.
         };
 
         $languageCodes = $this->extractCollectionCodes($user->getLanguageCollection());
@@ -87,6 +92,9 @@ class RegisterCandidatesCandidateBuilder
         return $candidate;
     }
 
+    /**
+     * Convert the external SIS birth timestamp to the IBIS date format.
+     */
     private function formatDateOfBirth(mixed $dateOfBirth): ?string
     {
         $dateOfBirth = $this->stringOrNull($dateOfBirth);
@@ -103,7 +111,8 @@ class RegisterCandidatesCandidateBuilder
     }
 
     /**
-     * @param mixed $collection
+     * Extract ordered code values from a Schoolbox language/nationality collection.
+     *
      * @return string[]
      */
     private function extractCollectionCodes(mixed $collection): array
@@ -129,6 +138,9 @@ class RegisterCandidatesCandidateBuilder
         return $codes;
     }
 
+    /**
+     * Normalise optional external/profile values before required-field checks.
+     */
     private function stringOrNull(mixed $value): ?string
     {
         if ($value === null) {

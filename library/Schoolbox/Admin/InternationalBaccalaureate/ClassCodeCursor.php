@@ -20,6 +20,9 @@ use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 use ValueError;
 
+/**
+ * Cursor-backed search adapter for class code options.
+ */
 class ClassCodeCursor implements ICursor
 {
     public const int LIMIT_MIN = 1;
@@ -28,6 +31,9 @@ class ClassCodeCursor implements ICursor
 
     private ICodec $codec;
 
+    /**
+     * @throws ValueError When the requested page size is outside the allowed range.
+     */
     public function __construct(
         private FolderCodeMapper $classCodeMapper,
         private ?string $search,
@@ -57,16 +63,25 @@ class ClassCodeCursor implements ICursor
         }
     }
 
+    /**
+     * @inheritdoc
+     */
     public function next(Collection $collection): ?string
     {
         return $this->buildCursor()->next($collection);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function current(Collection $collection): ?string
     {
         return $this->buildCursor()->current($collection);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function retrieveResultCount(): ?int
     {
         $sql = '
@@ -87,11 +102,17 @@ class ClassCodeCursor implements ICursor
         return (int) $statement->fetchColumn();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function retrieveResults(?string $encodedCursor): Collection
     {
         return $this->buildCursor()->retrieveResults($encodedCursor);
     }
 
+    /**
+     * Build the shared mapper cursor with stable ordering by class code.
+     */
     private function buildCursor(): MapperCursor
     {
         return new MapperCursor(
@@ -105,6 +126,9 @@ class ClassCodeCursor implements ICursor
         );
     }
 
+    /**
+     * Build code search predicates for the class code picker.
+     */
     private function buildPredicateBuilder(): Builder
     {
         $predicateBuilder = $this->classCodeMapper->getPredicateBuilder();
