@@ -409,7 +409,6 @@ module.exports = {
                     },
                 ],
             },
-
         ],
     },
     experiments: {
