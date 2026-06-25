@@ -304,9 +304,10 @@ class OverallDataset
                 vr.indicator_max_value                         AS indicator_max_value
             FROM v_rubric vr
             INNER JOIN rubric_instance ON vr.rubric_instance_id = rubric_instance.id
+            INNER JOIN assessment a ON vr.assessment_id = a.id
             WHERE {$whereClause}
             ORDER BY
-                vr.assessment_id,
+                a.due_date,
                 vr.rubric_instance_id,
                 vr.capability_sequence,
                 vr.capability_id,
@@ -409,12 +410,12 @@ class OverallDataset
          * > jez.gray 4/6/2026
          * > I had never noticed. Seems strange to me now that you point it out
          */
-        uasort(
-            $assessments,
-            static function (array $a, array $b): int {
-                return strnatcmp($a['name'], $b['name']);
-            }
-        );
+//        uasort(
+//            $assessments,
+//            static function (array $a, array $b): int {
+//                return strnatcmp($a['name'], $b['name']);
+//            }
+//        );
 
         return $assessments;
     }
@@ -553,7 +554,8 @@ class OverallDataset
                     vrm.indicator_id                               AS indicator_id,
                     vrm.indicator_name                             AS indicator_name,
                     vrm.indicator_mark                             AS indicator_mark,
-                    vrm.indicator_max_value                        AS indicator_max_value
+                    vrm.indicator_max_value                        AS indicator_max_value,
+                    rl.name                                        AS level_name
                 FROM (
                     SELECT
                         sb.assessment_id,
@@ -573,6 +575,8 @@ class OverallDataset
                     vrm.student_id    = latest_published_feedback.owner
                 INNER JOIN rubric_instance ON vrm.rubric_instance_id = rubric_instance.id
                 INNER JOIN user u ON vrm.student_id = u.id
+                LEFT JOIN rubric_descriptor rd ON vrm.descriptor_id = rd.id AND rd.rubric_indicator_id = vrm.indicator_id
+                LEFT JOIN rubric_level rl ON rd.level_id = rl.id
                 WHERE {$outerWhere}
                 AND rubric_instance.deleted_at IS NULL
                 ORDER BY vrm.student_id, vrm.assessment_id, vrm.capability_id, vrm.indicator_id
@@ -740,7 +744,9 @@ class OverallDataset
                         'published' => [
                             'normalisedMark' => $normalisedMark,
                             'humanReadableMark' => $humanReadableMark,
+                            'selectedLevel' => $row['level_name'],
                             'selectedDescriptorText' => $row['descriptor_name'],
+                            'selectedDescriptorValue' => $row['indicator_mark'],
                         ],
                         /* Normalised and human-readable marks from the most recent feedback: these would typically be draft
                          * marks, but could end up being the same as the Published ones by sheer coincidence.
@@ -748,7 +754,9 @@ class OverallDataset
                         'draft' => [
                             'normalisedMark' => null,
                             'humanReadableMark' => null,
+                            'selectedLevel' => null,
                             'selectedDescriptorText' => null,
+                            'selectedDescriptorValue' => null,
                         ],
                     ];
                 }
@@ -844,6 +852,7 @@ class OverallDataset
                     vrm.indicator_name                             AS indicator_name,
                     vrm.indicator_mark                             AS indicator_mark,
                     vrm.indicator_max_value                        AS indicator_max_value,
+                    rl.name                                        AS level_name,
                     vrm.feedback_date                              AS feedback_date
                 FROM (
                     SELECT
@@ -864,6 +873,8 @@ class OverallDataset
                     vrm.feedback_date IS NULL
                 INNER JOIN rubric_instance ON vrm.rubric_instance_id = rubric_instance.id
                 INNER JOIN user u ON vrm.student_id = u.id
+                LEFT JOIN rubric_descriptor rd ON vrm.descriptor_id = rd.id AND rd.rubric_indicator_id = vrm.indicator_id
+                LEFT JOIN rubric_level rl ON rd.level_id = rl.id
                 WHERE {$outerWhere}
                 AND rubric_instance.deleted_at IS NULL
                 ORDER BY vrm.student_id, vrm.assessment_id, vrm.capability_id, vrm.indicator_id
@@ -989,7 +1000,9 @@ class OverallDataset
                     'published' => [
                         'normalisedMark' => null,
                         'humanReadableMark' => null,
+                        'selectedLevel' => null,
                         'selectedDescriptorText' => null,
+                        'selectedDescriptorValue' => null,
                     ],
                     /* Normalised and human-readable marks from the most recent feedback: these would typically be draft
                      * marks, but could end up being the same as the Published ones by sheer coincidence.
@@ -997,7 +1010,9 @@ class OverallDataset
                     'draft' => [
                         'normalisedMark' => null,
                         'humanReadableMark' => null,
+                        'selectedLevel' => null,
                         'selectedDescriptorText' => null,
+                        'selectedDescriptorValue' => null,
                     ],
                     'indicators' => []
                 ];
@@ -1044,7 +1059,9 @@ class OverallDataset
                         'published' => [
                             'normalisedMark' => null,
                             'humanReadableMark' => null,
+                            'selectedLevel' => null,
                             'selectedDescriptorText' => null,
+                            'selectedDescriptorValue' => null,
                         ],
                         /* Normalised and human-readable marks from the most recent feedback: these would typically be draft
                          * marks, but could end up being the same as the Published ones by sheer coincidence.
@@ -1052,7 +1069,9 @@ class OverallDataset
                         'draft' => [
                             'normalisedMark' => null,
                             'humanReadableMark' => null,
+                            'selectedLevel' => null,
                             'selectedDescriptorText' => null,
+                            'selectedDescriptorValue' => null,
                         ],
                     ];
                 }
@@ -1068,7 +1087,9 @@ class OverallDataset
                 $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['draft'] = [
                     'normalisedMark' => $normalisedMark,
                     'humanReadableMark' => $humanReadableMark,
-                    'selectedDescriptorText' => $row['descriptor_name']
+                    'selectedLevel' => $row['level_name'],
+                    'selectedDescriptorText' => $row['descriptor_name'],
+                    'selectedDescriptorValue' => $row['indicator_mark'],
                 ];
             }
         }
