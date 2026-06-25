@@ -33,11 +33,25 @@
     border-top-color: transparent;
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
+.lrn .lrn-author-ui .lrn-author-widget-sidebar li button {
+    border: none;
+}
 .lrn .lrn-author-ui .lrn-author-widget-sidebar button:hover,
 .lrn .lrn-author-ui .lrn-author-widget-sidebar button:focus,
 .lrn .lrn-author-ui .lrn-author-widget-sidebar button:active {
     background: var(--sbx-config-color-active, var(--content-ui-background));
+    border: none;
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
+}
+.lrn .lrn-author-ui .lrn-author-widget-sidebar [data-authorapi-selector="config-edit-btn"]:hover,
+.lrn .lrn-author-ui .lrn-author-widget-sidebar [data-authorapi-selector="config-edit-btn"]:focus,
+.lrn .lrn-author-ui .lrn-author-widget-sidebar [data-authorapi-selector="config-edit-btn"]:active,
+.lrn .lrn-author-ui .lrn-author-widget-sidebar .lrn-author-widget-sidebar-delete-btn:hover,
+.lrn .lrn-author-ui .lrn-author-widget-sidebar .lrn-author-widget-sidebar-delete-btn:focus,
+.lrn .lrn-author-ui .lrn-author-widget-sidebar .lrn-author-widget-sidebar-delete-btn:active {
+    background: var(--sbx-config-color-active, var(--content-ui-background)) !important;
+    border-radius: var(--sbx-config-field-corner-radius, 0px);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground)) !important;
 }
 
 /* remove the padding from the right of the questions view */
@@ -47,7 +61,7 @@
 
 /* top bar background color */
 .lrn.lrn-author .lrn-author-item-nav {
-    background-color: #fff;
+    background-color: var(--sbx-color-foreground-primary, #fff);
 }
 
 /* save button background color */
@@ -63,7 +77,8 @@ button.lrn-author-btn-save-dropdown {
     vertical-align: middle;
 }
 .lrn .lrn-author-ui .lrn-author-btn-default[data-authorapi-selector="back"]:not([aria-disabled="true"]):hover {
-    background-color: var(--sbx-config-color-active, var(--content-ui-hover)) !important;
+    background: var(--sbx-color-foreground-primary, var(--content-ui-background)) !important;
+    border-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     color: var(--sbx-config-color-accent, var(--content-ui-foreground)) !important;
     padding-left: 30px;
     text-decoration: none !important;
@@ -85,18 +100,21 @@ button.lrn-author-btn-save.lrn-author-btn-old.lrn-author-btn-old-legacy.lrn-auth
 .lrn .lrn-author-ui .lrn-author-btn-success[disabled],
 .lrn .lrn-author-ui .lrn-author-btn-success[disabled]:hover,
 .lrn .lrn-author-ui .lrn-author-btn-success[disabled]:focus {
-    background-color: var(--content-ui-submit-background);
-    color: var(--content-ui-submit-foreground);
+    background-color: var(--sbx-config-color-accent, var(--content-ui-submit-background));
+    color: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground));
 }
 .lrn .lrn-author-ui .lrn-author-btn-save:not([disabled]):hover,
 .lrn .lrn-author-ui .lrn-author-btn-save:not([disabled]):focus {
-    background-color: rgba(
-        calc(var(--content-ui-submit-background-r) + (255 - var(--content-ui-submit-background-r)) * 0.2),
-        calc(var(--content-ui-submit-background-g) + (255 - var(--content-ui-submit-background-g)) * 0.2),
-        calc(var(--content-ui-submit-background-b) + (255 - var(--content-ui-submit-background-b)) * 0.2),
-        var(--content-ui-submit-background-a)
+    background-color: var(
+        --sbx-config-color-accent,
+        rgba(
+            calc(var(--content-ui-submit-background-r) + (255 - var(--content-ui-submit-background-r)) * 0.2),
+            calc(var(--content-ui-submit-background-g) + (255 - var(--content-ui-submit-background-g)) * 0.2),
+            calc(var(--content-ui-submit-background-b) + (255 - var(--content-ui-submit-background-b)) * 0.2),
+            var(--content-ui-submit-background-a)
+        )
     );
-    color: var(--content-ui-submit-foreground);
+    color: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground));
 }
 
 /* hide tags from questions list */
@@ -115,7 +133,7 @@ button.lrn-author-btn-save.lrn-author-btn-old.lrn-author-btn-old-legacy.lrn-auth
 }
 
 ul.lrn-author-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
-    background: #fff;
+    background: var(--sbx-color-foreground-primary, #fff);
     border-bottom: 1px solid var(--sbx-color-border, var(--body-background)) !important;
     list-style: none;
     max-width: none;
@@ -134,9 +152,36 @@ ul.lrn-author-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable 
     width: 100%;
 }
 
+.lrn-author-api-react-container.lrn-author-ui,
+.lrn .lrn-author-ui .lrn-author-activity-edit,
+.lrn .lrn-author-ui .lrn-author-activity-edit .lrn-author-item-nav,
+.lrn .lrn-author-ui .lrn-author-activity-edit .lrn-author-activity-toolbar,
+.lrn .lrn-author-ui .lrn-author-activity-edit .lrn-author-nav-tabs,
+.lrn .lrn-author-ui .lrn-author-activity-edit .lrn-author-tab-content,
+.lrn .lrn-author-ui .lrn-author-activity-edit .lrn-author-tab-pane,
+.lrn .lrn-author-ui .lrn-author-activity-edit .lrn-author-intro-outro-toolbar,
+.lrn .lrn-author-ui .lrn-author-activity-edit .lrn-item-for-activity-list,
+.lrn .lrn-author-ui .lrn-author-activity-edit .lrn-author-list-view,
+.lrn .lrn-author-ui .lrn-author-activity-edit .lrn-author-list-view-item,
+.lrn .lrn-author-ui .lrn-author-activity-edit .lrn-author-flyout {
+    border-radius: var(--sbx-config-container-corner-radius, 0px);
+}
+
+.lrn .lrn-author-ui .lrn-author-item-edit-old,
+.lrn .lrn-author-ui .lrn-author-item-edit-old .lrn-author-item,
+.lrn .lrn-author-ui .lrn-author-item-edit-old .lrn-author-item-nav,
+.lrn .lrn-author-ui .lrn-author-item-edit-old .lrn-author-item-toolbar,
+.lrn .lrn-author-ui .lrn-author-item-edit-old .lrn-author-item-content-wrapper,
+.lrn .lrn-author-ui .lrn-author-item-edit-old .lrn-author-item-content,
+.lrn .lrn-author-ui .lrn-author-item-edit-old .lrn-author-region,
+.lrn .lrn-author-ui .lrn-author-item-edit-old .lrn-author-region-column,
+.lrn .lrn-author-ui .lrn-author-item-edit-old .lds-alert {
+    border-radius: var(--sbx-config-container-corner-radius, 0px);
+}
+
 .lrn-qe .lrn-qe-ui .lrn-qe-tile-header {
     background: var(--sbx-config-color-accent, var(--content-ui-foreground));
-    border-radius: 0px;
+    border-radius: var(--sbx-config-container-corner-radius, 0px) var(--sbx-config-container-corner-radius, 0px) 0 0;
 }
 
 /* removed gap from header */
@@ -177,7 +222,8 @@ ul.lrn-author-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable 
 }
 .lrn .lrn-author-ui .lrn-btn:focus,
 .lrn .lrn-author-ui a.lrn-btn:focus {
-    outline: none;
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
 
 /* Hide the welcome/exit screen ui */
@@ -194,7 +240,7 @@ ul.lrn-author-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable 
 .lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-part {
     background-color: var(--content-ui-background);
     border: none;
-    border-radius: 0px;
+    border-radius: var(--sbx-config-field-corner-radius, 0px) !important;
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     font-size: 1rem;
 }
@@ -207,27 +253,39 @@ ul.lrn-author-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable 
 }
 
 /* author primary and secondary and disabled button styles */
-.lrn .lrn-author-ui .lrn-author-btn-primary,
+.lrn .lrn-author-ui .lrn-author-btn-primary {
+    background: var(--sbx-config-color-accent, var(--content-ui-submit-background));
+    border-radius: var(--sbx-config-field-corner-radius, 0px) !important;
+    border: none;
+    color: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground));
+    font-size: 1rem !important;
+}
 .lrn .lrn-author-ui .lrn-author-btn-sec,
 .lrn .lrn-author-ui .lrn-author-activity-button:not(.lrn-author-btn-primary):not(.lrn-author-btn-sec) {
-    background: var(--content-ui-background);
-    border-radius: 0px !important;
-    border: none;
+    background: var(--sbx-color-foreground-primary, var(--content-ui-background));
+    border-radius: var(--sbx-config-field-corner-radius, 0px) !important;
+    border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     font-size: 1rem !important;
 }
-.lrn .lrn-author-ui .lrn-author-btn-primary:hover,
+.lrn .lrn-author-ui .lrn-author-btn-primary:hover {
+    background: var(--sbx-config-color-accent, var(--content-ui-submit-background));
+    color: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground));
+    text-decoration: none !important;
+    font-size: 1rem !important;
+}
 .lrn .lrn-author-ui .lrn-author-btn-sec:hover,
 .lrn .lrn-author-ui .lrn-author-activity-button:not(.lrn-author-btn-primary):not(.lrn-author-btn-sec):hover {
-    background-color: var(--sbx-config-color-active, var(--content-ui-hover));
+    background: var(--sbx-color-foreground-primary, var(--content-ui-background));
+    border-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     text-decoration: none !important;
     font-size: 1rem !important;
 }
 button.lrn-author-activity-button.lrn-author-btn-i-xs.lrn-author-col-xs-none.lrn-author-col-sm-none.lrn-author-disabled {
-    background-color: var(--content-ui-background);
-    border-color: transparent;
-    border-radius: 0px;
+    background-color: var(--sbx-color-foreground-primary, var(--content-ui-background));
+    border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    border-radius: var(--sbx-config-field-corner-radius, 0px) !important;
     box-shadow: none;
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     cursor: default;
@@ -237,18 +295,13 @@ button.lrn-author-activity-button.lrn-author-btn-i-xs.lrn-author-col-xs-none.lrn
 
 /* Save button styles */
 .lrn .lrn-author-ui .lrn-author-save-button-group.lrn-author-btn-save-dropdown-active .lrn-author-btn-save {
-    color: var(--content-ui-submit-foreground);
-    background-color: var(--content-ui-submit-background);
+    color: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground));
+    background-color: var(--sbx-config-color-accent, var(--content-ui-submit-background));
 }
 .lrn .lrn-author-ui .lrn-author-save-button-group.lrn-author-btn-save-dropdown-active .lrn-author-btn-save:hover {
-    background-color: rgba(
-        calc(var(--content-ui-submit-background-r) + (255 - var(--content-ui-submit-background-r)) * 0.2),
-        calc(var(--content-ui-submit-background-g) + (255 - var(--content-ui-submit-background-g)) * 0.2),
-        calc(var(--content-ui-submit-background-b) + (255 - var(--content-ui-submit-background-b)) * 0.2),
-        var(--content-ui-submit-background-a)
-    );
+    background: var(--sbx-config-color-accent, var(--content-ui-submit-background));
     border: none;
-    color: var(--content-ui-submit-foreground);
+    color: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground));
 }
 
 /* hide player, defaults, tags tabs */
@@ -260,9 +313,11 @@ ul.lrn-author-nav.lrn-author-nav-tabs.lrn-author-ui-no-preview {
 button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-outline.lrn-author-btn-icon-left.lrn-author-btn-responsive.lrn-author-btn-i-xs.lrn-btn {
     display: none;
 }
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-left,
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-right,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-left,
 .lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-right {
-    background: var(--content-ui-background);
+    background: var(--sbx-color-foreground-primary, var(--content-ui-background));
     border: none;
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
@@ -273,11 +328,28 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-button,
 .lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-button {
     background-color: var(--content-ui-background);
-    border-radius: 0px !important;
+    border-radius: var(--sbx-config-field-corner-radius, 0px) !important;
     border: none;
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     font-size: 1rem;
     line-height: inherit;
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toolbar-control,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toolbar-control,
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-button,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-button {
+    background-color: var(--sbx-color-foreground-primary, var(--content-ui-background));
+    border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-left,
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-right,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-left,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-right {
+    border: none;
+}
+.lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-left,
+.lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-right {
+    border: none;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-active,
 .lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-active {
@@ -314,18 +386,27 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 .lrn .lrn-author-ui .lrn-author-validate-questions-toggle:hover,
 .lrn .lrn-author-ui .lrn-author-validate-questions-toggle.checked,
 .lrn .lrn-author-ui .lrn-author-validate-questions-toggle.checked:hover {
-    background-color: var(--content-ui-background);
-    border-radius: 0px;
-    border: 0px;
+    background-color: var(--sbx-color-foreground-primary, var(--content-ui-background));
+    border-radius: var(--sbx-config-field-corner-radius, 0px) !important;
+    border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     font-family:
-        -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica, Arial,
+        var(--sbx-font-primary, "Figtree"),
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Roboto",
+        "Droid Sans",
+        "Helvetica Neue",
+        Helvetica,
+        Arial,
         sans-serif !important;
     font-size: 1rem;
     font-weight: 400;
 }
 .lrn .lrn-author-ui-no-preview button:focus {
-    outline: none;
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate.checked span,
 .lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate.checked span {
@@ -333,7 +414,8 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-button:hover:enabled {
-    background-color: var(--content-ui-background);
+    background: var(--sbx-color-foreground-primary, var(--content-ui-background));
+    border-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate.checked span:hover,
@@ -346,9 +428,9 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 .cke_dialog_container_qe .cke_dialog_ui_button_cancel:focus,
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-button:focus,
 .lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-button:focus {
-    border-radius: 0;
-    outline: none;
-    outline-offset: 0;
+    border-radius: var(--sbx-config-field-corner-radius, 0px) !important;
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate.checked:focus span::after,
 .lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate.checked:focus span::after {
@@ -365,6 +447,7 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 .lrn-qe .lrn-qe-ui .lrn-qe-form-control {
     border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
     border-color: var(--sbx-config-color-accent, var(--form-border-color));
+    border-radius: var(--sbx-config-field-corner-radius, 0px);
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-form-control:hover {
     background-color: var(--form-bg-hover-color);
@@ -377,17 +460,43 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
     color: var(--form-bg-hover-color-contrast);
     outline: none;
 }
+.lrn-qe .lrn-qe-ui .lrn-qe-form-control:focus {
+    background: var(--sbx-color-foreground-primary, var(--content-ui-background));
+    border-color: var(--sbx-config-color-accent, var(--form-border-color)) !important;
+    box-shadow: none !important;
+    color: var(--sbx-color-text-primary, #000);
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--form-border-color)) !important;
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px) !important;
+}
+
+.lrn-qe .lrn-qe-ui .lrn-qe-form-control:focus-visible,
+.lrn-qe .lrn-qe-ui .lrn-qe-input:focus-visible,
+.lrn-qe .lrn-qe-ui input[data-lrn-qe-form-control]:focus-visible {
+    border-color: var(--sbx-config-color-accent, var(--form-border-color)) !important;
+    box-shadow: none !important;
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--form-border-color)) !important;
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px) !important;
+}
 .lrn-qe .lrn-qe-ui .lrn-qe-form-el-reorderable .lrn-qe-form-el-reorder-handle {
     border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
+    border-radius: var(--sbx-config-field-corner-radius, 0px);
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-btn-primary {
-    background-color: var(--content-ui-background) !important;
-    background: var(--content-ui-background);
-    border-radius: 0px;
+    background-color: var(--sbx-config-color-accent, var(--content-ui-submit-background)) !important;
+    background: var(--sbx-config-color-accent, var(--content-ui-submit-background));
+    border-radius: var(--sbx-config-field-corner-radius, 0px) !important;
     border: none;
-    color: var(--sbx-config-color-accent, var(--content-ui-foreground)) !important;
+    color: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground)) !important;
     font-family:
-        -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica, Arial,
+        var(--sbx-font-primary, "Figtree"),
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Roboto",
+        "Droid Sans",
+        "Helvetica Neue",
+        Helvetica,
+        Arial,
         sans-serif !important;
     font-size: 1rem;
     font-weight: 400;
@@ -401,35 +510,101 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
     width: 100% !important;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-btn-primary:hover {
-    background-color: var(--sbx-config-color-active, var(--content-ui-hover)) !important;
-    color: var(--sbx-config-color-accent, var(--content-ui-foreground)) !important;
+    background: var(--sbx-config-color-accent, var(--content-ui-submit-background)) !important;
+    color: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground)) !important;
     text-decoration: none !important;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-switch-trigger {
+    background-color: var(--sbx-color-foreground-primary, var(--content-ui-background));
     border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    border-radius: min(
+        var(--sbx-config-field-corner-radius, 0px),
+        var(--sbx-border-radius-m, var(--sbx-config-field-corner-radius, 0px))
+    );
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
+}
+
+.lrn-qe .lrn-qe-ui input[type="checkbox"],
+.lrn-qe .lrn-qe-ui .lrn-qe-input[type="checkbox"] {
+    accent-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
+    background-color: var(--sbx-color-foreground-primary, var(--content-ui-background));
+    border-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
+    border-radius: min(
+        var(--sbx-config-field-corner-radius, 0px),
+        var(--sbx-border-radius-m, var(--sbx-config-field-corner-radius, 0px))
+    );
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-form-control-ckeditor .cke_textarea_inline {
+    border-radius: var(--sbx-config-field-corner-radius, 0px);
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-form-control-ckeditor .cke_textarea_inline:focus {
-    background: var(--form-bg-hover-color);
-    border-color: hsla(
-        var(--form-border-color-h),
-        var(--form-border-color-s),
-        calc(var(--form-border-color-l) - 15%),
-        var(--form-border-color-a)
-    );
-    outline: none;
+    background: var(--sbx-color-foreground-primary, var(--content-ui-background));
+    border-color: var(--sbx-config-color-accent, var(--form-border-color)) !important;
+    border-radius: var(--sbx-config-field-corner-radius, 0px);
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--form-border-color)) !important;
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px) !important;
+}
+
+.lrn-qe .lrn-qe-ui .lrn-qe-form-control-ckeditor:focus-within {
+    border-color: var(--sbx-config-color-accent, var(--form-border-color)) !important;
+    box-shadow: none !important;
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--form-border-color)) !important;
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px) !important;
+}
+
+.lrn-qe .lrn-qe-ui .lrn-qe-form-control-ckeditor .cke_editable:focus,
+.lrn-qe .lrn-qe-ui .lrn-qe-form-control-ckeditor .cke_editable:focus-visible,
+.lrn-qe .lrn-qe-ui .lrn-qe-form-control-ckeditor .cke_editable.cke_focus,
+.lrn-qe .lrn-qe-ui .lrn-qe-form-control-ckeditor .cke_textarea_inline.cke_focus {
+    border-color: var(--sbx-config-color-accent, var(--form-border-color)) !important;
+    box-shadow: none !important;
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--form-border-color)) !important;
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px) !important;
+}
+
+/* keep shared border between field and reorder handle square */
+.lrn-qe .lrn-qe-ui .lrn-qe-form-el-reorderable > .lrn-qe-form-el-wrapper .lrn-qe-form-control,
+.lrn-qe
+    .lrn-qe-ui
+    .lrn-qe-form-el-reorderable
+    > .lrn-qe-form-el-wrapper
+    .lrn-qe-form-control-ckeditor
+    .cke_textarea_inline,
+.lrn-qe
+    .lrn-qe-ui
+    .lrn-qe-form-el-reorderable
+    > .lrn-qe-form-el-wrapper
+    .lrn-qe-form-control-ckeditor
+    .cke_textarea_inline:focus {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.lrn-qe .lrn-qe-ui .lrn-qe-form-el-reorderable > .lrn-qe-form-el-wrapper + div .lrn-qe-form-el-reorder-handle {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 /* more options styles */
 .lrn-qe .lrn-qe-ui button.lrn-qe-more-options,
 .lrn-qe .lrn-qe-ui .lrn-qe-more-options {
-    background: var(--content-ui-background);
+    background: var(--sbx-color-foreground-primary, var(--content-ui-background));
+    border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 .lrn-qe .lrn-qe-ui button.lrn-qe-more-options:hover,
-.lrn-qe .lrn-qe-ui button.lrn-qe-more-options:focus,
 .lrn-qe .lrn-qe-ui .lrn-qe-more-options:hover,
+.lrn-qe .lrn-qe-ui button.lrn-qe-more-options:focus,
 .lrn-qe .lrn-qe-ui .lrn-qe-more-options:focus {
+    background: var(--sbx-color-foreground-primary, var(--content-ui-background));
     border-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
+}
+.lrn-qe .lrn-qe-ui button.lrn-qe-more-options:focus,
+.lrn-qe .lrn-qe-ui .lrn-qe-more-options:focus {
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
 .lrn-qe .lrn-qe-ui button.lrn-qe-more-options:active:hover,
 .lrn-qe .lrn-qe-ui button.lrn-qe-more-options:active:focus,
@@ -449,9 +624,9 @@ span.lrn-qe-i-trash {
 .lrn-qe .lrn-qe-ui .lrn-qe-custom-select select {
     border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
     border-color: var(--sbx-config-color-accent, var(--form-border-color));
+    border-radius: var(--sbx-config-field-corner-radius, 0px);
 }
-.lrn-qe .lrn-qe-ui .lrn-qe-custom-select select:hover,
-.lrn-qe .lrn-qe-ui .lrn-qe-custom-select select:focus {
+.lrn-qe .lrn-qe-ui .lrn-qe-custom-select select:hover {
     background-color: var(--form-bg-hover-color);
     border-color: hsla(
         var(--form-border-color-h),
@@ -460,7 +635,30 @@ span.lrn-qe-i-trash {
         var(--form-border-color-a)
     );
     color: var(--form-bg-hover-color-contrast);
-    outline: none;
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-custom-select select:focus {
+    background: var(--sbx-color-foreground-primary, var(--content-ui-background));
+    border-color: var(--sbx-config-color-accent, var(--form-border-color)) !important;
+    box-shadow: none !important;
+    color: var(--sbx-color-text-primary, #000);
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--form-border-color)) !important;
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px) !important;
+}
+
+.lrn-qe .lrn-qe-ui .lrn-qe-custom-select select:focus-visible {
+    border-color: var(--sbx-config-color-accent, var(--form-border-color)) !important;
+    box-shadow: none !important;
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--form-border-color)) !important;
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px) !important;
+}
+
+.lrn-qe .lrn-qe-ui .lrn-qe-custom-select:focus-within,
+.lrn-qe .lrn-qe-ui .lrn-qe-form-control-wrapper:focus-within,
+.lrn-qe .lrn-qe-ui .lrn-qe-form-el-wrapper:focus-within {
+    border-color: var(--sbx-config-color-accent, var(--form-border-color)) !important;
+    box-shadow: none !important;
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--form-border-color)) !important;
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px) !important;
 }
 
 /*hide layout and selection, extra and more options, sections */
@@ -495,10 +693,16 @@ span.lrn-qe-i-trash {
 .lrn.lrn-author .lrn-author-item-for-activity-list .lrn-author-check-box-wrapper .lrn-author-check-box-span {
     background: none;
     border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
-    border-radius: 0px;
+    border-radius: min(var(--sbx-config-field-corner-radius, 0px), var(--sbx-border-radius-m, 4px));
     color: transparent;
 }
-
+.lrn-author
+    .lrn-author-ui
+    .lrn-author-list-view-select-col
+    .lrn-author-check-box-wrapper
+    .lrn-author-check-box-span:before {
+    line-height: 1em !important;
+}
 /* change checkbox and rows selection background color */
 .lrn.lrn-author .lrn-item-for-activity-list .lrn-check-box-wrapper .lrn-check-box-input:checked + .lrn-check-box-span {
     color: var(--sbx-config-color-accent, var(--content-ui-foreground)) !important;
@@ -531,30 +735,35 @@ span.lrn-qe-i-trash {
     [data-tab-content="details"]
     .lrn-list-selected-activity
     .lrn-list-details {
-    background-color: var(--content-ui-background);
+    background: var(--sbx-color-foreground-primary, var(--content-ui-background));
 }
 
 /* change create and find card positions */
 button.lrn-author-activity-button.lrn-author-activity-button-legacy.lrn-author-btn-i-xs.lrn-author-btn-sec.lrn-author-btn-sec-legacy.lrn-author-col-xs-none.lrn-author-col-sm-none {
     position: absolute;
-    right: 150px;
+    right: 160px;
     top: 50px;
     z-index: var(--sbx-depth-default);
 }
 button.lrn-author-activity-button.lrn-author-btn-i-xs.lrn-author-btn-primary.lrn-author-col-xs-none.lrn-author-col-sm-none {
     position: absolute;
-    right: 0px;
+    right: 10px;
     top: 50px;
     z-index: var(--sbx-depth-default);
 }
 span.lrn-author-name-wrapper {
     border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
+    border-radius: var(--sbx-config-field-corner-radius, 0px);
+}
+
+.lrn .lrn-author-ui .lrn-author-name-wrapper .lrn-author-form-control {
+    border-radius: var(--sbx-config-field-corner-radius, 0px);
 }
 
 /* questions and features button styles */
 .lrn .lrn-author-ui .lrn-author-btn-outline {
-    background-color: var(--content-ui-background);
-    border: none;
+    background-color: var(--sbx-color-foreground-primary, var(--content-ui-background));
+    border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     line-height: inherit;
     min-height: 2.5rem;
@@ -564,7 +773,8 @@ span.lrn-author-name-wrapper {
     vertical-align: middle;
 }
 .lrn .lrn-author-ui .lrn-author-btn-outline:hover {
-    background-color: var(--sbx-config-color-active, var(--content-ui-hover));
+    background: var(--sbx-color-foreground-primary, var(--content-ui-background));
+    border-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     text-decoration: none !important;
 }
@@ -572,13 +782,9 @@ span.lrn-author-name-wrapper {
     background: var(--content-ui-selected);
     border-left-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
-.lrn-qe .lrn-qe-ui .lrn-qe-nav-pills .lrn-qe-nav-link {
-    border-radius: 0px;
-}
-
 /* search pages styles */
 li.lrn-author-list-view-item.lrn-author-flyout-wrapper {
-    background: #fff;
+    background: var(--sbx-color-foreground-primary, #fff);
     border-bottom: 1px solid var(--sbx-color-border, var(--body-background)) !important;
     list-style: none;
     max-width: none;
@@ -619,11 +825,20 @@ li.lrn-author-list-view-item.lrn-author-flyout-wrapper {
     border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
     padding: 0.5rem 1rem;
 }
+.lrn .lrn-author-ui .lrn-author-input-group-btn[data-authorapi-selector="expand-advanced"] {
+    border-radius: 0 var(--sbx-config-field-corner-radius, 0px) var(--sbx-config-field-corner-radius, 0px) 0 !important;
+}
 .lrn .lrn-author-ui .lrn-author-input-group-lg .lrn-author-form-control {
-    background-color: #fff;
+    background-color: var(--sbx-color-foreground-primary, #fff);
     border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
     border-color: var(--sbx-config-color-accent, var(--form-border-color));
     padding: 0.5rem;
+}
+.lrn .lrn-author-ui .lrn-author-form-control[data-authorapi-selector="search-basic-input"] {
+    border-radius: var(--sbx-config-field-corner-radius, 0px) 0 0 var(--sbx-config-field-corner-radius, 0px);
+}
+.lrn .lrn-author-ui select.lrn-author-form-control {
+    border-radius: var(--sbx-config-field-corner-radius, 0px);
 }
 .lrn .lrn-author-ui .lrn-author-btn-save.lrn-author-btn-saving {
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
@@ -645,8 +860,8 @@ li.lrn-author-list-view-item.lrn-author-flyout-wrapper {
 
 /* update the info massage styles */
 .lds-message--info {
-    background-color: var(--content-ui-background);
-    border-radius: 0;
+    background: var(--sbx-color-foreground-primary, var(--content-ui-background));
+    border-radius: var(--sbx-config-container-corner-radius, 0px);
     border: none;
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     font-size: 16px;
@@ -660,7 +875,7 @@ li.lrn-author-list-view-item.lrn-author-flyout-wrapper {
 .lrn .lrn-author-ui .lrn-custom-select select:hover {
     background-color: var(--form-bg-hover-color);
     border-color: var(--sbx-config-color-accent, var(--form-border-color));
-    color: #000000;
+    color: var(--sbx-color-text-primary, #000000);
 }
 .lrn .lrn-author-ui .lrn-sort-author-button {
     border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
@@ -679,7 +894,15 @@ li.lrn-author-list-view-item.lrn-author-flyout-wrapper {
 .lrn-author-toolbar-toggle .lrn-author-toggle-part,
 .lrn-author-activity-button {
     font-family:
-        -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica, Arial,
+        var(--sbx-font-primary, "Figtree"),
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Roboto",
+        "Droid Sans",
+        "Helvetica Neue",
+        Helvetica,
+        Arial,
         sans-serif !important;
     font-size: 1rem;
     font-weight: 400;
@@ -798,15 +1021,16 @@ form.lrn-form.lrn-form-list-search
     font-size: 1rem;
 }
 .lrn .lrn-author-ui .lrn-author-btn-default {
-    background: var(--content-ui-background);
-    border-radius: 0px !important;
-    border: none;
+    background: var(--sbx-color-foreground-primary, var(--content-ui-background));
+    border-radius: var(--sbx-config-field-corner-radius, 0px) !important;
+    border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     font-size: 1rem;
 }
 .lrn .lrn-author-ui .lrn-author-btn-default:hover {
+    background: var(--sbx-color-foreground-primary, var(--content-ui-background));
+    border-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     color: var(--sbx-config-color-accent, var(--content-ui-foreground)) !important;
-    background-color: var(--sbx-config-color-active, var(--content-ui-hover)) !important;
     text-decoration: none !important;
 }
 .lrn-author-list-view-loaded > .lrn-author-list-view-empty.lrn-author-ui-no-preview::after {
@@ -823,11 +1047,11 @@ button.lrn-btn.lrn-author-btn-default.lrn-author-btn-full-width::before {
 .lrn .lrn-author-ui .lrn-author-btn-primary[disabled],
 .lrn .lrn-author-ui .lrn-author-btn-primary[disabled]:hover,
 .lrn .lrn-author-ui .lrn-author-btn-primary[disabled]:focus {
-    background-color: var(--content-ui-background);
-    border-color: transparent;
-    border-radius: 0px;
+    background-color: var(--sbx-config-color-accent, var(--content-ui-submit-background));
+    border-color: var(--sbx-config-color-accent, transparent);
+    border-radius: var(--sbx-config-field-corner-radius, 0px) !important;
     box-shadow: none;
-    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
+    color: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground));
     cursor: default;
     opacity: 0.5;
     font-size: 1rem;
@@ -879,7 +1103,7 @@ span.lrn-author-widget-icon.lrn-author-i-plus::before {
 
 /* updated notification side panel background colour to white*/
 .action-list {
-    background-color: #fff;
+    background-color: var(--sbx-color-foreground-primary, #fff);
 }
 
 /* Change the style for disabled buttons to make it clear to the user the button is disabled */
@@ -903,12 +1127,14 @@ button.lrn-h3.lrn-author-list-view-heading.lrn-ellipses.lrn-author-editable-item
 
 /* Updated the save button border color to match with new submit button color */
 .lrn .lrn-author-ui .lrn-author-btn-success {
-    border: 1px solid var(--content-ui-submit-background);
+    border: 1px solid var(--sbx-config-color-accent, var(--content-ui-submit-background));
 }
 
 /* Fixed the preview icon hover color and positions */
 .lrn.lrn-author .lrn-item-for-activity-list .lrn-author-list-view-item .lrn-author-btn-default:hover {
-    background: #ccc !important;
+    background: var(--sbx-color-foreground-primary, var(--content-ui-background)) !important;
+    border: none;
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground)) !important;
 }
 .lrn.lrn-author .lrn-item-for-activity-list .lrn-author-list-view-item .lrn-author-btn-default.lrn-close-preview {
     font-size: 1rem;
@@ -938,17 +1164,28 @@ button.lrn-author-activity-button.lrn-author-btn-i-xs.lrn-author-btn-sec {
 
 /* Updated the clear filter buttons */
 .lrn .lrn-author-ui-no-preview .lrn-label-group-btn {
-    background: var(--content-ui-background);
-    border: none;
-    border-radius: 0px !important;
+    background: var(--sbx-color-foreground-primary, var(--content-ui-background));
+    border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    border-radius: var(--sbx-config-field-corner-radius, 0px) !important;
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     font-size: 1rem !important;
     padding: 0.5rem;
 }
 .lrn .lrn-author-ui-no-preview .lrn-label-group-btn:hover {
-    background-color: var(--sbx-config-color-active, var(--content-ui-hover)) !important;
+    background: var(--sbx-color-foreground-primary, var(--content-ui-background)) !important;
+    border-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     color: var(--sbx-config-color-accent, var(--content-ui-foreground)) !important;
     text-decoration: none !important;
+}
+.lrn .lrn-author-ui-no-preview .lrn-author-label-group-btn.lrn-author-i-cross,
+.lrn .lrn-author-ui-no-preview .lrn-author-label-group-btn.lrn-author-i-cross:hover,
+.lrn .lrn-author-ui-no-preview .lrn-author-label-group-btn.lrn-author-i-cross:focus {
+    background: var(--sbx-color-foreground-primary, #fff) !important;
+    border-radius: 0 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
 }
 .lrn .lrn-author-ui .lrn-dl-inline dt {
     margin-left: 0px;
@@ -991,8 +1228,7 @@ li.lrn-item-for-activity-list.lrn-col-xs-10.lrn-col-md-11 {
 }
 
 ul.lrn-author-list-view.lrn-author-list-unstyled.lrn-author-list-divider.lrn-author-draggable {
-    background: #fff;
-    border-bottom: 1px solid var(--sbx-color-border, var(--body-background)) !important;
+    background: var(--sbx-color-foreground-primary, #fff);
     list-style: none;
     max-width: none;
     overflow: visible;
@@ -1035,8 +1271,36 @@ button.lrn-author-btn-old.lrn-author-btn-old-legacy.lrn-author-btn-sec.lrn-autho
 }
 .lrn-author .lrn-author-ui .lrn-author-btn-old-legacy:focus,
 .lrn-author .lrn-author-ui a.lrn-author-btn-old-legacy:focus {
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
+}
+.lrn-author
+    .lrn-author-ui
+    .lrn-author-pagination-btn:is(
+        [data-authorapi-selector="pagination-previous"],
+        [data-authorapi-selector="pagination-prev"],
+        [data-authorapi-selector="pagination-next"]
+    ):focus {
+    border: none;
     outline: none;
 }
+
+/* remove focus border from Learnosity buttons */
+.lrn .lrn-author-ui button:focus,
+.lrn .lrn-author-ui button:focus-visible,
+.lrn .lrn-author-ui .lrn-btn:focus,
+.lrn .lrn-author-ui .lrn-btn:focus-visible,
+.lrn-qe .lrn-qe-ui button:focus,
+.lrn-qe .lrn-qe-ui button:focus-visible,
+.lrn-qe .lrn-qe-ui .lrn-qe-btn:focus,
+.lrn-qe .lrn-qe-ui .lrn-qe-btn:focus-visible,
+.cke_dialog_container_qe .cke_dialog_ui_button:focus,
+.cke_dialog_container_qe .cke_dialog_ui_button:focus-visible {
+    border-color: inherit !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
 /* Fixed the mobile version for the search page */
 @media #{$small-only} {
     .lrn .lrn-author-ui .lrn-author-list-view-heading-wrapper {
@@ -1068,4 +1332,18 @@ button.lrn-author-btn-old.lrn-author-btn-old-legacy.lrn-author-btn-sec.lrn-autho
     .lrn_widget.lrn_sortlist .lrn_sortlist_soruce_trigger button {
         display: none;
     }
+}
+/* update the section background and overflow for learnosity */
+body.sbx-body .island section:not(:has(sbx-pop-out)) {
+    overflow: visible;
+    background: #fff;
+}
+
+/* update the review screen input */
+body.sbx-body .lrn.lrn-assess .app-panel.review-screen .panel-filters .lrn-assess-input {
+    position: relative;
+}
+body.sbx-body .lrn-assess-switch .lrn-assess-switch-trigger:before,
+body.sbx-body .lrn-assess-switch input.lrn-assess-input[aria-checked="true"] + .lrn-assess-switch-trigger:after {
+    display: none;
 }
