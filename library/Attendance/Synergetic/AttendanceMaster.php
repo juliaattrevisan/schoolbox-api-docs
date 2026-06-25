@@ -98,7 +98,7 @@ class Attendance_Synergetic_AttendanceMaster
             ClassCode = :classCode AND
             AttendanceDate = :attendanceDate AND
             AttendancePeriod = :attendancePeriod AND
-            (AttendanceDayNumber = :attendanceDayNumber OR (:attendanceDayNumber IS NULL AND AttendanceDayNumber IS NULL))
+            AttendanceDayNumber = :attendanceDayNumber
         ", [
             'fileType'          => $this->getClassFileType(),
             'fileYear'          => $this->getFileYear(),
