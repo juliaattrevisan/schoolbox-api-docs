@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\InternationalBaccalaureate\Test;
 
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Admin\InternationalBaccalaureate\RegisterCandidatesCandidateBuilder;
 use Schoolbox\GenericCollection;
@@ -60,7 +61,7 @@ class RegisterCandidatesCandidateBuilderTest extends TestCase
                 'firstname' => 'Test',
                 'lastname' => 'User',
                 'email' => 'test.user@example.edu',
-                'gender' => 'F',
+                'gender' => 'FEMALE',
                 'language1' => 'ENG',
                 'language2' => 'FRE',
                 'nationality1' => 'AUS',
@@ -69,6 +70,35 @@ class RegisterCandidatesCandidateBuilderTest extends TestCase
             ],
             $candidate
         );
+    }
+
+    #[DataProvider('genderProvider')]
+    public function testBuildMapsStudentGenderToIbisGender(string $studentGender, string $expectedGender): void
+    {
+        $candidate = (new RegisterCandidatesCandidateBuilder())->build(
+            $this->buildStudent(),
+            [
+                'StudentBirthDate' => strtotime('2009-04-12'),
+                'StudentGender' => $studentGender,
+            ]
+        );
+
+        $this->assertSame($expectedGender, $candidate['gender']);
+    }
+
+    /**
+     * @return array<string, array{0: string, 1: string}>
+     */
+    public static function genderProvider(): array
+    {
+        return [
+            'male code' => ['M', 'MALE'],
+            'male label' => [' male ', 'MALE'],
+            'female code' => ['F', 'FEMALE'],
+            'female label' => [' female ', 'FEMALE'],
+            'non-binary label' => ['non-binary', 'X'],
+            'unknown value' => ['unknown', 'X'],
+        ];
     }
 
     public function testBuildRequiresGender(): void
@@ -125,5 +155,28 @@ class RegisterCandidatesCandidateBuilderTest extends TestCase
                 'StudentGender' => null,
             ]
         );
+    }
+
+    private function buildStudent(): RegistrationSessionStudentModel
+    {
+        return (new RegistrationSessionStudentModel())
+            ->setUser(
+                (new User())
+                    ->setId(123)
+                    ->setFirstname('Test')
+                    ->setLastname('User')
+                    ->setLocalEmail(false)
+                    ->setAltEmail('test.user@example.edu')
+                    ->setLanguageCollection(
+                        new GenericCollection(LanguageModel::class, [
+                            (new LanguageModel())->setCode('ENG'),
+                        ])
+                    )
+                    ->setNationalityCollection(
+                        new GenericCollection(NationalityModel::class, [
+                            (new NationalityModel())->setCode('AUS'),
+                        ])
+                    )
+            );
     }
 }
