@@ -15,6 +15,7 @@ use Alaress_Date_Format;
 use External_Timetable;
 use InvalidArgumentException;
 use Schoolbox\Calendar\Event;
+use Schoolbox\Calendar\EventRecurrenceMapper;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
@@ -304,6 +305,10 @@ class Validation
             // existing booking: Validate related and recurrent bookings
             $validationResults = [];
             $allocationPeriodsByResourceId = [];
+            $originalQuantityByBookingId = $this->getOriginalQuantityByBookingId(
+                $existingBooking,
+                $postData['efficacy'] ?? null
+            );
             foreach (
                 $series->getExistingSeries(
                     $existingBooking,
@@ -329,7 +334,11 @@ class Validation
                     $thisBooking
                 );
                 if ($thisResource->getId() !== $resource->getId()) {
-                    $validationResults[] = $this->validateQuantity($thisResource, $resourceQuantity, $thisBooking);
+                    $validationResults[] = $this->validateQuantity(
+                        $thisResource,
+                        $resourceQuantity,
+                        $this->getOriginalQuantityBooking($thisBooking, $originalQuantityByBookingId)
+                    );
                 }
 
                 // Validate for clashes even if $override is true.
@@ -406,6 +415,48 @@ class Validation
             $relatedItems[$seriesResource->getId()] ?? [],
             $existingBooking
         );
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    private function getOriginalQuantityByBookingId(BookingModel $existingBooking, ?string $efficacy): array
+    {
+        $originalBookings = new Collection();
+        if ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES) {
+            $originalBookings = $this->getBookingMapper()->findSeriesBookings(
+                $existingBooking->getId(),
+                $existingBooking->getEvent()->getSeriesId()
+            );
+        }
+        $originalBookings->add($existingBooking);
+
+        $originalQuantityByBookingId = [];
+        foreach ($originalBookings as $originalBooking) {
+            $originalQuantityByBookingId[$originalBooking->getId()] = $originalBooking->getQuantity();
+            foreach ($this->getBookingMapper()->findRelatedBookings($originalBooking->getId()) as $relatedBooking) {
+                $originalQuantityByBookingId[$relatedBooking->getId()] = $relatedBooking->getQuantity();
+            }
+        }
+
+        return $originalQuantityByBookingId;
+    }
+
+    /**
+     * @param array<int, int> $originalQuantityByBookingId
+     */
+    private function getOriginalQuantityBooking(
+        BookingModel $booking,
+        array $originalQuantityByBookingId
+    ): ?BookingModel {
+        $bookingId = $booking->getId();
+        if (!isset($originalQuantityByBookingId[$bookingId])) {
+            return null;
+        }
+
+        $originalQuantityBooking = clone $booking;
+        $originalQuantityBooking->setQuantity($originalQuantityByBookingId[$bookingId]);
+        return $originalQuantityBooking;
     }
 
     public function validateBookingQuantity(

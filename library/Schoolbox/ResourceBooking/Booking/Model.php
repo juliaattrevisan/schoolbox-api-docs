@@ -54,17 +54,17 @@ class Model implements ISoftDeletable, JsonSerializable
     protected int $quantity = self::DEFAULT_QUANTITY;
 
     /**
-     * @var Item\Model
+     * @var Item\Model|null
      */
     protected $resource;
 
     /**
-     * @var Calendar\Event
+     * @var Calendar\Event|null
      */
     protected $event;
 
     /**
-     * @var Status\Model
+     * @var Status\Model|null
      */
     protected $status;
 
@@ -140,7 +140,7 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
-     * @return Item\Model
+     * @return Item\Model|null
      */
     public function getResource()
     {
@@ -158,7 +158,7 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
-     * @return Calendar\Event
+     * @return Calendar\Event|null
      */
     public function getEvent()
     {
@@ -194,7 +194,7 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
-     * @return Status\Model
+     * @return Status\Model|null
      */
     public function getStatus()
     {
@@ -415,23 +415,24 @@ class Model implements ISoftDeletable, JsonSerializable
     */
     public function jsonSerialize(): array
     {
+        $event = $this->getEvent();
         // If booking start/end times are not set, use start/end times from the linked event.
-        $bookingStartAt = $this->getBookingStartAt() ?? $this->getEvent()->getStartDateTime();
-        $bookingEndAt = $this->getBookingEndAt() ?? $this->getEvent()->getEndDateTime();
+        $bookingStartAt = $this->getBookingStartAt() ?? $event?->getStartDateTime();
+        $bookingEndAt = $this->getBookingEndAt() ?? $event?->getEndDateTime();
 
         return [
             'id'       => $this->getId(),
             'name'     => $this->getName(),
             'notes'    => $this->getNotes(),
             'quantity' => $this->getQuantity(),
-            'resource' => $this->getResource()->jsonSerialize(),
+            'resource' => $this->getResource()?->jsonSerialize(),
             'event'    => [
-                'start' => $this->getEvent()->getStartDateTime()?->toIso8601String(),
-                'end'   => $this->getEvent()->getEndDateTime()?->toIso8601String(),
+                'start' => $event?->getStartDateTime()?->toIso8601String(),
+                'end'   => $event?->getEndDateTime()?->toIso8601String(),
             ],
             'start' => $bookingStartAt?->toIso8601String(),
             'end' => $bookingEndAt?->toIso8601String(),
-            'status' => $this->getStatus()->jsonSerialize()
+            'status' => $this->getStatus()?->jsonSerialize()
         ];
     }
 }
