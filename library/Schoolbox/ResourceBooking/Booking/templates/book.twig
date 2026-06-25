@@ -227,6 +227,23 @@ $(function() {
                 max: {{ quantityMax }}
             },
             {% endif %}
+            {% for relatedItem in item.resource.relatedResourceList %}
+                {% if item.hasRelatedBookingForResource(relatedItem.id) %}
+                    {% set relatedBooking = item.getRelatedBookingForResource(relatedItem.id) %}
+                {% else %}
+                    {% set relatedBooking = {} %}
+                {% endif %}
+                {% set relatedBookingQuantity = relatedBooking.quantity|default(1) %}
+                {% set relatedQuantityMax = relatedItem.capacity > relatedBookingQuantity ? relatedItem.capacity : relatedBookingQuantity %}
+                {% if relatedItem.capacity > 1 or relatedBookingQuantity > 1 %}
+            'related_item[{{ relatedItem.id }}][quantity]': {
+                required: true,
+                digits: true,
+                min: 1,
+                max: {{ relatedQuantityMax }}
+            },
+                {% endif %}
+            {% endfor %}
             'repeat_until': {
                 datepickerDate: {
                     depends: function() {
@@ -281,6 +298,23 @@ $(function() {
                 max: 'Please enter a quantity no greater than {{ quantityMax }}'
             },
             {% endif %}
+            {% for relatedItem in item.resource.relatedResourceList %}
+                {% if item.hasRelatedBookingForResource(relatedItem.id) %}
+                    {% set relatedBooking = item.getRelatedBookingForResource(relatedItem.id) %}
+                {% else %}
+                    {% set relatedBooking = {} %}
+                {% endif %}
+                {% set relatedBookingQuantity = relatedBooking.quantity|default(1) %}
+                {% set relatedQuantityMax = relatedItem.capacity > relatedBookingQuantity ? relatedItem.capacity : relatedBookingQuantity %}
+                {% if relatedItem.capacity > 1 or relatedBookingQuantity > 1 %}
+            'related_item[{{ relatedItem.id }}][quantity]': {
+                required: 'Please enter a valid quantity',
+                digits: 'Please enter a whole number',
+                min: 'Please enter a quantity of at least 1',
+                max: 'Please enter a quantity no greater than {{ relatedQuantityMax }}'
+            },
+                {% endif %}
+            {% endfor %}
             'repeat_until': {
                 datepickerDate: 'Please enter a valid date',
                 'afterStart':   'Repeat-until date must be after start date'
