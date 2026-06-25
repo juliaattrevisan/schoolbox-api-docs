@@ -20,6 +20,11 @@
             searching: false
         });
 
+        $('[data-resource-booking-report-action="approve"]').on('click', function(event) {
+            event.preventDefault();
+            approveResourceBookingFromReport(event.currentTarget);
+        });
+
         onChangeDate('start'); // In case the initial dates are ever set too far apart.
     });
 
@@ -70,6 +75,51 @@
                 }
                 break;
         }
+    }
+
+    async function approveResourceBookingFromReport(action)
+    {
+        const data = new URLSearchParams({
+            efficacy: false
+        });
+
+        try {
+            const response = await fetch(action.href, {
+                method: "POST",
+                body: data.toString(),
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            });
+
+            if (response.ok) {
+                window.location.reload();
+                return;
+            }
+
+            const responseData = await response.json().catch(() => ({}));
+            showResourceBookingReportApprovalFailure(responseData);
+        } catch (error) {
+            console.error(error);
+            showResourceBookingReportApprovalFailure({});
+        }
+    }
+
+    function showResourceBookingReportApprovalFailure(responseData)
+    {
+        const periodErrors = Object.values(responseData?.errors?.start_period_errors ?? {});
+        const capacityExceeded = periodErrors.some(
+            (errors) => Array.isArray(errors) && errors.includes("conflict")
+        );
+        const message = capacityExceeded
+            ? "Failed to approve, capacity exceeded."
+            : "Failed to approve booking.";
+
+        window.sbProps.toastActivate(message).timeout({
+            text: message,
+            isSuccess: false
+        });
     }
 </script>
 <!-- END custom_head -->
@@ -278,7 +328,11 @@
                                     <ul class="flex-list buttons">
                                         {% if approveRoute %}
                                             <li>
-                                                <a href="{{ approveRoute }}" class="sbx-button--has-icon">
+                                                <a
+                                                    href="{{ approveRoute }}"
+                                                    class="sbx-button--has-icon"
+                                                    data-resource-booking-report-action="approve"
+                                                >
                                                     <sbx-icon name="approve"></sbx-icon>
                                                     Approve
                                                 </a>
