@@ -660,32 +660,33 @@ class Controller extends Base
             throw new NotFound("No Feedback for assessment.");
         }
 
+        // Attempting to publish an already published feedback should have no effect.
         if (!$feedback->isPublished()) {
             // Single publish is an explicit publish action by the current user.
             $feedback
                 ->setPublishedAt(\Alaress_Date_Format::now())
                 ->setPublishedBy($this->getUser()->getId());
-        }
 
-        $this->getFeedbackDataSource()->save($feedback);
+            $this->getFeedbackDataSource()->save($feedback);
 
-        // Update project mark as the published feedback may affect the project cache
-        (new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache($this->projectResultCacheMapper))
-            ->refresh($this->assessmentDataSource, $assessment, $student);
+            // Update project mark as the published feedback may affect the project cache
+            (new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache($this->projectResultCacheMapper))
+                ->refresh($this->assessmentDataSource, $assessment, $student);
 
-        // Find the Kami worksheet (if it exists)
-        /** @var DueWork\Response\Model|null $response */
-        $response = $feedback->getResponse();
-        $kamiModel = $response?->getAllFiles()->filter(function (SubmissionFile $file) {
-            return $file->getIsWorksheet();
-        })->first()?->getKami();
-        if ($kamiModel) {
-            // Save the kami doc to the feedback object
-            $this->kamiConnector->initiatePollingForKamiDownload(
-                $kamiModel,
-                'feedback',
-                $this->getUser(),
-            );
+            // Find the Kami worksheet (if it exists)
+            /** @var DueWork\Response\Model|null $response */
+            $response = $feedback->getResponse();
+            $kamiModel = $response?->getAllFiles()->filter(function (SubmissionFile $file) {
+                return $file->getIsWorksheet();
+            })->first()?->getKami();
+            if ($kamiModel) {
+                // Save the kami doc to the feedback object
+                $this->kamiConnector->initiatePollingForKamiDownload(
+                    $kamiModel,
+                    'feedback',
+                    $this->getUser(),
+                );
+            }
         }
 
         $data = [

@@ -450,18 +450,19 @@ class Controller extends Base
             throw new NotFound("No Feedback for assessment.");
         }
 
+        // Attempting to publish an already published feedback should have no effect.
         if (!$feedback->isPublished()) {
             // Single publish is an explicit publish action by the current user.
             $feedback
                 ->setPublishedAt(Alaress_Date_Format::now())
                 ->setPublishedBy($this->getUser()->getId());
+
+            $this->feedbackDataSource->save($feedback);
+
+            // Update project mark as the published feedback may affect the project cache
+            (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))
+                ->refresh($this->assessmentDataSource, $assessment, $learner);
         }
-
-        $this->feedbackDataSource->save($feedback);
-
-        // Update project mark as the published feedback may affect the project cache
-        (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))
-            ->refresh($this->assessmentDataSource, $assessment, $learner);
 
         $this->response = $this->responseAsJson([
             'success' => true,
