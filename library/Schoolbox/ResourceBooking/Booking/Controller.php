@@ -564,7 +564,7 @@ class Controller extends Base
                         $clashBookingStartDatesAsKeys,
                         $validation,
                         $overrideValidation,
-                        Model::DEFAULT_QUANTITY,
+                        $this->getQuantityFromFormData($relatedItemInputs),
                     );
                     $relatedBooking
                         ->setName($booking->getName())
@@ -695,7 +695,12 @@ class Controller extends Base
 
     private function getQuantityFromForm(?Model $existingBooking = null): int
     {
-        $quantity = $this->requestPost->get('quantity');
+        return $this->getQuantityFromFormData($this->requestPost, $existingBooking);
+    }
+
+    private function getQuantityFromFormData(array|\ArrayAccess $formData, ?Model $existingBooking = null): int
+    {
+        $quantity = $formData['quantity'] ?? null;
 
         if ($quantity === null || $quantity === '') {
             return $existingBooking?->getQuantity() ?? Model::DEFAULT_QUANTITY;

@@ -203,6 +203,7 @@ class Validation
         $startDate     = null;
         $endDate       = null;
         $quantity      = $this->getQuantityFromPostData($postData, $existingBooking);
+        $relatedItems  = $this->getRelatedItemsFromPostData($postData['related_item'] ?? null);
 
         // Only users allowed to moderate this item may override validation
         $override = (
@@ -247,7 +248,7 @@ class Validation
                 $startDate,
                 $endDate,
                 $postData['repeat_until'] ?? null,
-                $postData['related_item'] ?? null,
+                $relatedItems,
                 $postData['repeat'] ?? null,
                 $campus
             );
@@ -262,6 +263,16 @@ class Validation
                     $validationResults[] = $this->validateCurrentTermRestriction($thisEnd, $this->getCurrentTerm());
                 }
 
+                $resourceQuantity = $this->getQuantityForSeriesResource(
+                    $thisResource,
+                    $resource,
+                    $quantity,
+                    $relatedItems
+                );
+                if ($thisResource->getId() !== $resource->getId()) {
+                    $validationResults[] = $this->validateQuantity($thisResource, $resourceQuantity);
+                }
+
                 // Validate for clashes even if $override is true.
                 // The clash validation results will allow us to find and reject the clashing bookings.
                 // See $this->validateBookingIgnoringClashesIfClashesAllowed().
@@ -270,15 +281,11 @@ class Validation
                     $thisStart,
                     $thisEnd,
                     additionalApprovedPeriods: $allocationPeriodsByResourceId[$thisResource->getId()] ?? [],
-                    quantity: $thisResource->getId() === $resource->getId()
-                        ? $quantity
-                        : BookingModel::DEFAULT_QUANTITY,
+                    quantity: $resourceQuantity,
                 );
                 $validationResults[] = $clashValidationResult;
 
-                $allocationQuantity = $thisResource->getId() === $resource->getId()
-                    ? $quantity
-                    : BookingModel::DEFAULT_QUANTITY;
+                $allocationQuantity = $resourceQuantity;
                 if (
                     count($this->getAllErrorStringsAsFlatArray($clashValidationResult)) === 0
                     && $this->newResourceBookingWouldConsumeCapacityWithoutClash($thisResource, $override)
@@ -302,7 +309,7 @@ class Validation
                     $existingBooking,
                     $startDate,
                     $endDate,
-                    $postData['related_item'] ?? null,
+                    $relatedItems,
                     $postData['efficacy'] ?? null
                 ) as $check
             ) {
@@ -314,6 +321,17 @@ class Validation
                     $validationResults[] = $this->validateCurrentTermRestriction($thisEnd, $this->getCurrentTerm());
                 }
 
+                $resourceQuantity = $this->getQuantityForSeriesResource(
+                    $thisResource,
+                    $resource,
+                    $quantity,
+                    $relatedItems,
+                    $thisBooking
+                );
+                if ($thisResource->getId() !== $resource->getId()) {
+                    $validationResults[] = $this->validateQuantity($thisResource, $resourceQuantity, $thisBooking);
+                }
+
                 // Validate for clashes even if $override is true.
                 // The clash validation results will allow us to find and reject the clashing bookings.
                 // See $this->validateBookingIgnoringClashesIfClashesAllowed().
@@ -323,15 +341,11 @@ class Validation
                     $thisEnd,
                     $thisBooking,
                     $allocationPeriodsByResourceId[$thisResource->getId()] ?? [],
-                    $thisResource->getId() === $resource->getId()
-                        ? $quantity
-                        : $thisBooking->getQuantity(),
+                    $resourceQuantity,
                 );
                 $validationResults[] = $clashValidationResult;
 
-                $allocationQuantity = $thisResource->getId() === $resource->getId()
-                    ? $quantity
-                    : $thisBooking->getQuantity();
+                $allocationQuantity = $resourceQuantity;
                 if (
                     count($this->getAllErrorStringsAsFlatArray($clashValidationResult)) === 0
                     && (
@@ -363,6 +377,35 @@ class Validation
         }
 
         return filter_var($quantity, FILTER_VALIDATE_INT) === false ? 0 : (int)$quantity;
+    }
+
+    private function getRelatedItemsFromPostData(?array $relatedItems): array
+    {
+        $itemsByResourceId = [];
+        foreach ($relatedItems ?? [] as $relatedItem) {
+            if (isset($relatedItem['resource_id'])) {
+                $itemsByResourceId[(int)$relatedItem['resource_id']] = $relatedItem;
+            }
+        }
+
+        return $itemsByResourceId;
+    }
+
+    private function getQuantityForSeriesResource(
+        BookingItemModel $seriesResource,
+        BookingItemModel $primaryResource,
+        int $primaryQuantity,
+        array $relatedItems,
+        ?BookingModel $existingBooking = null
+    ): int {
+        if ($seriesResource->getId() === $primaryResource->getId()) {
+            return $primaryQuantity;
+        }
+
+        return $this->getQuantityFromPostData(
+            $relatedItems[$seriesResource->getId()] ?? [],
+            $existingBooking
+        );
     }
 
     public function validateBookingQuantity(
