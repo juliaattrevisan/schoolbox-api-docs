@@ -5,6 +5,14 @@ VALUES (@socs_config_id, 'SOCS', 29);
 
 UPDATE config
 SET type_id = @socs_config_id,
+    title = CASE name
+        WHEN 'socs_endpoint_host' THEN 'Calendar Feed Host'
+        ELSE title
+    END,
+    description = CASE name
+        WHEN 'socs_endpoint_host' THEN 'The SOCS host used for calendar and music feeds.'
+        ELSE description
+    END,
     sequence = CASE name
         WHEN 'socs_enabled' THEN 1
         WHEN 'socs_endpoint_host' THEN 2
@@ -80,6 +88,19 @@ VALUES (
     8
 );
 
+INSERT IGNORE INTO config (`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
+SELECT 'socs_endpoint_host_fixture',
+       COALESCE((SELECT value FROM config WHERE name = 'socs_endpoint_host' LIMIT 1), ''),
+       'Sports Fixture Feed Host',
+       'The SOCS host used for sports fixtures, teams, and results feeds.',
+       (SELECT id FROM lu_config_field WHERE field = 'input'),
+       @socs_config_id,
+       'true',
+       'false',
+       'false',
+       'settings',
+       9;
+
 UPDATE config
 SET type_id = @socs_config_id,
     sequence = CASE name
@@ -87,12 +108,14 @@ SET type_id = @socs_config_id,
         WHEN 'socs_calendar_name' THEN 6
         WHEN 'socs_calendar_default_event_type' THEN 7
         WHEN 'socs_import_sports_fixtures' THEN 8
+        WHEN 'socs_endpoint_host_fixture' THEN 9
     END
 WHERE name IN (
     'socs_import_calendar_events',
     'socs_calendar_name',
     'socs_calendar_default_event_type',
-    'socs_import_sports_fixtures'
+    'socs_import_sports_fixtures',
+    'socs_endpoint_host_fixture'
 );
 
 INSERT INTO calendar_connector (`event_type`, `connector_class`, `config`, `status`)

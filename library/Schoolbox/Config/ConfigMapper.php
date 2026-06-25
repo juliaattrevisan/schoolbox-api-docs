@@ -527,6 +527,7 @@ class ConfigMapper extends Mapper
      */
     public const string NAME_SOCS_ENABLED = 'socs_enabled';
     public const string NAME_SOCS_ENDPOINT_HOST = 'socs_endpoint_host';
+    public const string NAME_SOCS_ENDPOINT_HOST_FIXTURE = 'socs_endpoint_host_fixture';
     public const string NAME_SOCS_ENDPOINT_TOKEN = 'socs_endpoint_token';
     public const string NAME_SOCS_ENDPOINT_ID = 'socs_endpoint_id';
     public const string NAME_SOCS_IMPORT_CALENDAR_EVENTS = 'socs_import_calendar_events';

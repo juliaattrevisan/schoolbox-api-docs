@@ -88,7 +88,7 @@ class ImporterTool extends CliTool\App
             $runFixtures = $runResults = true;
         }
 
-        $host = (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_HOST);
+        $host = $this->resolveFixtureEndpointHost();
         $token = (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_TOKEN);
         $schoolId = (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_ID);
 
@@ -167,6 +167,19 @@ class ImporterTool extends CliTool\App
         }
 
         $lock->release();
+    }
+
+    /**
+     * Return the SOCS host used by fixtures, teams, and results feed imports.
+     */
+    protected function resolveFixtureEndpointHost(): string
+    {
+        $fixtureHost = trim((string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_HOST_FIXTURE));
+        if ($fixtureHost !== '') {
+            return $fixtureHost;
+        }
+
+        return (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_HOST);
     }
 
     /**
