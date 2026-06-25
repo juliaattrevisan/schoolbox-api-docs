@@ -148,7 +148,7 @@
 
                                             {# Published Marks #}
                                             {% if publishedMarks is not null and publishedMarks.humanReadableMark is not null %}
-                                                <p data-actual-mark>{{ publishedMarks.selectedDescriptorText ?? null }}</p>
+                                                <p data-actual-mark>{{ (publishedMarks.selectedDescriptorText ?? null) | markdown }}</p>
 
                                                 {% set max = rubricInstanceData.capabilities[capabilityId].indicators[indicatorId].max ?? null %}
 
@@ -162,7 +162,7 @@
 
                                             {# Draft Marks #}
                                             {% if draftMarks is not null and draftMarks.humanReadableMark is not null %}
-                                                <p data-draft-mark>{{ draftMarks.selectedDescriptorText ?? null }}</p>
+                                                <p data-draft-mark>{{ (draftMarks.selectedDescriptorText ?? null) | markdown }}</p>
 
                                                 {% set max = rubricInstanceData.capabilities[capabilityId].indicators[indicatorId].max ?? null %}
 
