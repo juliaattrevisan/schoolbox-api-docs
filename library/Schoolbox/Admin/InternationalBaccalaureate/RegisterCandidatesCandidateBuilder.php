@@ -41,7 +41,17 @@ class RegisterCandidatesCandidateBuilder
             throw new InvalidArgumentException('Selected candidate is missing required IBIS data.');
         }
 
-        $gender = $this->stringOrNull($externalStudent['StudentGender'] ?? null);
+        /* Mapping the gender to the valid IBIS gender list
+         */
+        $genderRaw = $this->stringOrNull($externalStudent['StudentGender'] ?? null);
+        $gender = $genderRaw === null ? null : strtoupper($genderRaw);
+        $gender = match ($gender) {
+            'M', 'MALE' => 'MALE',
+            'F', 'FEMALE' => 'FEMALE',
+            null => null, //forces the IBIS to validate and return error if gender is not defined
+            default => 'X', //otherwise all other genders including non-binary and other will be X
+        };
+
         $languageCodes = $this->extractCollectionCodes($user->getLanguageCollection());
         $nationalityCodes = $this->extractCollectionCodes($user->getNationalityCollection());
 
@@ -50,7 +60,7 @@ class RegisterCandidatesCandidateBuilder
             'firstname' => $user->getFirstname(),
             'lastname' => $user->getLastname(),
             'email' => $user->getEmail(),
-            'gender' => $gender === null ? null : strtoupper($gender),
+            'gender' => $gender,
             'language1' => $languageCodes[0] ?? null,
             'language2' => $languageCodes[1] ?? null,
             'nationality1' => $nationalityCodes[0] ?? null,
