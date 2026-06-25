@@ -14,13 +14,31 @@
 }
 
 /*the color used to highlight the selected item  */
-.lrn_widget .lrn_valid,
-.lrn_widget .lrn_selected {
+.lrn_widget:not(.lrn_qr) .lrn_valid,
+.lrn_widget:not(.lrn_qr) .lrn_selected {
     background-color: var(--content-ui-selected);
 }
 
+/* quiz review feedback states */
+.lrn_widget.lrn_qr .lrn_selected.lrn_correct,
+.lrn_widget.lrn_qr .lrn_selected.lrn_correct .lrn-label {
+    background-color: #e6f4ea;
+    color: #2e7d32;
+}
+
+.lrn_widget.lrn_qr .lrn_selected.lrn_incorrect,
+.lrn_widget.lrn_qr .lrn_selected.lrn_incorrect .lrn-label,
+.lrn_widget.lrn_qr .lrn_incorrect:not(.lrn_selected),
+.lrn_widget.lrn_qr .lrn_incorrect:not(.lrn_selected) .lrn-label {
+    background-color: var(--content-ui-background);
+}
+.lrn_widget.lrn_qr .lrn_selected.lrn_incorrect,
+.lrn_widget.lrn_qr .lrn_selected.lrn_incorrect .lrn-label {
+    color: #c62828;
+}
+
 /*the color used to highlight the selected item in the mutiplechoice-block layout */
-.lrn_widget.lrn_mcq .lrn_response .lrn_mcqgroup-block .lrn-mcq-option.lrn_selected .lrn-label {
+.lrn_widget.lrn_mcq:not(.lrn_qr) .lrn_response .lrn_mcqgroup-block .lrn-mcq-option.lrn_selected .lrn-label {
     background-color: var(--content-ui-selected);
 }
 
