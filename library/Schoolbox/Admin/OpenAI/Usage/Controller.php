@@ -317,11 +317,6 @@ class Controller extends Base
 
         /* Retrieve the hydrated moderation events for the session (if any exist)
          */
-        /* TODO: this is cursed and should probably be part of the session payload via a join?
-         * OR a separate endpoint (perhaps in the Schoolbox\OpenAi\Moderation namespace?) that takes
-         * a session ID and returns all the moderation events for that session.
-         * Need to consider in relation to how hydration of the other random data on Session should work too.
-         */
         $moderationEvents = $this->moderationEventMapper->findByColumn('target_ai_session_id', $session->getId(), [
             'order' => [ 'created_at' => 'ASC' ],
         ]);
