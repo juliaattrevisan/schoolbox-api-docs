@@ -68,22 +68,18 @@ class Finder extends AbstractIdFinder
         // Can we simplify filters using set theory?
         $completeFilters = $this->simplifyFilters($completeFilters);
 
-        $studentName = $completeFilters[Name\Definition::class]?->getAll();
-
-        $customisationRecordCampuses = $completeFilters[Campus\Definition::class]?->getAll();
-
-        $customisationRecordYearLevels = $completeFilters[YearLevel\Definition::class]?->getAll();
-
-        $customisationRecordAdjustmentCategories = $completeFilters[AdjustmentCategory\Definition::class]?->getAll();
-
-        $customisationRecordAdjustmentLevels = $completeFilters[AdjustmentLevel\Definition::class]?->getAll();
-
-        $customisationRecordTerm = $completeFilters[Term\Definition::class]?->getAll();
-
-        $customisationRecordWorkTypes = $completeFilters[WorkType\Definition::class]?->getAll();
-
         /** @var Mapper $mapper */
         $mapper = $this->getMapper();
+        [
+            $studentName,
+            $customisationRecordYearLevels,
+            $customisationRecordCampuses,
+            $customisationRecordAdjustmentCategories,
+            $customisationRecordAdjustmentLevels,
+            $customisationRecordTerm,
+            $customisationRecordWorkTypes,
+        ] = $this->getFilterValues($completeFilters);
+
         return $mapper->findByFilters(
             $studentName,
             $customisationRecordYearLevels,
@@ -96,6 +92,39 @@ class Finder extends AbstractIdFinder
             $order,
             $limit
         );
+    }
+
+    public function countCustomisationForStudentsByFilters(array $filters): int
+    {
+        // Ensure all filter keys so we don't need to perform repeated isset() checks
+        $completeFilters = $this->normaliseFilters($filters);
+
+        // Can we conclude filters will never permit any assessments to match? ie always an empty set?
+        if ($this->doFiltersGuaranteeEmptySet($completeFilters)) {
+            return 0;
+        }
+
+        // Can we simplify filters using set theory?
+        $completeFilters = $this->simplifyFilters($completeFilters);
+
+        /** @var Mapper $mapper */
+        $mapper = $this->getMapper();
+        return $mapper->countByFilters(
+            ...$this->getFilterValues($completeFilters),
+        );
+    }
+
+    private function getFilterValues(array $completeFilters): array
+    {
+        return [
+            $completeFilters[Name\Definition::class]?->getAll(),
+            $completeFilters[YearLevel\Definition::class]?->getAll(),
+            $completeFilters[Campus\Definition::class]?->getAll(),
+            $completeFilters[AdjustmentCategory\Definition::class]?->getAll(),
+            $completeFilters[AdjustmentLevel\Definition::class]?->getAll(),
+            $completeFilters[Term\Definition::class]?->getAll(),
+            $completeFilters[WorkType\Definition::class]?->getAll(),
+        ];
     }
 
     /**

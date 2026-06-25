@@ -55,7 +55,7 @@ class ModelToArray
         if (null === $context) {
             /* Assessment in a project, then look at the project context
              */
-            $context = $plan->getAssessment()->getContextProject()->getAssessmentModel()->getContextUnitImplementation();
+            $context = $plan->getAssessment()->getContextProject()?->getAssessmentModel()->getContextUnitImplementation();
         }
 
         return [
@@ -87,8 +87,10 @@ class ModelToArray
             'unit' => [
                 'title' => $context?->getTitle(),
             ],
+            /* If the class is not within a unit/course get the class name straight away
+             */
             'class' => [
-                'title' => $context?->getFolder()?->getTitle()
+                'title' => $context?->getFolder()?->getTitle() ?? $plan->getAssessment()->getContextFolder()?->getTitle()
             ]
         ];
     }
