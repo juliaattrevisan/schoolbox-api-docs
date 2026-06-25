@@ -10,8 +10,8 @@
 /* eslint-enable vue/no-v-html */
 // @ts-nocheck
 
-import { LT } from "@caspingus/lt/src/authoring/core";
-import * as imageUploader from "@caspingus/lt/src/authoring/extensions/ui/imageUploader/index";
+import { LT } from "@caspingus/lt/authoring/core";
+import { imageUploader } from "@caspingus/lt/authoring/extensions/imageUploader";
 
 /**
  * Adjust the header of the question items list to be fixed when scrolling down
