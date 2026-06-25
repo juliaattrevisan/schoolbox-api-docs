@@ -78,8 +78,8 @@ function onItemSelected(reference: string): void {
             }`"
             @click.prevent="onItemSelected(item.reference)"
         >
-            <span v-if="!item.isMarked && !item.isAttemptComment" class="unsubmitted label"
-                >Contains unmarked attempts</span
+            <sbx-label v-if="!item.isMarked && !item.isAttemptComment" text="Contains unmarked attempts"
+                >Marked</sbx-label
             >
             <span>
                 {{ item.title }}
@@ -94,7 +94,8 @@ function onItemSelected(reference: string): void {
     align-self: start; // https://moderncss.dev/css-button-styling-guide/#gotcha-child-of-flex-columns
     background: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
     border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
-    color: var(--color-buttons-text);
+    border-radius: var(--sbx-config-field-corner-radius, 0);
+    color: var(--sbx-config-color-accent, var(--color-buttons-text));
     display: inline-flex;
     justify-content: space-between;
     padding: var(--spacing-xs) var(--spacing-m);
@@ -103,10 +104,11 @@ function onItemSelected(reference: string): void {
     &:hover,
     &:active {
         &:not([disabled]) {
-            background-color: var(--form-bg-hover-color);
+            background-color: var(--sbx-config-color-active, var(--form-bg-hover-color));
         }
     }
     .sbx-icon--dropdown {
+        fill: var(--sbx-config-color-accent, black);
         transform: rotate(180deg);
     }
     &[aria-expanded="true"] {
@@ -122,13 +124,14 @@ function onItemSelected(reference: string): void {
     border-left: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
     border-right: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
     border-bottom: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: var(--sbx-shadow-s, 0 2px 4px 0 rgba(0, 0, 0, 0.1));
     display: none;
     max-height: 250px;
     overflow-y: scroll;
     position: absolute;
     z-index: var(--sbx-depth-pop-over);
     &__button {
+        align-items: center;
         background: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
         display: inline-flex;
         justify-content: start;
@@ -140,10 +143,10 @@ function onItemSelected(reference: string): void {
             font-weight: bold;
         }
         &:hover {
-            background-color: var(--form-bg-hover-color);
+            background-color: var(--sbx-config-color-active, var(--form-bg-hover-color));
         }
         &--active {
-            background-color: var(--content-ui-selected);
+            background-color: var(--sbx-config-color-active, var(--content-ui-selected));
         }
     }
 }
