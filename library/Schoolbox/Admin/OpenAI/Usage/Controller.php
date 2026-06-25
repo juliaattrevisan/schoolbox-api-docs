@@ -211,7 +211,15 @@ class Controller extends Base
          */
         $moderationStatuses = new GenericCollection(ModerationEventStatus::class);
 
-        if (\is_array($moderationStatusKeys)) {
+        if (null !== $moderationStatusKeys) {
+            if (!\is_array($moderationStatusKeys)) {
+                $problem = (new ApiProblem('Moderation status must be an array.'))
+                    ->setStatus(400)
+                    ->asArray();
+                $this->response = $this->responseAsJson($problem)->withStatus(400);
+                return;
+            }
+
             foreach ($moderationStatusKeys as $statusKey) {
                 try {
                     $moderationStatuses->add(ModerationEventStatus::from($statusKey));
