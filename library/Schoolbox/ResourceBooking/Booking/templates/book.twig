@@ -575,7 +575,7 @@ $(function() {
                                         <label for="related-item-{{ relatedItem.id }}">{{ relatedItem.name }}</label>
                                         <div data-relation="related-resource-notes" style="{% if relatedBooking is empty %}display:none{% endif %}">
                                             <textarea id="related-item-{{ relatedItem.id }}-notes" name="related_item[{{ relatedItem.id }}][notes]" data-notes>{{ relatedBooking.notes ?? '' }}</textarea>
-                                            {% if relatedItem.capacity > 1 or relatedBooking.quantity > 1 %}
+                                            {% if relatedItem.capacity > 1 or (relatedBooking.quantity|default(1)) > 1 %}
                                             <label for="related-item-{{ relatedItem.id }}-quantity">Quantity</label>
                                             <input name="related_item[{{ relatedItem.id }}][quantity]"
                                                    id="related-item-{{ relatedItem.id }}-quantity"
