@@ -160,6 +160,39 @@ class CapacityAllocation
     }
 
     /**
+     * Checks whether existing approved allocation periods exceed the resource capacity.
+     *
+     * @param ResourceModel $resource Resource whose capacity is being checked.
+     * @param array<int, array{startDatetime: Alaress_Date_Format, endDatetime: Alaress_Date_Format, quantity?: int}> $approvedPeriods Existing periods to count against capacity.
+     * @return bool True when approved allocations exceed resource capacity at any point.
+     */
+    public function approvedPeriodsExceedCapacity(ResourceModel $resource, array $approvedPeriods): bool
+    {
+        return $this->approvedPeriodConflictCount($resource, $approvedPeriods) > 0;
+    }
+
+    /**
+     * Returns the number of over-capacity spans created by approved allocation periods.
+     *
+     * @param ResourceModel $resource Resource whose capacity is being checked.
+     * @param array<int, array{startDatetime: Alaress_Date_Format, endDatetime: Alaress_Date_Format, quantity?: int}> $approvedPeriods Existing periods to count against capacity.
+     * @return int Number of time spans where approved allocations exceed resource capacity.
+     */
+    public function approvedPeriodConflictCount(ResourceModel $resource, array $approvedPeriods): int
+    {
+        $periods = [];
+        foreach ($approvedPeriods as $period) {
+            $periods[] = [
+                "start" => $period["startDatetime"],
+                "end" => $period["endDatetime"],
+                "quantity" => $period["quantity"] ?? self::BOOKING_QUANTITY,
+            ];
+        }
+
+        return $this->capacityConflictSpanCount($resource, $periods);
+    }
+
+    /**
      * Performs the capacity calculation by sweeping start and end points in chronological order.
      *
      * End points are sorted before start points at the same timestamp, allowing one booking to end
@@ -179,11 +212,26 @@ class CapacityAllocation
         array $existingPeriods,
         int $candidateQuantity = self::BOOKING_QUANTITY
     ): bool {
+        $periods = [[
+            "start" => $candidateStart,
+            "end" => $candidateEnd,
+            "quantity" => $candidateQuantity,
+        ]];
+
+        return $this->periodsExceedCapacity($resource, array_merge($periods, $existingPeriods));
+    }
+
+    /**
+     * @param ResourceModel $resource Resource whose capacity is being checked.
+     * @param array<int, array{start: DateTimeInterface|Alaress_Date_Format, end: DateTimeInterface|Alaress_Date_Format, quantity?: int}> $periods Existing periods to count against capacity.
+     * @return bool True when allocation exceeds resource capacity at any point.
+     */
+    private function periodsExceedCapacity(ResourceModel $resource, array $periods): bool
+    {
         $capacity = max(1, $resource->getCapacity());
         $points = [];
 
-        $this->addPeriodPoints($points, $candidateStart, $candidateEnd, $candidateQuantity);
-        foreach ($existingPeriods as $period) {
+        foreach ($periods as $period) {
             $this->addPeriodPoints($points, $period["start"], $period["end"], $period["quantity"] ?? self::BOOKING_QUANTITY);
         }
 
@@ -201,6 +249,44 @@ class CapacityAllocation
         }
 
         return false;
+    }
+
+    /**
+     * @param ResourceModel $resource Resource whose capacity is being checked.
+     * @param array<int, array{start: DateTimeInterface|Alaress_Date_Format, end: DateTimeInterface|Alaress_Date_Format, quantity?: int}> $periods Existing periods to count against capacity.
+     * @return int Number of time spans where allocation exceeds resource capacity.
+     */
+    private function capacityConflictSpanCount(ResourceModel $resource, array $periods): int
+    {
+        $capacity = max(1, $resource->getCapacity());
+        $points = [];
+
+        foreach ($periods as $period) {
+            $this->addPeriodPoints($points, $period["start"], $period["end"], $period["quantity"] ?? self::BOOKING_QUANTITY);
+        }
+
+        usort(
+            $points,
+            static fn (array $a, array $b): int => ($a["time"] <=> $b["time"]) ?: ($a["delta"] <=> $b["delta"])
+        );
+
+        $allocated = 0;
+        $lastTimestamp = null;
+        $conflictCount = 0;
+        $wasInConflict = false;
+        foreach ($points as $point) {
+            if ($lastTimestamp !== null && $point["time"] > $lastTimestamp) {
+                $isInConflict = $allocated > $capacity;
+                if ($isInConflict && !$wasInConflict) {
+                    $conflictCount++;
+                }
+                $wasInConflict = $isInConflict;
+            }
+            $allocated += $point["delta"];
+            $lastTimestamp = $point["time"];
+        }
+
+        return $conflictCount;
     }
 
     /**

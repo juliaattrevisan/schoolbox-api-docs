@@ -26,9 +26,13 @@ use Schoolbox\RoleMapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\ResourceBooking\Booking\CapacityAllocation;
+use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
 
 class Controller extends Base
 {
+    private const string REDUCED_CAPACITY_WARNING_TOAST = 'Capacity saved, but %d approved booking conflict%s now exist%s.';
+
     /**
      * @var Mapper
      */
@@ -43,6 +47,11 @@ class Controller extends Base
      * @var RoleMapper
      */
     protected $roleMapper;
+
+    /**
+     * @var BookingMapper
+     */
+    protected $bookingMapper;
 
     /** @var TermMapper */
 
@@ -273,17 +282,26 @@ class Controller extends Base
      */
     public function update(Model $item): void
     {
+        $oldCapacity = $item->getCapacity();
+
         $this->updateItemWithFormValues(
             $item,
             $this->requestPost
         );
+        $approvedCapacityConflictCount = $item->getCapacity() < $oldCapacity
+            ? $this->getApprovedCapacityConflictCount($item)
+            : 0;
+
         $this->mapper->save($item);
         // Return something.
         // If this is a JSON request, output a result - maybe if this is a
         // HTML request, redirect somewhere.
-        $this->response = $this->redirectAfterPost(
-            $this->routeGenerator->generate('resourceItem.read', ['id' => $item->getId(), 'format' => ''])
-        );
+        $redirectUrl = $this->routeGenerator->generate('resourceItem.read', ['id' => $item->getId(), 'format' => '']);
+        if ($approvedCapacityConflictCount > 0) {
+            $redirectUrl = $this->appendReducedCapacityWarningToast($redirectUrl, $approvedCapacityConflictCount);
+        }
+
+        $this->response = $this->redirectAfterPost($redirectUrl);
     }
 
     /**
@@ -374,6 +392,36 @@ class Controller extends Base
         }
     }
 
+    protected function getApprovedCapacityConflictCount(Model $item): int
+    {
+        $periodsByResourceId = $this->bookingMapper->getPeriodsOfFutureApprovedBookingsByResourceId([$item->getId()]);
+
+        return (new CapacityAllocation())->approvedPeriodConflictCount(
+            $item,
+            $periodsByResourceId[$item->getId()] ?? []
+        );
+    }
+
+    protected function appendReducedCapacityWarningToast(string $url, int $conflictCount): string
+    {
+        return $url
+            . (str_contains($url, '?') ? '&' : '?')
+            . http_build_query(
+                [
+                    'calendarToast' => sprintf(
+                        self::REDUCED_CAPACITY_WARNING_TOAST,
+                        $conflictCount,
+                        $conflictCount === 1 ? '' : 's',
+                        $conflictCount === 1 ? 's' : ''
+                    ),
+                    'calendarToastIsSuccess' => '0',
+                ],
+                '',
+                '&',
+                PHP_QUERY_RFC3986
+            );
+    }
+
     protected function getCapacityFromForm(mixed $capacity): int
     {
         $validatedCapacity = filter_var(
@@ -446,6 +494,16 @@ class Controller extends Base
     public function setMapper($mapper): self
     {
         $this->mapper = $mapper;
+        return $this;
+    }
+
+    /**
+     * @param  BookingMapper $bookingMapper
+     * @return $this
+     */
+    public function setBookingMapper($bookingMapper): self
+    {
+        $this->bookingMapper = $bookingMapper;
         return $this;
     }
 
