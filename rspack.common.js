@@ -419,6 +419,7 @@ module.exports = {
     cache: true,
     resolve: {
         // https://webpack.js.org/configuration/resolve/
+        roots: [__dirname], // rspack v2 removed the default roots=[context]; restore it so that /node_modules/... SCSS imports in core.scss resolve to the project root
         alias: {
             "@schoolboxLibrary": path.resolve(__dirname, "library/Schoolbox"),
             "@schoolboxCalendarEvent": path.resolve(__dirname, "library/Schoolbox/Calendar/Event/templates/vue"),
