@@ -425,7 +425,7 @@ class Controller extends Base
                 $publishSuccess = false;
             }
 
-            $results[$draftFeedbackId] = ['publishSuccess'   => $publishSuccess];
+            $results[$draftFeedbackId] = ['publishSuccess' => $publishSuccess];
         }
 
         $this->response = $this->responseAsJson($results);
