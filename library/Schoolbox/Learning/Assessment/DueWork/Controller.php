@@ -89,6 +89,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\File\Codec\Filename;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\User;
@@ -738,21 +739,20 @@ class Controller extends Assessment\Controller
 //        $rubricGrid = $this->rubricMapper->retrieveGrid($assessment, false);
 //        $assessment = $this->participantMapper->loadParticipationIntoAssessment($assessment);
 //
-        $basename = (new Url($assessment->getTitle()))->getSlug();
 //
 //        /** @var Model $assessment */
 //        $content  = $this->array2csv($this->collateResultSquare($rubricGrid->isMarkPerCapability(), $rubricGrid, $assessment->getAllParticipants()));
 //
-//        /* Maybe we set the Show Drafts option
-//         */
-//        $showDraft = (bool)$this->requestQuery->get(self::SHOW_DRAFTS_KEY, false);
 
-        $prefix = '';
+        $content = '';
 
-        if ($showDraft) {
-            $prefix = 'Draft - ';
-        }
-
+        $filename = (new Filename())->generate(sprintf(
+            '%s%s',
+            /* Maybe we set the Show Drafts option
+             */
+            ((bool)$this->requestQuery->get(self::SHOW_DRAFTS_KEY, false)) ? 'Draft -' : '',
+            $assessment->getTitle()
+        ), 'csv');
 
 
         $this->response = $this->responseFromContent($content)
@@ -760,7 +760,7 @@ class Controller extends Assessment\Controller
             ->withHeader('Cache-Control', ' ')
             ->withHeader('Content-Type', 'text/csv')
             ->withHeader('Content-Length', strlen($content))
-            ->withHeader('Content-Disposition', "attachment; filename=\"{$prefix}{$basename}.csv\"");
+            ->withHeader('Content-Disposition', "attachment; filename=\"{$filename}.csv\"");
     }
 
 
