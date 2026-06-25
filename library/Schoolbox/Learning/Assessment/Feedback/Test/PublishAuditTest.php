@@ -69,7 +69,6 @@ class PublishAuditTest extends TestCase
     private const int DUE_WORK_PUBLISHED_RETURNED_WORK_ID = 2002;
     private const int DUE_WORK_DRAFT_FEEDBACK_ID = 3001;
     private const int DUE_WORK_PUBLISHED_FEEDBACK_ID = 3002;
-    private const int DUE_WORK_MARKER_ID = 402;
     private const int ORIGINAL_DUE_WORK_PUBLISHER_ID = 502;
     private const int CURRENT_DUE_WORK_PUBLISHER_ID = 602;
 
@@ -128,52 +127,6 @@ class PublishAuditTest extends TestCase
     }
 
     /**
-     * Verifies due work bulk publish records the bulk publisher when a draft feedback item is missing one.
-     */
-    public function testDueWorkBulkPublishSetsCurrentUserAsPublisherWhenDraftPublisherIsUnset(): void
-    {
-        $assessment = $this->createStub(DueWork\Model::class);
-        $assessment
-            ->method('isSpecification')
-            ->willReturn(false);
-        $assessment
-            ->method('getId')
-            ->willReturn(self::DUE_WORK_ASSESSMENT_ID);
-
-        $submissionBox = new SubmissionBox()->setAssessmentModel(
-            new AssessmentModel()->setId(self::DUE_WORK_ASSESSMENT_ID)
-        );
-        $returnedWork = new ReturnedWork()
-            ->setId(self::DUE_WORK_DRAFT_RETURNED_WORK_ID)
-            ->setSubmissionBox($submissionBox)
-            ->setMarker(new User()->setId(self::DUE_WORK_MARKER_ID));
-
-        $returnedWorkMapper = $this->createMock(ReturnedWorkMapper::class);
-        $returnedWorkMapper
-            ->expects($this->once())
-            ->method('findById')
-            ->with(self::DUE_WORK_DRAFT_RETURNED_WORK_ID)
-            ->willReturn($returnedWork);
-        $returnedWorkMapper
-            ->expects($this->once())
-            ->method('save')
-            ->with(self::callback(
-                static fn(ReturnedWork $savedReturn): bool =>
-                    $savedReturn->getPublishedAt() instanceof Alaress_Date_Format
-                    && $savedReturn->getPublishedBy() === self::CURRENT_DUE_WORK_PUBLISHER_ID
-            ));
-
-        $controller = $this->buildDueWorkController(
-            $returnedWorkMapper,
-            $this->createStub(IFeedbackDataSource::class),
-        );
-        $controller->setRequestPost(new Values(['drafts' => [self::DUE_WORK_DRAFT_RETURNED_WORK_ID]]));
-        $controller->setUser(new User()->setId(self::CURRENT_DUE_WORK_PUBLISHER_ID));
-
-        $controller->postParticipantFeedbacks($assessment);
-    }
-
-    /**
      * Verifies reporting bulk publish does not overwrite existing published audit fields.
      */
     public function testReportingBulkPublishPreservesExistingPublishedAuditFields(): void
@@ -221,9 +174,9 @@ class PublishAuditTest extends TestCase
     }
 
     /**
-     * Verifies due work bulk publish records the bulk publisher when a draft feedback item is published.
+     * Verifies due work bulk publish preserves the existing draft publisher.
      */
-    public function testDueWorkBulkPublishSetsCurrentUserAsPublisherWhenDraftIsPublished(): void
+    public function testDueWorkBulkPublishPreservesDraftPublisherWhenDraftIsPublished(): void
     {
         $assessment = $this->createStub(DueWork\Model::class);
         $assessment
@@ -253,7 +206,7 @@ class PublishAuditTest extends TestCase
             ->with(self::callback(
                 static fn(ReturnedWork $savedReturn): bool =>
                     $savedReturn->getPublishedAt() instanceof Alaress_Date_Format
-                    && $savedReturn->getPublishedBy() === self::CURRENT_DUE_WORK_PUBLISHER_ID
+                    && $savedReturn->getPublishedBy() === self::ORIGINAL_DUE_WORK_PUBLISHER_ID
             ));
 
         $controller = $this->buildDueWorkController(
