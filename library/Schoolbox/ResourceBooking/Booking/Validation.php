@@ -1378,6 +1378,15 @@ class Validation
         return $this->getStatusIdForNonClashBooking($booking, $user);
     }
 
+    /**
+     * Return the status for an edited booking.
+     *
+     * When an edit does not override validation, move the booking period, or create a clash,
+     * reduced or unchanged quantities usually keep the existing status. The exception is an
+     * already-rejected booking reduced to the resource's current capacity or lower, because
+     * reducing quantity can remove the capacity clash that caused the rejection and allow the
+     * booking to be approved again.
+     */
     public function getNewStatusIdForUpdatedBooking(
         BookingModel $booking,
         bool $isClash,
@@ -1387,12 +1396,25 @@ class Validation
         bool $overrideValidation = false,
     ): int {
         $status = $booking->getStatus();
+        $quantity = $booking->getQuantity();
         if (
             !$overrideValidation
             && !$periodChanged
             && !$isClash
-            && $booking->getQuantity() <= $originalQuantity
             && $status !== null
+            && (
+                (
+                    $status->getId() !== BookingStatusModel::STATUS_REJECTED
+                    && $quantity <= $originalQuantity
+                )
+                || (
+                    $status->getId() === BookingStatusModel::STATUS_REJECTED
+                    && (
+                        $quantity >= $originalQuantity
+                        || $quantity > $booking->getResource()->getCapacity()
+                    )
+                )
+            )
         ) {
             return $status->getId();
         }
