@@ -110,6 +110,12 @@ function openModal(student: StudentRow): void {
                         data-dropdown-content
                         aria-hidden="true"
                     >
+                        <li v-if="student.updateLanguageEndpoint !== null">
+                            <button class="sbx-button--has-icon" @click.prevent="openModal(student)">
+                                <sbx-icon name="modify"></sbx-icon>
+                                Update language selection
+                            </button>
+                        </li>
                         <li v-if="student.stage === 'confirmed'">
                             <button
                                 class="sbx-button--has-icon"
@@ -117,12 +123,6 @@ function openModal(student: StudentRow): void {
                             >
                                 <sbx-icon name="export"></sbx-icon>
                                 Register via API
-                            </button>
-                        </li>
-                        <li v-if="student.updateLanguageEndpoint !== null">
-                            <button class="sbx-button--has-icon" @click.prevent="openModal(student)">
-                                <sbx-icon name="modify"></sbx-icon>
-                                Update language selection
                             </button>
                         </li>
                         <li v-if="student.renotifyEndpoint !== null">
@@ -152,15 +152,6 @@ function openModal(student: StudentRow): void {
                                 Approve on behalf of student
                             </button>
                         </li>
-                        <li v-if="student.stage === 'unconfirmed' || student.stage === 'confirmed'">
-                            <button
-                                class="sbx-button--has-icon"
-                                @click.prevent="emit('resetDetailsSingle', student.id)"
-                            >
-                                <sbx-icon name="undo"></sbx-icon>
-                                Reset all details
-                            </button>
-                        </li>
                         <li v-if="student.stage === 'confirmed'">
                             <button
                                 class="sbx-button--has-icon"
@@ -168,6 +159,15 @@ function openModal(student: StudentRow): void {
                             >
                                 <sbx-icon name="international-baccalaureate"></sbx-icon>
                                 Mark as manually registered
+                            </button>
+                        </li>
+                        <li v-if="student.stage === 'unconfirmed' || student.stage === 'confirmed'">
+                            <button
+                                class="sbx-button--has-icon"
+                                @click.prevent="emit('resetDetailsSingle', student.id)"
+                            >
+                                <sbx-icon name="undo"></sbx-icon>
+                                Reset all details
                             </button>
                         </li>
                     </ul>

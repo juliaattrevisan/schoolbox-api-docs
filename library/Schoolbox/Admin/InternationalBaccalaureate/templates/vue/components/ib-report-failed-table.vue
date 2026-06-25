@@ -104,15 +104,6 @@ function openModal(student: FailedRow): void {
                         data-dropdown-content
                         aria-hidden="true"
                     >
-                        <li>
-                            <button
-                                class="sbx-button--has-icon"
-                                @click.prevent="emit('registerViaApiSingle', student.id)"
-                            >
-                                <sbx-icon name="export"></sbx-icon>
-                                Register via API
-                            </button>
-                        </li>
                         <li v-if="student.updateLanguageEndpoint !== null">
                             <button class="sbx-button--has-icon" @click.prevent="openModal(student)">
                                 <sbx-icon name="modify"></sbx-icon>
@@ -122,10 +113,10 @@ function openModal(student: FailedRow): void {
                         <li>
                             <button
                                 class="sbx-button--has-icon"
-                                @click.prevent="emit('resetDetailsSingle', student.id)"
+                                @click.prevent="emit('registerViaApiSingle', student.id)"
                             >
-                                <sbx-icon name="undo"></sbx-icon>
-                                Reset all details
+                                <sbx-icon name="export"></sbx-icon>
+                                Register via API
                             </button>
                         </li>
                         <li>
@@ -135,6 +126,15 @@ function openModal(student: FailedRow): void {
                             >
                                 <sbx-icon name="international-baccalaureate"></sbx-icon>
                                 Mark as manually registered
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                class="sbx-button--has-icon"
+                                @click.prevent="emit('resetDetailsSingle', student.id)"
+                            >
+                                <sbx-icon name="undo"></sbx-icon>
+                                Reset all details
                             </button>
                         </li>
                     </ul>
