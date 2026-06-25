@@ -82,7 +82,7 @@ defineEmits<{
                     Mark as manually registered
                 </button>
             </li>
-            <li v-if="activeSection === 'confirmed'">
+            <li v-if="activeSection === 'confirmed' || activeSection === 'failed'">
                 <button
                     type="button"
                     class="button submit sbx-button--has-icon"

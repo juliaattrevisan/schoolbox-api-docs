@@ -15,6 +15,7 @@ const students = window.Vue.toRef(props, "students");
 const { selectedList, allSelected, isIndeterminate, showCheckboxes } = useSelectedList(students, selectedListModel);
 
 const emit = defineEmits<{
+    registerViaApiSingle: [studentId: number];
     resetDetailsSingle: [studentId: number];
     manuallyRegisterSingle: [studentId: number];
 }>();
@@ -103,6 +104,15 @@ function openModal(student: FailedRow): void {
                         data-dropdown-content
                         aria-hidden="true"
                     >
+                        <li>
+                            <button
+                                class="sbx-button--has-icon"
+                                @click.prevent="emit('registerViaApiSingle', student.id)"
+                            >
+                                <sbx-icon name="export"></sbx-icon>
+                                Register via API
+                            </button>
+                        </li>
                         <li v-if="student.updateLanguageEndpoint !== null">
                             <button class="sbx-button--has-icon" @click.prevent="openModal(student)">
                                 <sbx-icon name="modify"></sbx-icon>

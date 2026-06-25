@@ -1232,7 +1232,10 @@ class Controller extends ConfigController
                 if (
                     $student !== null
                     && !isset($seen[$student->getId()])
-                    && $student->getStatus() === RegistrationSessionStudentModel::STATUS_CONFIRMED
+                    && (
+                        $student->getStatus() === RegistrationSessionStudentModel::STATUS_CONFIRMED ||
+                        $student->getStatus() === RegistrationSessionStudentModel::STATUS_FAILED
+                    )
                 ) {
                     $seen[$student->getId()] = true;
                     $studentsToRegister[]    = $student;

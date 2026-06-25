@@ -261,7 +261,7 @@ async function handleCompletePreparation(studentIds: number[]): Promise<void> {
  * @param studentIds The ids to queue for API registration.
  */
 function promptRegisterViaApi(studentIds: number[]): void {
-    studentsToRegister.value = confirmed.value
+    studentsToRegister.value = [...confirmed.value, ...failed.value]
         .filter((s) => studentIds.includes(s.id))
         .map((s) => ({ id: s.id, userId: s.userId, name: s.name, subjects: s.subjects }));
     if (studentsToRegister.value.length === 0) return;
@@ -299,6 +299,7 @@ async function handleRegisterViaApi(): Promise<void> {
             subjects,
         }));
         confirmed.value = confirmed.value.filter((s) => !removedIds.has(s.id));
+        failed.value = failed.value.filter((s) => !removedIds.has(s.id));
         inProgress.value = [...queuedStudents, ...inProgress.value];
         clearSelection();
         toast.timeout({
@@ -613,6 +614,7 @@ window.Vue.onMounted((): void => {
                     v-model:selected-list="failedSelected"
                     :students="failed"
                     :active-selection-section="activeSelectionSection"
+                    @register-via-api-single="(id) => promptRegisterViaApi([id])"
                     @reset-details-single="(id) => promptResetDetails([id])"
                     @manually-register-single="(id) => handleManuallyRegister([id])"
                 />
@@ -664,7 +666,7 @@ window.Vue.onMounted((): void => {
             "
             :active-section="activeSelectionSection"
             @complete-preparation="handleCompletePreparation(preparationSelected.map((s) => s.id))"
-            @register-via-api="promptRegisterViaApi(confirmedSelected.map((s) => s.id))"
+            @register-via-api="promptRegisterViaApi([...confirmedSelected, ...failedSelected].map((s) => s.id))"
             @approve-on-behalf="handleApproveOnBehalf(unconfirmedSelected)"
             @renotify="handleRenotifySelected(unconfirmedSelected)"
             @reset-details="
