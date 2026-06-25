@@ -79,7 +79,7 @@ abstract class AbstractAssessment implements IAssessable
      *
      * This is used to automatically populate dates when importing CourseSpecs.
      *
-     * @var int
+     * @var int|null
      */
     private $defaultOpenSpan;
 
@@ -1015,7 +1015,7 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getDefaultOpenSpan()
     {
@@ -1024,7 +1024,7 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
-     * @param int $defaultOpenSpan
+     * @param int|null $defaultOpenSpan
      * @return $this
      */
     public function setDefaultOpenSpan($defaultOpenSpan)

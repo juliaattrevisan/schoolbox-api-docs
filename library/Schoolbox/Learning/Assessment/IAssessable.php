@@ -697,14 +697,14 @@ interface IAssessable extends ISoftDeletable
     /**
      * Period in days to schedule an Assessment for during Course Import
      *
-     * @return int
+     * @return int|null
      */
     public function getDefaultOpenSpan();
 
     /**
      * Period in days to schedule an Assessment for during Course Import
      *
-     * @param int $defaultOpenSpan
+     * @param int|null $defaultOpenSpan
      * @return $this
      */
     public function setDefaultOpenSpan($defaultOpenSpan);
