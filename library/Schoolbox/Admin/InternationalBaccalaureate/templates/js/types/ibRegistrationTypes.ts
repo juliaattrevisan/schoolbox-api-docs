@@ -7,3 +7,13 @@ export type RegistrationSession = {
     createdBy: string | null;
     deleteEndpoint: string | null;
 };
+
+export type SystemPurpose = {
+    id: number;
+    name: string;
+};
+
+export type RegistrationSessionsResponse = {
+    data: Record<string, RegistrationSession[]>;
+    systemPurposes: Record<string, SystemPurpose>;
+};
