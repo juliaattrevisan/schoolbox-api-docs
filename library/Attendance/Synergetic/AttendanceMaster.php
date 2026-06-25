@@ -110,26 +110,18 @@ class Attendance_Synergetic_AttendanceMaster
 
         $attendanceMasterSeqStatement->execute();
 
-        /* Seems like there's only supposed to be one record here: not sure if you can find more
-         * for the same class that occurred at this time for a given filetype/filesemester and
-         * campus...that seems like a mistake
-         */
-        $row = $attendanceMasterSeqStatement->fetch();
-        $attendanceMasterSeq = is_array($row) ? $row['wkAttendanceMasterSeq'] : null;
-
-        if ($attendanceMasterSeq) {
-            /* Cleanup all working data before commencing attendance marking */
+        foreach ($attendanceMasterSeqStatement->fetchAll() as $row) {
             $this->connector->executeQuery("
                 DELETE
                 FROM wkAttendances
                 WHERE wkAttendanceMasterSeq = :wkAttendanceMasterSeq
-            ", ['wkAttendanceMasterSeq' => $attendanceMasterSeq]);
+            ", ['wkAttendanceMasterSeq' => $row['wkAttendanceMasterSeq']]);
 
             $this->connector->executeQuery("
                 DELETE
                 FROM wkAttendanceMaster
                 WHERE wkAttendanceMasterSeq = :wkAttendanceMasterSeq
-            ", ['wkAttendanceMasterSeq' => $attendanceMasterSeq]);
+            ", ['wkAttendanceMasterSeq' => $row['wkAttendanceMasterSeq']]);
         }
 
         // Get the attendance master sequence number
