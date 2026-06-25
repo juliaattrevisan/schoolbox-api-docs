@@ -11,7 +11,6 @@
 // @ts-nocheck
 
 import { LT } from "@caspingus/lt/authoring/core";
-import { imageUploader } from "@caspingus/lt/authoring/extensions/imageUploader";
 
 /**
  * Adjust the header of the question items list to be fixed when scrolling down
@@ -198,18 +197,17 @@ const authorAppCallback = {
             }
         };
 
-        LT.init(authorApp); // Set up LT with the Author API application instance variable
-
-        // Put individual extensions in the LT object if that makes your life easier
-        LT.extensions = {
-            imageUploader,
-        };
-
-        // Run the image uploader extension
-        LT.extensions.imageUploader.run(
-            window.sbProps.authorApp.initOptions.security,
-            window.sbProps.authorApp.initOptions.request,
-        );
+        LT.init(authorApp, {
+            extensions: [
+                {
+                    id: "imageUploader",
+                    args: {
+                        security: window.sbProps.authorApp.initOptions.security,
+                        request: window.sbProps.authorApp.initOptions.request,
+                    },
+                },
+            ],
+        });
     },
     /* Log errors to console and to screen for users
      */
