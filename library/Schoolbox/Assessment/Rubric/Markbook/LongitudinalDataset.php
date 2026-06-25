@@ -73,7 +73,7 @@ class LongitudinalDataset
      * @param array $studentMarks
      * @return array
      */
-    public function generate(\Schoolbox\User $student, array $studentMarks): array
+    public function generate(User $student, array $studentMarks): array
     {
         /* We only need data for this one particular student
          */
