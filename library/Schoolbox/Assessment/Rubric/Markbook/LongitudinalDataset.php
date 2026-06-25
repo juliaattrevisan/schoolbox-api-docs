@@ -15,6 +15,16 @@ use Schoolbox\User;
 class LongitudinalDataset
 {
     /**
+     * Constructor
+     *
+     * @param bool $includeComparison If true, accumulate five-point summaries that fuel the boxplot graphs in the Progression Panel.
+     */
+    public function __construct(private bool $includeComparison)
+    {
+    }
+
+
+    /**
      * From the set of rubric marks data $studentMarks, find a particular $student's result set and rotate the hash
      * lookup data struct: this is because assessments render horizontally in longitudinally-oriented areas where we
      * look at one student's accomplishments:
@@ -22,6 +32,42 @@ class LongitudinalDataset
      *     - learning levels panel
      *     - progression panel
      *     - etc.
+     *
+     * Produces a struct like this:
+     *
+     * [
+     *     capability id => [
+     *         capability name
+     *         assessment results => [
+     *             assessment id => [
+     *                 grid => [
+     *                     rubric instance id => [
+     *                         published => [
+     *                             normalised mark
+     *                         ]
+     *                     ]
+     *                 ]
+     *             ]
+     *         ]
+     *         indicators => [
+     *             indicator id => [
+     *                 indicator name
+     *                 assessment results => [
+     *                     assessment id => [
+     *                         grid => [
+     *                             rubric instance id => [
+     *                                 published => [
+     *                                     normalised mark,
+     *                                     optionally a five point summary for boxplots
+     *                                 ]
+     *                             ]
+     *                         ]
+     *                     ]
+     *                 ]
+     *             ]
+     *         ]
+     *     ]
+     * ]
      *
      * @param User $student
      * @param array $studentMarks
@@ -42,6 +88,7 @@ class LongitudinalDataset
         /* Transpose this rubric markbook data
          */
         $stack = [];
+        $summaryIterator = null;
 
         foreach ($data['gridData'] as $assessmentId => $rubricInstanceData) {
             foreach ($rubricInstanceData as $rubricInstanceId => $rubricGridData) {
@@ -79,7 +126,21 @@ class LongitudinalDataset
                         /* If $includeComparison is truthy, also accumulate a five-point-summary for the boxplots in
                          * the user interface. This requires you to collect everyone's value for an indicator.
                          * You'll have to iterate over everyone else's indicator value to chuck into the boxplot summary.
+                         *
+                         * Reuse this old "statistics" node, for familiarity I guess
                          */
+                        if ($this->includeComparison) {
+                            /* Only spawn this once
+                             */
+                            if (null === $summaryIterator) {
+                                $summaryIterator = (new SummaryIterator($studentMarks));
+                            }
+
+                            /* All the normalised marks for this $indicatorId go into a data set, which then gets
+                             * pumped into a new Summary() instance's constructor.
+                             */
+                            $stack[$capabilityId]['indicators'][$indicatorId]['assessmentResults'][$assessmentId]['grid'][$rubricInstanceId]['published']['statistics'] = $summaryIterator->accumulate($assessmentId, $rubricInstanceId, $capabilityId, $indicatorId);
+                        }
                     }
                 }
             }

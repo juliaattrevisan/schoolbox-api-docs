@@ -555,12 +555,24 @@ select.letter-grade-select {
     }
 
     // Rubric progression graph
-    th.rubric-progression-capability,
-    th.rubric-progression-indicator {
-        width: 15%;
-    }
-    td.rubric-progression-graph {
-        padding: 0;
+    table.rb.rubric-progression {
+        table-layout: fixed;
+        width: 100%;
+
+        th.rubric-progression-capability,
+        th.rubric-progression-indicator {
+            width: 15%;
+        }
+
+        td.rubric-progression-graph {
+            min-width: 0;
+            padding: 0;
+            width: 70%;
+
+            > div {
+                width: 100%;
+            }
+        }
     }
 }
 

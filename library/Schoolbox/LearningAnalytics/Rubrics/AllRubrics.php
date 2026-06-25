@@ -59,6 +59,9 @@ class AllRubrics
             }
         }
 
+        /* TODO This getStudentMarksByIndicatorInFolder still uses submission return presumptively
+         *  What is THIS place?
+         */
         $studentRubricMarks = $rubricMapper->getStudentMarksByIndicatorInFolder($folderIds, $term);
         $allCriteria        = $rubricMapper->getAvailableIndicators($folderIds);
 
