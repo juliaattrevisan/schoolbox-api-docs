@@ -527,6 +527,7 @@ class Healthcheck
             'vStudentsAll',
             'vSubjectClassesStaff',
             'wkAttendances',
+            'wkAttendanceMaster'
         ];
 
         // Pastoral care tables (only if module enabled).
@@ -562,6 +563,7 @@ class Healthcheck
         // Attendance update Tests.
         $this->updateTest(['wkAttendances']);
         $this->updateTest(['AttendanceMaster']);
+        $this->deleteTest(['wkAttendances', 'wkAttendanceMaster']);
 
         // Markbook tests.
         if ($this->configMapper->get('external_markbook')) {

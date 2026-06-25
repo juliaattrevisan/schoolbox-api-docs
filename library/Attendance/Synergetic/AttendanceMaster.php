@@ -80,8 +80,53 @@ class Attendance_Synergetic_AttendanceMaster
         $this->setFileSemester($fileSemester);
         $this->timetableGroup = $timetableGroup;
 
-        // Get the attendance master sequence number
+        // Stored proc should delete wk table but for some reason it may not
+        /* This is stolen from their dbo.spiwkAttendances stored proc where it's conducted
+         * in two separate queries, due to a limitation in mssql where it can't delete
+         * from multiple tables in the same query, forcing you to split them.
+         *
+         * The first query finds the AttendanceMasterSeq values for wkAttendanceMaster
+         * which we'll use to delete corresponding rows from wkAttendances next.
+         */
+        $attendanceMasterSeqStatement = $this->connector->prepareQuery("
+            SELECT wkAttendanceMasterSeq
+            FROM wkAttendanceMaster
+            WHERE FileType = :fileType AND
+            FileYear = :fileYear AND
+            FileSemester = :fileSemester AND
+            ClassCampus = :classCampus AND
+            ClassCode = :classCode AND
+            AttendanceDate = :attendanceDate AND
+            AttendancePeriod = :attendancePeriod AND
+            AttendanceDayNumber = :attendanceDayNumber
+        ", [
+            'fileType'          => $this->getClassFileType(),
+            'fileYear'          => $this->getFileYear(),
+            'fileSemester'      => $this->getFileSemester(),
+            'classCampus'       => $this->getClassCampus() ?? '',
+            'classCode'         => $this->getClassCode(),
+            'attendanceDate'    => $attendanceDate->getDatabaseDate() . ' 00:00:00.000',
+            'attendancePeriod'  => $this->getAttendancePeriod(),
+            'attendanceDayNumber' => $attendanceDay,
+        ]);
 
+        $attendanceMasterSeqStatement->execute();
+
+        foreach ($attendanceMasterSeqStatement->fetchAll() as $row) {
+            $this->connector->executeQuery("
+                DELETE
+                FROM wkAttendances
+                WHERE wkAttendanceMasterSeq = :wkAttendanceMasterSeq
+            ", ['wkAttendanceMasterSeq' => $row['wkAttendanceMasterSeq']]);
+
+            $this->connector->executeQuery("
+                DELETE
+                FROM wkAttendanceMaster
+                WHERE wkAttendanceMasterSeq = :wkAttendanceMasterSeq
+            ", ['wkAttendanceMasterSeq' => $row['wkAttendanceMasterSeq']]);
+        }
+
+        // Get the attendance master sequence number
         $statement = $this->connector->prepareStoredProcedure('spiwkAttendances');
 
         $statement->bindInputs(
