@@ -404,6 +404,7 @@ class Controller extends Base
             }
 
             if ($feedback->isPublished()) {
+                $results[$draftFeedbackId] = ['publishSuccess' => false, 'error' => 'Feedback already published'];
                 continue; // Attempting to publish an already published feedback should have no effect.
             }
 

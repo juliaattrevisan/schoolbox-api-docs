@@ -127,9 +127,9 @@ class PublishAuditTest extends TestCase
     }
 
     /**
-     * Verifies reporting bulk publish does not overwrite existing published audit fields.
+     * Verifies reporting bulk publish skips already published feedback.
      */
-    public function testReportingBulkPublishPreservesExistingPublishedAuditFields(): void
+    public function testReportingBulkPublishSkipsAlreadyPublishedFeedback(): void
     {
         $assessmentModel = new AssessmentModel()->setId(self::REPORTING_ASSESSMENT_ID);
         $assessment = new Model()
@@ -150,13 +150,8 @@ class PublishAuditTest extends TestCase
             ->with(self::REPORTING_FEEDBACK_ID)
             ->willReturn($feedback);
         $feedbackMapper
-            ->expects($this->once())
-            ->method('save')
-            ->with(self::callback(
-                static fn(ReportingFeedback $savedFeedback): bool =>
-                    $savedFeedback->getPublishedAt() === $originalPublishedAt
-                    && $savedFeedback->getPublishedBy() === self::ORIGINAL_REPORTING_PUBLISHER_ID
-            ));
+            ->expects($this->never())
+            ->method('save');
 
         $projectResultCacheMapper = $this->createMock(ProjectResultCacheMapper::class);
         $projectResultCacheMapper
@@ -171,6 +166,18 @@ class PublishAuditTest extends TestCase
         $controller->setUser(new User()->setId(self::CURRENT_REPORTING_PUBLISHER_ID));
 
         $controller->postParticipantFeedbacks($assessment);
+
+        self::assertSame($originalPublishedAt, $feedback->getPublishedAt());
+        self::assertSame(self::ORIGINAL_REPORTING_PUBLISHER_ID, $feedback->getPublishedBy());
+        self::assertSame(
+            [
+                self::REPORTING_FEEDBACK_ID => [
+                    'publishSuccess' => false,
+                    'error' => 'Feedback already published',
+                ],
+            ],
+            $this->getJsonResponsePayload($controller),
+        );
     }
 
     /**
@@ -220,9 +227,9 @@ class PublishAuditTest extends TestCase
     }
 
     /**
-     * Verifies due work bulk publish does not overwrite existing published audit fields.
+     * Verifies due work bulk publish skips already published feedback.
      */
-    public function testDueWorkBulkPublishPreservesExistingPublishedAuditFields(): void
+    public function testDueWorkBulkPublishSkipsAlreadyPublishedFeedback(): void
     {
         $assessment = $this->createStub(DueWork\Model::class);
         $assessment
@@ -249,13 +256,8 @@ class PublishAuditTest extends TestCase
             ->with(self::DUE_WORK_PUBLISHED_RETURNED_WORK_ID)
             ->willReturn($returnedWork);
         $returnedWorkMapper
-            ->expects($this->once())
-            ->method('save')
-            ->with(self::callback(
-                static fn(ReturnedWork $savedReturn): bool =>
-                    $savedReturn->getPublishedAt() === $originalPublishedAt
-                    && $savedReturn->getPublishedBy() === self::ORIGINAL_DUE_WORK_PUBLISHER_ID
-            ));
+            ->expects($this->never())
+            ->method('save');
 
         $controller = $this->buildDueWorkController(
             $returnedWorkMapper,
@@ -265,6 +267,18 @@ class PublishAuditTest extends TestCase
         $controller->setUser(new User()->setId(self::CURRENT_DUE_WORK_PUBLISHER_ID));
 
         $controller->postParticipantFeedbacks($assessment);
+
+        self::assertSame($originalPublishedAt, $returnedWork->getPublishedAt());
+        self::assertSame(self::ORIGINAL_DUE_WORK_PUBLISHER_ID, $returnedWork->getPublishedBy());
+        self::assertSame(
+            [
+                self::DUE_WORK_PUBLISHED_RETURNED_WORK_ID => [
+                    'publishSuccess' => false,
+                    'error' => 'Feedback already published',
+                ],
+            ],
+            $this->getJsonResponsePayload($controller),
+        );
     }
 
     /**
@@ -298,9 +312,9 @@ class PublishAuditTest extends TestCase
     }
 
     /**
-     * Verifies due work single publish does not overwrite existing published audit fields.
+     * Verifies due work single publish skips already published feedback.
      */
-    public function testDueWorkSinglePublishPreservesExistingPublishedAuditFields(): void
+    public function testDueWorkSinglePublishSkipsAlreadyPublishedFeedback(): void
     {
         $student = new User()->setId(self::DUE_WORK_STUDENT_ID);
         $originalPublishedAt = Alaress_Date_Format::now()->modify('-1 day');
@@ -313,13 +327,8 @@ class PublishAuditTest extends TestCase
         $assessment = $this->createDueWorkAssessmentWithFeedback($student, $feedback);
         $feedbackDataSource = $this->createMock(IFeedbackDataSource::class);
         $feedbackDataSource
-            ->expects($this->once())
-            ->method('save')
-            ->with(self::callback(
-                static fn(DueWorkFeedback $savedFeedback): bool =>
-                    $savedFeedback->getPublishedAt() === $originalPublishedAt
-                    && $savedFeedback->getPublishedBy() === self::ORIGINAL_DUE_WORK_PUBLISHER_ID
-            ));
+            ->expects($this->never())
+            ->method('save');
 
         $controller = $this->buildDueWorkController(
             $this->createStub(ReturnedWorkMapper::class),
@@ -328,6 +337,9 @@ class PublishAuditTest extends TestCase
         $controller->setUser(new User()->setId(self::CURRENT_DUE_WORK_PUBLISHER_ID));
 
         $controller->postPublishFeedback($assessment, $student);
+
+        self::assertSame($originalPublishedAt, $feedback->getPublishedAt());
+        self::assertSame(self::ORIGINAL_DUE_WORK_PUBLISHER_ID, $feedback->getPublishedBy());
     }
 
     /**
@@ -442,5 +454,20 @@ class PublishAuditTest extends TestCase
             $httpFactory,
             $this->createStub(Environment::class),
         ));
+    }
+
+
+    /**
+     * Reads the decoded JSON response payload from a controller.
+     *
+     * @param Base $controller
+     * @return array<mixed>
+     */
+    private function getJsonResponsePayload(Base $controller): array
+    {
+        $response = $controller->getResponse();
+        self::assertNotNull($response);
+
+        return json_decode((string) $response->getBody(), true);
     }
 }
