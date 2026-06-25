@@ -97,15 +97,17 @@ class Attendance_Synergetic_AttendanceMaster
             ClassCampus = :classCampus AND
             ClassCode = :classCode AND
             AttendanceDate = :attendanceDate AND
-            AttendancePeriod = :attendancePeriod
+            AttendancePeriod = :attendancePeriod AND
+            (AttendanceDayNumber = :attendanceDayNumber OR (:attendanceDayNumber IS NULL AND AttendanceDayNumber IS NULL))
         ", [
-            'fileType'        => $this->getClassFileType(),
-            'fileYear'        => $this->getFileYear(),
-            'fileSemester'    => $this->getFileSemester(),
-            'classCampus'     => $this->getClassCampus(),
-            'classCode'       => $this->getClassCode(),
-            'attendanceDate'  => $attendanceDate->getDatabaseDate() . ' 00:00:00.000',
-            'attendancePeriod' => $this->getAttendancePeriod(),
+            'fileType'          => $this->getClassFileType(),
+            'fileYear'          => $this->getFileYear(),
+            'fileSemester'      => $this->getFileSemester(),
+            'classCampus'       => $this->getClassCampus() ?? '',
+            'classCode'         => $this->getClassCode(),
+            'attendanceDate'    => $attendanceDate->getDatabaseDate() . ' 00:00:00.000',
+            'attendancePeriod'  => $this->getAttendancePeriod(),
+            'attendanceDayNumber' => $attendanceDay,
         ]);
 
         $attendanceMasterSeqStatement->execute();
