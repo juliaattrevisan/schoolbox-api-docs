@@ -175,7 +175,10 @@ class Controller extends Base
 
 
     /**
-     * Submit multiple feedbacks in single call
+     * Publish multiple feedbacks in single call
+     *
+     * Note this function is for bulk publishing already saved feedbacks.  It does not affect feedback content.
+     * (see that the only POSTed data is draft feedback IDs)
      *
      * This is a dueWork/reporting-only route
      *
@@ -246,16 +249,16 @@ class Controller extends Base
                 continue;
             }
 
-            // Editing an existing published feedback creates a new feedback row (see DueWork\Feedback\Factory->produce()).
-            // Therefore bulk publishing an already-published row should preserve its original publishedAt/By audit fields.
-            if (!$submissionReturn->isPublished()) {
-                // Bulk publish can release draft feedback authored by someone else.  This workflow is handled in an
-                // odd way in the database: submission_return.published_by is set to the feedback author on creation,
-                // but submission_return.published_at is left unset.  See DueWork\Feedback\Factory->produce().
-                // Note submission_return.published_by is not nullable.  The bulk publish action sets published_at but
-                // leaves published_by unchanged (remember it cannot be null).
-                $submissionReturn->setPublishedAt($now);
+            if ($submissionReturn->isPublished()) {
+                continue; // Attempting to publish an already published feedback should have no effect.
             }
+
+            // Bulk publish can release draft feedback authored by someone else.  This workflow is handled in an
+            // odd way in the database: submission_return.published_by is set to the feedback author on creation,
+            // but submission_return.published_at is left unset.  See DueWork\Feedback\Factory->produce().
+            // Note submission_return.published_by is not nullable.  The bulk publish action sets published_at but
+            // leaves published_by unchanged (remember it cannot be null).
+            $submissionReturn->setPublishedAt($now);
 
             try {
                 $this->returnedWorkMapper->save($submissionReturn);
@@ -298,7 +301,7 @@ class Controller extends Base
                 $publishSuccess = false;
             }
 
-            $results[$draftFeedbackId] = ['publishSuccess'   => $publishSuccess];
+            $results[$draftFeedbackId] = ['publishSuccess' => $publishSuccess];
         }
 
         $this->response = $this->responseAsJson($results);
