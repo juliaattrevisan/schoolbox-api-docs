@@ -249,11 +249,14 @@ class Controller extends Base
             // Editing an existing published feedback creates a new feedback row (see DueWork\Feedback\Factory->produce()).
             // Therefore bulk publishing an already-published row should preserve its original publishedAt/By audit fields.
             if (!$submissionReturn->isPublished()) {
-                // Bulk publish can release draft feedback authored by someone else. The marker remains the feedback
-                // author; publishedBy records the user who performed this publish action.
+                // Bulk publish can release draft feedback authored by someone else.  This workflow is handled in an
+                // odd way in the database: submission_return.published_by is set to the feedback author on creation,
+                // but submission_return.published_at is left unset.  See DueWork\Feedback\Factory->produce().
+                // Note submission_return.published_by is not nullable.  The bulk publish action sets published_at but
+                // leaves published_by unchanged if it is set, otherwise falling back to the current user.
                 $submissionReturn
                     ->setPublishedAt($now)
-                    ->setPublishedBy($this->getUser()->getId());
+                    ->setPublishedBy($submissionReturn->getPublishedBy() ?? $this->getUser()->getId());
             }
 
             try {
