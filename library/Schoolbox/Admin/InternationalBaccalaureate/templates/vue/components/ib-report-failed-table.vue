@@ -19,6 +19,9 @@ const isSomeSelected = window.Vue.computed<boolean>(
     () => selectedList.value.length > 0 && selectedList.value.length < props.students.length,
 );
 
+/**
+ * Toggles selection of all students in this section.
+ */
 function toggleSelectAll(): void {
     if (isAllSelected.value) {
         selectedList.value = [];
