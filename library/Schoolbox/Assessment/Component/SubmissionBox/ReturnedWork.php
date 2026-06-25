@@ -363,8 +363,7 @@ class ReturnedWork implements ISoftDeletable
      */
     public function isPublished()
     {
-        // We do not compare the publishedAt time with now() here because due work feedback does not
-        // support scheduled publishing. UI publish flows for feedback just set published_at to now.
+        // See note in AbstractFeedback->isPublished().
         return ($this->getPublishedAt() instanceof Alaress_Date_Format);
     }
 
