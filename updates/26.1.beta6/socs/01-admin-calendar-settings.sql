@@ -16,13 +16,15 @@ SET type_id = @socs_config_id,
     sequence = CASE name
         WHEN 'socs_enabled' THEN 1
         WHEN 'socs_endpoint_host' THEN 2
-        WHEN 'socs_endpoint_id' THEN 3
-        WHEN 'socs_endpoint_token' THEN 4
+        WHEN 'socs_endpoint_host_fixture' THEN 3
+        WHEN 'socs_endpoint_id' THEN 4
+        WHEN 'socs_endpoint_token' THEN 5
         ELSE sequence
     END
 WHERE name IN (
     'socs_enabled',
     'socs_endpoint_host',
+    'socs_endpoint_host_fixture',
     'socs_endpoint_token',
     'socs_endpoint_id'
 );
@@ -39,7 +41,7 @@ VALUES (
     'false',
     'false',
     'settings',
-    5
+    6
 );
 
 INSERT IGNORE INTO config (`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
@@ -54,7 +56,7 @@ VALUES (
     'false',
     'false',
     'settings',
-    6
+    7
 );
 
 INSERT IGNORE INTO config (`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`, `hidden`, `required`, `module`, `options`, `sequence`)
@@ -70,7 +72,7 @@ VALUES (
     'false',
     'settings',
     'a:3:{s:6:"mapper";s:34:"Schoolbox\\Calendar\\EventTypeMapper";s:12:"getKeyMethod";s:5:"getId";s:14:"getValueMethod";s:7:"getType";}',
-    7
+    8
 );
 
 INSERT IGNORE INTO config (`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
@@ -85,7 +87,7 @@ VALUES (
     'false',
     'false',
     'settings',
-    8
+    9
 );
 
 INSERT IGNORE INTO config (`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
@@ -99,23 +101,21 @@ SELECT 'socs_endpoint_host_fixture',
        'false',
        'false',
        'settings',
-       9;
+       3;
 
 UPDATE config
 SET type_id = @socs_config_id,
     sequence = CASE name
-        WHEN 'socs_import_calendar_events' THEN 5
-        WHEN 'socs_calendar_name' THEN 6
-        WHEN 'socs_calendar_default_event_type' THEN 7
-        WHEN 'socs_import_sports_fixtures' THEN 8
-        WHEN 'socs_endpoint_host_fixture' THEN 9
+        WHEN 'socs_import_calendar_events' THEN 6
+        WHEN 'socs_calendar_name' THEN 7
+        WHEN 'socs_calendar_default_event_type' THEN 8
+        WHEN 'socs_import_sports_fixtures' THEN 9
     END
 WHERE name IN (
     'socs_import_calendar_events',
     'socs_calendar_name',
     'socs_calendar_default_event_type',
-    'socs_import_sports_fixtures',
-    'socs_endpoint_host_fixture'
+    'socs_import_sports_fixtures'
 );
 
 INSERT INTO calendar_connector (`event_type`, `connector_class`, `config`, `status`)
