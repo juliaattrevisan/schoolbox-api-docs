@@ -110,7 +110,7 @@ class Model implements ISoftDeletable
     private $workType;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $defaultOpenSpan;
 
@@ -772,7 +772,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getDefaultOpenSpan()
     {
@@ -780,7 +780,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param int $defaultOpenSpan
+     * @param int|null $defaultOpenSpan
      * @return static
      */
     public function setDefaultOpenSpan($defaultOpenSpan)

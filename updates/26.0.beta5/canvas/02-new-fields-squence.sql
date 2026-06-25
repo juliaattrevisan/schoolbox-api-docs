@@ -116,7 +116,7 @@ VALUES (
     'canvas_sissourceid_template',
     'SIS Source ID Template',
     '{folderCode}{parentCode}',
-    'Template Schoolbox uses to map Canvas data to Schoolbox data.',
+    'Template Schoolbox uses to map Canvas data to Schoolbox data. Supports {folderCode}, {parentCode}, {folderName}, and {year}.',
     (
          SELECT `id`
          FROM `lu_config_field`

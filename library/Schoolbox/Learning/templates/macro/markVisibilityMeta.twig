@@ -3,7 +3,7 @@
  #}
 {% macro markVisibilityMeta(assessment, plural = false) %}
     {% if assessment.markVisibility == 'staffStudentAndParent' %}
-        <li><sbx-icon name="staff" color="var(--sbx-color-text-secondary)"></sbx-icon> {{ (plural) ? locale.grades.properPlural : locale.grades.proper }} visible to staff, students and parents</li>
+        <li><sbx-icon name="group" color="var(--sbx-color-text-secondary)"></sbx-icon> {{ (plural) ? locale.grades.properPlural : locale.grades.proper }} visible to staff, students and parents</li>
     {% elseif assessment.markVisibility == 'staffAndParent' %}
         <li><sbx-icon name="staff" color="var(--sbx-color-text-secondary)"></sbx-icon> {{ (plural) ? locale.grades.properPlural : locale.grades.proper }} visible to staff and parents</li>
     {% elseif assessment.markVisibility == 'staffAndStudent' %}

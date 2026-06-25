@@ -67,7 +67,6 @@ class Controller extends Base
      * @param AssessmentMapperProxy $assessmentMapperProxy
      * @param Mapper $folderMapper
      * @param Term\Mapper $termMapper
-     * @param RubricDataSource $rubricMapper
      * @param FilterSelection\Mapper $filterSelectionMapper
      * @param Access $access
      * @param IdFinder $assessmentIdFinder
@@ -82,7 +81,6 @@ class Controller extends Base
         private AssessmentMapperProxy $assessmentMapperProxy,
         private Folder\Mapper $folderMapper,
         private Term\Mapper $termMapper,
-        private RubricDataSource $rubricMapper,
         private FilterSelection\Mapper $filterSelectionMapper,
         private Access $access,
         private AssessmentFilters\IdFinder $assessmentIdFinder,

@@ -135,11 +135,8 @@ class Cursor implements ICursor
 
     public function retrieveResultCount(): ?int
     {
-        return $this->finder->findCustomisationForStudentsByFilters(
-            $this->completedFilters,
-            null,
-            null,
-            null,
-        )->count();
+        return $this->finder->countCustomisationForStudentsByFilters(
+            $this->completedFilters
+        );
     }
 }

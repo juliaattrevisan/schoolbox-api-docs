@@ -144,6 +144,21 @@ class Module extends BaseModule
         $canViewStatus            = $this->buildAuthRuleCanViewStatus();
         $canViewSimilarityReport  = $this->buildAuthRuleCanViewSimilarityReport();
         $canAckSubmission         = $this->buildAuthRuleCanAcknowledgeSubmission();
+        /* Reporting activities are intentionally excluded from custom participation activity creation routes. They
+         * support student participation access in specific cases, but not actions that modify, copy, or create an
+         * activity from the participation screen.
+         *
+         * This is a trap for the Swamp where new activity types need to be added to this list.
+         */
+        $customParticipationAssessmentTypes = [
+            AssessmentType::TYPE_PROJECT,
+            AssessmentType::TYPE_DUE_WORK,
+            AssessmentType::TYPE_TASK,
+            AssessmentType::TYPE_QUIZ,
+            AssessmentType::TYPE_LTI_ASSESSMENT,
+            AssessmentType::TYPE_LESSON_PLAN,
+            AssessmentType::TYPE_DIALOG_AGENT,
+        ];
 
         $canDelete = new Rule\Any(
             $isSuper,
@@ -260,26 +275,15 @@ class Module extends BaseModule
             /* Check if the custom participation is available
              */
             new IsCustomParticipationModifiable(),
+            /* Modify Existing Activity is limited to custom participation activity types.
+             */
+            new ValidAssessmentType($customParticipationAssessmentTypes),
             new Rule\Any(
                 $isSuper,
                 new Rule\All(
                     $canWrite,
                     new AssessmentNotDeleted(),
                     new IsModifyUnLocked(new LockedChecker($this->getTermMapper())),
-                    /* Anything EXCEPT reporting activities have access to Modify Existing Activity
-                     *
-                     * Yes, I know this is a bit gruesome.
-                     * This is a trap for the Swamp where new activity types need to be added to this list.
-                     */
-                    new ValidAssessmentType([
-                        AssessmentType::TYPE_PROJECT,
-                        AssessmentType::TYPE_DUE_WORK,
-                        AssessmentType::TYPE_TASK,
-                        AssessmentType::TYPE_QUIZ,
-                        AssessmentType::TYPE_LTI_ASSESSMENT,
-                        AssessmentType::TYPE_LESSON_PLAN,
-                        AssessmentType::TYPE_DIALOG_AGENT,
-                    ]),
                 )
             )
         );
@@ -288,23 +292,9 @@ class Module extends BaseModule
         $canCopyAssessmentCustomParticipation = new Rule\All(
             $canModifyCustomParticipation,
             new IsCustomParticipationCopyable(),
-            new Rule\Any(
-                /* Anything EXCEPT reporting activities have access to Modify Existing Activity
-                 *
-                 * Yes, I know this is a bit gruesome.
-                 * This is a trap for the Swamp where new activity types need to be added to this list.
-                 */
-                new ValidAssessmentType([
-                    AssessmentType::TYPE_PROJECT,
-                    AssessmentType::TYPE_DUE_WORK,
-                    AssessmentType::TYPE_TASK,
-                    AssessmentType::TYPE_QUIZ,
-                    AssessmentType::TYPE_LTI_ASSESSMENT,
-                    AssessmentType::TYPE_LESSON_PLAN,
-                    AssessmentType::TYPE_DIALOG_AGENT,
-                ]),
-                new IsManageReportingActivity($this->getConfig()),
-            )
+            /* Create Copy is limited to custom participation activity types.
+             */
+            new ValidAssessmentType($customParticipationAssessmentTypes)
         );
 
         // pluralise for REST

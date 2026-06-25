@@ -5,7 +5,7 @@ import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import CreateSessionModal from "./components/create-session-modal.vue";
-import type { RegistrationSession } from "../js/types/ibRegistrationTypes";
+import type { RegistrationSession, RegistrationSessionsResponse, SystemPurpose } from "../js/types/ibRegistrationTypes";
 
 interface Props {
     sessionsEndpoint: string;
@@ -14,52 +14,99 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-// ── DIPLOMA section state (systemPurposeId: 1) ───────────────────────────
-// Future sections: add separate refs below this block, each with its own systemPurposeId.
+type RegistrationSection = {
+    systemPurpose: SystemPurpose;
+    sessions: RegistrationSession[];
+};
 
-const DIPLOMA_SYSTEM_PURPOSE_ID = 1;
-
-const diplomaSessions = window.Vue.ref<RegistrationSession[]>([]);
-const isDiplomaLoading = window.Vue.ref<boolean>(true);
-const isDiplomaModalOpen = window.Vue.ref<boolean>(false);
+const sessionsBySystemPurpose = window.Vue.ref<Record<string, RegistrationSession[]>>({});
+const systemPurposes = window.Vue.ref<SystemPurpose[]>([]);
+const isLoading = window.Vue.ref<boolean>(true);
+const activeCreateSystemPurpose = window.Vue.ref<SystemPurpose | null>(null);
 
 const sessionPendingDelete = window.Vue.ref<RegistrationSession | null>(null);
+const sessionPendingDeleteSystemPurposeId = window.Vue.ref<number | null>(null);
 const isDeleteModalOpen = window.Vue.ref<boolean>(false);
 const isDeleting = window.Vue.ref<boolean>(false);
 const deleteError = window.Vue.ref<string | null>(null);
 
-/** Fetches sessions from the API and populates the DIPLOMA section. On failure, leaves the list empty (shows empty state). */
-async function loadDiplomaSessions(): Promise<void> {
-    isDiplomaLoading.value = true;
+const registrationSections = window.Vue.computed<RegistrationSection[]>(() =>
+    systemPurposes.value.map((systemPurpose) => ({
+        systemPurpose,
+        sessions: sessionsBySystemPurpose.value[String(systemPurpose.id)] ?? [],
+    })),
+);
 
-    const response = await apiRequest<Record<string, RegistrationSession[]>>({
+const isCreateModalOpen = window.Vue.computed<boolean>({
+    get: () => activeCreateSystemPurpose.value !== null,
+    set: (isOpen) => {
+        if (!isOpen) {
+            activeCreateSystemPurpose.value = null;
+        }
+    },
+});
+
+/**
+ *  Get the heading for a registration section based on the system purpose.
+ *  @param systemPurpose - The system purpose for the section
+ *  @returns The heading for the section
+ */
+function getSectionHeading(systemPurpose: SystemPurpose): string {
+    return `Student Registration Information for ${systemPurpose.name}`;
+}
+
+/** Fetches sessions and system purposes from the API and builds registration sections. */
+async function loadRegistrationSessions(): Promise<void> {
+    isLoading.value = true;
+
+    const response = await apiRequest<RegistrationSessionsResponse>({
         url: props.sessionsEndpoint,
         method: "GET",
     });
 
-    isDiplomaLoading.value = false;
+    isLoading.value = false;
 
-    if (!response.success || typeof response.data !== "object" || Array.isArray(response.data)) {
+    if (!response.success || typeof response.data !== "object" || response.data === null) {
         return;
     }
 
-    diplomaSessions.value = response.data[String(DIPLOMA_SYSTEM_PURPOSE_ID)] ?? [];
+    sessionsBySystemPurpose.value = response.data.data;
+    systemPurposes.value = Object.values(response.data.systemPurposes);
 }
 
 /**
- * Appends a newly created session to the DIPLOMA list.
+ * Appends a newly created session to the active system purpose list.
  * @param session - The newly created registration session returned by the API
  */
-function onDiplomaSessionCreated(session: RegistrationSession): void {
-    diplomaSessions.value = [...diplomaSessions.value, session];
+function onRegistrationSessionCreated(session: RegistrationSession): void {
+    const systemPurpose = activeCreateSystemPurpose.value;
+    if (!systemPurpose) {
+        return;
+    }
+
+    const systemPurposeId = String(systemPurpose.id);
+    sessionsBySystemPurpose.value = {
+        ...sessionsBySystemPurpose.value,
+        [systemPurposeId]: [...(sessionsBySystemPurpose.value[systemPurposeId] ?? []), session],
+    };
+}
+
+/**
+ * Opens the create session modal for the given system purpose.
+ * @param systemPurpose - The system purpose for the new session
+ */
+function openCreateModal(systemPurpose: SystemPurpose): void {
+    activeCreateSystemPurpose.value = systemPurpose;
 }
 
 /**
  * Opens the delete confirmation modal for the given session.
+ * @param systemPurposeId - The system purpose the session belongs to
  * @param session - The session to delete
  */
-function openDeleteConfirm(session: RegistrationSession): void {
+function openDeleteConfirm(systemPurposeId: number, session: RegistrationSession): void {
     sessionPendingDelete.value = session;
+    sessionPendingDeleteSystemPurposeId.value = systemPurposeId;
     isDeleteModalOpen.value = true;
 }
 
@@ -75,6 +122,10 @@ async function confirmDelete(): Promise<void> {
     if (!session?.deleteEndpoint) {
         return;
     }
+    const systemPurposeId = sessionPendingDeleteSystemPurposeId.value;
+    if (systemPurposeId === null) {
+        return;
+    }
     const toast = window.sbProps.toastActivate("Deleting session...");
     try {
         isDeleting.value = true;
@@ -87,9 +138,14 @@ async function confirmDelete(): Promise<void> {
             throw new Error(response.message || "Failed to delete");
         }
         toast.timeout({ text: "Session deleted", isSuccess: true });
-        diplomaSessions.value = diplomaSessions.value.filter((s) => s.id !== session.id);
+        const key = String(systemPurposeId);
+        sessionsBySystemPurpose.value = {
+            ...sessionsBySystemPurpose.value,
+            [key]: (sessionsBySystemPurpose.value[key] ?? []).filter((s) => s.id !== session.id),
+        };
         isDeleteModalOpen.value = false;
         sessionPendingDelete.value = null;
+        sessionPendingDeleteSystemPurposeId.value = null;
     } catch (error) {
         // ignore abort errors, as the previous request was cancelled
         if (isAbortError(error)) {
@@ -110,97 +166,107 @@ const reportBaseUrl = window.Vue.computed<string | null>(() =>
 );
 
 window.Vue.onMounted((): void => {
-    void loadDiplomaSessions();
+    void loadRegistrationSessions();
 });
 </script>
 
 <template>
     <div class="small-12 island l-flex-col l-gap-m">
-        <!-- ── DIPLOMA SECTION ───────────────────────────────────────────────
-             Hardcoded: Student Registration Information for Diploma Programme Year 2.
-             Future sections are added below as additional hardcoded blocks,
-             each with its own reactive state (sessions, loading, error, modal).
-             Empty state: entire section collapses into a single card (no external heading).
-             Populated state: heading + add button appear above the session list.
-        ──────────────────────────────────────────────────────────────────── -->
-        <div v-if="isDiplomaLoading" class="loader" data-test="ib-registration-diploma-loading"></div>
+        <div v-if="isLoading" class="loader" data-test="ib-registration-loading"></div>
 
         <template v-else>
-            <empty-state v-if="diplomaSessions.length === 0" icon="icon-add">
-                <p>Student Registration Information for Diploma Programme Year 2 [DIPLOMA]</p>
-                <p>
-                    No registration sessions exist.
-                    <button
-                        type="button"
-                        class="button"
-                        data-test="ib-registration-diploma-add-link"
-                        @click.prevent="isDiplomaModalOpen = true"
-                    >
-                        Create a new session
-                    </button>
-                </p>
+            <empty-state v-if="registrationSections.length === 0" icon="icon-list">
+                <p>No registration session types are available.</p>
             </empty-state>
 
-            <!-- Populated state -->
             <template v-else>
-                <div class="l-flex l-flex--align-center l-flex--justify-space f-no-margins">
-                    <h2 class="subheader f-no-margins">
-                        Student Registration Information for Diploma Programme Year 2 [DIPLOMA]
-                    </h2>
-                    <button
-                        type="button"
-                        class="sbx-icon-only-button"
-                        style="font-size: 1.5rem; line-height: 1"
-                        data-test="ib-registration-diploma-add"
-                        aria-label="Create new Diploma Programme Year 2 examination session"
-                        @click.prevent="isDiplomaModalOpen = true"
-                    >
-                        +
-                    </button>
-                </div>
+                <div
+                    v-for="section in registrationSections"
+                    :key="section.systemPurpose.id"
+                    class="registration-section l-flex-col l-gap-s f-no-margins"
+                    :data-test="`ib-registration-system-purpose-${section.systemPurpose.id}`"
+                >
+                    <empty-state v-if="section.sessions.length === 0" icon="icon-add">
+                        <p>{{ getSectionHeading(section.systemPurpose) }}</p>
+                        <p>
+                            No registration sessions exist.
+                            <button
+                                type="button"
+                                class="button"
+                                :data-test="`ib-registration-system-purpose-${section.systemPurpose.id}-add-link`"
+                                @click.prevent="openCreateModal(section.systemPurpose)"
+                            >
+                                Create a new session
+                            </button>
+                        </p>
+                    </empty-state>
 
-                <div class="session-list-box">
-                    <ul class="session-list" data-test="ib-registration-diploma-list">
-                        <li
-                            v-for="session in diplomaSessions"
-                            :key="session.id"
-                            class="session-item"
-                            :data-test="`ib-registration-diploma-session-${session.id}`"
-                        >
-                            <div class="l-flex l-flex--align-center l-flex--justify-space l-gap-xs">
-                                <div class="l-flex-col">
-                                    <a v-if="reportBaseUrl" :href="`${reportBaseUrl}/${session.id}`">{{
-                                        session.title
-                                    }}</a>
-                                    <span v-else>{{ session.title }}</span>
-                                    <small
-                                        >Session created by {{ session.createdBy }} on
-                                        {{ new Date(session.createdAt).toLocaleDateString() }},
-                                        {{ new Date(session.createdAt).toLocaleTimeString() }}</small
-                                    >
-                                </div>
-                                <button
-                                    v-if="session.deleteEndpoint"
-                                    type="button"
-                                    class="sbx-icon-only-button"
-                                    :aria-label="`Delete session ${session.title}`"
-                                    :title="`Delete session ${session.title}`"
-                                    @click="openDeleteConfirm(session)"
+                    <template v-else>
+                        <div class="l-flex l-flex--align-center l-flex--justify-space f-no-margins">
+                            <h2 class="subheader f-no-margins">
+                                {{ getSectionHeading(section.systemPurpose) }}
+                            </h2>
+                            <button
+                                type="button"
+                                class="sbx-icon-only-button"
+                                style="font-size: 1.5rem; line-height: 1"
+                                :data-test="`ib-registration-system-purpose-${section.systemPurpose.id}-add`"
+                                :aria-label="`Create new ${section.systemPurpose.name} examination session`"
+                                @click.prevent="openCreateModal(section.systemPurpose)"
+                            >
+                                +
+                            </button>
+                        </div>
+
+                        <div class="session-list-box">
+                            <ul
+                                class="session-list"
+                                :data-test="`ib-registration-system-purpose-${section.systemPurpose.id}-list`"
+                            >
+                                <li
+                                    v-for="session in section.sessions"
+                                    :key="session.id"
+                                    class="session-item"
+                                    :data-test="`ib-registration-system-purpose-${section.systemPurpose.id}-session-${session.id}`"
                                 >
-                                    <sbx-icon name="delete"></sbx-icon>
-                                </button>
-                            </div>
-                        </li>
-                    </ul>
+                                    <div class="l-flex l-flex--align-center l-flex--justify-space l-gap-xs">
+                                        <div class="l-flex-col">
+                                            <a v-if="reportBaseUrl" :href="`${reportBaseUrl}/${session.id}`">{{
+                                                session.title
+                                            }}</a>
+                                            <span v-else>{{ session.title }}</span>
+                                            <small
+                                                >Session created by {{ session.createdBy }} on
+                                                {{ new Date(session.createdAt).toLocaleDateString() }},
+                                                {{ new Date(session.createdAt).toLocaleTimeString() }}</small
+                                            >
+                                        </div>
+                                        <button
+                                            v-if="session.deleteEndpoint"
+                                            type="button"
+                                            class="sbx-icon-only-button"
+                                            :aria-label="`Delete session ${session.title}`"
+                                            :title="`Delete session ${session.title}`"
+                                            @click="openDeleteConfirm(section.systemPurpose.id, session)"
+                                        >
+                                            <sbx-icon name="delete"></sbx-icon>
+                                        </button>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </template>
                 </div>
             </template>
         </template>
 
         <CreateSessionModal
-            v-model:is-open="isDiplomaModalOpen"
+            v-if="activeCreateSystemPurpose"
+            v-model:is-open="isCreateModalOpen"
             :create-endpoint="createEndpoint"
-            :system-purpose-id="DIPLOMA_SYSTEM_PURPOSE_ID"
-            @session-created="onDiplomaSessionCreated"
+            :system-purpose-id="activeCreateSystemPurpose.id"
+            :system-purpose-name="activeCreateSystemPurpose.name"
+            @session-created="onRegistrationSessionCreated"
         />
 
         <BasicModal

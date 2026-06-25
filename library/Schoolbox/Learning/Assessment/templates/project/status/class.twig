@@ -7,12 +7,14 @@
  #   [
  #       'assessment'       IAssessable
  #       'participantStats' ParticipantStatistics[] Indexed by user.id
- #       'participantCount' int Total number of participants in the class (not just in this chunk)
- #       'participantCursor' int Cursor for pagination, indicating the offset for the next chunk of participants to load
+ #       'participantCount' int Number of participants rendered in this chunk
+ #       'participantIndexCount' int Total roster users considered for cursor paging
+ #       'participantCursor' int|null Cursor for pagination, indicating the last user ID to continue after
  #   ]
  # @param bool $isSpecification         Whether to show classes as groups (course level), or just a flat list (class level)
 #}
-{% if aImpl.participantCount %}
+{% set participants = aImpl.participants ?? aImpl.assessment.allParticipants %}
+{% if participants | length %}
     <section
             {% if isSpecification %}
                 data-collapse-state="uncollapsed"

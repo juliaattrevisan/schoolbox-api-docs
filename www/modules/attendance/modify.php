@@ -193,11 +193,14 @@ $definition = $externalTimetable->getTimetableDefinition(
     $timetableDay
 );
 
-$firstPeriodNumber = array_search($firstPeriod, $definition['number'], true);
-$lastPeriodNumber  = array_search($lastPeriod, $definition['number'], true);
-$startTime   = $definition['start'][$firstPeriodNumber];
-$endTime     = $definition['end'][$lastPeriodNumber];
-$periodNames = array_unique([$definition['desc'][$firstPeriodNumber], $definition['desc'][$lastPeriodNumber]]);
+$firstPeriodNumber = array_search($firstPeriod, $definition['number'] ?? [], true);
+$lastPeriodNumber  = array_search($lastPeriod, $definition['number'] ?? [], true);
+$startTime   = $firstPeriodNumber !== false ? $definition['start'][$firstPeriodNumber] : null;
+$endTime     = $lastPeriodNumber !== false ? $definition['end'][$lastPeriodNumber] : null;
+$periodNames = array_unique([
+    $firstPeriodNumber !== false ? $definition['desc'][$firstPeriodNumber] : null,
+    $lastPeriodNumber !== false ? $definition['desc'][$lastPeriodNumber] : null,
+]);
 
 if ($class) {
     // Set up attendance time steps

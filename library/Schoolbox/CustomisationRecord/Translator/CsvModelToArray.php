@@ -17,7 +17,7 @@ class CsvModelToArray
         if (null === $context) {
             /* Assessment in a project, then look at the project context
              */
-            $context = $plan->getAssessment()->getContextProject()->getAssessmentModel()->getContextUnitImplementation();
+            $context = $plan->getAssessment()->getContextProject()?->getAssessmentModel()->getContextUnitImplementation();
         }
 
         return [
@@ -31,7 +31,9 @@ class CsvModelToArray
             'type' => $plan->getCustomisationType(),
             'work_type' => $plan->getAssessment()->getWorkType()?->getName() ?? 'None',
             'unit' => $context?->getTitle(),
-            'class' => $context?->getFolder()?->getTitle()
+            /* If the class is not within a unit/course get the class name straight away
+             */
+            'class' => $context?->getFolder()?->getTitle() ?? $plan->getAssessment()->getContextFolder()?->getTitle(),
         ];
     }
 }
