@@ -253,10 +253,8 @@ class Controller extends Base
                 // odd way in the database: submission_return.published_by is set to the feedback author on creation,
                 // but submission_return.published_at is left unset.  See DueWork\Feedback\Factory->produce().
                 // Note submission_return.published_by is not nullable.  The bulk publish action sets published_at but
-                // leaves published_by unchanged if it is set, otherwise falling back to the current user.
-                $submissionReturn
-                    ->setPublishedAt($now)
-                    ->setPublishedBy($submissionReturn->getPublishedBy() ?? $this->getUser()->getId());
+                // leaves published_by unchanged (remember it cannot be null).
+                $submissionReturn->setPublishedAt($now);
             }
 
             try {
