@@ -91,14 +91,22 @@ class Attendance_Synergetic_AttendanceMaster
         $attendanceMasterSeqStatement = $this->connector->prepareQuery("
             SELECT wkAttendanceMasterSeq
             FROM wkAttendanceMaster
-            WHERE FileType = '{$this->getClassFileType()}' AND
-            FileYear = '{$this->getFileYear()}' AND
-            FileSemester = '{$this->getFileSemester()}' AND
-            ClassCampus = '{$this->getClassCampus()}' AND
-            ClassCode = '{$this->getClassCode()}' AND
-            AttendanceDate = '{$attendanceDate->getDatabaseDate()} 00:00:00.000' AND
-            AttendancePeriod = '{$this->getAttendancePeriod()}'
-        ");
+            WHERE FileType = :fileType AND
+            FileYear = :fileYear AND
+            FileSemester = :fileSemester AND
+            ClassCampus = :classCampus AND
+            ClassCode = :classCode AND
+            AttendanceDate = :attendanceDate AND
+            AttendancePeriod = :attendancePeriod
+        ", [
+            'fileType'        => $this->getClassFileType(),
+            'fileYear'        => $this->getFileYear(),
+            'fileSemester'    => $this->getFileSemester(),
+            'classCampus'     => $this->getClassCampus(),
+            'classCode'       => $this->getClassCode(),
+            'attendanceDate'  => $attendanceDate->getDatabaseDate() . ' 00:00:00.000',
+            'attendancePeriod' => $this->getAttendancePeriod(),
+        ]);
 
         $attendanceMasterSeqStatement->execute();
 
@@ -109,27 +117,18 @@ class Attendance_Synergetic_AttendanceMaster
         $attendanceMasterSeq = $attendanceMasterSeqStatement->fetch()['wkAttendanceMasterSeq'];
 
         if ($attendanceMasterSeq) {
-            $cleanupQuery = "
-                DELETE 
+            /* Cleanup all working data before commencing attendance marking */
+            $this->connector->executeQuery("
+                DELETE
                 FROM wkAttendances
-                WHERE wkAttendanceMasterSeq = {$attendanceMasterSeq}
-            ";
+                WHERE wkAttendanceMasterSeq = :wkAttendanceMasterSeq
+            ", ['wkAttendanceMasterSeq' => $attendanceMasterSeq]);
 
-            /* Now you need DELETE perms on wkAttendances cos you have to micromanage that directly:
-             * The DELETE permission was denied on the object 'wkAttendances', database 'Synergetic_AUVIC_ALARESS_PRD', schema 'dbo'."thrown on /usr/share/schoolbox/library/Alaress/Database/Statement/Base.php:226
-             */
-            $this->connector->executeQuery($cleanupQuery);
-
-            $cleanupQuery = "
-                DELETE 
+            $this->connector->executeQuery("
+                DELETE
                 FROM wkAttendanceMaster
-                WHERE wkAttendanceMasterSeq = {$attendanceMasterSeq}
-            ";
-
-            /* Now you need DELETE perms on wkAttendanceMaster cos you have to micromanage that directly:
-             * The DELETE permission was denied on the object 'wkAttendanceMaster', database 'Synergetic_AUVIC_ALARESS_PRD', schema 'dbo'."thrown on /usr/share/schoolbox/library/Alaress/Database/Statement/Base.php:226
-             */
-            $this->connector->executeQuery($cleanupQuery);
+                WHERE wkAttendanceMasterSeq = :wkAttendanceMasterSeq
+            ", ['wkAttendanceMasterSeq' => $attendanceMasterSeq]);
         }
 
         // Get the attendance master sequence number
