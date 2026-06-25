@@ -403,9 +403,11 @@ class Controller extends Base
                 continue;
             }
 
-            // Editing an existing published feedback creates a new row (see Controller->postParticularFeedback()).
+            // Editing an existing published feedback creates a new row (see $this->postParticularFeedback()).
             // Therefore any already published feedback should preserve its original publishedAt/By audit fields.
             if (!$feedback->isPublished()) {
+                // Bulk publish can release draft feedback authored by someone else. The instructor remains the feedback
+                // author; publishedBy records the user who performed this publish action.
                 $feedback
                     ->setPublishedAt($now)
                     ->setPublishedBy($this->getUser()->getId());
@@ -449,7 +451,7 @@ class Controller extends Base
         }
 
         if (!$feedback->isPublished()) {
-            // publish this
+            // Single publish is an explicit publish action by the current user.
             $feedback
                 ->setPublishedAt(Alaress_Date_Format::now())
                 ->setPublishedBy($this->getUser()->getId());

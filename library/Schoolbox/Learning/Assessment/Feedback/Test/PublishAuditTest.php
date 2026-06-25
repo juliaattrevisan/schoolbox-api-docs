@@ -59,6 +59,7 @@ class PublishAuditTest extends TestCase
     private const int REPORTING_ASSESSMENT_ID = 42;
     private const int REPORTING_CONTEXT_FOLDER_ID = 1;
     private const int REPORTING_FEEDBACK_ID = 1001;
+    private const int REPORTING_INSTRUCTOR_ID = 401;
     private const int ORIGINAL_REPORTING_PUBLISHER_ID = 501;
     private const int CURRENT_REPORTING_PUBLISHER_ID = 601;
 
@@ -68,6 +69,7 @@ class PublishAuditTest extends TestCase
     private const int DUE_WORK_PUBLISHED_RETURNED_WORK_ID = 2002;
     private const int DUE_WORK_DRAFT_FEEDBACK_ID = 3001;
     private const int DUE_WORK_PUBLISHED_FEEDBACK_ID = 3002;
+    private const int DUE_WORK_MARKER_ID = 402;
     private const int ORIGINAL_DUE_WORK_PUBLISHER_ID = 502;
     private const int CURRENT_DUE_WORK_PUBLISHER_ID = 602;
 
@@ -83,6 +85,92 @@ class PublishAuditTest extends TestCase
         $feedback->setPublishedAt(Alaress_Date_Format::now());
 
         self::assertTrue($feedback->isPublished());
+    }
+
+    /**
+     * Verifies reporting bulk publish records the bulk publisher when a draft feedback item is published.
+     */
+    public function testReportingBulkPublishSetsCurrentUserAsPublisherWhenDraftPublisherIsUnset(): void
+    {
+        $assessmentModel = new AssessmentModel()->setId(self::REPORTING_ASSESSMENT_ID);
+        $assessment = new Model()
+            ->setId(self::REPORTING_ASSESSMENT_ID)
+            ->setContext(new Folder()->setId(self::REPORTING_CONTEXT_FOLDER_ID));
+        $reporting = new Reporting\Model()->setAssessmentModel($assessmentModel);
+        $feedback = new ReportingFeedback()
+            ->setId(self::REPORTING_FEEDBACK_ID)
+            ->setReporting($reporting)
+            ->setInstructor(new User()->setId(self::REPORTING_INSTRUCTOR_ID));
+
+        $feedbackMapper = $this->createMock(ReportingFeedbackMapper::class);
+        $feedbackMapper
+            ->expects($this->once())
+            ->method('findById')
+            ->with(self::REPORTING_FEEDBACK_ID)
+            ->willReturn($feedback);
+        $feedbackMapper
+            ->expects($this->once())
+            ->method('save')
+            ->with(self::callback(
+                static fn(ReportingFeedback $savedFeedback): bool =>
+                    $savedFeedback->getPublishedAt() instanceof Alaress_Date_Format
+                    && $savedFeedback->getPublishedBy() === self::CURRENT_REPORTING_PUBLISHER_ID
+            ));
+
+        $controller = $this->buildReportingController(
+            feedbackMapper: $feedbackMapper,
+            projectResultCacheMapper: $this->createStub(ProjectResultCacheMapper::class),
+        );
+        $controller->setRequestPost(new Values(['drafts' => [self::REPORTING_FEEDBACK_ID]]));
+        $controller->setUser(new User()->setId(self::CURRENT_REPORTING_PUBLISHER_ID));
+
+        $controller->postParticipantFeedbacks($assessment);
+    }
+
+    /**
+     * Verifies due work bulk publish records the bulk publisher when a draft feedback item is missing one.
+     */
+    public function testDueWorkBulkPublishSetsCurrentUserAsPublisherWhenDraftPublisherIsUnset(): void
+    {
+        $assessment = $this->createStub(DueWork\Model::class);
+        $assessment
+            ->method('isSpecification')
+            ->willReturn(false);
+        $assessment
+            ->method('getId')
+            ->willReturn(self::DUE_WORK_ASSESSMENT_ID);
+
+        $submissionBox = new SubmissionBox()->setAssessmentModel(
+            new AssessmentModel()->setId(self::DUE_WORK_ASSESSMENT_ID)
+        );
+        $returnedWork = new ReturnedWork()
+            ->setId(self::DUE_WORK_DRAFT_RETURNED_WORK_ID)
+            ->setSubmissionBox($submissionBox)
+            ->setMarker(new User()->setId(self::DUE_WORK_MARKER_ID));
+
+        $returnedWorkMapper = $this->createMock(ReturnedWorkMapper::class);
+        $returnedWorkMapper
+            ->expects($this->once())
+            ->method('findById')
+            ->with(self::DUE_WORK_DRAFT_RETURNED_WORK_ID)
+            ->willReturn($returnedWork);
+        $returnedWorkMapper
+            ->expects($this->once())
+            ->method('save')
+            ->with(self::callback(
+                static fn(ReturnedWork $savedReturn): bool =>
+                    $savedReturn->getPublishedAt() instanceof Alaress_Date_Format
+                    && $savedReturn->getPublishedBy() === self::CURRENT_DUE_WORK_PUBLISHER_ID
+            ));
+
+        $controller = $this->buildDueWorkController(
+            $returnedWorkMapper,
+            $this->createStub(IFeedbackDataSource::class),
+        );
+        $controller->setRequestPost(new Values(['drafts' => [self::DUE_WORK_DRAFT_RETURNED_WORK_ID]]));
+        $controller->setUser(new User()->setId(self::CURRENT_DUE_WORK_PUBLISHER_ID));
+
+        $controller->postParticipantFeedbacks($assessment);
     }
 
     /**
@@ -133,9 +221,9 @@ class PublishAuditTest extends TestCase
     }
 
     /**
-     * Verifies due work bulk publish records who published a draft feedback item.
+     * Verifies due work bulk publish records the bulk publisher when a draft feedback item is published.
      */
-    public function testDueWorkBulkPublishSetsPublishedAuditFieldsWhenDraftIsPublished(): void
+    public function testDueWorkBulkPublishSetsCurrentUserAsPublisherWhenDraftIsPublished(): void
     {
         $assessment = $this->createStub(DueWork\Model::class);
         $assessment
@@ -150,7 +238,8 @@ class PublishAuditTest extends TestCase
         );
         $returnedWork = new ReturnedWork()
             ->setId(self::DUE_WORK_DRAFT_RETURNED_WORK_ID)
-            ->setSubmissionBox($submissionBox);
+            ->setSubmissionBox($submissionBox)
+            ->setPublishedBy(self::ORIGINAL_DUE_WORK_PUBLISHER_ID);
 
         $returnedWorkMapper = $this->createMock(ReturnedWorkMapper::class);
         $returnedWorkMapper

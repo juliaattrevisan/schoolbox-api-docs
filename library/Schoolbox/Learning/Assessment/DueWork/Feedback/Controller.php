@@ -246,10 +246,11 @@ class Controller extends Base
                 continue;
             }
 
-            // Editing an existing published feedback on the Activity Status page creates a new feedback row
-            // (see DueWork\Feedback\Factory->produce()). Therefore bulk publishing an already-published row
-            // should preserve its original publishedAt/By audit fields.
+            // Editing an existing published feedback creates a new feedback row (see DueWork\Feedback\Factory->produce()).
+            // Therefore bulk publishing an already-published row should preserve its original publishedAt/By audit fields.
             if (!$submissionReturn->isPublished()) {
+                // Bulk publish can release draft feedback authored by someone else. The marker remains the feedback
+                // author; publishedBy records the user who performed this publish action.
                 $submissionReturn
                     ->setPublishedAt($now)
                     ->setPublishedBy($this->getUser()->getId());
@@ -656,7 +657,7 @@ class Controller extends Base
         }
 
         if (!$feedback->isPublished()) {
-            // publish this
+            // Single publish is an explicit publish action by the current user.
             $feedback
                 ->setPublishedAt(\Alaress_Date_Format::now())
                 ->setPublishedBy($this->getUser()->getId());
