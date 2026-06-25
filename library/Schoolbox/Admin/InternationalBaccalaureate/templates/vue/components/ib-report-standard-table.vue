@@ -15,6 +15,22 @@ const selectedList = defineModel<StudentRow[]>("selectedList", { default: () => 
 
 const updateLanguageStore = useIbReportUpdateLanguageStore();
 
+const isAllSelected = window.Vue.computed<boolean>(
+    () => props.students.length > 0 && selectedList.value.length === props.students.length,
+);
+
+const isSomeSelected = window.Vue.computed<boolean>(
+    () => selectedList.value.length > 0 && selectedList.value.length < props.students.length,
+);
+
+function toggleSelectAll(): void {
+    if (isAllSelected.value) {
+        selectedList.value = [];
+    } else {
+        selectedList.value = [...props.students];
+    }
+}
+
 const emit = defineEmits<{
     completePreparationSingle: [studentId: number];
     renotifySingle: [userId: number];
@@ -36,7 +52,24 @@ function openModal(student: StudentRow): void {
     <table class="tiger-stripe">
         <thead>
             <tr>
-                <th scope="col"><span class="sr-only">Select</span></th>
+                <th scope="col" class="checklist">
+                    <template
+                        v-if="props.activeSelectionSection === null || props.activeSelectionSection === props.section"
+                    >
+                        <span class="select-all-container">
+                            <input
+                                :id="`select-all-${props.section}`"
+                                type="checkbox"
+                                :checked="isAllSelected"
+                                :class="{ indeterminate: isSomeSelected }"
+                                aria-label="Select all"
+                                @change="toggleSelectAll"
+                            /><label class="checkbox-label" :for="`select-all-${props.section}`"></label>
+                            <span>Select all</span>
+                        </span>
+                    </template>
+                    <span v-else class="sr-only">Select</span>
+                </th>
                 <th scope="col">Name</th>
                 <th scope="col">Candidate Details</th>
                 <th scope="col">HL</th>
@@ -148,3 +181,11 @@ function openModal(student: StudentRow): void {
         </tbody>
     </table>
 </template>
+
+<style scoped>
+.select-all-container {
+    align-items: center;
+    display: inline-flex;
+    gap: var(--sbx-size-xs, 0.5rem);
+}
+</style>

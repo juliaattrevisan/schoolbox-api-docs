@@ -11,6 +11,22 @@ const props = defineProps<Props>();
 
 const selectedList = defineModel<FailedRow[]>("selectedList", { default: () => [] });
 
+const isAllSelected = window.Vue.computed<boolean>(
+    () => props.students.length > 0 && selectedList.value.length === props.students.length,
+);
+
+const isSomeSelected = window.Vue.computed<boolean>(
+    () => selectedList.value.length > 0 && selectedList.value.length < props.students.length,
+);
+
+function toggleSelectAll(): void {
+    if (isAllSelected.value) {
+        selectedList.value = [];
+    } else {
+        selectedList.value = [...props.students];
+    }
+}
+
 const emit = defineEmits<{
     resetDetailsSingle: [studentId: number];
     manuallyRegisterSingle: [studentId: number];
@@ -31,7 +47,22 @@ function openModal(student: FailedRow): void {
     <table class="tiger-stripe">
         <thead>
             <tr>
-                <th scope="col"><span class="sr-only">Select</span></th>
+                <th scope="col" class="checklist">
+                    <template v-if="props.activeSelectionSection === null || props.activeSelectionSection === 'failed'">
+                        <span class="select-all-container">
+                            <input
+                                id="select-all-failed"
+                                type="checkbox"
+                                :checked="isAllSelected"
+                                :class="{ indeterminate: isSomeSelected }"
+                                aria-label="Select all"
+                                @change="toggleSelectAll"
+                            /><label class="checkbox-label" for="select-all-failed"></label>
+                            <span>Select all</span>
+                        </span>
+                    </template>
+                    <span v-else class="sr-only">Select</span>
+                </th>
                 <th scope="col">Name</th>
                 <th scope="col">Candidate Details</th>
                 <th scope="col">HL</th>
@@ -120,5 +151,11 @@ function openModal(student: FailedRow): void {
 .ib-report-error-message {
     color: var(--sbx-color-error, #c0392b);
     font-size: 0.875rem;
+}
+
+.select-all-container {
+    align-items: center;
+    display: inline-flex;
+    gap: var(--sbx-size-xs, 0.5rem);
 }
 </style>
