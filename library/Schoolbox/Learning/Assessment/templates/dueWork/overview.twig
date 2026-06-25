@@ -152,7 +152,7 @@
 
                                                 {% set max = rubricInstanceData.capabilities[capabilityId].indicators[indicatorId].max ?? null %}
 
-                                                {% if max and max > 0 %}
+                                                {% if max is not null and max > 0 %}
                                                     {# Colour the human readable mark using the normalised mark #}
                                                     {% set gradientClass = urgency.marks(publishedMarks.normalisedMark) %}
 
@@ -166,7 +166,7 @@
 
                                                 {% set max = rubricInstanceData.capabilities[capabilityId].indicators[indicatorId].max ?? null %}
 
-                                                {% if max and max > 0 %}
+                                                {% if max is not null and max > 0 %}
                                                     <p class="meta" data-draft-mark>{{ draftMarks.selectedDescriptorValue|round }} / {{ max }}</p>
                                                 {% endif %}
                                             {% endif %}
