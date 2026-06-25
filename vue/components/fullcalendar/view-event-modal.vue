@@ -1203,7 +1203,7 @@ export default {
                                 <a
                                     class="button"
                                     :data-booking-action="String(action.action)"
-                                    @click.prevent="clickBookingButton($event)"
+                                    @click="clickBookingButton($event)"
                                     :href="action.href || '#'"
                                     >{{ action.label }}</a
                                 >
