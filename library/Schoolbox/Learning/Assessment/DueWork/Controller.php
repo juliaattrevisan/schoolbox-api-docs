@@ -733,7 +733,7 @@ class Controller extends Assessment\Controller
      */
     public function downloadOverview(IAssessable $assessment): void
     {
-        if (!$assessment->getUseRubric()) {
+        if (!$assessment->getRubricInstances()->count()) {
             throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_PAGE_NOT_FOUND);
         }
 
