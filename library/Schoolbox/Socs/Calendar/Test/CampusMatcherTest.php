@@ -23,7 +23,7 @@ class CampusMatcherTest extends TestCase
      * @param int[]    $expectedCampusIds
      */
     #[DataProvider('campusNameProvider')]
-    public function testMatchesSchoolsToCampusNamesExactly(array $schoolNames, array $expectedCampusIds): void
+    public function testMatchesSocsSchoolNamesToSchoolboxCampusNames(array $schoolNames, array $expectedCampusIds): void
     {
         $matcher = new CampusMatcher();
 

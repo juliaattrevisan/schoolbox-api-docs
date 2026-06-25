@@ -12,12 +12,12 @@ namespace Schoolbox\Socs\Calendar;
 use Schoolbox\Campus;
 
 /**
- * Matches SOCS school names to Schoolbox campus IDs.
+ * Matches SOCS school names against Schoolbox campus names and returns the matching campus IDs.
  */
 class CampusMatcher
 {
     /**
-     * Return campus IDs whose names exactly match the supplied SOCS school names.
+     * Return Schoolbox campus IDs whose campus names exactly match the supplied SOCS school names.
      *
      * @param Campus[] $campuses
      * @param string[] $schoolNames
