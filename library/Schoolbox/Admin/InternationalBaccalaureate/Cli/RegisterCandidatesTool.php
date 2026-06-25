@@ -307,6 +307,8 @@ class RegisterCandidatesTool extends CliTool\App
             return false;
         }
 
+        $msgId = $sessionRequest->getMsgId();
+
         if (!$sessionResponse->isSuccess()) {
             $this->getLogger()->warning(
                 sprintf(
@@ -316,10 +318,32 @@ class RegisterCandidatesTool extends CliTool\App
                     $sessionResponse->getErrorSummary() ?? 'unknown fault'
                 )
             );
+
+            // Some IBIS validation errors are returned as messages with no per-session response rows.
+            if ($sessionResponse->getSessionResponses() === []) {
+                $this->markCandidateRegistrationFailed($student, $studentMapper);
+                try {
+                    $responseLogHelper->saveRequestError(
+                        (int) $student->getRegistrationSession()->getId(),
+                        $student,
+                        $msgId,
+                        RegistrationApiResponseLogModel::REQUEST_TYPE_REGISTER_SESSIONS,
+                        $sessionResponse->getErrorSummary() ?? 'IBIS session registration failed.'
+                    );
+                } catch (Throwable $e) {
+                    $this->getLogger()->error(
+                        sprintf(
+                            'Saving IBIS session registration error summary log failed for candidate #%s.',
+                            $student->getId() ?? 'unknown'
+                        ),
+                        ['exception' => $e]
+                    );
+                }
+                return false;
+            }
         }
 
         $successful = true;
-        $msgId = $sessionRequest->getMsgId();
 
         foreach ($sessionResponse->getSessionResponses() as $sessionResponseItem) {
             try {
@@ -431,6 +455,8 @@ class RegisterCandidatesTool extends CliTool\App
             return false;
         }
 
+        $msgId = $request->getMsgId();
+
         if (!$response->isSuccess()) {
             $this->getLogger()->warning(
                 sprintf(
@@ -440,10 +466,32 @@ class RegisterCandidatesTool extends CliTool\App
                     $response->getErrorSummary() ?? 'unknown fault'
                 )
             );
+
+            // Some IBIS validation errors are returned as messages with no per-candidate response rows.
+            if ($response->getCandidateResponses() === []) {
+                $this->markCandidateRegistrationFailed($student, $studentMapper);
+                try {
+                    $responseLogHelper->saveRequestError(
+                        (int) $student->getRegistrationSession()->getId(),
+                        $student,
+                        $msgId,
+                        RegistrationApiResponseLogModel::REQUEST_TYPE_REGISTER_CANDIDATES,
+                        $response->getErrorSummary() ?? 'IBIS candidate registration failed.'
+                    );
+                } catch (Throwable $e) {
+                    $this->getLogger()->error(
+                        sprintf(
+                            'Saving IBIS candidate registration error summary log failed for candidate #%s.',
+                            $student->getId() ?? 'unknown'
+                        ),
+                        ['exception' => $e]
+                    );
+                }
+                return false;
+            }
         }
 
         $successful = true;
-        $msgId = $request->getMsgId();
 
         foreach ($response->getCandidateResponses() as $candidateResponse) {
             try {
