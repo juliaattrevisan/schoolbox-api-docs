@@ -6,11 +6,11 @@ VALUES (@socs_config_id, 'SOCS', 29);
 UPDATE config
 SET type_id = @socs_config_id,
     title = CASE name
-        WHEN 'socs_endpoint_host' THEN 'Calendar Feed Host'
+        WHEN 'socs_endpoint_host' THEN 'General Feed Host'
         ELSE title
     END,
     description = CASE name
-        WHEN 'socs_endpoint_host' THEN 'The SOCS host used for calendar and music feeds.'
+        WHEN 'socs_endpoint_host' THEN 'The general SOCS host used for non-fixture feeds.'
         ELSE description
     END,
     sequence = CASE name
