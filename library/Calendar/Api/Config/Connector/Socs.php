@@ -7,15 +7,24 @@
 
 declare(strict_types=1);
 
+/**
+ * Calendar connector configuration for SOCS calendar events.
+ */
 class Calendar_Api_Config_Connector_Socs extends Calendar_Api_Config_Connector_Abstract
 {
     protected string $connectorClass = 'Socs';
 
+    /**
+     * Return the default label used for the SOCS calendar source.
+     */
     public function getDefaultLabel(): string
     {
         return 'SOCS Events';
     }
 
+    /**
+     * Render SOCS connector options in the legacy calendar connector UI.
+     */
     public function render($page)
     {
         $page->setVar([
@@ -27,6 +36,9 @@ class Calendar_Api_Config_Connector_Socs extends Calendar_Api_Config_Connector_A
         $this->renderEventType($page, $this->getLuEventType());
     }
 
+    /**
+     * SOCS calendar visibility is filtered by event campus rather than connector permissions.
+     */
     public function hasPermissions($userCampus, $userGroup)
     {
         return true;

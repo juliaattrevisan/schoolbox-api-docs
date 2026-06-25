@@ -19,6 +19,23 @@ use Schoolbox\Socs\Calendar\Parser;
 #[CoversClass(Event::class)]
 class ParserTest extends TestCase
 {
+    private string $previousTimezone;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->previousTimezone = date_default_timezone_get();
+        date_default_timezone_set('Australia/Melbourne');
+    }
+
+    protected function tearDown(): void
+    {
+        date_default_timezone_set($this->previousTimezone);
+
+        parent::tearDown();
+    }
+
     public function testParsesCalendarEventsWithSchools(): void
     {
         $events = (new Parser())->parse(new \SimpleXMLElement(<<<'XML'
@@ -52,11 +69,7 @@ XML));
 
     public function testParsesCalendarTimesInLocalTimezone(): void
     {
-        $previousTimezone = date_default_timezone_get();
-        date_default_timezone_set('Australia/Melbourne');
-
-        try {
-            $events = (new Parser())->parse(new \SimpleXMLElement(<<<'XML'
+        $events = (new Parser())->parse(new \SimpleXMLElement(<<<'XML'
 <SOCSCalendar>
     <CalendarEvent>
         <EventID>17983749</EventID>
@@ -68,9 +81,6 @@ XML));
     </CalendarEvent>
 </SOCSCalendar>
 XML));
-        } finally {
-            date_default_timezone_set($previousTimezone);
-        }
 
         self::assertSame('Australia/Melbourne', $events[0]->start->getTimezone()->getName());
         self::assertSame('2026-05-19 07:00:00 +10:00', $events[0]->start->format('Y-m-d H:i:s P'));

@@ -11,14 +11,15 @@ namespace Calendar\Api\EventType\Event\Socs\Test;
 
 use Calendar\Event\Type\Day\Event;
 use Calendar_Api_EventType_Event_Socs_Default;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
+use Schoolbox\Config\ArrayLoader;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Socs\Calendar\CampusMatcher;
 use Schoolbox\Socs\Calendar\Parser;
 use Schoolbox\Socs\HttpClient;
@@ -52,24 +53,14 @@ class DefaultTest extends TestCase
             123,
             $user,
             new User(),
-            new class implements IConfigLoader {
-                public function get($var): mixed
-                {
-                    return match ($var) {
-                        ConfigMapper::NAME_SOCS_ENABLED,
-                        ConfigMapper::NAME_SOCS_IMPORT_CALENDAR_EVENTS => true,
-                        ConfigMapper::NAME_SOCS_ENDPOINT_HOST => 'https://socs.example.test',
-                        ConfigMapper::NAME_SOCS_ENDPOINT_ID => 'school',
-                        ConfigMapper::NAME_SOCS_ENDPOINT_TOKEN => 'token',
-                        ConfigMapper::NAME_SOCS_CALENDAR_DEFAULT_EVENT_TYPE => 1,
-                        default => null,
-                    };
-                }
-
-                public function dropCache(): void
-                {
-                }
-            },
+            new ArrayLoader([
+                ConfigMapper::NAME_SOCS_ENABLED => true,
+                ConfigMapper::NAME_SOCS_IMPORT_CALENDAR_EVENTS => true,
+                ConfigMapper::NAME_SOCS_ENDPOINT_HOST => 'https://socs.example.test',
+                ConfigMapper::NAME_SOCS_ENDPOINT_ID => 'school',
+                ConfigMapper::NAME_SOCS_ENDPOINT_TOKEN => 'token',
+                ConfigMapper::NAME_SOCS_CALENDAR_DEFAULT_EVENT_TYPE => 1,
+            ]),
             $eventTypeMapper,
             $campusMapper,
             new class extends HttpClient {
@@ -77,8 +68,14 @@ class DefaultTest extends TestCase
                 {
                 }
 
-                public function get(string $path, array $query): \SimpleXMLElement
+                public function getCached(string $path, array $query): \SimpleXMLElement
                 {
+                    Assert::assertSame(Calendar_Api_EventType_Event_Socs_Default::CALENDAR_PATH, $path);
+                    Assert::assertSame([
+                        'startdate' => '18 Jun 2026',
+                        'enddate' => '19 Jun 2026',
+                    ], $query);
+
                     return new \SimpleXMLElement(<<<'XML'
 <SOCSCalendar>
     <CalendarEvent>

@@ -43,6 +43,8 @@ class HttpClientTest extends TestCase
                         'key' => 'token',
                         'team' => 'firsts',
                     ],
+                    'timeout' => 300,
+                    'http_errors' => false,
                 ]
             )
             ->willReturn(new Response(200, [], '<fixtures><fixture id="1" /></fixtures>'));
@@ -195,10 +197,6 @@ class HttpClientTest extends TestCase
      */
     private function createHttpClient(Client $guzzle): HttpClient
     {
-        $client = new HttpClient('https://socs.example.test', 'school', 'token');
-        $clientProperty = new \ReflectionProperty($client, 'client');
-        $clientProperty->setValue($client, $guzzle);
-
-        return $client;
+        return new HttpClient('https://socs.example.test', 'school', 'token', $guzzle);
     }
 }

@@ -16,9 +16,13 @@ use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Socs\Calendar\CampusMatcher;
 use Schoolbox\Socs\Calendar\Parser;
+use Schoolbox\Socs\Fixtures\Registry;
 use Schoolbox\Socs\HttpClient;
 use Schoolbox\User;
 
+/**
+ * Calendar event source backed by the SOCS XML calendar feed.
+ */
 class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_Abstract
 {
     public const string CALENDAR_PATH = '/socs/xml/SOCScalendar.ashx';
@@ -35,13 +39,16 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
         private IConfigLoader $configLoader,
         private EventTypeMapper $eventTypeMapper,
         private CampusMapper $campusMapper,
-        private ?HttpClient $httpClient = null,
+        private HttpClient $httpClient,
         ?array $allLuEventTypes = null,
     ) {
         parent::__construct($connectorId, $user, $viewer);
         $this->allLuEventTypes = $allLuEventTypes ?? (new Calendar())->getTypeList();
     }
 
+    /**
+     * Retrieve SOCS calendar events that overlap the requested calendar window.
+     */
     public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): GenericCollection
     {
         return $this->getFilteredEventCollection(
@@ -51,9 +58,14 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
             ),
             null,
             $allowedEventTypes,
+            $startTimestamp,
+            $endTimestamp,
         );
     }
 
+    /**
+     * Retrieve one SOCS calendar event by its feed UID.
+     */
     public function getEvent($eventId): GenericCollection
     {
         return $this->getFilteredEventCollection(
@@ -62,10 +74,22 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
         );
     }
 
+    /**
+     * Read SOCS feed events, apply caller-specific filtering, and convert matches to Schoolbox events.
+     *
+     * The filter excludes events that do not belong in the caller's view. For date windows, that means
+     * excluding events that end before the window starts or start at/after the window ends.
+     *
+     * @param callable(\Schoolbox\Socs\Calendar\Event): bool $filterFunction
+     * @param int|null                                          $limit
+     * @param int[]|null                                        $allowedEventTypes
+     */
     private function getFilteredEventCollection(
         callable $filterFunction,
         ?int $limit = null,
         ?array $allowedEventTypes = null,
+        ?int $startTimestamp = null,
+        ?int $endTimestamp = null,
     ): GenericCollection {
         $collection = new GenericCollection(EventInterface::class);
 
@@ -82,7 +106,7 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
         $allCampuses = $this->campusMapper->findAll();
         $matcher = new CampusMatcher();
 
-        foreach ($this->readEvents() as $sourceEvent) {
+        foreach ($this->readEvents($startTimestamp, $endTimestamp) as $sourceEvent) {
             if (!$filterFunction($sourceEvent)) {
                 continue;
             }
@@ -101,6 +125,9 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
         return $collection;
     }
 
+    /**
+     * Determine whether the SOCS calendar feed has enough configuration to be queried.
+     */
     private function isConfigured(): bool
     {
         return (bool)$this->configLoader->get(ConfigMapper::NAME_SOCS_ENABLED)
@@ -111,31 +138,40 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
     }
 
     /**
+     * Read and parse SOCS calendar feed events for an optional date range.
+     *
      * @return \Schoolbox\Socs\Calendar\Event[]
+     * @throws \JsonException|\RuntimeException|\Sabre\VObject\ParseException
      */
-    private function readEvents(): array
+    private function readEvents(?int $startTimestamp = null, ?int $endTimestamp = null): array
     {
-        try {
-            $xml = $this->getHttpClient()->get(self::CALENDAR_PATH, []);
-            return (new Parser())->parse($xml);
-        } catch (Throwable) {
+        $xml = $this->httpClient->getCached(self::CALENDAR_PATH, $this->buildFeedQuery($startTimestamp, $endTimestamp));
+
+        return (new Parser())->parse($xml);
+    }
+
+    /**
+     * Build SOCS calendar feed query parameters for the calendar window.
+     *
+     * @return array<string,string>
+     */
+    private function buildFeedQuery(?int $startTimestamp, ?int $endTimestamp): array
+    {
+        if (null === $startTimestamp || null === $endTimestamp) {
             return [];
         }
+
+        return [
+            'startdate' => (new Alaress_Date_Format($startTimestamp, 'U'))->getUsingFormat(Registry::SOCS_DATE_FORMAT),
+            'enddate' => (new Alaress_Date_Format($endTimestamp, 'U'))->getUsingFormat(Registry::SOCS_DATE_FORMAT),
+        ];
     }
 
-    private function getHttpClient(): HttpClient
-    {
-        if (!$this->httpClient instanceof HttpClient) {
-            $this->httpClient = new HttpClient(
-                (string)$this->configLoader->get(ConfigMapper::NAME_SOCS_ENDPOINT_HOST),
-                (string)$this->configLoader->get(ConfigMapper::NAME_SOCS_ENDPOINT_ID),
-                (string)$this->configLoader->get(ConfigMapper::NAME_SOCS_ENDPOINT_TOKEN),
-            );
-        }
-
-        return $this->httpClient;
-    }
-
+    /**
+     * Convert a parsed SOCS calendar feed event into a Schoolbox calendar event.
+     *
+     * @param int[] $campusIds
+     */
     private function buildCalendarEvent(
         \Schoolbox\Socs\Calendar\Event $sourceEvent,
         int $eventTypeId,
@@ -167,11 +203,17 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
         return $event;
     }
 
+    /**
+     * Return the configured Schoolbox calendar category for SOCS events.
+     */
     private function getConfiguredEventTypeId(): int
     {
         return (int)$this->configLoader->get(ConfigMapper::NAME_SOCS_CALENDAR_DEFAULT_EVENT_TYPE);
     }
 
+    /**
+     * Return the inclusive Schoolbox end timestamp for timed and all-day SOCS events.
+     */
     private function getEndTimestamp(\Schoolbox\Socs\Calendar\Event $event): int
     {
         if (!$event->allDay) {
@@ -182,6 +224,8 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
     }
 
     /**
+     * Find calendar event-type display metadata for the configured category.
+     *
      * @return array{eventTypeID: int|string, eventType: string, eventColour: string}
      */
     private function findLuEventType(int $id): array

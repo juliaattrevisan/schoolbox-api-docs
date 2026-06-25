@@ -11,10 +11,13 @@ namespace Schoolbox\Socs\Calendar;
 
 use DateTimeImmutable;
 
+/**
+ * Parsed SOCS calendar event data before it is converted into a Schoolbox calendar event.
+ */
 class Event
 {
     /**
-     * @param string[] $schools
+     * @param string[] $schools Campus or school names supplied by SOCS for this event.
      */
     public function __construct(
         public readonly string $uid,

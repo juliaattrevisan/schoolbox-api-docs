@@ -12,16 +12,16 @@ namespace Schoolbox\Socs\Results;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\Fixtures\Result\Mapper as ResultMapper;
+use Schoolbox\Socs\Fixtures\Registry;
 use Schoolbox\Socs\IStrategy;
 use Symfony\Component\Lock\LockInterface;
 
 /**
  * SOCS results cleanup step.
  *
- * Soft-deletes fixtures results that were marked as stale in the prepare step
- * and not refreshed during the current import run. This mirrors the
- * Clipboard Sessions cleanup behaviour, but is applied when SOCS results are
- * imported.
+ * Soft-deletes SOCS fixture results that were marked as stale in the prepare
+ * step and not refreshed during the current import run. Non-SOCS fixture
+ * results are left untouched.
  */
 class Cleanup implements IStrategy
 {
@@ -45,10 +45,19 @@ class Cleanup implements IStrategy
         if ($this->perform) {
             $this->lock->refresh();
 
-            // Soft-delete results that were not touched during this import
-            // run. Any results that were re-imported will have an updated
-            // timestamp and are preserved.
-            $this->resultMapper->getDatabase()->query("UPDATE {$this->resultMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
+            // Soft-delete SOCS-owned results that were not touched during
+            // this import run. Any results that were re-imported will have an
+            // updated timestamp and are preserved.
+            $this->resultMapper->getDatabase()->executeQuery(
+                "
+                    UPDATE {$this->resultMapper->getTable()} r
+                    INNER JOIN sportsfixtures_match m ON m.id = r.match_id
+                    SET r.deleted_at = NOW()
+                    WHERE r.updated_at = '0000-00-00 00:00:00'
+                    AND m.external_id LIKE :external_id
+                ",
+                ['external_id' => Registry::EXTERNAL_ID_PREFIX . '%']
+            );
         }
 
         $this->log->info('Soft-deleting fixtures results that did not appear in the SOCS results import.');

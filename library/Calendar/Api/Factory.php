@@ -16,6 +16,7 @@
 
 use Alaress\Http\Cache;
 use Calendar\Api\ModuleChecker;
+use GuzzleHttp\Client;
 use Predis\ClientInterface;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Alaress\Database\Connector\IConnector;
@@ -43,7 +44,8 @@ class Calendar_Api_Factory
      * @param IConfigLoader          $configLoader         Schoolbox configuration.
      * @param null|IConnector        $databaseExternal     External database, if supported.
      * @param ClientInterface        $redis                Redis instance: required by vCal calendar.
-     * @param Cache                  $cache                HTTP cache: required by vCal calendar.
+     * @param Client                 $httpClient           HTTP client with application request tracing.
+     * @param Cache                  $cache                HTTP cache: required by vCal and SOCS calendars.
      */
     public function __construct(
         private Assessment\MapperProxy $assessmentDataSource,
@@ -51,6 +53,7 @@ class Calendar_Api_Factory
         private IConfigLoader $configLoader,
         private ?IConnector $databaseExternal,
         private ClientInterface $redis,
+        private Client $httpClient,
         private Cache $cache,
     ) {
         $this->generateAvailableSubscriptions();
@@ -338,6 +341,13 @@ class Calendar_Api_Factory
                     $this->configLoader,
                     \Schoolbox\Calendar\EventTypeMapper::getInstance(),
                     \Schoolbox\CampusMapper::getInstance(),
+                    new \Schoolbox\Socs\HttpClient(
+                        (string)$this->configLoader->get(\Schoolbox\Config\ConfigMapper::NAME_SOCS_ENDPOINT_HOST),
+                        (string)$this->configLoader->get(\Schoolbox\Config\ConfigMapper::NAME_SOCS_ENDPOINT_ID),
+                        (string)$this->configLoader->get(\Schoolbox\Config\ConfigMapper::NAME_SOCS_ENDPOINT_TOKEN),
+                        $this->httpClient,
+                        $this->cache,
+                    ),
                 );
             case Calendar_Api_EventType_Event_Vcal_Default::class:
                 return new Calendar_Api_EventType_Event_Vcal_Default($connectorId, $user, $viewer, $this->redis, $this->cache);

@@ -14,16 +14,24 @@ use DateTimeZone;
 use Sabre\VObject\ParseException;
 use SimpleXMLElement;
 
+/**
+ * Parses SOCS XML calendar feeds into normalized event value objects.
+ */
 class Parser
 {
     private DateTimeZone $timezone;
 
+    /**
+     * Capture the current instance timezone for SOCS date/time parsing.
+     */
     public function __construct()
     {
         $this->timezone = new DateTimeZone(date_default_timezone_get());
     }
 
     /**
+     * Parse all calendar event nodes from a SOCSCalendar XML document.
+     *
      * @return Event[]
      * @throws ParseException
      */
@@ -42,6 +50,8 @@ class Parser
     }
 
     /**
+     * Build one event from a CalendarEvent XML node.
+     *
      * @throws ParseException
      */
     private function buildEvent(SimpleXMLElement $eventNode, int $eventNumber): Event
@@ -87,6 +97,8 @@ class Parser
     }
 
     /**
+     * Extract school/campus names from flat or nested SOCS school fields.
+     *
      * @return string[]
      */
     private function getSchools(SimpleXMLElement $eventNode): array
@@ -111,6 +123,8 @@ class Parser
     }
 
     /**
+     * Parse a SOCS date and optional time in the configured instance timezone.
+     *
      * @throws ParseException
      */
     private function parseDateTime(string $date, string $time, string $fieldDescription): DateTimeImmutable
@@ -130,6 +144,9 @@ class Parser
         throw new ParseException("Could not parse {$fieldDescription}: {$value}");
     }
 
+    /**
+     * Confirm PHP parsed the previous date/time value without warnings or errors.
+     */
     private function dateParsedCleanly(): bool
     {
         $errors = DateTimeImmutable::getLastErrors();
@@ -138,7 +155,9 @@ class Parser
     }
 
     /**
-     *  string[]
+     * Split a comma-separated SOCS schools string into clean school names.
+     *
+     * @return string[]
      */
     private function splitSchools(string $schools): array
     {
@@ -149,6 +168,8 @@ class Parser
     }
 
     /**
+     * Return the first matching child value using a case-insensitive name comparison.
+     *
      * @param string[] $names
      */
     private function getChildValue(SimpleXMLElement $node, array $names): string

@@ -1971,6 +1971,7 @@ abstract class Kernel
                         $config,
                         $databaseExternal,
                         $di->get('redis.cache'),
+                        $di->get('httpClient'),
                         $di->get('httpClient.cache'),
                     );
                 }
