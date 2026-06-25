@@ -96,7 +96,7 @@ function onAttemptMarkUpdated(mark: string): void {
             @toggle="onToggleSelected"
         />
         <div ref="responseEl" class="">
-            <div ref="responseContentEl" class="response-content">
+            <div ref="responseContentEl" class="response-content t-visually-hidden">
                 <!-- this is the div Learnosity looks for to insert the response content into, it will be completely replaced -->
                 <div :id="props.student.elementId"></div>
             </div>
@@ -122,9 +122,4 @@ function onAttemptMarkUpdated(mark: string): void {
     </div>
 </template>
 
-<style scoped>
-.response-content {
-    /* this contains the html from Learnosity, which has the response DOM elements that are extracted as we move through the items */
-    display: none;
-}
-</style>
+<style scoped></style>
