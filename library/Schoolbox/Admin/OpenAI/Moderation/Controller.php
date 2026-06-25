@@ -29,8 +29,7 @@ class Controller extends Base
 
     /**
      * Transition the event to NO_ACTION_REQUIRED, recording the reviewing staff member.
-     *
-     * (The staff member has reviewed the event and deemed that no further action is required.)
+     * Conditions for when this transition can occur are handled by the module.
      *
      * @param Event\Model $event
      * @return void
@@ -50,10 +49,7 @@ class Controller extends Base
 
     /**
      * Transition the event to FURTHER_ACTION_REQUIRED, recording the reviewing staff member.
-     *
-     * (The staff member has reviewed the event and deemed that further action is required, but
-     * that action has not yet been taken.) Any prior resolution is cleared, as the event is no
-     * longer considered resolved.
+     * Conditions for when this transition can occur are handled by the module.
      *
      * @param Event\Model $event
      * @return void
@@ -75,9 +71,7 @@ class Controller extends Base
 
     /**
      * Transition the event to FURTHER_ACTION_TAKEN, recording the resolving staff member.
-     *
-     * (The staff member has resolved the 'further action required' request.) The earlier review
-     * details are preserved.
+     * Conditions for when this transition can occur are handled by the module.
      *
      * @param Event\Model $event
      * @return void
@@ -96,8 +90,9 @@ class Controller extends Base
 
 
     /**
-     * Respond as JSON with the translated event, so the frontend can update its data with the
-     * event's new state.
+     * Respond with a JSON payload containing the translated $event including routes/status.
+     * Used for asynchronous calls when the event state may have changed so that the frontend
+     * can realign its data with the new state.
      *
      * @param Event\Model $event
      * @return void
