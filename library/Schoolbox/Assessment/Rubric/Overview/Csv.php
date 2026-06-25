@@ -87,10 +87,17 @@ class Csv
                         self::SEPARATOR,
                         $indicatorData['name'],
                     );
+
+                    /* A descriptor value normally sits in this column so we have to add a placeholder here
+                     */
+                    $headings[] = '';
                 }
 
                 /* Optionally, the capability mark goes here
                  */
+                if ($rubricInstanceData['isMarkPerCapability']) {
+                    $headings[] = 'Overall';
+                }
             }
         }
 
@@ -136,6 +143,15 @@ class Csv
 
                     /* Optionally, the capability mark goes here
                      */
+                    if ($rubricInstanceData['isMarkPerCapability']) {
+                        $markNode = $studentMarks[$participantUser->getId()]['gridData'][$assessment->getId()][$rubricInstanceId]['capabilities'][$capabilityId][$this->markNode] ?? null;
+
+                        if (null !== $markNode) {
+                            $row[] = $markNode['humanReadableMark'];
+                        } else {
+                            $row[] = '';
+                        }
+                    }
                 }
             }
 
