@@ -114,7 +114,8 @@ class Attendance_Synergetic_AttendanceMaster
          * for the same class that occurred at this time for a given filetype/filesemester and
          * campus...that seems like a mistake
          */
-        $attendanceMasterSeq = $attendanceMasterSeqStatement->fetch()['wkAttendanceMasterSeq'];
+        $row = $attendanceMasterSeqStatement->fetch();
+        $attendanceMasterSeq = is_array($row) ? $row['wkAttendanceMasterSeq'] : null;
 
         if ($attendanceMasterSeq) {
             /* Cleanup all working data before commencing attendance marking */
