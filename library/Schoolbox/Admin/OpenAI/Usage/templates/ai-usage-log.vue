@@ -312,6 +312,11 @@ function printSelectedSession(): void {
                             <td
                                 :class="`actions-small-${session.moderationStatus && canViewSessionLogs(session) ? 2 : 1}`"
                             >
+                                <!--
+                                Although this does handle a non-viewable session which has a moderation status,
+                                it is not actually possible to end up in that state normally, since only sessions with
+                                a logFormat (and therefore viewable) can have a moderation status set.
+                                -->
                                 <nav v-if="session.moderationStatus || canViewSessionLogs(session)">
                                     <aul-moderation-indicator
                                         v-if="session.moderationStatus"
