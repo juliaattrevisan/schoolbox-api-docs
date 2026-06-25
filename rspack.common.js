@@ -410,9 +410,6 @@ module.exports = {
             filename: "../../css/core/[name].css",
         }),
     ],
-    experiments: {
-        css: false, // Disabled — using CssExtractRspackPlugin for CSS extraction instead https://rspack.rs/guide/tech/css
-    },
     externals: {
         vue: "Vue", // as Vue is loaded separately via a <script> tag, we need to notify webpack that it is available globally, so any .vue files will still bundle as expected
     },
