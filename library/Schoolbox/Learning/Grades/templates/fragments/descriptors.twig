@@ -70,7 +70,7 @@
                                                 {% set numerator = publishedMarks.selectedDescriptorValue ?? null %}
                                                 {% set denominator = activity.gridData[rubricInstanceId].capabilities[capabilityId].indicators[indicatorId].max ?? null %}
 
-                                                {% if numerator and denominator and showRubricPoints %}
+                                                {% if numerator is not null and denominator and showRubricPoints %}
                                                     ({{ numerator|round }}/{{ denominator|round }})
                                                 {% endif %}
                                             </span>
