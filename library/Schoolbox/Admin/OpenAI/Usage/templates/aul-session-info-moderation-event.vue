@@ -13,6 +13,8 @@ const props = defineProps<Props>();
 
 const componentId = window.Vue.useId();
 
+const isExpanded = window.Vue.ref<boolean>(true);
+
 const timestamp = window.Vue.computed(() => {
     const date = window.dayjs(props.event.createdAt);
     const time = date.format(window.dateDisplayFormats.dayjsTime);
@@ -47,20 +49,26 @@ const STATUS_LABEL_CLASSES: Record<AiModerationStatus, string> = {
         </div>
 
         <nav>
-            <!-- TODO: expand/collapse -->
-            <a class="sbx-icon-only-button">
-                <sbx-icon name="up-arrow"></sbx-icon>
-            </a>
+            <button
+                type="button"
+                class="sbx-icon-only-button"
+                :aria-expanded="isExpanded"
+                :aria-label="`${isExpanded ? 'Collapse' : 'Expand'} event details`"
+                :title="`${isExpanded ? 'Collapse' : 'Expand'} event details`"
+                @click="isExpanded = !isExpanded"
+            >
+                <sbx-icon :name="isExpanded ? 'up-arrow' : 'down-arrow'"></sbx-icon>
+            </button>
             <sbx-pop-out :content-id="`aul-session-info-moderation-event-${componentId}`"></sbx-pop-out>
         </nav>
         <ul :id="`aul-session-info-moderation-event-${componentId}`" class="f-dropdown" data-dropdown-content>
             <aul-session-info-moderation-event-actions :event="props.event" />
         </ul>
 
-        <article>{{ props.event.result.summary }}</article>
+        <article v-show="isExpanded">{{ props.event.result.summary }}</article>
     </li>
 
-    <li v-for="category in props.event.result.categories" :key="category.category" class="child">
+    <li v-for="category in props.event.result.categories" v-show="isExpanded" :key="category.category" class="child">
         <div class="content">
             <h3>{{ CATEGORY_LABELS[category.category] }}</h3>
             <p v-for="(evidence, evidenceIdx) in category.evidence" :key="evidenceIdx" class="meta">
