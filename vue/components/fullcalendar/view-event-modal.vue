@@ -780,31 +780,48 @@ export default {
          */
         async bookingApprove(efficacy) {
             this.$refs.bookingApproveSeriesModal.close();
-            let data = new URLSearchParams({
-                    efficacy: efficacy,
-                }),
-                approveActionUrl = this.eventExtendedProps.booking?.actions.find(
-                    (action) => action.action === "approve",
-                ).href;
-            return fetch(approveActionUrl, {
-                method: "POST",
-                body: data.toString(),
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-                },
-            })
-                .then((response) => {
-                    if (response.ok) {
-                        return response;
-                    } else {
-                        throw new Error(response.statusText);
-                    }
-                })
-                .then(() => this.event.remove())
-                .then(() => this.$emit(EVENT_MODIFIED, this.event))
-                .catch((error) => {
-                    console.error(error);
+            const toast = window.sbProps.toastActivate("Approving booking...");
+            const data = new URLSearchParams({
+                efficacy: efficacy,
+            });
+            const approveActionUrl = this.eventExtendedProps.booking?.actions.find(
+                (action) => action.action === "approve",
+            ).href;
+
+            try {
+                const response = await fetch(approveActionUrl, {
+                    method: "POST",
+                    body: data.toString(),
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                        "X-Requested-With": "XMLHttpRequest",
+                        Accept: "application/json",
+                    },
                 });
+
+                if (!response.ok) {
+                    let responseData = {};
+                    try {
+                        responseData = await response.json();
+                    } catch (error) {
+                        console.error(error);
+                    }
+                    toast.timeout({
+                        text:
+                            responseData?.message ||
+                            "Unable to approve booking. This booking would exceed the resource's concurrent booking capacity.",
+                        isSuccess: false,
+                    });
+                    return;
+                }
+
+                this.event.remove();
+                this.$emit(EVENT_MODIFIED, this.event);
+                toast.timeout({ text: "Booking approved", isSuccess: true });
+            } catch (error) {
+                console.error(error);
+                toast.timeout({ text: "Unable to approve booking.", isSuccess: false });
+            }
         },
 
         /**
