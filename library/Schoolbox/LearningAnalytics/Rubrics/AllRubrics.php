@@ -56,11 +56,16 @@ class AllRubrics
          *
          * This sounds awful, but remember this is a direct hash lookup implementation. You don't actually have to
          * traverse anything extraordinarily absurd.
+         *
+         * Still, there might be a way you can roll this into setupStruct() but it'll make it harder to understand;
+         * doing so merges the responsibilities
          */
         $manifest = $this->setupStruct($assessments);
 
+        /* Chuck student values in
+         */
+        $manifest = $this->populateVals($manifest, $overallMarks);
 
-        new \Alaress_Probe($assessments, $overallMarks, $manifest);
         return [];
     }
 
@@ -144,6 +149,47 @@ class AllRubrics
         unset($capability);
 
         uasort($manifest, [$this, 'sortByName']);
+
+        return $manifest;
+    }
+
+
+    /**
+     * Chuck student values into the $manifest via direct hash lookup
+     *
+     * @param array $manifest
+     * @param array $overallMarks
+     * @return array
+     */
+    private function populateVals(array $manifest, array $overallMarks): array
+    {
+        foreach ($overallMarks as $capabilityId => $capabilityData) {
+            foreach ($capabilityData['students'] as $studentId => $studentData) {
+                /* Only care about non-null values
+                 */
+                if (null !== $studentData['published']['normalisedMark']) {
+                    $manifest[$capabilityId]['published']['vals'][] = $studentData['published']['normalisedMark'];
+                }
+
+                if (null !== $studentData['draft']['normalisedMark']) {
+                    $manifest[$capabilityId]['draft']['vals'][] = $studentData['draft']['normalisedMark'];
+                }
+            }
+
+            foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
+                foreach ($indicatorData['students'] as $studentId => $studentData) {
+                    /* Only care about non-null values
+                     */
+                    if (null !== $studentData['published']['normalisedMark']) {
+                        $manifest[$capabilityId]['indicators'][$indicatorId]['published']['vals'][] = $studentData['published']['normalisedMark'];
+                    }
+
+                    if (null !== $studentData['draft']['normalisedMark']) {
+                        $manifest[$capabilityId]['indicators'][$indicatorId]['draft']['vals'][] = $studentData['draft']['normalisedMark'];
+                    }
+                }
+            }
+        }
 
         return $manifest;
     }
