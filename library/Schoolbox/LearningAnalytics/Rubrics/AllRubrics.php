@@ -8,30 +8,14 @@
 
 namespace Schoolbox\LearningAnalytics\Rubrics;
 
-use Alaress\Database\Connector\IConnector;
-use DebugBar\DebugBarException;
-use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
-use Schoolbox\Assessment\Rubric\Markbook\OverallDataset;
-use Schoolbox\Assessment\Term;
-use Schoolbox\Column\Decimal;
-use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Analytics\BoxPlot\Summary;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 
 class AllRubrics
 {
     /**
-     * An array of rubric data to plot
-     *
-     * @var array
-     */
-    private array $allRubrics;
-
-
-    /**
      * Constructor.
      */
-    public function __construct(private IConnector $databaseInternal)
+    public function __construct()
     {
     }
 
@@ -313,18 +297,4 @@ class AllRubrics
 //        return "{$grouping}: {$name}";
 //    }
 
-
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Get all rubrics
-     *
-     * @return array
-     */
-    public function getRubricData(): array
-    {
-        return $this->allRubrics;
-    }
 }
