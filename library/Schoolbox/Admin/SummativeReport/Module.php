@@ -69,6 +69,7 @@ class Module extends BaseModule
         $this->register('GET', '/terms', 'getTerms', $perms);
         $this->register('GET', '/yearlevels', 'getYearLevels', $perms);
         $this->register('GET', '/campuses', 'getCampuses', $perms);
+        $this->register('GET', '/students', 'getStudents', $perms);
         $this->register('GET', '/{reportId}/update', 'getUpdate', $perms, $preloadReport);
         $this->register('POST', '/{reportId}/update', 'postUpdate', $perms, $preloadReport);
         $this->register('GET', '/{reportId}/duplicate', 'getDuplicate', $perms, $preloadReport);

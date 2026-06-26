@@ -602,6 +602,212 @@ class Controller extends ConfigController
 
 
     /**
+     * Get students for selectize.
+     *
+     * Supports the existing name/external-id/username search behavior, plus
+     * comma-separated or space-separated exact matches for external IDs and
+     * usernames.
+     *
+     * @return void
+     * @api GET /adminv2/summative-report/students
+     */
+    public function getStudents(): void
+    {
+        $query = trim((string)$this->requestQuery->get('query'));
+
+        $hasListDelimiter = str_contains($query, ',') || preg_match('/\s+/', $query);
+        if (strlen($query) <= 1 || (!$hasListDelimiter && strlen($query) >= 64)) {
+            $this->response = $this->responseAsJson([]);
+            return;
+        }
+
+        $students = [];
+        $isListMatch = false;
+
+        if (str_contains($query, ',')) {
+            $students = $this->findStudentsByExternalIdsOrUsernames($this->splitStudentListQuery($query));
+            $isListMatch = true;
+        } elseif (preg_match('/\s+/', $query)) {
+            $tokens = $this->splitStudentListQuery($query);
+            $exactStudents = $this->findStudentsByExternalIdsOrUsernames($tokens);
+
+            if ($this->allUserListTokensMatched($tokens)) {
+                $students = $exactStudents;
+                $isListMatch = true;
+            }
+        }
+
+        if (!$isListMatch && $students === []) {
+            $students = $this->searchStudents($query);
+        }
+
+        $this->response = $this->responseAsJson(array_map(
+            fn (User $student): array => $this->formatStudentSelectizeOption($student, $isListMatch),
+            $students
+        ));
+    }
+
+    /**
+     * Split a pasted student list into external-id/username search tokens.
+     *
+     * @param string $query
+     * @return array
+     */
+    private function splitStudentListQuery(string $query): array
+    {
+        return array_values(array_unique(array_filter(
+            preg_split('/[\s,]+/', $query) ?: [],
+            static fn (string $token): bool => $token !== ''
+        )));
+    }
+
+
+    /**
+     * Find student users by exact external ID or username matches.
+     *
+     * @param array $tokens
+     * @return array
+     */
+    private function findStudentsByExternalIdsOrUsernames(array $tokens): array
+    {
+        return array_values(array_filter(
+            $this->findUsersByExternalIdsOrUsernames($tokens),
+            static fn (User $student): bool => $student->getRole()->getType() === Role::STUDENT
+        ));
+    }
+
+
+    /**
+     * Search students using the same broad matching rules as the standard user
+     * selectize endpoint.
+     *
+     * @param string $query
+     * @return array
+     */
+    private function searchStudents(string $query): array
+    {
+        $roleIds = $this->roleMapper
+            ->findByColumn('group_type', Role::STUDENT)
+            ->indexBy('id')
+            ->keys();
+
+        $userList = (new \User())->ajaxSearch($query, $roleIds, [], 30);
+        if (!is_array($userList) || $userList === []) {
+            return [];
+        }
+
+        $studentIds = array_map('intval', array_column($userList, 'uid'));
+        $students = iterator_to_array($this->userMapper->findByColumn('id', $studentIds));
+
+        return array_values(array_filter(
+            $students,
+            static fn (User $student): bool => $student->getRole()->getType() === Role::STUDENT
+        ));
+    }
+
+
+    /**
+     * Find users by exact external ID or username matches.
+     *
+     * @param array $tokens
+     * @return array
+     */
+    private function findUsersByExternalIdsOrUsernames(array $tokens): array
+    {
+        if ($tokens === []) {
+            return [];
+        }
+
+        $users = $this->userMapper->findByColumnList(['synergy_id' => $tokens])
+            ->mergeUnique($this->userMapper->findByColumnList(['username' => $tokens]), 'id');
+
+        return iterator_to_array($users);
+    }
+
+
+    /**
+     * Decide whether a whitespace-separated query is a complete username or
+     * external-id list instead of a full-name search.
+     *
+     * Matches against all role types so parent/staff tokens keep the query in
+     * list mode, but non-students are filtered out of the returned options.
+     *
+     * @param array $tokens
+     * @return bool
+     */
+    private function allUserListTokensMatched(array $tokens): bool
+    {
+        $matchedTokens = [];
+
+        foreach ($this->findUsersByExternalIdsOrUsernames($tokens) as $user) {
+            $matchedTokens[] = mb_strtolower((string)$user->getExternalId(), 'UTF-8');
+            $matchedTokens[] = mb_strtolower((string)$user->getUsername(), 'UTF-8');
+        }
+
+        $matchedTokens = array_filter($matchedTokens, static fn (string $token): bool => $token !== '');
+
+        foreach ($tokens as $token) {
+            if (!in_array(mb_strtolower($token, 'UTF-8'), $matchedTokens, true)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
+    /**
+     * Format a student for the selectize user picker.
+     *
+     * @param User $student
+     * @return array
+     */
+    private function formatStudentSelectizeOption(User $student, bool $isListMatch = false): array
+    {
+        $person = sprintf(
+            '%s - %s',
+            $student->getFullName(),
+            $this->formatStudentSelectizeMeta($student)
+        );
+
+        return [
+            'name'        => $person,
+            'id'          => $student->getId(),
+            'first_name'  => $student->getFirstname(),
+            'last_name'   => $student->getLastname(),
+            'full_name'   => $student->getFullName(),
+            'role'        => $student->getRole()->getName(),
+            'role_id'     => $student->getRole()->getId(),
+            'roleType'    => $student->getRole()->getType(),
+            'external_id' => $student->getExternalId(),
+            'list_match'  => $isListMatch,
+        ];
+    }
+
+
+    /**
+     * Format the student role/year/external-id metadata shown in selectize.
+     *
+     * @param User $student
+     * @return string
+     */
+    private function formatStudentSelectizeMeta(User $student): string
+    {
+        $meta = '';
+        if ($student->getYear()) {
+            $meta .= $student->getYear()->getLongName('Year') . ', ';
+        }
+
+        $meta .= $student->getRole()->getName();
+
+        if ($student->getExternalId() !== null) {
+            $meta .= " ({$student->getExternalId()})";
+        }
+
+        return $meta;
+    }
+
+    /**
      * Duplicate a report's settings
      *
      * @param Model $report
