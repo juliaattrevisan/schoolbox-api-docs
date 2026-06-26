@@ -409,11 +409,6 @@ module.exports = {
                     },
                 ],
             },
-            {
-                // to process svg files in the @caspingus/lt/src/authoring/extensions/ui/imageUploader/assets/ folder (for the Learnosity image uploader extension)
-                test: /(@caspingus[/\\]lt[/\\]src[/\\]authoring[/\\]extensions[/\\]ui[/\\]imageUploader[/\\]assets[/\\][^/\\]+\.svg$)/,
-                type: "asset/source",
-            },
         ],
     },
     experiments: {
