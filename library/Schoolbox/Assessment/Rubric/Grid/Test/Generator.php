@@ -14,7 +14,6 @@ use Schoolbox\Assessment\Rubric\Grid as RubricGrid;
 use Schoolbox\Assessment\Rubric\RowSet as RubricRowSet;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
-use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 
 /**
  * Generator for test data for grid tests.
@@ -211,7 +210,8 @@ class Generator
          */
         $rubricInstance = new \Schoolbox\Assessment\Rubric\Instance\Model()
             ->setId(117)
-            ->setCapabilityMarkType((new MarkType())->setId(MarkType::TYPE_TOTAL));
+            ->setCapabilityMarkType($dueWork->getCapabilityMarkType())
+            ->setCapabilityGradeGroup($dueWork->getCapabilityGradeGroup());
 
         $grid = new RubricGrid\Grid($dueWork, $rubricInstance, $rowSet);
 
