@@ -166,5 +166,3 @@ function openModal(student: StudentRow): void {
         </tbody>
     </table>
 </template>
-
-<style scoped></style>
