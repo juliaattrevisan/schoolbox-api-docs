@@ -26,6 +26,14 @@ const FORMAT_DISPLAY_TIME = "h:mma";
 const FORMAT_DISPLAY_DATETIME = "ddd Do MMM, h:mma";
 const FORMAT_DISPLAY_WEEK_DAY = "ddd D/M";
 
+/**
+ * If every status checkbox is cleared, treat that as no status filter rather than
+ * omitting the status query parameter. Sending all known statuses preserves a
+ * valid JSON calendar request while matching the filter semantics: no selected
+ * status filter means all booking statuses are included.
+ */
+const DEFAULT_BOOKING_STATUS_FILTERS = [1, 2, 3];
+
 export default {
     components: {
         FilterModal,
@@ -182,6 +190,12 @@ export default {
             this.$refs.filter.open();
         },
 
+        getStatusFiltersForRequest() {
+            return this.config.selectedFilters.length > 0
+                ? this.config.selectedFilters
+                : DEFAULT_BOOKING_STATUS_FILTERS;
+        },
+
         /**
          * Event source.
          * @see https://fullcalendar.io/docs/events-function
@@ -194,7 +208,7 @@ export default {
             const params = {
                 start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
                 end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
-                status: this.config.selectedFilters,
+                status: this.getStatusFiltersForRequest(),
             };
             fetch(`${this.config.resourceBookingEndpoint}?${getSearchString(params)}`, {
                 headers: {
