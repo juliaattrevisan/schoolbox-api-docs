@@ -89,6 +89,90 @@ test.describe("Admin LMS - Summative Reports Data Validation", () => {
         }
     });
 
+    test("create summative reports from external ID and username lists", async ({ tester, db }) => {
+        const listReportTitle = "Summative Report Student List Test";
+        const externalIds = ["507", "509"];
+        const usernames = await Promise.all(
+            externalIds.map(async (externalId) =>
+                String(await db.grabFromDatabase("user", "username", { synergy_id: externalId })),
+            ),
+        );
+        const nonStudentRoleIds = (await db.grabColumnFromDatabase("groups", "id", {
+            group_type: ["parent", "staff"],
+        })).map(Number);
+        const nonStudentUsername = String(
+            await db.grabFromDatabase("user", "username", {
+                group_id: nonStudentRoleIds,
+                username: "NOT NULL",
+                deleted_at: null,
+            }),
+        );
+        const nonStudentExternalId = String(
+            await db.grabFromDatabase("user", "synergy_id", {
+                group_id: nonStudentRoleIds,
+                synergy_id: "NOT NULL",
+                deleted_at: null,
+            }),
+        );
+        const nonStudentFullName = `${String(
+            await db.grabFromDatabase("user", "firstname", { username: nonStudentUsername }),
+        )} ${String(await db.grabFromDatabase("user", "lastname", { username: nonStudentUsername }))}`;
+
+        try {
+            tester.isGoingTo("create a summative report using a comma-separated external ID list");
+            await createSummativeReport.goto();
+            await createSummativeReport.fillTitleField(`${listReportTitle} - External IDs`);
+            await createSummativeReport.fillPeriodsField(academicPeriod);
+            await createSummativeReport.fillStudentSelectionField("students", externalIds.join(","));
+            await createSummativeReport.checkStudentSelectionContains(["Jana Reed", "Tim Reed"]);
+            await createSummativeReport.clickSaveButton();
+            await summativeReportList.checkSummativeReportTitleIsPresented(`${listReportTitle} - External IDs`);
+
+            tester.isGoingTo("check the external ID list report generates one report per selected student");
+            await summativeReportList.clickSummativeReportActionButton("download", `${listReportTitle} - External IDs`);
+            await summativeReportList.checkReportGenerationInProgressMessage(2);
+
+            tester.isGoingTo("create a summative report using a space-separated username list");
+            await createSummativeReport.goto();
+            await createSummativeReport.fillTitleField(`${listReportTitle} - Usernames`);
+            await createSummativeReport.fillPeriodsField(academicPeriod);
+            await createSummativeReport.fillStudentSelectionField("students", usernames.join(" "));
+            await createSummativeReport.checkStudentSelectionContains(["Jana Reed", "Tim Reed"]);
+            await createSummativeReport.clickSaveButton();
+            await summativeReportList.checkSummativeReportTitleIsPresented(`${listReportTitle} - Usernames`);
+
+            tester.isGoingTo("check the username list report generates one report per selected student");
+            await summativeReportList.clickSummativeReportActionButton("download", `${listReportTitle} - Usernames`);
+            await summativeReportList.checkReportGenerationInProgressMessage(2);
+
+            tester.isGoingTo("check non-student usernames are excluded from mixed student username lists");
+            await createSummativeReport.goto();
+            await createSummativeReport.fillStudentSelectionField(
+                "students",
+                [...usernames, nonStudentUsername].join(" "),
+            );
+            await createSummativeReport.checkStudentSelectionContains(["Jana Reed", "Tim Reed"]);
+            await createSummativeReport.checkStudentSelectionDoesNotContain([nonStudentFullName]);
+
+            tester.isGoingTo("check non-student-only username lists show no matching users");
+            await createSummativeReport.goto();
+            await createSummativeReport.fillStudentSelectionField("students", nonStudentUsername);
+            await createSummativeReport.checkStudentSelectionHasNoResults();
+
+            tester.isGoingTo("check non-student-only external ID lists show no matching users");
+            await createSummativeReport.goto();
+            await createSummativeReport.fillStudentSelectionField("students", nonStudentExternalId);
+            await createSummativeReport.checkStudentSelectionHasNoResults();
+        } finally {
+            tester.isGoingTo("soft delete summative reports created by the student list test");
+            await db.updateInDatabase(
+                "summative_report",
+                { deleted_at: "2022-01-15 11:22:34" },
+                { "title like": `${listReportTitle}%`, deleted_at: null },
+            );
+        }
+    });
+
     test("create a summative report page, toggle on the class page to check its details", async ({ tester, db }) => {
         try {
             tester.isGoingTo("create a summative report page, toggle on the class page");
