@@ -702,9 +702,7 @@ class CohortAnalysis
             $this->routeGenerator
         ))->buildMarkbookData(null, [], array_keys($unitImplAssessmentIds));
 
-        return (new AllRubrics($this->databaseInternal))->generate($assessments, $exclusions, $studentMarks, $overallMarks);
-
-//        return (new AllRubrics($unitImplementations, $term))->getRubricData();
+        return (new AllRubrics($this->databaseInternal))->generate($assessments, $overallMarks);
     }
 
 

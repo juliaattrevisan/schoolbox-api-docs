@@ -40,15 +40,11 @@ class AllRubrics
      * Find a set of John Turkey box plot datasets for each capability and indicator.
      *
      * @param array $assessments
-     * @param array $exclusions
-     * @param array $studentMarks
      * @param array $overallMarks
      * @return array
      */
     public function generate(
         array $assessments,
-        array $exclusions,
-        array $studentMarks,
         array $overallMarks
     ): array {
         /* Set up the structure of this panel. Each capability/indicator is sorted alphabetically.
