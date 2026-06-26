@@ -2,7 +2,7 @@
 import { getDayjsDatetimeLong } from "@js/util/dateUtils";
 import { AiModerationStatus, STATUS_LABELS } from "./moderationEvent";
 import type { AiModerationEvent } from "./moderationEvent";
-import { RISK_LEVEL_LABELS, CATEGORY_LABELS } from "./moderationResult";
+import { RISK_LEVEL_LABELS, CATEGORY_LABELS, RiskLevel } from "./moderationResult";
 import AulSessionInfoModerationEventActions from "./aul-session-info-moderation-event-actions.vue";
 
 interface Props {
@@ -19,6 +19,17 @@ const componentId = window.Vue.useId();
 
 const isExpanded = window.Vue.ref<boolean>(false);
 const canExpand = window.Vue.computed(() => props.event.result.categories.length > 0);
+
+/**
+ * Don't show the "No Behaviour Flagged" label if the above risk level will already say that.
+ * (you can't just check for NONE risk level, since it's possible to change the status of non-flagged events)
+ */
+const hideStatusLabel = window.Vue.computed(() => {
+    return (
+        props.event.status === AiModerationStatus.NO_BEHAVIOUR_FLAGGED &&
+        props.event.result.overall_risk_level !== RiskLevel.NONE
+    );
+});
 
 const timestamp = window.Vue.computed(() => {
     const date = window.dayjs(props.event.createdAt);
@@ -40,8 +51,12 @@ const STATUS_LABEL_CLASSES: Record<AiModerationStatus, string> = {
         <div class="list-item">
             <div class="card small-12">
                 <h3>
-                    {{ RISK_LEVEL_LABELS[props.event.result.overall_risk_level] }} Risk
-                    <span class="label right l-mar--0" :class="STATUS_LABEL_CLASSES[props.event.status]">
+                    {{ RISK_LEVEL_LABELS[props.event.result.overall_risk_level] }}
+                    <span
+                        v-if="!hideStatusLabel"
+                        class="label right l-mar--0"
+                        :class="STATUS_LABEL_CLASSES[props.event.status]"
+                    >
                         {{ STATUS_LABELS[props.event.status] }}
                     </span>
                 </h3>
