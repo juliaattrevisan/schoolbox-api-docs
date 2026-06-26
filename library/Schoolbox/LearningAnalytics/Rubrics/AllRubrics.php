@@ -9,6 +9,7 @@
 namespace Schoolbox\LearningAnalytics\Rubrics;
 
 use Alaress\Database\Connector\IConnector;
+use DebugBar\DebugBarException;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Rubric\Markbook\OverallDataset;
 use Schoolbox\Assessment\Term;
@@ -27,22 +28,22 @@ class AllRubrics
 
 
     /**
+     * Constructor.
      */
-    public function __construct(
-        private IConnector $databaseInternal,
-
-    )
+    public function __construct(private IConnector $databaseInternal)
     {
-
     }
 
 
     /**
+     * Find a set of John Turkey box plot datasets for each capability and indicator.
+     *
      * @param array $assessments
      * @param array $exclusions
      * @param array $studentMarks
      * @param array $overallMarks
      * @return array
+     * @throws DebugBarException
      */
     public function generate(
         array $assessments,
@@ -50,8 +51,114 @@ class AllRubrics
         array $studentMarks,
         array $overallMarks
     ): array {
-        new \Alaress_Probe($overallMarks);
+        /* Set up the structure of this panel. Each capability/indicator is sorted alphabetically.
+         * Actual statistical values are appended and calculated after populating into $manifest
+         *
+         * This sounds awful, but remember this is a direct hash lookup implementation. You don't actually have to
+         * traverse anything extraordinarily absurd.
+         */
+        $manifest = $this->setupStruct($assessments);
+
+
+        new \Alaress_Probe($assessments, $overallMarks, $manifest);
         return [];
+    }
+
+
+    /**
+     * Collect all the capabilities and indicators from all the assessments and compile them into a nice list
+     * We'll append John Turkey boxplot business later in this method
+     *
+     * @param array $assessments
+     * @return array
+     */
+    private function setupStruct(array $assessments): array
+    {
+        $manifest = [];
+
+        foreach ($assessments as $assessmentId => $assessmentData) {
+            foreach ($assessmentData['gridData'] as $rubricInstanceId => $rubricInstanceData) {
+                foreach ($rubricInstanceData['capabilities'] as $capabilityId => $capabilityData) {
+                    if (!isset($manifest[$capabilityId])) {
+                        $manifest[$capabilityId] = [
+                            'name' => $capabilityData['name'],
+                            /* Capability Marks, if relevant
+                             */
+                            'published' => [
+                                /* Each student's value gets stored here for now
+                                 */
+                                'vals' => [],
+                                /* Boxplot summary eventually gets calculated here from the $vals node once assembled
+                                 */
+                                'statistics' => null,
+                            ],
+                            'draft' => [
+                                /* Each student's value gets stored here for now
+                                 */
+                                'vals' => [],
+                                /* Boxplot summary eventually gets calculated here from the $vals node once assembled
+                                 */
+                                'statistics' => null,
+                            ],
+                            /* Set of indicators in this capability
+                             */
+                            'indicators' => []
+                        ];
+                    }
+
+                    foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
+                        if (!isset($manifest[$capabilityId]['indicators'][$indicatorId])) {
+                            $manifest[$capabilityId]['indicators'][$indicatorId] = [
+                                'name' => $indicatorData['name'],
+                                /* Indicator Marks, if relevant
+                                 */
+                                'published' => [
+                                    /* Each student's value gets stored here for now
+                                     */
+                                    'vals' => [],
+                                    /* Boxplot summary eventually gets calculated here from the $vals node once assembled
+                                     */
+                                    'statistics' => null,
+                                ],
+                                'draft' => [
+                                    /* Each student's value gets stored here for now
+                                     */
+                                    'vals' => [],
+                                    /* Boxplot summary eventually gets calculated here from the $vals node once assembled
+                                     */
+                                    'statistics' => null,
+                                ],
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+
+        /* Sort the capabilities and indicators alphabetically
+         */
+        foreach ($manifest as &$capability) {
+            uasort($capability['indicators'], [$this, 'sortByName']);
+        }
+
+        unset($capability);
+
+        uasort($manifest, [$this, 'sortByName']);
+
+        return $manifest;
+    }
+
+
+    /**
+     * Quick alpha sort function for indicators and capabilities summary section
+     *
+     * @param array $a
+     * @param array $b
+     * @return int
+     */
+    private function sortByName(array $a, array $b): int
+    {
+        return strnatcasecmp($a['name'], $b['name']);
     }
 
 
