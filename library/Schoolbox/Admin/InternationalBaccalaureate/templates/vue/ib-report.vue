@@ -22,6 +22,7 @@ import type {
     ApiCandidatesResponse,
     ApiManuallyRegisterResponse,
     ApiUpdateConfirmationResponse,
+    ApiRenotifyResponse,
 } from "../js/types/ibReportTypes";
 
 interface Props {
@@ -95,6 +96,7 @@ const isCompleting = window.Vue.ref<boolean>(false);
 const isResetting = window.Vue.ref<boolean>(false);
 const isManuallyRegistering = window.Vue.ref<boolean>(false);
 const isApprovingOnBehalf = window.Vue.ref<boolean>(false);
+const isRenotifying = window.Vue.ref<boolean>(false);
 const resetModalOpen = window.Vue.ref<boolean>(false);
 const studentsToReset = window.Vue.ref<Pick<StudentRow, "id" | "userId" | "name">[]>([]);
 
@@ -226,7 +228,7 @@ async function handleCompletePreparation(studentIds: number[]): Promise<void> {
         const removedIds = new Set(studentIds);
         const completedStudents = preparation.value
             .filter((s) => removedIds.has(s.id))
-            .map((s) => ({ ...s, stage: "unconfirmed" as const }));
+            .map((s) => ({ ...s, stage: "unconfirmed" as const, renotifyEndpoint }));
         preparation.value = preparation.value.filter((s) => !removedIds.has(s.id));
         unconfirmed.value = [...completedStudents, ...unconfirmed.value];
         clearSelection();
@@ -430,6 +432,41 @@ async function handleApproveOnBehalf(students: StudentRow[]): Promise<void> {
     }
 }
 
+/**
+ * Renotifies the given unconfirmed students via the session-level renotify endpoint.
+ * @param students The students to renotify.
+ */
+async function handleRenotifySelected(students: StudentRow[]): Promise<void> {
+    if (isRenotifying.value || !renotifyEndpoint || students.length === 0) return;
+    isRenotifying.value = true;
+
+    const toast = window.sbProps.toastActivate("Renotifying student(s)...");
+
+    try {
+        const response = await apiRequest<ApiRenotifyResponse, { studentIds: number[] }>({
+            url: renotifyEndpoint,
+            method: "POST",
+            body: { studentIds: students.map((s) => s.userId) },
+        });
+
+        if (!response.success) {
+            toast.timeout({ text: response.message ?? "Failed to renotify student(s).", isSuccess: false });
+            return;
+        }
+
+        clearSelection();
+        toast.timeout({
+            text: response.data.message ?? `${students.length} student${students.length === 1 ? "" : "s"} renotified.`,
+            isSuccess: !response.data.partial,
+        });
+    } catch (e) {
+        console.error("Failed to renotify students", e);
+        toast.timeout({ text: "Failed to renotify student(s).", isSuccess: false });
+    } finally {
+        isRenotifying.value = false;
+    }
+}
+
 window.Vue.onMounted((): void => {
     void loadCandidates();
 });
@@ -480,6 +517,9 @@ window.Vue.onMounted((): void => {
                     :search-languages-endpoint="props.searchLanguagesEndpoint"
                     section="unconfirmed"
                     :active-selection-section="activeSelectionSection"
+                    @renotify-single="
+                        (userId) => handleRenotifySelected(unconfirmed.filter((s) => s.userId === userId))
+                    "
                     @approve-on-behalf-single="(id) => handleApproveOnBehalf(unconfirmed.filter((s) => s.id === id))"
                     @reset-details-single="(id) => promptResetDetails([id])"
                 />
@@ -535,9 +575,10 @@ window.Vue.onMounted((): void => {
                 confirmedSelected.length +
                 failedSelected.length
             "
-            :is-loading="isCompleting || isResetting || isManuallyRegistering || isApprovingOnBehalf"
+            :is-loading="isCompleting || isResetting || isManuallyRegistering || isApprovingOnBehalf || isRenotifying"
             :active-section="activeSelectionSection"
             @complete-preparation="handleCompletePreparation(preparationSelected.map((s) => s.id))"
+            @renotify="handleRenotifySelected(unconfirmedSelected)"
             @approve-on-behalf="handleApproveOnBehalf(unconfirmedSelected)"
             @reset-details="
                 promptResetDetails([...unconfirmedSelected, ...confirmedSelected, ...failedSelected].map((s) => s.id))
