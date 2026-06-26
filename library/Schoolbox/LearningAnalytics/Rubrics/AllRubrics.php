@@ -114,7 +114,15 @@ class AllRubrics
                     foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
                         if (!isset($manifest[$capabilityId]['indicators'][$indicatorId])) {
                             $manifest[$capabilityId]['indicators'][$indicatorId] = [
-                                'name' => $indicatorData['name'],
+                                /* Note that capability name is prepended to the indicator name for this particular usage
+                                 */
+                                'name' => sprintf(
+                                    '%s (%s): %s (%s)',
+                                    $capabilityData['name'],
+                                    $capabilityId,
+                                    $indicatorData['name'],
+                                    $indicatorId,
+                                ),
                                 /* Indicator Marks, if relevant
                                  */
                                 'published' => [

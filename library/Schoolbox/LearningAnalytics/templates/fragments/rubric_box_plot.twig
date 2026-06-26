@@ -1,9 +1,6 @@
 {#
     Renders a rubric box plot for the learning analytics page
 
-    Data:
-        studentMarksPerCriterion: float[][]         Indexed by criteria name, then student ID
-        students:                 Collection|User[] Indexed by user.id
 #}
 {% autoescape 'js' %}
 <script type="text/javascript">
@@ -25,42 +22,62 @@
              * five-point summaries
              */
             allAssessments: [
-                {% for criterionName, studentMarks in studentMarksPerCriterion %}
-                    "{{ criterionName }}"{% if not loop.last %},{% endif %}
+                {% for capabilityId, capabilityData in dataset %}
+                    {% for indicatorId, indicatorData in capabilityData.indicators %}
+                        "{{ indicatorData.name }}",
+                    {% endfor %}
                 {% endfor %}
             ],
 
             // All the raw data
-            allData: $.fn.boxPlotCalculateAllSeriesData([
-                {% for criterionName, studentMarks in studentMarksPerCriterion %}
-                    [
-                        {# Highcharts won't render without at least one data point #}
-                        {% if 0 == studentMarks | length %}
-                        {
-                            info: null,
-                            externalId: null,
-                            uid: null,
-                            value: -100
-                        }{% if false %},{% endif %} {# Just a hack to placate storm #}
-                        {% endif %}
-
-                        {% for studentId, studentMark in studentMarks %}
-                        {
-                            uid: Number("{{ studentId }}"),
-                            externalId: "{{ students[studentId].externalId }}",
-                            info: "{{ students[studentId].fullName }}",
-                            value: Number("{{ studentMark }}")
-
-                        }{% if not loop.last %},{% endif %}
+            allData: {
+                allGraphData: [
+                    {% for capabilityId, capabilityData in dataset %}
+                        {% for indicatorId, indicatorData in capabilityData.indicators %}
+                            {% if indicatorData.published.vals|length %}
+                                [
+                                    {{ indicatorData.published.statistics.min }},
+                                    {{ indicatorData.published.statistics.quartile1 }},
+                                    {{ indicatorData.published.statistics.quartile2 }},
+                                    {{ indicatorData.published.statistics.quartile3 }},
+                                    {{ indicatorData.published.statistics.max }}
+                                ],
+                            {% endif %}
                         {% endfor %}
+                    {% endfor %}
+                ],
+                allOutliers: []
+            }
+            {#allData: $.fn.boxPlotCalculateAllSeriesData([#}
+            {#    {% for criterionName, studentMarks in studentMarksPerCriterion %}#}
+            {#        [#}
+            {#            #}{# Highcharts won't render without at least one data point #}
+            {#            {% if 0 == studentMarks | length %}#}
+            {#            {#}
+            {#                info: null,#}
+            {#                externalId: null,#}
+            {#                uid: null,#}
+            {#                value: -100#}
+            {#            }{% if false %},{% endif %} #}{# Just a hack to placate storm #}
+            {#            {% endif %}#}
 
-                    ]{% if not loop.last %},{% endif %}
-                {% endfor %}
-            ])
+            {#            {% for studentId, studentMark in studentMarks %}#}
+            {#            {#}
+            {#                uid: Number("{{ studentId }}"),#}
+            {#                externalId: "{{ students[studentId].externalId }}",#}
+            {#                info: "{{ students[studentId].fullName }}",#}
+            {#                value: Number("{{ studentMark }}")#}
+
+            {#            }{% if not loop.last %},{% endif %}#}
+            {#            {% endfor %}#}
+
+            {#        ]{% if not loop.last %},{% endif %}#}
+            {#    {% endfor %}#}
+            {#])#}
         });
     });
 </script>
 {% endautoescape %}
 
 
-<div data-graph="rubrics" style="height:{{ ((studentMarksPerCriterion | length)*40)+75 }}px"></div>
+<div data-graph="rubrics" style="height:{{ ((dataset | length) * 40) + 75 }}px"></div>

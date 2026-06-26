@@ -702,6 +702,7 @@ class CohortAnalysis
             $this->routeGenerator
         ))->buildMarkbookData(null, [], array_keys($unitImplAssessmentIds));
 
+//        new \Alaress_Probe((new AllRubrics($this->databaseInternal))->generate($assessments, $overallMarks));
         return (new AllRubrics($this->databaseInternal))->generate($assessments, $overallMarks);
     }
 
