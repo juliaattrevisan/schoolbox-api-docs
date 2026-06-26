@@ -27,7 +27,7 @@ const canExpand = window.Vue.computed(() => props.event.result.categories.length
 const hideStatusLabel = window.Vue.computed(() => {
     return (
         props.event.status === AiModerationStatus.NO_BEHAVIOUR_FLAGGED &&
-        props.event.result.overall_risk_level !== RiskLevel.NONE
+        props.event.result.overall_risk_level === RiskLevel.NONE
     );
 });
 
