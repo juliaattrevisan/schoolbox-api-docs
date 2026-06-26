@@ -28,6 +28,7 @@ use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Learning\MarkScheme\Factory;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
@@ -61,9 +62,9 @@ class OverallDataset
     /**
      * Build data required by both the HTML and CSV form of the rubric markbook.
      *
-     * @param Folder\Model $folder
-     * @param array        $request
-     * @param array        $assessmentIds
+     * @param Model|null $folder
+     * @param array $request
+     * @param array $assessmentIds
      * @return array 0: array A list of assessment data
      *               1: int[][] A list of IDs of students excluded from each
      *                  assessment, grouped by assessment ID
@@ -71,10 +72,10 @@ class OverallDataset
      *                  each student partaking
      *               3: array A summation of marks for each capability
      *
-     * @throws Mapper\Exception
-     * @throws Router\Exception\RouteNotFound
+     * @throws Exception
+     * @throws RouteNotFound
      */
-    public function buildMarkbookData(Folder\Model $folder, array $request, array $assessmentIds): array
+    public function buildMarkbookData(?Folder\Model $folder, array $request, array $assessmentIds): array
     {
         /* These are the filter selections that were used from the ui
          */
@@ -101,7 +102,14 @@ class OverallDataset
          * This process is repeated twice, almost verbatim, for published and draft marks.
          * TODO find a way to dedupe all this insanity
          */
-        $studentMarks = $this->insertFolderMembers($folder);
+        $studentMarks = [];
+
+        /* If a folder wasn't provided, just accumulate users from the retrieve*Marks() methods; there isn't a mandatory
+         * or conclusive list of guys to start with in such a scenario
+         */
+        if (null !== $folder) {
+            $studentMarks = $this->insertFolderMembers($folder);
+        }
 
         /* Augment $studentMarks with published data
          */

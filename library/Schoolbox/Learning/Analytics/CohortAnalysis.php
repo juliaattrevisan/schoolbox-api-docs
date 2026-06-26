@@ -9,26 +9,40 @@
 
 namespace Schoolbox\Learning\Analytics;
 
+use Alaress\Database\Connector\IConnector;
+use Aura\Router\Exception\RouteNotFound;
+use Aura\Router;
+use Aura\Router\Generator;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Assessment\Rubric\Markbook\OverallDataset;
+use Schoolbox\Assessment\Term\Model;
 use Schoolbox\Collection;
+use Schoolbox\Column\Decimal;
+use Schoolbox\Filter;
+use Schoolbox\Filter\Mapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
-use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\LearningAnalytics\Rubrics\AllRubrics;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\User;
+use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
+use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\MarkScheme;
+use Schoolbox\Learning\MarkScheme\Factory;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Log\Model as FolderLog;
 use Schoolbox\Resource\Folder\Log\Mapper as FolderLogMapper;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\UserMapper;
-use Schoolbox\Learning\Assessment\WorkType;
+use Schoolbox\User;
+
 use Schoolbox\Assessment\Term;
+
 
 /**
  * Class CohortAnalysis
@@ -41,8 +55,9 @@ use Schoolbox\Assessment\Term;
  */
 class CohortAnalysis
 {
-    const INCOMPLETE = 0;
-    const COMPLETE = 1;
+    private const int INCOMPLETE = 0;
+    private const int COMPLETE = 1;
+
 
     /**
      * Indexed by unitSpec.id
@@ -51,6 +66,7 @@ class CohortAnalysis
      */
     private GenericCollection $unitSpecCache;
 
+
     /**
      * Folders relevant for retrieving hit counts from
      *
@@ -58,12 +74,14 @@ class CohortAnalysis
      */
     private GenericCollection $classFolderCache;
 
+
     /**
      * Indexed by user.id
      *
      * @var float[]
      */
     private array $courseGrades = [];
+
 
     /**
      * Indexed by assessment.id, then user.id
@@ -74,6 +92,7 @@ class CohortAnalysis
      */
     private array $assessmentGrades = [];
 
+
     /**
      * Indexed by unitSpec.id, assessment.id, user.id
      *
@@ -82,6 +101,7 @@ class CohortAnalysis
      * @var float[][][]|null[][][]
      */
     private array $grades = [];
+
 
     /**
      * Indexed by unitSpec.id, assessment.id, user.id
@@ -92,15 +112,18 @@ class CohortAnalysis
      */
     private array $completions = [];
 
+
     /**
      * @var float[][] indexed by unitSpec.id, then user.id
      */
     private array $unitProgress = [];
 
+
     /**
      * @var float[] indexed by user.id
      */
     private array $courseProgress = [];
+
 
     /**
      * Average progress for all students in the course/class
@@ -109,6 +132,7 @@ class CohortAnalysis
      */
     private float $averageCourseProgress;
 
+
     /**
      * Most advanced student progress in the course/class
      *
@@ -116,12 +140,14 @@ class CohortAnalysis
      */
     private float $highestCourseProgress;
 
+
     /**
      * All students participating in the class/course - indexed by user.id
      *
      * @var GenericCollection<User> $userCache
      */
     private GenericCollection $userCache;
+
 
     /**
      * Aggregated Assessments, indexed by assessment.ID, sorted by sequence, then title
@@ -131,35 +157,32 @@ class CohortAnalysis
      */
     private Collection $assessmentCache;
 
-    /**
-     * If non-null, filter results for box-plot of DueWork that does not match this type
-     *
-     * @var null|WorkType\Model
-     */
-    private ?WorkType\Model $submissionTypeResultFilter;
-
-    /**
-     * Are we filtering from cohort down to class level?
-     * @var null|Folder
-     */
-    private ?Folder $classFolder;
-
 
     /**
      * You need to have FULLY hydrated and linked up your units.
      * This class depends on all unit, assessment, participation, response and feedback references being fully accounted for.
      *
      * @param Collection<IAssessable> $dueAssessments IAssessable implementations due in selected Term and cohort/class
-     * @param Folder|null             $classFolder
-     * @param null|WorkType\Model     $resultFilter   If supplied, filter results for box-plot of DueWork that does not match this type
-     * @throws \DomainException
+     * @param Factory $markSchemeFactory
+     * @param Mapper $filterMapper
+     * @param UserAccessMapper $userAccessMapper
+     * @param Generator $routeGenerator
+     * @param IConnector $databaseInternal
+     * @param Folder|null $classFolder Are we filtering from cohort down to class level?
+     * @param null|WorkType\Model $submissionTypeResultFilter If supplied, filter results for box-plot of DueWork that does not match this type
+     *                                                        If non-null, filter results for box-plot of DueWork that does not match this type
      * @todo inject mapper dependencies
      */
-    public function __construct(Collection $dueAssessments, ?Folder $classFolder = null, ?WorkType\Model $resultFilter = null)
-    {
-        $this->submissionTypeResultFilter = $resultFilter;
-        $this->classFolder                = $classFolder;
-
+    public function __construct(
+        Collection $dueAssessments,
+        private MarkScheme\Factory $markSchemeFactory,
+        private Filter\Mapper $filterMapper,
+        private UserAccessMapper $userAccessMapper,
+        private Router\Generator $routeGenerator,
+        private IConnector $databaseInternal,
+        private ?Folder $classFolder = null,
+        private ?WorkType\Model $submissionTypeResultFilter = null
+    ) {
         $this->buildCaches($dueAssessments);
         $this->aggregateAssessments($dueAssessments);
 
@@ -208,7 +231,6 @@ class CohortAnalysis
         // Sort the Assessments by sequence, then title
         $this->assessmentCache->sortByCallback([$this, 'compareAssessments'])->indexBy('id');
     }
-
 
 
     /**
@@ -648,13 +670,41 @@ class CohortAnalysis
      * (Cuts the same data as getCohortGradesByAssessment() but by indicators instead of assessment.)
      *
      * @param Collection<UnitImplementation> $unitImplementations
-     * @param Term\Model                      $term
+     * @param Model $term
      * @return array
+     * @throws MapperException
+     * @throws RouteNotFound
      */
     public function getCohortGradesByIndicator(Collection $unitImplementations, Term\Model $term)
     {
-        // exploit old class
-        return (new AllRubrics($unitImplementations, $term))->getRubricData();
+        /* Find all the activities inside each of the $unitImplementations
+         */
+        $unitImplAssessmentIds = [];
+
+        foreach ($unitImplementations as $unitImplementation) {
+            foreach ($unitImplementation->getAssessables() as $assessment) {
+                $unitImplAssessmentIds[$assessment->getId()] = true;
+            }
+        }
+
+        [
+            $assessments,
+            $exclusions,
+            $studentMarks,
+            $overallMarks
+        ] = (new OverallDataset(
+            $this->databaseInternal,
+            new Decimal(),
+            new MarkScheme\TotalMarkFractional(),
+            $this->markSchemeFactory,
+            $this->filterMapper,
+            $this->userAccessMapper,
+            $this->routeGenerator
+        ))->buildMarkbookData(null, [], array_keys($unitImplAssessmentIds));
+
+        return (new AllRubrics($this->databaseInternal))->generate($assessments, $exclusions, $studentMarks, $overallMarks);
+
+//        return (new AllRubrics($unitImplementations, $term))->getRubricData();
     }
 
 
