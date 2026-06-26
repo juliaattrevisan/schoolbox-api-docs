@@ -68,8 +68,20 @@ class AllRubrics
         foreach ($assessments as $assessmentId => $assessmentData) {
             foreach ($assessmentData['gridData'] as $rubricInstanceId => $rubricInstanceData) {
                 foreach ($rubricInstanceData['capabilities'] as $capabilityId => $capabilityData) {
-                    if (!isset($manifest[$capabilityId])) {
-                        $manifest[$capabilityId] = [
+                    /* This changes whether you wanted to index by capability id or by capability name, depending on
+                     * how you wanted to group similarly-named capability names and indicator names.
+                     *
+                     * I found that two capabilities with the same name, and same indicator names, all had different
+                     * identifiers: I'm not entirely sure how that came about, but it seems prevalent in this cohort
+                     * data. If they're the same capability name and same indicator name, I guess we *assumed* they
+                     * conceptually mean the same thing.
+                     *
+                     * If you really wanted to segregate this data, index by $capabilityId instead of $capabilityData['name']
+                     */
+                    $capabilityIndex = $capabilityData['name'];
+
+                    if (!isset($manifest[$capabilityIndex])) {
+                        $manifest[$capabilityIndex] = [
                             'name' => $capabilityData['name'],
                             /* Capability Marks, if relevant
                              */
@@ -96,16 +108,16 @@ class AllRubrics
                     }
 
                     foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
-                        if (!isset($manifest[$capabilityId]['indicators'][$indicatorId])) {
-                            $manifest[$capabilityId]['indicators'][$indicatorId] = [
+                        $indicatorIndex = $indicatorData['name'];
+
+                        if (!isset($manifest[$capabilityIndex]['indicators'][$indicatorIndex])) {
+                            $manifest[$capabilityIndex]['indicators'][$indicatorIndex] = [
                                 /* Note that capability name is prepended to the indicator name for this particular usage
                                  */
                                 'name' => sprintf(
-                                    '%s (%s): %s (%s)',
+                                    '%s: %s',
                                     $capabilityData['name'],
-                                    $capabilityId,
                                     $indicatorData['name'],
-                                    $indicatorId,
                                 ),
                                 /* Indicator Marks, if relevant
                                  */
@@ -156,28 +168,32 @@ class AllRubrics
     private function populateVals(array $manifest, array $overallMarks): array
     {
         foreach ($overallMarks as $capabilityId => $capabilityData) {
+            $capabilityIndex = $capabilityData['name'];
+
             foreach ($capabilityData['students'] as $studentId => $studentData) {
                 /* Only care about non-null values
                  */
                 if (null !== $studentData['published']['normalisedMark']) {
-                    $manifest[$capabilityId]['published']['vals'][] = $studentData['published']['normalisedMark'];
+                    $manifest[$capabilityIndex]['published']['vals'][] = $studentData['published']['normalisedMark'];
                 }
 
                 if (null !== $studentData['draft']['normalisedMark']) {
-                    $manifest[$capabilityId]['draft']['vals'][] = $studentData['draft']['normalisedMark'];
+                    $manifest[$capabilityIndex]['draft']['vals'][] = $studentData['draft']['normalisedMark'];
                 }
             }
 
             foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
+                $indicatorIndex = $indicatorData['name'];
+
                 foreach ($indicatorData['students'] as $studentId => $studentData) {
                     /* Only care about non-null values
                      */
                     if (null !== $studentData['published']['normalisedMark']) {
-                        $manifest[$capabilityId]['indicators'][$indicatorId]['published']['vals'][] = $studentData['published']['normalisedMark'];
+                        $manifest[$capabilityIndex]['indicators'][$indicatorIndex]['published']['vals'][] = $studentData['published']['normalisedMark'];
                     }
 
                     if (null !== $studentData['draft']['normalisedMark']) {
-                        $manifest[$capabilityId]['indicators'][$indicatorId]['draft']['vals'][] = $studentData['draft']['normalisedMark'];
+                        $manifest[$capabilityIndex]['indicators'][$indicatorIndex]['draft']['vals'][] = $studentData['draft']['normalisedMark'];
                     }
                 }
             }
