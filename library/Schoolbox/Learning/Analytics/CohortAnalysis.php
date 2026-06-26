@@ -683,7 +683,11 @@ class CohortAnalysis
 
         foreach ($unitImplementations as $unitImplementation) {
             foreach ($unitImplementation->getAssessables() as $assessment) {
-                $unitImplAssessmentIds[$assessment->getId()] = true;
+                /* only care about assessments that were due in $term
+                 */
+                if ($assessment->getDueAt()->between($term->getStart(), $term->getDisplayFinish())) {
+                    $unitImplAssessmentIds[$assessment->getId()] = true;
+                }
             }
         }
 
