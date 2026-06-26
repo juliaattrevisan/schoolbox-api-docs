@@ -18,6 +18,7 @@ const emit = defineEmits<{
 const componentId = window.Vue.useId();
 
 const isExpanded = window.Vue.ref<boolean>(false);
+const canExpand = window.Vue.computed(() => props.event.result.categories.length > 0);
 
 const timestamp = window.Vue.computed(() => {
     const date = window.dayjs(props.event.createdAt);
@@ -35,7 +36,7 @@ const STATUS_LABEL_CLASSES: Record<AiModerationStatus, string> = {
 </script>
 
 <template>
-    <li class="actions-small-2">
+    <li :class="`actions-small-${canExpand ? 2 : 1}`">
         <div class="list-item">
             <div class="card small-12">
                 <h3>
@@ -54,6 +55,7 @@ const STATUS_LABEL_CLASSES: Record<AiModerationStatus, string> = {
 
         <nav>
             <button
+                v-if="canExpand"
                 type="button"
                 class="sbx-icon-only-button"
                 :aria-expanded="isExpanded"
