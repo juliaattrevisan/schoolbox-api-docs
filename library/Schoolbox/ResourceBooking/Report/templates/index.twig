@@ -254,12 +254,13 @@
                                 </a>
                             {% endif %}
                         </td>
-                        <td>
+                        {% set statusSort = booking is empty ? 'Timetabled' : booking.getStatus().getName() %}
+                        <td data-sort="{{ statusSort }}">
                             {% if booking is empty %}
-                                &nbsp;
+                                <sbx-label text="Timetabled" sentiment="neutral"></sbx-label>
                             {% else %}
                                 {% set status = booking.getStatus() %}
-                                {% set statusSentiment = status.isApproved() ? 'success' : (status.isPending() ? 'warning' : 'neutral') %}
+                                {% set statusSentiment = status.isApproved() ? 'success' : (status.isPending() ? 'warning' : 'alert') %}
                                 <sbx-label text="{{ status.getName() }}" sentiment="{{ statusSentiment }}"></sbx-label>
                             {% endif %}
                         </td>
