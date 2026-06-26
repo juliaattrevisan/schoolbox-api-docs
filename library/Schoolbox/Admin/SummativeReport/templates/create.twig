@@ -135,17 +135,68 @@
             },
         });
 
-        $('#report-students').userSelectizeSelector({
-            multiple: true,
-            value: {{ options.students|json_encode|raw }},
-            ajax: {
-                data: {
-                    roleTypeID: 'student',
-                },
-            },
-            selectize: {
-                placeholder: 'Search students',
-            },
+        const reportStudentsSearch = document.getElementById('report-students-search-component');
+        const reportStudentsValue = document.getElementById('report-students');
+        const reportStudentsHiddenFields = document.getElementById('report-students-hidden-fields');
+
+        function normaliseSearchSelectSelection(eventDetail) {
+            if (Array.isArray(eventDetail) && Array.isArray(eventDetail[0])) {
+                return eventDetail[0];
+            }
+            return Array.isArray(eventDetail) ? eventDetail : [];
+        }
+
+        function syncReportStudentFields(selectedStudents) {
+            const studentIds = selectedStudents.map(function (student) {
+                return student.id;
+            });
+
+            reportStudentsValue.value = studentIds.join(',');
+            reportStudentsHiddenFields.innerHTML = '';
+
+            studentIds.forEach(function (studentId) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'students[]';
+                input.value = studentId;
+                reportStudentsHiddenFields.appendChild(input);
+            });
+        }
+
+        function mergeReportStudentSelection(students) {
+            const selectedById = new Map();
+            normaliseSearchSelectSelection(reportStudentsSearch.selected).forEach(function (student) {
+                selectedById.set(String(student.id), student);
+            });
+            students.forEach(function (student) {
+                selectedById.set(String(student.id), student);
+            });
+
+            reportStudentsSearch.selected = Array.from(selectedById.values());
+            syncReportStudentFields(reportStudentsSearch.selected);
+        }
+
+        reportStudentsSearch.endpoint = '{{ routeLookup('adminSummativeReport.getStudents') }}';
+        reportStudentsSearch.formValueName = 'studentsSearchSelected';
+        reportStudentsSearch.manageSearchResponse = true;
+        reportStudentsSearch.placeholder = 'Search students, or paste usernames/external IDs';
+        reportStudentsSearch.selected = {{ options.students|json_encode|raw }};
+        syncReportStudentFields(reportStudentsSearch.selected);
+
+        function handleReportStudentSearchResponse(event) {
+            const results = normaliseSearchSelectSelection(event.detail);
+            reportStudentsSearch.results = results;
+
+            if (results.length && results.every(function (item) { return item.list_match; })) {
+                mergeReportStudentSelection(results);
+            }
+        }
+
+        reportStudentsSearch.addEventListener('search-response', handleReportStudentSearchResponse);
+        reportStudentsSearch.addEventListener('searchResponse', handleReportStudentSearchResponse);
+
+        reportStudentsSearch.addEventListener('update:selected', function (event) {
+            syncReportStudentFields(normaliseSearchSelectSelection(event.detail));
         });
 
         /* Dynamically enable sections
@@ -449,8 +500,17 @@
                                     <input type="text" id="report-campuses" name="campuses" />
                                 </div>
                                 <div class="small-12 columns">
-                                    <label for="report-students">Students</label>
-                                    <input type="text" id="report-students" name="students" />
+                                    <label for="report-students-search">Students</label>
+                                    <input type="hidden" id="report-students" />
+                                    <div id="report-students-hidden-fields"></div>
+                                    <sbx-search-select
+                                        id="report-students-search-component"
+                                        label-id="report-students-search"
+                                        endpoint="{{ routeLookup('adminSummativeReport.getStudents') }}"
+                                        form-value-name="studentsSearchSelected"
+                                        manage-search-response="true"
+                                        placeholder="Search students, or paste usernames/external IDs"
+                                    ></sbx-search-select>
                                 </div>
                             </div>
                         </div>
