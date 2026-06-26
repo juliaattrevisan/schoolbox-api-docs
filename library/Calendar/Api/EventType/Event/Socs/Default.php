@@ -162,8 +162,8 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
         }
 
         return [
-            'startdate' => (new Alaress_Date_Format($startTimestamp, 'U'))->getUsingFormat(Registry::SOCS_DATE_FORMAT),
-            'enddate' => (new Alaress_Date_Format($endTimestamp, 'U'))->getUsingFormat(Registry::SOCS_DATE_FORMAT),
+            'startdate' => Alaress_Date_Format::newFromTimestamp($startTimestamp)->getUsingFormat(Registry::SOCS_DATE_FORMAT),
+            'enddate' => Alaress_Date_Format::newFromTimestamp($endTimestamp)->getUsingFormat(Registry::SOCS_DATE_FORMAT),
         ];
     }
 
