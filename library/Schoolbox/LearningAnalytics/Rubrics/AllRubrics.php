@@ -15,6 +15,7 @@ use Schoolbox\Assessment\Rubric\Markbook\OverallDataset;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Column\Decimal;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Analytics\BoxPlot\Summary;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 
 class AllRubrics
@@ -43,7 +44,6 @@ class AllRubrics
      * @param array $studentMarks
      * @param array $overallMarks
      * @return array
-     * @throws DebugBarException
      */
     public function generate(
         array $assessments,
@@ -66,7 +66,11 @@ class AllRubrics
          */
         $manifest = $this->populateVals($manifest, $overallMarks);
 
-        return [];
+        /* Calculate boxplot data
+         */
+        $manifest = $this->calculateStats($manifest);
+
+        return $manifest;
     }
 
 
@@ -188,6 +192,28 @@ class AllRubrics
                         $manifest[$capabilityId]['indicators'][$indicatorId]['draft']['vals'][] = $studentData['draft']['normalisedMark'];
                     }
                 }
+            }
+        }
+
+        return $manifest;
+    }
+
+
+    /**
+     * Calculate John Turkey boxplot summaries in place
+     *
+     * @param array $manifest
+     * @return array
+     */
+    private function calculateStats(array $manifest): array
+    {
+        foreach ($manifest as $capabilityId => &$capabilityData) {
+            $capabilityData['published']['statistics'] = (new Summary($capabilityData['published']['vals']))->getSummary();
+            $capabilityData['draft']['statistics'] = (new Summary($capabilityData['draft']['vals']))->getSummary();
+
+            foreach ($capabilityData['indicators'] as $indicatorId => &$indicatorData) {
+                $indicatorData['published']['statistics'] = (new Summary($indicatorData['published']['vals']))->getSummary();
+                $indicatorData['draft']['statistics'] = (new Summary($indicatorData['draft']['vals']))->getSummary();
             }
         }
 
