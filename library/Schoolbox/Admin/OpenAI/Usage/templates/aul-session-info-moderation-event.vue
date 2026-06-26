@@ -17,7 +17,7 @@ const emit = defineEmits<{
 
 const componentId = window.Vue.useId();
 
-const isExpanded = window.Vue.ref<boolean>(true);
+const isExpanded = window.Vue.ref<boolean>(false);
 
 const timestamp = window.Vue.computed(() => {
     const date = window.dayjs(props.event.createdAt);
@@ -75,7 +75,7 @@ const STATUS_LABEL_CLASSES: Record<AiModerationStatus, string> = {
             />
         </ul>
 
-        <article v-show="isExpanded">{{ props.event.result.summary }}</article>
+        <article>{{ props.event.result.summary }}</article>
     </li>
 
     <li v-for="category in props.event.result.categories" v-show="isExpanded" :key="category.category" class="child">
