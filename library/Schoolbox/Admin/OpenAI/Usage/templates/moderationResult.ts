@@ -2,7 +2,7 @@
  * The highest risk level identified across the full interaction by the AI Interaction Moderation agent.
  * @see /library/Schoolbox/OpenAi/Moderation/Result/RiskLevel.php
  */
-enum RiskLevel {
+export enum RiskLevel {
     NONE = "none",
     LOW = "low",
     MEDIUM = "medium",
@@ -11,11 +11,11 @@ enum RiskLevel {
 }
 
 export const RISK_LEVEL_LABELS: Record<RiskLevel, string> = {
-    [RiskLevel.NONE]: "None",
-    [RiskLevel.LOW]: "Low",
-    [RiskLevel.MEDIUM]: "Medium",
-    [RiskLevel.HIGH]: "High",
-    [RiskLevel.CRITICAL]: "Critical",
+    [RiskLevel.NONE]: "No Behaviour Flagged",
+    [RiskLevel.LOW]: "Low Risk",
+    [RiskLevel.MEDIUM]: "Medium Risk",
+    [RiskLevel.HIGH]: "High Risk",
+    [RiskLevel.CRITICAL]: "Critical Risk",
 };
 
 /**
