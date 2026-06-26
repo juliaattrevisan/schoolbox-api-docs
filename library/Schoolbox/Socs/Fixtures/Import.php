@@ -27,7 +27,7 @@ use Symfony\Component\Lock\LockInterface;
  */
 class Import implements IStrategy
 {
-    private const string FIXTURES_PATH = '/school/xml/SOCScalendar.ashx';
+    private const string FIXTURES_PATH = '/school/xml/fixturecalendar.ashx';
 
     /**
      * SOCS - Standard Fixture Feed
