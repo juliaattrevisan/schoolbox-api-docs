@@ -38,6 +38,10 @@
 }
 
 body.sbx-body {
+    .form-error {
+        color: var(--sbx-color-alert, #ea0a06);
+    }
+
     label,
     label.checkbox-label,
     &.body.login input[type="checkbox"]:not(.plain) + label {
