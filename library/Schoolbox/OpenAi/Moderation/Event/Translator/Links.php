@@ -30,14 +30,17 @@ class Links extends AbstractLinks
 
         $translation['postDismissEvent'] = $this->getRouteIfAuthorized('adminAiModeration.postDismissEvent', [
             'eventId' => $event->getId(),
+            'event' => $event,
         ]);
 
         $translation['postConfirmEvent'] = $this->getRouteIfAuthorized('adminAiModeration.postConfirmEvent', [
             'eventId' => $event->getId(),
+            'event' => $event,
         ]);
 
         $translation['postResolveEvent'] = $this->getRouteIfAuthorized('adminAiModeration.postResolveEvent', [
             'eventId' => $event->getId(),
+            'event' => $event,
         ]);
 
         return $translation;

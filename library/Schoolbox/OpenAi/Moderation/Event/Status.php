@@ -42,4 +42,56 @@ enum Status: string
      * (workflow would be: event received as REQUIRES_ATTENTION -> deemed as FURTHER_ACTION_REQUIRED -> resolved to FURTHER_ACTION_TAKEN).
      */
     case FURTHER_ACTION_TAKEN = 'further_action_taken';
+
+    /* State Transitions */
+
+    /**
+     * "Mark as No Action Required"
+     * Whether an event with this status can be dismissed (transitioned to NO_ACTION_REQUIRED).
+     *
+     * @return bool
+     */
+    public function canBeDismissed(): bool
+    {
+        return \in_array($this, [
+            // to allow schools to manually review non-flagged events and dismiss them if they are fine
+            self::NO_BEHAVIOUR_FLAGGED,
+            // usual workflow, dismiss a flagged event
+            self::REQUIRES_ATTENTION,
+            // a staff at some point deemed further action was required, but then someone decided it was actually fine
+            self::FURTHER_ACTION_REQUIRED,
+        ]);
+    }
+
+    /**
+     * "Request Further Action"
+     * Whether an event with this status can be confirmed (transitioned to FURTHER_ACTION_REQUIRED).
+     *
+     * @return bool
+     */
+    public function canBeConfirmed(): bool
+    {
+        return \in_array($this, [
+            // to allow schools to manually review non-flagged events and confirm them if they are problematic
+            self::NO_BEHAVIOUR_FLAGGED,
+            // usual workflow, confirm a flagged event
+            self::REQUIRES_ATTENTION,
+            // this was marked as dismissed, but then someone decided that further action is still required
+            self::NO_ACTION_REQUIRED,
+            // this was already marked as resolved, but then someone decided that further action is still required
+            self::FURTHER_ACTION_TAKEN,
+        ]);
+    }
+
+    /**
+     * "Mark as Resolved"
+     * Whether an event with this status can be resolved (transitioned to FURTHER_ACTION_TAKEN).
+     *
+     * @return bool
+     */
+    public function canBeResolved(): bool
+    {
+        // only events that have been confirmed as requiring further action can be resolved (must go thru the workflow first)
+        return $this === self::FURTHER_ACTION_REQUIRED;
+    }
 }
