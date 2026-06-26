@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useSelectedList } from "@schoolboxVue/composables/form/useSelectedList";
 import IbReportSubjectLabels from "./ib-report-subject-labels.vue";
 import { useIbReportUpdateLanguageStore } from "../store/ibReportUpdateLanguageStore";
 import type { FailedRow, StudentRow } from "../../js/types/ibReportTypes";
@@ -9,26 +10,9 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const selectedList = defineModel<FailedRow[]>("selectedList", { default: () => [] });
-
-const isAllSelected = window.Vue.computed<boolean>(
-    () => props.students.length > 0 && selectedList.value.length === props.students.length,
-);
-
-const isSomeSelected = window.Vue.computed<boolean>(
-    () => selectedList.value.length > 0 && selectedList.value.length < props.students.length,
-);
-
-/**
- * Toggles selection of all students in this section.
- */
-function toggleSelectAll(): void {
-    if (isAllSelected.value) {
-        selectedList.value = [];
-    } else {
-        selectedList.value = [...props.students];
-    }
-}
+const selectedListModel = defineModel<FailedRow[]>("selectedList", { default: () => [] });
+const students = window.Vue.toRef(props, "students");
+const { selectedList, allSelected, isIndeterminate, showCheckboxes } = useSelectedList(students, selectedListModel);
 
 const emit = defineEmits<{
     resetDetailsSingle: [studentId: number];
@@ -51,20 +35,21 @@ function openModal(student: FailedRow): void {
         <thead>
             <tr>
                 <th scope="col" class="checklist">
-                    <template v-if="props.activeSelectionSection === null || props.activeSelectionSection === 'failed'">
-                        <span class="select-all-container">
-                            <input
-                                id="select-all-failed"
-                                type="checkbox"
-                                :checked="isAllSelected"
-                                :class="{ indeterminate: isSomeSelected }"
-                                aria-label="Select all"
-                                @change="toggleSelectAll"
-                            /><label class="checkbox-label" for="select-all-failed"></label>
-                            <span>Select all</span>
-                        </span>
-                    </template>
-                    <span v-else class="sr-only">Select</span>
+                    <span
+                        v-if="
+                            showCheckboxes &&
+                            (props.activeSelectionSection === null || props.activeSelectionSection === 'failed')
+                        "
+                        class="select-all-container"
+                    >
+                        <input
+                            id="select-all-failed"
+                            v-model="allSelected"
+                            type="checkbox"
+                            :class="{ indeterminate: isIndeterminate }"
+                            aria-label="Select all"
+                        /><label class="checkbox-label" for="select-all-failed"></label>
+                    </span>
                 </th>
                 <th scope="col">Name</th>
                 <th scope="col">Candidate Details</th>
