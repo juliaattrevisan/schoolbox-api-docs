@@ -258,7 +258,9 @@
                             {% if booking is empty %}
                                 &nbsp;
                             {% else %}
-                                {{ booking.getStatus().getName() }}
+                                {% set status = booking.getStatus() %}
+                                {% set statusSentiment = status.isApproved() ? 'success' : (status.isPending() ? 'warning' : 'neutral') %}
+                                <sbx-label text="{{ status.getName() }}" sentiment="{{ statusSentiment }}"></sbx-label>
                             {% endif %}
                         </td>
                         <td>
