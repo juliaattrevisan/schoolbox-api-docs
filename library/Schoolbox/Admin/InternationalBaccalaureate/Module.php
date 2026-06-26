@@ -58,6 +58,7 @@ class Module extends BaseModule
         $ruleIBConfirmingDetailsPerms = new Rule\Any(
             $ruleIBCoordinatorAccess,
             new Rule\All(
+                $ibEnabled,
                 new Rule\IsLoggedIn(),
                 new Rule\Callback(function (array $params, User $user) {
                     if (!$user->getRole()->isStudent() || $user->getId() !== (int)$params['studentId']) {
