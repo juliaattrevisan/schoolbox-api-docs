@@ -3,6 +3,7 @@ import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import RelativeTime from "@schoolboxVue/components/relativeTime/relative-time.vue";
 import { AiLogFormat } from "./payload";
 import type { AiFeature, AiSession, AiSessionLogApiResponse } from "./payload";
+import type { AiModerationEvent } from "./moderationEvent";
 import AulAgentChat from "./aul-agent-chat.vue";
 import AulSessionInfoModerationEvent from "./aul-session-info-moderation-event.vue";
 
@@ -15,6 +16,10 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const emit = defineEmits<{
+    (e: "updateModerationEvent", event: AiModerationEvent): void;
+}>();
 
 // TODO: properly support sessions with multiple log formats, for now just filter out invalid logs
 const filteredLogs = window.Vue.computed(() => {
@@ -90,6 +95,7 @@ function printSelectedSession(): void {
                 v-for="event in props.sessionInfo.moderationEvents"
                 :key="event.id"
                 :event="event"
+                @update-event="(updatedEvent) => emit('updateModerationEvent', updatedEvent)"
             />
         </ul>
 

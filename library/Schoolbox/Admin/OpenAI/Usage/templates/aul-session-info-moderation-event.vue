@@ -11,6 +11,10 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const emit = defineEmits<{
+    (e: "updateEvent", event: AiModerationEvent): void;
+}>();
+
 const componentId = window.Vue.useId();
 
 const isExpanded = window.Vue.ref<boolean>(true);
@@ -59,10 +63,16 @@ const STATUS_LABEL_CLASSES: Record<AiModerationStatus, string> = {
             >
                 <sbx-icon :name="isExpanded ? 'up-arrow' : 'down-arrow'"></sbx-icon>
             </button>
-            <sbx-pop-out :content-id="`aul-session-info-moderation-event-${componentId}`"></sbx-pop-out>
+            <sbx-pop-out
+                :content-id="`aul-session-info-moderation-event-${componentId}`"
+                is-close-on-content-click
+            ></sbx-pop-out>
         </nav>
         <ul :id="`aul-session-info-moderation-event-${componentId}`" class="f-dropdown" data-dropdown-content>
-            <aul-session-info-moderation-event-actions :event="props.event" />
+            <aul-session-info-moderation-event-actions
+                :event="props.event"
+                @update-event="(event) => emit('updateEvent', event)"
+            />
         </ul>
 
         <article v-show="isExpanded">{{ props.event.result.summary }}</article>

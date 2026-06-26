@@ -45,3 +45,11 @@ export type AiModerationEvent = {
         postResolveEvent?: string | null;
     };
 };
+
+/**
+ * The response returned by the moderation event state-transition endpoints
+ * @see /library/Schoolbox/Admin/OpenAI/Moderation/Controller.php
+ */
+export type AiModerationEventActionResponse = {
+    event: AiModerationEvent;
+};

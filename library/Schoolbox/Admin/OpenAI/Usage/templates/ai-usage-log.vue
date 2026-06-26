@@ -4,7 +4,7 @@ import type { PaginationMeta } from "@js/util/sbx/apiUtils";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 import { EMPTY_DATE } from "@schoolboxVue/components/dateTimePicker/datePickerTypes";
 import PaginatorButtons from "@schoolboxVue/components/paginator-buttons.vue";
-import type { AiModerationStatus } from "./moderationEvent";
+import type { AiModerationEvent, AiModerationStatus } from "./moderationEvent";
 import type {
     AiFeature,
     AiSession,
@@ -151,6 +151,25 @@ async function openSessionDetails(session: AiSession): Promise<void> {
 
     selectedSessionInfo.value = response.data;
 }
+
+/**
+ * session info, so the displayed data realigns with the event's new state.
+ * Update the stored moderation event data after an action
+ * @param event The updated moderation event data
+ */
+function applyModerationEventUpdate(event: AiModerationEvent): void {
+    if (!selectedSessionInfo.value) {
+        throw new Error("Unable to update moderation event without session info"); // shouldn't get here
+    }
+
+    const index = selectedSessionInfo.value.moderationEvents.findIndex((existing) => existing.id === event.id);
+    if (index === -1) {
+        throw new Error("Unable to find moderation event to update"); // shouldn't get here
+    }
+
+    // update like this to ensure reactivity is preserved
+    selectedSessionInfo.value.moderationEvents[index] = event;
+}
 </script>
 
 <template>
@@ -217,9 +236,10 @@ async function openSessionDetails(session: AiSession): Promise<void> {
             </div>
             <aul-session-info
                 v-if="selectedSession !== null"
+                v-model:session-info="selectedSessionInfo"
                 :session="selectedSession"
-                :session-info="selectedSessionInfo"
                 :features="props.features"
+                @update-moderation-event="applyModerationEventUpdate"
             />
         </div>
     </div>
