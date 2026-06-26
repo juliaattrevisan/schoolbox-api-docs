@@ -1,0 +1,71 @@
+{% if markbook.assessments | length %}
+    <div class="row">
+        <div class="small-12 island">
+            <section>
+                {% for unit in tree %}
+                    <ul class="activity-list expandable-card">
+                        <li>
+                            <div class="unit">
+                                <div class="expander icon-up-arrow" data-collapser="unit-{{ unit.context.id }}"></div>
+                                <div class="small-12 card">
+                                    <a href="/homepage/{{ unit.context.specification.folder.id ?? unit.context.folder.id }}" title="{{ unit.context.title }}">
+                                        <h3>{{ unit.context.title }}</h3>
+                                    </a>
+                                </div>
+                            </div>
+                            <div data-collapse-state="" data-collapsable="unit-{{ unit.context.id }}">
+                                <ul>
+                                    {% for assessment in unit.assessments %}
+                                        {% if assessment.assessments is defined and assessment.assessments | length %}
+                                        <li class="project">
+                                            {% include '@learningGrades/fragments/assessmentGrade.twig' with {
+                                                assessment:  assessment.assessment,
+                                                student:     student,
+                                                canViewInstructorMarks: canViewInstructorMarks,
+                                                effectiveViewer: effectiveViewer,
+                                                progressTicksReadOnly: progressTicksReadOnly
+                                            } only %}
+                                            <ul>
+                                                {% for projectAssessment in assessment.assessments %}
+                                                <li class="assessment">
+                                                    {% include '@learningGrades/fragments/assessmentGrade.twig' with {
+                                                        assessment:  projectAssessment,
+                                                        student:     student,
+                                                        canViewInstructorMarks: canViewInstructorMarks,
+                                                        effectiveViewer: effectiveViewer,
+                                                        progressTicksReadOnly: progressTicksReadOnly
+                                                    } only %}
+                                                </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </li>
+                                        {% else %}
+                                        <li class="assessment">
+                                            {% include '@learningGrades/fragments/assessmentGrade.twig' with {
+                                                assessment:  assessment.assessment,
+                                                student:     student,
+                                                canViewInstructorMarks: canViewInstructorMarks,
+                                                effectiveViewer: effectiveViewer,
+                                                progressTicksReadOnly: progressTicksReadOnly
+                                            } only %}
+                                        </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+                {% endfor %}
+            </section>
+        </div>
+    </div>
+{% else %}
+    <div class="row">
+        <div class="small-12 island">
+            <div class="empty-state">
+                <sbx-icon name="reporting" size="2.5rem"></sbx-icon>
+                <p>No activities match your filter selections.</p>
+            </div>
+        </div>
+    </div>
+{% endif %}
