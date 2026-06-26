@@ -236,6 +236,7 @@ class AllRubrics
     {
         return strnatcasecmp($a['name'], $b['name']);
     }
+}
 
 
     /* This used to be in the constructor ????!!!
@@ -312,5 +313,3 @@ class AllRubrics
 //    {
 //        return "{$grouping}: {$name}";
 //    }
-
-}

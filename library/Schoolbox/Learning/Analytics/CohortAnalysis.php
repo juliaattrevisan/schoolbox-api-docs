@@ -40,9 +40,7 @@ use Schoolbox\Resource\Folder\Log\Mapper as FolderLogMapper;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\UserMapper;
 use Schoolbox\User;
-
 use Schoolbox\Assessment\Term;
-
 
 /**
  * Class CohortAnalysis
