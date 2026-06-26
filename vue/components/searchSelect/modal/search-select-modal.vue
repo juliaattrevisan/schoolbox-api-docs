@@ -286,7 +286,7 @@ window.Vue.watch(isOpen, async (newIsOpen) => {
                         />
                     </div>
                 </div>
-                <sbx-label v-if="validationError" sentiment="alert" :text="validationError"></sbx-label>
+                <label v-if="validationError" class="error" :for="props.labelId">{{ validationError }}</label>
                 <ssm-footer :saved-selected="savedSelected" @cancel="onCancel" @select="onSelect" />
             </div>
         </basic-modal>
