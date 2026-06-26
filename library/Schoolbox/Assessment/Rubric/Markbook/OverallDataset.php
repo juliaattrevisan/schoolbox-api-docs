@@ -308,6 +308,7 @@ class OverallDataset
             WHERE {$whereClause}
             ORDER BY
                 a.due_date,
+                a.title,
                 vr.rubric_instance_id,
                 vr.capability_sequence,
                 vr.capability_id,

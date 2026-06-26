@@ -1048,7 +1048,7 @@ class DataSource
 
             // Create the cap mark
             $capabilityMarkScheme = $markSchemeFactory->spawnForCapability(
-                $feedback->getAssessable(),
+                $rubricInstance,
                 $capabilityUsage->getMaxValue()
             );
 

@@ -136,7 +136,7 @@ class Factory
                 $capabilityMark = new CapabilityMark(
                     $capabilityUsage,
                     $markSchemeFactory->spawnForCapability(
-                        $markedGrid->getGrid()->getAssessment(),
+                        $markedGrid->getGrid()->getRubricInstance(),
                         $capabilityUsage->getMaxValue(),
                     )
                 );
