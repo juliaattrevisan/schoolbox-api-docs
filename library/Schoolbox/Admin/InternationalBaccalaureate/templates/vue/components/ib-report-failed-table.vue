@@ -40,7 +40,6 @@ function openModal(student: FailedRow): void {
                             showCheckboxes &&
                             (props.activeSelectionSection === null || props.activeSelectionSection === 'failed')
                         "
-                        class="select-all-container"
                     >
                         <input
                             id="select-all-failed"
@@ -138,12 +137,6 @@ function openModal(student: FailedRow): void {
 <style scoped>
 .ib-report-error-message {
     color: var(--sbx-color-error, #c0392b);
-    font-size: 0.875rem;
-}
-
-.select-all-container {
-    align-items: center;
-    display: inline-flex;
-    gap: var(--sbx-size-xs, 0.5rem);
+    font-size: var(--sbx-font-size-xs, 0.875rem);
 }
 </style>

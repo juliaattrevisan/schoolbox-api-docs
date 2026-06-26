@@ -45,7 +45,6 @@ function openModal(student: StudentRow): void {
                             showCheckboxes &&
                             (props.activeSelectionSection === null || props.activeSelectionSection === props.section)
                         "
-                        class="select-all-container"
                     >
                         <input
                             :id="`select-all-${props.section}`"
