@@ -59,9 +59,6 @@ export default class QualificationList {
     /** Visible label for the Diploma Programme Year 2 option */
     static readonly SYSTEM_PURPOSE_DIPLOMA = "Diploma Programme Year 2 [DIPLOMA]";
 
-    /** Visible label for the Diploma Programme Year 1 (Anticipated) option */
-    static readonly SYSTEM_PURPOSE_ANTICIPATED = "Diploma Programme Year 1 [ANTICIPATED]";
-
     /** Visible label for the Diploma Course option */
     static readonly SYSTEM_PURPOSE_COURSE = "Diploma Course [COURSE]";
 
@@ -329,7 +326,6 @@ export default class QualificationList {
         const options = await this.getSystemPurposeOptionsInRow(rowIndex);
         expect(options).toContain(QualificationList.SYSTEM_PURPOSE_NOT_SELECTED);
         expect(options).toContain(QualificationList.SYSTEM_PURPOSE_DIPLOMA);
-        expect(options).toContain(QualificationList.SYSTEM_PURPOSE_ANTICIPATED);
         expect(options).toContain(QualificationList.SYSTEM_PURPOSE_COURSE);
     }
 
