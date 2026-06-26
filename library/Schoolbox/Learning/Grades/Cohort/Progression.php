@@ -317,44 +317,44 @@ class Progression
         $assessmentList = [];
         $markSchemeFactory = new MarkSchemeFactory();
 
-        while ($row = $descriptorStatement->fetch(\PDO::FETCH_ASSOC)) {
-            /* TODO figure out what this screen does
-             */
-            continue;
-
-            $specificationId = $this->tuples[$row['assessment_id']];
-
-            $longitude[$row['capability_id']]['name']                        = $row['capability_name'];
-            $longitude[$row['capability_id']]['value'][$specificationId]     = $row['capability_value'];
-            $longitude[$row['capability_id']]['mark_type'][$specificationId] = $row['mark_type'];
-            $longitude[$row['capability_id']]['max_value'][$specificationId] = $row['capability_max_value'];
-
-            // Create the cap mark
-            if (!isset($longitude[$row['capability_id']]['mark'][$specificationId]) && $row['capability_max_value'] > 0 && isset($this->assessments[$row['assessment_id']])) {
-                $longitude[$row['capability_id']]['mark'][$specificationId] = $markSchemeFactory->spawnForCapability(
-                    // $this->assessments[$row['assessment_id']],
-
-                    /* TODO somehow slap in a Rubric Instance somehow
-                     */
-
-                    (float)$row['capability_max_value']
-                )->getHumanReadableMark(($row['capability_value'] / $row['capability_max_value']) * 100);
-            }
-
-            $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['name'] = $row['indicator_name'];
-
-            $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['activities'][$specificationId] = [
-                'name' => $row['assessment_title'],
-                'rubric_capability_mark_type_id' => $row['rubric_capability_mark_type_id'],
-                'descriptor' => $row['description'],
-                'level' => $row['level'],
-                'max_value' => $row['max_value'],
-                'value' => $row['value'],
-            ];
-
-            $assessmentList[$specificationId]['name'] = $row['assessment_title'];
-            $assessmentList[$specificationId]['rubric_capability_mark_type_id'] = $row['rubric_capability_mark_type_id'];
-        }
+//        while ($row = $descriptorStatement->fetch(\PDO::FETCH_ASSOC)) {
+//            /* TODO figure out what this screen does
+//             */
+//            continue;
+//
+//            $specificationId = $this->tuples[$row['assessment_id']];
+//
+//            $longitude[$row['capability_id']]['name']                        = $row['capability_name'];
+//            $longitude[$row['capability_id']]['value'][$specificationId]     = $row['capability_value'];
+//            $longitude[$row['capability_id']]['mark_type'][$specificationId] = $row['mark_type'];
+//            $longitude[$row['capability_id']]['max_value'][$specificationId] = $row['capability_max_value'];
+//
+//            // Create the cap mark
+//            if (!isset($longitude[$row['capability_id']]['mark'][$specificationId]) && $row['capability_max_value'] > 0 && isset($this->assessments[$row['assessment_id']])) {
+//                $longitude[$row['capability_id']]['mark'][$specificationId] = $markSchemeFactory->spawnForCapability(
+//                    // $this->assessments[$row['assessment_id']],
+//
+//                    /* TODO somehow slap in a Rubric Instance somehow
+//                     */
+//
+//                    (float)$row['capability_max_value']
+//                )->getHumanReadableMark(($row['capability_value'] / $row['capability_max_value']) * 100);
+//            }
+//
+//            $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['name'] = $row['indicator_name'];
+//
+//            $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['activities'][$specificationId] = [
+//                'name' => $row['assessment_title'],
+//                'rubric_capability_mark_type_id' => $row['rubric_capability_mark_type_id'],
+//                'descriptor' => $row['description'],
+//                'level' => $row['level'],
+//                'max_value' => $row['max_value'],
+//                'value' => $row['value'],
+//            ];
+//
+//            $assessmentList[$specificationId]['name'] = $row['assessment_title'];
+//            $assessmentList[$specificationId]['rubric_capability_mark_type_id'] = $row['rubric_capability_mark_type_id'];
+//        }
 
         $longitude['assessments'] = $assessmentList;
 
