@@ -115,7 +115,7 @@ class Factory
                 $venueMapper,
                 $teamMapper,
             ))
-            ->add(new Fixtures\Import(  // its own special endpoint `fixturecalendar.ashx`, which contains teams, venues, and matchups for the season
+            ->add(new Fixtures\Import(  // its own special endpoint `/school/xml/SOCScalendar.ashx`, which contains teams, venues, and matchups for the season
                 $this->log,
                 $this->perform,
                 $this->lock,
