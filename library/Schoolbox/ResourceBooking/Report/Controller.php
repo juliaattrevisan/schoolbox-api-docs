@@ -19,6 +19,7 @@ use Calendar_Api_Composite;
 use Schoolbox\GenericCollection;
 use Calendar\Event\Type\Day\Event as Event;
 use Schoolbox\ResourceBooking\Booking\CapacityAllocation;
+use Schoolbox\ResourceBooking\Booking\Status\Model as BookingStatus;
 use Schoolbox\ResourceBooking\Category;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\ResourceBooking\Item\Mapper;
@@ -113,14 +114,41 @@ class Controller extends Base
         }
 
         // Build the list of events (slowly)
-        $showClasses = $this->requestQuery->getBool('classes', true);
+        $statusOptions = [
+            BookingStatus::STATUS_APPROVED,
+            BookingStatus::STATUS_PENDING,
+            BookingStatus::STATUS_REJECTED,
+            'timetabled',
+        ];
+        $selectedStatuses = (array) $this->requestQuery->get('status', []);
+        if (empty($selectedStatuses)) {
+            $selectedStatuses = [
+                BookingStatus::STATUS_APPROVED,
+                BookingStatus::STATUS_PENDING,
+                'timetabled',
+            ];
+        }
+        $selectedStatuses = array_values(array_intersect($statusOptions, array_map(
+            static fn ($status) => is_numeric($status) ? (int) $status : $status,
+            $selectedStatuses
+        )));
+        $showTimetabled = in_array('timetabled', $selectedStatuses, true);
+        $selectedBookingStatuses = array_values(array_filter(
+            $selectedStatuses,
+            static fn ($status): bool => is_int($status)
+        ));
+        if (empty($selectedBookingStatuses)) {
+            // An empty status list means no filter, so use a non-matching status for Timetabled-only searches.
+            $selectedBookingStatuses = [0];
+        }
         $clashesOnly = $this->requestQuery->getBool('clashesOnly', false);
         $capacityAllocation = new CapacityAllocation();
 
         $this->api->add(
             $this->apiFactory->buildFromResourceCollection(
                 $resources,
-                $showClasses
+                $showTimetabled,
+                $selectedBookingStatuses
             )
         );
 
@@ -218,7 +246,7 @@ class Controller extends Base
                     'start'        => $start,
                     'end'          => $end,
                     'category'     => $selectedCategories,
-                    'classes'      => $showClasses,
+                    'status'       => $selectedStatuses,
                     'clashesOnly'  => $clashesOnly,
                 ],
             ],

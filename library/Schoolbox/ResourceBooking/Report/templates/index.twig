@@ -150,19 +150,22 @@
                     </div>
 
                     <div class="small-6 columns">
+                        <fieldset>
+                            <legend>Status</legend>
+                            <ul class="option-list">
+                                <li><input id="status-approved-checkbox" type="checkbox" name="status[]" value="2" {% if 2 in search.status %}checked{% endif %} /><label for="status-approved-checkbox" class="checkbox-label">Approved</label></li>
+                                <li><input id="status-pending-checkbox" type="checkbox" name="status[]" value="1" {% if 1 in search.status %}checked{% endif %} /><label for="status-pending-checkbox" class="checkbox-label">Pending</label></li>
+                                <li><input id="status-rejected-checkbox" type="checkbox" name="status[]" value="3" {% if 3 in search.status %}checked{% endif %} /><label for="status-rejected-checkbox" class="checkbox-label">Rejected</label></li>
+                                <li><input id="status-timetabled-checkbox" type="checkbox" name="status[]" value="timetabled" {% if 'timetabled' in search.status %}checked{% endif %} /><label for="status-timetabled-checkbox" class="checkbox-label">Timetabled</label></li>
+                            </ul>
+                        </fieldset>
+
                         <fieldset class="radiolist">
                             <legend>Clashes</legend>
                             <ul class="option-list">
                                 <li><input type="radio" name="clashesOnly" value="0" id="clashesAllOption" {% if not search.clashesOnly %}checked{% endif %}><label for="clashesAllOption">Show All Bookings</label></li>
                                 <li><input type="radio" name="clashesOnly" value="1" id="clashesOnlyOption" {% if search.clashesOnly %}checked{% endif %} ><label for="clashesOnlyOption">Only Show Conflicting Booking Requests</label></li>
                             </ul>
-                        </fieldset>
-
-                        <fieldset>
-                            <legend>Classes</legend>
-                            <input type="hidden" name="classes" value="0" />
-                            <input id='show-classes-checkbox' type="checkbox" name="classes" value="1" {% if search.classes %}checked{% endif %} />
-                            <label for="show-classes-checkbox" class="checkbox-label">Show Classes</label>
                         </fieldset>
                     </div>
                 </fieldset>
