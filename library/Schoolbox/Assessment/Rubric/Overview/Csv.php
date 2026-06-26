@@ -2,7 +2,7 @@
 
 namespace Schoolbox\Assessment\Rubric\Overview;
 
-use \Schoolbox\GenericCollection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\User;
 
