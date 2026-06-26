@@ -109,21 +109,6 @@ use function count;
 class Controller extends Assessment\Controller
 {
     /**
-     * Draft and Published marks are stored in two different
-     * (but adjacent) areas of the $marks array
-     */
-    private const MARK_DRAFT_KEY = 'latest';
-    private const MARK_PUBLISHED_KEY = 'published';
-
-
-    /**
-     * This is a suffix appended after every Draft mark
-     * so users know conclusively and obviously.
-     */
-    private const MARK_DRAFT_SUFFIX = ' (draft)';
-
-
-    /**
      * The querystring param for Show Drafts from the ui
      * Note that the markbooks currently hardcode this value in both the frontend and backend
      */
