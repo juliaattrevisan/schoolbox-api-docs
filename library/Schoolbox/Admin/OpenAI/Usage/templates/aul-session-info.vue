@@ -41,7 +41,7 @@ function printSelectedSession(): void {
 <template>
     <section>
         <!-- Info card -->
-        <div class="card small-12 actions-small-1">
+        <div class="card small-12 actions-small-1 u-border-bottom">
             <div class="list-item">
                 <span>
                     <user-photo
