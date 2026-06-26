@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useSelectedList } from "@schoolboxVue/composables/form/useSelectedList";
 import IbReportSubjectLabels from "./ib-report-subject-labels.vue";
 import { useIbReportUpdateLanguageStore } from "../store/ibReportUpdateLanguageStore";
 import type { StudentRow } from "../../js/types/ibReportTypes";
@@ -11,28 +12,11 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const selectedList = defineModel<StudentRow[]>("selectedList", { default: () => [] });
+const selectedListModel = defineModel<StudentRow[]>("selectedList", { default: () => [] });
+const students = window.Vue.toRef(props, "students");
+const { selectedList, allSelected, isIndeterminate, showCheckboxes } = useSelectedList(students, selectedListModel);
 
 const updateLanguageStore = useIbReportUpdateLanguageStore();
-
-const isAllSelected = window.Vue.computed<boolean>(
-    () => props.students.length > 0 && selectedList.value.length === props.students.length,
-);
-
-const isSomeSelected = window.Vue.computed<boolean>(
-    () => selectedList.value.length > 0 && selectedList.value.length < props.students.length,
-);
-
-/**
- * Toggles selection of all students in this section.
- */
-function toggleSelectAll(): void {
-    if (isAllSelected.value) {
-        selectedList.value = [];
-    } else {
-        selectedList.value = [...props.students];
-    }
-}
 
 const emit = defineEmits<{
     completePreparationSingle: [studentId: number];
@@ -56,22 +40,21 @@ function openModal(student: StudentRow): void {
         <thead>
             <tr>
                 <th scope="col" class="checklist">
-                    <template
-                        v-if="props.activeSelectionSection === null || props.activeSelectionSection === props.section"
+                    <span
+                        v-if="
+                            showCheckboxes &&
+                            (props.activeSelectionSection === null || props.activeSelectionSection === props.section)
+                        "
+                        class="select-all-container"
                     >
-                        <span class="select-all-container">
-                            <input
-                                :id="`select-all-${props.section}`"
-                                type="checkbox"
-                                :checked="isAllSelected"
-                                :class="{ indeterminate: isSomeSelected }"
-                                aria-label="Select all"
-                                @change="toggleSelectAll"
-                            /><label class="checkbox-label" :for="`select-all-${props.section}`"></label>
-                            <span>Select all</span>
-                        </span>
-                    </template>
-                    <span v-else class="sr-only">Select</span>
+                        <input
+                            :id="`select-all-${props.section}`"
+                            v-model="allSelected"
+                            type="checkbox"
+                            :class="{ indeterminate: isIndeterminate }"
+                            aria-label="Select all"
+                        /><label class="checkbox-label" :for="`select-all-${props.section}`"></label>
+                    </span>
                 </th>
                 <th scope="col">Name</th>
                 <th scope="col">Candidate Details</th>
@@ -185,10 +168,4 @@ function openModal(student: StudentRow): void {
     </table>
 </template>
 
-<style scoped>
-.select-all-container {
-    align-items: center;
-    display: inline-flex;
-    gap: var(--sbx-size-xs, 0.5rem);
-}
-</style>
+<style scoped></style>

@@ -3,15 +3,19 @@ import type { Ref } from "vue";
 /**
  * Composable for managing a selected list state
  * @param items - Reactive ref containing the list of all items
+ * @param $selectedList - Optional selected list ref
  * @returns Object containing checkbox list state and computed properties
  */
-export function useSelectedList<T>(items: Ref<T[]>): {
+export function useSelectedList<T>(
+    items: Ref<T[]>,
+    $selectedList: Ref<T[]> | undefined = undefined,
+): {
     showCheckboxes: Ref<boolean>;
     selectedList: Ref<T[]>;
     allSelected: Ref<boolean>;
     isIndeterminate: Ref<boolean>;
 } {
-    const selectedList = window.Vue.ref<T[]>([]) as Ref<T[]>; // currently selected items (checkboxes in the list)
+    const selectedList = $selectedList === undefined ? (window.Vue.ref<T[]>([]) as Ref<T[]>) : $selectedList;
 
     window.Vue.watch(items, (currentItems) => {
         selectedList.value = selectedList.value.filter((item) => currentItems.includes(item));
