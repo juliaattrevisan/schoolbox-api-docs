@@ -257,7 +257,11 @@
                         {% set statusSort = booking is empty ? 'Timetabled' : booking.getStatus().getName() %}
                         <td data-sort="{{ statusSort }}">
                             {% if booking is empty %}
-                                <sbx-label text="Timetabled" sentiment="neutral"></sbx-label>
+                                <sbx-label
+                                    text="Timetabled"
+                                    background-color="var(--sbx-color-foreground-secondary, #f4f4f4)"
+                                    text-color="var(--sbx-color-text-secondary, #474747)"
+                                ></sbx-label>
                             {% else %}
                                 {% set status = booking.getStatus() %}
                                 {% set statusSentiment = status.isApproved() ? 'success' : (status.isPending() ? 'warning' : 'alert') %}
