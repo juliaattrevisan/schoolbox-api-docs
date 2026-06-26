@@ -26,6 +26,7 @@ use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\RubricUsage;
 use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Learning\MarkScheme\Factory;
+use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
@@ -1168,7 +1169,7 @@ class OverallDataset
      * @param array $assessments
      * @param array $studentMarks
      * @param array $exclusions
-     * @param Model $folder
+     * @param Model|null $folder
      * @param bool $includeDiagnostics Adds the individual calculations as a frontend payload so you can see it in prod
      * @return array
      */
@@ -1176,7 +1177,7 @@ class OverallDataset
         array $assessments,
         array $studentMarks,
         array $exclusions,
-        Folder\Model $folder,
+        ?Folder\Model $folder,
         bool $includeDiagnostics = false
     ): array {
         $overallMarks = $this->aggregateMarks($assessments, $studentMarks, $exclusions, $folder, $includeDiagnostics);
@@ -1199,7 +1200,7 @@ class OverallDataset
      * @param array $assessments
      * @param array $studentMarks
      * @param array $exclusions
-     * @param Model $folder
+     * @param Model|null $folder
      * @param bool $includeDiagnostic
      * @return array
      */
@@ -1207,7 +1208,7 @@ class OverallDataset
         array $assessments,
         array $studentMarks,
         array $exclusions,
-        Folder\Model $folder,
+        ?Folder\Model $folder,
         bool $includeDiagnostic
     ): array {
         /* Non-iterable Coefficients Lookup
@@ -1553,7 +1554,13 @@ class OverallDataset
          * If there are multiple year levels on the class page, and they agree (we should use their grade group)
          * If there are multiple year levels on the class page, and they do NOT agree (all different grade groups), we should fall back to the system default grade group.
          */
-        $markScheme = $this->markSchemeFactory->spawnForFolder($folder, true);
+        if (null !== $folder) {
+            $markScheme = $this->markSchemeFactory->spawnForFolder($folder, true);
+        } else {
+            /* Presume this when $folder wasn't specified
+             */
+            $markScheme = new Percentage();
+        }
 
         foreach ($overallMarks as $capabilityId => &$capabilityData) {
             foreach ($capabilityData['students'] as &$studentCapabilityData) {
