@@ -23,6 +23,19 @@ use TypeError;
  */
 class RegisterSessionsSessionBuilder
 {
+    private const string DATE_FORMAT_DAY_MONTH_YEAR = 'd/F/Y';
+    private const string DATE_FORMAT_YEAR_MONTH_DAY = 'Y-m-d';
+    private const string SESSION_DATE_TEMPLATE = '01/%s/%s';
+
+    // IBIS transcript names change for future sessions and once IBIS accepts the shorter names.
+    private const string SUBJECT_TRANSCRIPT_OVERRIDE_CHANGEOVER_DATE = '2026-08-09';
+    private const string SUBJECT_TRANSCRIPT_OVERRIDE_CUTOVER_SESSION_DATE = '2027-05-01';
+
+    private const array SUBJECT_TRANSCRIPT_OVERRIDE = [
+        'ENGLISH A: Lang and Literature' => 'ENGLISH A: Lang and Lit',
+        'SPANISH A: Lang and Literature' => 'SPANISH A: Lang and Lit',
+    ];
+
     private const array REQUIRED_FIELDS = [
         'candidate',
         'category',
@@ -44,15 +57,22 @@ class RegisterSessionsSessionBuilder
         $registrationSession = $student->getRegistrationSession();
         $systemPurpose = $registrationSession?->getSystemPurpose();
 
+        $month = $this->stringOrNull($registrationSession?->getExamSession());
+        $year = $this->stringOrNull($registrationSession?->getAcademicYear());
+
+        if ($month === null || $year === null) {
+            throw new InvalidArgumentException('Selected candidate is missing required IBIS session time data.');
+        }
+
         $session = [
             'candidate' => $this->stringOrNull($candidateId),
             'category' => $this->stringOrNull($systemPurpose?->getCategory()?->getName()),
             'main_school' => $this->stringOrNull($schoolCode),
-            'month' => $this->stringOrNull($registrationSession?->getExamSession()),
+            'month' => $month,
             'programme' => $this->stringOrNull($systemPurpose?->getCategory()?->getName()),
-            'year' => $this->stringOrNull($registrationSession?->getAcademicYear()),
+            'year' => $year,
             'email' => $this->stringOrNull($user?->getEmail()),
-            'subjects' => $this->buildSubjects($student->getIbGroupSubjects()),
+            'subjects' => $this->buildSubjects($student->getIbGroupSubjects(), $month, $year),
         ];
 
         $missingFields = [];
@@ -81,9 +101,23 @@ class RegisterSessionsSessionBuilder
      *
      * @return array<int, array{subject_name: string, subject_language: string, subject_level: string|null}>
      */
-    private function buildSubjects(GenericCollection $groupSubjects): array
+    private function buildSubjects(GenericCollection $groupSubjects, string $month, string $year): array
     {
         $subjects = [];
+
+        $cutOverSession = new \Alaress_Date_Format(
+            self::SUBJECT_TRANSCRIPT_OVERRIDE_CUTOVER_SESSION_DATE,
+            self::DATE_FORMAT_YEAR_MONTH_DAY
+        );
+        $sessionDate = new \Alaress_Date_Format(
+            sprintf(self::SESSION_DATE_TEMPLATE, $month, $year),
+            self::DATE_FORMAT_DAY_MONTH_YEAR
+        );
+        $changeOverDate = new \Alaress_Date_Format(
+            self::SUBJECT_TRANSCRIPT_OVERRIDE_CHANGEOVER_DATE,
+            self::DATE_FORMAT_YEAR_MONTH_DAY
+        );
+        $today = \Alaress_Date_Format::now();
 
         foreach ($groupSubjects as $groupSubject) {
             if (!$groupSubject instanceof GroupSubjectModel) {
@@ -98,8 +132,19 @@ class RegisterSessionsSessionBuilder
                 continue;
             }
 
+            $subjectName = str_replace('[LANGUAGE]', strtoupper($subjectLanguage), $subjectName);
+
+            // Use the shortened transcript names after either the session or live IBIS changeover date.
+            // TODO this should be temporary, if these kind of thing is starting to happen often might consider with a more permenant solution
+            if (
+                ($sessionDate->gt($cutOverSession) || $today->gte($changeOverDate)) &&
+                isset(self::SUBJECT_TRANSCRIPT_OVERRIDE[$subjectName])
+            ) {
+                $subjectName = self::SUBJECT_TRANSCRIPT_OVERRIDE[$subjectName];
+            }
+
             $subjects[] = [
-                'subject_name' => str_replace('[LANGUAGE]', strtoupper($subjectLanguage), $subjectName),
+                'subject_name' => $subjectName,
                 'subject_language' => $subjectLanguage,
                 'subject_level' => $subjectLevel,
             ];
