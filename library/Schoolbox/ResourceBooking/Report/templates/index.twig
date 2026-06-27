@@ -11,6 +11,8 @@
             selector: form.find(':checkbox[data-selectall="category[]"]'),
             checkboxes: form.find(':checkbox[name="category[]"]')
         });
+        form.find(':radio[name="clashesOnly"]').on('change', updateStatusFilterForClashes);
+        updateStatusFilterForClashes();
 
         /* Results table
          */
@@ -35,6 +37,18 @@
      * The MAX_REPORTING_PERIOD_MONTHS restriction is enforced at the server too.
      * So check ResourceBooking/Report/Controller.php after any changes here.
      */
+    function updateStatusFilterForClashes()
+    {
+        var clashesOnly = $(":radio[name=\"clashesOnly\"]:checked").val() === "1";
+        var statusCheckboxes = $("fieldset[data-status-filter] :checkbox[name=\"status[]\"]");
+
+        if (clashesOnly) {
+            statusCheckboxes.prop("checked", false);
+            $("#status-approved-checkbox, #status-pending-checkbox").prop("checked", true);
+        }
+        statusCheckboxes.prop("disabled", clashesOnly);
+    }
+
     function onChangeDate(changedDateName)
     {
         const $startDate = $('#startDate');
@@ -150,13 +164,13 @@
                     </div>
 
                     <div class="small-6 columns">
-                        <fieldset>
+                        <fieldset data-status-filter>
                             <legend>Status</legend>
                             <ul class="option-list">
-                                <li><input id="status-approved-checkbox" type="checkbox" name="status[]" value="2" {% if 2 in search.status %}checked{% endif %} /><label for="status-approved-checkbox" class="checkbox-label">Approved</label></li>
-                                <li><input id="status-pending-checkbox" type="checkbox" name="status[]" value="1" {% if 1 in search.status %}checked{% endif %} /><label for="status-pending-checkbox" class="checkbox-label">Pending</label></li>
-                                <li><input id="status-rejected-checkbox" type="checkbox" name="status[]" value="3" {% if 3 in search.status %}checked{% endif %} /><label for="status-rejected-checkbox" class="checkbox-label">Rejected</label></li>
-                                <li><input id="status-timetabled-checkbox" type="checkbox" name="status[]" value="timetabled" {% if 'timetabled' in search.status %}checked{% endif %} /><label for="status-timetabled-checkbox" class="checkbox-label">Timetabled</label></li>
+                                <li><input id="status-approved-checkbox" type="checkbox" name="status[]" value="2" {% if 2 in search.status %}checked{% endif %} {% if search.clashesOnly %}disabled{% endif %} /><label for="status-approved-checkbox" class="checkbox-label">Approved</label></li>
+                                <li><input id="status-pending-checkbox" type="checkbox" name="status[]" value="1" {% if 1 in search.status %}checked{% endif %} {% if search.clashesOnly %}disabled{% endif %} /><label for="status-pending-checkbox" class="checkbox-label">Pending</label></li>
+                                <li><input id="status-rejected-checkbox" type="checkbox" name="status[]" value="3" {% if 3 in search.status %}checked{% endif %} {% if search.clashesOnly %}disabled{% endif %} /><label for="status-rejected-checkbox" class="checkbox-label">Rejected</label></li>
+                                <li><input id="status-timetabled-checkbox" type="checkbox" name="status[]" value="timetabled" {% if 'timetabled' in search.status %}checked{% endif %} {% if search.clashesOnly %}disabled{% endif %} /><label for="status-timetabled-checkbox" class="checkbox-label">Timetabled</label></li>
                             </ul>
                         </fieldset>
 

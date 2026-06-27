@@ -132,6 +132,13 @@ class Controller extends Base
             static fn ($status) => is_numeric($status) ? (int) $status : $status,
             $selectedStatuses
         )));
+        $clashesOnly = $this->requestQuery->getBool('clashesOnly', false);
+        if ($clashesOnly) {
+            $selectedStatuses = [
+                BookingStatus::STATUS_APPROVED,
+                BookingStatus::STATUS_PENDING,
+            ];
+        }
         $showTimetabled = in_array('timetabled', $selectedStatuses, true);
         $selectedBookingStatuses = array_values(array_filter(
             $selectedStatuses,
@@ -141,7 +148,6 @@ class Controller extends Base
             // An empty status list means no filter, so use a non-matching status for Timetabled-only searches.
             $selectedBookingStatuses = [0];
         }
-        $clashesOnly = $this->requestQuery->getBool('clashesOnly', false);
         $capacityAllocation = new CapacityAllocation();
 
         $this->api->add(
