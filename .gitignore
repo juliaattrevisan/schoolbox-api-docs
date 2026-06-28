@@ -10,7 +10,7 @@ www/static/css/core/core.css
 www/static/css/core/sbx-core.css
 www/static/css/core/learnosity.css
 www/static/css/core/schoolbox-ck-content.css
-www/static/css/core/learnosity.css
+www/static/css/core/*.css.map
 *.log
 *.swp
 vendor/
