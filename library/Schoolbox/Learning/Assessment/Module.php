@@ -144,9 +144,9 @@ class Module extends BaseModule
         $canViewStatus            = $this->buildAuthRuleCanViewStatus();
         $canViewSimilarityReport  = $this->buildAuthRuleCanViewSimilarityReport();
         $canAckSubmission         = $this->buildAuthRuleCanAcknowledgeSubmission();
-        /* Reporting activities are intentionally excluded from custom participation activity creation routes. They
-         * support student participation access in specific cases, but not actions that modify, copy, or create an
-         * activity from the participation screen.
+        /* Reporting activities are intentionally excluded from most custom participation activity creation routes. They
+         * support student participation access in specific cases, but not actions that modify or create an
+         * unrelated activity from the participation screen.
          *
          * This is a trap for the Swamp where new activity types need to be added to this list.
          */
@@ -158,6 +158,11 @@ class Module extends BaseModule
             AssessmentType::TYPE_LTI_ASSESSMENT,
             AssessmentType::TYPE_LESSON_PLAN,
             AssessmentType::TYPE_DIALOG_AGENT,
+        ];
+
+        $customParticipationCopyAssessmentTypes = [
+            ...$customParticipationAssessmentTypes,
+            AssessmentType::TYPE_REPORTING,
         ];
 
         $canDelete = new Rule\Any(
@@ -208,8 +213,8 @@ class Module extends BaseModule
          *
          * Reporting activities have a special set of checks that cause this rule to permit or deny access to their
          * respective routes, because reporting activities are unlike other LMS activities: it's bureaucratically-driven
-         * rather than learning-driven so things like creating/copying a reporting activity, modifying it, etc is
-         * actually precluded by nature of what that learning activity does.
+         * rather than learning-driven so things like creating a new reporting activity or modifying the existing one
+         * for selected students are precluded by nature of what that learning activity does.
          */
         $canModifyCustomParticipation = new Rule\All(
             /* Should only be accessible if the custom participation config is enabled
@@ -294,7 +299,7 @@ class Module extends BaseModule
             new IsCustomParticipationCopyable(),
             /* Create Copy is limited to custom participation activity types.
              */
-            new ValidAssessmentType($customParticipationAssessmentTypes)
+            new ValidAssessmentType($customParticipationCopyAssessmentTypes)
         );
 
         // pluralise for REST
