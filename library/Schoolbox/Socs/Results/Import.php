@@ -27,7 +27,7 @@ use Symfony\Component\Lock\LockInterface;
  */
 class Import implements IStrategy
 {
-    private const string RESULTS_PATH = 'results.ashx';
+    private const string RESULTS_PATH = '/school/xml/results.ashx';
 
     /**
      * SOCS - Standard Fixture Feed

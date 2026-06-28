@@ -143,7 +143,7 @@ class Factory
                 true,
                 new Person($userMapper)
             ))
-            ->add(new Teams\Import( // its own special endpoint `mso-sport.ashx`, which contains ONLY teams
+            ->add(new Teams\Import( // its own special endpoint `/school/xml/mso-sport.ashx`, which contains ONLY teams
                 $this->log,
                 $this->perform,
                 $this->lock,
