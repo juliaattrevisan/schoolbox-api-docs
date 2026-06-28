@@ -73,18 +73,12 @@
             {% set grade = participant.humanReadableMark(true) %}
             {% set instructorGrade = canViewInstructorMarks ?? false ? participant.humanReadableInstructorMark(true) : null %}
 
-            {% if grade %}
-                <div data-learner-mark class="grade {{ urgency.marks(participant.normalisedMark(true)) }}-bg"
-                    {# If there's an instructor grade available, then hide this by default #}
-                    {% if instructorGrade %}style="display: none"{% endif %}
-                >
-                    <span>{{ grade }}</span>
-                </div>
-            {% endif %}
-
-            {% if instructorGrade %}
-                <div data-instructor-mark class="grade {{ urgency.marks(participant.normalisedMark(true)) }}-bg">
-                    <span>{{ instructorGrade }}</span>
+            {% if grade or instructorGrade %}
+                <div class="grade {{ urgency.marks(participant.normalisedMark(true)) }}-bg" data-test="assessment-grade">
+                    {# Show the instructor grade if available, otherwise fall back to the learner grade
+                     # (this would only happen if you had a "None" input mark type and a meaningful display mark type, which is weird)
+                     #}
+                    <span>{{ instructorGrade ?? grade }}</span>
                 </div>
             {% endif %}
         {% endif %}
