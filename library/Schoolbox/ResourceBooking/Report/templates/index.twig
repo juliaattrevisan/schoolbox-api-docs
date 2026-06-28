@@ -30,12 +30,9 @@
     const MAX_REPORTING_PERIOD_MONTHS = 3;
 
     /**
-     * Ensure that:
-     *  - start date is always on or before end date AND
-     *  - the date range period never exceeds MAX_REPORTING_PERIOD_MONTHS.
-     *
-     * The MAX_REPORTING_PERIOD_MONTHS restriction is enforced at the server too.
-     * So check ResourceBooking/Report/Controller.php after any changes here.
+     * Conflict-only reporting is only meaningful for actionable booking conflicts.
+     * Force the Status filter to Approved and Pending while conflicts-only mode is
+     * selected, and disable the controls so submitted filters match what is shown.
      */
     function updateStatusFilterForClashes()
     {
@@ -49,6 +46,14 @@
         statusCheckboxes.prop("disabled", clashesOnly);
     }
 
+    /**
+     * Ensure that:
+     *  - start date is always on or before end date AND
+     *  - the date range period never exceeds MAX_REPORTING_PERIOD_MONTHS.
+     *
+     * The MAX_REPORTING_PERIOD_MONTHS restriction is enforced at the server too.
+     * So check ResourceBooking/Report/Controller.php after any changes here.
+     */
     function onChangeDate(changedDateName)
     {
         const $startDate = $('#startDate');
