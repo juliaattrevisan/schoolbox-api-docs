@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Socs;
 
+use Alaress\Http\Cache;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
@@ -36,6 +37,16 @@ class HttpClient
      */
     private const DEFAULT_TIMEOUT = 300;
 
+    /**
+     * Cache lifetime for SOCS calendar feed requests.
+     */
+    private const int CALENDAR_CACHE_TTL = 300;
+
+    /**
+     * Cache key prefix for SOCS calendar feed requests.
+     */
+    private const string CALENDAR_CACHE_PREFIX = 'socs-calendar-';
+
     private Client $client;
 
     private string $baseUrl;
@@ -52,9 +63,11 @@ class HttpClient
         string $host,
         private string $schoolId = '',
         #[SensitiveParameter] private string $token = '',
+        ?Client $client = null,
+        private ?Cache $cache = null,
     ) {
         $this->baseUrl = rtrim($host, '/');
-        $this->client = new Client([
+        $this->client = $client ?? new Client([
             RequestOptions::TIMEOUT => self::DEFAULT_TIMEOUT,
             RequestOptions::HTTP_ERRORS => false,
         ]);
@@ -79,8 +92,10 @@ class HttpClient
 
         while (true) {
             try {
-                $response =  $this->client->request('GET', $url, [
+                $response = $this->client->request('GET', $url, [
                     RequestOptions::QUERY => $fullQuery,
+                    RequestOptions::TIMEOUT => self::DEFAULT_TIMEOUT,
+                    RequestOptions::HTTP_ERRORS => false,
                 ]);
 
                 // NOT 200 status, assume broken
@@ -150,6 +165,55 @@ class HttpClient
             }
             sleep(self::NAP_TIMEOUT);
         }
+    }
+
+    /**
+     * Perform a cached GET request to a SOCS endpoint.
+     *
+     * @param string               $path
+     * @param array<string,string> $query Non-secret query parameters; ID and key are added automatically.
+     *
+     * @return SimpleXMLElement
+     * @throws \JsonException|\RuntimeException
+     */
+    public function getCached(string $path, array $query): SimpleXMLElement
+    {
+        if (!$this->cache instanceof Cache) {
+            return $this->get($path, $query);
+        }
+
+        $url = $this->buildBaseUrl($path);
+        $fullQuery = ['ID' => $this->schoolId, 'key' => $this->token] + $query;
+        $content = $this->cache->request(
+            $url . '?' . http_build_query($fullQuery),
+            self::CALENDAR_CACHE_PREFIX,
+            [],
+            self::CALENDAR_CACHE_TTL,
+        );
+
+        if ('' === $content) {
+            throw new \RuntimeException(sprintf(
+                'SOCS endpoint %s: returned an empty payload',
+                $path
+            ));
+        }
+
+        if (self::NOT_AVAILABLE === $content) {
+            throw new \RuntimeException(sprintf(
+                'SOCS endpoint returned known error string; aborting. %s',
+                self::NOT_AVAILABLE
+            ));
+        }
+
+        $xml = @simplexml_load_string($content);
+        if (false === $xml) {
+            throw new \RuntimeException(sprintf(
+                "Unable to parse SOCS XML payload; aborting. First 200 chars: '%s'",
+                substr($content, 0, 200)
+            ));
+        }
+
+        return $xml;
     }
 
     /**

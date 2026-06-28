@@ -26,7 +26,7 @@ class Person
      *     firstname:string,
      *     lastname:string,
      *     preferred_name:string
-     * }|int>|null
+     * }>|null
      */
     protected ?array $lookup = null;
 
@@ -45,7 +45,7 @@ class Person
      *     firstname:string,
      *     lastname:string,
      *     preferred_name:string
-     * }|int>
+     * }>
      * @throws \PDOException
      */
     public function generate(): array

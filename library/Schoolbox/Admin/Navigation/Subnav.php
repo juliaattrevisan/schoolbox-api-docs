@@ -604,6 +604,13 @@ class Subnav
                         'visible'     => count($enabledConfigs[ConfigMapper::TYPE_MODULES] ?? []) > 0,
                         'description' => 'Control which features and modules are currently available in your system.',
                     ],
+                    '/adminv2/socs' => [
+                        'name' => 'SOCS Connector',
+                        'visible' => true,
+                        'description' => 'Configure the connection to SOCS and its imported feeds.',
+                        'searchable' => true,
+                        'children' => []
+                    ],
                 ],
             ],
             '/adminv2/news' => [
@@ -874,7 +881,6 @@ class Subnav
                         'searchable' => true,
                         'children' => []
                     ],
-
                     '/adminv2/setting/Debugging' => [
                         'name'        => 'Debugging',
                         'visible'     => count($enabledConfigs[ConfigMapper::TYPE_DEBUGGING] ?? []) > 0,

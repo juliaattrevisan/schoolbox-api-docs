@@ -110,6 +110,7 @@ class ConfigMapper extends Mapper
     public const int TYPE_INTERNATIONAL_BACCALAUREATE = 26;
     public const int TYPE_ASSETS                      = 27;
     public const int TYPE_SONAR_SKIN_CONFIG           = 28;
+    public const int TYPE_SOCS                        = 29;
 
     // Technically these should be prefixed with 'NAME_', but it gets a bit verbose for little extra clarity
     public const string _GLOBAL_MODERATION              = 'global_moderation';
@@ -528,8 +529,13 @@ class ConfigMapper extends Mapper
      */
     public const string NAME_SOCS_ENABLED = 'socs_enabled';
     public const string NAME_SOCS_ENDPOINT_HOST = 'socs_endpoint_host';
+    public const string NAME_SOCS_ENDPOINT_HOST_FIXTURE = 'socs_endpoint_host_fixture';
     public const string NAME_SOCS_ENDPOINT_TOKEN = 'socs_endpoint_token';
     public const string NAME_SOCS_ENDPOINT_ID = 'socs_endpoint_id';
+    public const string NAME_SOCS_IMPORT_CALENDAR_EVENTS = 'socs_import_calendar_events';
+    public const string NAME_SOCS_CALENDAR_NAME = 'socs_calendar_name';
+    public const string NAME_SOCS_CALENDAR_DEFAULT_EVENT_TYPE = 'socs_calendar_default_event_type';
+    public const string NAME_SOCS_IMPORT_SPORTS_FIXTURES = 'socs_import_sports_fixtures';
 
 
     // Debug settings

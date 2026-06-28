@@ -21,7 +21,7 @@ use Symfony\Component\Lock\LockInterface;
  */
 class Import implements IStrategy
 {
-    private const string MSO_SPORT_PATH = 'mso-sport.ashx';
+    private const string MSO_SPORT_PATH = '/school/xml/mso-sport.ashx';
 
     public function __construct(
         private LoggerInterface $log,

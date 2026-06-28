@@ -12,16 +12,17 @@ namespace Schoolbox\Socs\Results;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\Fixtures\Result\Mapper as ResultMapper;
+use Schoolbox\Socs\Fixtures\Registry;
 use Schoolbox\Socs\IStrategy;
 use Symfony\Component\Lock\LockInterface;
 
 /**
  * SOCS results prepare step.
  *
- * Marks all existing fixtures results as stale by setting their updated_at
+ * Marks existing SOCS fixture results as stale by setting their updated_at
  * timestamps to a sentinel value. Results written during the current run will
  * have their timestamps refreshed, allowing the cleanup step to soft-delete
- * only those that did not appear in the latest SOCS feed.
+ * only SOCS-owned results that did not appear in the latest SOCS feed.
  */
 class Prepare implements IStrategy
 {
@@ -45,9 +46,17 @@ class Prepare implements IStrategy
         if ($this->perform) {
             $this->lock->refresh();
 
-            // Mark all existing results as "stale" until they are re-saved
+            // Mark SOCS-owned results as "stale" until they are re-saved
             // by the current import run.
-            $this->resultMapper->getDatabase()->query("UPDATE {$this->resultMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
+            $this->resultMapper->getDatabase()->executeQuery(
+                "
+                    UPDATE {$this->resultMapper->getTable()} r
+                    INNER JOIN sportsfixtures_match m ON m.id = r.match_id
+                    SET r.updated_at = '0000-00-00 00:00:00'
+                    WHERE m.external_id LIKE :external_id
+                ",
+                ['external_id' => Registry::EXTERNAL_ID_PREFIX . '%']
+            );
         }
 
         $this->log->info('Preparing previously-imported fixtures results for SOCS results import.');

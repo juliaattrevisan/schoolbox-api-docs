@@ -66,6 +66,11 @@ class ImporterTool extends CliTool\App
             return;
         }
 
+        if (!$this->getConfig()->get(ConfigMapper::NAME_SOCS_IMPORT_SPORTS_FIXTURES)) {
+            $logger->info('SOCS sports fixture import is not enabled; exiting');
+            return;
+        }
+
         try {
             $lock = $this->acquireLock(self::LOCK_NAME, self::LOCK_TTL);
         } catch (\RuntimeException $e) {
@@ -83,7 +88,7 @@ class ImporterTool extends CliTool\App
             $runFixtures = $runResults = true;
         }
 
-        $host = (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_HOST);
+        $host = $this->resolveFixtureEndpointHost();
         $token = (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_TOKEN);
         $schoolId = (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_ID);
 
@@ -162,6 +167,19 @@ class ImporterTool extends CliTool\App
         }
 
         $lock->release();
+    }
+
+    /**
+     * Return the SOCS host used by fixtures, teams, and results feed imports.
+     */
+    protected function resolveFixtureEndpointHost(): string
+    {
+        $fixtureHost = trim((string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_HOST_FIXTURE));
+        if ($fixtureHost !== '') {
+            return $fixtureHost;
+        }
+
+        return (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_HOST);
     }
 
     /**
