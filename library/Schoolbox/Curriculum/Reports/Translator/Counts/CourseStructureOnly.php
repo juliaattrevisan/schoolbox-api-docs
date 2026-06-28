@@ -4,6 +4,7 @@ namespace Schoolbox\Curriculum\Reports\Translator\Counts;
 
 use Alaress\Authorizer\Authorizer;
 use Aura\Router\Generator;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as Model;
 use Schoolbox\Resource\Folder\Translator\IModelToArray;
 use Schoolbox\User;
@@ -47,7 +48,7 @@ class CourseStructureOnly
             'id' => $model->getId(),
             'title' => $model->getTitle(),
             'folder' => call_user_func($this->folderTranslator, $model->getFolder()),
-            'units' => $this->courseUnitSpec[$model->getId()]?->map(
+            'units' => ($this->courseUnitSpec[$model->getId()] ?? new Collection())->map(
                 fn($unit) =>
                 [
                     'id' => $unit->getFolder()->getId(),

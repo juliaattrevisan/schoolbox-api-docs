@@ -5,6 +5,7 @@ namespace Schoolbox\Curriculum\Reports\Translator\Counts;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
 use Aura\Router\Generator;
+use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Model as CurriculumNodeModel;
 use Schoolbox\Curriculum\Reports\Cursor;
 use Schoolbox\Curriculum\Reports\Translator\Counts\UnitAssessmentUsage as UnitAssessmentUsageTranslator;
@@ -65,7 +66,7 @@ class CourseUsage
                     'count' => $courseCount
                 ]
             ],
-            'units' => $this->courseUnitSpec[$course->getId()]?->map(
+            'units' => ($this->courseUnitSpec[$course->getId()] ?? new Collection())->map(
                 function ($unit) use ($node, $counts) {
                     return call_user_func($this->unitAssessmentUsageUsageTranslator, $unit, $node, $counts);
                 }
