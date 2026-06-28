@@ -935,7 +935,7 @@ export default {
                         <meta-item icon="resource-booking" v-if="eventExtendedProps.booking?.status">{{
                             eventExtendedProps.booking?.status.name
                         }}</meta-item>
-                        <meta-item icon="resource-booking" v-if="eventExtendedProps.booking?.quantity">
+                        <meta-item icon="info" v-if="eventExtendedProps.booking?.quantity">
                             Quantity: {{ eventExtendedProps.booking.quantity }}
                         </meta-item>
                         <meta-item icon="calendar" v-if="eventExtendedProps.dateSpan">{{
