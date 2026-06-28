@@ -205,6 +205,7 @@ export default {
                 // There will be one booking, so data.booking will be filled, and data.bookings will not be filled.
                 extendedProps.bookings = [];
                 extendedProps.booking = {
+                    quantity: data?.booking?.quantity,
                     status: data?.booking?.status,
                     related: data?.booking?.related || [],
                     actions: (data?.booking?.buttons || []).filter((button) => button?.href),
@@ -934,6 +935,9 @@ export default {
                         <meta-item icon="resource-booking" v-if="eventExtendedProps.booking?.status">{{
                             eventExtendedProps.booking?.status.name
                         }}</meta-item>
+                        <meta-item icon="resource-booking" v-if="eventExtendedProps.booking?.quantity">
+                            Quantity: {{ eventExtendedProps.booking.quantity }}
+                        </meta-item>
                         <meta-item icon="calendar" v-if="eventExtendedProps.dateSpan">{{
                             eventExtendedProps.dateSpan
                         }}</meta-item>
