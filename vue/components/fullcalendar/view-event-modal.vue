@@ -268,6 +268,14 @@ export default {
             );
         },
 
+        formatBookingItemName(booking) {
+            if (booking?.quantity) {
+                return booking.item.name + " (" + String(booking.quantity) + ")";
+            }
+
+            return booking.item.name;
+        },
+
         /**
          * Accept an invitation
          */
@@ -1017,10 +1025,10 @@ export default {
                                 :icon="getBookingStatusIcon(booking.status)"
                             >
                                 <template v-if="booking.href">
-                                    <a :href="booking.href">{{ booking.item.name }}</a>
+                                    <a :href="booking.href">{{ formatBookingItemName(booking) }}</a>
                                 </template>
                                 <template v-else>
-                                    {{ booking.item.name }}
+                                    {{ formatBookingItemName(booking) }}
                                 </template>
                             </meta-item>
                         </meta-list>
@@ -1034,10 +1042,10 @@ export default {
                                 :icon="getBookingStatusIcon(booking.status)"
                             >
                                 <template v-if="booking.href">
-                                    <a :href="booking.href">{{ booking.item.name }}</a>
+                                    <a :href="booking.href">{{ formatBookingItemName(booking) }}</a>
                                 </template>
                                 <template v-else>
-                                    {{ booking.item.name }}
+                                    {{ formatBookingItemName(booking) }}
                                 </template>
                             </meta-item>
                         </meta-list>
