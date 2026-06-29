@@ -13,6 +13,8 @@
  # @param bool $interactionLocked             Is the assessment due in an archived term?
  # @param string $reviewRoute                 The mechanism by which feedback is being given
  # @param array $errors                       A list of Submission States to choose (despite its naming...)
+ # @param Markbook $supportingDataMarkbook    Filtered markbook for supporting data
+ # @param array $supportingDataTree           Unit/assessment tree for supporting data
  #}
 
 {# Don't remove this; it'll cause javascript Undefined errors #}
@@ -60,6 +62,12 @@
         publishedText: 'Feedback published'
     } only %}
 {% endblock %}
+
+{% include '@learningReportingFeedback/fragments/supportingData.twig' with {
+    learner: learner,
+    markbook: supportingDataMarkbook,
+    tree: supportingDataTree,
+} only %}
 
 <div class="row">
     <div class="small-12 columns">

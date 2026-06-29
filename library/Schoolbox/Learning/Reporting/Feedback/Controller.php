@@ -183,6 +183,10 @@ class Controller extends Base
              */
             'errors' => $this->stateMapper->listDisplayValues(),
             'participant' => $participant,
+            /* Supporting data
+             */
+            'supportingDataMarkbook' => , // TODO
+            'supportingDataTree' => , // TODO
         ], 'Feedback');
     }
 
