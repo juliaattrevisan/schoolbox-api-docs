@@ -151,7 +151,7 @@ window.Vue.watch(
 </script>
 <template>
     <fieldset class="sbx-checkbox-radio-group-scroll">
-        <legend class="t-visually-hidden">Search results</legend>
+        <legend class="u-visually-hidden">Search results</legend>
         <div ref="resultsEl" class="sbx-scroll-container">
             <p v-if="props.isSearching" class="sbx-scroll-container__status" aria-live="polite" aria-busy="true">
                 Searching for results....

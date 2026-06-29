@@ -13,7 +13,7 @@ const filterTypesStore = useFilterTypesStore();
     <div>
         <label>Types</label>
         <div class="checklist">
-            <ul class="option-list t-no-list-style l-flex-col f-no-margins">
+            <ul class="option-list u-no-list-style l-flex-col f-no-margins">
                 <sp-filter-types-type
                     v-for="typeItem in filterTypesStore.allTypes"
                     :key="typeItem.value"

@@ -70,7 +70,7 @@ async function onConfirm(): Promise<void> {
             <h2>Select Customisation</h2>
         </div>
         <fieldset class="checklist u-no-border l-pad--0 f-no-margins">
-            <legend class="t-visually-hidden">Choose the type of customisation to apply:</legend>
+            <legend class="u-visually-hidden">Choose the type of customisation to apply:</legend>
             <ul class="option-list">
                 <li v-if="props.routes.getLearningPlanNewUrl">
                     <input id="cp-modify" v-model="typePicked" type="radio" value="modify" />

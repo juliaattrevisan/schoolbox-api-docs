@@ -174,7 +174,7 @@ window.Vue.onMounted(() => {
     <div data-test="skin-config-container" class="l-flex-col l-gap-l l-pad-m--horiz">
         <div class="l-flex-col l-gap-m">
             <img :src="sonarImgSrc" alt="" class="l-c-cr" aria-hidden="true" />
-            <p class="t-visually-hidden">
+            <p class="u-visually-hidden">
                 Sonar UI is now available. We encourage you to enable it on your Staging server now to review your skin
                 settings and custom CSS before it becomes the only option in v26.2.
             </p>

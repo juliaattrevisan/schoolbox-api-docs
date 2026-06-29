@@ -92,12 +92,12 @@
                             <a title="{{ title }}" href="{{ route }}" class="l-flex l-gap-s" data-test="course-outline-assessment-title-{{ assessment.title }}">
                                 {# Render the icon for the assessment type #}
                                 <sbx-icon name="{{ icon.renderName(assessment)|trim }}"></sbx-icon>
-                                <p class="t-break-word">{{ assessment.title }}</p>
+                                <p class="u-break-word">{{ assessment.title }}</p>
                             </a>
                         {% else %}
                             <div title="{{ title }}" class="l-flex l-gap-s">
                                 <sbx-icon name="{{ icon.renderName(assessment)|trim }}"></sbx-icon>
-                                <p class="t-break-word">{{ assessment.title }}</p>
+                                <p class="u-break-word">{{ assessment.title }}</p>
                             </div>
                         {% endif %}
 
@@ -214,12 +214,12 @@
                                 {% if customRoute %}
                                     <a title="{{ customTitle }}" href="{{ customRoute }}" class="l-flex l-gap-s">
                                         <sbx-icon name="{{ icon.renderName(customisedAssessment)|trim }}"></sbx-icon>
-                                        <p class="t-break-word">{{ customisedAssessment.title }}</p>
+                                        <p class="u-break-word">{{ customisedAssessment.title }}</p>
                                     </a>
                                 {% else %}
                                     <div title="{{ customTitle }}" class="l-flex l-gap-s">
                                         <sbx-icon name="{{ icon.renderName(customisedAssessment)|trim }}"></sbx-icon>
-                                        <p class="t-break-word">{{ customisedAssessment.title }}</p>
+                                        <p class="u-break-word">{{ customisedAssessment.title }}</p>
                                     </div>
                                 {% endif %}
                                 {% if canWrite %}

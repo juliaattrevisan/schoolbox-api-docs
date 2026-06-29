@@ -822,7 +822,7 @@ export default {
                                 <p>No {{ selectedAudienceOption.namePlural }} found.</p>
                             </div>
                             <fieldset class="sbx-checkbox-radio-group-scroll l-mar-m--bottom" v-show="!showEmptyState">
-                                <legend class="t-visually-hidden">
+                                <legend class="u-visually-hidden">
                                     {{ selectedAudienceOption.namePlural }} options
                                 </legend>
                                 <div class="sbx-scroll-container sbx-scroll-container--smaller">

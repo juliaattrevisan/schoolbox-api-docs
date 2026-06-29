@@ -589,7 +589,7 @@ export default {
 <template>
     <div>
         <div class="small-12 island">
-            <h1 class="t-restrict-length">{{ subjectTitle }}</h1>
+            <h1 class="u-restrict-length">{{ subjectTitle }}</h1>
 
             <dl class="tabs" v-if="classCodeList.length > 1">
                 <dd :class="{ active: currentClassCode === null }">

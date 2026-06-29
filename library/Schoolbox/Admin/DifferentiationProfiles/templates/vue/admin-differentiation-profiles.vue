@@ -235,7 +235,7 @@ async function onSaveSelected(): Promise<void> {
                                                     <template v-else-if="header.type === 'text'">
                                                         <label
                                                             :for="`field-${header.key}-${item.element.id}`"
-                                                            class="t-visually-hidden"
+                                                            class="u-visually-hidden"
                                                         >
                                                             {{ header.title || header.key }}
                                                         </label>
