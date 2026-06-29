@@ -856,7 +856,7 @@ export default {
                                     </ul>
                                 </div>
                             </fieldset>
-                            <fieldset class="checklist border-none" v-show="showModifierCheckboxes">
+                            <fieldset class="checklist u-border-none" v-show="showModifierCheckboxes">
                                 <ul class="option-list">
                                     <li v-if="showModifierSelfCheckbox">
                                         <input type="checkbox" id="audience-select-users" v-model="includeUsers" />

@@ -69,7 +69,7 @@ async function onConfirm(): Promise<void> {
         <div class="u-flex-row u-flex--justify-space u-gap-s f-no-margins">
             <h2>Select Customisation</h2>
         </div>
-        <fieldset class="checklist u-no-border u-pad--0 f-no-margins">
+        <fieldset class="checklist u-border-none u-pad--0 f-no-margins">
             <legend class="u-visually-hidden">Choose the type of customisation to apply:</legend>
             <ul class="option-list">
                 <li v-if="props.routes.getLearningPlanNewUrl">
