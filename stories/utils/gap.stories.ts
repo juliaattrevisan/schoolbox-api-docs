@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "storybook-vue3-rsbuild";
 import StorybookSlot from "../../vue/components/storybook-slot.vue";
 
 /**
- * **Styles**: `www/static/css/core/layout/_gap.scss`
+ * **Styles**: `www/static/css/core/utils/_u-gap.scss`
  *
  * [**mdn**](https://developer.mozilla.org/en-US/docs/Web/CSS/gap)
  *
@@ -21,7 +21,7 @@ const meta: Meta<typeof StorybookSlot> = {
             `,
         }),
     ],
-    title: "Layout/Gap",
+    title: "Utility/Gap",
 };
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "storybook-vue3-rsbuild";
 import StorybookSlot from "../../vue/components/storybook-slot.vue";
 
 /**
- * **Styles**: `www/static/css/core/layout/_size.scss`
+ * **Styles**: `www/static/css/core/utils/_u-size.scss`
  *
  */
 const meta: Meta<typeof StorybookSlot> = {
@@ -16,7 +16,7 @@ const meta: Meta<typeof StorybookSlot> = {
             `,
         }),
     ],
-    title: "Layout/Width",
+    title: "Utility/Width",
 };
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "storybook-vue3-rsbuild";
 import StorybookSlot from "../../vue/components/storybook-slot.vue";
 
 /**
- * **Styles**: `www/static/css/core/layout/_margin.scss`
+ * **Styles**: `www/static/css/core/utils/_u-margin.scss`
  *
  * [**mdn**](https://developer.mozilla.org/en-US/docs/Web/CSS/margin)
  */
@@ -17,7 +17,7 @@ const meta: Meta<typeof StorybookSlot> = {
             `,
         }),
     ],
-    title: "Layout/Margin",
+    title: "Utility/Margin",
 };
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
