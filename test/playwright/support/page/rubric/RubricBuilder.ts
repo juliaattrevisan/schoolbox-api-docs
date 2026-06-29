@@ -7,23 +7,23 @@ import type { Locator, Page } from "@playwright/test";
 export default class RubricBuilder {
     private page: Page;
 
-    static readonly DATA_TEST_RUBRIC_CREATE = "rubric-create";
+    public static readonly DATA_TEST_RUBRIC_CREATE = "rubric-create";
 
-    static readonly DATA_TEST_RUBRIC_CREATE_MANUALLY = "rubric-create-manually";
+    public static readonly DATA_TEST_RUBRIC_CREATE_MANUALLY = "rubric-create-manually";
 
-    static readonly DATA_TEST_RUBRIC_TITLE = "rubric-title";
+    public static readonly DATA_TEST_RUBRIC_TITLE = "rubric-title";
 
-    static readonly DATA_TEST_RUBRIC_GRID = "rubric-grid"; // Append "-[rubricId]"
+    public static readonly DATA_TEST_RUBRIC_GRID = "rubric-grid"; // Append "-[rubricId]"
 
-    static readonly DATA_TEST_RUBRIC_SPAWN_LEVEL = "rubric-spawn-level";
+    public static readonly DATA_TEST_RUBRIC_SPAWN_LEVEL = "rubric-spawn-level";
 
-    static readonly DATA_TEST_RUBRIC_INDICATOR_ROW = "rubric-indicator-row-"; // Append "-[capabilityId]-[indicatorId]"
+    public static readonly DATA_TEST_RUBRIC_INDICATOR_ROW = "rubric-indicator-row-"; // Append "-[capabilityId]-[indicatorId]"
 
-    static readonly DATA_TEST_RUBRIC_INDICATOR_TOGGLE = "rubric-indicator-toggle";
+    public static readonly DATA_TEST_RUBRIC_INDICATOR_TOGGLE = "rubric-indicator-toggle";
 
-    static readonly DATA_TEST_RUBRIC_DESCRIPTOR_CELL = "rubric-descriptor-cell"; // Append "-[descriptorIndex]"
+    public static readonly DATA_TEST_RUBRIC_DESCRIPTOR_CELL = "rubric-descriptor-cell"; // Append "-[descriptorIndex]"
 
-    static readonly DATA_TEST_RUBRIC_DESCRIPTOR_MAX_VALUE = "rubric-descriptor-max-value";
+    public static readonly DATA_TEST_RUBRIC_DESCRIPTOR_MAX_VALUE = "rubric-descriptor-max-value";
 
     constructor(page: Page) {
         this.page = page;
@@ -32,14 +32,14 @@ export default class RubricBuilder {
     /**
      * Clicks the "Add a rubric" button to create a new rubric
      */
-    async clickAddRubric(): Promise<void> {
+    public async clickAddRubric(): Promise<void> {
         await this.page.getByTestId(RubricBuilder.DATA_TEST_RUBRIC_CREATE).click();
     }
 
     /**
      * Clicks the "Create manually" choice when creating a new rubric
      */
-    async clickCreateRubricManually(): Promise<void> {
+    public async clickCreateRubricManually(): Promise<void> {
         await this.page.getByTestId(RubricBuilder.DATA_TEST_RUBRIC_CREATE_MANUALLY).click();
     }
 
@@ -47,7 +47,7 @@ export default class RubricBuilder {
      * Sets the (required) title of the rubric being built
      * @param title - The title to set
      */
-    async setRubricTitle(title: string): Promise<void> {
+    public async setRubricTitle(title: string): Promise<void> {
         const titleInput = this.page.getByTestId(RubricBuilder.DATA_TEST_RUBRIC_TITLE);
         await titleInput.fill(title);
         await titleInput.blur(); // commit the value (the input uses v-model.lazy)
@@ -58,14 +58,14 @@ export default class RubricBuilder {
      * @param rubricId - The rubric ID to locate, new unsaved rubrics will have negative IDs starting from -1
      * @returns the locator for the grid which can be used for further narrowing
      */
-    locateGrid(rubricId: number): Locator {
+    public locateGrid(rubricId: number): Locator {
         return this.page.getByTestId(`${RubricBuilder.DATA_TEST_RUBRIC_GRID}-${rubricId}`);
     }
 
     /**
      * Adds a new rubric indicator level
      */
-    async addRubricLevel(): Promise<void> {
+    public async addRubricLevel(): Promise<void> {
         await this.page.getByTestId(RubricBuilder.DATA_TEST_RUBRIC_SPAWN_LEVEL).click();
     }
 
@@ -74,7 +74,7 @@ export default class RubricBuilder {
      * @param capabilityId - The capability ID
      * @param indicatorId - The indicator ID
      */
-    async toggleRubricIndicator(capabilityId: number, indicatorId: number): Promise<void> {
+    public async toggleRubricIndicator(capabilityId: number, indicatorId: number): Promise<void> {
         const indicatorToggle = this.page
             .getByTestId(`${RubricBuilder.DATA_TEST_RUBRIC_INDICATOR_ROW}${capabilityId}-${indicatorId}`)
             .getByTestId(RubricBuilder.DATA_TEST_RUBRIC_INDICATOR_TOGGLE);
@@ -88,7 +88,7 @@ export default class RubricBuilder {
      * @param descriptorIndex - The index of the descriptor
      * @param value - The value to set
      */
-    async fillRubricCriterionPoints(
+    public async fillRubricCriterionPoints(
         capabilityId: number,
         indicatorId: number,
         descriptorIndex: number,

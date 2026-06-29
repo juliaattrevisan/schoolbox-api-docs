@@ -9,13 +9,13 @@ import type { Page } from "@playwright/test";
 export default class RubricMarkable {
     private page: Page;
 
-    static readonly DATA_TEST_RUBRIC_INDICATOR = "rubric-markable-indicator"; // Append "-[indicatorId]"
+    public static readonly DATA_TEST_RUBRIC_INDICATOR = "rubric-markable-indicator"; // Append "-[indicatorId]"
 
-    static readonly DATA_TEST_RUBRIC_DESCRIPTOR = "rubric-markable-descriptor"; // Append "-[levelIndex]"
+    public static readonly DATA_TEST_RUBRIC_DESCRIPTOR = "rubric-markable-descriptor"; // Append "-[levelIndex]"
 
-    static readonly DATA_TEST_RUBRIC_FINAL_SUMMARY = "rubric-final-summary";
+    public static readonly DATA_TEST_RUBRIC_FINAL_SUMMARY = "rubric-final-summary";
 
-    static readonly DATA_TEST_RUBRIC_SUM = "rubric-sum";
+    public static readonly DATA_TEST_RUBRIC_SUM = "rubric-sum";
 
     constructor(page: Page) {
         this.page = page;
@@ -28,7 +28,7 @@ export default class RubricMarkable {
      * @param indicatorId - The ID of the indicator
      * @param levelIndex - The zero-based index of the level (column) to select
      */
-    async selectRubricIndicatorByLevel(indicatorId: number, levelIndex: number): Promise<void> {
+    public async selectRubricIndicatorByLevel(indicatorId: number, levelIndex: number): Promise<void> {
         await this.page
             .getByTestId(`${RubricMarkable.DATA_TEST_RUBRIC_INDICATOR}-${indicatorId}`)
             .getByTestId(`${RubricMarkable.DATA_TEST_RUBRIC_DESCRIPTOR}-${levelIndex}`)
@@ -39,7 +39,7 @@ export default class RubricMarkable {
      * Ensure the value of the rubric final summary bar matches the expected value
      * @param value - The expected value
      */
-    async expectRubricFinalSummaryMark(value: string): Promise<void> {
+    public async expectRubricFinalSummaryMark(value: string): Promise<void> {
         const finalSummaryBar = this.page.getByTestId(RubricMarkable.DATA_TEST_RUBRIC_FINAL_SUMMARY);
         await expect(finalSummaryBar).toHaveText(value);
     }
@@ -47,7 +47,7 @@ export default class RubricMarkable {
     /**
      * Expect that no rubric final summary bar is present
      */
-    async expectNoRubricFinalSummary(): Promise<void> {
+    public async expectNoRubricFinalSummary(): Promise<void> {
         const finalSummaryBar = this.page.getByTestId(RubricMarkable.DATA_TEST_RUBRIC_FINAL_SUMMARY);
         await expect(finalSummaryBar).not.toBeVisible();
     }
@@ -56,7 +56,7 @@ export default class RubricMarkable {
      * Expect the rubric "Assign XX from Rubric" button to contain the expected sum (value of XX)
      * @param value - The expected value
      */
-    async expectRubricSum(value: string): Promise<void> {
+    public async expectRubricSum(value: string): Promise<void> {
         const rubricSum = this.page.getByTestId(RubricMarkable.DATA_TEST_RUBRIC_SUM);
         await expect(rubricSum).toHaveText(value);
     }
@@ -64,7 +64,7 @@ export default class RubricMarkable {
     /**
      * Expect that no rubric sum is present
      */
-    async expectNoRubricSum(): Promise<void> {
+    public async expectNoRubricSum(): Promise<void> {
         const rubricSum = this.page.getByTestId(RubricMarkable.DATA_TEST_RUBRIC_SUM);
         await expect(rubricSum).not.toBeVisible();
     }
