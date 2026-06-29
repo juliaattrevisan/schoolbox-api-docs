@@ -491,5 +491,12 @@ class Decorator implements DecoratorInterface
             $assessment->setEnableFiles($this->getEnableFiles());
             $assessment->setEnablePolicy($this->getEnablePolicy());
         }
+
+        /* Keep the legacy use_rubric flag in sync with the presence of rubric instances,
+         * which are the source of truth for whether this activity uses a rubric. Without this,
+         * rubrics built with the rubric builder leave use_rubric = 0, hiding rubric-gated UI
+         * such as the "Assign ... from Rubric" button.
+         */
+        $assessment->setUseRubric($assessment->getRubricInstances()->count() > 0);
     }
 }
