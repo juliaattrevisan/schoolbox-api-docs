@@ -11,10 +11,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\OpenAi\Session;
 
+use Alaress\Database\Predicate\Builder;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\OpenAi\Feature;
+use Schoolbox\OpenAi\Moderation\Event\Status as ModerationEventStatus;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -164,6 +166,8 @@ class Mapper extends BaseMapper
      *                                           after this date.
      * @param \Alaress_Date_Format|null $end     The end date filters sessions to those with at least one log created
      *                                           on or before this date.
+     * @param GenericCollection<ModerationEventStatus> $moderationStatuses This filters sessions to those with at least one
+     *                                                                     log whose moderation status is in this collection.
      * @param int|null                  $limit   The limit controls the maximum number of sessions returned.
      * @param int|null                  $offset  The offset controls how many matching sessions are skipped before
      *                                           results are returned.
@@ -176,10 +180,11 @@ class Mapper extends BaseMapper
         ?User $user,
         ?\Alaress_Date_Format $start,
         ?\Alaress_Date_Format $end,
+        GenericCollection $moderationStatuses,
         ?int $limit = 100,
         ?int $offset = 0
     ): GenericCollection {
-        [$where, $params] = $this->buildSessionFilter($keyword, $feature, $user, $start, $end);
+        [$where, $params] = $this->buildSessionFilter($keyword, $feature, $user, $start, $end, $moderationStatuses);
 
         $limitSql  = null !== $limit ? 'LIMIT :limit' : '';
         $offsetSql = null !== $limit && null !== $offset ? 'OFFSET :offset' : '';
@@ -274,6 +279,7 @@ class Mapper extends BaseMapper
      * @param User|null                 $user
      * @param \Alaress_Date_Format|null $start
      * @param \Alaress_Date_Format|null $end
+     * @param GenericCollection<ModerationEventStatus> $moderationStatuses
      * @return int
      * @throws Exception
      */
@@ -283,8 +289,9 @@ class Mapper extends BaseMapper
         ?User $user,
         ?\Alaress_Date_Format $start,
         ?\Alaress_Date_Format $end,
+        GenericCollection $moderationStatuses,
     ): int {
-        [$where, $params] = $this->buildSessionFilter($keyword, $feature, $user, $start, $end, true);
+        [$where, $params] = $this->buildSessionFilter($keyword, $feature, $user, $start, $end, $moderationStatuses, true);
 
         $statement = $this->getDatabase()->prepare(
             "SELECT COUNT(*) FROM `{$this->table}` {$where}"
@@ -306,6 +313,7 @@ class Mapper extends BaseMapper
      * @param User|null                 $user
      * @param \Alaress_Date_Format|null $start
      * @param \Alaress_Date_Format|null $end
+     * @param GenericCollection<ModerationEventStatus> $moderationStatuses
      * @param bool                      $requireSessionLog Whether to exclude sessions without logs.
      * @return array{0: string, 1: array<string, mixed>}
      */
@@ -315,6 +323,7 @@ class Mapper extends BaseMapper
         ?User $user,
         ?\Alaress_Date_Format $start,
         ?\Alaress_Date_Format $end,
+        GenericCollection $moderationStatuses,
         bool $requireSessionLog = false,
     ): array {
         $pb = $this->getPredicateBuilder();
@@ -350,6 +359,21 @@ class Mapper extends BaseMapper
             }
             $logClauses = array_merge($logClauses, $datePredicate->getWhere());
             $logParams = array_merge($logParams, $datePredicate->getParams());
+        }
+
+        if ($moderationStatuses->count() > 0) {
+            $statusValues = $moderationStatuses
+                ->map(static fn(ModerationEventStatus $status) => $status->value)
+                ->jsonSerialize();
+
+            $pb->rawWhere(
+                'EXISTS (
+                    SELECT 1 FROM `ai_moderation_event` me
+                    WHERE me.target_ai_session_id = `' . $this->table . '`.id
+                    AND me.status IN ' . Builder::getArrayPlaceholders($statusValues, 'moderation_status') . '
+                )',
+                Builder::getArrayParameters($statusValues, 'moderation_status')
+            );
         }
 
         if ($logClauses) {

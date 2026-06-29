@@ -82,6 +82,7 @@ export type AiUsageLogApiRequest = {
     user: number | null;
     startDate: string | null;
     endDate: string | null;
+    moderationStatus: AiModerationStatus[] | null;
     page?: number;
     limit?: number;
 };

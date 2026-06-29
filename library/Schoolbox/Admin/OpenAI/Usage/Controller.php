@@ -18,7 +18,9 @@ use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\Admin\OpenAI\Config as AIConfig;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\OpenAi\Moderation\Event\Status as ModerationEventStatus;
 use Schoolbox\OpenAi\Session\Mapper as SessionMapper;
 use Schoolbox\OpenAi\Session\Log\Mapper as SessionLogMapper;
 use Schoolbox\OpenAi\Session\Model as SessionModel;
@@ -95,6 +97,7 @@ class Controller extends Base
         $feature = $this->getRequestPost()->get('feature');
         $startDate = $this->getRequestPost()->get('startDate');
         $endDate = $this->getRequestPost()->get('endDate');
+        $moderationStatusKeys = $this->getRequestPost()->get('moderationStatus');
         $page = $this->getRequestPost()->getInt('page', 1) ?? 1;
 
         if ($page <= 0) {
@@ -204,6 +207,34 @@ class Controller extends Base
             }
         }
 
+        /* Moderation Statuses (recieved as an array of ModerationEventStatus keys, or null for all)
+         */
+        $moderationStatuses = new GenericCollection(ModerationEventStatus::class);
+
+        if (null !== $moderationStatusKeys) {
+            if (!\is_array($moderationStatusKeys)) {
+                $problem = (new ApiProblem('Moderation status must be an array.'))
+                    ->setStatus(400)
+                    ->asArray();
+                $this->response = $this->responseAsJson($problem)->withStatus(400);
+                return;
+            }
+
+            foreach ($moderationStatusKeys as $statusKey) {
+                try {
+                    $moderationStatuses->add(ModerationEventStatus::from($statusKey));
+                } catch (\ValueError $e) {
+                    $message = \sprintf('%s is an invalid moderation status.', $statusKey);
+
+                    $problem = (new ApiProblem($message))
+                        ->setStatus(400)
+                        ->asArray();
+                    $this->response = $this->responseAsJson($problem)->withStatus(400);
+                    return;
+                }
+            }
+        }
+
         /**
          * Each entry of $logSessions represents a whole session of logs.
          * The per-log fields (e.g. prompt, response, errorMessage) therefore aren't present here.
@@ -215,6 +246,7 @@ class Controller extends Base
             $user,
             $startAt,
             $endAt,
+            $moderationStatuses,
             $limit,
             ($page - 1) * $limit,
         );
@@ -226,6 +258,7 @@ class Controller extends Base
             $user,
             $startAt,
             $endAt,
+            $moderationStatuses,
         );
 
         $paginator = (new Paginator\Paginator())

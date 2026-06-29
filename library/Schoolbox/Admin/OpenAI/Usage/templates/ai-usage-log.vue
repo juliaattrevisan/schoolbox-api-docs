@@ -19,6 +19,8 @@ import type {
 } from "./payload";
 import AulAgentChat from "./aul-agent-chat.vue";
 import AulModerationIndicator from "./aul-moderation-indicator.vue";
+import { STATUS_LABELS } from "./moderationEvent";
+import type { AiModerationStatus } from "./moderationEvent";
 
 interface Props {
     routeSearch: string;
@@ -40,6 +42,7 @@ const featureFilter = window.Vue.ref<keyof typeof props.features | null>(null);
 const userFilter = window.Vue.ref<SearchSelectItem[]>([]);
 const startDateFilter = window.Vue.ref<string>(EMPTY_DATE);
 const endDateFilter = window.Vue.ref<string>(EMPTY_DATE);
+const moderationStatusFilter = window.Vue.ref<AiModerationStatus[]>([]);
 
 const usageSessions = window.Vue.ref<AiSession[]>([]);
 const pageInfo = window.Vue.ref<PaginationMeta | null>(null);
@@ -130,6 +133,7 @@ async function loadUsageLogs(): Promise<void> {
             user: userFilter.value.length > 0 ? Number(userFilter.value[0].id) : null,
             startDate: startDateFilter.value !== EMPTY_DATE ? startDateFilter.value : null,
             endDate: endDateFilter.value !== EMPTY_DATE ? endDateFilter.value : null,
+            moderationStatus: moderationStatusFilter.value.length > 0 ? moderationStatusFilter.value : null,
             page: pageInfo.value !== null ? pageInfo.value.pagination.current : 1,
             limit: pageInfo.value !== null ? pageInfo.value.pagination.limit : PAGE_SIZE,
         },
@@ -159,8 +163,30 @@ async function changePage(page: number): Promise<void> {
     await loadUsageLogs();
 }
 
-window.Vue.onMounted(async () => {
+/**
+ * Apply the current filters, and invalidate pageInfo cache (go back to the first page)
+ * to avoid ending up on a page that no longer exists.
+ */
+async function applyFilters(): Promise<void> {
+    pageInfo.value = null;
     await loadUsageLogs();
+}
+
+/**
+ * Reset the filters to their default values (show everything)
+ */
+function resetFilters(): void {
+    keywordFilter.value = "";
+    featureFilter.value = null;
+    userFilter.value = [];
+    startDateFilter.value = EMPTY_DATE;
+    endDateFilter.value = EMPTY_DATE;
+    moderationStatusFilter.value = [];
+}
+
+window.Vue.onMounted(async () => {
+    resetFilters();
+    await applyFilters();
 });
 
 /**
@@ -248,12 +274,29 @@ function printSelectedSession(): void {
                             v-model:end-date="endDateFilter"
                             id-prefix="ai-usage-log-filter"
                         />
+
+                        <div>
+                            <label>Moderation Status</label>
+                            <div class="l-flex-row l-gap-m">
+                                <div v-for="(label, status) in STATUS_LABELS" :key="status">
+                                    <input
+                                        :id="`ai-usage-log-moderation-${status}`"
+                                        v-model="moderationStatusFilter"
+                                        type="checkbox"
+                                        :value="status"
+                                    />
+                                    <label :for="`ai-usage-log-moderation-${status}`" class="checkbox-label">
+                                        {{ label }}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </fieldset>
             </section>
             <div class="row">
                 <div class="small-12 columns">
-                    <button class="button submit" @click="loadUsageLogs">Filter</button>
+                    <button class="button submit" @click="applyFilters">Filter</button>
                 </div>
             </div>
         </div>
@@ -339,6 +382,24 @@ function printSelectedSession(): void {
                     </tbody>
                 </table>
             </div>
+
+            <div v-else class="empty-state">
+                <sbx-icon name="ai" size="2.5rem"></sbx-icon>
+                <p>
+                    No logs match the current filters. Try another filter or
+                    <a
+                        href="#"
+                        @click.prevent="
+                            () => {
+                                resetFilters();
+                                void applyFilters();
+                            }
+                        "
+                        >show everything</a
+                    >.
+                </p>
+            </div>
+
             <paginator-buttons
                 v-if="pageInfo !== null && pageInfo.pagination.pages > 1"
                 :page-count="pageInfo.pagination.pages"
