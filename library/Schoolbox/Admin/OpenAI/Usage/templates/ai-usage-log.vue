@@ -18,6 +18,7 @@ import type {
     AiSessionLogApiResponse,
 } from "./payload";
 import AulAgentChat from "./aul-agent-chat.vue";
+import AulModerationIndicator from "./aul-moderation-indicator.vue";
 
 interface Props {
     routeSearch: string;
@@ -89,6 +90,15 @@ function closeSessionDetails(): void {
     sessionLoadError.value = null;
     selectedSessionId.value = null;
     selectedSessionLog.value = null;
+}
+
+/**
+ * Determine if it is possible to view a session's logs
+ * @param session The session to check
+ * @returns true if the session's logs can be viewed
+ */
+function canViewSessionLogs(session: AiSession): boolean {
+    return session.logFormat !== null && session._routes.getSessionLogs !== undefined;
 }
 
 /**
@@ -280,7 +290,7 @@ function printSelectedSession(): void {
                     </thead>
 
                     <tbody>
-                        <tr v-for="session in usageSessions" :key="session.id ?? undefined">
+                        <tr v-for="session in usageSessions" :key="session.id">
                             <td>
                                 {{ formatSessionDate(session) }}
                             </td>
@@ -299,15 +309,21 @@ function printSelectedSession(): void {
                                 </component>
                             </td>
                             <td>{{ session.hasError ? "Error" : "" }}</td>
-                            <td class="actions-small-1">
-                                <nav
-                                    v-if="
-                                        session.id !== null &&
-                                        session.logFormat !== null &&
-                                        session._routes.getSessionLogs
-                                    "
-                                >
+                            <td
+                                :class="`actions-small-${session.moderationStatus && canViewSessionLogs(session) ? 2 : 1}`"
+                            >
+                                <!--
+                                Although this does handle a non-viewable session which has a moderation status,
+                                it is not actually possible to end up in that state normally, since only sessions with
+                                a logFormat (and therefore viewable) can have a moderation status set.
+                                -->
+                                <nav v-if="session.moderationStatus || canViewSessionLogs(session)">
+                                    <aul-moderation-indicator
+                                        v-if="session.moderationStatus"
+                                        :status="session.moderationStatus"
+                                    />
                                     <button
+                                        v-if="canViewSessionLogs(session)"
                                         type="button"
                                         class="sbx-icon-only-button f-no-margins"
                                         title="View session details"

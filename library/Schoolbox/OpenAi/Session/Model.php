@@ -49,14 +49,6 @@ class Model
     private ?string $derivedLogFormat = null;
 
     /**
-     * Return code derived from the session's first log, for the admin list only.
-     * Not a column; populated by {@see Mapper::getFilteredSessions()}.
-     *
-     * @var int|null
-     */
-    private ?int $derivedReturnCode = null;
-
-    /**
      * Whether any log in this session has an error condition, for the admin list only.
      * Not a column; populated by {@see Mapper::getFilteredSessions()}.
      *
@@ -140,24 +132,6 @@ class Model
     public function setDerivedLogFormat(?string $derivedLogFormat): self
     {
         $this->derivedLogFormat = $derivedLogFormat;
-        return $this;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getDerivedReturnCode(): ?int
-    {
-        return $this->derivedReturnCode;
-    }
-
-    /**
-     * @param int|null $derivedReturnCode
-     * @return $this
-     */
-    public function setDerivedReturnCode(?int $derivedReturnCode): self
-    {
-        $this->derivedReturnCode = $derivedReturnCode;
         return $this;
     }
 

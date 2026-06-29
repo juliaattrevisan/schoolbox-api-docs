@@ -46,8 +46,8 @@ class ModelToArray
             'logFormat' => $session->getDerivedLogFormat(),
             'createdAt' => $session->getCreatedAt()?->getUsingFormat(DATE_ATOM),
             'createdBy' => $session->getUser() ? $this->userTranslator->__invoke($session->getUser()) : null,
-            'returnCode' => $session->getDerivedReturnCode(),
             'hasError' => $session->getDerivedHasError(),
+            'moderationStatus' => null, // TODO
             '_routes' => $routes,
         ];
     }

@@ -12,6 +12,7 @@ namespace Schoolbox\OpenAi\Moderation\Event;
 
 /**
  * Possible statuses for an AI Interaction Moderation Event.
+ * @see /library/Schoolbox/Admin/OpenAI/Usage/templates/moderationEvent.ts
  */
 enum Status: string
 {

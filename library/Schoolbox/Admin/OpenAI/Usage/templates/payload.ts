@@ -6,6 +6,7 @@ import type { DateRFC3339 } from "@js/util/dateUtils";
 import type { PaginationMeta } from "@js/util/sbx/apiUtils";
 import type { AgentChatLogEntry } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
+import type { AiModerationStatus } from "./moderationEvent";
 
 /**
  * A unique guid for an AI session, used to group related requests such as a chat conversation together
@@ -52,7 +53,8 @@ export type AiSessionLog = {
     id: number;
     sessionId: AiSessionId;
     createdAt: DateRFC3339;
-    createdBy?: UserAuthor;
+    /** createdBy may be null if the log entry was system-generated */
+    createdBy: UserAuthor | null;
 } & (
     | { [K in AiLogFormat]: { logFormat: K; data: AiLogFormatDataMap[K] } }[AiLogFormat]
     | { logFormat: null; data: null }
@@ -60,14 +62,15 @@ export type AiSessionLog = {
 
 /** @see /library/Schoolbox/Editor/OpenAI/Log/Translator/ModelToArray.php */
 export type AiSession<TLogFormat extends AiLogFormat = AiLogFormat, TFeature extends AiFeature = AiFeature> = {
-    /** The session ID can be null for legacy records which never had a session ID before we added those */
-    id: AiSessionId | null;
+    id: AiSessionId;
     feature: TFeature;
     logFormat: TLogFormat | null;
     createdAt: DateRFC3339;
-    createdBy?: UserAuthor;
-    returnCode: number | null; // HTTP return code from OpenAI API
+    /** createdBy may be null if the log entry was system-generated */
+    createdBy: UserAuthor | null;
     hasError: boolean;
+    /** The highest-priority active moderation status for the session, or null when there is no active concern */
+    moderationStatus: AiModerationStatus | null;
     _routes: {
         getSessionLogs?: string | null;
     };

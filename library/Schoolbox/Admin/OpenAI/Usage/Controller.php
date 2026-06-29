@@ -205,9 +205,9 @@ class Controller extends Base
         }
 
         /**
-         * Each entry of $logSessions represents a whole session of logs.  The per-log fields (e.g. prompt, response,
-         * errorMessage) therefore aren't present here; the logFormat/returnCode shown for a session are derived from
-         * its first log by SessionMapper::getFilteredSessions().
+         * Each entry of $logSessions represents a whole session of logs.
+         * The per-log fields (e.g. prompt, response, errorMessage) therefore aren't present here.
+         * The logFormat shown for a session is derived from its first log by SessionMapper::getFilteredSessions().
          */
         $logSessions = $this->sessionMapper->getFilteredSessions(
             $keyword,
