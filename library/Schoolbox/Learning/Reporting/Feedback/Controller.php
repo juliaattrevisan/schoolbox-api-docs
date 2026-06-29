@@ -19,10 +19,12 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Model as CurriculumNode;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
@@ -131,7 +133,7 @@ class Controller extends Base
         $supportingDataTree = null;
         if ($assessment->getSupportingDataEnable() && $assessment->getSupportingDataMarkbookEnable()) {
             $supportingDataMarkbook = $this->buildSupportingDataMarkbook($assessment, $learner);
-            $supportingDataTree = null; //TODO
+            $supportingDataTree = $this->buildSupportingDataTree($supportingDataMarkbook, $learner);
         }
 
         /* TODO Technical Uplift Candidate
@@ -499,10 +501,59 @@ class Controller extends Base
 
 
     /**
+     * Layout assessments in a tree for twig to render for supporting data.
+     * Similar to the logic in Learning\Grades\Controller.php::postReport
+     *
+     * @param Markbook        $markbook   Already filtered markbook to derive assessments from
+     * @param User            $learner
+     * @return array<int,array<string,mixed>>
+     */
+    private function buildSupportingDataTree(Markbook $markbook, User $learner): array
+    {
+        $tree = [];
+
+        foreach ($markbook->getAssessments() as $assessment) {
+            $id            = $assessment->getId();
+            $context       = $assessment->getContext();
+            $contextId     = $context->getId();
+            $baseContextId = $assessment->getBaseContext()->getId();
+
+            if (isset($tree[$baseContextId]) && $contextId !== $baseContextId) {
+                /* Ensure projects and their participation are always in the base of the tree.
+                 * This means that a project's mark will always show,
+                 * even if it doesn't match the filter: but oh well.
+                 */
+                if ($context instanceof Project) {
+                    $contexts = new GenericCollection(IAssessable::class);
+                    $contexts->add($context);
+
+                    /* Participation cannot be assumed: load this learner's participation into the project.
+                     */
+                    $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection(
+                        collection: $contexts,
+                        users: (new Collection())->add($learner),
+                        removeExcluded: false,
+                        assumeParticipation: false,
+                    );
+                    $tree[$baseContextId]['assessments'][$contextId]['assessment'] = $context;
+                }
+                $tree[$baseContextId]['assessments'][$contextId]['context']          = $context;
+                $tree[$baseContextId]['assessments'][$contextId]['assessments'][$id] = $assessment;
+            } else {
+                $tree[$contextId]['context']                        = $context;
+                $tree[$contextId]['assessments'][$id]['assessment'] = $assessment;
+            }
+        }
+
+        return $tree;
+    }
+
+
+    /**
      * Builds a markbook for a particular assessment.
      *
      * @param Reporting\Model $assessment
-     * @param User $learner
+     * @param User            $learner
      * @return Markbook
      * @throws MapperException
      * @throws NotFound
@@ -603,7 +654,7 @@ class Controller extends Base
          * since you can already see the mark/comment fields for the activity and if you showed it up here then
          * they'd just desync.
          */
-        $assessments = $assessments->filter(fn(Model $assessment) => $assessment->getId() !== $assessment->getId());
+        $assessments = $assessments->filter(fn(IAssessable $markbookAssessment) => $markbookAssessment->getId() !== $assessment->getId());
 
         /* If supporting data is disabled, then there won't be any assessments. (This is a valid scenario)
          */

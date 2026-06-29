@@ -63,11 +63,13 @@
     } only %}
 {% endblock %}
 
-{% include '@learningReportingFeedback/fragments/supportingData.twig' with {
-    learner: learner,
-    markbook: supportingDataMarkbook,
-    tree: supportingDataTree,
-} only %}
+{% if assessment.supportingDataenable and assessment.supportingDataMarkbookEnable %}
+    {% include '@learningReportingFeedback/fragments/supportingData.twig' with {
+        student: learner,
+        markbook: supportingDataMarkbook,
+        tree: supportingDataTree,
+    } only %}
+{% endif %}
 
 <div class="row">
     <div class="small-12 columns">
