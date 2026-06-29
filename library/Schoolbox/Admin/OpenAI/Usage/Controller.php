@@ -22,7 +22,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\OpenAi\Moderation\Event\Mapper as ModerationEventMapper;
 use Schoolbox\OpenAi\Moderation\Event\Status as ModerationEventStatus;
-use Schoolbox\OpenAi\Moderation\Event\Translator\ModelToArray as ModerationEventTranslator;
+use Schoolbox\OpenAi\Moderation\Event\Translator as ModerationEventTranslator;
 use Schoolbox\OpenAi\Session\Mapper as SessionMapper;
 use Schoolbox\OpenAi\Session\Log\Mapper as SessionLogMapper;
 use Schoolbox\OpenAi\Session\Model as SessionModel;
@@ -313,7 +313,13 @@ class Controller extends Base
         $userTranslator = new User\Translator\Author\ModelToArray();
         $strategyFactory = new Log\Translator\Format\StrategyFactory();
         $logTranslator = new Log\Translator\ModelToArray($userTranslator, $strategyFactory);
-        $moderationEventTranslator = new ModerationEventTranslator($userTranslator);
+
+        $moderationEventLinksTranslator = new ModerationEventTranslator\Links(
+            $this->routeGenerator,
+            $this->getAuthorizer(),
+            $this->getUser()
+        );
+        $moderationEventTranslator = new ModerationEventTranslator\ModelToArray($userTranslator, $moderationEventLinksTranslator);
 
         /* Retrieve the hydrated moderation events for the session (if any exist)
          */

@@ -20,9 +20,11 @@ class ModelToArray
      * Constructor
      *
      * @param User\Translator\Author\ModelToArray $userTranslator
+     * @param Links $linkTranslator
      */
     public function __construct(
         private User\Translator\Author\ModelToArray $userTranslator,
+        private Links $linkTranslator,
     ) {
     }
 
@@ -38,21 +40,12 @@ class ModelToArray
         return [
             'id' => $event->getId(),
             'status' => $event->getStatus(),
-            'result' => [
-                'summary' => $event->getModerationDetails()->getSummary(),
-                'categories' => $event->getModerationDetails()
-                    ->getCategories()
-                    ->map(fn(Result\Category $category) => $category->getCategory())
-                    ->jsonSerialize(),
-            ],
+            /* note: this is the entire moderation result for now, may need to reduce this if more than superusers have access to it in the future */
+            'result' => $event->getModerationDetails()->jsonSerialize(),
             'reviewedBy' => $event->getReviewedBy() ? $this->userTranslator->__invoke($event->getReviewedBy()) : null,
             'resolvedBy' => $event->getResolvedBy() ? $this->userTranslator->__invoke($event->getResolvedBy()) : null,
             'createdAt' => $event->getCreatedAt()?->getUsingFormat(DATE_ATOM),
-            '_routes' => [
-                'postNoActionRequired' => null, // TODO: links translator
-                'postFurtherActionRequired' => null, // TODO: links translator
-                'postFurtherActionTaken' => null, // TODO: links translator
-            ],
+            '_routes' => $this->linkTranslator->__invoke($event),
         ];
     }
 }

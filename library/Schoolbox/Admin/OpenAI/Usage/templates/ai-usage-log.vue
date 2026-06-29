@@ -2,35 +2,26 @@
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import type { PaginationMeta } from "@js/util/sbx/apiUtils";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
-import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import { EMPTY_DATE } from "@schoolboxVue/components/dateTimePicker/datePickerTypes";
-import DateRange from "@schoolboxVue/components/dateTimePicker/date-range.vue";
-import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
-import RelativeTime from "@schoolboxVue/components/relativeTime/relative-time.vue";
 import PaginatorButtons from "@schoolboxVue/components/paginator-buttons.vue";
-import { AiLogFormat } from "./payload";
+import type { AiModerationEvent, AiModerationStatus } from "./moderationEvent";
 import type {
-    AiSessionId,
     AiFeature,
     AiSession,
+    AiSessionLogApiResponse,
     AiUsageLogApiRequest,
     AiUsageLogApiResponse,
-    AiSessionLogApiResponse,
 } from "./payload";
-import AulAgentChat from "./aul-agent-chat.vue";
-import AulModerationIndicator from "./aul-moderation-indicator.vue";
-import { STATUS_LABELS } from "./moderationEvent";
-import type { AiModerationEvent, AiModerationStatus } from "./moderationEvent";
-
-interface Props {
-    routeSearch: string;
-    features: Record<string, { title: string }>;
-}
+import AulFilters from "./aul-filters.vue";
+import AulSessionInfo from "./aul-session-info.vue";
+import AulSessionList from "./aul-session-list.vue";
 
 const PAGE_SIZE = 30;
 
-const UNKNOWN_FEATURE_TEXT = "Unknown Feature";
-const SELECTED_SESSION_ACTIONS_ID = "ai-usage-log-selected-session-actions";
+interface Props {
+    routeSearch: string;
+    features: Record<AiFeature, { title: string }>;
+}
 
 const props = defineProps<Props>();
 
@@ -44,79 +35,20 @@ const startDateFilter = window.Vue.ref<string>(EMPTY_DATE);
 const endDateFilter = window.Vue.ref<string>(EMPTY_DATE);
 const moderationStatusFilter = window.Vue.ref<AiModerationStatus[]>([]);
 
-const usageSessions = window.Vue.ref<AiSession[]>([]);
+const sessions = window.Vue.ref<AiSession[]>([]);
 const pageInfo = window.Vue.ref<PaginationMeta | null>(null);
 
 const sessionLoadError = window.Vue.ref<string | null>(null);
-const selectedSessionId = window.Vue.ref<AiSessionId | null>(null);
-const selectedSessionLog = window.Vue.ref<AiSessionLogApiResponse | null>(null);
-
-type AiSelectedSessionInfo<TFeature extends AiFeature = AiFeature> = {
-    [KLogFormat in AiLogFormat]: {
-        logFormat: KLogFormat;
-        session: AiSession<KLogFormat, TFeature>;
-        sessionLogs: AiSessionLogApiResponse<KLogFormat>["logs"];
-        moderationEvents: AiModerationEvent[];
-    };
-}[AiLogFormat];
-
-type AiSelectedSessionInfoLoading = Pick<AiSelectedSessionInfo, "session">;
-
-const selectedSessionInfo = window.Vue.computed<AiSelectedSessionInfo | AiSelectedSessionInfoLoading | null>(() => {
-    if (selectedSessionId.value === null) {
-        return null;
-    }
-
-    const sessionInfo = usageSessions.value.find((s) => s.id === selectedSessionId.value);
-    if (sessionInfo === undefined) {
-        console.warn(`Session ID ${selectedSessionId.value} not found`); // shouldn't get here
-        return null;
-    }
-
-    const logInfo = selectedSessionLog.value;
-    if (logInfo === null) {
-        // still loading
-        return { session: sessionInfo };
-    }
-
-    // TODO: properly support sessions with multiple log formats, for now just filter out invalid logs
-    const filteredLogs = logInfo.logs.filter((entry) => entry.logFormat !== null && entry.data !== null);
-
-    // sessionInfo.logFormat only selects the renderer; the renderer interprets each entry's own logFormat.
-    const info = {
-        logFormat: sessionInfo.logFormat,
-        session: sessionInfo,
-        sessionLogs: filteredLogs,
-        moderationEvents: logInfo.moderationEvents,
-    };
-    return info satisfies Record<keyof AiSelectedSessionInfo, unknown> as AiSelectedSessionInfo;
-});
+const selectedSession = window.Vue.ref<AiSession | null>(null);
+const selectedSessionInfo = window.Vue.ref<AiSessionLogApiResponse | null>(null);
 
 /**
  * Close the current session details pane
  */
 function closeSessionDetails(): void {
     sessionLoadError.value = null;
-    selectedSessionId.value = null;
-    selectedSessionLog.value = null;
-}
-
-/**
- * Determine if it is possible to view a session's logs
- * @param session The session to check
- * @returns true if the session's logs can be viewed
- */
-function canViewSessionLogs(session: AiSession): boolean {
-    return session.logFormat !== null && session._routes.getSessionLogs !== undefined;
-}
-
-/**
- * Get the formatted createdAt date for a given AI session
- * @param session the given session
- * @returns The formatted createdAt date
- */
-function formatSessionDate(session: AiSession): string {
-    return window.dayjs(session.createdAt).format(window.dateDisplayFormats.dayjsDatetime);
+    selectedSession.value = null;
+    selectedSessionInfo.value = null;
 }
 
 /**
@@ -128,7 +60,7 @@ async function loadUsageLogs(): Promise<void> {
 
     closeSessionDetails();
 
-    usageSessions.value = [];
+    sessions.value = [];
 
     const response = await apiRequest<AiUsageLogApiResponse, AiUsageLogApiRequest>({
         method: "POST",
@@ -152,7 +84,7 @@ async function loadUsageLogs(): Promise<void> {
         return;
     }
 
-    usageSessions.value = response.data.data;
+    sessions.value = response.data.data;
     pageInfo.value = response.data.metadata;
 }
 
@@ -181,19 +113,18 @@ async function applyFilters(): Promise<void> {
 /**
  * Reset the filters to their default values (show everything)
  */
-function resetFilters(): void {
+async function resetFilters(): Promise<void> {
     keywordFilter.value = "";
     featureFilter.value = null;
     userFilter.value = [];
     startDateFilter.value = EMPTY_DATE;
     endDateFilter.value = EMPTY_DATE;
     moderationStatusFilter.value = [];
+
+    await applyFilters();
 }
 
-window.Vue.onMounted(async () => {
-    resetFilters();
-    await applyFilters();
-});
+window.Vue.onMounted(resetFilters);
 
 /**
  * Open the details for a specific session
@@ -205,8 +136,8 @@ async function openSessionDetails(session: AiSession): Promise<void> {
     }
 
     sessionLoadError.value = null;
-    selectedSessionId.value = session.id;
-    selectedSessionLog.value = null;
+    selectedSession.value = session;
+    selectedSessionInfo.value = null;
 
     const response = await apiRequest<AiSessionLogApiResponse>({
         method: "GET",
@@ -218,100 +149,49 @@ async function openSessionDetails(session: AiSession): Promise<void> {
         return;
     }
 
-    selectedSessionLog.value = response.data;
+    selectedSessionInfo.value = response.data;
 }
 
 /**
- * Print the currently selected AI session log.
+ * session info, so the displayed data realigns with the event's new state.
+ * Update the stored moderation event data after an action
+ * @param event The updated moderation event data
  */
-function printSelectedSession(): void {
-    window.print();
+function applyModerationEventUpdate(event: AiModerationEvent): void {
+    if (!selectedSessionInfo.value) {
+        throw new Error("Unable to update moderation event without session info"); // shouldn't get here
+    }
+
+    const index = selectedSessionInfo.value.moderationEvents.findIndex((existing) => existing.id === event.id);
+    if (index === -1) {
+        throw new Error("Unable to find moderation event to update"); // shouldn't get here
+    }
+
+    // update like this to ensure reactivity is preserved
+    selectedSessionInfo.value.moderationEvents[index] = event;
 }
 </script>
 
 <template>
     <div class="row no-print">
         <div class="small-12 island">
-            <section>
-                <fieldset class="content">
-                    <legend>Filter</legend>
-                    <div class="small-12 columns l-flex-col l-gap-m">
-                        <label>
-                            Keyword
-                            <input
-                                v-model="keywordFilter"
-                                class="f-no-margins"
-                                type="text"
-                                name="keyword"
-                                placeholder="Filter by keyword"
-                            />
-                        </label>
-                        <div class="l-flex-row l-flex--no-wrap l-gap-m">
-                            <div class="l-flex-col l-flex__item--1">
-                                <label>
-                                    Feature
-                                    <select v-model="featureFilter" name="feature" class="f-no-margins">
-                                        <option :value="null">All</option>
-                                        <option
-                                            v-for="(featureConf, feature) in props.features"
-                                            :key="feature"
-                                            :value="feature"
-                                        >
-                                            {{ featureConf.title }}
-                                        </option>
-                                    </select>
-                                </label>
-                            </div>
-                            <div class="l-flex-col l-flex__item--1">
-                                <search-select
-                                    v-model:selected="userFilter"
-                                    label="User"
-                                    label-id="users"
-                                    endpoint="/ajax/user.php?groupID=0&"
-                                    :is-single-select="true"
-                                    placeholder="Search for user..."
-                                />
-                            </div>
-                        </div>
-
-                        <date-range
-                            ref="dateRangeRef"
-                            v-model:start-date="startDateFilter"
-                            v-model:end-date="endDateFilter"
-                            id-prefix="ai-usage-log-filter"
-                        />
-
-                        <div>
-                            <label>Moderation Status</label>
-                            <div class="l-flex-row l-gap-m">
-                                <div v-for="(label, status) in STATUS_LABELS" :key="status">
-                                    <input
-                                        :id="`ai-usage-log-moderation-${status}`"
-                                        v-model="moderationStatusFilter"
-                                        type="checkbox"
-                                        :value="status"
-                                    />
-                                    <label :for="`ai-usage-log-moderation-${status}`" class="checkbox-label">
-                                        {{ label }}
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </fieldset>
-            </section>
-            <div class="row">
-                <div class="small-12 columns">
-                    <button class="button submit" @click="applyFilters">Filter</button>
-                </div>
-            </div>
+            <aul-filters
+                v-model:keyword-filter="keywordFilter"
+                v-model:feature-filter="featureFilter"
+                v-model:user-filter="userFilter"
+                v-model:start-date-filter="startDateFilter"
+                v-model:end-date-filter="endDateFilter"
+                v-model:moderation-status-filter="moderationStatusFilter"
+                :features="props.features"
+                @apply-filters="applyFilters"
+            />
         </div>
     </div>
 
     <div class="no-print">
         <div class="list-item">
             <h2 class="subheader">
-                Activity<template v-if="!isLoading">: {{ usageSessions.length }} events</template>
+                Activity<template v-if="!isLoading">: {{ sessions.length }} events</template>
             </h2>
         </div>
     </div>
@@ -326,83 +206,20 @@ function printSelectedSession(): void {
                 <div class="loader"></div>
             </section>
 
-            <div v-else-if="usageSessions.length > 0">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Feature</th>
-                            <th>User</th>
-                            <th></th>
-                            <th></th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        <tr v-for="session in usageSessions" :key="session.id">
-                            <td>
-                                {{ formatSessionDate(session) }}
-                            </td>
-                            <td>
-                                {{ props.features[session.feature]?.title ?? UNKNOWN_FEATURE_TEXT }}
-                            </td>
-                            <td>
-                                <span v-if="!session.createdBy">System</span>
-                                <component
-                                    :is="session.createdBy._links.profile ? 'a' : 'span'"
-                                    v-else
-                                    :href="session.createdBy._links.profile ?? undefined"
-                                    :title="session.createdBy._links.profile ? 'View Profile' : undefined"
-                                >
-                                    {{ session.createdBy.fullName }}
-                                </component>
-                            </td>
-                            <td>{{ session.hasError ? "Error" : "" }}</td>
-                            <td
-                                :class="`actions-small-${session.moderationStatus && canViewSessionLogs(session) ? 2 : 1}`"
-                            >
-                                <!--
-                                Although this does handle a non-viewable session which has a moderation status,
-                                it is not actually possible to end up in that state normally, since only sessions with
-                                a logFormat (and therefore viewable) can have a moderation status set.
-                                -->
-                                <nav v-if="session.moderationStatus || canViewSessionLogs(session)">
-                                    <aul-moderation-indicator
-                                        v-if="session.moderationStatus"
-                                        :status="session.moderationStatus"
-                                    />
-                                    <button
-                                        v-if="canViewSessionLogs(session)"
-                                        type="button"
-                                        class="sbx-icon-only-button f-no-margins"
-                                        title="View session details"
-                                        aria-label="View session details"
-                                        :disabled="session.id.toString() === selectedSessionId?.toString()"
-                                        @click="() => openSessionDetails(session)"
-                                    >
-                                        <sbx-icon name="view" />
-                                    </button>
-                                </nav>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div v-else-if="sessions.length > 0">
+                <aul-session-list
+                    :features="props.features"
+                    :sessions="sessions"
+                    :selected-session-id="selectedSession?.id ?? null"
+                    @open-session-details="openSessionDetails"
+                />
             </div>
 
             <div v-else class="empty-state">
                 <sbx-icon name="ai" size="2.5rem"></sbx-icon>
                 <p>
                     No logs match the current filters. Try another filter or
-                    <a
-                        href="#"
-                        @click.prevent="
-                            () => {
-                                resetFilters();
-                                void applyFilters();
-                            }
-                        "
-                        >show everything</a
-                    >.
+                    <a href="#" @click.prevent="resetFilters">show everything</a>.
                 </p>
             </div>
 
@@ -417,72 +234,13 @@ function printSelectedSession(): void {
             <div v-if="sessionLoadError" data-alert class="alert-box alert">
                 {{ sessionLoadError }}
             </div>
-            <section v-else-if="selectedSessionInfo !== null">
-                <div class="card small-12 actions-small-1">
-                    <div class="list-item">
-                        <span>
-                            <user-photo
-                                v-if="selectedSessionInfo.session.createdBy"
-                                :user-id="selectedSessionInfo.session.createdBy.id || 0"
-                                render="small"
-                            />
-                            <h3>
-                                {{ props.features[selectedSessionInfo.session.feature]?.title ?? UNKNOWN_FEATURE_TEXT }}
-                            </h3>
-                        </span>
-                        <p class="meta">
-                            <span v-if="!selectedSessionInfo.session.createdBy"> Created </span>
-                            <template v-else>
-                                Created by
-                                <component
-                                    :is="selectedSessionInfo.session.createdBy._links.profile ? 'a' : 'span'"
-                                    :href="selectedSessionInfo.session.createdBy._links.profile ?? undefined"
-                                >
-                                    {{ selectedSessionInfo.session.createdBy.fullName }}
-                                </component>
-                            </template>
-                            <relative-time :datetime="selectedSessionInfo.session.createdAt" full-diff></relative-time>
-                        </p>
-                    </div>
-                    <nav class="no-print">
-                        <sbx-pop-out :content-id="SELECTED_SESSION_ACTIONS_ID"></sbx-pop-out>
-                    </nav>
-                    <ul :id="SELECTED_SESSION_ACTIONS_ID" class="f-dropdown no-print" data-dropdown-content>
-                        <li>
-                            <a
-                                href="#"
-                                class="sbx-button--has-icon"
-                                data-test="ai-usage-log-print-session"
-                                @click.prevent="printSelectedSession"
-                            >
-                                <sbx-icon name="print"></sbx-icon>
-                                Print / Save as PDF
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="clearfix"></div>
-
-                <div v-if="!('logFormat' in selectedSessionInfo)" class="loader"></div>
-                <div v-else-if="selectedSessionInfo.sessionLogs.length === 0" class="empty-state">
-                    <sbx-icon name="hidden" size="xl" />
-                    <p>
-                        The {{ props.features[selectedSessionInfo.session.feature].title }} feature does not support
-                        previews for this session.
-                    </p>
-                </div>
-                <div v-else class="l-mar-m">
-                    <aul-agent-chat
-                        v-if="
-                            selectedSessionInfo.logFormat === AiLogFormat.AGENT_CHAT ||
-                            selectedSessionInfo.logFormat === AiLogFormat.GUARDRAIL
-                        "
-                        :feature="selectedSessionInfo.session.feature"
-                        :session-logs="selectedSessionInfo.sessionLogs"
-                        :moderation-events="selectedSessionInfo.moderationEvents"
-                    />
-                </div>
-            </section>
+            <aul-session-info
+                v-if="selectedSession !== null"
+                v-model:session-info="selectedSessionInfo"
+                :session="selectedSession"
+                :features="props.features"
+                @update-moderation-event="applyModerationEventUpdate"
+            />
         </div>
     </div>
 </template>
