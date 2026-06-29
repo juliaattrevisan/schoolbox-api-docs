@@ -83,10 +83,10 @@ window.Vue.watch(bottom, (isAtBottom) => {
         <table class="coverage-report">
             <thead>
                 <tr>
-                    <th rowspan="2" class="u-border-right curriculum-column l-valign--bottom cc-sticky-left">
+                    <th rowspan="2" class="u-border-right curriculum-column u-valign-bottom cc-sticky-left">
                         Curriculum
                     </th>
-                    <th rowspan="2" class="l-valign--bottom">Total</th>
+                    <th rowspan="2" class="u-valign-bottom">Total</th>
                     <template v-for="course in coursesStore.courses" :key="course.id">
                         <th class="u-border-left" style="border-right: none">Course</th>
                         <!-- colspan will be the number of units plus total if more than one course -->
@@ -112,7 +112,7 @@ window.Vue.watch(bottom, (isAtBottom) => {
                             <a v-if="unit.folder" :href="unit.folder._links.view">{{ unit.title }}</a
                             ><template v-else>{{ unit.title }}</template>
                         </td>
-                        <td v-if="coursesStore.hasMultipleCourses" class="l-valign--bottom"><b>Total</b></td>
+                        <td v-if="coursesStore.hasMultipleCourses" class="u-valign-bottom"><b>Total</b></td>
                     </template>
                 </tr>
             </thead>
