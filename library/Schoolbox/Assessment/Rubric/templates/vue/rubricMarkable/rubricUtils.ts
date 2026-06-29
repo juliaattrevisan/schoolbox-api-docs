@@ -57,7 +57,7 @@ export function applyMarkScheme(
     if (markScheme.mode === MarkTypeSlug.PERCENT) {
         return {
             value: percentage !== null ? percentage.toString() : null,
-            humanReadableMark: percentage !== null ? `${percentage}%` : null,
+            humanReadableMark: percentage !== null ? `${percentage} %` : null,
         };
     }
 

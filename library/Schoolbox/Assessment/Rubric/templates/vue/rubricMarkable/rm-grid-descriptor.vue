@@ -63,12 +63,19 @@ const hasMarkRange = window.Vue.computed(() => props.descriptor.value !== null &
  * Internal cache of the selected value for this descriptor
  * default to the max value (unless it can be derived from the indicator mark, see onMounted)
  */
-const descriptorValue = window.Vue.ref<number>(
-    props.descriptor.value !== null
-        ? "max" in props.descriptor.value
-            ? props.descriptor.value.max
-            : Math.max(props.descriptor.value.left, props.descriptor.value.right)
-        : 0,
+const descriptorValue = window.Vue.ref<number | null>(
+    (() => {
+        // compute the initial value
+        if (props.descriptor.value !== null) {
+            if ("max" in props.descriptor.value) {
+                return props.descriptor.value.max;
+            }
+
+            return Math.max(props.descriptor.value.left, props.descriptor.value.right);
+        }
+
+        return 0;
+    })(),
 );
 
 const isDescriptorSelected = window.Vue.computed({

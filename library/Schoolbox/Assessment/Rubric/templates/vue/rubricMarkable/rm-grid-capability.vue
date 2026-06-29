@@ -105,7 +105,7 @@ function scaleMark(value: number | null): number | null {
  */
 const derivedCapabilityMark = window.Vue.computed(() => {
     const sum = indicatorMarkSum.value;
-    const scaledMark = scaleMark(sum);
+    const scaledMark = props.capabilityMarkScheme.mode === MarkTypeSlug.NONE ? null : scaleMark(sum);
     const { value, humanReadableMark } = applyMarkScheme(
         scaledMark,
         props.capability.maxValue,
