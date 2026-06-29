@@ -397,7 +397,11 @@ class Series
                     }
                     $relatedBooking
                         ->setName($item->getName())
-                        ->setNotes($relatedItems[$relatedResource->getId()]['notes']);
+                        ->setNotes($relatedItems[$relatedResource->getId()]['notes'])
+                        ->setQuantity(max(
+                            Model::DEFAULT_QUANTITY,
+                            (int)($relatedItems[$relatedResource->getId()]['quantity'] ?? $relatedBooking->getQuantity())
+                        ));
 
                     // Open resource: automatically confirm
                     if ($relatedResource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
