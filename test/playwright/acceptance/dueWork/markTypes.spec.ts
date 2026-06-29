@@ -12,6 +12,8 @@ import SubmitForm from "@schoolboxTest/playwright/support/page/dueWork/SubmitFor
 import StatusPage from "@schoolboxTest/playwright/support/page/dueWork/StatusPage";
 import UnitPlanner from "@schoolboxTest/playwright/support/page/unitPlanner/UnitPlanner";
 import FeedbackForm from "@schoolboxTest/playwright/support/page/dueWork/FeedbackForm";
+import RubricBuilder from "@schoolboxTest/playwright/support/page/rubric/RubricBuilder";
+import RubricMarkable from "@schoolboxTest/playwright/support/page/rubric/RubricMarkable";
 import MarkbookPage from "@schoolboxTest/playwright/support/page/markbook/MarkbookPage";
 import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
 import GradesPage from "@schoolboxTest/playwright/support/page/grades/GradesPage";
@@ -48,6 +50,7 @@ test.describe("Due Work - Mark type tests", () => {
     test("Create activities", async ({ tester, page }) => {
         const unitPlanner = new UnitPlanner(tester, page);
         const assessmentForm = new AssessmentForm(tester, page);
+        const rubricBuilder = new RubricBuilder(page);
         const common = new Common(page);
 
         tester.isGoingTo("navigate to Year 9 English Modify unit planner page");
@@ -96,15 +99,15 @@ test.describe("Due Work - Mark type tests", () => {
         await assessmentForm.enableDualMarkTypes();
         await assessmentForm.setMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
         await assessmentForm.setInstructorMarkType(AssessmentForm.MARK_TYPE_TOTAL_MARK);
-        await assessmentForm.clickAddRubric();
-        await assessmentForm.clickCreateRubricManually();
-        await assessmentForm.addRubricLevel();
-        await assessmentForm.toggleRubricIndicator(86, 426);
-        await assessmentForm.fillRubricCriterionPoints(86, 426, 0, "1");
-        await assessmentForm.fillRubricCriterionPoints(86, 426, 1, "2");
-        await assessmentForm.toggleRubricIndicator(87, 420);
-        await assessmentForm.fillRubricCriterionPoints(87, 420, 0, "1");
-        await assessmentForm.fillRubricCriterionPoints(87, 420, 1, "2");
+        await rubricBuilder.clickAddRubric();
+        await rubricBuilder.clickCreateRubricManually();
+        await rubricBuilder.addRubricLevel();
+        await rubricBuilder.toggleRubricIndicator(86, 426);
+        await rubricBuilder.fillRubricCriterionPoints(86, 426, 0, "1");
+        await rubricBuilder.fillRubricCriterionPoints(86, 426, 1, "2");
+        await rubricBuilder.toggleRubricIndicator(87, 420);
+        await rubricBuilder.fillRubricCriterionPoints(87, 420, 0, "1");
+        await rubricBuilder.fillRubricCriterionPoints(87, 420, 1, "2");
         await assessmentForm.clickCreate();
 
         // Now back on the unit planner page, import the unit into the homepage
@@ -153,14 +156,14 @@ test.describe("Due Work - Mark type tests", () => {
         await assessmentForm.enableDualMarkTypes();
         await assessmentForm.setMarkType(AssessmentForm.MARK_TYPE_NONE);
         await assessmentForm.setInstructorMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
-        await assessmentForm.clickAddRubric();
-        await assessmentForm.clickCreateRubricManually();
-        await assessmentForm.toggleRubricIndicator(74, 452);
-        await assessmentForm.fillRubricCriterionPoints(74, 452, 0, "1");
-        await assessmentForm.fillRubricCriterionPoints(74, 452, 1, "2");
-        await assessmentForm.toggleRubricIndicator(76, 446);
-        await assessmentForm.fillRubricCriterionPoints(76, 446, 0, "1");
-        await assessmentForm.fillRubricCriterionPoints(76, 446, 1, "2");
+        await rubricBuilder.clickAddRubric();
+        await rubricBuilder.clickCreateRubricManually();
+        await rubricBuilder.toggleRubricIndicator(74, 452);
+        await rubricBuilder.fillRubricCriterionPoints(74, 452, 0, "1");
+        await rubricBuilder.fillRubricCriterionPoints(74, 452, 1, "2");
+        await rubricBuilder.toggleRubricIndicator(76, 446);
+        await rubricBuilder.fillRubricCriterionPoints(76, 446, 0, "1");
+        await rubricBuilder.fillRubricCriterionPoints(76, 446, 1, "2");
         await assessmentForm.create();
     });
 
@@ -171,6 +174,7 @@ test.describe("Due Work - Mark type tests", () => {
         const homepageCourseOutline = new CourseOutline(tester, page);
         const assessmentPage = new AssessmentPage(tester, page);
         const feedbackForm = new FeedbackForm(tester, page);
+        const rubricMarkable = new RubricMarkable(page);
         const submitForm = new SubmitForm(tester, page);
 
         await tester.impersonateViaUserProfilePage(learner);
@@ -198,13 +202,13 @@ test.describe("Due Work - Mark type tests", () => {
             await assessmentPage.clickSelfAcknowledge();
             await assessmentPage.clickSelfAcknowledgeProceed();
 
-            await feedbackForm.selectRubricIndicatorByValue(452, "1");
-            await feedbackForm.selectRubricIndicatorByValue(446, "2");
+            await rubricMarkable.selectRubricIndicatorByValue(452, "1");
+            await rubricMarkable.selectRubricIndicatorByValue(446, "2");
 
             // Display mark type should be used (percentage)
             const participantId = await feedbackForm.getParticipantId();
-            await feedbackForm.expectRubricFinalSummaryMark("75 %");
-            await feedbackForm.expectRubricSum("75 %");
+            await rubricMarkable.expectRubricFinalSummaryMark("75 %");
+            await rubricMarkable.expectRubricSum("75 %");
             await feedbackForm.expectGrade("75 %", participantId);
 
             await feedbackForm.setComment("test", participantId);
@@ -219,13 +223,13 @@ test.describe("Due Work - Mark type tests", () => {
             await assessmentPage.clickSelfAcknowledge();
             await assessmentPage.clickSelfAcknowledgeProceed();
 
-            await feedbackForm.selectRubricIndicatorByValue(452, "1");
-            await feedbackForm.selectRubricIndicatorByValue(446, "2");
+            await rubricMarkable.selectRubricIndicatorByValue(452, "1");
+            await rubricMarkable.selectRubricIndicatorByValue(446, "2");
 
             // Display mark type should be used (none)
             const participantId = await feedbackForm.getParticipantId();
-            await feedbackForm.expectNoRubricFinalSummary();
-            await feedbackForm.expectNoRubricSum();
+            await rubricMarkable.expectNoRubricFinalSummary();
+            await rubricMarkable.expectNoRubricSum();
             await feedbackForm.expectNoGradeSelector(participantId);
 
             await feedbackForm.setComment("test", participantId);
@@ -239,6 +243,7 @@ test.describe("Due Work - Mark type tests", () => {
     test("Mark submissions", async ({ tester, page }) => {
         const homepageCourseOutline = new CourseOutline(tester, page);
         const feedbackForm = new FeedbackForm(tester, page);
+        const rubricMarkable = new RubricMarkable(page);
         const statusPage = new StatusPage(tester, page);
 
         await tester.impersonateViaUserProfilePage(instructor);
@@ -268,12 +273,12 @@ test.describe("Due Work - Mark type tests", () => {
             await statusPage.clickParticipantJellyTot(learnerId);
             await statusPage.clickViewAndGradeSubmission(learnerId);
 
-            await feedbackForm.selectRubricIndicatorByValue(452, "1");
-            await feedbackForm.selectRubricIndicatorByValue(446, "1");
+            await rubricMarkable.selectRubricIndicatorByValue(452, "1");
+            await rubricMarkable.selectRubricIndicatorByValue(446, "1");
 
             // Input mark type should be used (total mark)
-            await feedbackForm.expectRubricFinalSummaryMark("2 / 4 (3 / 4 given in Self-assessment)");
-            await feedbackForm.expectRubricSum("2 / 4");
+            await rubricMarkable.expectRubricFinalSummaryMark("2 / 4 (3 / 4 given in Self-assessment)");
+            await rubricMarkable.expectRubricSum("2 / 4");
             await feedbackForm.expectGrade("2 / 4", learnerId);
 
             // Display mark type should be used for the self assessment mark (percentage)
@@ -292,12 +297,12 @@ test.describe("Due Work - Mark type tests", () => {
             await statusPage.clickParticipantJellyTot(learnerId);
             await statusPage.clickViewAndGradeSubmission(learnerId);
 
-            await feedbackForm.selectRubricIndicatorByValue(452, "1");
-            await feedbackForm.selectRubricIndicatorByValue(446, "1");
+            await rubricMarkable.selectRubricIndicatorByValue(452, "1");
+            await rubricMarkable.selectRubricIndicatorByValue(446, "1");
 
             // Input mark type should be used (percentage)
-            await feedbackForm.expectRubricFinalSummaryMark("50 %");
-            await feedbackForm.expectRubricSum("50 %");
+            await rubricMarkable.expectRubricFinalSummaryMark("50 %");
+            await rubricMarkable.expectRubricSum("50 %");
             await feedbackForm.expectGrade("50 %", learnerId);
 
             // Displey mark type should be used for the self assessment mark (none)
