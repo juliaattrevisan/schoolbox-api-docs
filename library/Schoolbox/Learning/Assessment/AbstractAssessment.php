@@ -280,6 +280,7 @@ abstract class AbstractAssessment implements IAssessable
         // (One wonders why spec assessments even have plans?)
         $clone->setPlans($clone->getPlans()->emptyClone());
 
+        // TODO: SA-22480: Investigate below AI-generated 'fix', probably defer to another ticket
         // The clone must not carry over the source's rubric instances. Rubric cloning is
         // handled separately (see Replicator/Transplantor and RubricDataSource::copyRubric),
         // and these source instances have no frontend grid payload, so persisting the clone

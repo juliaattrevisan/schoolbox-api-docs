@@ -492,6 +492,7 @@ class Decorator implements DecoratorInterface
             $assessment->setEnablePolicy($this->getEnablePolicy());
         }
 
+        // TODO: SA-22480: use rubric is deprecated, this totally shouldn't exist
         /* Keep the legacy use_rubric flag in sync with the presence of rubric instances,
          * which are the source of truth for whether this activity uses a rubric. Without this,
          * rubrics built with the rubric builder leave use_rubric = 0, hiding rubric-gated UI

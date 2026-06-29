@@ -73,6 +73,7 @@ window.Vue.watch(derivedRubricMark, (scaledMark) => {
  * The self-assessment's mark, re-expressed in the instructor's (input) mark scheme rather than the
  * display scheme the student saw, so it can be compared against the mark the instructor is entering.
  */
+// TODO: SA-22480: Investigate below AI-generated 'fix', oh god it fulfilled my TODO down there...
 const selfAssessmentMarkInInputScheme = window.Vue.computed<string | null>(() => {
     if (!props.selfAssessmentFeedback) {
         return null;
