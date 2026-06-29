@@ -212,7 +212,7 @@ async function onDeleteConfirmed(): Promise<void> {
                 >Create a new template</a
             >
         </div>
-        <div v-else class="sbx-island l-c-cr-bottom">
+        <div v-else class="sbx-island u-c-cr-bottom">
             <div v-for="(template, index) in currentTemplates" :key="template.id" class="sbx-card">
                 <div
                     :class="`u-flex-row u-gap-m ${index !== currentTemplates.length - 1 ? `sbx-card--border-end-alt` : ''}`"
