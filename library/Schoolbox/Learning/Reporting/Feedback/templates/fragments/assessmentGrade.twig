@@ -20,38 +20,40 @@
  #}
 <div class="flex-grade">
     <div class="small-12 card columns">
-        {% set summaryRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
-            assessmentId: assessment.id,
-            assessment:   assessment,
-            studentId:    student.id,
-            student:      student
-        }) %}
-        {% if summaryRoute %}
-            <a class="grades-assessment-link" href="{{ summaryRoute }}{{ returnUrlSuffix is defined ? returnUrlSuffix : '' }}">
-                <sbx-icon class="grades-assessment-link__icon" name="{{ icon.renderName(assessment)|trim }}" color="var(--sbx-color-text-secondary)"></sbx-icon>
-                <p>{{ assessment.title }}
-                    {% if participant and effectiveViewer.role.isStaff and participant.plan.isStatic %}
-                        <span class="individualisation has-tip tip-top" data-tooltip title="{{ participant.plan.name}} ({{ participant.plan.duedate.short}})">i</span>
-                    {% endif %}
-                </p>
-            </a>
-        {% else %}
-            <div class="grades-assessment-link">
-                <sbx-icon class="grades-assessment-link__icon" name="{{ icon.renderName(assessment)|trim }}" color="var(--sbx-color-text-secondary)"></sbx-icon>
-                <p>{{ assessment.title }}</p>
-            </div>
-        {% endif %}
-        <p>
-            <span class="meta">{{ assessment.typeName }}</span>
+        <div class="grades-assessment-link">
+            {% set summaryRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
+                assessmentId: assessment.id,
+                assessment:   assessment,
+                studentId:    student.id,
+                student:      student
+            }) %}
+            {% if summaryRoute %}
+                <a class="grades-assessment-link" href="{{ summaryRoute }}{{ returnUrlSuffix is defined ? returnUrlSuffix : '' }}">
+                    <sbx-icon class="grades-assessment-link__icon" name="{{ icon.renderName(assessment)|trim }}" color="var(--sbx-color-text-secondary)"></sbx-icon>
+                    <p>
+                        {{ assessment.title }}
+                        {% if participant and effectiveViewer.role.isStaff and participant.plan.isStatic %}
+                            <span class="individualisation has-tip tip-top" data-tooltip title="{{ participant.plan.name}} ({{ participant.plan.duedate.short}})">i</span>
+                        {% endif %}
+                    </p>
+                </a>
+            {% else %}
+                <div class="grades-assessment-link">
+                    <sbx-icon class="grades-assessment-link__icon" name="{{ icon.renderName(assessment)|trim }}" color="var(--sbx-color-text-secondary)"></sbx-icon>
+                    <p>{{ assessment.title }}</p>
+                </div>
+            {% endif %}
+
+            <span class="pipe meta">{{ assessment.typeName }}</span>
             {% if assessment.isImplementation %}
                 <span class="pipe meta">{{ dueDate.dueDate(assessment, student) }}</span>
                 <span class="pipe meta">Weight: {{ assessment.weight }}</span>
             {% endif %}
-        </p>
+        </div>
     </div>
 
     {% if participant and assessment.isFeedbackVisibleToUser(effectiveViewer) %}
-        {% if assessment is task %}
+        {% if assessment is quiz %}
             {% include '@learningAssessment/fragments/progressTick.twig' with {
                 assessment: assessment,
                 student:    student,
