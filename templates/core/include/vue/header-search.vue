@@ -267,13 +267,13 @@ const searchButtonText = window.Vue.computed(() => {
             <div v-if="isOpen && keyword.length >= minKeywordLength" class="u-flex-col">
                 <div
                     v-if="userResults.length && userResults.length !== totalCountUsers"
-                    class="c-card c-card--border-end l-pad-s"
+                    class="c-card c-card--border-end u-pad-s"
                 >
                     <em>Showing {{ userResults.length }} of {{ totalCountUsers }} matching users</em>
                 </div>
                 <div
                     v-else-if="userResults.length && totalCountUsers === null"
-                    class="c-card c-card--border-end l-pad-s"
+                    class="c-card c-card--border-end u-pad-s"
                 >
                     <em>Showing top {{ userResults.length }} matching users</em>
                 </div>
@@ -286,7 +286,7 @@ const searchButtonText = window.Vue.computed(() => {
                     @mouseover="arrowCounter = i"
                     @mouseleave="arrowCounter = -1"
                 >
-                    <div class="u-flex-row u-flex--align-center u-flex--no-wrap u-gap-s l-pad-s">
+                    <div class="u-flex-row u-flex--align-center u-flex--no-wrap u-gap-s u-pad-s">
                         <div class="c-img c-img--s c-img--round u-flex__item--0-shrink">
                             <div class="c-img__wrapper">
                                 <img :src="result.image" :alt="`Portrait photo of ${result.title}`" />
@@ -302,13 +302,13 @@ const searchButtonText = window.Vue.computed(() => {
                 </a>
                 <div
                     v-if="pageResults.length && totalCountFolders !== null && pageResults.length !== totalCountFolders"
-                    class="c-card c-card--border-end l-pad-s"
+                    class="c-card c-card--border-end u-pad-s"
                 >
                     <em>Showing {{ pageResults.length }} of {{ totalCountFolders }} matching pages</em>
                 </div>
                 <div
                     v-else-if="pageResults.length && totalCountFolders === null"
-                    class="c-card c-card--border-end l-pad-s"
+                    class="c-card c-card--border-end u-pad-s"
                 >
                     <em>Showing top {{ pageResults.length }} matching pages</em>
                 </div>
@@ -323,7 +323,7 @@ const searchButtonText = window.Vue.computed(() => {
                     @mouseover="arrowCounter = i + userResults.length"
                     @mouseleave="arrowCounter = -1"
                 >
-                    <div class="u-flex-row u-flex--align-center u-flex--no-wrap u-gap-s l-pad-s">
+                    <div class="u-flex-row u-flex--align-center u-flex--no-wrap u-gap-s u-pad-s">
                         <div class="c-img c-img--s u-flex__item--0-shrink">
                             <div class="c-img__wrapper">
                                 <img v-if="result.image" :src="result.image" :alt="`photo of ${result.title}`" />
@@ -344,7 +344,7 @@ const searchButtonText = window.Vue.computed(() => {
                     </div>
                 </a>
                 <div v-if="isLoading" class="c-card c-card--loading">
-                    <div class="u-flex-row u-gap-s l-pad-s">
+                    <div class="u-flex-row u-gap-s u-pad-s">
                         <div class="c-img c-img--s c-img--round">
                             <div class="c-img__wrapper">
                                 <div class="img-placeholder"></div>
@@ -356,7 +356,7 @@ const searchButtonText = window.Vue.computed(() => {
                         </div>
                     </div>
                 </div>
-                <div v-if="!isLoading && !userResults.length && !pageResults.length" class="c-card l-pad-s">
+                <div v-if="!isLoading && !userResults.length && !pageResults.length" class="c-card u-pad-s">
                     <em>No users or pages were found matching "{{ keyword }}"</em>
                 </div>
             </div>

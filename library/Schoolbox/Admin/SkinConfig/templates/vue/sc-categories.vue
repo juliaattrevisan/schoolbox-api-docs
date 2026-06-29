@@ -57,7 +57,7 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
                 <div
                     v-for="(subcategory, index) in subcategories"
                     :key="subcategory.name || `default-${index}`"
-                    class="skin-config-subcategory u-flex-col u-gap-m l-pad-m"
+                    class="skin-config-subcategory u-flex-col u-gap-m u-pad-m"
                     :class="{ 'skin-config-subcategory--divided': index < subcategories.length - 1 }"
                     :data-test="`skin-config-subcategory-${subcategory.name || `default-${index}`}`"
                 >

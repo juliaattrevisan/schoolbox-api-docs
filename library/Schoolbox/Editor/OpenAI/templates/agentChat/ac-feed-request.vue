@@ -16,7 +16,7 @@ const props = defineProps<Props>();
 
 <template>
     <div class="ac-feed-request" :data-test="`ac-feed-request-list-item-${props.message.entryKey}`">
-        <div class="ac-feed-message-container l-pad-s">
+        <div class="ac-feed-message-container u-pad-s">
             <file-drop
                 v-if="props.message.meta.file"
                 :id="`ig-message-file-drop-${props.message.entryKey}`"

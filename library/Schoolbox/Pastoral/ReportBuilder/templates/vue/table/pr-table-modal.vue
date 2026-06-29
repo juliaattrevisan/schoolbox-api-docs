@@ -143,7 +143,7 @@ const { printAllRecords, isLoading: isLoadingPrint } = usePrintRecords(
                             </ul>
                         </div>
                     </div>
-                    <div v-if="isMoreLoading" class="c-island l-pad-s">
+                    <div v-if="isMoreLoading" class="c-island u-pad-s">
                         <div class="loader"></div>
                     </div>
                     <data-load-error

@@ -78,7 +78,7 @@ window.Vue.watch(bottom, (isAtBottom) => {
                         </ul>
                     </div>
                 </div>
-                <div v-if="isMoreLoading" class="c-island l-pad-s">
+                <div v-if="isMoreLoading" class="c-island u-pad-s">
                     <div class="loader"></div>
                 </div>
                 <data-load-error v-else-if="!isNewLoad && loadError" data-title="record" :further-info="loadError" />

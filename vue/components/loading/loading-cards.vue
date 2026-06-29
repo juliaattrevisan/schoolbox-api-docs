@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<Props>(), {
 <template>
     <div class="u-flex-col u-gap-m" data-test="loading-table">
         <div v-for="(row, index) in props.rows" :key="index" class="c-card c-card--loading">
-            <div class="u-flex-row u-gap-m l-pad-m">
+            <div class="u-flex-row u-gap-m u-pad-m">
                 <div v-if="props.showImage" class="c-img c-img--m c-img--round">
                     <div class="c-img__wrapper">
                         <div class="img-placeholder"></div>

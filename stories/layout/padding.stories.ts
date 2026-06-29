@@ -11,7 +11,7 @@ const meta: Meta<typeof StorybookSlot> = {
     decorators: [
         (): { template: string } => ({
             template: `
-                <div class="u-flex-row l-pad-m">
+                <div class="u-flex-row u-pad-m">
                     <story />
                 </div>
             `,
@@ -23,12 +23,12 @@ export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
 
 /**
- * `.l-pad-xs`
+ * `.u-pad-xs`
  */
 export const PaddingXS: Story = {
     render: () => ({
         template: `
-<div class="story-demo-box l-pad-xs">
+<div class="story-demo-box u-pad-xs">
     <div class="story-demo-box__inside"></div>
 </div>
         `,
@@ -36,12 +36,12 @@ export const PaddingXS: Story = {
 };
 
 /**
- * `.l-pad-s`
+ * `.u-pad-s`
  */
 export const PaddingS: Story = {
     render: () => ({
         template: `
-<div class="story-demo-box l-pad-s">
+<div class="story-demo-box u-pad-s">
     <div class="story-demo-box__inside"></div>
 </div>
         `,
@@ -49,12 +49,12 @@ export const PaddingS: Story = {
 };
 
 /**
- * `.l-pad-m`
+ * `.u-pad-m`
  */
 export const PaddingM: Story = {
     render: () => ({
         template: `
-<div class="story-demo-box l-pad-m">
+<div class="story-demo-box u-pad-m">
     <div class="story-demo-box__inside"></div>
 </div>
         `,
@@ -62,12 +62,12 @@ export const PaddingM: Story = {
 };
 
 /**
- * `.l-pad-l`
+ * `.u-pad-l`
  */
 export const PaddingL: Story = {
     render: () => ({
         template: `
-<div class="story-demo-box l-pad-l">
+<div class="story-demo-box u-pad-l">
     <div class="story-demo-box__inside"></div>
 </div>
         `,
@@ -75,12 +75,12 @@ export const PaddingL: Story = {
 };
 
 /**
- * `.l-pad-xl`
+ * `.u-pad-xl`
  */
 export const PaddingXL: Story = {
     render: () => ({
         template: `
-<div class="story-demo-box l-pad-xl">
+<div class="story-demo-box u-pad-xl">
     <div class="story-demo-box__inside"></div>
 </div>
         `,
@@ -88,14 +88,14 @@ export const PaddingXL: Story = {
 };
 
 /**
- * `.l-pad-m--horiz`
+ * `.u-pad-m--horiz`
  *
  * _Can be used with any of the sizes above_
  */
 export const PaddingHorizontal: Story = {
     render: () => ({
         template: `
-<div class="story-demo-box l-pad-m--horiz">
+<div class="story-demo-box u-pad-m--horiz">
     <div class="story-demo-box__inside"></div>
 </div>
         `,
@@ -103,14 +103,14 @@ export const PaddingHorizontal: Story = {
 };
 
 /**
- * `.l-pad-m--vert`
+ * `.u-pad-m--vert`
  *
  * _Can be used with any of the sizes above_
  */
 export const PaddingVertical: Story = {
     render: () => ({
         template: `
-<div class="story-demo-box l-pad-m--vert">
+<div class="story-demo-box u-pad-m--vert">
     <div class="story-demo-box__inside"></div>
 </div>
         `,
@@ -118,14 +118,14 @@ export const PaddingVertical: Story = {
 };
 
 /**
- * `.l-pad-m--top`
+ * `.u-pad-m--top`
  *
  * _Can be used with any of the sizes above_
  */
 export const PaddingTop: Story = {
     render: () => ({
         template: `
-<div class="story-demo-box l-pad-m--top">
+<div class="story-demo-box u-pad-m--top">
     <div class="story-demo-box__inside"></div>
 </div>
         `,
@@ -133,14 +133,14 @@ export const PaddingTop: Story = {
 };
 
 /**
- * `.l-pad-m--bottom`
+ * `.u-pad-m--bottom`
  *
  * _Can be used with any of the sizes above_
  */
 export const PaddingBottom: Story = {
     render: () => ({
         template: `
-<div class="story-demo-box l-pad-m--bottom">
+<div class="story-demo-box u-pad-m--bottom">
     <div class="story-demo-box__inside"></div>
 </div>
         `,
@@ -148,14 +148,14 @@ export const PaddingBottom: Story = {
 };
 
 /**
- * `.l-pad-m--left`
+ * `.u-pad-m--left`
  *
  * _Can be used with any of the sizes above_
  */
 export const PaddingLeft: Story = {
     render: () => ({
         template: `
-<div class="story-demo-box l-pad-m--left">
+<div class="story-demo-box u-pad-m--left">
     <div class="story-demo-box__inside"></div>
 </div>
         `,
@@ -163,14 +163,14 @@ export const PaddingLeft: Story = {
 };
 
 /**
- * `.l-pad-m--right`
+ * `.u-pad-m--right`
  *
  * _Can be used with any of the sizes above_
  */
 export const PaddingRight: Story = {
     render: () => ({
         template: `
-<div class="story-demo-box l-pad-m--right">
+<div class="story-demo-box u-pad-m--right">
     <div class="story-demo-box__inside"></div>
 </div>
         `,
@@ -178,14 +178,14 @@ export const PaddingRight: Story = {
 };
 
 /**
- * `.l-pad--0`
+ * `.u-pad--0`
  *
  * _Clear any existing padding on an element_
  */
 export const Padding0: Story = {
     render: () => ({
         template: `
-<div class="story-demo-box l-pad-m l-pad--0">
+<div class="story-demo-box u-pad-m u-pad--0">
     <div class="story-demo-box__inside"></div>
 </div>
         `,

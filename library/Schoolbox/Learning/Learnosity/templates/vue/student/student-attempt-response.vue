@@ -38,7 +38,7 @@ function onAttemptCommentUpdated(comment: string): void {
 </script>
 
 <template>
-    <div class="c-island l-pad-m">
+    <div class="c-island u-pad-m">
         <div class="u-flex-row u-gap-m">
             <student-attempt-response-mark
                 :student="props.student"

@@ -5,7 +5,7 @@
 
 @use "sass:list";
 
-.l-pad {
+.u-pad {
     @each $size in $global-sizes {
         &-#{$size} {
             padding: var(--spacing-#{$size});
@@ -54,13 +54,13 @@
     }
 }
 
-.l-pad-xl {
+.u-pad-xl {
     @media #{$small-only} {
         padding: var(--spacing-l);
     }
 }
 
-.l-pad-l {
+.u-pad-l {
     @media #{$small-only} {
         padding: var(--spacing-m);
     }

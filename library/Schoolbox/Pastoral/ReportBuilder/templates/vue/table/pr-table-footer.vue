@@ -45,7 +45,7 @@ function onNextSelected(): void {
 <template>
     <div
         v-if="!props.isLoading"
-        class="pr-table-footer u-flex-row u-flex--align-center u-flex--justify-end u-gap-m l-pad-m l-c-cr-bottom"
+        class="pr-table-footer u-flex-row u-flex--align-center u-flex--justify-end u-gap-m u-pad-m l-c-cr-bottom"
     >
         <p class="f-no-margins">
             <b

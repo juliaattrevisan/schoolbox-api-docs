@@ -171,7 +171,7 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <div data-test="skin-config-container" class="u-flex-col u-gap-l l-pad-m--horiz">
+    <div data-test="skin-config-container" class="u-flex-col u-gap-l u-pad-m--horiz">
         <div class="u-flex-col u-gap-m">
             <img :src="sonarImgSrc" alt="" class="l-c-cr" aria-hidden="true" />
             <p class="u-visually-hidden">
@@ -186,7 +186,7 @@ window.Vue.onMounted(() => {
             <request-error :further-info="loadError" />
         </div>
         <form method="post" class="u-flex-col u-gap-l skin-config-form" @submit.prevent="onSaveSelected">
-            <div class="c-island l-pad-m">
+            <div class="c-island u-pad-m">
                 <label id="skin-config-toggle" class="inline-block" for="skin-config-toggle-field">
                     <span>{{ editableConfigs.toggle.title }}</span>
                     <span

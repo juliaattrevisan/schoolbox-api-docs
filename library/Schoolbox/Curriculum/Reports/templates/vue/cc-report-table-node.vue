@@ -157,7 +157,7 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
             >
                 <sbx-icon v-if="!props.node.enabled" name="hidden" title="This outcome is disabled" />
                 <button
-                    class="l-pad--0 u-ta-left f-no-bkg f-always-show"
+                    class="u-pad--0 u-ta-left f-no-bkg f-always-show"
                     :data-test="`cc-report-table-node-title-button-${props.node.id}`"
                     @click="emit('titleClick', props.node)"
                 >

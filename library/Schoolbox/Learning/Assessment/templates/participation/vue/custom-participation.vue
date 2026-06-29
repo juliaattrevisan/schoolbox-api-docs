@@ -135,7 +135,7 @@ function onViewSuggestedCustomisation(participant: Participant): void {
 </script>
 
 <template>
-    <div v-if="loadError" class="c-island l-pad-m" data-test="custom-participation-load-error">
+    <div v-if="loadError" class="c-island u-pad-m" data-test="custom-participation-load-error">
         <data-load-error data-title="Student Participation" :further-info="loadError" />
     </div>
     <div>

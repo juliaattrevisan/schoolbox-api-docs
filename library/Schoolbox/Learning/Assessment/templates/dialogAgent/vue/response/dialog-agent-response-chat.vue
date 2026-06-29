@@ -339,7 +339,7 @@ window.Vue.watch(
         <template #header>
             <div
                 v-if="currentResponse.assistanceRequestedAt !== null"
-                class="alert-box highlight l-pad-xs l-pad-m--left"
+                class="alert-box highlight u-pad-xs u-pad-m--left"
             >
                 <div class="u-flex u-flex--justify-space u-flex--align-center">
                     <span>Help Requested! Your teacher will be informed. You can keep working while you wait.</span>

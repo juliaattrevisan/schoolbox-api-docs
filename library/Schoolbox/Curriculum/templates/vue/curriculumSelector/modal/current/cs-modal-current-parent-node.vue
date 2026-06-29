@@ -38,7 +38,7 @@ function onExpandSelected(): void {
 
 <template>
     <li>
-        <div class="node u-gap-xs l-pad-xs--vert">
+        <div class="node u-gap-xs u-pad-xs--vert">
             <div :class="{ 'u-flex u-flex--align-center u-gap-xs f-no-margins': showExpandButton }">
                 <button
                     v-if="showExpandButton"

@@ -40,7 +40,7 @@ function onAttemptMarkUpdated(mark: string): void {
 <template>
     <div class="u-flex-col u-gap-m">
         <qf-student-header :student="props.student" />
-        <div ref="responseContentEl" class="response-content c-island l-pad-m">
+        <div ref="responseContentEl" class="response-content c-island u-pad-m">
             <!-- this is the div Learnosity looks for to insert the response content into, it will be completely replaced -->
             <div :id="props.student.elementId"></div>
         </div>

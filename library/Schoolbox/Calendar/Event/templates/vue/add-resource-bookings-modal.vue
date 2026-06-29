@@ -126,7 +126,7 @@ async function createNewBooking(): Promise<void> {
             <section>
                 <search-select
                     v-model:selected="resources"
-                    class="l-pad-m--bottom"
+                    class="u-pad-m--bottom"
                     :endpoint="getResourceSearchEndpoint()"
                     label="Resources"
                     label-id="resources"

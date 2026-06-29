@@ -124,7 +124,7 @@ window.Vue.watch(
         v-for="(rubric, index) in rubrics"
         :key="rubric.rubric.id"
         initially-expanded
-        legend-class="l-pad-m--horiz"
+        legend-class="u-pad-m--horiz"
     >
         <template #legend>
             {{ rubric.rubric.title.length ? rubric.rubric.title : `Rubric ${index + 1}` }}

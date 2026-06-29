@@ -105,7 +105,7 @@ function retryResponse(): void {
 
         <!-- response errored -->
         <template v-if="props.message.data.status === 'error'">
-            <p class="alert-box alert l-mar--0 l-pad-s" data-test="ac-feed-message-content">
+            <p class="alert-box alert l-mar--0 u-pad-s" data-test="ac-feed-message-content">
                 <b v-if="props.errorPrefix">{{ props.errorPrefix }}</b>
                 {{ props.message.data.message }}
             </p>
@@ -127,7 +127,7 @@ function retryResponse(): void {
         <div v-else-if="!isResponseComplete" class="ac-feed-response-container">
             <img v-if="imageSrc" :src="imageSrc" />
 
-            <div class="ac-feed-message-container l-pad-s" :class="{ 'l-mar-s--top': imageSrc }">
+            <div class="ac-feed-message-container u-pad-s" :class="{ 'l-mar-s--top': imageSrc }">
                 <!-- we don't render the in progress message as HTML as it may be malformed -->
                 <p class="ac-feed-message-content" data-test="ac-feed-message-content">
                     {{
@@ -154,7 +154,7 @@ function retryResponse(): void {
             </div>
             <div
                 v-if="props.message.data.message.length"
-                class="ac-feed-message-container l-pad-s"
+                class="ac-feed-message-container u-pad-s"
                 :class="{ 'l-mar-s--top': imageSrc !== null }"
             >
                 <!-- eslint-disable vue/no-v-html -- scrubbed in the backend -->

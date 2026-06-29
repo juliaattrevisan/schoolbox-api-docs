@@ -30,7 +30,7 @@ function onToggleSelected(): void {
 </script>
 
 <template>
-    <div class="u-flex-row u-flex--justify-space u-gap-m l-pad-m f-no-margins">
+    <div class="u-flex-row u-flex--justify-space u-gap-m u-pad-m f-no-margins">
         <div class="u-flex-row u-flex--align-center u-gap-m f-no-margins">
             <button
                 v-if="props.student.isReportLoaded"

@@ -218,7 +218,7 @@ async function onDeleteConfirmed(): Promise<void> {
                     :class="`u-flex-row u-gap-m ${index !== currentTemplates.length - 1 ? `c-card--border-end-alt` : ''}`"
                 >
                     <div
-                        class="u-flex-col u-flex--justify-center u-flex__item--1 u-gap-xs l-pad-m f-no-margins"
+                        class="u-flex-col u-flex--justify-center u-flex__item--1 u-gap-xs u-pad-m f-no-margins"
                         :data-test="`editor-templates-list-item-${template.title}`"
                     >
                         <h3>

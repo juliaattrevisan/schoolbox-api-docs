@@ -77,7 +77,7 @@ window.Vue.onMounted((): void => {
                 </span>
             </p>
         </div>
-        <div class="u-flex-col u-gap-s l-pad-m u-clear-both">
+        <div class="u-flex-col u-gap-s u-pad-m u-clear-both">
             <media-article v-if="props.record.bodyPublic" :content="props.record.bodyPublic" />
             <div v-if="props.record.tags.length > 0" class="u-flex-row u-gap-xs f-no-margins">
                 <template v-for="tag in props.record.tags" :key="tag.id">

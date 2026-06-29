@@ -235,7 +235,7 @@ async function onFeedbackPublish(): Promise<void> {
             v-if="mbStore.data !== null && cellInfo !== null"
             :key="cellInfo.key"
             ref="feedbackRef"
-            class="mb-feedback l-pad-s--top"
+            class="mb-feedback u-pad-s--top"
             :class="{ 'mb-feedback--loading': mbStore.feedbackUILoadingInfo !== null }"
         >
             <div v-if="cellInfo.instructorMarkScheme.mode !== MarkTypeSlug.NONE" class="small-12 medium-3 column">

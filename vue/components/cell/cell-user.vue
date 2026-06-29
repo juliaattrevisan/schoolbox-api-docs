@@ -13,7 +13,7 @@ const props = defineProps<{
 </script>
 
 <template>
-    <div class="u-flex-col l-pad-s u-gap-m">
+    <div class="u-flex-col u-pad-s u-gap-m">
         <div class="u-flex-row u-flex--no-wrap u-flex--align-start u-gap-m">
             <user-photo :user="props.user" render="small" />
             <div class="u-flex-col u-flex--justify-center u-gap-sf-no-margins">

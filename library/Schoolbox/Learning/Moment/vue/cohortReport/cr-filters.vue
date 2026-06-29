@@ -56,7 +56,7 @@ async function applyFilters(): Promise<void> {
 
 <template>
     <form class="u-flex-col u-gap-s u-flex__item--0-shrink f-no-margins" @submit.prevent="applyFilters">
-        <div class="c-island filters u-flex-col l-pad-m" :class="{ 'u-gap-m': isOpen }">
+        <div class="c-island filters u-flex-col u-pad-m" :class="{ 'u-gap-m': isOpen }">
             <button
                 v-if="props.isSingleColumn"
                 class="filters__toggle-button l-mar--0"

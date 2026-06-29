@@ -61,7 +61,7 @@ window.Vue.onMounted(async () => {
 </script>
 
 <template>
-    <div class="u-flex-col u-gap-l l-pad-m f-no-margins">
+    <div class="u-flex-col u-gap-l u-pad-m f-no-margins">
         <h1>Horizontal Marking for {{ props.title }}</h1>
         <template v-if="hasStudents">
             <hm-items-header />

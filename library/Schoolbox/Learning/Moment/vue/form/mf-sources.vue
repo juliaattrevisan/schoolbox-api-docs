@@ -26,7 +26,7 @@ function onFolderSelected(folderId: number, event?: MouseEvent): void {
         </legend>
 
         <div
-            class="l-grid l-pad-m--left l-pad-m--right mf-sources-grid"
+            class="l-grid u-pad-m--left u-pad-m--right mf-sources-grid"
             :style="{ 'grid-template-rows': isExpanded ? '1fr' : '0fr' }"
         >
             <div class="l-grid l-grid--auto-fill u-gap-m mf-sources-grid-row">

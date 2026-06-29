@@ -64,7 +64,7 @@ function onCellSelected(header: TableHeader): void {
                     (index === 0 && props.isFirstColumnSticky) ||
                     (header.key === 'total' && props.isTotalSticky) ||
                     (header.key === 'trend' && props.isTrendSticky),
-                'l-pad--0': header.key === 'user',
+                'u-pad--0': header.key === 'user',
                 'total-cell': header.key === 'total',
                 'total-cell--sticky': header.key === 'total' && props.isTotalSticky,
                 'trend-cell--sticky': header.key === 'trend' && props.isTrendSticky,

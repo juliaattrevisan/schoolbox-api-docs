@@ -16,10 +16,10 @@ const reportStore = useReportStore();
         <sbx-icon name="report" size="2.5rem"></sbx-icon>
         To generate a report, first select at least one Course and Curriculum.
     </div>
-    <div v-else-if="reportStore.isLoading" class="c-island l-pad-m" data-test="cc-report-loading">
+    <div v-else-if="reportStore.isLoading" class="c-island u-pad-m" data-test="cc-report-loading">
         <div class="loader"></div>
     </div>
-    <div v-else-if="reportStore.hasLoadError" class="c-island l-pad-m">
+    <div v-else-if="reportStore.hasLoadError" class="c-island u-pad-m">
         <div class="alert-box alert f-no-margins">
             Sorry, there was an error during report retrieval. Please
             <a href="" title="refresh the page"> refresh the page </a>
@@ -29,7 +29,7 @@ const reportStore = useReportStore();
             >
         </div>
     </div>
-    <div v-else-if="reportStore.hasReport" class="c-island l-pad-m">
+    <div v-else-if="reportStore.hasReport" class="c-island u-pad-m">
         <div class="u-flex u-flex-col u-gap-s">
             <cc-report-filters />
             <cc-report-table />

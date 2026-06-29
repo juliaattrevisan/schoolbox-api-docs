@@ -5,7 +5,7 @@
             {% for child in studentData %}
                 <div class="u-flex-col">
                     <div class="c-card">
-                        <div class="u-flex-row u-gap-m l-pad-m">
+                        <div class="u-flex-row u-gap-m u-pad-m">
                             <div class="c-img c-img--round">
                                 <div class="c-img__wrapper">
                                     <img
@@ -20,7 +20,7 @@
                         </div>
                     </div>
                     {# Field Group details #}
-                    <div class="c-island l-pad-m--horiz scrollable">
+                    <div class="c-island u-pad-m--horiz scrollable">
                         {% if child.data.FieldGroup is defined %}
                             {% for group in child.data.FieldGroup %}
                                 <h2>{{ group.groupName }}</h2>

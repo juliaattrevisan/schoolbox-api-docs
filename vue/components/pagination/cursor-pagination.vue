@@ -45,7 +45,7 @@ function onNextSelected(): void {
 <template>
     <div
         v-if="!props.isLoading"
-        class="cursor-pagination u-flex-row u-flex--align-center u-flex--justify-end u-gap-m l-pad-m"
+        class="cursor-pagination u-flex-row u-flex--align-center u-flex--justify-end u-gap-m u-pad-m"
     >
         <p class="f-no-margins">
             <b

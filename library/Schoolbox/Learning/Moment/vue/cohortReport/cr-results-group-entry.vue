@@ -95,7 +95,7 @@ async function openLightbox(file: StorageFile, event: MouseEvent): Promise<void>
 <template>
     <div
         v-if="crStore.loadingEntries[props.entry.id]"
-        class="cr-result-entry cr-result-entry--loading u-flex-col l-pad-s"
+        class="cr-result-entry cr-result-entry--loading u-flex-col u-pad-s"
         :class="`cr-result-entry--${props.entry.currentState}`"
     >
         <div class="loader"></div>
@@ -103,7 +103,7 @@ async function openLightbox(file: StorageFile, event: MouseEvent): Promise<void>
 
     <div
         v-else
-        class="cr-result-entry u-flex-col l-pad-s actions-small-1"
+        class="cr-result-entry u-flex-col u-pad-s actions-small-1"
         :class="`cr-result-entry--${props.entry.currentState}`"
     >
         <div>
@@ -133,7 +133,7 @@ async function openLightbox(file: StorageFile, event: MouseEvent): Promise<void>
                 :href="props.entry.recipient._links.profile || undefined"
             >
                 <user-photo :user="props.entry.recipient" render="tiny" />
-                <span class="l-pad-s--left">{{ props.entry.recipient.fullName }}</span>
+                <span class="u-pad-s--left">{{ props.entry.recipient.fullName }}</span>
             </component>
         </div>
 
@@ -177,7 +177,7 @@ async function openLightbox(file: StorageFile, event: MouseEvent): Promise<void>
                 <div
                     v-for="evidence in props.entry.evidence"
                     :key="evidence.storage.hash"
-                    class="cr-evidence-button u-flex--no-wrap u-flex-row u-gap-xs l-pad-xs"
+                    class="cr-evidence-button u-flex--no-wrap u-flex-row u-gap-xs u-pad-xs"
                     :class="{ 'cr-evidence-button-selected': evidence.storage.hash === selectedEvidenceHash }"
                     :title="evidence.storage.name"
                     @click="selectedEvidenceHash = evidence.storage.hash"

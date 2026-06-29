@@ -63,7 +63,7 @@ defineExpose({ feedEl });
 
         <div
             ref="feedRef"
-            class="l-pad-s ac-feed-list-wrapper"
+            class="u-pad-s ac-feed-list-wrapper"
             :style="{
                 maxHeight: props.maxHeight,
                 minHeight: props.minHeight,

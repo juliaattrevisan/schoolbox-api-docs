@@ -27,7 +27,7 @@ const meta: Meta<typeof SbxLabel> = {
     decorators: [
         (): { template: string } => ({
             template: `
-                <div class="l-pad-m">
+                <div class="u-pad-m">
                     <story />
                 </div>
             `,
