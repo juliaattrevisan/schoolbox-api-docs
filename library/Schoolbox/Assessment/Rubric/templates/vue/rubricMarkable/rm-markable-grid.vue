@@ -69,6 +69,18 @@ window.Vue.watch(derivedRubricMark, (scaledMark) => {
     rubricMarkedGrid.value.normalisedMark = getPercentage(scaledMark, props.rubric.derivedMaxValue);
 });
 
+/**
+ * The self-assessment's mark, re-expressed in the instructor's (input) mark scheme rather than the
+ * display scheme the student saw, so it can be compared against the mark the instructor is entering.
+ */
+const selfAssessmentMarkInInputScheme = window.Vue.computed<string | null>(() => {
+    if (!props.selfAssessmentFeedback) {
+        return null;
+    }
+    const scaledMark = deriveRubricMark(props.selfAssessmentFeedback);
+    return applyMarkScheme(scaledMark, props.rubric.derivedMaxValue, props.assessmentMarkScheme).humanReadableMark;
+});
+
 const formValue = window.Vue.computed(() => JSON.stringify(translateMarkedGridToFormPayload(rubricMarkedGrid.value)));
 </script>
 
@@ -112,15 +124,14 @@ const formValue = window.Vue.computed(() => JSON.stringify(translateMarkedGridTo
                     >
                         {{ rubricMarkedGrid.humanReadableMark }}
 
-                        <!-- Self-Assessment -->
+                        <!-- Self-Assessment (only shown when the student received a displayable self-assessment mark) -->
                         <template v-if="props.selfAssessmentFeedback?.humanReadableMark">
-                            <!-- TODO: instructor mark type is used here... thanks past me -->
                             <!--
                             Although the student entered the mark using the display mark type,
                             we show it here using the input mark type so that it matches what the instructor
                             is currently entering so it can be easily compared.
                             -->
-                            ({{ props.selfAssessmentFeedback.humanReadableMark }}
+                            ({{ selfAssessmentMarkInInputScheme }}
                             given in
                             {{ locale.selfAssessment.singular() }})
                         </template>
