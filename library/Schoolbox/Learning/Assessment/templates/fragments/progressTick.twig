@@ -9,10 +9,12 @@
  #                                   impersonating a student/parent see that role's affordances.
  # * readonly:    bool  (optional) - Whether to render static status only, even if the logged-in
  #                                   user is authorized to update the task.
+ # * size:        null|'small'|'tiny' (optional) - The size of the progress tick. Defaults to null, which is the standard size.
  #}
 
 {% set viewer = viewer is defined ? viewer : USER %}
 {% set readonly = readonly is defined ? readonly : false %}
+{% set size = size is defined ? size : null %}
 
 {# Find the user's participation record
  #
@@ -56,11 +58,11 @@
          class="progress-tick-form"
          data-progress-tick-form="{{ assessment.isSelfAssessable ?? false ? 'selfAssessed' : 'teacherAssessed' }}">
             {% if loggedInUserShouldSeeIncompleteStatus %}
-                <a class="no-text progress-tick incomplete" title="Incomplete" data-progress-tick-status="incomplete" data-test='tick-{{assessment.title}}'></a>
+                <a class="no-text {{ size }} progress-tick incomplete" title="Incomplete" data-progress-tick-status="incomplete" data-test='tick-{{assessment.title}}'></a>
             {% elseif participant.isFeedbackRequired %}
-                <a class="no-text progress-tick pending" title="Self-assessed" data-progress-tick-status="selfAssessed" data-test='tick-{{assessment.title}}'></a>
+                <a class="no-text {{ size }} progress-tick pending" title="Self-assessed" data-progress-tick-status="selfAssessed" data-test='tick-{{assessment.title}}'></a>
             {% elseif participant.isReviewComplete %}
-                <a class="no-text progress-tick reviewed" title="Completed" data-progress-tick-status="teacherAssessed" data-test='tick-{{assessment.title}}'></a>
+                <a class="no-text {{ size }} progress-tick reviewed" title="Completed" data-progress-tick-status="teacherAssessed" data-test='tick-{{assessment.title}}'></a>
             {% endif %}
         </form>
     {% else %}
@@ -85,15 +87,15 @@
             {% endif %}
 
             {% if loggedInUserShouldSeeIncompleteStatus %}
-                <span class="no-text progress-tick incomplete" title="Incomplete"></span>
+                <span class="no-text {{ size }} progress-tick incomplete" title="Incomplete"></span>
             {% elseif currentStatus %}
-                <span class="no-text progress-tick {{ currentStatus.progressTickClass }}" title="{{ currentStatus.translate }}"></span>
+                <span class="no-text {{ size }} progress-tick {{ currentStatus.progressTickClass }}" title="{{ currentStatus.translate }}"></span>
             {% elseif participant.isFeedbackRequired %}
-                <span class="no-text progress-tick pending" title="Awaiting Feedback"></span>
+                <span class="no-text {{ size }} progress-tick pending" title="Awaiting Feedback"></span>
             {% elseif participant.isResubmissionRequired %}
-                <span class="no-text progress-tick failed" title="Resubmission Required"></span>
+                <span class="no-text {{ size }} progress-tick failed" title="Resubmission Required"></span>
             {% elseif participant.isReviewComplete %}
-                <span class="no-text progress-tick reviewed" title="Completed"></span>
+                <span class="no-text {{ size }} progress-tick reviewed" title="Completed"></span>
             {% endif %}
         {% endif %}
     {% endif %}

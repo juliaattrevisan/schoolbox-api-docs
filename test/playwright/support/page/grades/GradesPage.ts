@@ -15,8 +15,7 @@ export default class GradesPage {
 
     static readonly SELECTOR_ASSESSMENT = ".activity-list li.assessment";
 
-    static readonly SELECTOR_LEARNER_OR_INSTRUCTOR_MARK =
-        "div[data-learner-mark]:visible, div[data-instructor-mark]:visible";
+    static readonly DATA_TEST_ASSESSMENT_GRADE = "assessment-grade";
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
@@ -99,8 +98,7 @@ export default class GradesPage {
      */
     async expectAssessmentMark(assessmentName: string, mark: string | null): Promise<void> {
         const assessment = this.locateAssessment(assessmentName);
-        // The mark will either be in [data-learner-mark] or [data-instructor-mark], one of which will be visible
-        const markLocator = assessment.locator(GradesPage.SELECTOR_LEARNER_OR_INSTRUCTOR_MARK);
+        const markLocator = assessment.getByTestId(GradesPage.DATA_TEST_ASSESSMENT_GRADE);
 
         if (mark === null) {
             await expect(markLocator).not.toBeVisible();
