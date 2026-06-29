@@ -28,6 +28,11 @@ $cdn-prefix: "../..";
 @import "utils/modifiers";
 @import "utils/visibility";
 @import "utils/u-typography";
+@import "utils/u-flex";
+@import "utils/u-grid";
+@import "utils/u-gap";
+@import "utils/u-padding";
+@import "utils/u-margin";
 
 // Layout
 @import "layout/footer";
@@ -38,12 +43,7 @@ $cdn-prefix: "../..";
 @import "layout/spacing";
 @import "layout/roundness";
 @import "layout/image-sizes";
-@import "layout/l-grid";
-@import "layout/u-flex";
 @import "layout/position";
-@import "layout/padding";
-@import "layout/margin";
-@import "layout/gap";
 @import "layout/size";
 
 // Shared user interface
