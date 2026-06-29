@@ -51,6 +51,7 @@
                 } only %}
                 <span class="{{ participant or assessment is lessonPlan ? 'pipe' : '' }} meta">{{ assessment.typeName }}</span>
                 <span class="pipe meta">{{ dueDate.dueDate(assessment, student) }}</span>
+                <span class="pipe meta">Weight: {{ assessment.weight }}</span>
             {% endif %}
         </p>
     </div>
