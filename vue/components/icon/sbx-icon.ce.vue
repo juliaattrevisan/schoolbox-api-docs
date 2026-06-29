@@ -1944,7 +1944,7 @@ function alertInvalidIconName(): false {
             <svg
                 v-else-if="props.name === 'veracross'"
                 class="sbx-icon__svg"
-                viewBox="0 0 32 32"
+                viewBox="3 3 26 26"
                 xmlns="http://www.w3.org/2000/svg"
             >
                 <path d="M23.3776 9.59985H8.57764V11.6443H23.3776V9.59985Z" fill="currentColor" />
