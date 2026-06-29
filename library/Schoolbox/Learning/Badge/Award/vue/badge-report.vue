@@ -250,7 +250,7 @@ export default {
                 />
             </section>
         </div>
-        <div v-else-if="isDataLoaded && !hasStudents" class="empty-state margin-none">
+        <div v-else-if="isDataLoaded && !hasStudents" class="empty-state u-mar--0">
             <sbx-icon name="staff-students" size="2.5rem"></sbx-icon>
             <p>There are currently no users within this group.</p>
         </div>
