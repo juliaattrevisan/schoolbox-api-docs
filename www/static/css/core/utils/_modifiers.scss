@@ -18,20 +18,12 @@
     vertical-align: middle;
 }
 
-.align-bottom {
-    vertical-align: bottom;
-}
-
 // ensure an element is scrollable
 .scrollable {
     overflow: auto;
     table {
         margin-bottom: 0;
     }
-}
-
-.u-inline-block {
-    display: inline-block;
 }
 
 .u-cursor-pointer {
