@@ -9,23 +9,48 @@ import {
 import type { AgentChatLogEntry } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import { AiFeature, AiLogFormat } from "./payload";
 import type { AiSessionLogApiResponse } from "./payload";
+import { AiModerationStatus } from "./moderationEvent";
+import type { AiModerationEvent } from "./moderationEvent";
 
 interface Props {
     feature: AiFeature;
-    sessionLog: AiSessionLogApiResponse<AiLogFormat.AGENT_CHAT | AiLogFormat.GUARDRAIL>;
+    sessionLogs: AiSessionLogApiResponse<AiLogFormat.AGENT_CHAT | AiLogFormat.GUARDRAIL>["logs"];
+    moderationEvents: AiModerationEvent[];
 }
 
 const props = defineProps<Props>();
 const acStore = useAgentChatStore();
 
+/**
+ * Get a human-readable description for a particular moderation event, depending on its status.
+ * @param event - moderation event
+ * @returns relevant description, or null to exclude the event
+ */
+function getModerationEventDescription(event: AiModerationEvent): string | null {
+    switch (event.status) {
+        case AiModerationStatus.NO_BEHAVIOUR_FLAGGED:
+            return null; // these shouldn't be rendered as they are not a concern
+        case AiModerationStatus.REQUIRES_ATTENTION:
+            return "Current Status: Requires attention";
+        case AiModerationStatus.NO_ACTION_REQUIRED:
+            return `Deemed no further action required by ${event.reviewedBy?.fullName ?? "Unknown"}`;
+        case AiModerationStatus.FURTHER_ACTION_REQUIRED:
+            return `Further action required, requested by ${event.reviewedBy?.fullName ?? "Unknown"}`;
+        case AiModerationStatus.FURTHER_ACTION_TAKEN:
+            return `Resolved by ${event.resolvedBy?.fullName ?? "Unknown"}`;
+        default:
+            return assertUnreachable(event.status);
+    }
+}
+
 const sessionFeed = window.Vue.computed<ReturnType<typeof acStore.parseFeed>>(() => {
-    const firstLog = props.sessionLog[0];
+    const firstLog = props.sessionLogs[0];
     if (firstLog === undefined) {
         return [];
     }
 
     const feed: AgentChatLogEntry[] = [];
-    for (const entry of props.sessionLog) {
+    for (const entry of props.sessionLogs) {
         if (entry.logFormat === AiLogFormat.AGENT_CHAT) {
             /** An agent chat message can be directly pushed to the feed */
             feed.push(entry.data.input);
@@ -76,6 +101,34 @@ const sessionFeed = window.Vue.computed<ReturnType<typeof acStore.parseFeed>>(()
         } else {
             assertUnreachable(entry);
         }
+    }
+
+    /* jam in any flagged moderation events as if they were guardrail violations */
+    for (const event of props.moderationEvents) {
+        const eventDescription = getModerationEventDescription(event);
+        if (eventDescription === null) {
+            continue; // skip events that aren't a concern
+        }
+
+        // flagged events that haven't been dismissed are shown as warnings, otherwise just standard alerts
+        const eventSeverity = [
+            AiModerationStatus.REQUIRES_ATTENTION,
+            AiModerationStatus.FURTHER_ACTION_REQUIRED,
+            AiModerationStatus.FURTHER_ACTION_TAKEN,
+        ].includes(event.status)
+            ? "warning"
+            : "";
+
+        feed.push({
+            createdAt: event.createdAt,
+            type: AgentChatMessageType.ALERT,
+            data: {
+                side: AgentChatMessageType.RESPONSE,
+                severity: eventSeverity,
+                title: `Moderation identified ${event.result.categories.join(", ")}:`,
+                message: eventDescription,
+            },
+        });
     }
 
     return acStore.parseFeed(feed, firstLog.createdBy);

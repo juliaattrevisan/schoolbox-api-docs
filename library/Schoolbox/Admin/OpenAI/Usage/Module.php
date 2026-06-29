@@ -16,6 +16,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\OpenAi\Moderation\Event\Mapper as ModerationEventMapper;
 use Schoolbox\OpenAi\Session\Log\Mapper as AILogMapper;
 use Schoolbox\OpenAi\Session\Mapper as SessionMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -72,6 +73,7 @@ class Module extends BaseModule
             $this->getAILogMapper(),
             $this->getMapperFactory()->get(ConfigMapper::class),
             $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(ModerationEventMapper::class)
         );
     }
 

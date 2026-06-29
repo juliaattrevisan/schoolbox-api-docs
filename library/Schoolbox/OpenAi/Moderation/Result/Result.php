@@ -29,7 +29,6 @@ class Result implements JsonSerializable
      * @param GenericCollection<Category> $categories    A list of detected concern categories. An empty array if no concerns are found.
      * @param PatternAssessment $patternAssessment       Describes whether the interaction shows repeated, escalating, or evasive behaviour across multiple messages.
      * @param RecommendedAction $recommendedSchoolAction Suggested level of response for the school based on the interaction.
-     * @param bool              $needsHumanReview        true if any concern exists that should be reviewed by a staff member.
      * @param bool              $safeguardingPriority    true if the interaction relates to student safety or wellbeing, such as self-harm, threats, grooming, or exploitation.
      * @param bool              $disciplinePriority      true if the interaction relates to behaviour or policy breaches, such as cheating, misuse of AI, guardrail evasion, or abuse.
      */
@@ -39,7 +38,6 @@ class Result implements JsonSerializable
         private GenericCollection $categories,
         private PatternAssessment $patternAssessment,
         private RecommendedAction $recommendedSchoolAction,
-        private bool $needsHumanReview,
         private bool $safeguardingPriority,
         private bool $disciplinePriority,
     ) {
@@ -88,14 +86,6 @@ class Result implements JsonSerializable
     /**
      * @return bool
      */
-    public function getNeedsHumanReview(): bool
-    {
-        return $this->needsHumanReview;
-    }
-
-    /**
-     * @return bool
-     */
     public function isSafeguardingPriority(): bool
     {
         return $this->safeguardingPriority;
@@ -120,7 +110,6 @@ class Result implements JsonSerializable
             'categories' => $this->categories->jsonSerialize(),
             'pattern_assessment' => $this->patternAssessment->jsonSerialize(),
             'recommended_school_action' => $this->recommendedSchoolAction->jsonSerialize(),
-            'needs_human_review' => $this->needsHumanReview,
             'safeguarding_priority' => $this->safeguardingPriority,
             'discipline_priority' => $this->disciplinePriority,
         ];
@@ -146,7 +135,6 @@ class Result implements JsonSerializable
             categories: $categories,
             patternAssessment: PatternAssessment::fromArray($data['pattern_assessment'] ?? []),
             recommendedSchoolAction: RecommendedAction::fromArray($data['recommended_school_action'] ?? []),
-            needsHumanReview: (bool)($data['needs_human_review'] ?? false),
             safeguardingPriority: (bool)($data['safeguarding_priority'] ?? false),
             disciplinePriority: (bool)($data['discipline_priority'] ?? false),
         );

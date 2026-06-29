@@ -128,7 +128,7 @@ HELP;
         $moderationResult = $interactionModeration->request(null, $moderationSessionId, $logs);
 
         /* persist the result (for both flagged and non-flagged sessions so we can remember if we ran the agent against them already) */
-        $status = $moderationResult->getNeedsHumanReview()
+        $status = $moderationResult->getCategories()->count() > 0
             ? ModerationEventStatus::REQUIRES_ATTENTION
             : ModerationEventStatus::NO_BEHAVIOUR_FLAGGED;
 

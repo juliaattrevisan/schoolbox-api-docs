@@ -195,10 +195,6 @@ class InteractionModeration
                     ],
                     'required' => ['action_level', 'why'],
                 ],
-                'needs_human_review' => [
-                    'type' => 'boolean',
-                    'description' => 'Set to true if any concern exists that should be reviewed by a staff member.',
-                ],
                 'safeguarding_priority' => [
                     'type' => 'boolean',
                     'description' => 'Set to true if the interaction relates to student safety or wellbeing, such as self-harm, threats, grooming, or exploitation.',
@@ -214,7 +210,6 @@ class InteractionModeration
                 "categories",
                 "pattern_assessment",
                 "recommended_school_action",
-                "needs_human_review",
                 "safeguarding_priority",
                 "discipline_priority"
             ],
