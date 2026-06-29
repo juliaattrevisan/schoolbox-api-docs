@@ -32,8 +32,9 @@ $cdn-prefix: "../..";
 @import "utils/u-flex";
 @import "utils/u-grid";
 @import "utils/u-gap";
-@import "utils/u-padding";
 @import "utils/u-margin";
+@import "utils/u-border";
+@import "utils/u-padding";
 
 // Layout
 @import "layout/footer";
