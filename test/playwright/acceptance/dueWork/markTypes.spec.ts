@@ -204,8 +204,8 @@ test.describe("Due Work - Mark type tests", () => {
             await assessmentPage.clickSelfAcknowledge();
             await assessmentPage.clickSelfAcknowledgeProceed();
 
-            await rubricMarkable.selectRubricIndicatorByValue(452, "1");
-            await rubricMarkable.selectRubricIndicatorByValue(446, "2");
+            await rubricMarkable.selectRubricIndicatorByLevel(452, 0);
+            await rubricMarkable.selectRubricIndicatorByLevel(446, 1);
 
             // Display mark type should be used (percentage)
             const participantId = await feedbackForm.getParticipantId();
@@ -225,8 +225,8 @@ test.describe("Due Work - Mark type tests", () => {
             await assessmentPage.clickSelfAcknowledge();
             await assessmentPage.clickSelfAcknowledgeProceed();
 
-            await rubricMarkable.selectRubricIndicatorByValue(452, "1");
-            await rubricMarkable.selectRubricIndicatorByValue(446, "2");
+            await rubricMarkable.selectRubricIndicatorByLevel(452, 0);
+            await rubricMarkable.selectRubricIndicatorByLevel(446, 1);
 
             // Display mark type should be used (none)
             const participantId = await feedbackForm.getParticipantId();
@@ -275,8 +275,8 @@ test.describe("Due Work - Mark type tests", () => {
             await statusPage.clickParticipantJellyTot(learnerId);
             await statusPage.clickViewAndGradeSubmission(learnerId);
 
-            await rubricMarkable.selectRubricIndicatorByValue(452, "1");
-            await rubricMarkable.selectRubricIndicatorByValue(446, "1");
+            await rubricMarkable.selectRubricIndicatorByLevel(452, 0);
+            await rubricMarkable.selectRubricIndicatorByLevel(446, 0);
 
             // Input mark type should be used (total mark)
             await rubricMarkable.expectRubricFinalSummaryMark("2 / 4 (3 / 4 given in self-assessment)");
@@ -299,8 +299,8 @@ test.describe("Due Work - Mark type tests", () => {
             await statusPage.clickParticipantJellyTot(learnerId);
             await statusPage.clickViewAndGradeSubmission(learnerId);
 
-            await rubricMarkable.selectRubricIndicatorByValue(452, "1");
-            await rubricMarkable.selectRubricIndicatorByValue(446, "1");
+            await rubricMarkable.selectRubricIndicatorByLevel(452, 0);
+            await rubricMarkable.selectRubricIndicatorByLevel(446, 0);
 
             // Input mark type should be used (percentage)
             await rubricMarkable.expectRubricFinalSummaryMark("50 %");

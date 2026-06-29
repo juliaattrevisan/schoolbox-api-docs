@@ -6,13 +6,12 @@
 import locale from "@js/terminology/rosettaStone";
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import type { User } from "@schoolboxLibrary/types/User";
-import type { RubricGridDescriptor, RubricGridIndicator, RubricGridLevel, RubricMarkedGridIndicator } from "./types";
+import type { RubricGridDescriptor, RubricGridLevel, RubricMarkedGridIndicator } from "./types";
 
 interface Props {
     descriptor: RubricGridDescriptor;
-    /** The id of the indicator this descriptor belongs to (used to address the descriptor in acceptance tests) */
-    // TODO: SA-22480: This shouldn't have been added. Add a data-test above for the indicator and narrow down by chaining getByTestId's instead.
-    indicatorId: RubricGridIndicator["id"];
+    /** The index of the level (column) this descriptor sits in, used to address it in acceptance tests */
+    levelIndex: number;
     selfAssessmentIndicatorMark: RubricMarkedGridIndicator | null;
     level: RubricGridLevel;
     participantId: User["id"] | null;
@@ -61,21 +60,6 @@ const markRangeValues = window.Vue.computed<number[]>(() => {
 });
 
 const hasMarkRange = window.Vue.computed(() => props.descriptor.value !== null && "left" in props.descriptor.value);
-
-/**
- * The descriptor's representative point value, used together with the indicator id
- * to address this descriptor cell in acceptance tests. Null when the descriptor has no value.
- */
-// TODO: SA-22480: This is not necessary after the below TODO is addressed.
-const descriptorTestValue = window.Vue.computed<number | null>(() => {
-    if (props.descriptor.value === null) {
-        return null;
-    }
-
-    return "max" in props.descriptor.value
-        ? props.descriptor.value.max
-        : Math.max(props.descriptor.value.left, props.descriptor.value.right);
-});
 
 /**
  * Internal cache of the selected value for this descriptor
@@ -141,14 +125,9 @@ window.Vue.onMounted(() => {
                 data-rubric-descriptor-checkbox
             />
 
-            <!-- TODO SA-22480: although this matches the old implementation, avoid having a data-test that is based on the initial value of the descriptor and instead refer to them by level ID (since that is how they are created iteratively in the parent) -->
             <label
                 :for="`descriptor-${props.descriptor.id}-${componentId}`"
-                :data-test="
-                    descriptorTestValue !== null
-                        ? `rubric-descriptor-input-${props.indicatorId}-${descriptorTestValue}`
-                        : undefined
-                "
+                :data-test="`rubric-markable-descriptor-${props.levelIndex}`"
             >
                 <div class="hide-for-large-up u-pad-m hide-on-print">
                     <!-- display rubric levels for the mobile view. -->

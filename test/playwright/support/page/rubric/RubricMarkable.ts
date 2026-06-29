@@ -9,7 +9,9 @@ import type { Page } from "@playwright/test";
 export default class RubricMarkable {
     private page: Page;
 
-    static readonly DATA_TEST_RUBRIC_DESCRIPTOR_INPUT = "rubric-descriptor-input"; // Append "-[indicatorId]-[value]"
+    static readonly DATA_TEST_RUBRIC_INDICATOR = "rubric-markable-indicator"; // Append "-[indicatorId]"
+
+    static readonly DATA_TEST_RUBRIC_DESCRIPTOR = "rubric-markable-descriptor"; // Append "-[levelIndex]"
 
     static readonly DATA_TEST_RUBRIC_FINAL_SUMMARY = "rubric-final-summary";
 
@@ -20,15 +22,16 @@ export default class RubricMarkable {
     }
 
     /**
-     * Selects a given rubric indicator's descriptor based on its point value.
-     * Clicking the descriptor's label toggles the underlying descriptor checkbox.
+     * Selects a given rubric indicator's descriptor at a given level (column).
+     * Scopes to the indicator row, then clicks the descriptor's label at that level,
+     * which toggles the underlying descriptor checkbox.
      * @param indicatorId - The ID of the indicator
-     * @param value - The point value of the descriptor to select
+     * @param levelIndex - The zero-based index of the level (column) to select
      */
-    async selectRubricIndicatorByValue(indicatorId: number, value: string | number): Promise<void> {
+    async selectRubricIndicatorByLevel(indicatorId: number, levelIndex: number): Promise<void> {
         await this.page
-            // TODO: SA-22480: use chaining of getByTestId's instead, perhaps change to "ByLevel" instead.
-            .getByTestId(`${RubricMarkable.DATA_TEST_RUBRIC_DESCRIPTOR_INPUT}-${indicatorId}-${value}`)
+            .getByTestId(`${RubricMarkable.DATA_TEST_RUBRIC_INDICATOR}-${indicatorId}`)
+            .getByTestId(`${RubricMarkable.DATA_TEST_RUBRIC_DESCRIPTOR}-${levelIndex}`)
             .click();
     }
 
