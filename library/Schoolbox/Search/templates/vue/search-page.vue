@@ -91,7 +91,7 @@ function onBadgeModalClosed(): void {
         :class="`search-page l-grid l-gap-xl ${store.isSingleColumn ? 'search-page--single-column' : ''}`"
     >
         <sp-filters class="c-search-page__filters" />
-        <div class="c-search-page__results l-flex-col l-gap-m">
+        <div class="c-search-page__results u-flex-col l-gap-m">
             <sp-results-prompt v-if="searchStore.hasNotSearched" />
             <loading-cards v-else-if="searchStore.isSearching" />
             <sp-results-error v-else-if="searchStore.hasLoadError" />

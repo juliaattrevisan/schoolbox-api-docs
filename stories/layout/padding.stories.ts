@@ -11,7 +11,7 @@ const meta: Meta<typeof StorybookSlot> = {
     decorators: [
         (): { template: string } => ({
             template: `
-                <div class="l-flex-row l-pad-m">
+                <div class="u-flex-row l-pad-m">
                     <story />
                 </div>
             `,

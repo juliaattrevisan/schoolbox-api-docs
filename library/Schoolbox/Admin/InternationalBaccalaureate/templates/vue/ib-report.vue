@@ -473,8 +473,8 @@ window.Vue.onMounted((): void => {
 </script>
 
 <template>
-    <div class="small-12 island l-flex-col l-gap-m">
-        <div class="l-flex l-flex--align-center l-flex--justify-space f-no-margins">
+    <div class="small-12 island u-flex-col l-gap-m">
+        <div class="u-flex u-flex--align-center u-flex--justify-space f-no-margins">
             <h2 class="subheader f-no-margins">{{ props.sessionTitle }}</h2>
             <sbx-pop-out content-id="ib-report-actions-dropdown"></sbx-pop-out>
         </div>
@@ -497,7 +497,7 @@ window.Vue.onMounted((): void => {
 
         <data-load-error v-else-if="loadError" data-title="registration report" :further-info="loadError" />
 
-        <div v-else class="l-flex-col l-gap-s">
+        <div v-else class="u-flex-col l-gap-s">
             <ib-report-section title="Preparation" :count="preparation.length">
                 <ib-report-standard-table
                     v-model:selected-list="preparationSelected"

@@ -39,7 +39,7 @@ $cdn-prefix: "../..";
 @import "layout/roundness";
 @import "layout/image-sizes";
 @import "layout/l-grid";
-@import "layout/l-flex";
+@import "layout/u-flex";
 @import "layout/position";
 @import "layout/padding";
 @import "layout/margin";
@@ -183,7 +183,7 @@ $cdn-prefix: "../..";
 
 // Utility classes
 @import "layout/l-grid";
-@import "layout/l-flex";
+@import "layout/u-flex";
 @import "layout/position";
 @import "layout/padding";
 @import "layout/margin";

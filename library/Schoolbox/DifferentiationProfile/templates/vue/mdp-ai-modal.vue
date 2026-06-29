@@ -64,7 +64,7 @@ function onConfirmSelected(): void {
 
 <template>
     <basic-modal v-model:is-open="genAiStore.isOpen">
-        <form class="l-flex-col l-gap-m f-no-margins" @submit.prevent="onConfirmSelected">
+        <form class="u-flex-col l-gap-m f-no-margins" @submit.prevent="onConfirmSelected">
             <h2>
                 Suggested {{ locale.differentiationProfile.translate(false, true) }} for
                 {{ genAiStore.profile?.student.givenName }}
@@ -80,8 +80,8 @@ function onConfirmSelected(): void {
                     </loading-cards>
                 </template>
             </div>
-            <div v-else-if="genAiStore.aiResponse" class="sbx-vert-scroll-container l-flex-col l-gap-s">
-                <div v-for="item in genAiStore.aiResponse" :key="item.key" class="l-flex-col l-gap-s">
+            <div v-else-if="genAiStore.aiResponse" class="sbx-vert-scroll-container u-flex-col l-gap-s">
+                <div v-for="item in genAiStore.aiResponse" :key="item.key" class="u-flex-col l-gap-s">
                     <div>
                         <input
                             v-if="item.response !== null && item.response !== ''"
@@ -105,9 +105,9 @@ function onConfirmSelected(): void {
                 </div>
                 <span class="meta">AI sometimes gets things wrong — please check important details.</span>
             </div>
-            <div class="l-flex l-gap-xs f-no-margins">
+            <div class="u-flex l-gap-xs f-no-margins">
                 <button
-                    class="button l-flex__item--1"
+                    class="button u-flex__item--1"
                     data-test="up-delete-units-cancel"
                     @click.prevent="genAiStore.cancel()"
                 >
@@ -115,7 +115,7 @@ function onConfirmSelected(): void {
                 </button>
                 <button
                     v-if="!genAiStore.isProcessing && genAiStore.aiResponse && hasSelectedOptions"
-                    class="button submit l-flex__item--1"
+                    class="button submit u-flex__item--1"
                     type="button"
                     data-test="up-delete-unit-delete"
                     @click.prevent="onConfirmSelected"

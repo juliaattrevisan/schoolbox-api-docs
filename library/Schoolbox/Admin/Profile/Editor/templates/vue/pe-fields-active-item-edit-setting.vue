@@ -93,7 +93,7 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <div v-if="fieldSettingDefinition && availableFieldSettingOptions.length" class="l-flex__item--1-grow">
+    <div v-if="fieldSettingDefinition && availableFieldSettingOptions.length" class="u-flex__item--1-grow">
         <!-- only show the label if there are checkboxes, as each input has its own label instead -->
         <label v-if="availableFieldSettingOptions.checkbox.length">
             {{ fieldSettingDefinition.displayAs }}

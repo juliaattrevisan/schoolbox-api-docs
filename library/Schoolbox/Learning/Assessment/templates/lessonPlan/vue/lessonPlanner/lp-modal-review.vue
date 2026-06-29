@@ -40,11 +40,11 @@ window.Vue.onMounted(() => {
 
     <div class="clearfix"></div>
     <span class="meta">AI sometimes gets things wrong — please check important details.</span>
-    <div class="l-flex-row l-flex--no-wrap">
-        <button class="l-flex__item--1 button" @click="lpStore.modalStep = LessonPlannerModalStep.GENERATE">
+    <div class="u-flex-row u-flex--no-wrap">
+        <button class="u-flex__item--1 button" @click="lpStore.modalStep = LessonPlannerModalStep.GENERATE">
             Back
         </button>
-        <button class="l-flex__item--1 button submit" @click="lpStore.applySuggestions">
+        <button class="u-flex__item--1 button submit" @click="lpStore.applySuggestions">
             Add {{ selectedFields.length > 1 ? "all" : "" }} to {{ locale.lessonPlan.proper() }}
         </button>
     </div>

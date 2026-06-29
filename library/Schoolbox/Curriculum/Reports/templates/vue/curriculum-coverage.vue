@@ -38,7 +38,7 @@ useExportStore().init(props.exportEndpoint); // pass through the export endpoint
 </script>
 
 <template>
-    <div class="l-flex-col l-gap-m">
+    <div class="u-flex-col l-gap-m">
         <cc-header />
         <cc-input
             :courses-endpoint="props.coursesEndpoint"

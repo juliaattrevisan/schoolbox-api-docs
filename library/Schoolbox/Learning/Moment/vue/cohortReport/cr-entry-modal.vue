@@ -73,7 +73,7 @@ async function onDelete(): Promise<void> {
         <template v-if="crmStore.modalType === CohortReportModalType.READ_MORE">
             <template v-for="entry in crmStore.selectedEntries" :key="entry.id">
                 <div v-if="entry.creator !== null" class="card small-12 compact">
-                    <div class="l-flex-row l-flex--align-center">
+                    <div class="u-flex-row u-flex--align-center">
                         <user-photo :user="entry.creator" class="l-mar-s--right" size="xsmall" />
                         <p>{{ entry.creator.fullName }}</p>
                     </div>

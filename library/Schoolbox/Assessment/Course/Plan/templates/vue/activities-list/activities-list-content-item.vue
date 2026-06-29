@@ -132,7 +132,7 @@ window.Vue.onUnmounted(() => {
                 <component
                     :is="activityLink !== null ? 'a' : 'span'"
                     :href="activityLink !== null ? getReturnUrl(activityLink) : undefined"
-                    class="l-flex l-gap-s"
+                    class="u-flex l-gap-s"
                 >
                     <sbx-icon :name="activityIconName" :title="activityIconTitle"></sbx-icon>
                     <p

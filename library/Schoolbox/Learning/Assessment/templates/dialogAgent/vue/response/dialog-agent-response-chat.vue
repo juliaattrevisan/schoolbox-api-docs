@@ -341,7 +341,7 @@ window.Vue.watch(
                 v-if="currentResponse.assistanceRequestedAt !== null"
                 class="alert-box highlight l-pad-xs l-pad-m--left"
             >
-                <div class="l-flex l-flex--justify-space l-flex--align-center">
+                <div class="u-flex u-flex--justify-space u-flex--align-center">
                     <span>Help Requested! Your teacher will be informed. You can keep working while you wait.</span>
                     <button
                         v-if="currentResponse._routes.assistanceResolve"

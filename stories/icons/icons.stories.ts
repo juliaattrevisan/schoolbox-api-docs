@@ -217,7 +217,7 @@ export const Default: Story = {
             };
         },
         template: `
-            <div class="l-flex-row l-flex--center l-gap-s">
+            <div class="u-flex-row u-flex--center l-gap-s">
                 <div
                     v-for="icon in icons"
                     :key="icon.name"

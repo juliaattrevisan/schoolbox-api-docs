@@ -21,7 +21,7 @@ function getDate(): string {
 </script>
 
 <template>
-    <div class="item l-flex-col l-gap-xs l-pad-m--horiz l-pad-s--vert">
+    <div class="item u-flex-col l-gap-xs l-pad-m--horiz l-pad-s--vert">
         <a
             :href="props.item.url"
             :title="`View ${props.item.title}`"

@@ -52,9 +52,9 @@ function onCommentUpdated(comment: string): void {
 
 <template>
     <transition>
-        <div v-if="isActive" class="l-flex-col l-gap-m l-pad-m">
+        <div v-if="isActive" class="u-flex-col l-gap-m l-pad-m">
             <student-no-score-note :item="props.item" />
-            <div class="item-questions l-flex-col l-gap-m">
+            <div class="item-questions u-flex-col l-gap-m">
                 <student-item-question-display
                     v-for="question in props.item.questions"
                     :key="question.response_id"

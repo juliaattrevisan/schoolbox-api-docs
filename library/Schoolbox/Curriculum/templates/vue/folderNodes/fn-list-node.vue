@@ -75,8 +75,8 @@ function onRemoveSelected(): void {
 
 <template>
     <li>
-        <div class="node l-flex-row l-flex--justify-space l-flex--center l-flex--no-wrap l-pad-xs--vert">
-            <div class="l-flex-row l-flex--no-wrap l-flex--align-center l-gap-xs">
+        <div class="node u-flex-row u-flex--justify-space u-flex--center u-flex--no-wrap l-pad-xs--vert">
+            <div class="u-flex-row u-flex--no-wrap u-flex--align-center l-gap-xs">
                 <sbx-icon
                     v-if="!props.node.enabled"
                     name="hidden"
@@ -85,7 +85,7 @@ function onRemoveSelected(): void {
                 />
                 <a
                     v-if="hasCode"
-                    class="node__code f-no-margins l-flex__item--0-shrink"
+                    class="node__code f-no-margins u-flex__item--0-shrink"
                     :href="`#${props.node.id}`"
                     @click.prevent="onCodeSelected"
                     >[{{ props.node.code }}]
@@ -94,7 +94,7 @@ function onRemoveSelected(): void {
             </div>
             <button
                 v-if="showRemove"
-                class="node__remove f-no-icon-button sbx-icon-only-button l-flex-row l-flex--center l-flex__item--0-shrink"
+                class="node__remove f-no-icon-button sbx-icon-only-button u-flex-row u-flex--center u-flex__item--0-shrink"
                 :aria-label="`Remove [${props.node.code}] ${props.node.name}`"
                 :title="`Remove [${props.node.code}] ${props.node.name}`"
                 :data-test="`fn-list-node-remove-${props.node.id}`"

@@ -85,7 +85,7 @@
         @include skeleton-background-gradient;
         animation: shine-lines 1.6s ease infinite !important;
         background-size: 400% 100% !important;
-        .l-flex-row {
+        .u-flex-row {
             background-color: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
         }
         .img-placeholder,

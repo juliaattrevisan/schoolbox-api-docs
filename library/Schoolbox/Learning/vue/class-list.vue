@@ -710,8 +710,8 @@ export default {
                                 />
                             </td>
                             <td>
-                                <div class="l-flex-col l-gap-s">
-                                    <div class="l-flex-row l-gap-s">
+                                <div class="u-flex-col l-gap-s">
+                                    <div class="u-flex-row l-gap-s">
                                         <template v-if="student.id">
                                             <a
                                                 :data-test="`class-list-${student.id}-username`"

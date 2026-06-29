@@ -52,7 +52,7 @@ defineExpose({ isEmpty });
             </tr>
             <template v-for="capability in courseRubric" :key="capability.id">
                 <tr>
-                    <th class="l-flex markdown border-none">
+                    <th class="u-flex markdown border-none">
                         <sbx-icon
                             v-if="props.usedCapabilities.includes(capability.id)"
                             color="var(--sbx-color-text-secondary)"
@@ -64,7 +64,7 @@ defineExpose({ isEmpty });
                     </th>
                 </tr>
                 <tr v-for="indicator in capability.indicators" :key="indicator.id">
-                    <td class="l-flex border-none">
+                    <td class="u-flex border-none">
                         <sbx-icon
                             v-if="props.usedIndicators.includes(indicator.id)"
                             color="var(--sbx-color-text-secondary)"
@@ -104,7 +104,7 @@ defineExpose({ isEmpty });
             </tr>
             <template v-for="capability in unitRubric" :key="capability.id">
                 <tr>
-                    <th class="l-flex markdown border-none">
+                    <th class="u-flex markdown border-none">
                         <sbx-icon
                             v-if="props.usedCapabilities.includes(capability.id)"
                             name="submissions"
@@ -115,7 +115,7 @@ defineExpose({ isEmpty });
                     </th>
                 </tr>
                 <tr v-for="indicator in capability.indicators" :key="indicator.id">
-                    <td class="l-flex border-none">
+                    <td class="u-flex border-none">
                         <sbx-icon
                             v-if="props.usedIndicators.includes(indicator.id)"
                             name="submissions"
@@ -177,7 +177,7 @@ table.rb {
         border-left: none;
     }
 
-    .l-flex {
+    .u-flex {
         gap: var(--spacing-s);
     }
 }

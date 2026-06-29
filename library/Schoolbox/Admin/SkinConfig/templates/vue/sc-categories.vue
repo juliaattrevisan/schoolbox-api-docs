@@ -51,13 +51,13 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
 
 <template>
     <template v-for="(subcategories, categoryKey) in activeConfigs" :key="categoryKey">
-        <div class="l-flex-col l-gap-s">
+        <div class="u-flex-col l-gap-s">
             <h2 class="subheader u-lh-normal">{{ categoryKey }}</h2>
-            <div class="c-island l-flex-col" data-test="skin-config-category">
+            <div class="c-island u-flex-col" data-test="skin-config-category">
                 <div
                     v-for="(subcategory, index) in subcategories"
                     :key="subcategory.name || `default-${index}`"
-                    class="skin-config-subcategory l-flex-col l-gap-m l-pad-m"
+                    class="skin-config-subcategory u-flex-col l-gap-m l-pad-m"
                     :class="{ 'skin-config-subcategory--divided': index < subcategories.length - 1 }"
                     :data-test="`skin-config-subcategory-${subcategory.name || `default-${index}`}`"
                 >
@@ -173,9 +173,9 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
                                 <input id="title" type="text" name="title" value="School Musical" maxlength="255" />
                             </div>
                             <div class="small-12 medium-4 large-3">
-                                <div class="checklist l-flex-col l-gap-s">
+                                <div class="checklist u-flex-col l-gap-s">
                                     <label class="title">Filter</label>
-                                    <ul class="option-list l-flex-row l-gap-l">
+                                    <ul class="option-list u-flex-row l-gap-l">
                                         <li data-v-40e5173a="">
                                             <input id="waiting-list" type="checkbox" checked />
                                             <label for="waiting-list">Waiting List</label>
@@ -277,7 +277,7 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
                             </div>
                             <div class="small-12 medium-4">
                                 <label for="news-topics-selectized">Topics</label>
-                                <div class="l-flex-row l-gap-s">
+                                <div class="u-flex-row l-gap-s">
                                     <div class="sbx-tag">
                                         <button type="button" class="sbx-tag__name-button">General Notices</button>
                                         <button

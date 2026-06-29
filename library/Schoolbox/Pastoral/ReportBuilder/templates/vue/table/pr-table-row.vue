@@ -71,9 +71,9 @@ function onCellSelected(header: TableHeader): void {
             }"
         >
             <template v-if="header.type == TableHeaderType.USER">
-                <div class="l-flex-row l-flex--no-wrap l-gap-m">
+                <div class="u-flex-row u-flex--no-wrap l-gap-m">
                     <user-photo :user="props.rowData[header.key] as User" render="small" />
-                    <div class="l-flex-col l-flex--justify-center f-no-margins">
+                    <div class="u-flex-col u-flex--justify-center f-no-margins">
                         <a
                             v-if="(props.rowData[header.key] as User)._links?.profile"
                             :href="(props.rowData[header.key] as User)._links!.profile"

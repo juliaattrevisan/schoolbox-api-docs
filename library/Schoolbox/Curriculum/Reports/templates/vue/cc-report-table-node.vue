@@ -132,14 +132,14 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
 <template>
     <tr v-if="showNode">
         <td
-            class="l-flex l-flex--align-center l-gap-s f-no-margins name-cell u-border-right"
+            class="u-flex u-flex--align-center l-gap-s f-no-margins name-cell u-border-right"
             :style="{
                 paddingInlineStart: filtersStore.onlyShowGaps ? '0.5rem' : `calc(${props.depth * 0.5}rem + 0.5rem)`,
             }"
         >
             <button
                 v-if="showExpandButton"
-                class="l-flex l-flex--center l-flex__item--0-shrink f-no-bkg"
+                class="u-flex u-flex--center u-flex__item--0-shrink f-no-bkg"
                 :aria-label="props.node.isExpanded ? 'Collapse' : 'Expand'"
                 :title="props.node.isExpanded ? 'Collapse' : 'Expand'"
                 :data-test="`cc-report-table-node-expand-button-${props.node.id}`"
@@ -150,7 +150,7 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
             </button>
             <!-- add paddingLeft to the last child node to align better with the parent above, which is showing the expand button -->
             <div
-                class="l-flex l-flex--align-center l-gap-s"
+                class="u-flex u-flex--align-center l-gap-s"
                 :style="{
                     paddingLeft: isSingleNode || filtersStore.onlyShowGaps || showExpandButton ? '0' : '2.5rem',
                 }"

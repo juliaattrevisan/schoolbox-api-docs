@@ -68,7 +68,7 @@ defineExpose({ printAllRecords });
             <data-load-error data-title="record" :further-info="loadError" />
         </div>
         <template v-else-if="payload">
-            <div v-if="payload.data.results.length > 0" class="l-flex-col l-gap-s">
+            <div v-if="payload.data.results.length > 0" class="u-flex-col l-gap-s">
                 <div
                     v-for="record in payload.data.results"
                     :key="record.id"

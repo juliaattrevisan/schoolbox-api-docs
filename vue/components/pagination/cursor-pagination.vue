@@ -45,7 +45,7 @@ function onNextSelected(): void {
 <template>
     <div
         v-if="!props.isLoading"
-        class="cursor-pagination l-flex-row l-flex--align-center l-flex--justify-end l-gap-m l-pad-m"
+        class="cursor-pagination u-flex-row u-flex--align-center u-flex--justify-end l-gap-m l-pad-m"
     >
         <p class="f-no-margins">
             <b
@@ -56,7 +56,7 @@ function onNextSelected(): void {
                 {{ props.metadata.count }}
             </b>
         </p>
-        <nav v-if="hasPaginate" class="l-flex-row l-gap-m">
+        <nav v-if="hasPaginate" class="u-flex-row l-gap-m">
             <button
                 :disabled="!hasPrevious"
                 type="button"

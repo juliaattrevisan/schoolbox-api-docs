@@ -356,7 +356,7 @@ export default {
                                     '': !showBadgeMenus,
                                     'actions-small-1': showBadgeMenus,
                                     'checkbox-content': !showBadgeMenus,
-                                    'card-content l-flex-col l-gap-s': true,
+                                    'card-content u-flex-col l-gap-s': true,
                                 }"
                             >
                                 <div class="list-item sbx-checkbox-radio-container">

@@ -33,7 +33,7 @@ function onPrintSelected(): void {
     <div class="row actions-small-1 actions-medium-2">
         <div class="button-action small-12 columns">
             <h1>Unit Planner - {{ props.course.title }}</h1>
-            <div class="l-flex-row l-gap-s">
+            <div class="u-flex-row l-gap-s">
                 <button
                     v-if="routes.newUnits"
                     class="button sbx-button--has-icon"
@@ -50,12 +50,12 @@ function onPrintSelected(): void {
     <div v-if="props.course.subjectCode || props.curriculumNodes.length > 0" class="row">
         <div class="small-12 columns">
             <ul class="l-mar--0-left">
-                <li v-if="props.course.subjectCode" class="meta l-flex-row l-flex--align-start l-gap-s">
+                <li v-if="props.course.subjectCode" class="meta u-flex-row u-flex--align-start l-gap-s">
                     <sbx-icon name="subject-code"></sbx-icon>Subject Code: {{ props.course.subjectCode }}
                 </li>
                 <li
                     v-if="props.curriculumNodes.length > 0"
-                    class="meta l-flex-row l-flex--align-start l-flex--no-wrap l-gap-s"
+                    class="meta u-flex-row u-flex--align-start u-flex--no-wrap l-gap-s"
                 >
                     <sbx-icon name="curriculum"></sbx-icon>
                     <div>

@@ -104,7 +104,7 @@ function getIconName(iconClass: string): string {
                 </a>
             </li>
         </ul>
-        <div class="c-island l-flex-col">
+        <div class="c-island u-flex-col">
             <h3 v-if="upcoming.length > 0" class="l-pad-m--horiz l-pad-s--vert f-no-margins">
                 Upcoming Tasks (Action required)
             </h3>

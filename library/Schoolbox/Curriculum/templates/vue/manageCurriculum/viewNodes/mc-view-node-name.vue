@@ -96,7 +96,7 @@ async function onNameSelected(): Promise<void> {
 </script>
 
 <template>
-    <div class="name-container l-flex-row l-flex--no-wrap l-flex--align-center l-gap-xs">
+    <div class="name-container u-flex-row u-flex--no-wrap u-flex--align-center l-gap-xs">
         <sbx-icon v-if="!props.node.enabled" name="hidden" title="This outcome is disabled" />
         <show-matches
             v-if="isButton"

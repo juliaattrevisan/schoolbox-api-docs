@@ -11,7 +11,7 @@ const props = defineProps<{
 </script>
 
 <template>
-    <div class="l-flex-col l-pad-s l-gap-m">
+    <div class="u-flex-col l-pad-s l-gap-m">
         <a v-if="props.value._links?.view" :href="props.value._links.view">
             {{ props.value.title }}
         </a>

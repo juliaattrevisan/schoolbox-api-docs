@@ -13,14 +13,14 @@ const studentsStore = useStudentsStore();
 </script>
 
 <template>
-    <div class="l-flex-col l-gap-s f-no-margins">
+    <div class="u-flex-col l-gap-s f-no-margins">
         <h2 class="subheader f-no-margins">Students</h2>
-        <div class="l-flex-row l-flex--align-center l-gap-m">
+        <div class="u-flex-row u-flex--align-center l-gap-m">
             <hm-students-toggle />
             <hm-students-show-reviewed-attempts />
         </div>
         <hm-students-all-reviewed />
-        <div class="l-flex-col l-gap-m">
+        <div class="u-flex-col l-gap-m">
             <hm-students-student
                 v-for="student in studentsStore.students"
                 :key="student.id"

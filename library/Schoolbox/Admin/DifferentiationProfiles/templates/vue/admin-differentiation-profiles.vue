@@ -203,7 +203,7 @@ async function onSaveSelected(): Promise<void> {
                                     :data-field-key="item.element.name"
                                     :class="{ dragging: item.isDragging }"
                                 >
-                                    <div class="l-flex">
+                                    <div class="u-flex">
                                         <div
                                             v-if="module.isSortable"
                                             class="grip compact"

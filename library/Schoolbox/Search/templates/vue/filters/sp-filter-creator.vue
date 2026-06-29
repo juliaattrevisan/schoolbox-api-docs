@@ -15,7 +15,7 @@ const currentUser: Creator = {
 };
 </script>
 <template>
-    <div class="l-flex-col">
+    <div class="u-flex-col">
         <search-select
             v-model:selected="filterCreatorsStore.creator"
             label="Creator"

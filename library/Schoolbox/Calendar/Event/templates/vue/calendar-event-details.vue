@@ -646,7 +646,7 @@ export default {
                                             :src="'/portrait.php?id=' + guest.id + '&size=square64'"
                                             alt="portrait photo"
                                         />
-                                        <div class="l-flex l-flex--align-center l-gap-s">
+                                        <div class="u-flex u-flex--align-center l-gap-s">
                                             <p>
                                                 {{ guest.name }}
                                             </p>
@@ -683,9 +683,9 @@ export default {
 
         <div v-if="resourceBookingEnabled" class="small-12 medium-8 island">
             <section v-if="resourceBookings.length > 0" class="detail content">
-                <div class="l-flex-row l-flex--justify-space l-flex--align-end f-no-margins">
+                <div class="u-flex-row u-flex--justify-space u-flex--align-end f-no-margins">
                     <h2>Resource Bookings</h2>
-                    <nav v-if="canModify()" class="l-flex-row l-flex--align-center f-no-margins">
+                    <nav v-if="canModify()" class="u-flex-row u-flex--align-center f-no-margins">
                         <a
                             class="sbx-icon-only-button f-no-margins"
                             href="#"

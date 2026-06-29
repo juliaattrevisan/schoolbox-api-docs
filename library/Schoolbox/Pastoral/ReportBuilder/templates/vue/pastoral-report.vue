@@ -79,10 +79,10 @@ function onPrintSelected(): void {
 </script>
 
 <template>
-    <div class="l-flex-col l-gap-m">
-        <div class="l-flex-row l-flex--justify-space l-flex--align-end f-no-margins">
+    <div class="u-flex-col l-gap-m">
+        <div class="u-flex-row u-flex--justify-space u-flex--align-end f-no-margins">
             <h1>{{ props.title }}</h1>
-            <nav class="l-flex-row l-flex--align-center f-no-margins">
+            <nav class="u-flex-row u-flex--align-center f-no-margins">
                 <button
                     v-if="selectedTab?.type === TabType.LIST"
                     class="sbx-icon-only-button f-no-margins"

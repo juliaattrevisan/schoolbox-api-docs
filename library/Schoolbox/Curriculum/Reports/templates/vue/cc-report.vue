@@ -30,7 +30,7 @@ const reportStore = useReportStore();
         </div>
     </div>
     <div v-else-if="reportStore.hasReport" class="c-island l-pad-m">
-        <div class="l-flex l-flex-col l-gap-s">
+        <div class="u-flex u-flex-col l-gap-s">
             <cc-report-filters />
             <cc-report-table />
             <cc-report-load-more />

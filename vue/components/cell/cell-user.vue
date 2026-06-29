@@ -13,10 +13,10 @@ const props = defineProps<{
 </script>
 
 <template>
-    <div class="l-flex-col l-pad-s l-gap-m">
-        <div class="l-flex-row l-flex--no-wrap l-flex--align-start l-gap-m">
+    <div class="u-flex-col l-pad-s l-gap-m">
+        <div class="u-flex-row u-flex--no-wrap u-flex--align-start l-gap-m">
             <user-photo :user="props.user" render="small" />
-            <div class="l-flex-col l-flex--justify-center l-gap-sf-no-margins">
+            <div class="u-flex-col u-flex--justify-center l-gap-sf-no-margins">
                 <a v-if="props.user._links?.profile" :href="props.user._links!.profile" title="View Profile">
                     {{ props.user.lastName }},
                     {{ props.user.preferredName || props.user.firstName }}

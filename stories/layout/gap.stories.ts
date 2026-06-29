@@ -6,7 +6,7 @@ import StorybookSlot from "../../vue/components/storybook-slot.vue";
  *
  * [**mdn**](https://developer.mozilla.org/en-US/docs/Web/CSS/gap)
  *
- * Used with `.l-flex-*` and `.l-grid-*`, `gap` is the preferred method for adding space between elements.
+ * Used with `.u-flex-*` and `.l-grid-*`, `gap` is the preferred method for adding space between elements.
  *
  * Compared to using `margin`, it allows the parent to control spacing. Have a read of [**this article**](https://markus.oberlehner.net/blog/css-the-spacing-between-elements-should-be-determined-by-the-parent-element/) if you'd like to know why this is preferred.
  */
@@ -32,7 +32,7 @@ type Story = StoryObj<typeof StorybookSlot>;
 export const GapXS: Story = {
     render: () => ({
         template: `
-<div class="story-demo-boxes l-flex-row l-gap-xs">
+<div class="story-demo-boxes u-flex-row l-gap-xs">
     <div class="story-demo-box"></div>
     <div class="story-demo-box"></div>
     <div class="story-demo-box"></div>
@@ -47,7 +47,7 @@ export const GapXS: Story = {
 export const GapS: Story = {
     render: () => ({
         template: `
-<div class="story-demo-boxes l-flex-row l-gap-s">
+<div class="story-demo-boxes u-flex-row l-gap-s">
     <div class="story-demo-box"></div>
     <div class="story-demo-box"></div>
     <div class="story-demo-box"></div>
@@ -62,7 +62,7 @@ export const GapS: Story = {
 export const GapM: Story = {
     render: () => ({
         template: `
-<div class="story-demo-boxes l-flex-row l-gap-m">
+<div class="story-demo-boxes u-flex-row l-gap-m">
     <div class="story-demo-box"></div>
     <div class="story-demo-box"></div>
     <div class="story-demo-box"></div>
@@ -77,7 +77,7 @@ export const GapM: Story = {
 export const GapL: Story = {
     render: () => ({
         template: `
-<div class="story-demo-boxes l-flex-row l-gap-l">
+<div class="story-demo-boxes u-flex-row l-gap-l">
     <div class="story-demo-box"></div>
     <div class="story-demo-box"></div>
     <div class="story-demo-box"></div>
@@ -92,7 +92,7 @@ export const GapL: Story = {
 export const GapXL: Story = {
     render: () => ({
         template: `
-<div class="story-demo-boxes l-flex-row l-gap-xl">
+<div class="story-demo-boxes u-flex-row l-gap-xl">
     <div class="story-demo-box"></div>
     <div class="story-demo-box"></div>
     <div class="story-demo-box"></div>

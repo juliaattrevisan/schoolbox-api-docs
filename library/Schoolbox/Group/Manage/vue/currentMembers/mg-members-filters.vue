@@ -30,9 +30,9 @@ function onFilterChange(accessType) {
 <template>
     <!-- <p class="meta">Search group members, they can be searched by name, year level, house, campus, role or access</p> -->
     <div class="filters">
-        <div class="checklist l-flex-col l-gap-s">
+        <div class="checklist u-flex-col l-gap-s">
             <label class="title">Filter</label>
-            <ul class="option-list l-flex-row l-gap-l">
+            <ul class="option-list u-flex-row l-gap-l">
                 <li>
                     <input
                         type="checkbox"

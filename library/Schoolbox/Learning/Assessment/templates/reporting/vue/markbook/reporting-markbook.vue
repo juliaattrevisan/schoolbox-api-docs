@@ -85,7 +85,7 @@ window.Vue.onMounted(async () => {
         </div>
     </div>
 
-    <p v-if="props.supportingDataCurriculumNodes.length" class="meta l-flex-row l-gap-xs">
+    <p v-if="props.supportingDataCurriculumNodes.length" class="meta u-flex-row l-gap-xs">
         Showing data associated to curriculum codes:
         <curriculum-codes :nodes="props.supportingDataCurriculumNodes" />
     </p>

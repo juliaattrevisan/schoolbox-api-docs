@@ -34,7 +34,7 @@
                                     {% set recordId = record.id %}
 
                                     <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': studentId, 'recordId': recordId}) }}">
-                                        <h3 class="l-flex l-flex--align-center l-gap-s">{{ record.heading }}
+                                        <h3 class="u-flex u-flex--align-center l-gap-s">{{ record.heading }}
                                             {% if config.pastoral_severity == true and record.severity and record.severity.color %}
                                                 <span class="circle l-mar--0" style="background-color:{{ record.severity.color }}" title="{{ record.severity.name }}"></span>
                                             {% endif %}

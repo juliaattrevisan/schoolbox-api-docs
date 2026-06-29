@@ -73,10 +73,10 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <div class="l-flex-col">
+    <div class="u-flex-col">
         <div class="c-card l-c-cr-top" :class="{ 'c-card--border-end': showExpandedBorder }">
-            <div class="l-flex-row l-pad-s l-gap-s">
-                <div class="l-flex-col l-flex--justify-center f-no-margins l-pad-s--left">
+            <div class="u-flex-row l-pad-s l-gap-s">
+                <div class="u-flex-col u-flex--justify-center f-no-margins l-pad-s--left">
                     <input
                         :id="`${dataPrefix}-selectAll`"
                         type="checkbox"
@@ -86,10 +86,10 @@ window.Vue.onMounted(() => {
                     />
                     <label :for="`${dataPrefix}-selectAll`" class="checkbox-label"> </label>
                 </div>
-                <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
+                <div class="u-flex-col u-flex--justify-center u-flex__item--1 f-no-margins">
                     <h2>{{ props.label }}</h2>
                 </div>
-                <nav class="c-nav-actions l-flex-row">
+                <nav class="c-nav-actions u-flex-row">
                     <a :class="`icon-${isExpanded ? 'up' : 'down'}-arrow`" @click.prevent="toggleExpanded" />
                 </nav>
             </div>

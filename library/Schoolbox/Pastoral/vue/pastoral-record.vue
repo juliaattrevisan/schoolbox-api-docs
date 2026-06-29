@@ -38,7 +38,7 @@ window.Vue.onMounted((): void => {
                         .replace('{recordId}', props.record.id.toString())
                 "
             >
-                <h3 class="l-flex l-flex--align-center l-gap-s">
+                <h3 class="u-flex u-flex--align-center l-gap-s">
                     {{ props.record.student.fullName }}: {{ props.record.heading }}
                     <span
                         v-if="config?.pastoralSeverity && props.record.severity"
@@ -59,7 +59,7 @@ window.Vue.onMounted((): void => {
                             props.record.points !== null
                         "
                         :points="props.record.points"
-                        class="l-flex__item--none"
+                        class="u-flex__item--none"
                     ></sbx-label-pastoral-points>
                 </h3>
             </a>
@@ -77,9 +77,9 @@ window.Vue.onMounted((): void => {
                 </span>
             </p>
         </div>
-        <div class="l-flex-col l-gap-s l-pad-m u-clear-both">
+        <div class="u-flex-col l-gap-s l-pad-m u-clear-both">
             <media-article v-if="props.record.bodyPublic" :content="props.record.bodyPublic" />
-            <div v-if="props.record.tags.length > 0" class="l-flex-row l-gap-xs f-no-margins">
+            <div v-if="props.record.tags.length > 0" class="u-flex-row l-gap-xs f-no-margins">
                 <template v-for="tag in props.record.tags" :key="tag.id">
                     <a
                         v-if="routes?.getReportTags"

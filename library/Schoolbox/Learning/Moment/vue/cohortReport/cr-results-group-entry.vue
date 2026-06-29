@@ -95,7 +95,7 @@ async function openLightbox(file: StorageFile, event: MouseEvent): Promise<void>
 <template>
     <div
         v-if="crStore.loadingEntries[props.entry.id]"
-        class="cr-result-entry cr-result-entry--loading l-flex-col l-pad-s"
+        class="cr-result-entry cr-result-entry--loading u-flex-col l-pad-s"
         :class="`cr-result-entry--${props.entry.currentState}`"
     >
         <div class="loader"></div>
@@ -103,7 +103,7 @@ async function openLightbox(file: StorageFile, event: MouseEvent): Promise<void>
 
     <div
         v-else
-        class="cr-result-entry l-flex-col l-pad-s actions-small-1"
+        class="cr-result-entry u-flex-col l-pad-s actions-small-1"
         :class="`cr-result-entry--${props.entry.currentState}`"
     >
         <div>
@@ -114,7 +114,7 @@ async function openLightbox(file: StorageFile, event: MouseEvent): Promise<void>
                 :checked="crStore.isEntrySelected(props.entry.id)"
                 @change="crStore.toggleEntrySelection(props.entry.id)"
             />
-            <label :for="inputId" class="checkbox-label l-flex__item--1">
+            <label :for="inputId" class="checkbox-label u-flex__item--1">
                 <!-- Only show status that isn't published, since that is the default state -->
                 <span
                     v-if="props.entry.currentState !== EvidenceStatus.PUBLISHED"
@@ -144,7 +144,7 @@ async function openLightbox(file: StorageFile, event: MouseEvent): Promise<void>
             <cr-results-group-entry-actions :entry="props.entry" />
         </ul>
 
-        <div class="l-flex__item--1 l-grid l-grid--12 l-gap-s l-mar-xs--top">
+        <div class="u-flex__item--1 l-grid l-grid--12 l-gap-s l-mar-xs--top">
             <div class="small-12" :class="{ 'medium-8': selectableEvidence.length > 0 }">
                 <article
                     v-if="selectedEvidence !== null && selectedEvidence.storage.hash"
@@ -173,11 +173,11 @@ async function openLightbox(file: StorageFile, event: MouseEvent): Promise<void>
                 </p>
             </div>
 
-            <div v-if="selectableEvidence.length > 0" class="small-12 medium-4 l-flex-col l-gap-s">
+            <div v-if="selectableEvidence.length > 0" class="small-12 medium-4 u-flex-col l-gap-s">
                 <div
                     v-for="evidence in props.entry.evidence"
                     :key="evidence.storage.hash"
-                    class="cr-evidence-button l-flex--no-wrap l-flex-row l-gap-xs l-pad-xs"
+                    class="cr-evidence-button u-flex--no-wrap u-flex-row l-gap-xs l-pad-xs"
                     :class="{ 'cr-evidence-button-selected': evidence.storage.hash === selectedEvidenceHash }"
                     :title="evidence.storage.name"
                     @click="selectedEvidenceHash = evidence.storage.hash"

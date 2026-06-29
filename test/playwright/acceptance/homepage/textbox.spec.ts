@@ -138,17 +138,17 @@ test.describe.serial("Textbox Tests", () => {
         await searchPage.clickFilterType("textbox");
         await searchPage.clickApplyFilters();
         await page.waitForSelector("#search-page-container");
-        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).toContainText("Jana Reed");
-        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).toContainText("Third Text Box");
+        await expect(page.locator('div[class="u-flex-col l-gap-m"]')).toContainText("Jana Reed");
+        await expect(page.locator('div[class="u-flex-col l-gap-m"]')).toContainText("Third Text Box");
         await searchPage.inputKeyword("Test");
         await searchPage.clearFilters();
         await searchPage.clickFilterType("textbox");
         await searchPage.clickApplyFilters();
         await page.waitForSelector("#search-page-container");
-        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).toContainText("Second Text Box");
-        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).toContainText("Test");
-        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).toContainText("Test Text Box Title");
-        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).toContainText("I am textbox content");
+        await expect(page.locator('div[class="u-flex-col l-gap-m"]')).toContainText("Second Text Box");
+        await expect(page.locator('div[class="u-flex-col l-gap-m"]')).toContainText("Test");
+        await expect(page.locator('div[class="u-flex-col l-gap-m"]')).toContainText("Test Text Box Title");
+        await expect(page.locator('div[class="u-flex-col l-gap-m"]')).toContainText("I am textbox content");
 
         tester.isGoingTo(
             "As Jana Reed search for a  textbox and check whether it is presented in the search results grid or not",
@@ -159,16 +159,16 @@ test.describe.serial("Textbox Tests", () => {
         await tester.common.clickSearchTypeCheckbox("textbox");
         await searchPage.clickApplyFilters();
         await page.waitForSelector("#search-page-container");
-        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).not.toContainText("Jana Reed");
-        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).not.toContainText("Third Text Box");
+        await expect(page.locator('div[class="u-flex-col l-gap-m"]')).not.toContainText("Jana Reed");
+        await expect(page.locator('div[class="u-flex-col l-gap-m"]')).not.toContainText("Third Text Box");
         await searchPage.inputKeyword("Test");
         await searchPage.clearFilters();
         await searchPage.clickFilterType("textbox");
         await searchPage.clickApplyFilters();
         await page.waitForSelector("#search-page-container");
-        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).not.toContainText("Second Text Box");
-        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).toContainText("Test Text Box Title");
-        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).toContainText("I am textbox content");
+        await expect(page.locator('div[class="u-flex-col l-gap-m"]')).not.toContainText("Second Text Box");
+        await expect(page.locator('div[class="u-flex-col l-gap-m"]')).toContainText("Test Text Box Title");
+        await expect(page.locator('div[class="u-flex-col l-gap-m"]')).toContainText("I am textbox content");
 
         tester.isGoingTo("As Jack Coles navigate to the Test TextBox Homepage");
         await tester.impersonate("Jack Coles");
@@ -205,14 +205,14 @@ test.describe.serial("Textbox Tests", () => {
         await searchPage.clearFilters();
         await tester.common.clickSearchTypeCheckbox("textbox");
         await searchPage.clickApplyFilters();
-        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).toContainText("Jamal to be presented");
+        await expect(page.locator('div[class="u-flex-col l-gap-m"]')).toContainText("Jamal to be presented");
         await searchPage.inputKeyword("Jana");
         await searchPage.clearFilters();
         await searchPage.clickApplyFilters();
         await page.waitForSelector("#search-page-container");
-        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).toContainText("Jamal to be presented");
-        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).toContainText("Untitled textbox");
-        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).not.toContainText("Jana to be hidden");
+        await expect(page.locator('div[class="u-flex-col l-gap-m"]')).toContainText("Jamal to be presented");
+        await expect(page.locator('div[class="u-flex-col l-gap-m"]')).toContainText("Untitled textbox");
+        await expect(page.locator('div[class="u-flex-col l-gap-m"]')).not.toContainText("Jana to be hidden");
         tester.isGoingTo("Navigate to the Test TextBox Homepage to check whether the textbox is presented or not");
         await page.goto(`/homepage/${homepageId}`);
         await expect(page.locator("#container")).toContainText("Jamal to be presented");

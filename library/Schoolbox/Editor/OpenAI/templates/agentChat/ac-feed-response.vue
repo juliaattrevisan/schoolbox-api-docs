@@ -76,7 +76,7 @@ function retryResponse(): void {
         }"
         :data-test="`ac-feed-response-list-item-${props.message.entryKey}`"
     >
-        <div class="ac-feed-side l-flex-row l-mar-s--right">
+        <div class="ac-feed-side u-flex-row l-mar-s--right">
             <!-- When loading -->
             <div v-if="!isResponseComplete" class="loader" data-test="ac-feed-response-loading"></div>
 

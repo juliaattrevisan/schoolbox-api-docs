@@ -121,17 +121,17 @@
                                         {% set gradePath = routeLookupIfAuthorized('learningGrades.getGradesForSubject', {viewee: student, userId: student.id, term: currentTerm, termCode: currentTerm.code, subject: subject.folder, subjectId: subject.folder.id}) %}
                                         <div class="small-{{ subject.grade ? 8 : 12 }} card">
                                             {% if gradePath %}
-                                                <a href="{{ gradePath }}" title="View {{ locale.grades.properPlural }}" class="l-flex-row l-flex--no-wrap l-flex--align-center l-gap-m">
+                                                <a href="{{ gradePath }}" title="View {{ locale.grades.properPlural }}" class="u-flex-row u-flex--no-wrap u-flex--align-center l-gap-m">
                                                     <sbx-icon name="home" size="xl"></sbx-icon>
-                                                    <div class="l-flex-col l-gap-s">
+                                                    <div class="u-flex-col l-gap-s">
                                                         <p>{{ subject.folder.title }}</p>
                                                         <p class="meta">{{ subject.folder.codeString }}</p>
                                                     </div>
                                                 </a>
                                             {% else %}
-                                                <div class="l-flex-row l-flex--no-wrap l-flex--align-center l-gap-m">
+                                                <div class="u-flex-row u-flex--no-wrap u-flex--align-center l-gap-m">
                                                     <span class="icon-home size-32" title="{{ subject.folder.title }}"></span>
-                                                    <div class="l-flex-col l-gap-s">
+                                                    <div class="u-flex-col l-gap-s">
                                                         <p>{{ subject.folder.title }}</p>
                                                         <p class="meta">{{ subject.folder.codeString }}</p>
                                                     </div>
@@ -163,9 +163,9 @@
                                     <li class="actions-small-1">
                                         <div class="list-item">
                                             <div class="small-12 card">
-                                                <a href="/search/user/{{ teacher.id }}" title="" class="l-flex-row l-flex--no-wrap l-flex--align-start l-gap-m">
+                                                <a href="/search/user/{{ teacher.id }}" title="" class="u-flex-row u-flex--no-wrap u-flex--align-start l-gap-m">
                                                     {% include 'include/portrait.twig' with {user: teacher, description: teacher.fullName} only %}
-                                                    <div class="l-flex-col l-gap-xs">
+                                                    <div class="u-flex-col l-gap-xs">
                                                         <p>{{ teacher.formatName }}</p>
                                                         <p class="meta">{{ teacher.role.name }}</p>
                                                     </div>

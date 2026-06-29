@@ -32,7 +32,7 @@ function isUnknown(entry: SubjectEntry): boolean {
 </script>
 
 <template>
-    <div class="l-flex-col l-gap-s">
+    <div class="u-flex-col l-gap-s">
         <sbx-label
             v-for="e in props.entry"
             :key="`hl-${e.subject}`"

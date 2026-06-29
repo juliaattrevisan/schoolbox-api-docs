@@ -126,13 +126,13 @@ window.Vue.onUnmounted(async () => {
 </script>
 
 <template>
-    <div class="l-flex__item--1-grow">
+    <div class="u-flex__item--1-grow">
         <div
             v-if="
                 (props.isReadOnly && props.student.attemptResponse.comment === null) ||
                 (props.isReadOnly && props.student.attemptResponse.comment === '')
             "
-            class="l-flex-col l-gap-s"
+            class="u-flex-col l-gap-s"
         >
             <label>Comment</label>
             <p>
@@ -145,7 +145,7 @@ window.Vue.onUnmounted(async () => {
                 props.student.attemptResponse.comment &&
                 props.student.attemptResponse.comment !== ''
             "
-            class="l-flex-col l-gap-s"
+            class="u-flex-col l-gap-s"
         >
             <label>Comment</label>
             <media-article tag="div" :content="props.student.attemptResponse.comment"></media-article>
