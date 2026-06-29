@@ -42,14 +42,8 @@
             </div>
         {% endif %}
         <p>
-            {% if assessment.isSpecification %}
-                <span class="meta">{{ assessment.typeName }}</span>
-            {% else %}
-                {% include '@learningAssessment/fragments/statusLine.twig' with {
-                    assessable: assessment,
-                    student:    student
-                } only %}
-                <span class="{{ participant or assessment is lessonPlan ? 'pipe' : '' }} meta">{{ assessment.typeName }}</span>
+            <span class="meta">{{ assessment.typeName }}</span>
+            {% if assessment.isImplementation %}
                 <span class="pipe meta">{{ dueDate.dueDate(assessment, student) }}</span>
                 <span class="pipe meta">Weight: {{ assessment.weight }}</span>
             {% endif %}
