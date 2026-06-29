@@ -30,7 +30,7 @@
                     <tr>
                         <th width="10%">Time</th>
                         <th width="70%">Heading</th>
-                        <th width="20%" class="u-align-right">Import Result</th>
+                        <th width="20%" class="u-ta-right">Import Result</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -38,7 +38,7 @@
                     <tr>
                         <td>{{ log.timestamp }}</td>
                         <td>{{ log.message }}</td>
-                        <td class="u-align-right">{{ log.status }}</td>
+                        <td class="u-ta-right">{{ log.status }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -79,4 +79,3 @@
     </div>
 </div>
 {% endif %}
-

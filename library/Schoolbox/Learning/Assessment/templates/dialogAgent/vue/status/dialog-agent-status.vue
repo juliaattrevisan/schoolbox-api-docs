@@ -95,7 +95,7 @@ function toggleCollapse(assessmentId: number): void {
         </div>
 
         <!-- Status filters -->
-        <div class="small-12 large-8 columns u-align-right">
+        <div class="small-12 large-8 columns u-ta-right">
             <das-filters v-model:filters="filters" />
         </div>
     </div>

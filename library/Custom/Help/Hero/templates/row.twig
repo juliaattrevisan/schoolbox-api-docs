@@ -2,15 +2,15 @@
     <td><a href="/search/user/{{ id }}" title="View Profile for {{ userData.fullname }}">{{ userData.firstname }}</a></td>
     <td><a href="/search/user/{{ id }}" title="View Profile for {{ userData.fullname }}">{{ userData.lastname }}</a></td>
     <td><a href="/homepage/{{ userData.folderId }}" title="Visit Teacher Course homepage for {{ userData.folderName }}">{{ userData.folderName }}</a></td>
-    <td class="u-align-center">
+    <td class="u-ta-center">
         {% if userData.qualified %}
             Qualified
         {% endif %}
     </td>
-    <td class="u-align-center">
+    <td class="u-ta-center">
         <a href="{{ routeLookup('learningGrades.getGrades', {userId: id }) }}" title="Visit Grades page for {{ userData.fullname }}">Grades</a>
     </td>
-    <td class="actions-small-1 u-align-center">
+    <td class="actions-small-1 u-ta-center">
         {% if userData.heroised %}
             <a class="sbx-icon-only-button no-text" title="{{ userData.fullname }} is on the Hero Wall" aria-label="{{ userData.fullname }} is on the Hero Wall"><sbx-icon name="favourite"></sbx-icon></a>
         {% endif %}
