@@ -6,10 +6,12 @@
 import locale from "@js/terminology/rosettaStone";
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import type { User } from "@schoolboxLibrary/types/User";
-import type { RubricGridDescriptor, RubricGridLevel, RubricMarkedGridIndicator } from "./types";
+import type { RubricGridDescriptor, RubricGridIndicator, RubricGridLevel, RubricMarkedGridIndicator } from "./types";
 
 interface Props {
     descriptor: RubricGridDescriptor;
+    /** The id of the indicator this descriptor belongs to (used to address the descriptor in acceptance tests) */
+    indicatorId: RubricGridIndicator["id"];
     selfAssessmentIndicatorMark: RubricMarkedGridIndicator | null;
     level: RubricGridLevel;
     participantId: User["id"] | null;
@@ -58,6 +60,20 @@ const markRangeValues = window.Vue.computed<number[]>(() => {
 });
 
 const hasMarkRange = window.Vue.computed(() => props.descriptor.value !== null && "left" in props.descriptor.value);
+
+/**
+ * The descriptor's representative point value, used together with the indicator id
+ * to address this descriptor cell in acceptance tests. Null when the descriptor has no value.
+ */
+const descriptorTestValue = window.Vue.computed<number | null>(() => {
+    if (props.descriptor.value === null) {
+        return null;
+    }
+
+    return "max" in props.descriptor.value
+        ? props.descriptor.value.max
+        : Math.max(props.descriptor.value.left, props.descriptor.value.right);
+});
 
 /**
  * Internal cache of the selected value for this descriptor
@@ -123,7 +139,14 @@ window.Vue.onMounted(() => {
                 data-rubric-descriptor-checkbox
             />
 
-            <label :for="`descriptor-${props.descriptor.id}-${componentId}`">
+            <label
+                :for="`descriptor-${props.descriptor.id}-${componentId}`"
+                :data-test="
+                    descriptorTestValue !== null
+                        ? `rubric-descriptor-input-${props.indicatorId}-${descriptorTestValue}`
+                        : undefined
+                "
+            >
                 <div class="hide-for-large-up u-pad-m hide-on-print">
                     <!-- display rubric levels for the mobile view. -->
                     <p>

@@ -8,7 +8,7 @@ import type { Page } from "@playwright/test";
 export default class RubricMarkable {
     private page: Page;
 
-    static readonly DATA_TEST_RUBRIC_DESCRIPTOR_INPUT = "rubric-descriptor-input"; // append "-[descriptorId]-[value]"
+    static readonly DATA_TEST_RUBRIC_DESCRIPTOR_INPUT = "rubric-descriptor-input"; // Append "-[indicatorId]-[value]"
 
     static readonly DATA_TEST_RUBRIC_FINAL_SUMMARY = "rubric-final-summary";
 
@@ -19,16 +19,15 @@ export default class RubricMarkable {
     }
 
     /**
-     * Selects a given rubric indicator level based on its value in the feedback form
+     * Selects a given rubric indicator's descriptor based on its point value.
+     * Clicking the descriptor's label toggles the underlying descriptor checkbox.
      * @param indicatorId - The ID of the indicator
-     * @param value - The value of the indicator
+     * @param value - The point value of the descriptor to select
      */
     async selectRubricIndicatorByValue(indicatorId: number, value: string | number): Promise<void> {
-        // TODO: refine this to match descriptor/indicator correctly
-        const inputId = await this.page
+        await this.page
             .getByTestId(`${RubricMarkable.DATA_TEST_RUBRIC_DESCRIPTOR_INPUT}-${indicatorId}-${value}`)
-            .getAttribute("id");
-        await this.page.locator(`label[for="${inputId}"]`).click();
+            .click();
     }
 
     /**

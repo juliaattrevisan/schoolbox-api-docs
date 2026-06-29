@@ -38,6 +38,7 @@ window.Vue.watch(
             <rm-grid-descriptor
                 v-if="props.indicator.descriptors[index] !== null"
                 v-model:indicator-mark="indicatorMark"
+                :indicator-id="props.indicator.id"
                 :descriptor="props.indicator.descriptors[index]"
                 :self-assessment-indicator-mark="props.selfAssessmentIndicatorMark"
                 :level="level"
