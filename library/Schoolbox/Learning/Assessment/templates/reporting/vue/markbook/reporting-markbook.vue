@@ -40,7 +40,7 @@ async function loadData(): Promise<void> {
 
     if (!props.routeGetStatusData) {
         console.error("Missing route for loading markbook data");
-        loadError.value = "";
+        loadError.value = "Missing route for loading markbook data";
         return;
     }
 
@@ -90,7 +90,7 @@ window.Vue.onMounted(async () => {
         <curriculum-codes :nodes="props.supportingDataCurriculumNodes" />
     </p>
 
-    <request-error v-if="loadError" :further-info="loadError" />
+    <request-error v-if="loadError !== null" :further-info="loadError" />
     <loading-table v-else-if="mbStore.data === null" />
     <markbook-inner v-else :type="MarkbookType.REPORTING" />
 
