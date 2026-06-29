@@ -11,6 +11,8 @@ export default class RubricBuilder {
 
     static readonly DATA_TEST_RUBRIC_CREATE_MANUALLY = "rubric-create-manually";
 
+    static readonly DATA_TEST_RUBRIC_TITLE = "rubric-title";
+
     static readonly DATA_TEST_RUBRIC_GRID = "rubric-grid"; // Append "-[rubricId]"
 
     static readonly DATA_TEST_RUBRIC_SPAWN_LEVEL = "rubric-spawn-level";
@@ -39,6 +41,16 @@ export default class RubricBuilder {
      */
     async clickCreateRubricManually(): Promise<void> {
         await this.page.getByTestId(RubricBuilder.DATA_TEST_RUBRIC_CREATE_MANUALLY).click();
+    }
+
+    /**
+     * Sets the (required) title of the rubric being built
+     * @param title - The title to set
+     */
+    async setRubricTitle(title: string): Promise<void> {
+        const titleInput = this.page.getByTestId(RubricBuilder.DATA_TEST_RUBRIC_TITLE);
+        await titleInput.fill(title);
+        await titleInput.blur(); // commit the value (the input uses v-model.lazy)
     }
 
     /**

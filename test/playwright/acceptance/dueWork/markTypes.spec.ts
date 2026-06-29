@@ -101,6 +101,7 @@ test.describe("Due Work - Mark type tests", () => {
         await assessmentForm.setInstructorMarkType(AssessmentForm.MARK_TYPE_TOTAL_MARK);
         await rubricBuilder.clickAddRubric();
         await rubricBuilder.clickCreateRubricManually();
+        await rubricBuilder.setRubricTitle(`${dueWorkName2} Rubric`);
         await rubricBuilder.addRubricLevel();
         await rubricBuilder.toggleRubricIndicator(86, 426);
         await rubricBuilder.fillRubricCriterionPoints(86, 426, 0, "1");
@@ -158,6 +159,7 @@ test.describe("Due Work - Mark type tests", () => {
         await assessmentForm.setInstructorMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
         await rubricBuilder.clickAddRubric();
         await rubricBuilder.clickCreateRubricManually();
+        await rubricBuilder.setRubricTitle(`${dueWorkName3} Rubric`);
         await rubricBuilder.toggleRubricIndicator(74, 452);
         await rubricBuilder.fillRubricCriterionPoints(74, 452, 0, "1");
         await rubricBuilder.fillRubricCriterionPoints(74, 452, 1, "2");
