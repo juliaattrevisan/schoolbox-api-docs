@@ -10,7 +10,7 @@ const filters = defineModel<Record<ReportingFeedbackStatus, boolean>>("filters",
 
 <template>
     <ul class="filters">
-        <li v-for="status in Object.values(ReportingFeedbackStatus)" :key="status" class="l-mar-xs--left">
+        <li v-for="status in Object.values(ReportingFeedbackStatus)" :key="status" class="u-mar-xs--left">
             <input :id="`das-filter-${status}`" v-model="filters[status]" type="checkbox" />
             <label :for="`das-filter-${status}`">
                 <span class="progress-tick tiny" :class="STATUS_TICKS[status]"></span> {{ STATUS_LABELS[status] }}

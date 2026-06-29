@@ -17,7 +17,7 @@ const props = defineProps<Props>();
         :class="`ac-feed-alert--${props.message.data.side}`"
         :data-test="`ac-feed-alert-list-item-${props.message.entryKey}`"
     >
-        <p class="alert-box l-mar--0 u-pad-s" :class="props.message.data.severity" data-test="ac-feed-message-content">
+        <p class="alert-box u-mar--0 u-pad-s" :class="props.message.data.severity" data-test="ac-feed-message-content">
             <template v-if="props.message.data.title">
                 <strong>{{ props.message.data.title }}</strong>
                 <br />

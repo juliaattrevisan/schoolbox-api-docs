@@ -300,7 +300,7 @@ window.Vue.watch(
 </script>
 
 <template>
-    <div class="actions-small-1 l-mar-s--bottom no-print">
+    <div class="actions-small-1 u-mar-s--bottom no-print">
         <button
             v-if="currentResponse._routes.assistanceRequest"
             class="button"
@@ -326,7 +326,7 @@ window.Vue.watch(
 
     <ac-feed
         ref="feedRef"
-        class="l-mar-m--bottom ac-feed"
+        class="u-mar-m--bottom ac-feed"
         min-height="20rem"
         :max-height="maxFeedHeight"
         :feed="acStore.fullFeed"
@@ -345,7 +345,7 @@ window.Vue.watch(
                     <span>Help Requested! Your teacher will be informed. You can keep working while you wait.</span>
                     <button
                         v-if="currentResponse._routes.assistanceResolve"
-                        class="button highlight l-mar--0"
+                        class="button highlight u-mar--0"
                         type="button"
                         :disabled="isHelpRequestChanging || isLoading || undefined"
                         data-test="dialog-agent-response-request-help-dismiss"

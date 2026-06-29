@@ -56,7 +56,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     placeholder: undefined,
     accept: "*/*",
-    class: "l-mar-s--bottom",
+    class: "u-mar-s--bottom",
     inputName: undefined,
     required: false,
     disabled: false,

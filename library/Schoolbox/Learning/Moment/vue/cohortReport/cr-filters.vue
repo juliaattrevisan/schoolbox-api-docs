@@ -59,7 +59,7 @@ async function applyFilters(): Promise<void> {
         <div class="c-island filters u-flex-col u-pad-m" :class="{ 'u-gap-m': isOpen }">
             <button
                 v-if="props.isSingleColumn"
-                class="filters__toggle-button l-mar--0"
+                class="filters__toggle-button u-mar--0"
                 :class="isOpen ? 'icon-up-arrow' : 'icon-down-arrow'"
                 @click.prevent="isOpen = !isOpen"
             >

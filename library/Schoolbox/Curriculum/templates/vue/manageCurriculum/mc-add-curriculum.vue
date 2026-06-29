@@ -93,7 +93,7 @@ function onCancelSelected(): void {
             <form>
                 <section>
                     <fieldset class="content">
-                        <legend class="l-mar-m--bottom u-fs-m">Add new Curriculum</legend>
+                        <legend class="u-mar-m--bottom u-fs-m">Add new Curriculum</legend>
                         <div class="small-12 columns">
                             <label for="name" class="required">Name</label>
                             <input

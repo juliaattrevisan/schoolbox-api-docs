@@ -131,7 +131,7 @@ window.Vue.onMounted(() => {
         </div>
 
         <template v-for="(inputOption, i) in availableFieldSettingOptions.input" :key="inputOption.id">
-            <label :for="getLabelKeyForOption(inputOption)" :class="{ 'l-mar-s--top': i > 0 }">
+            <label :for="getLabelKeyForOption(inputOption)" :class="{ 'u-mar-s--top': i > 0 }">
                 {{ inputOption.name }}
                 <span
                     v-if="getMetaTextForOption(inputOption)"

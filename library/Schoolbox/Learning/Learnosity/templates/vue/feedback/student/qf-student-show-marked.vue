@@ -12,7 +12,7 @@ const studentStore = useStudentStore();
 
 <template>
     <div class="checklist f-no-margins">
-        <ul class="option-list l-mar--0">
+        <ul class="option-list u-mar--0">
             <li class="f-no-margins">
                 <input
                     id="show-marked-attempts"

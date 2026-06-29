@@ -5,7 +5,7 @@
 
 @use "sass:list";
 
-.l-mar {
+.u-mar {
     @each $size in $global-sizes {
         &-#{$size} {
             margin: var(--spacing-#{$size});

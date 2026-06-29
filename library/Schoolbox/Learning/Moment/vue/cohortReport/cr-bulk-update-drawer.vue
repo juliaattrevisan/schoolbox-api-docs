@@ -112,10 +112,10 @@ async function onAction(type: keyof typeof selectedResultActions.value): Promise
 
 <template>
     <bottom-drawer :show-drawer="totalSelectedResults > 0">
-        <h3 class="selected-count l-mar-s--right">
+        <h3 class="selected-count u-mar-s--right">
             <em>{{ totalSelectedResults }} records selected</em>
         </h3>
-        <div class="meta l-mar-s--right">({{ selectedResultStatuses }})</div>
+        <div class="meta u-mar-s--right">({{ selectedResultStatuses }})</div>
         <button class="button-clear" @click.prevent="clearSelection">Clear selection</button>
 
         <div class="u-flex-row u-flex--justify u-gap-xs">

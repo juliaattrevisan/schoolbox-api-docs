@@ -76,7 +76,7 @@ function retryResponse(): void {
         }"
         :data-test="`ac-feed-response-list-item-${props.message.entryKey}`"
     >
-        <div class="ac-feed-side u-flex-row l-mar-s--right">
+        <div class="ac-feed-side u-flex-row u-mar-s--right">
             <!-- When loading -->
             <div v-if="!isResponseComplete" class="loader" data-test="ac-feed-response-loading"></div>
 
@@ -105,11 +105,11 @@ function retryResponse(): void {
 
         <!-- response errored -->
         <template v-if="props.message.data.status === 'error'">
-            <p class="alert-box alert l-mar--0 u-pad-s" data-test="ac-feed-message-content">
+            <p class="alert-box alert u-mar--0 u-pad-s" data-test="ac-feed-message-content">
                 <b v-if="props.errorPrefix">{{ props.errorPrefix }}</b>
                 {{ props.message.data.message }}
             </p>
-            <div v-if="props.allowRetry && isLatestMessage" class="l-mar-xs--left">
+            <div v-if="props.allowRetry && isLatestMessage" class="u-mar-xs--left">
                 <button
                     class="button f-no-icon-button sbx-icon-only-button"
                     type="button"
@@ -127,7 +127,7 @@ function retryResponse(): void {
         <div v-else-if="!isResponseComplete" class="ac-feed-response-container">
             <img v-if="imageSrc" :src="imageSrc" />
 
-            <div class="ac-feed-message-container u-pad-s" :class="{ 'l-mar-s--top': imageSrc }">
+            <div class="ac-feed-message-container u-pad-s" :class="{ 'u-mar-s--top': imageSrc }">
                 <!-- we don't render the in progress message as HTML as it may be malformed -->
                 <p class="ac-feed-message-content" data-test="ac-feed-message-content">
                     {{
@@ -155,7 +155,7 @@ function retryResponse(): void {
             <div
                 v-if="props.message.data.message.length"
                 class="ac-feed-message-container u-pad-s"
-                :class="{ 'l-mar-s--top': imageSrc !== null }"
+                :class="{ 'u-mar-s--top': imageSrc !== null }"
             >
                 <!-- eslint-disable vue/no-v-html -- scrubbed in the backend -->
                 <p
@@ -164,7 +164,7 @@ function retryResponse(): void {
                     v-html="props.message.data.message"
                 ></p>
                 <!-- eslint-enable vue/no-v-html -->
-                <p v-if="props.showTimestamps" class="meta l-mar--0">
+                <p v-if="props.showTimestamps" class="meta u-mar--0">
                     <time :datetime="props.message.createdAt" :title="getDayjsDatetimeLong(props.message.createdAt)">
                         {{ formatTimestamp(props.message) }}
                     </time>

@@ -319,7 +319,7 @@ window.Vue.watch(
 </script>
 
 <template>
-    <div class="share-work-buttons l-grid u-gap-m l-mar-m--bottom">
+    <div class="share-work-buttons l-grid u-gap-m u-mar-m--bottom">
         <a
             class="share-photo sbx-button--has-icon"
             data-test="learning-moment-evidence-share-photo"

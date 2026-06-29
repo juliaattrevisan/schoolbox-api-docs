@@ -23,73 +23,73 @@ export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
 
 /**
- * `.l-mar-xs`
+ * `.u-mar-xs`
  */
 export const MarginXS: Story = {
     render: () => ({
         template: `
 <div class="story-demo-boxes u-flex-row">
-    <div class="story-demo-box l-mar-xs"></div>
+    <div class="story-demo-box u-mar-xs"></div>
 </div>
         `,
     }),
 };
 
 /**
- * `.l-mar-s`
+ * `.u-mar-s`
  */
 export const MarginS: Story = {
     render: () => ({
         template: `
 <div class="story-demo-boxes u-flex-row">
-    <div class="story-demo-box l-mar-s"></div>
+    <div class="story-demo-box u-mar-s"></div>
 </div>
         `,
     }),
 };
 
 /**
- * `.l-mar-m`
+ * `.u-mar-m`
  */
 export const MarginM: Story = {
     render: () => ({
         template: `
 <div class="story-demo-boxes u-flex-row">
-    <div class="story-demo-box l-mar-m"></div>
+    <div class="story-demo-box u-mar-m"></div>
 </div>
         `,
     }),
 };
 
 /**
- * `.l-mar-l`
+ * `.u-mar-l`
  */
 export const MarginL: Story = {
     render: () => ({
         template: `
 <div class="story-demo-boxes u-flex-row">
-    <div class="story-demo-box l-mar-l"></div>
+    <div class="story-demo-box u-mar-l"></div>
 </div>
         `,
     }),
 };
 
 /**
- * `.l-mar-xl`
+ * `.u-mar-xl`
  *
  */
 export const MarginXL: Story = {
     render: () => ({
         template: `
 <div class="story-demo-boxes u-flex-row">
-    <div class="story-demo-box l-mar-xl"></div>
+    <div class="story-demo-box u-mar-xl"></div>
 </div>
         `,
     }),
 };
 
 /**
- * `.l-mar-m--horiz`
+ * `.u-mar-m--horiz`
  *
  * _Can be used with any of the sizes above_
  */
@@ -97,14 +97,14 @@ export const MarginHorizontals: Story = {
     render: () => ({
         template: `
 <div class="story-demo-boxes u-flex-row">
-    <div class="story-demo-box l-mar-m--horiz"></div>
+    <div class="story-demo-box u-mar-m--horiz"></div>
 </div>
         `,
     }),
 };
 
 /**
- * `.l-mar-m--vert`
+ * `.u-mar-m--vert`
  *
  * _Can be used with any of the sizes above_
  */
@@ -112,14 +112,14 @@ export const MarginVertical: Story = {
     render: () => ({
         template: `
 <div class="story-demo-boxes u-flex-row">
-    <div class="story-demo-box l-mar-m--vert"></div>
+    <div class="story-demo-box u-mar-m--vert"></div>
 </div>
         `,
     }),
 };
 
 /**
- * `.l-mar-m--top`
+ * `.u-mar-m--top`
  *
  * _Can be used with any of the sizes above_
  */
@@ -127,14 +127,14 @@ export const MarginTop: Story = {
     render: () => ({
         template: `
 <div class="story-demo-boxes u-flex-row">
-    <div class="story-demo-box l-mar-m--top"></div>
+    <div class="story-demo-box u-mar-m--top"></div>
 </div>
         `,
     }),
 };
 
 /**
- * `.l-mar-m--bottom`
+ * `.u-mar-m--bottom`
  *
  * _Can be used with any of the sizes above_
  */
@@ -142,14 +142,14 @@ export const MarginBottom: Story = {
     render: () => ({
         template: `
 <div class="story-demo-boxes u-flex-row">
-    <div class="story-demo-box l-mar-m--bottom"></div>
+    <div class="story-demo-box u-mar-m--bottom"></div>
 </div>
         `,
     }),
 };
 
 /**
- * `.l-mar-m--left`
+ * `.u-mar-m--left`
  *
  * _Can be used with any of the sizes above_
  */
@@ -157,14 +157,14 @@ export const MarginLeft: Story = {
     render: () => ({
         template: `
 <div class="story-demo-boxes u-flex-row">
-    <div class="story-demo-box l-mar-m--left"></div>
+    <div class="story-demo-box u-mar-m--left"></div>
 </div>
         `,
     }),
 };
 
 /**
- * `.l-mar-m--right`
+ * `.u-mar-m--right`
  *
  * _Can be used with any of the sizes above_
  */
@@ -172,14 +172,14 @@ export const MarginRight: Story = {
     render: () => ({
         template: `
 <div class="story-demo-boxes u-flex-row">
-    <div class="story-demo-box l-mar-m--right"></div>
+    <div class="story-demo-box u-mar-m--right"></div>
 </div>
         `,
     }),
 };
 
 /**
- * `.l-mar--0`
+ * `.u-mar--0`
  *
  * _Clear any existing margins on an element_
  */
@@ -187,7 +187,7 @@ export const Margin0: Story = {
     render: () => ({
         template: `
 <div class="story-demo-boxes u-flex-row">
-    <div class="story-demo-box l-mar-m l-mar--0"></div>
+    <div class="story-demo-box u-mar-m u-mar--0"></div>
 </div>
         `,
     }),

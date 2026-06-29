@@ -729,7 +729,7 @@ window.Vue.onMounted(async () => {
                                                 <!-- Only show status that isn't published, since that is the default state -->
                                                 <span
                                                     v-if="item.object.currentState !== EvidenceStatus.PUBLISHED"
-                                                    class="label l-mar--0"
+                                                    class="label u-mar--0"
                                                     :class="`label--moment-${item.object.currentState}`"
                                                     :data-test="`learning-moment-status-${item.object.currentState}`"
                                                 >

@@ -144,7 +144,7 @@ async function openLightbox(file: StorageFile, event: MouseEvent): Promise<void>
             <cr-results-group-entry-actions :entry="props.entry" />
         </ul>
 
-        <div class="u-flex__item--1 l-grid l-grid--12 u-gap-s l-mar-xs--top">
+        <div class="u-flex__item--1 l-grid l-grid--12 u-gap-s u-mar-xs--top">
             <div class="small-12" :class="{ 'medium-8': selectableEvidence.length > 0 }">
                 <article
                     v-if="selectedEvidence !== null && selectedEvidence.storage.hash"
@@ -162,10 +162,10 @@ async function openLightbox(file: StorageFile, event: MouseEvent): Promise<void>
                     ></storage-object>
                 </article>
 
-                <p class="l-mar-s--top">
+                <p class="u-mar-s--top">
                     <!-- eslint-disable-next-line vue/no-v-html - this is scrubbed on the backend -->
                     <span v-html="props.entry.blurb"></span>
-                    <span v-if="props.entry.showReadMore" class="l-mar-s--top">
+                    <span v-if="props.entry.showReadMore" class="u-mar-s--top">
                         <a @click.prevent="crmStore.openModal(props.entry, CohortReportModalType.READ_MORE)">
                             Read more
                         </a>
@@ -188,7 +188,7 @@ async function openLightbox(file: StorageFile, event: MouseEvent): Promise<void>
             </div>
         </div>
 
-        <div v-if="props.entry.creator && props.entry.recipient?.id !== props.entry.creator.id" class="l-mar-s--top">
+        <div v-if="props.entry.creator && props.entry.recipient?.id !== props.entry.creator.id" class="u-mar-s--top">
             <user-photo
                 :user="props.entry.creator"
                 render="tiny"

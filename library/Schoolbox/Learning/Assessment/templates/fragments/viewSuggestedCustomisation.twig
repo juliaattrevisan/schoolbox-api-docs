@@ -15,7 +15,7 @@
 {% set isValidAssessmentType = assessment is defined and assessment.familyName is defined and (assessment.familyName == 'dueWork' or assessment.familyName == 'task') %}
 {# Only show generate/view suggested customisation button if there is one participant when creating/modifying a customisation #}
 {% set showSuggestedCustomisation = assessmentId != 0 and participants ?? [] is not empty and participants|length == 1 and isValidAssessmentType %}
-<div class="u-flex-row u-flex--justify-space u-flex--align-end {% if showSuggestedCustomisation %}l-mar-xs--bottom{% endif %}">
+<div class="u-flex-row u-flex--justify-space u-flex--align-end {% if showSuggestedCustomisation %}u-mar-xs--bottom{% endif %}">
     <label for="{{ editorId }}" class="{% if isRequired is defined and isRequired %}required{% endif %}">
         Description
          {% if isQuiz is defined %}<span class="hint has-tip tip-top" data-tooltip title="This content will be shown to users before they begin to attempt the quiz.">?</span>{% endif %}

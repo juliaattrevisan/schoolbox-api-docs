@@ -42,7 +42,7 @@ window.Vue.onMounted((): void => {
                     {{ props.record.student.fullName }}: {{ props.record.heading }}
                     <span
                         v-if="config?.pastoralSeverity && props.record.severity"
-                        class="circle l-mar--0"
+                        class="circle u-mar--0"
                         :style="`background-color:${props.record.severity.color}`"
                         :title="props.record.severity.name"
                     ></span>
