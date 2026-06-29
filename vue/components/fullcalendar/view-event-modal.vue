@@ -608,7 +608,7 @@ export default {
          * @param $event
          */
         clickBookingButton($event) {
-            switch ($event.target.dataset.bookingAction) {
+            switch ($event.currentTarget.dataset.bookingAction) {
                 case "approve":
                     $event.preventDefault();
                     if (this.eventExtendedProps.seriesId) {
@@ -806,10 +806,16 @@ export default {
                     } catch (error) {
                         console.error(error);
                     }
+                    const periodErrors = Object.values(responseData?.errors?.start_period_errors ?? {});
+                    const capacityExceeded = periodErrors.some(
+                        (errors) => Array.isArray(errors) && errors.includes("conflict"),
+                    );
                     toast.timeout({
                         text:
                             responseData?.message ||
-                            "Unable to approve booking. This booking would exceed the resource's concurrent booking capacity.",
+                            (capacityExceeded
+                                ? "Unable to approve booking. This booking would exceed the resource's concurrent booking capacity."
+                                : "Unable to approve booking."),
                         isSuccess: false,
                     });
                     return;

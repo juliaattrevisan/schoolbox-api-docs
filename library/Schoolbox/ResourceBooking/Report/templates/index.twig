@@ -20,6 +20,11 @@
             searching: false
         });
 
+        $('[data-resource-booking-report-action="approve"]').on('click', function(event) {
+            event.preventDefault();
+            approveResourceBookingFromReport(event.currentTarget);
+        });
+
         onChangeDate('start'); // In case the initial dates are ever set too far apart.
     });
 
@@ -69,6 +74,54 @@
                     }
                 }
                 break;
+        }
+    }
+
+    async function approveResourceBookingFromReport(action)
+    {
+        // Activate the toast immediately so the click gives feedback while the request is in flight.
+        const toast = window.sbProps.toastActivate("Approving booking...");
+        const data = new URLSearchParams({
+            efficacy: false
+        });
+
+        try {
+            const response = await fetch(action.href, {
+                method: "POST",
+                body: data.toString(),
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                    "X-Requested-With": "XMLHttpRequest",
+                    Accept: "application/json"
+                }
+            });
+
+            if (!response.ok) {
+                let responseData = {};
+                try {
+                    responseData = await response.json();
+                } catch (error) {
+                    console.error(error);
+                }
+                const periodErrors = Object.values(responseData?.errors?.start_period_errors ?? {});
+                const capacityExceeded = periodErrors.some(
+                    (errors) => Array.isArray(errors) && errors.includes("conflict")
+                );
+                toast.timeout({
+                    text:
+                        responseData?.message ||
+                        (capacityExceeded
+                            ? "Unable to approve booking. This booking would exceed the resource's concurrent booking capacity."
+                            : "Unable to approve booking."),
+                    isSuccess: false
+                });
+                return;
+            }
+
+            window.location.reload();
+        } catch (error) {
+            console.error(error);
+            toast.timeout({ text: "Unable to approve booking.", isSuccess: false });
         }
     }
 </script>
@@ -281,7 +334,11 @@
                                     <ul class="flex-list buttons">
                                         {% if approveRoute %}
                                             <li>
-                                                <a href="{{ approveRoute }}" class="sbx-button--has-icon">
+                                                <a
+                                                    href="{{ approveRoute }}"
+                                                    class="sbx-button--has-icon"
+                                                    data-resource-booking-report-action="approve"
+                                                >
                                                     <sbx-icon name="approve"></sbx-icon>
                                                     Approve
                                                 </a>
