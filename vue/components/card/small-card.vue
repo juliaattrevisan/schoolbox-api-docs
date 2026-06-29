@@ -8,13 +8,13 @@
 </script>
 
 <template>
-    <div class="c-card c-card--small">
+    <div class="sbx-card sbx-card--small">
         <slot></slot>
     </div>
 </template>
 
 <style lang="scss">
-.c-card {
+.sbx-card {
     padding: 0.5rem 1.5rem;
     background-color: white;
 

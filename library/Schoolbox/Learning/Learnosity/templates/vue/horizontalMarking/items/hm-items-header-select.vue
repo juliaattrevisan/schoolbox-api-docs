@@ -63,7 +63,7 @@ function onItemSelected(reference: string): void {
             height="16"
             aria-hidden="true"
             focusable="false"
-            class="c-icon c-icon--dropdown"
+            class="sbx-icon sbx-icon--dropdown"
         >
             <path d="M0 24h32l-16-16z"></path>
         </svg>
@@ -106,12 +106,12 @@ function onItemSelected(reference: string): void {
             background-color: var(--form-bg-hover-color);
         }
     }
-    .c-icon--dropdown {
+    .sbx-icon--dropdown {
         transform: rotate(180deg);
     }
     &[aria-expanded="true"] {
         // rotate when open
-        .c-icon--dropdown {
+        .sbx-icon--dropdown {
             transform: rotate(0deg);
         }
     }

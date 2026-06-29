@@ -137,13 +137,13 @@ const { printAllRecords, isLoading: isLoadingPrint } = usePrintRecords(
                 </div>
                 <div ref="modalResultsRef" class="pr-table__records" data-test="pr-table-modal-records">
                     <div class="u-flex-col u-gap-s">
-                        <div v-for="record in payload?.data.results" :key="record.id" class="c-island">
+                        <div v-for="record in payload?.data.results" :key="record.id" class="sbx-island">
                             <ul class="information-list threaded" data-test="pastoral-records-modal-list">
                                 <pastoral-record :record="record" />
                             </ul>
                         </div>
                     </div>
-                    <div v-if="isMoreLoading" class="c-island u-pad-s">
+                    <div v-if="isMoreLoading" class="sbx-island u-pad-s">
                         <div class="loader"></div>
                     </div>
                     <data-load-error

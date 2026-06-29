@@ -72,13 +72,13 @@ window.Vue.watch(bottom, (isAtBottom) => {
             </div>
             <div ref="modalResultsRef" class="prm__records">
                 <div class="u-flex-col u-gap-s">
-                    <div v-for="record in payload?.data.results" :key="record.id" class="c-island">
+                    <div v-for="record in payload?.data.results" :key="record.id" class="sbx-island">
                         <ul class="information-list threaded">
                             <pastoral-record :record="record" />
                         </ul>
                     </div>
                 </div>
-                <div v-if="isMoreLoading" class="c-island u-pad-s">
+                <div v-if="isMoreLoading" class="sbx-island u-pad-s">
                     <div class="loader"></div>
                 </div>
                 <data-load-error v-else-if="!isNewLoad && loadError" data-title="record" :further-info="loadError" />

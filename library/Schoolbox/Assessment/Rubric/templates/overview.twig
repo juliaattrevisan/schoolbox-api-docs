@@ -34,7 +34,7 @@
                             Show Drafts
                         </label>
                     </div>
-                    <nav class="c-nav-actions u-flex-row">
+                    <nav class="sbx-nav-actions u-flex-row">
                         <a href="{{ routeLookup('learningAssessment.downloadOverview', { assessmentId: assessment.id }) }}?format=csv" title="Download CSV" data-download-spreadsheet class="sbx-icon-only-button"><sbx-icon name="download"></sbx-icon></a>
                     </nav>
                 </div>
@@ -123,8 +123,8 @@
                                         assessmentId: assessment.id,
                                         studentId: user.id
                                     }) }}" title="View Profile" class="u-flex u-flex-col u-flex--center">
-                                        <div class="c-img c-img--m c-img--round">
-                                            <div class="c-img__wrapper">
+                                        <div class="sbx-img sbx-img--m sbx-img--round">
+                                            <div class="sbx-img__wrapper">
                                                 {% include 'include/portrait.twig' with {
                                                     user: user,
                                                     description: user.fullName,

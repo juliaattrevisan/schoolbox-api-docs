@@ -1,6 +1,6 @@
 /**
  * Styling rework of our card layouts, utilising flex to do a lot of the heavy lifting.
- * Will eventually replace the `c-card` in `www/static/css/core/ui/_card.scss
+ * Will eventually replace the `sbx-card` in `www/static/css/core/ui/_card.scss
  * When this is done it can be renamed
  */
 
@@ -8,7 +8,7 @@
     --border-colour: #aaaaaa;
 }
 
-.c-new-card {
+.sbx-new-card {
     background-color: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
     border-radius: var(--sbx-config-field-corner-radius, var(--roundness-cards));
     line-height: var(--base-line-height);

@@ -2,7 +2,7 @@
  *   The <select> HTML element represents a control that provides a menu of options.
  *   Styled primarily based from https://moderncss.dev/custom-select-styles-with-pure-css/
 */
-.c-select {
+.sbx-select {
     align-items: center;
     background-color: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
     border: var(--size-form-element-border-width) solid var(--sbx-config-color-accent);

@@ -59,7 +59,7 @@ async function onResetFilters(): Promise<void> {
         <div v-if="crStore.loadError" class="alert-box alert">
             {{ crStore.loadError }}
         </div>
-        <div v-else-if="crStore.isLoading" class="small-12 c-island">
+        <div v-else-if="crStore.isLoading" class="small-12 sbx-island">
             <section class="content">
                 <div class="loader"></div>
             </section>

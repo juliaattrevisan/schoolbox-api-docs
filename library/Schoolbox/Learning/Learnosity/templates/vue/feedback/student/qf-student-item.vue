@@ -59,7 +59,7 @@ function onCommentUpdated(comment: string): void {
 </script>
 
 <template>
-    <div ref="itemEl" class="c-island u-flex-col u-gap-m u-pad-m">
+    <div ref="itemEl" class="sbx-island u-flex-col u-gap-m u-pad-m">
         <student-item-mark :item="item" :container="container as HTMLDivElement" :is-shown="true" :show-title="true" />
         <student-no-score-note v-if="!store.isReadOnly" :item="props.item" />
         <div class="item-questions u-flex-col u-gap-l">

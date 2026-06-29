@@ -33,7 +33,7 @@
 }
 
 // used on pages that have the new spacing styles applied
-#container.c-container {
+#container.sbx-container {
     --container-padding-top: var(--spacing-xl);
     --container-padding-right: var(--spacing-xl);
     --container-padding-bottom: var(--spacing-xl);
@@ -48,7 +48,7 @@
 }
 
 #container[data-has-bottom-drawer="true"] {
-    .c-bottom-drawer-offset-target {
+    .sbx-bottom-drawer-offset-target {
         padding-bottom: calc(var(--bottom-drawer-offset) + var(--bottom-drawer-target-padding-bottom, 0px));
     }
 }
@@ -139,7 +139,7 @@
 }
 
 // to identify 'islands' of content, sitting on --color-foreground-primary
-.c-island {
+.sbx-island {
     background-color: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
 }
 
@@ -154,7 +154,7 @@
     position: relative;
 }
 
-.c-max-width {
+.sbx-max-width {
     &--small {
         max-width: $small-breakpoint;
     }

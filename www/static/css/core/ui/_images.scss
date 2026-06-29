@@ -20,7 +20,7 @@
 
 @use "sass:list";
 
-.c-img {
+.sbx-img {
     /*
         Though it doesn't seem like this container layer does much, it's absolutely necessary. Having the
         container means we can encapsulate logic like vertical alignment or have the container scale without
@@ -30,7 +30,7 @@
     overflow: hidden;
 
     // The wrapper basically exists to handle image overflow, centering of the <img> / icon and rounding
-    .c-img__wrapper {
+    .sbx-img__wrapper {
         // Default images to medium size if no size is specified. This size is the standard image thumbnail size
         // used on the platform currently.
         align-items: center;
@@ -59,7 +59,7 @@
     }
 
     // Logic for if we've got a user with no profile image
-    .c-img__initials {
+    .sbx-img__initials {
         color: white;
         font-size: calc(var(--image-size-m) * 0.4);
         font-weight: 600;
@@ -72,7 +72,7 @@
     */
     @each $size in $global-image-sizes {
         &--#{$size} {
-            .c-img__wrapper {
+            .sbx-img__wrapper {
                 flex: 1 var(--image-size-#{$size});
                 max-height: var(--image-size-#{$size});
                 min-height: var(--image-size-#{$size});
@@ -107,7 +107,7 @@
 
     // Modifier class to round off images.
     &--round {
-        .c-img__wrapper {
+        .sbx-img__wrapper {
             border-radius: 50%;
         }
     }
@@ -115,21 +115,21 @@
     //  Some additional rules for rounded images
     &--round {
         //Apply to default sizes
-        &.c-img .c-img__wrapper {
+        &.sbx-img .sbx-img__wrapper {
             flex: 1 calc(var(--image-size-m) - var(--spacing-xs));
             max-height: calc(var(--image-size-m) - var(--spacing-xs));
             max-width: calc(var(--image-size-m) - var(--spacing-xs));
         }
 
         @each $size in $global-image-sizes {
-            &.c-img--#{$size} {
-                .c-img__wrapper {
+            &.sbx-img--#{$size} {
+                .sbx-img__wrapper {
                     flex: 1 calc(var(--image-size-#{$size}) - var(--spacing-xs));
                     max-height: calc(var(--image-size-#{$size}) - var(--spacing-xs));
                     max-width: calc(var(--image-size-#{$size}) - var(--spacing-xs));
                 }
 
-                .c-img__initials {
+                .sbx-img__initials {
                     font-size: calc(var(--image-size-#{$size}) * 0.35);
                 }
             }

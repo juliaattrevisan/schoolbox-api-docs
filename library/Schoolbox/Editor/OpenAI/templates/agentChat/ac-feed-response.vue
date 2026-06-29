@@ -95,8 +95,8 @@ function retryResponse(): void {
 
             <!-- When not loading, show the agent's portrait -->
             <div v-if="isResponseComplete" class="ac-feed-message-portrait">
-                <div class="c-img c-img--round c-img--xs">
-                    <div class="c-img__wrapper">
+                <div class="sbx-img sbx-img--round sbx-img--xs">
+                    <div class="sbx-img__wrapper">
                         <sbx-icon :name="props.agentIcon" size="m"></sbx-icon>
                     </div>
                 </div>
@@ -216,7 +216,7 @@ function retryResponse(): void {
     .ac-feed-message-portrait {
         align-self: end;
 
-        .c-img__wrapper {
+        .sbx-img__wrapper {
             width: 100%;
             height: 100%;
             background-color: #e4e4e4;

@@ -18,7 +18,7 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <div :class="`c-card c-card--child ${!props.isLast ? `c-card--border-end` : ''}`">
+    <div :class="`sbx-card sbx-card--child ${!props.isLast ? `sbx-card--border-end` : ''}`">
         <div class="u-flex-col u-gap-s u-pad-m">
             <div class="u-flex-row u-gap-s">
                 <sp-results-result-image :result="props.subResult" :is-sub-result="true" />

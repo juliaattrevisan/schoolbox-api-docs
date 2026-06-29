@@ -13,7 +13,7 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <div class="c-img__wrapper">
+    <div class="sbx-img__wrapper">
         <img
             v-if="props.result.image"
             :src="props.result.image"

@@ -135,7 +135,7 @@ function onViewSuggestedCustomisation(participant: Participant): void {
 </script>
 
 <template>
-    <div v-if="loadError" class="c-island u-pad-m" data-test="custom-participation-load-error">
+    <div v-if="loadError" class="sbx-island u-pad-m" data-test="custom-participation-load-error">
         <data-load-error data-title="Student Participation" :further-info="loadError" />
     </div>
     <div>
@@ -166,7 +166,7 @@ function onViewSuggestedCustomisation(participant: Participant): void {
         </div>
 
         <div class="small-12 island">
-            <div v-if="filteredParticipants.length > 0" class="scrollable c-bottom-drawer-offset-target">
+            <div v-if="filteredParticipants.length > 0" class="scrollable sbx-bottom-drawer-offset-target">
                 <table>
                     <thead>
                         <tr>

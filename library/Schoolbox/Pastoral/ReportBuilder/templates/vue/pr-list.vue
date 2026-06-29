@@ -61,10 +61,10 @@ defineExpose({ printAllRecords });
 
 <template>
     <div ref="containerRef" data-test="pr-list">
-        <div v-if="isNewLoad && isNewLoading" class="c-island u-pad-m" data-test="pr-list-loading">
+        <div v-if="isNewLoad && isNewLoading" class="sbx-island u-pad-m" data-test="pr-list-loading">
             <div class="loader"></div>
         </div>
-        <div v-else-if="isNewLoad && loadError" class="c-island u-pad-m">
+        <div v-else-if="isNewLoad && loadError" class="sbx-island u-pad-m">
             <data-load-error data-title="record" :further-info="loadError" />
         </div>
         <template v-else-if="payload">
@@ -72,7 +72,7 @@ defineExpose({ printAllRecords });
                 <div
                     v-for="record in payload.data.results"
                     :key="record.id"
-                    class="c-island"
+                    class="sbx-island"
                     data-test="pr-list-record-rows"
                 >
                     <ul class="information-list threaded">
@@ -81,7 +81,7 @@ defineExpose({ printAllRecords });
                 </div>
             </div>
             <pr-empty v-else />
-            <div v-if="isMoreLoading" class="c-island u-pad-s">
+            <div v-if="isMoreLoading" class="sbx-island u-pad-s">
                 <div class="loader"></div>
             </div>
             <data-load-error v-else-if="!isNewLoad && loadError" data-title="record" :further-info="loadError" />

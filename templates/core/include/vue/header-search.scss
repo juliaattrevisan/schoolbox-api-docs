@@ -1,7 +1,7 @@
 @import "@css/core/base/_functions";
 @import "@css/core/base/_settings";
 
-.c-header-search {
+.sbx-header-search {
     margin: 0;
     position: absolute;
     top: 0;
@@ -15,13 +15,13 @@
     &.focus {
         width: 100%;
         padding-left: calc(var(--tabbar-icon-width) * 2);
-        .c-search-input {
+        .sbx-search-input {
             grid-template-columns: 1fr 4.5rem;
         }
-        .c-search-input__field {
+        .sbx-search-input__field {
             opacity: 1;
         }
-        .c-search-input__button {
+        .sbx-search-input__button {
             background-color: var(--sbx-config-color-menu-hover, var(--navigation-hover));
             color: var(--navigation-foreground);
         }
@@ -31,7 +31,7 @@
         }
     }
 
-    .c-search-input {
+    .sbx-search-input {
         grid-template-columns: 0 4.5rem;
         &__field {
             opacity: 0;
@@ -76,12 +76,12 @@
 @media #{$medium-down} {
     body {
         // Search bar always has right=1 and left-padding=2 while notifications are enabled
-        &:not(.disableNotifications) .c-header-search {
+        &:not(.disableNotifications) .sbx-header-search {
             @include header-search-properties(1, 2);
         }
 
         // If notifications are disabled, search bar always has right=0 and left-padding=1
-        &.disableNotifications .c-header-search {
+        &.disableNotifications .sbx-header-search {
             @include header-search-properties(0, 1);
         }
     }
@@ -93,17 +93,17 @@
         // Search bar properties when notifications are enabled
         &:not(.disableNotifications) {
             // - right is always 2, left-padding varies
-            .c-header-search {
+            .sbx-header-search {
                 @include header-search-properties(2, -1);
             }
 
             // When the left sidebar is pinned open, left padding should be 2
-            .inner-wrap.left-open .c-header-search {
+            .inner-wrap.left-open .sbx-header-search {
                 @include header-search-properties(-1, 2);
             }
 
             // When stashed, left padding should be 3
-            .inner-wrap:not(.left-open) .c-header-search {
+            .inner-wrap:not(.left-open) .sbx-header-search {
                 @include header-search-properties(-1, 3);
             }
         }
@@ -111,17 +111,17 @@
         // Search bar properties when notifications are disabled
         &.disableNotifications {
             // - right is always 1, left-padding varies
-            .c-header-search {
+            .sbx-header-search {
                 @include header-search-properties(1, -1);
             }
 
             // When notifications are disabled, and the left sidebar is pinned open, left padding should be 1
-            .inner-wrap.left-open .c-header-search {
+            .inner-wrap.left-open .sbx-header-search {
                 @include header-search-properties(-1, 1);
             }
 
             // When notifications are disabled, and the left sidebar is stashed, left padding should be 2
-            .inner-wrap:not(.left-open) .c-header-search {
+            .inner-wrap:not(.left-open) .sbx-header-search {
                 @include header-search-properties(-1, 2);
             }
         }
@@ -134,22 +134,22 @@
         // Search bar properties when notifications are enabled
         &:not(.disableNotifications) {
             // Panels: LEFT and RIGHT open -> right=1 left-padding=1
-            .inner-wrap.left-open.right-open .c-header-search {
+            .inner-wrap.left-open.right-open .sbx-header-search {
                 @include header-search-properties(1, 1);
             }
 
             // Panels: LEFT open, RIGHT closed -> right=2 left-padding=2
-            .inner-wrap.left-open:not(.right-open) .c-header-search {
+            .inner-wrap.left-open:not(.right-open) .sbx-header-search {
                 @include header-search-properties(2, 2);
             }
 
             // Panels: LEFT closed, RIGHT open -> right=1 left-padding=2
-            .inner-wrap:not(.left-open).right-open .c-header-search {
+            .inner-wrap:not(.left-open).right-open .sbx-header-search {
                 @include header-search-properties(1, 2);
             }
 
             // Panels: LEFT and RIGHT closed -> right=2 left-padding=3
-            .inner-wrap:not(.left-open):not(.right-open) .c-header-search {
+            .inner-wrap:not(.left-open):not(.right-open) .sbx-header-search {
                 @include header-search-properties(2, 3);
             }
         }
@@ -157,17 +157,17 @@
         // Search bar properties when notifications are disabled
         &.disableNotifications {
             // When notifications are disabled in this condition, right is always 1
-            .c-header-search {
+            .sbx-header-search {
                 @include header-search-properties(1, -1);
             }
 
             // When notifications are disabled, and the left sidebar is pinned open, left padding should be 1
-            .inner-wrap.left-open .c-header-search {
+            .inner-wrap.left-open .sbx-header-search {
                 @include header-search-properties(-1, 1);
             }
 
             // When notifications are disabled, and the left sidebar is stashed, left padding should be 2
-            .inner-wrap:not(.left-open) .c-header-search {
+            .inner-wrap:not(.left-open) .sbx-header-search {
                 @include header-search-properties(-1, 2);
             }
         }

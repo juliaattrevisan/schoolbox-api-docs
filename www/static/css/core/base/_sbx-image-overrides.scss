@@ -22,16 +22,16 @@ body.sbx-body {
         overflow: hidden; // prevent the tile text background from bleeding outside the tile's rounded corners
     }
 
-    .c-img:not(.c-img--round):has(> .c-img__wrapper > img) {
-        .c-img__wrapper {
+    .sbx-img:not(.sbx-img--round):has(> .sbx-img__wrapper > img) {
+        .sbx-img__wrapper {
             // Larger wrapped images inherit the configured field corner radius.
             border-radius: var(--sbx-config-field-corner-radius);
         }
     }
 
-    .c-img:not(.c-img--round):has(> .c-img__wrapper > img[src*="/portrait.php?"][src*="size=square32"]),
-    .c-img:not(.c-img--round):has(> .c-img__wrapper > img[src*="/portrait.php?"][src*="size=square48"]) {
-        .c-img__wrapper {
+    .sbx-img:not(.sbx-img--round):has(> .sbx-img__wrapper > img[src*="/portrait.php?"][src*="size=square32"]),
+    .sbx-img:not(.sbx-img--round):has(> .sbx-img__wrapper > img[src*="/portrait.php?"][src*="size=square48"]) {
+        .sbx-img__wrapper {
             // Small wrapped portraits render as circles at or below 48px.
             border-radius: var(--sbx-border-radius-full);
         }

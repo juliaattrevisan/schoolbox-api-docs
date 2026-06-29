@@ -605,9 +605,9 @@ function onToggleSelected(): void {
             <div class="collapsible">
                 <small-card v-for="(activityItem, index) in activityItems" :key="index">
                     <user-photo :user-id="activityItem.effector.id" render="tiny" rounded-corners></user-photo>
-                    <div class="c-card__details">
-                        <div class="c-card__text">{{ activityItem.effector.name }} {{ getAction(activityItem) }}</div>
-                        <div class="c-card__subtext">{{ activityItem.date.short }}</div>
+                    <div class="sbx-card__details">
+                        <div class="sbx-card__text">{{ activityItem.effector.name }} {{ getAction(activityItem) }}</div>
+                        <div class="sbx-card__subtext">{{ activityItem.date.short }}</div>
                     </div>
                 </small-card>
             </div>
@@ -780,17 +780,17 @@ function onToggleSelected(): void {
 }
 
 .is-expanded {
-    .collapsible > .c-card {
+    .collapsible > .sbx-card {
         display: flex;
     }
 
     .pop-out-menu__options {
-        .c-menu-item,
-        .c-menu-item__divider {
+        .sbx-menu-item,
+        .sbx-menu-item__divider {
             display: none;
         }
 
-        .c-menu-item:first-child {
+        .sbx-menu-item:first-child {
             display: block;
         }
     }
@@ -800,7 +800,7 @@ function onToggleSelected(): void {
     max-height: 20rem;
     overflow-y: auto;
 
-    .c-card {
+    .sbx-card {
         display: none;
 
         &:first-child {

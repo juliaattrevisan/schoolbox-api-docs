@@ -12,7 +12,7 @@ body.sbx-body {
     // Apply box shadows to base box surfaces
     .island section,
     .island > table,
-    .c-island,
+    .sbx-island,
     .empty-state,
     .empty-state-flex-centered,
     .side-nav,
@@ -36,7 +36,7 @@ body.sbx-body {
     .content-overlay .empty-state-flex-centered,
     .off-canvas-list section,
     #activity-feed section,
-    .c-island .scrollable {
+    .sbx-island .scrollable {
         box-shadow: none;
     }
 

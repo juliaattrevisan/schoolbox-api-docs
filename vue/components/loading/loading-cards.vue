@@ -16,10 +16,10 @@ const props = withDefaults(defineProps<Props>(), {
 
 <template>
     <div class="u-flex-col u-gap-m" data-test="loading-table">
-        <div v-for="(row, index) in props.rows" :key="index" class="c-card c-card--loading">
+        <div v-for="(row, index) in props.rows" :key="index" class="sbx-card sbx-card--loading">
             <div class="u-flex-row u-gap-m u-pad-m">
-                <div v-if="props.showImage" class="c-img c-img--m c-img--round">
-                    <div class="c-img__wrapper">
+                <div v-if="props.showImage" class="sbx-img sbx-img--m sbx-img--round">
+                    <div class="sbx-img__wrapper">
                         <div class="img-placeholder"></div>
                     </div>
                 </div>

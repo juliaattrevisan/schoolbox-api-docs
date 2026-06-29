@@ -74,7 +74,7 @@ window.Vue.onMounted(() => {
 
 <template>
     <div class="u-flex-col">
-        <div class="c-card l-c-cr-top" :class="{ 'c-card--border-end': showExpandedBorder }">
+        <div class="sbx-card l-c-cr-top" :class="{ 'sbx-card--border-end': showExpandedBorder }">
             <div class="u-flex-row u-pad-s u-gap-s">
                 <div class="u-flex-col u-flex--justify-center f-no-margins u-pad-s--left">
                     <input
@@ -89,13 +89,13 @@ window.Vue.onMounted(() => {
                 <div class="u-flex-col u-flex--justify-center u-flex__item--1 f-no-margins">
                     <h2>{{ props.label }}</h2>
                 </div>
-                <nav class="c-nav-actions u-flex-row">
+                <nav class="sbx-nav-actions u-flex-row">
                     <a :class="`icon-${isExpanded ? 'up' : 'down'}-arrow`" @click.prevent="toggleExpanded" />
                 </nav>
             </div>
         </div>
 
-        <div ref="entryListRef" class="c-card l-c-cr-bottom">
+        <div ref="entryListRef" class="sbx-card l-c-cr-bottom">
             <div class="cr-results-grid u-grid u-gap-m u-pad-m">
                 <cr-results-group-entry
                     v-for="entry in props.entries"

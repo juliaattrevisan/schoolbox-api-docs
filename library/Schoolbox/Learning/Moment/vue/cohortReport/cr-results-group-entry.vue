@@ -137,7 +137,7 @@ async function openLightbox(file: StorageFile, event: MouseEvent): Promise<void>
             </component>
         </div>
 
-        <nav class="c-nav-actions">
+        <nav class="sbx-nav-actions">
             <sbx-pop-out :content-id="dropdownId"></sbx-pop-out>
         </nav>
         <ul :id="dropdownId" class="f-dropdown" data-dropdown-content>

@@ -18,7 +18,7 @@ function toggle(): void {
 </script>
 
 <template>
-    <div class="ib-report-section c-island">
+    <div class="ib-report-section sbx-island">
         <button
             type="button"
             class="ib-report-section__header u-flex u-flex--align-center u-flex--justify-space f-no-margins"

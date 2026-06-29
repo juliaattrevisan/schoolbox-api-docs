@@ -25,7 +25,7 @@ body.sbx-body {
     input[type="color"],
     select,
     .selectize-input,
-    .c-filter-search-term input[type="text"].c-filter-search-term__field {
+    .sbx-filter-search-term input[type="text"].sbx-filter-search-term__field {
         background-color: var(--sbx-color-foreground-primary);
         border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
         border-radius: var(--sbx-config-field-corner-radius);
@@ -72,7 +72,7 @@ body.sbx-body {
     }
 
     // Search page search term field, which sits inline with a button, similar to an .input-group
-    .c-filter-search-term input[type="text"].c-filter-search-term__field {
+    .sbx-filter-search-term input[type="text"].sbx-filter-search-term__field {
         border-radius: var(--sbx-config-field-corner-radius) 0 0 var(--sbx-config-field-corner-radius);
     }
 

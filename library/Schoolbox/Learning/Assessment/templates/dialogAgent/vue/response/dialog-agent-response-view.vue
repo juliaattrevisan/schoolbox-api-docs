@@ -55,7 +55,7 @@ function onAction(): void {
         <p>{{ props.student.fullName }} has not started a response for this {{ locale.dialogAgent.singular() }} yet.</p>
     </div>
     <!-- Apparently we _really_ want this to be a centered snowflake -->
-    <section v-else class="content c-max-width--medium u-mar--auto-horiz">
+    <section v-else class="content sbx-max-width--medium u-mar--auto-horiz">
         <div v-if="!response.authoritative" class="row">
             <div class="small-12 columns">
                 <div class="alert-box warning">

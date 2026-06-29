@@ -186,7 +186,7 @@ window.Vue.onMounted(() => {
             <request-error :further-info="loadError" />
         </div>
         <form method="post" class="u-flex-col u-gap-l skin-config-form" @submit.prevent="onSaveSelected">
-            <div class="c-island u-pad-m">
+            <div class="sbx-island u-pad-m">
                 <label id="skin-config-toggle" class="inline-block" for="skin-config-toggle-field">
                     <span>{{ editableConfigs.toggle.title }}</span>
                     <span

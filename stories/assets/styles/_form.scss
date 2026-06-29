@@ -69,7 +69,7 @@ hr {
  *  Tweaks to make the range slider more inline with draft styles,
  *  eventually this should be added into the proper range slider styles
  */
-.c-input-range {
+.sbx-input-range {
     &__input::-webkit-slider-runnable-track {
         background-color: var(--sbx-color-foreground-primary);
         border: var(--sbx-size-form-element-border-width) solid var(--sbx-config-color-accent);

@@ -98,7 +98,7 @@ window.Vue.watch(
         aria-label="Sitewide"
         @submit.prevent="onSearch"
     >
-        <div class="c-island u-pad-m">
+        <div class="sbx-island u-pad-m">
             <sp-filter-search-term
                 :initial-input="queryStore.query"
                 :is-active-when-empty="true"
@@ -107,7 +107,7 @@ window.Vue.watch(
                 @click="onSearch"
             />
         </div>
-        <div :class="`c-island filters u-flex-col  ${isOpen ? 'u-gap-m' : ''} u-pad-m`">
+        <div :class="`sbx-island filters u-flex-col  ${isOpen ? 'u-gap-m' : ''} u-pad-m`">
             <button
                 v-if="store.isSingleColumn"
                 :class="`filters__toggle-button ${isOpen ? 'icon-up-arrow' : 'icon-down-arrow'}`"

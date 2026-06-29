@@ -53,7 +53,7 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
     <template v-for="(subcategories, categoryKey) in activeConfigs" :key="categoryKey">
         <div class="u-flex-col u-gap-s">
             <h2 class="subheader u-lh-normal">{{ categoryKey }}</h2>
-            <div class="c-island u-flex-col" data-test="skin-config-category">
+            <div class="sbx-island u-flex-col" data-test="skin-config-category">
                 <div
                     v-for="(subcategory, index) in subcategories"
                     :key="subcategory.name || `default-${index}`"

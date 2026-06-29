@@ -42,8 +42,8 @@ function onToggleSelected(): void {
                 @click.prevent="onToggleSelected"
             ></button>
             <span v-else class="loader"></span>
-            <div class="c-img c-img--round c-img--s">
-                <div class="c-img__wrapper">
+            <div class="sbx-img sbx-img--round sbx-img--s">
+                <div class="sbx-img__wrapper">
                     <img
                         :src="`/portrait.php?id=${props.student.id}&size=square64`"
                         :alt="`Photo of ${props.student.name}`"

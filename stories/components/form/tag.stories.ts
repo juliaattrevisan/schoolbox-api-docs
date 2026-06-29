@@ -15,7 +15,7 @@ const meta: Meta<typeof StorybookSlot> = {
     decorators: [
         (): { template: string } => ({
             template: `
-                <div class="c-island">
+                <div class="sbx-island">
                     <story />
                 </div>
             `,

@@ -4,10 +4,10 @@
         <div class="u-flex-col u-gap-m">
             {% for child in studentData %}
                 <div class="u-flex-col">
-                    <div class="c-card">
+                    <div class="sbx-card">
                         <div class="u-flex-row u-gap-m u-pad-m">
-                            <div class="c-img c-img--round">
-                                <div class="c-img__wrapper">
+                            <div class="sbx-img sbx-img--round">
+                                <div class="sbx-img__wrapper">
                                     <img
                                         src="/portrait.php?id={{ child.user.id }}&amp;size=square64"
                                         alt="Photo of {{ child.user.formatName }}"
@@ -20,7 +20,7 @@
                         </div>
                     </div>
                     {# Field Group details #}
-                    <div class="c-island u-pad-m--horiz scrollable">
+                    <div class="sbx-island u-pad-m--horiz scrollable">
                         {% if child.data.FieldGroup is defined %}
                             {% for group in child.data.FieldGroup %}
                                 <h2>{{ group.groupName }}</h2>
