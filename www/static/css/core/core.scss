@@ -28,6 +28,7 @@ $cdn-prefix: "../..";
 @import "utils/modifiers";
 @import "utils/visibility";
 @import "utils/u-typography";
+@import "utils/u-size";
 @import "utils/u-flex";
 @import "utils/u-grid";
 @import "utils/u-gap";
@@ -44,7 +45,6 @@ $cdn-prefix: "../..";
 @import "layout/roundness";
 @import "layout/image-sizes";
 @import "layout/position";
-@import "layout/size";
 
 // Shared user interface
 @import "ui/icons";
