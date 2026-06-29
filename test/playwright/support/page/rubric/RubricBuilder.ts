@@ -1,8 +1,8 @@
 import type { Locator, Page } from "@playwright/test";
 
 /**
- * Page object for the rubric builder (the editable rubric grid shown when
- * creating or modifying an assessment).
+ * Page support for the rubric builder.
+ * Used when creating/modifying an assessment.
  */
 export default class RubricBuilder {
     private page: Page;

@@ -2,8 +2,9 @@ import { expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
 /**
- * Page object for the markable rubric grid (used in the assessment inline grading
- * page, for both self-assessment and instructor grading).
+ * Page support for the markable rubric grid.
+ * Used in the assessment inline grading page,
+ * for both self-assessment and instructor grading.
  */
 export default class RubricMarkable {
     private page: Page;
@@ -26,6 +27,7 @@ export default class RubricMarkable {
      */
     async selectRubricIndicatorByValue(indicatorId: number, value: string | number): Promise<void> {
         await this.page
+            // TODO: SA-22480: use chaining of getByTestId's instead, perhaps change to "ByLevel" instead.
             .getByTestId(`${RubricMarkable.DATA_TEST_RUBRIC_DESCRIPTOR_INPUT}-${indicatorId}-${value}`)
             .click();
     }
