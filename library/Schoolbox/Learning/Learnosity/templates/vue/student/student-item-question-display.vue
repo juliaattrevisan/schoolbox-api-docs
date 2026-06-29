@@ -268,7 +268,7 @@ window.Vue.onBeforeUnmount(async () => {
                             inputmode="numeric"
                         />
                     </template>
-                    <div class="save-container l-grid">
+                    <div class="save-container u-grid">
                         <div class="save-container__inner-container">
                             <div
                                 :class="`alert-box f-no-margins ${hasSaved ? 'success' : ''} ${

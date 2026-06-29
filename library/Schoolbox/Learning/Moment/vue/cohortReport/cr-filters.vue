@@ -113,7 +113,7 @@ async function applyFilters(): Promise<void> {
 
                     <div>
                         <label>Filter by state</label>
-                        <div class="l-grid u-gap-s l-grid--2-col">
+                        <div class="u-grid u-gap-s u-grid--2-col">
                             <div v-for="(label, status) in evidenceStatusLabels" :key="status">
                                 <input
                                     :id="`cr-filters-${status}`"

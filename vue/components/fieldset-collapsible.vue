@@ -44,7 +44,7 @@ window.Vue.onMounted(() => {
             <slot name="legend"></slot>
         </legend>
 
-        <div class="l-grid" :style="{ 'grid-template-rows': isExpanded ? '1fr' : '0fr' }">
+        <div class="u-grid" :style="{ 'grid-template-rows': isExpanded ? '1fr' : '0fr' }">
             <div class="collapsible-inner">
                 <slot
                     v-if="!props.delayContentRender || hasBeenExpanded"
@@ -58,7 +58,7 @@ window.Vue.onMounted(() => {
 </template>
 
 <style scoped>
-.l-grid {
+.u-grid {
     transition: grid-template-rows 300ms;
 }
 

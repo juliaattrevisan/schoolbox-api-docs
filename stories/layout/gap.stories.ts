@@ -6,7 +6,7 @@ import StorybookSlot from "../../vue/components/storybook-slot.vue";
  *
  * [**mdn**](https://developer.mozilla.org/en-US/docs/Web/CSS/gap)
  *
- * Used with `.u-flex-*` and `.l-grid-*`, `gap` is the preferred method for adding space between elements.
+ * Used with `.u-flex-*` and `.u-grid-*`, `gap` is the preferred method for adding space between elements.
  *
  * Compared to using `margin`, it allows the parent to control spacing. Have a read of [**this article**](https://markus.oberlehner.net/blog/css-the-spacing-between-elements-should-be-determined-by-the-parent-element/) if you'd like to know why this is preferred.
  */

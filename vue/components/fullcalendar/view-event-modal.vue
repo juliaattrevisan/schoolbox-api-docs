@@ -949,7 +949,7 @@ export default {
             <template v-else>
                 <h2 :class="eventExtendedProps.classCancelled">{{ event.title }}</h2>
             </template>
-            <div class="l-grid l-grid--12">
+            <div class="u-grid u-grid--12">
                 <div class="medium-8 small-12">
                     <meta-list>
                         <template v-if="eventExtendedProps.timetable.code && eventExtendedProps.timetable.code.length">

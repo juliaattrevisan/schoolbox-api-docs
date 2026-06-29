@@ -157,7 +157,7 @@ window.Vue.onUnmounted(async () => {
                 details on creation.
             </p>
             <textarea :id="editorId" v-model="comment" rows="3" class="comment-input f-no-margins"></textarea>
-            <div class="save-container l-grid">
+            <div class="save-container u-grid">
                 <div class="save-container__inner-container">
                     <div :class="`alert-box f-no-margins ${hasSaved ? 'success' : ''} ${hasError ? 'alert' : ''}`">
                         <em>{{ saveText }}</em>

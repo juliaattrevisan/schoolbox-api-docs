@@ -144,7 +144,7 @@ async function openLightbox(file: StorageFile, event: MouseEvent): Promise<void>
             <cr-results-group-entry-actions :entry="props.entry" />
         </ul>
 
-        <div class="u-flex__item--1 l-grid l-grid--12 u-gap-s u-mar-xs--top">
+        <div class="u-flex__item--1 u-grid u-grid--12 u-gap-s u-mar-xs--top">
             <div class="small-12" :class="{ 'medium-8': selectableEvidence.length > 0 }">
                 <article
                     v-if="selectedEvidence !== null && selectedEvidence.storage.hash"

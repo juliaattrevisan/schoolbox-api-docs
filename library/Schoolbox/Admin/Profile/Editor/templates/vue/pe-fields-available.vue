@@ -95,7 +95,7 @@ window.Vue.watch(
             :list="availableFieldsToShow"
             :item-key="(item) => item.field"
             :options="sortableOptions"
-            class="l-grid l-grid--4-col"
+            class="u-grid u-grid--4-col"
         >
             <template #item="item">
                 <div :data-pe-field="item.element.field">

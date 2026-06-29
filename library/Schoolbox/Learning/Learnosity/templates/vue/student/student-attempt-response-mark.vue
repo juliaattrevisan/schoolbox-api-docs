@@ -299,7 +299,7 @@ window.Vue.onBeforeUnmount(async () => {
     </div>
     <div v-else class="grade-container">
         <div ref="gradeEl"></div>
-        <div class="save-container l-grid">
+        <div class="save-container u-grid">
             <div class="save-container__inner-container">
                 <div :class="`alert-box f-no-margins ${hasSaved ? 'success' : ''} ${hasError ? 'alert' : ''}`">
                     <em>{{ saveText }}</em>

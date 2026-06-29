@@ -22,7 +22,7 @@ window.Vue.watch(
 </script>
 
 <template>
-    <div class="all-marked l-grid">
+    <div class="all-marked u-grid">
         <div class="all-marked__inner-container">
             <div class="empty-state-flex-centered">
                 <sbx-icon name="quiz" size="2.5rem"></sbx-icon>

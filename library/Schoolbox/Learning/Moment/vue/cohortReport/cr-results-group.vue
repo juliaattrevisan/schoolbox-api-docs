@@ -96,7 +96,7 @@ window.Vue.onMounted(() => {
         </div>
 
         <div ref="entryListRef" class="c-card l-c-cr-bottom">
-            <div class="cr-results-grid l-grid u-gap-m u-pad-m">
+            <div class="cr-results-grid u-grid u-gap-m u-pad-m">
                 <cr-results-group-entry
                     v-for="entry in props.entries"
                     :key="entry.id"

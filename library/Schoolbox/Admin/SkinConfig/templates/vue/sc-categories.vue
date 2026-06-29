@@ -62,7 +62,7 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
                     :data-test="`skin-config-subcategory-${subcategory.name || `default-${index}`}`"
                 >
                     <h3 v-if="subcategory.name" class="f-no-margins">{{ subcategory.name }}</h3>
-                    <div class="l-grid l-grid--12 u-gap-m">
+                    <div class="u-grid u-grid--12 u-gap-m">
                         <div
                             v-for="option in subcategory.options"
                             :key="option.id"
@@ -133,7 +133,7 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
                     <template v-if="configs.toggle.enabled">
                         <div
                             v-if="subcategory.name === 'Component'"
-                            class="preview-container l-grid l-grid--12 u-gap-m f-no-margins"
+                            class="preview-container u-grid u-grid--12 u-gap-m f-no-margins"
                         >
                             <h4 class="large-12">Preview</h4>
                             <div class="large-12">
@@ -165,7 +165,7 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
                         </div>
                         <div
                             v-else-if="subcategory.name === 'General'"
-                            class="preview-container l-grid l-grid--12 u-gap-m f-no-margins"
+                            class="preview-container u-grid u-grid--12 u-gap-m f-no-margins"
                         >
                             <h4 class="large-12">Preview</h4>
                             <div class="small-12 medium-4 large-3 f-no-margins">
