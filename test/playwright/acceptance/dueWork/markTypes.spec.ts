@@ -279,7 +279,7 @@ test.describe("Due Work - Mark type tests", () => {
             await rubricMarkable.selectRubricIndicatorByValue(446, "1");
 
             // Input mark type should be used (total mark)
-            await rubricMarkable.expectRubricFinalSummaryMark("2 / 4 (3 / 4 given in Self-assessment)");
+            await rubricMarkable.expectRubricFinalSummaryMark("2 / 4 (3 / 4 given in self-assessment)");
             await rubricMarkable.expectRubricSum("2 / 4");
             await feedbackForm.expectGrade("2 / 4", learnerId);
 
