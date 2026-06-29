@@ -254,11 +254,14 @@
                                 </a>
                             {% endif %}
                         </td>
-                        <td>
+                        {% set statusSort = booking is empty ? 'Timetabled' : booking.getStatus().getName() %}
+                        <td data-sort="{{ statusSort }}">
                             {% if booking is empty %}
-                                &nbsp;
+                                <span class="neutral label">Timetabled</span>
                             {% else %}
-                                {{ booking.getStatus().getName() }}
+                                {% set status = booking.getStatus() %}
+                                {% set statusLabelClass = status.isApproved() ? 'approved' : (status.isPending() ? 'pending' : 'rejected') %}
+                                <span class="{{ statusLabelClass }} label">{{ status.getName() }}</span>
                             {% endif %}
                         </td>
                         <td>
