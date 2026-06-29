@@ -25,7 +25,7 @@ const moderationStatusFilter = defineModel<AiModerationStatus[]>("moderationStat
     <section>
         <fieldset class="content">
             <legend>Filter</legend>
-            <div class="small-12 columns l-flex-col l-gap-m">
+            <div class="small-12 columns u-flex-col u-gap-m">
                 <label>
                     Keyword
                     <input
@@ -36,8 +36,8 @@ const moderationStatusFilter = defineModel<AiModerationStatus[]>("moderationStat
                         placeholder="Filter by keyword"
                     />
                 </label>
-                <div class="l-flex-row l-flex--no-wrap l-gap-m">
-                    <div class="l-flex-col l-flex__item--1">
+                <div class="u-flex-row u-flex--no-wrap u-gap-m">
+                    <div class="u-flex-col u-flex__item--1">
                         <label>
                             Feature
                             <select v-model="featureFilter" name="feature" class="f-no-margins">
@@ -52,7 +52,7 @@ const moderationStatusFilter = defineModel<AiModerationStatus[]>("moderationStat
                             </select>
                         </label>
                     </div>
-                    <div class="l-flex-col l-flex__item--1">
+                    <div class="u-flex-col u-flex__item--1">
                         <search-select
                             v-model:selected="userFilter"
                             label="User"
@@ -73,7 +73,7 @@ const moderationStatusFilter = defineModel<AiModerationStatus[]>("moderationStat
 
                 <div>
                     <label>Moderation Status</label>
-                    <div class="l-flex-row l-gap-m">
+                    <div class="u-flex-row u-gap-m">
                         <div v-for="(label, status) in STATUS_LABELS" :key="status">
                             <input
                                 :id="`ai-usage-log-moderation-${status}`"

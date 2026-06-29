@@ -108,7 +108,7 @@ function printSelectedSession(): void {
                 session.
             </p>
         </div>
-        <div v-else class="l-mar-m">
+        <div v-else class="u-mar-m">
             <aul-agent-chat
                 v-if="
                     props.session.logFormat === AiLogFormat.AGENT_CHAT ||
