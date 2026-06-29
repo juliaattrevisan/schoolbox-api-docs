@@ -19,12 +19,7 @@ import ActivityFeed from "@schoolboxTest/playwright/support/page/profilePage/Act
 import CourseOutline from "@schoolboxTest/playwright/support/page/homepage/CourseOutline";
 import Common from "@schoolboxTest/playwright/support/page/Common";
 
-/**
- * TODO: SKIPPED As part of SA-22090 we are intentionally making rubrics unmarkable for now, in the meantime, this test is disabled.
- * This will be again after at least SA-22315 (and maybe also SA-22319) is done.
- * Further updates to the tests to be able to interact with the new rubric screen may be required, do these once it functions in the above to properly test it.
- */
-test.describe.skip("Due Work - Mark type tests", () => {
+test.describe("Due Work - Mark type tests", () => {
     test.describe.configure({ mode: "serial" });
 
     const instructor = "Mr Jack Coles";
