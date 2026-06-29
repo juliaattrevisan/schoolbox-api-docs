@@ -1257,7 +1257,14 @@ class Controller extends ConfigController
             );
 
             foreach ($studentsToReset as $student) {
-                $student->setStatus(RegistrationSessionStudentModel::STATUS_PREPARATION);
+                $student
+                    ->setStatus(RegistrationSessionStudentModel::STATUS_PREPARATION)
+                    ->setCandidateConfirmed(false)
+                    ->setCandidateConfirmedAt(null)
+                    ->setCandidateConfirmedBy(null)
+                    ->setSubjectConfirmed(false)
+                    ->setSubjectConfirmedAt(null)
+                    ->setSubjectConfirmedBy(null);
                 $this->registrationSessionStudentMapper->save($student);
             }
 
