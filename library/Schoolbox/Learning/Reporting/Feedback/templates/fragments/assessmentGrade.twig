@@ -51,11 +51,6 @@
                 } only %}
                 <span class="{{ participant or assessment is lessonPlan ? 'pipe' : '' }} meta">{{ assessment.typeName }}</span>
                 <span class="pipe meta">{{ dueDate.dueDate(assessment, student) }}</span>
-                {% if assessment is quiz and summaryRoute and participant and participant.allResponses | length %}
-                    <span class="pipe meta">
-                        <a href="{{ summaryRoute }}" title="View Attempts">View Attempts</a>
-                    </span>
-                {% endif %}
             {% endif %}
         </p>
     </div>
@@ -84,15 +79,3 @@
         {% endif %}
     {% endif %}
 </div>
-{% if participant and assessment.isFeedbackVisibleToUser(effectiveViewer) %}
-    {% set feedback = participant.findAuthoritativeVisibleFeedback(effectiveViewer) %}
-    {% if feedback and feedback.comment   %}
-        <div class="content">
-            <blockquote>{{ feedback.comment | purify }}</blockquote>
-            {% if assessment is dueWork and (assessment.useRubric or feedback.allFiles | length) and summaryRoute %}
-                <a href="{{ summaryRoute }}{{ returnUrlSuffix is defined ? returnUrlSuffix : '' }}">
-                    View assessment details</a>
-            {% endif %}
-        </div>
-    {% endif %}
-{% endif %}
