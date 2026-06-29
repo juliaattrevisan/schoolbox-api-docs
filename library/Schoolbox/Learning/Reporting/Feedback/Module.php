@@ -20,6 +20,7 @@ use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Authorizer\Rule\HasParticipant;
+use Schoolbox\Learning\Markbook\FeedbackFolders;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Role;
@@ -172,6 +173,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\Reporting\Feedback\Mapper::class),
             $this->injector->get('assessmentDataSource'),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::class),
+            $this->getFeedbackFolders(),
         );
     }
 
@@ -232,5 +234,17 @@ class Module extends BaseModule
     private function getErrorMapper()
     {
         return $this->getMapperFactory()->get(Error\Mapper::class);
+    }
+
+    /**
+     * @return FeedbackFolders
+     */
+    protected function getFeedbackFolders(): FeedbackFolders
+    {
+        return new FeedbackFolders(
+            $this->injector->get('databaseInternal'),
+            $this->injector->get('externalClass'),
+            $this->getMapperFactory()->get(UserMapper::class),
+        );
     }
 }
