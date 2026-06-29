@@ -378,7 +378,7 @@ class Controller extends Base
 
 
     /**
-     * Submit multiple feedbacks in single call
+     * Publish multiple feedbacks in single call
      *
      * This is a dueWork/reporting-only route
      *
@@ -401,13 +401,19 @@ class Controller extends Base
         foreach ($draftFeedbackIds as $draftFeedbackId) {
             // Verify that this feedback is for this assessment
             $feedback = $this->feedbackDataMapper->findById($draftFeedbackId);
-            $publishSuccess   = false;
 
             if ($feedback->getReporting()->getAssessmentModel()->getId() !== $assessment->getId()) {
                 $results[$draftFeedbackId] = ['publishSuccess' => false, 'error' => 'Feedback not for this assessment'];
                 continue;
             }
 
+            if ($feedback->isPublished()) {
+                $results[$draftFeedbackId] = ['publishSuccess' => false, 'error' => 'Feedback already published'];
+                continue; // Attempting to publish an already published feedback should have no effect.
+            }
+
+            // Bulk publish can release draft feedback authored by someone else. The author remains in the
+            // created_by field, and published_by records the user who performed this publish action.
             $feedback
                 ->setPublishedAt($now)
                 ->setPublishedBy($this->getUser()->getId());
@@ -424,7 +430,7 @@ class Controller extends Base
                 $publishSuccess = false;
             }
 
-            $results[$draftFeedbackId] = ['publishSuccess'   => $publishSuccess];
+            $results[$draftFeedbackId] = ['publishSuccess' => $publishSuccess];
         }
 
         $this->response = $this->responseAsJson($results);
@@ -449,18 +455,19 @@ class Controller extends Base
             throw new NotFound("No Feedback for assessment.");
         }
 
+        // Attempting to publish an already published feedback should have no effect.
         if (!$feedback->isPublished()) {
-            // publish this
+            // Single publish is an explicit publish action by the current user.
             $feedback
                 ->setPublishedAt(Alaress_Date_Format::now())
                 ->setPublishedBy($this->getUser()->getId());
+
+            $this->feedbackDataSource->save($feedback);
+
+            // Update project mark as the published feedback may affect the project cache
+            (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))
+                ->refresh($this->assessmentDataSource, $assessment, $learner);
         }
-
-        $this->feedbackDataSource->save($feedback);
-
-        // Update project mark as the published feedback may affect the project cache
-        (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))
-            ->refresh($this->assessmentDataSource, $assessment, $learner);
 
         $this->response = $this->responseAsJson([
             'success' => true,

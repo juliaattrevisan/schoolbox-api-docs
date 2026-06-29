@@ -107,6 +107,12 @@ abstract class AbstractFeedback implements IFeedback
      */
     public function isPublished()
     {
+        // Note regarding lack of `&& publishedAt <= now` check
+        // ----------------------------------------------------
+        // 'Feedback published' state is represented by a non-null publishedAt value.
+        // This method intentionally does not compare publishedAt with now(): Admin Bulk Feedback Import can
+        // create feedback with a future publishedAt, and Schoolbox still treats that feedback as published
+        // immediately. UI publish flows for feedback set publishedAt to now.
         return $this->getPublishedAt() !== null;
     }
 

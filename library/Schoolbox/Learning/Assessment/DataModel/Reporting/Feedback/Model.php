@@ -232,6 +232,16 @@ class Model implements ISoftDeletable
 
 
     /**
+     * @return bool
+     */
+    public function isPublished(): bool
+    {
+        // See note in AbstractFeedback->isPublished().
+        return $this->getPublishedAt() !== null;
+    }
+
+
+    /**
      * @param \Alaress_Date_Format|null $publishedAt
      * @return $this
      */

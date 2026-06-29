@@ -175,7 +175,10 @@ class Controller extends Base
 
 
     /**
-     * Submit multiple feedbacks in single call
+     * Publish multiple feedbacks in single call
+     *
+     * Note this function is for bulk publishing already saved feedbacks.  It does not affect feedback content.
+     * (see that the only POSTed data is draft feedback IDs)
      *
      * This is a dueWork/reporting-only route
      *
@@ -236,7 +239,6 @@ class Controller extends Base
         foreach ($draftFeedbackIds as $draftFeedbackId) {
             // Verify that this return is for this assessment
             $submissionReturn = $this->returnedWorkMapper->findById($draftFeedbackId);
-            $publishSuccess   = false;
 
             // hydrate the duework assessment, not just the feedback joined assessment minimal modal.
             /** @var \Schoolbox\Learning\Assessment\DueWork\Model $assessment */
@@ -247,6 +249,16 @@ class Controller extends Base
                 continue;
             }
 
+            if ($submissionReturn->isPublished()) {
+                $results[$draftFeedbackId] = ['publishSuccess' => false, 'error' => 'Feedback already published'];
+                continue; // Attempting to publish an already published feedback should have no effect.
+            }
+
+            // Bulk publish can release draft feedback authored by someone else.  This workflow is handled in an
+            // odd way in the database: submission_return.published_by is set to the feedback author on creation,
+            // but submission_return.published_at is left unset.  See DueWork\Feedback\Factory->produce().
+            // Note submission_return.published_by is not nullable.  The bulk publish action sets published_at but
+            // leaves published_by unchanged (remember it cannot be null).
             $submissionReturn->setPublishedAt($now);
 
             try {
@@ -290,7 +302,7 @@ class Controller extends Base
                 $publishSuccess = false;
             }
 
-            $results[$draftFeedbackId] = ['publishSuccess'   => $publishSuccess];
+            $results[$draftFeedbackId] = ['publishSuccess' => $publishSuccess];
         }
 
         $this->response = $this->responseAsJson($results);
@@ -642,36 +654,40 @@ class Controller extends Base
     public function postPublishFeedback(DueWork\Model $assessment, User $student)
     {
         $participant = $assessment->getParticipant($student);
+        /** @var Model|null $feedback */
         $feedback = $participant->findMostRecentInstructorGivenFeedback();
 
         if (null === $feedback) {
             throw new NotFound("No Feedback for assessment.");
         }
 
+        // Attempting to publish an already published feedback should have no effect.
         if (!$feedback->isPublished()) {
-            // publish this
-            $feedback->setPublishedAt(\Alaress_Date_Format::now());
-        }
+            // Single publish is an explicit publish action by the current user.
+            $feedback
+                ->setPublishedAt(\Alaress_Date_Format::now())
+                ->setPublishedBy($this->getUser()->getId());
 
-        $this->getFeedbackDataSource()->save($feedback);
+            $this->getFeedbackDataSource()->save($feedback);
 
-        // Update project mark as the published feedback may affect the project cache
-        (new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache($this->projectResultCacheMapper))
-            ->refresh($this->assessmentDataSource, $assessment, $student);
+            // Update project mark as the published feedback may affect the project cache
+            (new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache($this->projectResultCacheMapper))
+                ->refresh($this->assessmentDataSource, $assessment, $student);
 
-        // Find the Kami worksheet (if it exists)
-        /** @var DueWork\Response\Model|null $response */
-        $response = $feedback->getResponse();
-        $kamiModel = $response?->getAllFiles()->filter(function (SubmissionFile $file) {
-            return $file->getIsWorksheet();
-        })->first()?->getKami();
-        if ($kamiModel) {
-            // Save the kami doc to the feedback object
-            $this->kamiConnector->initiatePollingForKamiDownload(
-                $kamiModel,
-                'feedback',
-                $this->getUser(),
-            );
+            // Find the Kami worksheet (if it exists)
+            /** @var DueWork\Response\Model|null $response */
+            $response = $feedback->getResponse();
+            $kamiModel = $response?->getAllFiles()->filter(function (SubmissionFile $file) {
+                return $file->getIsWorksheet();
+            })->first()?->getKami();
+            if ($kamiModel) {
+                // Save the kami doc to the feedback object
+                $this->kamiConnector->initiatePollingForKamiDownload(
+                    $kamiModel,
+                    'feedback',
+                    $this->getUser(),
+                );
+            }
         }
 
         $data = [
