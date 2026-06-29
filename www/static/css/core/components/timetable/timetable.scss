@@ -8,6 +8,7 @@
     /* Remove padding on cells containing classes
      */
     td {
+        overflow: hidden;
         padding: 0;
 
         /* Active subject(s) decoration
@@ -44,16 +45,7 @@
             padding: 1rem;
             transition:
                 opacity 0.15s ease,
-                filter 0.15s ease,
-                box-shadow 0.15s ease,
-                transform 0.15s ease;
-
-            &.sbx-related-event-match {
-                box-shadow: 0 0.25rem 0.75rem rgba($black, 0.18);
-                position: relative;
-                transform: translateY(-1px) scale(1.02);
-                z-index: 2;
-            }
+                filter 0.15s ease;
 
             &.sbx-related-event-muted {
                 filter: grayscale(35%);

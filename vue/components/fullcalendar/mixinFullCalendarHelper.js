@@ -69,6 +69,13 @@ export default {
             return true;
         },
 
+        /**
+         * Add relation metadata and hover/focus handlers for events that belong
+         * to an existing FullCalendar group. Keeping this opt-in avoids grouping
+         * unrelated calendar events that only share broad fallback metadata.
+         *
+         * @param {object} eventRenderInfo
+         */
         fullCalendarHelper_attachRelatedEventHighlighting(eventRenderInfo) {
             const relationKey = this.fullCalendarHelper_getRelatedEventKey(eventRenderInfo.event);
 
@@ -83,31 +90,28 @@ export default {
             eventRenderInfo.el.addEventListener("focusout", this.fullCalendarHelper_clearRelatedEventHighlights);
         },
 
+        /**
+         * Return a relation key for group-linked events only. Other event types
+         * need explicit relation metadata before they can be safely grouped.
+         *
+         * @param {object} event
+         * @return {?string}
+         */
         fullCalendarHelper_getRelatedEventKey(event) {
-            const data = event?.extendedProps?.data;
-            const categoryId = data?.links?.category?.id;
-            if (categoryId) {
-                return `category:${categoryId}`;
-            }
-
-            const timetableCode = data?.timetable?.code;
-            if (timetableCode) {
-                return `class:${timetableCode}`;
-            }
-
             const groupClass = event?.classNames?.find((className) => /^group\d+$/u.test(className));
             if (groupClass) {
                 return groupClass.replace(/^group/u, "group:");
             }
 
-            const eventTypeId = data?.meta?.eventTypeId;
-            if (eventTypeId) {
-                return `type:${eventTypeId}`;
-            }
-
             return null;
         },
 
+        /**
+         * Dim events outside the active group while preserving the original
+         * rendering of grouped events to avoid FullCalendar repaint issues.
+         *
+         * @param {Event} event
+         */
         fullCalendarHelper_highlightRelatedEvents(event) {
             const relationKey = event.currentTarget.getAttribute(RELATED_EVENT_RELATION_ATTRIBUTE);
             const calendar = event.currentTarget.closest(".fc");
@@ -127,6 +131,12 @@ export default {
             });
         },
 
+        /**
+         * Remove hover/focus styling from the current FullCalendar instance.
+         * This keeps the effect scoped when multiple calendars are rendered.
+         *
+         * @param {Event} event
+         */
         fullCalendarHelper_clearRelatedEventHighlights(event) {
             const calendar = event.currentTarget.closest(".fc");
 
