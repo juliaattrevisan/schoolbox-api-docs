@@ -132,7 +132,7 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
 <template>
     <tr v-if="showNode">
         <td
-            class="u-flex u-flex--align-center l-gap-s f-no-margins name-cell u-border-right"
+            class="u-flex u-flex--align-center u-gap-s f-no-margins name-cell u-border-right"
             :style="{
                 paddingInlineStart: filtersStore.onlyShowGaps ? '0.5rem' : `calc(${props.depth * 0.5}rem + 0.5rem)`,
             }"
@@ -150,7 +150,7 @@ function onCourseClicked(course: CourseWithCurriculumNodeUsage, buttonEl: HTMLBu
             </button>
             <!-- add paddingLeft to the last child node to align better with the parent above, which is showing the expand button -->
             <div
-                class="u-flex u-flex--align-center l-gap-s"
+                class="u-flex u-flex--align-center u-gap-s"
                 :style="{
                     paddingLeft: isSingleNode || filtersStore.onlyShowGaps || showExpandButton ? '0' : '2.5rem',
                 }"

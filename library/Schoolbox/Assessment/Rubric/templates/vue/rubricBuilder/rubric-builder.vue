@@ -307,7 +307,7 @@ const rubricRows = window.Vue.computed(() => {
 
             <!-- create a new rubric -->
             <template v-else #content>
-                <div class="u-flex-row u-flex--justify l-gap-xs">
+                <div class="u-flex-row u-flex--justify u-gap-xs">
                     <button
                         class="button u-flex__item--1 icon-modify"
                         type="button"

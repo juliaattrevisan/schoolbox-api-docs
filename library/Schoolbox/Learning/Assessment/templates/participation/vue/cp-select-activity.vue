@@ -65,8 +65,8 @@ async function onConfirm(): Promise<void> {
 </script>
 
 <template>
-    <form class="u-flex-col l-gap-m f-no-margins" @submit.prevent="onConfirm">
-        <div class="u-flex-row u-flex--justify-space l-gap-s f-no-margins">
+    <form class="u-flex-col u-gap-m f-no-margins" @submit.prevent="onConfirm">
+        <div class="u-flex-row u-flex--justify-space u-gap-s f-no-margins">
             <h2>Select Customisation</h2>
         </div>
         <fieldset class="checklist u-no-border l-pad--0 f-no-margins">
@@ -101,7 +101,7 @@ async function onConfirm(): Promise<void> {
         <div v-if="loadError">
             <request-error :further-info="loadError" />
         </div>
-        <div class="u-flex l-gap-xs f-no-margins">
+        <div class="u-flex u-gap-xs f-no-margins">
             <button class="button u-flex__item--1" data-test="" @click.prevent="onBack">Back</button>
             <button class="button submit u-flex__item--1" type="button" data-test="" @click.prevent="onConfirm">
                 {{ proceedText }}

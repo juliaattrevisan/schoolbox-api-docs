@@ -71,7 +71,7 @@ function onCellSelected(header: TableHeader): void {
             }"
         >
             <template v-if="header.type == TableHeaderType.USER">
-                <div class="u-flex-row u-flex--no-wrap l-gap-m">
+                <div class="u-flex-row u-flex--no-wrap u-gap-m">
                     <user-photo :user="props.rowData[header.key] as User" render="small" />
                     <div class="u-flex-col u-flex--justify-center f-no-margins">
                         <a

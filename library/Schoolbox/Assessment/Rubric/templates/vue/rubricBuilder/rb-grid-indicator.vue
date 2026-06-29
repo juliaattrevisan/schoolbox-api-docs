@@ -109,7 +109,7 @@ window.Vue.onMounted(() => {
                 </a>
             </span>
 
-            <div class="u-flex u-flex--align-start l-gap-s">
+            <div class="u-flex u-flex--align-start u-gap-s">
                 <input
                     :id="`rb-indicator-${componentId}`"
                     v-model="hasUsage"

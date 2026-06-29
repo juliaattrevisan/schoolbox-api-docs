@@ -46,7 +46,7 @@ async function onResetFilters(): Promise<void> {
 </script>
 
 <template>
-    <div class="u-flex-col l-gap-m">
+    <div class="u-flex-col u-gap-m">
         <cr-results-group
             v-for="(group, i) in resultGroups"
             :id="group.id"

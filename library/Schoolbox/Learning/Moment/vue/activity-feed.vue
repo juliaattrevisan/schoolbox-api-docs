@@ -593,7 +593,7 @@ window.Vue.onMounted(async () => {
                     <div class="filters">
                         <div class="checklist l-pad-s--left">
                             <label class="title">Filter to:</label>
-                            <ul class="option-list u-flex-row l-gap-l">
+                            <ul class="option-list u-flex-row u-gap-l">
                                 <li v-if="showLearningMoments">
                                     <input
                                         id="filter-learningMoments"
@@ -691,7 +691,7 @@ window.Vue.onMounted(async () => {
                                                 :title="
                                                     item.object.creator?._links.profile ? 'View Profile' : undefined
                                                 "
-                                                class="l-gap-s"
+                                                class="u-gap-s"
                                             >
                                                 <div class="u-flex-row u-flex--align-center">
                                                     <template v-if="item.object.creator">

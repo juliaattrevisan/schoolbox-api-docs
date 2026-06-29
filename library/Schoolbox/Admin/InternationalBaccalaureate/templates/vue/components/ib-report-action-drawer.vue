@@ -25,7 +25,7 @@ defineEmits<{
             <em>{{ selectedCount }} student{{ selectedCount === 1 ? "" : "s" }} selected</em>
         </span>
         <button type="button" class="button-clear" @click="$emit('clearSelection')">Clear selection</button>
-        <div class="u-flex-row u-flex--justify l-gap-xs">
+        <div class="u-flex-row u-flex--justify u-gap-xs">
             <button
                 v-if="activeSection === 'preparation'"
                 type="button"

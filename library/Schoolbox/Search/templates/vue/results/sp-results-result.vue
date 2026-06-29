@@ -43,8 +43,8 @@ async function onBadgeSelected(): Promise<void> {
 <template>
     <div ref="resultEl" class="u-flex-col" :data-test="`sp-results-result-${props.result.id}`">
         <div :class="`c-card ${hasSubResults ? 'c-card--border-end' : ''}`">
-            <div class="u-flex-col l-gap-m l-pad-m">
-                <div class="u-flex-row l-gap-m">
+            <div class="u-flex-col u-gap-m l-pad-m">
+                <div class="u-flex-row u-gap-m">
                     <sp-results-result-image
                         v-if="props.result.image || props.result.icon"
                         :result="props.result"

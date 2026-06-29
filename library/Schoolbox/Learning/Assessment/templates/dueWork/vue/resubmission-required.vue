@@ -18,7 +18,7 @@ const resubmissionRequired = defineModel<boolean>("resubmission-required", { req
 </script>
 
 <template>
-    <div class="resubmission-required u-flex u-flex--align-center l-gap-s">
+    <div class="resubmission-required u-flex u-flex--align-center u-gap-s">
         <input
             :id="`resubmissionRequired-${identifier}`"
             v-model="resubmissionRequired"

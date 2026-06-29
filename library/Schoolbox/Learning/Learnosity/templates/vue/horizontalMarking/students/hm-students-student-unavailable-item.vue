@@ -26,7 +26,7 @@ const isActive = window.Vue.computed(() => {
 </script>
 
 <template>
-    <div v-if="isActive" class="u-flex-col l-gap-m l-pad-m">
+    <div v-if="isActive" class="u-flex-col u-gap-m l-pad-m">
         <div class="alert-box f-no-margins">This item was not in the quiz when the student attempted the quiz.</div>
     </div>
 </template>

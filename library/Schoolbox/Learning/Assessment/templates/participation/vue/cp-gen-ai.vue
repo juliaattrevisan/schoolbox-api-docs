@@ -107,8 +107,8 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <form class="u-flex-col l-gap-m f-no-margins" @submit.prevent="onConfirm">
-        <div class="u-flex-row u-flex--justify-space l-gap-s f-no-margins">
+    <form class="u-flex-col u-gap-m f-no-margins" @submit.prevent="onConfirm">
+        <div class="u-flex-row u-flex--justify-space u-gap-s f-no-margins">
             <h2>
                 Suggested Customisation
                 {{ props.participant?.user.fullName ? ` for ${props.participant.user.fullName}` : "" }}
@@ -131,16 +131,16 @@ window.Vue.onMounted(() => {
                 <p></p>
             </loading-cards>
         </div>
-        <div v-else-if="participant && aiResponse" class="u-flex-col l-gap-s f-no-margins">
-            <div class="sbx-vert-scroll-container u-flex-col l-gap-s">
-                <div class="u-flex-col l-gap-s f-no-margins">
-                    <div class="u-flex-col l-gap-xs f-no-margins">
+        <div v-else-if="participant && aiResponse" class="u-flex-col u-gap-s f-no-margins">
+            <div class="sbx-vert-scroll-container u-flex-col u-gap-s">
+                <div class="u-flex-col u-gap-s f-no-margins">
+                    <div class="u-flex-col u-gap-xs f-no-margins">
                         <h3>
                             <strong>Considerations</strong>
                         </h3>
                         <media-article :content="aiResponse?.suggested_considerations as string" />
                     </div>
-                    <div class="u-flex-col l-gap-xs f-no-margins">
+                    <div class="u-flex-col u-gap-xs f-no-margins">
                         <h3>
                             <strong>Suggested Learning {{ locale.activity.translate(false, true) }} Update</strong>
                         </h3>
@@ -150,7 +150,7 @@ window.Vue.onMounted(() => {
             </div>
             <span class="meta">AI sometimes gets things wrong — please check important details.</span>
         </div>
-        <div class="u-flex l-gap-xs f-no-margins">
+        <div class="u-flex u-gap-xs f-no-margins">
             <button class="button u-flex__item--1" data-test="cp-ai-modal-cancel" @click.prevent="onCancel">
                 {{ isProcessing ? "Cancel" : "Close" }}
             </button>

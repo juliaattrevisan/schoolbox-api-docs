@@ -250,7 +250,7 @@ window.Vue.watch(isOpen, async (newIsOpen) => {
 <template>
     <div>
         <basic-modal v-model:is-open="isOpen">
-            <div class="u-flex-col l-gap-m">
+            <div class="u-flex-col u-gap-m">
                 <h2 class="f-no-margins">{{ props.title }}</h2>
                 <ss-selected
                     v-if="props.showSelected"

@@ -171,8 +171,8 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <div data-test="skin-config-container" class="u-flex-col l-gap-l l-pad-m--horiz">
-        <div class="u-flex-col l-gap-m">
+    <div data-test="skin-config-container" class="u-flex-col u-gap-l l-pad-m--horiz">
+        <div class="u-flex-col u-gap-m">
             <img :src="sonarImgSrc" alt="" class="l-c-cr" aria-hidden="true" />
             <p class="u-visually-hidden">
                 Sonar UI is now available. We encourage you to enable it on your Staging server now to review your skin
@@ -185,7 +185,7 @@ window.Vue.onMounted(() => {
         <div v-if="loadError" data-test="skin-config-load-error">
             <request-error :further-info="loadError" />
         </div>
-        <form method="post" class="u-flex-col l-gap-l skin-config-form" @submit.prevent="onSaveSelected">
+        <form method="post" class="u-flex-col u-gap-l skin-config-form" @submit.prevent="onSaveSelected">
             <div class="c-island l-pad-m">
                 <label id="skin-config-toggle" class="inline-block" for="skin-config-toggle-field">
                     <span>{{ editableConfigs.toggle.title }}</span>
@@ -227,7 +227,7 @@ window.Vue.onMounted(() => {
                 text="Resolve all colour contrast issues to save the Skin Config."
                 is-full-width
             />
-            <div class="u-flex u-flex--justify l-gap-xs">
+            <div class="u-flex u-flex--justify u-gap-xs">
                 <button v-if="hasUnsavedChanges" type="button" class="button u-flex__item--1" @click="onUndoChanges">
                     Undo Changes
                 </button>

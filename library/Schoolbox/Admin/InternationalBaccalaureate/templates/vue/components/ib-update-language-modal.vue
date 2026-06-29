@@ -11,13 +11,13 @@ const updateLanguageStore = useIbReportUpdateLanguageStore();
     <basic-modal v-model:is-open="updateLanguageStore.isOpen">
         <form
             v-if="updateLanguageStore.activeStudent"
-            class="u-flex-col l-gap-m f-no-margins"
+            class="u-flex-col u-gap-m f-no-margins"
             @submit.prevent="updateLanguageStore.save"
         >
             <h2>Update language selection</h2>
             <p class="f-no-margins">Manually assigning languages for: {{ updateLanguageStore.activeStudent.name }}</p>
 
-            <div class="sbx-vert-scroll-container u-flex-col l-gap-s">
+            <div class="sbx-vert-scroll-container u-flex-col u-gap-s">
                 <div v-for="(row, index) in updateLanguageStore.subjectRows" :key="index">
                     <search-select
                         v-model:selected="row.selected"
@@ -35,7 +35,7 @@ const updateLanguageStore = useIbReportUpdateLanguageStore();
 
             <request-error v-if="updateLanguageStore.saveError" :further-info="updateLanguageStore.saveError" />
 
-            <div class="u-flex l-gap-xs f-no-margins">
+            <div class="u-flex u-gap-xs f-no-margins">
                 <button type="button" class="button u-flex__item--1" @click.prevent="updateLanguageStore.close()">
                     Cancel
                 </button>

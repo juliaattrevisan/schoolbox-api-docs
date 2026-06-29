@@ -144,7 +144,7 @@ async function openLightbox(file: StorageFile, event: MouseEvent): Promise<void>
             <cr-results-group-entry-actions :entry="props.entry" />
         </ul>
 
-        <div class="u-flex__item--1 l-grid l-grid--12 l-gap-s l-mar-xs--top">
+        <div class="u-flex__item--1 l-grid l-grid--12 u-gap-s l-mar-xs--top">
             <div class="small-12" :class="{ 'medium-8': selectableEvidence.length > 0 }">
                 <article
                     v-if="selectedEvidence !== null && selectedEvidence.storage.hash"
@@ -173,11 +173,11 @@ async function openLightbox(file: StorageFile, event: MouseEvent): Promise<void>
                 </p>
             </div>
 
-            <div v-if="selectableEvidence.length > 0" class="small-12 medium-4 u-flex-col l-gap-s">
+            <div v-if="selectableEvidence.length > 0" class="small-12 medium-4 u-flex-col u-gap-s">
                 <div
                     v-for="evidence in props.entry.evidence"
                     :key="evidence.storage.hash"
-                    class="cr-evidence-button u-flex--no-wrap u-flex-row l-gap-xs l-pad-xs"
+                    class="cr-evidence-button u-flex--no-wrap u-flex-row u-gap-xs l-pad-xs"
                     :class="{ 'cr-evidence-button-selected': evidence.storage.hash === selectedEvidenceHash }"
                     :title="evidence.storage.name"
                     @click="selectedEvidenceHash = evidence.storage.hash"

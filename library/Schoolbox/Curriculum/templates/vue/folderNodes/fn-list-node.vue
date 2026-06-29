@@ -76,7 +76,7 @@ function onRemoveSelected(): void {
 <template>
     <li>
         <div class="node u-flex-row u-flex--justify-space u-flex--center u-flex--no-wrap l-pad-xs--vert">
-            <div class="u-flex-row u-flex--no-wrap u-flex--align-center l-gap-xs">
+            <div class="u-flex-row u-flex--no-wrap u-flex--align-center u-gap-xs">
                 <sbx-icon
                     v-if="!props.node.enabled"
                     name="hidden"

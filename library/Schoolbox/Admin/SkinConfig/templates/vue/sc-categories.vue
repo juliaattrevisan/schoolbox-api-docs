@@ -51,18 +51,18 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
 
 <template>
     <template v-for="(subcategories, categoryKey) in activeConfigs" :key="categoryKey">
-        <div class="u-flex-col l-gap-s">
+        <div class="u-flex-col u-gap-s">
             <h2 class="subheader u-lh-normal">{{ categoryKey }}</h2>
             <div class="c-island u-flex-col" data-test="skin-config-category">
                 <div
                     v-for="(subcategory, index) in subcategories"
                     :key="subcategory.name || `default-${index}`"
-                    class="skin-config-subcategory u-flex-col l-gap-m l-pad-m"
+                    class="skin-config-subcategory u-flex-col u-gap-m l-pad-m"
                     :class="{ 'skin-config-subcategory--divided': index < subcategories.length - 1 }"
                     :data-test="`skin-config-subcategory-${subcategory.name || `default-${index}`}`"
                 >
                     <h3 v-if="subcategory.name" class="f-no-margins">{{ subcategory.name }}</h3>
-                    <div class="l-grid l-grid--12 l-gap-m">
+                    <div class="l-grid l-grid--12 u-gap-m">
                         <div
                             v-for="option in subcategory.options"
                             :key="option.id"
@@ -133,7 +133,7 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
                     <template v-if="configs.toggle.enabled">
                         <div
                             v-if="subcategory.name === 'Component'"
-                            class="preview-container l-grid l-grid--12 l-gap-m f-no-margins"
+                            class="preview-container l-grid l-grid--12 u-gap-m f-no-margins"
                         >
                             <h4 class="large-12">Preview</h4>
                             <div class="large-12">
@@ -165,7 +165,7 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
                         </div>
                         <div
                             v-else-if="subcategory.name === 'General'"
-                            class="preview-container l-grid l-grid--12 l-gap-m f-no-margins"
+                            class="preview-container l-grid l-grid--12 u-gap-m f-no-margins"
                         >
                             <h4 class="large-12">Preview</h4>
                             <div class="small-12 medium-4 large-3 f-no-margins">
@@ -173,9 +173,9 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
                                 <input id="title" type="text" name="title" value="School Musical" maxlength="255" />
                             </div>
                             <div class="small-12 medium-4 large-3">
-                                <div class="checklist u-flex-col l-gap-s">
+                                <div class="checklist u-flex-col u-gap-s">
                                     <label class="title">Filter</label>
-                                    <ul class="option-list u-flex-row l-gap-l">
+                                    <ul class="option-list u-flex-row u-gap-l">
                                         <li data-v-40e5173a="">
                                             <input id="waiting-list" type="checkbox" checked />
                                             <label for="waiting-list">Waiting List</label>
@@ -277,7 +277,7 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
                             </div>
                             <div class="small-12 medium-4">
                                 <label for="news-topics-selectized">Topics</label>
-                                <div class="u-flex-row l-gap-s">
+                                <div class="u-flex-row u-gap-s">
                                     <div class="sbx-tag">
                                         <button type="button" class="sbx-tag__name-button">General Notices</button>
                                         <button

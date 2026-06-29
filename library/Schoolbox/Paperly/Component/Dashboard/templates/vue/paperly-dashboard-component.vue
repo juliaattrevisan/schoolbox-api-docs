@@ -95,7 +95,7 @@ function getIconName(iconClass: string): string {
         <ul class="flex-list flex-wrap buttons l-pad-s">
             <li v-for="feature in paperlyPayload.features" :key="feature.url">
                 <a
-                    class="sbx-button--has-icon l-gap-s"
+                    class="sbx-button--has-icon u-gap-s"
                     :href="feature.url ?? ''"
                     :target="props.openItemsInNewTab ? '_blank' : undefined"
                 >

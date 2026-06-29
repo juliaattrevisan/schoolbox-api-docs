@@ -74,7 +74,7 @@ window.Vue.watch(
         <div v-else-if="popOutStore.isLoading && !popOutStore.hasLoadError" class="usage__loader">
             <div class="loader"></div>
         </div>
-        <div v-else-if="popOutStore.usage" class="u-flex-col l-gap-m">
+        <div v-else-if="popOutStore.usage" class="u-flex-col u-gap-m">
             <div
                 v-if="
                     filtersStore.selectedReportOptions.includes(ReportOptionValues.COURSE) &&
@@ -83,7 +83,7 @@ window.Vue.watch(
                 class="usage__section"
             >
                 <h5 class="section-title">Course</h5>
-                <div class="u-flex l-gap-s">
+                <div class="u-flex u-gap-s">
                     <sbx-icon name="course-builder" />
                     <p class="f-no-margins">Assigned to Course</p>
                 </div>
@@ -93,7 +93,7 @@ window.Vue.watch(
                 class="usage__section"
             >
                 <h5 class="section-title">{{ locale.unit.proper() }}</h5>
-                <div class="u-flex l-gap-s">
+                <div class="u-flex u-gap-s">
                     <sbx-icon name="unit" />
                     <p class="f-no-margins">Assigned to {{ locale.unit.proper() }}</p>
                 </div>
@@ -156,7 +156,7 @@ window.Vue.watch(
                 <h5 class="section-title">Rubrics</h5>
                 <template v-for="activity in popOutStore.usage.inUseRubric" :key="activity._links.view">
                     <h6 class="section-sub-title">
-                        <a :href="activity._links.view" :title="`View ${activity.name}`" class="u-flex l-gap-s">
+                        <a :href="activity._links.view" :title="`View ${activity.name}`" class="u-flex u-gap-s">
                             <sbx-icon :name="activity.icon" />
                             {{ activity.name }}
                         </a>

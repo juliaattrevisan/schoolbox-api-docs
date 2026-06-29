@@ -79,7 +79,7 @@ function onPrintSelected(): void {
 </script>
 
 <template>
-    <div class="u-flex-col l-gap-m">
+    <div class="u-flex-col u-gap-m">
         <div class="u-flex-row u-flex--justify-space u-flex--align-end f-no-margins">
             <h1>{{ props.title }}</h1>
             <nav class="u-flex-row u-flex--align-center f-no-margins">

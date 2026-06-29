@@ -27,7 +27,7 @@
                     <li><sbx-icon name="{{ icon.renderName(assessment)|trim }}" color="var(--sbx-color-text-secondary)"></sbx-icon> {{ assessment.typeName }}</li>
                     <li><sbx-icon name="calendar" color="var(--sbx-color-text-secondary)"></sbx-icon> Due {{ assessment.dueAt.getRelativeTime }} on {{ assessment.dueAt.localShort }}</li>
                 </ul>
-                <div class="u-flex u-flex--align-center u-flex--justify-end l-gap-m l-pad-m--horiz no-pad">
+                <div class="u-flex u-flex--align-center u-flex--justify-end u-gap-m l-pad-m--horiz no-pad">
                     <div class="checklist">
                         <input type="checkbox" id="show-drafts">
                         <label for="show-drafts">

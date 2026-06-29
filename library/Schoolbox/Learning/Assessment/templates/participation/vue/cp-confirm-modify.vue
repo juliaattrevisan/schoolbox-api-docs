@@ -36,8 +36,8 @@ function onConfirm(): void {
 </script>
 
 <template>
-    <div class="u-flex-col l-gap-m f-no-margins">
-        <div class="u-flex-col l-gap-s f-no-margins">
+    <div class="u-flex-col u-gap-m f-no-margins">
+        <div class="u-flex-col u-gap-s f-no-margins">
             <h2>Please confirm</h2>
             <p class="f-no-margins">
                 <slot name="status-text">
@@ -45,11 +45,11 @@ function onConfirm(): void {
                     {{ locale.assessment.singular() }}.
                 </slot>
             </p>
-            <div v-if="showParticipants" class="u-flex-col l-gap-xs">
+            <div v-if="showParticipants" class="u-flex-col u-gap-xs">
                 <div
                     v-for="participant in participants"
                     :key="participant.user.id"
-                    class="u-flex l-gap-s u-flex--align-center"
+                    class="u-flex u-gap-s u-flex--align-center"
                 >
                     <img
                         :src="`/portrait.php?id=${participant.user.id}&size=square32`"
@@ -70,7 +70,7 @@ function onConfirm(): void {
                 </slot>
             </p>
         </div>
-        <div class="u-flex l-gap-xs f-no-margins">
+        <div class="u-flex u-gap-xs f-no-margins">
             <button
                 class="button submit u-flex__item--1"
                 data-test="cp-confirm-modify-modal-yes-button"

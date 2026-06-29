@@ -319,7 +319,7 @@ window.Vue.watch(
 </script>
 
 <template>
-    <div class="share-work-buttons l-grid l-gap-m l-mar-m--bottom">
+    <div class="share-work-buttons l-grid u-gap-m l-mar-m--bottom">
         <a
             class="share-photo sbx-button--has-icon"
             data-test="learning-moment-evidence-share-photo"
@@ -410,7 +410,7 @@ window.Vue.watch(
 
     <div v-if="mfStore.moment !== null && mfStore.moment.evidence.length">
         <label> Attachments ({{ mfStore.moment.evidence.length }} out of {{ MOMENT_MAX_EVIDENCE }}) </label>
-        <div class="l-grid l-grid--12 l-gap-m">
+        <div class="l-grid l-grid--12 u-gap-m">
             <div class="large-6 small-12">
                 <article
                     v-if="selectedEvidence !== null && selectedEvidence.storage.hash"

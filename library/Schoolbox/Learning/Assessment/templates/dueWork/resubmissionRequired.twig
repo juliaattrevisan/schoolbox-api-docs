@@ -11,7 +11,7 @@
 
 {% set prefix = prefix is defined ? prefix ~ '-' : '' %}
 {% set inputId = 'resubmissionRequired-' ~ prefix ~ participant.user.id %}
-<div class="resubmission-required u-flex u-flex--align-center l-gap-s">
+<div class="resubmission-required u-flex u-flex--align-center u-gap-s">
     <input type="checkbox"
         value="1"
         tabindex="{{ tabIndex }}"

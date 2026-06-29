@@ -16,7 +16,7 @@ const isLoading = defineModel<boolean>("is-loading", { default: false }); // to 
 <template>
     <basic-modal v-model:is-open="isLoading" size="s" :show-close-button="false" :has-focus-trap="false">
         <data-load-error v-if="props.loadError" data-title="record" :further-info="props.loadError" />
-        <div v-else class="container u-flex-col u-flex--center l-gap-s" role="status" aria-live="polite">
+        <div v-else class="container u-flex-col u-flex--center u-gap-s" role="status" aria-live="polite">
             <div class="loader"></div>
             <h3><em>Generating print report, please wait... </em></h3>
         </div>

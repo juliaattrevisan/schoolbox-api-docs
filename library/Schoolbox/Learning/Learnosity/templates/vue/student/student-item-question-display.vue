@@ -225,7 +225,7 @@ window.Vue.onBeforeUnmount(async () => {
 </script>
 
 <template>
-    <div class="u-flex-col l-gap-m question">
+    <div class="u-flex-col u-gap-m question">
         <template v-if="props.question.response">
             <div ref="responsesEl"></div>
             <template v-if="props.showFeedback">

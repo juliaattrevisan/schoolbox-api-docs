@@ -55,8 +55,8 @@ async function applyFilters(): Promise<void> {
 </script>
 
 <template>
-    <form class="u-flex-col l-gap-s u-flex__item--0-shrink f-no-margins" @submit.prevent="applyFilters">
-        <div class="c-island filters u-flex-col l-pad-m" :class="{ 'l-gap-m': isOpen }">
+    <form class="u-flex-col u-gap-s u-flex__item--0-shrink f-no-margins" @submit.prevent="applyFilters">
+        <div class="c-island filters u-flex-col l-pad-m" :class="{ 'u-gap-m': isOpen }">
             <button
                 v-if="props.isSingleColumn"
                 class="filters__toggle-button l-mar--0"
@@ -66,7 +66,7 @@ async function applyFilters(): Promise<void> {
                 {{ isOpen ? "Hide filters" : "Show filters" }}
             </button>
             <div class="filters__container" :style="{ 'grid-template-rows': isOpen ? '1fr' : '0fr' }">
-                <div class="filters__inner-container u-flex-col l-gap-m">
+                <div class="filters__inner-container u-flex-col u-gap-m">
                     <search-select
                         v-model:selected="crfStore.studentFilter"
                         label="Filter by students"
@@ -113,7 +113,7 @@ async function applyFilters(): Promise<void> {
 
                     <div>
                         <label>Filter by state</label>
-                        <div class="l-grid l-gap-s l-grid--2-col">
+                        <div class="l-grid u-gap-s l-grid--2-col">
                             <div v-for="(label, status) in evidenceStatusLabels" :key="status">
                                 <input
                                     :id="`cr-filters-${status}`"
@@ -128,7 +128,7 @@ async function applyFilters(): Promise<void> {
                         </div>
                     </div>
 
-                    <div class="u-flex-row u-flex--no-wrap l-gap-m">
+                    <div class="u-flex-row u-flex--no-wrap u-gap-m">
                         <button
                             class="button u-flex__item--1 icon-close f-no-margins"
                             data-test="cr-filter-clear-button"

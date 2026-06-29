@@ -34,7 +34,7 @@ Usage:
         <div class="grip compact"></div>
         <div class="list-item">
             <div class="card small-12 compact wrap-down">
-                {% if textLinkRoute %}<a class="u-flex l-gap-s" data-test="course-builder-assessment-title-{{ assessment.title }}" data-test-activity-id="{{ assessment.id }}" href="{{ textLinkRoute }}?{{ returnUrlName }}={{ returnUrl }}">{% endif %}
+                {% if textLinkRoute %}<a class="u-flex u-gap-s" data-test="course-builder-assessment-title-{{ assessment.title }}" data-test-activity-id="{{ assessment.id }}" href="{{ textLinkRoute }}?{{ returnUrlName }}={{ returnUrl }}">{% endif %}
                     <sbx-icon name="{{ icon.renderName(assessment)|trim }}" size="m" color="currentColor"></sbx-icon>
                     <p>{{ assessment.title }}</p>
                 {% if textLinkRoute %}</a>{% endif %}

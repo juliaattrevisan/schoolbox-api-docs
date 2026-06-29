@@ -37,10 +37,10 @@ function onGenerateSelected(): void {
 </script>
 
 <template>
-    <div class="u-flex-col l-pad-s l-gap-m">
-        <div class="u-flex-row u-flex--no-wrap u-flex--align-start l-gap-m">
+    <div class="u-flex-col l-pad-s u-gap-m">
+        <div class="u-flex-row u-flex--no-wrap u-flex--align-start u-gap-m">
             <user-photo :user="props.user" render="small" />
-            <div class="u-flex-col u-flex--justify-center l-gap-s f-no-margins">
+            <div class="u-flex-col u-flex--justify-center u-gap-s f-no-margins">
                 <a v-if="props.user._links?.profile" :href="props.user._links!.profile" title="View Profile">
                     {{ props.user.lastName }},
                     {{ props.user.givenName }}

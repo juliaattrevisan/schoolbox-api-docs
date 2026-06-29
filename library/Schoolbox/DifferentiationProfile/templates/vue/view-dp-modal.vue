@@ -115,8 +115,8 @@ function onClose(): void {
             :data-title="locale.differentiationProfile.translate(false, true)"
             :further-info="loadError"
         />
-        <div v-else-if="student && data.length > 0" class="u-flex-col l-gap-m f-no-margins">
-            <div class="u-flex-col l-gap-s f-no-margins">
+        <div v-else-if="student && data.length > 0" class="u-flex-col u-gap-m f-no-margins">
+            <div class="u-flex-col u-gap-s f-no-margins">
                 <div class="u-flex-row u-flex--justify-space">
                     <h2>
                         {{ locale.differentiationProfile.translate(false, true) }} for {{ getFirstName(student) }}
@@ -125,19 +125,19 @@ function onClose(): void {
                     <a
                         v-if="props.customisationsRoute"
                         :href="`${props.customisationsRoute}`"
-                        class="button u-flex l-gap-s sbx-button--has-icon"
+                        class="button u-flex u-gap-s sbx-button--has-icon"
                     >
                         <sbx-icon name="group"></sbx-icon>
                         View Customisations
                     </a>
                 </div>
             </div>
-            <div class="sbx-vert-scroll-container u-flex-col l-gap-s" data-test="view-dp-modal-fields-container">
-                <div class="u-flex-col l-gap-s f-no-margins">
+            <div class="sbx-vert-scroll-container u-flex-col u-gap-s" data-test="view-dp-modal-fields-container">
+                <div class="u-flex-col u-gap-s f-no-margins">
                     <div
                         v-for="item in adjustmentData"
                         :key="item.terminology"
-                        class="u-flex-col l-gap-xs f-no-margins"
+                        class="u-flex-col u-gap-xs f-no-margins"
                     >
                         <h5>
                             <strong>{{ item.terminology }}</strong>
@@ -148,7 +148,7 @@ function onClose(): void {
                             </ul>
                         </article>
                     </div>
-                    <div v-for="item in textData" :key="item.terminology" class="u-flex-col l-gap-xs f-no-margins">
+                    <div v-for="item in textData" :key="item.terminology" class="u-flex-col u-gap-xs f-no-margins">
                         <h5>
                             <strong>{{ item.terminology }}</strong>
                         </h5>
@@ -156,7 +156,7 @@ function onClose(): void {
                     </div>
                 </div>
             </div>
-            <div class="u-flex l-gap-xs f-no-margins">
+            <div class="u-flex u-gap-xs f-no-margins">
                 <button class="button u-flex__item--1" @click.prevent="onClose">Close</button>
             </div>
         </div>

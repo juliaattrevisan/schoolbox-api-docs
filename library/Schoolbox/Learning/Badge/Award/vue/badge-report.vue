@@ -265,7 +265,7 @@ export default {
                 <em>{{ selectedStudentsCount }} selected</em>
             </h3>
             <button @click.prevent="onClearStudentSelection" class="button-clear">Clear selection</button>
-            <div class="u-flex-row l-gap-s">
+            <div class="u-flex-row u-gap-s">
                 <a :href="getUrl('goal')" title="Set goal" class="button u-flex__item--1 sbx-button--has-icon"
                     ><sbx-icon name="goal"></sbx-icon>Set goal</a
                 >

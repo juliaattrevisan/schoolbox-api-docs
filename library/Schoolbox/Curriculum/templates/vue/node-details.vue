@@ -143,7 +143,7 @@ window.Vue.onMounted(() => {
 <template>
     <div v-if="isLoading" class="loader" />
     <div v-else-if="activeNode !== null">
-        <h2 class="u-flex-row u-flex--align-center u-flex--no-wrap l-gap-xs">
+        <h2 class="u-flex-row u-flex--align-center u-flex--no-wrap u-gap-xs">
             <sbx-icon v-if="!activeNode.node.enabled" name="hidden" title="This outcome is disabled" />{{ title }}
         </h2>
         <p v-if="breadcrumbs.length > 0" class="meta">{{ breadcrumbs }}</p>

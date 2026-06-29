@@ -118,7 +118,7 @@ async function onAction(type: keyof typeof selectedResultActions.value): Promise
         <div class="meta l-mar-s--right">({{ selectedResultStatuses }})</div>
         <button class="button-clear" @click.prevent="clearSelection">Clear selection</button>
 
-        <div class="u-flex-row u-flex--justify l-gap-xs">
+        <div class="u-flex-row u-flex--justify u-gap-xs">
             <button
                 class="button u-flex__item--1-auto sbx-button--has-icon"
                 :disabled="selectedResultActions.delete.length === 0"
@@ -136,7 +136,7 @@ async function onAction(type: keyof typeof selectedResultActions.value): Promise
                 Request Update
             </button>
         </div>
-        <div class="u-flex-row u-flex--justify l-gap-xs">
+        <div class="u-flex-row u-flex--justify u-gap-xs">
             <button
                 class="button u-flex__item--1-auto submit sbx-button--has-icon"
                 :disabled="selectedResultActions.publish.length === 0"

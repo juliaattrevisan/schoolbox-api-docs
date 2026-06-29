@@ -25,7 +25,7 @@ function toggle(): void {
             :aria-expanded="isOpen"
             @click="toggle"
         >
-            <span class="u-flex u-flex--align-center l-gap-xs f-no-margins">
+            <span class="u-flex u-flex--align-center u-gap-xs f-no-margins">
                 <span>{{ title }}</span>
                 <span class="ib-report-section__count">{{ count }}</span>
             </span>

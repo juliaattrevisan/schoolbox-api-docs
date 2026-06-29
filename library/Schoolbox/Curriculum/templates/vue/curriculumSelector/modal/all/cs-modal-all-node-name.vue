@@ -107,7 +107,7 @@ function onNameSelected(): void {
 </script>
 
 <template>
-    <div class="l-width-100 u-flex-row u-flex--no-wrap u-flex--align-center l-gap-xs">
+    <div class="l-width-100 u-flex-row u-flex--no-wrap u-flex--align-center u-gap-xs">
         <sbx-icon v-if="!props.node.enabled" name="hidden" title="This outcome is disabled" />
         <show-matches
             v-if="isButton"

@@ -106,7 +106,7 @@ function onOpenIncludeInExistingModal(): void {
             />
         </td>
         <td>
-            <div class="u-flex-col l-gap-s">
+            <div class="u-flex-col u-gap-s">
                 <div v-if="props.participant.user.id">
                     <a :href="`/search/user/${props.participant.user.id}`">
                         {{ props.participant.user.lastname }},

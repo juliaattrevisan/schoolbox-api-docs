@@ -286,7 +286,7 @@ const searchButtonText = window.Vue.computed(() => {
                     @mouseover="arrowCounter = i"
                     @mouseleave="arrowCounter = -1"
                 >
-                    <div class="u-flex-row u-flex--align-center u-flex--no-wrap l-gap-s l-pad-s">
+                    <div class="u-flex-row u-flex--align-center u-flex--no-wrap u-gap-s l-pad-s">
                         <div class="c-img c-img--s c-img--round u-flex__item--0-shrink">
                             <div class="c-img__wrapper">
                                 <img :src="result.image" :alt="`Portrait photo of ${result.title}`" />
@@ -323,7 +323,7 @@ const searchButtonText = window.Vue.computed(() => {
                     @mouseover="arrowCounter = i + userResults.length"
                     @mouseleave="arrowCounter = -1"
                 >
-                    <div class="u-flex-row u-flex--align-center u-flex--no-wrap l-gap-s l-pad-s">
+                    <div class="u-flex-row u-flex--align-center u-flex--no-wrap u-gap-s l-pad-s">
                         <div class="c-img c-img--s u-flex__item--0-shrink">
                             <div class="c-img__wrapper">
                                 <img v-if="result.image" :src="result.image" :alt="`photo of ${result.title}`" />
@@ -344,13 +344,13 @@ const searchButtonText = window.Vue.computed(() => {
                     </div>
                 </a>
                 <div v-if="isLoading" class="c-card c-card--loading">
-                    <div class="u-flex-row l-gap-s l-pad-s">
+                    <div class="u-flex-row u-gap-s l-pad-s">
                         <div class="c-img c-img--s c-img--round">
                             <div class="c-img__wrapper">
                                 <div class="img-placeholder"></div>
                             </div>
                         </div>
-                        <div class="u-flex-col u-flex--justify-center u-flex__item--1 l-gap-s">
+                        <div class="u-flex-col u-flex--justify-center u-flex__item--1 u-gap-s">
                             <h3></h3>
                             <span></span>
                         </div>

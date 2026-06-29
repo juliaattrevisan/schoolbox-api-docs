@@ -117,7 +117,7 @@ const isSomeSubTypesSelected = window.Vue.computed(() => {
 <template>
     <li class="u-flex-col f-min-btn-height">
         <div class="u-flex-row u-flex--align-center f-min-btn-height f-no-margins">
-            <div class="u-flex u-flex--align-center l-gap-s u-flex__item--1">
+            <div class="u-flex u-flex--align-center u-gap-s u-flex__item--1">
                 <input
                     :id="props.type.value"
                     v-model="filterTypesStore.selectedTypes"
@@ -142,7 +142,7 @@ const isSomeSubTypesSelected = window.Vue.computed(() => {
         <div v-if="props.type.subTypes" class="sub-types" :style="{ 'grid-template-rows': subTypeHeight }">
             <ul>
                 <li v-for="subType in props.type.subTypes" :key="subType.value" class="f-min-btn-height">
-                    <div class="u-flex-row u-flex--align-center l-gap-s f-min-btn-height f-no-margins">
+                    <div class="u-flex-row u-flex--align-center u-gap-s f-min-btn-height f-no-margins">
                         <input
                             :id="subType.value"
                             v-model="filterTypesStore.selectedTypes"

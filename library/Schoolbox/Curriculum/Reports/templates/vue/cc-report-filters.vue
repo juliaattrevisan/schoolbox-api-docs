@@ -14,12 +14,12 @@ const isModalOpen = window.Vue.ref(false); // to open/close the exporting to csv
 </script>
 
 <template>
-    <div class="u-flex-row l-gap-l">
-        <div class="u-flex-col u-flex__item--1 l-gap-l">
+    <div class="u-flex-row u-gap-l">
+        <div class="u-flex-col u-flex__item--1 u-gap-l">
             <div class="checklist">
                 <label>Report on</label>
                 <p class="meta">Include usages linked to the selected options in the report.</p>
-                <ul class="option-list u-flex l-gap-m f-no-margins">
+                <ul class="option-list u-flex u-gap-m f-no-margins">
                     <li v-for="reportOption in filtersStore.allReportOptions" :key="reportOption.value">
                         <input
                             :id="reportOption.value"
@@ -60,7 +60,7 @@ const isModalOpen = window.Vue.ref(false); // to open/close the exporting to csv
         </div>
         <div>
             <a
-                class="u-flex-row l-gap-s f-no-bkg f-no-margins sbx-button--has-icon"
+                class="u-flex-row u-gap-s f-no-bkg f-no-margins sbx-button--has-icon"
                 aria-label="Export to CSV"
                 title="Export to CSV"
                 data-test="cc-report-filters-export-button"
@@ -72,7 +72,7 @@ const isModalOpen = window.Vue.ref(false); // to open/close the exporting to csv
         </div>
     </div>
     <basic-modal v-model:is-open="isModalOpen" :has-background-click="true">
-        <div class="u-flex-col l-gap-m f-no-margins">
+        <div class="u-flex-col u-gap-m f-no-margins">
             <h2>Export to CSV</h2>
             <p>The exported data will match the options currently selected in the report.</p>
             <ul class="flex-list buttons">

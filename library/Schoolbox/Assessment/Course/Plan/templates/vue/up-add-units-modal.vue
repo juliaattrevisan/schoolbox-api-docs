@@ -46,14 +46,14 @@ window.Vue.onMounted(() => {
 
 <template>
     <basic-modal v-model:is-open="addUnitsStore.isOpen">
-        <form class="u-flex-col l-gap-m f-no-margins" @submit.prevent="onAddSelected">
+        <form class="u-flex-col u-gap-m f-no-margins" @submit.prevent="onAddSelected">
             <h2 data-test="up-add-units-title">Create {{ locale.unit.translate(true, true) }}</h2>
-            <div class="sbx-vert-scroll-container u-flex-col l-gap-s">
-                <div class="u-flex-col l-gap-s">
+            <div class="sbx-vert-scroll-container u-flex-col u-gap-s">
+                <div class="u-flex-col u-gap-s">
                     <!-- Loop through newUnits and display label and text input for each -->
-                    <div v-for="(unit, index) in addUnitsStore.newUnits" :key="index" class="u-flex-col l-gap-xs">
+                    <div v-for="(unit, index) in addUnitsStore.newUnits" :key="index" class="u-flex-col u-gap-xs">
                         <label :for="`unit-${index}`" class="required">Name</label>
-                        <div class="u-flex l-gap-xs l-align-items-center f-no-margins">
+                        <div class="u-flex u-gap-xs l-align-items-center f-no-margins">
                             <input
                                 :id="`unit-${index}`"
                                 v-model="addUnitsStore.newUnits[index]"
@@ -95,7 +95,7 @@ window.Vue.onMounted(() => {
                 </div>
             </div>
             <request-error v-if="addUnitsStore.loadError" :further-info="addUnitsStore.loadError" />
-            <div class="u-flex l-gap-xs f-no-margins">
+            <div class="u-flex u-gap-xs f-no-margins">
                 <button
                     class="button u-flex__item--1"
                     data-test="up-add-units-cancel"

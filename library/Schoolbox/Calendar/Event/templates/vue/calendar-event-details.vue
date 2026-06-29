@@ -646,7 +646,7 @@ export default {
                                             :src="'/portrait.php?id=' + guest.id + '&size=square64'"
                                             alt="portrait photo"
                                         />
-                                        <div class="u-flex u-flex--align-center l-gap-s">
+                                        <div class="u-flex u-flex--align-center u-gap-s">
                                             <p>
                                                 {{ guest.name }}
                                             </p>

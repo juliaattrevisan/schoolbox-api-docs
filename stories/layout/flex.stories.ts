@@ -28,7 +28,7 @@ type Story = StoryObj<typeof StorybookSlot>;
 export const FlexRow: Story = {
     render: () => ({
         template: `
-<div class="story-demo-boxes u-flex-row l-gap-m">
+<div class="story-demo-boxes u-flex-row u-gap-m">
     <div class="story-demo-box u-flex u-flex--center"><span>1</span></div>
     <div class="story-demo-box u-flex u-flex--center"><span>2</span></div>
     <div class="story-demo-box u-flex u-flex--center"><span>3</span></div>
@@ -49,7 +49,7 @@ export const FlexRow: Story = {
 export const FlexCol: Story = {
     render: () => ({
         template: `
-<div class="story-demo-boxes u-flex-col l-gap-m">
+<div class="story-demo-boxes u-flex-col u-gap-m">
     <div class="story-demo-box u-flex u-flex--center"><span>1</span></div>
     <div class="story-demo-box u-flex u-flex--center"><span>2</span></div>
     <div class="story-demo-box u-flex u-flex--center"><span>3</span></div>
@@ -64,7 +64,7 @@ export const FlexCol: Story = {
 export const WrapReverse: Story = {
     render: () => ({
         template: `
-<div class="story-demo-boxes u-flex-row u-flex--wrap-reverse l-gap-m">
+<div class="story-demo-boxes u-flex-row u-flex--wrap-reverse u-gap-m">
     <div class="story-demo-box u-flex u-flex--center"><span>1</span></div>
     <div class="story-demo-box u-flex u-flex--center"><span>2</span></div>
     <div class="story-demo-box u-flex u-flex--center"><span>3</span></div>
@@ -85,7 +85,7 @@ export const WrapReverse: Story = {
 export const Center: Story = {
     render: () => ({
         template: `
-<div class="story-demo-boxes u-flex-row u-flex--center l-gap-m" style="height: 200px;">
+<div class="story-demo-boxes u-flex-row u-flex--center u-gap-m" style="height: 200px;">
     <div class="story-demo-box u-flex u-flex--center"><span>1</span></div>
     <div class="story-demo-box u-flex u-flex--center"><span>2</span></div>
     <div class="story-demo-box u-flex u-flex--center"><span>3</span></div>
@@ -100,7 +100,7 @@ export const Center: Story = {
 export const AlignCenter: Story = {
     render: () => ({
         template: `
-<div class="story-demo-boxes u-flex-row u-flex--align-center l-gap-m" style="height: 200px;">
+<div class="story-demo-boxes u-flex-row u-flex--align-center u-gap-m" style="height: 200px;">
     <div class="story-demo-box u-flex u-flex--center"><span>1</span></div>
     <div class="story-demo-box u-flex u-flex--center"><span>2</span></div>
     <div class="story-demo-box u-flex u-flex--center"><span>3</span></div>
@@ -115,7 +115,7 @@ export const AlignCenter: Story = {
 export const JustifyCenter: Story = {
     render: () => ({
         template: `
-<div class="story-demo-boxes u-flex-row u-flex--justify-center l-gap-m">
+<div class="story-demo-boxes u-flex-row u-flex--justify-center u-gap-m">
     <div class="story-demo-box u-flex u-flex--center"><span>1</span></div>
     <div class="story-demo-box u-flex u-flex--center"><span>2</span></div>
     <div class="story-demo-box u-flex u-flex--center"><span>3</span></div>
@@ -130,7 +130,7 @@ export const JustifyCenter: Story = {
 export const JustifyEnd: Story = {
     render: () => ({
         template: `
-<div class="story-demo-boxes u-flex-row u-flex--justify-end l-gap-m">
+<div class="story-demo-boxes u-flex-row u-flex--justify-end u-gap-m">
     <div class="story-demo-box u-flex u-flex--center"><span>1</span></div>
     <div class="story-demo-box u-flex u-flex--center"><span>2</span></div>
     <div class="story-demo-box u-flex u-flex--center"><span>3</span></div>
@@ -145,7 +145,7 @@ export const JustifyEnd: Story = {
 export const JustifySpace: Story = {
     render: () => ({
         template: `
-<div class="story-demo-boxes u-flex-row u-flex--justify-space l-gap-m">
+<div class="story-demo-boxes u-flex-row u-flex--justify-space u-gap-m">
     <div class="story-demo-box u-flex u-flex--center"><span>1</span></div>
     <div class="story-demo-box u-flex u-flex--center"><span>2</span></div>
     <div class="story-demo-box u-flex u-flex--center"><span>3</span></div>
@@ -162,7 +162,7 @@ export const JustifySpace: Story = {
 export const FlexItem: Story = {
     render: () => ({
         template: `
-<div class="story-demo-boxes u-flex-row l-gap-m">
+<div class="story-demo-boxes u-flex-row u-gap-m">
     <div class="story-demo-box u-flex u-flex--center"><span>1</span></div>
     <div class="story-demo-box u-flex u-flex--center u-flex__item--1"><span>2</span></div>
     <div class="story-demo-box u-flex u-flex--center"><span>3</span></div>

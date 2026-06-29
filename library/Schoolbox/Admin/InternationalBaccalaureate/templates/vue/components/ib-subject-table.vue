@@ -682,7 +682,7 @@ async function saveSubjectConfiguration(): Promise<void> {
                             <tr>
                                 <td>{{ row.subject }}</td>
                                 <td>
-                                    <div class="u-flex l-gap-xs">
+                                    <div class="u-flex u-gap-xs">
                                         <input
                                             type="text"
                                             :value="getLanguageDisplayText(row)"
@@ -724,7 +724,7 @@ async function saveSubjectConfiguration(): Promise<void> {
                             <tr>
                                 <td>{{ row.subject }}</td>
                                 <td>
-                                    <div class="u-flex l-gap-xs">
+                                    <div class="u-flex u-gap-xs">
                                         <input
                                             type="text"
                                             :value="getLanguageDisplayText(row)"
@@ -776,7 +776,7 @@ async function saveSubjectConfiguration(): Promise<void> {
                                 </td>
                                 <td>{{ row.level }}</td>
                                 <td>
-                                    <div v-if="!row.isLanguageRow" class="u-flex l-gap-xs">
+                                    <div v-if="!row.isLanguageRow" class="u-flex u-gap-xs">
                                         <input
                                             type="text"
                                             :value="getLanguageDisplayText(row)"
@@ -801,7 +801,7 @@ async function saveSubjectConfiguration(): Promise<void> {
                                     </span>
                                 </td>
                                 <td>
-                                    <div v-if="row.isLanguageRow || row.languages.length <= 1" class="u-flex l-gap-xs">
+                                    <div v-if="row.isLanguageRow || row.languages.length <= 1" class="u-flex u-gap-xs">
                                         <input
                                             type="text"
                                             :value="getClassCodeDisplayText(row)"

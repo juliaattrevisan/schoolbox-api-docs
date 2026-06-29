@@ -40,7 +40,7 @@ const hasVisibleContent = window.Vue.computed(() => {
         :is="props.page === 'settings' ? PwaMenuPanelSettings : PwaMenuPanelSidebar"
         :has-visible-content="hasVisibleContent"
     >
-        <div class="u-flex-col l-gap-m f-no-margins">
+        <div class="u-flex-col u-gap-m f-no-margins">
             <pwa-menu-install
                 ref="pwaMenuInstallRef"
                 :page="props.page"

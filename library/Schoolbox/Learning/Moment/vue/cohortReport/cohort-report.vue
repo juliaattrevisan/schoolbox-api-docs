@@ -44,7 +44,7 @@ const isSingleColumn = window.Vue.computed(() => containerWidth.value < SINGLE_C
     <div class="row columns">
         <div
             ref="cohortReportRef"
-            class="cohort-report small-12 l-grid l-gap-xl"
+            class="cohort-report small-12 l-grid u-gap-xl"
             :class="{ 'cohort-report--single-column': isSingleColumn }"
         >
             <cr-filters

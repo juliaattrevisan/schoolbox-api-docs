@@ -443,7 +443,7 @@ window.Vue.watch(modifySelected, (newSelected) => {
         <template v-if="currentAction === ActionType.ADD">
             <h2>Add oAuth Client</h2>
             <div v-if="saveError" class="alert-box alert">{{ saveError }}</div>
-            <div class="u-flex-col l-gap-m">
+            <div class="u-flex-col u-gap-m">
                 <div class="f-no-margins">
                     <label for="addClient-name" class="required">Name</label>
                     <p class="meta">
@@ -528,7 +528,7 @@ window.Vue.watch(modifySelected, (newSelected) => {
         <template v-else-if="currentAction === ActionType.MODIFY">
             <h2>Modify oAuth Client</h2>
             <div v-if="saveError" class="alert-box alert">{{ saveError }}</div>
-            <div class="u-flex-col l-gap-m">
+            <div class="u-flex-col u-gap-m">
                 <div class="f-no-margins">
                     <label for="modifyItem-name" class="required">Name</label>
                     <p class="meta">

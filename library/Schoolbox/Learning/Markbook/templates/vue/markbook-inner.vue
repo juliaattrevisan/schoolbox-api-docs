@@ -110,7 +110,7 @@ const exportReportRoute = window.Vue.computed(() => {
 </script>
 
 <template>
-    <div class="u-flex u-flex-row u-flex--align-end u-flex--justify-end l-gap-m">
+    <div class="u-flex u-flex-row u-flex--align-end u-flex--justify-end u-gap-m">
         <div class="legend">
             <div class="indicators">
                 <p class="meta"><span class="legend-indicator indicator-none"></span>Unmarked</p>

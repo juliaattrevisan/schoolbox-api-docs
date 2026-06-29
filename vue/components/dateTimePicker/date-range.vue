@@ -127,7 +127,7 @@ defineExpose({ clearInvalidDates });
 </script>
 
 <template>
-    <div class="u-flex-row u-flex--no-wrap l-gap-m">
+    <div class="u-flex-row u-flex--no-wrap u-gap-m">
         <div class="u-flex-col u-flex__item--1">
             <label :for="`${props.idPrefix}-start-date-input`">{{ props.labelStart }}</label>
             <input

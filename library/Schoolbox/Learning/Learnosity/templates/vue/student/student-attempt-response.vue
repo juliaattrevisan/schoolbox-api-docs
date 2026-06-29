@@ -39,7 +39,7 @@ function onAttemptCommentUpdated(comment: string): void {
 
 <template>
     <div class="c-island l-pad-m">
-        <div class="u-flex-row l-gap-m">
+        <div class="u-flex-row u-gap-m">
             <student-attempt-response-mark
                 :student="props.student"
                 :is-read-only="props.isReadOnly"

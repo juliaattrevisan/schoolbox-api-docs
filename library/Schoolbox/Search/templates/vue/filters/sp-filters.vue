@@ -93,7 +93,7 @@ window.Vue.watch(
 
 <template>
     <form
-        class="u-flex-col l-gap-s u-flex__item--0-shrink f-no-margins"
+        class="u-flex-col u-gap-s u-flex__item--0-shrink f-no-margins"
         role="search"
         aria-label="Sitewide"
         @submit.prevent="onSearch"
@@ -107,7 +107,7 @@ window.Vue.watch(
                 @click="onSearch"
             />
         </div>
-        <div :class="`c-island filters u-flex-col  ${isOpen ? 'l-gap-m' : ''} l-pad-m`">
+        <div :class="`c-island filters u-flex-col  ${isOpen ? 'u-gap-m' : ''} l-pad-m`">
             <button
                 v-if="store.isSingleColumn"
                 :class="`filters__toggle-button ${isOpen ? 'icon-up-arrow' : 'icon-down-arrow'}`"
@@ -116,11 +116,11 @@ window.Vue.watch(
                 {{ titleText }}
             </button>
             <div class="filters__container" :style="{ 'grid-template-rows': containerHeight }">
-                <div class="filters__inner-container u-flex-col l-gap-m">
+                <div class="filters__inner-container u-flex-col u-gap-m">
                     <sp-filter-date-range />
                     <sp-filter-creator />
                     <sp-filter-types />
-                    <div class="u-flex-row u-flex--no-wrap l-gap-m">
+                    <div class="u-flex-row u-flex--no-wrap u-gap-m">
                         <button
                             class="button u-flex__item--1 icon-close f-no-margins"
                             data-test="sp-filter-clear-button"

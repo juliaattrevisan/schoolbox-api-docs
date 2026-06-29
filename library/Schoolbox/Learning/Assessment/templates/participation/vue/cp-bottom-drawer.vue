@@ -62,7 +62,7 @@ function clearSelection(): void {
             <em>{{ selectedList.length }} selected</em>
         </h3>
         <button class="button-clear" @click.prevent="clearSelection">Clear selection</button>
-        <div class="u-flex-row u-flex--justify l-gap-xs">
+        <div class="u-flex-row u-flex--justify u-gap-xs">
             <template v-if="hasCustomisedInSelection">
                 <button
                     class="icon-close button u-flex__item--1-auto"
