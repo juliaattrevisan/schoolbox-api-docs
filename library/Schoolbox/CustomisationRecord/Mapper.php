@@ -76,12 +76,13 @@ class Mapper extends BaseMapper
                 $participation = $collection[$participant->getId()];
                 /** @var \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model|\Schoolbox\Resource\Folder\Model|null $assessmentContext */
                 $assessmentContext = $participation->getPlan()->getAssessment()->getAssessmentContext();
-                /* Hydrate the folder for the assessment context if it is a unit implementation, otherwise use the context folder from the assessment
+                /* Attempt to grab the folder from the assessment context, if it is a unit then grab the course folder,
+                 * otherwise grab the assessment context folder
                  */
                 if ($assessmentContext instanceof \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model) {
-                    $folder = $assessmentContext?->getCourse()->getFolder() ?? $participation->getPlan()->getAssessment()->getContextFolder();
+                    $folder = $assessmentContext->getCourse()->getFolder();
                 } else {
-                    $folder = $assessmentContext;
+                    $folder = $assessmentContext ?? $participation->getPlan()->getAssessment()->getContextFolder();
                 }
                 /* Append folder code
                  */
