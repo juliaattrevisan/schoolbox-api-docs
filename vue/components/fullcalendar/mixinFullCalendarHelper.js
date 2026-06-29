@@ -9,6 +9,8 @@ const RELATED_EVENT_ACTIVE_CLASS = "sbx-related-events-active";
 const RELATED_EVENT_MATCH_CLASS = "sbx-related-event-match";
 const RELATED_EVENT_MUTED_CLASS = "sbx-related-event-muted";
 const RELATED_EVENT_RELATION_ATTRIBUTE = "data-calendar-event-relation";
+const EVENT_FETCH_DAYS_BEFORE_VISIBLE_RANGE = 30;
+const EVENT_FETCH_DAYS_AFTER_VISIBLE_RANGE = 100;
 
 export default {
     methods: {
@@ -168,6 +170,45 @@ export default {
          */
         fullCalendarHelper_isEOTC(event) {
             return event?.extendedProps?.data?.custom?.isEOTC === true;
+        },
+
+        /**
+         * Expand a visible FullCalendar range before requesting events.
+         *
+         * @param {{ start: Date, end: Date }} range
+         * @return {{ start: Date, end: Date }}
+         */
+        fullCalendarHelper_expandEventFetchRange(range) {
+            const start = new Date(range.start);
+            start.setDate(start.getDate() - EVENT_FETCH_DAYS_BEFORE_VISIBLE_RANGE);
+
+            const end = new Date(range.end);
+            end.setDate(end.getDate() + EVENT_FETCH_DAYS_AFTER_VISIBLE_RANGE);
+
+            return {
+                ...range,
+                start,
+                end,
+            };
+        },
+
+        /**
+         * Determine whether an event overlaps a FullCalendar fetch range.
+         *
+         * @param {{ start: string|Date, end?: string|Date }} event
+         * @param {{ start: Date, end: Date }} range
+         * @return {boolean}
+         */
+        fullCalendarHelper_eventOverlapsFetchRange(event, range) {
+            const eventStart = new Date(event.start).getTime();
+            const rangeStart = range.start.getTime();
+            const rangeEnd = range.end.getTime();
+
+            if (!event.end) {
+                return eventStart >= rangeStart && eventStart < rangeEnd;
+            }
+
+            return new Date(event.end).getTime() > rangeStart && eventStart < rangeEnd;
         },
 
         /**
