@@ -79,6 +79,8 @@
 
     async function approveResourceBookingFromReport(action)
     {
+        // Activate the toast immediately so the click gives feedback while the request is in flight.
+        const toast = window.sbProps.toastActivate("Approving booking...");
         const data = new URLSearchParams({
             efficacy: false
         });
@@ -99,14 +101,14 @@
             }
 
             const responseData = await response.json().catch(() => ({}));
-            showResourceBookingReportApprovalFailure(responseData);
+            showResourceBookingReportApprovalFailure(toast, responseData);
         } catch (error) {
             console.error(error);
-            showResourceBookingReportApprovalFailure({});
+            showResourceBookingReportApprovalFailure(toast, {});
         }
     }
 
-    function showResourceBookingReportApprovalFailure(responseData)
+    function showResourceBookingReportApprovalFailure(toast, responseData)
     {
         const periodErrors = Object.values(responseData?.errors?.start_period_errors ?? {});
         const capacityExceeded = periodErrors.some(
@@ -116,7 +118,7 @@
             ? "Failed to approve, capacity exceeded."
             : "Failed to approve booking.";
 
-        window.sbProps.toastActivate(message).timeout({
+        toast.timeout({
             text: message,
             isSuccess: false
         });
