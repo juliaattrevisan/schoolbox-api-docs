@@ -202,12 +202,7 @@ window.Vue.onMounted(() => {
                         {{ scheme.name }}
                     </option>
                 </select>
-                <button
-                    type="button"
-                    class="button"
-                    :data-reveal-id="`${idPrefix}gradeScale`"
-                    @click="isGradeScaleModalOpen = true"
-                >
+                <button type="button" class="button" @click="isGradeScaleModalOpen = true">
                     Show {{ locale.grades.proper() }} Scale
                 </button>
             </div>
