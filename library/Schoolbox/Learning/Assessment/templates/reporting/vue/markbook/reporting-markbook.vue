@@ -73,7 +73,7 @@ window.Vue.onMounted(async () => {
 
         <!-- Status filters -->
         <!-- TODO: implement filters (out of scope for now according to SA-22474's AC) -->
-        <!-- <div class="small-12 large-8 columns text-right">
+        <!-- <div class="small-12 large-8 columns u-align-right">
             <rmb-filters v-model:filters="filters" />
         </div> -->
     </div>

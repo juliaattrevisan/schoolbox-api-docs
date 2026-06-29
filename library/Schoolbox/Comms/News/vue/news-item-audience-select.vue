@@ -772,7 +772,7 @@ export default {
         <template v-if="!audienceIsReadOnly">
             <div data-reveal id="audience-browse" class="reveal-modal no-pad">
                 <template v-if="canCreateComplex">
-                    <dl class="tabs text-center" role="list">
+                    <dl class="tabs u-align-center" role="list">
                         <dd :class="{ active: pageShow.index || pageShow.valueSelect }">
                             <a @click="showPage('index')">Select Audience</a>
                         </dd>

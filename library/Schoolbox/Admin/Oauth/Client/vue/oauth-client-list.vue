@@ -386,7 +386,7 @@ window.Vue.watch(modifySelected, (newSelected) => {
                             <th>Redirect URI</th>
                             <th>Client ID</th>
                             <th>Client Credentials User</th>
-                            <th class="text-right">Actions</th>
+                            <th class="u-align-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody>

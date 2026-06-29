@@ -1,10 +1,10 @@
 {% if dataset|length == 2 and dataset|keys == ['old','new'] %}
     <div class="row">
-        <div class="small-5 column text-right">
+        <div class="small-5 column u-align-right">
             {%- include '@upsRuleset/log/visible-value.twig' with { value: dataset['old'] } -%}
         </div>
-        <div class="small-2 column text-center">&rarr;</div>
-        <div class="small-5 column text-left">
+        <div class="small-2 column u-align-center">&rarr;</div>
+        <div class="small-5 column u-align-left">
             {%- include '@upsRuleset/log/visible-value.twig' with { value: dataset['new'] } -%}
         </div>
     </div>

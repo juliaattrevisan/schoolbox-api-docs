@@ -93,7 +93,7 @@
         {% if assessment.isFeedbackVisibleToUser(USER) and participant and assessment.humanReadableMark(participant, true) is not null %}
             <h2 class="subheader">{{ locale.project }} {{ locale.grades }}</h2>
             <section>
-                <div class="grade {{ urgency.marks(assessment.normalisedMark(participant, true)) }}-bg text-center">
+                <div class="grade {{ urgency.marks(assessment.normalisedMark(participant, true)) }}-bg u-align-center">
                     <span>{{ participant.humanReadableMark(true) }}</span>
                 </div>
             </section>

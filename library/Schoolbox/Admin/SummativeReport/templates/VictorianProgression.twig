@@ -142,7 +142,7 @@
 
                 {% for i in payload.levels %}
                     {# Check current year; smear it yellow if i matches student year level #}
-                    <th colspan="2" class="text-center {% if i == payload.student.currentYearLevel %}yellow{% endif %}">
+                    <th colspan="2" class="u-align-center {% if i == payload.student.currentYearLevel %}yellow{% endif %}">
                         Level {{ i }}
                     </th>
                 {% endfor %}
