@@ -91,37 +91,38 @@
                 body: data.toString(),
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-                    "X-Requested-With": "XMLHttpRequest"
+                    "X-Requested-With": "XMLHttpRequest",
+                    Accept: "application/json"
                 }
             });
 
-            if (response.ok) {
-                window.location.reload();
+            if (!response.ok) {
+                let responseData = {};
+                try {
+                    responseData = await response.json();
+                } catch (error) {
+                    console.error(error);
+                }
+                const periodErrors = Object.values(responseData?.errors?.start_period_errors ?? {});
+                const capacityExceeded = periodErrors.some(
+                    (errors) => Array.isArray(errors) && errors.includes("conflict")
+                );
+                toast.timeout({
+                    text:
+                        responseData?.message ||
+                        (capacityExceeded
+                            ? "Unable to approve booking. This booking would exceed the resource's concurrent booking capacity."
+                            : "Unable to approve booking."),
+                    isSuccess: false
+                });
                 return;
             }
 
-            const responseData = await response.json().catch(() => ({}));
-            showResourceBookingReportApprovalFailure(toast, responseData);
+            window.location.reload();
         } catch (error) {
             console.error(error);
-            showResourceBookingReportApprovalFailure(toast, {});
+            toast.timeout({ text: "Unable to approve booking.", isSuccess: false });
         }
-    }
-
-    function showResourceBookingReportApprovalFailure(toast, responseData)
-    {
-        const periodErrors = Object.values(responseData?.errors?.start_period_errors ?? {});
-        const capacityExceeded = periodErrors.some(
-            (errors) => Array.isArray(errors) && errors.includes("conflict")
-        );
-        const message = capacityExceeded
-            ? "Failed to approve, capacity exceeded."
-            : "Failed to approve booking.";
-
-        toast.timeout({
-            text: message,
-            isSuccess: false
-        });
     }
 </script>
 <!-- END custom_head -->
