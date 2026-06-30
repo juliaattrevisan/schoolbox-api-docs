@@ -206,6 +206,98 @@ XML);
     }
 
 
+    public function testSocsCalendarFeedFailureReturnsEmptyCollection(): void
+    {
+        $campus = (new Campus())->setId(11)->setName('Seniors');
+        $user = (new User())->setCampusCollection(new GenericCollection(Campus::class, [$campus]));
+
+        $campusMapper = $this->createMock(CampusMapper::class);
+        $campusMapper->expects($this->once())->method('findAll')->willReturn(new GenericCollection(Campus::class, [$campus]));
+
+        $eventTypeMapper = $this->createMock(EventTypeMapper::class);
+        $eventTypeMapper->expects($this->never())->method('findFirstMeaningfulId');
+
+        $source = new Calendar_Api_EventType_Event_Socs_Default(
+            123,
+            $user,
+            new User(),
+            new ArrayLoader([
+                ConfigMapper::NAME_SOCS_ENABLED => true,
+                ConfigMapper::NAME_SOCS_IMPORT_CALENDAR_EVENTS => true,
+                ConfigMapper::NAME_SOCS_ENDPOINT_HOST => 'https://socs.example.test',
+                ConfigMapper::NAME_SOCS_ENDPOINT_ID => 'school',
+                ConfigMapper::NAME_SOCS_ENDPOINT_TOKEN => 'token',
+                ConfigMapper::NAME_SOCS_CALENDAR_DEFAULT_EVENT_TYPE => 1,
+            ]),
+            $eventTypeMapper,
+            $campusMapper,
+            new class extends HttpClient {
+                public function __construct()
+                {
+                }
+
+                public function getCached(string $path, array $query): \SimpleXMLElement
+                {
+                    throw new \RuntimeException('Bad SOCS config');
+                }
+            },
+            [[
+                'eventTypeID' => 1,
+                'eventType' => 'SOCS',
+                'eventColour' => '#9ad39b',
+            ]],
+        );
+
+        $events = $source->getEvents(strtotime('2026-06-18 00:00:00'), strtotime('2026-06-19 00:00:00'));
+
+        self::assertCount(0, $events);
+    }
+
+    public function testSocsMusicFeedFailureReturnsEmptyCollection(): void
+    {
+        $eventTypeMapper = $this->createMock(EventTypeMapper::class);
+        $eventTypeMapper->expects($this->never())->method('findFirstMeaningfulId');
+
+        $userMapper = $this->createMock(UserMapper::class);
+        $userMapper->expects($this->never())->method('findByExternalId');
+
+        $source = new Calendar_Api_EventType_Event_SocsMusic_Default(
+            456,
+            $this->createUser(91, 'STUDENT-9', 'Jill', 'Student'),
+            new User(),
+            new ArrayLoader([
+                ConfigMapper::NAME_SOCS_ENABLED => true,
+                ConfigMapper::NAME_SOCS_IMPORT_MUSIC_LESSONS => true,
+                ConfigMapper::NAME_SOCS_ENDPOINT_HOST => 'https://socs.example.test',
+                ConfigMapper::NAME_SOCS_ENDPOINT_ID => 'school',
+                ConfigMapper::NAME_SOCS_ENDPOINT_TOKEN => 'token',
+                ConfigMapper::NAME_SOCS_MUSIC_LESSONS_DEFAULT_EVENT_TYPE => 1,
+            ]),
+            $eventTypeMapper,
+            new class extends HttpClient {
+                public function __construct()
+                {
+                }
+
+                public function getCached(string $path, array $query): \SimpleXMLElement
+                {
+                    throw new \RuntimeException('Bad SOCS config');
+                }
+            },
+            $userMapper,
+            [[
+                'eventTypeID' => 1,
+                'eventType' => 'SOCS Music',
+                'eventColour' => '#9ad39b',
+            ]],
+        );
+
+        $events = $source->getEvents(strtotime('2026-05-19 00:00:00'), strtotime('2026-05-20 00:00:00'));
+
+        self::assertCount(0, $events);
+    }
+
+
     public function testEventsAreCampusFilterable(): void
     {
         $seniorCampus = (new Campus())->setId(11)->setName('Seniors (Y7-Y11)');

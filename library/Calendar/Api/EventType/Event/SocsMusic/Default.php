@@ -90,7 +90,13 @@ class Calendar_Api_EventType_Event_SocsMusic_Default extends Calendar_Api_EventT
             return $collection;
         }
 
-        foreach ($this->readLessons() as $lesson) {
+        try {
+            $lessons = $this->readLessons();
+        } catch (\JsonException | \RuntimeException | \Sabre\VObject\ParseException $e) {
+            return $collection;
+        }
+
+        foreach ($lessons as $lesson) {
             if (!$filterFunction($lesson)) {
                 continue;
             }

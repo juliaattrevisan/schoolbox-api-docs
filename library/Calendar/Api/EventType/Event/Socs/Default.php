@@ -106,7 +106,13 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
         $allCampuses = $this->campusMapper->findAll();
         $matcher = new CampusMatcher();
 
-        foreach ($this->readEvents($startTimestamp, $endTimestamp) as $sourceEvent) {
+        try {
+            $sourceEvents = $this->readEvents($startTimestamp, $endTimestamp);
+        } catch (\JsonException | \RuntimeException | \Sabre\VObject\ParseException $e) {
+            return $collection;
+        }
+
+        foreach ($sourceEvents as $sourceEvent) {
             if (!$filterFunction($sourceEvent)) {
                 continue;
             }
