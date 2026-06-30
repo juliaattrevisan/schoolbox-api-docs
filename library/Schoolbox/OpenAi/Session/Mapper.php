@@ -154,9 +154,9 @@ class Mapper extends BaseMapper
     /**
      * Fetch a page of sessions with logs for the admin usage log, newest first.
      *
-     * The logFormat and returnCode values are derived from each session's first viewable log, ordered by earliest
-     * created_at and then id. This is a summary hint for the admin list, not a guarantee that every log in the session
-     * has this format. The error flag is derived from all logs in the session.
+     * The log format is derived from each session's first viewable log, ordered by earliest created_at and then id.
+     * This is a summary hint for the admin list, not a guarantee that every log in the session has this format.
+     * The error flag is derived from all logs in the session.
      *
      * @param string|null               $keyword This filters sessions to those with at least one log whose prompt or
      *                                           response contains this text.
@@ -184,14 +184,15 @@ class Mapper extends BaseMapper
         ?int $limit = 100,
         ?int $offset = 0
     ): GenericCollection {
-        [$where, $params] = $this->buildSessionFilter($keyword, $feature, $user, $start, $end, $moderationStatuses);
+        [$where, $params] = $this->buildSessionFilter($keyword, $feature, $user, $start, $end, $moderationStatuses, true);
 
         $limitSql  = null !== $limit ? 'LIMIT :limit' : '';
         $offsetSql = null !== $limit && null !== $offset ? 'OFFSET :offset' : '';
 
-        /* Notes
-         * - Requiring anyLog here keeps orphan sessions off the admin list. The details button is controlled by
-         *   firstViewableLog, because a session's first raw log may not have a format the admin UI can render.
+        /* Notes:
+         * - Passing requireSessionLog to buildSessionFilter() keeps orphan sessions off the admin list.
+         * - The details button is controlled by derived_log_format, because a session's first raw log may not have a
+         *   format the admin UI can render.
          * - derived_log_format is used to determine whether any log in the session is renderable (since rendering
          *   requires a known log format - see aul-agent-chat.vue).  This usage makes sense, although the name does
          *   not imply this usage.
@@ -204,33 +205,9 @@ class Mapper extends BaseMapper
                 `{$this->table}`.id AS id,
                 `{$this->table}`.feature AS feature,
                 `{$this->table}`.created_at AS created_at,
-                firstViewableLog.log_format AS derived_log_format,
-                EXISTS (
-                    SELECT 1 FROM `ai_session_log` errorLog
-                    WHERE errorLog.ai_session_id = `{$this->table}`.id
-                    AND (
-                        (
-                            errorLog.return_code IS NOT NULL
-                            AND errorLog.return_code <> :successfulReturnCode
-                        )
-                        OR errorLog.error_message IS NOT NULL
-                    )
-                ) AS derived_has_error,
                 {$this->getJoinColumnString('user', 'u')}
             FROM `{$this->table}`
             LEFT JOIN {$this->getJoinSql('user', '', 'u', true)}
-            JOIN `ai_session_log` anyLog ON anyLog.id = (
-                SELECT id FROM `ai_session_log`
-                WHERE ai_session_id = `{$this->table}`.id
-                LIMIT 1
-            )
-            LEFT JOIN `ai_session_log` firstViewableLog ON firstViewableLog.id = (
-                SELECT id FROM `ai_session_log`
-                WHERE ai_session_id = `{$this->table}`.id
-                AND log_format IS NOT NULL
-                ORDER BY created_at ASC, id ASC
-                LIMIT 1
-            )
             {$where}
             ORDER BY `{$this->table}`.created_at DESC
             {$limitSql}
@@ -241,7 +218,6 @@ class Mapper extends BaseMapper
         foreach ($params as $name => $value) {
             $statement->bindValue($name, $value);
         }
-        $statement->bindValue('successfulReturnCode', self::HTTP_STATUS_CODE_OK, \PDO::PARAM_INT);
         if (null !== $limit) {
             $statement->bindValue('limit', $limit, \PDO::PARAM_INT);
         }
@@ -252,11 +228,16 @@ class Mapper extends BaseMapper
 
         $collection = $this->createCollection();
         $userMapper = $this->getJoinMapper('user');
+        $sessionRows = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        $sessionLogRowsBySessionId = $this->getSessionLogRowsBySessionId(
+            array_column($sessionRows, 'id')
+        );
 
-        foreach ($statement as $row) {
+        foreach ($sessionRows as $row) {
+            $summary = $this->summariseSessionLogRows($sessionLogRowsBySessionId[$row['id']] ?? []);
             $session = $this->hydrate($row)
-                ->setDerivedLogFormat($row['derived_log_format'] ?? null)
-                ->setDerivedHasError((bool)$row['derived_has_error']);
+                ->setDerivedLogFormat($summary['derived_log_format'])
+                ->setDerivedHasError($summary['derived_has_error']);
 
             /** @var \Schoolbox\User|null $sessionUser */
             $sessionUser = $userMapper->hydrate($row, 'u');
@@ -268,6 +249,86 @@ class Mapper extends BaseMapper
         }
 
         return $collection;
+    }
+
+    /**
+     * Fetch summary-relevant log rows for the supplied session IDs, indexed by ai_session_log.ai_session_id.
+     *
+     * @param string[] $sessionIds
+     * @return array<string, list<array{id: int|string, ai_session_id: string, created_at: string, log_format: string|null, return_code: int|null, error_message: string|null}>>
+     */
+    public function getSessionLogRowsBySessionId(array $sessionIds): array
+    {
+        $sessionIds = array_values(array_unique($sessionIds));
+
+        if (!$sessionIds) {
+            return [];
+        }
+
+        $sessionLogRowsBySessionId = array_fill_keys($sessionIds, []);
+        $statement = $this->getDatabase()->prepare(
+            'SELECT
+                id,
+                ai_session_id,
+                created_at,
+                log_format,
+                return_code,
+                error_message
+            FROM `ai_session_log`
+            WHERE ai_session_id IN ' . Builder::getArrayPlaceholders($sessionIds, 'session_id') . '
+            ORDER BY ai_session_id ASC, created_at ASC, id ASC'
+        );
+
+        foreach (Builder::getArrayParameters($sessionIds, 'session_id') as $name => $value) {
+            $statement->bindValue($name, $value);
+        }
+        $statement->execute();
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $sessionLogRowsBySessionId[$row['ai_session_id']][] = $row;
+        }
+
+        return $sessionLogRowsBySessionId;
+    }
+
+    /**
+     * Summarise session log rows into the derived fields used by the admin usage list.
+     *
+     * @param array<int, array{id?: int|string, created_at?: string, log_format?: string|null, return_code?: int|null, error_message?: string|null}> $sessionLogRows
+     * @return array{derived_log_format: string|null, derived_has_error: bool}
+     */
+    public function summariseSessionLogRows(array $sessionLogRows): array
+    {
+        usort($sessionLogRows, static function (array $a, array $b): int {
+            return [
+                $a['created_at'] ?? '',
+                (int)($a['id'] ?? 0),
+            ] <=> [
+                $b['created_at'] ?? '',
+                (int)($b['id'] ?? 0),
+            ];
+        });
+
+        $summary = [
+            'derived_log_format' => null,
+            'derived_has_error' => false,
+        ];
+
+        foreach ($sessionLogRows as $row) {
+            if (null === $summary['derived_log_format'] && null !== ($row['log_format'] ?? null)) {
+                $summary['derived_log_format'] = $row['log_format'];
+            }
+
+            $returnCode = $row['return_code'] ?? null;
+            if (
+                null !== ($row['error_message'] ?? null)
+                || (null !== $returnCode && self::HTTP_STATUS_CODE_OK !== (int)$returnCode)
+            ) {
+                $summary['derived_has_error'] = true;
+            }
+        }
+
+        return $summary;
     }
 
     /**
