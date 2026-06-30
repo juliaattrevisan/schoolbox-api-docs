@@ -392,16 +392,29 @@ class Controller extends Base
         }
     }
 
+    /**
+     * Returns the number of future approved booking spans that exceed the item's capacity.
+     *
+     * @param Model $item Resource booking item being saved.
+     * @return int Number of over-capacity spans created by approved bookings.
+     */
     protected function getApprovedCapacityConflictCount(Model $item): int
     {
         $periodsByResourceId = $this->bookingMapper->getPeriodsOfFutureApprovedBookingsByResourceId([$item->getId()]);
 
-        return (new CapacityAllocation())->approvedPeriodConflictCount(
+        return (new CapacityAllocation())->countTimeSpansExceedingCapacity(
             $item,
             $periodsByResourceId[$item->getId()] ?? []
         );
     }
 
+    /**
+     * Appends a warning toast query string to the redirect URL after reducing capacity.
+     *
+     * @param string $url Redirect URL to decorate.
+     * @param int $conflictCount Number of approved booking conflicts to show.
+     * @return string Redirect URL with warning toast parameters appended.
+     */
     protected function appendReducedCapacityWarningToast(string $url, int $conflictCount): string
     {
         return $url

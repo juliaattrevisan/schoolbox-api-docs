@@ -168,17 +168,31 @@ class CapacityAllocation
      */
     public function approvedPeriodsExceedCapacity(ResourceModel $resource, array $approvedPeriods): bool
     {
-        return $this->approvedPeriodConflictCount($resource, $approvedPeriods) > 0;
+        return $this->countTimeSpansExceedingCapacity($resource, $approvedPeriods) > 0;
     }
 
     /**
-     * Returns the number of over-capacity spans created by approved allocation periods.
+     * Returns the number of over-capacity time spans created by approved allocation periods.
+     *
+     * For example, with resource capacity 2:
+     *
+     * $periods = [
+     *     ['startDatetime' => '09:00', 'endDatetime' => '10:00', 'quantity' => 1],
+     *     ['startDatetime' => '09:30', 'endDatetime' => '10:30', 'quantity' => 1],
+     *     ['startDatetime' => '09:45', 'endDatetime' => '10:15', 'quantity' => 1],
+     *     ['startDatetime' => '10:45', 'endDatetime' => '11:15', 'quantity' => 2],
+     *     ['startDatetime' => '11:00', 'endDatetime' => '11:30', 'quantity' => 1],
+     * ];
+     *
+     * The first three periods exceed capacity from 09:45-10:00, which counts as one
+     * span. The last two periods exceed capacity from 11:00-11:15, which counts as a
+     * second span. The return value is therefore 2.
      *
      * @param ResourceModel $resource Resource whose capacity is being checked.
      * @param array<int, array{startDatetime: Alaress_Date_Format, endDatetime: Alaress_Date_Format, quantity?: int}> $approvedPeriods Existing periods to count against capacity.
      * @return int Number of time spans where approved allocations exceed resource capacity.
      */
-    public function approvedPeriodConflictCount(ResourceModel $resource, array $approvedPeriods): int
+    public function countTimeSpansExceedingCapacity(ResourceModel $resource, array $approvedPeriods): int
     {
         $periods = [];
         foreach ($approvedPeriods as $period) {
@@ -189,7 +203,7 @@ class CapacityAllocation
             ];
         }
 
-        return $this->capacityConflictSpanCount($resource, $periods);
+        return $this->countTimeSpansExceedingCapacityFromPeriods($resource, $periods);
     }
 
     /**
@@ -218,45 +232,20 @@ class CapacityAllocation
             "quantity" => $candidateQuantity,
         ]];
 
-        return $this->periodsExceedCapacity($resource, array_merge($periods, $existingPeriods));
+        return $this->countTimeSpansExceedingCapacityFromPeriods(
+            $resource,
+            array_merge($periods, $existingPeriods)
+        ) > 0;
     }
 
     /**
-     * @param ResourceModel $resource Resource whose capacity is being checked.
-     * @param array<int, array{start: DateTimeInterface|Alaress_Date_Format, end: DateTimeInterface|Alaress_Date_Format, quantity?: int}> $periods Existing periods to count against capacity.
-     * @return bool True when allocation exceeds resource capacity at any point.
-     */
-    private function periodsExceedCapacity(ResourceModel $resource, array $periods): bool
-    {
-        $capacity = max(1, $resource->getCapacity());
-        $points = [];
-
-        foreach ($periods as $period) {
-            $this->addPeriodPoints($points, $period["start"], $period["end"], $period["quantity"] ?? self::BOOKING_QUANTITY);
-        }
-
-        usort(
-            $points,
-            static fn (array $a, array $b): int => ($a["time"] <=> $b["time"]) ?: ($a["delta"] <=> $b["delta"])
-        );
-
-        $allocated = 0;
-        foreach ($points as $point) {
-            $allocated += $point["delta"];
-            if ($allocated > $capacity) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
+     * Counts over-capacity spans from normalised allocation period data.
+     *
      * @param ResourceModel $resource Resource whose capacity is being checked.
      * @param array<int, array{start: DateTimeInterface|Alaress_Date_Format, end: DateTimeInterface|Alaress_Date_Format, quantity?: int}> $periods Existing periods to count against capacity.
      * @return int Number of time spans where allocation exceeds resource capacity.
      */
-    private function capacityConflictSpanCount(ResourceModel $resource, array $periods): int
+    private function countTimeSpansExceedingCapacityFromPeriods(ResourceModel $resource, array $periods): int
     {
         $capacity = max(1, $resource->getCapacity());
         $points = [];

@@ -140,6 +140,43 @@ class CapacityAllocationTest extends TestCase
         ));
     }
 
+    public function testCountsSeparateTimeSpansExceedingCapacity(): void
+    {
+        $resource = (new ResourceModel())->setId(10)->setCapacity(2);
+        $allocation = new CapacityAllocation();
+
+        $this->assertSame(2, $allocation->countTimeSpansExceedingCapacity(
+            $resource,
+            [
+                [
+                    'startDatetime' => $this->date('2077-01-01T09:00:00+00:00'),
+                    'endDatetime' => $this->date('2077-01-01T10:00:00+00:00'),
+                    'quantity' => 1,
+                ],
+                [
+                    'startDatetime' => $this->date('2077-01-01T09:30:00+00:00'),
+                    'endDatetime' => $this->date('2077-01-01T10:30:00+00:00'),
+                    'quantity' => 1,
+                ],
+                [
+                    'startDatetime' => $this->date('2077-01-01T09:45:00+00:00'),
+                    'endDatetime' => $this->date('2077-01-01T10:15:00+00:00'),
+                    'quantity' => 1,
+                ],
+                [
+                    'startDatetime' => $this->date('2077-01-01T10:45:00+00:00'),
+                    'endDatetime' => $this->date('2077-01-01T11:15:00+00:00'),
+                    'quantity' => 2,
+                ],
+                [
+                    'startDatetime' => $this->date('2077-01-01T11:00:00+00:00'),
+                    'endDatetime' => $this->date('2077-01-01T11:30:00+00:00'),
+                    'quantity' => 1,
+                ],
+            ]
+        ));
+    }
+
     public function testPendingEventsDoNotBlockDashboardCandidate(): void
     {
         $resource = (new ResourceModel())->setId(10)->setCapacity(1);
