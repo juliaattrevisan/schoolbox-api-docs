@@ -52,12 +52,13 @@ body.sbx-body {
     }
 
     // when we need to ensure the border radius is applied correctly to the content,
-    .introjs-whatsnewmodal,
-    .attachment-browser-container,
-    #activity-feed,
-    .island section:not(:has(sbx-pop-out)) {
-        overflow: hidden;
-    }
+    // this is causing too many issues with content not being able to overflow the container, so we are disabling this for now
+    // .introjs-whatsnewmodal,
+    // .attachment-browser-container,
+    // #activity-feed,
+    // .island section:not(:has(sbx-pop-out)) {
+    //     overflow: hidden;
+    // }
 
     // this is to round an svg rect element
     .highcharts-background {
