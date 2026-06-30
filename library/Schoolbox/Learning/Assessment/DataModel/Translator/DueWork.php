@@ -86,7 +86,6 @@ class DueWork implements IAssessmentTypeTranslator
         null === $domainObject->getCreator()                || $dataModel->setOwner($domainObject->getCreator());
         null === $domainObject->isAcceptMulti()             || $dataModel->setAcceptMultiple($domainObject->isAcceptMulti());
         null === $domainObject->getUseRubric()              || $dataModel->setUseRubric($domainObject->getUseRubric());
-        null === $domainObject->getCapabilityGradeGroup()   || $dataModel->setCapabilityGradeGroup($domainObject->getCapabilityGradeGroup());
         null === $domainObject->getSelfReviewability()      || $dataModel->setSelfReviewability($domainObject->getSelfReviewability());
         null === $domainObject->getSimilarityCheckEnabled() || $dataModel->setSimilarityCheckEnabled($domainObject->getSimilarityCheckEnabled());
         null === $domainObject->getEnableWorksheet()        || $dataModel->setEnableWorksheet($domainObject->getEnableWorksheet());
@@ -195,10 +194,8 @@ class DueWork implements IAssessmentTypeTranslator
          */
         if ($dataModel->getUseRubric()) {
             $domainObject->setUseRubric(true);
-            $domainObject->setCapabilityGradeGroup($dataModel->getCapabilityGradeGroup());
         } else {
             $domainObject->setUseRubric(false);
-            $domainObject->setCapabilityGradeGroup(null);
         }
 
         // Figure out submission visibility

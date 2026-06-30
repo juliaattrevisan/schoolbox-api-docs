@@ -89,13 +89,6 @@ class Model extends AbstractAssessment implements ISelfAssessable
     private $rubricGrid;
 
     /**
-     * The rubric capability's grade group, if chosen
-     *
-     * @var SubmissionBox\GradeLevel\Group\Model|null
-     */
-    protected $capabilityGradeGroup;
-
-    /**
      * Only relevant if this DueWork's MarkType is 'TotalMark'
      * The max mark as per $this->markType
      *
@@ -260,7 +253,6 @@ class Model extends AbstractAssessment implements ISelfAssessable
     {
         parent::overwrite($source);
         $this->acceptOnline           = $source->acceptOnline;
-        $this->capabilityGradeGroup   = $source->capabilityGradeGroup;
         $this->maxMark                = $source->maxMark;
         $this->instructorMaxMark      = $source->instructorMaxMark;
         $this->instructorMarkType     = $source->instructorMarkType;
@@ -996,24 +988,6 @@ class Model extends AbstractAssessment implements ISelfAssessable
     public function setSimilarityCheckEnabled(bool $similarityCheckEnabled): self
     {
         $this->similarityCheckEnabled = $similarityCheckEnabled;
-        return $this;
-    }
-
-    /**
-     * @return SubmissionBox\GradeLevel\Group\Model|null
-     */
-    public function getCapabilityGradeGroup(): ?SubmissionBox\GradeLevel\Group\Model
-    {
-        return $this->capabilityGradeGroup;
-    }
-
-    /**
-     * @param SubmissionBox\GradeLevel\Group\Model|null $capabilityGradeGroup
-     * @return Model
-     */
-    public function setCapabilityGradeGroup(?SubmissionBox\GradeLevel\Group\Model $capabilityGradeGroup): self
-    {
-        $this->capabilityGradeGroup = $capabilityGradeGroup;
         return $this;
     }
 

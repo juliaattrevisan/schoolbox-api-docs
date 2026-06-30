@@ -148,14 +148,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
 
 
     /**
-     * The grade group associated with Letter Grade capability mark type
-     *
-     * @var GradeLevel\Group\Model|null
-     */
-    protected $capabilityGradeGroup;
-
-
-    /**
      * @var string
      */
     protected $mark_visibility;
@@ -689,24 +681,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     public function setExternalId(?string $externalId): self
     {
         $this->externalId = $externalId;
-        return $this;
-    }
-
-    /**
-     * @return GradeLevel\Group\Model|null
-     */
-    public function getCapabilityGradeGroup(): ?GradeLevel\Group\Model
-    {
-        return $this->capabilityGradeGroup;
-    }
-
-    /**
-     * @param GradeLevel\Group\Model|null $capabilityGradeGroup
-     * @return $this
-     */
-    public function setCapabilityGradeGroup(?GradeLevel\Group\Model $capabilityGradeGroup): self
-    {
-        $this->capabilityGradeGroup = $capabilityGradeGroup;
         return $this;
     }
 

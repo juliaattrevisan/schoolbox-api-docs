@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\MarkedGrid\Test;
 
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Rubric\Grid as RubricGrid;
 use Schoolbox\Assessment\Rubric\MarkedGrid as RubricMarkedGrid;
@@ -72,6 +73,14 @@ class Generator
 
 
     /**
+     * Optional capability grade group forwarded to the grid generator's rubric instance.
+     *
+     * @var GradeLevel\Group\Model|null
+     */
+    private ?GradeLevel\Group\Model $capabilityGradeGroup = null;
+
+
+    /**
      * Build a marked grid.
      *
      * @param array $capabilities     The capabilities that comprise the grid's
@@ -107,6 +116,7 @@ class Generator
         }
 
         $gridGenerator->setCapabilityMarkType($this->capabilityMarkType);
+        $gridGenerator->setCapabilityGradeGroup($this->capabilityGradeGroup);
 
         $grid = $gridGenerator->generateGrid($capabilities, $levels, $capabilityUsages);
         $rowSet = $grid->getRowSet();
@@ -198,6 +208,17 @@ class Generator
     public function setCapabilityMarkType(?MarkType $capabilityMarkType): self
     {
         $this->capabilityMarkType = $capabilityMarkType;
+        return $this;
+    }
+
+
+    /**
+     * @param GradeLevel\Group\Model|null $capabilityGradeGroup
+     * @return $this
+     */
+    public function setCapabilityGradeGroup(?GradeLevel\Group\Model $capabilityGradeGroup): self
+    {
+        $this->capabilityGradeGroup = $capabilityGradeGroup;
         return $this;
     }
 }
