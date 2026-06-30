@@ -24,6 +24,7 @@
  # @param string|null $syncContext      When keeping in sync for dual mark types, the context to sync with when the switch is disabled (optional, default null)
  # @param string $syncMarkTypeLabel     The label text to use on this mark type input when keeping in sync for dual mark types (optional, default $markTypeLabel)
  # @param string $syncMarkTypeTooltip   The tooltip text to use on this mark type input when keeping in sync for dual mark types (optional, default null)
+ # @param bool $maxMarksFromRubricBtn   For forms with a rubric-builder, renders the "Assign XXX from Rubric" button to the right of the max mark input field (optional, default false)
  #}
 
 {# Letter Grade enables Grading Scheme
@@ -94,6 +95,12 @@
             Maximum Available Marks
             <input id="{{ context }}maxMark" type="text" name="{{ context }}maxMark" value="{{ selectedMaxMark ?? '' }}" {% if courseManagedReadonly ?? false %}readonly{% endif %} />
         </label>
+        {% if maxMarksFromRubricBtn ?? false %}
+            {# see rubric-builder.vue #}
+            <a class="fieldAssign" href="#" data-assign-max-marks-from-rubric="{{ context }}maxMark" style="display: none;">
+                Assign <span class="descriptor-sum" data-rubric-sum></span> from Rubric
+            </a>
+        {% endif %}
     </div>
     {% endif %}
 

@@ -12,6 +12,7 @@
  # @param int|null $selectedGradeGroup  The grade group currently selected
  # @param int $defaultGradeGroup        Set in admin via default_grade_group config var
  # @param bool $courseManagedReadonly   A bool to decide if this is readonly or not
+ # @param bool $maxMarksFromRubricBtn   For forms with a rubric-builder, renders the "Assign XXX from Rubric" button to the right of the max mark input field (optional, default false)
  #}
 
 {% set selectedInstructorMarkType = assessment.instructorMarkType.id ?? null %}
@@ -54,6 +55,7 @@
     courseManagedReadonly: courseManagedReadonly,
     syncSwitchSelector: '#useDualMarkTypes',
     syncMarkTypeLabel: 'Mark Type',
+    maxMarksFromRubricBtn: maxMarksFromRubricBtn ?? false
 } %}
 
 {% include '@learningAssessment/fragments/markType.twig' with {
@@ -72,4 +74,5 @@
     rowHidden: not dualMarkTypesEnabled,
     syncSwitchSelector: '#useDualMarkTypes',
     syncContext: 'instructor',
+    maxMarksFromRubricBtn: maxMarksFromRubricBtn ?? false
 } %}
