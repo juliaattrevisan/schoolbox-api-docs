@@ -22,7 +22,10 @@
 /* quiz review feedback states */
 .lrn_widget.lrn_qr .lrn_selected.lrn_correct,
 .lrn_widget.lrn_qr .lrn_selected.lrn_correct .lrn-label {
-    background-color: var(--sbx-color-foreground-primary, var(--content-ui-background, var(--sbx-config-color-active, #d2edf2)));
+    background-color: var(
+        --sbx-color-foreground-primary,
+        var(--content-ui-background, var(--sbx-config-color-active, #d2edf2))
+    );
     background-color: color-mix(
         in srgb,
         var(--sbx-color-success, #3e843e) 12%,
@@ -130,7 +133,10 @@
     .lrn_response_container.lrn_dragdrop.lrn_highlight:not(.lrn_disabled):not(.lrn-dragdrop-empty),
 .lrn .lrn_possibilityList.lrn_over,
 .lrn .lrn_possibilityListContainer.lrn_over {
-    background: var(--sbx-color-foreground-primary, var(--content-ui-background, var(--sbx-config-color-active, #d2edf2)));
+    background: var(
+        --sbx-color-foreground-primary,
+        var(--content-ui-background, var(--sbx-config-color-active, #d2edf2))
+    );
 }
 
 /* update the active border color of the drag and drop to content-ui-selected*/
@@ -143,7 +149,7 @@
 .lrn_widget .lrn_btn_sort.lrn_focus:active,
 .lrn_widget .lrn_btn_sort:focus.lrn_active {
     box-shadow:
-    inset 0 0 0 1px var(--content-ui-selected, var(--sbx-config-color-active, #d2edf2)),
+        inset 0 0 0 1px var(--content-ui-selected, var(--sbx-config-color-active, #d2edf2)),
         inset 0 0 0 3px var(--sbx-color-foreground-primary, #fff);
 }
 
@@ -166,7 +172,8 @@
         var(--form-border-color-a, 1)
     );
     color: var(--form-bg-hover-color-contrast, var(--sbx-color-text-primary, #000));
-    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground, #001691));
+    outline: var(--sbx-border-width-normal, 2px) solid
+        var(--sbx-config-color-accent, var(--content-ui-foreground, #001691));
     outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
 
@@ -198,14 +205,18 @@
 
 /* update the border color for classification */
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table .lrn_response_container {
-    border-top: 1px dashed var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
-    border-left: 1px dashed var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
+    border-top: 1px dashed
+        var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
+    border-left: 1px dashed
+        var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
 }
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr .lrn_response_container.lrn_last {
-    border-right: 1px dashed var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
+    border-right: 1px dashed
+        var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
 }
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr.lrn_last .lrn_response_container {
-    border-bottom: 1px dashed var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
+    border-bottom: 1px dashed
+        var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
 }
 .lrn_widget.lrn_association .lrn_response_container.lrn_dropzone {
     border-color: var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
@@ -264,7 +275,8 @@
 .lrn_widget.lrn_formulaessayV2 .lrn-toolbar,
 .lrn_widget.lrn_longtextV2 .lrn-toolbar {
     background: var(--sbx-color-foreground-primary, #fff);
-    border-bottom: 1px solid var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
+    border-bottom: 1px solid
+        var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
 }
 .lrn_widget.lrn_chemistryessayV2 .lrn-divider:after,
 .lrn_widget.lrn_formulaessayV2 .lrn-divider:after,
@@ -285,13 +297,15 @@
 .lrn_widget.lrn_longtextV2 .lrn_texteditor_editable:focus,
 .lrn_widget.lrn_longtextV2 .lrn_texteditor_editable.lrn_active {
     box-shadow: 1px 1px 2px #0000001a inset;
-    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground, #001691));
+    outline: var(--sbx-border-width-normal, 2px) solid
+        var(--sbx-config-color-accent, var(--content-ui-foreground, #001691));
     outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
 .lrn_widget .lrn_texteditor_editable:focus {
     border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground, #001691));
     box-shadow: 1px 1px 2px #0000001a inset;
-    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground, #001691));
+    outline: var(--sbx-border-width-normal, 2px) solid
+        var(--sbx-config-color-accent, var(--content-ui-foreground, #001691));
     outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
 
@@ -374,7 +388,10 @@ input[type="checkbox"] {
 
 /* plaintext styles*/
 .lrn .lrn_btn:not(.lrn_btn_blue) {
-    background-color: var(--sbx-color-foreground-primary, var(--content-ui-background, var(--sbx-config-color-active, #d2edf2)));
+    background-color: var(
+        --sbx-color-foreground-primary,
+        var(--content-ui-background, var(--sbx-config-color-active, #d2edf2))
+    );
     border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground, #001691));
     color: var(--sbx-config-color-accent, var(--content-ui-foreground, #001691));
 }
@@ -387,8 +404,10 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
     background: var(--sbx-color-foreground-primary, #fff);
 }
 .lrn_texteditor > .lrn_toolbar {
-    border-left: 1px solid var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
-    border-right: 1px solid var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
+    border-left: 1px solid
+        var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
+    border-right: 1px solid
+        var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
     border-top: 1px solid var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
 }
 
@@ -423,12 +442,15 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 .lrn_widget .lrn-imageupload-config-outlet .lrn-imageupload-config-upload-btn-container,
 .lrn_widget .lrn-imageupload-img-wrapper-is-empty {
     background: var(--sbx-color-foreground-primary, #fff);
-    border-bottom: 1px solid var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
+    border-bottom: 1px solid
+        var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
 }
 .lrn_widget .lrn-imageupload-config-outlet .lrn-imageupload-config-upload-btn-container,
 .lrn_widget .lrn-imageupload-img-wrapper-is-empty {
-    border-left: 1px solid var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
-    border-right: 1px solid var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
+    border-left: 1px solid
+        var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
+    border-right: 1px solid
+        var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
 }
 .lrn_widget.lrn_imageupload .lrn_toolbar {
     border: 1px solid var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
@@ -472,14 +494,18 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 /* update the classification drop zone borders */
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr .lrn_response_container.lrn_last,
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr.lrn_last .lrn_response_container {
-    border-right: 1px dashed var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
+    border-right: 1px dashed
+        var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
 }
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr.lrn_last .lrn_response_container {
-    border-bottom: 1px dashed var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
+    border-bottom: 1px dashed
+        var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
 }
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table .lrn_response_container {
-    border-left: 1px dashed var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
-    border-top: 1px dashed var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
+    border-left: 1px dashed
+        var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
+    border-top: 1px dashed
+        var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)));
 }
 .lrn_widget.lrn_classification
     .lrn_response
@@ -530,7 +556,8 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 
 /* update graphing border */
 .lrn_widget.lrn_graphplotting .lrn_response_wrapper .lrn_graph_plotter .lrn_toolbar:focus-within {
-    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground, #001691));
+    outline: var(--sbx-border-width-normal, 2px) solid
+        var(--sbx-config-color-accent, var(--content-ui-foreground, #001691));
     outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
 
@@ -561,14 +588,18 @@ button.lrn-author-widget-button.lrn-author-widget-button-more > span.lrn-author-
     text-shadow: none;
 }
 button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
-    background: var(--sbx-color-foreground-primary, var(--content-ui-background, var(--sbx-config-color-active, #d2edf2))) !important;
+    background: var(
+        --sbx-color-foreground-primary,
+        var(--content-ui-background, var(--sbx-config-color-active, #d2edf2))
+    ) !important;
     border-color: var(--sbx-config-color-accent, var(--content-ui-foreground, #001691));
     color: var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)) !important;
     text-decoration: none !important;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-btn:focus,
 .lrn-qe .lrn-qe-ui a.lrn-qe-btn:focus {
-    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground, #001691));
+    outline: var(--sbx-border-width-normal, 2px) solid
+        var(--sbx-config-color-accent, var(--content-ui-foreground, #001691));
     outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
 
@@ -634,14 +665,18 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
 .lrn_dropdown.lrn_theme_primary.lrn_open .lrn_dropdown_toggle:focus {
     background: transparent;
     border-color: transparent;
-    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground, #001691));
+    outline: var(--sbx-border-width-normal, 2px) solid
+        var(--sbx-config-color-accent, var(--content-ui-foreground, #001691));
     outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
 
 /* Check answer button */
 .lds-btn-secondary,
 .lrn .lrn_btn:is(.lds-btn-secondary) {
-    background-color: var(--sbx-color-foreground-primary, var(--content-ui-background, var(--sbx-config-color-active, #d2edf2)));
+    background-color: var(
+        --sbx-color-foreground-primary,
+        var(--content-ui-background, var(--sbx-config-color-active, #d2edf2))
+    );
     border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground, #001691));
     border-radius: var(--sbx-config-field-corner-radius, 0px) !important;
     color: var(--sbx-config-color-accent, var(--content-ui-foreground, #001691));
@@ -649,7 +684,10 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
 }
 .lds-btn-secondary,
 .lrn .lrn_btn:is(.lds-btn-secondary):hover {
-    background: var(--sbx-color-foreground-primary, var(--content-ui-background, var(--sbx-config-color-active, #d2edf2)));
+    background: var(
+        --sbx-color-foreground-primary,
+        var(--content-ui-background, var(--sbx-config-color-active, #d2edf2))
+    );
     border-color: var(--sbx-config-color-accent, var(--content-ui-foreground, #001691));
     color: var(--sbx-config-color-accent, var(--content-ui-foreground, #001691));
     font-family:
@@ -666,7 +704,10 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
     font-size: 1rem;
 }
 .lrn .lrn_btn:is(.lds-btn-secondary):focus {
-    background: var(--sbx-color-foreground-primary, var(--content-ui-background, var(--sbx-config-color-active, #d2edf2)));
+    background: var(
+        --sbx-color-foreground-primary,
+        var(--content-ui-background, var(--sbx-config-color-active, #d2edf2))
+    );
     border-color: var(--sbx-config-color-accent, var(--content-ui-foreground, #001691));
     color: var(--sbx-config-color-accent, var(--content-ui-foreground, #001691));
     font-family:
@@ -681,7 +722,8 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
         Arial,
         sans-serif !important;
     font-size: 1rem;
-    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground, #001691));
+    outline: var(--sbx-border-width-normal, 2px) solid
+        var(--sbx-config-color-accent, var(--content-ui-foreground, #001691));
     outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
 
@@ -701,7 +743,8 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
 }
 .lrn button.lrn-mask:hover,
 .lrn button.lrn-mask:focus {
-    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)) !important;
+    outline: var(--sbx-border-width-normal, 2px) solid
+        var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)) !important;
     outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
 
@@ -732,7 +775,8 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
 /* fixed save button hover style*/
 .lrn .lrn-author-ui .lrn-author-btn-save:not([disabled]):hover,
 .lrn .lrn-author-ui .lrn-author-btn-save:not([disabled]):focus {
-    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)) !important;
+    outline: var(--sbx-border-width-normal, 2px) solid
+        var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)) !important;
     outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
 
@@ -812,7 +856,10 @@ span.lrn-author {
     color: var(--sbx-config-color-accent, var(--content-ui-foreground, #001691));
 }
 button.lrn-author-btn-old.lrn-author-btn-old-legacy.lrn-author-btn-default.lrn-author-btn-default-legacy.lrn-author-btn-icon-left {
-    background-color: var(--sbx-color-foreground-primary, var(--content-ui-background, var(--sbx-config-color-active, #d2edf2))) !important;
+    background-color: var(
+        --sbx-color-foreground-primary,
+        var(--content-ui-background, var(--sbx-config-color-active, #d2edf2))
+    ) !important;
     border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)) !important;
     color: var(--sbx-config-color-accent, var(--content-ui-foreground, #001691)) !important;
     line-height: inherit !important;
