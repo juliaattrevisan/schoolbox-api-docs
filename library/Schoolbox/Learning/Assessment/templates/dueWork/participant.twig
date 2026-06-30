@@ -145,7 +145,7 @@
     #}
     {% set hasKami = latestFeedback and latestFeedback.hasResponseWithKamiDocs %}
     {% set fileCount = latestFeedback ? latestFeedback.allFiles.count : 0 %}
-    {% set showRubricLink = assessment.rubricInstances|length and (rubricMarks[participant.user.id]|default(false)) %}
+    {% set showRubricLink = assessment.rubricInstances.count and (rubricMarks[participant.user.id]|default(false)) %}
 
     {% if hasKami or fileCount or showRubricLink %}
         {% set meta = [] %}
