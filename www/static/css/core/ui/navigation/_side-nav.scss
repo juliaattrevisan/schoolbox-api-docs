@@ -136,6 +136,13 @@ $border-bottom-width: 2px;
             padding: 0.5rem 0.75rem;
             display: block;
             border-left: $border-bottom-width solid transparent;
+            // when the up/down icon is in use, ensure long text doesn't wrap and push the icon down
+            &:has(sbx-icon) {
+                align-items: start;
+                display: flex !important; // important to override the a:not(.button) selector above
+                gap: var(--sbx-size-xs, 0.5rem);
+                justify-content: space-between;
+            }
             @media #{$medium-up} {
                 //ensure isn't applied on desktop
                 &:hover {
@@ -144,7 +151,6 @@ $border-bottom-width: 2px;
                 }
             }
         }
-
         &.active {
             > a {
                 font-weight: $side-nav-font-weight-active;
@@ -181,7 +187,6 @@ $border-bottom-width: 2px;
             .sbx-side-nav__toggle-icon {
                 color: currentColor;
                 flex-shrink: 0;
-                float: right;
                 transform: rotate(0deg); // Default icon is pointing down when collapsed
                 transition: transform 0.3s;
             }
