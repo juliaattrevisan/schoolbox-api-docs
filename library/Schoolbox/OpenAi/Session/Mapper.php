@@ -21,6 +21,8 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
+ * This is the lightweight row shape required to summarise logs.
+ *
  * @phpstan-type SessionLogSummaryRow array{
  *     id: int,
  *     ai_session_id: string,
