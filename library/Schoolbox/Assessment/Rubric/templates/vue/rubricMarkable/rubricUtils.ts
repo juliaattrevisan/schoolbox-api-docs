@@ -57,8 +57,7 @@ export function applyMarkScheme(
     if (markScheme.mode === MarkTypeSlug.PERCENT) {
         return {
             value: percentage !== null ? percentage.toString() : null,
-            // TODO: SA-22480: HA steve and I literally debugged and fixed this and this agent found it along the way, it's nice when we have functional tests...
-            // Match the canonical "75 %" format used elsewhere (see MarkScheme\Percentage::convertFormInputToHumanReadableMark)
+            // Match the canonical "75 %" format defined in MarkScheme\Percentage::convertFormInputToHumanReadableMark
             humanReadableMark: percentage !== null ? `${percentage} %` : null,
         };
     }
