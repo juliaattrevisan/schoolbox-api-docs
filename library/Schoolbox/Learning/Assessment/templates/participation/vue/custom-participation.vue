@@ -150,8 +150,8 @@ function onViewSuggestedCustomisation(participant: Participant): void {
                     </select>
                 </div>
 
-                <div class="small-12 medium-6 large-4 columns">
-                    <label for="only-show-dp">
+                <div v-if="props.differentiationEnabled" class="small-12 medium-6 large-4 columns">
+                    <label class="l-mbs" for="only-show-dp">
                         Only show students with {{ locale.differentiationProfile.translate(true, true) }}
                     </label>
                     <div class="switch f-no-margins">
