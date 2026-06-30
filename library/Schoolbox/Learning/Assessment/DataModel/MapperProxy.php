@@ -20,6 +20,8 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Assessment\Rubric\Grid\Grid;
+use Schoolbox\Assessment\Rubric\Instance\Model as RubricInstance;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
@@ -1443,7 +1445,7 @@ class MapperProxy
              * based on whether you were creating or updating (!??!!?) but seeing as we're near the end of this method,
              * all of that will have already happened.
              */
-            $rubricMapper = RubricDataSource::getInstance();
+            $rubricMapper = $this->rubricMapper;
 
             /* Keep track of all the still-existing rubric instance ids
              * We soft delete every rubric instance associated with $assessable that -isn't- in this set anymore.
@@ -1457,7 +1459,7 @@ class MapperProxy
                 /* The latest version of the rubric grid, as per the Decorators that processed the frontend
                  * payload, storing it in the temporary place so we can get it here.
                  */
-                $newGrid = $rubricInstance->getGrid();
+                $newGrid = $this->resolveRubricGridForPersistence($assessable, $rubricInstance);
 
                 // Need to compare the previously existing grid with the newly
                 // saved one, for invalidation purposes
@@ -1547,6 +1549,36 @@ class MapperProxy
         if ($isCreate) {
             $this->participantDataSource->loadParticipationIntoAssessment($assessable);
         }
+    }
+
+    /**
+     * Resolve the rubric grid that should be persisted for an assessment save.
+     *
+     * Existing rubric instances can reach this save path without decorator-populated transient grid state, for example
+     * when course unit date changes trigger learning activity persistence without rubric POST data. New rubric instances
+     * still require the decorator-built grid because there is nothing persisted to reload yet.
+     *
+     * @param IAssessable $assessable
+     * @param RubricInstance $rubricInstance
+     * @return Grid
+     * @throws LogicException If a new rubric instance has no prepared grid.
+     */
+    private function resolveRubricGridForPersistence(IAssessable $assessable, RubricInstance $rubricInstance): Grid
+    {
+        $grid = $rubricInstance->getGrid();
+
+        if ($grid instanceof Grid) {
+            return $grid;
+        }
+
+        if ($rubricInstance->getId() > 0) {
+            $grid = $this->rubricMapper->retrieveOneGrid($assessable, $rubricInstance, false);
+            $rubricInstance->setGrid($grid);
+
+            return $grid;
+        }
+
+        throw new LogicException('Cannot persist a new rubric instance without a prepared grid.');
     }
 
     /**
