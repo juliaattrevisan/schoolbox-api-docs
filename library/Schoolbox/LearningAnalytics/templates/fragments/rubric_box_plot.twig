@@ -42,6 +42,9 @@
                                     {{ indicatorData.published.statistics.quartile3 }},
                                     {{ indicatorData.published.statistics.max }}
                                 ],
+                            {% else %}
+                                {# Seems to be the same as [null,null,null,null,null] #}
+                                [],
                             {% endif %}
                         {% endfor %}
                     {% endfor %}
