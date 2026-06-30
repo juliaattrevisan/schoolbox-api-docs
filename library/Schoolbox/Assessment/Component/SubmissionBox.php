@@ -143,10 +143,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
      */
     protected $instructorMarkType;
 
-    /** @var bool */
-    protected $useRubric;
-
-
     /**
      * @var string
      */
@@ -190,16 +186,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     public function __construct()
     {
         $this->setAssessmentModel(new Model());
-    }
-
-    /**
-     * Determine whether a submissionBox is a rubric one or not
-     *
-     * @return bool
-     */
-    public function isRubric()
-    {
-        return $this->useRubric;
     }
 
 
@@ -442,26 +428,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @return boolean
-     */
-    public function getUseRubric()
-    {
-        return $this->isRubric();
-    }
-
-
-    /**
-     * @param boolean $useRubric
-     * @return static
-     */
-    public function setUseRubric($useRubric)
-    {
-        $this->useRubric = $useRubric;
-        return $this;
-    }
-
-
-    /**
      * @param  string $mark_visibility
      * @return $this
      */
@@ -577,32 +543,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
             $this->getAssessmentModel()->getOpenDate(),
             $this->getAssessmentModel()->getCloseDate()
         );
-    }
-
-    /**
-     * Determine whether a user can view the rubrics associated with
-     * this submission box
-     *
-     * @param User $user
-     * @return bool
-     */
-    public function canViewRubric(User $user)
-    {
-        // no rubric to view
-        if (!$this->isRubric()) {
-            return false;
-        }
-
-        switch ($user->getRole()->getType()) {
-            case Role::PARENT:
-                return $this->isMarkShownToParents();
-            case Role::STUDENT:
-                return $this->isMarkShownToStudents();
-            case Role::STAFF:
-                return true;
-            default:
-                return false;
-        }
     }
 
     /**

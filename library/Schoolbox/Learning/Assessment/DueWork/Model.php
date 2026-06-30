@@ -74,16 +74,6 @@ class Model extends AbstractAssessment implements ISelfAssessable
     protected $showSubmittedOnly = false;
 
     /**
-     * This DueWork uses a Rubric
-     *
-     * This property IS required. We cannot just inspect the attached Rubric because in some
-     * scenarios (eg Collections) we don't hydrate the Rubric.
-     *
-     * @var bool
-     */
-    protected $useRubric = false;
-
-    /**
      * @var Grid|null
      */
     private $rubricGrid;
@@ -261,7 +251,6 @@ class Model extends AbstractAssessment implements ISelfAssessable
         $this->selfReviewability      = $source->selfReviewability;
         $this->showSubmittedOnly      = $source->showSubmittedOnly;
         $this->similarityCheckEnabled = $source->similarityCheckEnabled;
-        $this->useRubric              = $source->useRubric;
         $this->enableOffline          = $source->enableOffline;
         $this->enableFiles            = $source->enableFiles;
         $this->enablePolicy           = $source->enablePolicy;
@@ -754,24 +743,6 @@ class Model extends AbstractAssessment implements ISelfAssessable
     public function showAllSubmissibleStudents()
     {
         $this->setShowSubmittedOnly(false);
-        return $this;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getUseRubric()
-    {
-        return $this->useRubric;
-    }
-
-    /**
-     * @param boolean $useRubric
-     * @return static
-     */
-    public function setUseRubric($useRubric)
-    {
-        $this->useRubric = $useRubric;
         return $this;
     }
 

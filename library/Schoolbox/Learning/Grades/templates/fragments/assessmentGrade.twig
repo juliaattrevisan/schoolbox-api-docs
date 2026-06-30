@@ -89,7 +89,7 @@
     {% if feedback and feedback.comment   %}
         <div class="content">
             <blockquote>{{ feedback.comment | purify }}</blockquote>
-            {% if assessment is dueWork and (assessment.useRubric or feedback.allFiles | length) and summaryRoute %}
+            {% if assessment is dueWork and (assessment.rubricInstances|length or feedback.allFiles | length) and summaryRoute %}
                 <a href="{{ summaryRoute }}{{ returnUrlSuffix is defined ? returnUrlSuffix : '' }}">
                     View assessment details</a>
             {% endif %}

@@ -78,7 +78,6 @@ class SubmissionBoxMapper extends BaseMapper
         $this->uses('enable_policy', self::TYPE_BOOLEAN, null, 'enablePolicy');
         $this->uses('max_mark', self::TYPE_DECIMAL);
         $this->uses('instructor_max_mark', self::TYPE_DECIMAL);
-        $this->uses('use_rubric', self::TYPE_BOOLEAN);
         $this->uses('mark_visibility', self::TYPE_STRING);
         $this->uses('skip_unsubmitted', self::TYPE_BOOLEAN);
         $this->uses('self_reviewability', self::TYPE_STRING);

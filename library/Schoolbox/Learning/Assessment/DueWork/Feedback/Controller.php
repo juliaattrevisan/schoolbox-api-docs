@@ -485,7 +485,7 @@ class Controller extends Base
         if (
             $mostRecentFeedback !== null
             && $mostRecentFeedback->getAssessable() instanceof DueWork\Model
-            && $mostRecentFeedback->getAssessable()->getUseRubric()
+            && $mostRecentFeedback->getAssessable()->getRubricInstances()?->count()
         ) {
             $hasRubric = true;
         }

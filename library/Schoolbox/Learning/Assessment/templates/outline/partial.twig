@@ -72,7 +72,7 @@
                 </li>
             {% endif %}
             {% if similarityReportRoute %}<li><a href="{{ similarityReportRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" title="View Similarity Report" data-test="course-outline-similarity-report-{{ assessment.id }}" class="sbx-button--has-icon"><sbx-icon name="due-work"></sbx-icon>Similarity Report</a></li>{% endif %}
-            {%  if assessment is dueWork and assessment.useRubric %}
+            {%  if assessment is dueWork and assessment.rubricInstances|length %}
                 <li>
                     <a href="{{ routeLookup('learningAssessment.getOverview', { assessmentId: assessment.id }) }}"
                        data-test="course-outline-rubric-report-{{ assessment.id }}" class="sbx-button--has-icon"><sbx-icon name="criteria"></sbx-icon>Rubric Report</a>

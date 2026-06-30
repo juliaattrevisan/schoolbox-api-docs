@@ -87,7 +87,6 @@ class DueWorkTest extends TestCase
                 ->setName('A dumb type'))
             ->setMarkScheme(new None())
             ->setInstructorMarkScheme(new None())
-            ->setUseRubric(true)
             ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_FULL)
         ;
 
@@ -101,7 +100,6 @@ class DueWorkTest extends TestCase
         $this->assertEquals(3, $dueWorkModel->getOwner()->getId());
         $this->assertTrue($dueWorkModel->getAcceptOnline());
         $this->assertTrue($dueWorkModel->getAcceptMultiple());
-        $this->assertTrue($dueWorkModel->getUseRubric());
         $this->assertTrue($dueWorkModel->getSkipUnsubmitted());
 
         // Test files
@@ -363,7 +361,6 @@ class DueWorkTest extends TestCase
             ->setSkipUnsubmitted(false)
             ->setAcceptOnline(true)
             ->setAcceptMultiple(true)
-            ->setUseRubric(false)
             ->setOwner(self::getTeacher2())
             ->setAttachments((new GenericCollection(SubmissionBox\SingleFile\Model::class))
                 ->add($file1)

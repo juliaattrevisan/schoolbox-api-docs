@@ -631,7 +631,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             /* Retrieves the grid with assessment id reset to empty so it can be applied to the new assessment
              * and only apply it when the rubric is being used in the original assessment
              */
-            if ($assessment instanceof DueWork\Model && $assessment->getUseRubric()) {
+            if ($assessment instanceof DueWork\Model && $assessment->getRubricInstances()?->count()) {
                 $rubricGrid = $this->rubricMapper->retrieveGrid($assessment, true, true);
 
                 /**
