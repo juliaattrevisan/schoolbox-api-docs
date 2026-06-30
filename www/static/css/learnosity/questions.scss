@@ -14,14 +14,30 @@
 }
 
 /*the color used to highlight the selected item  */
-.lrn_widget .lrn_valid,
-.lrn_widget .lrn_selected {
-    background-color: var(--content-ui-selected);
+.lrn_widget:not(.lrn_qr) .lrn_valid,
+.lrn_widget:not(.lrn_qr) .lrn_selected {
+    background-color: var(--sbx-config-color-active, var(--content-ui-selected));
+}
+
+/* quiz review feedback states */
+.lrn_widget.lrn_qr .lrn_selected.lrn_correct,
+.lrn_widget.lrn_qr .lrn_selected.lrn_correct .lrn-label {
+    background-color: var(--sbx-color-foreground-primary, var(--content-ui-background));
+    background-color: color-mix(
+        in srgb,
+        var(--sbx-color-success, #3e843e) 12%,
+        var(--sbx-color-foreground-primary, var(--content-ui-background))
+    );
+    color: var(--sbx-color-success, #3e843e);
+}
+.lrn_widget.lrn_qr .lrn_selected.lrn_incorrect,
+.lrn_widget.lrn_qr .lrn_selected.lrn_incorrect .lrn-label {
+    color: var(--sbx-color-alert, #ea0a06);
 }
 
 /*the color used to highlight the selected item in the mutiplechoice-block layout */
-.lrn_widget.lrn_mcq .lrn_response .lrn_mcqgroup-block .lrn-mcq-option.lrn_selected .lrn-label {
-    background-color: var(--content-ui-selected);
+.lrn_widget.lrn_mcq:not(.lrn_qr) .lrn_response .lrn_mcqgroup-block .lrn-mcq-option.lrn_selected .lrn-label {
+    background-color: var(--sbx-config-color-active, var(--content-ui-selected));
 }
 
 /* keep visible radio control and answer text on the same row */
@@ -89,7 +105,7 @@
 .lrn_widget .lrn_btn_drag.lrn_active,
 .lrn_widget .lrn_btn_sort:active,
 .lrn_widget .lrn_btn_sort.lrn_active {
-    background-color: var(--content-ui-selected);
+    background-color: var(--sbx-config-color-active, var(--content-ui-selected));
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 
@@ -127,7 +143,7 @@
 .lrn_widget .lrn_btn_sort.lrn_focus:active,
 .lrn_widget .lrn_btn_sort:focus.lrn_active {
     box-shadow:
-        inset 0 0 0 1px var(--content-ui-selected),
+        inset 0 0 0 1px var(--sbx-config-color-active, var(--content-ui-selected)),
         inset 0 0 0 3px var(--sbx-color-foreground-primary, #fff);
 }
 
@@ -142,14 +158,14 @@
 }
 .lrn_widget .lrn_response.lrn_cloze .lrn_combobox select.lrn-cloze-select:hover,
 .lrn_widget .lrn_response.lrn_cloze .lrn_combobox select.lrn-cloze-select:focus {
-    background-color: var(--form-bg-hover-color) !important;
+    background-color: var(--sbx-color-foreground-primary, var(--form-bg-hover-color)) !important;
     border-color: hsla(
-        var(--form-border-color-h),
-        var(--form-border-color-s),
-        calc(var(--form-border-color-l) - 15%),
-        var(--form-border-color-a)
+        var(--form-border-color-h, 230.9),
+        var(--form-border-color-s, 100%),
+        calc(var(--form-border-color-l, 28.43%) - 15%),
+        var(--form-border-color-a, 1)
     );
-    color: var(--form-bg-hover-color-contrast);
+    color: var(--sbx-color-text-primary, var(--form-bg-hover-color-contrast));
     outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground));
     outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
@@ -182,17 +198,17 @@
 
 /* update the border color for classification */
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table .lrn_response_container {
-    border-top: 1px dashed var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground)));
-    border-left: 1px dashed var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground)));
+    border-top: 1px dashed var(--sbx-color-border, var(--content-ui-foreground));
+    border-left: 1px dashed var(--sbx-color-border, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr .lrn_response_container.lrn_last {
-    border-right: 1px dashed var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground)));
+    border-right: 1px dashed var(--sbx-color-border, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr.lrn_last .lrn_response_container {
-    border-bottom: 1px dashed var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground)));
+    border-bottom: 1px dashed var(--sbx-color-border, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_association .lrn_response_container.lrn_dropzone {
-    border-color: var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground)));
+    border-color: var(--sbx-color-border, var(--content-ui-foreground));
 }
 
 /* update styles for order list*/
@@ -242,13 +258,13 @@
 .lrn_widget.lrn_chemistryessayV2 .lrn_response_input_wrapper,
 .lrn_widget.lrn_formulaessayV2 .lrn_response_input_wrapper,
 .lrn_widget.lrn_longtextV2 .lrn_response_input_wrapper {
-    border-color: var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground)));
+    border-color: var(--sbx-color-border, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_chemistryessayV2 .lrn-toolbar,
 .lrn_widget.lrn_formulaessayV2 .lrn-toolbar,
 .lrn_widget.lrn_longtextV2 .lrn-toolbar {
     background: var(--sbx-color-foreground-primary, #fff);
-    border-bottom: 1px solid var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground)));
+    border-bottom: 1px solid var(--sbx-color-border, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_chemistryessayV2 .lrn-divider:after,
 .lrn_widget.lrn_formulaessayV2 .lrn-divider:after,
@@ -260,7 +276,7 @@
 .lrn_widget.lrn_formulaessayV2 .lrn-toolbar-footer,
 .lrn_widget.lrn_longtextV2 .lrn-toolbar-footer {
     background: var(--sbx-color-foreground-primary, #fff);
-    border-top: 1px solid var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground)));
+    border-top: 1px solid var(--sbx-color-border, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_chemistryessayV2 .lrn_texteditor_editable:focus,
 .lrn_widget.lrn_chemistryessayV2 .lrn_texteditor_editable.lrn_active,
@@ -287,7 +303,7 @@
 .lrn_widget.lrn_simpleshading .lrn-shading-wrapper.lrn_no_touch .lrn-shading-cell.lrn-shading-selected:hover,
 .lrn_widget.lrn_simpleshading .lrn-shading-wrapper.lrn_no_touch .lrn-shading-cell.lrn-shading-selected:focus {
     background-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
-    border: 1px solid var(--content-ui-background);
+    border: 1px solid var(--sbx-config-color-active, var(--content-ui-background));
 }
 .lrn_widget.lrn_simpleshading .lrn-shading-wrapper.lrn_no_touch .lrn-shading-cell:hover {
     background-color: rgba(255, 255, 255, 0.8);
@@ -295,7 +311,7 @@
 }
 .lrn_widget.lrn_simpleshading .lrn-shading-cell.lrn-shading-selected {
     background-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
-    border: 1px solid var(--content-ui-background);
+    border: 1px solid var(--sbx-config-color-active, var(--content-ui-background));
 }
 .lrn_widget.lrn_simpleshading .lrn-shading-wrapper.lrn_no_touch .lrn-shading-cell:focus {
     border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
@@ -326,7 +342,7 @@ input[type="checkbox"] {
 
 /*the hover color of choice matrix-standard radio buttons set to content-ui-selected*/
 .lrn_qr.lrn_choicematrix .lrn_response_input > table td.lrn_option.lrn_enabled.lrn_selected:hover {
-    background-color: var(--content-ui-selected);
+    background-color: var(--sbx-config-color-active, var(--content-ui-selected));
 }
 
 /*update the border color of dropzone in Cloze with drag & drop*/
@@ -371,9 +387,9 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
     background: var(--sbx-color-foreground-primary, #fff);
 }
 .lrn_texteditor > .lrn_toolbar {
-    border-left: 1px solid var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground)));
-    border-right: 1px solid var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground)));
-    border-top: 1px solid var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground)));
+    border-left: 1px solid var(--sbx-color-border, var(--content-ui-foreground));
+    border-right: 1px solid var(--sbx-color-border, var(--content-ui-foreground));
+    border-top: 1px solid var(--sbx-color-border, var(--content-ui-foreground));
 }
 
 /* update number line with drag and drop styles */
@@ -385,7 +401,7 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 }
 .lrn_widget.lrn_numberline .lrn_btn_arrow:not(.lrn_disabled, .lrn_suggested):hover,
 .lrn_widget.lrn_numberline .lrn_btn_arrow:not(.lrn_disabled, .lrn_suggested):focus {
-    background: var(--content-ui-selected);
+    background: var(--sbx-config-color-active, var(--content-ui-selected));
     border-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 .lrn .lrn_btn_arrow:active:after,
@@ -400,22 +416,22 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 
 /* update file upload styles */
 .lrn_widget.lrn_fileupload .lrn_response_input_wrapper {
-    border-color: var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground)));
+    border-color: var(--sbx-color-border, var(--content-ui-foreground));
 }
 .lrn_wid .lrn_widget.lrn_fileupload .lrn-toolbar,
 .lrn_widget.lrn_fileupload .lrn-toolbar,
 .lrn_widget .lrn-imageupload-config-outlet .lrn-imageupload-config-upload-btn-container,
 .lrn_widget .lrn-imageupload-img-wrapper-is-empty {
     background: var(--sbx-color-foreground-primary, #fff);
-    border-bottom: 1px solid var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground)));
+    border-bottom: 1px solid var(--sbx-color-border, var(--content-ui-foreground));
 }
 .lrn_widget .lrn-imageupload-config-outlet .lrn-imageupload-config-upload-btn-container,
 .lrn_widget .lrn-imageupload-img-wrapper-is-empty {
-    border-left: 1px solid var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground)));
-    border-right: 1px solid var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground)));
+    border-left: 1px solid var(--sbx-color-border, var(--content-ui-foreground));
+    border-right: 1px solid var(--sbx-color-border, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_imageupload .lrn_toolbar {
-    border: 1px solid var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground)));
+    border: 1px solid var(--sbx-color-border, var(--content-ui-foreground));
     touch-action: none;
     -ms-touch-action: none;
 }
@@ -435,7 +451,7 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
         0 0 0 2px var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton.lrn_active {
-    background-color: var(--content-ui-selected);
+    background-color: var(--sbx-config-color-active, var(--content-ui-selected));
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton.lrn_active:focus {
@@ -456,14 +472,14 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 /* update the classification drop zone borders */
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr .lrn_response_container.lrn_last,
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr.lrn_last .lrn_response_container {
-    border-right: 1px dashed var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground)));
+    border-right: 1px dashed var(--sbx-color-border, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr.lrn_last .lrn_response_container {
-    border-bottom: 1px dashed var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground)));
+    border-bottom: 1px dashed var(--sbx-color-border, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table .lrn_response_container {
-    border-left: 1px dashed var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground)));
-    border-top: 1px dashed var(--sbx-color-border, var(--sbx-config-color-accent, var(--content-ui-foreground)));
+    border-left: 1px dashed var(--sbx-color-border, var(--content-ui-foreground));
+    border-top: 1px dashed var(--sbx-color-border, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_classification
     .lrn_response
@@ -503,7 +519,7 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
     tr
     .lrn_response_container.lrn_last.lrn_over,
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr .lrn_response_container.lrn_over {
-    border: 1px var(--content-ui-background) solid;
+    border: 1px var(--sbx-config-color-active, var(--content-ui-background)) solid;
 }
 
 /* update shortlist icon color */
