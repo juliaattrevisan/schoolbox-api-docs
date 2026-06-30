@@ -279,6 +279,14 @@ abstract class AbstractAssessment implements IAssessable
         // This should not inherit any of the spec assessment's participants.
         // (One wonders why spec assessments even have plans?)
         $clone->setPlans($clone->getPlans()->emptyClone());
+
+        /* The clone shouldn't inherit the spec assessment's rubric instances,
+         * cloning of the rubrics is handled separately (see Replicator::replicateRubricGrids).
+         * Avoid setRubricInstances() as that would mutate the shared source collection in place.
+         */
+        // TODO: revise this fix, it's possible that something else somewhere needs to be done too, but it appears to be a good start
+        $clone->rubricInstances = new GenericCollection(\Schoolbox\Assessment\Rubric\Instance\Model::class);
+
         return $clone;
     }
 

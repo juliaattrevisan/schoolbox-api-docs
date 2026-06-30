@@ -62,6 +62,7 @@ window.Vue.onMounted(() => {
                     :name="`rubric-${props.rubricId}-title`"
                     maxlength="255"
                     required
+                    data-test="rubric-title"
                 />
             </label>
         </div>

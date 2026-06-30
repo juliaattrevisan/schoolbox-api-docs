@@ -10,6 +10,8 @@ import type { RubricGridDescriptor, RubricGridLevel, RubricMarkedGridIndicator }
 
 interface Props {
     descriptor: RubricGridDescriptor;
+    /** The index of the level (column) this descriptor sits in, used to address it in acceptance tests */
+    levelIndex: number;
     selfAssessmentIndicatorMark: RubricMarkedGridIndicator | null;
     level: RubricGridLevel;
     participantId: User["id"] | null;
@@ -123,7 +125,10 @@ window.Vue.onMounted(() => {
                 data-rubric-descriptor-checkbox
             />
 
-            <label :for="`descriptor-${props.descriptor.id}-${componentId}`">
+            <label
+                :for="`descriptor-${props.descriptor.id}-${componentId}`"
+                :data-test="`rubric-markable-descriptor-${props.levelIndex}`"
+            >
                 <div class="hide-for-large-up u-pad-m hide-on-print">
                     <!-- display rubric levels for the mobile view. -->
                     <p>
