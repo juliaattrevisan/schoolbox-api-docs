@@ -22,13 +22,11 @@ export default class RubricMarkable {
     }
 
     /**
-     * Selects a given rubric indicator's descriptor at a given level (column).
-     * Scopes to the indicator row, then clicks the descriptor's label at that level,
-     * which toggles the underlying descriptor checkbox.
+     * Select a descriptor for a particular rubric indicator based on the associated level.
      * @param indicatorId - The ID of the indicator
-     * @param levelIndex - The zero-based index of the level (column) to select
+     * @param levelIndex - The zero-based index of the target descriptor's level (column)
      */
-    public async selectRubricIndicatorByLevel(indicatorId: number, levelIndex: number): Promise<void> {
+    public async selectRubricDescriptorByLevel(indicatorId: number, levelIndex: number): Promise<void> {
         await this.page
             .getByTestId(`${RubricMarkable.DATA_TEST_RUBRIC_INDICATOR}-${indicatorId}`)
             .getByTestId(`${RubricMarkable.DATA_TEST_RUBRIC_DESCRIPTOR}-${levelIndex}`)
