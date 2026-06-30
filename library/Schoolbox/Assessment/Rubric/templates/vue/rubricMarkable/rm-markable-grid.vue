@@ -73,12 +73,24 @@ window.Vue.watch(derivedRubricMark, (scaledMark) => {
  * The self-assessment's mark, re-expressed in the instructor's (input) mark scheme rather than the
  * display scheme the student saw, so it can be compared against the mark the instructor is entering.
  */
-// TODO: SA-22480: Investigate below AI-generated 'fix', oh god it fulfilled my TODO down there...
-const selfAssessmentMarkInInputScheme = window.Vue.computed<string | null>(() => {
+const selfAssessmentMark = window.Vue.computed<string | null>(() => {
     if (!props.selfAssessmentFeedback) {
         return null;
     }
-    const scaledMark = deriveRubricMark(props.selfAssessmentFeedback);
+
+    if (props.selfAssessmentFeedback.normalisedMark === null) {
+        /* probably just show whatever is in humanReadableMark in this scenario
+         * (you might not have access to normalisedMark but can still see the HR mark for whatever reason I guess)
+         */
+        return props.selfAssessmentFeedback.humanReadableMark;
+    }
+
+    // need to rederive the scaled mark based on the normalisedMark for applyMarkScheme to receive the right value
+    let scaledMark = (props.selfAssessmentFeedback.normalisedMark / 100) * props.rubric.derivedMaxValue;
+    if (scaledMark % 1 !== 0) {
+        scaledMark = parseFloat(scaledMark.toFixed(2));
+    }
+
     return applyMarkScheme(scaledMark, props.rubric.derivedMaxValue, props.assessmentMarkScheme).humanReadableMark;
 });
 
@@ -125,16 +137,14 @@ const formValue = window.Vue.computed(() => JSON.stringify(translateMarkedGridTo
                     >
                         {{ rubricMarkedGrid.humanReadableMark }}
 
-                        <!-- Self-Assessment (only shown when the student received a displayable self-assessment mark) -->
-                        <template v-if="props.selfAssessmentFeedback?.humanReadableMark">
+                        <!-- Self-Assessment -->
+                        <template v-if="selfAssessmentMark">
                             <!--
                             Although the student entered the mark using the display mark type,
                             we show it here using the input mark type so that it matches what the instructor
                             is currently entering so it can be easily compared.
                             -->
-                            ({{ selfAssessmentMarkInInputScheme }}
-                            given in
-                            {{ locale.selfAssessment.singular() }})
+                            ({{ selfAssessmentMark }} given in {{ locale.selfAssessment.singular() }})
                         </template>
                     </th>
                 </tr>
