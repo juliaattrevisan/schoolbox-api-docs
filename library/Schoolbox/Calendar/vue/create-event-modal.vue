@@ -283,7 +283,7 @@ export default {
 
                         <template v-if="canBookResources">
                             <search-select
-                                class="l-pad-m--bottom"
+                                class="u-pad-m--bottom"
                                 v-model:selected="resources"
                                 :endpoint="getBookingEndpoint()"
                                 label="Resources"
@@ -296,7 +296,7 @@ export default {
 
                         <template v-if="canInvite">
                             <search-select
-                                class="l-pad-m--bottom"
+                                class="u-pad-m--bottom"
                                 v-model:selected="selected"
                                 :endpoint="getEndpoint()"
                                 label="Invite Guests"

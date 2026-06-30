@@ -93,7 +93,7 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <div v-if="fieldSettingDefinition && availableFieldSettingOptions.length" class="l-flex__item--1-grow">
+    <div v-if="fieldSettingDefinition && availableFieldSettingOptions.length" class="u-flex__item--1-grow">
         <!-- only show the label if there are checkboxes, as each input has its own label instead -->
         <label v-if="availableFieldSettingOptions.checkbox.length">
             {{ fieldSettingDefinition.displayAs }}
@@ -131,7 +131,7 @@ window.Vue.onMounted(() => {
         </div>
 
         <template v-for="(inputOption, i) in availableFieldSettingOptions.input" :key="inputOption.id">
-            <label :for="getLabelKeyForOption(inputOption)" :class="{ 'l-mar-s--top': i > 0 }">
+            <label :for="getLabelKeyForOption(inputOption)" :class="{ 'u-mar-s--top': i > 0 }">
                 {{ inputOption.name }}
                 <span
                     v-if="getMetaTextForOption(inputOption)"

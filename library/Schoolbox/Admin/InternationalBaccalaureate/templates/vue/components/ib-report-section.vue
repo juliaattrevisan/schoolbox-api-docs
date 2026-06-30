@@ -18,14 +18,14 @@ function toggle(): void {
 </script>
 
 <template>
-    <div class="ib-report-section c-island">
+    <div class="ib-report-section sbx-island">
         <button
             type="button"
-            class="ib-report-section__header l-flex l-flex--align-center l-flex--justify-space f-no-margins"
+            class="ib-report-section__header u-flex u-flex--align-center u-flex--justify-space f-no-margins"
             :aria-expanded="isOpen"
             @click="toggle"
         >
-            <span class="l-flex l-flex--align-center l-gap-xs f-no-margins">
+            <span class="u-flex u-flex--align-center u-gap-xs f-no-margins">
                 <span>{{ title }}</span>
                 <span class="ib-report-section__count">{{ count }}</span>
             </span>

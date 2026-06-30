@@ -6,11 +6,11 @@
                 <li>
                     <div class="list-item">
                         <div class="small-12 card">
-                            <div class="l-flex-row l-gap-m l-pad-s--vert">
+                            <div class="u-flex-row u-gap-m u-pad-s--vert">
                                 <sbx-icon name="mute" size="xl" color="var(--sbx-color-text-secondary,var(--body-foreground))"></sbx-icon>
                                 <div>
                                     <p>Muted</p>
-                                    <p class="meta t-white-space-normal">
+                                    <p class="meta u-ws-normal">
                                         {{ who | capitalize }} won't receive this message.
                                     </p>
                                 </div>
@@ -23,11 +23,11 @@
                 <li>
                     <div class="list-item">
                         <div class="small-12 card">
-                            <div class="l-flex-row l-gap-m l-pad-s--vert">
+                            <div class="u-flex-row u-gap-m u-pad-s--vert">
                                 <sbx-icon name="news" size="xl" color="var(--sbx-color-text-secondary,var(--body-foreground))"></sbx-icon>
                                 <div>
                                     <p>Digest</p>
-                                    <p class="meta t-white-space-normal">
+                                    <p class="meta u-ws-normal">
                                         This message will be collated and emailed to {{ who }} in a digest{% if digest | length > 1 %} <strong>{{ digest }}</strong>{% endif %}.<br/>
                                         It will not appear in {{ who }}{{ who == 'you' ? 'r' : "'" }} internal messages list.
                                     </p>
@@ -41,11 +41,11 @@
                 <li>
                     <div class="list-item">
                         <div class="small-12 card">
-                            <div class="l-flex-row l-gap-m l-pad-s--vert">
+                            <div class="u-flex-row u-gap-m u-pad-s--vert">
                                 <sbx-icon name="notifications" size="xl" color="var(--sbx-color-text-secondary,var(--body-foreground))"></sbx-icon>
                                 <div>
                                     <p>Instant</p>
-                                    <p class="meta t-white-space-normal">
+                                    <p class="meta u-ws-normal">
                                         This message will appear in {{ who }}{{ who == 'you' ? 'r' : "'" }} internal messages list.
                                     </p>
                                 </div>
@@ -57,7 +57,7 @@
                 <li>
                     <div class="list-item">
                         <div class="small-12 card">
-                            <div class="l-flex-row l-gap-m l-pad-s--vert">
+                            <div class="u-flex-row u-gap-m u-pad-s--vert">
                                 <sbx-icon name="add" size="xl" color="var(--sbx-color-text-secondary,var(--body-foreground))"></sbx-icon>
                             </div>
                         </div>
@@ -68,11 +68,11 @@
                 <li>
                     <div class="list-item">
                         <div class="small-12 card">
-                            <div class="l-flex-row l-gap-m l-pad-s--vert">
+                            <div class="u-flex-row u-gap-m u-pad-s--vert">
                                 <sbx-icon name="mobile" size="xl" color="var(--sbx-color-text-secondary,var(--body-foreground))"></sbx-icon>
                                 <div>
                                     <p>Device</p>
-                                    <p class="meta t-white-space-normal">
+                                    <p class="meta u-ws-normal">
                                         This message will be pushed to {{ who }}{{ who == 'you' ? 'r' : "'" }} device{% if mobile | length > 1 %}s{% endif %}. <br />
                                         * Requires Instant to be enabled.
                                     </p>
@@ -86,11 +86,11 @@
                 <li>
                     <div class="list-item">
                         <div class="small-12 card">
-                            <div class="l-flex-row l-gap-m l-pad-s--vert">
+                            <div class="u-flex-row u-gap-m u-pad-s--vert">
                                 <sbx-icon name="email" size="xl" color="var(--sbx-color-text-secondary,var(--body-foreground))"></sbx-icon>
                                 <div>
                                     <p>Email</p>
-                                    <p class="meta t-white-space-normal">
+                                    <p class="meta u-ws-normal">
                                         This message will be immediately emailed to {{ who }}.<br />
                                         * Requires Instant to be enabled.
                                     </p>

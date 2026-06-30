@@ -73,7 +73,7 @@ window.Vue.onMounted(async () => {
 
         <!-- Status filters -->
         <!-- TODO: implement filters (out of scope for now according to SA-22474's AC) -->
-        <!-- <div class="small-12 large-8 columns text-right">
+        <!-- <div class="small-12 large-8 columns u-ta-right">
             <rmb-filters v-model:filters="filters" />
         </div> -->
     </div>
@@ -85,7 +85,7 @@ window.Vue.onMounted(async () => {
         </div>
     </div>
 
-    <p v-if="props.supportingDataCurriculumNodes.length" class="meta l-flex-row l-gap-xs">
+    <p v-if="props.supportingDataCurriculumNodes.length" class="meta u-flex-row u-gap-xs">
         Showing data associated to curriculum codes:
         <curriculum-codes :nodes="props.supportingDataCurriculumNodes" />
     </p>

@@ -197,7 +197,7 @@ function applyModerationEventUpdate(event: AiModerationEvent): void {
     </div>
 
     <div class="row">
-        <div class="small-12 medium-6 columns l-mar-m--bottom no-print" :class="{ island: isLoading }">
+        <div class="small-12 medium-6 columns u-mar-m--bottom no-print" :class="{ island: isLoading }">
             <div v-if="loadError" data-alert class="alert-box alert">
                 {{ loadError }}
             </div>

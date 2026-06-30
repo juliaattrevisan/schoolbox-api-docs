@@ -46,19 +46,19 @@ window.Vue.onMounted(() => {
 
 <template>
     <basic-modal v-model:is-open="addUnitsStore.isOpen">
-        <form class="l-flex-col l-gap-m f-no-margins" @submit.prevent="onAddSelected">
+        <form class="u-flex-col u-gap-m f-no-margins" @submit.prevent="onAddSelected">
             <h2 data-test="up-add-units-title">Create {{ locale.unit.translate(true, true) }}</h2>
-            <div class="sbx-vert-scroll-container l-flex-col l-gap-s">
-                <div class="l-flex-col l-gap-s">
+            <div class="sbx-vert-scroll-container u-flex-col u-gap-s">
+                <div class="u-flex-col u-gap-s">
                     <!-- Loop through newUnits and display label and text input for each -->
-                    <div v-for="(unit, index) in addUnitsStore.newUnits" :key="index" class="l-flex-col l-gap-xs">
+                    <div v-for="(unit, index) in addUnitsStore.newUnits" :key="index" class="u-flex-col u-gap-xs">
                         <label :for="`unit-${index}`" class="required">Name</label>
-                        <div class="l-flex l-gap-xs l-align-items-center f-no-margins">
+                        <div class="u-flex u-gap-xs f-no-margins">
                             <input
                                 :id="`unit-${index}`"
                                 v-model="addUnitsStore.newUnits[index]"
                                 type="text"
-                                class="input l-flex__item--1"
+                                class="input u-flex__item--1"
                                 maxlength="255"
                                 :data-test="`up-add-units-name-input-${index}`"
                                 :placeholder="`Enter ${locale.unit.translate(false, false).toLowerCase()} name`"
@@ -95,16 +95,16 @@ window.Vue.onMounted(() => {
                 </div>
             </div>
             <request-error v-if="addUnitsStore.loadError" :further-info="addUnitsStore.loadError" />
-            <div class="l-flex l-gap-xs f-no-margins">
+            <div class="u-flex u-gap-xs f-no-margins">
                 <button
-                    class="button l-flex__item--1"
+                    class="button u-flex__item--1"
                     data-test="up-add-units-cancel"
                     type="button"
                     @click.prevent="addUnitsStore.cancel()"
                 >
                     Cancel
                 </button>
-                <button class="button submit l-flex__item--1" data-test="up-add-units-create">
+                <button class="button submit u-flex__item--1" data-test="up-add-units-create">
                     {{ addUnitsStore.isProcessing ? "Creating..." : "Create" }}
                 </button>
             </div>

@@ -18,36 +18,12 @@
     vertical-align: middle;
 }
 
-.align-bottom {
-    vertical-align: bottom;
-}
-
-.border-none {
-    border: none !important;
-}
-
 // ensure an element is scrollable
 .scrollable {
     overflow: auto;
     table {
         margin-bottom: 0;
     }
-}
-
-.margin-none {
-    margin: 0;
-}
-
-.padding-none {
-    padding: 0;
-}
-
-.u-inline-block {
-    display: inline-block;
-}
-
-.u-no-border {
-    border: none;
 }
 
 .u-cursor-pointer {

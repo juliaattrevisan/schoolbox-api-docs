@@ -67,8 +67,8 @@ function handleConfirm(): void {
 
 <template>
     <basic-modal v-model:is-open="isOpen">
-        <div class="l-flex-col l-gap-m f-no-margins">
-            <div class="l-flex-col l-gap-s f-no-margins">
+        <div class="u-flex-col u-gap-m f-no-margins">
+            <div class="u-flex-col u-gap-s f-no-margins">
                 <h2>Include in existing customisation</h2>
                 <p class="meta">
                     Modifying participation for:
@@ -81,7 +81,7 @@ function handleConfirm(): void {
                     </template>
                 </p>
             </div>
-            <div class="l-flex-col l-gap-s f-no-margins">
+            <div class="u-flex-col u-gap-s f-no-margins">
                 <label for="activitySelect">Customisation</label>
                 <select id="activitySelect" v-model="selectedActivityId" class="f-no-margins">
                     <option value="null" disabled>Select customisation</option>
@@ -90,11 +90,11 @@ function handleConfirm(): void {
                     </option>
                 </select>
             </div>
-            <div class="l-flex l-gap-xs f-no-margins">
-                <button class="button l-flex__item--1" @click.prevent="handleCancel">Cancel</button>
+            <div class="u-flex u-gap-xs f-no-margins">
+                <button class="button u-flex__item--1" @click.prevent="handleCancel">Cancel</button>
                 <button
                     v-if="selectedActivity"
-                    class="button submit l-flex__item--1"
+                    class="button submit u-flex__item--1"
                     data-test="cp-include-in-existing-modal-confirm-button"
                     @click.prevent="handleConfirm"
                 >

@@ -26,10 +26,10 @@ function onFolderSelected(folderId: number, event?: MouseEvent): void {
         </legend>
 
         <div
-            class="l-grid l-pad-m--left l-pad-m--right mf-sources-grid"
+            class="u-grid u-pad-m--left u-pad-m--right mf-sources-grid"
             :style="{ 'grid-template-rows': isExpanded ? '1fr' : '0fr' }"
         >
-            <div class="l-grid l-grid--auto-fill l-gap-m mf-sources-grid-row">
+            <div class="u-grid u-grid--auto-fill u-gap-m mf-sources-grid-row">
                 <div v-for="folder in mfStore.folders" :key="folder.id" class="mf-source">
                     <section class="checklist">
                         <div class="v-card small-12">

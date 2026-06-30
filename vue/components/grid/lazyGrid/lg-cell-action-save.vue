@@ -33,14 +33,14 @@ function onSaveClicked(): void {
         <section class="f-no-margins">
             <div
                 v-if="props.hasChanged && !props.isSaving"
-                class="meta l-pad-s"
+                class="meta u-pad-s"
                 data-role="dirty-indicator"
                 role="status"
                 aria-live="polite"
             >
                 Changes not saved
             </div>
-            <div v-if="props.isSaving" class="meta l-pad-s" role="status" aria-live="polite">Saving...</div>
+            <div v-if="props.isSaving" class="meta u-pad-s" role="status" aria-live="polite">Saving...</div>
             <button
                 v-else-if="!props.hasChanged && !props.isFocused"
                 class="button"

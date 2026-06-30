@@ -61,9 +61,9 @@ window.Vue.watch(bottom, (isAtBottom) => {
     <basic-modal v-model:is-open="isOpen" has-background-click allow-outside-click>
         <div v-if="isNewLoad && isNewLoading" class="loader"></div>
         <data-load-error v-else-if="isNewLoad && loadError" data-title="record" :further-info="loadError" />
-        <div v-else class="l-flex-col l-gap-m">
-            <div class="l-flex-row l-flex--justify-space l-flex--no-wrap l-gap-m">
-                <div class="l-flex-col l-gap-s f-no-margins">
+        <div v-else class="u-flex-col u-gap-m">
+            <div class="u-flex-row u-flex--justify-space u-flex--no-wrap u-gap-m">
+                <div class="u-flex-col u-gap-s f-no-margins">
                     <h2 v-if="props.title">{{ props.title }}</h2>
                     <p v-if="props.meta" class="meta">
                         {{ props.meta }}
@@ -71,14 +71,14 @@ window.Vue.watch(bottom, (isAtBottom) => {
                 </div>
             </div>
             <div ref="modalResultsRef" class="prm__records">
-                <div class="l-flex-col l-gap-s">
-                    <div v-for="record in payload?.data.results" :key="record.id" class="c-island">
+                <div class="u-flex-col u-gap-s">
+                    <div v-for="record in payload?.data.results" :key="record.id" class="sbx-island">
                         <ul class="information-list threaded">
                             <pastoral-record :record="record" />
                         </ul>
                     </div>
                 </div>
-                <div v-if="isMoreLoading" class="c-island l-pad-s">
+                <div v-if="isMoreLoading" class="sbx-island u-pad-s">
                     <div class="loader"></div>
                 </div>
                 <data-load-error v-else-if="!isNewLoad && loadError" data-title="record" :further-info="loadError" />

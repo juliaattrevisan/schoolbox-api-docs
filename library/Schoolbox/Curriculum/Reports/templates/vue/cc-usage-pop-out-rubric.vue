@@ -16,7 +16,7 @@ const props = defineProps<Props>();
         <p class="f-no-margins">
             <b>{{ capability.name }}</b>
         </p>
-        <ul class="l-mar--0-bottom">
+        <ul class="u-mar--0-bottom">
             <li v-for="indicator in capability.indicators" :key="indicator.name">
                 {{ indicator.name }}
             </li>

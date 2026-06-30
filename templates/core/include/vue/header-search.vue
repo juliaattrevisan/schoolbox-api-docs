@@ -246,7 +246,7 @@ const searchButtonText = window.Vue.computed(() => {
         id="search"
         ref="formElement"
         v-on-click-outside="onClickOutside"
-        class="c-header-search"
+        class="sbx-header-search"
         action="/search"
         :class="{ focus: isSelected }"
     >
@@ -263,36 +263,36 @@ const searchButtonText = window.Vue.computed(() => {
             @mouse-out="onMouseOut"
             @click="onClicked"
         />
-        <div v-show="isSelected" class="c-header-search__results">
-            <div v-if="isOpen && keyword.length >= minKeywordLength" class="l-flex-col">
+        <div v-show="isSelected" class="sbx-header-search__results">
+            <div v-if="isOpen && keyword.length >= minKeywordLength" class="u-flex-col">
                 <div
                     v-if="userResults.length && userResults.length !== totalCountUsers"
-                    class="c-card c-card--border-end l-pad-s"
+                    class="sbx-card sbx-card--border-end u-pad-s"
                 >
                     <em>Showing {{ userResults.length }} of {{ totalCountUsers }} matching users</em>
                 </div>
                 <div
                     v-else-if="userResults.length && totalCountUsers === null"
-                    class="c-card c-card--border-end l-pad-s"
+                    class="sbx-card sbx-card--border-end u-pad-s"
                 >
                     <em>Showing top {{ userResults.length }} matching users</em>
                 </div>
                 <a
                     v-for="(result, i) in userResults"
                     :key="i"
-                    :class="`c-card c-card--link c-card--border-end ${i === arrowCounter ? 'c-card--active' : ''}`"
+                    :class="`sbx-card sbx-card--link sbx-card--border-end ${i === arrowCounter ? 'sbx-card--active' : ''}`"
                     :href="result.url"
                     :data-test="`header-search-user-result-link-${result.title}`"
                     @mouseover="arrowCounter = i"
                     @mouseleave="arrowCounter = -1"
                 >
-                    <div class="l-flex-row l-flex--align-center l-flex--no-wrap l-gap-s l-pad-s">
-                        <div class="c-img c-img--s c-img--round l-flex__item--0-shrink">
-                            <div class="c-img__wrapper">
+                    <div class="u-flex-row u-flex--align-center u-flex--no-wrap u-gap-s u-pad-s">
+                        <div class="sbx-img sbx-img--s sbx-img--round u-flex__item--0-shrink">
+                            <div class="sbx-img__wrapper">
                                 <img :src="result.image" :alt="`Portrait photo of ${result.title}`" />
                             </div>
                         </div>
-                        <div class="l-flex-col l-flex--justify-center f-no-margins">
+                        <div class="u-flex-col u-flex--justify-center f-no-margins">
                             <h3>
                                 {{ result.title }}
                             </h3>
@@ -302,35 +302,35 @@ const searchButtonText = window.Vue.computed(() => {
                 </a>
                 <div
                     v-if="pageResults.length && totalCountFolders !== null && pageResults.length !== totalCountFolders"
-                    class="c-card c-card--border-end l-pad-s"
+                    class="sbx-card sbx-card--border-end u-pad-s"
                 >
                     <em>Showing {{ pageResults.length }} of {{ totalCountFolders }} matching pages</em>
                 </div>
                 <div
                     v-else-if="pageResults.length && totalCountFolders === null"
-                    class="c-card c-card--border-end l-pad-s"
+                    class="sbx-card sbx-card--border-end u-pad-s"
                 >
                     <em>Showing top {{ pageResults.length }} matching pages</em>
                 </div>
                 <a
                     v-for="(result, i) in pageResults"
                     :key="i + userResults.length"
-                    :class="`c-card c-card--link c-card--border-end ${
-                        i + userResults.length === arrowCounter ? 'c-card--active' : ''
+                    :class="`sbx-card sbx-card--link sbx-card--border-end ${
+                        i + userResults.length === arrowCounter ? 'sbx-card--active' : ''
                     }`"
                     :href="result.url"
                     :data-test="`header-search-page-result-link-${result.title}`"
                     @mouseover="arrowCounter = i + userResults.length"
                     @mouseleave="arrowCounter = -1"
                 >
-                    <div class="l-flex-row l-flex--align-center l-flex--no-wrap l-gap-s l-pad-s">
-                        <div class="c-img c-img--s l-flex__item--0-shrink">
-                            <div class="c-img__wrapper">
+                    <div class="u-flex-row u-flex--align-center u-flex--no-wrap u-gap-s u-pad-s">
+                        <div class="sbx-img sbx-img--s u-flex__item--0-shrink">
+                            <div class="sbx-img__wrapper">
                                 <img v-if="result.image" :src="result.image" :alt="`photo of ${result.title}`" />
                                 <div v-else :class="`icon icon-${result.icon}`"></div>
                             </div>
                         </div>
-                        <div class="l-flex-col l-flex--justify-center f-no-margins">
+                        <div class="u-flex-col u-flex--justify-center f-no-margins">
                             <h3>
                                 {{ result.title }}
                             </h3>
@@ -343,25 +343,25 @@ const searchButtonText = window.Vue.computed(() => {
                         </div>
                     </div>
                 </a>
-                <div v-if="isLoading" class="c-card c-card--loading">
-                    <div class="l-flex-row l-gap-s l-pad-s">
-                        <div class="c-img c-img--s c-img--round">
-                            <div class="c-img__wrapper">
+                <div v-if="isLoading" class="sbx-card sbx-card--loading">
+                    <div class="u-flex-row u-gap-s u-pad-s">
+                        <div class="sbx-img sbx-img--s sbx-img--round">
+                            <div class="sbx-img__wrapper">
                                 <div class="img-placeholder"></div>
                             </div>
                         </div>
-                        <div class="l-flex-col l-flex--justify-center l-flex__item--1 l-gap-s">
+                        <div class="u-flex-col u-flex--justify-center u-flex__item--1 u-gap-s">
                             <h3></h3>
                             <span></span>
                         </div>
                     </div>
                 </div>
-                <div v-if="!isLoading && !userResults.length && !pageResults.length" class="c-card l-pad-s">
+                <div v-if="!isLoading && !userResults.length && !pageResults.length" class="sbx-card u-pad-s">
                     <em>No users or pages were found matching "{{ keyword }}"</em>
                 </div>
             </div>
-            <div class="l-flex-col">
-                <a class="button f-no-margins t-lh--normal c-header-search__search-button" :href="searchButtonHref">
+            <div class="u-flex-col">
+                <a class="button f-no-margins u-lh-normal sbx-header-search__search-button" :href="searchButtonHref">
                     <sbx-icon name="search" size="1rem" color="currentColor" />
                     {{ searchButtonText }}
                 </a>

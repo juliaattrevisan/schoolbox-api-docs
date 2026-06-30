@@ -62,10 +62,10 @@ function clearSelection(): void {
             <em>{{ selectedList.length }} selected</em>
         </h3>
         <button class="button-clear" @click.prevent="clearSelection">Clear selection</button>
-        <div class="l-flex-row l-flex--justify l-gap-xs">
+        <div class="u-flex-row u-flex--justify u-gap-xs">
             <template v-if="hasCustomisedInSelection">
                 <button
-                    class="icon-close button l-flex__item--1-auto"
+                    class="icon-close button u-flex__item--1-auto"
                     data-test="custom-participation-remove-customisation"
                     @click.prevent="handleActionSelected(selectedList, 'removeCustomisation')"
                 >
@@ -75,7 +75,7 @@ function clearSelection(): void {
             <template v-else>
                 <button
                     v-if="props.routes.getLearningPlanNewUrl"
-                    class="button l-flex__item--1-auto sbx-button--has-icon"
+                    class="button u-flex__item--1-auto sbx-button--has-icon"
                     @click.prevent="
                         handleActionSelected(
                             selectedList,
@@ -87,7 +87,7 @@ function clearSelection(): void {
                     Modify Existing {{ locale.activity.translate(false, true) }}
                 </button>
                 <button
-                    class="button l-flex__item--1-auto sbx-button--has-icon"
+                    class="button u-flex__item--1-auto sbx-button--has-icon"
                     @click.prevent="handleActionSelected(selectedList, 'exclude')"
                 >
                     <sbx-icon name="staff-students"></sbx-icon>
@@ -95,7 +95,7 @@ function clearSelection(): void {
                 </button>
                 <button
                     v-if="props.customisations.length > 0 && props.routes.includeInExistingCustomisation"
-                    class="button l-flex__item--1-auto sbx-button--has-icon"
+                    class="button u-flex__item--1-auto sbx-button--has-icon"
                     @click.prevent="handleOpenIncludeInExistingModal"
                 >
                     <sbx-icon name="list"></sbx-icon>
@@ -103,7 +103,7 @@ function clearSelection(): void {
                 </button>
                 <button
                     v-if="props.routes.getAssessmentParticipationCopyActivity"
-                    class="button l-flex__item--1-auto sbx-button--has-icon"
+                    class="button u-flex__item--1-auto sbx-button--has-icon"
                     data-test="custom-participation-copy-activity"
                     @click.prevent="
                         handleActionSelected(
@@ -117,7 +117,7 @@ function clearSelection(): void {
                 </button>
                 <button
                     v-if="props.routes.getAssessmentParticipationNewActivity"
-                    class="button l-flex__item--1-auto sbx-button--has-icon"
+                    class="button u-flex__item--1-auto sbx-button--has-icon"
                     @click.prevent="
                         handleActionSelected(
                             selectedList,
@@ -152,7 +152,7 @@ function clearSelection(): void {
         flex-direction: column;
     }
 
-    .l-flex__item--1-auto {
+    .u-flex__item--1-auto {
         flex: 1 1 100%;
     }
 }

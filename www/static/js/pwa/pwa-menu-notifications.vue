@@ -115,7 +115,7 @@ defineExpose({ hasVisibleContent });
         You have notifications enabled for this device
     </div>
 
-    <div v-else-if="prompt === PromptType.ENABLE_NOTIF_PROMPT" class="l-flex-col l-gap-s f-no-margins">
+    <div v-else-if="prompt === PromptType.ENABLE_NOTIF_PROMPT" class="u-flex-col u-gap-s f-no-margins">
         <p>Enable notifications on your device:</p>
         <a
             class="button enable-notif-button"

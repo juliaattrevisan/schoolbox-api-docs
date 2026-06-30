@@ -244,8 +244,8 @@ export default {
 </script>
 
 <template>
-    <div class="c-island l-pad-m manage-qrcodes">
-        <div v-if="isDataLoaded && hasStudents" class="students l-flex-row l-gap-m">
+    <div class="sbx-island u-pad-m manage-qrcodes">
+        <div v-if="isDataLoaded && hasStudents" class="students u-flex-row u-gap-m">
             <manage-qr-codes-student
                 v-for="student in students"
                 :key="student.id"

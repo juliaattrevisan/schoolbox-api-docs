@@ -1,6 +1,6 @@
 // To match the typical background colour of the dropdown content
 // and better visually connect the button to the content
-button.c-button[aria-expanded="true"] {
+button.sbx-button[aria-expanded="true"] {
     background-color: var(--sbx-config-color-active, var(--content-ui-background));
     opacity: 1;
     &:hover,
@@ -13,7 +13,7 @@ button.c-button[aria-expanded="true"] {
         }
     }
     // rotate when open
-    .c-icon--dropdown {
+    .sbx-icon--dropdown {
         transform: rotate(0deg);
     }
 }
@@ -47,7 +47,7 @@ button.f-match-existing-button-styles {
         padding-right: var(--spacing-s);
     }
     // is a up arrow by default, so flip
-    .c-icon--dropdown {
+    .sbx-icon--dropdown {
         transform: rotate(180deg);
     }
     &:focus {

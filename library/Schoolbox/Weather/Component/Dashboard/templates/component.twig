@@ -13,18 +13,18 @@
                 <div class="list-item">
                     <div class="row">
                         <div class="small-12 medium-3 columns">
-                            <p class="text-center current-value">Now</p>
+                            <p class="u-ta-center current-value">Now</p>
                         </div>
                         <div class="small-12 medium-3 columns">
-                            <p class="text-center">
+                            <p class="u-ta-center">
                                 <img src="{{ today.weatherIcon }}" title="{{ today.weatherSummary }}" alt="{{ today.weatherSummary }}" />
                             </p>
                         </div>
                         <div class="small-12 medium-3 columns">
-                            <p class="text-center current-value">{{ today.currentTemp }}&deg;C</p>
+                            <p class="u-ta-center current-value">{{ today.currentTemp }}&deg;C</p>
                         </div>
                         <div class="small-12 medium-3 columns">
-                            <p class="text-center current-value">UV Index {{ today.uvIndex}}</p>
+                            <p class="u-ta-center current-value">UV Index {{ today.uvIndex}}</p>
                         </div>
                     </div>
                 </div>
@@ -35,18 +35,18 @@
                 <div class="list-item">
                     <div class="row">
                         <div class="small-12 medium-3 columns">
-                            <p class="text-center current-value">{{ forecastDay.day }}</p>
+                            <p class="u-ta-center current-value">{{ forecastDay.day }}</p>
                         </div>
                         <div class="small-12 medium-3 columns">
-                            <p class="text-center">
+                            <p class="u-ta-center">
                                 <img src="{{ forecastDay.weatherIcon }}" title="{{ forecastDay.weatherSummary }}" alt="{{ forecastDay.weatherSummary }}"/>
                             </p>
                         </div>
                         <div class="small-12 medium-3 columns">
-                            <p class="text-center cold">{{ forecastDay.lowTemp }}&deg;C</p>
+                            <p class="u-ta-center cold">{{ forecastDay.lowTemp }}&deg;C</p>
                         </div>
                         <div class="small-12 medium-3 columns">
-                            <p class="text-center hot">{{ forecastDay.highTemp }}&deg;C</p>
+                            <p class="u-ta-center hot">{{ forecastDay.highTemp }}&deg;C</p>
                         </div>
                     </div>
                 </div>

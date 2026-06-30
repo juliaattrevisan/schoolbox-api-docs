@@ -36,19 +36,19 @@ function onSelected(e: Event): void {
 </script>
 
 <template>
-    <div v-if="props.justText" class="c-menu-item">
+    <div v-if="props.justText" class="sbx-menu-item">
         <slot></slot>
     </div>
-    <a v-else-if="props.link" class="c-menu-item" :href="props.link" @click="onSelected">
+    <a v-else-if="props.link" class="sbx-menu-item" :href="props.link" @click="onSelected">
         <slot></slot>
     </a>
-    <button v-else class="c-menu-item" @click="onSelected">
+    <button v-else class="sbx-menu-item" @click="onSelected">
         <slot></slot>
     </button>
 </template>
 
 <style lang="scss">
-.c-menu-item {
+.sbx-menu-item {
     align-items: center;
     background-color: white;
     font-size: 0.8rem;
@@ -89,8 +89,8 @@ function onSelected(e: Event): void {
 }
 
 /* We don't want these styles applying to the div v-if="props.justText", just the <a> and <button> elements */
-a.c-menu-item,
-button.c-menu-item {
+a.sbx-menu-item,
+button.sbx-menu-item {
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     &:hover:not(.is-disabled) {
         background-color: var(--sbx-config-color-active, var(--content-ui-background));

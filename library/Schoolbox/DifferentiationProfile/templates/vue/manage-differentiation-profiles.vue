@@ -67,10 +67,10 @@ const { maxScrollableHeight } = useMaxScrollableHeight(
 </script>
 
 <template>
-    <div v-if="rowsStore.isNewLoading" class="c-island l-pad-m">
+    <div v-if="rowsStore.isNewLoading" class="sbx-island u-pad-m">
         <div class="loader"></div>
     </div>
-    <div v-else-if="rowsStore.loadError" class="c-island l-pad-m">
+    <div v-else-if="rowsStore.loadError" class="sbx-island u-pad-m">
         <data-load-error data-title="record" :further-info="rowsStore.loadError" />
     </div>
     <empty-state v-else-if="rowsStore.isEmpty" icon="icon-learning-support">

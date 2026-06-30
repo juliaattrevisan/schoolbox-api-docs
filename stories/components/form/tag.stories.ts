@@ -15,7 +15,7 @@ const meta: Meta<typeof StorybookSlot> = {
     decorators: [
         (): { template: string } => ({
             template: `
-                <div class="c-island">
+                <div class="sbx-island">
                     <story />
                 </div>
             `,
@@ -29,7 +29,7 @@ type Story = StoryObj<typeof StorybookSlot>;
 export const Default: Story = {
     render: () => ({
         template: `
-<div class="l-flex-row l-gap-s">
+<div class="u-flex-row u-gap-s">
     <div class="sbx-tag">
         <span class="sbx-tag__name-span">Community</span>
     </div>
@@ -40,7 +40,7 @@ export const Default: Story = {
 export const Multiple: Story = {
     render: () => ({
         template: `
-<div class="l-flex-row l-gap-s">
+<div class="u-flex-row u-gap-s">
     <div class="sbx-tag">
         <span class="sbx-tag__name-span">Community</span>
     </div>
@@ -54,7 +54,7 @@ export const Multiple: Story = {
 export const WithButton: Story = {
     render: () => ({
         template: `
-<div class="l-flex-row l-gap-s">
+<div class="u-flex-row u-gap-s">
     <div class="sbx-tag">
         <button type="button" class="sbx-tag__name-button">Community</button>
     </div>
@@ -65,7 +65,7 @@ export const WithButton: Story = {
 export const WithClose: Story = {
     render: () => ({
         template: `
-<div class="l-flex-row l-gap-s">
+<div class="u-flex-row u-gap-s">
     <div class="sbx-tag">
         <button type="button" class="sbx-tag__name-button">Community</button>
         <button type="button" class="sbx-tag__remove-button" title="Remove Community" aria-label="Remove Community">

@@ -6,23 +6,23 @@
 @use "sass:list";
 
 @each $size in $global-sizes {
-    .l-gap-#{$size} {
+    .u-gap-#{$size} {
         gap: var(--spacing-#{$size});
     }
 }
 
-.l-gap-xl {
+.u-gap-xl {
     @media #{$small-only} {
         gap: var(--spacing-l);
     }
 }
 
-.l-gap-l {
+.u-gap-l {
     @media #{$small-only} {
         gap: var(--spacing-m);
     }
 }
 
-.l-gap--0 {
+.u-gap--0 {
     gap: 0;
 }

@@ -41,7 +41,7 @@
 
 </style>
 
-<div class="l-grid l-grid--12">
+<div class="u-grid u-grid--12">
     <div class="small-12 columns">
         <h1>Pantry - New Grid / Flex </h1>
     </div>
@@ -67,7 +67,7 @@
 </div>
 
 <h2 class="subheader">FOREWORD</h2>
-<div class="dummy-content l-mar-l--bottom">
+<div class="dummy-content u-mar-l--bottom">
     Which option should you go for? It entirely depends on the unique use case of what you require, but as a rough guide...<br /><br />
     If you need to align content across two axes, use <b>grid</b><br />
     If you only need to align content across a single axis, use <b>flex</b><br /><br />
@@ -75,8 +75,8 @@
 </div>
 
 <h2 class="subheader">LEGACY GRID LAYOUT IN CSS GRID</h2>
-<div class="meta l-mar-m--bottom">No need to use row classes (we previously were required to in Foundation)</div>
-<div class="l-grid l-grid--12 l-gap-m dummy-content l-mar-m--bottom highlighter">
+<div class="meta u-mar-m--bottom">No need to use row classes (we previously were required to in Foundation)</div>
+<div class="u-grid u-grid--12 u-gap-m dummy-content u-mar-m--bottom highlighter">
     <div class="large-4 medium-6 small-12">large-4 medium-6 small-12</div>
     <div class="large-4 medium-6 small-9">large-4 medium-6 small-9</div>
     <div class="large-4">large-4</div>
@@ -92,8 +92,8 @@
 </div>
 
 <h2 class="subheader">NEW GRID LAYOUT</h2>
-<div class="meta l-mar-m--bottom">Responsive, preserves minimum defined width of (default is 18rem) on all grid items</div>
-<div class="l-grid l-gap-l dummy-content highlighter l-mar-m--bottom">
+<div class="meta u-mar-m--bottom">Responsive, preserves minimum defined width of (default is 18rem) on all grid items</div>
+<div class="u-grid u-gap-l dummy-content highlighter u-mar-m--bottom">
     <div>responsive</div>
     <div>responsive</div>
     <div>responsive</div>
@@ -104,8 +104,8 @@
     <div>responsive</div>
 </div>
 
-<div class="meta l-mar-m--bottom">Four explicit columns</div>
-<div class="l-grid l-gap-l l-grid--4-col dummy-content highlighter l-mar-m--bottom">
+<div class="meta u-mar-m--bottom">Four explicit columns</div>
+<div class="u-grid u-gap-l u-grid--4-col dummy-content highlighter u-mar-m--bottom">
     <div>4-col</div>
     <div>4-col</div>
     <div>4-col</div>
@@ -116,8 +116,8 @@
     <div>4-col</div>
 </div>
 
-<div class="meta l-mar-m--bottom">Three explicit columns</div>
-<div class="l-grid l-gap-l l-grid--3-col dummy-content highlighter l-mar-m--bottom">
+<div class="meta u-mar-m--bottom">Three explicit columns</div>
+<div class="u-grid u-gap-l u-grid--3-col dummy-content highlighter u-mar-m--bottom">
     <div>3-col</div>
     <div>3-col</div>
     <div>3-col</div>
@@ -126,8 +126,8 @@
     <div>3-col</div>
 </div>
 
-<div class="meta l-mar-m--bottom">Two explicit columns</div>
-<div class="l-grid l-gap-l l-grid--2-col dummy-content highlighter l-mar-m--bottom">
+<div class="meta u-mar-m--bottom">Two explicit columns</div>
+<div class="u-grid u-gap-l u-grid--2-col dummy-content highlighter u-mar-m--bottom">
     <div>2-col</div>
     <div>2-col</div>
     <div>2-col</div>
@@ -135,30 +135,11 @@
 </div>
 
 <h2 class="subheader">FLEX</h2>
-<div class="meta l-mar-m--bottom">Utility classes available for creating quick, generic flex content when a unique solution isn't required</div>
-<div class="meta l-mar-m--bottom">With wrapping</div>
-<div class="l-flex l-flex--row l-gap-l l-flex--wrap dummy-content highlighter l-mar-m--bottom">
+<div class="meta u-mar-m--bottom">Utility classes available for creating quick, generic flex content when a unique solution isn't required</div>
+<div class="meta u-mar-m--bottom">With wrapping</div>
+<div class="u-flex u-flex--row u-gap-l u-flex--wrap dummy-content highlighter u-mar-m--bottom">
     <div class="">default</div>
-    <div class="l-flex__item l-flex__item--1">flex-1</div>
-    <div class="">default</div>
-    <div class="">default</div>
-    <div class="">default</div>
-    <div class="">default</div>
-    <div class="">default</div>
-    <div class="">default</div>
-    <div class="">default</div>
-    <div class="">default</div>
-    <div class="">default</div>
-    <div class="l-flex__item l-flex__item--1">flex-1</div>
-    <div class="">default</div>
-    <div class="">default</div>
-    <div class="">default</div>
-</div>
-
-<div class="meta l-mar-m--bottom">Without wrapping</div>
-<div class="l-flex-row l-gap-l dummy-content highlighter l-mar-m--bottom">
-    <div class="">default</div>
-    <div class="l-flex__item l-flex__item--1">flex-1</div>
+    <div class="u-flex__item u-flex__item--1">flex-1</div>
     <div class="">default</div>
     <div class="">default</div>
     <div class="">default</div>
@@ -168,14 +149,33 @@
     <div class="">default</div>
     <div class="">default</div>
     <div class="">default</div>
-    <div class="l-flex__item l-flex__item--1">flex-1</div>
+    <div class="u-flex__item u-flex__item--1">flex-1</div>
     <div class="">default</div>
     <div class="">default</div>
     <div class="">default</div>
 </div>
 
-<div class="meta l-mar-m--bottom">Centring content</div>
-<div class="l-flex-row l-gap-l l-flex--center dummy-content highlighter l-mar-m--bottom">
+<div class="meta u-mar-m--bottom">Without wrapping</div>
+<div class="u-flex-row u-gap-l dummy-content highlighter u-mar-m--bottom">
+    <div class="">default</div>
+    <div class="u-flex__item u-flex__item--1">flex-1</div>
+    <div class="">default</div>
+    <div class="">default</div>
+    <div class="">default</div>
+    <div class="">default</div>
+    <div class="">default</div>
+    <div class="">default</div>
+    <div class="">default</div>
+    <div class="">default</div>
+    <div class="">default</div>
+    <div class="u-flex__item u-flex__item--1">flex-1</div>
+    <div class="">default</div>
+    <div class="">default</div>
+    <div class="">default</div>
+</div>
+
+<div class="meta u-mar-m--bottom">Centring content</div>
+<div class="u-flex-row u-gap-l u-flex--center dummy-content highlighter u-mar-m--bottom">
     <div class="">default</div>
     <div class="">default</div>
     <div class="">default</div>

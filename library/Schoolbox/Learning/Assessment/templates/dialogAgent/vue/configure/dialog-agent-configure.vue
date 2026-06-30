@@ -155,7 +155,7 @@ window.Vue.onMounted(async () => {
             <section>
                 <div class="loader"></div>
 
-                <p class="text-center">Setting up scenario content...</p>
+                <p class="u-ta-center">Setting up scenario content...</p>
             </section>
         </div>
     </div>

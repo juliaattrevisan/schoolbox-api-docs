@@ -8,13 +8,13 @@
     editable:      bool
 #}
 {% extends '@settings/fieldType/input.twig' %}
-{% block extraWrapperClasses %}c-form-element c-input-range{% endblock %}
+{% block extraWrapperClasses %}sbx-form-element sbx-input-range{% endblock %}
 {% set inputType = 'range' %}
 {% block extraInputAttributes %}
     min="{{ min }}"
     max="{{ max }}"
     step="{{ step }}"
-    class="c-input-range__input"
+    class="sbx-input-range__input"
 {% endblock %}
 
 {# Add the value after the title so the user can see what it is set to #}

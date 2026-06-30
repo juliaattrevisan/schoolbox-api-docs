@@ -41,7 +41,7 @@ function onFlagSelect(event: CustomEvent): void {
 </script>
 
 <template>
-    <div class="l-flex-row l-gap-xs" :data-test="`pastoral-flags-${props.userId}`">
+    <div class="u-flex-row u-gap-xs" :data-test="`pastoral-flags-${props.userId}`">
         <sbx-label
             v-for="flag in props.flags"
             :key="`flag-${flag.typeId}-${flag.subtypeId ?? 0}`"

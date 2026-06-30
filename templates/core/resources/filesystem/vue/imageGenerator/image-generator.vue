@@ -50,7 +50,7 @@ const uploadError = window.Vue.ref<string | null>(null);
             v-if="acStore.feed.length > 0"
             :feed="acStore.fullFeed"
             :allow-retry="!!props.generateRoute"
-            class="l-mar-m--bottom"
+            class="u-mar-m--bottom"
             max-height="35vh"
             allow-selection
             error-prefix="There was a problem generating the image."
@@ -67,7 +67,7 @@ const uploadError = window.Vue.ref<string | null>(null);
             :allow-file-drop="acStore.feed.length === 0"
             :prompt-attributes="props.promptAttributes"
         />
-        <div v-if="uploadError !== null" class="alert-box alert l-mar--0">
+        <div v-if="uploadError !== null" class="alert-box alert u-mar--0">
             <b>There was a problem uploading the image.</b>
             {{ uploadError }}
         </div>

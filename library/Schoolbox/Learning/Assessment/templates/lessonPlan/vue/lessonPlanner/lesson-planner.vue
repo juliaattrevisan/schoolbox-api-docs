@@ -36,7 +36,7 @@ window.Vue.onMounted(() => {
         <!-- Hidden field outside of the modal to ensure the form gets it -->
         <input v-model="lpStore.lessonPlanDuration" type="hidden" name="duration" />
 
-        <div class="row l-pad-m--top">
+        <div class="row u-pad-m--top">
             <div class="small-12 columns">
                 <button
                     v-if="sbProps.aiFeatures.lessonplan?.enabled"

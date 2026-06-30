@@ -117,7 +117,7 @@ window.Vue.onMounted(() => {
             />
 
             <label :for="`descriptor-${props.descriptor.id}-${componentId}`">
-                <div class="hide-for-large-up l-pad-m hide-on-print">
+                <div class="hide-for-large-up u-pad-m hide-on-print">
                     <!-- display rubric levels for the mobile view. -->
                     <p>
                         <!-- eslint-disable-next-line vue/no-v-html -- scrubbed in the backend -->

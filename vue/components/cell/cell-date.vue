@@ -23,7 +23,7 @@ function formatDateShort(): string | null {
 </script>
 
 <template>
-    <div class="l-pad-s">
+    <div class="u-pad-s">
         <span>
             {{ formatDateShort() }}
         </span>

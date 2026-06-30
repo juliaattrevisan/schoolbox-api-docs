@@ -390,7 +390,7 @@
             <div class="profile-tabs tabs-content">
             {% if 'activity' in possibleTabNames %}
                 <div class="content no-pad {% if activeTab == 'activity' %}active{% endif %}" id="tab-activity">
-                    <div id="activity-feed" class="l-c-cr-bottom">
+                    <div id="activity-feed" class="u-c-cr-bottom">
                         <activity-feed
                             :show-learning-moments="{{ config.learning_moments_enabled ? 'true' : 'false' }}"
                             :show-goals="{{ config.badges_enabled ? 'true' : 'false' }}"
@@ -432,7 +432,7 @@
 
             {% if 'goals' in possibleTabNames %}
                 <div class="content no-pad {% if activeTab == 'goals' %}active{% endif %}" id="tab-goals">
-                    <div id="goal-feed" class="goals-achievements l-c-cr-bottom">
+                    <div id="goal-feed" class="goals-achievements u-c-cr-bottom">
                         <goal-feed />
                     </div>
                 </div>
@@ -493,7 +493,7 @@
             {% if 'classes' in possibleTabNames %}
                 {% if subjects|length %}
                     <div class="content no-pad {% if activeTab == 'classes' %}active{% endif %}" id="tab-classes">
-                    <section class="l-c-cr-bottom">
+                    <section class="u-c-cr-bottom">
 
                         {% for group, subjectGroup in subjects %}
 
@@ -655,7 +655,7 @@
             {% if 'groups' in possibleTabNames %}
                 {% if groups|length %}
                     <div class="content no-pad {% if activeTab == 'groups' %}active{% endif %}" id="tab-groups">
-                        <section class="l-c-cr-bottom">
+                        <section class="u-c-cr-bottom">
                             <h2 class="subheader content">Groups</h2>
                             <section class="v-card-list classes-groups content">
                                 {% for groupKey, group in groups %}
@@ -750,7 +750,7 @@
 
             {% if 'registration' in possibleTabNames %}
                 <div class="content no-pad {% if activeTab == 'registration' %}active{% endif %}" id="tab-registration">
-                    <section class="content l-c-cr-bottom">
+                    <section class="content u-c-cr-bottom">
                         {% if registrationPayload %}
                         <h1>{{ registrationPayload.qualification }}</h1>
                         <div class="alert-box">
@@ -867,7 +867,7 @@
                  # or they have emergency contacts
                  #}
                 <div class="content no-pad {% if activeTab == 'contacts' %}active{% endif %}" id="tab-contacts">
-                    <section class="content l-c-cr-bottom">
+                    <section class="content u-c-cr-bottom">
                         {% block contacts_island %}
                             {% block contacts %}
                                 {% if hasContacts %}

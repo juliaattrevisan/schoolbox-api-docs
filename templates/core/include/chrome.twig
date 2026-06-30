@@ -422,7 +422,7 @@
                         </li>
                         {% include '@notifications/pwa.twig' with { pwaPage: 'sidebar' } %}
                         <li>
-                            <a id="msg-mar" class="mark-all-read button sbx-button--has-icon l-width-100" href="#"><sbx-icon name="approve"></sbx-icon> Mark all read</a>
+                            <a id="msg-mar" class="mark-all-read button sbx-button--has-icon u-width-100" href="#"><sbx-icon name="approve"></sbx-icon> Mark all read</a>
                         </li>
                         <li>
                             <section>
@@ -431,8 +431,8 @@
                                         <div class="list-item">
                                             <div class="compact card wrap-down small-12">
                                                 <a data-msgitem-href class="no-pad">
-                                                    <div class="l-flex l-flex--align-start">
-                                                        <img data-msgitem-thumb class="l-flex__item--none" />
+                                                    <div class="u-flex u-flex--align-start">
+                                                        <img data-msgitem-thumb class="u-flex__item--none" />
                                                         <div>
                                                             <p data-msgitem-title></p>
                                                             <p class="meta spaced" data-msgitem-time></p>
@@ -486,7 +486,7 @@
                         });
 
                         $('#profile-drop').on('click', function(e) {
-                            $(".c-header-search").removeClass( "focus" );
+                            $(".sbx-header-search").removeClass( "focus" );
                             e.preventDefault(); // Prevent '#' from being appended to the URL.  This can mess up interactions with the browser history API.
                         });
 

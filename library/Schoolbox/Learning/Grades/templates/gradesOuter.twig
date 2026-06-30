@@ -111,7 +111,7 @@
     {% if markbook.studentStatistics[student.id] is defined and markbook.studentStatistics[student.id].weightedMean is not null %}
     <div class="small-12 medium-3 xlarge-2 right">
         <h2 class="subheader">{{ locale.grades.proper }} Average</h2>
-        <div class="grade {{ urgency.marks(markbook.studentStatistics[student.id].meanNormalised) }}-bg text-center">
+        <div class="grade {{ urgency.marks(markbook.studentStatistics[student.id].meanNormalised) }}-bg u-ta-center">
             {% set weightedMean = markbook.studentStatistics[student.id].weightedMean %}
             <span>{% if weightedMean is null %}<span class="meta">-</span>{% else %}{{ weightedMean }}{% endif %}</span>
         </div>

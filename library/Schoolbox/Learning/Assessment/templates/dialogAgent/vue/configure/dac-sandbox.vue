@@ -57,7 +57,7 @@ defineExpose({ resetFeed });
         </div>
 
         <ac-feed
-            class="l-mar-m--bottom"
+            class="u-mar-m--bottom"
             min-height="20rem"
             max-height="70vh"
             :feed="acStore.fullFeed"

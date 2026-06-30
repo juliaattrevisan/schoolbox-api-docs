@@ -92,10 +92,10 @@ function getIconName(iconClass: string): string {
         <data-load-error data-title="Paperly" />
     </section>
     <template v-else>
-        <ul class="flex-list flex-wrap buttons l-pad-s">
+        <ul class="flex-list flex-wrap buttons u-pad-s">
             <li v-for="feature in paperlyPayload.features" :key="feature.url">
                 <a
-                    class="sbx-button--has-icon l-gap-s"
+                    class="sbx-button--has-icon u-gap-s"
                     :href="feature.url ?? ''"
                     :target="props.openItemsInNewTab ? '_blank' : undefined"
                 >
@@ -104,8 +104,8 @@ function getIconName(iconClass: string): string {
                 </a>
             </li>
         </ul>
-        <div class="c-island l-flex-col">
-            <h3 v-if="upcoming.length > 0" class="l-pad-m--horiz l-pad-s--vert f-no-margins">
+        <div class="sbx-island u-flex-col">
+            <h3 v-if="upcoming.length > 0" class="u-pad-m--horiz u-pad-s--vert f-no-margins">
                 Upcoming Tasks (Action required)
             </h3>
             <div v-if="upcoming.length === 0" class="empty-state">

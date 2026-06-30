@@ -54,7 +54,7 @@ const STATUS_LABEL_CLASSES: Record<AiModerationStatus, string> = {
                     {{ RISK_LEVEL_LABELS[props.event.result.overall_risk_level] }}
                     <span
                         v-if="!hideStatusLabel"
-                        class="label right l-mar--0"
+                        class="label right u-mar--0"
                         :class="STATUS_LABEL_CLASSES[props.event.status]"
                     >
                         {{ STATUS_LABELS[props.event.status] }}

@@ -65,12 +65,12 @@ async function onConfirm(): Promise<void> {
 </script>
 
 <template>
-    <form class="l-flex-col l-gap-m f-no-margins" @submit.prevent="onConfirm">
-        <div class="l-flex-row l-flex--justify-space l-gap-s f-no-margins">
+    <form class="u-flex-col u-gap-m f-no-margins" @submit.prevent="onConfirm">
+        <div class="u-flex-row u-flex--justify-space u-gap-s f-no-margins">
             <h2>Select Customisation</h2>
         </div>
-        <fieldset class="checklist u-no-border l-pad--0 f-no-margins">
-            <legend class="t-visually-hidden">Choose the type of customisation to apply:</legend>
+        <fieldset class="checklist u-border-none u-pad--0 f-no-margins">
+            <legend class="u-visually-hidden">Choose the type of customisation to apply:</legend>
             <ul class="option-list">
                 <li v-if="props.routes.getLearningPlanNewUrl">
                     <input id="cp-modify" v-model="typePicked" type="radio" value="modify" />
@@ -101,9 +101,9 @@ async function onConfirm(): Promise<void> {
         <div v-if="loadError">
             <request-error :further-info="loadError" />
         </div>
-        <div class="l-flex l-gap-xs f-no-margins">
-            <button class="button l-flex__item--1" data-test="" @click.prevent="onBack">Back</button>
-            <button class="button submit l-flex__item--1" type="button" data-test="" @click.prevent="onConfirm">
+        <div class="u-flex u-gap-xs f-no-margins">
+            <button class="button u-flex__item--1" data-test="" @click.prevent="onBack">Back</button>
+            <button class="button submit u-flex__item--1" type="button" data-test="" @click.prevent="onConfirm">
                 {{ proceedText }}
             </button>
         </div>

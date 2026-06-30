@@ -171,7 +171,7 @@ window.Vue.onMounted((): void => {
 </script>
 
 <template>
-    <div class="small-12 island l-flex-col l-gap-m">
+    <div class="small-12 island u-flex-col u-gap-m">
         <div v-if="isLoading" class="loader" data-test="ib-registration-loading"></div>
 
         <template v-else>
@@ -183,7 +183,7 @@ window.Vue.onMounted((): void => {
                 <div
                     v-for="section in registrationSections"
                     :key="section.systemPurpose.id"
-                    class="registration-section l-flex-col l-gap-s f-no-margins"
+                    class="registration-section u-flex-col u-gap-s f-no-margins"
                     :data-test="`ib-registration-system-purpose-${section.systemPurpose.id}`"
                 >
                     <empty-state v-if="section.sessions.length === 0" icon="icon-add">
@@ -202,7 +202,7 @@ window.Vue.onMounted((): void => {
                     </empty-state>
 
                     <template v-else>
-                        <div class="l-flex l-flex--align-center l-flex--justify-space f-no-margins">
+                        <div class="u-flex u-flex--align-center u-flex--justify-space f-no-margins">
                             <h2 class="subheader f-no-margins">
                                 {{ getSectionHeading(section.systemPurpose) }}
                             </h2>
@@ -229,8 +229,8 @@ window.Vue.onMounted((): void => {
                                     class="session-item"
                                     :data-test="`ib-registration-system-purpose-${section.systemPurpose.id}-session-${session.id}`"
                                 >
-                                    <div class="l-flex l-flex--align-center l-flex--justify-space l-gap-xs">
-                                        <div class="l-flex-col">
+                                    <div class="u-flex u-flex--align-center u-flex--justify-space u-gap-xs">
+                                        <div class="u-flex-col">
                                             <a v-if="reportBaseUrl" :href="`${reportBaseUrl}/${session.id}`">{{
                                                 session.title
                                             }}</a>
@@ -275,15 +275,15 @@ window.Vue.onMounted((): void => {
             :show-close-button="true"
             :is-close-disabled="isDeleting"
         >
-            <form class="l-flex-col l-gap-s f-no-margins">
+            <form class="u-flex-col u-gap-s f-no-margins">
                 <h2>Please Confirm</h2>
                 <p>Are you sure you want to delete this session?</p>
                 <request-error v-if="deleteError" :further-info="deleteError" />
-                <div class="l-flex l-gap-xs f-no-margins">
-                    <button type="button" class="button alert l-flex__item--1" @click="confirmDelete">
+                <div class="u-flex u-gap-xs f-no-margins">
+                    <button type="button" class="button alert u-flex__item--1" @click="confirmDelete">
                         {{ isDeleting ? "Deleting..." : "Delete" }}
                     </button>
-                    <button type="button" class="button l-flex__item--1" @click="isDeleteModalOpen = false">
+                    <button type="button" class="button u-flex__item--1" @click="isDeleteModalOpen = false">
                         Cancel
                     </button>
                 </div>

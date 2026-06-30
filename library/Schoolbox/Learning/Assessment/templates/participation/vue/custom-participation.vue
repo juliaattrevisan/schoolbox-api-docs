@@ -135,7 +135,7 @@ function onViewSuggestedCustomisation(participant: Participant): void {
 </script>
 
 <template>
-    <div v-if="loadError" class="c-island l-pad-m" data-test="custom-participation-load-error">
+    <div v-if="loadError" class="sbx-island u-pad-m" data-test="custom-participation-load-error">
         <data-load-error data-title="Student Participation" :further-info="loadError" />
     </div>
     <div>
@@ -151,7 +151,7 @@ function onViewSuggestedCustomisation(participant: Participant): void {
                 </div>
 
                 <div class="small-12 medium-6 large-4 columns">
-                    <label class="l-mbs" for="only-show-dp">
+                    <label for="only-show-dp">
                         Only show students with {{ locale.differentiationProfile.translate(true, true) }}
                     </label>
                     <div class="switch f-no-margins">
@@ -166,7 +166,7 @@ function onViewSuggestedCustomisation(participant: Participant): void {
         </div>
 
         <div class="small-12 island">
-            <div v-if="filteredParticipants.length > 0" class="scrollable c-bottom-drawer-offset-target">
+            <div v-if="filteredParticipants.length > 0" class="scrollable sbx-bottom-drawer-offset-target">
                 <table>
                     <thead>
                         <tr>

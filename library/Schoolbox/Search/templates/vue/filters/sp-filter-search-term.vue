@@ -109,12 +109,12 @@ function onMouseOut(event: MouseEvent): void {
 </script>
 
 <template>
-    <div class="l-flex-col">
-        <div class="c-filter-search-term">
+    <div class="u-flex-col">
+        <div class="sbx-filter-search-term">
             <input
                 id="search-field"
                 ref="inputElement"
-                class="c-filter-search-term__field"
+                class="sbx-filter-search-term__field"
                 type="text"
                 name="keyword"
                 maxlength="2048"
@@ -134,7 +134,7 @@ function onMouseOut(event: MouseEvent): void {
             />
             <button
                 for="search-field"
-                class="c-filter-search-term__button no-text sbx-icon-only-button"
+                class="sbx-filter-search-term__button no-text sbx-icon-only-button"
                 title="Search"
                 data-test="sp-submit-button"
                 @mouseover="onMouseOver"
@@ -148,12 +148,12 @@ function onMouseOut(event: MouseEvent): void {
 </template>
 
 <style lang="scss">
-.c-filter-search-term {
+.sbx-filter-search-term {
     --tabbar-height: 3rem;
     display: grid;
     grid-template-columns: 1fr var(--tabbar-height);
 
-    input[type="text"].c-filter-search-term__field {
+    input[type="text"].sbx-filter-search-term__field {
         border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
         background-color: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
         color: var(--sbx-color-text-primary, var(--color-text-primary));

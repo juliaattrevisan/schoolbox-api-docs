@@ -12,7 +12,7 @@ const resultsStore = useResultsStore();
 </script>
 
 <template>
-    <div class="l-flex-col l-gap-m">
+    <div class="u-flex-col u-gap-m">
         <!-- using index as the key is typically not advised, however as the results will never change their order, it's fine in this instance -->
         <sp-results-result
             v-for="(result, index) in resultsStore.allResults"

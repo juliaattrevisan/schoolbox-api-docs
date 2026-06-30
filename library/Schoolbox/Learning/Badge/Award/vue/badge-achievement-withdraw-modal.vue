@@ -177,7 +177,7 @@ export default {
             </div>
 
             <search-select
-                class="l-pad-m--bottom"
+                class="u-pad-m--bottom"
                 v-model:selected="selected"
                 label="Search"
                 label-id="usersAchievement"

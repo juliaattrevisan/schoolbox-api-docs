@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "storybook-vue3-rsbuild";
 import StorybookSlot from "../../vue/components/storybook-slot.vue";
 
 /**
- * **Styles**: `www/static/css/core/layout/_l-grid.scss`
+ * **Styles**: `www/static/css/core/utils/_u-grid.scss`
  *
  * [**mdn**](https://developer.mozilla.org/en-US/docs/Web/CSS/grid)
  *
@@ -13,13 +13,13 @@ const meta: Meta<typeof StorybookSlot> = {
     decorators: [
         (): { template: string } => ({
             template: `
-                <div class="l-pad-xl">
+                <div class="u-pad-xl">
                     <story />
                 </div>
             `,
         }),
     ],
-    title: "Layout/Grid",
+    title: "Utility/Grid",
 };
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;

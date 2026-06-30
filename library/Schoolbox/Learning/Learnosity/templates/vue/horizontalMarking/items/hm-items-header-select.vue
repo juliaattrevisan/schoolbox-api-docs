@@ -63,12 +63,12 @@ function onItemSelected(reference: string): void {
             height="16"
             aria-hidden="true"
             focusable="false"
-            class="c-icon c-icon--dropdown"
+            class="sbx-icon sbx-icon--dropdown"
         >
             <path d="M0 24h32l-16-16z"></path>
         </svg>
     </button>
-    <div id="item-list" class="item-list l-flex-col l-flex--no-wrap f-no-margins" data-dropdown-content>
+    <div id="item-list" class="item-list u-flex-col u-flex--no-wrap f-no-margins" data-dropdown-content>
         <button
             v-for="item in itemsStore.items"
             :key="item.id"
@@ -106,12 +106,12 @@ function onItemSelected(reference: string): void {
             background-color: var(--form-bg-hover-color);
         }
     }
-    .c-icon--dropdown {
+    .sbx-icon--dropdown {
         transform: rotate(180deg);
     }
     &[aria-expanded="true"] {
         // rotate when open
-        .c-icon--dropdown {
+        .sbx-icon--dropdown {
             transform: rotate(0deg);
         }
     }

@@ -591,9 +591,9 @@ window.Vue.onMounted(async () => {
             <section class="activity-feed">
                 <div class="VueTables">
                     <div class="filters">
-                        <div class="checklist l-pad-s--left">
+                        <div class="checklist u-pad-s--left">
                             <label class="title">Filter to:</label>
-                            <ul class="option-list l-flex-row l-gap-l">
+                            <ul class="option-list u-flex-row u-gap-l">
                                 <li v-if="showLearningMoments">
                                     <input
                                         id="filter-learningMoments"
@@ -691,9 +691,9 @@ window.Vue.onMounted(async () => {
                                                 :title="
                                                     item.object.creator?._links.profile ? 'View Profile' : undefined
                                                 "
-                                                class="l-gap-s"
+                                                class="u-gap-s"
                                             >
-                                                <div class="l-flex-row l-flex--align-center">
+                                                <div class="u-flex-row u-flex--align-center">
                                                     <template v-if="item.object.creator">
                                                         <img
                                                             :src="item.object.creator?._links.avatar"
@@ -729,7 +729,7 @@ window.Vue.onMounted(async () => {
                                                 <!-- Only show status that isn't published, since that is the default state -->
                                                 <span
                                                     v-if="item.object.currentState !== EvidenceStatus.PUBLISHED"
-                                                    class="label l-mar--0"
+                                                    class="label u-mar--0"
                                                     :class="`label--moment-${item.object.currentState}`"
                                                     :data-test="`learning-moment-status-${item.object.currentState}`"
                                                 >

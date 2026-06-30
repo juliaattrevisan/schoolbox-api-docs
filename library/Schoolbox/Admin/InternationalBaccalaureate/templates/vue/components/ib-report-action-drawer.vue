@@ -25,11 +25,11 @@ defineEmits<{
             <em>{{ selectedCount }} student{{ selectedCount === 1 ? "" : "s" }} selected</em>
         </span>
         <button type="button" class="button-clear" @click="$emit('clearSelection')">Clear selection</button>
-        <div class="l-flex-row l-flex--justify l-gap-xs">
+        <div class="u-flex-row u-flex--justify u-gap-xs">
             <button
                 v-if="activeSection === 'preparation'"
                 type="button"
-                class="button sbx-button--has-icon l-flex__item--1-auto"
+                class="button sbx-button--has-icon u-flex__item--1-auto"
                 :disabled="isLoading"
                 @click="$emit('completePreparation')"
             >
@@ -39,7 +39,7 @@ defineEmits<{
             <button
                 v-if="activeSection === 'unconfirmed'"
                 type="button"
-                class="button sbx-button--has-icon l-flex__item--1-auto"
+                class="button sbx-button--has-icon u-flex__item--1-auto"
                 :disabled="isLoading"
                 @click="$emit('renotify')"
             >
@@ -49,7 +49,7 @@ defineEmits<{
             <button
                 v-if="activeSection === 'unconfirmed'"
                 type="button"
-                class="button sbx-button--has-icon l-flex__item--1-auto"
+                class="button sbx-button--has-icon u-flex__item--1-auto"
                 :disabled="isLoading"
                 @click="$emit('approveOnBehalf')"
             >
@@ -59,7 +59,7 @@ defineEmits<{
             <button
                 v-if="activeSection === 'unconfirmed' || activeSection === 'confirmed' || activeSection === 'failed'"
                 type="button"
-                class="button sbx-button--has-icon l-flex__item--1-auto"
+                class="button sbx-button--has-icon u-flex__item--1-auto"
                 :disabled="isLoading"
                 @click="$emit('resetDetails')"
             >
@@ -69,7 +69,7 @@ defineEmits<{
             <button
                 v-if="activeSection === 'confirmed' || activeSection === 'failed'"
                 type="button"
-                class="button sbx-button--has-icon l-flex__item--1-auto"
+                class="button sbx-button--has-icon u-flex__item--1-auto"
                 :disabled="isLoading"
                 @click="$emit('manuallyRegister')"
             >
@@ -78,7 +78,7 @@ defineEmits<{
             </button>
             <button
                 type="button"
-                class="button sbx-button--has-icon l-flex__item--1-auto"
+                class="button sbx-button--has-icon u-flex__item--1-auto"
                 disabled
                 aria-disabled="true"
                 title="Coming soon"

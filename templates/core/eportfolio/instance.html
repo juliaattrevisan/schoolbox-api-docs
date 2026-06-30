@@ -177,9 +177,9 @@
                     <!-- don't show a slider for screens which don't have multiple columns -->
                     <fieldset class="content hide-for-medium-down">
                         <div class="small-12 columns">
-                            <div class="c-input-range">
-                                <label class="c-input-range__label" for="column-width">Column Width <span data-tooltip class="has-tip tip-top hint" title="Drag the slider to change the width of the left and right columns. (On small screens, the right column will drop below the left.)">?</span></label>
-                                <input class="c-input-range__input" type="range" id="column-width" name="column-width" min="3" max="9" step="1" value="{TEMPLATE_LEFT_COLUMN_WIDTH}" data-interaction="column-width" data-original-value="{TEMPLATE_LEFT_COLUMN_WIDTH}" />
+                            <div class="sbx-input-range">
+                                <label class="sbx-input-range__label" for="column-width">Column Width <span data-tooltip class="has-tip tip-top hint" title="Drag the slider to change the width of the left and right columns. (On small screens, the right column will drop below the left.)">?</span></label>
+                                <input class="sbx-input-range__input" type="range" id="column-width" name="column-width" min="3" max="9" step="1" value="{TEMPLATE_LEFT_COLUMN_WIDTH}" data-interaction="column-width" data-original-value="{TEMPLATE_LEFT_COLUMN_WIDTH}" />
                                 <input type="hidden" name="width" value="{TEMPLATE_LEFT_COLUMN_WIDTH}">
                             </div>
                         </div>
@@ -236,7 +236,7 @@
                         <!-- END legacy_homepage_content_colours -->
                     </fieldset>
 
-                    <ul class="flex-list buttons l-pad-s">
+                    <ul class="flex-list buttons u-pad-s">
                         <li><a href="#" class="button no-margin" data-role="reset-to-default">Reset</a></li>
                         <li><a href="#" class="button no-margin" data-role="undo">Undo Changes</a></li>
                         <li><a href="#" class="button submit no-margin" data-role="save">Save</a></li>

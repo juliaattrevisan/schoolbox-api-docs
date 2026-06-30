@@ -772,7 +772,7 @@ export default {
         <template v-if="!audienceIsReadOnly">
             <div data-reveal id="audience-browse" class="reveal-modal no-pad">
                 <template v-if="canCreateComplex">
-                    <dl class="tabs text-center" role="list">
+                    <dl class="tabs u-ta-center" role="list">
                         <dd :class="{ active: pageShow.index || pageShow.valueSelect }">
                             <a @click="showPage('index')">Select Audience</a>
                         </dd>
@@ -821,8 +821,8 @@ export default {
                             <div class="empty-state" v-show="showEmptyState">
                                 <p>No {{ selectedAudienceOption.namePlural }} found.</p>
                             </div>
-                            <fieldset class="sbx-checkbox-radio-group-scroll l-mar-m--bottom" v-show="!showEmptyState">
-                                <legend class="t-visually-hidden">
+                            <fieldset class="sbx-checkbox-radio-group-scroll u-mar-m--bottom" v-show="!showEmptyState">
+                                <legend class="u-visually-hidden">
                                     {{ selectedAudienceOption.namePlural }} options
                                 </legend>
                                 <div class="sbx-scroll-container sbx-scroll-container--smaller">
@@ -856,7 +856,7 @@ export default {
                                     </ul>
                                 </div>
                             </fieldset>
-                            <fieldset class="checklist border-none" v-show="showModifierCheckboxes">
+                            <fieldset class="checklist u-border-none" v-show="showModifierCheckboxes">
                                 <ul class="option-list">
                                     <li v-if="showModifierSelfCheckbox">
                                         <input type="checkbox" id="audience-select-users" v-model="includeUsers" />

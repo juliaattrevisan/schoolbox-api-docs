@@ -18,17 +18,17 @@ defineEmits<{
 
 <template>
     <basic-modal v-model:is-open="isOpen" size="s" :is-close-disabled="isLoading">
-        <div class="l-flex-col l-gap-m f-no-margins">
+        <div class="u-flex-col u-gap-m f-no-margins">
             <h2>Please confirm</h2>
             <p class="f-no-margins">
                 Resetting will clear all registration details and move the selected student(s) back to Preparation.
             </p>
 
-            <div class="sbx-vert-scroll-container l-flex-col l-gap-xs">
+            <div class="sbx-vert-scroll-container u-flex-col u-gap-xs">
                 <div
                     v-for="student in students"
                     :key="student.id"
-                    class="l-flex l-flex--align-center l-gap-xs f-no-margins"
+                    class="u-flex u-flex--align-center u-gap-xs f-no-margins"
                 >
                     <img
                         :src="`/portrait.php?id=${student.userId}&size=square32`"
@@ -41,13 +41,13 @@ defineEmits<{
                 </div>
             </div>
 
-            <div class="l-flex l-gap-xs f-no-margins">
-                <button type="button" class="button l-flex__item--1" :disabled="isLoading" @click="$emit('cancel')">
+            <div class="u-flex u-gap-xs f-no-margins">
+                <button type="button" class="button u-flex__item--1" :disabled="isLoading" @click="$emit('cancel')">
                     Cancel
                 </button>
                 <button
                     type="button"
-                    class="button submit l-flex__item--1"
+                    class="button submit u-flex__item--1"
                     :disabled="isLoading"
                     @click="$emit('confirm')"
                 >

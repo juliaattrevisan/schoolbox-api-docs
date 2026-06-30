@@ -1,11 +1,11 @@
 /*
     Layout classes to quickly apply standardised margin without having
-    to explicity define a class for it.
+    to explicitly define a class for it.
  */
 
 @use "sass:list";
 
-.l-mar {
+.u-mar {
     @each $size in $global-sizes {
         &-#{$size} {
             margin: var(--spacing-#{$size});

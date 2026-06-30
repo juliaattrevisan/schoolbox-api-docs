@@ -73,14 +73,14 @@ async function onDelete(): Promise<void> {
         <template v-if="crmStore.modalType === CohortReportModalType.READ_MORE">
             <template v-for="entry in crmStore.selectedEntries" :key="entry.id">
                 <div v-if="entry.creator !== null" class="card small-12 compact">
-                    <div class="l-flex-row l-flex--align-center">
-                        <user-photo :user="entry.creator" class="l-mar-s--right" size="xsmall" />
+                    <div class="u-flex-row u-flex--align-center">
+                        <user-photo :user="entry.creator" class="u-mar-s--right" size="xsmall" />
                         <p>{{ entry.creator.fullName }}</p>
                     </div>
                 </div>
                 <div class="clearfix"></div>
                 <!-- eslint-disable-next-line vue/no-v-html - this is scrubbed on the backend -->
-                <div class="l-mar-s--top" v-html="entry.body"></div>
+                <div class="u-mar-s--top" v-html="entry.body"></div>
                 <div class="clearfix"></div>
             </template>
         </template>

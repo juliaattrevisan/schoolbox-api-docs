@@ -198,7 +198,7 @@ const meta: Meta<typeof StorybookSlot> = {
     decorators: [
         (): { template: string } => ({
             template: `
-                <div class="l-pad-xl">
+                <div class="u-pad-xl">
                     <story />
                 </div>
             `,
@@ -217,7 +217,7 @@ export const Default: Story = {
             };
         },
         template: `
-            <div class="l-flex-row l-flex--center l-gap-s">
+            <div class="u-flex-row u-flex--center u-gap-s">
                 <div
                     v-for="icon in icons"
                     :key="icon.name"

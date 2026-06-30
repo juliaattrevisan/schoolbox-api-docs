@@ -46,7 +46,7 @@
                     <th class="small-2">Match Campus<span class='hint has-tip tip-top' title="If checked, these users must be in the same campus as the student to access this record" data-tooltip>?</span></th>
                     <th class="small-1">Comments<span class='hint has-tip tip-top' title="If checked, these users will be able to read and post comments on this record" data-tooltip>?</span></th>
                 {% endif %}
-                <th class="text-right small-1">Delete</th>
+                <th class="u-ta-right small-1">Delete</th>
             </tr>
         </thead>
         {%- if not reportPage %}
@@ -312,7 +312,7 @@
                 <label class="checkbox-label" for="{{ accessType }}Comment{ID}"></label>
             </td>
             {% endif %}
-            <td class="text-right small-1">
+            <td class="u-ta-right small-1">
                 <a href="#" data-delete-visibility="{{ accessType }}" class="sbx-icon-only-button no-text" title="Delete" aria-label="Delete"><sbx-icon name="delete"></sbx-icon></a>
             </td>
         </tr>

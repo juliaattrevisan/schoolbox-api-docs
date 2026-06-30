@@ -5,8 +5,8 @@
 </script>
 
 <template>
-    <div class="l-flex-row f-no-margins">
-        <h1 class="l-flex__item--1">Curriculum Coverage Report</h1>
+    <div class="u-flex-row f-no-margins">
+        <h1 class="u-flex__item--1">Curriculum Coverage Report</h1>
     </div>
 </template>
 

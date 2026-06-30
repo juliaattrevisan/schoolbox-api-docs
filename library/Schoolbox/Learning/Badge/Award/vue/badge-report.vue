@@ -250,7 +250,7 @@ export default {
                 />
             </section>
         </div>
-        <div v-else-if="isDataLoaded && !hasStudents" class="empty-state margin-none">
+        <div v-else-if="isDataLoaded && !hasStudents" class="empty-state u-mar--0">
             <sbx-icon name="staff-students" size="2.5rem"></sbx-icon>
             <p>There are currently no users within this group.</p>
         </div>
@@ -265,14 +265,14 @@ export default {
                 <em>{{ selectedStudentsCount }} selected</em>
             </h3>
             <button @click.prevent="onClearStudentSelection" class="button-clear">Clear selection</button>
-            <div class="l-flex-row l-gap-s">
-                <a :href="getUrl('goal')" title="Set goal" class="button l-flex__item--1 sbx-button--has-icon"
+            <div class="u-flex-row u-gap-s">
+                <a :href="getUrl('goal')" title="Set goal" class="button u-flex__item--1 sbx-button--has-icon"
                     ><sbx-icon name="goal"></sbx-icon>Set goal</a
                 >
                 <a
                     :href="getUrl('achievement')"
                     title="Award achievement"
-                    class="button sbx-button--has-icon l-flex__item--1"
+                    class="button sbx-button--has-icon u-flex__item--1"
                     ><sbx-icon name="achievement"></sbx-icon>Award achievement</a
                 >
             </div>

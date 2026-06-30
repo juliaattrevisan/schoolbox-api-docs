@@ -22,19 +22,19 @@
     <div>
         <div class="small-12 columns">
             <h1>Rubric Report for {{ assessment.title }}</h1>
-            <div class="l-flex l-flex--justify-space">
+            <div class="u-flex u-flex--justify-space">
                 <ul class="meta">
                     <li><sbx-icon name="{{ icon.renderName(assessment)|trim }}" color="var(--sbx-color-text-secondary)"></sbx-icon> {{ assessment.typeName }}</li>
                     <li><sbx-icon name="calendar" color="var(--sbx-color-text-secondary)"></sbx-icon> Due {{ assessment.dueAt.getRelativeTime }} on {{ assessment.dueAt.localShort }}</li>
                 </ul>
-                <div class="l-flex l-flex--align-center l-flex--justify-end l-gap-m l-pad-m--horiz no-pad">
+                <div class="u-flex u-flex--align-center u-flex--justify-end u-gap-m u-pad-m--horiz no-pad">
                     <div class="checklist">
                         <input type="checkbox" id="show-drafts">
                         <label for="show-drafts">
                             Show Drafts
                         </label>
                     </div>
-                    <nav class="c-nav-actions l-flex-row">
+                    <nav class="sbx-nav-actions u-flex-row">
                         <a href="{{ routeLookup('learningAssessment.downloadOverview', { assessmentId: assessment.id }) }}?format=csv" title="Download CSV" data-download-spreadsheet class="sbx-icon-only-button"><sbx-icon name="download"></sbx-icon></a>
                     </nav>
                 </div>
@@ -122,9 +122,9 @@
                                     <a href="{{ routeLookup('learningAssessment.getSummary', {
                                         assessmentId: assessment.id,
                                         studentId: user.id
-                                    }) }}" title="View Profile" class="l-flex l-flex-col l-flex--center">
-                                        <div class="c-img c-img--m c-img--round">
-                                            <div class="c-img__wrapper">
+                                    }) }}" title="View Profile" class="u-flex u-flex-col u-flex--center">
+                                        <div class="sbx-img sbx-img--m sbx-img--round">
+                                            <div class="sbx-img__wrapper">
                                                 {% include 'include/portrait.twig' with {
                                                     user: user,
                                                     description: user.fullName,

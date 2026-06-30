@@ -87,7 +87,7 @@ window.Vue.onMounted(async () => {
                     />
                 </div>
 
-                <div v-if="saveError" class="l-mar-m--bottom">
+                <div v-if="saveError" class="u-mar-m--bottom">
                     <request-error :further-info="saveError" />
                 </div>
 
