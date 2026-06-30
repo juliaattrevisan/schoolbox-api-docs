@@ -134,7 +134,6 @@ $app = new class extends CliTool\App {
             'lti_assessment'    => 'SELECT count(*) FROM lti_assessment JOIN assessment a on lti_assessment.assessment_id = a.id WHERE a.deleted_at IS NULL',
             'lesson_plans'      => 'SELECT count(*) FROM lesson_plan JOIN assessment a on lesson_plan.assessment_id = a.id WHERE a.deleted_at IS NULL',
             'lesson_plan_template' => 'SELECT COUNT(*) FROM lesson_plan_template WHERE deleted_at IS NULL',
-            'due_work_rubrics'  => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND use_rubric = 1',
             'due_work_self_assessments' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND self_reviewability != "none"',
             'due_work_online_submission' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND accept_submission = 1',
             'due_work_offline_submission' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND accept_submission = 0',
@@ -169,6 +168,13 @@ $app = new class extends CliTool\App {
             'dialog_agent_tutor' => 'SELECT count(*) FROM dialog_agent da JOIN dialog_agent_scenario das ON da.scenario_id = das.id
                                           WHERE das.title = "Socratic Tutor" AND type="system" AND da.deleted_at is null',
             'dialog_agent_attempt' => 'SELECT count(*) FROM dialog_agent_response WHERE deleted_at is null',
+
+            // Agnostic rubrics
+            'rubric_instances' => 'SELECT COUNT(*) FROM rubric_instance ri JOIN assessment a ON ri.assessment_id = a.id WHERE ri.deleted_at IS NULL AND a.deleted_at IS NULL',
+            'due_work_rubrics' => 'SELECT COUNT(*) FROM rubric_instance ri JOIN assessment a ON ri.assessment_id = a.id JOIN submission_box sb ON a.id = sb.assessment_id WHERE ri.deleted_at IS NULL AND a.deleted_at IS NULL',
+            // 'rubric_instance_quiz' => "SELECT COUNT(*) FROM rubric_instance ri JOIN assessment a ON ri.assessment_id = a.id JOIN assess q ON a.id = q.assessment_id WHERE ri.deleted_at IS NULL AND a.deleted_at IS NULL AND q.deleted_at IS NULL AND q.availability = 'assess'",
+            // 'rubric_instance_lti' => 'SELECT COUNT(*) FROM rubric_instance ri JOIN assessment a ON ri.assessment_id = a.id JOIN lti_assessment lti ON a.id = lti.assessment_id WHERE ri.deleted_at IS NULL AND a.deleted_at IS NULL',
+            // 'rubric_instance_reporting' => 'SELECT COUNT(*) FROM rubric_instance ri JOIN assessment a ON ri.assessment_id = a.id JOIN reporting r ON a.id = r.assessment_id WHERE ri.deleted_at IS NULL AND a.deleted_at IS NULL AND r.deleted_at IS NULL',
 
             // More quiz info:
             // Quizzes which for some reason have no Learnosity reference
