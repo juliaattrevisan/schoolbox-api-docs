@@ -11,6 +11,7 @@ namespace Calendar\Api\EventType\Event\Socs\Test;
 
 use Calendar\Event\Type\Day\Event;
 use Calendar_Api_EventType_Event_Socs_Default;
+use Calendar_Api_EventType_Event_SocsMusic_Default;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -24,16 +25,184 @@ use Schoolbox\Socs\Calendar\CampusMatcher;
 use Schoolbox\Socs\Calendar\Parser;
 use Schoolbox\Socs\HttpClient;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 #[CoversClass(Calendar_Api_EventType_Event_Socs_Default::class)]
+#[CoversClass(Calendar_Api_EventType_Event_SocsMusic_Default::class)]
 #[CoversClass(Parser::class)]
 #[CoversClass(CampusMatcher::class)]
 class DefaultTest extends TestCase
 {
-    public function testSocsMusicCalendarClassesAutoload(): void
+    public function testSocsMusicLessonsUseTuitionEndpointAndOnlyShowForMatchedUsers(): void
     {
-        self::assertTrue(class_exists('Calendar_Api_Config_Connector_SocsMusic'));
-        self::assertTrue(class_exists('Calendar_Api_EventType_Event_SocsMusic_Default'));
+        $student = $this->createUser(91, 'STUDENT-9', 'Jill', 'Student');
+        $staff = $this->createUser(71, 'STAFF-7', 'Sam', 'Staff');
+
+        $eventTypeMapper = $this->createMock(EventTypeMapper::class);
+        $eventTypeMapper->expects($this->once())->method('findFirstMeaningfulId')->willReturn(1);
+
+        $userMapper = $this->createMock(UserMapper::class);
+        $userMapper->expects($this->exactly(3))
+            ->method('findByExternalId')
+            ->willReturnMap([
+                ['STAFF-7', \Schoolbox\Role::STAFF, $staff],
+                ['STUDENT-9', \Schoolbox\Role::STUDENT, $student],
+                ['STUDENT-10', \Schoolbox\Role::STUDENT, $this->createUser(92, 'STUDENT-10', 'Other', 'Student')],
+            ]);
+
+        $source = new Calendar_Api_EventType_Event_SocsMusic_Default(
+            456,
+            $student,
+            new User(),
+            new ArrayLoader([
+                ConfigMapper::NAME_SOCS_ENABLED => true,
+                ConfigMapper::NAME_SOCS_IMPORT_MUSIC_LESSONS => true,
+                ConfigMapper::NAME_SOCS_ENDPOINT_HOST => 'https://socs.example.test',
+                ConfigMapper::NAME_SOCS_ENDPOINT_ID => 'school',
+                ConfigMapper::NAME_SOCS_ENDPOINT_TOKEN => 'token',
+                ConfigMapper::NAME_SOCS_MUSIC_LESSONS_DEFAULT_EVENT_TYPE => 1,
+            ]),
+            $eventTypeMapper,
+            new class extends HttpClient {
+                public function __construct()
+                {
+                }
+
+                public function getCached(string $path, array $query): \SimpleXMLElement
+                {
+                    Assert::assertSame(Calendar_Api_EventType_Event_SocsMusic_Default::TUITION_PATH, $path);
+                    Assert::assertSame([
+                        'data' => 'musiclessons',
+                    ], $query);
+
+                    return new \SimpleXMLElement(<<<'XML'
+<lessons>
+    <lesson>
+        <lessonid>98765</lessonid>
+        <startdate>19/05/2026</startdate>
+        <starttime>09:30</starttime>
+        <endtime>10:00</endtime>
+        <instrument>Cello</instrument>
+        <title>Cello lesson</title>
+        <location>Music Room 2</location>
+        <staffid>STAFF-7</staffid>
+        <pupilid>STUDENT-9</pupilid>
+    </lesson>
+    <lesson>
+        <lessonid>98766</lessonid>
+        <startdate>19/05/2026</startdate>
+        <starttime>11:30</starttime>
+        <endtime>12:00</endtime>
+        <instrument>Violin</instrument>
+        <title>Other student's lesson</title>
+        <location>Music Room 3</location>
+        <staffid>STAFF-7</staffid>
+        <pupilid>STUDENT-10</pupilid>
+    </lesson>
+</lessons>
+XML);
+                }
+            },
+            $userMapper,
+            [[
+                'eventTypeID' => 1,
+                'eventType' => 'SOCS Music',
+                'eventColour' => '#9ad39b',
+            ]],
+        );
+
+        $events = $source->getEvents(strtotime('2026-05-19 00:00:00'), strtotime('2026-05-20 00:00:00'));
+
+        self::assertCount(1, $events);
+        $event = $events->first();
+        self::assertInstanceOf(Event::class, $event);
+        self::assertSame('socs-music-98765', $event->getEventId());
+        self::assertSame(Event::PERSONAL_ACCESS, $event->getAccess());
+        self::assertSame('Cello lesson', $event->getTitle());
+        self::assertSame('Music Room 2', $event->getLocation());
+        self::assertSame([[
+            'id' => 71,
+            'name' => 'Sam Staff',
+            'url' => '/search/user/71',
+        ]], $event->getSocsMusicStaff());
+        self::assertSame([[
+            'id' => 91,
+            'name' => 'Jill Student',
+            'url' => '/search/user/91',
+        ]], $event->getSocsMusicStudents());
+    }
+
+
+    public function testSocsMusicLessonStillShowsForMatchedStaffWhenStudentIsUnmatched(): void
+    {
+        $staff = $this->createUser(71, 'STAFF-7', 'Sam', 'Staff');
+
+        $eventTypeMapper = $this->createMock(EventTypeMapper::class);
+        $eventTypeMapper->expects($this->once())->method('findFirstMeaningfulId')->willReturn(1);
+
+        $userMapper = $this->createMock(UserMapper::class);
+        $userMapper->expects($this->exactly(2))
+            ->method('findByExternalId')
+            ->willReturnCallback(function (string $externalId, string $roleType) use ($staff): User {
+                if ($externalId === 'STAFF-7' && $roleType === \Schoolbox\Role::STAFF) {
+                    return $staff;
+                }
+
+                throw new \Schoolbox\Mapper\Exception\NotFound();
+            });
+
+        $source = new Calendar_Api_EventType_Event_SocsMusic_Default(
+            456,
+            $staff,
+            new User(),
+            new ArrayLoader([
+                ConfigMapper::NAME_SOCS_ENABLED => true,
+                ConfigMapper::NAME_SOCS_IMPORT_MUSIC_LESSONS => true,
+                ConfigMapper::NAME_SOCS_ENDPOINT_HOST => 'https://socs.example.test',
+                ConfigMapper::NAME_SOCS_ENDPOINT_ID => 'school',
+                ConfigMapper::NAME_SOCS_ENDPOINT_TOKEN => 'token',
+                ConfigMapper::NAME_SOCS_MUSIC_LESSONS_DEFAULT_EVENT_TYPE => 1,
+            ]),
+            $eventTypeMapper,
+            new class extends HttpClient {
+                public function __construct()
+                {
+                }
+
+                public function getCached(string $path, array $query): \SimpleXMLElement
+                {
+                    return new \SimpleXMLElement(<<<'XML'
+<lessons>
+    <lesson>
+        <lessonid>98765</lessonid>
+        <startdate>19/05/2026</startdate>
+        <starttime>09:30</starttime>
+        <endtime>10:00</endtime>
+        <instrument>Cello</instrument>
+        <title>Cello lesson</title>
+        <location>Music Room 2</location>
+        <staffid>STAFF-7</staffid>
+        <pupilid>UNKNOWN-STUDENT</pupilid>
+    </lesson>
+</lessons>
+XML);
+                }
+            },
+            $userMapper,
+            [[
+                'eventTypeID' => 1,
+                'eventType' => 'SOCS Music',
+                'eventColour' => '#9ad39b',
+            ]],
+        );
+
+        $events = $source->getEvents(strtotime('2026-05-19 00:00:00'), strtotime('2026-05-20 00:00:00'));
+
+        self::assertCount(1, $events);
+        $event = $events->first();
+        self::assertInstanceOf(Event::class, $event);
+        self::assertSame([['id' => 71, 'name' => 'Sam Staff', 'url' => '/search/user/71']], $event->getSocsMusicStaff());
+        self::assertSame([], $event->getSocsMusicStudents());
     }
 
 
@@ -112,5 +281,14 @@ XML);
         self::assertInstanceOf(Event::class, $event);
         self::assertSame('12,11', $event->getCampusList());
         self::assertSame(' campus12 campus11', $event->getFilterClasses());
+    }
+
+    private function createUser(int $id, string $externalId, string $firstname, string $lastname): User
+    {
+        return (new User())
+            ->setId($id)
+            ->setExternalId($externalId)
+            ->setFirstname($firstname)
+            ->setLastname($lastname);
     }
 }
