@@ -354,7 +354,7 @@ class Mapper extends BaseMapper
             [$pb, $statusSelect, $statusSubquery, $statusParam] = $this->buildStatusConditions($pb, $status);
         }
 
-        $pb->isNull('differentiation_profiles.deleted_at');
+        $pb->isNull('p.deleted_at');
 
         $pb = $this->filterByPermission($pb, $viewer);
 
