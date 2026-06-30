@@ -229,7 +229,7 @@ class ResourceBookingCest
             [
                 '<th>Start</th>',
                 '<th>End</th>',
-                '<th>Booking</th>',
+                '<th>Event Title</th>',
                 '<th>Venue/Resource</th>',
                 '<th>Quantity</th>',
                 '<th>Booker</th>',
