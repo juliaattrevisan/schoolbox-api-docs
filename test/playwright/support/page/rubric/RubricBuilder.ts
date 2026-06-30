@@ -17,7 +17,7 @@ export default class RubricBuilder {
 
     public static readonly DATA_TEST_RUBRIC_SPAWN_LEVEL = "rubric-spawn-level";
 
-    public static readonly DATA_TEST_RUBRIC_INDICATOR_ROW = "rubric-indicator-row-"; // Append "-[capabilityId]-[indicatorId]"
+    public static readonly DATA_TEST_RUBRIC_INDICATOR_ROW = "rubric-indicator-row"; // Append "-[capabilityId]-[indicatorId]"
 
     public static readonly DATA_TEST_RUBRIC_INDICATOR_TOGGLE = "rubric-indicator-toggle";
 
@@ -76,7 +76,7 @@ export default class RubricBuilder {
      */
     public async toggleRubricIndicator(capabilityId: number, indicatorId: number): Promise<void> {
         const indicatorToggle = this.page
-            .getByTestId(`${RubricBuilder.DATA_TEST_RUBRIC_INDICATOR_ROW}${capabilityId}-${indicatorId}`)
+            .getByTestId(`${RubricBuilder.DATA_TEST_RUBRIC_INDICATOR_ROW}-${capabilityId}-${indicatorId}`)
             .getByTestId(RubricBuilder.DATA_TEST_RUBRIC_INDICATOR_TOGGLE);
         await indicatorToggle.click();
     }
@@ -95,7 +95,7 @@ export default class RubricBuilder {
         value: string | number,
     ): Promise<void> {
         const descriptor = this.page
-            .getByTestId(`${RubricBuilder.DATA_TEST_RUBRIC_INDICATOR_ROW}${capabilityId}-${indicatorId}`)
+            .getByTestId(`${RubricBuilder.DATA_TEST_RUBRIC_INDICATOR_ROW}-${capabilityId}-${indicatorId}`)
             .getByTestId(`${RubricBuilder.DATA_TEST_RUBRIC_DESCRIPTOR_CELL}-${descriptorIndex}`);
 
         const pointsInput = descriptor.getByTestId(RubricBuilder.DATA_TEST_RUBRIC_DESCRIPTOR_MAX_VALUE);
