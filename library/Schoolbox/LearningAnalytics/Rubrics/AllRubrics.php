@@ -273,6 +273,15 @@ class AllRubrics
         foreach ($overallMarks as $capabilityId => $capabilityData) {
             $capabilityIndex = $capabilityData['name'];
 
+            /* The manifest is a superset built from the folders' indicators and the assessments' grids, so every
+             * capability/indicator here should already exist in it. Guard against any mismatch anyway: writing to a
+             * missing key would auto-vivify a malformed entry (no name/draft/indicators) that later fatals in
+             * calculateStats() and sortByName().
+             */
+            if (!isset($manifest[$capabilityIndex])) {
+                continue;
+            }
+
             foreach ($capabilityData['students'] as $studentId => $studentData) {
                 /* Only care about non-null values
                  */
@@ -287,6 +296,10 @@ class AllRubrics
 
             foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
                 $indicatorIndex = $indicatorData['name'];
+
+                if (!isset($manifest[$capabilityIndex]['indicators'][$indicatorIndex])) {
+                    continue;
+                }
 
                 foreach ($indicatorData['students'] as $studentId => $studentData) {
                     /* Only care about non-null values
