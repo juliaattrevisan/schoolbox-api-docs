@@ -177,6 +177,7 @@ class CohortAnalysis
         private Filter\Mapper $filterMapper,
         private UserAccessMapper $userAccessMapper,
         private Router\Generator $routeGenerator,
+        private \Schoolbox\Assessment\Rubric\DataModel\DataSource $rubricMapper,
         private IConnector $databaseInternal,
         private ?Folder $classFolder = null,
         private ?WorkType\Model $submissionTypeResultFilter = null
@@ -704,7 +705,7 @@ class CohortAnalysis
             $this->routeGenerator
         ))->buildMarkbookData(null, [], array_keys($unitImplAssessmentIds));
 
-        return (new AllRubrics())->generate($assessments, $overallMarks);
+        return (new AllRubrics($this->rubricMapper))->generate($unitImplementations, $assessments, $overallMarks);
     }
 
 

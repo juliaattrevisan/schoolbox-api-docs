@@ -8,14 +8,18 @@
 
 namespace Schoolbox\LearningAnalytics\Rubrics;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Analytics\BoxPlot\Summary;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 
 class AllRubrics
 {
     /**
      * Constructor.
+     *
+     * @param \Schoolbox\Assessment\Rubric\DataModel\DataSource $rubricMapper
      */
-    public function __construct()
+    public function __construct(private \Schoolbox\Assessment\Rubric\DataModel\DataSource $rubricMapper)
     {
     }
 
@@ -23,14 +27,23 @@ class AllRubrics
     /**
      * Find a set of John Turkey box plot datasets for each capability and indicator.
      *
+     * @param GenericCollection<UnitImplementation\Model> $unitImplementations
      * @param array $assessments
      * @param array $overallMarks
      * @return array
      */
     public function generate(
+        GenericCollection $unitImplementations,
         array $assessments,
         array $overallMarks
     ): array {
+        /* Collect all the caps/indicators from all the homepages used by $unitImplementations
+         * This creates a superset of rubric pieces that should encompass setupStruct(), theoretically
+         *
+         * This is a mega dupe of setupUsedCapabilitiesAndIndicators() internal workings, albeit slightly modified
+         */
+        $manifest = $this->setupAllCapabilitiesAndIndicators($unitImplementations);
+
         /* Set up the structure of this panel. Each capability/indicator is sorted alphabetically.
          * Actual statistical values are appended and calculated after populating into $manifest
          *
@@ -40,7 +53,7 @@ class AllRubrics
          * Still, there might be a way you can roll this into setupStruct() but it'll make it harder to understand;
          * doing so merges the responsibilities
          */
-        $manifest = $this->setupStruct($assessments);
+        $manifest = $this->setupUsedCapabilitiesAndIndicators($manifest, $assessments);
 
         /* Chuck student values in
          */
@@ -55,16 +68,106 @@ class AllRubrics
 
 
     /**
+     * Find all the capabilities and indicators used in the folders related to $unitImplementations.
+     * This should be the superset of all capabilities and indicators used therein, but I can't be totally sure.
+     *
+     * @param GenericCollection $unitImplementations
+     * @return array
+     */
+    private function setupAllCapabilitiesAndIndicators(GenericCollection $unitImplementations): array
+    {
+        $folderIds = array_unique($unitImplementations->map(function (UnitImplementation\Model $unitImpl) {
+            return $unitImpl->getFolder()->getId();
+        })->getAll());
+
+        $results = $this->rubricMapper->getAvailableIndicators($folderIds);
+
+        $manifest = [];
+
+        foreach ($results as $result) {
+            /* This is going to overlap setupStruct() which derives caps/inds from assessments' grids.
+             * I suspect that to be a subset of this, so potentially dedupe it.
+             *
+             * At the moment though I can't be totally sure about the data in the wild.
+             */
+            $capabilityIndex = $result['grouping'];
+
+            if (!isset($manifest[$capabilityIndex])) {
+                $manifest[$capabilityIndex] = [
+                    'name' => $result['grouping'],
+                    /* Capability Marks, if relevant
+                     */
+                    'published' => [
+                        /* Each student's value gets stored here for now
+                         */
+                        'vals' => [],
+                        /* Boxplot summary eventually gets calculated here from the $vals node once assembled
+                         */
+                        'statistics' => null,
+                    ],
+                    'draft' => [
+                        /* Each student's value gets stored here for now
+                         */
+                        'vals' => [],
+                        /* Boxplot summary eventually gets calculated here from the $vals node once assembled
+                         */
+                        'statistics' => null,
+                    ],
+                    /* Set of indicators in this capability
+                     */
+                    'indicators' => []
+                ];
+            }
+
+            $indicatorIndex = $result['name'];
+
+            if (!isset($manifest[$capabilityIndex]['indicators'][$indicatorIndex])) {
+                $manifest[$capabilityIndex]['indicators'][$indicatorIndex] = [
+                    /* Note that capability name is prepended to the indicator name for this particular usage
+                     */
+                    'name' => sprintf(
+                        '%s: %s',
+                        $result['grouping'],
+                        $result['name'],
+                    ),
+                    /* Indicator Marks, if relevant
+                     */
+                    'published' => [
+                        /* Each student's value gets stored here for now
+                         */
+                        'vals' => [],
+                        /* Boxplot summary eventually gets calculated here from the $vals node once assembled
+                         */
+                        'statistics' => null,
+                    ],
+                    'draft' => [
+                        /* Each student's value gets stored here for now
+                         */
+                        'vals' => [],
+                        /* Boxplot summary eventually gets calculated here from the $vals node once assembled
+                         */
+                        'statistics' => null,
+                    ],
+                ];
+            }
+        }
+
+        return $manifest;
+    }
+
+
+    /**
      * Collect all the capabilities and indicators from all the assessments and compile them into a nice list
      * We'll append John Turkey boxplot business later in this method
      *
+     * @param array $manifest
      * @param array $assessments
      * @return array
      */
-    private function setupStruct(array $assessments): array
-    {
-        $manifest = [];
-
+    private function setupUsedCapabilitiesAndIndicators(
+        array $manifest,
+        array $assessments
+    ): array {
         foreach ($assessments as $assessmentId => $assessmentData) {
             foreach ($assessmentData['gridData'] as $rubricInstanceId => $rubricInstanceData) {
                 foreach ($rubricInstanceData['capabilities'] as $capabilityId => $capabilityData) {

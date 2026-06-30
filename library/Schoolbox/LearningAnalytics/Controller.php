@@ -13,6 +13,7 @@ namespace Schoolbox\LearningAnalytics;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\Filter;
@@ -42,6 +43,7 @@ class Controller extends Base
      * @param Mapper $workTypeMapper
      * @param Filter\Mapper $filterMapper
      * @param UserAccessMapper $userAccessMapper
+     * @param DataSource $rubricMapper
      */
     public function __construct(
         private TermMapper $termMapper,
@@ -49,6 +51,7 @@ class Controller extends Base
         private WorkType\Mapper $workTypeMapper,
         private Filter\Mapper $filterMapper,
         private UserAccessMapper $userAccessMapper,
+        private \Schoolbox\Assessment\Rubric\DataModel\DataSource $rubricMapper
     ) {
     }
 
@@ -382,6 +385,7 @@ class Controller extends Base
             $this->filterMapper,
             $this->userAccessMapper,
             $this->routeGenerator,
+            $this->rubricMapper,
             $this->getDi()->get('databaseInternal'),
             $classFolder,
             $submissionType

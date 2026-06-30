@@ -281,6 +281,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(WorkTypeMapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Filter\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Permission\Access\UserAccessMapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Assessment\Rubric\DataModel\DataSource::class)
         );
     }
 
