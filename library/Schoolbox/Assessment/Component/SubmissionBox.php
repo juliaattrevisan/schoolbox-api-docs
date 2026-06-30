@@ -148,14 +148,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
 
 
     /**
-     * The mark type chosen to represent capability totals
-     *
-     * @var MarkType|null
-     */
-    protected $capabilityMarkType;
-
-
-    /**
      * The grade group associated with Letter Grade capability mark type
      *
      * @var GradeLevel\Group\Model|null
@@ -476,25 +468,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
         return $this;
     }
 
-
-    /**
-     * @return MarkType|null
-     */
-    public function getCapabilityMarkType(): ?MarkType
-    {
-        return $this->capabilityMarkType;
-    }
-
-
-    /**
-     * @param MarkType|null $capabilityMarkType
-     * @return $this
-     */
-    public function setCapabilityMarkType(?MarkType $capabilityMarkType): self
-    {
-        $this->capabilityMarkType = $capabilityMarkType;
-        return $this;
-    }
 
     /**
      * @param  string $mark_visibility

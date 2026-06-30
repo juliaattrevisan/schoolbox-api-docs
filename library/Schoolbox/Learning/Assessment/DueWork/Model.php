@@ -89,14 +89,6 @@ class Model extends AbstractAssessment implements ISelfAssessable
     private $rubricGrid;
 
     /**
-     * The rubric capability's mark type, if chosen
-     *
-     * @var MarkType|null
-     */
-    protected $capabilityMarkType;
-
-
-    /**
      * The rubric capability's grade group, if chosen
      *
      * @var SubmissionBox\GradeLevel\Group\Model|null
@@ -269,7 +261,6 @@ class Model extends AbstractAssessment implements ISelfAssessable
         parent::overwrite($source);
         $this->acceptOnline           = $source->acceptOnline;
         $this->capabilityGradeGroup   = $source->capabilityGradeGroup;
-        $this->capabilityMarkType     = $source->capabilityMarkType;
         $this->maxMark                = $source->maxMark;
         $this->instructorMaxMark      = $source->instructorMaxMark;
         $this->instructorMarkType     = $source->instructorMarkType;
@@ -933,24 +924,6 @@ class Model extends AbstractAssessment implements ISelfAssessable
     public function setInstructorMarkScheme(IMarkScheme $instructorMarkScheme): self
     {
         $this->instructorMarkScheme = $instructorMarkScheme;
-        return $this;
-    }
-
-    /**
-     * @return MarkType|null
-     */
-    public function getCapabilityMarkType(): ?MarkType
-    {
-        return $this->capabilityMarkType;
-    }
-
-    /**
-     * @param MarkType|null $capabilityMarkType
-     * @return $this
-     */
-    public function setCapabilityMarkType(?MarkType $capabilityMarkType): self
-    {
-        $this->capabilityMarkType = $capabilityMarkType;
         return $this;
     }
 

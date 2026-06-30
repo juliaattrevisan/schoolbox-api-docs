@@ -86,7 +86,6 @@ class DueWork implements IAssessmentTypeTranslator
         null === $domainObject->getCreator()                || $dataModel->setOwner($domainObject->getCreator());
         null === $domainObject->isAcceptMulti()             || $dataModel->setAcceptMultiple($domainObject->isAcceptMulti());
         null === $domainObject->getUseRubric()              || $dataModel->setUseRubric($domainObject->getUseRubric());
-        null === $domainObject->getCapabilityMarkType()     || $dataModel->setCapabilityMarkType($domainObject->getCapabilityMarkType());
         null === $domainObject->getCapabilityGradeGroup()   || $dataModel->setCapabilityGradeGroup($domainObject->getCapabilityGradeGroup());
         null === $domainObject->getSelfReviewability()      || $dataModel->setSelfReviewability($domainObject->getSelfReviewability());
         null === $domainObject->getSimilarityCheckEnabled() || $dataModel->setSimilarityCheckEnabled($domainObject->getSimilarityCheckEnabled());
@@ -196,11 +195,9 @@ class DueWork implements IAssessmentTypeTranslator
          */
         if ($dataModel->getUseRubric()) {
             $domainObject->setUseRubric(true);
-            $domainObject->setCapabilityMarkType($dataModel->getCapabilityMarkType());
             $domainObject->setCapabilityGradeGroup($dataModel->getCapabilityGradeGroup());
         } else {
             $domainObject->setUseRubric(false);
-            $domainObject->setCapabilityMarkType(null);
             $domainObject->setCapabilityGradeGroup(null);
         }
 

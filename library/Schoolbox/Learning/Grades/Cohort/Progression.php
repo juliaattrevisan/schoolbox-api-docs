@@ -291,7 +291,6 @@ class Progression
                 ri.name AS indicator_name,
                 a.id AS assessment_id,
                 a.title AS assessment_title,
-                sb.rubric_capability_mark_type_id,
                 sb.mark_type,
                 rl.name as level,
                 rd.description,

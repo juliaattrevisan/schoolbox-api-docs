@@ -2503,12 +2503,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
 
 		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getCapabilityMarkType\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getEnableFiles\(\)\.$#'
 			identifier: method.notFound
 			count: 2
@@ -2647,12 +2641,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
 
 		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setCapabilityMarkType\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setEnableFiles\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -2785,12 +2773,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
 
 		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getCapabilityMarkType\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getEnableFiles\(\)\.$#'
 			identifier: method.notFound
 			count: 2
@@ -2906,12 +2888,6 @@ parameters:
 
 		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setCapabilityGradeGroup\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setCapabilityMarkType\(\)\.$#'
 			identifier: method.notFound
 			count: 2
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php

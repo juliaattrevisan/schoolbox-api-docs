@@ -64,8 +64,8 @@ class CapabilityMarkTypeTest extends TestCase
          */
         $generator->setDueWork((new DueWork\Model())
             ->setMarkType($dueWorkMarkType)
-            ->setCapabilityMarkType($capabilityMarkType)
             ->setCapabilityGradeGroup($capabilityGradeGroup));
+        $generator->setCapabilityMarkType($capabilityMarkType);
 
         /* Reach in and yank out a bunch of human readable marks using our local variant
          */

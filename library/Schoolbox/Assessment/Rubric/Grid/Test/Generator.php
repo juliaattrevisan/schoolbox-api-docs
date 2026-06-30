@@ -161,6 +161,14 @@ class Generator
 
 
     /**
+     * Optional capability mark type seeded onto the generated rubric instance.
+     *
+     * @var MarkType|null
+     */
+    private ?MarkType $capabilityMarkType = null;
+
+
+    /**
      * Generator constructor.
      */
     public function __construct()
@@ -210,7 +218,7 @@ class Generator
          */
         $rubricInstance = new \Schoolbox\Assessment\Rubric\Instance\Model()
             ->setId(117)
-            ->setCapabilityMarkType($dueWork->getCapabilityMarkType())
+            ->setCapabilityMarkType($this->capabilityMarkType)
             ->setCapabilityGradeGroup($dueWork->getCapabilityGradeGroup());
 
         $grid = new RubricGrid\Grid($dueWork, $rubricInstance, $rowSet);
@@ -266,6 +274,17 @@ class Generator
     public function setDueWork(DueWork $dueWork): self
     {
         $this->dueWork = $dueWork;
+        return $this;
+    }
+
+
+    /**
+     * @param MarkType|null $capabilityMarkType
+     * @return $this
+     */
+    public function setCapabilityMarkType(?MarkType $capabilityMarkType): self
+    {
+        $this->capabilityMarkType = $capabilityMarkType;
         return $this;
     }
 }
