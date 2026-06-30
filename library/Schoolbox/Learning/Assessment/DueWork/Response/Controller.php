@@ -287,10 +287,6 @@ class Controller extends Base
             'selfAssess' => false,
             'selfReflect' => false,
             'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
-
-            // TODO: SA-22480: Investigate below AI-generated 'fix'
-            /* Staff grading sees the overall rubric total (false for student views, true for staff). */
-            'showRubricTotal' => true,
         ];
 
         /* Rubrics data
