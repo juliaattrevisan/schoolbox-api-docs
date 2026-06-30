@@ -45,7 +45,6 @@ use Schoolbox\Assessment\Rubric\RowSet\Indicator;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\Assessment\Rubric\RowSet\ValidRowSet;
 use Schoolbox\Assessment\Rubric\Util;
-use Schoolbox\Assessment\Term\Model as TermModel;
 use Schoolbox\Database\Factory;
 use Schoolbox\GenericCollection;
 use Schoolbox\IMapper;
@@ -64,7 +63,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use UnderflowException;
 use UnexpectedValueException;
 
 /**
@@ -1907,187 +1905,6 @@ class DataSource
             $this->levelMapper->delete($levels);
             $this->descriptorMapper->deleteByColumn('level_id', $levels->getPropertyValues('id'));
         }
-    }
-
-
-    /**
-     * Returns normalised marks for all student rubric marks in specified folders
-     * on assessments due in the specified term.
-     *
-     * Does not respect assessment.weight, ie all assessments are weighted at 1.
-     *
-     * If a student mark has a NULL value, it is ignored for aggregation.
-     *
-     * Normalised mark: (0.0 - 100.0)
-     *
-     * TODO this is copied wholesale from now-deleted `Duework_Rubric_Handler`; consider modernizing
-     *
-     * @param int[]     $folderIds
-     * @param TermModel $term
-     * @return array
-     * @internal  string       $data [sb.id][rc.id]['grouping'] indicator.grouping
-     * @internal  string       $data [sb.id][rc.id]['name'] indicator.name
-     * @internal  string       $data [sb.id][rc.id]['max_mark'] max mark
-     * @internal  array        $data [sb.id][rc.id]['marks']
-     * @internal  float        $data [sb.id][rc.id]['marks'][student.id]
-     * @throws UnderflowException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     */
-    public function getStudentMarksByIndicatorInFolder(array $folderIds, TermModel $term)
-    {
-        if (!count($folderIds)) {
-            return [];
-        }
-
-        // Step 1: figure out the due works in the term for the given folders
-        $pb = new Builder($this->database->getQuoter(), '');
-        $pb->in('rc.parent_id', $folderIds)
-            /* TODO This parent_type never varies. Why did options exist for it, but were never used?
-             */
-           ->equals('rc.parent_type', CapabilityModel::PARENT_TYPE_CATEGORY)
-           ->greaterThanOrEqualTo('a.due_date', $term->getStart()->getDatabase())
-           ->equals('sr.review_route', SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
-           ->isNull('a.deleted_at')
-           ->notNull('sr.published_at')
-           ->isNull('sr.deleted_at')
-           ->isNull('u.deleted_at');
-
-        $finish = $term->getActualFinish();
-
-        if (null !== $finish) {
-            $pb->lessThan('a.due_date', $finish->getDatabase());
-        }
-
-        $where = implode(' AND ', $pb->getWhere());
-
-        $assessmentStatement = $this->database->prepare("
-            SELECT
-                sr.owner AS studentId,
-                sr.id    AS feedbackId,
-                a.id     AS assessmentId
-            FROM submission_return sr
-            INNER JOIN user                      u ON sr.owner = u.id
-            INNER JOIN submission_box           sb ON sr.box_id = sb.id
-            INNER JOIN rubric_capability_usage rcu ON sb.id = rcu.submission_box_id
-            INNER JOIN rubric_capability        rc ON rgu.rubric_capability_id = rc.id
-            INNER JOIN assessment                a ON sb.assessment_id = a.id
-            WHERE {$where}
-            ORDER BY sr.published_at
-        ");
-
-        $assessmentStatement->execute($pb->getParams());
-
-        $groupedFeedbackIds = [];
-
-        foreach ($assessmentStatement as $row) {
-            $groupedFeedbackIds[$row['assessmentId']][$row['studentId']] = $row['feedbackId'];
-        }
-
-        // We don't care about the assessment ID; only that the feedback is the
-        // most recent for that assessment.
-        $feedbackIds = [];
-
-        foreach ($groupedFeedbackIds as $assessmentId => $feedbackIdsByStudent) {
-            $feedbackIds = array_merge($feedbackIds, $feedbackIdsByStudent);
-        }
-
-        // Short-circuit if there's no feedback
-        if (empty($feedbackIds)) {
-            return [];
-        }
-
-        sort($feedbackIds);
-
-        // Step 2: Get max mark per indicator and dueWork for each due work
-        $results = [];
-
-        $pb = new Builder($this->database->getQuoter(), '');
-        $pb->in('rc.parent_id', $folderIds)
-           ->equals('rc.parent_type', CapabilityModel::PARENT_TYPE_CATEGORY)
-           ->notNull('riu.max_value')
-           ->greaterThan('riu.max_value', 0.0);
-
-        $where = implode(' AND ', $pb->getWhere());
-
-        $maxMarksStatement = $this->database->prepare("
-            SELECT
-                a.id,
-                ri.id AS criterionId,
-                rc.name AS grouping,
-                ri.name,
-                riu.max_value AS maxMark
-            FROM rubric_indicator        ri
-            JOIN rubric_capability       rc ON rc.id = ri.rubric_capability_id AND rc.deleted_at IS NULL
-            JOIN rubric_indicator_usage riu ON ri.id = riu.rubric_indicator_id
-            JOIN submission_box          sb ON riu.submission_box_id = sb.id
-            JOIN assessment               a ON sb.assessment_id = a.id
-            WHERE {$where}
-            ORDER BY riu.submission_box_id, ri.id
-        ");
-
-        $maxMarksStatement->execute($pb->getParams());
-
-        foreach ($maxMarksStatement as $row) {
-            $boxId       = $row['id'];
-            $indicatorId = $row['criterionId'];
-
-            $results[$boxId][$indicatorId] = [
-                'grouping' => $row['grouping'],
-                'name'     => $row['name'],
-                'maxMark'  => $row['maxMark'],
-                'marks'    => [],
-            ];
-        }
-
-        // Step 3: pass to getLongitudinal or similar?
-        $pb = new Builder($this->database->getQuoter(), '');
-        $pb->in('sr.id', $feedbackIds);
-
-        $where = implode(' AND ', $pb->getWhere());
-
-        /* Note that the old aliases still exist here: conceptually, grouping === capability
-         * ...but it doesn't even get used, so it seems to be a diagnostic thing
-         */
-        $descriptorStatement = $this->database->prepare("
-            SELECT
-                sr.owner AS studentId,
-                ri.id    AS indicatorId,
-                rc.name  AS grouping,
-                ri.name,
-                a.id,
-                a.title,
-                rd.description,
-                rim.value
-            FROM       rubric_indicator_mark  rim
-            INNER JOIN rubric_capability_mark rcm ON rim.rubric_capability_mark_id = rcm.id
-            INNER JOIN rubric_capability       rc ON rcm.rubric_capability_id = rc.id
-            INNER JOIN rubric_descriptor       rd ON rim.descriptor_id = rd.id
-            INNER JOIN rubric_indicator        ri ON rd.rubric_indicator_id = ri.id
-            INNER JOIN submission_return       sr ON rcm.return_id = sr.id
-            INNER JOIN submission_box          sb ON sr.box_id = sb.id
-            INNER JOIN assessment               a ON sb.assessment_id = a.id
-            WHERE {$where}
-            ORDER BY rc.name, ri.name, a.due_date DESC;
-        ");
-
-        $descriptorStatement->execute($pb->getParams());
-
-        // Step 4: smoosh them all together
-        foreach ($descriptorStatement as $row) {
-            $boxId       = $row['id'];
-            $indicatorId = $row['indicatorId'];
-            $mark        = $row['value'];
-            $maxMark     = $results[$boxId][$indicatorId]['maxMark'] ?? 0;
-
-            if ($maxMark === 0) {
-                continue;
-            }
-
-            $results[$boxId][$indicatorId]['marks'][$row['studentId']] = 100.0 * $mark / $maxMark;
-        }
-
-        // Finally:
-        return $results;
     }
 
 

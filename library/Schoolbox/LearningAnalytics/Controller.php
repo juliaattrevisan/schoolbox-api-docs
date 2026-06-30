@@ -13,12 +13,16 @@ namespace Schoolbox\LearningAnalytics;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
+use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Analytics\CohortAnalysis;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\WorkType\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Collection;
@@ -33,26 +37,22 @@ use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 
 class Controller extends Base
 {
-    /** @var TermMapper $termMapper */
-    private $termMapper;
-
-    /** @var FolderMapper */
-    private $folderMapper;
-
-    /** @var WorkType\Mapper */
-    private $workTypeMapper;
-
-
     /**
-     * @param TermMapper      $termMapper
-     * @param FolderMapper    $folderMapper
-     * @param WorkType\Mapper $workTypeMapper
+     * @param TermMapper $termMapper
+     * @param FolderMapper $folderMapper
+     * @param Mapper $workTypeMapper
+     * @param Filter\Mapper $filterMapper
+     * @param UserAccessMapper $userAccessMapper
+     * @param DataSource $rubricMapper
      */
-    public function __construct(TermMapper $termMapper, FolderMapper $folderMapper, WorkType\Mapper $workTypeMapper)
-    {
-        $this->termMapper           = $termMapper;
-        $this->folderMapper         = $folderMapper;
-        $this->workTypeMapper       = $workTypeMapper;
+    public function __construct(
+        private TermMapper $termMapper,
+        private FolderMapper $folderMapper,
+        private WorkType\Mapper $workTypeMapper,
+        private Filter\Mapper $filterMapper,
+        private UserAccessMapper $userAccessMapper,
+        private \Schoolbox\Assessment\Rubric\DataModel\DataSource $rubricMapper
+    ) {
     }
 
 
@@ -375,7 +375,21 @@ class Controller extends Base
         // All variants of learning analytics reports could take a while
         $this->extendExecutionTime();
 
-        $analysis = new CohortAnalysis($dueAssessments, $classFolder, $submissionType);
+        /* This is used in the rubrics section to generate Overall Marks that is used in boxplots here
+         */
+        $markSchemeFactory = new \Schoolbox\Learning\MarkScheme\Factory($this->getConfigLoader());
+
+        $analysis = new CohortAnalysis(
+            $dueAssessments,
+            $markSchemeFactory,
+            $this->filterMapper,
+            $this->userAccessMapper,
+            $this->routeGenerator,
+            $this->rubricMapper,
+            $this->getDi()->get('databaseInternal'),
+            $classFolder,
+            $submissionType
+        );
 
         // Ensure we have folder codes
         /** @var FolderCodeMapper $codeMapper */
@@ -416,9 +430,7 @@ class Controller extends Base
             'progress'            => [
                 'allUnits' => $analysis->getProgressByUnit(),
             ],
-            'rubrics'             =>
-                $analysis->getCohortGradesByIndicator($unitImplsInTerm, $term)
-            ,
+            'rubrics'             => $analysis->getCohortGradesByIndicator($unitImplsInTerm, $term),
             'effort'              => [
                 'allEffort' => $analysis->getEffort(),
             ],

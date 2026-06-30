@@ -14,7 +14,6 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Map;
 use Alaress\Web\Router\PathMatcher;
 use Schoolbox\Application\Exception\Exception as ApplicationException;
 use Schoolbox\Collection;
@@ -26,14 +25,12 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImpleme
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Role;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -282,6 +279,9 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(TermMapper::class),
             $this->getMapperFactory()->get(FolderMapper::class),
             $this->getMapperFactory()->get(WorkTypeMapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Filter\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Permission\Access\UserAccessMapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Assessment\Rubric\DataModel\DataSource::class)
         );
     }
 

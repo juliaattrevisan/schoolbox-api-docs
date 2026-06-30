@@ -26,8 +26,10 @@ use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\RubricUsage;
 use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Learning\MarkScheme\Factory;
+use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
@@ -61,9 +63,9 @@ class OverallDataset
     /**
      * Build data required by both the HTML and CSV form of the rubric markbook.
      *
-     * @param Folder\Model $folder
-     * @param array        $request
-     * @param array        $assessmentIds
+     * @param Model|null $folder
+     * @param array $request
+     * @param array $assessmentIds
      * @return array 0: array A list of assessment data
      *               1: int[][] A list of IDs of students excluded from each
      *                  assessment, grouped by assessment ID
@@ -71,10 +73,10 @@ class OverallDataset
      *                  each student partaking
      *               3: array A summation of marks for each capability
      *
-     * @throws Mapper\Exception
-     * @throws Router\Exception\RouteNotFound
+     * @throws Exception
+     * @throws RouteNotFound
      */
-    public function buildMarkbookData(Folder\Model $folder, array $request, array $assessmentIds): array
+    public function buildMarkbookData(?Folder\Model $folder, array $request, array $assessmentIds): array
     {
         /* These are the filter selections that were used from the ui
          */
@@ -101,7 +103,14 @@ class OverallDataset
          * This process is repeated twice, almost verbatim, for published and draft marks.
          * TODO find a way to dedupe all this insanity
          */
-        $studentMarks = $this->insertFolderMembers($folder);
+        $studentMarks = [];
+
+        /* If a folder wasn't provided, just accumulate users from the retrieve*Marks() methods; there isn't a mandatory
+         * or conclusive list of guys to start with in such a scenario
+         */
+        if (null !== $folder) {
+            $studentMarks = $this->insertFolderMembers($folder);
+        }
 
         /* Augment $studentMarks with published data
          */
@@ -1160,7 +1169,7 @@ class OverallDataset
      * @param array $assessments
      * @param array $studentMarks
      * @param array $exclusions
-     * @param Model $folder
+     * @param Model|null $folder
      * @param bool $includeDiagnostics Adds the individual calculations as a frontend payload so you can see it in prod
      * @return array
      */
@@ -1168,7 +1177,7 @@ class OverallDataset
         array $assessments,
         array $studentMarks,
         array $exclusions,
-        Folder\Model $folder,
+        ?Folder\Model $folder,
         bool $includeDiagnostics = false
     ): array {
         $overallMarks = $this->aggregateMarks($assessments, $studentMarks, $exclusions, $folder, $includeDiagnostics);
@@ -1191,7 +1200,7 @@ class OverallDataset
      * @param array $assessments
      * @param array $studentMarks
      * @param array $exclusions
-     * @param Model $folder
+     * @param Model|null $folder
      * @param bool $includeDiagnostic
      * @return array
      */
@@ -1199,7 +1208,7 @@ class OverallDataset
         array $assessments,
         array $studentMarks,
         array $exclusions,
-        Folder\Model $folder,
+        ?Folder\Model $folder,
         bool $includeDiagnostic
     ): array {
         /* Non-iterable Coefficients Lookup
@@ -1545,7 +1554,13 @@ class OverallDataset
          * If there are multiple year levels on the class page, and they agree (we should use their grade group)
          * If there are multiple year levels on the class page, and they do NOT agree (all different grade groups), we should fall back to the system default grade group.
          */
-        $markScheme = $this->markSchemeFactory->spawnForFolder($folder, true);
+        if (null !== $folder) {
+            $markScheme = $this->markSchemeFactory->spawnForFolder($folder, true);
+        } else {
+            /* Presume this when $folder wasn't specified
+             */
+            $markScheme = new Percentage();
+        }
 
         foreach ($overallMarks as $capabilityId => &$capabilityData) {
             foreach ($capabilityData['students'] as &$studentCapabilityData) {
