@@ -280,12 +280,11 @@ abstract class AbstractAssessment implements IAssessable
         // (One wonders why spec assessments even have plans?)
         $clone->setPlans($clone->getPlans()->emptyClone());
 
-        // TODO: SA-22480: Investigate below AI-generated 'fix', probably defer to another ticket
-        // The clone must not carry over the source's rubric instances. Rubric cloning is
-        // handled separately (see Replicator/Transplantor and RubricDataSource::copyRubric),
-        // and these source instances have no frontend grid payload, so persisting the clone
-        // would otherwise dereference a null grid. Assign a fresh collection directly rather
-        // than via setRubricInstances(), which mutates the (shared) source collection in place.
+        /* The clone shouldn't inherit the spec assessment's rubric instances,
+         * cloning of the rubrics is handled separately (see Replicator::replicateRubricGrids).
+         * Avoid setRubricInstances() as that would mutate the shared source collection in place.
+         */
+        // TODO: revise this fix, it's possible that something else somewhere needs to be done too, but it appears to be a good start
         $clone->rubricInstances = new GenericCollection(\Schoolbox\Assessment\Rubric\Instance\Model::class);
 
         return $clone;

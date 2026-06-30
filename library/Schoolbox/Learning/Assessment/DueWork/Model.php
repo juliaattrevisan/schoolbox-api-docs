@@ -242,6 +242,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
          * it is unlikely to be hydrated at this point. This call merely protects the system in case someone
          * alters the default hydration.
          */
+        // TODO: theoretically this is deprecated and should be removed, rubrics are handled one layer up now.
         $clone->setRubricGrid(null);
         return $clone;
     }
