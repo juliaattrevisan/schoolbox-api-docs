@@ -21,6 +21,15 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
+ * @phpstan-type SessionLogSummaryRow array{
+ *     id: int,
+ *     ai_session_id: string,
+ *     created_at: string,
+ *     log_format: string|null,
+ *     return_code: int|null,
+ *     error_message: string|null
+ * }
+ *
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
@@ -255,7 +264,7 @@ class Mapper extends BaseMapper
      * Fetch summary-relevant log rows for the supplied session IDs, indexed by ai_session_log.ai_session_id.
      *
      * @param string[] $sessionIds
-     * @return array<string, list<array{id: int|string, ai_session_id: string, created_at: string, log_format: string|null, return_code: int|null, error_message: string|null}>>
+     * @return array<string, list<SessionLogSummaryRow>>
      */
     public function getSessionLogRowsBySessionId(array $sessionIds): array
     {
@@ -285,7 +294,15 @@ class Mapper extends BaseMapper
         $statement->execute();
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $sessionLogRowsBySessionId[$row['ai_session_id']][] = $row;
+            $sessionId = (string)$row['ai_session_id'];
+            $sessionLogRowsBySessionId[$sessionId][] = [
+                'id' => (int)$row['id'],
+                'ai_session_id' => $sessionId,
+                'created_at' => (string)$row['created_at'],
+                'log_format' => null === $row['log_format'] ? null : (string)$row['log_format'],
+                'return_code' => null === $row['return_code'] ? null : (int)$row['return_code'],
+                'error_message' => null === $row['error_message'] ? null : (string)$row['error_message'],
+            ];
         }
 
         return $sessionLogRowsBySessionId;
@@ -297,7 +314,7 @@ class Mapper extends BaseMapper
      * Session log rows must be supplied in the order used to determine the first viewable log.
      * Rows from $this->getSessionLogRowsBySessionId() meet this requirement.
      *
-     * @param array<int, array{id?: int|string, created_at?: string, log_format?: string|null, return_code?: int|null, error_message?: string|null}> $sessionLogRows
+     * @param list<SessionLogSummaryRow> $sessionLogRows
      * @return array{derived_log_format: string|null, derived_has_error: bool}
      */
     public function summariseSessionLogRows(array $sessionLogRows): array
@@ -308,14 +325,14 @@ class Mapper extends BaseMapper
         ];
 
         foreach ($sessionLogRows as $row) {
-            if (null === $summary['derived_log_format'] && null !== ($row['log_format'] ?? null)) {
+            if (null === $summary['derived_log_format'] && null !== $row['log_format']) {
                 $summary['derived_log_format'] = $row['log_format'];
             }
 
-            $returnCode = $row['return_code'] ?? null;
+            $returnCode = $row['return_code'];
             if (
-                null !== ($row['error_message'] ?? null)
-                || (null !== $returnCode && self::HTTP_STATUS_CODE_OK !== (int)$returnCode)
+                null !== $row['error_message']
+                || (null !== $returnCode && self::HTTP_STATUS_CODE_OK !== $returnCode)
             ) {
                 $summary['derived_has_error'] = true;
             }

@@ -27,6 +27,7 @@ class MapperTest extends TestCase
         $summary = $mapper->summariseSessionLogRows([
             [
                 'id' => 10,
+                'ai_session_id' => 'session-1',
                 'created_at' => '2026-01-01 10:00:00',
                 'log_format' => null,
                 'return_code' => null,
@@ -34,6 +35,7 @@ class MapperTest extends TestCase
             ],
             [
                 'id' => 11,
+                'ai_session_id' => 'session-1',
                 'created_at' => '2026-01-01 10:01:00',
                 'log_format' => 'agent-chat',
                 'return_code' => 200,
@@ -41,6 +43,7 @@ class MapperTest extends TestCase
             ],
             [
                 'id' => 12,
+                'ai_session_id' => 'session-1',
                 'created_at' => '2026-01-01 10:02:00',
                 'log_format' => 'structured-output',
                 'return_code' => 500,
@@ -67,6 +70,7 @@ class MapperTest extends TestCase
         $summary = $mapper->summariseSessionLogRows([
             [
                 'id' => 10,
+                'ai_session_id' => 'session-1',
                 'created_at' => '2026-01-01 10:00:00',
                 'log_format' => null,
                 'return_code' => null,
@@ -93,6 +97,7 @@ class MapperTest extends TestCase
         $summary = $mapper->summariseSessionLogRows([
             [
                 'id' => 12,
+                'ai_session_id' => 'session-1',
                 'created_at' => '2026-01-01 10:02:00',
                 'log_format' => 'supplied-first',
                 'return_code' => 200,
@@ -100,6 +105,7 @@ class MapperTest extends TestCase
             ],
             [
                 'id' => 11,
+                'ai_session_id' => 'session-1',
                 'created_at' => '2026-01-01 10:01:00',
                 'log_format' => 'chronological-first',
                 'return_code' => 200,
