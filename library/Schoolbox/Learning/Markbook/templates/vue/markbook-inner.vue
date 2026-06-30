@@ -110,7 +110,7 @@ const exportReportRoute = window.Vue.computed(() => {
 </script>
 
 <template>
-    <div class="u-flex u-flex-row u-flex--align-end u-flex--justify-end u-gap-m">
+    <div class="u-flex u-flex-row u-flex--align-center u-flex--justify-end u-gap-l u-mar-s--bottom">
         <div class="legend">
             <div class="indicators">
                 <p class="meta"><span class="legend-indicator indicator-none"></span>Unmarked</p>
@@ -122,7 +122,7 @@ const exportReportRoute = window.Vue.computed(() => {
 
         <div class="checklist">
             <input id="show-display-marks" v-model="mbStore.showDisplayMarks" type="checkbox" />
-            <label for="show-display-marks" data-test="markbook-show-display-marks">
+            <label for="show-display-marks" data-test="markbook-show-display-marks" class="f-no-margins">
                 Show Display Marks
                 <span
                     class="hint has-tip tip-top"
@@ -135,7 +135,7 @@ const exportReportRoute = window.Vue.computed(() => {
         </div>
         <div class="checklist">
             <input id="show-drafts" v-model="mbStore.showDrafts" type="checkbox" />
-            <label for="show-drafts">Show Drafts</label>
+            <label for="show-drafts" class="f-no-margins">Show Drafts</label>
         </div>
         <nav v-if="exportReportRoute">
             <sbx-pop-out content-id="header-options"></sbx-pop-out>

@@ -22,8 +22,8 @@
     .legend {
         .indicators {
             display: flex;
-            justify-content: flex-end;
             flex-wrap: wrap;
+            gap: var(--sbx-size-m, 1rem);
         }
         .legend-indicator {
             position: relative;
@@ -31,12 +31,7 @@
             margin-right: 0.5rem;
         }
         .meta {
-            display: inline-block;
-            margin-right: 2rem;
-
-            @media #{$small-only} {
-                margin-right: 1rem;
-            }
+            margin: 0;
         }
     }
 
