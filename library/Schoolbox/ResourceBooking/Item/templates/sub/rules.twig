@@ -1,6 +1,8 @@
 {# Booking rules for a resource. #}
 <ul>
-    <li>Conflict bookings: {{ item.allowClashBookings ? 'Allowed' : 'Not allowed' }}</li>
+    {% if not item.allowClashBookings %}
+        <li>Only allow booking requests up to capacity.</li>
+    {% endif %}
     {% set capacity = item.capacity|default(1) %}
     <li>Capacity: {{ capacity }} concurrent {{ capacity == 1 ? 'booking' : 'bookings' }}</li>
 
