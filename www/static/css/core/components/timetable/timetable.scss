@@ -46,12 +46,6 @@
             transition:
                 opacity 0.15s ease,
                 filter 0.15s ease;
-
-            &.sbx-related-event-muted {
-                filter: grayscale(35%);
-                opacity: 0.38;
-            }
-
             /* override global icon colour.
             *  make it normal icon size.
             */
@@ -80,6 +74,12 @@
         display: block;
         font-weight: normal;
     }
+}
+
+.fc-event.sbx-related-event-muted,
+.timetable-subject.sbx-related-event-muted {
+    filter: grayscale(35%);
+    opacity: 0.38;
 }
 
 /* Fifty-fifty split on small devices

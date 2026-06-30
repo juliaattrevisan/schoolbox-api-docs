@@ -128,6 +128,11 @@
             $(config.target).html("");
         }
 
+        /**
+         * Register hover/focus highlighting for timetable subjects that share
+         * the same class code. The handler is delegated because the small
+         * timetable is rebuilt from the full grid when timetables are shown.
+         */
         function registerRelatedClassHighlighting() {
             $(document)
                 .off(".timetableHighlight")
@@ -144,9 +149,9 @@
 
                         container.find("[data-timetable-class-code]").each(function () {
                             if ($(this).attr("data-timetable-class-code") === classCode) {
-                                $(this).addClass("sbx-related-event-match").removeClass("sbx-related-event-muted");
+                                $(this).removeClass("sbx-related-event-muted");
                             } else {
-                                $(this).addClass("sbx-related-event-muted").removeClass("sbx-related-event-match");
+                                $(this).addClass("sbx-related-event-muted");
                             }
                         });
                     },
@@ -158,7 +163,7 @@
                         $(this)
                             .closest(config.wrapper.data + ", " + config.target)
                             .find("[data-timetable-class-code]")
-                            .removeClass("sbx-related-event-match sbx-related-event-muted");
+                            .removeClass("sbx-related-event-muted");
                     },
                 );
         }

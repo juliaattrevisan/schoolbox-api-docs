@@ -6,7 +6,6 @@
 import { EVENT_VARIANTS } from "@schoolboxCalendarEvent/event-variants";
 
 const RELATED_EVENT_ACTIVE_CLASS = "sbx-related-events-active";
-const RELATED_EVENT_MATCH_CLASS = "sbx-related-event-match";
 const RELATED_EVENT_MUTED_CLASS = "sbx-related-event-muted";
 const RELATED_EVENT_RELATION_ATTRIBUTE = "data-calendar-event-relation";
 const EVENT_FETCH_DAYS_BEFORE_VISIBLE_RANGE = 30;
@@ -125,10 +124,9 @@ export default {
             calendar.classList.add(RELATED_EVENT_ACTIVE_CLASS);
             calendar.querySelectorAll(`[${RELATED_EVENT_RELATION_ATTRIBUTE}]`).forEach((calendarEvent) => {
                 if (calendarEvent.getAttribute(RELATED_EVENT_RELATION_ATTRIBUTE) === relationKey) {
-                    calendarEvent.classList.remove(RELATED_EVENT_MATCH_CLASS, RELATED_EVENT_MUTED_CLASS);
+                    calendarEvent.classList.remove(RELATED_EVENT_MUTED_CLASS);
                 } else {
                     calendarEvent.classList.add(RELATED_EVENT_MUTED_CLASS);
-                    calendarEvent.classList.remove(RELATED_EVENT_MATCH_CLASS);
                 }
             });
         },
@@ -148,7 +146,7 @@ export default {
 
             calendar.classList.remove(RELATED_EVENT_ACTIVE_CLASS);
             calendar.querySelectorAll(`[${RELATED_EVENT_RELATION_ATTRIBUTE}]`).forEach((calendarEvent) => {
-                calendarEvent.classList.remove(RELATED_EVENT_MATCH_CLASS, RELATED_EVENT_MUTED_CLASS);
+                calendarEvent.classList.remove(RELATED_EVENT_MUTED_CLASS);
             });
         },
 
