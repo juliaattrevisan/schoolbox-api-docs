@@ -78,9 +78,21 @@ const selfAssessmentMark = window.Vue.computed<string | null>(() => {
         return null;
     }
 
+    /* If there is no humanReadableMark, then the display mark type would've been NONE (or there's no mark at all),
+     * it's still somehow possible to end up with a normalised mark in this case, but historically we haven't
+     * shown a computed mark when humanReadableInstructorMark was null (theoretically should be the same as when
+     * humanReadableMark is null in this specific scenario due to it being a self assessment and the usual order reversed).
+     *
+     * Anyway, to align with the old way we'll just hide it if there's no humanReadableMark, even if there's a norm mark.
+     */
+    if (props.selfAssessmentFeedback.humanReadableMark === null) {
+        return null;
+    }
+
     if (props.selfAssessmentFeedback.normalisedMark === null) {
-        /* probably just show whatever is in humanReadableMark in this scenario
-         * (you might not have access to normalisedMark but can still see the HR mark for whatever reason I guess)
+        /* having no normalised mark whilst still having a humanReadableMark is strange, perhaps due to submission states?
+         * Just show whatever humanReadableMark is in this case, we don't want to reverse the display mark type as it'll
+         * loose precision and likely be inaccurate.
          */
         return props.selfAssessmentFeedback.humanReadableMark;
     }
