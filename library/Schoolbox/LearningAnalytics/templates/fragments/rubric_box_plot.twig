@@ -22,8 +22,14 @@
              * five-point summaries
              */
             allAssessments: [
+                {# Annoyingly, this is used to set a height of a presentation element:'
+                 # graph height is derived from the quantity of indicators
+                 #}
+                {% set numIndicators = 0 %}
+
                 {% for capabilityId, capabilityData in dataset %}
                     {% for indicatorId, indicatorData in capabilityData.indicators %}
+                        {% set numIndicators = numIndicators + 1 %}
                         "{{ indicatorData.name }}",
                     {% endfor %}
                 {% endfor %}
@@ -83,4 +89,4 @@
 {% endautoescape %}
 
 
-<div data-graph="rubrics" style="height:{{ ((dataset | length) * 40) + 75 }}px"></div>
+<div data-graph="rubrics" style="height:{{ (numIndicators * 40) + 75 }}px"></div>
