@@ -87,24 +87,23 @@ class SessionSummariser
     }
 
     /**
-     * Summarise session log rows into the derived fields used by the admin usage list.
+     * Hydrate a session with the derived fields used by the admin usage list.
      *
      * Session log rows must be supplied in the order used to determine the first viewable log.
      * Rows from $this->getSessionLogRowsBySessionId() meet this requirement.
      *
+     * @param Model $session
      * @param list<SessionLogSummaryRow> $sessionLogRows
-     * @return array{derived_log_format: string|null, derived_has_error: bool}
+     * @return void
      */
-    public function summariseSessionLogRows(array $sessionLogRows): array
+    public function hydrateSessionWithSummaryInfo(Model $session, array $sessionLogRows): void
     {
-        $summary = [
-            'derived_log_format' => null,
-            'derived_has_error' => false,
-        ];
+        $derivedLogFormat = null;
+        $derivedHasError = false;
 
         foreach ($sessionLogRows as $row) {
-            if (null === $summary['derived_log_format'] && null !== $row['log_format']) {
-                $summary['derived_log_format'] = $row['log_format'];
+            if (null === $derivedLogFormat && null !== $row['log_format']) {
+                $derivedLogFormat = $row['log_format'];
             }
 
             $returnCode = $row['return_code'];
@@ -112,10 +111,12 @@ class SessionSummariser
                 null !== $row['error_message']
                 || (null !== $returnCode && self::HTTP_STATUS_CODE_OK !== $returnCode)
             ) {
-                $summary['derived_has_error'] = true;
+                $derivedHasError = true;
             }
         }
 
-        return $summary;
+        $session
+            ->setDerivedLogFormat($derivedLogFormat)
+            ->setDerivedHasError($derivedHasError);
     }
 }

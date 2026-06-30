@@ -11,6 +11,7 @@ namespace Schoolbox\OpenAi\Session\Test;
 
 use Alaress\Database\Connector\NullConnector;
 use PHPUnit\Framework\TestCase;
+use Schoolbox\OpenAi\Session\Model;
 use Schoolbox\OpenAi\Session\SessionSummariser;
 
 /**
@@ -21,11 +22,12 @@ class SessionSummariserTest extends TestCase
     /**
      * Session log rows are summarised using the first viewable log and any error condition.
      */
-    public function testSummariseSessionLogRowsUsesFirstViewableLogAndAnyError(): void
+    public function testHydrateSessionWithSummaryUsesFirstViewableLogAndAnyError(): void
     {
         $summariser = new SessionSummariser(new NullConnector());
+        $session = new Model();
 
-        $summary = $summariser->summariseSessionLogRows([
+        $summariser->hydrateSessionWithSummaryInfo($session, [
             [
                 'id' => 10,
                 'ai_session_id' => 'session-1',
@@ -52,23 +54,19 @@ class SessionSummariserTest extends TestCase
             ],
         ]);
 
-        $this->assertSame(
-            [
-                'derived_log_format' => 'agent-chat',
-                'derived_has_error' => true,
-            ],
-            $summary
-        );
+        $this->assertSame('agent-chat', $session->getDerivedLogFormat());
+        $this->assertTrue($session->getDerivedHasError());
     }
 
     /**
      * Session log rows without a viewable log or error return the default summary values.
      */
-    public function testSummariseSessionLogRowsReturnsDefaultsForEmptySummary(): void
+    public function testHydrateSessionWithSummaryUsesDefaultsForEmptySummary(): void
     {
         $summariser = new SessionSummariser(new NullConnector());
+        $session = new Model();
 
-        $summary = $summariser->summariseSessionLogRows([
+        $summariser->hydrateSessionWithSummaryInfo($session, [
             [
                 'id' => 10,
                 'ai_session_id' => 'session-1',
@@ -79,23 +77,19 @@ class SessionSummariserTest extends TestCase
             ],
         ]);
 
-        $this->assertSame(
-            [
-                'derived_log_format' => null,
-                'derived_has_error' => false,
-            ],
-            $summary
-        );
+        $this->assertNull($session->getDerivedLogFormat());
+        $this->assertFalse($session->getDerivedHasError());
     }
 
     /**
      * Session log rows are summarised in their supplied order.
      */
-    public function testSummariseSessionLogRowsUsesSuppliedOrder(): void
+    public function testHydrateSessionWithSummaryUsesSuppliedOrder(): void
     {
         $summariser = new SessionSummariser(new NullConnector());
+        $session = new Model();
 
-        $summary = $summariser->summariseSessionLogRows([
+        $summariser->hydrateSessionWithSummaryInfo($session, [
             [
                 'id' => 12,
                 'ai_session_id' => 'session-1',
@@ -114,12 +108,7 @@ class SessionSummariserTest extends TestCase
             ],
         ]);
 
-        $this->assertSame(
-            [
-                'derived_log_format' => 'supplied-first',
-                'derived_has_error' => false,
-            ],
-            $summary
-        );
+        $this->assertSame('supplied-first', $session->getDerivedLogFormat());
+        $this->assertFalse($session->getDerivedHasError());
     }
 }

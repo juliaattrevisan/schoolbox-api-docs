@@ -233,10 +233,8 @@ class Mapper extends BaseMapper
         );
 
         foreach ($sessionRows as $row) {
-            $summary = $sessionSummariser->summariseSessionLogRows($sessionLogRowsBySessionId[$row['id']] ?? []);
-            $session = $this->hydrate($row)
-                ->setDerivedLogFormat($summary['derived_log_format'])
-                ->setDerivedHasError($summary['derived_has_error']);
+            $session = $this->hydrate($row);
+            $sessionSummariser->hydrateSessionWithSummaryInfo($session, $sessionLogRowsBySessionId[$row['id']] ?? []);
 
             /** @var \Schoolbox\User|null $sessionUser */
             $sessionUser = $userMapper->hydrate($row, 'u');
