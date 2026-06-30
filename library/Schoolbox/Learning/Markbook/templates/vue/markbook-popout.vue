@@ -147,18 +147,6 @@ function onPopOutClosed(): void {
     referenceElement.value = null;
 }
 
-/**
- * Checks whether a markbook action route is available to use.
- *
- * A false route means the user does not have access, while null means the
- * route was not provided for this entry.
- * @param route The route value from the markbook action routes payload.
- * @returns True when the route can be used as an action URL.
- */
-function hasActionRoute(route: string | false | null): route is string {
-    return route !== null && route !== false;
-}
-
 const { onButtonSelected, close } = usePopOut(
     referenceElement,
     popOutElement,
@@ -191,7 +179,7 @@ const viewAllText = window.Vue.computed(() => {
         cellInfo.value?.aImpl._routes.student[cellInfo.value.studentId].getAssessmentParticipationForm ?? null;
     if (cellInfo.value.participant.isExcluded) {
         if (getAssessmentParticipationRoute === null) {
-            if (hasActionRoute(routes.value.includeRoute)) {
+            if (routes.value.includeRoute) {
                 return "The student has been excluded. You may include this student in this activity";
             }
             return "The student has been excluded.";
@@ -200,7 +188,7 @@ const viewAllText = window.Vue.computed(() => {
     }
     if (isActivityEmpty.value) {
         if (getAssessmentParticipationRoute === null) {
-            if (hasActionRoute(routes.value.excludeRoute)) {
+            if (routes.value.excludeRoute) {
                 return "There has been no activity yet, you may create feedback or exclude this student from this activity";
             }
             return "There has been no activity yet";
@@ -260,13 +248,13 @@ const hasVisibleMenuItems = window.Vue.computed(() => {
     const hasIncludeMenuItem =
         participant &&
         participant.isExcluded &&
-        hasActionRoute(routes.value.includeRoute) &&
+        routes.value.includeRoute &&
         routes.value.getAssessmentParticipationForm === null;
 
     const hasExcludeMenuItem =
         participant &&
         !participant.isExcluded &&
-        hasActionRoute(routes.value.excludeRoute) &&
+        routes.value.excludeRoute &&
         activity.assessmentType !== ACTIVITY_TYPE_PROJECT;
 
     const hasHistoryMenuItem = participant && !participant.isExcluded;
@@ -290,7 +278,7 @@ async function getActivity(): Promise<void> {
     mbStore.isPopoutLoading = true;
 
     try {
-        if (hasActionRoute(timelineRoute)|| hasActionRoute(infoRoute)) {
+        if (!timelineRoute || !infoRoute) {
             throw new Error("Unable to find timelineRoute/infoRoute for retrieving activity items");
         }
 
@@ -710,7 +698,7 @@ function onToggleSelected(): void {
                     v-if="
                         cellInfo.participant &&
                         cellInfo.participant.isExcluded &&
-                        hasActionRoute(routes.includeRoute) &&
+                        routes.includeRoute &&
                         routes.getAssessmentParticipationForm === null
                     "
                     :class="{ 'is-disabled': !cellInfo.participant.isExcluded }"
@@ -722,7 +710,7 @@ function onToggleSelected(): void {
                     v-if="
                         cellInfo.participant &&
                         !cellInfo.participant.isExcluded &&
-                        hasActionRoute(routes.excludeRoute) &&
+                        routes.excludeRoute &&
                         cellInfo.activity.assessmentType !== ACTIVITY_TYPE_PROJECT
                     "
                     :class="{ 'is-disabled': !routes.excludeRoute && !cellInfo.participant.isExcluded }"
