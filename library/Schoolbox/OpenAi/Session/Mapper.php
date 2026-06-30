@@ -17,21 +17,11 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\OpenAi\Feature;
 use Schoolbox\OpenAi\Moderation\Event\Status as ModerationEventStatus;
+use Schoolbox\OpenAi\Session\Helper\SessionSummariser;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
- * This is the lightweight row shape required to summarise logs.
- *
- * @phpstan-type SessionLogSummaryRow array{
- *     id: int,
- *     ai_session_id: string,
- *     created_at: string,
- *     log_format: string|null,
- *     return_code: int|null,
- *     error_message: string|null
- * }
- *
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
@@ -40,8 +30,6 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends BaseMapper
 {
-    private const int HTTP_STATUS_CODE_OK = 200;
-
     /**
      * @inheritDoc
      *
@@ -239,13 +227,14 @@ class Mapper extends BaseMapper
 
         $collection = $this->createCollection();
         $userMapper = $this->getJoinMapper('user');
+        $sessionSummariser = new SessionSummariser($this->getDatabase());
         $sessionRows = $statement->fetchAll(\PDO::FETCH_ASSOC);
-        $sessionLogRowsBySessionId = $this->getSessionLogRowsBySessionId(
+        $sessionLogRowsBySessionId = $sessionSummariser->getSessionLogRowsBySessionId(
             array_column($sessionRows, 'id')
         );
 
         foreach ($sessionRows as $row) {
-            $summary = $this->summariseSessionLogRows($sessionLogRowsBySessionId[$row['id']] ?? []);
+            $summary = $sessionSummariser->summariseSessionLogRows($sessionLogRowsBySessionId[$row['id']] ?? []);
             $session = $this->hydrate($row)
                 ->setDerivedLogFormat($summary['derived_log_format'])
                 ->setDerivedHasError($summary['derived_has_error']);
@@ -260,88 +249,6 @@ class Mapper extends BaseMapper
         }
 
         return $collection;
-    }
-
-    /**
-     * Fetch summary-relevant log rows for the supplied session IDs, indexed by ai_session_log.ai_session_id.
-     *
-     * @param string[] $sessionIds
-     * @return array<string, list<SessionLogSummaryRow>>
-     */
-    public function getSessionLogRowsBySessionId(array $sessionIds): array
-    {
-        $sessionIds = array_values(array_unique($sessionIds));
-
-        if (!$sessionIds) {
-            return [];
-        }
-
-        $sessionLogRowsBySessionId = array_fill_keys($sessionIds, []);
-        $statement = $this->getDatabase()->prepare(
-            'SELECT
-                id,
-                ai_session_id,
-                created_at,
-                log_format,
-                return_code,
-                error_message
-            FROM `ai_session_log`
-            WHERE ai_session_id IN ' . Builder::getArrayPlaceholders($sessionIds, 'session_id') . '
-            ORDER BY ai_session_id ASC, created_at ASC, id ASC'
-        );
-
-        foreach (Builder::getArrayParameters($sessionIds, 'session_id') as $name => $value) {
-            $statement->bindValue($name, $value);
-        }
-        $statement->execute();
-
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $sessionId = (string)$row['ai_session_id'];
-            // Normalise raw PDO values into the documented SessionLogSummaryRow shape.
-            $sessionLogRowsBySessionId[$sessionId][] = [
-                'id' => (int)$row['id'],
-                'ai_session_id' => $sessionId,
-                'created_at' => (string)$row['created_at'],
-                'log_format' => null === $row['log_format'] ? null : (string)$row['log_format'],
-                'return_code' => null === $row['return_code'] ? null : (int)$row['return_code'],
-                'error_message' => null === $row['error_message'] ? null : (string)$row['error_message'],
-            ];
-        }
-
-        return $sessionLogRowsBySessionId;
-    }
-
-    /**
-     * Summarise session log rows into the derived fields used by the admin usage list.
-     *
-     * Session log rows must be supplied in the order used to determine the first viewable log.
-     * Rows from $this->getSessionLogRowsBySessionId() meet this requirement.
-     *
-     * @param list<SessionLogSummaryRow> $sessionLogRows
-     * @return array{derived_log_format: string|null, derived_has_error: bool}
-     */
-    public function summariseSessionLogRows(array $sessionLogRows): array
-    {
-        $summary = [
-            'derived_log_format' => null,
-            'derived_has_error' => false,
-        ];
-
-        foreach ($sessionLogRows as $row) {
-            if (null === $summary['derived_log_format'] && null !== $row['log_format']) {
-                $summary['derived_log_format'] = $row['log_format'];
-            }
-
-            $returnCode = $row['return_code'];
-            if (
-                null !== $row['error_message']
-                || (null !== $returnCode && self::HTTP_STATUS_CODE_OK !== $returnCode)
-            ) {
-                $summary['derived_has_error'] = true;
-            }
-        }
-
-        return $summary;
     }
 
     /**

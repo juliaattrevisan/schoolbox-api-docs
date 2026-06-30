@@ -7,24 +7,25 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\OpenAi\Session\Test;
+namespace Schoolbox\OpenAi\Session\Helper\Test;
 
+use Alaress\Database\Connector\NullConnector;
 use PHPUnit\Framework\TestCase;
-use Schoolbox\OpenAi\Session\Mapper;
+use Schoolbox\OpenAi\Session\Helper\SessionSummariser;
 
 /**
- * Unit tests for the AI session {@see Mapper}.
+ * Unit tests for the AI session {@see SessionSummariser}.
  */
-class MapperTest extends TestCase
+class SessionSummariserTest extends TestCase
 {
     /**
      * Session log rows are summarised using the first viewable log and any error condition.
      */
     public function testSummariseSessionLogRowsUsesFirstViewableLogAndAnyError(): void
     {
-        $mapper = new Mapper();
+        $summariser = new SessionSummariser(new NullConnector());
 
-        $summary = $mapper->summariseSessionLogRows([
+        $summary = $summariser->summariseSessionLogRows([
             [
                 'id' => 10,
                 'ai_session_id' => 'session-1',
@@ -65,9 +66,9 @@ class MapperTest extends TestCase
      */
     public function testSummariseSessionLogRowsReturnsDefaultsForEmptySummary(): void
     {
-        $mapper = new Mapper();
+        $summariser = new SessionSummariser(new NullConnector());
 
-        $summary = $mapper->summariseSessionLogRows([
+        $summary = $summariser->summariseSessionLogRows([
             [
                 'id' => 10,
                 'ai_session_id' => 'session-1',
@@ -92,9 +93,9 @@ class MapperTest extends TestCase
      */
     public function testSummariseSessionLogRowsUsesSuppliedOrder(): void
     {
-        $mapper = new Mapper();
+        $summariser = new SessionSummariser(new NullConnector());
 
-        $summary = $mapper->summariseSessionLogRows([
+        $summary = $summariser->summariseSessionLogRows([
             [
                 'id' => 12,
                 'ai_session_id' => 'session-1',
