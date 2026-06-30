@@ -40,7 +40,7 @@ class HttpClient
     /**
      * Cache lifetime for SOCS calendar feed requests.
      */
-    private const int CALENDAR_CACHE_TTL = 300;
+    private const int CALENDAR_CACHE_TTL = 1200;
 
     /**
      * Cache key prefix for SOCS calendar feed requests.
