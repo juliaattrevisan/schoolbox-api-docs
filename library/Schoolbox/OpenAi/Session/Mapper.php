@@ -295,6 +295,7 @@ class Mapper extends BaseMapper
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $sessionId = (string)$row['ai_session_id'];
+            // Normalise raw PDO values into the documented SessionLogSummaryRow shape.
             $sessionLogRowsBySessionId[$sessionId][] = [
                 'id' => (int)$row['id'],
                 'ai_session_id' => $sessionId,
