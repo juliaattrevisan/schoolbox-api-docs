@@ -1228,13 +1228,13 @@ class OverallDatasetOld
           The total weight of the rubric grids in $assessmentId. This is used to calculate a weight sum of each rubric
           grid's contribution to the overall value.
 
-        $coefficients[capability][$capabilityId][student][$studentId]['totalAssessmentWeight']['published']
+        $coefficients['capability'][$capabilityId]['student'][$studentId]['totalAssessmentWeight']['published']
           The total weight of the capability's usages across all the assessments where the student had a mark.
           This aggregates toward a denominator for "assessment total weight" for this constituent of a rubric grid.
           It only accumulates if a student had a mark in it; this denominator is specifically for a particular guy
           There's a "published" and "draft" variants of this
 
-        $coefficients[capability][$capabilityId][indicators][student][$studentId]['totalAssessmentWeight']['published']
+        $coefficients['capability'][$capabilityId]['indicators'][$indicatorId]['student'][$studentId]['totalAssessmentWeight']['published']
           The total weight of the indicator's usages across all the assessments where the student had a mark.
           This aggregates toward a denominator for "assessment total weight" for this constituent of a rubric grid.
           It only accumulates if a student had a mark in it; this denominator is specifically for a particular guy

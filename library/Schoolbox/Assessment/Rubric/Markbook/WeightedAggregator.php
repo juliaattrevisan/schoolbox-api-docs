@@ -22,6 +22,7 @@ class WeightedAggregator
     /**
      * Calculate a weighted aggregation contribution of a rubric capability or indicator.
      *
+     * TODO Update all this lot
      * This individual formula is used to calculate how an indicator's mark (the selected descriptor's value) from a
      * particular grid contributes to its overall value across multiple grids in multiple assessments. It can also be
      * used to calculate a capability value (if applicable).
@@ -35,59 +36,36 @@ class WeightedAggregator
      * (I'm not a statistician so maybe this needs to be double-checked more closely; thanks Jonathan Kerslake for
      * joining me in this adventure)
      *
-     * @param float|null $assessmentWeight
-     * @param float|null $assessmentTotalWeight
-     * @param float|null $gridWeight
-     * @param float|null $gridTotalWeight
-     * @param float|null $normalisedMark A float between 0 and 100
+     * @param float|null $numerator
+     * @param float|null $denominator
      * @param string|null $prefix An optional prefix for diagnostic usage only
      * @return array|null
      */
     public function calculate(
-        ?float $assessmentWeight,
-        ?float $assessmentTotalWeight,
-        ?float $gridWeight,
-        ?float $gridTotalWeight,
-        ?float $normalisedMark,
+        ?float $numerator,
+        ?float $denominator,
         ?string $prefix,
     ): ?array {
         /* Avoid divide-by-zero scenarios: exit early
          */
-        if (!$assessmentTotalWeight) {
+        if (!$numerator) {
             return null;
         }
 
-        if (!$gridTotalWeight) {
+        if (!$denominator) {
             return null;
         }
 
-        /* If the grid weight was falsey, it doesn't count toward anything and shouldn't be equated to zero.
-         * Exit early instead.
-         */
-        if (!$gridWeight) {
-            return null;
-        }
-
-        /* normalised mark is null; this doesn't count toward anything and shouldn't be equated to zero.
-         * Exit early instead.
-         */
-        if (null === $normalisedMark) {
-            return null;
-        }
-
-        $val = ($assessmentWeight / $assessmentTotalWeight) * ($gridWeight / $gridTotalWeight) * $normalisedMark;
+        $val = $numerator/$denominator;
         $val = round($val, self::PRECISION);
 
         /* Diagnostic
          */
         $diagnostic = sprintf(
-            "%s: (%s/%s) * (%s/%s) * %s = %s",
+            "%s: %s/%s = %s",
             $prefix,
-            $assessmentWeight,
-            $assessmentTotalWeight,
-            $gridWeight,
-            $gridTotalWeight,
-            $normalisedMark,
+            $numerator,
+            $denominator,
             $val
         );
 
