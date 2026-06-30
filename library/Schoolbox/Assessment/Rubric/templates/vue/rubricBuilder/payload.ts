@@ -85,7 +85,11 @@ export function translateGridToFormPayload(grid: RubricGrid): RubricGridFormPayl
 
             gridData.descriptor[indicator.id] = indicator.descriptors.map((descriptor) => ({
                 id: descriptor.id >= 0 ? descriptor.id : "", // the backend expects empty IDs for new descriptors
-                text: descriptor.description.trim(),
+                /* a whitespace-only descriptor is considered deliberate
+                 * in order to get a blank cell, so it must not be trimmed.
+                 * For normal text, still trim to avoid accidental whitespace.
+                 */
+                text: descriptor.description.trim() === "" ? descriptor.description : descriptor.description.trim(),
                 points: (descriptor.maxValue ?? "").toString(),
             }));
         }
