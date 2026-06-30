@@ -116,7 +116,7 @@ const icons: IconStoryEntry[] = [
     { name: "network", label: "network" },
     { name: "news", label: "news" },
     { name: "next", label: "next" },
-    { name: "notifications", label: "notifications | notification" },
+    { name: "notifications", label: "notifications | notification | bell" },
     { name: "notifications-hollow", label: "notifications-hollow" },
     { name: "office-365", label: "office-365" },
     { name: "open", label: "open" },

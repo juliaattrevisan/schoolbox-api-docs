@@ -90,7 +90,7 @@ window.Vue.watch(
             <a @click="selectedCategory = category">{{ category }}</a>
         </dd>
     </dl>
-    <section v-if="peStore.selectedRoleType !== null" class="pe-fields-palette">
+    <section v-if="peStore.selectedRoleType !== null" class="pe-fields-palette u-c-cr-bottom">
         <sortable-wrapper
             :list="availableFieldsToShow"
             :item-key="(item) => item.field"

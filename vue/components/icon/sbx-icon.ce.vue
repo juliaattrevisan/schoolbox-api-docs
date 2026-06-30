@@ -1225,7 +1225,7 @@ function alertInvalidIconName(): false {
                 ></path>
             </svg>
             <svg
-                v-else-if="['notifications', 'notification'].includes(props.name)"
+                v-else-if="['notifications', 'notification', 'bell'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 640 640"
                 xmlns="http://www.w3.org/2000/svg"

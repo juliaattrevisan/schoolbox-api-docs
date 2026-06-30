@@ -43,19 +43,25 @@ const isClickToReveal = window.Vue.computed(() => {
 </script>
 
 <template>
-    <span
-        v-if="props.field.icon"
-        :data-tooltip="tooltipText !== undefined ? `pe-fields-icon-tip-${props.field.css}` : undefined"
-        :title="tooltipText"
-        class="pe-fields-icon pe-fields-icon-primary"
-        :class="`${props.field.icon} ${props.field.css || ''}`"
-    ></span>
-    <span
-        v-if="isClickToReveal"
-        data-tooltip
-        title="Content stays hidden until revealed by a click."
-        class="pe-fields-icon icon-view-hollow"
-    ></span>
+    <div v-if="props.field.icon || isClickToReveal" class="u-flex u-flex--align-center u-gap-s">
+        <span
+            v-if="props.field.icon"
+            :data-tooltip="tooltipText !== undefined ? `pe-fields-icon-tip-${props.field.css}` : undefined"
+            :title="tooltipText"
+            class="pe-fields-icon pe-fields-icon-primary"
+            :class="`${props.field.css || ''}`"
+        >
+            <sbx-icon :name="props.field.icon.replace('icon-', '')"></sbx-icon>
+        </span>
+        <span
+            v-if="isClickToReveal"
+            data-tooltip
+            title="Content stays hidden until revealed by a click."
+            class="pe-fields-icon"
+        >
+            <sbx-icon name="view-hollow"></sbx-icon>
+        </span>
+    </div>
 </template>
 
 <style scoped lang="scss">

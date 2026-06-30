@@ -20,7 +20,7 @@ const disabled = window.Vue.computed(() => peFieldsStore.getActiveFieldType(prop
 
 <template>
     <div
-        class="pe-palette-item u-pad-s"
+        class="pe-palette-item u-flex u-flex--align-center u-gap-s u-pad-s"
         :class="{ disabled }"
         :title="disabled ? 'This field is already selected' : undefined"
         :data-pe-prevent-drag="disabled ? true : undefined"
@@ -39,7 +39,8 @@ const disabled = window.Vue.computed(() => peFieldsStore.getActiveFieldType(prop
 
     &.disabled {
         cursor: not-allowed;
-        opacity: 0.7;
+        background: var(--sbx-color-foreground-secondary, #f4f2f2);
+        color: var(--sbx-color-text-secondary, #525252);
     }
 
     &:not(.disabled) {
