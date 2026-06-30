@@ -53,7 +53,7 @@ window.Vue.onMounted(() => {
                     <!-- Loop through newUnits and display label and text input for each -->
                     <div v-for="(unit, index) in addUnitsStore.newUnits" :key="index" class="u-flex-col u-gap-xs">
                         <label :for="`unit-${index}`" class="required">Name</label>
-                        <div class="u-flex u-gap-xs l-align-items-center f-no-margins">
+                        <div class="u-flex u-gap-xs f-no-margins">
                             <input
                                 :id="`unit-${index}`"
                                 v-model="addUnitsStore.newUnits[index]"
