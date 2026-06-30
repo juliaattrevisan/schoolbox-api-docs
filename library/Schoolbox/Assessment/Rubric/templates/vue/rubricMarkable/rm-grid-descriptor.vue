@@ -74,7 +74,7 @@ const descriptorValue = window.Vue.ref<number | null>(
             return Math.max(props.descriptor.value.left, props.descriptor.value.right);
         }
 
-        return 0;
+        return null;
     })(),
 );
 
