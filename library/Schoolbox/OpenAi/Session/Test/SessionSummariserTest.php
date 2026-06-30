@@ -7,11 +7,11 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\OpenAi\Session\Helper\Test;
+namespace Schoolbox\OpenAi\Session\Test;
 
 use Alaress\Database\Connector\NullConnector;
 use PHPUnit\Framework\TestCase;
-use Schoolbox\OpenAi\Session\Helper\SessionSummariser;
+use Schoolbox\OpenAi\Session\SessionSummariser;
 
 /**
  * Unit tests for the AI session {@see SessionSummariser}.

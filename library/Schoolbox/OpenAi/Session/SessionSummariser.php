@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\OpenAi\Session\Helper;
+namespace Schoolbox\OpenAi\Session;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;

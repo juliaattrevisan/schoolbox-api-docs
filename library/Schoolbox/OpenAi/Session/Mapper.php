@@ -17,7 +17,6 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\OpenAi\Feature;
 use Schoolbox\OpenAi\Moderation\Event\Status as ModerationEventStatus;
-use Schoolbox\OpenAi\Session\Helper\SessionSummariser;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
