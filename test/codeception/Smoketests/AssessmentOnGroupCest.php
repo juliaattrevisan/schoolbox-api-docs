@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace Tests\Smoketests;
 
-use Codeception\Scenario;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Tests\Support\IntegrationTester;
 use Tests\Support\Page\Duework\AssessmentForm;
@@ -118,11 +117,8 @@ class AssessmentOnGroupCest
      *
      * @param IntegrationTester $i
      */
-    public function createAssessmentWithRubric(IntegrationTester $i, Scenario $scenario): void
+    public function createAssessmentWithRubric(IntegrationTester $i): void
     {
-        $scenario->skip('Skipped pending rubric restructure fix [SA-22466].');
-
-
         #GIVEN
         $timestamp  = time();
         $groupPage = $this->createHomepage($i, 'Testing Create Assessments with rubric on Group Page at ' . $timestamp);
@@ -201,11 +197,8 @@ class AssessmentOnGroupCest
      *
      * @param IntegrationTester $i
      */
-    public function markAssessmentWithRubric(IntegrationTester $i, Scenario $scenario): void
+    public function markAssessmentWithRubric(IntegrationTester $i): void
     {
-        $scenario->skip('Skipped pending rubric restructure fix [SA-22466].');
-
-
         #GIVEN
         $timestamp  = time();
         $groupPage = $this->createHomepage($i, 'Testing Mark Assessment with rubric on Group Page at ' . $timestamp);
