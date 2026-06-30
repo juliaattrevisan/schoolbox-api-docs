@@ -40,6 +40,7 @@ use Schoolbox\Learning\Assessment\Reporting\Model;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\InlineGrader\Kami\Connector as KamiConnector;
+use Schoolbox\Learning\Markbook\FeedbackFolders;
 use Schoolbox\Learning\Reporting\Feedback\Controller;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -364,6 +365,7 @@ class PublishAuditTest extends TestCase
             $feedbackMapper,
             $this->createStub(AssessmentDataSource::class),
             $projectResultCacheMapper,
+            $this->createStub(FeedbackFolders::class),
         );
 
         $this->configureControllerResponseFactory($controller);
