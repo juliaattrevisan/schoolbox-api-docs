@@ -121,6 +121,7 @@ class Javascript extends Base
                     'id'   => $relatedBooking->getResource()->getId(),
                     'name' => $relatedBooking->getResource()->getName(),
                 ],
+                'quantity' => $relatedBooking->getQuantity(),
                 'status' => $relatedBooking->getStatus()->jsonSerialize(),
                 'href'   => $reviewHref,
             ];
@@ -214,6 +215,7 @@ class Javascript extends Base
                         'id'   => $this->getEvent()->getBooking()->getResource()->getId(),
                         'name' => $this->getEvent()->getBooking()->getResource()->getName(),
                     ],
+                    'quantity' => $this->getEvent()->getBooking()->getQuantity(),
                     'status'   => $this->getEvent()->getBooking()->getStatus()->jsonSerialize(),
                     'buttons'  => $bookingButtons,
                     'reviewer' => $reviewerRender,
