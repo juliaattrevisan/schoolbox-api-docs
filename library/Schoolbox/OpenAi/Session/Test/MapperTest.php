@@ -82,4 +82,37 @@ class MapperTest extends TestCase
             $summary
         );
     }
+
+    /**
+     * Session log rows are summarised in their supplied order.
+     */
+    public function testSummariseSessionLogRowsUsesSuppliedOrder(): void
+    {
+        $mapper = new Mapper();
+
+        $summary = $mapper->summariseSessionLogRows([
+            [
+                'id' => 12,
+                'created_at' => '2026-01-01 10:02:00',
+                'log_format' => 'supplied-first',
+                'return_code' => 200,
+                'error_message' => null,
+            ],
+            [
+                'id' => 11,
+                'created_at' => '2026-01-01 10:01:00',
+                'log_format' => 'chronological-first',
+                'return_code' => 200,
+                'error_message' => null,
+            ],
+        ]);
+
+        $this->assertSame(
+            [
+                'derived_log_format' => 'supplied-first',
+                'derived_has_error' => false,
+            ],
+            $summary
+        );
+    }
 }

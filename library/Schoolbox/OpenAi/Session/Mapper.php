@@ -294,21 +294,14 @@ class Mapper extends BaseMapper
     /**
      * Summarise session log rows into the derived fields used by the admin usage list.
      *
+     * Session log rows must be supplied in the order used to determine the first viewable log.
+     * Rows from $this->getSessionLogRowsBySessionId() meet this requirement.
+     *
      * @param array<int, array{id?: int|string, created_at?: string, log_format?: string|null, return_code?: int|null, error_message?: string|null}> $sessionLogRows
      * @return array{derived_log_format: string|null, derived_has_error: bool}
      */
     public function summariseSessionLogRows(array $sessionLogRows): array
     {
-        usort($sessionLogRows, static function (array $a, array $b): int {
-            return [
-                $a['created_at'] ?? '',
-                (int)($a['id'] ?? 0),
-            ] <=> [
-                $b['created_at'] ?? '',
-                (int)($b['id'] ?? 0),
-            ];
-        });
-
         $summary = [
             'derived_log_format' => null,
             'derived_has_error' => false,
