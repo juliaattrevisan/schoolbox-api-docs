@@ -42,22 +42,22 @@ interface Props {
     /**
      * TODO: likely a sign of permission issues, but for now pass these thru.
      */
-    showDescriptorValue: boolean;
+    showDescriptorValue?: boolean;
     /**
      * From "selfAssessmentFeedback.isSelfGrading"
      * TODO: likely a sign of permission issues, but for now pass these thru.
      */
-    isSelfGrading: boolean;
+    isSelfGrading?: boolean;
     /**
      * From "selfAssess"
      * TODO: likely a sign of permission issues, but for now pass these thru.
      */
-    isSelfAssess: boolean;
+    isSelfAssess?: boolean;
     /**
      * From "studentView"
      * TODO: likely a sign of permission issues, but for now pass these thru.
      */
-    isStudentView: boolean;
+    isStudentView?: boolean;
 }
 const props = defineProps<Props>();
 
