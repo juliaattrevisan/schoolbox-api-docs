@@ -22,7 +22,7 @@
              * five-point summaries
              */
             allAssessments: [
-                {# Annoyingly, this is used to set a height of a presentation element:'
+                {# Annoyingly, this is used to set a height of a presentation element:
                  # graph height is derived from the quantity of indicators
                  #}
                 {% set numIndicators = 0 %}
@@ -57,32 +57,6 @@
                 ],
                 allOutliers: []
             }
-            {#allData: $.fn.boxPlotCalculateAllSeriesData([#}
-            {#    {% for criterionName, studentMarks in studentMarksPerCriterion %}#}
-            {#        [#}
-            {#            #}{# Highcharts won't render without at least one data point #}
-            {#            {% if 0 == studentMarks | length %}#}
-            {#            {#}
-            {#                info: null,#}
-            {#                externalId: null,#}
-            {#                uid: null,#}
-            {#                value: -100#}
-            {#            }{% if false %},{% endif %} #}{# Just a hack to placate storm #}
-            {#            {% endif %}#}
-
-            {#            {% for studentId, studentMark in studentMarks %}#}
-            {#            {#}
-            {#                uid: Number("{{ studentId }}"),#}
-            {#                externalId: "{{ students[studentId].externalId }}",#}
-            {#                info: "{{ students[studentId].fullName }}",#}
-            {#                value: Number("{{ studentMark }}")#}
-
-            {#            }{% if not loop.last %},{% endif %}#}
-            {#            {% endfor %}#}
-
-            {#        ]{% if not loop.last %},{% endif %}#}
-            {#    {% endfor %}#}
-            {#])#}
         });
     });
 </script>
