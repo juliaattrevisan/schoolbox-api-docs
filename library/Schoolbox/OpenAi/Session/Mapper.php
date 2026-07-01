@@ -187,17 +187,6 @@ class Mapper extends BaseMapper
         $limitSql  = null !== $limit ? 'LIMIT :limit' : '';
         $offsetSql = null !== $limit && null !== $offset ? 'OFFSET :offset' : '';
 
-        /* Notes:
-         * - Passing requireSessionLog to buildSessionFilter() keeps orphan sessions off the admin list.
-         * - The details button is controlled by derived_log_format, because a session's first raw log may not have a
-         *   format the admin UI can render.
-         * - derived_log_format is used to determine whether any log in the session is renderable (since rendering
-         *   requires a known log format - see aul-agent-chat.vue).  This usage makes sense, although the name does
-         *   not imply this usage.
-         * - derived_has_error indicates that at least one log within a session finished with an error condition
-         *   based on if an error_message exists or had a non-200 return code (and non-null return code, as some requests
-         *   won't have any return code if they didn't actually send a request to an AI service, e.g. non LLM guardrails).
-         */
         $query = "
             SELECT
                 `{$this->table}`.id AS id,

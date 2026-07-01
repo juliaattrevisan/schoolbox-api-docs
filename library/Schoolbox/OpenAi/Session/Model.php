@@ -42,24 +42,26 @@ class Model
     private ?string $feature = null;
 
     /**
-     * Log format derived from the session's first log, for the admin list only.
-     * Not a column; populated by {@see Mapper::getFilteredSessions()}.
+     * Log format derived from the session's first log.
+     * This is used to determine whether any log in the session is renderable (since rendering requires a known log
+     * format - see aul-agent-chat.vue).
+     * Populated by {@see Mapper::getFilteredSessions(), SessionSummariser::hydrateSessionWithSummaryInfo()}
      *
      * @var string|null
      */
     private ?string $derivedLogFormat = null;
 
     /**
-     * Whether any log in this session has an error condition, for the admin list only.
-     * Not a column; populated by {@see Mapper::getFilteredSessions()}.
+     * Whether any log in this session has an error condition.
+     * Populated by {@see Mapper::getFilteredSessions(), SessionSummariser::hydrateSessionWithSummaryInfo()}
      *
      * @var bool
      */
     private bool $derivedHasError = false;
 
     /**
-     * The highest-priority moderation event status for this session, for the admin list only.
-     * Not a column; populated by {@see Mapper::getFilteredSessions()}.
+     * The highest-priority moderation event status for this session.
+     * Populated by {@see Mapper::getFilteredSessions(), SessionSummariser::hydrateSessionWithSummaryInfo()}
      *
      * @var string|null
      */
