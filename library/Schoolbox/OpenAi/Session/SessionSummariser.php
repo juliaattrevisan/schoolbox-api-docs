@@ -41,11 +41,11 @@ class SessionSummariser
 {
     private const int HTTP_STATUS_CODE_OK = 200;
     private const array MODERATION_STATUS_PRIORITY = [
-        ModerationEventStatus::FURTHER_ACTION_REQUIRED,
-        ModerationEventStatus::REQUIRES_ATTENTION,
-        ModerationEventStatus::FURTHER_ACTION_TAKEN,
-        ModerationEventStatus::NO_ACTION_REQUIRED,
-        ModerationEventStatus::NO_BEHAVIOUR_FLAGGED,
+        ModerationEventStatus::FURTHER_ACTION_REQUIRED->value,
+        ModerationEventStatus::REQUIRES_ATTENTION->value,
+        ModerationEventStatus::FURTHER_ACTION_TAKEN->value,
+        ModerationEventStatus::NO_ACTION_REQUIRED->value,
+        ModerationEventStatus::NO_BEHAVIOUR_FLAGGED->value,
     ];
 
     /**
@@ -222,14 +222,14 @@ class SessionSummariser
     }
 
     /**
+     * Return the priority rank of the status according to self::MODERATION_STATUS_PRIORITY.
+     *
      * @param string|null $status
      * @return int
      */
     private function getModerationStatusPriority(?string $status): int
     {
-        $status = null === $status ? null : ModerationEventStatus::tryFrom($status);
         $priority = array_search($status, self::MODERATION_STATUS_PRIORITY, true);
-
         return false === $priority ? count(self::MODERATION_STATUS_PRIORITY) : $priority;
     }
 }
