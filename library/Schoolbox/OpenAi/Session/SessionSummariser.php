@@ -77,8 +77,8 @@ class SessionSummariser
 
             $this->hydrateSessionWithSummaryInfo(
                 $session,
-                null === $sessionId ? [] : ($sessionLogRowsBySessionId[$sessionId] ?? []),
-                null === $sessionId ? [] : ($moderationEventRowsBySessionId[$sessionId] ?? [])
+                $sessionLogRowsBySessionId[$sessionId] ?? [],
+                $moderationEventRowsBySessionId[$sessionId] ?? []
             );
         }
     }
