@@ -194,6 +194,30 @@ class SessionSummariser
     }
 
     /**
+     * Hydrate multiple sessions with the derived fields used by the admin usage list.
+     *
+     * @param list<Model> $sessions
+     * @param array<string, list<SessionLogSummaryRow>> $sessionLogRowsBySessionId
+     * @param array<string, list<ModerationEventSummaryRow>> $moderationEventRowsBySessionId
+     * @return void
+     */
+    public function hydrateSessionsWithSummaryInfo(
+        array $sessions,
+        array $sessionLogRowsBySessionId,
+        array $moderationEventRowsBySessionId
+    ): void {
+        foreach ($sessions as $session) {
+            $sessionId = $session->getId();
+
+            $this->hydrateSessionWithSummaryInfo(
+                $session,
+                null === $sessionId ? [] : ($sessionLogRowsBySessionId[$sessionId] ?? []),
+                null === $sessionId ? [] : ($moderationEventRowsBySessionId[$sessionId] ?? [])
+            );
+        }
+    }
+
+    /**
      * @param string|null $status
      * @return int
      */

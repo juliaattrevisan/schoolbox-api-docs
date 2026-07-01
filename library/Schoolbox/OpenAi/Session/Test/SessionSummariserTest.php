@@ -170,4 +170,67 @@ class SessionSummariserTest extends TestCase
 
         $this->assertNull($session->getDerivedModerationStatus());
     }
+
+    /**
+     * Multiple sessions are hydrated from rows grouped by session ID.
+     */
+    public function testHydrateSessionsWithSummaryInfoDelegatesToSingleSessionHydration(): void
+    {
+        $summariser = new SessionSummariser(new NullConnector());
+        $firstSession = (new Model())->setId('session-1');
+        $secondSession = (new Model())->setId('session-2');
+
+        $summariser->hydrateSessionsWithSummaryInfo(
+            [$firstSession, $secondSession],
+            [
+                'session-1' => [
+                    [
+                        'id' => 10,
+                        'ai_session_id' => 'session-1',
+                        'created_at' => '2026-01-01 10:00:00',
+                        'log_format' => 'agent-chat',
+                        'return_code' => 200,
+                        'error_message' => null,
+                    ],
+                ],
+                'session-2' => [
+                    [
+                        'id' => 11,
+                        'ai_session_id' => 'session-2',
+                        'created_at' => '2026-01-01 10:01:00',
+                        'log_format' => 'guardrail',
+                        'return_code' => 500,
+                        'error_message' => null,
+                    ],
+                ],
+            ],
+            [
+                'session-1' => [
+                    [
+                        'id' => 20,
+                        'target_ai_session_id' => 'session-1',
+                        'status' => ModerationEventStatus::NO_ACTION_REQUIRED->value,
+                    ],
+                ],
+                'session-2' => [
+                    [
+                        'id' => 21,
+                        'target_ai_session_id' => 'session-2',
+                        'status' => ModerationEventStatus::FURTHER_ACTION_REQUIRED->value,
+                    ],
+                ],
+            ]
+        );
+
+        $this->assertSame('agent-chat', $firstSession->getDerivedLogFormat());
+        $this->assertFalse($firstSession->getDerivedHasError());
+        $this->assertSame(ModerationEventStatus::NO_ACTION_REQUIRED->value, $firstSession->getDerivedModerationStatus());
+
+        $this->assertSame('guardrail', $secondSession->getDerivedLogFormat());
+        $this->assertTrue($secondSession->getDerivedHasError());
+        $this->assertSame(
+            ModerationEventStatus::FURTHER_ACTION_REQUIRED->value,
+            $secondSession->getDerivedModerationStatus()
+        );
+    }
 }
