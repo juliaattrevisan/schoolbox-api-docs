@@ -64,13 +64,10 @@ class SessionSummariser
      */
     public function hydrateSessionsWithSummaryInfo(GenericCollection $sessions): void
     {
-        $sessionIds = [];
-        foreach ($sessions as $session) {
-            $sessionId = $session->getId();
-            if (null !== $sessionId) {
-                $sessionIds[] = $sessionId;
-            }
-        }
+        /** @var string[] $sessionIds */
+        $sessionIds = $sessions
+            ->map(static fn (Model $session): ?string => $session->getId(), false)
+            ->getAll();
 
         $sessionLogRowsBySessionId = $this->getSessionLogRowsBySessionId($sessionIds);
         $moderationEventRowsBySessionId = $this->getModerationEventRowsBySessionId($sessionIds);
