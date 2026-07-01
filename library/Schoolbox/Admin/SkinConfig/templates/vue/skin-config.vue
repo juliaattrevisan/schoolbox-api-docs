@@ -166,6 +166,10 @@ async function onSaveSelected(): Promise<void> {
 window.Vue.onMounted(() => {
     if (editableConfigs.value.toggle.enabled) {
         // ensure the latest colours are used in the preview
+        schedulePreviewRefresh();
+    }
+
+    if (hasInvalidColours.value) {
         void onSaveSelected();
     }
 });
