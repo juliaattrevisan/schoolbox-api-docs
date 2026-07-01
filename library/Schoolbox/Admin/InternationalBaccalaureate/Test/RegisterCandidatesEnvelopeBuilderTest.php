@@ -20,10 +20,11 @@ class RegisterCandidatesEnvelopeBuilderTest extends TestCase
 {
     public function testBuildsRegisterCandidatesEnvelopeWithEscapedCandidateValues(): void
     {
+        $schoolCode = "009876";
         $request = new RegisterCandidatesRequest(
             'SCHOOLBOX',
             str_repeat('A', 96),
-            '001700',
+            $schoolCode,
             [
                 [
                     'date_of_birth' => '21-NOV-1979',
@@ -48,7 +49,7 @@ class RegisterCandidatesEnvelopeBuilderTest extends TestCase
         $this->assertStringContainsString('<msgID xsi:type="xsd:string">' . str_repeat('A', 96) . '</msgID>', $xml);
         $this->assertStringContainsString('<firstname>Test &amp; One</firstname>', $xml);
         $this->assertStringContainsString('<lastname>User &lt;One&gt;</lastname>', $xml);
-        $this->assertStringContainsString('<school>001700</school>', $xml);
+        $this->assertStringContainsString("<school>$schoolCode</school>", $xml);
         $this->assertStringContainsString('<language2/>', $xml);
         $this->assertStringContainsString('<nationality2/>', $xml);
 

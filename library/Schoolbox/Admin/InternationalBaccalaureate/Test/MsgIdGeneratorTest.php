@@ -30,13 +30,13 @@ class MsgIdGeneratorTest extends TestCase
             fn() => '0123456789ABCDEF0123456789ABCDEF'
         );
 
-        $msgId = $generator->generate('31225BE2C7309F8C35D8A521897EFE16');
+        $msgId = $generator->generate('22252BE2C7309F8C35D8A521897EFE16');
 
         $this->assertSame(96, strlen($msgId));
         $this->assertMatchesRegularExpression('/^[0-9A-F]{96}$/', $msgId);
         $this->assertSame('0123456789ABCDEF0123456789ABCDEF', substr($msgId, 0, 32));
         $this->assertSame(
-            'A7D61859EF31AEA07CDEABCD38B2D7E88F2085AB390CB2B8A6CF5FDD9CCD4F4B',
+            '4F3A1DB60B9B9DA9B73C035BD2DCB2FEE63C6755F57FB222754A9516E8A69F3E',
             substr($msgId, 32)
         );
     }

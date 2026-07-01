@@ -78,13 +78,15 @@ XML);
 
     public function testBuildRegisterCandidatesRequestUsesConfiguredValuesAndGeneratedMsgId(): void
     {
+        $schoolCode = "009876";
+
         $config = $this->createStub(IConfigLoader::class);
         $config
             ->method('get')
             ->willReturnMap([
                 [ConfigMapper::NAME_IBIS_APP_ID, 'CUSTOMAPP'],
-                [ConfigMapper::NAME_IBIS_SECRET_KEY, '31225BE2C7309F8C35D8A521897EFE16'],
-                [ConfigMapper::NAME_IB_SCHOOL_CODE, '001700'],
+                [ConfigMapper::NAME_IBIS_SECRET_KEY, bin2hex(random_bytes(16))],
+                [ConfigMapper::NAME_IB_SCHOOL_CODE, $schoolCode],
             ]);
 
         $factory = new ClientFactory(
@@ -107,7 +109,7 @@ XML);
         ]);
 
         $this->assertSame('CUSTOMAPP', $request->getAppId());
-        $this->assertSame('001700', $request->getSchoolCode());
+        $this->assertSame($schoolCode, $request->getSchoolCode());
         $this->assertSame(96, strlen($request->getMsgId()));
     }
 
@@ -119,7 +121,7 @@ XML);
             ->willReturnMap([
                 [ConfigMapper::NAME_IBIS_APP_ID, null],
                 [ConfigMapper::NAME_IBIS_SECRET_KEY, ''],
-                [ConfigMapper::NAME_IB_SCHOOL_CODE, '001700'],
+                [ConfigMapper::NAME_IB_SCHOOL_CODE, '009876'],
             ]);
 
         $this->expectException(UnexpectedValueException::class);
@@ -133,7 +135,7 @@ XML);
         return new RegisterCandidatesRequest(
             'SCHOOLBOX',
             str_repeat('A', 96),
-            '001700',
+            '009876',
             [
                 [
                     'date_of_birth' => '21-NOV-1979',

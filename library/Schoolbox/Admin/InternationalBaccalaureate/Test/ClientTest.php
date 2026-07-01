@@ -62,7 +62,7 @@ class ClientTest extends TestCase
 
     public function testRegisterCandidatesConvertsTransportFailuresToSchoolboxExceptions(): void
     {
-        $secretKey = '31225BE2C7309F8C35D8A521897EFE16';
+        $secretKey = uniqid();
         $httpClient = new HttpClient([
             'handler' => fn(RequestInterface $request) => throw new ConnectException(
                 'Could not connect with key ' . $secretKey,
@@ -138,7 +138,7 @@ class ClientTest extends TestCase
         return new RegisterCandidatesRequest(
             'SCHOOLBOX',
             str_repeat('A', 96),
-            '001700',
+            str_pad((string)random_int(1000, 9999), 6, '0', STR_PAD_LEFT),
             [
                 [
                     'date_of_birth' => '21-NOV-1979',
