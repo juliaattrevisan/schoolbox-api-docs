@@ -40,9 +40,17 @@ use UnexpectedValueException;
 class OverallDataset
 {
     /**
+     * These ar regularly-used strings for important nodes in the hash lookup
+     * I've compiled them up here in case of typos throughout the hash lookup which is REALLY ANNOYING to find/fix
+     */
+    private const string MARK_NODE_PUBLISHED = 'published';
+    private const string MARK_NODE_DRAFT = 'draft';
+
+
+    /**
      * These are repeatedly-used indexes in the hash lookup. They are calculated synonymously with each other.
      */
-    private const array MARK_NODES = ['published', 'draft'];
+    private const array MARK_NODES = [self::MARK_NODE_PUBLISHED, self::MARK_NODE_DRAFT];
 
 
     /**
@@ -724,14 +732,14 @@ class OverallDataset
                     'name' => $row['capability_name'],
                     /* Published normalised and human-readable marks from the authoritative feedback
                      */
-                    'published' => [
+                    self::MARK_NODE_PUBLISHED => [
                         'normalisedMark' => $normalisedMark,
                         'humanReadableMark' => $humanReadableMark,
                     ],
                     /* Normalised and human-readable marks from the most recent feedback: these would typically be draft
                      * marks, but could end up being the same as the Published ones by sheer coincidence.
                      */
-                    'draft' => [
+                    self::MARK_NODE_DRAFT => [
                         'normalisedMark' => null,
                         'humanReadableMark' => null,
                     ],
@@ -757,7 +765,7 @@ class OverallDataset
                         'name' => $row['indicator_name'],
                         /* Published normalised and human-readable marks from the authoritative feedback
                          */
-                        'published' => [
+                        self::MARK_NODE_PUBLISHED => [
                             'normalisedMark' => $normalisedMark,
                             'humanReadableMark' => $humanReadableMark,
                             'selectedLevel' => $row['level_name'],
@@ -767,7 +775,7 @@ class OverallDataset
                         /* Normalised and human-readable marks from the most recent feedback: these would typically be draft
                          * marks, but could end up being the same as the Published ones by sheer coincidence.
                          */
-                        'draft' => [
+                        self::MARK_NODE_DRAFT => [
                             'normalisedMark' => null,
                             'humanReadableMark' => null,
                             'selectedLevel' => null,
@@ -1013,7 +1021,7 @@ class OverallDataset
                     'name' => $row['capability_name'],
                     /* Published normalised and human-readable marks from the authoritative feedback
                      */
-                    'published' => [
+                    self::MARK_NODE_PUBLISHED => [
                         'normalisedMark' => null,
                         'humanReadableMark' => null,
                         'selectedLevel' => null,
@@ -1023,7 +1031,7 @@ class OverallDataset
                     /* Normalised and human-readable marks from the most recent feedback: these would typically be draft
                      * marks, but could end up being the same as the Published ones by sheer coincidence.
                      */
-                    'draft' => [
+                    self::MARK_NODE_DRAFT => [
                         'normalisedMark' => null,
                         'humanReadableMark' => null,
                         'selectedLevel' => null,
@@ -1054,7 +1062,7 @@ class OverallDataset
                 $humanReadableMark = $row['capability_human_readable_mark'];
             }
 
-            $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['draft'] = [
+            $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']][self::MARK_NODE_DRAFT] = [
                 'normalisedMark' => $normalisedMark,
                 'humanReadableMark' => $humanReadableMark,
             ];
@@ -1072,7 +1080,7 @@ class OverallDataset
                         'name' => $row['indicator_name'],
                         /* Published normalised and human-readable marks from the authoritative feedback
                          */
-                        'published' => [
+                        self::MARK_NODE_PUBLISHED => [
                             'normalisedMark' => null,
                             'humanReadableMark' => null,
                             'selectedLevel' => null,
@@ -1082,7 +1090,7 @@ class OverallDataset
                         /* Normalised and human-readable marks from the most recent feedback: these would typically be draft
                          * marks, but could end up being the same as the Published ones by sheer coincidence.
                          */
-                        'draft' => [
+                        self::MARK_NODE_DRAFT => [
                             'normalisedMark' => null,
                             'humanReadableMark' => null,
                             'selectedLevel' => null,
@@ -1100,7 +1108,7 @@ class OverallDataset
                 $normalisedMark = $marks['normalisedMark'];
                 $humanReadableMark = $marks['humanReadableMark'];
 
-                $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['draft'] = [
+                $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']][self::MARK_NODE_DRAFT] = [
                     'normalisedMark' => $normalisedMark,
                     'humanReadableMark' => $humanReadableMark,
                     'selectedLevel' => $row['level_name'],
@@ -1243,13 +1251,13 @@ class OverallDataset
           The total weight of the rubric grids in $assessmentId. This is used to calculate a weight sum of each rubric
           grid's contribution to the overall value.
 
-        $coefficients[capability][$capabilityId][student][$studentId]['totalAssessmentWeight']['published']
+        $coefficients[capability][$capabilityId][student][$studentId]['totalAssessmentWeight'][self::MARK_NODE_PUBLISHED]
           The total weight of the capability's usages across all the assessments where the student had a mark.
           This aggregates toward a denominator for "assessment total weight" for this constituent of a rubric grid.
           It only accumulates if a student had a mark in it; this denominator is specifically for a particular guy
           There's a "published" and "draft" variants of this
 
-        $coefficients[capability][$capabilityId][indicators][student][$studentId]['totalAssessmentWeight']['published']
+        $coefficients[capability][$capabilityId][indicators][student][$studentId]['totalAssessmentWeight'][self::MARK_NODE_PUBLISHED]
           The total weight of the indicator's usages across all the assessments where the student had a mark.
           This aggregates toward a denominator for "assessment total weight" for this constituent of a rubric grid.
           It only accumulates if a student had a mark in it; this denominator is specifically for a particular guy
@@ -1317,45 +1325,45 @@ class OverallDataset
             foreach ($studentData['gridData'] as $assessmentId => $rubricInstanceData) {
                 foreach ($rubricInstanceData as $rubricInstanceId => $rubricGridData) {
                     foreach ($rubricGridData['capabilities'] as $capabilityId => $capabilityData) {
-                        if (null !== $capabilityData['published']['normalisedMark']) {
+                        if (null !== $capabilityData[self::MARK_NODE_PUBLISHED]['normalisedMark']) {
                             /* Initialise and add it to the published capability total for this guy
                              */
-                            if (!isset($coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['published'])) {
-                                $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['published'] = 0;
+                            if (!isset($coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight'][self::MARK_NODE_PUBLISHED])) {
+                                $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight'][self::MARK_NODE_PUBLISHED] = 0;
                             }
 
-                            $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['published'] += $coefficients['assessments'][$assessmentId];
+                            $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight'][self::MARK_NODE_PUBLISHED] += $coefficients['assessments'][$assessmentId];
                         }
 
-                        if (null !== $capabilityData['draft']['normalisedMark']) {
+                        if (null !== $capabilityData[self::MARK_NODE_DRAFT]['normalisedMark']) {
                             /* Initialise and add it to the draft capability total for this guy
                              */
-                            if (!isset($coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['draft'])) {
-                                $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['draft'] = 0;
+                            if (!isset($coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight'][self::MARK_NODE_DRAFT])) {
+                                $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight'][self::MARK_NODE_DRAFT] = 0;
                             }
 
-                            $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['draft'] += $coefficients['assessments'][$assessmentId];
+                            $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight'][self::MARK_NODE_DRAFT] += $coefficients['assessments'][$assessmentId];
                         }
 
                         foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
-                            if (null !== $indicatorData['published']['normalisedMark']) {
+                            if (null !== $indicatorData[self::MARK_NODE_PUBLISHED]['normalisedMark']) {
                                 /* Initialise and add it to the published indicator total for this guy
                                  */
-                                if (!isset($coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['published'])) {
-                                    $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['published'] = 0;
+                                if (!isset($coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight'][self::MARK_NODE_PUBLISHED])) {
+                                    $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight'][self::MARK_NODE_PUBLISHED] = 0;
                                 }
 
-                                $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['published'] += $coefficients['assessments'][$assessmentId];
+                                $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight'][self::MARK_NODE_PUBLISHED] += $coefficients['assessments'][$assessmentId];
                             }
 
-                            if (null !== $indicatorData['draft']['normalisedMark']) {
+                            if (null !== $indicatorData[self::MARK_NODE_DRAFT]['normalisedMark']) {
                                 /* Initialise and add it to the draft indicator total for this guy
                                  */
-                                if (!isset($coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['draft'])) {
-                                    $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['draft'] = 0;
+                                if (!isset($coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight'][self::MARK_NODE_DRAFT])) {
+                                    $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight'][self::MARK_NODE_DRAFT] = 0;
                                 }
 
-                                $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['draft'] += $coefficients['assessments'][$assessmentId];
+                                $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight'][self::MARK_NODE_DRAFT] += $coefficients['assessments'][$assessmentId];
                             }
                         }
                     }
@@ -1374,7 +1382,7 @@ class OverallDataset
                          */
                         if (!isset($overallMarks[$capabilityId]['students'][$studentId])) {
                             $overallMarks[$capabilityId]['students'][$studentId] = [
-                                'published' => [
+                                self::MARK_NODE_PUBLISHED => [
                                     'normalisedMark' => null,
                                     'humanReadableMark' => null,
                                     'formula' => [
@@ -1384,7 +1392,7 @@ class OverallDataset
                                     'reasoning' => [],
 
                                 ],
-                                'draft' => [
+                                self::MARK_NODE_DRAFT => [
                                     'normalisedMark' => null,
                                     'humanReadableMark' => null,
                                     'formula' => [
@@ -1422,7 +1430,7 @@ class OverallDataset
                              */
                             if (!isset($overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId])) {
                                 $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId] = [
-                                    'published' => [
+                                    self::MARK_NODE_PUBLISHED => [
                                         'normalisedMark' => null,
                                         'humanReadableMark' => null,
                                         'formula' => [
@@ -1431,7 +1439,7 @@ class OverallDataset
                                         ],
                                         'reasoning' => [],
                                     ],
-                                    'draft' => [
+                                    self::MARK_NODE_DRAFT => [
                                         'normalisedMark' => null,
                                         'humanReadableMark' => null,
                                         'formula' => [
