@@ -77,6 +77,16 @@ body.ck-fullscreen {
     margin-bottom: 1rem;
 }
 
+/* Override the default save button to match our submit button colours */
+.ck.ck-button.ck-button-save {
+    background-color: var(--sbx-config-color-accent, var(--content-ui-submit-background));
+    color: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground));
+}
+
+.ck.ck-button-action:not(.ck-disabled):hover {
+    color: var(--sbx-config-color-accent, var(--content-ui-submit-background));
+}
+
 /**
  * add a min and max height to the editable area
  */
