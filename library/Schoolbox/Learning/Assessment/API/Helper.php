@@ -676,7 +676,7 @@ class Helper
             if (!isset($participationItems[$rowAssessmentId])) {
                 $participationItems[$rowAssessmentId] = [];
             }
-            $rubric = $this->getRubricFeedback($rowAssessmentId, $row['feedback_id']);
+            $rubrics = $this->getRubricsFeedback($rowAssessmentId, (int)$row['feedback_id'], (string)$row['feedback_table']);
 
             // Feedback fields are duplicated in the base key of the feedback
             // item, as well as in "feedback".
@@ -693,7 +693,8 @@ class Helper
                     'lastName'      => $row['reviewer_last_name'],
                     'externalId'    => $row['reviewer_external_id'],
                 ] : null,
-                'rubric'         => $rubric,
+                'rubric'         => self::firstRubricAsLegacy($rubrics),
+                'rubrics'        => $rubrics,
             ];
 
             // Add learner details
@@ -1124,112 +1125,119 @@ class Helper
     }
 
     /**
-     * get feedback rubric
+     * Get all marked feedback rubrics for a single feedback record.
+     *
+     * Reads the agnostic v_rubric_mark view (submission_return + reporting_feedback marks), so it works
+     * for any feedback source. Returns a list of rubrics (each with its own title); empty when the
+     * feedback has no rubric marks. Restricted to instructor feedback, matching prior behaviour.
      *
      * @param string $assessmentId
      * @param int    $feedbackID
-     * @return null|array
+     * @param string $feedbackTable Source table for this feedback (e.g. 'submission_return',
+     *                              'reporting_feedback'); disambiguates feedback_id across sources.
+     * @return array<int, array>
      */
-    public function getRubricFeedback(string $assessmentId, int $feedbackID): ?array
+    public function getRubricsFeedback(string $assessmentId, int $feedbackID, string $feedbackTable): array
     {
         $statement = $this->mapper->getDatabase()->prepare("
-            select 
-                `sb`.`assessment_id`                              AS `assessment_id`,
-                `vr`.`capability_mark_type_id`                        AS `capability_mark_type_id`,
-                `vr`.`capability_grade_group_id`                      AS `capability_grade_group_id`,
-                `sr`.`owner`                                          AS `student_id`,
-                `sr`.`marker`                                         AS `marker_id`,
-                `sr`.`id`                                             AS `feedback_id`,
-                `sr`.`published_at`                                   AS `feedback_date`,
-                `sr`.`review_route`                                   AS `feedback_type`,
-                `vr`.`capability_id`                                  AS `capability_id`,
-                `vr`.`capability_name`                                AS `capability_name`,
-                `vr`.`capability_max_value`                           AS `capability_max_value`,
-                if(`rcm`.`valid`, `rcm`.`value`, NULL)                AS `capability_mark`,
-                if(`rcm`.`valid`, `rcm`.`human_readable_value`, NULL) AS `capability_human_readable_mark`,
-                `vr`.`indicator_id`                                   AS `indicator_id`,
-                `vr`.`indicator_name`                                 AS `indicator_name`,
-                `vr`.`indicator_max_value`                            AS `indicator_max_value`,
-                if(`rim`.`valid`, `rim`.`value`, NULL)                AS `indicator_mark`,
-                `rim`.`descriptor_id`                                 AS `descriptor_id`,
-                `rim`.`descriptor_name`                               AS `descriptor_name`,
-                `rd`.`max_value`                                      AS `descriptor_max_value`,
-                `rd`.`description`                                    AS `descriptor_descriptor`,
-                `rl`.`sequence`                                       AS `descriptor_sequence`
-            from ((((`v_rubric` `vr`
-                join `submission_box` `sb`on (`vr`.`assessment_id` = `sb`.`assessment_id`))
-                join `submission_return` `sr` on (`sb`.`id` = `sr`.`box_id`))
-                join `rubric_capability_mark` `rcm` on (
-                    `rcm`.`feedback_table` = 'submission_return'
-                    and `rcm`.`feedback_id` = `sr`.`id`
-                    and `rcm`.`rubric_instance_id` = `vr`.`rubric_instance_id`
-                    and `rcm`.`rubric_capability_id` = `vr`.`capability_id`
-                ))
-                left join `v_rubric_indicator_mark_extend` `rim` on (`rim`.`rubric_indicator_id` = `vr`.`indicator_id` and `rcm`.`id` = `rim`.`rubric_capability_mark_id`))
-                LEFT JOIN `rubric_descriptor` `rd` on (`rim`.`descriptor_id` = `rd`.`id` and `rd`.`deleted_at` is null)
-                LEFT JOIN `rubric_level` `rl` on (
-                    `rd`.`level_id` = `rl`.`id`
-                    and `vr`.`rubric_instance_id` = `rl`.`rubric_instance_id`
-                    and `rl`.`deleted_at` is null
-                )
-            where `sr`.`deleted_at` is null
-                and `sr`.`published_at` is not null
-                and (`rcm`.`valid` is true or `rim`.`valid` is true)
-                and `sb`.`assessment_id` = :assessmentID
-                AND `sr`.`review_route` = 'instructor'
-                AND `sr`.`id` = :feedbackID
-            order by `sb`.`assessment_id`, `sr`.`owner`, `sr`.`published_at`, `vr`.`capability_sequence`, `vr`.`capability_id`,
-                `vr`.`indicator_sequence`, `vr`.`indicator_id`
+            SELECT
+                `rubric_instance_id`,
+                `rubric_instance_title`,
+                `capability_id`,
+                `capability_name`,
+                `capability_mark`,
+                `capability_human_readable_mark`,
+                `capability_max_value`,
+                `indicator_id`,
+                `indicator_name`,
+                `indicator_max_value`,
+                `indicator_mark`,
+                `descriptor_id`,
+                `descriptor_name`,
+                `descriptor_max_value`,
+                `descriptor_sequence`
+            FROM `v_rubric_mark`
+            WHERE `assessment_id` = :assessmentID
+                AND `feedback_id` = :feedbackID
+                AND `feedback_table` = :feedbackTable
+                AND `feedback_type` = 'instructor'
+            ORDER BY `rubric_instance_id`, `capability_sequence`, `capability_id`, `indicator_sequence`, `indicator_id`
         ");
         $statement->execute(
             [
                 'assessmentID'  => $assessmentId,
                 'feedbackID'    => $feedbackID,
+                'feedbackTable' => $feedbackTable,
             ]
         );
-        $output = [];
-        //if assessment has no rubric, return null
-        if (0 === $statement->rowCount()) {
-            return null;
-        }
-        foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
-            //build the capability if it does not already exist
-            if (!isset($output['capabilities'][$row['capability_id']])) {
-                $output['capabilities'][$row['capability_id']] = [
-                    'id'                    => (int)$row['capability_id'],
-                    'name'                  => $row['capability_name'],
-                    'value'                 => (null === $row['capability_mark']) ? null : (float)$row['capability_mark'],
-                    'maxValue'              => (float)$row['capability_max_value'],
-                    'mark'                  => $row['capability_human_readable_mark'],
-                    'indicators'            => []
+
+        return self::buildFeedbackRubrics($statement->fetchAll(PDO::FETCH_ASSOC));
+    }
+
+    /**
+     * Reshape flat feedback rubric rows into a list of nested, marked rubrics grouped by rubric instance.
+     *
+     * @param array<int, array> $rows
+     * @return array<int, array>
+     */
+    private static function buildFeedbackRubrics(array $rows): array
+    {
+        $rubrics = [];
+        foreach ($rows as $row) {
+            $instanceId = (int)$row['rubric_instance_id'];
+
+            if (!isset($rubrics[$instanceId])) {
+                $rubrics[$instanceId] = [
+                    'id'           => $instanceId,
+                    'title'        => $row['rubric_instance_title'],
+                    'capabilities' => [],
                 ];
             }
-            //capability should already exist, so lets build the indicator for that capability
-            if (!isset($output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']])) {
-                $output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']] = [
-                    'id'            => (int)$row['indicator_id'],
-                    'name'          => $row['indicator_name'],
-                    'maxValue'      => (float)$row['indicator_max_value'],
-                    'value'         => (float)$row['indicator_mark'],
-                    'descriptor'    => null,
-                    ];
-                //if descriptor is not null, then enter it
+
+            $capabilities = &$rubrics[$instanceId]['capabilities'];
+            if (!isset($capabilities[$row['capability_id']])) {
+                $capabilities[$row['capability_id']] = [
+                    'id'         => (int)$row['capability_id'],
+                    'name'       => $row['capability_name'],
+                    'value'      => (null === $row['capability_mark']) ? null : (float)$row['capability_mark'],
+                    'maxValue'   => (float)$row['capability_max_value'],
+                    'mark'       => $row['capability_human_readable_mark'],
+                    'indicators' => [],
+                ];
+            }
+
+            $indicators = &$capabilities[$row['capability_id']]['indicators'];
+            if (!isset($indicators[$row['indicator_id']])) {
+                $indicators[$row['indicator_id']] = [
+                    'id'         => (int)$row['indicator_id'],
+                    'name'       => $row['indicator_name'],
+                    'maxValue'   => (float)$row['indicator_max_value'],
+                    'value'      => (float)$row['indicator_mark'],
+                    'descriptor' => null,
+                ];
+
                 if (null != $row['descriptor_name']) {
-                    $output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['descriptor'] = [
-                        'id'            => (int)$row['descriptor_id'],
-                        'description'   => $row['descriptor_name'],
-                        'maxValue'      => (float)$row['descriptor_max_value'],
-                        'sequence'      => (int)$row['descriptor_sequence']
+                    $indicators[$row['indicator_id']]['descriptor'] = [
+                        'id'          => (int)$row['descriptor_id'],
+                        'description' => $row['descriptor_name'],
+                        'maxValue'    => (float)$row['descriptor_max_value'],
+                        'sequence'    => (int)$row['descriptor_sequence'],
                     ];
                 }
             }
+
+            unset($capabilities, $indicators);
         }
-        //clean the data, remove the numeric array keys
-        foreach ($output['capabilities'] as $capKey => $capArr) {
-            //grab the original array indicators values which above has changed, not the old ones from the foreach loop that have numeric keys
-            $output['capabilities'][$capKey]['indicators'] = array_values($output['capabilities'][$capKey]['indicators']);
+
+        foreach ($rubrics as &$rubric) {
+            foreach ($rubric['capabilities'] as &$capability) {
+                $capability['indicators'] = array_values($capability['indicators']);
+            }
+            unset($capability);
+            $rubric['capabilities'] = array_values($rubric['capabilities']);
         }
-        $output['capabilities'] = array_values($output['capabilities']);
-        return $output;
+        unset($rubric);
+
+        return array_values($rubrics);
     }
 }

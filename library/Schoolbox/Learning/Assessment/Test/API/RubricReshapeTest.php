@@ -43,6 +43,29 @@ class RubricReshapeTest extends TestCase
         $this->assertSame([], $this->invokeStatic('buildTemplateRubrics', []));
     }
 
+    public function testBuildFeedbackRubricsGroupsRowsByInstanceWithTitleAndMarks(): void
+    {
+        $rows = [
+            $this->feedbackRow(1, 'Written', 10, 'Skills', '2', '3', 100, 'Communication', '2', 1000, 'Proficient', 5),
+            $this->feedbackRow(2, 'Oral', 20, 'Speaking', '1', '2', 200, 'Clarity', '1', null, null, 0),
+        ];
+
+        $rubrics = $this->invokeStatic('buildFeedbackRubrics', $rows);
+
+        $this->assertCount(2, $rubrics);
+        $this->assertSame(1, $rubrics[0]['id']);
+        $this->assertSame('Written', $rubrics[0]['title']);
+        $this->assertArrayNotHasKey('weight', $rubrics[0]);
+        $this->assertSame(2.0, $rubrics[0]['capabilities'][0]['value']);
+        $this->assertSame('Proficient', $rubrics[0]['capabilities'][0]['indicators'][0]['descriptor']['description']);
+        $this->assertNull($rubrics[1]['capabilities'][0]['indicators'][0]['descriptor']);
+    }
+
+    public function testBuildFeedbackRubricsReturnsEmptyArrayForNoRows(): void
+    {
+        $this->assertSame([], $this->invokeStatic('buildFeedbackRubrics', []));
+    }
+
     public function testFirstRubricAsLegacyReturnsFirstCapabilitiesOnly(): void
     {
         $rubrics = [
@@ -87,6 +110,43 @@ class RubricReshapeTest extends TestCase
             'descriptor_descriptor'  => $descriptorDescription,
             'descriptor_max_value'   => '0',
             'descriptor_sequence'    => $descriptorSequence,
+        ];
+    }
+
+    /**
+     * Build a single flat feedback rubric row with all keys buildFeedbackRubrics reads.
+     * Pass $descriptorId = null (with $descriptorName = null) to represent an indicator with no descriptor.
+     */
+    private function feedbackRow(
+        int $instanceId,
+        string $instanceTitle,
+        int $capabilityId,
+        string $capabilityName,
+        ?string $capabilityMark,
+        ?string $capabilityMax,
+        int $indicatorId,
+        string $indicatorName,
+        ?string $indicatorMark,
+        ?int $descriptorId,
+        ?string $descriptorName,
+        int $descriptorSequence,
+    ): array {
+        return [
+            'rubric_instance_id'             => $instanceId,
+            'rubric_instance_title'          => $instanceTitle,
+            'capability_id'                  => $capabilityId,
+            'capability_name'                => $capabilityName,
+            'capability_mark'                => $capabilityMark,
+            'capability_human_readable_mark' => $capabilityMark,
+            'capability_max_value'           => $capabilityMax,
+            'indicator_id'                   => $indicatorId,
+            'indicator_name'                 => $indicatorName,
+            'indicator_max_value'            => '0',
+            'indicator_mark'                 => $indicatorMark,
+            'descriptor_id'                  => $descriptorId,
+            'descriptor_name'                => $descriptorName,
+            'descriptor_max_value'           => '0',
+            'descriptor_sequence'            => $descriptorSequence,
         ];
     }
 
