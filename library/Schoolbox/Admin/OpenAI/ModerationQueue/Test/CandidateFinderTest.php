@@ -60,6 +60,8 @@ class CandidateFinderTest extends TestCase
         $this->assertSame('2026-07-01 09:00:00', $candidates[0]->getLastModeratedAt()?->getDatabase());
         $this->assertSame(['excludedFeature' => Feature::AI_MODERATION_AGENT->value], $statement->executedParams);
         $this->assertStringContainsString('`ai_session`.feature <> :excludedFeature', $statement->sql);
+        $this->assertStringContainsString('LEFT JOIN `ai_moderation_event`', $statement->sql);
+        $this->assertStringContainsString('MAX(`ai_moderation_event`.created_at) AS last_moderated_at', $statement->sql);
         $this->assertStringContainsString('last_moderated_at IS NULL', $statement->sql);
         $this->assertStringContainsString('last_message_sent_at > last_moderated_at', $statement->sql);
         $this->assertStringContainsString('ORDER BY last_message_sent_at ASC, session_id ASC', $statement->sql);

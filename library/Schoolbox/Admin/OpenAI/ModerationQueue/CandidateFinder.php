@@ -42,13 +42,11 @@ class CandidateFinder
                 SELECT
                     `ai_session`.id AS session_id,
                     MAX(`ai_session_log`.created_at) AS last_message_sent_at,
-                    (
-                        SELECT MAX(`ai_moderation_event`.created_at)
-                        FROM `ai_moderation_event`
-                        WHERE `ai_moderation_event`.target_ai_session_id = `ai_session`.id
-                    ) AS last_moderated_at
+                    MAX(`ai_moderation_event`.created_at) AS last_moderated_at
                 FROM `ai_session`
                 JOIN `ai_session_log` ON `ai_session_log`.ai_session_id = `ai_session`.id
+                LEFT JOIN `ai_moderation_event`
+                    ON `ai_moderation_event`.target_ai_session_id = `ai_session`.id
                 WHERE `ai_session`.feature <> :excludedFeature
                 GROUP BY `ai_session`.id
             ) candidates

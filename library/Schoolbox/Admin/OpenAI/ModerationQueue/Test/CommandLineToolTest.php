@@ -121,10 +121,57 @@ class CommandLineToolTest extends TestCase
             $moderator,
             ['n' => 10, 'batch' => 1, 'max-time' => 10],
             true,
-            [100, 100, 111],
+            [100, 100, 100, 111],
         )->run();
 
         $this->assertSame([[1, 0]], $this->findCalls);
+    }
+
+    /**
+     * @return void
+     */
+    public function testMaxTimeStopsDuringBatch(): void
+    {
+        $finder = $this->createFinder([
+            [$this->createCandidate('session-a'), $this->createCandidate('session-b')],
+        ]);
+        $moderator = $this->createMock(Moderator::class);
+        $moderator
+            ->expects($this->once())
+            ->method('moderate')
+            ->with('session-a')
+            ->willReturn(ModerationResult::moderated(new ModerationEventModel()));
+
+        $this->createTool(
+            $finder,
+            $moderator,
+            ['n' => 10, 'batch' => 2, 'max-time' => 10],
+            true,
+            [100, 100, 100, 111],
+        )->run();
+
+        $this->assertSame([[2, 0]], $this->findCalls);
+    }
+
+    /**
+     * @return void
+     */
+    public function testNoOpResultDoesNotAdvancePerformOffset(): void
+    {
+        $finder = $this->createFinder([
+            [$this->createCandidate('session-concurrent')],
+            [],
+        ]);
+        $moderator = $this->createMock(Moderator::class);
+        $moderator
+            ->expects($this->once())
+            ->method('moderate')
+            ->with('session-concurrent')
+            ->willReturn(ModerationResult::noOp('already_moderated'));
+
+        $this->createTool($finder, $moderator, ['n' => 3, 'batch' => 1], true)->run();
+
+        $this->assertSame([[1, 0], [1, 0]], $this->findCalls);
     }
 
     /**
@@ -157,7 +204,7 @@ class CommandLineToolTest extends TestCase
     }
 
     /**
-     * Ensures the packaged cron template runs the placeholder with bounded work settings.
+     * Ensures the packaged cron template runs the moderation queue with bounded work settings.
      *
      * @return void
      */
@@ -195,7 +242,7 @@ class CommandLineToolTest extends TestCase
     }
 
     /**
-     * Ensures operators can inspect and release the scheduler lock if a placeholder run exits unexpectedly.
+     * Ensures operators can inspect and release the scheduler lock if a moderation queue run exits unexpectedly.
      *
      * @return void
      */
@@ -245,22 +292,33 @@ class CommandLineToolTest extends TestCase
         array $clockTimes = [100],
     ): CommandLineTool {
         $lock = $this->createStub(LockInterface::class);
-        $clock = static function () use (&$clockTimes): int {
-            return array_shift($clockTimes) ?? end($clockTimes) ?: 100;
-        };
-        $tool = new class ($finder, $moderator, $clock, $lock) extends CommandLineTool {
+        $tool = new class ($finder, $moderator, $lock, $clockTimes) extends CommandLineTool {
+            /**
+             * @param list<int> $clockTimes
+             */
             public function __construct(
                 CandidateFinder $candidateFinder,
                 Moderator $moderator,
-                callable $clock,
                 private readonly LockInterface $lock,
+                private array $clockTimes,
             ) {
-                parent::__construct($candidateFinder, $moderator, $clock);
+                parent::__construct($candidateFinder, $moderator);
             }
 
             protected function acquireLock(string $lockName, ?float $timeout): LockInterface
             {
                 return $this->lock;
+            }
+
+            protected function now(): int
+            {
+                $next = array_shift($this->clockTimes);
+
+                if (null !== $next) {
+                    return $next;
+                }
+
+                return end($this->clockTimes) ?: 100;
             }
         };
 

@@ -33,19 +33,14 @@ class CommandLineTool extends CliTool\App
     private const string OPT_LONG_BATCH_SIZE = 'batch:';
     private const string OPT_LONG_MAX_TIME = 'max-time:';
 
-    private readonly \Closure $clock;
-
     /**
      * @param CandidateFinder|null $candidateFinder Optional candidate finder, primarily for tests.
      * @param Moderator|null       $moderator       Optional moderator, primarily for tests.
-     * @param callable|null        $clock           Optional clock, primarily for tests.
      */
     public function __construct(
         private ?CandidateFinder $candidateFinder = null,
         private ?Moderator $moderator = null,
-        ?callable $clock = null,
     ) {
-        $this->clock = \Closure::fromCallable($clock ?? static fn(): int => time());
     }
 
     /**
@@ -164,6 +159,12 @@ HELP;
             }
 
             foreach ($candidates as $candidate) {
+                if ($this->now() > $endTime) {
+                    $this->refreshLock($lock);
+                    $this->logSummary($stats, 'maximum runtime reached during batch');
+                    return;
+                }
+
                 $stats['inspected']++;
 
                 if (!$this->perform()) {
@@ -174,6 +175,7 @@ HELP;
                         $candidate->getSessionId(),
                         $candidate->getLastMessageSentAt()->getDatabase(),
                     ));
+                    $this->refreshLock($lock);
                     continue;
                 }
 
@@ -187,25 +189,25 @@ HELP;
                         $candidate->getSessionId(),
                         $e->getMessage(),
                     ), ['exception' => $e]);
+                    $this->refreshLock($lock);
                     continue;
                 }
 
                 if ($result->isModerated()) {
                     $stats['moderated']++;
                     $logger->info(sprintf('Moderated AI session "%s".', $candidate->getSessionId()));
+                    $this->refreshLock($lock);
                     continue;
                 }
 
                 $stats['noOpSkipped']++;
-                $performOffset++;
                 $logger->info(sprintf(
                     'Skipped AI session "%s": %s.',
                     $candidate->getSessionId(),
                     $result->getReason() ?? 'no-op',
                 ));
+                $this->refreshLock($lock);
             }
-
-            $this->refreshLock($lock);
 
             if ($this->now() > $endTime) {
                 $this->logSummary($stats, 'maximum runtime reached after batch');
@@ -297,8 +299,8 @@ HELP;
     /**
      * @return int
      */
-    private function now(): int
+    protected function now(): int
     {
-        return ($this->clock)();
+        return time();
     }
 }
