@@ -88,11 +88,11 @@ class Csv
         $subheaderRows = ['Curriculum', 'Total'];
         foreach ($structure as $course) {
             $headerRows[]    = 'Course';
-            $subheaderRows[] = $course['name'];
+            $subheaderRows[] = $course['title'];
             $unitRowOutput   = false;
             foreach ($course['units'] as $unit) {
                 $headerRows[]    = $unitRowOutput ? '' : $this->translator->translate('unit', capital: true);
-                $subheaderRows[] = $unit['name'];
+                $subheaderRows[] = $unit['title'];
                 $unitRowOutput   = true;
             }
             if ($isMultipleCourse) {
