@@ -61,7 +61,7 @@ class SessionSummariser
      * @param string[] $sessionIds
      * @return array<string, list<SessionLogSummaryRow>>
      */
-    public function getSessionLogRowsBySessionId(array $sessionIds): array
+    private function getSessionLogRowsBySessionId(array $sessionIds): array
     {
         $sessionIds = array_values(array_unique($sessionIds));
 
@@ -110,7 +110,7 @@ class SessionSummariser
      * @param string[] $sessionIds
      * @return array<string, list<ModerationEventSummaryRow>>
      */
-    public function getModerationEventRowsBySessionId(array $sessionIds): array
+    private function getModerationEventRowsBySessionId(array $sessionIds): array
     {
         $sessionIds = array_values(array_unique($sessionIds));
 
@@ -157,7 +157,7 @@ class SessionSummariser
      * @param list<ModerationEventSummaryRow> $moderationEventRows
      * @return void
      */
-    public function hydrateSessionWithSummaryInfo(Model $session, array $sessionLogRows, array $moderationEventRows): void
+    private function hydrateSessionWithSummaryInfo(Model $session, array $sessionLogRows, array $moderationEventRows): void
     {
         $derivedLogFormat = null;
         $derivedHasError = false;

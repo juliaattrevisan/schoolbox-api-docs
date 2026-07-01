@@ -9,15 +9,18 @@ declare(strict_types=1);
 
 namespace Schoolbox\OpenAi\Session\Test;
 
-use Alaress\Database\Connector\NullConnector;
+use PDOStatement;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\OpenAi\Moderation\Event\Status as ModerationEventStatus;
 use Schoolbox\OpenAi\Session\Model;
 use Schoolbox\OpenAi\Session\SessionSummariser;
+use Schoolbox\Test\MockConnector;
 
 /**
  * Unit tests for the AI session {@see SessionSummariser}.
  */
+#[AllowMockObjectsWithoutExpectations]
 class SessionSummariserTest extends TestCase
 {
     /**
@@ -25,11 +28,7 @@ class SessionSummariserTest extends TestCase
      */
     public function testHydrateSessionWithSummaryUsesFirstViewableLogAndAnyError(): void
     {
-        $summariser = new SessionSummariser(new NullConnector());
-        $session = new Model();
-
-        $summariser->hydrateSessionWithSummaryInfo(
-            $session,
+        $summariser = $this->createSummariserWithRows(
             [
                 [
                     'id' => 10,
@@ -58,6 +57,9 @@ class SessionSummariserTest extends TestCase
             ],
             []
         );
+        $session = (new Model())->setId('session-1');
+
+        $summariser->hydrateSessionsWithSummaryInfo([$session]);
 
         $this->assertSame('agent-chat', $session->getDerivedLogFormat());
         $this->assertTrue($session->getDerivedHasError());
@@ -68,11 +70,7 @@ class SessionSummariserTest extends TestCase
      */
     public function testHydrateSessionWithSummaryUsesDefaultsForEmptySummary(): void
     {
-        $summariser = new SessionSummariser(new NullConnector());
-        $session = new Model();
-
-        $summariser->hydrateSessionWithSummaryInfo(
-            $session,
+        $summariser = $this->createSummariserWithRows(
             [
                 [
                     'id' => 10,
@@ -85,6 +83,9 @@ class SessionSummariserTest extends TestCase
             ],
             []
         );
+        $session = (new Model())->setId('session-1');
+
+        $summariser->hydrateSessionsWithSummaryInfo([$session]);
 
         $this->assertNull($session->getDerivedLogFormat());
         $this->assertFalse($session->getDerivedHasError());
@@ -95,11 +96,7 @@ class SessionSummariserTest extends TestCase
      */
     public function testHydrateSessionWithSummaryUsesSuppliedOrder(): void
     {
-        $summariser = new SessionSummariser(new NullConnector());
-        $session = new Model();
-
-        $summariser->hydrateSessionWithSummaryInfo(
-            $session,
+        $summariser = $this->createSummariserWithRows(
             [
                 [
                     'id' => 12,
@@ -120,6 +117,9 @@ class SessionSummariserTest extends TestCase
             ],
             []
         );
+        $session = (new Model())->setId('session-1');
+
+        $summariser->hydrateSessionsWithSummaryInfo([$session]);
 
         $this->assertSame('supplied-first', $session->getDerivedLogFormat());
         $this->assertFalse($session->getDerivedHasError());
@@ -130,11 +130,7 @@ class SessionSummariserTest extends TestCase
      */
     public function testHydrateSessionWithSummaryUsesMostImportantModerationStatus(): void
     {
-        $summariser = new SessionSummariser(new NullConnector());
-        $session = new Model();
-
-        $summariser->hydrateSessionWithSummaryInfo(
-            $session,
+        $summariser = $this->createSummariserWithRows(
             [],
             [
                 [
@@ -154,6 +150,9 @@ class SessionSummariserTest extends TestCase
                 ],
             ]
         );
+        $session = (new Model())->setId('session-1');
+
+        $summariser->hydrateSessionsWithSummaryInfo([$session]);
 
         $this->assertSame(ModerationEventStatus::REQUIRES_ATTENTION->value, $session->getDerivedModerationStatus());
     }
@@ -163,10 +162,10 @@ class SessionSummariserTest extends TestCase
      */
     public function testHydrateSessionWithSummaryUsesNullModerationStatusWhenNoEventsExist(): void
     {
-        $summariser = new SessionSummariser(new NullConnector());
+        $summariser = $this->createSummariserWithRows([], []);
         $session = (new Model())->setDerivedModerationStatus(ModerationEventStatus::REQUIRES_ATTENTION);
 
-        $summariser->hydrateSessionWithSummaryInfo($session, [], []);
+        $summariser->hydrateSessionsWithSummaryInfo([$session]);
 
         $this->assertNull($session->getDerivedModerationStatus());
     }
@@ -176,53 +175,38 @@ class SessionSummariserTest extends TestCase
      */
     public function testHydrateSessionsWithSummaryInfoDelegatesToSingleSessionHydration(): void
     {
-        $summariser = new class (new NullConnector()) extends SessionSummariser {
-            public function getSessionLogRowsBySessionId(array $sessionIds): array
-            {
-                return [
-                    'session-1' => [
-                        [
-                            'id' => 10,
-                            'ai_session_id' => 'session-1',
-                            'created_at' => '2026-01-01 10:00:00',
-                            'log_format' => 'agent-chat',
-                            'return_code' => 200,
-                            'error_message' => null,
-                        ],
-                    ],
-                    'session-2' => [
-                        [
-                            'id' => 11,
-                            'ai_session_id' => 'session-2',
-                            'created_at' => '2026-01-01 10:01:00',
-                            'log_format' => 'guardrail',
-                            'return_code' => 500,
-                            'error_message' => null,
-                        ],
-                    ],
-                ];
-            }
-
-            public function getModerationEventRowsBySessionId(array $sessionIds): array
-            {
-                return [
-                    'session-1' => [
-                        [
-                            'id' => 20,
-                            'target_ai_session_id' => 'session-1',
-                            'status' => ModerationEventStatus::NO_ACTION_REQUIRED->value,
-                        ],
-                    ],
-                    'session-2' => [
-                        [
-                            'id' => 21,
-                            'target_ai_session_id' => 'session-2',
-                            'status' => ModerationEventStatus::FURTHER_ACTION_REQUIRED->value,
-                        ],
-                    ],
-                ];
-            }
-        };
+        $summariser = $this->createSummariserWithRows(
+            [
+                [
+                    'id' => 10,
+                    'ai_session_id' => 'session-1',
+                    'created_at' => '2026-01-01 10:00:00',
+                    'log_format' => 'agent-chat',
+                    'return_code' => 200,
+                    'error_message' => null,
+                ],
+                [
+                    'id' => 11,
+                    'ai_session_id' => 'session-2',
+                    'created_at' => '2026-01-01 10:01:00',
+                    'log_format' => 'guardrail',
+                    'return_code' => 500,
+                    'error_message' => null,
+                ],
+            ],
+            [
+                [
+                    'id' => 20,
+                    'target_ai_session_id' => 'session-1',
+                    'status' => ModerationEventStatus::NO_ACTION_REQUIRED->value,
+                ],
+                [
+                    'id' => 21,
+                    'target_ai_session_id' => 'session-2',
+                    'status' => ModerationEventStatus::FURTHER_ACTION_REQUIRED->value,
+                ],
+            ]
+        );
         $firstSession = (new Model())->setId('session-1');
         $secondSession = (new Model())->setId('session-2');
 
@@ -238,5 +222,57 @@ class SessionSummariserTest extends TestCase
             ModerationEventStatus::FURTHER_ACTION_REQUIRED->value,
             $secondSession->getDerivedModerationStatus()
         );
+    }
+
+    /**
+     * @param list<array{
+     *     id: int,
+     *     ai_session_id: string,
+     *     created_at: string,
+     *     log_format: string|null,
+     *     return_code: int|null,
+     *     error_message: string|null
+     * }> $sessionLogRows
+     * @param list<array{
+     *     id: int,
+     *     target_ai_session_id: string,
+     *     status: string|null
+     * }> $moderationEventRows
+     * @return SessionSummariser
+     */
+    private function createSummariserWithRows(array $sessionLogRows, array $moderationEventRows): SessionSummariser
+    {
+        $logConnector = new MockConnector($this);
+        $logConnector->setNextFetchAll($sessionLogRows);
+
+        $moderationConnector = new MockConnector($this);
+        $moderationConnector->setNextFetchAll($moderationEventRows);
+
+        $database = new class ($this, [$logConnector, $moderationConnector]) extends MockConnector {
+            /**
+             * @param TestCase $testCase
+             * @param list<MockConnector> $connectors
+             */
+            public function __construct(TestCase $testCase, private array $connectors)
+            {
+                parent::__construct($testCase);
+            }
+
+            /**
+             * @inheritdoc
+             */
+            public function prepare(string $statement, array $driverOptions = []): PDOStatement
+            {
+                $connector = array_shift($this->connectors);
+
+                if (null === $connector) {
+                    throw new \RuntimeException('Unexpected extra database query in SessionSummariser test.');
+                }
+
+                return $connector->prepare($statement, $driverOptions);
+            }
+        };
+
+        return new SessionSummariser($database);
     }
 }
