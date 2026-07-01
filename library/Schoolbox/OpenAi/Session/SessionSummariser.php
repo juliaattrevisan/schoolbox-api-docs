@@ -56,6 +56,81 @@ class SessionSummariser
     }
 
     /**
+     * Hydrate multiple sessions with the derived fields used by the admin usage list.
+     *
+     * @param list<Model> $sessions
+     * @return void
+     */
+    public function hydrateSessionsWithSummaryInfo(array $sessions): void
+    {
+        $sessionIds = array_values(
+            array_filter(
+                array_map(static fn(Model $session) => $session->getId(), $sessions),
+                static fn(?string $sessionId) => null !== $sessionId
+            )
+        );
+        $sessionLogRowsBySessionId = $this->getSessionLogRowsBySessionId($sessionIds);
+        $moderationEventRowsBySessionId = $this->getModerationEventRowsBySessionId($sessionIds);
+
+        foreach ($sessions as $session) {
+            $sessionId = $session->getId();
+
+            $this->hydrateSessionWithSummaryInfo(
+                $session,
+                null === $sessionId ? [] : ($sessionLogRowsBySessionId[$sessionId] ?? []),
+                null === $sessionId ? [] : ($moderationEventRowsBySessionId[$sessionId] ?? [])
+            );
+        }
+    }
+
+    /**
+     * Hydrate a session with the derived fields used by the admin usage list.
+     *
+     * Session log rows must be supplied in the order used to determine the first viewable log.
+     * Rows from $this->getSessionLogRowsBySessionId() meet this requirement.
+     *
+     * @param Model $session
+     * @param list<SessionLogSummaryRow> $sessionLogRows
+     * @param list<ModerationEventSummaryRow> $moderationEventRows
+     * @return void
+     */
+    private function hydrateSessionWithSummaryInfo(Model $session, array $sessionLogRows, array $moderationEventRows): void
+    {
+        $derivedLogFormat = null;
+        $derivedHasError = false;
+        $moderationStatus = null;
+        $moderationStatusPriority = count(self::MODERATION_STATUS_PRIORITY);
+
+        foreach ($sessionLogRows as $row) {
+            if (null === $derivedLogFormat && null !== $row['log_format']) {
+                $derivedLogFormat = $row['log_format'];
+            }
+
+            $returnCode = $row['return_code'];
+            if (
+                null !== $row['error_message']
+                || (null !== $returnCode && self::HTTP_STATUS_CODE_OK !== $returnCode)
+            ) {
+                $derivedHasError = true;
+            }
+        }
+
+        foreach ($moderationEventRows as $row) {
+            $rowStatusPriority = $this->getModerationStatusPriority($row['status']);
+
+            if ($rowStatusPriority < $moderationStatusPriority) {
+                $moderationStatus = $row['status'];
+                $moderationStatusPriority = $rowStatusPriority;
+            }
+        }
+
+        $session
+            ->setDerivedLogFormat($derivedLogFormat)
+            ->setDerivedHasError($derivedHasError)
+            ->setDerivedModerationStatus($moderationStatus);
+    }
+
+    /**
      * Fetch summary-relevant log rows for the supplied session IDs, indexed by ai_session_log.ai_session_id.
      *
      * @param string[] $sessionIds
@@ -144,81 +219,6 @@ class SessionSummariser
         }
 
         return $moderationEventRowsBySessionId;
-    }
-
-    /**
-     * Hydrate a session with the derived fields used by the admin usage list.
-     *
-     * Session log rows must be supplied in the order used to determine the first viewable log.
-     * Rows from $this->getSessionLogRowsBySessionId() meet this requirement.
-     *
-     * @param Model $session
-     * @param list<SessionLogSummaryRow> $sessionLogRows
-     * @param list<ModerationEventSummaryRow> $moderationEventRows
-     * @return void
-     */
-    private function hydrateSessionWithSummaryInfo(Model $session, array $sessionLogRows, array $moderationEventRows): void
-    {
-        $derivedLogFormat = null;
-        $derivedHasError = false;
-        $moderationStatus = null;
-        $moderationStatusPriority = count(self::MODERATION_STATUS_PRIORITY);
-
-        foreach ($sessionLogRows as $row) {
-            if (null === $derivedLogFormat && null !== $row['log_format']) {
-                $derivedLogFormat = $row['log_format'];
-            }
-
-            $returnCode = $row['return_code'];
-            if (
-                null !== $row['error_message']
-                || (null !== $returnCode && self::HTTP_STATUS_CODE_OK !== $returnCode)
-            ) {
-                $derivedHasError = true;
-            }
-        }
-
-        foreach ($moderationEventRows as $row) {
-            $rowStatusPriority = $this->getModerationStatusPriority($row['status']);
-
-            if ($rowStatusPriority < $moderationStatusPriority) {
-                $moderationStatus = $row['status'];
-                $moderationStatusPriority = $rowStatusPriority;
-            }
-        }
-
-        $session
-            ->setDerivedLogFormat($derivedLogFormat)
-            ->setDerivedHasError($derivedHasError)
-            ->setDerivedModerationStatus($moderationStatus);
-    }
-
-    /**
-     * Hydrate multiple sessions with the derived fields used by the admin usage list.
-     *
-     * @param list<Model> $sessions
-     * @return void
-     */
-    public function hydrateSessionsWithSummaryInfo(array $sessions): void
-    {
-        $sessionIds = array_values(
-            array_filter(
-                array_map(static fn(Model $session) => $session->getId(), $sessions),
-                static fn(?string $sessionId) => null !== $sessionId
-            )
-        );
-        $sessionLogRowsBySessionId = $this->getSessionLogRowsBySessionId($sessionIds);
-        $moderationEventRowsBySessionId = $this->getModerationEventRowsBySessionId($sessionIds);
-
-        foreach ($sessions as $session) {
-            $sessionId = $session->getId();
-
-            $this->hydrateSessionWithSummaryInfo(
-                $session,
-                null === $sessionId ? [] : ($sessionLogRowsBySessionId[$sessionId] ?? []),
-                null === $sessionId ? [] : ($moderationEventRowsBySessionId[$sessionId] ?? [])
-            );
-        }
     }
 
     /**
