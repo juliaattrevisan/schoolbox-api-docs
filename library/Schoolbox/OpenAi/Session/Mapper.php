@@ -201,10 +201,10 @@ class Mapper extends BaseMapper
         }
         $statement->execute();
 
-        $collection = $this->hydrateSelect($statement);
-        new SessionSummariser($this->getDatabase())->hydrateSessionsWithSummaryInfo($collection);
+        $sessions = $this->hydrateSelect($statement);
+        new SessionSummariser($this->getDatabase())->hydrateSessionsWithSummaryInfo($sessions);
 
-        return $collection;
+        return $sessions;
     }
 
     /**
