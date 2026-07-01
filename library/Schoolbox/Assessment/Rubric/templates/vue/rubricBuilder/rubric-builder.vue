@@ -84,15 +84,15 @@ const allRubricsSum = window.Vue.computed(() => {
 const knownMaxMarkFields = window.Vue.ref<string[]>([]);
 
 /**
- * Update whether the assign from button is disabled or not
+ * Update whether the assign from button is visible or not
  * @param input - the max mark input field
  * @param assignBtn - the "Assign from Rubric" button
  */
 function updateAssignFromButtonState(input: HTMLInputElement, assignBtn: HTMLAnchorElement): void {
     if (input.value === "" || parseFloat(input.value) !== allRubricsSum.value) {
-        assignBtn.removeAttribute("disabled");
+        assignBtn.style.display = "";
     } else {
-        assignBtn.setAttribute("disabled", "true");
+        assignBtn.style.display = "none";
     }
 }
 
@@ -118,8 +118,6 @@ function syncMaxMarkInputs(prevSum: number | null): void {
             assignBtn.style.display = "none";
             return;
         }
-        // otherwise, the button is always visible
-        assignBtn.style.display = "";
 
         // Initialise listeners if that hasn't been done already
         if (!knownMaxMarkFields.value.includes(id)) {
@@ -139,8 +137,7 @@ function syncMaxMarkInputs(prevSum: number | null): void {
             });
         }
 
-        // The "Assign XXX from Rubric" button exists, show it and fill in the relevant value
-        assignBtn.style.display = "";
+        // The "Assign XXX from Rubric" button exists, fill in the relevant value
         assignBtn.querySelector<HTMLElement>("[data-rubric-sum]")!.textContent = allRubricsSum.value.toString();
 
         // if not customised, sync
@@ -152,7 +149,7 @@ function syncMaxMarkInputs(prevSum: number | null): void {
             input.value = allRubricsSum.value.toString();
         }
 
-        // update the button's customised state
+        // update the button's customised state (only visible when customised)
         updateAssignFromButtonState(input, assignBtn);
     });
 }
