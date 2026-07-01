@@ -1,3 +1,4 @@
+-- Updating the default role permissions for unconfirmed notifications in the IB registration namespace to instant, mobile and email delivery type
 UPDATE msg_route_perm
 SET role_default = 'IN,MO,EM'
 WHERE msg_source_id = (
