@@ -1398,7 +1398,11 @@ class OverallDataset
                                     $gridWeight = $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'];
                                     $effectiveWeight = $assessmentWeight * $gridWeight;
                                     $numerator = $capabilityData[$node]['normalisedMark'] * $effectiveWeight;
-
+                                    if ($capabilityId == 19) {
+                                        if ($studentId == 65) {
+//                                            var_dump($capabilityData);
+                                        }
+                                    }
                                     /* Jez Maths
                                      */
                                     $overallMarks[$capabilityId]['students'][$studentId][$node]['formula']['numerator'] += $numerator;
@@ -1407,7 +1411,8 @@ class OverallDataset
                                     /* Jez reasoning
                                      */
                                     $overallMarks[$capabilityId]['students'][$studentId][$node]['reasoning'][] = sprintf(
-                                        'assessmentWeight: %s, gridWeight: %s, numerator: %s, denominator: %s,',
+                                        'assessmentId: %s, assessmentWeight: %s, gridWeight: %s, numerator: %s, denominator: %s',
+                                        $assessmentId,
                                         $assessmentWeight,
                                         $gridWeight,
                                         $numerator,
@@ -1421,6 +1426,8 @@ class OverallDataset
                                         $assessmentWeight,
                                         $gridWeight,
                                     );
+
+                                    $overallMarks[$capabilityId]['students'][$studentId][$node]['reasoning'][] = null;
                                 }
                             }
                         }
@@ -1473,7 +1480,8 @@ class OverallDataset
                                         /* Jez reasoning
                                          */
                                         $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId][$node]['reasoning'][] = sprintf(
-                                            'assessmentWeight: %s, gridWeight: %s, numerator: %s, denominator: %s,',
+                                            'assessmentId: %s, assessmentWeight: %s, gridWeight: %s, numerator: %s, denominator: %s',
+                                            $assessmentId,
                                             $assessmentWeight,
                                             $gridWeight,
                                             $numerator,
@@ -1487,6 +1495,8 @@ class OverallDataset
                                             $assessmentWeight,
                                             $gridWeight,
                                         );
+
+                                        $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId][$node]['reasoning'][] = null;
                                     }
                                 }
                             }
