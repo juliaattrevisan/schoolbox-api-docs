@@ -222,13 +222,7 @@ class Mapper extends BaseMapper
             $collection->add($session);
         }
 
-        $sessionIds = array_column($sessionRows, 'id');
-        $sessionSummariser = new SessionSummariser($this->getDatabase());
-        $sessionSummariser->hydrateSessionsWithSummaryInfo(
-            $sessions,
-            $sessionSummariser->getSessionLogRowsBySessionId($sessionIds),
-            $sessionSummariser->getModerationEventRowsBySessionId($sessionIds),
-        );
+        new SessionSummariser($this->getDatabase())->hydrateSessionsWithSummaryInfo($sessions);
 
         return $collection;
     }
