@@ -101,7 +101,7 @@ test("participant table opts into shared bottom drawer offset", () => {
         },
     });
 
-    expect(wrapper.find(".scrollable.c-bottom-drawer-offset-target").exists()).toBe(true);
+    expect(wrapper.find(".scrollable.sbx-bottom-drawer-offset-target").exists()).toBe(true);
 });
 
 test("When one of the three students is excluded, Copy Activity button does not appear", async () => {

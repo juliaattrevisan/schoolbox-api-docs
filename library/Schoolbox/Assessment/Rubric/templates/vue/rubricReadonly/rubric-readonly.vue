@@ -40,7 +40,7 @@ const props = defineProps<Props>();
             v-for="(rubric, index) in props.rubricMarkedGridsPayload"
             :key="rubric.rubric.id"
             initially-expanded
-            legend-class="l-pad-m--horiz"
+            legend-class="u-pad-m--horiz"
         >
             <template #legend>{{ rubric.rubric.title.length ? rubric.rubric.title : `Rubric ${index + 1}` }}</template>
 
@@ -58,7 +58,7 @@ const props = defineProps<Props>();
         </fieldset-collapsible>
     </template>
     <template v-for="(rubric, index) in props.rubricMarkedGridsPayload" v-else :key="rubric.rubric.id">
-        <div class="l-pad-s">
+        <div class="u-pad-s">
             <!-- TODO: figure out how people desire this to appear in places. this'll do for now... -->
             <h3>{{ rubric.rubric.title.length ? rubric.rubric.title : `Rubric ${index + 1}` }}</h3>
         </div>

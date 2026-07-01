@@ -30,6 +30,24 @@ function buildConfigs() {
                         },
                     ],
                 },
+                {
+                    name: "Accent",
+                    options: [
+                        {
+                            id: 102,
+                            name: "skin_accent_colour",
+                            value: "#ff6600",
+                            title: "Accent Colour",
+                            description: "Set the accent brand colour.",
+                            customProperty: "--sbx-config-accent-colour",
+                            contrast: null,
+                            type: "colour",
+                            selectOptions: [],
+                            editable: true,
+                            hidden: false,
+                        },
+                    ],
+                },
             ],
             "Corner Radius": [
                 {

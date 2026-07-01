@@ -32,7 +32,7 @@ export default {
 
 <template>
     <tr class="VueTables__no-results">
-        <td class="text-center" :tabindex="props.tabIndex" :colspan="props.colspan">
+        <td class="u-ta-center" :tabindex="props.tabIndex" :colspan="props.colspan">
             No submissions match your current filters.
             <button @click.prevent="onResetSelected" @keydown.enter="onResetSelected" class="button-reset">
                 Reset filters

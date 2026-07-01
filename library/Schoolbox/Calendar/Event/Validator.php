@@ -193,8 +193,15 @@ class Validator
                         continue; // Null is okay for 'maxAttendees'.
                     }
                 }
-                if (!is_int($value) && !(is_string($value) && ctype_digit($value))) {
+                // Note preg_match() is used below because e.g. '-1' is an integer.
+                if (!is_int($value) && !(is_string($value) && preg_match('/^-?\d+$/', $value) === 1)) {
                     throw new SchoolboxException("Value for key '$integerKey' should be an integer.");
+                }
+                // Extra validation for integer key 'maxAttendees' (if supplied).
+                if ($integerKey === 'maxAttendees') {
+                    if ((int)$value < 1) {
+                        throw new SchoolboxException("Value for key '$integerKey' should be a positive integer.");
+                    }
                 }
                 // Extra validation for integer key 'level'.
                 if ($integerKey === 'level') {
@@ -468,11 +475,25 @@ class Validator
             throw new SchoolboxException("Object stub for key '$key' is missing an 'id' key.");
         }
         $idValue = $value['id'];
-        if (!is_int($idValue) && !(is_string($idValue) && ctype_digit($idValue))) {
-            throw new SchoolboxException("Value for '$key.id' should be an integer.");
+        if (!$this->isPositiveIntegerValue($idValue)) {
+            throw new SchoolboxException("Value for '$key.id' should be a positive integer.");
         }
         $value['id'] = (int)$idValue;
 
         return $value;
+    }
+
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    private function isPositiveIntegerValue(mixed $value): bool
+    {
+        if (is_int($value)) {
+            return $value > 0;
+        }
+
+        // Note must still check > 0, because '0' is a digit.
+        return is_string($value) && ctype_digit($value) && (int)$value > 0;
     }
 }

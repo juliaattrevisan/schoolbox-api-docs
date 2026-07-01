@@ -140,10 +140,10 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <div v-if="isNewLoading" class="c-island l-pad-m" data-test="pr-table-loading">
+    <div v-if="isNewLoading" class="sbx-island u-pad-m" data-test="pr-table-loading">
         <div class="loader"></div>
     </div>
-    <div v-else-if="loadError" class="c-island l-pad-m">
+    <div v-else-if="loadError" class="sbx-island u-pad-m">
         <data-load-error data-title="record" :further-info="loadError" />
     </div>
     <pr-empty v-else-if="isEmpty" />

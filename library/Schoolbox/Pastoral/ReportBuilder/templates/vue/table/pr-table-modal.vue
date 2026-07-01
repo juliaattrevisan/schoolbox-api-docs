@@ -105,9 +105,9 @@ const { printAllRecords, isLoading: isLoadingPrint } = usePrintRecords(
         <div v-if="isNewLoad && isNewLoading" class="loader"></div>
         <data-load-error v-else-if="isNewLoad && loadError" data-title="record" :further-info="loadError" />
         <template v-else-if="selectedHeader !== null">
-            <div ref="containerRef" class="container l-flex-col l-gap-m">
-                <div class="l-flex-row l-flex--justify-space l-flex--no-wrap l-gap-m">
-                    <div class="l-flex-col l-gap-s f-no-margins">
+            <div ref="containerRef" class="container u-flex-col u-gap-m">
+                <div class="u-flex-row u-flex--justify-space u-flex--no-wrap u-gap-m">
+                    <div class="u-flex-col u-gap-s f-no-margins">
                         <h2>{{ title }}</h2>
                         <p v-if="props.selectedCell" class="meta">
                             <template v-for="(meta, index) in props.selectedCell.meta" :key="index">
@@ -115,7 +115,7 @@ const { printAllRecords, isLoading: isLoadingPrint } = usePrintRecords(
                             </template>
                         </p>
                     </div>
-                    <nav class="l-flex-row l-flex--align-center f-no-margins">
+                    <nav class="u-flex-row u-flex--align-center f-no-margins">
                         <button
                             class="sbx-icon-only-button f-no-margins"
                             aria-label="Print Report Results"
@@ -136,14 +136,14 @@ const { printAllRecords, isLoading: isLoadingPrint } = usePrintRecords(
                     </nav>
                 </div>
                 <div ref="modalResultsRef" class="pr-table__records" data-test="pr-table-modal-records">
-                    <div class="l-flex-col l-gap-s">
-                        <div v-for="record in payload?.data.results" :key="record.id" class="c-island">
+                    <div class="u-flex-col u-gap-s">
+                        <div v-for="record in payload?.data.results" :key="record.id" class="sbx-island">
                             <ul class="information-list threaded" data-test="pastoral-records-modal-list">
                                 <pastoral-record :record="record" />
                             </ul>
                         </div>
                     </div>
-                    <div v-if="isMoreLoading" class="c-island l-pad-s">
+                    <div v-if="isMoreLoading" class="sbx-island u-pad-s">
                         <div class="loader"></div>
                     </div>
                     <data-load-error

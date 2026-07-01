@@ -112,15 +112,15 @@ async function onAction(type: keyof typeof selectedResultActions.value): Promise
 
 <template>
     <bottom-drawer :show-drawer="totalSelectedResults > 0">
-        <h3 class="selected-count l-mar-s--right">
+        <h3 class="selected-count u-mar-s--right">
             <em>{{ totalSelectedResults }} records selected</em>
         </h3>
-        <div class="meta l-mar-s--right">({{ selectedResultStatuses }})</div>
+        <div class="meta u-mar-s--right">({{ selectedResultStatuses }})</div>
         <button class="button-clear" @click.prevent="clearSelection">Clear selection</button>
 
-        <div class="l-flex-row l-flex--justify l-gap-xs">
+        <div class="u-flex-row u-flex--justify u-gap-xs">
             <button
-                class="button l-flex__item--1-auto sbx-button--has-icon"
+                class="button u-flex__item--1-auto sbx-button--has-icon"
                 :disabled="selectedResultActions.delete.length === 0"
                 @click="onAction('delete')"
             >
@@ -128,7 +128,7 @@ async function onAction(type: keyof typeof selectedResultActions.value): Promise
                 Delete
             </button>
             <button
-                class="button l-flex__item--1-auto sbx-button--has-icon"
+                class="button u-flex__item--1-auto sbx-button--has-icon"
                 :disabled="selectedResultActions.reject.length === 0"
                 @click="onAction('reject')"
             >
@@ -136,9 +136,9 @@ async function onAction(type: keyof typeof selectedResultActions.value): Promise
                 Request Update
             </button>
         </div>
-        <div class="l-flex-row l-flex--justify l-gap-xs">
+        <div class="u-flex-row u-flex--justify u-gap-xs">
             <button
-                class="button l-flex__item--1-auto submit sbx-button--has-icon"
+                class="button u-flex__item--1-auto submit sbx-button--has-icon"
                 :disabled="selectedResultActions.publish.length === 0"
                 @click="onAction('publish')"
             >

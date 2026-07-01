@@ -56,9 +56,9 @@ class Markbook
 
 
     /**
-     * @var int
+     * @var float
      */
-    private int $totalWeight = 0;
+    private float $totalWeight = 0.0;
 
 
     /**

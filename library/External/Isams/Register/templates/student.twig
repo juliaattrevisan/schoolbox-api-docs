@@ -1,26 +1,26 @@
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/dataTables.js?v={{ config.site_version }}"></script>
 <div class="small-12 island">
     <h2 class="subheader">{{ register.name }}</h2>
-        <div class="l-flex-col l-gap-m">
+        <div class="u-flex-col u-gap-m">
             {% for child in studentData %}
-                <div class="l-flex-col">
-                    <div class="c-card">
-                        <div class="l-flex-row l-gap-m l-pad-m">
-                            <div class="c-img c-img--round">
-                                <div class="c-img__wrapper">
+                <div class="u-flex-col">
+                    <div class="sbx-card">
+                        <div class="u-flex-row u-gap-m u-pad-m">
+                            <div class="sbx-img sbx-img--round">
+                                <div class="sbx-img__wrapper">
                                     <img
                                         src="/portrait.php?id={{ child.user.id }}&amp;size=square64"
                                         alt="Photo of {{ child.user.formatName }}"
                                     />
                                 </div>
                             </div>
-                            <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
+                            <div class="u-flex-col u-flex--justify-center u-flex__item--1 f-no-margins">
                                 <h3>{{ child.user.formatName }}</h3>
                             </div>
                         </div>
                     </div>
                     {# Field Group details #}
-                    <div class="c-island l-pad-m--horiz scrollable">
+                    <div class="sbx-island u-pad-m--horiz scrollable">
                         {% if child.data.FieldGroup is defined %}
                             {% for group in child.data.FieldGroup %}
                                 <h2>{{ group.groupName }}</h2>

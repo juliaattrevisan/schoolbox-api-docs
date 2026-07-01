@@ -50,6 +50,7 @@ export default {
             calendarApi: null, //to access the underlying calendar object
             calendarOptions: {}, //will init in beforeMount due to linked vars being needed
             pendingReloadToastMessage: null, // For replacing the 'Events retrieved' toast message with something else.
+            pendingReloadToastIsSuccess: true,
         };
     },
 
@@ -80,7 +81,9 @@ export default {
         const pendingToast = url.searchParams.get("calendarToast");
         if (pendingToast) {
             this.pendingReloadToastMessage = pendingToast;
+            this.pendingReloadToastIsSuccess = url.searchParams.get("calendarToastIsSuccess") !== "0";
             url.searchParams.delete("calendarToast");
+            url.searchParams.delete("calendarToastIsSuccess");
             window.history.replaceState({}, "", url.toString());
         }
 
@@ -196,7 +199,9 @@ export default {
          */
         events(fetchInfo, callback) {
             const customSuccessMessage = this.pendingReloadToastMessage;
+            const customToastIsSuccess = this.pendingReloadToastIsSuccess;
             this.pendingReloadToastMessage = null;
+            this.pendingReloadToastIsSuccess = true;
 
             const toast = window.sbProps.toastActivate("Retrieving events...");
             const params = {
@@ -216,7 +221,10 @@ export default {
                             return "start" in v;
                         }),
                     );
-                    toast.timeout({ text: customSuccessMessage ?? "Events retrieved" });
+                    toast.timeout({
+                        text: customSuccessMessage ?? "Events retrieved",
+                        isSuccess: customSuccessMessage === null ? true : customToastIsSuccess,
+                    });
                 })
                 .catch((error) => {
                     console.error(error);

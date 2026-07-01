@@ -48,12 +48,13 @@ type FeedItemDataAlert = {
      * TODO: this aligns with a CSS class for now, but we probably need to think about this whole struct anyway
      *
      * Currently used for:
+     * - "" (standard): AI usage log dismissed/non-flagged interaction moderation events
      * - highlight: dialog agent stopped requesting assistance
-     * - warning: guardrails alert
+     * - warning: guardrails alert, AI usage log flagged interaction moderation events
      * - warning-tint: dialog agent started requesting assistance
      * - alert: X (although AgentChatFeedMessage<AgentChatMessageType.RESPONSE> is essentially the same thing)
      */
-    severity: "highlight" | "warning" | "warning-tint" | "alert";
+    severity: "" | "highlight" | "warning" | "warning-tint" | "alert";
     title?: string; // optional title for the alert (shows in bold)
     message: string;
 };

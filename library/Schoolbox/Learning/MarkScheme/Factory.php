@@ -13,6 +13,7 @@ use InvalidArgumentException;
 use RangeException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Assessment\Rubric\Instance\Model;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -311,47 +312,45 @@ class Factory
     }
 
     /**
-     * Capabilities have their own markscheme. Currently, the type of mark scheme is inferred from the due work they are used on.
-     * In the future we might add the ability to choose a different markscheme for each capability.
+     * Capabilities have their own markscheme. Currently, the type of mark scheme is inferred from the rubric instance
+     * they are used on. In the future we might add the ability to choose a different markscheme for each capability.
      *
-     * @param IAssessable    $assessable
+     * @param Model $rubricInstance
      * @param float|null $maxMark
      * @return IMarkScheme
-     * @throws DomainException
-     * @throws RangeException
      */
-    public function spawnForCapability(IAssessable $assessable, ?float $maxMark = null): IMarkScheme
-    {
+    public function spawnForCapability(
+        \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance,
+        ?float $maxMark = null
+    ): IMarkScheme {
+        /* A meaningless max mark: can't derive anything from that, so exit early
+         */
         if (null !== $maxMark && $maxMark <= 0) {
             return new None();
         }
 
-        /* Type-enforcement throughout the swamp compels me to keep this as IAssessable $assessable
-         * instead of switching it to DueWork $assessable, even though only DueWork gets rubric grids
+        /* Mark type never specified; equivalent to TotalMarkFractional, which is to exhibit original behaviour
          */
-        if ($assessable instanceof DueWork) {
-            /* Mark type never specified; equivalent to TotalMarkFractional,
-             * which is to exhibit original behaviour
-             */
-            if ($assessable->getCapabilityMarkType() === null) {
-                return new TotalMarkFractional($maxMark);
-            }
-
-            switch ($assessable->getCapabilityMarkType()->getId()) {
-                case MarkType::TYPE_PERCENT:
-                    return new Percentage();
-                case MarkType::TYPE_NONE:
-                    return new None();
-                case MarkType::TYPE_TOTAL:
-                    return new TotalMarkFractional($maxMark);
-                case MarkType::TYPE_LETTER:
-                    return new LetterGrade($assessable->getCapabilityGradeGroup());
-                default:
-                    throw new DomainException('Invalid MarkType for DueWork: ' . $assessable->getMarkType()->getName());
-            }
+        if ($rubricInstance->getCapabilityMarkType() === null) {
+            return new TotalMarkFractional($maxMark);
         }
 
-        throw new DomainException('$assessable is not an instance of DueWork');
+        switch ($rubricInstance->getCapabilityMarkType()->getId()) {
+            case MarkType::TYPE_PERCENT:
+                return new Percentage();
+            case MarkType::TYPE_NONE:
+                return new None();
+            case MarkType::TYPE_TOTAL:
+                return new TotalMarkFractional($maxMark);
+            case MarkType::TYPE_LETTER:
+                return new LetterGrade($rubricInstance->getCapabilityGradeGroup());
+            default:
+                throw new DomainException(sprintf(
+                    'Invalid MarkType for rubric grid %s: %s',
+                    $rubricInstance->getTitle(),
+                    $rubricInstance->getCapabilityMarkType()->getName()
+                ));
+        }
     }
 
 
@@ -503,15 +502,15 @@ class Factory
     {
         if ($folder && $folder->getYearLevels() && $folder->getYearLevels()->count() > 0) {
             // Get overall grade settings from year level, when all the settings are the same
-            $overAllGrades     = array_unique($folder->getYearLevels()->getPropertyValues('overallGrade'));
+            $overallGrades     = array_unique($folder->getYearLevels()->getPropertyValues('overallGrade'));
             $showOverallGrades = array_unique($folder->getYearLevels()->getPropertyValues('showOverallGrade'));
 
-            $overAllGrade     = count($overAllGrades) === 1 ? $overAllGrades[0] : null;
+            $overallGrade     = count($overallGrades) === 1 ? $overallGrades[0] : null;
             $showOverallGrade = count($showOverallGrades) === 1 ? $showOverallGrades[0] : null;
         }
 
         // Otherwise fall back to config
-        $overAllGrade     = $overAllGrade ?? $this->config->get('overall_grade');
+        $overallGrade     = $overallGrade ?? $this->config->get('overall_grade');
         $showOverallGrade = $showOverallGrade ?? $this->config->get('show_overall_grade');
 
         // If the grade is hidden
@@ -522,7 +521,7 @@ class Factory
         $gradeGroups = $this->getGradeLevelGroupMapper()->findAllForAdminOption();
 
         /** @var Group\Model|null $gradeGroup */
-        $gradeGroup  = $gradeGroups->getBy('id', $overAllGrade);
+        $gradeGroup = $gradeGroups->getBy('id', $overallGrade);
 
         if (empty($gradeGroup) || $gradeGroup->getId() === $this->getGradeLevelGroupMapper()::GRADE_GROUP_ID_NONE) {
             return new None();

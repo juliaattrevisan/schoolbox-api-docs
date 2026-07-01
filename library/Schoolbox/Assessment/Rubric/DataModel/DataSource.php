@@ -14,7 +14,6 @@ use Alaress\Database\Predicate\Builder;
 use PDO;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as CapabilityMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
 use Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\Mapper as CapabilityMarkMapper;
@@ -46,12 +45,10 @@ use Schoolbox\Assessment\Rubric\RowSet\Indicator;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\Assessment\Rubric\RowSet\ValidRowSet;
 use Schoolbox\Assessment\Rubric\Util;
-use Schoolbox\Assessment\Term\Model as TermModel;
 use Schoolbox\Database\Factory;
 use Schoolbox\GenericCollection;
 use Schoolbox\IMapper;
 use Schoolbox\L10n\RosettaStone;
-use Schoolbox\Learning\Analytics\BoxPlot\Summary;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedbackModel;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkModel;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -66,8 +63,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Schoolbox\User;
-use UnderflowException;
 use UnexpectedValueException;
 
 /**
@@ -984,6 +979,18 @@ class DataSource
             throw new \InvalidArgumentException('Unknown feedback table derived from feedback instance.');
         }
 
+        /* Severe headache warning:
+         *
+         * For this particular grid, retrieve the capability mark models that it uses, along with the indicator mark
+         * models that THOSE used. If you don't specify a rubric_instance_id you'll experience a geometric runaway
+         * as cap mark models/ind mark models tend to be accumulative in other areas.
+         *
+         * Not specifying a rubric instance identifier leads to geometric database expansion, unstable descriptor
+         * selections due to having WAY more rows than you were supposed to (since they go into the db in whatever order
+         * it felt like, some cells appear before others, so you can't even count on them being persisted in any
+         * consistent chronological order) and is really bad news bears for everyone.
+         */
+
         // What goes in the grid?
         // * Capability marks
         // * Descriptor marks
@@ -992,6 +999,7 @@ class DataSource
         $capabilityMarkModels = $this->capabilityMarkMapper->findByColumnList([
             'feedback_id' => $feedback->getId(),
             'feedback_table' => $feedbackTable,
+            'rubric_instance_id' => $rubricInstance->getId(),
             'valid' => true,
         ]);
 
@@ -1038,7 +1046,7 @@ class DataSource
 
             // Create the cap mark
             $capabilityMarkScheme = $markSchemeFactory->spawnForCapability(
-                $feedback->getAssessable(),
+                $rubricInstance,
                 $capabilityUsage->getMaxValue()
             );
 
@@ -1125,16 +1133,23 @@ class DataSource
          */
         $feedback = $mapper->findById($feedbackId);
 
-        // Create list of cap/ind marks that will be saved
-        $capabilityMarksToSave = $this->capabilityMarkMapper->createCollection();
-        $indicatorMarksToSave  = $this->indicatorMarkMapper->createCollection();
+        /* Remove previous marks
+         *
+         * Use the derived mapper and the derived feedbackId to delete any rubric pieces that were previously associated
+         * with it which essentially cleanses the slate. Although, I think you'd be better off deleting them immediately
+         * prior to saving, in case something died during the construction of whatever you were going to save. That
+         * would have left you in a half-baked state, deleting previous data but not persisting current data.
+         */
+        $this->indicatorMarkMapper->deleteFeedbackMarks($feedbackId, $rubricInstance, $mapper->getTable());
+        $this->capabilityMarkMapper->deleteFeedbackMarks($feedbackId, $rubricInstance, $mapper->getTable());
 
+        /** @var CapabilityMark $capabilityMark */
         foreach ($markedGrid->getCapabilityMarks() as $capabilityMark) {
             // Create cap mark
             $capabilityId = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
             $capabilityModel = $this->capabilityMapper->findById($capabilityId);
 
-            $capabilityMarksToSave[$capabilityId] = $capabilityMarkModel = $this->capabilityMarkMapper->createModel()
+            $capabilityMarkModel = $this->capabilityMarkMapper->createModel()
                 ->setRubricInstance($rubricInstance)
                 ->setFeedbackId($feedback->getId())
                 ->setFeedbackTable($mapper->getTable())
@@ -1142,6 +1157,12 @@ class DataSource
                 ->setValue($capabilityMark->getValue())
                 ->setHumanReadableValue($capabilityMark->getHumanReadableValue())
                 ->setValid(true);
+
+            /* For some reason this has become integral: we can't just save the collection at the end.
+             * I have to save them in situ as I progress: must be something to do with the object-by-reference nature
+             * of what we're building here.
+             */
+            $this->capabilityMarkMapper->save($capabilityMarkModel);
 
             // Create ind marks
             foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
@@ -1157,28 +1178,19 @@ class DataSource
                     continue;
                 }
 
-                $indicatorMarksToSave[$indicatorId] = $this->indicatorMarkMapper->createModel()
+                $indicatorMarkModel = $this->indicatorMarkMapper->createModel()
                     ->setCapabilityMark($capabilityMarkModel)
                     ->setDescriptor($descriptorModel)
                     ->setValue($indicatorMark->getValue())
                     ->setValid(true);
+
+                /* For some reason this has become integral: we can't just save the collection at the end.
+                 * I have to save them in situ as I progress: must be something to do with the object-by-reference nature
+                 * of what we're building here.
+                 */
+                $this->indicatorMarkMapper->save($indicatorMarkModel);
             }
         }
-
-        /* Remove previous marks
-         *
-         * Use the derived mapper and the derived feedbackId to delete any rubric pieces that were previously associated
-         * with it which essentially cleanses the slate. Although, I think you'd be better off deleting them immediately
-         * prior to saving, in case something died during the construction of whatever you were going to save. That
-         * would have left you in a half-baked state, deleting previous data but not persisting current data.
-         */
-        $this->indicatorMarkMapper->deleteFeedbackMarks($feedbackId, $rubricInstance, $mapper->getTable());
-        $this->capabilityMarkMapper->deleteFeedbackMarks($feedbackId, $rubricInstance, $mapper->getTable());
-
-        /* Save the updated cap/ind marks
-         */
-        $this->capabilityMarkMapper->save($capabilityMarksToSave);
-        $this->indicatorMarkMapper->save($indicatorMarksToSave);
     }
 
 
@@ -1229,6 +1241,9 @@ class DataSource
 
         foreach ($participant->getAllFeedbacks() as $feedback) {
             if (
+                /* TODO Remove requirement to be a due work feedback instance and check the validCapMarkCount
+                 *  against a feedback table too
+                 */
                 $feedback instanceof DueWorkFeedbackModel
                 && \in_array($feedback->getReviewRoute(), $feedbackTypes, true)
             ) {
@@ -1582,213 +1597,6 @@ class DataSource
 
 
     /**
-     * Specialised query for returning the longitudinal cross-section of rubric data for a
-     * student and set of DueWorks. Data is returned in a primitive hierarchy of:
-     *   - capability
-     *   - indicator
-     *   - assessment
-     *   - descriptor (student result)
-     *
-     * @param GenericCollection<DueWorkModel> $dueWorks
-     * @param User                             $student
-     * @param bool                             $includeComparison Include other students results for comparison
-     *
-     * @return array $longitude
-     */
-    public function getLongitudinal(GenericCollection $dueWorks, User $student, bool $includeComparison): array
-    {
-        if (0 === $dueWorks->count()) {
-            return [];
-        }
-
-        $dueWorks->indexBy('id');
-
-        [$feedbackIds, $allFeedbackIds] = $this->getFeedbackIdsWithRubric($dueWorks, $student, $includeComparison);
-
-        if (empty($feedbackIds)) {
-            return [];
-        }
-
-        // Find rubric used in the assessments
-        $pb = new Builder($this->database->getQuoter(), 'vr');
-        $pb->in('a.id', array_keys($feedbackIds));
-
-        $where = implode(' AND ', $pb->getWhere());
-
-        $capabilityStatement = $this->database->prepare("
-            SELECT
-                vr.capability_id,
-                vr.capability_name,
-                vr.capability_max_value,
-                vr.indicator_id,
-                vr.indicator_name,
-                vr.assessment_id,
-                vr.assessment_title,
-                vr.capability_mark_type_id AS rubric_capability_mark_type_id,
-                vr.assessment_mark_type AS mark_type,
-                vr.indicator_max_value AS max_value
-            FROM v_rubric vr
-            JOIN assessment a ON vr.assessment_id = a.id
-            WHERE {$where}
-            AND a.deleted_at IS NULL
-            ORDER BY a.due_date, vr.capability_sequence, vr.indicator_sequence, a.id;
-        ");
-
-        $capabilityStatement->execute($pb->getParams());
-
-
-        // Collate the selected descriptor values into longitudinal array
-        $longitude      = [];
-        $assessmentList = [];
-
-        while ($row = $capabilityStatement->fetch(\PDO::FETCH_ASSOC)) {
-            $longitude[$row['capability_id']]['name']                                                                  = $row['capability_name'];
-            $longitude[$row['capability_id']]['mark_type'][$row['assessment_id']]                                      = $row['mark_type'];
-            $longitude[$row['capability_id']]['max_value'][$row['assessment_id']]                                      = $row['capability_max_value'];
-            $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['name']                              = $row['indicator_name'];
-            $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['activities'][$row['assessment_id']] = [
-                'name'                           => $row['assessment_title'],
-                'rubric_capability_mark_type_id' => $row['rubric_capability_mark_type_id'],
-                'max_value'                      => $row['max_value'],
-            ];
-
-            $assessmentList[$row['assessment_id']]['name']                           = $row['assessment_title'];
-            $assessmentList[$row['assessment_id']]['rubric_capability_mark_type_id'] = $row['rubric_capability_mark_type_id'];
-        }
-
-        // Sort by name
-        foreach ($longitude as &$capability) {
-            uasort($capability['indicators'], [$this, 'sortByName']);
-        }
-
-        unset($capability);
-        uasort($longitude, [$this, 'sortByName']);
-
-        // Add assessment info to the list
-        $longitude['assessments'] = $assessmentList;
-
-        if (count($feedbackIds) > 0) {
-            // Find the descriptors selected for each of these feedback IDs
-            $pb = new Builder($this->database->getQuoter(), '');
-            $pb->in('sr.id', $feedbackIds);
-
-            $where = implode(' AND ', $pb->getWhere());
-            $averageStatement = $this->database->prepare("
-                SELECT
-                    rc.id AS capability_id,
-                    ri.id AS indicator_id,
-                    a.id AS assessment_id,
-                    a.due_date,
-                    rim.value,
-                    rcm.value AS capability_value,
-                    rcm.human_readable_value AS capability_human_readable_value,
-                    rd.description,
-                    rl.name AS level
-                FROM rubric_capability_mark rcm
-                INNER JOIN rubric_capability      rc ON rcm.rubric_capability_id = rc.id
-                INNER JOIN rubric_indicator       ri ON ri.rubric_capability_id = rc.id
-                INNER JOIN submission_return      sr ON rcm.return_id = sr.id
-                INNER JOIN submission_box         sb ON sr.box_id = sb.id
-                -- Join rubric_indicator_usage to remove indicators indicators that aren't part of the submission
-                INNER JOIN rubric_indicator_usage riu ON riu.rubric_indicator_id = ri.id AND riu.submission_box_id = sb.id
-                INNER JOIN assessment             a ON sb.assessment_id = a.id
-                -- Check for rubric_indicator_mark_id match to avoid duplicate results after the join
-                LEFT JOIN v_rubric_indicator_mark_extend  rim ON rcm.id = rim.rubric_capability_mark_id AND rim.rubric_indicator_id = ri.id
-                LEFT JOIN rubric_descriptor       rd ON rim.descriptor_id = rd.id
-                LEFT JOIN rubric_level            rl ON rd.level_id = rl.id
-                WHERE {$where}
-                AND rc.deleted_at IS NULL
-                AND ri.deleted_at IS NULL
-                AND sr.deleted_at IS NULL
-                AND a.deleted_at IS NULL
-                ORDER BY a.due_date ASC;
-            ");
-
-            $averageStatement->execute($pb->getParams());
-
-            while ($row = $averageStatement->fetch(\PDO::FETCH_ASSOC)) {
-                if (
-                    !isset($longitude[$row['capability_id']]['mark'][$row['assessment_id']])
-                    && $longitude[$row['capability_id']]['max_value'][$row['assessment_id']] > 0
-                    && $row['capability_value'] !== null
-                    && isset($dueWorks[$row['assessment_id']])
-                ) {
-                    $longitude[$row['capability_id']]['mark'][$row['assessment_id']] = $row['capability_human_readable_value'];
-                }
-
-                $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['activities'][$row['assessment_id']]['descriptor'] = $row['description'];
-                $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['activities'][$row['assessment_id']]['level']      = $row['level'];
-                $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['activities'][$row['assessment_id']]['value']      = $row['value'];
-            }
-        }
-
-        unset($pb);
-
-        // Return immediately if we do not required comparison data for box and whisker
-        if (!$includeComparison) {
-            return $longitude;
-        }
-
-        $allResults = [];
-
-        if (count($allFeedbackIds) > 0) {
-            //Find all students results across all indicators in all activities
-            $pb = new Builder($this->database->getQuoter(), '');
-            $pb->in('sr.id', $allFeedbackIds);
-
-            $where = implode(' AND ', $pb->getWhere());
-            $averageStatement = $this->database->prepare("
-                SELECT
-                    rc.id AS capability_id,
-                    ri.id AS indicator_id,
-                    a.id AS assessment_id,
-                    a.due_date,
-                    rim.value
-                FROM       rubric_indicator_mark  rim
-                INNER JOIN rubric_capability_mark rcm ON rim.rubric_capability_mark_id = rcm.id
-                INNER JOIN rubric_capability       rc ON rcm.rubric_capability_id = rc.id
-                INNER JOIN rubric_descriptor       rd ON rim.descriptor_id = rd.id
-                INNER JOIN rubric_indicator        ri ON rd.rubric_indicator_id = ri.id
-                INNER JOIN submission_return       sr ON rcm.return_id = sr.id
-                INNER JOIN submission_box          sb ON sr.box_id = sb.id
-                INNER JOIN assessment               a ON sb.assessment_id = a.id
-                WHERE {$where}
-                AND rc.deleted_at IS NULL
-                AND ri.deleted_at IS NULL
-                AND sr.deleted_at IS NULL
-                AND a.deleted_at IS NULL
-                ORDER BY a.due_date ASC;
-            ");
-
-            $averageStatement->execute($pb->getParams());
-
-            while ($row = $averageStatement->fetch(\PDO::FETCH_ASSOC)) {
-                $allResults[$row['assessment_id']][$row['capability_id']][$row['indicator_id']][] = (float)$row['value'];
-            }
-        }
-
-        //Insert the statistical summary data collated from all students results across all indicators in all activities
-        foreach ($allResults as $assessmentId => $assessment) {
-            if (!key_exists($assessmentId, $longitude['assessments'])) {
-                continue;
-            }
-
-            foreach ($assessment as $capabilityId => $capability) {
-                if (!isset($longitude[$capabilityId])) {
-                    continue;
-                }
-
-                foreach ($capability as $indicatorId => $indicator) {
-                    $longitude[$capabilityId]['indicators'][$indicatorId]['activities'][$assessmentId]['statistics'] = (new Summary($indicator))->getSummary();
-                }
-            }
-        }
-
-        return $longitude;
-    }
-
-
-    /**
      * Copies a Rubric from source assessment to destination assessment.
      *
      * Overall logic is to build the source rubric object graph, then clone and clear all IDs.
@@ -2101,187 +1909,6 @@ class DataSource
 
 
     /**
-     * Returns normalised marks for all student rubric marks in specified folders
-     * on assessments due in the specified term.
-     *
-     * Does not respect assessment.weight, ie all assessments are weighted at 1.
-     *
-     * If a student mark has a NULL value, it is ignored for aggregation.
-     *
-     * Normalised mark: (0.0 - 100.0)
-     *
-     * TODO this is copied wholesale from now-deleted `Duework_Rubric_Handler`; consider modernizing
-     *
-     * @param int[]     $folderIds
-     * @param TermModel $term
-     * @return array
-     * @internal  string       $data [sb.id][rc.id]['grouping'] indicator.grouping
-     * @internal  string       $data [sb.id][rc.id]['name'] indicator.name
-     * @internal  string       $data [sb.id][rc.id]['max_mark'] max mark
-     * @internal  array        $data [sb.id][rc.id]['marks']
-     * @internal  float        $data [sb.id][rc.id]['marks'][student.id]
-     * @throws UnderflowException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     */
-    public function getStudentMarksByIndicatorInFolder(array $folderIds, TermModel $term)
-    {
-        if (!count($folderIds)) {
-            return [];
-        }
-
-        // Step 1: figure out the due works in the term for the given folders
-        $pb = new Builder($this->database->getQuoter(), '');
-        $pb->in('rc.parent_id', $folderIds)
-            /* TODO This parent_type never varies. Why did options exist for it, but were never used?
-             */
-           ->equals('rc.parent_type', CapabilityModel::PARENT_TYPE_CATEGORY)
-           ->greaterThanOrEqualTo('a.due_date', $term->getStart()->getDatabase())
-           ->equals('sr.review_route', SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
-           ->isNull('a.deleted_at')
-           ->notNull('sr.published_at')
-           ->isNull('sr.deleted_at')
-           ->isNull('u.deleted_at');
-
-        $finish = $term->getActualFinish();
-
-        if (null !== $finish) {
-            $pb->lessThan('a.due_date', $finish->getDatabase());
-        }
-
-        $where = implode(' AND ', $pb->getWhere());
-
-        $assessmentStatement = $this->database->prepare("
-            SELECT
-                sr.owner AS studentId,
-                sr.id    AS feedbackId,
-                a.id     AS assessmentId
-            FROM submission_return sr
-            INNER JOIN user                      u ON sr.owner = u.id
-            INNER JOIN submission_box           sb ON sr.box_id = sb.id
-            INNER JOIN rubric_capability_usage rcu ON sb.id = rcu.submission_box_id
-            INNER JOIN rubric_capability        rc ON rgu.rubric_capability_id = rc.id
-            INNER JOIN assessment                a ON sb.assessment_id = a.id
-            WHERE {$where}
-            ORDER BY sr.published_at
-        ");
-
-        $assessmentStatement->execute($pb->getParams());
-
-        $groupedFeedbackIds = [];
-
-        foreach ($assessmentStatement as $row) {
-            $groupedFeedbackIds[$row['assessmentId']][$row['studentId']] = $row['feedbackId'];
-        }
-
-        // We don't care about the assessment ID; only that the feedback is the
-        // most recent for that assessment.
-        $feedbackIds = [];
-
-        foreach ($groupedFeedbackIds as $assessmentId => $feedbackIdsByStudent) {
-            $feedbackIds = array_merge($feedbackIds, $feedbackIdsByStudent);
-        }
-
-        // Short-circuit if there's no feedback
-        if (empty($feedbackIds)) {
-            return [];
-        }
-
-        sort($feedbackIds);
-
-        // Step 2: Get max mark per indicator and dueWork for each due work
-        $results = [];
-
-        $pb = new Builder($this->database->getQuoter(), '');
-        $pb->in('rc.parent_id', $folderIds)
-           ->equals('rc.parent_type', CapabilityModel::PARENT_TYPE_CATEGORY)
-           ->notNull('riu.max_value')
-           ->greaterThan('riu.max_value', 0.0);
-
-        $where = implode(' AND ', $pb->getWhere());
-
-        $maxMarksStatement = $this->database->prepare("
-            SELECT
-                a.id,
-                ri.id AS criterionId,
-                rc.name AS grouping,
-                ri.name,
-                riu.max_value AS maxMark
-            FROM rubric_indicator        ri
-            JOIN rubric_capability       rc ON rc.id = ri.rubric_capability_id AND rc.deleted_at IS NULL
-            JOIN rubric_indicator_usage riu ON ri.id = riu.rubric_indicator_id
-            JOIN submission_box          sb ON riu.submission_box_id = sb.id
-            JOIN assessment               a ON sb.assessment_id = a.id
-            WHERE {$where}
-            ORDER BY riu.submission_box_id, ri.id
-        ");
-
-        $maxMarksStatement->execute($pb->getParams());
-
-        foreach ($maxMarksStatement as $row) {
-            $boxId       = $row['id'];
-            $indicatorId = $row['criterionId'];
-
-            $results[$boxId][$indicatorId] = [
-                'grouping' => $row['grouping'],
-                'name'     => $row['name'],
-                'maxMark'  => $row['maxMark'],
-                'marks'    => [],
-            ];
-        }
-
-        // Step 3: pass to getLongitudinal or similar?
-        $pb = new Builder($this->database->getQuoter(), '');
-        $pb->in('sr.id', $feedbackIds);
-
-        $where = implode(' AND ', $pb->getWhere());
-
-        /* Note that the old aliases still exist here: conceptually, grouping === capability
-         * ...but it doesn't even get used, so it seems to be a diagnostic thing
-         */
-        $descriptorStatement = $this->database->prepare("
-            SELECT
-                sr.owner AS studentId,
-                ri.id    AS indicatorId,
-                rc.name  AS grouping,
-                ri.name,
-                a.id,
-                a.title,
-                rd.description,
-                rim.value
-            FROM       rubric_indicator_mark  rim
-            INNER JOIN rubric_capability_mark rcm ON rim.rubric_capability_mark_id = rcm.id
-            INNER JOIN rubric_capability       rc ON rcm.rubric_capability_id = rc.id
-            INNER JOIN rubric_descriptor       rd ON rim.descriptor_id = rd.id
-            INNER JOIN rubric_indicator        ri ON rd.rubric_indicator_id = ri.id
-            INNER JOIN submission_return       sr ON rcm.return_id = sr.id
-            INNER JOIN submission_box          sb ON sr.box_id = sb.id
-            INNER JOIN assessment               a ON sb.assessment_id = a.id
-            WHERE {$where}
-            ORDER BY rc.name, ri.name, a.due_date DESC;
-        ");
-
-        $descriptorStatement->execute($pb->getParams());
-
-        // Step 4: smoosh them all together
-        foreach ($descriptorStatement as $row) {
-            $boxId       = $row['id'];
-            $indicatorId = $row['indicatorId'];
-            $mark        = $row['value'];
-            $maxMark     = $results[$boxId][$indicatorId]['maxMark'] ?? 0;
-
-            if ($maxMark === 0) {
-                continue;
-            }
-
-            $results[$boxId][$indicatorId]['marks'][$row['studentId']] = 100.0 * $mark / $maxMark;
-        }
-
-        // Finally:
-        return $results;
-    }
-
-
-    /**
      * Get all indicators available on the specified parent
      *
      * TODO this is copied wholesale from now-deleted `Duework_Rubric_Handler`; consider modernizing
@@ -2334,75 +1961,5 @@ class DataSource
         }
 
         return $indicators;
-    }
-
-
-    /**
-     * Gets feedback ids for the due works which uses rubric
-     * @param GenericCollection $dueWorks
-     * @param User              $student
-     * @param bool              $includeComparison
-     * @return array
-     */
-    private function getFeedbackIdsWithRubric(GenericCollection $dueWorks, User $student, bool $includeComparison): array
-    {
-        $pb = new Builder($this->database->getQuoter(), '');
-        $pb->in('a.id', $dueWorks->getPropertyValues('id'))
-           ->isNull('a.deleted_at')
-           ->isTrue('sb.use_rubric')
-           ->equals('sr.review_route', SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
-           ->notNull('sr.published_at')
-           ->isNull('sr.deleted_at');
-
-        if (!$includeComparison) {
-            $pb->equals('sr.owner', $student->getId());
-        }
-
-        $where = implode(' AND ', $pb->getWhere());
-
-        /* TODO tis submission_return idea must go away here
-         */
-        $feedbackStatement = $this->database->prepare("
-            SELECT
-                sr.id    AS feedbackId,
-                a.id     AS assessmentId,
-                sr.owner AS studentUserId
-            FROM submission_return sr
-            INNER JOIN submission_box sb ON sr.box_id = sb.id
-            INNER JOIN assessment      a ON sb.assessment_id = a.id
-            WHERE {$where}
-            ORDER BY sr.published_at ASC
-        ");
-
-        $feedbackStatement->execute($pb->getParams());
-
-        $allFeedbackIds     = [];
-        $studentFeedbackIds = [];
-
-        foreach ($feedbackStatement as $row) {
-            if ((int)$row['studentUserId'] === $student->getId()) {
-                $studentFeedbackIds[$row['assessmentId']] = $row['feedbackId'];
-            }
-
-            if ($includeComparison) {
-                $allFeedbackIds[] = $row['feedbackId'];
-            }
-        }
-
-        return [$studentFeedbackIds, $allFeedbackIds];
-    }
-
-
-    /**
-     * Quick alpha sort function for indicators and capabilities summary section
-     * (this method duped from the Rubric Markbook Controller)
-     *
-     * @param array $a
-     * @param array $b
-     * @return int
-     */
-    private function sortByName(array $a, array $b): int
-    {
-        return strnatcasecmp($a['name'], $b['name']);
     }
 }

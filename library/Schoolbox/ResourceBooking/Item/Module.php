@@ -21,6 +21,7 @@ use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
 
 class Module extends BaseModule
 {
@@ -103,6 +104,7 @@ class Module extends BaseModule
             ->setMapper($this->getMapperFactory()->get(Mapper::class))
             ->setUserMapper($this->getMapperFactory()->get(UserMapper::class))
             ->setRoleMapper($this->getMapperFactory()->get(RoleMapper::class))
+            ->setBookingMapper($this->getMapperFactory()->get(BookingMapper::class))
             ->setTermMapper($this->getMapperFactory()->get(TermMapper::class))
             ->setPaginator(
                 (new UrlPaginator())

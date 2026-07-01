@@ -93,11 +93,11 @@ const renderParameterMap = {
 } as const;
 
 const renderRoundClassMap = {
-    tiny: "c-img--xxs",
-    xsmall: "c-img--xs",
-    small: "c-img--s",
-    menuMobile: "c-img--s",
-    profile: "c-img--s",
+    tiny: "sbx-img--xxs",
+    xsmall: "sbx-img--xs",
+    small: "sbx-img--s",
+    menuMobile: "sbx-img--s",
+    profile: "sbx-img--s",
 };
 
 const dimensions = window.Vue.computed(() => {
@@ -124,8 +124,8 @@ const srcBase = window.Vue.computed(() => `/portrait.php?${userParameter.value}`
         :title="props.description ?? undefined"
     />
 
-    <div v-else-if="props.roundedCorners" class="c-img c-img--round" :class="renderRoundClassMap[props.render]">
-        <div class="c-img__wrapper">
+    <div v-else-if="props.roundedCorners" class="sbx-img sbx-img--round" :class="renderRoundClassMap[props.render]">
+        <div class="sbx-img__wrapper">
             <img
                 :src="`${srcBase}${renderParameterMap[props.render]}${props.appendQueryParam}`"
                 :class="props.class"
@@ -153,10 +153,10 @@ const srcBase = window.Vue.computed(() => `/portrait.php?${userParameter.value}`
  * Some overrides to mimic the old <user-photo> component usage on the markbook popout..
  * I expect we can remove this in the future and tweak the global styles instead, but quick fix for now
  */
-.c-img--round.c-img--xxs {
+.sbx-img--round.sbx-img--xxs {
     overflow: visible;
 
-    > .c-img__wrapper {
+    > .sbx-img__wrapper {
         max-width: 32px;
         max-height: 32px;
     }

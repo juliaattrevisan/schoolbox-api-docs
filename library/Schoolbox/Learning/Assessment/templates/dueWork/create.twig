@@ -154,7 +154,7 @@
             <ul class="option-list">
                 {% if kami_enabled %}
                 <li {% if not config.kami_worksheets_enabled %}style="display:none"{% endif %}>
-                    <div class="l-flex-col l-gap-s">
+                    <div class="u-flex-col u-gap-s">
                         <div class="sbx-checkbox-radio-container">
                             <input id="worksheet" {% if courseManaged.isReadonly %} readonly {% endif %} type="checkbox" {{ assessment.getEnableWorksheet ? 'checked' : '' }} name="submissionOptions[]" value="enableWorksheet" data-type-group>
                             <label for="worksheet" class="checkbox-label" data-test="assessment-form-submission-type-interactive_worksheet">Interactive Worksheet </label>
@@ -196,7 +196,7 @@
             </ul>
             {% if lmsStudentPolicy | length %}
                 <input type="hidden" name="enablePolicy" value="{% if courseManaged.isReadonly and assessment.getEnablePolicy %}on{% else %}0{% endif %}" />
-                <div class="l-flex l-flex--align-center l-gap-s">
+                <div class="u-flex u-flex--align-center u-gap-s">
                     <label for="declaration" class="inline-block">Student Authenticity Declaration Terms</label>
                     <span class="hint has-tip tip-top f-no-margins" data-tooltip title="This will require students to agree to the terms of the student authenticity declaration when they submit {{ locale.dueWork.proper }}.">?</span>
                 </div>
@@ -233,6 +233,34 @@
 <fieldset>
     <legend>{{ locale.grading.proper }}</legend>
 
+    {# Letter Grade enables Grading Scheme
+     # Total Mark enables Maximum Available Marks
+    #}
+    {% set markTypeLetterGrade = 2 %}
+    {% set markTypeTotalMark = 3 %}
+    {% set markTypeNone = 6 %}
+
+    {# lol rubricMarkedGridPayloads displays a readonly grid in the create/update screens for Course-Managed rubrics.
+     # Otherwise it displays the rubric builder vue component using the rubricGridsPayload array struct
+     #}
+    {% include '@learningAssessment/fragments/rubric.twig' with {
+        rubricMarkedGridPayloads: rubricMarkedGridPayloads,
+        rubricGridsPayload: rubricGridsPayload,
+        rubricBlankGrid: rubricBlankGrid,
+        rubricAttachZone: rubricAttachZone,
+        resultSets: rubricResultSets,
+        assessment: assessment,
+        markTypeTotalMark: markTypeTotalMark,
+        capabilityMarkTypes: capabilityMarkTypes,
+        capabilityGradingSchemes: capabilityGradingSchemes,
+        defaultGradeGroup: defaultGradeGroup,
+        markTypeNone: markTypeNone,
+        courseManagedReadonly: courseManaged.isReadonly
+    } only %}
+
+    {# yeah I know, I'm in a rush #}
+    <br />
+
     {% include '@learningAssessment/fragments/weight.twig' with {
         assessment: assessment,
         courseManagedReadonly: courseManaged.isReadonly
@@ -259,13 +287,6 @@
 
     <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
 
-    {# Letter Grade enables Grading Scheme
-     # Total Mark enables Maximum Available Marks
-     #}
-    {% set markTypeLetterGrade = 2 %}
-    {% set markTypeTotalMark = 3 %}
-    {% set markTypeNone = 6 %}
-
     {% include '@learningAssessment/fragments/dualMarkTypes.twig' with {
         assessment: assessment,
         allMarkTypes: allMarkTypes,
@@ -276,21 +297,6 @@
         defaultGradeGroup: defaultGradeGroup,
         courseManagedReadonly: courseManaged.isReadonly
     } %}
-
-    {% include '@learningAssessment/fragments/rubric.twig' with {
-        rubricGrids: rubricGrids,
-        rubricGridsPayload: rubricGridsPayload,
-        rubricBlankGrid: rubricBlankGrid,
-        rubricAttachZone: rubricAttachZone,
-        resultSets: rubricResultSets,
-        assessment: assessment,
-        markTypeTotalMark: markTypeTotalMark,
-        capabilityMarkTypes: capabilityMarkTypes,
-        capabilityGradingSchemes: capabilityGradingSchemes,
-        defaultGradeGroup: defaultGradeGroup,
-        markTypeNone: markTypeNone,
-        courseManagedReadonly: courseManaged.isReadonly
-    } only %}
 </fieldset>
 
 {# ----------------------------------------------------------- #}

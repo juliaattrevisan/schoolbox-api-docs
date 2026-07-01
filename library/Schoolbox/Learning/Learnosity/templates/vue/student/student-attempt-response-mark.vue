@@ -286,20 +286,20 @@ window.Vue.onBeforeUnmount(async () => {
             (props.isReadOnly && props.student.attemptResponse.mark === null) ||
             (props.isReadOnly && props.student.attemptResponse.mark === '')
         "
-        class="l-flex-col l-gap-s"
+        class="u-flex-col u-gap-s"
     >
         <label>Grade</label>
         <p>
             <em>No grade added.</em>
         </p>
     </div>
-    <div v-else-if="props.isReadOnly && props.student.attemptResponse.mark !== ''" class="l-flex-col l-gap-s">
+    <div v-else-if="props.isReadOnly && props.student.attemptResponse.mark !== ''" class="u-flex-col u-gap-s">
         <label>Grade</label>
         <p>{{ props.student.attemptResponse.mark }}</p>
     </div>
     <div v-else class="grade-container">
         <div ref="gradeEl"></div>
-        <div class="save-container l-grid">
+        <div class="save-container u-grid">
             <div class="save-container__inner-container">
                 <div :class="`alert-box f-no-margins ${hasSaved ? 'success' : ''} ${hasError ? 'alert' : ''}`">
                     <em>{{ saveText }}</em>

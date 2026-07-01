@@ -125,6 +125,7 @@ export default {
     },
 
     created() {
+        this.ATTENDANCE_STATUS = ATTENDANCE_STATUS;
         this.ENDPOINTS = ENDPOINTS;
         this.canRsvp = checks.canRsvp;
         this.showRsvpButtons = checks.showRsvpButtons;
@@ -645,16 +646,21 @@ export default {
                                             :src="'/portrait.php?id=' + guest.id + '&size=square64'"
                                             alt="portrait photo"
                                         />
-
-                                        <p
-                                            :class="{
-                                                pending: isPending(guest.status),
-                                                accepted: isAccepted(guest.status),
-                                                declined: isDeclined(guest.status),
-                                            }"
-                                        >
-                                            {{ guest.name }}<span class="status-icon"></span>
-                                        </p>
+                                        <div class="u-flex u-flex--align-center u-gap-s">
+                                            <p>
+                                                {{ guest.name }}
+                                            </p>
+                                            <sbx-label
+                                                v-if="guest.status === ATTENDANCE_STATUS.ACCEPTED"
+                                                sentiment="success"
+                                                icon="approve"
+                                            ></sbx-label>
+                                            <sbx-label
+                                                v-else-if="guest.status === ATTENDANCE_STATUS.DECLINED"
+                                                sentiment="alert"
+                                                icon="close"
+                                            ></sbx-label>
+                                        </div>
                                     </a>
                                 </div>
                                 <nav>
@@ -677,9 +683,9 @@ export default {
 
         <div v-if="resourceBookingEnabled" class="small-12 medium-8 island">
             <section v-if="resourceBookings.length > 0" class="detail content">
-                <div class="l-flex-row l-flex--justify-space l-flex--align-end f-no-margins">
+                <div class="u-flex-row u-flex--justify-space u-flex--align-end f-no-margins">
                     <h2>Resource Bookings</h2>
-                    <nav v-if="canModify()" class="l-flex-row l-flex--align-center f-no-margins">
+                    <nav v-if="canModify()" class="u-flex-row u-flex--align-center f-no-margins">
                         <a
                             class="sbx-icon-only-button f-no-margins"
                             href="#"

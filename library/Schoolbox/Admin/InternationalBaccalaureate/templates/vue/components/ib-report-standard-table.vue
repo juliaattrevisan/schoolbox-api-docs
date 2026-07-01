@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { apiRequest } from "@js/util/sbx/apiUtils";
+import { useSelectedList } from "@schoolboxVue/composables/form/useSelectedList";
 import IbReportSubjectLabels from "./ib-report-subject-labels.vue";
 import { useIbReportUpdateLanguageStore } from "../store/ibReportUpdateLanguageStore";
-import type { ApiRenotifyResponse, StudentRow } from "../../js/types/ibReportTypes";
+import type { StudentRow } from "../../js/types/ibReportTypes";
 
 interface Props {
     students: StudentRow[];
@@ -12,14 +12,17 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const selectedList = defineModel<StudentRow[]>("selectedList", { default: () => [] });
+const selectedListModel = defineModel<StudentRow[]>("selectedList", { default: () => [] });
+const students = window.Vue.toRef(props, "students");
+const { selectedList, allSelected, isIndeterminate, showCheckboxes } = useSelectedList(students, selectedListModel);
 
 const updateLanguageStore = useIbReportUpdateLanguageStore();
-const renotifyingStudentIds = window.Vue.ref<Set<number>>(new Set());
 
 const emit = defineEmits<{
     completePreparationSingle: [studentId: number];
+    renotifySingle: [userId: number];
     resetDetailsSingle: [studentId: number];
+    manuallyRegisterSingle: [studentId: number];
     approveOnBehalfSingle: [studentId: number];
 }>();
 
@@ -30,62 +33,28 @@ const emit = defineEmits<{
 function openModal(student: StudentRow): void {
     updateLanguageStore.prompt(student);
 }
-
-/**
- * Re-sends the unconfirmed details notification to the given student.
- * @param student The student to renotify.
- */
-async function renotifyStudent(student: StudentRow): Promise<void> {
-    if (student.renotifyEndpoint === null || renotifyingStudentIds.value.has(student.userId)) {
-        return;
-    }
-
-    renotifyingStudentIds.value = new Set([...renotifyingStudentIds.value, student.userId]);
-    const toast = window.sbProps.toastActivate("Renotifying student...");
-
-    try {
-        const response = (await apiRequest<ApiRenotifyResponse>({
-            url: student.renotifyEndpoint,
-            method: "POST",
-            body: {
-                studentIds: [student.userId],
-            },
-        })) as ApiRenotifyResponse;
-
-        if (!response.success) {
-            toast.timeout({ text: response.message ?? "Failed to renotify student.", isSuccess: false });
-            return;
-        }
-
-        toast.timeout({
-            text: response.message ?? "Student(s) renotified.",
-            isSuccess: !response.partial,
-        });
-    } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : "Failed to renotify student.";
-        toast.timeout({ text: errorMessage, isSuccess: false });
-    } finally {
-        const nextStudentIds = new Set(renotifyingStudentIds.value);
-        nextStudentIds.delete(student.userId);
-        renotifyingStudentIds.value = nextStudentIds;
-    }
-}
-
-/**
- * Whether the student currently has an in-flight renotify request.
- * @param student The student row.
- * @returns True if the student is currently renotifying, false otherwise.
- */
-function isRenotifying(student: StudentRow): boolean {
-    return renotifyingStudentIds.value.has(student.userId);
-}
 </script>
 
 <template>
     <table class="tiger-stripe">
         <thead>
             <tr>
-                <th scope="col"><span class="sr-only">Select</span></th>
+                <th scope="col" class="checklist">
+                    <span
+                        v-if="
+                            showCheckboxes &&
+                            (props.activeSelectionSection === null || props.activeSelectionSection === props.section)
+                        "
+                    >
+                        <input
+                            :id="`select-all-${props.section}`"
+                            v-model="allSelected"
+                            type="checkbox"
+                            :class="{ indeterminate: isIndeterminate }"
+                            aria-label="Select all"
+                        /><label class="checkbox-label" :for="`select-all-${props.section}`"></label>
+                    </span>
+                </th>
                 <th scope="col">Name</th>
                 <th scope="col">Candidate Details</th>
                 <th scope="col">HL</th>
@@ -143,14 +112,13 @@ function isRenotifying(student: StudentRow): boolean {
                         <li v-if="student.updateLanguageEndpoint !== null">
                             <button class="sbx-button--has-icon" @click.prevent="openModal(student)">
                                 <sbx-icon name="modify"></sbx-icon>
-                                Update Language Selection
+                                Update language selection
                             </button>
                         </li>
                         <li v-if="student.renotifyEndpoint !== null">
                             <button
                                 class="sbx-button--has-icon"
-                                :disabled="isRenotifying(student)"
-                                @click.prevent="renotifyStudent(student)"
+                                @click.prevent="emit('renotifySingle', student.userId)"
                             >
                                 <sbx-icon name="notifications-hollow"></sbx-icon>
                                 Renotify student
@@ -162,7 +130,7 @@ function isRenotifying(student: StudentRow): boolean {
                                 @click.prevent="emit('completePreparationSingle', student.id)"
                             >
                                 <sbx-icon name="notifications-hollow"></sbx-icon>
-                                Complete Preparation
+                                Complete preparation
                             </button>
                         </li>
                         <li v-if="student.stage === 'unconfirmed'">
@@ -180,7 +148,16 @@ function isRenotifying(student: StudentRow): boolean {
                                 @click.prevent="emit('resetDetailsSingle', student.id)"
                             >
                                 <sbx-icon name="undo"></sbx-icon>
-                                Reset All Details
+                                Reset all details
+                            </button>
+                        </li>
+                        <li v-if="student.stage === 'confirmed'">
+                            <button
+                                class="sbx-button--has-icon"
+                                @click.prevent="emit('manuallyRegisterSingle', student.id)"
+                            >
+                                <sbx-icon name="international-baccalaureate"></sbx-icon>
+                                Mark as manually registered
                             </button>
                         </li>
                     </ul>

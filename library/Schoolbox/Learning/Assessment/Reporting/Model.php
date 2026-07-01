@@ -124,6 +124,31 @@ class Model extends AbstractAssessment
 
 
     /**
+     * Reporting activities do not expose Activity Duration. Ignore any persisted or imported value so reporting
+     * assessments cannot schedule from a hidden duration.
+     *
+     * @return int|null
+     */
+    public function getDefaultOpenSpan()
+    {
+        return null;
+    }
+
+
+    /**
+     * Reporting activities do not expose Activity Duration, so values hydrated from legacy data or imports are
+     * deliberately discarded.
+     *
+     * @param int|null $defaultOpenSpan
+     * @return $this
+     */
+    public function setDefaultOpenSpan($defaultOpenSpan)
+    {
+        return $this;
+    }
+
+
+    /**
      * @inheritdoc
      */
     public function getHumanReadableInstructorMark(Participant $participant, $publishedOnly)

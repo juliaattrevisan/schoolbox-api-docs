@@ -74,9 +74,16 @@ class Mapper extends BaseMapper
             if ($collection->keyExists($participant->getId())) {
                 /** @var Model $participation */
                 $participation = $collection[$participant->getId()];
-                /** @var \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model $assessmentContext */
+                /** @var \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model|\Schoolbox\Resource\Folder\Model|null $assessmentContext */
                 $assessmentContext = $participation->getPlan()->getAssessment()->getAssessmentContext();
-                $folder = $assessmentContext->getCourse()->getFolder();
+                /* Attempt to grab the folder from the assessment context, if it is a unit then grab the course folder,
+                 * otherwise grab the assessment context folder
+                 */
+                if ($assessmentContext instanceof \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model) {
+                    $folder = $assessmentContext->getCourse()->getFolder();
+                } else {
+                    $folder = $assessmentContext ?? $participation->getPlan()->getAssessment()->getContextFolder();
+                }
                 /* Append folder code
                  */
                 if ($folder && $folderCode !== null) {
@@ -108,24 +115,30 @@ class Mapper extends BaseMapper
             $assessmentContext = $assessmentMapper->hydrateJoin($row, 'assessment_course_unit_implementation', 'cui');
             /** @var \Schoolbox\Learning\Course\DataModel\Implementation\Model $courseImplementation */
             $courseImplementation = $assessmentMapper->hydrateJoin($row, 'assessment_course_unit_implementation.course', 'ci');
-            if (null !== $courseImplementation) {
-                $folder = $assessmentMapper->hydrateJoin($row, 'assessment_course_unit_implementation.course.folder', 'f');
-                /* Always create a new collection for folder codes as there
-                 * might be multiple folder codes for the same folder depending on the number
-                 * of records returned from the query
-                 */
-                $folderCodeCollection = FolderCode::createCollection();
-                if (null !== $folderCode) {
-                    $folderCodeCollection->add($folderCode);
-                }
-                $folder->setCodes($folderCodeCollection);
+            /** @var \Schoolbox\Resource\Folder\Model $folder */
+            $folder = $assessmentMapper->hydrateJoin($row, 'assessment_course_unit_implementation.course.folder', 'f');
+            /* Always create a new collection for folder codes as there
+             * might be multiple folder codes for the same folder depending on the number
+             * of records returned from the query
+             */
+            $folderCodeCollection = FolderCode::createCollection();
+            if (null !== $folderCode) {
+                $folderCodeCollection->add($folderCode);
+            }
+            $folder->setCodes($folderCodeCollection);
 
+            if (null !== $courseImplementation) {
                 /* Hydrating folder for class details
                  */
                 $courseImplementation->setFolder($folder);
                 $assessmentContext->setCourse($courseImplementation);
+                $assessment->setAssessmentContext($assessmentContext);
+            } else {
+                /* When the assessment is within the class that are not assigned to a unit/course
+                 */
+                $assessment->setContextFolder($folder);
             }
-            $assessment->setAssessmentContext($assessmentContext);
+
             $plan->setAssessment($assessment);
             /* Hydrate user
              */
@@ -188,15 +201,13 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('user.userCampus', 'u', 'c')}
             INNER JOIN userCampus sc ON u.id = sc.uid
             INNER JOIN assessment a ON pp.assessment_id = a.id AND a.deleted_at IS NULL
-            LEFT JOIN (
-                SELECT p.assessment_id projectAssessmentId, pa.assessment_id
-                FROM project_assessment pa
-                     INNER JOIN project p ON p.id = pa.project_id AND p.deleted_at IS NULL
-            ) pa ON a.id = pa.assessment_id
-            LEFT JOIN assessment_course_unit_implementation ui ON a.id = ui.assessment_id or pa.projectAssessmentId = ui.assessment_id
-            LEFT JOIN course_unit_implementation cui ON ui.course_unit_implementation_id = cui.id
-            LEFT JOIN course_implementation ci ON cui.course_implementation_id = ci.id
-            LEFT JOIN folder f ON ci.folder_id = f.id
+            LEFT JOIN mv_assessment_relation mvar
+                ON mvar.assessment_id = a.id
+               AND mvar.course_specification_id IS NULL
+               AND mvar.course_unit_specification_id IS NULL
+            LEFT JOIN course_unit_implementation cui ON mvar.course_unit_implementation_id = cui.id
+            LEFT JOIN course_implementation ci ON mvar.course_implementation_id = ci.id
+            LEFT JOIN folder f ON mvar.folder_id = f.id
             LEFT JOIN folder_code fc ON f.id = fc.folder_id AND fc.deleted_at IS NULL
             LEFT JOIN assessment oa ON a.original_assessment_id = oa.id
             LEFT JOIN lu_work_type wt ON a.work_type_id = wt.id
@@ -241,6 +252,67 @@ class Mapper extends BaseMapper
         ?array $order = null,
         ?int $limit = null
     ): GenericCollection {
+        $pb = $this->buildFiltersPredicate(
+            $nameSearch,
+            $yearLevelIds,
+            $campusIds,
+            $adjustmentCategories,
+            $adjustmentLevels,
+            $termIds,
+            $workTypeIds,
+            $cursorParams,
+            $order
+        );
+
+        $option = [];
+
+        if (null !== $limit) {
+            $option['limit'] = $limit;
+        }
+
+        if (!empty($order)) {
+            $option['order'] = $order;
+        }
+
+        return $this->findByPredicates(
+            $pb,
+            $option,
+        );
+    }
+
+    public function countByFilters(
+        ?array $nameSearch,
+        ?array $yearLevelIds,
+        ?array $campusIds,
+        ?array $adjustmentCategories,
+        ?array $adjustmentLevels,
+        ?array $termIds,
+        ?array $workTypeIds = null,
+    ): int {
+        return $this->countByPredicates(
+            $this->buildFiltersPredicate(
+                $nameSearch,
+                $yearLevelIds,
+                $campusIds,
+                $adjustmentCategories,
+                $adjustmentLevels,
+                $termIds,
+                $workTypeIds,
+            )
+        );
+    }
+
+    private function buildFiltersPredicate(
+        ?array $nameSearch,
+        ?array $yearLevelIds,
+        ?array $campusIds,
+        ?array $adjustmentCategories,
+        ?array $adjustmentLevels,
+        ?array $termIds,
+        ?array $workTypeIds = null,
+        ?array $cursorParams = null,
+        ?array $order = null
+    ): Builder {
         $pb = $this->getPredicateBuilder();
         if (!empty($nameSearch)) {
             $pb = $this->buildNameSearchPredicate($pb, $nameSearch);
@@ -286,20 +358,7 @@ class Mapper extends BaseMapper
             );
         }
 
-        $option = [];
-
-        if (null !== $limit) {
-            $option['limit'] = $limit;
-        }
-
-        if (!empty($order)) {
-            $option['order'] = $order;
-        }
-
-        return $this->findByPredicates(
-            $pb,
-            $option,
-        );
+        return $pb;
     }
 
     /**
@@ -396,7 +455,7 @@ class Mapper extends BaseMapper
         /** @var \Schoolbox\Assessment\Term\Model $term */
         foreach ($terms as $term) {
             $tempPb = $this->getPredicateBuilder()
-                ->greaterThanOrEqualTo('created_at', $term->getStart()->getDatabase());
+                           ->greaterThanOrEqualTo('created_at', $term->getStart()->getDatabase());
 
             if (null !== $term->getActualFinish()) {
                 $tempPb->lessThanOrEqualTo('created_at', $term->getActualFinish()->getDatabase());

@@ -1,9 +1,9 @@
 /**
  * To identify 'islands' of content, sitting on --color-foreground-primary
- * This `c-island` will replace the `c-island` in `www/static/css/core/layout/_container.scss`
+ * This `sbx-island` will replace the `sbx-island` in `www/static/css/core/layout/_container.scss`
  */
 
-.c-island {
+.sbx-island {
     background-color: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
     padding: var(--spacing-l);
 }

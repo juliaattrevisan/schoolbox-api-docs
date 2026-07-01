@@ -40,7 +40,7 @@ async function loadData(): Promise<void> {
 
     if (!props.routeGetStatusData) {
         console.error("Missing route for loading markbook data");
-        loadError.value = "";
+        loadError.value = "Missing route for loading markbook data";
         return;
     }
 
@@ -73,7 +73,7 @@ window.Vue.onMounted(async () => {
 
         <!-- Status filters -->
         <!-- TODO: implement filters (out of scope for now according to SA-22474's AC) -->
-        <!-- <div class="small-12 large-8 columns text-right">
+        <!-- <div class="small-12 large-8 columns u-ta-right">
             <rmb-filters v-model:filters="filters" />
         </div> -->
     </div>
@@ -85,12 +85,12 @@ window.Vue.onMounted(async () => {
         </div>
     </div>
 
-    <p v-if="props.supportingDataCurriculumNodes.length" class="meta l-flex-row l-gap-xs">
+    <p v-if="props.supportingDataCurriculumNodes.length" class="meta u-flex-row u-gap-xs">
         Showing data associated to curriculum codes:
         <curriculum-codes :nodes="props.supportingDataCurriculumNodes" />
     </p>
 
-    <request-error v-if="loadError" :further-info="loadError" />
+    <request-error v-if="loadError !== null" :further-info="loadError" />
     <loading-table v-else-if="mbStore.data === null" />
     <markbook-inner v-else :type="MarkbookType.REPORTING" />
 

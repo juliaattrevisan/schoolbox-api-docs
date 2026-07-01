@@ -28,7 +28,7 @@ async function onLoadMoreSelected(): Promise<void> {
 
 <template>
     <div v-if="loadMoreStore.isLoading" class="loader"></div>
-    <div v-else-if="loadMoreStore.hasLoadError" class="c-island l-pad-m">
+    <div v-else-if="loadMoreStore.hasLoadError" class="sbx-island u-pad-m">
         <div class="alert-box alert f-no-margins">
             Sorry, there was an error during report retrieval. Please
             <a href="" title="refresh the page"> refresh the page </a>

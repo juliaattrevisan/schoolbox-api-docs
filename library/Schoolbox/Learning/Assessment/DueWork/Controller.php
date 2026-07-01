@@ -28,6 +28,10 @@ use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use RangeException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Rubric\Grid\Payload;
+use Schoolbox\Assessment\Rubric\Markbook\OverallDataset;
+use Schoolbox\Assessment\Rubric\Overview\Csv;
+use Schoolbox\Column\Decimal;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper;
 use Schoolbox\File\MimetypeMapper;
@@ -46,6 +50,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplem
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\DueWork\StateMapper;
+use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
@@ -82,7 +87,10 @@ use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\File\Codec\Filename;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\User;
@@ -100,21 +108,6 @@ use function count;
  */
 class Controller extends Assessment\Controller
 {
-    /**
-     * Draft and Published marks are stored in two different
-     * (but adjacent) areas of the $marks array
-     */
-    private const MARK_DRAFT_KEY = 'latest';
-    private const MARK_PUBLISHED_KEY = 'published';
-
-
-    /**
-     * This is a suffix appended after every Draft mark
-     * so users know conclusively and obviously.
-     */
-    private const MARK_DRAFT_SUFFIX = ' (draft)';
-
-
     /**
      * The querystring param for Show Drafts from the ui
      * Note that the markbooks currently hardcode this value in both the frontend and backend
@@ -484,26 +477,29 @@ class Controller extends Assessment\Controller
         );
         $lastView->addNewView($assessment, $student, $this->getUser());
 
+        /* Various feedback entities
+         */
+        $authoritativeFeedback = $participant?->findAuthoritativeVisibleFeedback($this->getUser());
+        $selfAssessmentFeedback = $participant?->findMostRecentSelfAssessedPublishedFeedback();
+
         /* Find all the records spawned by $participant
          *
          * Order them by submitted time to find the most recent, and use that
          */
         $twigData = [
-            'lastViews'    => $lastView->getTwigViews($assessment, $student, $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder())),
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
-                [
-                    $assessment->getTitle(),
-                    '',
-                ]
-            ),
+            'lastViews' => $lastView->getTwigViews($assessment, $student, $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder())),
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([
+                $assessment->getTitle(),
+                '',
+            ]),
             'assessment'             => $assessment,
             'student'                => $student,
             'participant'            => $participant,
             'returnUrl'              => $returnUrl,                   // Unencoded URL for use in direct redirection (eg. <a href='{{ returnUrl }}'>)
             'returnUrlEncoded'       => Redirect::encode($returnUrl), // Encoded URL For use as a URL parameter (eg. '?returnUrl={{ returnUrlEncoded }}')
             'timeline'               => $participant ? (new FullTimeline($participant))->getForUser($this->getUser()) : null,
-            'authoritativeFeedback'  => $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null,
-            'selfAssessmentFeedback' => $participant ? $participant->findMostRecentSelfAssessedPublishedFeedback() : null,
+            'authoritativeFeedback'  => $authoritativeFeedback,
+            'selfAssessmentFeedback' => $selfAssessmentFeedback,
             'selfReflect'            => $participant ? (new ValidSelfReflectionWithResponse())->isSatisfiedBy($this->getUser(), $participant) : null,
             'selfAssess'             => $participant ? (new ValidSelfGradableWithResponse())->isSatisfiedBy($this->getUser(), $participant) : null,
 
@@ -546,6 +542,43 @@ class Controller extends Assessment\Controller
 
             // detect the combination of "accept none + self-assess" and allow ACK in this case
             $twigData['acknowledgementBlocked'] = false === ($assessment->isSelfAssessable() && $assessment->isAcceptNone());
+        }
+
+        /* The most recent authoritative and self-graded feedbacks appear here as usual
+         */
+        $twigData['rubricMarkedGridPayloads'] = new Payload(
+            $this->rubricMapper,
+            $this->getConfigLoader()->get(ConfigMapper::NAME_RUBRIC_SHOW_POINTS),
+            $this->getUser()
+        )->generate(
+            $assessment->getRubricInstances(),
+            $selfAssessmentFeedback,
+            $authoritativeFeedback,
+        );
+
+        /* Other Rubric Grid Payloads indexed by a feedback id. This is because the timeline displays multiple sets of
+         * rubric grids; it's not just the grids for one feedback anymore.
+         */
+        $payloadGenerator = new Payload(
+            $this->rubricMapper,
+            $this->getConfigLoader()->get(ConfigMapper::NAME_RUBRIC_SHOW_POINTS),
+            $this->getUser()
+        );
+
+        /* If the student doesn't have a feedback atm, we still need to have this var
+         */
+        $twigData['rubricMarkedGridPayloadsHistory'] = [];
+
+        /* Participant might be null here;
+         * Even if extant, they might night have any feedbacks at all.
+         * This results in a hilarious double-null-coalesce scenario
+         */
+        foreach ($participant?->getAllFeedbacks() ?? [] as $feedback) {
+            $twigData['rubricMarkedGridPayloadsHistory'][$feedback->getId()] = $payloadGenerator->generate(
+                $assessment->getRubricInstances(),
+                null,  // show self-graded feedback as if they were instructor-derived
+                $feedback,
+            );
         }
 
         $this->response = $this->responseFromTemplate(
@@ -618,8 +651,14 @@ class Controller extends Assessment\Controller
      */
     public function getOverview(IAssessable $assessment): void
     {
+        /* The folder where this assessment lives can be found in the base context instance.
+         */
+        $folder = $assessment->getBaseContext()->getFolder();
+
         // Sort participant by lastname, firstname, and id
-        $participants = $assessment->getParticipantUsers()->sortByCallback(
+        /* TODO surely we could reorder this inside OverallDataset::insertFolderMembers() instead...
+         */
+        $participantUsers = $assessment->getParticipantUsers()->sortByCallback(
             static function (User $participantA, User $participantB) {
                 return strnatcasecmp($participantA->getLastname() ?? '', $participantB->getLastname() ?? '')
                     ?: strnatcasecmp($participantA->getFirstname(), $participantB->getFirstname())
@@ -627,35 +666,36 @@ class Controller extends Assessment\Controller
             }
         );
 
-        $data = [
-            'breadcrumbs'  => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
-                                   ->add(
-                                       [
-                                           $assessment->getTitle(),
-                                           $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]),
-                                       ]
-                                   )
-                                   ->add(['Rubric Report', '']),
-            'dueWork'      => $assessment,
-            'participants' => $participants,
-        ];
-
-        if ($assessment->getUseRubric()) {
-            $rubricGrid = $this->rubricMapper->retrieveGrid($assessment, false);
-            $assessment = $this->participantMapper->loadParticipationIntoAssessment($assessment);
-
-            $data = array_merge(
-                $data,
-                [
-                'headers' => $this->getRubricHeaders($rubricGrid),
-                'marks'   => $this->getMarks($assessment->getAllParticipants()),
-                ]
-            );
-        }
+        /* Brutal reuse of the rubric markbook calcs
+         */
+        [
+            $assessments,
+            $exclusions,
+            $studentMarks,
+            $overallMarks
+        ] = (new OverallDataset(
+            $this->getDi()->get('databaseInternal'),
+            new Decimal(),
+            new MarkScheme\TotalMarkFractional(),
+            new \Schoolbox\Learning\MarkScheme\Factory($this->getConfigLoader()),
+            $this->filterMapper,
+            UserAccessMapper::getInstance(), // TODO inject this, which is amega change in the constructor across all learning activities' controllers lol
+            $this->routeGenerator
+        ))->buildMarkbookData($folder, [], [$assessment->getId()]);
 
         $this->response = $this->responseFromTemplate(
-            '@learningAssessment/dueWork/overview.twig',
-            $data,
+            '@rubric/overview.twig',
+            [
+                'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([
+                        $assessment->getTitle(),
+                        $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]),
+                    ])
+                    ->add(['Rubric Report', '']),
+                'assessment' => $assessment,
+                'participantUsers' => $participantUsers,
+                'grids' => $assessments[$assessment->getId()]['gridData'],
+                'studentMarks' => $studentMarks,
+            ],
             'Rubric Report'
         );
     }
@@ -677,319 +717,72 @@ class Controller extends Assessment\Controller
      */
     public function downloadOverview(IAssessable $assessment): void
     {
-        if (!$assessment->getUseRubric()) {
+        /* We didn't care to do this check in getOverview(), so I wonder why we care here in the csv?
+         * TODO work out why
+         */
+        if (!$assessment->getRubricInstances()->count()) {
             throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_PAGE_NOT_FOUND);
         }
 
-        $rubricGrid = $this->rubricMapper->retrieveGrid($assessment, false);
-        $assessment = $this->participantMapper->loadParticipationIntoAssessment($assessment);
-
-        $basename = (new Url($assessment->getTitle()))->getSlug();
-
-        /** @var Model $assessment */
-        $content  = $this->array2csv($this->collateResultSquare($rubricGrid->isMarkPerCapability(), $rubricGrid, $assessment->getAllParticipants()));
-
-        /* Maybe we set the Show Drafts option
+        // Sort participant by lastname, firstname, and id
+        /* TODO surely we could reorder this inside OverallDataset::insertFolderMembers() instead...
          */
-        $showDraft = (bool)$this->requestQuery->get(self::SHOW_DRAFTS_KEY, false);
+        $participantUsers = $assessment->getParticipantUsers()->sortByCallback(
+            static function (User $participantA, User $participantB) {
+                return strnatcasecmp($participantA->getLastname() ?? '', $participantB->getLastname() ?? '')
+                    ?: strnatcasecmp($participantA->getFirstname(), $participantB->getFirstname())
+                        ?: strnatcasecmp($participantA->getId(), $participantB->getId());
+            }
+        );
 
-        $prefix = '';
+        /* The folder where this assessment lives can be found in the base context instance.
+         */
+        $folder = $assessment->getBaseContext()->getFolder();
 
-        if ($showDraft) {
-            $prefix = 'Draft - ';
-        }
+        /* If the Show Drafts checkbox was enabled, we're after draft marks
+         */
+        $showDrafts = (bool)$this->requestQuery->get(self::SHOW_DRAFTS_KEY, false);
 
-        $this->response = $this->responseFromContent($content)
+        /* Brutal reuse of the rubric markbook calcs
+         */
+        [
+            $assessments,
+            $exclusions,
+            $studentMarks,
+            $overallMarks
+        ] = (new OverallDataset(
+            $this->getDi()->get('databaseInternal'),
+            new Decimal(),
+            new MarkScheme\TotalMarkFractional(),
+            new \Schoolbox\Learning\MarkScheme\Factory($this->getConfigLoader()),
+            $this->filterMapper,
+            UserAccessMapper::getInstance(), // TODO inject this, which is amega change in the constructor across all learning activities' controllers lol
+            $this->routeGenerator
+        ))->buildMarkbookData($folder, [], [$assessment->getId()]);
+
+        /* A mega csv string
+         */
+        $contents = (new Csv($showDrafts))->generate(
+            $assessment,
+            $assessments,
+            $participantUsers,
+            $studentMarks,
+        );
+
+        $filename = (new Filename())->generate(sprintf(
+            '%s%s',
+            /* Maybe we set the Show Drafts option
+             */
+            $showDrafts ? 'Draft -' : '',
+            $assessment->getTitle()
+        ), 'csv');
+
+        $this->response = $this->responseFromContent($contents)
             ->withHeader('Pragma', ' ')
             ->withHeader('Cache-Control', ' ')
             ->withHeader('Content-Type', 'text/csv')
-            ->withHeader('Content-Length', strlen($content))
-            ->withHeader('Content-Disposition', "attachment; filename=\"{$prefix}{$basename}.csv\"");
-    }
-
-
-    /**
-     * Get headers for the rubric report or CSV download.
-     *
-     * @param Grid $grid
-     * @return array Grouped by capability name, then indicator ID
-     */
-    private function getRubricHeaders(Grid $grid): array
-    {
-        $headers = [];
-        foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
-            $capability = $capabilityUsage->getCapability();
-
-            /* Index capability identifiers along with their indicator stuff
-             */
-            if (!isset($headers['capabilities'][$capabilityUsage->getCapability()->getId()])) {
-                $headers['capabilities'][$capability->getId()] = [
-                    'name' => $capability->getName(),
-                    'indicators' => []
-                ];
-            }
-
-            foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
-                $indicator = $indicatorUsage->getIndicator();
-
-                $headers['capabilities'][$capability->getId()]['indicators'][$indicator->getId()] = $indicator->getName();
-            }
-        }
-        return $headers;
-    }
-
-
-    /**
-     * Get rubric marks given for each indicator.
-     *
-     * @param ICollection|Participant[] $participants
-     * @return array capability id, published marks and indicator data grouped in sets indexed by user.id
-     */
-    private function getMarks(ICollection $participants): array
-    {
-        $marks = [];
-
-        foreach ($participants as $participant) {
-            $latestFeedback = $participant->findMostRecentInstructorGivenFeedback();
-            $publishedFeedback = $latestFeedback;
-            if (!$latestFeedback) {
-                continue;
-            }
-            // if this feedback is a draft, we need to check if there is published feedback...
-            if ($latestFeedback->isDraft()) {
-                $publishedFeedback = $participant->findMostRecentInstructorGivenPublishedFeedback();
-            } else {
-                // ignore latest feedbacks that are published... we only care about draft latest
-                $latestFeedback = null;
-            }
-
-            try {
-                /* @phpstan-ignore-next-line */
-                $markedGridLatest = $latestFeedback ? $this->rubricMapper->retrieveMarkedGrid($latestFeedback) : null;
-                // if no published feedback default to empty
-                /* @phpstan-ignore-next-line */
-                $markedGridPublished = $publishedFeedback ? $this->rubricMapper->retrieveMarkedGrid($publishedFeedback) : null;
-            } catch (MapperException) {
-                // can't really do anything
-                continue;
-            }
-            $studentId = $participant->getUser()->getId();
-            if (null !== $markedGridPublished) {
-                foreach ($markedGridPublished->getCapabilityMarks() as $capabilityMark) {
-                    /* Index cap marks by capability id, per person
-                     */
-                    $capabilityId = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
-                    $marks[$studentId]['capabilityMark'][$capabilityId]['published'] = $capabilityMark->getHumanReadableValue();
-
-                    /* Remember the Capability to which this Indicator belongs
-                     * (The Indicators in the csv output don't know their parent Capability)
-                     * Arguably you could remember the full capability instance itself, but meh
-                     */
-                    foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
-                        $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()]['capabilityId'] = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
-                        $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()][self::MARK_PUBLISHED_KEY] = $indicatorMark;
-                    }
-                }
-            }
-            if (null !== $markedGridLatest) {
-                foreach ($markedGridLatest->getCapabilityMarks() as $capabilityMark) {
-                    /* Index cap marks by capability id, per person
-                     */
-                    $capabilityId = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
-                    $marks[$studentId]['capabilityMark'][$capabilityId][self::MARK_DRAFT_KEY] = $capabilityMark->getHumanReadableValue();
-
-                    /* Remember the Capability to which this Indicator belongs
-                     * (The Indicators in the csv output don't know their parent Capability)
-                     * Arguably you could remember the full capability instance itself, but meh
-                     */
-                    foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
-                        $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()]['capabilityId'] = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
-                        $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()][self::MARK_DRAFT_KEY] = $indicatorMark;
-                    }
-                }
-            }
-        }
-
-        return $marks;
-    }
-
-
-    /**
-     * Creates a CSV structure for this rubric grid and its participants.
-     *
-     * @param bool $isMarkPerCapability
-     * @param Grid $grid
-     * @param Collection $participants
-     * @return array
-     */
-    private function collateResultSquare(bool $isMarkPerCapability, Grid $grid, Collection $participants): array
-    {
-        // array inside an array that's *nearly* empty...
-        $data = [['Name', 'External ID']];
-
-        // put header row in array
-        foreach ($this->getRubricHeaders($grid)['capabilities'] as $capabilityData) {
-            $indicators = $capabilityData['indicators'];
-            $capabilityName = $capabilityData['name'];
-
-            foreach ($indicators as $indicatorId => $indicator) {
-                $data[0][] = "{$capabilityName} - {$indicator}";
-                $data[0][] = '';
-            }
-
-            /* If Capability Mark Type is something other than None,
-             * prepare an additional column
-             */
-            if ($isMarkPerCapability) {
-                $data[0][] = 'Overall';
-            }
-        }
-
-        $data[0][] = 'Total';
-
-        /**
-         * Collate by id, each sub-collection will contain only 1 User element
-         *
-         * @var Collection[] $participantsGrouped
-         */
-        $participantsGrouped = $participants->groupByCallback(
-            function (Participant $participant) {
-                return $participant->getUser()->getId();
-            }
-        )->getAll();
-
-        /* Maybe we set the Show Drafts option
-         */
-        $showDraft = (bool)$this->requestQuery->get(self::SHOW_DRAFTS_KEY, false);
-
-        /* For each student,
-         * try to build a csv row based on capability and indicator usage
-         */
-        foreach ($this->getMarks($participants) as $studentId => $marks) {
-            /** @var Participant $participant */
-            $participant = $participantsGrouped[$studentId]->first();
-
-            /* Total marks for this person
-             */
-            $sumDraft = null;
-            $sumPublished = null;
-
-            $row = [
-                'name' => $participant->getUser()->formatName('{lastname}, {firstname}'),
-                'externalId' => $participant->getUser()->getExternalId(),
-            ];
-
-            foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
-                $capabilityUsageId = $capabilityUsage->getCapability()->getId();
-
-                foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
-                    $indicatorUsageId = $indicatorUsage->getIndicator()->getId();
-
-                    /* Indexing to preserve structure and order for students without marks selected
-                     * via the rubric grid (ie. descriptor stayed unclicked)
-                     */
-                    $descriptorIndex = "{$capabilityUsageId}-{$indicatorUsageId}-descriptor";
-                    $valueIndex = "{$capabilityUsageId}-{$indicatorUsageId}-value";
-
-                    /* Initialise nodes even if they will contain nothing because the student
-                     * doesn't have any marks for these indicator/descriptor combinations
-                     */
-                    $row[$descriptorIndex] = '';
-                    $row[$valueIndex] = '';
-
-                    /* If the student has marks, populate with their values
-                     */
-                    if (\count($marks)) {
-                        // array of all marked indicator ids of the participant
-                        $markedIndicatorIds = array_keys($marks);
-
-                        /* If the current descriptor has a draft,
-                         * and we enabled drafts,
-                         * show its draft value and add a suffix (even if it's null/empty)
-                         */
-                        if ($showDraft && array_key_exists(self::MARK_DRAFT_KEY, $marks[$indicatorUsageId] ?? [])) {
-                            if (in_array($indicatorUsageId, $markedIndicatorIds, true)) {
-                                $descriptor = $marks[$indicatorUsageId][self::MARK_DRAFT_KEY]->getDescriptor();
-                                $row[$descriptorIndex] = ($descriptor ? $descriptor->getDescription() : '') . self::MARK_DRAFT_SUFFIX;
-                                $row[$valueIndex] = $marks[$indicatorUsageId][self::MARK_DRAFT_KEY]->getValue() . self::MARK_DRAFT_SUFFIX;
-                            } else {
-                                $row[$descriptorIndex] = self::MARK_DRAFT_SUFFIX;
-                                $row[$valueIndex] = self::MARK_DRAFT_SUFFIX;
-                            }
-
-                            /* Accumulate total marks for this person
-                             */
-                            $sumDraft += $marks[$indicatorUsageId][self::MARK_DRAFT_KEY]->getValue();
-                        } elseif (array_key_exists(self::MARK_PUBLISHED_KEY, $marks[$indicatorUsageId] ?? []) && in_array($indicatorUsageId, $markedIndicatorIds, true)) {
-                            $descriptor = $marks[$indicatorUsageId][self::MARK_PUBLISHED_KEY]->getDescriptor();
-                            $row[$descriptorIndex] = $descriptor ? $descriptor->getDescription() : '';
-                            $row[$valueIndex] = $marks[$indicatorUsageId][self::MARK_PUBLISHED_KEY]->getValue();
-
-                            /* Accumulate total marks for this person
-                             */
-                            $sumPublished += $marks[$indicatorUsageId][self::MARK_PUBLISHED_KEY]->getValue();
-                        }
-                    }
-                }
-
-                /* Prepare an additional column for Capability Marks
-                 */
-                if ($isMarkPerCapability) {
-                    $capabilityMarkIndex = "{$capabilityUsageId}-mark";
-
-                    /* Decide which kind to show: draft or published
-                     *
-                     * Note: the student might not have a draft available,
-                     * and/or the student might not have a published mark available
-                     */
-                    $capabilityMark = '';
-
-                    if ($showDraft && isset($marks['capabilityMark'][$capabilityUsageId][self::MARK_DRAFT_KEY])) {
-                        $capabilityMark = $marks['capabilityMark'][$capabilityUsageId][self::MARK_DRAFT_KEY];
-                        $capabilityMark .= self::MARK_DRAFT_SUFFIX;
-                    } elseif (isset($marks['capabilityMark'][$capabilityUsageId][self::MARK_PUBLISHED_KEY])) {
-                        $capabilityMark = $marks['capabilityMark'][$capabilityUsageId][self::MARK_PUBLISHED_KEY];
-                    }
-
-                    $row[$capabilityMarkIndex] = $capabilityMark;
-                }
-            }
-
-            /* Total marks for this person
-             */
-            if (null !== $sumDraft) {
-                $row['total'] = $sumDraft . self::MARK_DRAFT_SUFFIX;
-            } elseif (null !== $sumPublished) {
-                $row['total'] = $sumPublished;
-            } else {
-                $row['total'] = '';
-            }
-
-            /* Trim everything
-             */
-            $data[] = array_values(array_map(fn ($x) => trim($x ?? ''), $row));
-        }
-
-        return $data;
-    }
-
-
-    /**
-     * The array data should obviously be in a CSV-compatible format (ie. rectangle)
-     *
-     * @param array $array
-     * @return string
-     */
-    protected function array2csv(array $array): string
-    {
-        $fp = fopen('php://temp', 'w');
-        foreach ($array as $row) {
-            fputcsv($fp, $row, escape: '');
-        }
-        rewind($fp);
-        $contents = stream_get_contents($fp);
-        fclose($fp);
-        return $contents;
+            ->withHeader('Content-Length', strlen($contents))
+            ->withHeader('Content-Disposition', "attachment; filename=\"{$filename}.csv\"");
     }
 
 
@@ -1193,10 +986,8 @@ class Controller extends Assessment\Controller
          *  and $assessment->isSelfAssessable() (self grading) - you can already figure out the answer without needing
          *  these extra $selfAssess and $selfReflect vars. I wonder why those were ever necessary...
          */
-        /* TODO probably superfluous (and always was?)
-         */
-//        $selfReflect = $reviewRoute === ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION;
-//        $selfAssess = $reviewRoute === ReturnedWork::REVIEW_ROUTE_SELF_GRADING;
+        $selfReflect = $assessment->isSelfReflectionOnly();
+        $selfAssess = $assessment->isSelfGradable();
 
         if ($this->requestQuery->get(Redirect::RETURN_URL)) {
             $returnUrl = Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL));
@@ -1228,10 +1019,8 @@ class Controller extends Assessment\Controller
             'policy'         => $assessment->getEnablePolicy() ? $this->getConfigLoader()->get('lms_student_policy') : '', // only use the policy, if this assessment is showing the policy
             'errorMessage'   => $errorMessage,
             'readonly'       => $isInteractionLocked,
-            /* TODO probably superfluous (and always was?)
-             */
-//            'selfReflect'    => $selfReflect,
-//            'selfAssess'     => $selfAssess,
+            'selfReflect'    => $selfReflect,
+            'selfAssess'     => $selfAssess,
             'acceptsOnline'  => $acceptsOnlineSubmissions,
             'returnUrl'      => $returnUrl,
             'kamiSession'    => $kamiSession,
@@ -1239,11 +1028,26 @@ class Controller extends Assessment\Controller
             'editorTemplates' => $this->activityTemplateHelper !== null ? $this->activityTemplateHelper->getTemplatesForCategory() : [],
 
             /* Only show these things if the assessment is self-gradable */
-            /* TODO probably superfluous (and always was?)
+            /* TODO showGroupTotal is a property of the rubric instance now...I think these are wrong to implement here
+             *  in this manner. Snake lord I'll have to work it out with you one day
              */
-//            'showGroupTotal'      => $selfAssess && ($assessment->getCapabilityMarkType() !== SubmissionBox\MarkType::SLUG_NONE),
-//            'showRubricTotal'     => $selfAssess
+            'showGroupTotal' => null,
+            'showRubricTotal' => $selfAssess
         ];
+
+        /* Rubric Grid Payloads
+         */
+        $data['rubricMarkedGridPayloads'] = new Payload(
+            $this->rubricMapper,
+            $this->getConfigLoader()->get(ConfigMapper::NAME_RUBRIC_SHOW_POINTS),
+            $this->getUser()
+        )->generate(
+            $assessment->getRubricInstances(),
+            null,
+            /* Intentionally simulate a staff-given feedback by cramming a self-graded feedback here.
+             */
+            $feedback,
+        );
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/dueWork/createSubmission.twig',

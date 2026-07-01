@@ -18,11 +18,11 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <div :class="`c-card c-card--child ${!props.isLast ? `c-card--border-end` : ''}`">
-        <div class="l-flex-col l-gap-s l-pad-m">
-            <div class="l-flex-row l-gap-s">
+    <div :class="`sbx-card sbx-card--child ${!props.isLast ? `sbx-card--border-end` : ''}`">
+        <div class="u-flex-col u-gap-s u-pad-m">
+            <div class="u-flex-row u-gap-s">
                 <sp-results-result-image :result="props.subResult" :is-sub-result="true" />
-                <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
+                <div class="u-flex-col u-flex--justify-center u-flex__item--1 f-no-margins">
                     <sp-results-result-title :result="props.subResult" :is-sub-result="true" />
                     <sp-results-result-meta :result="props.subResult" :is-sub-result="true" />
                 </div>

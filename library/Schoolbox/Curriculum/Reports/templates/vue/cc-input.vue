@@ -65,8 +65,8 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <form class="c-island l-flex-col l-pad-m l-gap-m hide-for-print" @submit.prevent="onGenerateReport">
-        <div class="l-flex-col l-gap-m">
+    <form class="sbx-island u-flex-col u-pad-m u-gap-m hide-for-print" @submit.prevent="onGenerateReport">
+        <div class="u-flex-col u-gap-m">
             <div>
                 <course-selector
                     :endpoint="props.coursesEndpoint"

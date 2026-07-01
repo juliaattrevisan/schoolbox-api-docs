@@ -159,6 +159,7 @@ class Javascript extends Base
                     'id' => $booking->getResource()->getId(),
                     'name' => $booking->getResource()->getName(),
                 ],
+                'quantity' => $booking->getQuantity(),
                 'status' => $booking->getStatus()->jsonSerialize(),
                 'href' => $href,
             ];

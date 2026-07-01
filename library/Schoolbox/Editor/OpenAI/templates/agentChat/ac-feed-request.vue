@@ -16,21 +16,21 @@ const props = defineProps<Props>();
 
 <template>
     <div class="ac-feed-request" :data-test="`ac-feed-request-list-item-${props.message.entryKey}`">
-        <div class="ac-feed-message-container l-pad-s">
+        <div class="ac-feed-message-container u-pad-s">
             <file-drop
                 v-if="props.message.meta.file"
                 :id="`ig-message-file-drop-${props.message.entryKey}`"
                 :current-file="props.message.meta.file"
                 disabled
             />
-            <p class="ac-feed-message-content l-mar--0" data-test="ac-feed-message-content">{{ props.message.data }}</p>
-            <p v-if="props.showTimestamps" class="meta l-mar--0">
+            <p class="ac-feed-message-content u-mar--0" data-test="ac-feed-message-content">{{ props.message.data }}</p>
+            <p v-if="props.showTimestamps" class="meta u-mar--0">
                 <time :datetime="props.message.createdAt" :title="getDayjsDatetimeLong(props.message.createdAt)">
                     {{ formatTimestamp(props.message) }}
                 </time>
             </p>
         </div>
-        <div v-if="props.message.meta.user" class="ac-feed-message-portrait l-mar-s--left">
+        <div v-if="props.message.meta.user" class="ac-feed-message-portrait u-mar-s--left">
             <user-photo :user="props.message.meta.user" render="xsmall" :description="null" rounded-corners />
         </div>
     </div>

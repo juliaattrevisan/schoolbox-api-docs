@@ -42,18 +42,22 @@ class Validator
             throw new SchoolboxException("Parameter 'search' must have a string value.");
         }
 
-        if (!ctype_digit($limit)) {
+        if (!$this->isPositiveIntegerValue($limit)) {
             // The API docs say 'integer' here, but the value will always be a string because it comes from the URL.
-            throw new SchoolboxException("Parameter 'limit' should have an integer or integer string value.");
+            throw new SchoolboxException(
+                "Parameter 'limit' should have a positive integer or positive integer string value."
+            );
         }
         $limit = (int)$limit; // Set type to that expected according to the API docs.
 
-        if ($cursor !== '' && !ctype_digit($cursor)) {
+        if ($cursor !== '' && !$this->isPositiveIntegerValue($cursor)) {
             // The API docs say the value for 'cursor' should be a string.  That is because 'cursor' in the API docs
             // has a templated docblock, and cursors in general can be strings.  So the API docs are fine, and we
             // must cope with that.  This specific cursor should be an integer string, which is also fine and doesn't
             // contradict the API docs.  A blank string cursor is equivalent to no cursor value.
-            throw new SchoolboxException("Parameter 'cursor' should have an integer or integer string value.");
+            throw new SchoolboxException(
+                "Parameter 'cursor' should have a positive integer or positive integer string value."
+            );
         }
         $cursor = (string)$cursor; // Set type to that expected according to the API docs.
 
@@ -158,8 +162,10 @@ class Validator
                 // This is the expected case.  Check that the key is either 'id' or 'name'.
                 if (array_key_exists('id', $array)) {
                     $id = $array['id'];
-                    if (!is_int($id) && !(is_string($id) && ctype_digit($id))) {
-                        throw new SchoolboxException("Filter '$arrayName' property 'id' must have an integer value.");
+                    if (!$this->isPositiveIntegerValue($id)) {
+                        throw new SchoolboxException(
+                            "Filter '$arrayName' property 'id' must have a positive integer value."
+                        );
                     }
                 } elseif (array_key_exists('name', $array)) {
                     $name = $array['name'];
@@ -176,5 +182,19 @@ class Validator
                     "Filter '$arrayName' must contain only one key - either 'id' or 'name'."
                 );
         }
+    }
+
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    private function isPositiveIntegerValue(mixed $value): bool
+    {
+        if (is_int($value)) {
+            return $value > 0;
+        }
+
+        // Note must still check > 0, because '0' is a digit.
+        return is_string($value) && ctype_digit($value) && (int)$value > 0;
     }
 }

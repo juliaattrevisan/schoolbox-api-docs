@@ -26,20 +26,21 @@
         </nav>
         <ul class="f-dropdown" id="header-options" data-test="profile-header-options" data-dropdown-content>
             {% for linkInfo in linksInfo %}
+                {% set iconName = linkInfo.iconClass|replace({'icon-': ''}) %}
                 <li>
                     {% if linkInfo.disabled %}
                         <a
-                            class="{{ linkInfo.iconClass }} menu_disabled"
+                            class="sbx-button--has-icon menu_disabled"
                             title="{{ linkInfo.mouseoverText }}"
                             data-test="user-profile-impersonate-disabled"
-                        >{{ linkInfo.title }}</a>
+                        ><sbx-icon name="{{ iconName }}"></sbx-icon>{{ linkInfo.title }}</a>
                     {% else %}
                         <a
                             href="{{ linkInfo.url }}"
-                            class="{{ linkInfo.iconClass }}"
+                            class="sbx-button--has-icon"
                             title="{{ linkInfo.mouseoverText }}"
                             data-test="{{ linkInfo.dataTest }}"
-                        >{{ linkInfo.title }}</a>
+                        ><sbx-icon name="{{ iconName }}"></sbx-icon>{{ linkInfo.title }}</a>
                     {% endif %}
                 </li>
             {% endfor %}
@@ -50,17 +51,18 @@
         <div class="button-action small-12 columns">
             {{ _self.myProfileHeading(user, nameFormat) }}
             {% set linkInfo = linksInfo|first %}
+            {% set iconName = linkInfo.iconClass|replace({'icon-': ''}) %}
             {% if linkInfo.disabled %}
                 <a
-                    class="{{ linkInfo.iconClass }} button menu_disabled"
+                    class="sbx-button--has-icon button menu_disabled"
                     title="Account disabled"
-                >{{ linkInfo.title }}</a>
+                ><sbx-icon name="{{ iconName }}"></sbx-icon>{{ linkInfo.title }}</a>
             {% else %}
                 <a
                     href="{{ linkInfo.url }}"
-                    class="{{ linkInfo.iconClass }} button"
+                    class="sbx-button--has-icon button"
                     title="{{ linkInfo.mouseoverText }}"
-                >{{ linkInfo.title }}</a>
+                ><sbx-icon name="{{ iconName }}"></sbx-icon>{{ linkInfo.title }}</a>
             {% endif %}
         </div>
     </div>

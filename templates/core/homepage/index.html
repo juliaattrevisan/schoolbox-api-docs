@@ -149,12 +149,12 @@
 <div class="row actions-small-5">
     <div class="list-item">
         <div class="small-12 column">
-            <h1 class="t-restrict-length">{HEADING}</h1>
+            <h1 class="u-restrict-length">{HEADING}</h1>
         </div>
     </div>
-    <nav class="l-flex--inline-flex l-flex--no-wrap l-flex--align-center l-gap-xs">
+    <nav class="u-flex--inline-flex u-flex--no-wrap u-flex--align-center u-gap-xs">
         <!-- BEGIN edit_page -->
-        <span data-tab class="l-flex--inline-flex l-flex--no-wrap l-flex--align-center l-gap-xs">
+        <span data-tab class="u-flex--inline-flex u-flex--no-wrap u-flex--align-center u-gap-xs">
             <span class="switch inline" id="component-lock-switch">
                 <input id="component-lock-toggle" type="checkbox" autocomplete="off" />
                 <label for="component-lock-toggle" data-test="homepage-component-lock-toggle">
@@ -431,9 +431,9 @@
                     <!-- don't show a slider for screens which don't have multiple columns -->
                     <fieldset class="content hide-for-medium-down">
                         <div class="small-12 columns">
-                            <div class="c-input-range">
-                                <label class="c-input-range__label" for="column-width">Column Width <span data-tooltip class="has-tip tip-top hint" title="Drag the slider to change the width of the left and right columns. (On small screens, the right column will drop below the left.)">?</span></label>
-                                <input class="c-input-range__input" type="range" id="column-width" name="column-width" min="3" max="9" step="1" value="{TEMPLATE_LEFT_COLUMN_WIDTH}" data-interaction="column-width" data-original-value="{TEMPLATE_LEFT_COLUMN_WIDTH}" />
+                            <div class="sbx-input-range">
+                                <label class="sbx-input-range__label" for="column-width">Column Width <span data-tooltip class="has-tip tip-top hint" title="Drag the slider to change the width of the left and right columns. (On small screens, the right column will drop below the left.)">?</span></label>
+                                <input class="sbx-input-range__input" type="range" id="column-width" name="column-width" min="3" max="9" step="1" value="{TEMPLATE_LEFT_COLUMN_WIDTH}" data-interaction="column-width" data-original-value="{TEMPLATE_LEFT_COLUMN_WIDTH}" />
                                 <input type="hidden" name="width" value="{TEMPLATE_LEFT_COLUMN_WIDTH}">
                             </div>
                         </div>
@@ -493,7 +493,7 @@
                     </fieldset>
                     <!-- END homepage_color_selector -->
 
-                    <ul class="flex-list buttons l-pad-s">
+                    <ul class="flex-list buttons u-pad-s">
                         <li><a href="#" class="button no-margin" data-role="reset-to-default">Reset</a></li>
                         <li><a href="#" class="button no-margin" data-role="undo">Undo Changes</a></li>
                         <li><a href="#" class="button submit no-margin" data-role="save">Save</a></li>

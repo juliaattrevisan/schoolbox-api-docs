@@ -55,7 +55,7 @@ class ConfigMapper extends Mapper
     public const string MODULE_IB = 'ib';
 
     // IB config name constants
-    public const string NAME_IB_ENABLED = 'ib_enabled';
+    public const string NAME_IB_ENABLED     = 'ib_enabled';
     public const string NAME_IB_SCHOOL_NAME = 'ib_school_name';
     public const string NAME_IB_SCHOOL_CODE = 'ib_school_code';
 
@@ -110,6 +110,7 @@ class ConfigMapper extends Mapper
     public const int TYPE_INTERNATIONAL_BACCALAUREATE = 26;
     public const int TYPE_ASSETS                      = 27;
     public const int TYPE_SONAR_SKIN_CONFIG           = 28;
+    public const int TYPE_SOCS                        = 29;
 
     // Technically these should be prefixed with 'NAME_', but it gets a bit verbose for little extra clarity
     public const string _GLOBAL_MODERATION              = 'global_moderation';
@@ -129,6 +130,7 @@ class ConfigMapper extends Mapper
     public const string NAME_EXTERNAL_DB_PASSWORD       = 'external_db_passwd';
     public const string NAME_EXTERNAL_DB_NAME           = 'external_db_db';
     public const string NAME_EXTERNAL_DB_ENCRYPTION     = 'external_db_encryption';
+    public const string NAME_EXTERNAL_CACHE_TIMEOUT     = 'external_cache_timeout';
 
     public const string NAME_ALLOW_STUDENT_CLASS_ACCESS = 'allow_student_class_access';
     public const string NAME_LMS_RESUBMIT_WINDOW        = 'lms_resubmit_window';
@@ -271,6 +273,7 @@ class ConfigMapper extends Mapper
     public const string NAME_MAX_FILE_SIZE = 'max_file_size';
 
     public const string NAME_RUBRIC_MAX_LEVELS = 'rubric_max_levels';
+    public const string NAME_RUBRIC_SHOW_POINTS = 'rubric_show_points';
 
     public const string NAME_LMS_SEB_ENABLED = 'lms_seb_enable';
 
@@ -395,6 +398,8 @@ class ConfigMapper extends Mapper
     public const string NAME_EMAIL_BANNER_IMAGE = 'email_banner_image';
     public const string NAME_SKIN_FAVICON = 'skin_favicon';
     public const string NAME_SONAR_UI_TOGGLE = 'advanced_ui_enabled';
+    public const string NAME_SONAR_SKIN_CUSTOM_CSS = 'skin_sonar_custom_css';
+
 
     /* Skin Config Categories
      */
@@ -441,17 +446,17 @@ class ConfigMapper extends Mapper
 
     /* OpenAI
      */
-    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_* */
+    /* @deprecated now ai feature specific \Schoolbox\OpenAi\Feature values */
     public const string NAME_OPENAI_TEXT_ENDPOINT = 'openai_text_endpoint';
-    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_* */
+    /* @deprecated now ai feature specific \Schoolbox\OpenAi\Feature values */
     public const string NAME_OPENAI_TEXT_KEY = 'openai_text_key';
-    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_* */
+    /* @deprecated now ai feature specific \Schoolbox\OpenAi\Feature values */
     public const string NAME_OPENAI_TEXT_RESOURCE_NAME = 'openai_text_azure_resource_name';
-    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_* */
+    /* @deprecated now ai feature specific \Schoolbox\OpenAi\Feature values */
     public const string NAME_OPENAI_TEXT_DEPLOYMENT_ID = 'openai_text_azure_deployment_id';
-    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_* */
+    /* @deprecated now ai feature specific \Schoolbox\OpenAi\Feature values */
     public const string NAME_OPENAI_TEXT_MODEL = 'openai_text_model';
-    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_* */
+    /* @deprecated now ai feature specific \Schoolbox\OpenAi\Feature values */
     public const string NAME_OPENAI_TEXT_SYSTEM_PROMPT = 'openai_text_generation_system_prompt';
 
     // Text Feature json config
@@ -468,6 +473,8 @@ class ConfigMapper extends Mapper
     public const string NAME_PRESIDIO_ANALYSIS_HOST = 'presidio_analysis_host';
     public const string NAME_PRESIDIO_ANONYMISATION_HOST = 'presidio_anonymisation_host';
 
+    // Tools daemon
+    public const string NAME_TOOLSD_HOST = 'toolsd_host';
 
     /* Differentiation profiles
      */
@@ -522,7 +529,14 @@ class ConfigMapper extends Mapper
      */
     public const string NAME_SOCS_ENABLED = 'socs_enabled';
     public const string NAME_SOCS_ENDPOINT_HOST = 'socs_endpoint_host';
+    public const string NAME_SOCS_ENDPOINT_HOST_FIXTURE = 'socs_endpoint_host_fixture';
     public const string NAME_SOCS_ENDPOINT_TOKEN = 'socs_endpoint_token';
+    public const string NAME_SOCS_ENDPOINT_ID = 'socs_endpoint_id';
+    public const string NAME_SOCS_IMPORT_CALENDAR_EVENTS = 'socs_import_calendar_events';
+    public const string NAME_SOCS_CALENDAR_NAME = 'socs_calendar_name';
+    public const string NAME_SOCS_CALENDAR_DEFAULT_EVENT_TYPE = 'socs_calendar_default_event_type';
+    public const string NAME_SOCS_IMPORT_SPORTS_FIXTURES = 'socs_import_sports_fixtures';
+
 
     // Debug settings
     public const string NAME_DEBUG_MODE = 'debug_mode';
@@ -609,6 +623,28 @@ class ConfigMapper extends Mapper
         self::NAME_OAUTH_ENABLE_SSO,
         //        self::NAME_OAUTH_SSO_IP_BLACKLIST,
         //        self::NAME_OAUTH_SSO_IP_WHITELIST,
+    ];
+
+    /**
+     * Config settings which affect the external cache's content.
+     *
+     * If any of these settings change: invalidate the external cache.
+     */
+    public const array SETTINGS_AFFECTING_EXTERNAL_CACHE_CONTENT = [
+        self::NAME_EXTERNAL_TYPE,
+        self::NAME_EXTERNAL_DB_HOST,
+        self::NAME_EXTERNAL_DB_USER,
+        self::NAME_EXTERNAL_DB_PASSWORD,
+        self::NAME_EXTERNAL_DB_NAME,
+    ];
+
+    /**
+     * Config settings which affect the external cache's TTL.
+     *
+     * If any of these settings change: change the TTL of the external cache.
+     */
+    public const array SETTINGS_AFFECTING_EXTERNAL_CACHE_TTL = [
+        self::NAME_EXTERNAL_CACHE_TIMEOUT,
     ];
 
     /**

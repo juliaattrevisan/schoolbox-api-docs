@@ -49,7 +49,7 @@ async function onResequenceTab(event: Sortable.SortableEvent): Promise<void> {
         <h3 class="subheader">Tabs</h3>
         <div>
             <sortable-wrapper
-                class="pe-tabs l-flex-row l-gap-xs"
+                class="pe-tabs u-flex-row u-gap-xs"
                 :list="peStore.selectedRoleType.tabs"
                 :item-key="(item) => item.id"
                 :options="sortableOptions"

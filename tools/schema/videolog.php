@@ -17,24 +17,26 @@ require_once __DIR__ . '/../../conf/core/require.php';
  * This tool will clean up the video queue log and remove any successful run logs from over 3 months ago.
  * This prevents the video_queue table from becoming very large
  */
-$app = new class extends CliTool\App
+$app = new class extends CliTool\BaseApp
 {
-    /**
-     * --help
-     *
-     * Print help text for those who don't know how to use this tool
-     */
-    private const OPT_LONG_HELP = 'help';
-
-
-    /**
-     * @inheritdoc
-     */
-    public function getLongOpts(): array
+    protected function getName(): string
     {
-        return [
-            self::OPT_LONG_HELP,
-        ];
+        return 'videolog';
+    }
+
+    protected function getDescription(): string
+    {
+        return 'Periodically cleans the message field from the video_queue table. Anything older than 3 months from the time of running is deleted permanently.';
+    }
+
+    protected function setOptions(): self
+    {
+        return $this;
+    }
+
+    protected function hasPerformMode(): bool
+    {
+        return true;
     }
 
     /**
@@ -42,19 +44,6 @@ $app = new class extends CliTool\App
      */
     public function run(): void
     {
-        if ($this->getOpt(self::OPT_LONG_HELP)) {
-            echo <<<HELP
-
-This periodically cleans the message field from the video_queue table. Anything older than
-3 months from the time of running is deleted permanently.
-
-Usage: videolog.php --perform
-
-
-HELP;
-            exit;
-        }
-
         if (!$this->perform()) {
             $this->getLogger()->info('Searching for records to clean.');
 

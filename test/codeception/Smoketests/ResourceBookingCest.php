@@ -163,7 +163,7 @@ class ResourceBookingCest
         $resourceName = 'Testing Resource Rules at ' . microtime(true);
         $resource->setResourceName($resourceName);
         $resource->setCapacity('7');
-        $resource->setAllowClashBookings(true);
+        $resource->setAllowClashBookings(false);
 
         $i->sendRequest($resource);
 
@@ -173,7 +173,9 @@ class ResourceBookingCest
         $i->sendGET('/resource-booking/item/' . $newItem->getId());
 
         $i->seeResponseCodeIs(200);
-        $i->seeResponseContains('Conflict bookings: Allowed');
+        $i->seeResponseContains('Only allow booking requests up to capacity.');
+        $i->dontSeeResponseContains('Conflict bookings: Allowed');
+        $i->dontSeeResponseContains('Conflict bookings: Not allowed');
         $i->seeResponseContains('Capacity: 7 concurrent bookings');
     }
 
@@ -229,7 +231,7 @@ class ResourceBookingCest
             [
                 '<th>Start</th>',
                 '<th>End</th>',
-                '<th>Booking</th>',
+                '<th>Event Title</th>',
                 '<th>Venue/Resource</th>',
                 '<th>Quantity</th>',
                 '<th>Booker</th>',

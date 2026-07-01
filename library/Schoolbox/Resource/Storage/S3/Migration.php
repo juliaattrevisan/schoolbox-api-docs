@@ -476,13 +476,13 @@ class Migration extends CliTool\App
             } catch (InvalidArgumentException $e) {
                 $this->failedPaths[] = $relativeLocalPath;
                 $this->getLogger()->error("Cannot write file to S3, skipping: '{$e->getMessage()}'");
-                fclose($fp);
+                $this->safeClose($fp);
                 return false;
             }
         } else {
             $writeSucceeded = true;
         }
-        fclose($fp);
+        $this->safeClose($fp);
 
         if ($writeSucceeded) {
             $this->getLogger()->debug("Upload completed");
@@ -640,6 +640,19 @@ class Migration extends CliTool\App
         closedir($handle);
         return true;
     }
+
+    /**
+     * Closes a file handle if it is still a valid resource.
+     *
+     * @param resource|false $handle
+     */
+    private function safeClose(mixed $handle): void
+    {
+        if (is_resource($handle)) {
+            fclose($handle);
+        }
+    }
+
 
     /**
      * Logs a list of relative paths where migration failed.

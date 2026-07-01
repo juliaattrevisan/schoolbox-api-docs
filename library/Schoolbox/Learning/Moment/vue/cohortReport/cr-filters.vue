@@ -55,18 +55,18 @@ async function applyFilters(): Promise<void> {
 </script>
 
 <template>
-    <form class="l-flex-col l-gap-s l-flex__item--0-shrink f-no-margins" @submit.prevent="applyFilters">
-        <div class="c-island filters l-flex-col l-pad-m" :class="{ 'l-gap-m': isOpen }">
+    <form class="u-flex-col u-gap-s u-flex__item--0-shrink f-no-margins" @submit.prevent="applyFilters">
+        <div class="sbx-island filters u-flex-col u-pad-m" :class="{ 'u-gap-m': isOpen }">
             <button
                 v-if="props.isSingleColumn"
-                class="filters__toggle-button l-mar--0"
+                class="filters__toggle-button u-mar--0"
                 :class="isOpen ? 'icon-up-arrow' : 'icon-down-arrow'"
                 @click.prevent="isOpen = !isOpen"
             >
                 {{ isOpen ? "Hide filters" : "Show filters" }}
             </button>
             <div class="filters__container" :style="{ 'grid-template-rows': isOpen ? '1fr' : '0fr' }">
-                <div class="filters__inner-container l-flex-col l-gap-m">
+                <div class="filters__inner-container u-flex-col u-gap-m">
                     <search-select
                         v-model:selected="crfStore.studentFilter"
                         label="Filter by students"
@@ -113,7 +113,7 @@ async function applyFilters(): Promise<void> {
 
                     <div>
                         <label>Filter by state</label>
-                        <div class="l-grid l-gap-s l-grid--2-col">
+                        <div class="u-grid u-gap-s u-grid--2-col">
                             <div v-for="(label, status) in evidenceStatusLabels" :key="status">
                                 <input
                                     :id="`cr-filters-${status}`"
@@ -128,16 +128,16 @@ async function applyFilters(): Promise<void> {
                         </div>
                     </div>
 
-                    <div class="l-flex-row l-flex--no-wrap l-gap-m">
+                    <div class="u-flex-row u-flex--no-wrap u-gap-m">
                         <button
-                            class="button l-flex__item--1 icon-close f-no-margins"
+                            class="button u-flex__item--1 icon-close f-no-margins"
                             data-test="cr-filter-clear-button"
                             @click.prevent="crfStore.resetFilters"
                         >
                             Clear filters
                         </button>
                         <button
-                            class="button submit l-flex__item--1 f-no-margins sbx-button--has-icon"
+                            class="button submit u-flex__item--1 f-no-margins sbx-button--has-icon"
                             data-test="cr-filter-apply-button"
                             @click.prevent="applyFilters"
                         >

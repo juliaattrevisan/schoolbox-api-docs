@@ -274,6 +274,7 @@ class Scrub
                 // CKEditor5
                 // Don't Scrub these bits. CKEditor5 needs them...
                 $def->addAttribute('a', 'download', 'Text');
+                $def->addAttribute('a', 'rel', 'Text');
                 $def->addAttribute('img', 'style', 'Text');
                 $figure = $def->addElement(
                     'figure',

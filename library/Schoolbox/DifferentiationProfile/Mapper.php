@@ -354,7 +354,7 @@ class Mapper extends BaseMapper
             [$pb, $statusSelect, $statusSubquery, $statusParam] = $this->buildStatusConditions($pb, $status);
         }
 
-        $pb->isNull('differentiation_profiles.deleted_at');
+        $pb->isNull('p.deleted_at');
 
         $pb = $this->filterByPermission($pb, $viewer);
 
@@ -724,10 +724,11 @@ class Mapper extends BaseMapper
     protected function getFromString(): string
     {
         return "
-            FROM differentiation_profiles
-            INNER JOIN {$this->getJoinSql('createdBy', '', 'createdBy', true)}
-            INNER JOIN {$this->getJoinSql('updatedBy', '', 'updatedBy', true)}
-            RIGHT JOIN pastoral p ON differentiation_profiles.student_id = p.student_id AND differentiation_profiles.deleted_at IS NULL AND p.deleted_at IS NULL
+            FROM pastoral p
+            LEFT JOIN differentiation_profiles ON differentiation_profiles.student_id = p.student_id AND
+                                                  differentiation_profiles.deleted_at IS NULL
+            LEFT JOIN `user` AS `createdBy`ON differentiation_profiles.created_by = `createdBy`.`id`
+            LEFT JOIN `user` AS `updatedBy`ON differentiation_profiles.updated_by = `updatedBy`.`id`
             LEFT JOIN pastoral_access pa ON p.id = pa.pastoral_id
             INNER JOIN user s ON p.student_id = s.id AND s.deleted_at IS NULL
             LEFT JOIN lu_pastoral_type lpt ON p.type_id = lpt.id

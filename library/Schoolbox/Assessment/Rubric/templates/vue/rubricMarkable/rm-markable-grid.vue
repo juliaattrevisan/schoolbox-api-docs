@@ -11,7 +11,7 @@ import locale from "@js/terminology/rosettaStone";
 import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 import type { MarkScheme } from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/markScheme";
 import type { User } from "@schoolboxLibrary/types/User";
-import { applyMarkScheme, getPercentage } from "./rubricUtils";
+import { applyMarkScheme, deriveRubricMark, getPercentage } from "./rubricUtils";
 import type { RubricGrid, RubricMarkedGrid } from "./types";
 import RmGridCapability from "./rm-grid-capability.vue";
 import { translateMarkedGridToFormPayload } from "./payload";
@@ -58,28 +58,7 @@ const capabilities = window.Vue.computed(() => {
 /**
  * The mark of this rubric derived from the current scaled capability marks
  */
-const derivedRubricMark = window.Vue.computed(() => {
-    let total = 0;
-    let hasMeaningfulMark = false;
-
-    for (const capability of rubricMarkedGrid.value.capabilities) {
-        if (capability.scaledMark !== null) {
-            total += capability.scaledMark;
-            hasMeaningfulMark = true;
-        }
-    }
-
-    if (!hasMeaningfulMark) {
-        return null;
-    }
-
-    // if the total is not a whole number, round to 2dp
-    if (total % 1 !== 0) {
-        total = parseFloat(total.toFixed(2));
-    }
-
-    return total;
-});
+const derivedRubricMark = window.Vue.computed(() => deriveRubricMark(rubricMarkedGrid.value));
 
 /**
  * When a capability mark is updated, update the grid total
@@ -88,6 +67,43 @@ window.Vue.watch(derivedRubricMark, (scaledMark) => {
     const { humanReadableMark } = applyMarkScheme(scaledMark, props.rubric.derivedMaxValue, props.assessmentMarkScheme);
     rubricMarkedGrid.value.humanReadableMark = humanReadableMark;
     rubricMarkedGrid.value.normalisedMark = getPercentage(scaledMark, props.rubric.derivedMaxValue);
+});
+
+/**
+ * The self-assessment's mark, re-expressed in the instructor's (input) mark scheme rather than the
+ * display scheme the student saw, so it can be compared against the mark the instructor is entering.
+ */
+const selfAssessmentMark = window.Vue.computed<string | null>(() => {
+    if (!props.selfAssessmentFeedback) {
+        return null;
+    }
+
+    /* If there is no humanReadableMark, then the display mark type would've been NONE (or there's no mark at all),
+     * it's still somehow possible to end up with a normalised mark in this case, but historically we haven't
+     * shown a computed mark when humanReadableInstructorMark was null (theoretically should be the same as when
+     * humanReadableMark is null in this specific scenario due to it being a self assessment and the usual order reversed).
+     *
+     * Anyway, to align with the old way we'll just hide it if there's no humanReadableMark, even if there's a norm mark.
+     */
+    if (props.selfAssessmentFeedback.humanReadableMark === null) {
+        return null;
+    }
+
+    if (props.selfAssessmentFeedback.normalisedMark === null) {
+        /* having no normalised mark whilst still having a humanReadableMark is strange, perhaps due to submission states?
+         * Just show whatever humanReadableMark is in this case, we don't want to reverse the display mark type as it'll
+         * loose precision and likely be inaccurate.
+         */
+        return props.selfAssessmentFeedback.humanReadableMark;
+    }
+
+    // need to rederive the scaled mark based on the normalisedMark for applyMarkScheme to receive the right value
+    let scaledMark = (props.selfAssessmentFeedback.normalisedMark / 100) * props.rubric.derivedMaxValue;
+    if (scaledMark % 1 !== 0) {
+        scaledMark = parseFloat(scaledMark.toFixed(2));
+    }
+
+    return applyMarkScheme(scaledMark, props.rubric.derivedMaxValue, props.assessmentMarkScheme).humanReadableMark;
 });
 
 const formValue = window.Vue.computed(() => JSON.stringify(translateMarkedGridToFormPayload(rubricMarkedGrid.value)));
@@ -134,16 +150,13 @@ const formValue = window.Vue.computed(() => JSON.stringify(translateMarkedGridTo
                         {{ rubricMarkedGrid.humanReadableMark }}
 
                         <!-- Self-Assessment -->
-                        <template v-if="props.selfAssessmentFeedback?.humanReadableMark">
-                            <!-- TODO: instructor mark type is used here... thanks past me -->
+                        <template v-if="selfAssessmentMark">
                             <!--
                             Although the student entered the mark using the display mark type,
                             we show it here using the input mark type so that it matches what the instructor
                             is currently entering so it can be easily compared.
                             -->
-                            ({{ props.selfAssessmentFeedback.humanReadableMark }}
-                            given in
-                            {{ locale.selfAssessment.singular() }})
+                            ({{ selfAssessmentMark }} given in {{ locale.selfAssessment.singular() }})
                         </template>
                     </th>
                 </tr>

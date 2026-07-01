@@ -7,3 +7,58 @@ import { Meta } from "@storybook/addon-docs/blocks";
 Design tokens are consistent, reusable, and well-defined global properties that capture the fundamental elements of a design system, such as colours, typography, spacing, and more.
 They serve as the atomic units of a design language, allowing designers and developers to maintain design consistency across different platforms and applications.
 By abstracting design decisions into tokens, design systems become more flexible, adaptable, and scalable, promoting cohesive branding and efficient development workflows.
+
+## Conventions
+
+- Design tokens are exposed as CSS custom properties.
+- They should be used instead of hard-coded values when relevant property is covered.
+
+### Naming
+
+- All Schoolbox design tokens use the `--sbx-` prefix.
+- Token names are lowercase and use hyphen-separated words.
+- The name should describe the design decision or role the token represents, rather than only describing its current value.
+
+| Pattern                              | Purpose                                                                                   | Examples                                                            |
+| ------------------------------------ | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `--sbx-config-*`                     | Configurable skin tokens that can be changed via Admin > Design > Settings - Skin Config. | `--sbx-config-color-accent`, `--sbx-config-container-corner-radius` |
+| `--sbx-{category}-{role}`            | Core semantic tokens for a category.                                                      | `--sbx-color-text-primary`, `--sbx-depth-modal`                     |
+| `--sbx-{category}-{property}-{role}` | Tokens where the CSS property is part of the category naming.                             | `--sbx-border-radius-m`, `--sbx-font-weight-heading`                |
+| `--sbx-{category}-{scale}`           | Scale tokens with reusable size, speed, or elevation steps.                               | `--sbx-size-m`, `--sbx-shadow-s`                                    |
+
+### Configurable tokens
+
+- Configurable tokens begin with `--sbx-config-` and represent values that can be customised by a School.
+- Most configurable colour tokens follow `--sbx-config-color-{context}-{role}`.
+- For example, `--sbx-config-color-menu-background` and `--sbx-config-color-menu-foreground` describe the menu context and the role each colour plays.
+- The login form tokens currently use the shorter `--sbx-config-login-form-*` convention.
+- Configurable tokens may point to core tokens as their initial value, such as `var(--sbx-border-radius-s)` or `var(--sbx-shadow-none)`.
+- This allows the default skin to stay aligned with the core token scale while still allowing local customisation.
+
+### Core token categories
+
+Core tokens are grouped by the CSS property or design concern they control.
+
+| Category      | Further Details                                          |
+| ------------- | -------------------------------------------------------- |
+| Animation     | [Animation](?path=/docs/design-tokens-animation--docs)   |
+| Border radius | [Borders](?path=/docs/design-tokens-borders--docs)       |
+| Border width  | [Borders](?path=/docs/design-tokens-borders--docs)       |
+| Colour        | [Colours](?path=/docs/design-tokens-colours--docs)       |
+| Depth         | [Depth](?path=/docs/design-tokens-depth--docs)           |
+| Font family   | [Typography](?path=/docs/design-tokens-typography--docs) |
+| Font size     | [Typography](?path=/docs/design-tokens-typography--docs) |
+| Font weight   | [Typography](?path=/docs/design-tokens-typography--docs) |
+| Line height   | [Typography](?path=/docs/design-tokens-typography--docs) |
+| Shadow        | [Shadows](?path=/docs/design-tokens-shadows--docs)       |
+| Size          | [Sizing](?path=/docs/design-tokens-sizing--docs)         |
+
+### Adding or changing tokens
+
+When adding or changing a token:
+
+- Define it in the appropriate SCSS token file.
+- Document it in the matching Storybook design token page.
+- Prefer semantic names based on purpose over names based only on visual appearance.
+- Include contrast information for colour tokens where the token is intended for text or UI on a background.
+- Keep configurable tokens limited to values that should be controlled by skin configuration.

@@ -71,11 +71,11 @@
                     <ul class="information-list">
                         {% for date in item.bookingEvents %}
                             <li class="list-item">
-                                <div class="l-grid l-grid--12">
-                                    <div class="small-1 l-pad-s--right text-center">
+                                <div class="u-grid u-grid--12">
+                                    <div class="small-1 u-pad-s--right u-ta-center">
                                         {# booking date, may have multiple bookings under this date #}
                                         {{ date.dateFormat.dayName }}
-                                        <h4 class="l-mar--0">{{ date.dateFormat.day }}</h4>
+                                        <h4 class="u-mar--0">{{ date.dateFormat.day }}</h4>
                                         {{ date.dateFormat.monthName }}
                                     </div>
                                     <div class="small-11">

@@ -423,10 +423,11 @@ class DataTransferObject
         foreach ($projectSpec->getAssessables() as $subAssessment) {
             // Base Case: non-project
             if (!$subAssessment instanceof Project) {
-                if (null === $subAssessment->getDefaultOpenSpan()) {
+                $openSpan = $subAssessment->getDefaultOpenSpan();
+                if (null === $openSpan) {
                     return null;
                 }
-                $totalOpenSpan += $subAssessment->getDefaultOpenSpan();
+                $totalOpenSpan += $openSpan;
             } else {
                 // Recursive Case: project
                 $openSpan = $this->recursiveGetDefaultOpenSpan($subAssessment);

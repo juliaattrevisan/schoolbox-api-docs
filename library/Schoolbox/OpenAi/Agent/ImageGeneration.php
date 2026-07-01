@@ -11,8 +11,7 @@ namespace Schoolbox\OpenAi\Agent;
 
 use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Admin\OpenAI\Config;
-use Schoolbox\Editor\OpenAI\Helper;
-use Schoolbox\Editor\OpenAI\Log;
+use Schoolbox\Editor\OpenAI\Log\Translator\Format\AgentChat;
 use Schoolbox\Editor\OpenAI\Payload\ImageGeneration as PayloadGenerator;
 use Schoolbox\OpenAi\AgentChat\EventStream\ResponseListener;
 use Schoolbox\OpenAi\AgentChat\LogHandler\LogOutputText;
@@ -67,9 +66,9 @@ class ImageGeneration
             $payload,
             $prompt,
             $user,
-            Helper::FEATURE_IMAGE,
+            \Schoolbox\OpenAi\Feature::IMAGE,
             $sessionId,
-            Log\Translator\Format\AgentChat::getLogFormat(),
+            AgentChat::getLogFormat(),
         );
         return $this->client->createResponseStream(
             $payload,

@@ -58,7 +58,10 @@
 </div>
 
 <nav id="admin-nav">
-    <a href="#" class="dropdown-btn" data-admin-subnav-dropdown>Go to...</a>
+    <a href="#" class="dropdown-btn" data-admin-subnav-dropdown>
+        <span>Go to...</span>
+        <sbx-icon name="down-arrow" class="sbx-side-nav__dropdown-icon"></sbx-icon>
+    </a>
     <ul class="admin side-nav" role="navigation" data-admin>
 
         {% for parentUrl, parentData in nodes | filter(parentData => parentData.visible) %}
@@ -81,7 +84,10 @@
                 #}
                 {% set children = parentData.children | filter(childData => childData.visible) %}
                 {% if children | length %}
-                    <a>{{ parentData.name }}</a>
+                    <a>
+                        <span>{{ parentData.name }}</span>
+                        <sbx-icon name="down-arrow" class="sbx-side-nav__toggle-icon"></sbx-icon>
+                    </a>
                 {% else %}
                     <a href="{{ parentUrl }}">{{ parentData.name }}</a>
                 {% endif %}

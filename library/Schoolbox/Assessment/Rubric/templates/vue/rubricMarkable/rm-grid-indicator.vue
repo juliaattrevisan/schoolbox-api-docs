@@ -30,7 +30,7 @@ window.Vue.watch(
 </script>
 
 <template>
-    <tr class="rb-indicator-row">
+    <tr class="rb-indicator-row" :data-test="`rubric-markable-indicator-${props.indicator.id}`">
         <!-- eslint-disable-next-line vue/no-v-html -- scrubbed in the backend -->
         <th class="rb-criterion-name markdown" v-html="props.indicator.name"></th>
 
@@ -38,6 +38,7 @@ window.Vue.watch(
             <rm-grid-descriptor
                 v-if="props.indicator.descriptors[index] !== null"
                 v-model:indicator-mark="indicatorMark"
+                :level-index="index"
                 :descriptor="props.indicator.descriptors[index]"
                 :self-assessment-indicator-mark="props.selfAssessmentIndicatorMark"
                 :level="level"

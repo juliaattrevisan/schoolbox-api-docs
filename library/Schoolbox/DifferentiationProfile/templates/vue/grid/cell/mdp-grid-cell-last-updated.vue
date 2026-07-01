@@ -24,7 +24,7 @@ function formatDateShort(dateString: string | null): string | null {
 </script>
 
 <template>
-    <div class="l-flex-col l-pad-s l-gap-s f-no-margins">
+    <div class="u-flex-col u-pad-s u-gap-s f-no-margins">
         <p v-if="props.profile.updated_at">{{ formatDateShort(props.profile.updated_at) }}</p>
         <sbx-label
             v-if="props.profile.status?.includes(ProfileStatus.OUT_OF_DATE)"

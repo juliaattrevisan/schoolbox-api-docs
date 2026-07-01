@@ -2,11 +2,12 @@
  * CKEditor-specific utility functions/helpers for the resource plugins
  */
 
-import type { Editor, Element, Position, Writer } from "ckeditor5";
+import type { Editor, ModelElement, ModelPosition, ModelWriter } from "ckeditor5";
 import { getWithoutExtension } from "@js/util/fileUtils";
 import { getAttributes, ResourceType } from "@js/resource/resourceUtils";
 import type { Resource } from "@js/resource/resourceUtils";
 import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
+import { getLightboxRel, LIGHTBOX_LINK_ATTRIBUTE } from "./lightboxLinkUtils";
 
 /**
  * Move the caret out of link context so the next insertion does not inherit the previous link.
@@ -15,7 +16,7 @@ import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
  * @param editor - the ckeditor instance
  * @param writer - the model writer used for the current change block
  */
-export function exitLinkContext(editor: Editor, writer: Writer): void {
+export function exitLinkContext(editor: Editor, writer: ModelWriter): void {
     const { selection } = editor.model.document;
     const linkAttributes = Array.from(selection.getAttributeKeys()).filter((attribute) => attribute.startsWith("link"));
 
@@ -42,7 +43,7 @@ export function exitLinkContext(editor: Editor, writer: Writer): void {
  * @param writer - the model writer used for the current change block
  * @param position - the insertion point after the inline resource
  */
-export function insertSoftBreak(editor: Editor, writer: Writer, position: Position): void {
+export function insertSoftBreak(editor: Editor, writer: ModelWriter, position: ModelPosition): void {
     if (!editor.model.schema.checkChild(position, "softBreak")) {
         return;
     }
@@ -61,6 +62,10 @@ export function addResource(editor: Editor, resource: Resource): void {
     const config = editor.config.get("sbConfig") as SbxEditorConfig;
     const imageUtils = editor.plugins.get("ImageUtils");
     const resourceAttributes = getAttributes(resource, config.baseHref);
+    if (resource.type === ResourceType.IMAGE) {
+        resourceAttributes[LIGHTBOX_LINK_ATTRIBUTE] = getLightboxRel(editor);
+    }
+
     editor.model.change((writer) => {
         if (!("linkHref" in resourceAttributes)) {
             // Videos/audio use image placeholders without their own link. If the caret is still carrying
@@ -73,7 +78,7 @@ export function addResource(editor: Editor, resource: Resource): void {
             resourceAttributes,
             editor.model.document.selection.getFirstPosition(),
             "imageInline",
-        ) as Element;
+        ) as ModelElement;
 
         if (!("linkHref" in resourceAttributes)) {
             const inheritedLinkAttributes = Array.from(image.getAttributeKeys()).filter((attribute) =>

@@ -118,6 +118,7 @@ const orderedClassImplStudents = window.Vue.computed(() => {
             :class-impl="classImpl"
             label="Visibility"
             stats-key="markVisibility"
+            :hide-for-types="[ACTIVITY_TYPE_TASK]"
             :input="{
                 key: 'markVisibility',
                 selectOptions: (aImpl) =>

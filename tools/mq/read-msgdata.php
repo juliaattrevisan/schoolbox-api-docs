@@ -7,8 +7,28 @@ use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$app = new class extends CliTool\App
+$app = new class extends CliTool\BaseApp
 {
+    protected function getName(): string
+    {
+        return 'read-msgdata';
+    }
+
+    protected function getDescription(): string
+    {
+        return 'Looks up and prints raw notification message data stored in Redis for the given hash arguments.';
+    }
+
+    protected function setOptions(): self
+    {
+        return $this;
+    }
+
+    protected function hasPerformMode(): bool
+    {
+        return false;
+    }
+
     /** @inheritDoc */
     public function run(): void
     {

@@ -250,7 +250,7 @@ window.Vue.watch(isOpen, async (newIsOpen) => {
 <template>
     <div>
         <basic-modal v-model:is-open="isOpen">
-            <div class="l-flex-col l-gap-m">
+            <div class="u-flex-col u-gap-m">
                 <h2 class="f-no-margins">{{ props.title }}</h2>
                 <ss-selected
                     v-if="props.showSelected"
@@ -286,7 +286,7 @@ window.Vue.watch(isOpen, async (newIsOpen) => {
                         />
                     </div>
                 </div>
-                <p v-if="validationError" class="form-error" role="alert">{{ validationError }}</p>
+                <label v-if="validationError" class="error" :for="props.labelId">{{ validationError }}</label>
                 <ssm-footer :saved-selected="savedSelected" @cancel="onCancel" @select="onSelect" />
             </div>
         </basic-modal>

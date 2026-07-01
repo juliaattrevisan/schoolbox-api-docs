@@ -62,10 +62,11 @@ defineExpose({ textareaRef });
         data-descriptor
         @click="onCellClick"
     >
+        <!-- Intentionally not trimmed (see SA-22480), only whitespace represents a deliberate blank cell -->
         <textarea
             :id="`rb-descriptor-textarea-${componentId}`"
             ref="textareaRef"
-            v-model.trim="descriptorDescription"
+            v-model="descriptorDescription"
             :placeholder="`Descriptor for ${props.levelName} ${props.indicatorName}`"
             rows="2"
             :maxlength="descriptionHasChanged ? MAX_DESCRIPTOR_LENGTH : undefined"

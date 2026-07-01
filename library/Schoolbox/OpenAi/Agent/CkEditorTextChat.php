@@ -63,7 +63,7 @@ class CkEditorTextChat
             $payload,
             $this->extractUserInput($payload),
             $user,
-            Helper::FEATURE_CHAT,
+            \Schoolbox\OpenAi\Feature::CHAT,
             $aiSessionId,
             null, // TODO: should be able to use the AgentChat log format
         );
@@ -95,6 +95,10 @@ class CkEditorTextChat
             : ($this->config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? '')
         ;
         $payload['stream'] = true;
+        if ($provider === Helper::ENDPOINT_TYPE_OPENAI) {
+            // Persist direct OpenAI chat completions so they appear in OpenAI platform logs.
+            $payload['store'] = true;
+        }
         $payload['max_completion_tokens'] = 10000;
         $reasoningEffort = trim($this->config[Config::SECTION_GENERAL][Config::FIELD_REASONING_EFFORT]['value'] ?? '') ?: Config::REASONING_EFFORT_OPTION_DEFAULT;
         if ($reasoningEffort !== Config::REASONING_EFFORT_OPTION_DEFAULT) {

@@ -50,10 +50,10 @@ mbStore.feedbackDrawerEventBus.on(({ drawerRect }) => {
 <template>
     <tr v-if="mbStore.data !== null" ref="studentRowRef" :class="{ 'markbook-faded': isFaded }">
         <th class="profile-cell fixed-left white">
-            <div class="c-card">
-                <div class="l-flex-row l-gap-m l-pad-s">
+            <div class="sbx-card">
+                <div class="u-flex-row u-gap-m u-pad-s">
                     <user-photo v-if="!mbStore.isDegraded" :user="student" render="small" rounded-corners />
-                    <div class="l-flex-col l-flex--justify-center f-no-margins profile-cell-clip">
+                    <div class="u-flex-col u-flex--justify-center f-no-margins profile-cell-clip">
                         <a :href="`/search/user/${student.id}`" title="View Profile">
                             {{ student.lastName }}, {{ student.givenName }}
                         </a>

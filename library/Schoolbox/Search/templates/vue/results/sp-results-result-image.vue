@@ -21,7 +21,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-    <div :class="`c-img ${props.isSubResult ? 'c-img--s' : ''}`">
+    <div :class="`sbx-img ${props.isSubResult ? 'sbx-img--s' : ''}`">
         <a
             v-if="props.result.type === ResultTypes.BADGE"
             href="#open-badge-modal"

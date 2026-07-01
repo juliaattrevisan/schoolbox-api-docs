@@ -143,7 +143,7 @@ window.Vue.onUnmounted(async () => {
                 props.item.questions[0].response?.comment !== ''
             "
         >
-            <div v-if="props.hasMarkVisibility" class="comment-container l-pad-m--top">
+            <div v-if="props.hasMarkVisibility" class="comment-container u-pad-m--top">
                 <label>Comment</label>
                 <media-article tag="div" :content="props.item.questions[0].response.comment"></media-article>
             </div>
@@ -155,7 +155,7 @@ window.Vue.onUnmounted(async () => {
                 details on creation.
             </p>
             <textarea :id="editorId"></textarea>
-            <div class="save-container l-grid">
+            <div class="save-container u-grid">
                 <div class="save-container__inner-container">
                     <div :class="`alert-box f-no-margins ${hasSaved ? 'success' : ''} ${hasError ? 'alert' : ''}`">
                         <em>{{ saveText }}</em>

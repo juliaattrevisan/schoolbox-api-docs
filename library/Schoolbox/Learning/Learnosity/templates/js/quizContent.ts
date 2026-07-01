@@ -10,8 +10,7 @@
 /* eslint-enable vue/no-v-html */
 // @ts-nocheck
 
-import { LT } from "@caspingus/lt/src/authoring/core";
-import * as imageUploader from "@caspingus/lt/src/authoring/extensions/ui/imageUploader/index";
+import { LT } from "@caspingus/lt/authoring/core";
 
 /**
  * Adjust the header of the question items list to be fixed when scrolling down
@@ -198,18 +197,17 @@ const authorAppCallback = {
             }
         };
 
-        LT.init(authorApp); // Set up LT with the Author API application instance variable
-
-        // Put individual extensions in the LT object if that makes your life easier
-        LT.extensions = {
-            imageUploader,
-        };
-
-        // Run the image uploader extension
-        LT.extensions.imageUploader.run(
-            window.sbProps.authorApp.initOptions.security,
-            window.sbProps.authorApp.initOptions.request,
-        );
+        LT.init(authorApp, {
+            extensions: [
+                {
+                    id: "imageUploader",
+                    args: {
+                        security: window.sbProps.authorApp.initOptions.security,
+                        request: window.sbProps.authorApp.initOptions.request,
+                    },
+                },
+            ],
+        });
     },
     /* Log errors to console and to screen for users
      */

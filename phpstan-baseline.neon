@@ -3517,12 +3517,6 @@ parameters:
 			path: library/Schoolbox/Learning/MarkScheme/TotalMarkAbstract.php
 
 		-
-			message: '#^Property Schoolbox\\Learning\\Markbook\\Markbook\:\:\$totalWeight \(int\) does not accept float\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: library/Schoolbox/Learning/Markbook/Markbook.php
-
-		-
 			message: '#^Call to an undefined method Schoolbox\\Mapper\:\:findForToday\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -4392,12 +4386,6 @@ parameters:
 			identifier: method.unused
 			count: 1
 			path: tools/custom/wes/changeType.php
-
-		-
-			message: '#^Constant Schoolbox\\Application\\CliTool\\App@anonymous/tools/mq/list\-redis\-routes\.php\:21\:\:TTL_NOT_SET is unused\.$#'
-			identifier: classConstant.unused
-			count: 1
-			path: tools/mq/list-redis-routes.php
 
 		-
 			message: '#^Call to function method_exists\(\) with Schoolbox\\Realtime\\Schedule\\Trigger\\InstantTriggerInterface and ''getModuleNotifier'' will always evaluate to true\.$#'

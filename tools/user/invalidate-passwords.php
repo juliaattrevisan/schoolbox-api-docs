@@ -13,7 +13,27 @@ use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$app = new class extends CliTool\App {
+$app = new class extends CliTool\BaseApp {
+    protected function getName(): string
+    {
+        return 'invalidate-passwords';
+    }
+
+    protected function getDescription(): string
+    {
+        return 'Clears the password for any user whose password is still set to the default value "donotchange".';
+    }
+
+    protected function setOptions(): self
+    {
+        return $this;
+    }
+
+    protected function hasPerformMode(): bool
+    {
+        return false;
+    }
+
     public function run(): void
     {
         $dbc = $this->getDatabaseInternal();

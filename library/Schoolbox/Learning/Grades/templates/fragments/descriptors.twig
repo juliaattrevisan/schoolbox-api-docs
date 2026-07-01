@@ -1,71 +1,87 @@
-{#
-    Renders all the selected descriptors in rubrics across all the rubrics students have been marked for
-
-    Usage:
-        rubricAssessmentList  array
-        longitudinalRubric    array
-        student               User
-        assessments           IAssessable[]
-        returnUrlSuffix       string
-#}
+{##
+ # Learning Levels panel on a student's Grades page
+ #
+ # "Renders all the selected descriptors in rubrics across all the rubrics students have been marked for"
+ #
+ # Shows the selected descriptor text that a student received for each indicator used among assessments.
+ # We were already obtaining this selected descriptor text from the rubric markbook mega hash lookup data struct;
+ # The Learning Levels panel is identical in layout to Capability Marks panel, but we go deeper into the rubric tree
+ #
+ # @param array $longitudinalAssessments  A set of array-represented activity metadata (these are not object instances)
+ # @param array $longitudinalStudentMarks A set of (student, grid outcome) tuples; stolen from the rubric markbook struct
+ # @param User $student                   The student whose grades page we are viewing
+ # @param GenericCollection $assessments  A collection of IAssessable instances indexed by assessment id
+ # @param string $returnUrlSuffix         A redirect fragment
+ #}
 <div class="scrollable">
     <table class="rb markable">
         <thead>
-        <tr><th colspan="2">&nbsp;</th>
-            {% for activity_id, activity in rubricAssessmentList  %}
-                <th>
-                    {% set activityAssessment = assessments.by('id', activity_id) %}
-                    {% if activityAssessment %}
-                        {%- set activityHref = routeLookupIfAuthorized(
-                            'learningAssessment.getSummary',
-                            {
-                                assessmentId: activity_id,
+            <tr>
+                <th colspan="2">&nbsp;</th>
+
+                {% for activityId, activity in longitudinalAssessments %}
+                    {% for rubricInstanceId, rubricInstanceData in activity.gridData %}
+                        <th>
+                            {% set summaryLink = routeLookupIfAuthorized('learningAssessment.getSummary', {
                                 studentId: student.id,
                                 student: student,
-                                assessment: activityAssessment,
-                            }
-                            ) -%}
-                    {% else %}
-                        {%- set activityHref = '' -%}
-                    {% endif %}
-                    {%- if activityHref -%}
-                        <a href="{{ activityHref }}{{ returnUrlSuffix }}">{{ activity.name }}</a>
-                    {%- else -%}
-                        {{ activity.name }}
-                    {%- endif -%}
-                </th>
-            {% endfor %}
-        </tr>
+                                assessmentId: activityId,
+                                assessment: assessments.by('id', activityId)
+                            }) %}
+                            <a href="{{ summaryLink ?? null }}{{ returnUrlSuffix }}">{{ activity.name }}</a><br />
+                            {{ rubricInstanceData.title }}
+                        </th>
+                    {% endfor %}
+                {% endfor %}
+            </tr>
         </thead>
         <tbody>
-        {% for capability in longitudinalRubric %}
-            <tr>
-            <th class="rb-group-name markdown" rowspan="{{ capability.indicators|length }}">{{ capability.name | markdown }}</th>
-            {% for indicator in capability.indicators %}
-                {% if not loop.first %}
-                    <tr>
-                {% endif %}
-                <th class="rb-criterion-name markdown">{{ (indicator.name  ?? '') | markdown }}</th>
-                {% for activity_id, activity in rubricAssessmentList %}
-                    {% set activity = indicator.activities[activity_id] is defined ? indicator.activities[activity_id] : null %}
-                    <td>
-                        <div>
-                            <span class="rb-description markdown">
-                                {% if activity %}<b>{{ activity.level ?? '' }}</b><br />{% endif %}
-                                {{ (activity.descriptor ?? '') | markdown }}
-                                {% if activity and activity.value is defined and (activity.max_value ?? 0) > 0 and showRubricPoints %}
-                                    ({{ activity.value|round }}/{{ activity.max_value|round }})
-                                {% endif %}
-                            </span>
-                        </div>
-                    </td>
-                {% endfor %}
+            {% for capabilityId, capabilityData in longitudinalStudentMarks %}
+                <tr>
+                    <th class="rb-group-name markdown" rowspan="{{ capabilityData.indicators|length }}">{{ capabilityData.name | markdown }}</th>
+
+                    {% for indicatorId, indicatorData in capabilityData.indicators %}
+                        {# mystical html table witchery #}
+                        {% if not loop.first %}
+                            </tr>
+                            <tr>
+                        {% endif %}
+
+                        <th class="rb-criterion-name markdown">{{ (indicatorData.name  ?? '') | markdown }}</th>
+
+                        {% for activityId, activity in longitudinalAssessments %}
+                            {% for rubricInstanceId, rubricInstanceData in activity.gridData %}
+                                <td>
+                                    {# Shortcuts to marks of various types #}
+                                    {% set publishedMarks = indicatorData.assessmentResults[activityId].grid[rubricInstanceId].published ?? null %}
+
+                                    {% if publishedMarks is not null %}
+                                        <div>
+                                            <span class="rb-description markdown">
+                                                {# If there's a meaningful level name, show that too #}
+                                                {% if publishedMarks.selectedLevel ?? null %}
+                                                    <strong>{{ publishedMarks.selectedLevel }}</strong><br />
+                                                {% endif %}
+
+                                                {# Show the selected descriptor's text #}
+                                                {{ (publishedMarks.selectedDescriptorText ?? '') | markdown }}
+
+                                                {# Calculate a fractional points score, if possible #}
+                                                {% set numerator = publishedMarks.selectedDescriptorValue ?? null %}
+                                                {% set denominator = activity.gridData[rubricInstanceId].capabilities[capabilityId].indicators[indicatorId].max ?? null %}
+
+                                                {% if numerator is not null and denominator and showRubricPoints %}
+                                                    ({{ numerator|round }}/{{ denominator|round }})
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        {% endfor %}
+                    {% endfor %}
                 </tr>
             {% endfor %}
-            </tr>
-        {% endfor %}
         </tbody>
     </table>
 </div>
-
-

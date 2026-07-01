@@ -50,8 +50,11 @@
             cellContent: function(args) {
                 let resourceDetails = document.createElement('span');
                 resourceDetails.setAttribute('class', 'meta');
-                resourceDetails.innerText = ' · Capacity: ' + args.resource.extendedProps.capacity
-                    + ' · Conflicts ' + (args.resource.extendedProps.allowClashBookings ? 'Allowed' : 'Not Allowed');
+                let resourceDetailsText = ' · Capacity: ' + args.resource.extendedProps.capacity;
+                if (!args.resource.extendedProps.allowClashBookings) {
+                    resourceDetailsText += ' · Only allow booking requests up to capacity.';
+                }
+                resourceDetails.innerText = resourceDetailsText;
 
                 let link = document.createElement('a');
                 link.setAttribute('href', '/resource-booking/item/' + args.fieldValue);

@@ -103,6 +103,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
              * Can't determine what event type this would be
              */
             $eventType = null;
+            $days = 1; // no config available (CONFIGURATION_NONE) — default to expensive for today
         }
 
         /* Ensure $eventType is valid, finding first available one if it is invalid.

@@ -587,7 +587,13 @@ class Controller extends BaseController
              * See tabConstraintsRoleType
              */
             'contacts'     => true,
-            'registration' => $registrationPayload !== null,
+            'registration' => $registrationPayload !== null && $this->getRouteIfAuthorized(
+                'internationalBaccalaureate.updateRegistrationSessionStudentConfirmation',
+                [
+                    'registrationSession' => $registrationSessionStudent->getRegistrationSession(),
+                    'studentId'           => $student->getId(),
+                ]
+            ),
         ];
 
         /* Decide whether the Contacts tab should show for the viewer:

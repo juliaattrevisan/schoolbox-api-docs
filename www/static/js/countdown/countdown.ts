@@ -48,7 +48,7 @@ countdownElements.forEach((element) => {
         }
 
         targetElement.innerHTML =
-            '<li class="count count--finished l-flex l-flex--center">Countdown has been reached!</li>';
+            '<li class="count count--finished u-flex u-flex--center">Countdown has been reached!</li>';
         targetElementParent.classList.add("disabled");
 
         // don't play the animation if the user has reduced motion enabled

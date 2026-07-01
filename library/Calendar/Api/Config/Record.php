@@ -36,6 +36,7 @@ class Calendar_Api_Config_Record
         'Event' => [
             'External' => 'External', // Default.
             'Schoolbox' => 'Schoolbox', // Default.
+            'Socs' => 'Socs', // Default.
             'Vcal' => 'Vcal' // Default.
         ],
         'Fixtures' => [

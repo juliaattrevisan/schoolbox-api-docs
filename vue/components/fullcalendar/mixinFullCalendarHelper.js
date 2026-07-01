@@ -176,5 +176,27 @@ export default {
             }
             return contentHeight;
         },
+
+        /**
+         * Update the icons in the calendar's header toolbar to match
+         * @param {*} buttonClassName
+         * @param {*} iconName
+         * @returns void
+         */
+        fullCalendarHelper_replaceButtonIcon(buttonClassName, iconName) {
+            const selector = buttonClassName.startsWith(".") ? buttonClassName : `.${buttonClassName}`;
+            const rootEl = this && this.$el ? this.$el : document;
+            const button = rootEl.querySelector ? rootEl.querySelector(selector) : document.querySelector(selector);
+            if (!button) {
+                return;
+            }
+
+            button.replaceChildren();
+
+            const icon = document.createElement("sbx-icon");
+            icon.setAttribute("name", iconName);
+            icon.setAttribute("aria-hidden", "true");
+            button.appendChild(icon);
+        },
     },
 };

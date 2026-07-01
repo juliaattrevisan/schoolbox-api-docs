@@ -38,11 +38,11 @@ function onExpandSelected(): void {
 
 <template>
     <li>
-        <div class="node l-gap-xs l-pad-xs--vert">
-            <div :class="{ 'l-flex l-flex--align-center l-gap-xs f-no-margins': showExpandButton }">
+        <div class="node u-gap-xs u-pad-xs--vert">
+            <div :class="{ 'u-flex u-flex--align-center u-gap-xs f-no-margins': showExpandButton }">
                 <button
                     v-if="showExpandButton"
-                    class="l-flex l-flex--center l-flex__item--0-shrink f-no-bkg"
+                    class="u-flex u-flex--center u-flex__item--0-shrink f-no-bkg"
                     :aria-label="isExpanded ? 'Collapse' : 'Expand'"
                     :title="isExpanded ? 'Collapse' : 'Expand'"
                     :data-test="`cc-report-table-node-expand-button-${props.node.id}`"

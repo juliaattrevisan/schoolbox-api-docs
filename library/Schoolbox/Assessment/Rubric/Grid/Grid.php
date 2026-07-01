@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Grid;
 
 use DomainException;
-use JsonSerializable;
 use RangeException;
 use Schoolbox\Assessment\Rubric\RowSet\Indicator;
 use Schoolbox\Assessment\Rubric\RowSet\Capability;
@@ -334,7 +333,7 @@ class Grid
      */
     public function getCapabilityMarkScheme(): IMarkScheme
     {
-        return $this->markSchemeFactory->spawnForCapability($this->getAssessment());
+        return $this->markSchemeFactory->spawnForCapability($this->getRubricInstance());
     }
 
 
@@ -440,18 +439,5 @@ class Grid
     {
         $this->levels = $levels;
         return $this;
-    }
-
-    /**
-     * @param bool $showPoints
-     * @return array
-     * @see /library/Schoolbox/Assessment/Rubric/templates/vue/types.ts RubricGrid
-     */
-    public function toArray(bool $showPoints): array
-    {
-        // TODO: injecting this stuff like this is quite unpleasant, let's review once it's at least working...
-        // ^ see MarkedGrid::toArray for further comments
-        $rubricGridTranslator = new Translator\ModelToArray\Base($showPoints);
-        return $rubricGridTranslator($this);
     }
 }

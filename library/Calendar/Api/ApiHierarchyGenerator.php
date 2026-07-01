@@ -60,6 +60,12 @@ class ApiHierarchyGenerator
             foreach ($subDirNames as $subDirName) {
                 $connectorClassFilename = basename($subDirName);
 
+                // SOCS is configured from the SOCS admin screen, so it should not be listed
+                // with user-managed calendar subscriptions.
+                if (in_array($connectorClassFilename, ['Socs'], true)) {
+                    continue;
+                }
+
                 $className = "Calendar_Api_Config_Connector_{$connectorClassFilename}";
                 $config    = new $className();
 

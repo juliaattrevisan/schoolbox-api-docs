@@ -14,15 +14,17 @@ use Schoolbox\Admin\OpenAI\Config as AIConfig;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Editor\OpenAI\Helper;
-use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
+use Schoolbox\OpenAi\Feature;
+use Schoolbox\OpenAi\Session\Log\Mapper as AILogMapper;
 use Schoolbox\OpenAi\Agent\InteractionModeration;
 use Schoolbox\OpenAi\ClientFactory;
+use Schoolbox\OpenAi\Moderation\Event\Mapper as ModerationEventMapper;
+use Schoolbox\OpenAi\Moderation\Event\Status as ModerationEventStatus;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
 /**
- * Temporary tool to run the InteractionModeration agent against a particular session_id within openai_log
+ * Temporary tool to run the InteractionModeration agent against a particular AI session within ai_session_log.
  */
 $app = new class extends CliTool\App {
     /**
@@ -38,6 +40,11 @@ $app = new class extends CliTool\App {
      * The AI session ID to run moderation against
      */
     private const string OPT_LONG_SESSION_ID = 'session-id:';
+
+    /**
+     * @var ModerationEventMapper
+     */
+    private ModerationEventMapper $moderationEventMapper;
 
     /**
      * @var AILogMapper
@@ -69,7 +76,7 @@ $app = new class extends CliTool\App {
                     echo <<<HELP
 Interaction Moderation Tool
 
-Runs the AI interaction moderation agent against existing openai_log rows for a session.
+Runs the AI interaction moderation agent against existing ai_session_log rows for an AI session.
 
 Usage: {$this->getToolFilename()} --session-id SESSION_ID
     --session-id    The AI session ID to run moderation against
@@ -78,35 +85,40 @@ HELP;
             exit(CliKernelAbstract::EXIT_STATUS_OK);
         }
 
-        $sessionId = trim((string)($this->getOpt(self::OPT_LONG_SESSION_ID) ?? ''));
+        $targetSessionId = trim((string)($this->getOpt(self::OPT_LONG_SESSION_ID) ?? ''));
 
-        if ($sessionId === '') {
+        if ($targetSessionId === '') {
             $this->getLogger()->error('--session-id is required.');
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
 
+        $this->moderationEventMapper = ModerationEventMapper::getInstance();
         $this->aiLogMapper = AILogMapper::getInstance();
         $this->clientFactory = $this->getDi()->get('ai.clientFactory');
 
-        $logs = $this->aiLogMapper->findByColumn('session_id', $sessionId, [
+        /* find related logs */
+
+        $logs = $this->aiLogMapper->findByColumn('ai_session_id', $targetSessionId, [
             'order' => [
                 'created_at' => 'ASC',
             ],
         ]);
 
         if ($logs->count() === 0) {
-            $this->getLogger()->error(sprintf('No logs found for session ID "%s"', $sessionId));
+            $this->getLogger()->error(sprintf('No logs found for session ID "%s"', $targetSessionId));
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
 
-        $this->getLogger()->info(sprintf('Found %d log(s) for session ID "%s"', $logs->count(), $sessionId));
+        $this->getLogger()->info(sprintf('Found %d log(s) for session ID "%s"', $logs->count(), $targetSessionId));
+
+        /* run the agent */
 
         $agentConfig = (new AIConfig())->decode(
             (string)$this->getConfig()->get(ConfigMapper::NAME_AI_MODERATION_AGENT)
         );
 
         $interactionModeration = new InteractionModeration(
-            $this->clientFactory->buildForFeature(Helper::FEATURE_AI_MODERATION_AGENT),
+            $this->clientFactory->buildForFeature(Feature::AI_MODERATION_AGENT),
             $agentConfig,
         );
 
@@ -115,6 +127,20 @@ HELP;
         $moderationSessionId = (string)Uuid::uuid4();
         $moderationResult = $interactionModeration->request(null, $moderationSessionId, $logs);
 
+        /* persist the result (for both flagged and non-flagged sessions so we can remember if we ran the agent against them already) */
+        $status = $moderationResult->getCategories()->count() > 0
+            ? ModerationEventStatus::REQUIRES_ATTENTION
+            : ModerationEventStatus::NO_BEHAVIOUR_FLAGGED;
+
+        $event = $this->moderationEventMapper->createModel()
+            ->setAiSessionId($moderationSessionId)
+            ->setTargetAiSessionId($targetSessionId)
+            ->setStatus($status)
+            ->setModerationDetails($moderationResult);
+
+        $this->moderationEventMapper->save($event);
+
+        /* dump the results out since this is a temp testing tool */
         fwrite(
             $this->getOutStream(),
             json_encode($moderationResult, JSON_PRETTY_PRINT) . PHP_EOL

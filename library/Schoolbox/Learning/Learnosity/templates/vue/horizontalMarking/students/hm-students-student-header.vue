@@ -30,11 +30,11 @@ function onToggleSelected(): void {
 </script>
 
 <template>
-    <div class="l-flex-row l-flex--justify-space l-gap-m l-pad-m f-no-margins">
-        <div class="l-flex-row l-flex--align-center l-gap-m f-no-margins">
+    <div class="u-flex-row u-flex--justify-space u-gap-m u-pad-m f-no-margins">
+        <div class="u-flex-row u-flex--align-center u-gap-m f-no-margins">
             <button
                 v-if="props.student.isReportLoaded"
-                :class="`toggle-button l-flex l-flex--align-center l-flex--justify-center ${
+                :class="`toggle-button u-flex u-flex--align-center u-flex--justify-center ${
                     props.student.isExpanded ? 'icon-up-arrow' : 'icon-down-arrow'
                 }`"
                 :disabled="!props.student.isReportLoaded"
@@ -42,8 +42,8 @@ function onToggleSelected(): void {
                 @click.prevent="onToggleSelected"
             ></button>
             <span v-else class="loader"></span>
-            <div class="c-img c-img--round c-img--s">
-                <div class="c-img__wrapper">
+            <div class="sbx-img sbx-img--round sbx-img--s">
+                <div class="sbx-img__wrapper">
                     <img
                         :src="`/portrait.php?id=${props.student.id}&size=square64`"
                         :alt="`Photo of ${props.student.name}`"

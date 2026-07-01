@@ -117,11 +117,11 @@ function onMouseOut(event: MouseEvent): void {
 </script>
 
 <template>
-    <div id="header-search-input" class="c-search-input">
+    <div id="header-search-input" class="sbx-search-input">
         <input
             id="search-field"
             ref="inputElement"
-            class="c-search-input__field"
+            class="sbx-search-input__field"
             type="text"
             name="keyword"
             placeholder="Search"
@@ -142,7 +142,7 @@ function onMouseOut(event: MouseEvent): void {
         <button
             for="search-field"
             type="button"
-            class="c-search-input__button sbx-icon-only-button"
+            class="sbx-search-input__button sbx-icon-only-button"
             title="Search"
             aria-label="Search"
             data-test="search-input-button"
@@ -157,11 +157,11 @@ function onMouseOut(event: MouseEvent): void {
 </template>
 
 <style lang="scss">
-.c-search-input {
+.sbx-search-input {
     display: grid;
     grid-template-columns: 1fr 4.5rem;
 
-    input[type="text"].c-search-input__field {
+    input[type="text"].sbx-search-input__field {
         border: 2px solid var(--sbx-config-color-accent, var(--form-border-color));
         background-color: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
         color: var(--sbx-color-text-primary, var(--color-text-primary));

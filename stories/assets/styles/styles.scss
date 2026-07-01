@@ -10,7 +10,7 @@
  */
 
 @import "docs";
-@import "../../../www/static/css/core/ui/button/c-button";
+@import "../../../www/static/css/core/ui/button/sbx-button";
 @import "form";
 @import "../../../www/static/css/core/layout/island";
 @import "card";
@@ -26,7 +26,7 @@
  * Clear any gaps, not needed in SBX, utility classes should have precedence
  * when used in production
  */
-.l-gap--0 {
+.u-gap--0 {
     gap: 0;
 }
 

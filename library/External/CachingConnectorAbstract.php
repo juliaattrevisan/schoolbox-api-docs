@@ -117,7 +117,11 @@ class CachingConnectorAbstract
             return $this->bypassCache($method, $params);
         }
 
-        $key      = get_class($this->database) . '.' . $method;
+        // Use this class' name, instead of the internal database's class name,
+        // as the cache key:
+        // this is so that methods outside of this one may more easily
+        // invalidate the cache.
+        $key      = get_class($this) . '.' . $method;
         $database = $this->database;
         $callback = static function ($params) use ($database, $method) {
             return call_user_func_array([$database, $method], $params);

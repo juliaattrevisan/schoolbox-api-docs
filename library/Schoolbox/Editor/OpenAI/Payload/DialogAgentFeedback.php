@@ -3,7 +3,8 @@
 namespace Schoolbox\Editor\OpenAI\Payload;
 
 use Schoolbox\Admin\OpenAI\Config;
-use Schoolbox\Editor\OpenAI\Log;
+use Schoolbox\OpenAi\Session\Log;
+use Schoolbox\Editor\OpenAI\Log\Translator\Format\AgentChat;
 use Schoolbox\Admin\DialogAgent\Scenario\Model as Scenario;
 use Schoolbox\Admin\DialogAgent\Scenario\Criterion\Model as Criterion;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
@@ -232,12 +233,12 @@ class DialogAgentFeedback
             'content' => $assessment->getOpeningMessage(),
         ]);
 
-        $logEntries = $this->aiLogMapper->findByColumn('session_id', $response->getSessionId(), [
+        $logEntries = $this->aiLogMapper->findByColumn('ai_session_id', $response->getSessionId(), [
             'order' => [ 'created_at' => 'ASC' ]
         ]);
 
         /** The strategy should always be AgentChat for each log */
-        $strategy = new Log\Translator\Format\AgentChat();
+        $strategy = new AgentChat();
         foreach ($logEntries as $log) {
             $feedPrompt->add([
                 'role' => 'student',

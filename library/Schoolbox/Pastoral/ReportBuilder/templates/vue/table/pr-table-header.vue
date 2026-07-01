@@ -91,7 +91,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
         <tr>
             <th class="u-border-right u-sticky-left">
                 <div v-if="config?.pastoralPointEnabled" class="checklist">
-                    <ul class="option-list l-flex l-gap-m f-no-margins">
+                    <ul class="option-list u-flex u-gap-m f-no-margins">
                         <li v-for="(option, index) in recordsAndPoints" :key="`option-${index}`">
                             <input
                                 :id="option"

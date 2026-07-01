@@ -254,7 +254,7 @@
                     height="16"
                     aria-hidden="true"
                     focusable="false"
-                    class="c-icon"
+                    class="sbx-icon"
                 >
                     <path
                         fill-rule="evenodd"
@@ -308,7 +308,7 @@
     <div class="small-12 island">
         <h2 class="subheader">{{ locale.rubricCriterion.properPlural }}</h2>
         <section class="content">
-            {% include '@learningAnalytics/fragments/rubric_box_plot.twig' with {studentMarksPerCriterion: rubrics, students: students} only %}
+            {% include '@learningAnalytics/fragments/rubric_box_plot.twig' with {dataset: rubrics} only %}
         </section>
     </div>
 </div>

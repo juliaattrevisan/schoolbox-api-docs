@@ -64,16 +64,16 @@ function onCellSelected(header: TableHeader): void {
                     (index === 0 && props.isFirstColumnSticky) ||
                     (header.key === 'total' && props.isTotalSticky) ||
                     (header.key === 'trend' && props.isTrendSticky),
-                'l-pad--0': header.key === 'user',
+                'u-pad--0': header.key === 'user',
                 'total-cell': header.key === 'total',
                 'total-cell--sticky': header.key === 'total' && props.isTotalSticky,
                 'trend-cell--sticky': header.key === 'trend' && props.isTrendSticky,
             }"
         >
             <template v-if="header.type == TableHeaderType.USER">
-                <div class="l-flex-row l-flex--no-wrap l-gap-m">
+                <div class="u-flex-row u-flex--no-wrap u-gap-m">
                     <user-photo :user="props.rowData[header.key] as User" render="small" />
-                    <div class="l-flex-col l-flex--justify-center f-no-margins">
+                    <div class="u-flex-col u-flex--justify-center f-no-margins">
                         <a
                             v-if="(props.rowData[header.key] as User)._links?.profile"
                             :href="(props.rowData[header.key] as User)._links!.profile"

@@ -589,7 +589,7 @@ export default {
 <template>
     <div>
         <div class="small-12 island">
-            <h1 class="t-restrict-length">{{ subjectTitle }}</h1>
+            <h1 class="u-restrict-length">{{ subjectTitle }}</h1>
 
             <dl class="tabs" v-if="classCodeList.length > 1">
                 <dd :class="{ active: currentClassCode === null }">
@@ -710,8 +710,8 @@ export default {
                                 />
                             </td>
                             <td>
-                                <div class="l-flex-col l-gap-s">
-                                    <div class="l-flex-row l-gap-s">
+                                <div class="u-flex-col u-gap-s">
+                                    <div class="u-flex-row u-gap-s">
                                         <template v-if="student.id">
                                             <a
                                                 :data-test="`class-list-${student.id}-username`"

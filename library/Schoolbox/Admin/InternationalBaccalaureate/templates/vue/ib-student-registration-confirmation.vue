@@ -75,7 +75,7 @@ async function toggle(value: boolean): Promise<void> {
 </script>
 
 <template>
-    <div class="small-12 l-mar-s--top">
+    <div class="small-12 u-mar-s--top">
         <div class="checklist sbx-checkbox-radio-container">
             <input
                 :id="`confirmation-${props.section}`"

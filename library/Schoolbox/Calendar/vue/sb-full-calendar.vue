@@ -223,26 +223,12 @@ export default {
 
         this.registerListCustomInputFields();
 
-        this.replaceButtonIcon("fc-quickSwitchButton-button", "calendar");
-        this.replaceButtonIcon("fc-customPrev-button", "previous");
-        this.replaceButtonIcon("fc-customNext-button", "next");
+        this.fullCalendarHelper_replaceButtonIcon("fc-quickSwitchButton-button", "calendar");
+        this.fullCalendarHelper_replaceButtonIcon("fc-customPrev-button", "previous");
+        this.fullCalendarHelper_replaceButtonIcon("fc-customNext-button", "next");
     },
 
     methods: {
-        replaceButtonIcon(buttonClassName, iconName) {
-            const button = document.getElementsByClassName(buttonClassName)[0];
-            if (!button) {
-                return;
-            }
-
-            button.replaceChildren();
-
-            const icon = document.createElement("sbx-icon");
-            icon.setAttribute("name", iconName);
-            icon.setAttribute("aria-hidden", "true");
-            button.appendChild(icon);
-        },
-
         /**
          * Open the export modal.
          */

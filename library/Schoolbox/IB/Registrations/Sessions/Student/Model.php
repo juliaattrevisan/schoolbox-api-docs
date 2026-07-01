@@ -114,6 +114,18 @@ class Model implements IModel
     private ?User $subjectConfirmedBy = null;
 
     /**
+     * Staff member who performed the manual registration
+     * @var User|null
+     */
+    private ?User $manuallyRegisteredBy = null;
+
+    /**
+     * Timestamp of the manual registration
+     * @var Alaress_Date_Format|null
+     */
+    private ?Alaress_Date_Format $manuallyRegisteredAt = null;
+
+    /**
      * Registration session this student belongs to
      * @var SessionModel|null
      */
@@ -309,6 +321,42 @@ class Model implements IModel
     {
         $ibGroupSubjects->assertCollectionOf(GroupSubjectModel::class);
         $this->ibGroupSubjects = $ibGroupSubjects;
+        return $this;
+    }
+
+    /**
+     * @return User|null
+     */
+    public function getManuallyRegisteredBy(): ?User
+    {
+        return $this->manuallyRegisteredBy;
+    }
+
+    /**
+     * @param User|null $manuallyRegisteredBy
+     * @return self
+     */
+    public function setManuallyRegisteredBy(?User $manuallyRegisteredBy): self
+    {
+        $this->manuallyRegisteredBy = $manuallyRegisteredBy;
+        return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format|null
+     */
+    public function getManuallyRegisteredAt(): ?Alaress_Date_Format
+    {
+        return $this->manuallyRegisteredAt;
+    }
+
+    /**
+     * @param Alaress_Date_Format|null $manuallyRegisteredAt
+     * @return self
+     */
+    public function setManuallyRegisteredAt(?Alaress_Date_Format $manuallyRegisteredAt): self
+    {
+        $this->manuallyRegisteredAt = $manuallyRegisteredAt;
         return $this;
     }
 }

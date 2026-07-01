@@ -225,7 +225,7 @@ window.Vue.onBeforeUnmount(async () => {
 </script>
 
 <template>
-    <div class="l-flex-col l-gap-m question">
+    <div class="u-flex-col u-gap-m question">
         <template v-if="props.question.response">
             <div ref="responsesEl"></div>
             <template v-if="props.showFeedback">
@@ -268,7 +268,7 @@ window.Vue.onBeforeUnmount(async () => {
                             inputmode="numeric"
                         />
                     </template>
-                    <div class="save-container l-grid">
+                    <div class="save-container u-grid">
                         <div class="save-container__inner-container">
                             <div
                                 :class="`alert-box f-no-margins ${hasSaved ? 'success' : ''} ${

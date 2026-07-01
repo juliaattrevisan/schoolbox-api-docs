@@ -1,0 +1,93 @@
+/*
+    This is basically a utility class for us to create flex containers without having to...
+    a) explicitly create a class definition somewhere
+    b) leverage other classes for this purpose that probably *shouldn't be used*
+
+    "Isn't this the same as using inline styles" I hear you ask?
+    No. Firstly, it's abundantly clear that these classes are applying the explict styles
+    you're seeing via the naming convention and structure. More importantly though, all
+    implementations of these flex containers using these classes can have their styles
+    updated and controlled from this specific file. Let's say flex changes a property in
+    the future and we want to target all flex containers - we can do that here in a single
+    location. Could we do that if this was the same as "inline styles?"
+*/
+
+.u-flex {
+    display: flex;
+
+    > * {
+        max-width: 100%; // prevent flex items from overflowing the container
+    }
+
+    &-col,
+    &-row {
+        display: flex;
+    }
+
+    &-col {
+        flex-direction: column;
+    }
+    &-row {
+        flex-direction: row;
+        flex-wrap: wrap; // always allow flex items to wrap
+    }
+
+    &--inline-flex {
+        display: inline-flex !important;
+    }
+
+    &--wrap-reverse {
+        flex-wrap: wrap-reverse;
+    }
+
+    &--no-wrap {
+        flex-wrap: nowrap;
+    }
+
+    &--center {
+        align-items: center;
+        justify-content: center;
+    }
+
+    &--align-start {
+        align-items: start;
+    }
+
+    &--align-center {
+        align-items: center;
+    }
+
+    &--align-end {
+        align-items: end;
+    }
+
+    &--justify-center {
+        justify-content: center;
+    }
+
+    &--justify-end {
+        justify-content: flex-end;
+    }
+
+    &--justify-space {
+        justify-content: space-between;
+    }
+
+    &__item {
+        &--1 {
+            flex: 1;
+        }
+        &--1-auto {
+            flex: 1 auto;
+        }
+        &--0-shrink {
+            flex-shrink: 0;
+        }
+        &--1-grow {
+            flex-grow: 1;
+        }
+        &--none {
+            flex: none;
+        }
+    }
+}

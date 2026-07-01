@@ -22,7 +22,7 @@ require __DIR__ . '/../../conf/core/require.php';
  * Iterates over the calendar vcal keys and removes them from the system.
  * These keys are temporary, so they can be disposed of safely
  */
-$app = new class extends CliTool\App {
+$app = new class extends CliTool\BaseApp {
     private const PROGRESS_INCREMENTS = 10000;
 
     private int $countVcalCacheDeleted = 0;
@@ -33,6 +33,29 @@ $app = new class extends CliTool\App {
         return null; // Doesn't matter.
     }
 
+    protected function getName(): string
+    {
+        return 'removeVcalCache';
+    }
+
+    protected function getDescription(): string
+    {
+        return <<<DESC
+            Iterates over the calendar vcal keys and removes them from the system.
+            These keys are temporary, so they can be disposed of safely.
+            IMPORTANT: do not run for all instances in parallel on the server, or you will overload Redis.
+            DESC;
+    }
+
+    protected function setOptions(): self
+    {
+        return $this;
+    }
+
+    protected function hasPerformMode(): bool
+    {
+        return true;
+    }
 
     /** @inheritDoc */
     public function run(): void

@@ -6,6 +6,7 @@ import type { RegistrationSession } from "../../js/types/ibRegistrationTypes";
 interface Props {
     createEndpoint: string;
     systemPurposeId: number;
+    systemPurposeName: string;
 }
 const props = defineProps<Props>();
 
@@ -91,9 +92,9 @@ async function onSubmit(): Promise<void> {
 
 <template>
     <BasicModal v-model:is-open="isOpen" :has-background-click="true" size="s">
-        <form class="l-flex-col l-gap-m f-no-margins" @submit.prevent="onSubmit">
+        <form class="u-flex-col u-gap-m f-no-margins" @submit.prevent="onSubmit">
             <h2>Create New Examination Session</h2>
-            <p>Configuring registration for Diploma Programme Year 2 [DIPLOMA]</p>
+            <p>Configuring registration for {{ systemPurposeName }}</p>
 
             <div class="alert-box" role="alert">
                 If incorrect students appear on the following report, please update the students' qualification.
@@ -103,7 +104,7 @@ async function onSubmit(): Promise<void> {
                 {{ submitError }}
             </div>
 
-            <div class="l-flex-col l-gap-xs">
+            <div class="u-flex-col u-gap-xs">
                 <label for="academic-year" class="required">Academic Year</label>
                 <input
                     id="academic-year"
@@ -118,7 +119,7 @@ async function onSubmit(): Promise<void> {
 
             <fieldset class="radiolist clear-fieldset">
                 <legend class="required">Examination Session</legend>
-                <ul class="option-list l-flex-row l-gap-l f-no-margins">
+                <ul class="option-list u-flex-row u-gap-l f-no-margins">
                     <li>
                         <input
                             id="may"
@@ -141,10 +142,10 @@ async function onSubmit(): Promise<void> {
                 <label v-if="examSessionError" class="error">{{ examSessionError }}</label>
             </fieldset>
 
-            <div class="l-flex l-gap-xs f-no-margins">
-                <button type="button" class="button l-flex__item--1" @click.prevent="isOpen = false">Cancel</button>
+            <div class="u-flex u-gap-xs f-no-margins">
+                <button type="button" class="button u-flex__item--1" @click.prevent="isOpen = false">Cancel</button>
                 <button
-                    class="button submit l-flex__item--1"
+                    class="button submit u-flex__item--1"
                     :disabled="isSubmitting"
                     data-test="ib-registration-create-session-submit"
                 >

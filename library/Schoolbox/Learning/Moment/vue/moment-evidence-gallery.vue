@@ -96,7 +96,7 @@ function onFeaturedEvidenceClick(): void {
         :files="imageGalleryEvidence"
     />
 
-    <file-grid v-if="fileGridEvidence.length > 0" :id="props.id" :files="fileGridEvidence" class="l-mar-m--top" />
+    <file-grid v-if="fileGridEvidence.length > 0" :id="props.id" :files="fileGridEvidence" class="u-mar-m--top" />
 </template>
 
 <style scoped></style>

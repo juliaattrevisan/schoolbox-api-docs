@@ -89,7 +89,7 @@ function onAttemptMarkUpdated(mark: string): void {
 </script>
 
 <template>
-    <div ref="studentEl" class="student c-island l-flex-col l-gap-m">
+    <div ref="studentEl" class="student sbx-island u-flex-col u-gap-m">
         <hm-students-student-header
             :student="props.student"
             :container="responseContentEl as HTMLElement"

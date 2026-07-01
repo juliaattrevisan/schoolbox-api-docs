@@ -38,6 +38,7 @@ use Schoolbox\Learning\Assessment\Task\Decorator\Decorator as TaskDecorator;
 use Schoolbox\Learning\Assessment\Task\Decorator\TaskTrait;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -248,8 +249,7 @@ class Factory
             $this->setWorkType(null);
         } else {
             try {
-                // If an invalid work type has been supplied by the client, treat as information missing.
-                $this->setWorkType($this->workTypeMapper->findById($post['workType'])->getId());
+                $this->setWorkType($this->workTypeMapper->findById($post['workType'] ?? null)->getId());
             } catch (MapperException) {
                 throw $this->errorMapper->generateException(Error\Mapper::ERROR_INFORMATION_MISSING);
             }
@@ -406,6 +406,13 @@ class Factory
 
         $this->setDurationHours($durationHours);
         $this->setDurationMinutes($durationMinutes);
+
+        if (isset($post['visibility']) && $post['visibility'] === '') {
+            // This protects against the situation where the selected visibility option in visibility.twig is disabled.
+            // If the form is submitted in that situation, $post['visibility'] will end up at a blank string.
+            // Note a client-side fix has been added to visibility.twig.  This is the server-side fix.
+            throw Error\Mapper::getInstance()->generateException(Error\Mapper::ERROR_INFORMATION_MISSING);
+        }
 
         /* Quiz needs this to instantiate correctly
          */
@@ -574,6 +581,17 @@ class Factory
         /* Some facts about Course Managed Fields
          */
         $courseManagedFields = new CourseManagedFields($this->creator, $assessment);
+
+        if (!$courseManagedFields->isReadonly() && $this->getWorkType() !== null) {
+            try {
+                $this->assertSubmittedWorkTypeCanBeSaved(
+                    $assessment,
+                    $this->workTypeMapper->findById($this->getWorkType()),
+                );
+            } catch (MapperException) {
+                throw $this->errorMapper->generateException(Error\Mapper::ERROR_INFORMATION_MISSING);
+            }
+        }
 
         if ($assessment instanceof Project) {
             $decorator = new ProjectDecorator(
@@ -856,6 +874,17 @@ class Factory
     {
         $this->workType = $workType;
         return $this;
+    }
+
+
+    private function assertSubmittedWorkTypeCanBeSaved(IAssessable $assessment, WorkType $submittedWorkType): void
+    {
+        $currentWorkType = $assessment->getWorkType();
+        $workTypeChanged = $currentWorkType === null || $currentWorkType->getId() !== $submittedWorkType->getId();
+
+        if ($workTypeChanged && !$submittedWorkType->isPermittedForAssessmentType(AssessmentType::objectToString($assessment))) {
+            throw new UnexpectedValueException('The selected work type does not support the selected assessment type.');
+        }
     }
 
     /**

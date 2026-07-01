@@ -28,7 +28,7 @@ use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Rubric\DataModel\Result\Mapper as RubricResultSetMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
+use Schoolbox\OpenAi\Session\Log\Mapper as AILogMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Filter;
@@ -144,6 +144,26 @@ class Module extends BaseModule
         $canViewStatus            = $this->buildAuthRuleCanViewStatus();
         $canViewSimilarityReport  = $this->buildAuthRuleCanViewSimilarityReport();
         $canAckSubmission         = $this->buildAuthRuleCanAcknowledgeSubmission();
+        /* Reporting activities are intentionally excluded from most custom participation activity creation routes. They
+         * support student participation access in specific cases, but not actions that modify or create an
+         * unrelated activity from the participation screen.
+         *
+         * This is a trap for the Swamp where new activity types need to be added to this list.
+         */
+        $customParticipationAssessmentTypes = [
+            AssessmentType::TYPE_PROJECT,
+            AssessmentType::TYPE_DUE_WORK,
+            AssessmentType::TYPE_TASK,
+            AssessmentType::TYPE_QUIZ,
+            AssessmentType::TYPE_LTI_ASSESSMENT,
+            AssessmentType::TYPE_LESSON_PLAN,
+            AssessmentType::TYPE_DIALOG_AGENT,
+        ];
+
+        $customParticipationCopyAssessmentTypes = [
+            ...$customParticipationAssessmentTypes,
+            AssessmentType::TYPE_REPORTING,
+        ];
 
         $canDelete = new Rule\Any(
             $isSuper,
@@ -193,8 +213,8 @@ class Module extends BaseModule
          *
          * Reporting activities have a special set of checks that cause this rule to permit or deny access to their
          * respective routes, because reporting activities are unlike other LMS activities: it's bureaucratically-driven
-         * rather than learning-driven so things like creating/copying a reporting activity, modifying it, etc is
-         * actually precluded by nature of what that learning activity does.
+         * rather than learning-driven so things like creating a new reporting activity or modifying the existing one
+         * for selected students are precluded by nature of what that learning activity does.
          */
         $canModifyCustomParticipation = new Rule\All(
             /* Should only be accessible if the custom participation config is enabled
@@ -260,26 +280,15 @@ class Module extends BaseModule
             /* Check if the custom participation is available
              */
             new IsCustomParticipationModifiable(),
+            /* Modify Existing Activity is limited to custom participation activity types.
+             */
+            new ValidAssessmentType($customParticipationAssessmentTypes),
             new Rule\Any(
                 $isSuper,
                 new Rule\All(
                     $canWrite,
                     new AssessmentNotDeleted(),
                     new IsModifyUnLocked(new LockedChecker($this->getTermMapper())),
-                    /* Anything EXCEPT reporting activities have access to Modify Existing Activity
-                     *
-                     * Yes, I know this is a bit gruesome.
-                     * This is a trap for the Swamp where new activity types need to be added to this list.
-                     */
-                    new ValidAssessmentType([
-                        AssessmentType::TYPE_PROJECT,
-                        AssessmentType::TYPE_DUE_WORK,
-                        AssessmentType::TYPE_TASK,
-                        AssessmentType::TYPE_QUIZ,
-                        AssessmentType::TYPE_LTI_ASSESSMENT,
-                        AssessmentType::TYPE_LESSON_PLAN,
-                        AssessmentType::TYPE_DIALOG_AGENT,
-                    ]),
                 )
             )
         );
@@ -288,23 +297,9 @@ class Module extends BaseModule
         $canCopyAssessmentCustomParticipation = new Rule\All(
             $canModifyCustomParticipation,
             new IsCustomParticipationCopyable(),
-            new Rule\Any(
-                /* Anything EXCEPT reporting activities have access to Modify Existing Activity
-                 *
-                 * Yes, I know this is a bit gruesome.
-                 * This is a trap for the Swamp where new activity types need to be added to this list.
-                 */
-                new ValidAssessmentType([
-                    AssessmentType::TYPE_PROJECT,
-                    AssessmentType::TYPE_DUE_WORK,
-                    AssessmentType::TYPE_TASK,
-                    AssessmentType::TYPE_QUIZ,
-                    AssessmentType::TYPE_LTI_ASSESSMENT,
-                    AssessmentType::TYPE_LESSON_PLAN,
-                    AssessmentType::TYPE_DIALOG_AGENT,
-                ]),
-                new IsManageReportingActivity($this->getConfig()),
-            )
+            /* Create Copy is limited to custom participation activity types.
+             */
+            new ValidAssessmentType($customParticipationCopyAssessmentTypes)
         );
 
         // pluralise for REST
@@ -486,7 +481,8 @@ class Module extends BaseModule
         // exclude user from assessment
         $this->register('POST', "$assRoute/$studentParam/exclude", 'postExclude', $canModifyCustomParticipation, $preloadParticipant);
 
-        $this->register('GET', "$assRoute/$studentParam/info", 'getInfo', $canModify, $preloadParticipant);
+        // markbook popout
+        $this->register('GET', "$assRoute/$studentParam/info", 'getInfo', $canViewStatus, $preloadParticipant);
 
         // Due work: Teacher interactive worksheet view
         $this->register(self::METHOD_GET, "$assRoute/worksheet", 'getWorksheet', $canModifyWorksheet, $preloadAssessment);

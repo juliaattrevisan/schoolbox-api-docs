@@ -25,10 +25,10 @@
             {% endif %}
             {{ event.title }}
             {% set hasShownStaff = false %}
-            {% for staffId, staffName in event.staff %}
+            {% for staffUserId, staffName in event.staff %}
                 {# Only show "with" if it's a different user (i.e. don't show a teacher is with themselves) #}
-                {% if staffId != user.id %}
-                    {% set staffProfileRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: user.id, user: user}) %}
+                {% if staffUserId != user.id %}
+                    {% set staffProfileRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: staffUserId}) %}
                     {% if hasShownStaff %}/{% else %}with{% endif %}
                     {% if staffProfileRoute %}
                         <a href="{{ staffProfileRoute }}">{{ staffName }}</a>

@@ -88,10 +88,10 @@ function onBadgeModalClosed(): void {
 <template>
     <div
         ref="searchPageEl"
-        :class="`search-page l-grid l-gap-xl ${store.isSingleColumn ? 'search-page--single-column' : ''}`"
+        :class="`search-page u-grid u-gap-xl ${store.isSingleColumn ? 'search-page--single-column' : ''}`"
     >
-        <sp-filters class="c-search-page__filters" />
-        <div class="c-search-page__results l-flex-col l-gap-m">
+        <sp-filters class="sbx-search-page__filters" />
+        <div class="sbx-search-page__results u-flex-col u-gap-m">
             <sp-results-prompt v-if="searchStore.hasNotSearched" />
             <loading-cards v-else-if="searchStore.isSearching" />
             <sp-results-error v-else-if="searchStore.hasLoadError" />

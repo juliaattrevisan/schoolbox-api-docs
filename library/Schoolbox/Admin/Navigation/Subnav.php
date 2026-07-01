@@ -18,8 +18,8 @@ use Schoolbox\Filter\Page\LabelBuilder;
 use Schoolbox\Filter\Page\Model as FilterPageModel;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\OpenAi\Feature;
 use Schoolbox\User;
-use Schoolbox\Editor\OpenAI;
 use Twig\Environment;
 use Twig\Extension\DebugExtension;
 use Twig\Loader\FilesystemLoader;
@@ -604,6 +604,13 @@ class Subnav
                         'visible'     => count($enabledConfigs[ConfigMapper::TYPE_MODULES] ?? []) > 0,
                         'description' => 'Control which features and modules are currently available in your system.',
                     ],
+                    '/adminv2/socs' => [
+                        'name' => 'SOCS Connector',
+                        'visible' => true,
+                        'description' => 'Configure the connection to SOCS and its imported feeds.',
+                        'searchable' => true,
+                        'children' => []
+                    ],
                 ],
             ],
             '/adminv2/news' => [
@@ -828,32 +835,32 @@ class Subnav
                         'description' => 'Enable and configure OpenAI integration to enable AI services to be made available to users.',
                         'searchable' => true,
                         'children' => [
-                            '/adminv2/ai-services#ai_' . OpenAi\Helper::FEATURE_CHAT => [
+                            '/adminv2/ai-services#ai_' . Feature::CHAT->value => [
                                 'name' => 'AI Text Chat',
                                 'visible' => true,
                                 'description' => 'Configure AI settings for interactive text editors.',
                             ],
-                            '/adminv2/ai-services#ai_' . OpenAi\Helper::FEATURE_LESSONPLAN => [
+                            '/adminv2/ai-services#ai_' . Feature::LESSON_PLAN->value => [
                                 'name' => 'AI Lesson Plan',
                                 'visible' => true,
                                 'description' => 'Configure AI settings for generating lesson plan content.',
                             ],
-                            '/adminv2/ai-services#ai_' . OpenAi\Helper::FEATURE_DIALOGAGENT => [
+                            '/adminv2/ai-services#ai_' . Feature::DIALOG_AGENT->value => [
                                 'name' => 'AI Discussion Activity',
                                 'visible' => true,
                                 'description' => 'Configure AI settings for discussion learning activities.',
                             ],
-                            '/adminv2/ai-services#ai_' . OpenAi\Helper::FEATURE_DIFFERENTIATION => [
+                            '/adminv2/ai-services#ai_' . Feature::DIFFERENTIATION->value => [
                                 'name' => 'AI Differentiation Profiles',
                                 'visible' => true,
                                 'description' => 'Configure AI settings for differentiation profile support in discussion learning activities.',
                             ],
-                            '/adminv2/ai-services#ai_' . OpenAi\Helper::FEATURE_IMAGE => [
+                            '/adminv2/ai-services#ai_' . Feature::IMAGE->value => [
                                 'name' => 'AI Image Generation',
                                 'visible' => true,
                                 'description' => 'Configure AI settings for image generation.',
                             ],
-                            '/adminv2/ai-services#ai_' . OpenAi\Helper::FEATURE_LEARNING_ACTIVITY_CUSTOMISATION => [
+                            '/adminv2/ai-services#ai_' . Feature::LEARNING_ACTIVITY_CUSTOMISATION->value => [
                                 'name' => 'AI Learning Activity Customisation',
                                 'visible' => true,
                                 'description' => 'Configure AI settings for learning activity customisation.',
@@ -874,7 +881,6 @@ class Subnav
                         'searchable' => true,
                         'children' => []
                     ],
-
                     '/adminv2/setting/Debugging' => [
                         'name'        => 'Debugging',
                         'visible'     => count($enabledConfigs[ConfigMapper::TYPE_DEBUGGING] ?? []) > 0,

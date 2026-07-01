@@ -10,7 +10,7 @@ const allMarkVisibilityOptions: MarkVisibilityOption[] = [
     { value: "staffOnly", label: "&#xe63e; Staff Only", readonlyIcon: "icon-locked" },
     { value: "staffAndStudent", label: "&#xe667; Staff & Student", readonlyIcon: "icon-staff-students" },
     { value: "staffAndParent", label: "&#xe666; Staff & Parent", readonlyIcon: "icon-staff" },
-    { value: "staffStudentAndParent", label: "&#xe666; Staff, Student & Parent", readonlyIcon: "icon-staff" },
+    { value: "staffStudentAndParent", label: "&#xe630; Staff, Student & Parent", readonlyIcon: "icon-group" },
 ];
 
 /**

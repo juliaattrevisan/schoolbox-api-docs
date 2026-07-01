@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\MarkedGrid;
 
+use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Learning\Assessment\ISelfAssessableFeedback;
 
 /**
@@ -124,6 +125,7 @@ class Factory
         $isSelfReflection = $feedback instanceof ISelfAssessableFeedback && $feedback->isSelfReflectionOnly();
 
         // Set marks for all the capabilities and indicators
+        /** @var CapabilityUsage $capabilityUsage */
         foreach ($markedGrid->getGrid()->getCapabilityUsages() as $capabilityUsage) {
             $capabilityId = $capabilityUsage->getCapability()->getId();
 
@@ -134,7 +136,7 @@ class Factory
                 $capabilityMark = new CapabilityMark(
                     $capabilityUsage,
                     $markSchemeFactory->spawnForCapability(
-                        $markedGrid->getGrid()->getAssessment(),
+                        $markedGrid->getGrid()->getRubricInstance(),
                         $capabilityUsage->getMaxValue(),
                     )
                 );

@@ -89,6 +89,7 @@ class Inspector extends CliTool\App
         /* Clipboard CLI Tools
          */
         ImporterTool::CLIPBOARD_IMPORTER_LOCK_NAME => 'Clipboard Sport/Division/Team/Players/Sessions (./tools/clipboard/importer.php)',
+        \Schoolbox\Socs\Cli\ImporterTool::LOCK_NAME => 'SOCS Fixtures Importer (./tools/socs/importer.php)',
 
         /* Expired Storage Removal Tool
          */

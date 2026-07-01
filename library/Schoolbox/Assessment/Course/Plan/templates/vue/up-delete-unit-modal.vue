@@ -23,16 +23,16 @@ function onDeleteSelected(): void {
 
 <template>
     <basic-modal v-model:is-open="deleteUnitsStore.isOpen" size="s">
-        <form class="l-flex-col l-gap-s f-no-margins" @submit.prevent="onDeleteSelected">
+        <form class="u-flex-col u-gap-s f-no-margins" @submit.prevent="onDeleteSelected">
             <h2 data-test="up-delete-units-title">Please Confirm</h2>
             <p>
                 Are you sure you wish to delete this {{ locale.unit.translate(false, false) }}? This will also delete
                 all {{ locale.activity.translate(true, false) }} in the {{ locale.unit.translate(false, false) }}.
             </p>
             <request-error v-if="deleteUnitsStore.loadError" :further-info="deleteUnitsStore.loadError" />
-            <div class="l-flex l-gap-xs f-no-margins">
+            <div class="u-flex u-gap-xs f-no-margins">
                 <button
-                    class="button submit l-flex__item--1"
+                    class="button submit u-flex__item--1"
                     type="button"
                     data-test="up-delete-unit-delete"
                     @click.prevent="onDeleteSelected"
@@ -40,7 +40,7 @@ function onDeleteSelected(): void {
                     {{ deleteUnitsStore.isProcessing ? "Deleting..." : "Yes" }}
                 </button>
                 <button
-                    class="button l-flex__item--1"
+                    class="button u-flex__item--1"
                     data-test="up-delete-units-cancel"
                     @click.prevent="deleteUnitsStore.cancel()"
                 >

@@ -1,15 +1,25 @@
 <script setup lang="ts">
 /**
  * Student table used in the Registered section of the registration report.
- * Includes the student's IB candidate number.
+ * Includes the student's IB candidate number and manual registration metadata.
  */
 import IbReportSubjectLabels from "./ib-report-subject-labels.vue";
-import type { StudentRow } from "../../js/types/ibReportTypes";
+import type { RegisteredRow } from "../../js/types/ibReportTypes";
 
 interface Props {
-    students: StudentRow[];
+    students: RegisteredRow[];
 }
 defineProps<Props>();
+
+/**
+ * Formats an ISO date string as short date + time using site display formats.
+ * @param isoString - ISO 8601 date string to format.
+ * @returns Formatted date and time string.
+ */
+function formatDate(isoString: string): string {
+    const d = window.dayjs(isoString);
+    return `${d.format(window.dateDisplayFormats.dayjsDateShort)} ${d.format(window.dateDisplayFormats.dayjsTime)}`;
+}
 </script>
 
 <template>
@@ -22,6 +32,7 @@ defineProps<Props>();
                 <th>SL</th>
                 <th>Core</th>
                 <th>IB Candidate Number</th>
+                <th>Manually Registered By</th>
             </tr>
         </thead>
         <tbody>
@@ -46,6 +57,12 @@ defineProps<Props>();
                 <td><ib-report-subject-labels :entry="student.subjects.sl" /></td>
                 <td><ib-report-subject-labels :entry="student.subjects.core" /></td>
                 <td>{{ student.ibCandidateNumber ?? "—" }}</td>
+                <td>
+                    <template v-if="student.manuallyRegisteredBy && student.manuallyRegisteredAt">
+                        {{ student.manuallyRegisteredBy }} on {{ formatDate(student.manuallyRegisteredAt) }}
+                    </template>
+                    <template v-else>—</template>
+                </td>
             </tr>
         </tbody>
     </table>

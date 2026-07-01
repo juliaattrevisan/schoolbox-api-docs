@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\OpenAi\AgentChat;
 use Schoolbox\OpenAi\EventStream\Message;
+use Schoolbox\OpenAi\Session\Log;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
@@ -149,7 +149,7 @@ HELP;
             "SELECT id, prompt, response
             FROM openai_log
             WHERE log_format IS NULL AND feature = :feature",
-            ['feature' => Schoolbox\Editor\OpenAI\Helper::FEATURE_IMAGE]
+            ['feature' => \Schoolbox\OpenAi\Feature::IMAGE->value]
         );
 
         foreach ($logIterator as $logData) {

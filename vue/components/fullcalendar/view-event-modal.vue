@@ -205,6 +205,7 @@ export default {
                 // There will be one booking, so data.booking will be filled, and data.bookings will not be filled.
                 extendedProps.bookings = [];
                 extendedProps.booking = {
+                    quantity: data?.booking?.quantity,
                     status: data?.booking?.status,
                     related: data?.booking?.related || [],
                     actions: (data?.booking?.buttons || []).filter((button) => button?.href),
@@ -266,6 +267,14 @@ export default {
                     this.eventExtendedProps.attendance.payload.attendees.available,
                 )
             );
+        },
+
+        formatBookingItemName(booking) {
+            if (booking?.quantity) {
+                return booking.item.name + " (" + String(booking.quantity) + ")";
+            }
+
+            return booking.item.name;
         },
 
         /**
@@ -608,7 +617,7 @@ export default {
          * @param $event
          */
         clickBookingButton($event) {
-            switch ($event.target.dataset.bookingAction) {
+            switch ($event.currentTarget.dataset.bookingAction) {
                 case "approve":
                     $event.preventDefault();
                     if (this.eventExtendedProps.seriesId) {
@@ -780,31 +789,54 @@ export default {
          */
         async bookingApprove(efficacy) {
             this.$refs.bookingApproveSeriesModal.close();
-            let data = new URLSearchParams({
-                    efficacy: efficacy,
-                }),
-                approveActionUrl = this.eventExtendedProps.booking?.actions.find(
-                    (action) => action.action === "approve",
-                ).href;
-            return fetch(approveActionUrl, {
-                method: "POST",
-                body: data.toString(),
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-                },
-            })
-                .then((response) => {
-                    if (response.ok) {
-                        return response;
-                    } else {
-                        throw new Error(response.statusText);
-                    }
-                })
-                .then(() => this.event.remove())
-                .then(() => this.$emit(EVENT_MODIFIED, this.event))
-                .catch((error) => {
-                    console.error(error);
+            const toast = window.sbProps.toastActivate("Approving booking...");
+            const data = new URLSearchParams({
+                efficacy: efficacy,
+            });
+            const approveActionUrl = this.eventExtendedProps.booking?.actions.find(
+                (action) => action.action === "approve",
+            ).href;
+
+            try {
+                const response = await fetch(approveActionUrl, {
+                    method: "POST",
+                    body: data.toString(),
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                        "X-Requested-With": "XMLHttpRequest",
+                        Accept: "application/json",
+                    },
                 });
+
+                if (!response.ok) {
+                    let responseData = {};
+                    try {
+                        responseData = await response.json();
+                    } catch (error) {
+                        console.error(error);
+                    }
+                    const periodErrors = Object.values(responseData?.errors?.start_period_errors ?? {});
+                    const capacityExceeded = periodErrors.some(
+                        (errors) => Array.isArray(errors) && errors.includes("conflict"),
+                    );
+                    toast.timeout({
+                        text:
+                            responseData?.message ||
+                            (capacityExceeded
+                                ? "Unable to approve booking. This booking would exceed the resource's concurrent booking capacity."
+                                : "Unable to approve booking."),
+                        isSuccess: false,
+                    });
+                    return;
+                }
+
+                this.event.remove();
+                this.$emit(EVENT_MODIFIED, this.event);
+                toast.timeout({ text: "Booking approved", isSuccess: true });
+            } catch (error) {
+                console.error(error);
+                toast.timeout({ text: "Unable to approve booking.", isSuccess: false });
+            }
         },
 
         /**
@@ -917,7 +949,7 @@ export default {
             <template v-else>
                 <h2 :class="eventExtendedProps.classCancelled">{{ event.title }}</h2>
             </template>
-            <div class="l-grid l-grid--12">
+            <div class="u-grid u-grid--12">
                 <div class="medium-8 small-12">
                     <meta-list>
                         <template v-if="eventExtendedProps.timetable.code && eventExtendedProps.timetable.code.length">
@@ -926,6 +958,9 @@ export default {
                         <meta-item icon="resource-booking" v-if="eventExtendedProps.booking?.status">{{
                             eventExtendedProps.booking?.status.name
                         }}</meta-item>
+                        <meta-item icon="info" v-if="eventExtendedProps.booking?.quantity">
+                            Quantity: {{ eventExtendedProps.booking.quantity }}
+                        </meta-item>
                         <meta-item icon="calendar" v-if="eventExtendedProps.dateSpan">{{
                             eventExtendedProps.dateSpan
                         }}</meta-item>
@@ -1017,10 +1052,10 @@ export default {
                                 :icon="getBookingStatusIcon(booking.status)"
                             >
                                 <template v-if="booking.href">
-                                    <a :href="booking.href">{{ booking.item.name }}</a>
+                                    <a :href="booking.href">{{ formatBookingItemName(booking) }}</a>
                                 </template>
                                 <template v-else>
-                                    {{ booking.item.name }}
+                                    {{ formatBookingItemName(booking) }}
                                 </template>
                             </meta-item>
                         </meta-list>
@@ -1034,10 +1069,10 @@ export default {
                                 :icon="getBookingStatusIcon(booking.status)"
                             >
                                 <template v-if="booking.href">
-                                    <a :href="booking.href">{{ booking.item.name }}</a>
+                                    <a :href="booking.href">{{ formatBookingItemName(booking) }}</a>
                                 </template>
                                 <template v-else>
-                                    {{ booking.item.name }}
+                                    {{ formatBookingItemName(booking) }}
                                 </template>
                             </meta-item>
                         </meta-list>

@@ -274,7 +274,7 @@ export default {
                                                 title="View record"
                                                 :class="`record-heading ${record._links.read ? '' : 'disabled'}`"
                                             >
-                                                <h3 class="l-flex l-flex--align-center l-gap-s">
+                                                <h3 class="u-flex u-flex--align-center u-gap-s">
                                                     {{ record.heading }}
                                                     <span
                                                         v-if="record.severity?.color"

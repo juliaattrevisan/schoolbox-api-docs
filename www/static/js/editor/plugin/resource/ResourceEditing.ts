@@ -3,10 +3,12 @@
  * and add the insertResource command to the editor
  */
 
-import { Plugin, type ResizeImageCommand, type Element } from "ckeditor5";
+import { Plugin, type ResizeImageCommand, type ModelElement, type ViewElement } from "ckeditor5";
 import { ResourceType, getExtraAttributes } from "@js/resource/resourceUtils";
 import InsertResourceCommand from "./InsertResourceCommand";
+import { LIGHTBOX_LINK_ATTRIBUTE } from "./lightboxLinkUtils";
 
+const LINK_ATTRIBUTE_PRIORITY = 5;
 export default class ResourceEditing extends Plugin {
     /**
      * Runs on startup, defines the schema and converters
@@ -26,7 +28,7 @@ export default class ResourceEditing extends Plugin {
     updateSchema(): void {
         const { schema } = this.editor.model;
         schema.extend("imageInline", {
-            allowAttributes: [...getExtraAttributes()],
+            allowAttributes: [...getExtraAttributes(), LIGHTBOX_LINK_ATTRIBUTE],
         });
     }
 
@@ -56,11 +58,42 @@ export default class ResourceEditing extends Plugin {
                     key: attribute,
                 },
                 model: {
-                    name: "imageInline",
                     key: attribute,
                     value: undefined,
                 },
             });
+        });
+
+        // define converters for the lightbox rel attribute, which is added to images when they are uploaded to trigger the lightbox gallery on the frontend
+        conversion.for("downcast").attributeToElement({
+            model: {
+                name: "imageInline",
+                key: LIGHTBOX_LINK_ATTRIBUTE,
+            },
+            view: (rel, { writer }, { item }: { item: ModelElement }) => {
+                if (rel === null || rel === undefined || !item.hasAttribute("linkHref")) {
+                    return null;
+                }
+                const linkElement = writer.createAttributeElement(
+                    "a",
+                    { rel: String(rel) },
+                    { priority: LINK_ATTRIBUTE_PRIORITY },
+                );
+                writer.setCustomProperty("link", true, linkElement);
+                return linkElement;
+            },
+        });
+        conversion.for("upcast").elementToAttribute({
+            view: {
+                name: "a",
+                attributes: {
+                    rel: /^lightbox\[.*\]$/,
+                },
+            },
+            model: {
+                key: LIGHTBOX_LINK_ATTRIBUTE,
+                value: (viewElement: ViewElement) => viewElement.getAttribute("rel"),
+            },
         });
     }
 
@@ -76,7 +109,7 @@ export default class ResourceEditing extends Plugin {
         const imageUtils = editor.plugins.get("ImageUtils");
         const resizeImageCommand = editor.commands.get("resizeImage") as ResizeImageCommand;
         resizeImageCommand.on("execute", (eventInfo) => {
-            const imageElement = imageUtils.getClosestSelectedImageElement(model.document.selection) as Element;
+            const imageElement = imageUtils.getClosestSelectedImageElement(model.document.selection) as ModelElement;
             if (
                 imageElement.hasAttribute("data-schoolboxresource-type") &&
                 imageElement.getAttribute("data-schoolboxresource-type") === ResourceType.VIDEO

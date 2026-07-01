@@ -178,15 +178,15 @@ $border-bottom-width: 2px;
             }
         }
         &.parent-item {
-            > a:after {
-                font-family: $font-family-icon;
-                content: "\e901"; //.icon-down-arrow
+            .sbx-side-nav__toggle-icon {
+                color: currentColor;
+                flex-shrink: 0;
                 float: right;
                 transform: rotate(0deg); // Default icon is pointing down when collapsed
                 transition: transform 0.3s;
             }
 
-            &.flyout-expanded > a:after {
+            &.flyout-expanded > a .sbx-side-nav__toggle-icon {
                 transform: rotate(180deg); // Icon should point up when expanded
             }
         }
@@ -203,12 +203,12 @@ $border-bottom-width: 2px;
         background-color: $white;
         padding: 0.75rem;
         display: none;
+    }
 
-        &:after {
-            font-family: $font-family-icon;
-            content: "\e621"; //.icon-dropdown
-            float: right;
-        }
+    .sbx-side-nav__dropdown-icon {
+        color: currentColor;
+        flex-shrink: 0;
+        float: right;
     }
     @media #{$medium-down} {
         .dropdown-btn {

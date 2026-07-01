@@ -2,14 +2,17 @@
  # Renders an assessment with a grade, used to display students results on the grade card
  #
  # Params:
- # * assessment:  IAssessable - The assessment object
- # * student:     User        - The user record for the student
+ # * assessment:             IAssessable - The assessment object
+ # * student:                User - The user record for the student
  # * canViewInstructorMarks: bool - Whether the user can view instructor marks
+ # * effectiveViewer:        User - The user whose feedback visibility rules apply
+ # * progressTicksReadOnly:  bool - Whether progress ticks should render as read-only
  #}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 {% import '@learning/macro/urgency.twig' as urgency %}
 {% import '@learningAssessment/project/macro/icon.twig' as icon %}
 
+{% set progressTicksReadOnly = progressTicksReadOnly is defined ? progressTicksReadOnly : false %}
 {% set participant = assessment ? assessment.participantIfExtant(student) : null %}
 
 {# Lesson Plans do not appear in the Grades page
@@ -27,7 +30,7 @@
             <a class="grades-assessment-link" href="{{ summaryRoute }}{{ returnUrlSuffix is defined ? returnUrlSuffix : '' }}">
                 <sbx-icon class="grades-assessment-link__icon" name="{{ icon.renderName(assessment)|trim }}" color="var(--sbx-color-text-secondary)"></sbx-icon>
                 <p>{{ assessment.title }}
-                    {% if participant and USER.role.isStaff and participant.plan.isStatic %}
+                    {% if participant and effectiveViewer.role.isStaff and participant.plan.isStatic %}
                         <span class="individualisation has-tip tip-top" data-tooltip title="{{ participant.plan.name}} ({{ participant.plan.duedate.short}})">i</span>
                     {% endif %}
                 </p>
@@ -57,36 +60,32 @@
         </p>
     </div>
 
-    {% if participant and assessment.isFeedbackVisibleToUser(USER) %}
+    {% if participant and assessment.isFeedbackVisibleToUser(effectiveViewer) %}
         {% if assessment is task %}
             {% include '@learningAssessment/fragments/progressTick.twig' with {
                 assessment: assessment,
-                student:    student
+                student:    student,
+                viewer:     effectiveViewer,
+                readonly:   progressTicksReadOnly
             } only %}
         {% else %}
             {# learners and instructors can view the display mark, only instructors can see the instructor mark #}
             {% set grade = participant.humanReadableMark(true) %}
             {% set instructorGrade = canViewInstructorMarks ?? false ? participant.humanReadableInstructorMark(true) : null %}
 
-            {% if grade %}
-                <div data-learner-mark class="grade {{ urgency.marks(participant.normalisedMark(true)) }}-bg"
-                    {# If there's an instructor grade available, then hide this by default #}
-                    {% if instructorGrade %}style="display: none"{% endif %}
-                >
-                    <span>{{ grade }}</span>
-                </div>
-            {% endif %}
-
-            {% if instructorGrade %}
-                <div data-instructor-mark class="grade {{ urgency.marks(participant.normalisedMark(true)) }}-bg">
-                    <span>{{ instructorGrade }}</span>
+            {% if grade or instructorGrade %}
+                <div class="grade {{ urgency.marks(participant.normalisedMark(true)) }}-bg" data-test="assessment-grade">
+                    {# Show the instructor grade if available, otherwise fall back to the learner grade
+                     # (this would only happen if you had a "None" input mark type and a meaningful display mark type, which is weird)
+                     #}
+                    <span>{{ instructorGrade ?? grade }}</span>
                 </div>
             {% endif %}
         {% endif %}
     {% endif %}
 </div>
-{% if participant and assessment.isFeedbackVisibleToUser(USER) %}
-    {% set feedback = participant.findAuthoritativeVisibleFeedback(USER) %}
+{% if participant and assessment.isFeedbackVisibleToUser(effectiveViewer) %}
+    {% set feedback = participant.findAuthoritativeVisibleFeedback(effectiveViewer) %}
     {% if feedback and feedback.comment   %}
         <div class="content">
             <blockquote>{{ feedback.comment | purify }}</blockquote>

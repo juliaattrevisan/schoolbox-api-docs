@@ -94,11 +94,11 @@ window.Vue.onMounted(async () => {
             <div class="birthday-container__background">
                 <canvas ref="canvasEl" width="72" height="72"></canvas>
             </div>
-            <div class="birthday-container__foreground l-flex l-flex--center">
+            <div class="birthday-container__foreground u-flex u-flex--center">
                 <sbx-icon
                     name="notifications"
                     color="var(--navigation-foreground)"
-                    size="2rem"
+                    size="xl"
                     data-birthday-bell
                 ></sbx-icon>
             </div>

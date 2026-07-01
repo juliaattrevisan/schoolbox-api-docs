@@ -6,7 +6,7 @@
 */
 
 // Margins usually should no longer be applied directly on an element and should instead be added to the parent
-// via the l-gap utility classes, as such we remove all margins from direct children
+// via the u-gap utility classes, as such we remove all margins from direct children
 .f-no-margins {
     margin: 0 !important;
     > h1,

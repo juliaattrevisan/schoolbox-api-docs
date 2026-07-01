@@ -13,19 +13,32 @@ namespace Schoolbox\Learning\Reporting\Feedback;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Collection;
+use Schoolbox\Curriculum\Node\Model as CurriculumNode;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Reporting;
+use Schoolbox\Learning\Assessment\Reporting\Folder as SupportingDataFolder;
 use Schoolbox\Learning\Assessment\Reporting\Model;
 use Schoolbox\Learning\Assessment\Reporting\Feedback\Model as Feedback;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\DueWork\StateMapper;
+use Schoolbox\Learning\Markbook\FeedbackFolders;
+use Schoolbox\Learning\Markbook\Markbook;
+use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\TokenReplacer;
 use Schoolbox\User;
 use Twig\Error\Error;
 
@@ -45,6 +58,7 @@ class Controller extends Base
         private \Schoolbox\Learning\Assessment\DataModel\Reporting\Feedback\Mapper $feedbackDataMapper,
         private AssessmentDataSource $assessmentDataSource,
         private Project\ResultCache\Mapper $projectResultCacheMapper,
+        private FeedbackFolders $feedbackFolders,
     ) {
         /* TODO Technical Uplift Candidate
          *  StateMapper.
@@ -92,14 +106,14 @@ class Controller extends Base
      *
      * @param Model $assessment
      * @param User $learner
-     * @param Reporting\Feedback\Model|null $feedback
+     * @param Feedback|null $feedback
      * @throws Error
      * @throws RouteNotFound
      */
     public function getParticularFeedback(
         Reporting\Model $assessment,
-        \Schoolbox\User $learner,
-        ?Reporting\Feedback\Model $feedback = null,
+        User $learner,
+        ?Feedback $feedback = null,
     ): void {
         /**
          * Generate the participant carousel, only if you have access to the status page
@@ -108,6 +122,19 @@ class Controller extends Base
             'assessment' => $assessment,
             'assessmentId' => $assessment->getId(),
         ]);
+
+        /* Build this learner's supporting data, currently just based on the assessments which the learner
+         * is apart of (same logic as the reporting markbook), excluding those where the participant has been excluded.
+         *
+         * Skip the markbook build entirely unless supporting data is enabled, as there's no point in
+         * going further right now until we add the other proposed tabs at some point in the future.
+         */
+        $supportingDataMarkbook = null;
+        $supportingDataTree = null;
+        if ($assessment->getSupportingDataEnable() && $assessment->getSupportingDataMarkbookEnable()) {
+            $supportingDataMarkbook = $this->buildSupportingDataMarkbook($assessment, $learner);
+            $supportingDataTree = $this->buildSupportingDataTree($supportingDataMarkbook, $learner);
+        }
 
         /* TODO Technical Uplift Candidate
          *  Consolidate the ParticipantCarousel into a standardised structure that we can reuse across all the activities
@@ -128,7 +155,7 @@ class Controller extends Base
                 $authoritativeFeedback = null;
 
                 if ($participant->getAllFeedbacks()->count()) {
-                    /** @var \Schoolbox\Learning\Assessment\Reporting\Feedback\Model|null $authoritativeFeedback */
+                    /** @var Feedback|null $authoritativeFeedback */
                     $authoritativeFeedback = $assessment->getAuthoritativeFeedback($participant, false);
                 }
 
@@ -182,6 +209,10 @@ class Controller extends Base
              */
             'errors' => $this->stateMapper->listDisplayValues(),
             'participant' => $participant,
+            /* Supporting data
+             */
+            'supportingDataMarkbook' => $supportingDataMarkbook,
+            'supportingDataTree' => $supportingDataTree,
         ], 'Feedback');
     }
 
@@ -192,14 +223,14 @@ class Controller extends Base
      *
      * @param Model $assessment
      * @param User $learner
-     * @param Reporting\Feedback\Model|null $feedback
+     * @param Feedback|null $feedback
      * @return void
      * @throws \Exception
      */
     public function postParticularFeedback(
         Reporting\Model $assessment,
-        \Schoolbox\User $learner,
-        ?Reporting\Feedback\Model $feedback = null,
+        User $learner,
+        ?Feedback $feedback = null,
     ): void {
         /* Check that $learner is indeed a participant of $assessment
          */
@@ -267,7 +298,9 @@ class Controller extends Base
         /* Feedback Comments are optional based on the Reporting toggle
          */
         if ($assessment->getFeedbackCommentsEnable()) {
-            $feedback->setComment($post['comment'] ?? '');
+            $feedback->setComment(
+                (new TokenReplacer\Student(new TokenReplacer\Simple()))->replace($post['comment'] ?? '', $learner)
+            );
         }
 
         /** Get mark schemes
@@ -362,6 +395,7 @@ class Controller extends Base
             'normalisedMark'              => $feedback->getNormalisedMark(),
             'humanReadableMark'           => $feedback->getHumanReadableMark(),
             'humanReadableInstructorMark' => $feedback->getHumanReadableInstructorMark(),
+            'comment'                     => $feedback->getComment(),
             'plan' => [
                 'isDynamic' => $plan->getIsDynamic(),
                 'name' => $plan->getName(),
@@ -374,7 +408,7 @@ class Controller extends Base
 
 
     /**
-     * Submit multiple feedbacks in single call
+     * Publish multiple feedbacks in single call
      *
      * This is a dueWork/reporting-only route
      *
@@ -397,13 +431,19 @@ class Controller extends Base
         foreach ($draftFeedbackIds as $draftFeedbackId) {
             // Verify that this feedback is for this assessment
             $feedback = $this->feedbackDataMapper->findById($draftFeedbackId);
-            $publishSuccess   = false;
 
             if ($feedback->getReporting()->getAssessmentModel()->getId() !== $assessment->getId()) {
                 $results[$draftFeedbackId] = ['publishSuccess' => false, 'error' => 'Feedback not for this assessment'];
                 continue;
             }
 
+            if ($feedback->isPublished()) {
+                $results[$draftFeedbackId] = ['publishSuccess' => false, 'error' => 'Feedback already published'];
+                continue; // Attempting to publish an already published feedback should have no effect.
+            }
+
+            // Bulk publish can release draft feedback authored by someone else. The author remains in the
+            // created_by field, and published_by records the user who performed this publish action.
             $feedback
                 ->setPublishedAt($now)
                 ->setPublishedBy($this->getUser()->getId());
@@ -420,7 +460,7 @@ class Controller extends Base
                 $publishSuccess = false;
             }
 
-            $results[$draftFeedbackId] = ['publishSuccess'   => $publishSuccess];
+            $results[$draftFeedbackId] = ['publishSuccess' => $publishSuccess];
         }
 
         $this->response = $this->responseAsJson($results);
@@ -445,23 +485,213 @@ class Controller extends Base
             throw new NotFound("No Feedback for assessment.");
         }
 
+        // Attempting to publish an already published feedback should have no effect.
         if (!$feedback->isPublished()) {
-            // publish this
+            // Single publish is an explicit publish action by the current user.
             $feedback
                 ->setPublishedAt(Alaress_Date_Format::now())
                 ->setPublishedBy($this->getUser()->getId());
+
+            $this->feedbackDataSource->save($feedback);
+
+            // Update project mark as the published feedback may affect the project cache
+            (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))
+                ->refresh($this->assessmentDataSource, $assessment, $learner);
         }
-
-        $this->feedbackDataSource->save($feedback);
-
-        // Update project mark as the published feedback may affect the project cache
-        (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))
-            ->refresh($this->assessmentDataSource, $assessment, $learner);
 
         $this->response = $this->responseAsJson([
             'success' => true,
             'message' => 'OK',
             'id'      => $feedback->getId(),
         ]);
+    }
+
+
+    /**
+     * Layout assessments in a tree for twig to render for supporting data.
+     * Similar to the logic in Learning\Grades\Controller.php::postReport
+     *
+     * @param Markbook        $markbook   Already filtered markbook to derive assessments from
+     * @param User            $learner
+     * @return array<int,array<string,mixed>>
+     */
+    private function buildSupportingDataTree(Markbook $markbook, User $learner): array
+    {
+        $tree = [];
+
+        foreach ($markbook->getAssessments() as $assessment) {
+            $id            = $assessment->getId();
+            $context       = $assessment->getContext();
+            $contextId     = $context->getId();
+            $baseContextId = $assessment->getBaseContext()->getId();
+
+            if (isset($tree[$baseContextId]) && $contextId !== $baseContextId) {
+                /* Ensure projects and their participation are always in the base of the tree.
+                 * This means that a project's mark will always show,
+                 * even if it doesn't match the filter: but oh well.
+                 */
+                if ($context instanceof Project) {
+                    $contexts = new GenericCollection(IAssessable::class);
+                    $contexts->add($context);
+
+                    /* Participation cannot be assumed: load this learner's participation into the project.
+                     */
+                    $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection(
+                        collection: $contexts,
+                        users: (new Collection())->add($learner),
+                        removeExcluded: false,
+                        assumeParticipation: false,
+                    );
+                    $tree[$baseContextId]['assessments'][$contextId]['assessment'] = $context;
+                }
+                $tree[$baseContextId]['assessments'][$contextId]['context']          = $context;
+                $tree[$baseContextId]['assessments'][$contextId]['assessments'][$id] = $assessment;
+            } else {
+                $tree[$contextId]['context']                        = $context;
+                $tree[$contextId]['assessments'][$id]['assessment'] = $assessment;
+            }
+        }
+
+        return $tree;
+    }
+
+
+    /**
+     * Builds a markbook for a particular assessment.
+     *
+     * @param Reporting\Model $assessment
+     * @param User            $learner
+     * @return Markbook
+     * @throws MapperException
+     * @throws NotFound
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    private function buildSupportingDataMarkbook(Reporting\Model $assessment, User $learner): Markbook
+    {
+        $folder = $assessment->getBaseContext()->getFolder();
+
+        /* Find data between these date ranges
+        */
+        // TODO: SA-22532 - handle each of the cases of $assessment->getSupportingDataRange(), for now just always uses the current academic year
+        $now = Alaress_Date_Format::now();
+
+        $from = $now->getStartOfSchoolYear();
+        $to = $now->endOfSchoolYear();
+
+        $assessments = $this->assessmentDataSource->createCollection();
+
+        /* Supporting Data Enable and Supporting Data Markbook Enable must both be turned on
+         * for assessments to show up on the markbook.
+         *
+         * Currently the 'markbook enable' option isn't really meaningful at the moment since
+         * the only type of supporting data that can show are via activities currently,
+         * it's there for the future when we have other types of supporting data to show.
+         */
+        if ($assessment->getSupportingDataEnable() && $assessment->getSupportingDataMarkbookEnable()) {
+            /* The folders to filter to, fall back to current only if for some reason this is unset */
+            $supportingDataFolders = SupportingDataFolder::tryFrom($assessment->getSupportingDataFolders())
+                ?? SupportingDataFolder::CURRENT_ONLY;
+
+            /* The curriculum codes to filter to */
+            $supportingDataCurriculumCodes = $assessment->getSupportingDataCurriculumNodes()
+                ->map(fn(CurriculumNode $curriculumNode) => $curriculumNode->getCode())
+                ->getAll();
+
+            /* Note that the first arg to findAllByFolderIdForReview() can actually be a set of folder ids
+             */
+            $assessments = $this->assessmentDataSource->findAllByFolderIdForReview(
+                /* For the students in $folder, find all the folders where they had a published feedback.
+                 * Or, use just the current class folder this activity is imported to to show content only from that page.
+                 */
+                folderId: match ($supportingDataFolders) {
+                    SupportingDataFolder::ANY_FOLDERS => $this->feedbackFolders->findForFolder($folder, $from, $to),
+                    SupportingDataFolder::CURRENT_ONLY => [$folder->getId()],
+                },
+                /* This was thought to limit it to one student, but it doesn't help much; it just finds assessments
+                 * this student did, which still ends up hydrating what every other student in that assessment too,
+                 * by virtue of the swamp.
+                 *
+                 * student: \Schoolbox\UserMapper::getInstance()->findById(13),
+                 */
+                /* Only hydrate these particular participants and their feedbacks, if specified: otherwise swamp hydrates
+                 * everyone who participated in each $assessment which might be more than you need.
+                 */
+                users: (new Collection())->add($learner),
+                /* Somewhat experimental:
+                 * Don't need any response instances. You get some mixed results here, since the markbook infers states:
+                 * a response existing, but no feedback given yet, is shown as a hyphen - ...but if a response doesn't
+                 * exist, the markbook shows "Pending" under the assumption you never submitted anything.
+                 */
+                includeResponses: true,
+                /* There's this somewhat obscure "options to pass to findByColumList" but there's actually a few
+                 * rarely-used, rarely-encountered ideas here: ref. convertOptionsToPredicateBuilder() in the
+                 * Assessment MapperProxy:1790. You get there via findAllByFolderIdForReview() and it has a plethora of
+                 * date range filters, term-based filters, etc. deep in the swamp where you'd never look.
+                 */
+                options: [
+                    'due_after' => $from,
+                    'due_before' => $to,
+                    'type' => [
+                        AssessmentType::TYPE_DUE_WORK,
+                        AssessmentType::TYPE_QUIZ,
+                        AssessmentType::TYPE_PROJECT,
+                        AssessmentType::TYPE_LTI_ASSESSMENT
+                    ],
+                    'work_type' => $assessment->getSupportingDataWorkTypes()
+                        ->map(fn(WorkType $workType) => $workType->getId())
+                        ->getAll(),
+                    /* If both are provided, assessment ids and curriculum nodes execute an intersect: this results in
+                     * all the assessment ids provided that -also- are associated with any of the curric codes specified
+                     */
+                //                    'ids' => [391],
+                //                    'curriculum_codes' => [
+                //                        'AC9SAS09',
+                //                        'GC-FA-a'
+                //                    ]
+                    /* the curriculum codes filter can't be an empty array, but can be null. */
+                    'curriculum_codes' => \count($supportingDataCurriculumCodes) > 0
+                        ? $supportingDataCurriculumCodes
+                        : null,
+                ],
+            );
+        }
+
+        /* The reporting activity itself should never appear in this list of supporting data on the feedback page
+         * since you can already see the mark/comment fields for the activity and if you showed it up here then
+         * they'd just desync.
+         */
+        $assessments = $assessments->filter(fn(IAssessable $markbookAssessment) => $markbookAssessment->getId() !== $assessment->getId());
+
+        /* If supporting data is disabled, then there won't be any assessments. (This is a valid scenario)
+         */
+
+        // Build a markbook
+        $markSchemeFactory = new MarkScheme\Factory($this->getConfigLoader());
+        $overallMarkScheme = $markSchemeFactory->spawnForFolder($folder, $this->getUser()->getRole()->isStaff());
+
+        $markbook = new Markbook(
+            assessments: $assessments,
+            defaultMarkScheme: $overallMarkScheme,
+            viewingUser: $this->getUser(),
+            /* Ignore processing weight, mean, stdev, min, max, etc. statistics. This appears in an accordion thing on
+             * the class markbook page. Setting this to false zeroes out the data, ignoring its normal calculation algorithms,
+             * which we do not need on the reporting feedback page.
+             */
+            overallStatistics: false,
+            /* Use this to reduce $assessments to only returning a row for these guy(s)
+             * findAllByFolderIdForReview() doesn't really support individual participants across multiple folders.
+             * It goes into a different orthogonal method.
+             *
+             * The reporting feedback page scopes to the single participant being graded.
+             */
+            studentIds: [$learner->getId()],
+            curriculumCodes: null,
+            folderIds: null,
+        );
+
+        $markbook->sortAssessables();
+
+        return $markbook;
     }
 }

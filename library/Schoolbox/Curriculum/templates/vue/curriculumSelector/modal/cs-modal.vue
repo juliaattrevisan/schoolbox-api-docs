@@ -125,7 +125,7 @@ function onTabSelected(tab: string): void {
         @closed="onModalClosed"
     >
         <template #sequence-1>
-            <div class="l-flex-col l-gap-m" :data-test="`cs-modal-${props.testId}`">
+            <div class="u-flex-col u-gap-m" :data-test="`cs-modal-${props.testId}`">
                 <h2 class="f-no-margins">Browse Curriculum</h2>
                 <dl v-if="props.hasTabs" ref="tabsEl" class="tabs" data-test="cs-modal-tabs">
                     <dd :class="{ active: currentTab === current }">

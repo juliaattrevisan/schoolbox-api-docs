@@ -15,11 +15,14 @@ import type {
     StudentRow,
     FailedRow,
     InProgressRow,
+    RegisteredRow,
     SubjectEntry,
     ApiStudent,
     ApiSubject,
     ApiCandidatesResponse,
+    ApiManuallyRegisterResponse,
     ApiUpdateConfirmationResponse,
+    ApiRenotifyResponse,
 } from "../js/types/ibReportTypes";
 
 interface Props {
@@ -30,6 +33,7 @@ interface Props {
     renotifyEndpoint: string;
     completePreparationEndpoint: string;
     resetDetailsEndpoint: string;
+    manuallyRegisterEndpoint: string;
     sessionTitle: string;
 }
 const props = defineProps<Props>();
@@ -43,7 +47,7 @@ const unconfirmed = window.Vue.ref<StudentRow[]>([]);
 const confirmed = window.Vue.ref<StudentRow[]>([]);
 const inProgress = window.Vue.ref<InProgressRow[]>([]);
 const failed = window.Vue.ref<FailedRow[]>([]);
-const registered = window.Vue.ref<StudentRow[]>([]);
+const registered = window.Vue.ref<RegisteredRow[]>([]);
 
 const { selectedList: preparationSelected } = useSelectedList(preparation);
 const { selectedList: unconfirmedSelected } = useSelectedList(unconfirmed);
@@ -90,7 +94,9 @@ window.Vue.watch(failedSelected, (newVal) => {
 
 const isCompleting = window.Vue.ref<boolean>(false);
 const isResetting = window.Vue.ref<boolean>(false);
+const isManuallyRegistering = window.Vue.ref<boolean>(false);
 const isApprovingOnBehalf = window.Vue.ref<boolean>(false);
+const isRenotifying = window.Vue.ref<boolean>(false);
 const resetModalOpen = window.Vue.ref<boolean>(false);
 const studentsToReset = window.Vue.ref<Pick<StudentRow, "id" | "userId" | "name">[]>([]);
 
@@ -169,7 +175,13 @@ async function loadCandidates(): Promise<void> {
         confirmed.value = (byKey["confirmed"] ?? []).map((s) => mapStudentRow(s, "confirmed"));
         inProgress.value = (byKey["inProgress"] ?? []).map((s) => mapStudentRow(s, "inProgress"));
         failed.value = (byKey["failed"] ?? []).map((s) => mapStudentRow(s, "failed") as FailedRow);
-        registered.value = (byKey["registered"] ?? []).map((s) => mapStudentRow(s, "registered"));
+        registered.value = (byKey["registered"] ?? []).map(
+            (s): RegisteredRow => ({
+                ...mapStudentRow(s, "registered"),
+                manuallyRegisteredBy: s.manuallyRegisteredBy,
+                manuallyRegisteredAt: s.manuallyRegisteredAt,
+            }),
+        );
     } catch (e) {
         console.error("Failed to load candidates", e);
         loadError.value = "Failed to load registration report.";
@@ -216,13 +228,17 @@ async function handleCompletePreparation(studentIds: number[]): Promise<void> {
         const removedIds = new Set(studentIds);
         const completedStudents = preparation.value
             .filter((s) => removedIds.has(s.id))
-            .map((s) => ({ ...s, stage: "unconfirmed" as const }));
+            .map((s) => ({ ...s, stage: "unconfirmed" as const, renotifyEndpoint }));
         preparation.value = preparation.value.filter((s) => !removedIds.has(s.id));
         unconfirmed.value = [...completedStudents, ...unconfirmed.value];
         clearSelection();
         toast.timeout({
             text: `Preparation completed for ${studentIds.length} student${studentIds.length === 1 ? "" : "s"}.`,
         });
+        // Reload to get the real registrationSessionStudentId for students that didn't have a
+        // persisted row before completePreparation. Without this, subsequent actions (e.g. manual
+        // register) send the stale userId instead of the session-student ID and the backend rejects them.
+        void loadCandidates();
     } catch (e) {
         console.error("Failed to complete preparation", e);
         toast.timeout({ text: "Failed to complete preparation.", isSuccess: false });
@@ -285,6 +301,58 @@ async function handleResetDetails(): Promise<void> {
     } finally {
         isResetting.value = false;
         studentsToReset.value = [];
+    }
+}
+
+/**
+ * POSTs the given student IDs to the mark-as-manually-registered endpoint.
+ * On success, moves matched students from confirmed/failed into registered.
+ * @param studentIds The registration session student IDs to register.
+ */
+async function handleManuallyRegister(studentIds: number[]): Promise<void> {
+    if (isManuallyRegistering.value) return;
+    isManuallyRegistering.value = true;
+
+    const toast = window.sbProps.toastActivate("Marking as manually registered...");
+
+    try {
+        const response = await apiRequest<ApiManuallyRegisterResponse, { studentIds: number[] }>({
+            url: props.manuallyRegisterEndpoint,
+            method: "POST",
+            body: { studentIds },
+        });
+
+        if (!response.success) {
+            toast.timeout({
+                text: response.message ?? "Failed to mark as manually registered.",
+                isSuccess: false,
+            });
+            return;
+        }
+
+        const removedIds = new Set(studentIds);
+        const manuallyRegisteredBy = response.data?.manuallyRegisteredBy ?? null;
+        const manuallyRegisteredAt = response.data?.manuallyRegisteredAt ?? null;
+        const newRegistered = [
+            ...confirmed.value
+                .filter((s) => removedIds.has(s.id))
+                .map((s) => ({ ...s, stage: "registered" as const, manuallyRegisteredBy, manuallyRegisteredAt })),
+            ...failed.value
+                .filter((s) => removedIds.has(s.id))
+                .map((s) => ({ ...s, stage: "registered" as const, manuallyRegisteredBy, manuallyRegisteredAt })),
+        ];
+        confirmed.value = confirmed.value.filter((s) => !removedIds.has(s.id));
+        failed.value = failed.value.filter((s) => !removedIds.has(s.id));
+        registered.value = [...newRegistered, ...registered.value];
+        clearSelection();
+        toast.timeout({
+            text: `${studentIds.length} student${studentIds.length === 1 ? "" : "s"} marked as manually registered.`,
+        });
+    } catch (e) {
+        console.error("Failed to mark as manually registered", e);
+        toast.timeout({ text: "Failed to mark as manually registered.", isSuccess: false });
+    } finally {
+        isManuallyRegistering.value = false;
     }
 }
 
@@ -364,14 +432,49 @@ async function handleApproveOnBehalf(students: StudentRow[]): Promise<void> {
     }
 }
 
+/**
+ * Renotifies the given unconfirmed students via the session-level renotify endpoint.
+ * @param students The students to renotify.
+ */
+async function handleRenotifySelected(students: StudentRow[]): Promise<void> {
+    if (isRenotifying.value || !renotifyEndpoint || students.length === 0) return;
+    isRenotifying.value = true;
+
+    const toast = window.sbProps.toastActivate("Renotifying student(s)...");
+
+    try {
+        const response = await apiRequest<ApiRenotifyResponse, { studentIds: number[] }>({
+            url: renotifyEndpoint,
+            method: "POST",
+            body: { studentIds: students.map((s) => s.userId) },
+        });
+
+        if (!response.success) {
+            toast.timeout({ text: response.message ?? "Failed to renotify student(s).", isSuccess: false });
+            return;
+        }
+
+        clearSelection();
+        toast.timeout({
+            text: response.data.message ?? `${students.length} student${students.length === 1 ? "" : "s"} renotified.`,
+            isSuccess: !response.data.partial,
+        });
+    } catch (e) {
+        console.error("Failed to renotify students", e);
+        toast.timeout({ text: "Failed to renotify student(s).", isSuccess: false });
+    } finally {
+        isRenotifying.value = false;
+    }
+}
+
 window.Vue.onMounted((): void => {
     void loadCandidates();
 });
 </script>
 
 <template>
-    <div class="small-12 island l-flex-col l-gap-m">
-        <div class="l-flex l-flex--align-center l-flex--justify-space f-no-margins">
+    <div class="small-12 island u-flex-col u-gap-m">
+        <div class="u-flex u-flex--align-center u-flex--justify-space f-no-margins">
             <h2 class="subheader f-no-margins">{{ props.sessionTitle }}</h2>
             <sbx-pop-out content-id="ib-report-actions-dropdown"></sbx-pop-out>
         </div>
@@ -385,7 +488,7 @@ window.Vue.onMounted((): void => {
             <li>
                 <a :href="props.candidateNumberUpdateRoute" class="sbx-button--has-icon">
                     <sbx-icon name="modify"></sbx-icon>
-                    Update Candidate Numbers
+                    Update candidate numbers
                 </a>
             </li>
         </ul>
@@ -394,7 +497,7 @@ window.Vue.onMounted((): void => {
 
         <data-load-error v-else-if="loadError" data-title="registration report" :further-info="loadError" />
 
-        <div v-else class="l-flex-col l-gap-s">
+        <div v-else class="u-flex-col u-gap-s">
             <ib-report-section title="Preparation" :count="preparation.length">
                 <ib-report-standard-table
                     v-model:selected-list="preparationSelected"
@@ -414,6 +517,9 @@ window.Vue.onMounted((): void => {
                     :search-languages-endpoint="props.searchLanguagesEndpoint"
                     section="unconfirmed"
                     :active-selection-section="activeSelectionSection"
+                    @renotify-single="
+                        (userId) => handleRenotifySelected(unconfirmed.filter((s) => s.userId === userId))
+                    "
                     @approve-on-behalf-single="(id) => handleApproveOnBehalf(unconfirmed.filter((s) => s.id === id))"
                     @reset-details-single="(id) => promptResetDetails([id])"
                 />
@@ -427,6 +533,7 @@ window.Vue.onMounted((): void => {
                     section="confirmed"
                     :active-selection-section="activeSelectionSection"
                     @reset-details-single="(id) => promptResetDetails([id])"
+                    @manually-register-single="(id) => handleManuallyRegister([id])"
                 />
             </ib-report-section>
 
@@ -440,6 +547,7 @@ window.Vue.onMounted((): void => {
                     :students="failed"
                     :active-selection-section="activeSelectionSection"
                     @reset-details-single="(id) => promptResetDetails([id])"
+                    @manually-register-single="(id) => handleManuallyRegister([id])"
                 />
             </ib-report-section>
 
@@ -467,13 +575,15 @@ window.Vue.onMounted((): void => {
                 confirmedSelected.length +
                 failedSelected.length
             "
-            :is-loading="isCompleting || isResetting || isApprovingOnBehalf"
+            :is-loading="isCompleting || isResetting || isManuallyRegistering || isApprovingOnBehalf || isRenotifying"
             :active-section="activeSelectionSection"
             @complete-preparation="handleCompletePreparation(preparationSelected.map((s) => s.id))"
+            @renotify="handleRenotifySelected(unconfirmedSelected)"
             @approve-on-behalf="handleApproveOnBehalf(unconfirmedSelected)"
             @reset-details="
                 promptResetDetails([...unconfirmedSelected, ...confirmedSelected, ...failedSelected].map((s) => s.id))
             "
+            @manually-register="handleManuallyRegister([...confirmedSelected, ...failedSelected].map((s) => s.id))"
             @clear-selection="clearSelection"
         />
     </div>

@@ -1247,7 +1247,7 @@ function alertInvalidIconName(): false {
             <svg
                 v-else-if="props.name === 'paperly'"
                 class="sbx-icon__svg"
-                viewBox="0 0 20 20"
+                viewBox="3 1.5 14 17"
                 xmlns="http://www.w3.org/2000/svg"
             >
                 <path
@@ -1260,7 +1260,7 @@ function alertInvalidIconName(): false {
             <svg
                 v-else-if="props.name === 'paperly-excursions'"
                 class="sbx-icon__svg"
-                viewBox="0 0 20 20"
+                viewBox="1.5 1.5 17 17"
                 xmlns="http://www.w3.org/2000/svg"
             >
                 <path
@@ -1291,7 +1291,7 @@ function alertInvalidIconName(): false {
             <svg
                 v-else-if="props.name === 'paperly-forms'"
                 class="sbx-icon__svg"
-                viewBox="0 0 20 20"
+                viewBox="1.5 1.5 17 17"
                 xmlns="http://www.w3.org/2000/svg"
             >
                 <path
@@ -1322,7 +1322,7 @@ function alertInvalidIconName(): false {
             <svg
                 v-else-if="props.name === 'paperly-pti'"
                 class="sbx-icon__svg"
-                viewBox="0 0 20 20"
+                viewBox="1.5 1.5 17 17"
                 xmlns="http://www.w3.org/2000/svg"
             >
                 <path
@@ -1368,7 +1368,7 @@ function alertInvalidIconName(): false {
             <svg
                 v-else-if="props.name === 'paperly-details'"
                 class="sbx-icon__svg"
-                viewBox="0 0 20 20"
+                viewBox="1.5 1.5 17 17"
                 xmlns="http://www.w3.org/2000/svg"
             >
                 <path
@@ -1944,7 +1944,7 @@ function alertInvalidIconName(): false {
             <svg
                 v-else-if="props.name === 'veracross'"
                 class="sbx-icon__svg"
-                viewBox="0 0 32 32"
+                viewBox="3 3 26 26"
                 xmlns="http://www.w3.org/2000/svg"
             >
                 <path d="M23.3776 9.59985H8.57764V11.6443H23.3776V9.59985Z" fill="currentColor" />

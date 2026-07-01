@@ -22,7 +22,7 @@ const selectedSet = window.Vue.ref<ResultSet | null>(null);
 </script>
 
 <template>
-    <button class="button l-mar-m--bottom" type="button" @click="showModal = true">Apply Result Set</button>
+    <button class="button u-mar-m--bottom" type="button" @click="showModal = true">Apply Result Set</button>
 
     <basic-modal v-model:is-open="showModal" has-background-click>
         <h2>Apply Result Set</h2>

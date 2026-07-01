@@ -190,6 +190,11 @@ function getAllColourPickers() {
  * @returns { Boolean }
  */
 export function validateHeadingColourContrast() {
+    // if sonar is not active skip
+    if (!document.querySelector("body").classList.contains("sbx-body")) {
+        return true;
+    }
+
     const headFontPicker = document.getElementById(HEAD_FONT_PICKER_ID);
     const headBackgroundPicker = document.getElementById(HEAD_BACKGROUND_PICKER_ID);
 

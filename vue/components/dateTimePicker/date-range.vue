@@ -127,8 +127,8 @@ defineExpose({ clearInvalidDates });
 </script>
 
 <template>
-    <div class="l-flex-row l-flex--no-wrap l-gap-m">
-        <div class="l-flex-col l-flex__item--1">
+    <div class="u-flex-row u-flex--no-wrap u-gap-m">
+        <div class="u-flex-col u-flex__item--1">
             <label :for="`${props.idPrefix}-start-date-input`">{{ props.labelStart }}</label>
             <input
                 :id="`${props.idPrefix}-start-date-input`"
@@ -143,7 +143,7 @@ defineExpose({ clearInvalidDates });
                 :data-datepicker-time="props.useTime || undefined"
             />
         </div>
-        <div class="l-flex-col l-flex__item--1">
+        <div class="u-flex-col u-flex__item--1">
             <label :for="`${props.idPrefix}-end-date-input`">{{ props.labelEnd }}</label>
             <input
                 :id="`${props.idPrefix}-end-date-input`"

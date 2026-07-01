@@ -19,7 +19,7 @@ Usage:
         {% set getCreateForm = routeLookupIfAuthorized('learningMomentEvidence.getCreateForm', { userIds: user.id }) %}
         {% if getCreateForm != '' %}
             {% set baseUrlParams = '?folderId=' ~ folder.id ~ '&' ~ RETURN_URL.name ~ '=' ~ (encodedReturnUrl ?? RETURN_URL.current) %}
-            <div class="share-work-buttons l-mar-m">
+            <div class="share-work-buttons u-mar-m">
                 <a
                     data-action="shareLearningMoment"
                     data-moment-type="photo"
@@ -138,7 +138,7 @@ Usage:
                         {% endfor %}
                     </ul>
 
-                    <ul class="flex-list buttons l-mar-m--top">
+                    <ul class="flex-list buttons u-mar-m--top">
                         <li><a class="button sbx-button--has-icon" data-moment-share-submit disabled><sbx-icon name="share"></sbx-icon>Share Learning Moment</a></li>
                     </ul>
                 {% else %}

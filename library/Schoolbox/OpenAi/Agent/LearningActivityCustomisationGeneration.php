@@ -10,6 +10,7 @@ use Schoolbox\DifferentiationProfile\Model as DifferentiationProfileModel;
 use Schoolbox\DifferentiationProfile\Translator\ProfileToArray;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\OpenAi\Feature;
 use Schoolbox\OpenAi\IClient;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Storage\FilesystemProxy;
@@ -38,7 +39,7 @@ class LearningActivityCustomisationGeneration
      * @param IAssessable                 $assessable                  The assessable learning activity.
      * @param DifferentiationProfileModel $differentiationProfileModel The differentiation profile
      * @param Folder                      $course
-     * @param string|null                 $aiSessionId
+     * @param string                      $aiSessionId                 The AI session ID used to associate logs with this request.
      * @return array
      * @throws ClientExceptionInterface
      */
@@ -47,7 +48,7 @@ class LearningActivityCustomisationGeneration
         IAssessable $assessable,
         DifferentiationProfileModel $differentiationProfileModel,
         Folder $course,
-        ?string $aiSessionId = null,
+        string $aiSessionId,
     ): array {
         $attachments = $this->generateFilePrompts($assessable);
 
@@ -67,7 +68,13 @@ class LearningActivityCustomisationGeneration
         );
 
         $payload = $payloadGenerator->generate();
-        $log = $this->client->createLog($payload, null, $user, Helper::FEATURE_LEARNING_ACTIVITY_CUSTOMISATION, $aiSessionId);
+        $log = $this->client->createLog(
+            $payload,
+            null,
+            $user,
+            Feature::LEARNING_ACTIVITY_CUSTOMISATION,
+            $aiSessionId
+        );
         $response = $this->client->createResponse($payload, $log);
 
         $data = json_decode($response->getBody()->getContents(), true);

@@ -39,9 +39,9 @@
                             <li>
                                 <a
                                     href="{{ createAssessmentRoute }}?type={{ type }}&{{ returnUrlName }}={{ encodedReturnUrl }}"
-                                    class="{{ icon.renderClassForType(type) }}"
+                                    class="sbx-button--has-icon"
                                     data-test="course-outline-menu-add-{{ type }}"
-                                >{{ label }}</a>
+                                ><sbx-icon name="{{ icon.renderNameForType(type)|trim }}"></sbx-icon>{{ label }}</a>
                             </li>
                         {% endfor %}
                     {% endif %}

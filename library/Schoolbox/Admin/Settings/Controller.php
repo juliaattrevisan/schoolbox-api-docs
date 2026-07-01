@@ -9,10 +9,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Settings;
 
+use Alaress\Module\Cache\Rebuilder;
 use Alaress\Redis;
 use Alaress_Byte_Format;
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
+use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Config\Config;
@@ -21,11 +23,31 @@ use Schoolbox\Error\Mapper;
 use Schoolbox\GenericCollection;
 use Alaress\Database\Predicate;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\ToolsDaemon;
 use Schoolbox\User;
 use Twig\Error\Error;
 
 class Controller extends ConfigController
 {
+    /**
+     * Constructor
+     *
+     * @param ConfigMapper         $configMapper
+     * @param FieldStrategyFactory $fieldStrategyFactory
+     * @param Rebuilder            $rebuilder
+     * @param CacheInterface       $oidcCache
+     * @param ToolsDaemon\IClient  $toolsDaemonClient
+     */
+    public function __construct(
+        ConfigMapper $configMapper,
+        FieldStrategyFactory $fieldStrategyFactory,
+        Rebuilder $rebuilder,
+        CacheInterface $oidcCache,
+        private ToolsDaemon\IClient $toolsDaemonClient,
+    ) {
+        parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder, $oidcCache);
+    }
+
     /**
      * Renders an admin settings page for settings with the specified type
      *
@@ -174,8 +196,15 @@ class Controller extends ConfigController
 
         $foundConfig = $this->getConfigMapper()->findByPredicates($pb);
 
+        $isSonarEnabled = (bool) $this->getConfigLoader()->get(ConfigMapper::NAME_SONAR_UI_TOGGLE);
+        $excludedSkinConfigTypeId = $isSonarEnabled ? ConfigMapper::TYPE_SKIN_CONFIG : ConfigMapper::TYPE_SONAR_SKIN_CONFIG;
+
         /** @var Config $config */
         foreach ($foundConfig as $config) {
+            if ($config->getType()?->getId() === $excludedSkinConfigTypeId) {
+                continue;
+            }
+
             $module = $config->getModule();
 
             $type = $config->getType() ? $config->getType()->getType() : '';
@@ -225,6 +254,8 @@ class Controller extends ConfigController
         $reloadMobileDaemon   = false;
         $rebuildModules       = false;
         $clearOidcCache       = false;
+        $clearExternalCache   = false;
+        $setExternalCacheTtl  = false;
 
         foreach ($postedValues as $name => $value) {
             $existingConfig  = $existingConfigs[$name];
@@ -260,12 +291,19 @@ class Controller extends ConfigController
                 if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_OAUTH, true)) {
                     $clearOidcCache = true;
                 }
+                if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_EXTERNAL_CACHE_CONTENT, true)) {
+                    $clearExternalCache = true;
+                }
+                if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_EXTERNAL_CACHE_TTL, true)) {
+                    $setExternalCacheTtl = true;
+                }
                 $existingConfig->setValue(trim((string)$newValue));
                 $this->getConfigMapper()->save($existingConfig);
             }
         }
 
         if ($reloadRouteDaemon || $reloadScheduleDaemon || $reloadMobileDaemon) {
+            // TODO inject this
             $redisClient = Redis::getSignalQueueClientInstance();
             if ($redisClient && $reloadRouteDaemon) {
                 $redisClient->publish('scheduled.' . INSTANCE_ID . '.reload', '');
@@ -278,12 +316,37 @@ class Controller extends ConfigController
             }
         }
         if ($rebuildModules) {
+            // TODO send this and anything else which uses post-output callbacks to toolsd
             $this->postOutputCallbacks[] = $this->buildRebuildModuleCacheCallback();
             // After everything else: reload the route table
             $this->response = $this->responseEmpty();
         }
         if ($clearOidcCache) {
             $this->oidcCache->clear();
+        }
+        if ($clearExternalCache) {
+            try {
+                // Don't need to wait for toolsd to run the job
+                $this->toolsDaemonClient->run(new ToolsDaemon\JobRequest('clearExternalCache', INSTANCE_ID));
+            } catch (ToolsDaemon\ClientException $e) {
+                // log an error to stdout, but continue?
+                $this->spawnLogger('toolsd.' . INSTANCE_ID)->warning(
+                    sprintf('Tools daemon request failed (message: %s)', $e->getMessage()),
+                    ['exception' => $e],
+                );
+            }
+        }
+        if ($setExternalCacheTtl) {
+            try {
+                // Don't need to wait for toolsd to run the job
+                $this->toolsDaemonClient->run(new ToolsDaemon\JobRequest('setExternalCacheTtl', INSTANCE_ID));
+            } catch (ToolsDaemon\ClientException $e) {
+                // log an error to stdout, but continue?
+                $this->spawnLogger('toolsd.' . INSTANCE_ID)->warning(
+                    sprintf('Tools daemon request failed (message: %s)', $e->getMessage()),
+                    ['exception' => $e],
+                );
+            }
         }
 
         $this->response = $this->redirectAfterPost($this->getRouteUrlFromTypeLabel($typeLabel));
@@ -412,11 +475,13 @@ class Controller extends ConfigController
                 return match ($type) {
                     'Resources'           => "/adminv2/setting/cms/$typeEncoded",      // E.g. /adminv2/setting/cms/Resources
                     'Assets',
-                    'Skin Config'         => "/adminv2/setting/design/$typeEncoded",   // E.g. /adminv2/setting/design/Skin%20Config
+                    'Skin Config'         => "/adminv2/setting/design/$typeEncoded",      // E.g. /adminv2/setting/design/Skin%20Config
+                    'Sonar Skin Configs'  => '/adminv2/setting/design/Skin%20Config',    // Sonar configs live on the same page
                     'LMS Policy',
                     'Document Management' => "/adminv2/setting/lms/$typeEncoded",      // E.g. /adminv2/setting/lms/LMS%20Policy
                     'Pastoral Care'       => "/adminv2/setting/pastoral/$typeEncoded", // E.g. /adminv2/setting/pastoral/Pastoral%20Care
                     'Canvas'              => "/adminv2/canvas",
+                    'SOCS'                => "/adminv2/socs",
                     'DataRetention'       => "/adminv2/data-retention",
                     default               => "/adminv2/setting/$typeEncoded",          // E.g. /adminv2/setting/Modules
                 };
@@ -460,8 +525,9 @@ class Controller extends ConfigController
                     'Resources' => $user->hasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL),
                     // This is for the settings in 'Admin -> Design -> Assets'.
                     'Assets',
-                    // This is for the settings in 'Admin -> Design -> Skin Config'.
-                    'Skin Config' => $user->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL),
+                    // This is for the settings in 'Admin -> Design -> Skin Config' (legacy and Sonar both render on the same page).
+                    'Skin Config',
+                    'Sonar Skin Configs' => $user->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL),
 
                     // This is for the settings in 'Admin -> LMS -> LMS Policy' and 'Admin -> LMS -> Document Management'.
                     'LMS Policy', 'Document Management' => $user->hasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL),

@@ -10,6 +10,12 @@
         'folders'                Folder\Model[]      All folders where this student has interactions for current term
         'markbook'               Markbook            Unfiltered markbook for student, term + folder
         'conversation'           Conversation
+        'viewMode'               string              Selected grades view mode
+        'viewModes'              string[]            Supported view modes in display order
+        'viewModeQuerySuffix'    string              Query suffix that preserves the selected view mode
+        'effectiveViewer'        User                The user whose feedback visibility rules apply
+        'progressTicksReadOnly'  bool                Whether progress ticks should render as read-only
+        'commentsReadOnly'       bool                Whether comments should render as read-only
 #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learning/macro/urgency.twig' as urgency %}
@@ -21,13 +27,16 @@
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/eportfolio/jquery.eportfolio.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
     $(function () {
-        // Set up comment abilities: post
+        // Set up comment abilities: post.
+        // Skipped when viewing as another user so the comment form stays inert (no editor, no handlers).
+        {% if not commentsReadOnly %}
         $.fn.allWork.commentSetup({
             data: {
                 studentId: '{{ student.id }}',
                 folderId: '{{ subject.id }}'
             }
         });
+        {% endif %}
         $('[data-print]').on('click', function () {
             window.print();
             $('#container').highcharts().reflow();
@@ -37,32 +46,41 @@
 
 {# Crumbs: Learning > Grades > {subject.name} #}
 
-{{ bread.crumbs(['Learning', '/learning/classes'], [locale.grades.properPlural, routeLookup('learningGrades.getGrades', {userId: student.id, termCode: term.code})], [subject.name]) }}
+{{ bread.crumbs(['Learning', '/learning/classes'], [locale.grades.properPlural, routeLookup('learningGrades.getGrades', {userId: student.id, termCode: term.code}) ~ viewModeQuerySuffix], [subject.name]) }}
 
-{% set canViewInstructorMarks = USER.role.isStaff %}
-<div class="row{% if canViewInstructorMarks %} actions-small-2{% endif %}">
+{% set canSwitchViewMode = USER.role.isStaff %}
+{% if canSwitchViewMode %}
+    {% set currentRouteBase = routeLookup('learningGrades.getGradesForSubject', {
+        viewee: student,
+        userId: student.id,
+        term: term,
+        termCode: term.code,
+        subject: subject,
+        subjectId: subject.id
+    }) %}
+{% endif %}
+<div class="row">
     <div class="small-12 columns">
         <h1>{{ locale.grades.properPlural }} for {{ subject.name }} - {{ student.fullName }}</h1>
 
-        {% if subject.teachers|length or canViewInstructorMarks %}
+        {% if subject.teachers|length %}
         <ul class="meta">
-            {% if subject.teachers|length %}
-                <li><sbx-icon name="teacher" color="var(--sbx-color-text-secondary)"></sbx-icon>Teacher(s): {% for teacher in subject.teachers %}<a href="/search/user/{{ teacher.id }}" title="View Profile">{{ teacher.fullName }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</li>
-            {% endif %}
-            {% if canViewInstructorMarks %}
-                <li data-has-student-view-meta><sbx-icon data-has-student-view-meta-icon name="teacher" color="var(--sbx-color-text-secondary)"></sbx-icon>Teacher view</li>
-            {% endif %}
+            <li>
+                <sbx-icon name="teacher" color="var(--sbx-color-text-secondary)"></sbx-icon>
+                Teacher(s): {% for teacher in subject.teachers %}<a href="/search/user/{{ teacher.id }}" title="View Profile">{{ teacher.fullName }}</a>
+                {% if not loop.last %}, {% endif %}{% endfor %}
+            </li>
         </ul>
         {% endif %}
+
+        {% if canSwitchViewMode %}
+            {% include '@learningGrades/fragments/viewModeNavSwitcher.twig' with {
+                viewMode: viewMode,
+                viewModes: viewModes,
+                currentRouteBase: currentRouteBase
+            } only %}
+        {% endif %}
     </div>
-    {% if canViewInstructorMarks %}
-        <nav>
-            <sbx-pop-out content-id="header-options" data-test="sbx-pop-out-header-options"></sbx-pop-out>
-        </nav>
-        <ul id="header-options" class="f-dropdown" data-dropdown-content>
-            {% include '@learningGrades/fragments/studentViewNavSwitcher.twig' %}
-        </ul>
-    {% endif %}
 </div>
 
 <div class="row">
@@ -76,14 +94,16 @@
                     route:       'learningGrades.getGradesForSubject',
                     routeArgs:   {userId: student.id, subjectId: subject.id},
                     yearUrl:     yearUrl,
-                    year:        year is defined ? year : null
+                    year:        year is defined ? year : null,
+                    viewModeQuerySuffix: viewModeQuerySuffix
                 } only %}
                 {% include 'sub/subjectSelector.twig' with {
                     currentSubject: subject,
                     subjects:       folders,
                     route:         'learningGrades.getGradesForSubject',
                     routeArgs:      {userId: student.id, termCode: term.code},
-                    year:        year is defined ? year : null
+                    year:        year is defined ? year : null,
+                    viewModeQuerySuffix: viewModeQuerySuffix
                 } only %}
             </div>
         </div>
@@ -91,7 +111,7 @@
     {% if markbook.studentStatistics[student.id] is defined and markbook.studentStatistics[student.id].weightedMean is not null %}
     <div class="small-12 medium-3 xlarge-2 right">
         <h2 class="subheader">{{ locale.grades.proper }} Average</h2>
-        <div class="grade {{ urgency.marks(markbook.studentStatistics[student.id].meanNormalised) }}-bg text-center">
+        <div class="grade {{ urgency.marks(markbook.studentStatistics[student.id].meanNormalised) }}-bg u-ta-center">
             {% set weightedMean = markbook.studentStatistics[student.id].weightedMean %}
             <span>{% if weightedMean is null %}<span class="meta">-</span>{% else %}{{ weightedMean }}{% endif %}</span>
         </div>
@@ -112,47 +132,54 @@
 
     <div id="{{ reportContentId }}"></div>
 
-    {% set comments   = conversation.getVisibleComments(USER) %}
-    {% set canComment = conversation.canComment(USER) %}
+    {% set comments   = conversation.getVisibleComments(effectiveViewer) %}
+    {% set canComment = conversation.canComment(effectiveViewer) %}
 
     {% if comments|length or canComment %}
         <div class="row">
             <div class="small-12 columns">
                 <h2 class="subheader">Comments</h2>
+                {% if commentsReadOnly %}
+                    <p class="meta">Viewing as {{ viewMode|capitalize }} &mdash; comments are read-only in this view.</p>
+                {% endif %}
             </div>
 
             {% if canComment %}
             <script type="text/javascript" src='{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}'></script>
-            <div class="small-12 island">
+            <div class="small-12 island"{% if commentsReadOnly %} title="Comments are read-only while viewing as {{ viewMode|capitalize }}."{% endif %}>
                 <form id="create-comment" data-comment-form action="/ajax/comment.php" method="post">
                     <section class="content">
                         <input type="hidden" name="studentId" value="{{ student.id }}"/>
                         <input type="hidden" name="categoryId" value="{{ subject.id }}"/>
-                        <textarea id="create-comment-{{ student.id }}" name="comment" rows="3"></textarea>
+                        <textarea id="create-comment-{{ student.id }}" name="comment" rows="3"{% if commentsReadOnly %} disabled{% endif %}></textarea>
                         <div class="row">
-                            {% if USER.role.isStaff %}
+                            {% if effectiveViewer.role.isStaff %}
                                 <div class="small-3 medium-3 column">
-                                    <input id="vis-student" type="checkbox" name="visibility[student]" value="1" />
+                                    <input id="vis-student" type="checkbox" name="visibility[student]" value="1"{% if commentsReadOnly %} disabled{% endif %} />
                                     <label for="vis-student" class="checkbox-label">Visible To Student</label>
                                 </div>
                                 <div class="small-3 medium-3 column">
-                                    <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" checked />
+                                    <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" checked{% if commentsReadOnly %} disabled{% endif %} />
                                     <label for="vis-parent" class="checkbox-label">Visible To Parents</label>
                                 </div>
-                            {% elseif USER.role.isStudent %}
+                            {% elseif effectiveViewer.role.isStudent %}
                                 <div class="small-3 medium-3 column">
-                                    <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" checked />
+                                    <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" checked{% if commentsReadOnly %} disabled{% endif %} />
                                     <label for="vis-parent" class="checkbox-label">Visible To Parents</label>
                                 </div>
-                            {% elseif USER.role.isParent %}
+                            {% elseif effectiveViewer.role.isParent %}
                                 <div class="small-3 medium-3 column">
-                                    <input id="vis-student" type="checkbox" name="visibility[student]" value="1" />
+                                    <input id="vis-student" type="checkbox" name="visibility[student]" value="1"{% if commentsReadOnly %} disabled{% endif %} />
                                     <label for="vis-student" class="checkbox-label">Visible To Student</label>
                                 </div>
                             {% endif %}
                         </div>
                     </section>
-                    <a class="button submit" data-comment-post="new">Post comment</a>
+                    {% if commentsReadOnly %}
+                        <a class="button submit disabled" aria-disabled="true">Post comment</a>
+                    {% else %}
+                        <a class="button submit" data-comment-post="new">Post comment</a>
+                    {% endif %}
                 </form>
             </div>
             {% endif %}
@@ -185,7 +212,7 @@
                                     </div>
                                 </div>
                                 <nav>
-                                    {% if isCommenter %}
+                                    {% if isCommenter and not commentsReadOnly %}
                                         <a class="sbx-icon-only-button no-text"
                                            title="Delete"
                                            data-comment-delete

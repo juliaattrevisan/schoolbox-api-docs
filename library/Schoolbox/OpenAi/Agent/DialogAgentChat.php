@@ -12,7 +12,7 @@ namespace Schoolbox\OpenAi\Agent;
 use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
-use Schoolbox\Editor\OpenAI\Log;
+use Schoolbox\Editor\OpenAI\Log\Translator\Format\AgentChat;
 use Schoolbox\Editor\OpenAI\Payload\DialogAgentChat as PayloadGenerator;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Role;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Status;
@@ -80,7 +80,7 @@ Your teacher has been notified.";
         $pipeline = new Guardrails\Pipeline(
             $this->client,
             $user,
-            Helper::FEATURE_DIALOGAGENT,
+            \Schoolbox\OpenAi\Feature::DIALOG_AGENT,
             $sessionId,
         );
 
@@ -178,9 +178,9 @@ Your teacher has been notified.";
             $payload,
             $userPrompt,
             $user,
-            Helper::FEATURE_DIALOGAGENT,
+            \Schoolbox\OpenAi\Feature::DIALOG_AGENT,
             $sessionId,
-            Log\Translator\Format\AgentChat::getLogFormat(),
+            AgentChat::getLogFormat(),
         );
 
         /** Immediately save the log so the dialog agent response can be associated without failing a foreign key constraint */

@@ -134,7 +134,6 @@ $app = new class extends CliTool\App {
             'lti_assessment'    => 'SELECT count(*) FROM lti_assessment JOIN assessment a on lti_assessment.assessment_id = a.id WHERE a.deleted_at IS NULL',
             'lesson_plans'      => 'SELECT count(*) FROM lesson_plan JOIN assessment a on lesson_plan.assessment_id = a.id WHERE a.deleted_at IS NULL',
             'lesson_plan_template' => 'SELECT COUNT(*) FROM lesson_plan_template WHERE deleted_at IS NULL',
-            'due_work_rubrics'  => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND use_rubric = 1',
             'due_work_self_assessments' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND self_reviewability != "none"',
             'due_work_online_submission' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND accept_submission = 1',
             'due_work_offline_submission' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND accept_submission = 0',
@@ -145,9 +144,7 @@ $app = new class extends CliTool\App {
             'due_work_use_files' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND enable_files = 1',
             'due_work_show_policy' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND enable_policy = 1',
             'due_work_seb'      => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND seb_enabled = 1',
-            'assessment_visibility_staff' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND mark_visibility = 0',
-            'assessment_visibility_student' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND mark_visibility = 1',
-            'assessment_visibility_parent' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND mark_visibility = 2',
+
             'kami_docs'         => 'SELECT count(*) FROM kami_document WHERE status = "done" and deleted_at is null',
             'kami_processing'   => 'SELECT count(*) FROM kami_document WHERE status = "processing" and deleted_at is null',
             'kami_errors'       => 'SELECT count(*) FROM kami_document WHERE status = "error" and deleted_at is null',
@@ -181,6 +178,12 @@ $app = new class extends CliTool\App {
             'reporting_supporting_data_folders_any_folders' => "SELECT COUNT(*) FROM reporting r JOIN assessment a ON r.assessment_id = a.id WHERE r.deleted_at IS NULL AND a.deleted_at IS NULL AND r.supporting_data_folders = 'any_folders'",
             'reporting_supporting_data_markbook_enabled' => 'SELECT COUNT(*) FROM reporting r JOIN assessment a ON r.assessment_id = a.id WHERE r.deleted_at IS NULL AND a.deleted_at IS NULL AND r.supporting_data_markbook_enable = 1',
             'reporting_supporting_data_markbook_disabled' => 'SELECT COUNT(*) FROM reporting r JOIN assessment a ON r.assessment_id = a.id WHERE r.deleted_at IS NULL AND a.deleted_at IS NULL AND r.supporting_data_markbook_enable = 0',
+            // Agnostic rubrics
+            'rubric_instances' => 'SELECT COUNT(*) FROM rubric_instance ri JOIN assessment a ON ri.assessment_id = a.id WHERE ri.deleted_at IS NULL AND a.deleted_at IS NULL',
+            'due_work_rubrics' => 'SELECT COUNT(*) FROM rubric_instance ri JOIN assessment a ON ri.assessment_id = a.id JOIN submission_box sb ON a.id = sb.assessment_id WHERE ri.deleted_at IS NULL AND a.deleted_at IS NULL',
+            // 'rubric_instance_quiz' => "SELECT COUNT(*) FROM rubric_instance ri JOIN assessment a ON ri.assessment_id = a.id JOIN assess q ON a.id = q.assessment_id WHERE ri.deleted_at IS NULL AND a.deleted_at IS NULL AND q.deleted_at IS NULL AND q.availability = 'assess'",
+            // 'rubric_instance_lti' => 'SELECT COUNT(*) FROM rubric_instance ri JOIN assessment a ON ri.assessment_id = a.id JOIN lti_assessment lti ON a.id = lti.assessment_id WHERE ri.deleted_at IS NULL AND a.deleted_at IS NULL',
+            // 'rubric_instance_reporting' => 'SELECT COUNT(*) FROM rubric_instance ri JOIN assessment a ON ri.assessment_id = a.id JOIN reporting r ON a.id = r.assessment_id WHERE ri.deleted_at IS NULL AND a.deleted_at IS NULL AND r.deleted_at IS NULL',
 
             // More quiz info:
             // Quizzes which for some reason have no Learnosity reference
@@ -233,6 +236,25 @@ $app = new class extends CliTool\App {
                 AND learnosity_job_status = 'unprocessable'
                 AND deleted_at IS NULL
             ",
+
+            // Activity audiences
+            'feedback_visibility_staff' => "SELECT COUNT(*) FROM (SELECT sb.mark_visibility FROM assessment a JOIN submission_box sb ON a.id = sb.assessment_id WHERE a.deleted_at IS NULL UNION ALL SELECT COALESCE(q.mark_visibility, 'staffAndStudent') FROM assessment a JOIN assess q ON a.id = q.assessment_id WHERE a.deleted_at IS NULL AND q.deleted_at IS NULL AND q.availability = 'assess' UNION ALL SELECT COALESCE(p.mark_visibility, 'staffAndStudent') FROM assessment a JOIN project p ON a.id = p.assessment_id WHERE a.deleted_at IS NULL AND p.deleted_at IS NULL UNION ALL SELECT COALESCE(lti.mark_visibility, 'staffOnly') FROM assessment a JOIN lti_assessment lti ON a.id = lti.assessment_id WHERE a.deleted_at IS NULL UNION ALL SELECT COALESCE(r.mark_visibility, 'staffOnly') FROM assessment a JOIN reporting r ON a.id = r.assessment_id WHERE a.deleted_at IS NULL AND r.deleted_at IS NULL) feedback WHERE mark_visibility = 'staffOnly'",
+            'feedback_visibility_staff_students' => "SELECT COUNT(*) FROM (SELECT sb.mark_visibility FROM assessment a JOIN submission_box sb ON a.id = sb.assessment_id WHERE a.deleted_at IS NULL UNION ALL SELECT COALESCE(q.mark_visibility, 'staffAndStudent') FROM assessment a JOIN assess q ON a.id = q.assessment_id WHERE a.deleted_at IS NULL AND q.deleted_at IS NULL AND q.availability = 'assess' UNION ALL SELECT COALESCE(p.mark_visibility, 'staffAndStudent') FROM assessment a JOIN project p ON a.id = p.assessment_id WHERE a.deleted_at IS NULL AND p.deleted_at IS NULL UNION ALL SELECT COALESCE(lti.mark_visibility, 'staffOnly') FROM assessment a JOIN lti_assessment lti ON a.id = lti.assessment_id WHERE a.deleted_at IS NULL UNION ALL SELECT COALESCE(r.mark_visibility, 'staffOnly') FROM assessment a JOIN reporting r ON a.id = r.assessment_id WHERE a.deleted_at IS NULL AND r.deleted_at IS NULL) feedback WHERE mark_visibility = 'staffAndStudent'",
+            'feedback_visibility_staff_parents' => "SELECT COUNT(*) FROM (SELECT sb.mark_visibility FROM assessment a JOIN submission_box sb ON a.id = sb.assessment_id WHERE a.deleted_at IS NULL UNION ALL SELECT COALESCE(q.mark_visibility, 'staffAndStudent') FROM assessment a JOIN assess q ON a.id = q.assessment_id WHERE a.deleted_at IS NULL AND q.deleted_at IS NULL AND q.availability = 'assess' UNION ALL SELECT COALESCE(p.mark_visibility, 'staffAndStudent') FROM assessment a JOIN project p ON a.id = p.assessment_id WHERE a.deleted_at IS NULL AND p.deleted_at IS NULL UNION ALL SELECT COALESCE(lti.mark_visibility, 'staffOnly') FROM assessment a JOIN lti_assessment lti ON a.id = lti.assessment_id WHERE a.deleted_at IS NULL UNION ALL SELECT COALESCE(r.mark_visibility, 'staffOnly') FROM assessment a JOIN reporting r ON a.id = r.assessment_id WHERE a.deleted_at IS NULL AND r.deleted_at IS NULL) feedback WHERE mark_visibility = 'staffAndParent'",
+            'feedback_visibility_staff_students_parents' => "SELECT COUNT(*) FROM (SELECT sb.mark_visibility FROM assessment a JOIN submission_box sb ON a.id = sb.assessment_id WHERE a.deleted_at IS NULL UNION ALL SELECT COALESCE(q.mark_visibility, 'staffAndStudent') FROM assessment a JOIN assess q ON a.id = q.assessment_id WHERE a.deleted_at IS NULL AND q.deleted_at IS NULL AND q.availability = 'assess' UNION ALL SELECT COALESCE(p.mark_visibility, 'staffAndStudent') FROM assessment a JOIN project p ON a.id = p.assessment_id WHERE a.deleted_at IS NULL AND p.deleted_at IS NULL UNION ALL SELECT COALESCE(lti.mark_visibility, 'staffOnly') FROM assessment a JOIN lti_assessment lti ON a.id = lti.assessment_id WHERE a.deleted_at IS NULL UNION ALL SELECT COALESCE(r.mark_visibility, 'staffOnly') FROM assessment a JOIN reporting r ON a.id = r.assessment_id WHERE a.deleted_at IS NULL AND r.deleted_at IS NULL) feedback WHERE mark_visibility = 'staffStudentAndParent'",
+            'work_types' => 'SELECT COUNT(*) FROM lu_work_type WHERE deleted_at IS NULL',
+            'activity_audience_staff' => 'SELECT COUNT(*) FROM lu_work_type WHERE deleted_at IS NULL AND is_visible_to_learners = 0 AND is_visible_to_parents = 0',
+            'activity_audience_staff_students' => 'SELECT COUNT(*) FROM lu_work_type WHERE deleted_at IS NULL AND is_visible_to_learners = 1 AND is_visible_to_parents = 0',
+            'activity_audience_staff_parents' => 'SELECT COUNT(*) FROM lu_work_type WHERE deleted_at IS NULL AND is_visible_to_learners = 0 AND is_visible_to_parents = 1',
+            'activity_audience_staff_students_parents' => 'SELECT COUNT(*) FROM lu_work_type WHERE deleted_at IS NULL AND is_visible_to_learners = 1 AND is_visible_to_parents = 1',
+            'work_types_permitted_due_work' => 'SELECT COUNT(*) FROM lu_work_type WHERE deleted_at IS NULL AND permitted_due_work = 1',
+            'work_types_permitted_quiz' => 'SELECT COUNT(*) FROM lu_work_type WHERE deleted_at IS NULL AND permitted_quiz = 1',
+            'work_types_permitted_task' => 'SELECT COUNT(*) FROM lu_work_type WHERE deleted_at IS NULL AND permitted_task = 1',
+            'work_types_permitted_project' => 'SELECT COUNT(*) FROM lu_work_type WHERE deleted_at IS NULL AND permitted_project = 1',
+            'work_types_permitted_lti' => 'SELECT COUNT(*) FROM lu_work_type WHERE deleted_at IS NULL AND permitted_lti = 1',
+            'work_types_permitted_lesson_plan' => 'SELECT COUNT(*) FROM lu_work_type WHERE deleted_at IS NULL AND permitted_lesson_plan = 1',
+            'work_types_permitted_dialog_agent' => 'SELECT COUNT(*) FROM lu_work_type WHERE deleted_at IS NULL AND permitted_dialog_agent = 1',
+            'work_types_permitted_reporting' => 'SELECT COUNT(*) FROM lu_work_type WHERE deleted_at IS NULL AND permitted_reporting_activity = 1',
 
             //Homepages
             'forum_posts'       => 'SELECT count(*) FROM `forumPost` WHERE `deleted_at` IS NULL',
@@ -434,24 +456,31 @@ $app = new class extends CliTool\App {
             'whats_new_completed' => 'SELECT COUNT(*) FROM tour_status INNER JOIN tour ON tour_status.tour_uuid = tour.uuid WHERE tour.title like "%Release" AND tour.deleted_at IS NULL AND tour_status.status = "' . Schoolbox\Tour\Status\Model::STATUS_COMPLETED . '"',
 
             //AI Usage
-            'openai_success'    => 'SELECT COUNT(*) FROM openai_log WHERE return_code = 200',
-            'openai_error'      => 'SELECT COUNT(*) FROM openai_log WHERE return_code != 200',
-            'openai_input_tokens' => 'SELECT SUM(input_tokens) FROM openai_log WHERE return_code = 200',
-            'openai_output_tokens' => 'SELECT SUM(output_tokens) FROM openai_log WHERE return_code = 200',
-            'openai_tokens' => 'SELECT SUM(output_tokens) + SUM(input_tokens) FROM openai_log WHERE return_code = 200',
+            'openai_success'    => 'SELECT COUNT(*) FROM ai_session_log WHERE return_code = 200',
+            'openai_error'      => 'SELECT COUNT(*) FROM ai_session_log WHERE return_code != 200',
+            'openai_input_tokens' => 'SELECT SUM(input_tokens) FROM ai_session_log WHERE return_code = 200',
+            'openai_output_tokens' => 'SELECT SUM(output_tokens) FROM ai_session_log WHERE return_code = 200',
+            'openai_tokens' => 'SELECT SUM(output_tokens) + SUM(input_tokens) FROM ai_session_log WHERE return_code = 200',
 
             //image tokens
-            'openai_input_tokens_image' => 'SELECT SUM(input_tokens) FROM openai_log WHERE return_code = 200 AND feature = "image"',
-            'openai_output_tokens_image' => 'SELECT SUM(output_tokens) FROM openai_log WHERE return_code = 200 AND feature = "image"',
-            'openai_tokens_image' => 'SELECT SUM(output_tokens) + SUM(input_tokens) FROM openai_log WHERE return_code = 200 AND feature = "image"',
+            'openai_input_tokens_image' => 'SELECT SUM(input_tokens) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE return_code = 200 AND s.feature = "image"',
+            'openai_output_tokens_image' => 'SELECT SUM(output_tokens) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE return_code = 200 AND s.feature = "image"',
+            'openai_tokens_image' => 'SELECT SUM(output_tokens) + SUM(input_tokens) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE return_code = 200 AND s.feature = "image"',
 
             // AI feature usage
-            'openai_chat' => "SELECT count(*) FROM openai_log WHERE feature = 'chat'",
-            'openai_lessonplan' => "SELECT count(*) FROM openai_log WHERE feature = 'lessonplan'",
-            'openai_image' => "SELECT count(*) FROM openai_log WHERE feature = 'image'",
-            'openai_differentiation' => "SELECT count(*) FROM openai_log WHERE feature = 'differentiation'",
-            'openai_dialogagent' => "SELECT count(*) FROM openai_log WHERE feature = 'dialogagent'",
-            'openai_learning_customisation' => "SELECT count(*) FROM openai_log WHERE feature = 'learningactivitycustomisation'",
+            'openai_chat' => "SELECT count(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'chat'",
+            'openai_lessonplan' => "SELECT count(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'lessonplan'",
+            'openai_image' => "SELECT count(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'image'",
+            'openai_differentiation' => "SELECT count(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'differentiation'",
+            'openai_dialogagent' => "SELECT count(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'dialogagent'",
+            'openai_learning_customisation' => "SELECT count(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'learningactivitycustomisation'",
+
+            // AI moderation
+            'ai_moderation_events' => 'SELECT COUNT(id) FROM ai_moderation_event',
+            'ai_moderation_events_no_action_required' => "SELECT COUNT(id) FROM ai_moderation_event WHERE status = 'no_action_required'",
+            'ai_moderation_events_requires_attention' => "SELECT COUNT(id) FROM ai_moderation_event WHERE status = 'requires_attention'",
+            'ai_moderation_events_further_action_required' => "SELECT COUNT(id) FROM ai_moderation_event WHERE status = 'further_action_required'",
+            'ai_moderation_events_further_action_taken' => "SELECT COUNT(id) FROM ai_moderation_event WHERE status = 'further_action_taken'",
 
             //Packages
             'package_installed' => 'SELECT COUNT(*) FROM package WHERE installed = 1',
@@ -481,27 +510,27 @@ $app = new class extends CliTool\App {
             }
 
             $queryList['openai_model_' . $model] = [
-                "SELECT COUNT(*) FROM openai_log WHERE " . implode(' AND ', $queryParts),
+                "SELECT COUNT(*) FROM ai_session_log WHERE " . implode(' AND ', $queryParts),
                 $queryParams,
             ];
         }
 
         // Build the unknown model query
         $queryList['openai_model_unknown'] = [
-            "SELECT COUNT(*) FROM openai_log WHERE " . implode(' AND ', array_map(fn ($model) => 'model NOT LIKE ?', OpenAiConfig::AI_MODELS)),
+            "SELECT COUNT(*) FROM ai_session_log WHERE " . implode(' AND ', array_map(fn ($model) => 'model NOT LIKE ?', OpenAiConfig::AI_MODELS)),
             array_map(fn ($model) => $model . '%', OpenAiConfig::AI_MODELS),
         ];
 
         // Query image model usage
         foreach (OpenAiConfig::AI_IMAGE_MODELS as $imageModel) {
             $queryList['openai_image_model_' . $imageModel] = [
-                "SELECT COUNT(*) FROM openai_log WHERE feature = 'image' AND JSON_VALUE(prompt, '$.tools[0].model') = ?",
+                "SELECT COUNT(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'image' AND JSON_VALUE(prompt, '$.tools[0].model') = ?",
                 [$imageModel],
             ];
         }
         $queryList['openai_image_model_unknown'] = [
             sprintf(
-                "SELECT COUNT(*) FROM openai_log WHERE feature = 'image' AND COALESCE(JSON_VALUE(prompt, '$.tools[0].model'), '') NOT IN (%s)",
+                "SELECT COUNT(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'image' AND COALESCE(JSON_VALUE(prompt, '$.tools[0].model'), '') NOT IN (%s)",
                 implode(',', array_fill(0, count(OpenAiConfig::AI_IMAGE_MODELS), '?')),
             ),
             OpenAiConfig::AI_IMAGE_MODELS,

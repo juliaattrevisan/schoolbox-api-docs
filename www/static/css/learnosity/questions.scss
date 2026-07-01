@@ -14,14 +14,58 @@
 }
 
 /*the color used to highlight the selected item  */
-.lrn_widget .lrn_valid,
-.lrn_widget .lrn_selected {
-    background-color: var(--content-ui-selected);
+.lrn_widget:not(.lrn_qr) .lrn_valid,
+.lrn_widget:not(.lrn_qr) .lrn_selected {
+    background-color: var(--sbx-config-color-active, var(--content-ui-selected));
+}
+
+/* quiz review feedback states */
+.lrn_widget.lrn_qr .lrn_selected.lrn_correct,
+.lrn_widget.lrn_qr .lrn_selected.lrn_correct .lrn-label {
+    background-color: var(--sbx-color-foreground-primary, var(--content-ui-background));
+    background-color: color-mix(
+        in srgb,
+        var(--sbx-color-success, #3e843e) 12%,
+        var(--sbx-color-foreground-primary, var(--content-ui-background))
+    );
+    color: var(--sbx-color-success, #3e843e);
+}
+.lrn_widget.lrn_qr .lrn_selected.lrn_incorrect,
+.lrn_widget.lrn_qr .lrn_selected.lrn_incorrect .lrn-label {
+    color: var(--sbx-color-alert, #ea0a06);
 }
 
 /*the color used to highlight the selected item in the mutiplechoice-block layout */
-.lrn_widget.lrn_mcq .lrn_response .lrn_mcqgroup-block .lrn-mcq-option.lrn_selected .lrn-label {
-    background-color: var(--content-ui-selected);
+.lrn_widget.lrn_mcq:not(.lrn_qr) .lrn_response .lrn_mcqgroup-block .lrn-mcq-option.lrn_selected .lrn-label {
+    background-color: var(--sbx-config-color-active, var(--content-ui-selected));
+}
+
+/* keep visible radio control and answer text on the same row */
+.lrn_widget.lrn_mcq .lrn_response .lrn_mcqgroup-block .lrn-mcq-option,
+.lrn_widget.lrn_mcq .lrn_response .lrn_mcqgroup-horizontal .lrn-mcq-option {
+    align-items: center !important;
+    column-gap: 0.5rem;
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr);
+}
+
+.lrn_widget.lrn_mcq .lrn_response .lrn_mcqgroup-block .lrn-mcq-option > input.lrn-input[type="radio"],
+.lrn_widget.lrn_mcq .lrn_response .lrn_mcqgroup-horizontal .lrn-mcq-option > input.lrn-input[type="radio"] {
+    align-self: center;
+    grid-column: 1;
+    margin: 0;
+}
+
+.lrn_widget.lrn_mcq .lrn_response .lrn_mcqgroup-block .lrn-mcq-option > .lrn-label,
+.lrn_widget.lrn_mcq .lrn_response .lrn_mcqgroup-horizontal .lrn-mcq-option > .lrn-label {
+    grid-column: 2;
+    margin: 0;
+    min-width: 0;
+}
+
+.lrn_widget.lrn_mcq .lrn_response .lrn_mcqgroup-block .lrn-mcq-option + .lrn-mcq-option,
+.lrn_widget.lrn_mcq .lrn_response .lrn_mcqgroup-horizontal .lrn-mcq-option + .lrn-mcq-option {
+    margin-top: 0.5rem;
 }
 
 /* update border color in the mutiplechoice-block layout */
@@ -61,7 +105,7 @@
 .lrn_widget .lrn_btn_drag.lrn_active,
 .lrn_widget .lrn_btn_sort:active,
 .lrn_widget .lrn_btn_sort.lrn_active {
-    background-color: var(--content-ui-selected);
+    background-color: var(--sbx-config-color-active, var(--content-ui-selected));
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 
@@ -86,7 +130,7 @@
     .lrn_response_container.lrn_dragdrop.lrn_highlight:not(.lrn_disabled):not(.lrn-dragdrop-empty),
 .lrn .lrn_possibilityList.lrn_over,
 .lrn .lrn_possibilityListContainer.lrn_over {
-    background-color: var(--content-ui-background);
+    background: var(--sbx-color-foreground-primary, var(--content-ui-background));
 }
 
 /* update the active border color of the drag and drop to content-ui-selected*/
@@ -99,29 +143,31 @@
 .lrn_widget .lrn_btn_sort.lrn_focus:active,
 .lrn_widget .lrn_btn_sort:focus.lrn_active {
     box-shadow:
-        inset 0 0 0 1px var(--content-ui-selected),
-        inset 0 0 0 3px #fff;
+        inset 0 0 0 1px var(--sbx-config-color-active, var(--content-ui-selected)),
+        inset 0 0 0 3px var(--sbx-color-foreground-primary, #fff);
 }
 
 /* updated the drop down styles*/
 .lrn_widget .lrn_response.lrn_cloze .lrn_combobox select.lrn-cloze-select {
-    background-color: #fff;
+    background-color: var(--sbx-color-foreground-primary, #fff);
     border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    border-radius: var(--sbx-config-field-corner-radius, 0px);
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     margin: 10px 0;
     padding: 0 20px 0 10px;
 }
 .lrn_widget .lrn_response.lrn_cloze .lrn_combobox select.lrn-cloze-select:hover,
 .lrn_widget .lrn_response.lrn_cloze .lrn_combobox select.lrn-cloze-select:focus {
-    background-color: var(--form-bg-hover-color) !important;
+    background-color: var(--sbx-color-foreground-primary, var(--form-bg-hover-color)) !important;
     border-color: hsla(
-        var(--form-border-color-h),
-        var(--form-border-color-s),
-        calc(var(--form-border-color-l) - 15%),
-        var(--form-border-color-a)
+        var(--form-border-color-h, 230.9),
+        var(--form-border-color-s, 100%),
+        calc(var(--form-border-color-l, 28.43%) - 15%),
+        var(--form-border-color-a, 1)
     );
-    color: var(--form-bg-hover-color-contrast);
-    outline: none;
+    color: var(--sbx-color-text-primary, var(--form-bg-hover-color-contrast));
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
 
 /* update the color , border and margin of textarea */
@@ -129,10 +175,11 @@
 .lrn_widget textarea,
 .lrn_widget .lrn_texteditor_editable {
     border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    border-radius: var(--sbx-config-field-corner-radius, 0px);
 }
 .lrn_cloze .lrn_response_input .lrn_textinput input,
 .lrn_cloze .lrn_response_input .lrn_textinput textarea {
-    color: #000;
+    color: var(--sbx-color-text-primary, #000);
 }
 
 /*  update the border color for label image with drag and drop */
@@ -151,17 +198,17 @@
 
 /* update the border color for classification */
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table .lrn_response_container {
-    border-top: 1px dashed var(--sbx-config-color-accent, var(--content-ui-foreground));
-    border-left: 1px dashed var(--sbx-config-color-accent, var(--content-ui-foreground));
+    border-top: 1px dashed var(--sbx-color-border, var(--content-ui-foreground));
+    border-left: 1px dashed var(--sbx-color-border, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr .lrn_response_container.lrn_last {
-    border-right: 1px dashed var(--sbx-config-color-accent, var(--content-ui-foreground));
+    border-right: 1px dashed var(--sbx-color-border, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr.lrn_last .lrn_response_container {
-    border-bottom: 1px dashed var(--sbx-config-color-accent, var(--content-ui-foreground));
+    border-bottom: 1px dashed var(--sbx-color-border, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_association .lrn_response_container.lrn_dropzone {
-    border-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
+    border-color: var(--sbx-color-border, var(--content-ui-foreground));
 }
 
 /* update styles for order list*/
@@ -192,7 +239,7 @@
         inset 0 0 0 1px var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 .lrn .lrn_btn_sort {
-    color: #000;
+    color: var(--sbx-color-text-primary, #000);
 }
 .lrn_widget.lrn_sortlist .lrn_arrow_top span {
     border-bottom: 1em solid var(--sbx-config-color-accent, var(--content-ui-foreground));
@@ -211,13 +258,13 @@
 .lrn_widget.lrn_chemistryessayV2 .lrn_response_input_wrapper,
 .lrn_widget.lrn_formulaessayV2 .lrn_response_input_wrapper,
 .lrn_widget.lrn_longtextV2 .lrn_response_input_wrapper {
-    border-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
+    border-color: var(--sbx-color-border, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_chemistryessayV2 .lrn-toolbar,
 .lrn_widget.lrn_formulaessayV2 .lrn-toolbar,
 .lrn_widget.lrn_longtextV2 .lrn-toolbar {
-    background: #ffff;
-    border-bottom: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    background: var(--sbx-color-foreground-primary, #fff);
+    border-bottom: 1px solid var(--sbx-color-border, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_chemistryessayV2 .lrn-divider:after,
 .lrn_widget.lrn_formulaessayV2 .lrn-divider:after,
@@ -228,8 +275,8 @@
 .lrn_widget.lrn_chemistryessayV2 .lrn-toolbar-footer,
 .lrn_widget.lrn_formulaessayV2 .lrn-toolbar-footer,
 .lrn_widget.lrn_longtextV2 .lrn-toolbar-footer {
-    background: #ffff;
-    border-top: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    background: var(--sbx-color-foreground-primary, #fff);
+    border-top: 1px solid var(--sbx-color-border, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_chemistryessayV2 .lrn_texteditor_editable:focus,
 .lrn_widget.lrn_chemistryessayV2 .lrn_texteditor_editable.lrn_active,
@@ -238,11 +285,14 @@
 .lrn_widget.lrn_longtextV2 .lrn_texteditor_editable:focus,
 .lrn_widget.lrn_longtextV2 .lrn_texteditor_editable.lrn_active {
     box-shadow: 1px 1px 2px #0000001a inset;
-    outline: none;
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
 .lrn_widget .lrn_texteditor_editable:focus {
     border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
     box-shadow: 1px 1px 2px #0000001a inset;
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
 
 /* update shading styles */
@@ -253,7 +303,7 @@
 .lrn_widget.lrn_simpleshading .lrn-shading-wrapper.lrn_no_touch .lrn-shading-cell.lrn-shading-selected:hover,
 .lrn_widget.lrn_simpleshading .lrn-shading-wrapper.lrn_no_touch .lrn-shading-cell.lrn-shading-selected:focus {
     background-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
-    border: 1px solid var(--content-ui-background);
+    border: 1px solid var(--sbx-config-color-active, var(--content-ui-background));
 }
 .lrn_widget.lrn_simpleshading .lrn-shading-wrapper.lrn_no_touch .lrn-shading-cell:hover {
     background-color: rgba(255, 255, 255, 0.8);
@@ -261,7 +311,7 @@
 }
 .lrn_widget.lrn_simpleshading .lrn-shading-cell.lrn-shading-selected {
     background-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
-    border: 1px solid var(--content-ui-background);
+    border: 1px solid var(--sbx-config-color-active, var(--content-ui-background));
 }
 .lrn_widget.lrn_simpleshading .lrn-shading-wrapper.lrn_no_touch .lrn-shading-cell:focus {
     border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
@@ -292,7 +342,7 @@ input[type="checkbox"] {
 
 /*the hover color of choice matrix-standard radio buttons set to content-ui-selected*/
 .lrn_qr.lrn_choicematrix .lrn_response_input > table td.lrn_option.lrn_enabled.lrn_selected:hover {
-    background-color: var(--content-ui-selected);
+    background-color: var(--sbx-config-color-active, var(--content-ui-selected));
 }
 
 /*update the border color of dropzone in Cloze with drag & drop*/
@@ -323,9 +373,10 @@ input[type="checkbox"] {
 }
 
 /* plaintext styles*/
-.lrn .lrn_btn {
-    background-color: var(--content-ui-background);
-    color: #000;
+.lrn .lrn_btn:not(.lrn_btn_blue) {
+    background-color: var(--sbx-color-foreground-primary, var(--content-ui-background));
+    border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 button.lrn_btn.lrn_start_recording,
 .lrn_box_skin_wrapper .lrn_widget_footer .lrn_toolbar_left .lrn_btn,
@@ -333,12 +384,12 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
     background-color: #eaeaea;
 }
 .lrn_toolbar {
-    background-color: #fff;
+    background: var(--sbx-color-foreground-primary, #fff);
 }
 .lrn_texteditor > .lrn_toolbar {
-    border-left: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
-    border-right: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
-    border-top: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    border-left: 1px solid var(--sbx-color-border, var(--content-ui-foreground));
+    border-right: 1px solid var(--sbx-color-border, var(--content-ui-foreground));
+    border-top: 1px solid var(--sbx-color-border, var(--content-ui-foreground));
 }
 
 /* update number line with drag and drop styles */
@@ -350,7 +401,7 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 }
 .lrn_widget.lrn_numberline .lrn_btn_arrow:not(.lrn_disabled, .lrn_suggested):hover,
 .lrn_widget.lrn_numberline .lrn_btn_arrow:not(.lrn_disabled, .lrn_suggested):focus {
-    background: var(--content-ui-selected);
+    background: var(--sbx-config-color-active, var(--content-ui-selected));
     border-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 .lrn .lrn_btn_arrow:active:after,
@@ -365,22 +416,22 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 
 /* update file upload styles */
 .lrn_widget.lrn_fileupload .lrn_response_input_wrapper {
-    border-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
+    border-color: var(--sbx-color-border, var(--content-ui-foreground));
 }
 .lrn_wid .lrn_widget.lrn_fileupload .lrn-toolbar,
 .lrn_widget.lrn_fileupload .lrn-toolbar,
 .lrn_widget .lrn-imageupload-config-outlet .lrn-imageupload-config-upload-btn-container,
 .lrn_widget .lrn-imageupload-img-wrapper-is-empty {
-    background: #fff;
-    border-bottom: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    background: var(--sbx-color-foreground-primary, #fff);
+    border-bottom: 1px solid var(--sbx-color-border, var(--content-ui-foreground));
 }
 .lrn_widget .lrn-imageupload-config-outlet .lrn-imageupload-config-upload-btn-container,
 .lrn_widget .lrn-imageupload-img-wrapper-is-empty {
-    border-left: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
-    border-right: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    border-left: 1px solid var(--sbx-color-border, var(--content-ui-foreground));
+    border-right: 1px solid var(--sbx-color-border, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_imageupload .lrn_toolbar {
-    border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    border: 1px solid var(--sbx-color-border, var(--content-ui-foreground));
     touch-action: none;
     -ms-touch-action: none;
 }
@@ -395,51 +446,40 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 }
 .lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton:focus {
     box-shadow:
-        inset 0 0 0 1px var(--content-ui-selected),
-        inset 0 0 0 1px #fff,
-        inset 0 0 0 4px #1877b1;
+        inset 0 0 0 1px var(--sbx-config-color-accent, var(--content-ui-foreground)),
+        inset 0 0 0 2px var(--sbx-color-foreground-primary, #fff),
+        0 0 0 2px var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton.lrn_active {
-    background-color: var(--content-ui-selected);
+    background-color: var(--sbx-config-color-active, var(--content-ui-selected));
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton.lrn_active:focus {
     box-shadow:
         inset 0 0 0 1px var(--sbx-config-color-accent, var(--content-ui-foreground)),
-        inset 0 0 0 3px #fff;
+        inset 0 0 0 2px var(--sbx-color-foreground-primary, #fff),
+        0 0 0 2px var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 
-/* update the border radius to 0px */
-.lrn .lrn_btn,
+/* update container border radius */
 .lrn_widget .lrn_response .lrn_response_container,
-.lrn .lrn_btn_drag,
-.lrn_widget .lrn_response.lrn_cloze .lrn_combobox select.lrn-cloze-select,
-.lrn_cloze .lrn_response_input .lrn_textinput input,
-.lrn_cloze .lrn_response_input .lrn_textinput textarea,
-.lrn_widget.lrn_qr .lrn-clozeformula-input,
 .lrn_response_input_wrapper,
-.lrn.lrn_widget .lrn_bordered_mathinput,
-.lrn .lrn_btn_arrow,
 .lrn_widget.lrn_fileupload .lrn_response_input_wrapper,
-.lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton,
-.lrn_widget.lrn_shorttext .lrn_textinput input,
-.lrn-qe .lrn-qe-ui .lrn-qe-tile-preview,
-.lrn .lrn-author-ui .lrn-btn,
-.lrn .lrn-author-ui a.lrn-btn {
-    border-radius: 0;
+.lrn-qe .lrn-qe-ui .lrn-qe-tile-preview {
+    border-radius: var(--sbx-config-container-corner-radius, 0px);
 }
 
 /* update the classification drop zone borders */
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr .lrn_response_container.lrn_last,
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr.lrn_last .lrn_response_container {
-    border-right: 1px dashed var(--sbx-config-color-accent, var(--content-ui-foreground));
+    border-right: 1px dashed var(--sbx-color-border, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr.lrn_last .lrn_response_container {
-    border-bottom: 1px dashed var(--sbx-config-color-accent, var(--content-ui-foreground));
+    border-bottom: 1px dashed var(--sbx-color-border, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table .lrn_response_container {
-    border-left: 1px dashed var(--sbx-config-color-accent, var(--content-ui-foreground));
-    border-top: 1px dashed var(--sbx-config-color-accent, var(--content-ui-foreground));
+    border-left: 1px dashed var(--sbx-color-border, var(--content-ui-foreground));
+    border-top: 1px dashed var(--sbx-color-border, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_classification
     .lrn_response
@@ -479,7 +519,7 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
     tr
     .lrn_response_container.lrn_last.lrn_over,
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr .lrn_response_container.lrn_over {
-    border: 1px var(--content-ui-background) solid;
+    border: 1px var(--sbx-config-color-active, var(--content-ui-background)) solid;
 }
 
 /* update shortlist icon color */
@@ -490,7 +530,8 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 
 /* update graphing border */
 .lrn_widget.lrn_graphplotting .lrn_response_wrapper .lrn_graph_plotter .lrn_toolbar:focus-within {
-    outline: unset;
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
 
 /* update image upload button box-shadow */
@@ -501,12 +542,14 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 
 /* upload image button color */
 span.btn.lrn_btn_blue.lrn-imageupload-config-btn-upload {
-    background-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
+    background-color: var(--sbx-config-color-accent, var(--content-ui-submit-background));
+    color: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground));
 }
 
 /* upload file button color */
 .lrn_widget.lrn_fileupload .lrn-fileupload-btn-upload {
-    background-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
+    background-color: var(--sbx-config-color-accent, var(--content-ui-submit-background));
+    color: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground));
 }
 
 /* add "Add" before icon for adding question to an item */
@@ -518,13 +561,15 @@ button.lrn-author-widget-button.lrn-author-widget-button-more > span.lrn-author-
     text-shadow: none;
 }
 button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
-    background-color: var(--sbx-config-color-active, var(--content-ui-hover)) !important;
+    background: var(--sbx-color-foreground-primary, var(--content-ui-background)) !important;
+    border-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     color: var(--sbx-config-color-accent, var(--content-ui-foreground)) !important;
     text-decoration: none !important;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-btn:focus,
 .lrn-qe .lrn-qe-ui a.lrn-qe-btn:focus {
-    outline: none;
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
 
 /* fixed file upload button styles in preview questions */
@@ -533,7 +578,7 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
     z-index: 3;
 }
 .lrn.lrn-assess .app-layout .lrn_btn_blue:after {
-    border-radius: 0;
+    border-radius: var(--sbx-config-field-corner-radius, 0px) !important;
 }
 
 /* remove the relevant disabled styles on a student response elements within horizontal marking */
@@ -556,7 +601,7 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
 .lrn_response_wrapper select[disabled],
 .lrn_response_wrapper select[readonly] {
     background-color: transparent;
-    color: #000;
+    color: var(--sbx-color-text-primary, #000);
 }
 /* remove the relevant disabled styles on a student response elements within horizontal marking */
 .lrn_response_wrapper input:not([type]):disabled,
@@ -579,34 +624,65 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
     background: transparent;
     top: -4px;
 }
-.lrn_dropdown.lrn_theme_primary .lrn_dropdown_toggle:focus,
 .lrn_dropdown.lrn_theme_primary .lrn_dropdown_toggle:hover,
 .lrn_dropdown.lrn_theme_primary.lrn_open .lrn_dropdown_toggle,
-.lrn_dropdown.lrn_theme_primary.lrn_open .lrn_dropdown_toggle:focus,
 .lrn_dropdown.lrn_theme_primary.lrn_open .lrn_dropdown_toggle:hover {
     background: transparent;
     border-color: transparent;
+}
+.lrn_dropdown.lrn_theme_primary .lrn_dropdown_toggle:focus,
+.lrn_dropdown.lrn_theme_primary.lrn_open .lrn_dropdown_toggle:focus {
+    background: transparent;
+    border-color: transparent;
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
 
 /* Check answer button */
 .lds-btn-secondary,
 .lrn .lrn_btn:is(.lds-btn-secondary) {
-    background-color: var(--content-ui-background);
-    border: none;
-    border-radius: 0;
+    background-color: var(--sbx-color-foreground-primary, var(--content-ui-background));
+    border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    border-radius: var(--sbx-config-field-corner-radius, 0px) !important;
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     min-height: auto;
 }
 .lds-btn-secondary,
-.lrn .lrn_btn:is(.lds-btn-secondary):hover,
-.lds-btn-secondary,
-.lrn .lrn_btn:is(.lds-btn-secondary):focus {
-    background-color: var(--sbx-config-color-active, var(--content-ui-hover));
+.lrn .lrn_btn:is(.lds-btn-secondary):hover {
+    background: var(--sbx-color-foreground-primary, var(--content-ui-background));
+    border-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     font-family:
-        -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica, Arial,
+        var(--sbx-font-primary, "Figtree"),
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Roboto",
+        "Droid Sans",
+        "Helvetica Neue",
+        Helvetica,
+        Arial,
         sans-serif !important;
     font-size: 1rem;
+}
+.lrn .lrn_btn:is(.lds-btn-secondary):focus {
+    background: var(--sbx-color-foreground-primary, var(--content-ui-background));
+    border-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
+    font-family:
+        var(--sbx-font-primary, "Figtree"),
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Roboto",
+        "Droid Sans",
+        "Helvetica Neue",
+        Helvetica,
+        Arial,
+        sans-serif !important;
+    font-size: 1rem;
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground));
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
 
 /* updatle the uploader button */
@@ -625,7 +701,8 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
 }
 .lrn button.lrn-mask:hover,
 .lrn button.lrn-mask:focus {
-    outline: unset !important;
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground)) !important;
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
 
 /* Made edit/preview button font sizes consistent */
@@ -655,7 +732,8 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
 /* fixed save button hover style*/
 .lrn .lrn-author-ui .lrn-author-btn-save:not([disabled]):hover,
 .lrn .lrn-author-ui .lrn-author-btn-save:not([disabled]):focus {
-    outline: unset !important;
+    outline: var(--sbx-border-width-normal, 2px) solid var(--sbx-config-color-accent, var(--content-ui-foreground)) !important;
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
 
 /* fixed search page checkbox inputs */
@@ -705,7 +783,7 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
     border-top: unset;
     border-right: unset;
     border-left: unset;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid var(--sbx-color-border, #ccc);
 }
 
 /* fixed the math dialog styles */
@@ -734,7 +812,8 @@ span.lrn-author {
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 button.lrn-author-btn-old.lrn-author-btn-old-legacy.lrn-author-btn-default.lrn-author-btn-default-legacy.lrn-author-btn-icon-left {
-    background-color: var(--content-ui-background) !important;
+    background-color: var(--sbx-color-foreground-primary, var(--content-ui-background)) !important;
+    border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground)) !important;
     color: var(--sbx-config-color-accent, var(--content-ui-foreground)) !important;
     line-height: inherit !important;
     margin: auto;
@@ -747,5 +826,5 @@ button.lrn-author-btn-old.lrn-author-btn-old-legacy.lrn-author-btn-default.lrn-a
     width: 99% !important;
 }
 .lrn-author.lrn-author .lrn-author-row-old > .lrn-author-col-xs-12-old {
-    background-color: #fff;
+    background-color: var(--sbx-color-foreground-primary, #fff);
 }

@@ -39,8 +39,8 @@ function onChange($isChecked: boolean): void {
 
 <template>
     <li v-if="props.isExpanded">
-        <div class="node l-gap-xs l-pad-xs--vert">
-            <div v-if="hasCode" class="checklist l-flex l-gap-s l-pad-xs--vert">
+        <div class="node u-gap-xs u-pad-xs--vert">
+            <div v-if="hasCode" class="checklist u-flex u-gap-s u-pad-xs--vert">
                 <input
                     :id="`checkbox-${props.node.id}__${extraId}`"
                     type="checkbox"

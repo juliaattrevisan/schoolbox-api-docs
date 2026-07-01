@@ -73,10 +73,10 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <div class="l-flex-col">
-        <div class="c-card" :class="{ 'c-card--border-end': showExpandedBorder }">
-            <div class="l-flex-row l-pad-s l-gap-s">
-                <div class="l-flex-col l-flex--justify-center f-no-margins l-pad-s--left">
+    <div class="u-flex-col">
+        <div class="sbx-card u-c-cr-top" :class="{ 'sbx-card--border-end': showExpandedBorder }">
+            <div class="u-flex-row u-pad-s u-gap-s">
+                <div class="u-flex-col u-flex--justify-center f-no-margins u-pad-s--left">
                     <input
                         :id="`${dataPrefix}-selectAll`"
                         type="checkbox"
@@ -86,17 +86,17 @@ window.Vue.onMounted(() => {
                     />
                     <label :for="`${dataPrefix}-selectAll`" class="checkbox-label"> </label>
                 </div>
-                <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
+                <div class="u-flex-col u-flex--justify-center u-flex__item--1 f-no-margins">
                     <h2>{{ props.label }}</h2>
                 </div>
-                <nav class="c-nav-actions l-flex-row">
+                <nav class="sbx-nav-actions u-flex-row">
                     <a :class="`icon-${isExpanded ? 'up' : 'down'}-arrow`" @click.prevent="toggleExpanded" />
                 </nav>
             </div>
         </div>
 
-        <div ref="entryListRef" class="c-card">
-            <div class="cr-results-grid l-grid l-gap-m l-pad-m">
+        <div ref="entryListRef" class="sbx-card u-c-cr-bottom">
+            <div class="cr-results-grid u-grid u-gap-m u-pad-m">
                 <cr-results-group-entry
                     v-for="entry in props.entries"
                     :key="entry.id"

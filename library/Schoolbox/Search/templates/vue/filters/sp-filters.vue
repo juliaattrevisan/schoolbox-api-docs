@@ -93,12 +93,12 @@ window.Vue.watch(
 
 <template>
     <form
-        class="l-flex-col l-gap-s l-flex__item--0-shrink f-no-margins"
+        class="u-flex-col u-gap-s u-flex__item--0-shrink f-no-margins"
         role="search"
         aria-label="Sitewide"
         @submit.prevent="onSearch"
     >
-        <div class="c-island l-pad-m">
+        <div class="sbx-island u-pad-m">
             <sp-filter-search-term
                 :initial-input="queryStore.query"
                 :is-active-when-empty="true"
@@ -107,7 +107,7 @@ window.Vue.watch(
                 @click="onSearch"
             />
         </div>
-        <div :class="`c-island filters l-flex-col  ${isOpen ? 'l-gap-m' : ''} l-pad-m`">
+        <div :class="`sbx-island filters u-flex-col  ${isOpen ? 'u-gap-m' : ''} u-pad-m`">
             <button
                 v-if="store.isSingleColumn"
                 :class="`filters__toggle-button ${isOpen ? 'icon-up-arrow' : 'icon-down-arrow'}`"
@@ -116,20 +116,20 @@ window.Vue.watch(
                 {{ titleText }}
             </button>
             <div class="filters__container" :style="{ 'grid-template-rows': containerHeight }">
-                <div class="filters__inner-container l-flex-col l-gap-m">
+                <div class="filters__inner-container u-flex-col u-gap-m">
                     <sp-filter-date-range />
                     <sp-filter-creator />
                     <sp-filter-types />
-                    <div class="l-flex-row l-flex--no-wrap l-gap-m">
+                    <div class="u-flex-row u-flex--no-wrap u-gap-m">
                         <button
-                            class="button l-flex__item--1 icon-close f-no-margins"
+                            class="button u-flex__item--1 icon-close f-no-margins"
                             data-test="sp-filter-clear-button"
                             @click.prevent="onClearAllSelected"
                         >
                             Clear filters
                         </button>
                         <button
-                            class="button submit l-flex__item--1 f-no-margins sbx-button--has-icon"
+                            class="button submit u-flex__item--1 f-no-margins sbx-button--has-icon"
                             data-test="sp-filter-apply-button"
                             @click.prevent="onSearch"
                         >

@@ -1,0 +1,222 @@
+{##
+ # Rubric Report for a particular learning activity
+ #
+ # Shows a set of all the existing capabilities/indicators for an assessment and what each student received.
+ # There's a draft mode toggle here so we support both: the csv export reflects the setting chosen.
+ #
+ # @param array $breadcrumbs            Breadcrumb nodes
+ # @param IAssessable $assessment       The fully-hydrated learning activity being examined
+ # @param Collection $participantUsers  User instances of students who were involved in this learning activity
+ # @param array $grids                  A set of capabilities and indicators that were in this learning activity, grouped by rubric instance id
+ # @param array $studentMarks           The marks obtained by all the students who got feedback for this learning activity
+ #}
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.marksheet.js?v={{ config.site_version }}"></script>
+
+{% import '@learningAssessment/project/macro/icon.twig' as icon %}
+{% import '@learning/macro/urgency.twig' as urgency %}
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="actions-small-1 row">
+    <div>
+        <div class="small-12 columns">
+            <h1>Rubric Report for {{ assessment.title }}</h1>
+            <div class="u-flex u-flex--justify-space">
+                <ul class="meta">
+                    <li><sbx-icon name="{{ icon.renderName(assessment)|trim }}" color="var(--sbx-color-text-secondary)"></sbx-icon> {{ assessment.typeName }}</li>
+                    <li><sbx-icon name="calendar" color="var(--sbx-color-text-secondary)"></sbx-icon> Due {{ assessment.dueAt.getRelativeTime }} on {{ assessment.dueAt.localShort }}</li>
+                </ul>
+                <div class="u-flex u-flex--align-center u-flex--justify-end u-gap-m u-pad-m--horiz no-pad">
+                    <div class="checklist">
+                        <input type="checkbox" id="show-drafts">
+                        <label for="show-drafts">
+                            Show Drafts
+                        </label>
+                    </div>
+                    <nav class="sbx-nav-actions u-flex-row">
+                        <a href="{{ routeLookup('learningAssessment.downloadOverview', { assessmentId: assessment.id }) }}?format=csv" title="Download CSV" data-download-spreadsheet class="sbx-icon-only-button"><sbx-icon name="download"></sbx-icon></a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <div class="scrollable">
+            <table class="rb rb-report">
+                <thead>
+                    <tr>
+                        <th rowspan="4" class="rb-group-name markdown">&nbsp;</th>
+                    </tr>
+                    <tr>
+                        {% for rubricInstanceId, rubricInstanceData in grids %}
+                            {# Each grid spans N indicators which are found among all its capabilities
+                             # (i.e. the total number of indicators used in the entire grid
+                             #
+                             # Look ahead to find out how many exist
+                             #}
+                            {% set gridColspan = 0 %}
+
+                            {% for capabilityId, capabilityData in rubricInstanceData.capabilities %}
+                                {% set gridColspan = gridColspan + capabilityData.indicators|length %}
+
+                                {# If the grid specified a meaningful Capability Mark Type then we need to inject another
+                                 # column in, called "Overall', which will house the capability mark as if it were an
+                                 # indicator; increment an extra column for each capability
+                                 #}
+                                {% if rubricInstanceData.isMarkPerCapability %}
+                                    {% set gridColspan = gridColspan + 1 %}
+                                {% endif %}
+                            {% endfor %}
+
+                            <th colspan="{{ gridColspan }}" class="markdown">
+                                {{ rubricInstanceData.title }}
+                            </th>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        {% for rubricInstanceId, rubricInstanceData in grids %}
+                            {% for capabilityId, capabilityData in rubricInstanceData.capabilities %}
+                                {% set indicatorColspan = capabilityData.indicators|length %}
+
+                                {# Increase the colspan to support the Capability Mark column that might be here #}
+                                {% if rubricInstanceData.isMarkPerCapability %}
+                                    {% set indicatorColspan = indicatorColspan + 1 %}
+                                {% endif %}
+
+                                <th colspan="{{ indicatorColspan }}" class="markdown">
+                                    {{ capabilityData.name|markdown }}
+                                </th>
+                            {% endfor %}
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        {% for rubricInstanceId, rubricInstanceData in grids %}
+                            {% for capabilityId, capabilityData in rubricInstanceData.capabilities %}
+                                {% for indicatorId, indicatorData in capabilityData.indicators %}
+                                    <th class="rb-criterion-name markdown">
+                                        {{ indicatorData.name|markdown }}
+                                    </th>
+                                {% endfor %}
+
+                                {# This is the Capability Mark column, if supported by the grid
+                                 # It's basically a hardcoded pseudo-indicator
+                                 #}
+                                {% if rubricInstanceData.isMarkPerCapability %}
+                                    <th class="rb-criterion-name markdown">
+                                        <span title="Capability mark">Overall</span>
+                                    </th>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in participantUsers %}
+                        <tr>
+                            <td>
+                                <div class="wrap-down small-12 ">
+                                    <a href="{{ routeLookup('learningAssessment.getSummary', {
+                                        assessmentId: assessment.id,
+                                        studentId: user.id
+                                    }) }}" title="View Profile" class="u-flex u-flex-col u-flex--center">
+                                        <div class="sbx-img sbx-img--m sbx-img--round">
+                                            <div class="sbx-img__wrapper">
+                                                {% include 'include/portrait.twig' with {
+                                                    user: user,
+                                                    description: user.fullName,
+                                                    class: "rubric-profile"
+                                                } only %}
+                                            </div>
+                                        </div>
+                                        <p>{{ user.fullname}}</p>
+                                    </a>
+                                </div>
+                            </td>
+
+                            {# Slap in all their results here #}
+                            {% for rubricInstanceId, rubricInstanceData in grids %}
+                                {% for capabilityId, capabilityData in rubricInstanceData.capabilities %}
+                                    {% for indicatorId, indicatorData in capabilityData.indicators %}
+                                        <td>
+                                            {# Shortcuts to marks of various types #}
+                                            {% set publishedMarks = studentMarks[user.id].gridData[assessment.id][rubricInstanceId].capabilities[capabilityId].indicators[indicatorId].published ?? null %}
+                                            {% set draftMarks = studentMarks[user.id].gridData[assessment.id][rubricInstanceId].capabilities[capabilityId].indicators[indicatorId].draft ?? null %}
+
+                                            {# Published Marks #}
+                                            {% if publishedMarks is not null and publishedMarks.humanReadableMark is not null %}
+                                                <p data-actual-mark>{{ (publishedMarks.selectedDescriptorText ?? null) | markdown }}</p>
+
+                                                {% set max = rubricInstanceData.capabilities[capabilityId].indicators[indicatorId].max ?? null %}
+
+                                                {% if max is not null and max > 0 %}
+                                                    {# Colour the human readable mark using the normalised mark #}
+                                                    {% set gradientClass = urgency.marks(publishedMarks.normalisedMark) %}
+
+                                                    <p class="{{ gradientClass }}" data-actual-mark>{{ publishedMarks.selectedDescriptorValue|round }} / {{ max }}</p>
+                                                {% endif %}
+                                            {% endif %}
+
+                                            {# Draft Marks #}
+                                            {% if draftMarks is not null and draftMarks.humanReadableMark is not null %}
+                                                <p data-draft-mark>{{ (draftMarks.selectedDescriptorText ?? null) | markdown }}</p>
+
+                                                {% set max = rubricInstanceData.capabilities[capabilityId].indicators[indicatorId].max ?? null %}
+
+                                                {% if max is not null and max > 0 %}
+                                                    <p class="meta" data-draft-mark>{{ draftMarks.selectedDescriptorValue|round }} / {{ max }}</p>
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+
+                                    {# This is the Capability Mark column, if supported by the grid
+                                     # It's basically a hardcoded pseudo-indicator
+                                     #}
+                                    {% if rubricInstanceData.isMarkPerCapability %}
+                                        {% set publishedMarks = studentMarks[user.id].gridData[assessment.id][rubricInstanceId].capabilities[capabilityId].published ?? null %}
+                                        {% set draftMarks = studentMarks[user.id].gridData[assessment.id][rubricInstanceId].capabilities[capabilityId].draft ?? null %}
+
+                                        <td>
+                                            {# Published Marks #}
+                                            {% if publishedMarks is not null and publishedMarks.humanReadableMark is not null %}
+                                                {# Colour the human readable mark using the normalised mark #}
+                                                {% set gradientClass = urgency.marks(publishedMarks.normalisedMark) %}
+
+                                                <p class="{{ gradientClass }}" data-actual-mark>{{ publishedMarks.humanReadableMark }}</p>
+                                            {% endif %}
+
+                                            {# Draft Marks #}
+                                            {% if draftMarks is not null and draftMarks.humanReadableMark is not null %}
+                                                <p class="meta" data-draft-mark>{{ draftMarks.humanReadableMark }}</p>
+                                            {% endif %}
+                                        </td>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    [data-draft-mark] {
+        display: none;
+    }
+    .rubric-profile {
+        max-width: 64px;
+    }
+</style>
+{% autoescape 'js' %}
+    <script type="text/javascript">
+        $(function() {
+            $.marksheetToggleDrafts('#show-drafts');
+        });
+    </script>
+{% endautoescape %}

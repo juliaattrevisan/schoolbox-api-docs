@@ -174,12 +174,12 @@ async function postDeleteBookingForm(): Promise<void> {
 </script>
 
 <template>
-    <div class="l-grid l-gap-l l-grid--2-col l-mar-m--bottom">
+    <div class="u-grid u-gap-l u-grid--2-col u-mar-m--bottom">
         <div>
             <!-- Intentionally display the resource name here, not the booking name -->
             {{ props.booking.resource.name }}
         </div>
-        <div class="text-right">
+        <div class="u-ta-right">
             <span
                 class="label"
                 :class="{

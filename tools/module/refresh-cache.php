@@ -25,7 +25,7 @@ use Schoolbox\Config\ConfigMapper;
 require __DIR__ . '/../../conf/core/require.php';
 
 $kernel = new CliTool\Kernel(
-    new class extends CliTool\App
+    new class extends CliTool\BaseApp
     {
         /**
          * @inheritdoc
@@ -42,6 +42,32 @@ $kernel = new CliTool\Kernel(
         public function runAsRoot(): ?bool
         {
             return null;
+        }
+
+        protected function getName(): string
+        {
+            return 'refresh-cache';
+        }
+
+        protected function getDescription(): string
+        {
+            return <<<DESC
+                Loads or refreshes the route and module cache for this instance.
+                This script must be run as part of the upgrade process. The ideal time for it
+                to be run is before an upgrade's SQL updates are run: update scripts may require
+                that routes and modules be defined, but route and module definitions should not
+                depend on SQL updates.
+                DESC;
+        }
+
+        protected function setOptions(): self
+        {
+            return $this;
+        }
+
+        protected function hasPerformMode(): bool
+        {
+            return false;
         }
     },
     [CliKernelAbstract::OPTION_LEVEL => Monolog\Logger::INFO],

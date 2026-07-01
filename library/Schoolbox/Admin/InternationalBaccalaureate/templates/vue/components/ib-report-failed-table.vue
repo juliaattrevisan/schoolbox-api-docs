@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useSelectedList } from "@schoolboxVue/composables/form/useSelectedList";
 import IbReportSubjectLabels from "./ib-report-subject-labels.vue";
 import { useIbReportUpdateLanguageStore } from "../store/ibReportUpdateLanguageStore";
 import type { FailedRow, StudentRow } from "../../js/types/ibReportTypes";
@@ -9,10 +10,13 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const selectedList = defineModel<FailedRow[]>("selectedList", { default: () => [] });
+const selectedListModel = defineModel<FailedRow[]>("selectedList", { default: () => [] });
+const students = window.Vue.toRef(props, "students");
+const { selectedList, allSelected, isIndeterminate, showCheckboxes } = useSelectedList(students, selectedListModel);
 
 const emit = defineEmits<{
     resetDetailsSingle: [studentId: number];
+    manuallyRegisterSingle: [studentId: number];
 }>();
 
 const updateLanguageStore = useIbReportUpdateLanguageStore();
@@ -30,7 +34,22 @@ function openModal(student: FailedRow): void {
     <table class="tiger-stripe">
         <thead>
             <tr>
-                <th scope="col"><span class="sr-only">Select</span></th>
+                <th scope="col" class="checklist">
+                    <span
+                        v-if="
+                            showCheckboxes &&
+                            (props.activeSelectionSection === null || props.activeSelectionSection === 'failed')
+                        "
+                    >
+                        <input
+                            id="select-all-failed"
+                            v-model="allSelected"
+                            type="checkbox"
+                            :class="{ indeterminate: isIndeterminate }"
+                            aria-label="Select all"
+                        /><label class="checkbox-label" for="select-all-failed"></label>
+                    </span>
+                </th>
                 <th scope="col">Name</th>
                 <th scope="col">Candidate Details</th>
                 <th scope="col">HL</th>
@@ -87,7 +106,7 @@ function openModal(student: FailedRow): void {
                         <li v-if="student.updateLanguageEndpoint !== null">
                             <button class="sbx-button--has-icon" @click.prevent="openModal(student)">
                                 <sbx-icon name="modify"></sbx-icon>
-                                Update Language Selection
+                                Update language selection
                             </button>
                         </li>
                         <li>
@@ -96,7 +115,16 @@ function openModal(student: FailedRow): void {
                                 @click.prevent="emit('resetDetailsSingle', student.id)"
                             >
                                 <sbx-icon name="undo"></sbx-icon>
-                                Reset All Details
+                                Reset all details
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                class="sbx-button--has-icon"
+                                @click.prevent="emit('manuallyRegisterSingle', student.id)"
+                            >
+                                <sbx-icon name="international-baccalaureate"></sbx-icon>
+                                Mark as manually registered
                             </button>
                         </li>
                     </ul>
@@ -109,6 +137,6 @@ function openModal(student: FailedRow): void {
 <style scoped>
 .ib-report-error-message {
     color: var(--sbx-color-error, #c0392b);
-    font-size: 0.875rem;
+    font-size: var(--sbx-font-size-xs, 0.875rem);
 }
 </style>

@@ -307,9 +307,9 @@ const rubricRows = window.Vue.computed(() => {
 
             <!-- create a new rubric -->
             <template v-else #content>
-                <div class="l-flex-row l-flex--justify l-gap-xs">
+                <div class="u-flex-row u-flex--justify u-gap-xs">
                     <button
-                        class="button l-flex__item--1 icon-modify"
+                        class="button u-flex__item--1 icon-modify"
                         type="button"
                         data-test="rubric-create-manually"
                         @click="createRubric"
@@ -317,8 +317,8 @@ const rubricRows = window.Vue.computed(() => {
                         Create manually
                     </button>
                     <!-- TODO -->
-                    <!-- <button class="button l-flex__item--1 icon-copy" type="button">Copy from existing activity</button> -->
-                    <button class="button l-flex__item--1 icon-upload" type="button" @click="openImportAttachzone">
+                    <!-- <button class="button u-flex__item--1 icon-copy" type="button">Copy from existing activity</button> -->
+                    <button class="button u-flex__item--1 icon-upload" type="button" @click="openImportAttachzone">
                         Upload a Schoolbox format file
                     </button>
                 </div>

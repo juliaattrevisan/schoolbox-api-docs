@@ -24,13 +24,36 @@ require_once __DIR__ . '/../../conf/core/require.php';
  * Only refresh tokens are migrated, as other token types don't last long enough
  * to be worth migrating.
  */
-$app = new class extends CliTool\App {
+$app = new class extends CliTool\BaseApp {
     // Old and new key prefixes
     private const string KEY_PREFIX = 'oidcServer.' . INSTANCE_ID . ':' . CacheHelper::REFRESH_TOKEN_KEY;
     private const string OLD_KEY_PREFIX = self::KEY_PREFIX . self::OLD_PART_SEPARATOR;
     private const string NEW_KEY_PREFIX = self::KEY_PREFIX . self::NEW_PART_SEPARATOR;
     private const string OLD_PART_SEPARATOR = ':';
     private const string NEW_PART_SEPARATOR = '.';
+
+    protected function getName(): string
+    {
+        return 'migrateRefreshTokens';
+    }
+
+    protected function getDescription(): string
+    {
+        return <<<DESC
+            Migrates refresh tokens which may have somehow been stored with the disallowed ":" part separator.
+            Only refresh tokens are migrated, as other token types don't last long enough to be worth migrating.
+            DESC;
+    }
+
+    protected function setOptions(): self
+    {
+        return $this;
+    }
+
+    protected function hasPerformMode(): bool
+    {
+        return false;
+    }
 
     /**
      * Run the tool

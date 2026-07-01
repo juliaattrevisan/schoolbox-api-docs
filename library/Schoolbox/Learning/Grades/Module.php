@@ -14,13 +14,14 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error;
+use Schoolbox\Filter;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
@@ -166,12 +167,15 @@ class Module extends BaseModule
             $this->injector->get('assessmentDataSource'),
             $this->getMapperFactory()->get(Folder\Mapper::class),
             $this->getMapperFactory()->get(Term\Mapper::class),
-            $this->getMapperFactory()->get(RubricDataSource::class),
             $this->getMapperFactory()->get(FilterSelection\Mapper::class),
             $this->getMapperFactory()->get(Access::class),
             $this->injector->get('filters.assessmentIdFinder'),
             $this->injector->get('filters.factoryFactory'),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\WorkType\Mapper::class),
+            new \Schoolbox\External\User(),
+            $this->injector->get('databaseInternal'),
+            $this->getMapperFactory()->get(UserAccessMapper::class),
+            $this->getMapperFactory()->get(Filter\Mapper::class),
         );
     }
 

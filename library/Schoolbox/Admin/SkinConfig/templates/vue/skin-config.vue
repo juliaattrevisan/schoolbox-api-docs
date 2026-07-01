@@ -13,6 +13,8 @@ import { useSkinConfigContrastValidation } from "./composable/useSkinConfigContr
 import { useSkinConfigState } from "./composable/useSkinConfigState";
 import { useSkinPreview } from "./composable/useSkinPreview";
 
+const sonarImgSrc = `${window.cdnPrefix}/images/tour/26.1/26_1_SonarUI_AdminTile.png`;
+
 const props = defineProps<{
     routes: Routes;
     configs: SkinConfigData;
@@ -169,19 +171,22 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <div data-test="skin-config-container" class="l-flex-col l-gap-l l-pad-m--horiz">
-        <div class="alert-box warning f-no-margins">
-            <strong>Sonar UI is now available.</strong> We encourage you to enable it on your
-            <strong>Staging server</strong> now to review your skin settings and custom CSS before it becomes the only
-            option in <strong>v26.2.</strong><br />
-            <br />
-            <a href="/help/sso/send?returnUrl=/homepage/5808" target="_blank">Read the Transition Guide</a>
+    <div data-test="skin-config-container" class="u-flex-col u-gap-l u-pad-m--horiz">
+        <div class="u-flex-col u-gap-m">
+            <img :src="sonarImgSrc" alt="" class="u-c-cr" aria-hidden="true" />
+            <p class="u-visually-hidden">
+                Sonar UI is now available. We encourage you to enable it on your Staging server now to review your skin
+                settings and custom CSS before it becomes the only option in v26.2.
+            </p>
+            <a href="/help/sso/send?returnUrl=/homepage/5808" target="_blank" rel="noopener noreferrer" class="button"
+                >Read the Transition Guide</a
+            >
         </div>
         <div v-if="loadError" data-test="skin-config-load-error">
             <request-error :further-info="loadError" />
         </div>
-        <form method="post" class="l-flex-col l-gap-l skin-config-form" @submit.prevent="onSaveSelected">
-            <div class="c-island l-pad-m">
+        <form method="post" class="u-flex-col u-gap-l skin-config-form" @submit.prevent="onSaveSelected">
+            <div class="sbx-island u-pad-m">
                 <label id="skin-config-toggle" class="inline-block" for="skin-config-toggle-field">
                     <span>{{ editableConfigs.toggle.title }}</span>
                     <span
@@ -214,11 +219,19 @@ window.Vue.onMounted(() => {
                 :colour-errors="colourErrors"
                 @preview-refresh="schedulePreviewRefresh"
             />
-            <div class="l-flex l-flex--justify l-gap-xs">
-                <button v-if="hasUnsavedChanges" type="button" class="button l-flex__item--1" @click="onUndoChanges">
+            <sbx-label
+                v-if="editableConfigs.toggle.enabled && hasColourErrors"
+                size="l"
+                sentiment="alert"
+                icon="alert"
+                text="Resolve all colour contrast issues to save the Skin Config."
+                is-full-width
+            />
+            <div class="u-flex u-flex--justify u-gap-xs">
+                <button v-if="hasUnsavedChanges" type="button" class="button u-flex__item--1" @click="onUndoChanges">
                     Undo Changes
                 </button>
-                <button class="button submit l-flex__item--1" data-test="skin-config-save-submit">
+                <button class="button submit u-flex__item--1" data-test="skin-config-save-submit">
                     {{ saveText }}
                 </button>
             </div>

@@ -79,7 +79,7 @@ class Controller extends BaseController
         $folderId = $post->get('folderId');
 
         if (!$folderId) {
-            $this->sendJSONError('Must supply a folder Id');
+            $this->sendJSONError('Must supply a folder Id', 400);
             return;
         }
 
@@ -88,7 +88,7 @@ class Controller extends BaseController
         try {
             $folder = $this->folderMapper->findById($folderId);
         } catch (\Schoolbox\Mapper\Exception $e) {
-            $this->sendJSONError('Folder not found');
+            $this->sendJSONError('Folder not found', 400);
             return;
         }
 
@@ -97,7 +97,7 @@ class Controller extends BaseController
         $rubricInstanceId = $post->getInt('rubricId', 0);
 
         if ($rubricInstanceId === null || $rubricInstanceId === 0) {
-            $this->sendJSONError('Must supply a rubric instance Id');
+            $this->sendJSONError('Must supply a rubric instance Id', 400);
             return;
         }
 
@@ -114,7 +114,7 @@ class Controller extends BaseController
             try {
                 $rubricInstance = $this->rubricInstanceMapper->findById($rubricInstanceId);
             } catch (\Schoolbox\Mapper\Exception $e) {
-                $this->sendJSONError('Rubric instance not found');
+                $this->sendJSONError('Rubric instance not found', 400);
                 return;
             }
 
@@ -123,7 +123,7 @@ class Controller extends BaseController
             try {
                 $assessment = $this->assessmentDataSource->findById($assessmentId);
             } catch (\Schoolbox\Mapper\Exception $e) {
-                $this->sendJSONError('Learning activity not found (it might have been deleted)');
+                $this->sendJSONError('Learning activity not found (it might have been deleted)', 400);
                 return;
             }
         }
@@ -173,7 +173,8 @@ class Controller extends BaseController
                 $this->sendJSONError(
                     $this->rosettaStone->translateSentence(
                         'Must supply {:rubricGroup|indef} {:rubricGroup} for new {:rubricCriterion}'
-                    )
+                    ),
+                    400,
                 );
 
                 return;
@@ -191,7 +192,8 @@ class Controller extends BaseController
                     $this->sendJSONError(
                         $this->rosettaStone->translateSentence(
                             'May only create folder-level {:rubricCriterion|p}'
-                        )
+                        ),
+                        400,
                     );
 
                     return;
@@ -212,7 +214,8 @@ class Controller extends BaseController
                     $this->sendJSONError(
                         $this->rosettaStone->translateSentence(
                             '{:rubricCriterion|c} already exists in this {:rubricGroup}'
-                        )
+                        ),
+                        400,
                     );
 
                     return;
@@ -265,7 +268,8 @@ class Controller extends BaseController
                     $this->sendJSONError(
                         $this->rosettaStone->translateSentence(
                             '{:rubricGroup|c} name already exists in this context'
-                        )
+                        ),
+                        400,
                     );
                     return;
                 }
@@ -275,17 +279,6 @@ class Controller extends BaseController
             $this->response = $this->responseAsJson($capabilityData);
             return;
         }
-    }
-
-    /**
-     * Sends a JSON error.
-     *
-     * @param mixed $data
-     * @param int $statusCode
-     */
-    protected function sendJSONError($data, $statusCode = 400): void
-    {
-        $this->response = $this->responseAsJson($data)->withStatus($statusCode);
     }
 
 
@@ -300,6 +293,15 @@ class Controller extends BaseController
      */
     public function postImport(File $file): void
     {
+        /* See if $file was valid before even TRYING to do anything here
+         */
+        $isValid = (new ValidCsv())->isSatisfiedBy($this->getDi()->get('filesystem.storageProxy')->readStream($file));
+
+        if (!$isValid) {
+            $this->response = $this->responseAsJson('This file is not a valid rubric csv file.')->withStatus(400);
+            return;
+        }
+
         $post = $this->requestPost;
 
         try {
@@ -445,7 +447,13 @@ class Controller extends BaseController
         /* Note that some of these settings are overridden by rb-rubric-download.vue implementation in frontend...
          * ...in case you were trying to debug why you couldn't change the filename lol
          */
-        $filename = (new Filename())->generate($rubricInstance->getTitle(), 'csv');
+        $title = $assessment->getTitle();
+
+        if ('' !== trim((string)$rubricInstance->getTitle())) {
+            $title = $rubricInstance->getTitle();
+        }
+
+        $filename = (new Filename())->generate($title, 'csv');
 
         $this->response = $this->responseFromContent($content)
             ->withHeader('Pragma', ' ')

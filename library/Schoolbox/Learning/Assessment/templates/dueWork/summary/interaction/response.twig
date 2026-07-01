@@ -1,3 +1,11 @@
+{##
+ # Response fragment in the submission history that represents what the student submitted.
+ # Note that there might be a feedback present in this space.
+ #
+ # @param array $rubricMarkedGridPayloadsHistory  A set of feedback-id indexed json strings corresponding to the rubric payload for a particular feedback
+ #                                                Note that self-graded feedback will display like an instructor-given feedback.
+ #                                                This is used to populate all the rubric grids in the entire history of someone's feedback
+ #}
 {# if submitted, try going to inline grader #}
 {% set url     = null %}
 {% set tooltip = null %}
@@ -72,46 +80,46 @@
                     <sbx-pop-out content-id="response-options-{{ currentInteraction.id }}"></sbx-pop-out>
                 </nav>
                 <ul id="response-options-{{ currentInteraction.id }}" class="f-dropdown" data-dropdown-content>
-                    {%  if url %} <li><a href="{{ url }}" title="{{ tooltip }}" class="sbx-button--has-icon"><sbx-icon name="task"></sbx-icon>{{ tooltip }}</a></li>
+                    {%  if url %}
+                        <li><a href="{{ url }}" title="{{ tooltip }}" class="sbx-button--has-icon"><sbx-icon name="task"></sbx-icon>{{ tooltip }}</a></li>
                     {% endif %}
                     <li><a href="{{ viewRoute }}" title="Delete submission" data-delete="{{ deleteRoute }}" class="sbx-button--has-icon"><sbx-icon name="delete"></sbx-icon>Delete</a></li>
                 </ul>
                 {% endif %}
             </li>
         </ul>
+
         {% if currentInteraction.allFiles %}
-        <ul class="information-list">
-        {% for currentFile in currentInteraction.allFiles %}
-                {% include '@learning/dueWork/interaction/response/files.twig' with {
-                    assessment: currentInteraction.assessable,
-                    assessmentId: currentInteraction.assessable.id,
-                    response: currentInteraction,
-                    plagscanId: currentFile.plagscan ? currentFile.plagscan.plagscanId : null
-                } %}
-            {% endfor %}
-        </ul>
+            <ul class="information-list">
+                {% for currentFile in currentInteraction.allFiles %}
+                    {% include '@learning/dueWork/interaction/response/files.twig' with {
+                        assessment: currentInteraction.assessable,
+                        assessmentId: currentInteraction.assessable.id,
+                        response: currentInteraction,
+                        plagscanId: currentFile.plagscan ? currentFile.plagscan.plagscanId : null
+                    } %}
+                {% endfor %}
+            </ul>
         {% endif %}
 
         {% if currentInteraction.allFeedback|length %}
+            {% for currentFeedback in currentInteraction.allFeedback %}
+                {% set hasCollapser = currentFeedback.allFiles.count or currentFeedback.comment | length > 0 or currentFeedback.rubricMarkedGrids %}
 
-                {% for currentFeedback in currentInteraction.allFeedback %}
-
-                    {% set hasCollapser = currentFeedback.allFiles.count or currentFeedback.comment | length > 0 or currentFeedback.rubricMarkedGrids.count %}
-
-                    {# We pass the responseId as well, so that people can download annotated kami docs #}
-                    {% include '@learningAssessment/dueWork/summary/interaction/feedback.twig' with {
-                        currentFeedback: currentFeedback,
-                        assessment: currentInteraction.assessable,
-                        assessmentId: currentInteraction.assessable.id,
-                        responseId: currentInteraction.id,
-                        participant: participant,
-                        hasCollapser: hasCollapser,
-                        collapsed: true,
-                        deleteIcon: true,
-                    }
-                    only %}
-                {% endfor %}
-
+                {# We pass the responseId as well, so that people can download annotated kami docs #}
+                {% include '@learningAssessment/dueWork/summary/interaction/feedback.twig' with {
+                    currentFeedback: currentFeedback,
+                    assessment: currentInteraction.assessable,
+                    assessmentId: currentInteraction.assessable.id,
+                    responseId: currentInteraction.id,
+                    participant: participant,
+                    hasCollapser: hasCollapser,
+                    collapsed: true,
+                    deleteIcon: true,
+                    rubricMarkedGridPayloads: rubricMarkedGridPayloadsHistory[currentFeedback.id],
+                }
+                only %}
+            {% endfor %}
         {% endif %}
     </li>
 </ul>

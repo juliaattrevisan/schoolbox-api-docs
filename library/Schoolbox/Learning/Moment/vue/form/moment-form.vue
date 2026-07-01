@@ -127,7 +127,7 @@ window.Vue.onMounted(() => {
         <div class="small-12 island">
             <section>
                 <fieldset class="content">
-                    <div class="small-12 columns l-flex-col">
+                    <div class="small-12 columns u-flex-col">
                         <mf-evidence :editor-templates="props.editorTemplates" />
 
                         <label>

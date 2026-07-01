@@ -227,7 +227,7 @@ class CapabilityMarkTypeTest extends TestCase
 
             /* Figure out the mark scheme for this capability
              */
-            $capabilityMarkScheme = $markSchemeFactory->spawnForCapability($dueWork, $capabilityUsage->getMaxValue());
+            $capabilityMarkScheme = $markSchemeFactory->spawnForCapability($markedGrid->getGrid()->getRubricInstance(), $capabilityUsage->getMaxValue());
 
             // Use the actual input value (which may be null) instead of the
             // calculated mark.

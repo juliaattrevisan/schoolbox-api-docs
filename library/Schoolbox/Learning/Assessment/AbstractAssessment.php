@@ -79,7 +79,7 @@ abstract class AbstractAssessment implements IAssessable
      *
      * This is used to automatically populate dates when importing CourseSpecs.
      *
-     * @var int
+     * @var int|null
      */
     private $defaultOpenSpan;
 
@@ -279,6 +279,14 @@ abstract class AbstractAssessment implements IAssessable
         // This should not inherit any of the spec assessment's participants.
         // (One wonders why spec assessments even have plans?)
         $clone->setPlans($clone->getPlans()->emptyClone());
+
+        /* The clone shouldn't inherit the spec assessment's rubric instances,
+         * cloning of the rubrics is handled separately (see Replicator::replicateRubricGrids).
+         * Avoid setRubricInstances() as that would mutate the shared source collection in place.
+         */
+        // TODO: revise this fix, it's possible that something else somewhere needs to be done too, but it appears to be a good start
+        $clone->rubricInstances = new GenericCollection(\Schoolbox\Assessment\Rubric\Instance\Model::class);
+
         return $clone;
     }
 
@@ -1015,7 +1023,7 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getDefaultOpenSpan()
     {
@@ -1024,7 +1032,7 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
-     * @param int $defaultOpenSpan
+     * @param int|null $defaultOpenSpan
      * @return $this
      */
     public function setDefaultOpenSpan($defaultOpenSpan)

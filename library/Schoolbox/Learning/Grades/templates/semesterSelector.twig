@@ -7,6 +7,7 @@ Usage: include 'sub/semesterSelector.twig
     termRoute:   string                  - Aura route
     routeArgs:   JSON object             - Aura route args to be merged with {Term.code} inside loop
     year:        null|int                - (optional) If viewing an entire year of results
+    viewModeQuerySuffix: string          - (optional) query string suffix to append to generated URLs
 #}
 
 <script type="text/javascript">
@@ -69,12 +70,12 @@ Usage: include 'sub/semesterSelector.twig
                 {% set startYear = term.start.startOfSchoolYear.year %}
                 {% if foundYear['_'~startYear] is not defined or not foundYear['_'~startYear] %}
                     {% set foundYear = foundYear | merge({('_'~startYear):true}) %}
-                    <option data-href="{{ routeLookup('learningGrades.getGradesYear', routeArgs | merge({year: startYear}) ) }}" value="{{ startYear }}" {% if year == startYear %}{% set selected = true %}selected{% endif %}>
+                    <option data-href="{{ routeLookup('learningGrades.getGradesYear', routeArgs | merge({year: startYear}) ) ~ (viewModeQuerySuffix ?? '') }}" value="{{ startYear }}" {% if year == startYear %}{% set selected = true %}selected{% endif %}>
                         {#- dessicate -#}{{ term.start.schoolYear }} Grades Summary{#- dessicate -#}
                     </option>
                 {% endif %}
             {% endif %}
-            <option data-href="{{ routeLookup(route, routeArgs|merge({termCode: term.code})) }}" value="{{ term.code }}" {% if currentTerm.code == term.code and not selected %}{% set selected = true %}selected{% endif %}>
+            <option data-href="{{ routeLookup(route, routeArgs|merge({termCode: term.code})) ~ (viewModeQuerySuffix ?? '') }}" value="{{ term.code }}" {% if currentTerm.code == term.code and not selected %}{% set selected = true %}selected{% endif %}>
                 {#- dessicate -#}{{ term.title }} ({{ term.start.dateOnly }} - {{ term.displayFinish.dateOnly }}){#- dessicate -#}
             </option>
         {% endfor %}
@@ -89,7 +90,7 @@ Usage: include 'sub/semesterSelector.twig
              # current url, sending you to /learning/grades-year/25/year/undefined, so we force this
              # to have an href like its kindred
              #}
-            <option data-href="{{ routeLookup('learningGrades.getGradesYear', routeArgs | merge({year: year}) ) }}" selected>{{ year }} Grades Summary</option>
+            <option data-href="{{ routeLookup('learningGrades.getGradesYear', routeArgs | merge({year: year}) ) ~ (viewModeQuerySuffix ?? '') }}" selected>{{ year }} Grades Summary</option>
         {% endif %}
     </select>
 </div>

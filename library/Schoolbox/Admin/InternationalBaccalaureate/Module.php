@@ -58,6 +58,7 @@ class Module extends BaseModule
         $ruleIBConfirmingDetailsPerms = new Rule\Any(
             $ruleIBCoordinatorAccess,
             new Rule\All(
+                $ibEnabled,
                 new Rule\IsLoggedIn(),
                 new Rule\Callback(function (array $params, User $user) {
                     if (!$user->getRole()->isStudent() || $user->getId() !== (int)$params['studentId']) {
@@ -94,6 +95,7 @@ class Module extends BaseModule
          */
         $this->register('POST', '/registrations/sessions/{sessionId:\\d+}/complete-preparation', 'sessionCompletePreparation', $ruleIBCoordinatorAccess, $preloadRegistrationSession);
         $this->register('POST', '/registrations/sessions/{sessionId:\\d+}/reset-details', 'sessionResetDetails', $ruleIBCoordinatorAccess, $preloadRegistrationSession);
+        $this->register('POST', '/registrations/sessions/{sessionId:\\d+}/mark-as-manually-registered', 'sessionMarkAsManuallyRegistered', $ruleIBCoordinatorAccess, $preloadRegistrationSession);
         $this->register('PUT', '/registrations/sessions/{sessionId:\\d+}/candidates/{studentId:\\d+}/confirmation', 'updateRegistrationSessionStudentConfirmation', $ruleIBConfirmingDetailsPerms);
 
         /* Notifications

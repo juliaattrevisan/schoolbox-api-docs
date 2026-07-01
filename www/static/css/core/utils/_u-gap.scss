@@ -1,0 +1,28 @@
+/*
+    Layout classes to quickly apply standardised gap without having
+    to explicitly define a class for it.
+ */
+
+@use "sass:list";
+
+@each $size in $global-sizes {
+    .u-gap-#{$size} {
+        gap: var(--spacing-#{$size});
+    }
+}
+
+.u-gap-xl {
+    @media #{$small-only} {
+        gap: var(--spacing-l);
+    }
+}
+
+.u-gap-l {
+    @media #{$small-only} {
+        gap: var(--spacing-m);
+    }
+}
+
+.u-gap--0 {
+    gap: 0;
+}

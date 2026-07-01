@@ -1971,6 +1971,7 @@ abstract class Kernel
                         $config,
                         $databaseExternal,
                         $di->get('redis.cache'),
+                        $di->get('httpClient'),
                         $di->get('httpClient.cache'),
                     );
                 }
@@ -2466,11 +2467,26 @@ abstract class Kernel
             $di->lazyNew(
                 \Schoolbox\OpenAi\ClientFactory::class,
                 [
-                    'config'     => $di->lazyGet('config'),
-                    'logMapper'  => $mapperFactory->getLazy(\Schoolbox\Editor\OpenAI\Log\Mapper::class),
-                    'httpClient' => $di->lazyGet('httpClient'),
+                    'config'        => $di->lazyGet('config'),
+                    'logMapper'     => $mapperFactory->getLazy(\Schoolbox\OpenAi\Session\Log\Mapper::class),
+                    'httpClient'    => $di->lazyGet('httpClient'),
+                    'sessionMapper' => $mapperFactory->getLazy(\Schoolbox\OpenAi\Session\Mapper::class),
                 ]
             )
+        );
+
+        // Tools daemon client
+        $di->set(
+            'toolsDaemon.client',
+            $di->lazy(
+                function () use ($di) {
+                    $factory = new \Schoolbox\ToolsDaemon\ClientFactory(
+                        $di->get('httpClient'),
+                        $di->get('config')
+                    );
+                    return $factory->build();
+                },
+            ),
         );
 
         return $di;

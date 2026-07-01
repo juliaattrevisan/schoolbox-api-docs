@@ -11,6 +11,8 @@
             selector: form.find(':checkbox[data-selectall="category[]"]'),
             checkboxes: form.find(':checkbox[name="category[]"]')
         });
+        form.find(':radio[name="clashesOnly"]').on('change', updateStatusFilterForClashes);
+        updateStatusFilterForClashes();
 
         /* Results table
          */
@@ -20,12 +22,34 @@
             searching: false
         });
 
+        $('[data-resource-booking-report-action="approve"]').on('click', function(event) {
+            event.preventDefault();
+            approveResourceBookingFromReport(event.currentTarget);
+        });
+
         onChangeDate('start'); // In case the initial dates are ever set too far apart.
     });
 
     // This is the maximum date range period
     // (enforced to limit the amount of data the report can generate, and hence avoid timeout errors).
     const MAX_REPORTING_PERIOD_MONTHS = 3;
+
+    /**
+     * Conflict-only reporting is only meaningful for actionable booking conflicts.
+     * Force the Status filter to Approved and Pending while conflicts-only mode is
+     * selected, and disable the controls so submitted filters match what is shown.
+     */
+    function updateStatusFilterForClashes()
+    {
+        var clashesOnly = $(":radio[name=\"clashesOnly\"]:checked").val() === "1";
+        var statusCheckboxes = $("fieldset[data-status-filter] :checkbox[name=\"status[]\"]");
+
+        if (clashesOnly) {
+            statusCheckboxes.prop("checked", false);
+            $("#status-approved-checkbox, #status-pending-checkbox").prop("checked", true);
+        }
+        statusCheckboxes.prop("disabled", clashesOnly);
+    }
 
     /**
      * Ensure that:
@@ -69,6 +93,54 @@
                     }
                 }
                 break;
+        }
+    }
+
+    async function approveResourceBookingFromReport(action)
+    {
+        // Activate the toast immediately so the click gives feedback while the request is in flight.
+        const toast = window.sbProps.toastActivate("Approving booking...");
+        const data = new URLSearchParams({
+            efficacy: false
+        });
+
+        try {
+            const response = await fetch(action.href, {
+                method: "POST",
+                body: data.toString(),
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                    "X-Requested-With": "XMLHttpRequest",
+                    Accept: "application/json"
+                }
+            });
+
+            if (!response.ok) {
+                let responseData = {};
+                try {
+                    responseData = await response.json();
+                } catch (error) {
+                    console.error(error);
+                }
+                const periodErrors = Object.values(responseData?.errors?.start_period_errors ?? {});
+                const capacityExceeded = periodErrors.some(
+                    (errors) => Array.isArray(errors) && errors.includes("conflict")
+                );
+                toast.timeout({
+                    text:
+                        responseData?.message ||
+                        (capacityExceeded
+                            ? "Unable to approve booking. This booking would exceed the resource's concurrent booking capacity."
+                            : "Unable to approve booking."),
+                    isSuccess: false
+                });
+                return;
+            }
+
+            window.location.reload();
+        } catch (error) {
+            console.error(error);
+            toast.timeout({ text: "Unable to approve booking.", isSuccess: false });
         }
     }
 </script>
@@ -150,19 +222,22 @@
                     </div>
 
                     <div class="small-6 columns">
+                        <fieldset data-status-filter>
+                            <legend>Status</legend>
+                            <ul class="option-list">
+                                <li><input id="status-approved-checkbox" type="checkbox" name="status[]" value="2" {% if 2 in search.status %}checked{% endif %} {% if search.clashesOnly %}disabled{% endif %} /><label for="status-approved-checkbox" class="checkbox-label">Approved</label></li>
+                                <li><input id="status-pending-checkbox" type="checkbox" name="status[]" value="1" {% if 1 in search.status %}checked{% endif %} {% if search.clashesOnly %}disabled{% endif %} /><label for="status-pending-checkbox" class="checkbox-label">Pending</label></li>
+                                <li><input id="status-rejected-checkbox" type="checkbox" name="status[]" value="3" {% if 3 in search.status %}checked{% endif %} {% if search.clashesOnly %}disabled{% endif %} /><label for="status-rejected-checkbox" class="checkbox-label">Rejected</label></li>
+                                <li><input id="status-timetabled-checkbox" type="checkbox" name="status[]" value="timetabled" {% if 'timetabled' in search.status %}checked{% endif %} {% if search.clashesOnly %}disabled{% endif %} /><label for="status-timetabled-checkbox" class="checkbox-label">Timetabled</label></li>
+                            </ul>
+                        </fieldset>
+
                         <fieldset class="radiolist">
                             <legend>Clashes</legend>
                             <ul class="option-list">
                                 <li><input type="radio" name="clashesOnly" value="0" id="clashesAllOption" {% if not search.clashesOnly %}checked{% endif %}><label for="clashesAllOption">Show All Bookings</label></li>
                                 <li><input type="radio" name="clashesOnly" value="1" id="clashesOnlyOption" {% if search.clashesOnly %}checked{% endif %} ><label for="clashesOnlyOption">Only Show Conflicting Booking Requests</label></li>
                             </ul>
-                        </fieldset>
-
-                        <fieldset>
-                            <legend>Classes</legend>
-                            <input type="hidden" name="classes" value="0" />
-                            <input id='show-classes-checkbox' type="checkbox" name="classes" value="1" {% if search.classes %}checked{% endif %} />
-                            <label for="show-classes-checkbox" class="checkbox-label">Show Classes</label>
                         </fieldset>
                     </div>
                 </fieldset>
@@ -184,7 +259,7 @@
                 <tr>
                     <th>Start</th>
                     <th>End</th>
-                    <th>Booking</th>
+                    <th>Event Title</th>
                     <th>Venue/Resource</th>
                     <th>Quantity</th>
                     <th>Booker</th>
@@ -254,11 +329,14 @@
                                 </a>
                             {% endif %}
                         </td>
-                        <td>
+                        {% set statusSort = booking is empty ? 'Timetabled' : booking.getStatus().getName() %}
+                        <td data-sort="{{ statusSort }}">
                             {% if booking is empty %}
-                                &nbsp;
+                                <span class="neutral label">Timetabled</span>
                             {% else %}
-                                {{ booking.getStatus().getName() }}
+                                {% set status = booking.getStatus() %}
+                                {% set statusLabelClass = status.isApproved() ? 'approved' : (status.isPending() ? 'pending' : 'rejected') %}
+                                <span class="{{ statusLabelClass }} label">{{ status.getName() }}</span>
                             {% endif %}
                         </td>
                         <td>
@@ -278,7 +356,11 @@
                                     <ul class="flex-list buttons">
                                         {% if approveRoute %}
                                             <li>
-                                                <a href="{{ approveRoute }}" class="sbx-button--has-icon">
+                                                <a
+                                                    href="{{ approveRoute }}"
+                                                    class="sbx-button--has-icon"
+                                                    data-resource-booking-report-action="approve"
+                                                >
                                                     <sbx-icon name="approve"></sbx-icon>
                                                     Approve
                                                 </a>

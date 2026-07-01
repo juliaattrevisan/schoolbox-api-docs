@@ -234,11 +234,6 @@ class Controller extends Assessment\Controller
             $assessmentStats[$subAssessable->getId()] = new Assessment\Statistics($subAssessable);
         }
 
-        $participantStats = new GenericCollection(Assessment\ParticipantStatistics::class);
-        foreach ($participants as $participant) {
-            $participantStats[$participant->getUser()->getId()] = new Assessment\ParticipantStatistics($participant);
-        }
-
         $twigData = [
             'breadcrumbs'      => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]),
             'baseContext'      => $assessment->getBaseContext(),
@@ -254,12 +249,8 @@ class Controller extends Assessment\Controller
 
         // impl assessments we can just grab the details, spec we need to get the unit assessments first
         if ($assessment->isImplementation()) {
-            $twigData['aImpls'][$assessment->getId()] = [
-                'participantCount' => $participants->count(),
-                'participantCursor' => $participants->count(),
-                'assessment' => $assessment,
-                'participantStats' => $participantStats,
-            ];
+            $pagedAssessment = clone $assessment;
+            $twigData['aImpls'][$assessment->getId()] = $this->getParticipantPageData($pagedAssessment);
         } else {
             $assessments = $this->getUnitAssessments($assessment, false);
             /** @var Project $assessment */
@@ -275,6 +266,7 @@ class Controller extends Assessment\Controller
                 $twigData['participantStats'][$assessment->getId()] = $participantStats;
                 $twigData['aImpls'][$assessment->getId()] = [
                     'participantCount' => $participants->count(),
+                    'participantIndexCount' => $participants->count(),
                     'participantCursor' => null,
                     'assessment' => $assessment,
                     'participantStats' => $participantStats,
@@ -459,23 +451,55 @@ class Controller extends Assessment\Controller
     }
 
     /**
-     * fetch participants for a specific class assessment, that is part of the course assessment
-     * this collates and may chunk the data as needed
+     * Fetches one participant page for project status.
      *
-     * @param IAssessable $assessmentSpec
-     * @param IAssessable $assessmentImpl
+     * participantCount is the rendered participant count after hydration filters.
+     * participantIndexCount is the roster/index count used for cursor paging.
+     *
+     * @param IAssessable $assessment
      * @return array
-     * @throws Exception\NotFound
      */
+    private function getParticipantPageData(IAssessable $assessment): array
+    {
+        $participantCursor = (int)$this->requestQuery->get('participantCursor', 0);
+        if ($participantCursor < 0) {
+            $participantCursor = 0;
+        }
+
+        $participantPage = $this->participantDataSource->findParticipantUserPage(
+            $assessment,
+            $participantCursor,
+            self::PARTICIPANT_CHUNK_SIZE
+        );
+
+        $assessments = new GenericCollection(IAssessable::class, [$assessment]);
+        if ($participantPage['users']->count()) {
+            $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection(
+                collection: $assessments,
+                users: $participantPage['users'],
+                removeExcluded: true
+            );
+        }
+
+        $participants = $assessment->getAllParticipants();
+
+        $participantStats = new GenericCollection(Assessment\ParticipantStatistics::class);
+        foreach ($participants as $participant) {
+            $participantStats[$participant->getUser()->getId()] = new Assessment\ParticipantStatistics($participant);
+        }
+
+        return [
+            'participantCount' => $participants->count(),
+            'participantIndexCount' => $participantPage['total'],
+            'participantCursor' => $participantPage['nextCursor'],
+            'assessment' => $assessment,
+            'participantStats' => $participantStats,
+            'participants' => $participants,
+        ];
+    }
+
     private function getClassStudentInfo(IAssessable $assessmentSpec, IAssessable $assessmentImpl): array
     {
-        $assessments = new GenericCollection(IAssessable::class, [$assessmentImpl]);
-        // We are first loading and hydrating the participants into the assessments, so we know how many exist, for when we chunk them
-        // we chunk them later as the stats logic causes increased load and demand on the system.
-        // Looking through `loadParticipantsIntoAssessmentCollection` it was going to be too hard to try and fetch / hydrate only a specific chunk of participants.
-        // so we are loading and then throwing away data (yes, can be fixed later) but this is better than trying to load and use everything and run out of memory)
-        $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection(collection: $assessments, users: null, removeExcluded: true);
-
         $twigData = [
             'baseContext'      => $assessmentSpec->getBaseContext(),
             'assessment'       => $assessmentSpec,
@@ -487,36 +511,9 @@ class Controller extends Assessment\Controller
                     : $this->getSession()->getHistory(),
             'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ];
-        /** @var Project $assessment */
-        foreach ($assessments as $assessment) {
-            // Calculate summary totals for display purposes
-            $participants = $assessment->getAllParticipants();
 
-            // slice/cut the participants to a chunked count
-            $participantCount = $participants->count();
-            $participantCursor = (int)$this->requestQuery->get('participantCursor', 0);
-            if ($participantCursor < 0) {
-                $participantCursor = 0;
-            }
-
-            // slice the participant list to a reduced set, `new Assessment\ParticipantStatistics` is expensive and when you are doing that for hundreds of humans
-            // it can cause memory and load issues, so we are chunking the participants and only doing the stats for the chunk we are showing
-            $participants = $participants->slice($participantCursor, self::PARTICIPANT_CHUNK_SIZE);
-
-            $participantStats = new GenericCollection(Assessment\ParticipantStatistics::class);
-            foreach ($participants as $participant) {
-                $participantStats[$participant->getUser()->getId()] = new Assessment\ParticipantStatistics($participant);
-            }
-
-            $twigData['participantStats'][$assessment->getId()] = $participantStats;
-            $twigData['aImpl'] = [
-                'participantCount' => $participantCount,
-                'participantCursor' => $participantCursor + self::PARTICIPANT_CHUNK_SIZE,
-                'assessment' => $assessment,
-                'participantStats' => $participantStats,
-                'participants' => $participants,
-            ];
-        }
+        $twigData['aImpl'] = $this->getParticipantPageData($assessmentImpl);
+        $twigData['participantStats'][$assessmentImpl->getId()] = $twigData['aImpl']['participantStats'];
 
         return $twigData;
     }

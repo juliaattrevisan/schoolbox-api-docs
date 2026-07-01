@@ -164,7 +164,7 @@ class ConfigTest extends TestCase
         ];
 
         // Should not throw
-        $json = $cfg->encode($input, Helper::FEATURE_CHAT);
+        $json = $cfg->encode($input, \Schoolbox\OpenAi\Feature::CHAT->value);
         $this->assertIsString($json);
 
         // decode should return an array
@@ -185,7 +185,7 @@ class ConfigTest extends TestCase
         $cfg = new Config();
         $this->expectException(\Schoolbox\Mapper\Exception::class);
         // provider validation happens before structure checks - provider must be nested ['value'=>...]
-        $cfg->encode([Config::FIELD_PROVIDER => ['value' => 'INVALID_PROVIDER']], Helper::FEATURE_CHAT);
+        $cfg->encode([Config::FIELD_PROVIDER => ['value' => 'INVALID_PROVIDER']], \Schoolbox\OpenAi\Feature::CHAT->value);
     }
 
     /**
@@ -210,7 +210,7 @@ class ConfigTest extends TestCase
                 ],
                 // NOTE: Helper::ENDPOINT_TYPE_AZURE is intentionally omitted
             ],
-            Helper::FEATURE_CHAT,
+            \Schoolbox\OpenAi\Feature::CHAT->value,
         );
     }
 
@@ -238,7 +238,7 @@ class ConfigTest extends TestCase
             ],
         ];
 
-        $json = $cfg->encode($input, Helper::FEATURE_CHAT);
+        $json = $cfg->encode($input, \Schoolbox\OpenAi\Feature::CHAT->value);
         $this->assertIsString($json);
 
         $decoded = $cfg->decode($json);
@@ -273,7 +273,7 @@ class ConfigTest extends TestCase
         $this->expectException(\Schoolbox\Mapper\Exception::class);
 
         // should throw due to missing top-level OpenAI section
-        $cfg->encode($input, Helper::FEATURE_CHAT);
+        $cfg->encode($input, \Schoolbox\OpenAi\Feature::CHAT->value);
     }
 
     /**
@@ -304,6 +304,6 @@ class ConfigTest extends TestCase
         $this->expectException(\Schoolbox\Mapper\Exception::class);
 
         // should throw due to extra nested field
-        $cfg->encode($input, Helper::FEATURE_CHAT);
+        $cfg->encode($input, \Schoolbox\OpenAi\Feature::CHAT->value);
     }
 }

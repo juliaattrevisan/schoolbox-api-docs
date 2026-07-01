@@ -212,13 +212,13 @@ async function onDeleteConfirmed(): Promise<void> {
                 >Create a new template</a
             >
         </div>
-        <div v-else class="c-island">
-            <div v-for="(template, index) in currentTemplates" :key="template.id" class="c-card">
+        <div v-else class="sbx-island u-c-cr-bottom">
+            <div v-for="(template, index) in currentTemplates" :key="template.id" class="sbx-card">
                 <div
-                    :class="`l-flex-row l-gap-m ${index !== currentTemplates.length - 1 ? `c-card--border-end-alt` : ''}`"
+                    :class="`u-flex-row u-gap-m ${index !== currentTemplates.length - 1 ? `sbx-card--border-end-alt` : ''}`"
                 >
                     <div
-                        class="l-flex-col l-flex--justify-center l-flex__item--1 l-gap-xs l-pad-m f-no-margins"
+                        class="u-flex-col u-flex--justify-center u-flex__item--1 u-gap-xs u-pad-m f-no-margins"
                         :data-test="`editor-templates-list-item-${template.title}`"
                     >
                         <h3>
@@ -245,7 +245,7 @@ async function onDeleteConfirmed(): Promise<void> {
                             </span>
                         </p>
                     </div>
-                    <div class="l-flex l-flex--align-start l-gap-xs">
+                    <div class="u-flex u-flex--align-start u-gap-xs">
                         <a
                             class="sbx-icon-only-button f-no-margins"
                             aria-label="Edit template"
@@ -283,7 +283,7 @@ async function onDeleteConfirmed(): Promise<void> {
         <media-article :content="(currentTemplate as Template).body"></media-article>
     </basic-modal>
     <basic-modal v-model:is-open="isDeleteOpen" :has-background-click="true" size="s">
-        <div class="l-flex-col l-gap-s f-no-margins">
+        <div class="u-flex-col u-gap-s f-no-margins">
             <h2>Please confirm</h2>
             <p>Are you sure you want to delete this template?</p>
             <div v-if="deleteError" class="alert-box alert">
@@ -292,16 +292,16 @@ async function onDeleteConfirmed(): Promise<void> {
                 to try again and contact your support if the problem persists.<br />
                 <em>Further support info: {{ deleteError }}</em>
             </div>
-            <div class="l-flex l-gap-xs f-no-margins">
+            <div class="u-flex u-gap-xs f-no-margins">
                 <button
-                    class="button submit l-flex__item--1 alert"
+                    class="button submit u-flex__item--1 alert"
                     data-test="editor-templates-delete-confirm-button"
                     @click.prevent="onDeleteConfirmed"
                 >
                     {{ isDeleting ? "Deleting..." : "Delete" }}
                 </button>
                 <button
-                    class="button l-flex__item--1"
+                    class="button u-flex__item--1"
                     data-test="editor-templates-delete-cancel-button"
                     @click.prevent="isDeleteOpen = false"
                 >

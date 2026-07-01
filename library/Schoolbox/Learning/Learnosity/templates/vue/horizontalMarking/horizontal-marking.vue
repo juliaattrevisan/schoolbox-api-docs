@@ -61,13 +61,13 @@ window.Vue.onMounted(async () => {
 </script>
 
 <template>
-    <div class="l-flex-col l-gap-l l-pad-m f-no-margins">
+    <div class="u-flex-col u-gap-l u-pad-m f-no-margins">
         <h1>Horizontal Marking for {{ props.title }}</h1>
         <template v-if="hasStudents">
             <hm-items-header />
             <!-- hm-students has to be available before store is loaded as the Learnosity Report API's look for the student elements to put the reports in -->
             <hm-students />
-            <div class="l-flex-row l-flex--no-wrap l-gap-m">
+            <div class="u-flex-row u-flex--no-wrap u-gap-m">
                 <hm-previous-item />
                 <hm-next-item />
                 <hm-finalise-review />

@@ -179,13 +179,19 @@ const viewAllText = window.Vue.computed(() => {
         cellInfo.value?.aImpl._routes.student[cellInfo.value.studentId].getAssessmentParticipationForm ?? null;
     if (cellInfo.value.participant.isExcluded) {
         if (getAssessmentParticipationRoute === null) {
-            return "The student has been excluded. You may include this student in this activity";
+            if (routes.value.includeRoute) {
+                return "The student has been excluded. You may include this student in this activity";
+            }
+            return "The student has been excluded.";
         }
         return `The student has been excluded. Visit the <a href="${getAssessmentParticipationRoute}">participation page</a> of the original learning activity to customise their status`;
     }
     if (isActivityEmpty.value) {
         if (getAssessmentParticipationRoute === null) {
-            return "There has been no activity yet, you may create feedback or exclude this student from this activity";
+            if (routes.value.excludeRoute) {
+                return "There has been no activity yet, you may create feedback or exclude this student from this activity";
+            }
+            return "There has been no activity yet";
         }
         return `There has been no activity yet, you may create feedback or visit the <a href="${getAssessmentParticipationRoute}">participation page</a> of the original learning activity to customise their status`;
     }
@@ -240,10 +246,16 @@ const hasVisibleMenuItems = window.Vue.computed(() => {
         [ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ, ACTIVITY_TYPE_REPORTING].includes(activity.assessmentType);
 
     const hasIncludeMenuItem =
-        participant && participant.isExcluded && routes.value.getAssessmentParticipationForm === null;
+        participant &&
+        participant.isExcluded &&
+        routes.value.includeRoute &&
+        routes.value.getAssessmentParticipationForm === null;
 
     const hasExcludeMenuItem =
-        participant && !participant.isExcluded && activity.assessmentType !== ACTIVITY_TYPE_PROJECT;
+        participant &&
+        !participant.isExcluded &&
+        routes.value.excludeRoute &&
+        activity.assessmentType !== ACTIVITY_TYPE_PROJECT;
 
     const hasHistoryMenuItem = participant && !participant.isExcluded;
 
@@ -266,7 +278,7 @@ async function getActivity(): Promise<void> {
     mbStore.isPopoutLoading = true;
 
     try {
-        if (timelineRoute === null || infoRoute === null) {
+        if (!timelineRoute || !infoRoute) {
             throw new Error("Unable to find timelineRoute/infoRoute for retrieving activity items");
         }
 
@@ -605,9 +617,9 @@ function onToggleSelected(): void {
             <div class="collapsible">
                 <small-card v-for="(activityItem, index) in activityItems" :key="index">
                     <user-photo :user-id="activityItem.effector.id" render="tiny" rounded-corners></user-photo>
-                    <div class="c-card__details">
-                        <div class="c-card__text">{{ activityItem.effector.name }} {{ getAction(activityItem) }}</div>
-                        <div class="c-card__subtext">{{ activityItem.date.short }}</div>
+                    <div class="sbx-card__details">
+                        <div class="sbx-card__text">{{ activityItem.effector.name }} {{ getAction(activityItem) }}</div>
+                        <div class="sbx-card__subtext">{{ activityItem.date.short }}</div>
                     </div>
                 </small-card>
             </div>
@@ -686,6 +698,7 @@ function onToggleSelected(): void {
                     v-if="
                         cellInfo.participant &&
                         cellInfo.participant.isExcluded &&
+                        routes.includeRoute &&
                         routes.getAssessmentParticipationForm === null
                     "
                     :class="{ 'is-disabled': !cellInfo.participant.isExcluded }"
@@ -697,6 +710,7 @@ function onToggleSelected(): void {
                     v-if="
                         cellInfo.participant &&
                         !cellInfo.participant.isExcluded &&
+                        routes.excludeRoute &&
                         cellInfo.activity.assessmentType !== ACTIVITY_TYPE_PROJECT
                     "
                     :class="{ 'is-disabled': !routes.excludeRoute && !cellInfo.participant.isExcluded }"
@@ -780,17 +794,17 @@ function onToggleSelected(): void {
 }
 
 .is-expanded {
-    .collapsible > .c-card {
+    .collapsible > .sbx-card {
         display: flex;
     }
 
     .pop-out-menu__options {
-        .c-menu-item,
-        .c-menu-item__divider {
+        .sbx-menu-item,
+        .sbx-menu-item__divider {
             display: none;
         }
 
-        .c-menu-item:first-child {
+        .sbx-menu-item:first-child {
             display: block;
         }
     }
@@ -800,7 +814,7 @@ function onToggleSelected(): void {
     max-height: 20rem;
     overflow-y: auto;
 
-    .c-card {
+    .sbx-card {
         display: none;
 
         &:first-child {
