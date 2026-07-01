@@ -57,7 +57,7 @@ class SessionSummariserTest extends TestCase
             ],
             []
         );
-        $session = (new Model())->setId('session-1');
+        $session = new Model()->setId('session-1');
 
         $summariser->hydrateSessionsWithSummaryInfo([$session]);
 
@@ -83,7 +83,7 @@ class SessionSummariserTest extends TestCase
             ],
             []
         );
-        $session = (new Model())->setId('session-1');
+        $session = new Model()->setId('session-1');
 
         $summariser->hydrateSessionsWithSummaryInfo([$session]);
 
@@ -117,7 +117,7 @@ class SessionSummariserTest extends TestCase
             ],
             []
         );
-        $session = (new Model())->setId('session-1');
+        $session = new Model()->setId('session-1');
 
         $summariser->hydrateSessionsWithSummaryInfo([$session]);
 
@@ -150,7 +150,7 @@ class SessionSummariserTest extends TestCase
                 ],
             ]
         );
-        $session = (new Model())->setId('session-1');
+        $session = new Model()->setId('session-1');
 
         $summariser->hydrateSessionsWithSummaryInfo([$session]);
 
@@ -163,7 +163,7 @@ class SessionSummariserTest extends TestCase
     public function testHydrateSessionWithSummaryUsesNullModerationStatusWhenNoEventsExist(): void
     {
         $summariser = $this->createSummariserWithRows([], []);
-        $session = (new Model())->setDerivedModerationStatus(ModerationEventStatus::REQUIRES_ATTENTION);
+        $session = new Model()->setDerivedModerationStatus(ModerationEventStatus::REQUIRES_ATTENTION);
 
         $summariser->hydrateSessionsWithSummaryInfo([$session]);
 
@@ -207,8 +207,8 @@ class SessionSummariserTest extends TestCase
                 ],
             ]
         );
-        $firstSession = (new Model())->setId('session-1');
-        $secondSession = (new Model())->setId('session-2');
+        $firstSession = new Model()->setId('session-1');
+        $secondSession = new Model()->setId('session-2');
 
         $summariser->hydrateSessionsWithSummaryInfo([$firstSession, $secondSession]);
 
