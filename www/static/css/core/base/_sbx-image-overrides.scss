@@ -48,6 +48,6 @@ body.sbx-body {
 
     // undo unintended rounding on some images that are not appropriate
     .card.attachment img {
-        border-radius: 0 !important;
+        border-radius: 0;
     }
 }

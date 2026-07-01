@@ -83,6 +83,7 @@ body.ck-fullscreen {
     color: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground));
 }
 
+/* update the text so it sits well on the active background colour */
 .ck.ck-button-action:not(.ck-disabled):hover {
     color: var(--sbx-config-color-accent, var(--content-ui-submit-background));
 }
