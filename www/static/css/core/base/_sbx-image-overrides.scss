@@ -45,4 +45,9 @@ body.sbx-body {
         // Small direct portrait images render as circles at or below 48px.
         border-radius: var(--sbx-border-radius-full);
     }
+
+    // undo unintended rounding on some images that are not appropriate
+    .card.attachment img {
+        border-radius: 0 !important;
+    }
 }
