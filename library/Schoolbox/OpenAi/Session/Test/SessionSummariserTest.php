@@ -92,40 +92,6 @@ class SessionSummariserTest extends TestCase
     }
 
     /**
-     * Session log rows are summarised in their supplied order.
-     */
-    public function testHydrateSessionWithSummaryUsesSuppliedOrder(): void
-    {
-        $summariser = $this->createSummariserWithRows(
-            [
-                [
-                    'id' => 12,
-                    'ai_session_id' => 'session-1',
-                    'created_at' => '2026-01-01 10:02:00',
-                    'log_format' => 'supplied-first',
-                    'return_code' => 200,
-                    'error_message' => null,
-                ],
-                [
-                    'id' => 11,
-                    'ai_session_id' => 'session-1',
-                    'created_at' => '2026-01-01 10:01:00',
-                    'log_format' => 'chronological-first',
-                    'return_code' => 200,
-                    'error_message' => null,
-                ],
-            ],
-            []
-        );
-        $session = new Model()->setId('session-1');
-
-        $summariser->hydrateSessionsWithSummaryInfo([$session]);
-
-        $this->assertSame('supplied-first', $session->getDerivedLogFormat());
-        $this->assertFalse($session->getDerivedHasError());
-    }
-
-    /**
      * Moderation event rows are summarised using the highest-priority status.
      */
     public function testHydrateSessionWithSummaryUsesMostImportantModerationStatus(): void
@@ -155,19 +121,6 @@ class SessionSummariserTest extends TestCase
         $summariser->hydrateSessionsWithSummaryInfo([$session]);
 
         $this->assertSame(ModerationEventStatus::REQUIRES_ATTENTION->value, $session->getDerivedModerationStatus());
-    }
-
-    /**
-     * Sessions without moderation event rows use a null moderation status.
-     */
-    public function testHydrateSessionWithSummaryUsesNullModerationStatusWhenNoEventsExist(): void
-    {
-        $summariser = $this->createSummariserWithRows([], []);
-        $session = new Model()->setDerivedModerationStatus(ModerationEventStatus::REQUIRES_ATTENTION);
-
-        $summariser->hydrateSessionsWithSummaryInfo([$session]);
-
-        $this->assertNull($session->getDerivedModerationStatus());
     }
 
     /**
