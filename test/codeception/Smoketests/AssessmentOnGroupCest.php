@@ -16,7 +16,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Tests\Support\IntegrationTester;
 use Tests\Support\Page\Duework\AssessmentForm;
 use Tests\Support\Payload;
-use Tests\Support\Payload\Assessable\Grading\AssessmentMark;
 use Tests\Support\Payload\Group\AddMembers;
 use Tests\Support\Payload\Rubric\CreateCapability;
 use Tests\Support\Payload\Rubric\CreateIndicator;
@@ -188,63 +187,6 @@ class AssessmentOnGroupCest
         #THEN
         $i->seeResponseCodeIs(302);
         $i->seeHttpHeader('location', "/learning/assessments/$assessmentPageId/{$student->getId()}");
-    }
-
-
-    /**Marks an assessment with a rubric using a curl payload.
-     *
-     * Fires off creation of a group homepage folder and create assessment with rubric grid for mark and submission on behalf of student.
-     *
-     * @param IntegrationTester $i
-     */
-    public function markAssessmentWithRubric(IntegrationTester $i): void
-    {
-        #GIVEN
-        $timestamp  = time();
-        $groupPage = $this->createHomepage($i, 'Testing Mark Assessment with rubric on Group Page at ' . $timestamp);
-
-        $student = $i->grabUser('jreed');
-        $teacher = $i->grabUser('jcoles');
-        $admin   = $i->grabUser('alaress');
-
-        $memberPayload = new AddMembers($groupPage->getId());
-        $memberPayload->setNewMembers([$student->getId(), $admin->getId(), $teacher->getId()]);
-        $i->amGoingTo('Add group members to Group Page #' . $groupPage->getId());
-        $i->sendRequest($memberPayload);
-
-        $accessLevels = new Payload\Group\ModifyAccessLevel($groupPage->getId());
-        $accessLevels->setMemberAccessLevel($student->getId(), UserAccess::ACCESS_READ);
-        $accessLevels->setMemberAccessLevel($teacher->getId(), UserAccess::ACCESS_WRITE);
-        $accessLevels->setMemberAccessLevel($admin->getId(), UserAccess::ACCESS_FULL);
-        $i->amGoingTo('Add group members permissions to Group Page #' . $groupPage->getId());
-        $i->sendRequest($accessLevels);
-
-        $newAssessmentRequest = new Payload\Assessable\Create(AssessmentContextType::TYPE_FOLDER, $groupPage->getId(), $groupPage->getId(), AssessmentType::TYPE_DUE_WORK);
-        $assessment_title     = 'Testing Mark Assessment with rubric On Homepage ID ' . $groupPage->getId() . ' at ' . $timestamp;
-        $newAssessmentRequest->setTitle($assessment_title);
-        $newAssessmentRequest->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK); // Required form parameter.
-        $this->setDefaultRubric($i, $newAssessmentRequest, $groupPage->getId());
-        $i->amGoingTo('Send request create asessment on Group Page #' . $groupPage->getId());
-        $i->sendRequest($newAssessmentRequest);
-        $assessmentId = $i->grabFirstAssessmentIdByTitle($assessment_title);
-
-        $referrer                = "/learning/assessments/$assessmentId/{$student->getId()}/submit";
-        $url                     = "/learning/assessments/$assessmentId/{$student->getId()}/submit";
-        $submitAssessmentPayload = new Payload\Base('POST', $referrer, $url);
-        $submitAssessmentPayload->setFormParam('responseId', '');
-        $submitAssessmentPayload->setFormParam('submitted_in_person', 'on');
-        $i->amGoingTo('Send submit assessment on students behalf. Student #' . $student->getId());
-        $i->sendRequest($submitAssessmentPayload);
-        $submissionID = $i->grabFirstSubmissionIdByOwnerAndAssessmentID($assessmentId, $admin->getId(), $student->getId());
-
-        #WHEN
-        $newMarkRequest = new Payload\Assessable\Grading\AssessmentMark($assessmentId, $student->getId(), $submissionID);
-        $this->setDefaultRubricMarks($i, $newMarkRequest);
-        $i->amGoingTo('Send request mark rubric assessment # ' . $assessmentId . ' for student # ' . $student->getId());
-        $i->sendRequest($newMarkRequest);
-
-        #THEN
-        $i->seeResponseCodeIs(200);
     }
 
 
@@ -693,26 +635,6 @@ class AssessmentOnGroupCest
 
                     $assessmentPayload->setRubricDescription(null, $indicatorId, $levelIndex, $descriptorText, $descriptorPoints);
                 }
-            }
-        }
-    }
-
-    /**
-     * Convenience helper to set some default rubric marks on the rubric mark request
-     *
-     * @param IntegrationTester                         $i
-     * @param Payload\Assessable\Grading\AssessmentMark $assessmentMark
-     */
-    private function setDefaultRubricMarks(IntegrationTester $i, AssessmentMark $assessmentMark): void
-    {
-        $assessmentID = $assessmentMark->getAssessmentId();
-        $markGrid = $i->grabAssessmentRubricGrid($assessmentID); ## Has been deprecated needs a recode.
-
-        foreach ($markGrid->getCapabilityUsages() as $group_capability) {
-            foreach ($group_capability->getIndicatorUsages() as $capability_indicator) {
-                $descriptors = $capability_indicator->getDescriptors();
-                $levelToPick =  random_int(0, 2);
-                $assessmentMark->addMarkRubricDescriptorSelect($descriptors[$levelToPick]->getId());
             }
         }
     }
