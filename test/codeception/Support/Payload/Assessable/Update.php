@@ -40,11 +40,6 @@ class Update extends Request
         $this->setFormParam("part-2", 1);
     }
 
-    public function getRubricAssessmentId(): int
-    {
-        return $this->assessable->getId();
-    }
-
     /** @inheritDoc */
     protected function getUrl(): string
     {

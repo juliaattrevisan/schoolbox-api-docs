@@ -48,10 +48,4 @@ class Update extends Request
     {
         return "/learning/assessments/{$this->lessonPlanId}";
     }
-
-
-    public function getRubricAssessmentId(): int
-    {
-        return 0;
-    }
 }

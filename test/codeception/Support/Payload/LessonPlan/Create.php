@@ -60,9 +60,4 @@ class Create extends Request
     {
         return "/learning/{$this->contextType}s/{$this->contextId}/assessments";
     }
-
-    public function getRubricAssessmentId(): int
-    {
-        return 0;
-    }
 }

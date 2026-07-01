@@ -24,9 +24,6 @@ class CheckMarkInvalidation extends Payload\Request
     use PostTrait;
     use Payload\Assessable\UpdateFormTrait;
 
-    /** @var IAssessable */
-    private $assessable;
-
     /**
      * @param IAssessable $assessable
      * @param string      $returnUrl
@@ -34,17 +31,10 @@ class CheckMarkInvalidation extends Payload\Request
      */
     public function __construct(IAssessable $assessable, string $returnUrl)
     {
-        $this->assessable = $assessable;
-
         $this->setReferer("/learning/assessments/{$assessable->getId()}/modify?returnUrl=");
 
         $this->initiateForm(AssessmentType::objectToString($assessable));
         $this->populateForm($assessable, $returnUrl);
-    }
-
-    public function getRubricAssessmentId(): int
-    {
-        return $this->assessable->getId();
     }
 
     /** @inheritDoc */

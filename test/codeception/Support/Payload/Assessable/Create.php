@@ -82,10 +82,4 @@ class Create extends Request
     {
         return "/learning/{$this->contextType}s/{$this->contextId}/assessments";
     }
-
-    /** @inheritDoc */
-    public function getRubricAssessmentId(): int
-    {
-        return -1;
-    }
 }
