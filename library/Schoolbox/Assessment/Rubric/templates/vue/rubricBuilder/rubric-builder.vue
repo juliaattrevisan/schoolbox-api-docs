@@ -119,6 +119,12 @@ function syncMaxMarkInputs(prevSum: number | null): void {
             return;
         }
 
+        // Update the term used for "Rubric"/"Rubrics" depending on the number of grids
+        const rubricTerm = document.querySelector<HTMLElement>(`[data-rubric-term]`);
+        if (rubricTerm) {
+            rubricTerm.textContent = rubricGrids.value.length === 1 ? "Rubric" : "Rubrics";
+        }
+
         // Initialise listeners if that hasn't been done already
         if (!knownMaxMarkFields.value.includes(id)) {
             knownMaxMarkFields.value.push(id);
