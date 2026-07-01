@@ -231,10 +231,17 @@ class Mapper extends BaseMapper
         $sessionLogRowsBySessionId = $sessionSummariser->getSessionLogRowsBySessionId(
             array_column($sessionRows, 'id')
         );
+        $moderationEventRowsBySessionId = $sessionSummariser->getModerationEventRowsBySessionId(
+            array_column($sessionRows, 'id')
+        );
 
         foreach ($sessionRows as $row) {
             $session = $this->hydrate($row);
-            $sessionSummariser->hydrateSessionWithSummaryInfo($session, $sessionLogRowsBySessionId[$row['id']] ?? []);
+            $sessionSummariser->hydrateSessionWithSummaryInfo(
+                $session,
+                $sessionLogRowsBySessionId[$row['id']] ?? [],
+                $moderationEventRowsBySessionId[$row['id']] ?? []
+            );
 
             /** @var \Schoolbox\User|null $sessionUser */
             $sessionUser = $userMapper->hydrate($row, 'u');

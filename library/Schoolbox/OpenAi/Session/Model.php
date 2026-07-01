@@ -13,6 +13,7 @@ namespace Schoolbox\OpenAi\Session;
 
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\OpenAi\Feature;
+use Schoolbox\OpenAi\Moderation\Event\Status as ModerationEventStatus;
 use Schoolbox\User;
 
 class Model
@@ -55,6 +56,14 @@ class Model
      * @var bool
      */
     private bool $derivedHasError = false;
+
+    /**
+     * The highest-priority moderation event status for this session, for the admin list only.
+     * Not a column; populated by {@see Mapper::getFilteredSessions()}.
+     *
+     * @var string|null
+     */
+    private ?string $derivedModerationStatus = null;
 
     /**
      * @return string|null
@@ -150,6 +159,32 @@ class Model
     public function setDerivedHasError(bool $derivedHasError): self
     {
         $this->derivedHasError = $derivedHasError;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDerivedModerationStatus(): ?string
+    {
+        return $this->derivedModerationStatus;
+    }
+
+    /**
+     * @param string|ModerationEventStatus|null $derivedModerationStatus
+     * @return $this
+     */
+    public function setDerivedModerationStatus(string|ModerationEventStatus|null $derivedModerationStatus): self
+    {
+        if (null === $derivedModerationStatus) {
+            $this->derivedModerationStatus = null;
+            return $this;
+        }
+
+        $this->derivedModerationStatus = $derivedModerationStatus instanceof ModerationEventStatus
+            ? $derivedModerationStatus->value
+            : ModerationEventStatus::from($derivedModerationStatus)->value;
+
         return $this;
     }
 }
