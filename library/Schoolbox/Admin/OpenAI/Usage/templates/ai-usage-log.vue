@@ -191,7 +191,9 @@ function applyModerationEventUpdate(event: AiModerationEvent): void {
     <div class="no-print">
         <div class="list-item">
             <h2 class="subheader">
-                Activity<template v-if="!isLoading">: {{ sessions.length }} events</template>
+                Activity<template v-if="!isLoading"
+                    >: {{ sessions.length }} event{{ sessions.length === 1 ? "" : "s" }}</template
+                >
             </h2>
         </div>
     </div>
