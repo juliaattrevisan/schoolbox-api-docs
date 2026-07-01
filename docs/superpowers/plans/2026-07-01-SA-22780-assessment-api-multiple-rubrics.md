@@ -15,7 +15,7 @@
 - **Non-breaking contract:** always emit `rubrics` (an array, `[]` when none). Keep singular `rubric` populated as `rubrics[0]` reduced to `{capabilities: [...]}`, or `null` when there are no rubrics. The singular is a 6-month deprecation shim and is intentionally lossy for multi-rubric assessments.
 - Template rubric item shape: `{ id, title, weight, capabilities: [...] }`. Feedback rubric item shape: `{ id, title, capabilities: [...] }` (no `weight`).
 - Feedback is now **agnostic**: it reads the `v_rubric_mark` view, which unions `submission_return` (due work) + `reporting_feedback` (reporting) rubric marks. Preserve instructor-only behaviour via `feedback_type = 'instructor'` (this replaces the old `review_route='instructor'` + hardcoded `feedback_table='submission_return'`).
-- **Collation:** every string column the redefined views emit must be `utf8mb4_unicode_ci`. Normalise string literals with `CONVERT(<expr> USING utf8mb4) COLLATE utf8mb4_unicode_ci` (base-table charset normalisation is out of scope).
+- **Collation (root-cause fix at the server, not the view):** all table columns in the view chain are already `utf8mb4_unicode_ci` (audited). The `Illegal mix of collations` error came from the server default collation (`utf8mb4_uca1400_ai_ci`) baking into the reporting arm's `'instructor'` literal at view-creation time. Fix it at the server level (`collation-server = utf8mb4_unicode_ci`) so the literal bakes correctly and the views carry **no** `COLLATE`/`CONVERT` clauses. The server config MUST be applied and the DB restarted **before** the `v_rubric_mark` migration runs.
 - `Helper.php` has **no** `declare(strict_types=1)`; int→string arg coercion at call sites is intentional — do not add strict types.
 - PHP test command: `vendor/bin/phpunit <path-to-test-file>` from the repo root.
 - DB access for view verification: `mariadb -u schoolboxdocker -pabc123 -h 127.0.0.1 schoolbox` (MariaDB 11.8.6).
@@ -26,8 +26,9 @@
 ## File Structure
 
 **`schoolbox` repo:**
+- Create: `docker/mariadb/config/mariadb.conf.d/10-force-server-charset.cnf` — sets `character-set-server=utf8mb4` / `collation-server=utf8mb4_unicode_ci` so baked view literals get the right collation (requires DB image rebuild + restart).
 - Create: `updates/26.1.beta7/rubric/16-v_rubric.sql` — redefines the `v_rubric` view to also expose `rubric_instance.title` and `rubric_instance.weight`.
-- Create: `updates/26.1.beta7/rubric/17-v_rubric_mark.sql` — redefines the `v_rubric_mark` view to add `rubric_instance_title`, `descriptor_max_value`/`descriptor_sequence`, and normalise `feedback_type` to `utf8mb4_unicode_ci`.
+- Create: `updates/26.1.beta7/rubric/17-v_rubric_mark.sql` — redefines the `v_rubric_mark` view to add `rubric_instance_title` and `descriptor_max_value`/`descriptor_sequence` (no `COLLATE` clause needed once the server default collation is fixed).
 - Modify: `library/Schoolbox/Learning/Assessment/API/Helper.php` — rename + rewire the two rubric methods (template reads `v_rubric`, feedback reads `v_rubric_mark`), add two pure reshaping methods and one legacy-shim method, update three call sites.
 - Create: `library/Schoolbox/Learning/Assessment/Test/API/RubricReshapeTest.php` — unit tests for the pure reshaping methods (via reflection, matching the module's existing test style).
 
@@ -161,18 +162,52 @@ git commit -m "feat: expose rubric instance title & weight via v_rubric [SA-2278
 
 ---
 
-## Task 2: Redefine `v_rubric_mark` (title, descriptor columns, collation)
+## Task 2: Fix server default collation + redefine `v_rubric_mark` (title, descriptor columns)
 
 **Files:**
+- Create: `docker/mariadb/config/mariadb.conf.d/10-force-server-charset.cnf`
 - Create: `updates/26.1.beta7/rubric/17-v_rubric_mark.sql`
 
 **Interfaces:**
 - Consumes: `v_rubric.rubric_instance_title` from Task 1.
-- Produces: `v_rubric_mark` gains `rubric_instance_title`, `descriptor_max_value`, `descriptor_sequence`, and a `feedback_type` normalised to `utf8mb4_unicode_ci`. Task 4 (`getRubricsFeedback`) reads these.
+- Produces: server default collation `utf8mb4_unicode_ci`; `v_rubric_mark` gains `rubric_instance_title`, `descriptor_max_value`, `descriptor_sequence`. Task 4 (`getRubricsFeedback`) reads these and filters `feedback_type = 'instructor'` without a collation error.
 
-This is a `CREATE OR REPLACE VIEW` migration based on `updates/26.1.beta4/rubric/17-v_rubric_mark.sql` with three changes in **both** UNION arms: (1) select `vr.rubric_instance_title`, (2) `LEFT JOIN rubric_descriptor` + `rubric_level` to expose `descriptor_max_value`/`descriptor_sequence`, (3) wrap `feedback_type` in `CONVERT(... USING utf8mb4) COLLATE utf8mb4_unicode_ci` to fix the mixed-collation error. The `INNER JOIN v_rubric_indicator_mark_extend` is left unchanged (shared with the markbook consumer; row parity verified). No PHP test; verified by querying the view.
+**Root-cause collation fix (why this task changes the server, not the view):** the table columns are all already `utf8mb4_unicode_ci` (audited across the 14 tables feeding these views — the only non-conforming column, `submission_box.worksheet_template_hash`, is `ascii` and unused here). The `Illegal mix of collations` error comes from the reporting arm's hardcoded `'instructor'` literal baking in the **server default collation** (`utf8mb4_uca1400_ai_ci`) at view-creation time. Confirmed baked-in: the error persists even under `SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci`. Fixing the server default to `utf8mb4_unicode_ci` makes the literal bake correctly, so the view needs **no** `COLLATE`/`CONVERT` clause. This config **must be applied and the DB restarted before** the view migration below runs (and before any `WHERE feedback_type = 'instructor'` query).
 
-- [ ] **Step 1: Create the migration file**
+The view change itself is a `CREATE OR REPLACE VIEW` based on `updates/26.1.beta4/rubric/17-v_rubric_mark.sql` with two changes in **both** UNION arms: (1) select `vr.rubric_instance_title`, (2) `LEFT JOIN rubric_descriptor` + `rubric_level` to expose `descriptor_max_value`/`descriptor_sequence`. The `INNER JOIN v_rubric_indicator_mark_extend` is left unchanged (shared with the markbook consumer; row parity verified). No PHP test; verified by querying the view.
+
+- [ ] **Step 1: Create the server charset/collation config file**
+
+Create `docker/mariadb/config/mariadb.conf.d/10-force-server-charset.cnf` with this exact content (the Dockerfile copies `config/mariadb.conf.d/*` into `/etc/mysql/mariadb.conf.d/`; `[mariadbd]` is the server section read by MariaDB 11.8):
+
+```ini
+[mariadbd]
+character-set-server = utf8mb4
+collation-server     = utf8mb4_unicode_ci
+```
+
+- [ ] **Step 2: Rebuild the DB image and restart the container**
+
+Run (from the repo root; adjust to your compose wrapper if there is one):
+
+```bash
+docker compose -f docker/base.docker-compose.yaml build mariadb
+docker compose -f docker/base.docker-compose.yaml up -d mariadb
+```
+
+Expected: the `docker-mariadb-1` container restarts. Existing data volume is preserved.
+
+- [ ] **Step 3: Verify the server default collation is now correct**
+
+Run:
+
+```bash
+mariadb -u schoolboxdocker -pabc123 -h 127.0.0.1 schoolbox -e "SELECT @@character_set_server, @@collation_server;"
+```
+
+Expected: `utf8mb4` and `utf8mb4_unicode_ci` (was `utf8mb4_uca1400_ai_ci`).
+
+- [ ] **Step 4: Create the view migration file**
 
 Create `updates/26.1.beta7/rubric/17-v_rubric_mark.sql` with this exact content:
 
@@ -180,8 +215,9 @@ Create `updates/26.1.beta7/rubric/17-v_rubric_mark.sql` with this exact content:
 -- Extend v_rubric_mark for the agnostic Assessment feedback API (SA-22780):
 --  * expose rubric_instance_title (from v_rubric)
 --  * expose descriptor_max_value / descriptor_sequence (LEFT JOIN rubric_descriptor + rubric_level)
---  * normalise feedback_type to utf8mb4_unicode_ci (the reporting arm's 'instructor' literal was
---    created under a utf8mb3 connection, causing "Illegal mix of collations" on WHERE feedback_type=...)
+-- Note: the reporting arm's 'instructor' literal is left bare on purpose. With the server default
+-- collation set to utf8mb4_unicode_ci (see docker/mariadb/config/mariadb.conf.d/10-force-server-charset.cnf,
+-- which MUST be applied first), the literal bakes as utf8mb4_unicode_ci and no COLLATE clause is needed.
 -- The INNER JOIN to v_rubric_indicator_mark_extend is unchanged (shared with the rubric markbook).
 
 CREATE OR REPLACE VIEW v_rubric_mark AS
@@ -195,7 +231,7 @@ FROM
             sr.owner AS student_id,
             sr.marker AS marker_id,
             sr.published_at AS feedback_date,
-            CONVERT(sr.review_route USING utf8mb4) COLLATE utf8mb4_unicode_ci AS feedback_type,
+            sr.review_route AS feedback_type,
             vr.rubric_instance_id AS rubric_instance_id,
             vr.rubric_instance_title AS rubric_instance_title,
             vr.capability_mark_type_id AS capability_mark_type_id,
@@ -241,7 +277,7 @@ FROM
             rf.learner_id AS student_id,
             rf.instructor_id AS marker_id,
             rf.published_at AS feedback_date,
-            CONVERT('instructor' USING utf8mb4) COLLATE utf8mb4_unicode_ci AS feedback_type,
+            'instructor' AS feedback_type,
             vr.rubric_instance_id AS rubric_instance_id,
             vr.rubric_instance_title AS rubric_instance_title,
             vr.capability_mark_type_id AS capability_mark_type_id,
@@ -281,7 +317,7 @@ FROM
 ORDER BY assessment_id, student_id, feedback_date, capability_sequence, capability_id, indicator_sequence, indicator_id;
 ```
 
-- [ ] **Step 2: Apply the view (Task 1 must already be applied so `v_rubric.rubric_instance_title` exists)**
+- [ ] **Step 5: Apply the view (Tasks 1–3 must already be done: `v_rubric.rubric_instance_title` exists and the server default collation is `utf8mb4_unicode_ci`)**
 
 Run:
 
@@ -291,7 +327,7 @@ mariadb -u schoolboxdocker -pabc123 -h 127.0.0.1 schoolbox < updates/26.1.beta7/
 
 Expected: no error. (If it errors with "Unknown column 'vr.rubric_instance_title'", Task 1's migration has not been applied yet — apply it first.)
 
-- [ ] **Step 3: Verify the new columns exist**
+- [ ] **Step 6: Verify the new columns exist**
 
 Run:
 
@@ -302,7 +338,7 @@ mariadb -u schoolboxdocker -pabc123 -h 127.0.0.1 schoolbox -N -e \
 
 Expected: rows returned, no "Unknown column" error.
 
-- [ ] **Step 4: Verify the collation fix — filtering feedback_type no longer errors**
+- [ ] **Step 7: Verify the collation fix — filtering feedback_type no longer errors (view recreated under the new server default)**
 
 Run:
 
@@ -311,9 +347,16 @@ mariadb -u schoolboxdocker -pabc123 -h 127.0.0.1 schoolbox -N -e \
   "SELECT COUNT(*) FROM v_rubric_mark WHERE feedback_type = 'instructor';"
 ```
 
-Expected: a number (e.g. hundreds), **not** `ERROR 1267 ... Illegal mix of collations`.
+Expected: a number (e.g. hundreds), **not** `ERROR 1267 ... Illegal mix of collations`. Also confirm the baked collation is right:
 
-- [ ] **Step 5: Verify row-count parity with the old feedback query (no rows lost/gained)**
+```bash
+mariadb -u schoolboxdocker -pabc123 -h 127.0.0.1 schoolbox -N -e \
+  "SELECT COLLATION_NAME FROM information_schema.COLUMNS WHERE TABLE_NAME='v_rubric_mark' AND COLUMN_NAME='feedback_type';"
+```
+
+Expected: `utf8mb4_unicode_ci`.
+
+- [ ] **Step 8: Verify row-count parity with the old feedback query (no rows lost/gained)**
 
 Pick an assessment+feedback that has marks (e.g. from `SELECT assessment_id, feedback_id, feedback_table FROM v_rubric_mark LIMIT 1;`) and compare counts:
 
@@ -330,7 +373,7 @@ SELECT (SELECT COUNT(*) FROM v_rubric_mark WHERE assessment_id=38 AND feedback_i
 
 Expected: `new_rows` == `old_rows` (adjust the ids to a real marked feedback in your DB).
 
-- [ ] **Step 6: Verify the existing markbook consumer still runs**
+- [ ] **Step 9: Verify the existing markbook consumer still runs**
 
 The other consumer of this view is `library/Schoolbox/Assessment/Rubric/Markbook/OverallDataset.php`. Sanity-check the view is still selectable the way that code joins it:
 
@@ -341,11 +384,11 @@ mariadb -u schoolboxdocker -pabc123 -h 127.0.0.1 schoolbox -N -e \
 
 Expected: a number, no error.
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 10: Commit**
 
 ```bash
-git add updates/26.1.beta7/rubric/17-v_rubric_mark.sql
-git commit -m "feat: extend v_rubric_mark with title, descriptor detail, utf8mb4 collation [SA-22780]"
+git add docker/mariadb/config/mariadb.conf.d/10-force-server-charset.cnf updates/26.1.beta7/rubric/17-v_rubric_mark.sql
+git commit -m "feat: default DB collation to utf8mb4_unicode_ci; extend v_rubric_mark [SA-22780]"
 ```
 
 ---
@@ -1108,7 +1151,7 @@ For an assessment with published instructor feedback that used rubric marks, con
 
 ## Self-Review Notes
 
-- **Spec coverage:** `v_rubric` title/weight (Task 1) → §Approach.1; `v_rubric_mark` title/descriptor/collation (Task 2) → §Approach.1a; `getRubrics` decoupling + array + deprecated singular (Task 3) → §Approach.2; agnostic feedback array via `v_rubric_mark` + deprecated singular (Task 4) → §Approach.3; caller sweep (Task 3 Step 6, Task 4 Step 6) → §Approach.4; docs (Task 5) → §Approach.5; testing incl. view checks + live JWT (Task 2 checks, Task 3/4 unit, Task 6) → §Testing.
+- **Spec coverage:** `v_rubric` title/weight (Task 1) → §Approach.1; `v_rubric_mark` title/descriptor (Task 2 Steps 4–10) → §Approach.1a; server-default collation fix (Task 2 Steps 1–3, the `10-force-server-charset.cnf` file) → §Approach.1b; `getRubrics` decoupling + array + deprecated singular (Task 3) → §Approach.2; agnostic feedback array via `v_rubric_mark` + deprecated singular (Task 4) → §Approach.3; caller sweep (Task 3 Step 6, Task 4 Step 6) → §Approach.4; docs (Task 5) → §Approach.5; testing incl. view checks + live JWT (Task 2 checks, Task 3/4 unit, Task 6) → §Testing.
 - **Feedback is agnostic:** `getRubricsFeedback` reads `v_rubric_mark` (submission_return + reporting_feedback), disambiguated by `feedback_table` from the call site and restricted to `feedback_type = 'instructor'` — this fixes reporting feedback rubrics (dropped today) and removes the `submission_box` coupling entirely. Performance confirmed non-regressive via `EXPLAIN` (predicate pushdown, ~3ms). The pre-existing per-feedback N+1 is unchanged and explicitly out of scope.
 - **Ordering dependency:** Task 2 (`v_rubric_mark`) selects `vr.rubric_instance_title`, which only exists after Task 1 is applied — Task 2 Step 2 calls this out. Tasks must run in order 1 → 2 → 3 → 4.
 - **Type consistency:** `buildTemplateRubrics`, `buildFeedbackRubrics`, `firstRubricAsLegacy`, `getRubrics`, `getRubricsFeedback` names are used identically across tasks. `firstRubricAsLegacy` is defined in Task 3 and reused in Task 4. `getRubricsFeedback` takes `(string $assessmentId, int $feedbackID, string $feedbackTable)` — the call site (Task 4 Step 5) passes all three.

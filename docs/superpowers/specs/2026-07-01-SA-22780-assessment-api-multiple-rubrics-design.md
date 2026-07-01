@@ -99,7 +99,7 @@ predicates into the UNION arms — every base table resolves as `const`/`ref` in
 whole-DB materialization, ~3ms. No regression versus the current query.
 
 New migration `updates/26.1.beta7/rubric/17-v_rubric_mark.sql` (CREATE OR REPLACE VIEW) redefines
-`v_rubric_mark` with three changes in **both** UNION arms:
+`v_rubric_mark` with two changes in **both** UNION arms:
 
 1. **Title:** add `vr.rubric_instance_title AS rubric_instance_title` (available once §1 lands).
 2. **Descriptor gap:** `v_rubric_mark` currently exposes only `descriptor_id`/`descriptor_name`. The
@@ -109,20 +109,32 @@ New migration `updates/26.1.beta7/rubric/17-v_rubric_mark.sql` (CREATE OR REPLAC
    AND rl.deleted_at IS NULL`, selecting `rd.max_value AS descriptor_max_value` and
    `rl.sequence AS descriptor_sequence`. Both joins are 0:1 (PK/eq_ref), so they do not change the
    view's row count for its existing consumer (`Rubric\Markbook\OverallDataset`).
-3. **Collation:** the reporting arm's string literal `'instructor' AS feedback_type` is created under
-   a `utf8mb3` connection, so `feedback_type` becomes a mixed-charset UNION column and
-   `WHERE feedback_type = 'instructor'` throws *Illegal mix of collations*. Normalise every string
-   expression the view emits to `utf8mb4_unicode_ci` — wrap `feedback_type` in both arms as
-   `CONVERT(<expr> USING utf8mb4) COLLATE utf8mb4_unicode_ci` (arm 1 `<expr>` = `sr.review_route`,
-   arm 2 `<expr>` = `'instructor'`). This is the "use `utf8mb4_unicode_ci` everywhere" rule applied to
-   the view's own output.
+
+The reporting arm's `'instructor' AS feedback_type` literal is left **bare** — see the collation
+fix below.
 
 Do **not** change the view's `INNER JOIN v_rubric_indicator_mark_extend` to a `LEFT JOIN`: that
 join semantics is shared with the markbook consumer, and row-for-row parity with the old feedback
 query was confirmed on real data (7 == 7 rows for a sample feedback).
 
-Base-table charset normalisation (some columns are `utf8mb3` at rest) is a broader concern and is
-**out of scope**; we only normalise the view's emitted string columns here.
+### 1b. Collation fix — at the server default, not in the view
+
+Filtering `WHERE feedback_type = 'instructor'` on `v_rubric_mark` throws *Illegal mix of collations*.
+Investigation showed the cause is **not** a table column — all string columns across the 14 tables
+feeding these views are already `utf8mb4_unicode_ci` (the only outlier, `submission_box.worksheet_template_hash`,
+is `ascii` and unused). The error is the reporting arm's hardcoded `'instructor'` literal baking in
+the **server default collation** `utf8mb4_uca1400_ai_ci` at view-creation time (confirmed: the error
+persists even under `SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci`).
+
+Fix it at the root: set the DB **server default** collation to `utf8mb4_unicode_ci` via
+`docker/mariadb/config/mariadb.conf.d/10-force-server-charset.cnf`
+(`[mariadbd]\ncharacter-set-server = utf8mb4\ncollation-server = utf8mb4_unicode_ci`). The image
+copies `config/mariadb.conf.d/*` into the container at build. With this default, the baked literal
+becomes `utf8mb4_unicode_ci`, so the view needs **no** `COLLATE`/`CONVERT` clause. **Ordering:** the
+config must be applied and the DB restarted **before** the `v_rubric_mark` migration recreates the
+view (otherwise the literal re-bakes as `uca1400_ai_ci`).
+
+Base-table charset normalisation (unrelated columns such as `ascii` hashes) is **out of scope**.
 
 ### 2. `getRubric` → `getRubrics` (rename)
 
@@ -202,8 +214,9 @@ other callers. (Expected to be internal to this Helper, but verify.)
 - Write/modify paths for rubrics (create/update). This is read-API only.
 - Frontend consumption of the new `rubrics` array.
 - Removal of the deprecated singular `rubric` (separate ticket after the 6-month window).
-- Normalising base-table column charsets (`utf8mb3` at rest). We only normalise the string columns
-  the redefined views emit to `utf8mb4_unicode_ci`.
+- Converting unrelated non-`utf8mb4_unicode_ci` columns (e.g. the `ascii`
+  `submission_box.worksheet_template_hash`). The columns in the view chain are already
+  `utf8mb4_unicode_ci`; the collation fix is the server default (§1b), not per-column ALTERs.
 - Eliminating the pre-existing per-feedback N+1 (one `getRubricsFeedback` call per participation
   item). Batching it into a single `v_rubric_mark` read is a worthwhile follow-up but not required
   here; `EXPLAIN` shows each call is a cheap index-lookup.
