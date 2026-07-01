@@ -1397,10 +1397,11 @@ class OverallDataset
                                 if (null !== $assessmentWeight) {
                                     $gridWeight = $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'];
                                     $effectiveWeight = $assessmentWeight * $gridWeight;
+                                    $numerator = $capabilityData[$node]['normalisedMark'] * $effectiveWeight;
 
                                     /* Jez Maths
                                      */
-                                    $overallMarks[$capabilityId]['students'][$studentId][$node]['formula']['numerator'] += $capabilityData[$node]['normalisedMark'] * $effectiveWeight;
+                                    $overallMarks[$capabilityId]['students'][$studentId][$node]['formula']['numerator'] += $numerator;
                                     $overallMarks[$capabilityId]['students'][$studentId][$node]['formula']['denominator'] += $effectiveWeight;
                                 }
                             }
