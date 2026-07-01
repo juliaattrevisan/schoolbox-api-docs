@@ -501,7 +501,12 @@ export default {
                     >
                         Award with evidence
                     </a>
-                    <button :title="submitButtonText" :isProcessing="isProcessing" @click.prevent="onSubmit">
+                    <button
+                        class="button"
+                        :title="submitButtonText"
+                        :isProcessing="isProcessing"
+                        @click.prevent="onSubmit"
+                    >
                         {{ submitButtonText }}
                     </button>
                 </section>

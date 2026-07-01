@@ -443,7 +443,11 @@ export default {
                             >
                                 Award with evidence
                             </a>
-                            <button v-if="hasGoalAwardLink() && isUnawardedGoal()" @click.prevent="awardAchievement">
+                            <button
+                                v-if="hasGoalAwardLink() && isUnawardedGoal()"
+                                class="button"
+                                @click.prevent="awardAchievement"
+                            >
                                 Award
                             </button>
                         </section>
