@@ -1325,45 +1325,29 @@ class OverallDataset
             foreach ($studentData['gridData'] as $assessmentId => $rubricInstanceData) {
                 foreach ($rubricInstanceData as $rubricInstanceId => $rubricGridData) {
                     foreach ($rubricGridData['capabilities'] as $capabilityId => $capabilityData) {
-                        if (null !== $capabilityData[self::MARK_NODE_PUBLISHED]['normalisedMark']) {
-                            /* Initialise and add it to the published capability total for this guy
-                             */
-                            if (!isset($coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight'][self::MARK_NODE_PUBLISHED])) {
-                                $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight'][self::MARK_NODE_PUBLISHED] = 0;
+                        foreach (self::MARK_NODES as $node) {
+                            if (null !== $capabilityData[$node]['normalisedMark']) {
+                                /* Initialise and add it to the published capability total for this guy
+                                 */
+                                if (!isset($coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight'][$node])) {
+                                    $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight'][$node] = 0;
+                                }
+
+                                $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight'][$node] += $coefficients['assessments'][$assessmentId];
                             }
-
-                            $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight'][self::MARK_NODE_PUBLISHED] += $coefficients['assessments'][$assessmentId];
-                        }
-
-                        if (null !== $capabilityData[self::MARK_NODE_DRAFT]['normalisedMark']) {
-                            /* Initialise and add it to the draft capability total for this guy
-                             */
-                            if (!isset($coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight'][self::MARK_NODE_DRAFT])) {
-                                $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight'][self::MARK_NODE_DRAFT] = 0;
-                            }
-
-                            $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight'][self::MARK_NODE_DRAFT] += $coefficients['assessments'][$assessmentId];
                         }
 
                         foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
-                            if (null !== $indicatorData[self::MARK_NODE_PUBLISHED]['normalisedMark']) {
-                                /* Initialise and add it to the published indicator total for this guy
-                                 */
-                                if (!isset($coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight'][self::MARK_NODE_PUBLISHED])) {
-                                    $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight'][self::MARK_NODE_PUBLISHED] = 0;
+                            foreach (self::MARK_NODES as $node) {
+                                if (null !== $indicatorData[$node]['normalisedMark']) {
+                                    /* Initialise and add it to the published indicator total for this guy
+                                     */
+                                    if (!isset($coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight'][$node])) {
+                                        $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight'][$node] = 0;
+                                    }
+
+                                    $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight'][$node] += $coefficients['assessments'][$assessmentId];
                                 }
-
-                                $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight'][self::MARK_NODE_PUBLISHED] += $coefficients['assessments'][$assessmentId];
-                            }
-
-                            if (null !== $indicatorData[self::MARK_NODE_DRAFT]['normalisedMark']) {
-                                /* Initialise and add it to the draft indicator total for this guy
-                                 */
-                                if (!isset($coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight'][self::MARK_NODE_DRAFT])) {
-                                    $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight'][self::MARK_NODE_DRAFT] = 0;
-                                }
-
-                                $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight'][self::MARK_NODE_DRAFT] += $coefficients['assessments'][$assessmentId];
                             }
                         }
                     }
