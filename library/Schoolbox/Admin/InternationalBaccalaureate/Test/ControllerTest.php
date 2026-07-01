@@ -1089,6 +1089,84 @@ class ControllerTest extends TestCase
         $this->assertSame(RegistrationSessionStudentModel::STATUS_UNCONFIRMED, $studentThree->getStatus());
     }
 
+    public function testSessionRegisterViaApiRejectsMissingSchoolCode(): void
+    {
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('getDatabase');
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('findStudentsForSession');
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('save');
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class),
+            configOverrides: [
+                ConfigMapper::NAME_IB_SCHOOL_CODE => '',
+            ]
+        );
+        $controller->setRequestPost(new Values([
+            'studentIds' => [123],
+        ]));
+
+        $controller->sessionRegisterViaApi((new RegistrationSessionModel())->setId(12));
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(400, $response->getStatusCode());
+
+        $payload = json_decode((string) $response->getBody(), true);
+        $this->assertSame(400, $payload['status']);
+        $this->assertSame(
+            'School code and School name must be configured before registering candidates via API.',
+            $payload['title']
+        );
+    }
+
+    public function testSessionRegisterViaApiRejectsMissingSchoolName(): void
+    {
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('getDatabase');
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('findStudentsForSession');
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('save');
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class),
+            configOverrides: [
+                ConfigMapper::NAME_IB_SCHOOL_NAME => '',
+            ]
+        );
+        $controller->setRequestPost(new Values([
+            'studentIds' => [123],
+        ]));
+
+        $controller->sessionRegisterViaApi((new RegistrationSessionModel())->setId(12));
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(400, $response->getStatusCode());
+
+        $payload = json_decode((string) $response->getBody(), true);
+        $this->assertSame(400, $payload['status']);
+        $this->assertSame(
+            'School code and School name must be configured before registering candidates via API.',
+            $payload['title']
+        );
+    }
+
     public function testRenotifyUnconfirmedReportsPartialSuccess(): void
     {
         $unconfirmedStudent = $this->buildStudent(
@@ -2258,7 +2336,8 @@ class ControllerTest extends TestCase
         ?UserMapper $userMapper = null,
         ?User $currentUser = null,
         ?Environment $twig = null,
-        ?RegistrationApiResponseLogHelper $registrationApiResponseLogHelper = null
+        ?RegistrationApiResponseLogHelper $registrationApiResponseLogHelper = null,
+        array $configOverrides = []
     ): Controller {
         $registrationSessionStudentHelper = new RegistrationSessionStudentHelper();
         $routeGenerator = $this->createStub(Generator::class);
@@ -2381,7 +2460,7 @@ class ControllerTest extends TestCase
                 $currentUser,
             ),
             $registrationSessionStudentHelper,
-            $registrationApiResponseLogHelper ?? $this->createConfiguredMock(
+            $registrationApiResponseLogHelper ?? $this->createConfiguredStub(
                 RegistrationApiResponseLogHelper::class,
                 [
                     'getLatestErrorMessagesByStudentId' => [],
@@ -2403,7 +2482,7 @@ class ControllerTest extends TestCase
             )
         );
         $controller->setRequest($httpFactory->createServerRequest('GET', '/')->withParsedBody([]));
-        $controller->setDi($this->buildContainer());
+        $controller->setDi($this->buildContainer($configOverrides));
         $controller->setAuthorizer($authorizer);
         $controller->setRouteGenerator($routeGenerator);
         $controller->setUser($currentUser);
@@ -2411,9 +2490,9 @@ class ControllerTest extends TestCase
         return $controller;
     }
 
-    private function buildContainer(): ContainerInterface
+    private function buildContainer(array $configOverrides = []): ContainerInterface
     {
-        $configLoader = $this->buildConfigLoader();
+        $configLoader = $this->buildConfigLoader($configOverrides);
 
         return new class ($configLoader) implements ContainerInterface {
             public function __construct(private IConfigLoader $configLoader)
@@ -2436,15 +2515,16 @@ class ControllerTest extends TestCase
         };
     }
 
-    private function buildConfigLoader(): IConfigLoader
+    private function buildConfigLoader(array $configOverrides = []): IConfigLoader
     {
-        return new ArrayLoader([
+        return new ArrayLoader(array_replace([
             ConfigMapper::NAME_IB_SCHOOL_NAME => 'Example School',
+            ConfigMapper::NAME_IB_SCHOOL_CODE => '123456',
             ConfigMapper::NAME_NAME_FORMAT => '{title} {firstname} {lastname}',
             'debug_mode' => true,
             'debug_templates' => false,
             'strict_templates' => false,
-        ]);
+        ], $configOverrides));
     }
 
     private function buildRegistrationSession(): RegistrationSessionModel
