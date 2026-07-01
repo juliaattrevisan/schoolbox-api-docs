@@ -1225,66 +1225,13 @@ class OverallDataset
         ?Folder\Model $folder,
         bool $includeDiagnostic
     ): array {
-        /* Non-iterable Coefficients Lookup
-         *
-         * Coefficients of a weighted sum algorithm are tabulated here, per student, for convenience.
-         * This saves you having to constantly traverse data sets to get something for the WeightedAggregator formula.
-         *
-         * NOTE That this is intended as a HASH LOOKUP ONLY.
-         * IT IS NOT intended for you to foreach() because of its intentional structure.
-         *
-         * I didn't really have the time or inclination to convert this to a tightly-typed struct with limited access.
-         * The next evolution of this would be a defined object, Coefficients, which is immutable: pass $assessments
-         * as a dependency, ->generate(), and only have read methods to a coordinate in the struct. This would make it
-         * effectively readonly once generated.
-         */
-
-        /* $coefficients is a set of supposedly-convenient values that we can quickly reference
-         *
-        $coefficient['assessments'][$assessmentId]
-          The weight of an individual assessment.
-
-        $coefficients['grids'][$rubricInstanceId]
-          The weight of a particular rubric grid.
-
-        $coefficients['grids']['assessments'][$assessmentId]
-          The total weight of the rubric grids in $assessmentId. This is used to calculate a weight sum of each rubric
-          grid's contribution to the overall value.
-
-        $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight'][self::MARK_NODE_PUBLISHED]
-          The total weight of the capability's usages across all the assessments where the student had a mark.
-          This aggregates toward a denominator for "assessment total weight" for this constituent of a rubric grid.
-          It only accumulates if a student had a mark in it; this denominator is specifically for a particular guy
-          There's a "published" and "draft" variants of this
-
-        $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight'][self::MARK_NODE_PUBLISHED]
-          The total weight of the indicator's usages across all the assessments where the student had a mark.
-          This aggregates toward a denominator for "assessment total weight" for this constituent of a rubric grid.
-          It only accumulates if a student had a mark in it; this denominator is specifically for a particular guy
-          There's a "published" and "draft" variants of this
-        */
-        $coefficients = [];
-
         /* Precalculate all the coefficients now that we have assembled $assessments in its entirety with all its
          * capabilities and indicators and their max_values.
          */
         $overallMarks = [];
 
         foreach ($assessments as $assessmentId => $assessmentData) {
-            $coefficients['assessments'][$assessmentId] = $assessmentData['weight'];
-
             foreach ($assessmentData['gridData'] as $rubricInstanceId => $rubricGridData) {
-                if (!isset($coefficients['grids']['assessments'][$assessmentId])) {
-                    $coefficients['grids']['assessments'][$assessmentId] = [
-                        'totalGridWeight' => 0,
-                    ];
-                }
-
-                /* Total weight of all the grids in a particular assessment
-                 */
-                $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'] += $rubricGridData['weight'];
-                $coefficients['grids'][$rubricInstanceId] = $rubricGridData['weight'] ? (float)$rubricGridData['weight'] : null;
-
                 /* Set up OverallMarks struct
                  *
                  * This pre-compiles capability/indicator structs while we're traversing this $assessments struct.
@@ -1313,42 +1260,6 @@ class OverallDataset
                                  */
                                 'students' => []
                             ];
-                        }
-                    }
-                }
-            }
-        }
-
-        /* Precompute denominators for each student's capabilities and indicators
-         */
-        foreach ($studentMarks as $studentId => $studentData) {
-            foreach ($studentData['gridData'] as $assessmentId => $rubricInstanceData) {
-                foreach ($rubricInstanceData as $rubricInstanceId => $rubricGridData) {
-                    foreach ($rubricGridData['capabilities'] as $capabilityId => $capabilityData) {
-                        foreach (self::MARK_NODES as $node) {
-                            if (null !== $capabilityData[$node]['normalisedMark']) {
-                                /* Initialise and add it to the published capability total for this guy
-                                 */
-                                if (!isset($coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight'][$node])) {
-                                    $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight'][$node] = 0;
-                                }
-
-                                $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight'][$node] += $coefficients['assessments'][$assessmentId];
-                            }
-                        }
-
-                        foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
-                            foreach (self::MARK_NODES as $node) {
-                                if (null !== $indicatorData[$node]['normalisedMark']) {
-                                    /* Initialise and add it to the published indicator total for this guy
-                                     */
-                                    if (!isset($coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight'][$node])) {
-                                        $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight'][$node] = 0;
-                                    }
-
-                                    $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight'][$node] += $coefficients['assessments'][$assessmentId];
-                                }
-                            }
                         }
                     }
                 }
