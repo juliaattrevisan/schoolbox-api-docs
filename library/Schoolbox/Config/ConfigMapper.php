@@ -399,6 +399,12 @@ class ConfigMapper extends Mapper
     public const string NAME_SKIN_FAVICON = 'skin_favicon';
     public const string NAME_SONAR_UI_TOGGLE = 'advanced_ui_enabled';
     public const string NAME_SONAR_SKIN_CUSTOM_CSS = 'skin_sonar_custom_css';
+    public const string NAME_SONAR_SKIN_COLOUR_BODY_BACKGROUND = 'skin_colour_body_background';
+    public const string NAME_SONAR_SKIN_COLOUR_MENU_BACKGROUND = 'skin_colour_menu_background';
+    public const string NAME_SONAR_SKIN_COLOUR_MENU_FOREGROUND = 'skin_colour_menu_foreground';
+    public const string NAME_SONAR_SKIN_COLOUR_ACCENT = 'skin_colour_accent';
+    public const string NAME_SONAR_SKIN_COLOUR_ACCENT_TEXT = 'skin_colour_accent_text';
+    public const string NAME_SONAR_SKIN_COLOUR_ACTIVE = 'skin_colour_active';
 
 
     /* Skin Config Categories

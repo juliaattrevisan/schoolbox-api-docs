@@ -94,6 +94,16 @@
         window.sbProps.iframelyLicenseKey = "{{ config.iframely_license_key_public ?? null }}";
 
         window.sbProps.colourDefaults = {
+            {% if config.advanced_ui_enabled %}
+            "skin" : [
+                "{{ config.skin_colour_body_background }}",
+                "{{ config.skin_colour_menu_background }}",
+                "{{ config.skin_colour_menu_foreground }}",
+                "{{ config.skin_colour_accent }}",
+                "{{ config.skin_colour_accent_text }}",
+                "{{ config.skin_colour_active }}",
+            ],
+            {% else %}
             "skin" : [
                 "{{ config.skin_colour_navigation_background }}",
                 "{{ config.skin_colour_content_ui_foreground }}",
@@ -103,6 +113,7 @@
                 "{{ config.skin_colour_navigation_foreground }}",
                 "{{ config.skin_colour_content_ui_submit_background }}",
             ],
+            {% endif %}
             "constant": [
                 "rgb(50, 114, 226)",
                 "rgb(101, 168, 101)",
