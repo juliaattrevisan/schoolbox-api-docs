@@ -201,24 +201,8 @@ class Mapper extends BaseMapper
         }
         $statement->execute();
 
-        $collection = $this->createCollection();
-        $userMapper = $this->getJoinMapper('user');
-        $sessionRows = $statement->fetchAll(\PDO::FETCH_ASSOC);
-        $sessions = [];
-        foreach ($sessionRows as $row) {
-            $session = $this->hydrate($row);
-            $sessions[] = $session;
-
-            /** @var \Schoolbox\User|null $sessionUser */
-            $sessionUser = $userMapper->hydrate($row, 'u');
-            if ($sessionUser) {
-                $session->setUser($sessionUser);
-            }
-
-            $collection->add($session);
-        }
-
-        new SessionSummariser($this->getDatabase())->hydrateSessionsWithSummaryInfo($sessions);
+        $collection = $this->hydrateSelect($statement);
+        new SessionSummariser($this->getDatabase())->hydrateSessionsWithSummaryInfo($collection);
 
         return $collection;
     }

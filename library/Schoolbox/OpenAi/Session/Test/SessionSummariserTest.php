@@ -12,6 +12,7 @@ namespace Schoolbox\OpenAi\Session\Test;
 use PDOStatement;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
+use Schoolbox\GenericCollection;
 use Schoolbox\OpenAi\Moderation\Event\Status as ModerationEventStatus;
 use Schoolbox\OpenAi\Session\Model;
 use Schoolbox\OpenAi\Session\SessionSummariser;
@@ -59,7 +60,7 @@ class SessionSummariserTest extends TestCase
         );
         $session = new Model()->setId('session-1');
 
-        $summariser->hydrateSessionsWithSummaryInfo([$session]);
+        $summariser->hydrateSessionsWithSummaryInfo($this->createSessionCollection($session));
 
         $this->assertSame('agent-chat', $session->getDerivedFirstViewableLogFormat());
         $this->assertTrue($session->getDerivedHasError());
@@ -85,7 +86,7 @@ class SessionSummariserTest extends TestCase
         );
         $session = new Model()->setId('session-1');
 
-        $summariser->hydrateSessionsWithSummaryInfo([$session]);
+        $summariser->hydrateSessionsWithSummaryInfo($this->createSessionCollection($session));
 
         $this->assertNull($session->getDerivedFirstViewableLogFormat());
         $this->assertFalse($session->getDerivedHasError());
@@ -118,7 +119,7 @@ class SessionSummariserTest extends TestCase
         );
         $session = new Model()->setId('session-1');
 
-        $summariser->hydrateSessionsWithSummaryInfo([$session]);
+        $summariser->hydrateSessionsWithSummaryInfo($this->createSessionCollection($session));
 
         $this->assertSame(ModerationEventStatus::REQUIRES_ATTENTION->value, $session->getDerivedModerationStatus());
     }
@@ -163,7 +164,7 @@ class SessionSummariserTest extends TestCase
         $firstSession = new Model()->setId('session-1');
         $secondSession = new Model()->setId('session-2');
 
-        $summariser->hydrateSessionsWithSummaryInfo([$firstSession, $secondSession]);
+        $summariser->hydrateSessionsWithSummaryInfo($this->createSessionCollection($firstSession, $secondSession));
 
         $this->assertSame('agent-chat', $firstSession->getDerivedFirstViewableLogFormat());
         $this->assertFalse($firstSession->getDerivedHasError());
@@ -227,5 +228,14 @@ class SessionSummariserTest extends TestCase
         };
 
         return new SessionSummariser($database);
+    }
+
+    /**
+     * @param Model ...$sessions
+     * @return GenericCollection<Model>
+     */
+    private function createSessionCollection(Model ...$sessions): GenericCollection
+    {
+        return new GenericCollection(Model::class, $sessions);
     }
 }

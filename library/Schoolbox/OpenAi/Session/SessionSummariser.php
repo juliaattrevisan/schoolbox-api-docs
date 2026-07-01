@@ -13,6 +13,7 @@ namespace Schoolbox\OpenAi\Session;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
+use Schoolbox\GenericCollection;
 use Schoolbox\OpenAi\Moderation\Event\Status as ModerationEventStatus;
 
 /**
@@ -58,17 +59,19 @@ class SessionSummariser
     /**
      * Hydrate multiple sessions with the derived fields used by the admin usage list.
      *
-     * @param list<Model> $sessions
+     * @param GenericCollection<Model> $sessions
      * @return void
      */
-    public function hydrateSessionsWithSummaryInfo(array $sessions): void
+    public function hydrateSessionsWithSummaryInfo(GenericCollection $sessions): void
     {
-        $sessionIds = array_values(
-            array_filter(
-                array_map(static fn(Model $session) => $session->getId(), $sessions),
-                static fn(?string $sessionId) => null !== $sessionId
-            )
-        );
+        $sessionIds = [];
+        foreach ($sessions as $session) {
+            $sessionId = $session->getId();
+            if (null !== $sessionId) {
+                $sessionIds[] = $sessionId;
+            }
+        }
+
         $sessionLogRowsBySessionId = $this->getSessionLogRowsBySessionId($sessionIds);
         $moderationEventRowsBySessionId = $this->getModerationEventRowsBySessionId($sessionIds);
 
