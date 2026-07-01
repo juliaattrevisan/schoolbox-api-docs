@@ -61,7 +61,7 @@ class SessionSummariserTest extends TestCase
 
         $summariser->hydrateSessionsWithSummaryInfo([$session]);
 
-        $this->assertSame('agent-chat', $session->getDerivedLogFormat());
+        $this->assertSame('agent-chat', $session->getDerivedFirstViewableLogFormat());
         $this->assertTrue($session->getDerivedHasError());
     }
 
@@ -87,7 +87,7 @@ class SessionSummariserTest extends TestCase
 
         $summariser->hydrateSessionsWithSummaryInfo([$session]);
 
-        $this->assertNull($session->getDerivedLogFormat());
+        $this->assertNull($session->getDerivedFirstViewableLogFormat());
         $this->assertFalse($session->getDerivedHasError());
     }
 
@@ -165,11 +165,11 @@ class SessionSummariserTest extends TestCase
 
         $summariser->hydrateSessionsWithSummaryInfo([$firstSession, $secondSession]);
 
-        $this->assertSame('agent-chat', $firstSession->getDerivedLogFormat());
+        $this->assertSame('agent-chat', $firstSession->getDerivedFirstViewableLogFormat());
         $this->assertFalse($firstSession->getDerivedHasError());
         $this->assertSame(ModerationEventStatus::NO_ACTION_REQUIRED->value, $firstSession->getDerivedModerationStatus());
 
-        $this->assertSame('guardrail', $secondSession->getDerivedLogFormat());
+        $this->assertSame('guardrail', $secondSession->getDerivedFirstViewableLogFormat());
         $this->assertTrue($secondSession->getDerivedHasError());
         $this->assertSame(
             ModerationEventStatus::FURTHER_ACTION_REQUIRED->value,

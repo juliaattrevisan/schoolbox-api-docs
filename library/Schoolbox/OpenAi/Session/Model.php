@@ -50,7 +50,7 @@ class Model
      *
      * @var string|null
      */
-    private ?string $derivedLogFormat = null;
+    private ?string $derivedFirstViewableLogFormat = null;
 
     /**
      * Whether any log in this session has an error condition.
@@ -132,18 +132,18 @@ class Model
     /**
      * @return string|null
      */
-    public function getDerivedLogFormat(): ?string
+    public function getDerivedFirstViewableLogFormat(): ?string
     {
-        return $this->derivedLogFormat;
+        return $this->derivedFirstViewableLogFormat;
     }
 
     /**
-     * @param string|null $derivedLogFormat
+     * @param string|null $derivedFirstViewableLogFormat
      * @return $this
      */
-    public function setDerivedLogFormat(?string $derivedLogFormat): self
+    public function setDerivedFirstViewableLogFormat(?string $derivedFirstViewableLogFormat): self
     {
-        $this->derivedLogFormat = $derivedLogFormat;
+        $this->derivedFirstViewableLogFormat = $derivedFirstViewableLogFormat;
         return $this;
     }
 

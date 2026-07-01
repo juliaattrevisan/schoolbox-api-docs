@@ -96,14 +96,14 @@ class SessionSummariser
      */
     private function hydrateSessionWithSummaryInfo(Model $session, array $sessionLogRows, array $moderationEventRows): void
     {
-        $derivedLogFormat = null;
+        $derivedFirstViewableLogFormat = null;
         $derivedHasError = false;
         $moderationStatus = null;
         $moderationStatusPriority = count(self::MODERATION_STATUS_PRIORITY);
 
         foreach ($sessionLogRows as $row) {
-            if (null === $derivedLogFormat && null !== $row['log_format']) {
-                $derivedLogFormat = $row['log_format'];
+            if (null === $derivedFirstViewableLogFormat && null !== $row['log_format']) {
+                $derivedFirstViewableLogFormat = $row['log_format'];
             }
 
             $returnCode = $row['return_code'];
@@ -125,7 +125,7 @@ class SessionSummariser
         }
 
         $session
-            ->setDerivedLogFormat($derivedLogFormat)
+            ->setDerivedFirstViewableLogFormat($derivedFirstViewableLogFormat)
             ->setDerivedHasError($derivedHasError)
             ->setDerivedModerationStatus($moderationStatus);
     }
