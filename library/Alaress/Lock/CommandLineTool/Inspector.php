@@ -131,7 +131,7 @@ class Inspector extends CliTool\App
         // Data Retention, hard delete things that were soft deleted
         \Schoolbox\Admin\DataRetention\CommandLineTool::LOCK_NAME => 'Data Retention Cleanup tool (./tools/dataRetention/process.php)',
 
-        // AI moderation queue placeholder
+        // AI moderation queue cron
         ModerationQueueTool::LOCK_NAME => 'AI Moderation Queue (./tools/ai/moderation-queue.php)',
     ];
 
