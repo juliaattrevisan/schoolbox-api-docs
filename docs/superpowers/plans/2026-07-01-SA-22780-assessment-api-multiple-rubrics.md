@@ -6,7 +6,7 @@
 
 **Architecture:** Both rubric payloads are produced in `library/Schoolbox/Learning/Assessment/API/Helper.php`. The migrated schema already links `rubric_instance` to `assessment_id` (many-per-assessment) and the `v_rubric` view already joins it. We (1) expose the instance `title`/`weight` through `v_rubric`, (2) extract the flat-rows→nested-structure reshaping into pure, unit-testable methods that group by `rubric_instance_id`, and (3) rewire the two producing methods and their call sites to emit a `rubrics` array plus a deprecated singular `rubric`.
 
-**Tech Stack:** PHP 8 (no `declare(strict_types=1)` in `Helper.php`), PDO, MySQL views, PHPUnit 12, Redocly OpenAPI docs (separate repo `schoolbox-api-docs`).
+**Tech Stack:** PHP 8 (no `declare(strict_types=1)` in `Helper.php`), PDO, MariaDB 11.8 views (`condition_pushdown_for_derived=on`), PHPUnit 12, Redocly OpenAPI docs (separate repo `schoolbox-api-docs`).
 
 ## Global Constraints
 
@@ -14,9 +14,11 @@
 - Ticket tag for commits: `[SA-22780]`.
 - **Non-breaking contract:** always emit `rubrics` (an array, `[]` when none). Keep singular `rubric` populated as `rubrics[0]` reduced to `{capabilities: [...]}`, or `null` when there are no rubrics. The singular is a 6-month deprecation shim and is intentionally lossy for multi-rubric assessments.
 - Template rubric item shape: `{ id, title, weight, capabilities: [...] }`. Feedback rubric item shape: `{ id, title, capabilities: [...] }` (no `weight`).
-- Preserve all existing feedback query filters, including `sr.review_route = 'instructor'` and `rcm.feedback_table = 'submission_return'`.
+- Feedback is now **agnostic**: it reads the `v_rubric_mark` view, which unions `submission_return` (due work) + `reporting_feedback` (reporting) rubric marks. Preserve instructor-only behaviour via `feedback_type = 'instructor'` (this replaces the old `review_route='instructor'` + hardcoded `feedback_table='submission_return'`).
+- **Collation:** every string column the redefined views emit must be `utf8mb4_unicode_ci`. Normalise string literals with `CONVERT(<expr> USING utf8mb4) COLLATE utf8mb4_unicode_ci` (base-table charset normalisation is out of scope).
 - `Helper.php` has **no** `declare(strict_types=1)`; int→string arg coercion at call sites is intentional — do not add strict types.
 - PHP test command: `vendor/bin/phpunit <path-to-test-file>` from the repo root.
+- DB access for view verification: `mariadb -u schoolboxdocker -pabc123 -h 127.0.0.1 schoolbox` (MariaDB 11.8.6).
 - Docs lint command: `npm test` (runs `redocly lint`) from the `schoolbox-api-docs` repo root.
 
 ---
@@ -25,7 +27,8 @@
 
 **`schoolbox` repo:**
 - Create: `updates/26.1.beta7/rubric/16-v_rubric.sql` — redefines the `v_rubric` view to also expose `rubric_instance.title` and `rubric_instance.weight`.
-- Modify: `library/Schoolbox/Learning/Assessment/API/Helper.php` — rename + rewire the two rubric methods, add two pure reshaping methods and one legacy-shim method, update three call sites.
+- Create: `updates/26.1.beta7/rubric/17-v_rubric_mark.sql` — redefines the `v_rubric_mark` view to add `rubric_instance_title`, `descriptor_max_value`/`descriptor_sequence`, and normalise `feedback_type` to `utf8mb4_unicode_ci`.
+- Modify: `library/Schoolbox/Learning/Assessment/API/Helper.php` — rename + rewire the two rubric methods (template reads `v_rubric`, feedback reads `v_rubric_mark`), add two pure reshaping methods and one legacy-shim method, update three call sites.
 - Create: `library/Schoolbox/Learning/Assessment/Test/API/RubricReshapeTest.php` — unit tests for the pure reshaping methods (via reflection, matching the module's existing test style).
 
 **`schoolbox-api-docs` repo (`/home/james/Sites/schoolbox-api-docs`):**
@@ -42,7 +45,7 @@
 - Create: `updates/26.1.beta7/rubric/16-v_rubric.sql`
 
 **Interfaces:**
-- Produces: `v_rubric` columns `rubric_instance_title` (varchar, nullable) and `rubric_instance_weight` (decimal, nullable), present in **both** UNION arms. Tasks 2 and 3 read these.
+- Produces: `v_rubric` columns `rubric_instance_title` (varchar, nullable) and `rubric_instance_weight` (decimal, nullable), present in **both** UNION arms. Task 2 (`v_rubric_mark`) and Task 3 (template rubrics) read these.
 
 This is a `CREATE OR REPLACE VIEW` migration copied from `updates/26.1.beta4/rubric/16-v_rubric.sql` with two extra selected columns in each arm. There is no PHP test; verification is by applying it and querying the view.
 
@@ -131,10 +134,10 @@ ORDER BY assessment_id, rubric_instance_id, capability_sequence, capability_id, 
 
 - [ ] **Step 2: Apply the view to the dev database**
 
-Run (adjust the mysql invocation to your dev environment; the token in the task targets `docker.dev.schoolbox.cloud`):
+Run:
 
 ```bash
-mysql schoolbox < updates/26.1.beta7/rubric/16-v_rubric.sql
+mariadb -u schoolboxdocker -pabc123 -h 127.0.0.1 schoolbox < updates/26.1.beta7/rubric/16-v_rubric.sql
 ```
 
 Expected: no error.
@@ -144,7 +147,7 @@ Expected: no error.
 Run:
 
 ```bash
-mysql schoolbox -e "SELECT DISTINCT rubric_instance_id, rubric_instance_title, rubric_instance_weight FROM v_rubric LIMIT 5;"
+mariadb -u schoolboxdocker -pabc123 -h 127.0.0.1 schoolbox -e "SELECT DISTINCT rubric_instance_id, rubric_instance_title, rubric_instance_weight FROM v_rubric LIMIT 5;"
 ```
 
 Expected: rows returned including non-null `rubric_instance_title` values (given seeded rubric data). No "Unknown column" error.
@@ -158,7 +161,196 @@ git commit -m "feat: expose rubric instance title & weight via v_rubric [SA-2278
 
 ---
 
-## Task 2: Template rubrics — `getRubric` → `getRubrics` (array of titled rubrics)
+## Task 2: Redefine `v_rubric_mark` (title, descriptor columns, collation)
+
+**Files:**
+- Create: `updates/26.1.beta7/rubric/17-v_rubric_mark.sql`
+
+**Interfaces:**
+- Consumes: `v_rubric.rubric_instance_title` from Task 1.
+- Produces: `v_rubric_mark` gains `rubric_instance_title`, `descriptor_max_value`, `descriptor_sequence`, and a `feedback_type` normalised to `utf8mb4_unicode_ci`. Task 4 (`getRubricsFeedback`) reads these.
+
+This is a `CREATE OR REPLACE VIEW` migration based on `updates/26.1.beta4/rubric/17-v_rubric_mark.sql` with three changes in **both** UNION arms: (1) select `vr.rubric_instance_title`, (2) `LEFT JOIN rubric_descriptor` + `rubric_level` to expose `descriptor_max_value`/`descriptor_sequence`, (3) wrap `feedback_type` in `CONVERT(... USING utf8mb4) COLLATE utf8mb4_unicode_ci` to fix the mixed-collation error. The `INNER JOIN v_rubric_indicator_mark_extend` is left unchanged (shared with the markbook consumer; row parity verified). No PHP test; verified by querying the view.
+
+- [ ] **Step 1: Create the migration file**
+
+Create `updates/26.1.beta7/rubric/17-v_rubric_mark.sql` with this exact content:
+
+```sql
+-- Extend v_rubric_mark for the agnostic Assessment feedback API (SA-22780):
+--  * expose rubric_instance_title (from v_rubric)
+--  * expose descriptor_max_value / descriptor_sequence (LEFT JOIN rubric_descriptor + rubric_level)
+--  * normalise feedback_type to utf8mb4_unicode_ci (the reporting arm's 'instructor' literal was
+--    created under a utf8mb3 connection, causing "Illegal mix of collations" on WHERE feedback_type=...)
+-- The INNER JOIN to v_rubric_indicator_mark_extend is unchanged (shared with the rubric markbook).
+
+CREATE OR REPLACE VIEW v_rubric_mark AS
+SELECT *
+FROM
+    (
+        SELECT DISTINCT
+            vr.assessment_id AS assessment_id,
+            rcm.feedback_id AS feedback_id,
+            rcm.feedback_table AS feedback_table,
+            sr.owner AS student_id,
+            sr.marker AS marker_id,
+            sr.published_at AS feedback_date,
+            CONVERT(sr.review_route USING utf8mb4) COLLATE utf8mb4_unicode_ci AS feedback_type,
+            vr.rubric_instance_id AS rubric_instance_id,
+            vr.rubric_instance_title AS rubric_instance_title,
+            vr.capability_mark_type_id AS capability_mark_type_id,
+            vr.capability_grade_group_id AS capability_grade_group_id,
+            vr.capability_id AS capability_id,
+            vr.capability_name AS capability_name,
+            vr.capability_max_value AS capability_max_value,
+            IF (rcm.valid, rcm.value, NULL) AS capability_mark,
+            IF (rcm.valid, rcm.human_readable_value, NULL) AS capability_human_readable_mark,
+            vr.capability_sequence AS capability_sequence,
+            vr.indicator_id AS indicator_id,
+            vr.indicator_name AS indicator_name,
+            vr.indicator_max_value AS indicator_max_value,
+            IF (rim.valid, rim.value, NULL) AS indicator_mark,
+            vr.indicator_sequence AS indicator_sequence,
+            rim.descriptor_id AS descriptor_id,
+            rim.descriptor_name AS descriptor_name,
+            rd.max_value AS descriptor_max_value,
+            rl.sequence AS descriptor_sequence
+        FROM v_rubric vr
+        INNER JOIN submission_box sb ON vr.assessment_id = sb.assessment_id
+        INNER JOIN submission_return sr ON sb.id = sr.box_id
+        INNER JOIN rubric_capability_mark rcm ON vr.rubric_instance_id = rcm.rubric_instance_id
+            AND rcm.rubric_capability_id = vr.capability_id
+            AND rcm.feedback_id = sr.id
+            AND rcm.feedback_table = 'submission_return'
+        INNER JOIN v_rubric_indicator_mark_extend rim ON rim.rubric_capability_mark_id = rcm.id
+            AND vr.indicator_id = rim.rubric_indicator_id
+        LEFT JOIN rubric_descriptor rd ON rim.descriptor_id = rd.id AND rd.deleted_at IS NULL
+        LEFT JOIN rubric_level rl ON rd.level_id = rl.id
+            AND vr.rubric_instance_id = rl.rubric_instance_id
+            AND rl.deleted_at IS NULL
+        WHERE sr.deleted_at IS NULL
+          AND sr.published_at IS NOT NULL
+          AND (rcm.valid IS TRUE OR rim.valid IS TRUE)
+
+        UNION
+
+        SELECT DISTINCT
+            vr.assessment_id AS assessment_id,
+            rcm.feedback_id AS feedback_id,
+            rcm.feedback_table AS feedback_table,
+            rf.learner_id AS student_id,
+            rf.instructor_id AS marker_id,
+            rf.published_at AS feedback_date,
+            CONVERT('instructor' USING utf8mb4) COLLATE utf8mb4_unicode_ci AS feedback_type,
+            vr.rubric_instance_id AS rubric_instance_id,
+            vr.rubric_instance_title AS rubric_instance_title,
+            vr.capability_mark_type_id AS capability_mark_type_id,
+            vr.capability_grade_group_id AS capability_grade_group_id,
+            vr.capability_id AS capability_id,
+            vr.capability_name AS capability_name,
+            vr.capability_max_value AS capability_max_value,
+            IF (rcm.valid, rcm.value, NULL) AS capability_mark,
+            IF (rcm.valid, rcm.human_readable_value, NULL) AS capability_human_readable_mark,
+            vr.capability_sequence AS capability_sequence,
+            vr.indicator_id AS indicator_id,
+            vr.indicator_name AS indicator_name,
+            vr.indicator_max_value AS indicator_max_value,
+            IF (rim.valid, rim.value, NULL) AS indicator_mark,
+            vr.indicator_sequence AS indicator_sequence,
+            rim.descriptor_id AS descriptor_id,
+            rim.descriptor_name AS descriptor_name,
+            rd.max_value AS descriptor_max_value,
+            rl.sequence AS descriptor_sequence
+        FROM v_rubric vr
+        INNER JOIN reporting r ON vr.assessment_id = r.assessment_id
+        INNER JOIN reporting_feedback rf ON r.id = rf.reporting_id
+        INNER JOIN rubric_capability_mark rcm ON vr.rubric_instance_id = rcm.rubric_instance_id
+            AND rcm.rubric_capability_id = vr.capability_id
+            AND rcm.feedback_id = rf.id
+            AND rcm.feedback_table = 'reporting_feedback'
+        INNER JOIN v_rubric_indicator_mark_extend rim ON rim.rubric_capability_mark_id = rcm.id
+            AND vr.indicator_id = rim.rubric_indicator_id
+        LEFT JOIN rubric_descriptor rd ON rim.descriptor_id = rd.id AND rd.deleted_at IS NULL
+        LEFT JOIN rubric_level rl ON rd.level_id = rl.id
+            AND vr.rubric_instance_id = rl.rubric_instance_id
+            AND rl.deleted_at IS NULL
+        WHERE rf.deleted_at IS NULL
+          AND rf.published_at IS NOT NULL
+          AND (rcm.valid IS TRUE OR rim.valid IS TRUE)
+) rubricSummary
+ORDER BY assessment_id, student_id, feedback_date, capability_sequence, capability_id, indicator_sequence, indicator_id;
+```
+
+- [ ] **Step 2: Apply the view (Task 1 must already be applied so `v_rubric.rubric_instance_title` exists)**
+
+Run:
+
+```bash
+mariadb -u schoolboxdocker -pabc123 -h 127.0.0.1 schoolbox < updates/26.1.beta7/rubric/17-v_rubric_mark.sql
+```
+
+Expected: no error. (If it errors with "Unknown column 'vr.rubric_instance_title'", Task 1's migration has not been applied yet — apply it first.)
+
+- [ ] **Step 3: Verify the new columns exist**
+
+Run:
+
+```bash
+mariadb -u schoolboxdocker -pabc123 -h 127.0.0.1 schoolbox -N -e \
+  "SELECT rubric_instance_title, descriptor_max_value, descriptor_sequence FROM v_rubric_mark LIMIT 3;"
+```
+
+Expected: rows returned, no "Unknown column" error.
+
+- [ ] **Step 4: Verify the collation fix — filtering feedback_type no longer errors**
+
+Run:
+
+```bash
+mariadb -u schoolboxdocker -pabc123 -h 127.0.0.1 schoolbox -N -e \
+  "SELECT COUNT(*) FROM v_rubric_mark WHERE feedback_type = 'instructor';"
+```
+
+Expected: a number (e.g. hundreds), **not** `ERROR 1267 ... Illegal mix of collations`.
+
+- [ ] **Step 5: Verify row-count parity with the old feedback query (no rows lost/gained)**
+
+Pick an assessment+feedback that has marks (e.g. from `SELECT assessment_id, feedback_id, feedback_table FROM v_rubric_mark LIMIT 1;`) and compare counts:
+
+```bash
+mariadb -u schoolboxdocker -pabc123 -h 127.0.0.1 schoolbox -N -e "
+SELECT (SELECT COUNT(*) FROM v_rubric_mark WHERE assessment_id=38 AND feedback_id=34 AND feedback_table='submission_return') AS new_rows,
+       (SELECT COUNT(*) FROM v_rubric vr
+          JOIN submission_box sb ON vr.assessment_id=sb.assessment_id
+          JOIN submission_return sr ON sb.id=sr.box_id
+          JOIN rubric_capability_mark rcm ON rcm.feedback_table='submission_return' AND rcm.feedback_id=sr.id AND rcm.rubric_instance_id=vr.rubric_instance_id AND rcm.rubric_capability_id=vr.capability_id
+          LEFT JOIN v_rubric_indicator_mark_extend rim ON rim.rubric_indicator_id=vr.indicator_id AND rcm.id=rim.rubric_capability_mark_id
+          WHERE sr.deleted_at IS NULL AND sr.published_at IS NOT NULL AND (rcm.valid IS TRUE OR rim.valid IS TRUE) AND sb.assessment_id=38 AND sr.id=34) AS old_rows;"
+```
+
+Expected: `new_rows` == `old_rows` (adjust the ids to a real marked feedback in your DB).
+
+- [ ] **Step 6: Verify the existing markbook consumer still runs**
+
+The other consumer of this view is `library/Schoolbox/Assessment/Rubric/Markbook/OverallDataset.php`. Sanity-check the view is still selectable the way that code joins it:
+
+```bash
+mariadb -u schoolboxdocker -pabc123 -h 127.0.0.1 schoolbox -N -e \
+  "SELECT COUNT(*) FROM v_rubric_mark vrm WHERE vrm.assessment_id IN (38);"
+```
+
+Expected: a number, no error.
+
+- [ ] **Step 7: Commit**
+
+```bash
+git add updates/26.1.beta7/rubric/17-v_rubric_mark.sql
+git commit -m "feat: extend v_rubric_mark with title, descriptor detail, utf8mb4 collation [SA-22780]"
+```
+
+---
+
+## Task 3: Template rubrics — `getRubric` → `getRubrics` (array of titled rubrics)
 
 **Files:**
 - Modify: `library/Schoolbox/Learning/Assessment/API/Helper.php` (method at 1009, call site at 170)
@@ -167,7 +359,7 @@ git commit -m "feat: expose rubric instance title & weight via v_rubric [SA-2278
 **Interfaces:**
 - Produces:
   - `Helper::buildTemplateRubrics(array $rows): array` (private static) — flat `v_rubric` rows → `[{id:int, title:string, weight:float|null, capabilities:[{id,name,maxValue,indicators:[{id,name,maxValue,descriptors:[{id,description,maxValue,sequence}]}]}]}]`. Returns `[]` for `[]`.
-  - `Helper::firstRubricAsLegacy(array $rubrics): ?array` (private static) — `rubrics[0]` reduced to `{capabilities: [...]}`, or `null`. Shared with Task 3.
+  - `Helper::firstRubricAsLegacy(array $rubrics): ?array` (private static) — `rubrics[0]` reduced to `{capabilities: [...]}`, or `null`. Shared with Task 4.
   - `Helper::getRubrics(string $assessmentId): array` — runs the template query and delegates to `buildTemplateRubrics`.
 - Consumes: `v_rubric.rubric_instance_id/title/weight` from Task 1.
 
@@ -452,7 +644,7 @@ git commit -m "feat: return a set of titled rubrics on the assessment [SA-22780]
 
 ---
 
-## Task 3: Feedback rubrics — `getRubricFeedback` → `getRubricsFeedback` (array of titled rubrics)
+## Task 4: Feedback rubrics — `getRubricFeedback` → `getRubricsFeedback` (agnostic, via `v_rubric_mark`)
 
 **Files:**
 - Modify: `library/Schoolbox/Learning/Assessment/API/Helper.php` (method at 1082, call site at 677 / feedbackFields at 681)
@@ -461,8 +653,8 @@ git commit -m "feat: return a set of titled rubrics on the assessment [SA-22780]
 **Interfaces:**
 - Produces:
   - `Helper::buildFeedbackRubrics(array $rows): array` (private static) — flat feedback rows → `[{id:int, title:string, capabilities:[{id,name,value,maxValue,mark,indicators:[{id,name,maxValue,value,descriptor:null|{id,description,maxValue,sequence}}]}]}]`. Returns `[]` for `[]`.
-  - `Helper::getRubricsFeedback(string $assessmentId, int $feedbackID): array`.
-- Consumes: `firstRubricAsLegacy` (Task 2), `v_rubric.rubric_instance_title` (Task 1).
+  - `Helper::getRubricsFeedback(string $assessmentId, int $feedbackID, string $feedbackTable): array` — reads `v_rubric_mark` (agnostic across `submission_return` + `reporting_feedback`), filtered to `feedback_type = 'instructor'`.
+- Consumes: `firstRubricAsLegacy` (Task 3), the extended `v_rubric_mark` (Task 2: `rubric_instance_title`, `descriptor_max_value`, `descriptor_sequence`, normalised `feedback_type`).
 
 - [ ] **Step 1: Add the failing feedback reshape test**
 
@@ -541,75 +733,53 @@ Expected: FAIL — `Method ...::buildFeedbackRubrics() does not exist`.
 
 - [ ] **Step 3: Add `buildFeedbackRubrics` and rework `getRubricFeedback` → `getRubricsFeedback`**
 
-In `library/Schoolbox/Learning/Assessment/API/Helper.php`, replace the entire `getRubricFeedback` method (currently the docblock `get feedback rubric` at 1075 through its closing `}` at 1183) with the following two methods. The SQL is unchanged except: two new selected columns (`rubric_instance_id`, `rubric_instance_title`) and `vr.rubric_instance_id` added to the `ORDER BY`.
+In `library/Schoolbox/Learning/Assessment/API/Helper.php`, replace the entire `getRubricFeedback` method (currently the docblock `get feedback rubric` at 1075 through its closing `}` at 1183) with the following two methods. The hand-rolled `submission_box`/`submission_return` join is gone — `getRubricsFeedback` now reads the agnostic `v_rubric_mark` view (Task 2), so it covers both due-work and reporting feedback and no longer couples to `submission_box`.
 
 ```php
     /**
      * Get all marked feedback rubrics for a single feedback record.
      *
-     * Returns a list of rubrics (each with its own title). Empty when the feedback has no rubric marks.
+     * Reads the agnostic v_rubric_mark view (submission_return + reporting_feedback marks), so it works
+     * for any feedback source. Returns a list of rubrics (each with its own title); empty when the
+     * feedback has no rubric marks. Restricted to instructor feedback, matching prior behaviour.
      *
      * @param string $assessmentId
      * @param int    $feedbackID
+     * @param string $feedbackTable Source table for this feedback (e.g. 'submission_return',
+     *                              'reporting_feedback'); disambiguates feedback_id across sources.
      * @return array<int, array>
      */
-    public function getRubricsFeedback(string $assessmentId, int $feedbackID): array
+    public function getRubricsFeedback(string $assessmentId, int $feedbackID, string $feedbackTable): array
     {
         $statement = $this->mapper->getDatabase()->prepare("
-            select 
-                `vr`.`rubric_instance_id`                             AS `rubric_instance_id`,
-                `vr`.`rubric_instance_title`                          AS `rubric_instance_title`,
-                `sb`.`assessment_id`                                  AS `assessment_id`,
-                `vr`.`capability_mark_type_id`                        AS `capability_mark_type_id`,
-                `vr`.`capability_grade_group_id`                      AS `capability_grade_group_id`,
-                `sr`.`owner`                                          AS `student_id`,
-                `sr`.`marker`                                         AS `marker_id`,
-                `sr`.`id`                                             AS `feedback_id`,
-                `sr`.`published_at`                                   AS `feedback_date`,
-                `sr`.`review_route`                                   AS `feedback_type`,
-                `vr`.`capability_id`                                  AS `capability_id`,
-                `vr`.`capability_name`                                AS `capability_name`,
-                `vr`.`capability_max_value`                           AS `capability_max_value`,
-                if(`rcm`.`valid`, `rcm`.`value`, NULL)                AS `capability_mark`,
-                if(`rcm`.`valid`, `rcm`.`human_readable_value`, NULL) AS `capability_human_readable_mark`,
-                `vr`.`indicator_id`                                   AS `indicator_id`,
-                `vr`.`indicator_name`                                 AS `indicator_name`,
-                `vr`.`indicator_max_value`                            AS `indicator_max_value`,
-                if(`rim`.`valid`, `rim`.`value`, NULL)                AS `indicator_mark`,
-                `rim`.`descriptor_id`                                 AS `descriptor_id`,
-                `rim`.`descriptor_name`                               AS `descriptor_name`,
-                `rd`.`max_value`                                      AS `descriptor_max_value`,
-                `rd`.`description`                                    AS `descriptor_descriptor`,
-                `rl`.`sequence`                                       AS `descriptor_sequence`
-            from ((((`v_rubric` `vr`
-                join `submission_box` `sb`on (`vr`.`assessment_id` = `sb`.`assessment_id`))
-                join `submission_return` `sr` on (`sb`.`id` = `sr`.`box_id`))
-                join `rubric_capability_mark` `rcm` on (
-                    `rcm`.`feedback_table` = 'submission_return'
-                    and `rcm`.`feedback_id` = `sr`.`id`
-                    and `rcm`.`rubric_instance_id` = `vr`.`rubric_instance_id`
-                    and `rcm`.`rubric_capability_id` = `vr`.`capability_id`
-                ))
-                left join `v_rubric_indicator_mark_extend` `rim` on (`rim`.`rubric_indicator_id` = `vr`.`indicator_id` and `rcm`.`id` = `rim`.`rubric_capability_mark_id`))
-                LEFT JOIN `rubric_descriptor` `rd` on (`rim`.`descriptor_id` = `rd`.`id` and `rd`.`deleted_at` is null)
-                LEFT JOIN `rubric_level` `rl` on (
-                    `rd`.`level_id` = `rl`.`id`
-                    and `vr`.`rubric_instance_id` = `rl`.`rubric_instance_id`
-                    and `rl`.`deleted_at` is null
-                )
-            where `sr`.`deleted_at` is null
-                and `sr`.`published_at` is not null
-                and (`rcm`.`valid` is true or `rim`.`valid` is true)
-                and `sb`.`assessment_id` = :assessmentID
-                AND `sr`.`review_route` = 'instructor'
-                AND `sr`.`id` = :feedbackID
-            order by `sb`.`assessment_id`, `vr`.`rubric_instance_id`, `sr`.`owner`, `sr`.`published_at`, `vr`.`capability_sequence`, `vr`.`capability_id`,
-                `vr`.`indicator_sequence`, `vr`.`indicator_id`
+            SELECT
+                `rubric_instance_id`,
+                `rubric_instance_title`,
+                `capability_id`,
+                `capability_name`,
+                `capability_mark`,
+                `capability_human_readable_mark`,
+                `capability_max_value`,
+                `indicator_id`,
+                `indicator_name`,
+                `indicator_max_value`,
+                `indicator_mark`,
+                `descriptor_id`,
+                `descriptor_name`,
+                `descriptor_max_value`,
+                `descriptor_sequence`
+            FROM `v_rubric_mark`
+            WHERE `assessment_id` = :assessmentID
+                AND `feedback_id` = :feedbackID
+                AND `feedback_table` = :feedbackTable
+                AND `feedback_type` = 'instructor'
+            ORDER BY `rubric_instance_id`, `capability_sequence`, `capability_id`, `indicator_sequence`, `indicator_id`
         ");
         $statement->execute(
             [
                 'assessmentID'  => $assessmentId,
                 'feedbackID'    => $feedbackID,
+                'feedbackTable' => $feedbackTable,
             ]
         );
 
@@ -699,10 +869,10 @@ Replace this line (currently line 677):
             $rubric = $this->getRubricFeedback($rowAssessmentId, $row['feedback_id']);
 ```
 
-with:
+with (passing `feedback_table`, which each participation-union arm already selects, so the new agnostic view can disambiguate the feedback source):
 
 ```php
-            $rubrics = $this->getRubricsFeedback($rowAssessmentId, (int)$row['feedback_id']);
+            $rubrics = $this->getRubricsFeedback($rowAssessmentId, (int)$row['feedback_id'], (string)$row['feedback_table']);
 ```
 
 Then in the `$feedbackFields` array immediately below, replace this line (currently line 694):
@@ -737,7 +907,7 @@ git commit -m "feat: return a set of titled rubrics in assessment feedback [SA-2
 
 ---
 
-## Task 4: Update the OpenAPI docs
+## Task 5: Update the OpenAPI docs
 
 **Files (in `/home/james/Sites/schoolbox-api-docs`):**
 - Create: `openapi/components/schemas/assessment-rubrics.yaml`
@@ -872,26 +1042,28 @@ git commit -m "docs: document rubrics array on assessment API, deprecate rubric 
 
 ---
 
-## Task 5: Live verification against the dev instance
+## Task 6: Live verification against the dev instance
 
 **Files:** none (manual verification).
 
-This task confirms the end-to-end behaviour the unit tests can't: real SQL against `v_rubric`, backwards compatibility, and the agnostic decoupling. Use the JWT from the task brief (host `docker.dev.schoolbox.cloud`). Export it once:
+This task confirms the end-to-end behaviour the unit tests can't: real SQL against the views, backwards compatibility, and the agnostic decoupling. Use the JWT from the task brief (host `docker.dev.schoolbox.cloud`). Export it once:
 
 ```bash
 export SB_TOKEN='eyJ0eXAiOiJKV1Qi...'   # the full token from the task brief
 export SB_HOST='https://docker.dev.schoolbox.cloud'
 ```
 
-- [ ] **Step 1: Find an assessment with 2+ rubric instances**
+> **Data caveat (verified during design):** the current dev DB has **no** assessment with 2+ `rubric_instance` rows, and **zero** `reporting_feedback` rubric marks (all 880 marks are `submission_return`). Steps 1 and 5 below therefore require seeding first, or they can only confirm the single-rubric / due-work paths. The multi-rubric and reporting-feedback behaviours are otherwise covered by the Task 3/4 unit tests and the Task 2 view checks.
+
+- [ ] **Step 1: Find (or seed) an assessment with 2+ rubric instances**
 
 Run:
 
 ```bash
-mysql schoolbox -e "SELECT assessment_id, COUNT(*) AS n FROM rubric_instance WHERE deleted_at IS NULL GROUP BY assessment_id HAVING n >= 2 LIMIT 5;"
+mariadb -u schoolboxdocker -pabc123 -h 127.0.0.1 schoolbox -e "SELECT assessment_id, COUNT(*) AS n FROM rubric_instance WHERE deleted_at IS NULL GROUP BY assessment_id HAVING n >= 2 LIMIT 5;"
 ```
 
-Expected: at least one `assessment_id`. Note it as `MULTI_ID`. If none exist, seed a second `rubric_instance` for an existing rubric assessment, or fall back to verifying a single-rubric assessment for the array shape.
+Expected: at least one `assessment_id`. Note it as `MULTI_ID`. Per the data caveat this returns nothing on the current dev DB, so seed a second `rubric_instance` (plus its `rubric_capability_usage`/`rubric_indicator_usage` rows) against an assessment that already has one rubric, or fall back to a single-rubric assessment to verify the array shape.
 
 - [ ] **Step 2: Verify the GET endpoint returns a titled `rubrics` array + deprecated `rubric`**
 
@@ -936,7 +1108,7 @@ For an assessment with published instructor feedback that used rubric marks, con
 
 ## Self-Review Notes
 
-- **Spec coverage:** view title/weight (Task 1) → §Approach.1; `getRubrics` decoupling + array + deprecated singular (Task 2) → §Approach.2; feedback array + deprecated singular (Task 3) → §Approach.3; caller sweep (Tasks 2/3 Step 6) → §Approach.4; docs (Task 4) → §Approach.5; testing incl. live JWT checks (Tasks 2/3 unit + Task 5) → §Testing.
-- **Deviation from spec to flag:** the spec said "remove submission_box coupling" for the feedback method too. In practice the feedback rubric is located *through* `submission_return.box_id → submission_box.id → assessment_id`, so `submission_box` is a structural join, not a single-rubric gate. Multiple rubrics come from `v_rubric`'s `rubric_instance` join regardless. This plan therefore keeps the `submission_box`/`submission_return` path on the feedback side (scoped to `submission_return` feedback, as today) and only removes the coupling on the assessment template side, where it genuinely gated out non-due-work types. Confirm this interpretation is acceptable; making feedback fully source-agnostic (e.g. `reporting_feedback` marks) is a larger change and out of scope.
-- **Type consistency:** `buildTemplateRubrics`, `buildFeedbackRubrics`, `firstRubricAsLegacy`, `getRubrics`, `getRubricsFeedback` names are used identically across tasks. `firstRubricAsLegacy` is defined in Task 2 and reused in Task 3.
-```
+- **Spec coverage:** `v_rubric` title/weight (Task 1) → §Approach.1; `v_rubric_mark` title/descriptor/collation (Task 2) → §Approach.1a; `getRubrics` decoupling + array + deprecated singular (Task 3) → §Approach.2; agnostic feedback array via `v_rubric_mark` + deprecated singular (Task 4) → §Approach.3; caller sweep (Task 3 Step 6, Task 4 Step 6) → §Approach.4; docs (Task 5) → §Approach.5; testing incl. view checks + live JWT (Task 2 checks, Task 3/4 unit, Task 6) → §Testing.
+- **Feedback is agnostic:** `getRubricsFeedback` reads `v_rubric_mark` (submission_return + reporting_feedback), disambiguated by `feedback_table` from the call site and restricted to `feedback_type = 'instructor'` — this fixes reporting feedback rubrics (dropped today) and removes the `submission_box` coupling entirely. Performance confirmed non-regressive via `EXPLAIN` (predicate pushdown, ~3ms). The pre-existing per-feedback N+1 is unchanged and explicitly out of scope.
+- **Ordering dependency:** Task 2 (`v_rubric_mark`) selects `vr.rubric_instance_title`, which only exists after Task 1 is applied — Task 2 Step 2 calls this out. Tasks must run in order 1 → 2 → 3 → 4.
+- **Type consistency:** `buildTemplateRubrics`, `buildFeedbackRubrics`, `firstRubricAsLegacy`, `getRubrics`, `getRubricsFeedback` names are used identically across tasks. `firstRubricAsLegacy` is defined in Task 3 and reused in Task 4. `getRubricsFeedback` takes `(string $assessmentId, int $feedbackID, string $feedbackTable)` — the call site (Task 4 Step 5) passes all three.
