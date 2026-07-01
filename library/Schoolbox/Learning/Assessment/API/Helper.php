@@ -1121,9 +1121,15 @@ class Helper
     /**
      * Get all marked feedback rubrics for a single feedback record.
      *
-     * Reads the agnostic v_rubric_mark view (submission_return + reporting_feedback marks), so it works
-     * for any feedback source. Returns a list of rubrics (each with its own title); empty when the
+     * Reads rubric marks straight from the mark tables (submission_return + reporting_feedback), so it
+     * works for any feedback source. Returns a list of rubrics (each with its own title); empty when the
      * feedback has no rubric marks. Restricted to instructor feedback, matching prior behaviour.
+     *
+     * The indicator marks are LEFT JOINed on purpose: an indicator with no selected descriptor — or a
+     * manually entered capability mark with no descriptors at all — still returns a row with
+     * descriptor: null, rather than being dropped. This deliberately does NOT read the v_rubric_mark
+     * view, whose INNER JOIN to v_rubric_indicator_mark_extend (only selected descriptors, for the
+     * rubric markbook) would omit those unmarked indicators/capabilities from the feedback payload.
      *
      * @param string $assessmentId
      * @param int    $feedbackID
@@ -1150,12 +1156,90 @@ class Helper
                 `descriptor_name`,
                 `descriptor_max_value`,
                 `descriptor_sequence`
-            FROM `v_rubric_mark`
-            WHERE `assessment_id` = :assessmentID
-                AND `feedback_id` = :feedbackID
-                AND `feedback_table` = :feedbackTable
-                AND `feedback_type` = 'instructor'
-            ORDER BY `rubric_instance_id`, `capability_sequence`, `capability_id`, `indicator_sequence`, `indicator_id`
+            FROM (
+                SELECT DISTINCT
+                    vr.assessment_id                              AS assessment_id,
+                    sr.id                                         AS feedback_id,
+                    'submission_return'                           AS feedback_table,
+                    vr.rubric_instance_id                         AS rubric_instance_id,
+                    vr.rubric_instance_title                      AS rubric_instance_title,
+                    vr.capability_id                              AS capability_id,
+                    vr.capability_name                            AS capability_name,
+                    IF(rcm.valid, rcm.value, NULL)                AS capability_mark,
+                    IF(rcm.valid, rcm.human_readable_value, NULL) AS capability_human_readable_mark,
+                    vr.capability_max_value                       AS capability_max_value,
+                    vr.capability_sequence                        AS capability_sequence,
+                    vr.indicator_id                               AS indicator_id,
+                    vr.indicator_name                             AS indicator_name,
+                    vr.indicator_max_value                        AS indicator_max_value,
+                    IF(rim.valid, rim.value, NULL)                AS indicator_mark,
+                    vr.indicator_sequence                         AS indicator_sequence,
+                    rim.descriptor_id                             AS descriptor_id,
+                    rim.descriptor_name                           AS descriptor_name,
+                    rd.max_value                                  AS descriptor_max_value,
+                    rl.sequence                                   AS descriptor_sequence
+                FROM v_rubric vr
+                INNER JOIN submission_box sb ON vr.assessment_id = sb.assessment_id
+                INNER JOIN submission_return sr ON sb.id = sr.box_id
+                INNER JOIN rubric_capability_mark rcm ON vr.rubric_instance_id = rcm.rubric_instance_id
+                    AND rcm.rubric_capability_id = vr.capability_id
+                    AND rcm.feedback_id = sr.id
+                    AND rcm.feedback_table = 'submission_return'
+                LEFT JOIN v_rubric_indicator_mark_extend rim ON rim.rubric_capability_mark_id = rcm.id
+                    AND vr.indicator_id = rim.rubric_indicator_id
+                LEFT JOIN rubric_descriptor rd ON rim.descriptor_id = rd.id AND rd.deleted_at IS NULL
+                LEFT JOIN rubric_level rl ON rd.level_id = rl.id
+                    AND vr.rubric_instance_id = rl.rubric_instance_id
+                    AND rl.deleted_at IS NULL
+                WHERE sr.deleted_at IS NULL
+                  AND sr.published_at IS NOT NULL
+                  AND sr.review_route = 'instructor'
+                  AND (rcm.valid IS TRUE OR rim.valid IS TRUE)
+
+                UNION
+
+                SELECT DISTINCT
+                    vr.assessment_id                              AS assessment_id,
+                    rf.id                                         AS feedback_id,
+                    'reporting_feedback'                          AS feedback_table,
+                    vr.rubric_instance_id                         AS rubric_instance_id,
+                    vr.rubric_instance_title                      AS rubric_instance_title,
+                    vr.capability_id                              AS capability_id,
+                    vr.capability_name                            AS capability_name,
+                    IF(rcm.valid, rcm.value, NULL)                AS capability_mark,
+                    IF(rcm.valid, rcm.human_readable_value, NULL) AS capability_human_readable_mark,
+                    vr.capability_max_value                       AS capability_max_value,
+                    vr.capability_sequence                        AS capability_sequence,
+                    vr.indicator_id                               AS indicator_id,
+                    vr.indicator_name                             AS indicator_name,
+                    vr.indicator_max_value                        AS indicator_max_value,
+                    IF(rim.valid, rim.value, NULL)                AS indicator_mark,
+                    vr.indicator_sequence                         AS indicator_sequence,
+                    rim.descriptor_id                             AS descriptor_id,
+                    rim.descriptor_name                           AS descriptor_name,
+                    rd.max_value                                  AS descriptor_max_value,
+                    rl.sequence                                   AS descriptor_sequence
+                FROM v_rubric vr
+                INNER JOIN reporting r ON vr.assessment_id = r.assessment_id
+                INNER JOIN reporting_feedback rf ON r.id = rf.reporting_id
+                INNER JOIN rubric_capability_mark rcm ON vr.rubric_instance_id = rcm.rubric_instance_id
+                    AND rcm.rubric_capability_id = vr.capability_id
+                    AND rcm.feedback_id = rf.id
+                    AND rcm.feedback_table = 'reporting_feedback'
+                LEFT JOIN v_rubric_indicator_mark_extend rim ON rim.rubric_capability_mark_id = rcm.id
+                    AND vr.indicator_id = rim.rubric_indicator_id
+                LEFT JOIN rubric_descriptor rd ON rim.descriptor_id = rd.id AND rd.deleted_at IS NULL
+                LEFT JOIN rubric_level rl ON rd.level_id = rl.id
+                    AND vr.rubric_instance_id = rl.rubric_instance_id
+                    AND rl.deleted_at IS NULL
+                WHERE rf.deleted_at IS NULL
+                  AND rf.published_at IS NOT NULL
+                  AND (rcm.valid IS TRUE OR rim.valid IS TRUE)
+            ) rubricMarks
+            WHERE assessment_id = :assessmentID
+                AND feedback_id = :feedbackID
+                AND feedback_table = :feedbackTable
+            ORDER BY rubric_instance_id, capability_sequence, capability_id, indicator_sequence, indicator_id
         ");
         $statement->execute(
             [
