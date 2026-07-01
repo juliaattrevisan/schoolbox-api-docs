@@ -46,7 +46,9 @@ class Model
      * This is a summary hint for the admin list, not a guarantee that every log in the session has this format.
      * This is used to determine whether any log in the session is renderable (since rendering requires a known log
      * format - see aul-agent-chat.vue).
-     * Populated by {@see Mapper::getFilteredSessions(), SessionSummariser::hydrateSessionWithSummaryInfo()}
+     * Populated by:
+     *  - @see Mapper::getFilteredSessions()
+     *  - @see SessionSummariser::hydrateSessionsWithSummaryInfo()
      *
      * @var string|null
      */
@@ -54,7 +56,9 @@ class Model
 
     /**
      * Whether any log in this session has an error condition.
-     * Populated by {@see Mapper::getFilteredSessions(), SessionSummariser::hydrateSessionWithSummaryInfo()}
+     * Populated by:
+     *  - @see Mapper::getFilteredSessions()
+     *  - @see SessionSummariser::hydrateSessionsWithSummaryInfo()
      *
      * @var bool
      */
@@ -62,7 +66,9 @@ class Model
 
     /**
      * The highest-priority moderation event status for this session.
-     * Populated by {@see Mapper::getFilteredSessions(), SessionSummariser::hydrateSessionWithSummaryInfo()}
+     * Populated by:
+     *  - @see Mapper::getFilteredSessions()
+     *  - @see SessionSummariser::hydrateSessionsWithSummaryInfo()
      *
      * @var string|null
      */
