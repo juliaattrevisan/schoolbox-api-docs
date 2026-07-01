@@ -22,6 +22,7 @@ use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\Message\SourceMapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 
 class Controller extends BaseController
@@ -266,6 +267,14 @@ class Controller extends BaseController
                                ->indexBy('id')
                                ->getAll();
 
+        $msgConfig = $this->getRoutePermissionMapper()->findAllRoutePermissionsForUser($this->getUser());
+
+        if (Role::STUDENT === $this->getUser()->getRole()->getType()) {
+            /* students should not be able to disable ib registration notifications
+             */
+            $msgConfig = array_filter($msgConfig, fn($conf) => NSMapper::NS_IB_REGISTRATION != $conf['slug']);
+        }
+
         $this->response = $this->responseFromTemplate(
             '@notifications/settings.twig',
             [
@@ -274,7 +283,7 @@ class Controller extends BaseController
                 'perms'     => $this->getConfig()->getPermissionList($digest, $mobile),
                 'digest'    => $digest,
                 'mobile'    => $mobile,
-                'msgConfig' => $this->getRoutePermissionMapper()->findAllRoutePermissionsForUser($this->getUser()),
+                'msgConfig' => $msgConfig,
             ],
             'Notification Settings',
         );
