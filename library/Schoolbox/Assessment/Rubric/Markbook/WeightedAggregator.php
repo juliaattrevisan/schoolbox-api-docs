@@ -56,7 +56,7 @@ class WeightedAggregator
             return null;
         }
 
-        $val = $numerator/$denominator;
+        $val = $numerator / $denominator;
         $val = round($val, self::PRECISION);
 
         /* Diagnostic
