@@ -114,14 +114,17 @@ class CommandLineToolTest extends TestCase
             ->expects($this->once())
             ->method('moderate')
             ->with('session-a')
-            ->willReturn(ModerationResult::moderated(new ModerationEventModel()));
+            ->willReturnCallback(function (): ModerationResult {
+                $this->waitForMaxTimeToExpire();
+
+                return ModerationResult::moderated(new ModerationEventModel());
+            });
 
         $this->createTool(
             $finder,
             $moderator,
-            ['n' => 10, 'batch' => 1, 'max-time' => 10],
+            ['n' => 10, 'batch' => 1, 'max-time' => 1],
             true,
-            [100, 100, 100, 111],
         )->run();
 
         $this->assertSame([[1, 0]], $this->findCalls);
@@ -140,14 +143,17 @@ class CommandLineToolTest extends TestCase
             ->expects($this->once())
             ->method('moderate')
             ->with('session-a')
-            ->willReturn(ModerationResult::moderated(new ModerationEventModel()));
+            ->willReturnCallback(function (): ModerationResult {
+                $this->waitForMaxTimeToExpire();
+
+                return ModerationResult::moderated(new ModerationEventModel());
+            });
 
         $this->createTool(
             $finder,
             $moderator,
-            ['n' => 10, 'batch' => 2, 'max-time' => 10],
+            ['n' => 10, 'batch' => 2, 'max-time' => 1],
             true,
-            [100, 100, 100, 111],
         )->run();
 
         $this->assertSame([[2, 0]], $this->findCalls);
@@ -281,7 +287,6 @@ class CommandLineToolTest extends TestCase
      * @param Moderator $moderator
      * @param array<string, int> $options
      * @param bool $perform
-     * @param list<int> $clockTimes
      * @return CommandLineTool
      */
     private function createTool(
@@ -289,18 +294,13 @@ class CommandLineToolTest extends TestCase
         Moderator $moderator,
         array $options,
         bool $perform,
-        array $clockTimes = [100],
     ): CommandLineTool {
         $lock = $this->createStub(LockInterface::class);
-        $tool = new class ($finder, $moderator, $lock, $clockTimes) extends CommandLineTool {
-            /**
-             * @param list<int> $clockTimes
-             */
+        $tool = new class ($finder, $moderator, $lock) extends CommandLineTool {
             public function __construct(
                 CandidateFinder $candidateFinder,
                 Moderator $moderator,
                 private readonly LockInterface $lock,
-                private array $clockTimes,
             ) {
                 parent::__construct($candidateFinder, $moderator);
             }
@@ -308,17 +308,6 @@ class CommandLineToolTest extends TestCase
             protected function acquireLock(string $lockName, ?float $timeout): LockInterface
             {
                 return $this->lock;
-            }
-
-            protected function now(): int
-            {
-                $next = array_shift($this->clockTimes);
-
-                if (null !== $next) {
-                    return $next;
-                }
-
-                return end($this->clockTimes) ?: 100;
             }
         };
 
@@ -331,6 +320,14 @@ class CommandLineToolTest extends TestCase
         $tool->setup($options, $container, fopen('php://memory', 'w+'), $this->createStub(LoggerInterface::class), $perform);
 
         return $tool;
+    }
+
+    /**
+     * @return void
+     */
+    private function waitForMaxTimeToExpire(): void
+    {
+        sleep(2);
     }
 
     /**
