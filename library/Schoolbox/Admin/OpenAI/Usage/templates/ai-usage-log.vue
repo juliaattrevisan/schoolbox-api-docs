@@ -36,7 +36,6 @@ const endDateFilter = window.Vue.ref<string>(EMPTY_DATE);
 const moderationStatusFilter = window.Vue.ref<AiModerationStatus[]>([]);
 
 const sessions = window.Vue.ref<AiSession[]>([]);
-const sessionCountLabel = window.Vue.computed(() => (sessions.value.length === 1 ? "event" : "events"));
 const pageInfo = window.Vue.ref<PaginationMeta | null>(null);
 
 const sessionLoadError = window.Vue.ref<string | null>(null);
@@ -192,7 +191,9 @@ function applyModerationEventUpdate(event: AiModerationEvent): void {
     <div class="no-print">
         <div class="list-item">
             <h2 class="subheader">
-                Activity<template v-if="!isLoading">: {{ sessions.length }} {{ sessionCountLabel }}</template>
+                Activity<template v-if="!isLoading"
+                    >: {{ sessions.length }} event{{ sessions.length === 1 ? "" : "s" }}</template
+                >
             </h2>
         </div>
     </div>
