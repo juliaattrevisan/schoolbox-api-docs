@@ -1047,65 +1047,59 @@ class Helper
     {
         $rubrics = [];
         foreach ($rows as $row) {
-            $instanceId = (int)$row['rubric_instance_id'];
+            $instanceId   = (int)$row['rubric_instance_id'];
+            $capabilityId = (int)$row['capability_id'];
+            $indicatorId  = (int)$row['indicator_id'];
+            $descriptorId = (int)$row['descriptor_id'];
 
-            if (!isset($rubrics[$instanceId])) {
-                $rubrics[$instanceId] = [
-                    'id'           => $instanceId,
-                    'title'        => $row['rubric_instance_title'],
-                    'weight'       => (null === $row['rubric_instance_weight']) ? null : (float)$row['rubric_instance_weight'],
-                    'capabilities' => [],
-                ];
-            }
+            $rubrics[$instanceId]['id']     = $instanceId;
+            $rubrics[$instanceId]['title']  = $row['rubric_instance_title'];
+            $rubrics[$instanceId]['weight'] = (null === $row['rubric_instance_weight']) ? null : (float)$row['rubric_instance_weight'];
 
-            $capabilities = &$rubrics[$instanceId]['capabilities'];
-            if (!isset($capabilities[$row['capability_id']])) {
-                $capabilities[$row['capability_id']] = [
-                    'id'         => (int)$row['capability_id'],
+            if (!isset($rubrics[$instanceId]['capabilities'][$capabilityId])) {
+                $rubrics[$instanceId]['capabilities'][$capabilityId] = [
+                    'id'         => $capabilityId,
                     'name'       => $row['capability_name'],
                     'maxValue'   => (float)$row['capability_max_value'],
                     'indicators' => [],
                 ];
             }
 
-            $indicators = &$capabilities[$row['capability_id']]['indicators'];
-            if (!isset($indicators[$row['indicator_id']])) {
-                $indicators[$row['indicator_id']] = [
-                    'id'          => (int)$row['indicator_id'],
+            if (!isset($rubrics[$instanceId]['capabilities'][$capabilityId]['indicators'][$indicatorId])) {
+                $rubrics[$instanceId]['capabilities'][$capabilityId]['indicators'][$indicatorId] = [
+                    'id'          => $indicatorId,
                     'name'        => $row['indicator_name'],
                     'maxValue'    => (float)$row['indicator_max_value'],
                     'descriptors' => [],
                 ];
             }
 
-            $descriptors = &$indicators[$row['indicator_id']]['descriptors'];
-            if (!isset($descriptors[$row['descriptor_id']])) {
-                $descriptors[$row['descriptor_id']] = [
-                    'id'          => (int)$row['descriptor_id'],
-                    'description' => $row['descriptor_descriptor'],
-                    'maxValue'    => (float)$row['descriptor_max_value'],
-                    'sequence'    => (int)$row['descriptor_sequence'],
-                ];
-            }
-
-            unset($capabilities, $indicators, $descriptors);
+            $rubrics[$instanceId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['descriptors'][$descriptorId] = [
+                'id'          => $descriptorId,
+                'description' => $row['descriptor_descriptor'],
+                'maxValue'    => (float)$row['descriptor_max_value'],
+                'sequence'    => (int)$row['descriptor_sequence'],
+            ];
         }
 
-        // Strip the associative keys used only for grouping.
-        foreach ($rubrics as &$rubric) {
-            foreach ($rubric['capabilities'] as &$capability) {
-                foreach ($capability['indicators'] as &$indicator) {
+        // Reindex the associative grouping keys into contiguous lists.
+        $result = [];
+        foreach ($rubrics as $rubric) {
+            $capabilities = [];
+            foreach ($rubric['capabilities'] as $capability) {
+                $indicators = [];
+                foreach ($capability['indicators'] as $indicator) {
                     $indicator['descriptors'] = array_values($indicator['descriptors']);
+                    $indicators[] = $indicator;
                 }
-                unset($indicator);
-                $capability['indicators'] = array_values($capability['indicators']);
+                $capability['indicators'] = $indicators;
+                $capabilities[] = $capability;
             }
-            unset($capability);
-            $rubric['capabilities'] = array_values($rubric['capabilities']);
+            $rubric['capabilities'] = $capabilities;
+            $result[] = $rubric;
         }
-        unset($rubric);
 
-        return array_values($rubrics);
+        return $result;
     }
 
     /**
@@ -1184,20 +1178,16 @@ class Helper
     {
         $rubrics = [];
         foreach ($rows as $row) {
-            $instanceId = (int)$row['rubric_instance_id'];
+            $instanceId   = (int)$row['rubric_instance_id'];
+            $capabilityId = (int)$row['capability_id'];
+            $indicatorId  = (int)$row['indicator_id'];
 
-            if (!isset($rubrics[$instanceId])) {
-                $rubrics[$instanceId] = [
-                    'id'           => $instanceId,
-                    'title'        => $row['rubric_instance_title'],
-                    'capabilities' => [],
-                ];
-            }
+            $rubrics[$instanceId]['id']    = $instanceId;
+            $rubrics[$instanceId]['title'] = $row['rubric_instance_title'];
 
-            $capabilities = &$rubrics[$instanceId]['capabilities'];
-            if (!isset($capabilities[$row['capability_id']])) {
-                $capabilities[$row['capability_id']] = [
-                    'id'         => (int)$row['capability_id'],
+            if (!isset($rubrics[$instanceId]['capabilities'][$capabilityId])) {
+                $rubrics[$instanceId]['capabilities'][$capabilityId] = [
+                    'id'         => $capabilityId,
                     'name'       => $row['capability_name'],
                     'value'      => (null === $row['capability_mark']) ? null : (float)$row['capability_mark'],
                     'maxValue'   => (float)$row['capability_max_value'],
@@ -1206,38 +1196,39 @@ class Helper
                 ];
             }
 
-            $indicators = &$capabilities[$row['capability_id']]['indicators'];
-            if (!isset($indicators[$row['indicator_id']])) {
-                $indicators[$row['indicator_id']] = [
-                    'id'         => (int)$row['indicator_id'],
-                    'name'       => $row['indicator_name'],
-                    'maxValue'   => (float)$row['indicator_max_value'],
-                    'value'      => (float)$row['indicator_mark'],
-                    'descriptor' => null,
-                ];
-
+            if (!isset($rubrics[$instanceId]['capabilities'][$capabilityId]['indicators'][$indicatorId])) {
+                $descriptor = null;
                 if (null != $row['descriptor_name']) {
-                    $indicators[$row['indicator_id']]['descriptor'] = [
+                    $descriptor = [
                         'id'          => (int)$row['descriptor_id'],
                         'description' => $row['descriptor_name'],
                         'maxValue'    => (float)$row['descriptor_max_value'],
                         'sequence'    => (int)$row['descriptor_sequence'],
                     ];
                 }
-            }
 
-            unset($capabilities, $indicators);
+                $rubrics[$instanceId]['capabilities'][$capabilityId]['indicators'][$indicatorId] = [
+                    'id'         => $indicatorId,
+                    'name'       => $row['indicator_name'],
+                    'maxValue'   => (float)$row['indicator_max_value'],
+                    'value'      => (float)$row['indicator_mark'],
+                    'descriptor' => $descriptor,
+                ];
+            }
         }
 
-        foreach ($rubrics as &$rubric) {
-            foreach ($rubric['capabilities'] as &$capability) {
+        // Reindex the associative grouping keys into contiguous lists.
+        $result = [];
+        foreach ($rubrics as $rubric) {
+            $capabilities = [];
+            foreach ($rubric['capabilities'] as $capability) {
                 $capability['indicators'] = array_values($capability['indicators']);
+                $capabilities[] = $capability;
             }
-            unset($capability);
-            $rubric['capabilities'] = array_values($rubric['capabilities']);
+            $rubric['capabilities'] = $capabilities;
+            $result[] = $rubric;
         }
-        unset($rubric);
 
-        return array_values($rubrics);
+        return $result;
     }
 }
