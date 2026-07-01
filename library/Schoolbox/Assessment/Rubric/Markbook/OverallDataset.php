@@ -1458,7 +1458,6 @@ class OverallDataset
                     $val = $aggregator->calculate(
                         $studentCapabilityData[$node]['formula']['numerator'],
                         $studentCapabilityData[$node]['formula']['denominator'],
-                        null
                     );
 
                     if (null !== $val) {
@@ -1475,7 +1474,6 @@ class OverallDataset
                         $val = $aggregator->calculate(
                             $studentIndicatorData[$node]['formula']['numerator'],
                             $studentIndicatorData[$node]['formula']['denominator'],
-                            null
                         );
 
                         if (null !== $val) {

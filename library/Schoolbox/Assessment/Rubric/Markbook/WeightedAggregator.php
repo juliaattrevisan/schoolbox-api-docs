@@ -38,13 +38,11 @@ class WeightedAggregator
      *
      * @param float|null $numerator
      * @param float|null $denominator
-     * @param string|null $prefix An optional prefix for diagnostic usage only
      * @return array|null
      */
     public function calculate(
         ?float $numerator,
         ?float $denominator,
-        ?string $prefix,
     ): ?array {
         /* Avoid divide-by-zero scenarios: exit early
          */
@@ -62,8 +60,7 @@ class WeightedAggregator
         /* Diagnostic
          */
         $diagnostic = sprintf(
-            "%s: %s/%s = %s",
-            $prefix,
+            "%s/%s = %s",
             $numerator,
             $denominator,
             $val
