@@ -1392,7 +1392,7 @@ class OverallDataset
                             foreach (self::MARK_NODES as $node) {
                                 /* Jez Math Pieces
                                  */
-                                $assessmentWeight = $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight'][$node] ?? null;
+                                $assessmentWeight = $assessments[$assessmentId]['weight'] ?? null;
 
                                 /* Skip if this is null; it doesn't count toward their total
                                  */
@@ -1465,7 +1465,7 @@ class OverallDataset
                                 foreach (self::MARK_NODES as $node) {
                                     /* Jez Math Pieces
                                      */
-                                    $assessmentWeight = $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight'][$node] ?? null;
+                                    $assessmentWeight = $assessments[$assessmentId]['weight'] ?? null;
 
                                     /* Skip if this is null; it doesn't count toward their total
                                      */
