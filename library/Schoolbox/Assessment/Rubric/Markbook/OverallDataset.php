@@ -1403,6 +1403,24 @@ class OverallDataset
                                      */
                                     $overallMarks[$capabilityId]['students'][$studentId][$node]['formula']['numerator'] += $numerator;
                                     $overallMarks[$capabilityId]['students'][$studentId][$node]['formula']['denominator'] += $effectiveWeight;
+
+                                    /* Jez reasoning
+                                     */
+                                    $overallMarks[$capabilityId]['students'][$studentId][$node]['reasoning'][] = sprintf(
+                                        'assessmentWeight: %s, gridWeight: %s, numerator: %s, denominator: %s,',
+                                        $assessmentWeight,
+                                        $gridWeight,
+                                        $numerator,
+                                        $effectiveWeight,
+                                    );
+
+                                    $overallMarks[$capabilityId]['students'][$studentId][$node]['reasoning'][] = sprintf(
+                                        'numerator += %s * %s, denominator += %s * %s',
+                                        $capabilityData[$node]['normalisedMark'],
+                                        $effectiveWeight,
+                                        $assessmentWeight,
+                                        $gridWeight,
+                                    );
                                 }
                             }
                         }
