@@ -19,6 +19,7 @@ use Schoolbox\Socs\Calendar\Parser;
 use Schoolbox\Socs\Fixtures\Registry;
 use Schoolbox\Socs\HttpClient;
 use Schoolbox\User;
+use Sentry\State\HubInterface;
 
 /**
  * Calendar event source backed by the SOCS XML calendar feed.
@@ -41,6 +42,7 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
         private CampusMapper $campusMapper,
         private HttpClient $httpClient,
         ?array $allLuEventTypes = null,
+        private ?HubInterface $sentry = null,
     ) {
         parent::__construct($connectorId, $user, $viewer);
         $this->allLuEventTypes = $allLuEventTypes ?? (new Calendar())->getTypeList();
@@ -109,6 +111,8 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
         try {
             $sourceEvents = $this->readEvents($startTimestamp, $endTimestamp);
         } catch (\JsonException | \RuntimeException | \Sabre\VObject\ParseException $e) {
+            $this->reportFeedFailure($e);
+
             return $collection;
         }
 
@@ -207,6 +211,15 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
         $event->setConnectorId($this->getConnectorId());
 
         return $event;
+    }
+
+    private function reportFeedFailure(\Throwable $e): void
+    {
+        if (str_contains($e->getMessage(), 'returned an empty payload')) {
+            return;
+        }
+
+        $this->sentry?->captureException($e);
     }
 
     /**

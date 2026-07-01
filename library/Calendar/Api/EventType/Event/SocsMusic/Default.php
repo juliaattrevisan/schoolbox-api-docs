@@ -19,6 +19,7 @@ use Schoolbox\Socs\Music\Lesson;
 use Schoolbox\Socs\Music\Parser;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Sentry\State\HubInterface;
 
 class Calendar_Api_EventType_Event_SocsMusic_Default extends Calendar_Api_EventType_Abstract
 {
@@ -45,6 +46,7 @@ class Calendar_Api_EventType_Event_SocsMusic_Default extends Calendar_Api_EventT
         private HttpClient $httpClient,
         private UserMapper $userMapper,
         ?array $allLuEventTypes = null,
+        private ?HubInterface $sentry = null,
     ) {
         parent::__construct($connectorId, $user, $viewer);
         $this->allLuEventTypes = $allLuEventTypes ?? (new Calendar())->getTypeList();
@@ -93,6 +95,8 @@ class Calendar_Api_EventType_Event_SocsMusic_Default extends Calendar_Api_EventT
         try {
             $lessons = $this->readLessons();
         } catch (\JsonException | \RuntimeException | \Sabre\VObject\ParseException $e) {
+            $this->reportFeedFailure($e);
+
             return $collection;
         }
 
@@ -136,6 +140,15 @@ class Calendar_Api_EventType_Event_SocsMusic_Default extends Calendar_Api_EventT
         ]);
 
         return (new Parser())->parse($xml);
+    }
+
+    private function reportFeedFailure(\Throwable $e): void
+    {
+        if (str_contains($e->getMessage(), 'returned an empty payload')) {
+            return;
+        }
+
+        $this->sentry?->captureException($e);
     }
 
     private function getConfiguredEventTypeId(): int

@@ -97,9 +97,36 @@ class Parser
     private function parseDateTime(string $date, string $time, string $fieldDescription): DateTimeImmutable
     {
         $value = trim(trim($date) . ' ' . trim($time));
-        $formats = trim($time) === ''
-            ? ['!d/m/Y', '!Y-m-d', '!d-m-Y', '!m/d/Y', '!j M Y']
-            : ['!d/m/Y H:i', '!Y-m-d H:i', '!d-m-Y H:i', '!m/d/Y H:i', '!j M Y H:i', '!d/m/Y g:i A', '!m/d/Y g:i A'];
+        $dateOnlyFormats = [
+            // Observed in SOCS tuition payloads and shared with SOCS calendar feeds.
+            '!d/m/Y',
+            // ISO-style Schoolbox compatibility fallback for internal/test payloads.
+            '!Y-m-d',
+            // Defensive fallback for dash-separated SOCS date values.
+            '!d-m-Y',
+            // Defensive fallback for month-first SOCS date values from international instances.
+            '!m/d/Y',
+            // SOCS documented date-range examples use "1 Sep 2025":
+            // https://help.socscms.com/Page.asp?CatID=13&ID=276
+            '!j M Y',
+        ];
+        $dateTimeFormats = [
+            // Observed in SOCS tuition payloads and shared with SOCS calendar feeds.
+            '!d/m/Y H:i',
+            // ISO-style Schoolbox compatibility fallback for internal/test payloads.
+            '!Y-m-d H:i',
+            // Defensive fallback for dash-separated SOCS date values.
+            '!d-m-Y H:i',
+            // Defensive fallback for month-first SOCS date values from international instances.
+            '!m/d/Y H:i',
+            // SOCS documented date-range shape combined with a 24-hour time.
+            '!j M Y H:i',
+            // Schoolbox compatibility fallback for 12-hour times in SOCS calendar-style payloads.
+            '!d/m/Y g:i A',
+            // Defensive 12-hour variant for month-first SOCS date values.
+            '!m/d/Y g:i A',
+        ];
+        $formats = trim($time) === '' ? $dateOnlyFormats : $dateTimeFormats;
 
         foreach ($formats as $format) {
             $dateTime = DateTimeImmutable::createFromFormat($format, $value, $this->timezone);

@@ -26,6 +26,7 @@ use Schoolbox\Socs\Calendar\Parser;
 use Schoolbox\Socs\HttpClient;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Sentry\State\HubInterface;
 
 #[CoversClass(Calendar_Api_EventType_Event_Socs_Default::class)]
 #[CoversClass(Calendar_Api_EventType_Event_SocsMusic_Default::class)]
@@ -217,6 +218,11 @@ XML);
         $eventTypeMapper = $this->createMock(EventTypeMapper::class);
         $eventTypeMapper->expects($this->never())->method('findFirstMeaningfulId');
 
+        $sentry = $this->createMock(HubInterface::class);
+        $sentry->expects($this->once())
+            ->method('captureException')
+            ->with($this->isInstanceOf(\RuntimeException::class));
+
         $source = new Calendar_Api_EventType_Event_Socs_Default(
             123,
             $user,
@@ -246,6 +252,7 @@ XML);
                 'eventType' => 'SOCS',
                 'eventColour' => '#9ad39b',
             ]],
+            $sentry,
         );
 
         $events = $source->getEvents(strtotime('2026-06-18 00:00:00'), strtotime('2026-06-19 00:00:00'));
@@ -260,6 +267,11 @@ XML);
 
         $userMapper = $this->createMock(UserMapper::class);
         $userMapper->expects($this->never())->method('findByExternalId');
+
+        $sentry = $this->createMock(HubInterface::class);
+        $sentry->expects($this->once())
+            ->method('captureException')
+            ->with($this->isInstanceOf(\RuntimeException::class));
 
         $source = new Calendar_Api_EventType_Event_SocsMusic_Default(
             456,
@@ -290,6 +302,56 @@ XML);
                 'eventType' => 'SOCS Music',
                 'eventColour' => '#9ad39b',
             ]],
+            $sentry,
+        );
+
+        $events = $source->getEvents(strtotime('2026-05-19 00:00:00'), strtotime('2026-05-20 00:00:00'));
+
+        self::assertCount(0, $events);
+    }
+
+
+    public function testSocsMusicEmptyFeedFailureReturnsEmptyCollectionWithoutReporting(): void
+    {
+        $eventTypeMapper = $this->createMock(EventTypeMapper::class);
+        $eventTypeMapper->expects($this->never())->method('findFirstMeaningfulId');
+
+        $userMapper = $this->createMock(UserMapper::class);
+        $userMapper->expects($this->never())->method('findByExternalId');
+
+        $sentry = $this->createMock(HubInterface::class);
+        $sentry->expects($this->never())->method('captureException');
+
+        $source = new Calendar_Api_EventType_Event_SocsMusic_Default(
+            456,
+            $this->createUser(91, 'STUDENT-9', 'Jill', 'Student'),
+            new User(),
+            new ArrayLoader([
+                ConfigMapper::NAME_SOCS_ENABLED => true,
+                ConfigMapper::NAME_SOCS_IMPORT_MUSIC_LESSONS => true,
+                ConfigMapper::NAME_SOCS_ENDPOINT_HOST => 'https://socs.example.test',
+                ConfigMapper::NAME_SOCS_ENDPOINT_ID => 'school',
+                ConfigMapper::NAME_SOCS_ENDPOINT_TOKEN => 'token',
+                ConfigMapper::NAME_SOCS_MUSIC_LESSONS_DEFAULT_EVENT_TYPE => 1,
+            ]),
+            $eventTypeMapper,
+            new class extends HttpClient {
+                public function __construct()
+                {
+                }
+
+                public function getCached(string $path, array $query): \SimpleXMLElement
+                {
+                    throw new \RuntimeException('SOCS endpoint /socs/xml/tuition.ashx: returned an empty payload');
+                }
+            },
+            $userMapper,
+            [[
+                'eventTypeID' => 1,
+                'eventType' => 'SOCS Music',
+                'eventColour' => '#9ad39b',
+            ]],
+            $sentry,
         );
 
         $events = $source->getEvents(strtotime('2026-05-19 00:00:00'), strtotime('2026-05-20 00:00:00'));

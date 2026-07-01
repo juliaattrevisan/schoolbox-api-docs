@@ -25,6 +25,7 @@ use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
+use Sentry\State\HubInterface;
 
 class Calendar_Api_Factory
 {
@@ -46,6 +47,7 @@ class Calendar_Api_Factory
      * @param ClientInterface        $redis                Redis instance: required by vCal calendar.
      * @param Client                 $httpClient           HTTP client with application request tracing.
      * @param Cache                  $cache                HTTP cache: required by vCal and SOCS calendars.
+     * @param HubInterface|null      $sentry               Sentry hub for reporting feed failures.
      */
     public function __construct(
         private Assessment\MapperProxy $assessmentDataSource,
@@ -55,6 +57,7 @@ class Calendar_Api_Factory
         private ClientInterface $redis,
         private Client $httpClient,
         private Cache $cache,
+        private ?HubInterface $sentry = null,
     ) {
         $this->generateAvailableSubscriptions();
     }
@@ -348,6 +351,8 @@ class Calendar_Api_Factory
                         $this->cache,
                     ),
                     \Schoolbox\UserMapper::getInstance(),
+                    null,
+                    $this->sentry,
                 );
             case Calendar_Api_EventType_Event_Socs_Default::class:
                 return new Calendar_Api_EventType_Event_Socs_Default(
@@ -364,6 +369,8 @@ class Calendar_Api_Factory
                         $this->httpClient,
                         $this->cache,
                     ),
+                    null,
+                    $this->sentry,
                 );
             case Calendar_Api_EventType_Event_Vcal_Default::class:
                 return new Calendar_Api_EventType_Event_Vcal_Default($connectorId, $user, $viewer, $this->redis, $this->cache);
