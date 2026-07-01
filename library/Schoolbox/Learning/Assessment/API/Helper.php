@@ -143,6 +143,7 @@ class Helper
             ];
 
             if (!isset($output[$assessmentId])) {
+                $rubrics = $this->getRubrics((string)$assessmentId);
                 $output[$assessmentId] = [
                     'id'               => $assessmentId,
                     'title'            => $row['title'],
@@ -167,7 +168,8 @@ class Helper
                     'project'          => (null === $row['project']) ? null : ['id' => (int)$row['project']],
                     'weight'           => in_array($row['assessmentType'], $unweightedActivities) ? null : (float)$row['weight'],
                     'dueDate'          => $row['due_date'] ? \Alaress_Date_Format::newDatabaseDate($row['due_date'])->toRfc3339String() : null,
-                    'rubric'           => $this->getRubric($assessmentId),
+                    'rubric'           => self::firstRubricAsLegacy($rubrics),
+                    'rubrics'          => $rubrics,
                     'participants'     => (
                         // Participants is not applicable to 'lessonPlan'.
                         (AssessmentType::TYPE_LESSON_PLAN === $row['assessmentType']) ? null : []
@@ -1002,11 +1004,15 @@ class Helper
     }
 
     /**
-     * get full rubric template
+     * Get all rubric templates attached to an assessment.
+     *
+     * Returns a list of rubrics (each with its own title and weight). Empty when the assessment has
+     * no rubric instances. Decoupled from submission_box so it works for any assessment type.
+     *
      * @param string $assessmentId
-     * @return array|null
+     * @return array<int, array>
      */
-    public function getRubric(string $assessmentId): ?array
+    public function getRubrics(string $assessmentId): array
     {
         $statement = $this->mapper->getDatabase()->prepare("
         SELECT
@@ -1016,60 +1022,105 @@ class Helper
             rl.sequence as `descriptor_sequence`,
             t.*
         FROM v_rubric t
-                 INNER JOIN submission_box sb on t.assessment_id = sb.assessment_id
                  INNER JOIN rubric_descriptor rd ON (t.indicator_id = rd.rubric_indicator_id and rd.deleted_at is null)
                  INNER JOIN rubric_level rl on (
                     rd.level_id = rl.id
                     and t.rubric_instance_id = rl.rubric_instance_id
                     and rl.deleted_at is null
                  )
-        WHERE t.assessment_id =  :assessmentID
+        WHERE t.assessment_id = :assessmentID
+        ORDER BY t.rubric_instance_id, t.capability_sequence, t.capability_id, t.indicator_sequence, t.indicator_id
         ");
         $statement->execute(['assessmentID' => $assessmentId]);
-        $output = [];
-        //if assessment has no rubric, return null
-        if (0 === $statement->rowCount()) {
+
+        return self::buildTemplateRubrics($statement->fetchAll(PDO::FETCH_ASSOC));
+    }
+
+    /**
+     * Reshape flat v_rubric template rows into a list of nested rubrics grouped by rubric instance.
+     *
+     * @param array<int, array> $rows
+     * @return array<int, array>
+     */
+    private static function buildTemplateRubrics(array $rows): array
+    {
+        $rubrics = [];
+        foreach ($rows as $row) {
+            $instanceId = (int)$row['rubric_instance_id'];
+
+            if (!isset($rubrics[$instanceId])) {
+                $rubrics[$instanceId] = [
+                    'id'           => $instanceId,
+                    'title'        => $row['rubric_instance_title'],
+                    'weight'       => (null === $row['rubric_instance_weight']) ? null : (float)$row['rubric_instance_weight'],
+                    'capabilities' => [],
+                ];
+            }
+
+            $capabilities = &$rubrics[$instanceId]['capabilities'];
+            if (!isset($capabilities[$row['capability_id']])) {
+                $capabilities[$row['capability_id']] = [
+                    'id'         => (int)$row['capability_id'],
+                    'name'       => $row['capability_name'],
+                    'maxValue'   => (float)$row['capability_max_value'],
+                    'indicators' => [],
+                ];
+            }
+
+            $indicators = &$capabilities[$row['capability_id']]['indicators'];
+            if (!isset($indicators[$row['indicator_id']])) {
+                $indicators[$row['indicator_id']] = [
+                    'id'          => (int)$row['indicator_id'],
+                    'name'        => $row['indicator_name'],
+                    'maxValue'    => (float)$row['indicator_max_value'],
+                    'descriptors' => [],
+                ];
+            }
+
+            $descriptors = &$indicators[$row['indicator_id']]['descriptors'];
+            if (!isset($descriptors[$row['descriptor_id']])) {
+                $descriptors[$row['descriptor_id']] = [
+                    'id'          => (int)$row['descriptor_id'],
+                    'description' => $row['descriptor_descriptor'],
+                    'maxValue'    => (float)$row['descriptor_max_value'],
+                    'sequence'    => (int)$row['descriptor_sequence'],
+                ];
+            }
+
+            unset($capabilities, $indicators, $descriptors);
+        }
+
+        // Strip the associative keys used only for grouping.
+        foreach ($rubrics as &$rubric) {
+            foreach ($rubric['capabilities'] as &$capability) {
+                foreach ($capability['indicators'] as &$indicator) {
+                    $indicator['descriptors'] = array_values($indicator['descriptors']);
+                }
+                unset($indicator);
+                $capability['indicators'] = array_values($capability['indicators']);
+            }
+            unset($capability);
+            $rubric['capabilities'] = array_values($rubric['capabilities']);
+        }
+        unset($rubric);
+
+        return array_values($rubrics);
+    }
+
+    /**
+     * Reduce a list of rubrics to the deprecated singular `rubric` payload: the first rubric's
+     * capabilities only (no id/title/weight), or null when there are no rubrics.
+     *
+     * @param array<int, array> $rubrics
+     * @return array|null
+     */
+    private static function firstRubricAsLegacy(array $rubrics): ?array
+    {
+        if (!isset($rubrics[0])) {
             return null;
         }
-        foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
-            //build the capability if it does not already exist
-            if (!isset($output['capabilities'][$row['capability_id']])) {
-                $output['capabilities'][$row['capability_id']] = [
-                    'id'            => (int)$row['capability_id'],
-                    'name'          => $row['capability_name'],
-                    'maxValue'      => (float)$row['capability_max_value'],
-                    'indicators'    => []
-                ];
-            }
-            //capability should already exist, so lets build the indicator for that capability
-            if (!isset($output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']])) {
-                $output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']] = [
-                    'id'            => (int)$row['indicator_id'],
-                    'name'          => $row['indicator_name'],
-                    'maxValue'      => (float)$row['indicator_max_value'],
-                    'descriptors'   => []
-                ];
-            }
-            //indicator should already exist, so lets build the descriptor for that indicator for that capability
-            if (!isset($output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['descriptors'][$row['descriptor_id']])) {
-                $output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['descriptors'][$row['descriptor_id']] = [
-                    'id'            => (int)$row['descriptor_id'],
-                    'description'   => $row['descriptor_descriptor'],
-                    'maxValue'      => (float)$row['descriptor_max_value'],
-                    'sequence'      => (int)$row['descriptor_sequence']
-                ];
-            }
-        }
-        //clean the data, remove the numeric array keys
-        foreach ($output['capabilities'] as $capKey => $capArr) {
-            foreach ($capArr['indicators'] as $indKey => $indArr) {
-                $output['capabilities'][$capKey]['indicators'][$indKey]['descriptors'] = array_values($indArr['descriptors']);
-            }
-            //grab the original array indicators values which above has changed, not the old ones from the foreach loop that have numeric keys
-            $output['capabilities'][$capKey]['indicators'] = array_values($output['capabilities'][$capKey]['indicators']);
-        }
-        $output['capabilities'] = array_values($output['capabilities']);
-        return $output;
+
+        return ['capabilities' => $rubrics[0]['capabilities']];
     }
 
     /**
