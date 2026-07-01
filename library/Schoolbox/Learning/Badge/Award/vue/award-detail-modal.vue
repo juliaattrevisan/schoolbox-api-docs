@@ -403,7 +403,7 @@ export default {
                         ></relative-time>
                     </p>
                     <template v-if="award.badge.curriculumNodes.length">
-                        <p class="meta">
+                        <p class="meta u-flex u-flex--justify-center u-gap-xs">
                             Curriculum Codes:
                             <codes-list :nodes="award.badge.curriculumNodes" @selected="onCodeSelected" />
                         </p>

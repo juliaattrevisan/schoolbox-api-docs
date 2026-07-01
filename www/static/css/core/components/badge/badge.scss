@@ -137,6 +137,9 @@
     .meta:last-of-type {
         padding-bottom: 1rem;
     }
+    .meta {
+        justify-content: center; // we want to center within the modal, but not when displayed on the evidence page
+    }
 }
 
 .evidence-badge-container {
