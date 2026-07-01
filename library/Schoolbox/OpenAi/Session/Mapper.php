@@ -113,15 +113,7 @@ class Mapper extends BaseMapper
     /**
      * @inheritDoc
      *
-     * TODO:
-     * The derived properties in this class are not hydrated by this function.
-     * There ought to be a way to get the derived properties hydrated.
-     * Possibilities:
-     *  1. Add hydration of the derived fields to this function so findById() would return a fully hydrated object.
-     *  2. Add a findByIdWithDerivedProperties() function as an alternative to findById()
-     *  3. Add a hydrateDerivedProperties() function that could be used to hydrate an object returned by findById().
-     *
-     * Note derived properties are hydrated by $this->getFilteredSessions().
+     * Note derived properties are hydrated by $this->getFilteredSessions() and by the SessionSummariser.
      *
      * @param \PDOStatement $statement
      * @return GenericCollection<Model>
@@ -215,15 +207,7 @@ class Mapper extends BaseMapper
 
         $collection = $this->createCollection();
         $userMapper = $this->getJoinMapper('user');
-        $sessionSummariser = new SessionSummariser($this->getDatabase());
         $sessionRows = $statement->fetchAll(\PDO::FETCH_ASSOC);
-        $sessionLogRowsBySessionId = $sessionSummariser->getSessionLogRowsBySessionId(
-            array_column($sessionRows, 'id')
-        );
-        $moderationEventRowsBySessionId = $sessionSummariser->getModerationEventRowsBySessionId(
-            array_column($sessionRows, 'id')
-        );
-
         $sessions = [];
         foreach ($sessionRows as $row) {
             $session = $this->hydrate($row);
@@ -238,10 +222,12 @@ class Mapper extends BaseMapper
             $collection->add($session);
         }
 
+        $sessionIds = array_column($sessionRows, 'id');
+        $sessionSummariser = new SessionSummariser($this->getDatabase());
         $sessionSummariser->hydrateSessionsWithSummaryInfo(
             $sessions,
-            $sessionLogRowsBySessionId,
-            $moderationEventRowsBySessionId
+            $sessionSummariser->getSessionLogRowsBySessionId($sessionIds),
+            $sessionSummariser->getModerationEventRowsBySessionId($sessionIds),
         );
 
         return $collection;
