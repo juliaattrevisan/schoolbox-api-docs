@@ -2497,18 +2497,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
 
 		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getCapabilityGradeGroup\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getCapabilityMarkType\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getEnableFiles\(\)\.$#'
 			identifier: method.notFound
 			count: 2
@@ -2611,12 +2599,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
 
 		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getUseRubric\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getWorksheetTemplate\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -2636,18 +2618,6 @@ parameters:
 
 		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setAttachments\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setCapabilityGradeGroup\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setCapabilityMarkType\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
@@ -2761,12 +2731,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
 
 		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setUseRubric\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setWorksheetTemplate\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -2776,18 +2740,6 @@ parameters:
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getAttachedFiles\(\)\.$#'
 			identifier: method.notFound
 			count: 4
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getCapabilityGradeGroup\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getCapabilityMarkType\(\)\.$#'
-			identifier: method.notFound
-			count: 2
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
 
 		-
@@ -2857,12 +2809,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
 
 		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getUseRubric\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getWorksheetTemplate\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -2900,18 +2846,6 @@ parameters:
 
 		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setAttachedFiles\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setCapabilityGradeGroup\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setCapabilityMarkType\(\)\.$#'
 			identifier: method.notFound
 			count: 2
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
@@ -2992,12 +2926,6 @@ parameters:
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setSimilarityCheckEnabled\(\)\.$#'
 			identifier: method.notFound
 			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setUseRubric\(\)\.$#'
-			identifier: method.notFound
-			count: 2
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
 
 		-

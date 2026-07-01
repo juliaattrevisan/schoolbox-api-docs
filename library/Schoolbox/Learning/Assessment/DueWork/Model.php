@@ -74,34 +74,9 @@ class Model extends AbstractAssessment implements ISelfAssessable
     protected $showSubmittedOnly = false;
 
     /**
-     * This DueWork uses a Rubric
-     *
-     * This property IS required. We cannot just inspect the attached Rubric because in some
-     * scenarios (eg Collections) we don't hydrate the Rubric.
-     *
-     * @var bool
-     */
-    protected $useRubric = false;
-
-    /**
      * @var Grid|null
      */
     private $rubricGrid;
-
-    /**
-     * The rubric capability's mark type, if chosen
-     *
-     * @var MarkType|null
-     */
-    protected $capabilityMarkType;
-
-
-    /**
-     * The rubric capability's grade group, if chosen
-     *
-     * @var SubmissionBox\GradeLevel\Group\Model|null
-     */
-    protected $capabilityGradeGroup;
 
     /**
      * Only relevant if this DueWork's MarkType is 'TotalMark'
@@ -268,8 +243,6 @@ class Model extends AbstractAssessment implements ISelfAssessable
     {
         parent::overwrite($source);
         $this->acceptOnline           = $source->acceptOnline;
-        $this->capabilityGradeGroup   = $source->capabilityGradeGroup;
-        $this->capabilityMarkType     = $source->capabilityMarkType;
         $this->maxMark                = $source->maxMark;
         $this->instructorMaxMark      = $source->instructorMaxMark;
         $this->instructorMarkType     = $source->instructorMarkType;
@@ -278,7 +251,6 @@ class Model extends AbstractAssessment implements ISelfAssessable
         $this->selfReviewability      = $source->selfReviewability;
         $this->showSubmittedOnly      = $source->showSubmittedOnly;
         $this->similarityCheckEnabled = $source->similarityCheckEnabled;
-        $this->useRubric              = $source->useRubric;
         $this->enableOffline          = $source->enableOffline;
         $this->enableFiles            = $source->enableFiles;
         $this->enablePolicy           = $source->enablePolicy;
@@ -775,24 +747,6 @@ class Model extends AbstractAssessment implements ISelfAssessable
     }
 
     /**
-     * @return boolean
-     */
-    public function getUseRubric()
-    {
-        return $this->useRubric;
-    }
-
-    /**
-     * @param boolean $useRubric
-     * @return static
-     */
-    public function setUseRubric($useRubric)
-    {
-        $this->useRubric = $useRubric;
-        return $this;
-    }
-
-    /**
      * @return null|Grid
      */
     public function getRubricGrid(): ?Grid
@@ -937,24 +891,6 @@ class Model extends AbstractAssessment implements ISelfAssessable
     }
 
     /**
-     * @return MarkType|null
-     */
-    public function getCapabilityMarkType(): ?MarkType
-    {
-        return $this->capabilityMarkType;
-    }
-
-    /**
-     * @param MarkType|null $capabilityMarkType
-     * @return $this
-     */
-    public function setCapabilityMarkType(?MarkType $capabilityMarkType): self
-    {
-        $this->capabilityMarkType = $capabilityMarkType;
-        return $this;
-    }
-
-    /**
      * @return Collection|File[]
      */
     public function getAttachedFiles()
@@ -1023,24 +959,6 @@ class Model extends AbstractAssessment implements ISelfAssessable
     public function setSimilarityCheckEnabled(bool $similarityCheckEnabled): self
     {
         $this->similarityCheckEnabled = $similarityCheckEnabled;
-        return $this;
-    }
-
-    /**
-     * @return SubmissionBox\GradeLevel\Group\Model|null
-     */
-    public function getCapabilityGradeGroup(): ?SubmissionBox\GradeLevel\Group\Model
-    {
-        return $this->capabilityGradeGroup;
-    }
-
-    /**
-     * @param SubmissionBox\GradeLevel\Group\Model|null $capabilityGradeGroup
-     * @return Model
-     */
-    public function setCapabilityGradeGroup(?SubmissionBox\GradeLevel\Group\Model $capabilityGradeGroup): self
-    {
-        $this->capabilityGradeGroup = $capabilityGradeGroup;
         return $this;
     }
 

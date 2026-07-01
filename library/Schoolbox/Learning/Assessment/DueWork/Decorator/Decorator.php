@@ -193,13 +193,6 @@ class Decorator implements DecoratorInterface
             ->setGradeGroup($gradingGroup)
             ->setInstructorGradeGroup($instructorGradingGroup);
 
-        //        $capabilityMarkType = MarkTypeMapper::getInstance()->createModel()->setId($this->getCapabilityMarkType());
-        //        /** @var SubmissionBox\GradeLevel\Group\Model $capabilityGradeGroup */
-        //        $capabilityGradeGroup = Mapper::getInstance()->createModel()->setId($this->getCapabilityGradeGroup());
-        //
-        //        $assessment->setCapabilityMarkType($capabilityMarkType);
-        //        $assessment->setCapabilityGradeGroup($capabilityGradeGroup);
-
         if ($this->getSelfReviewable() !== null) {
             // Something has come through from post, set to that
             $assessment->setSelfReviewability($this->getSelfReviewable());

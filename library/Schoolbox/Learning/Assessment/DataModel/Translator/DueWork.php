@@ -85,9 +85,6 @@ class DueWork implements IAssessmentTypeTranslator
         null === $domainObject->getShowSubmittedOnly()      || $dataModel->setSkipUnsubmitted($domainObject->getShowSubmittedOnly());
         null === $domainObject->getCreator()                || $dataModel->setOwner($domainObject->getCreator());
         null === $domainObject->isAcceptMulti()             || $dataModel->setAcceptMultiple($domainObject->isAcceptMulti());
-        null === $domainObject->getUseRubric()              || $dataModel->setUseRubric($domainObject->getUseRubric());
-        null === $domainObject->getCapabilityMarkType()     || $dataModel->setCapabilityMarkType($domainObject->getCapabilityMarkType());
-        null === $domainObject->getCapabilityGradeGroup()   || $dataModel->setCapabilityGradeGroup($domainObject->getCapabilityGradeGroup());
         null === $domainObject->getSelfReviewability()      || $dataModel->setSelfReviewability($domainObject->getSelfReviewability());
         null === $domainObject->getSimilarityCheckEnabled() || $dataModel->setSimilarityCheckEnabled($domainObject->getSimilarityCheckEnabled());
         null === $domainObject->getEnableWorksheet()        || $dataModel->setEnableWorksheet($domainObject->getEnableWorksheet());
@@ -190,19 +187,6 @@ class DueWork implements IAssessmentTypeTranslator
         // Kami file _may_ be null though
         $domainObject->setWorksheetTemplate($dataModel->getWorksheetTemplate());
         $domainObject->setKamiWorksheetTemplate($dataModel->getKamiWorksheetTemplate());
-
-        /* Has Rubric? (actual rubric must be loaded outside of this method)
-         * If rubric is off for this Due Work, then clear the rubric-related settings
-         */
-        if ($dataModel->getUseRubric()) {
-            $domainObject->setUseRubric(true);
-            $domainObject->setCapabilityMarkType($dataModel->getCapabilityMarkType());
-            $domainObject->setCapabilityGradeGroup($dataModel->getCapabilityGradeGroup());
-        } else {
-            $domainObject->setUseRubric(false);
-            $domainObject->setCapabilityMarkType(null);
-            $domainObject->setCapabilityGradeGroup(null);
-        }
 
         // Figure out submission visibility
         if ($dataModel->getAcceptOnline()) {

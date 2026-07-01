@@ -1330,16 +1330,12 @@ class Mapper extends BaseMapper
                 SELECT
                     {$mapper->getColumnString()},
                     {$mapper->getJoinColumnString('mark_type', 'mt')},
-                    {$mapper->getJoinColumnString('rubric_capability_mark_type_id', 'rmt')},
-                    {$mapper->getJoinColumnString('rubric_capability_grade_group_id', 'rcgg')},
                     {$mapper->getJoinColumnString('worksheetTemplate', 'dueworkWorksheetTemplate')},
                     {$mapper->getJoinColumnString('worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplateAllowedFileExtension')}
                 FROM {$mapper->getDatabase()->getQuoter()->quoteIdentifier($mapper->getTable())}
                 LEFT JOIN {$mapper->getJoinSql('worksheetTemplate', '', 'dueworkWorksheetTemplate', true)}
                 LEFT JOIN {$mapper->getJoinSql('worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplate', 'dueworkWorksheetTemplateAllowedFileExtension', true)}
                 LEFT JOIN {$mapper->getJoinSql('mark_type', '', 'mt')}
-                LEFT JOIN {$mapper->getJoinSql('rubric_capability_mark_type_id', '', 'rmt')}
-                LEFT JOIN {$mapper->getJoinSql('rubric_capability_grade_group_id', '', 'rcgg', true)}
             ",
             $this->hydrateDueWork(...),
         );
@@ -1357,8 +1353,6 @@ class Mapper extends BaseMapper
         $mapper = $this->getJoinMapper('duework');
         return $mapper->hydrate($row)
             ->setMarkType($mapper->hydrateJoin($row, 'mark_type', 'mt'))
-            ->setCapabilityMarkType($mapper->hydrateJoin($row, 'rubric_capability_mark_type_id', 'rmt'))
-            ->setCapabilityGradeGroup($mapper->hydrateJoin($row, 'rubric_capability_grade_group_id', 'rcgg'))
             ->setWorksheetTemplate(
                 $mapper->hydrateJoin($row, 'worksheetTemplate', 'dueworkWorksheetTemplate')
                     ?->setMimeType(
@@ -2285,16 +2279,6 @@ class Mapper extends BaseMapper
                 if ($submodel->getInstructorGradeGroup() instanceof SubmissionBox\GradeLevel\Group\Model) {
                     $submodel->setInstructorGradeGroup(
                         $gradeGroupMapper->findByIdWithFallback($submodel->getInstructorGradeGroup()->getId())
-                    );
-                }
-            }
-
-            /* Rubric Capability Grade Groups only apply to submission boxes (DueWork instances)
-             */
-            if ($submodel instanceof SubmissionBox) {
-                if ($submodel->getCapabilityGradeGroup() instanceof SubmissionBox\GradeLevel\Group\Model) {
-                    $submodel->setCapabilityGradeGroup(
-                        $gradeGroupMapper->findByIdWithFallback($submodel->getCapabilityGradeGroup()->getId())
                     );
                 }
             }
