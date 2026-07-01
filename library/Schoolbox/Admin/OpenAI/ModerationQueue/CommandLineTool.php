@@ -118,7 +118,7 @@ HELP;
             $this->getOptAsInt(self::OPT_LONG_MAX_TIME, self::DEFAULT_MAX_TIME),
             self::DEFAULT_MAX_TIME,
         );
-        $endTime = $this->now() + $maxTime;
+        $endTime = time() + $maxTime;
 
         $logger->notice(sprintf('Running AI moderation queue %s.', $this->perform() ? 'with perform' : 'in dry-run mode'));
         $logger->notice(sprintf('Limit: %d; batch size: %d; max time: %d seconds.', $limit, $batchSize, $maxTime));
@@ -143,7 +143,7 @@ HELP;
         $performOffset = 0;
 
         while ($stats['inspected'] < $limit) {
-            if ($this->now() > $endTime) {
+            if (time() > $endTime) {
                 $this->logSummary($stats, 'maximum runtime reached before next batch');
                 return;
             }
@@ -159,7 +159,7 @@ HELP;
             }
 
             foreach ($candidates as $candidate) {
-                if ($this->now() > $endTime) {
+                if (time() > $endTime) {
                     $this->refreshLock($lock);
                     $this->logSummary($stats, 'maximum runtime reached during batch');
                     return;
@@ -209,7 +209,7 @@ HELP;
                 $this->refreshLock($lock);
             }
 
-            if ($this->now() > $endTime) {
+            if (time() > $endTime) {
                 $this->logSummary($stats, 'maximum runtime reached after batch');
                 return;
             }
@@ -294,13 +294,5 @@ HELP;
             $stats['noOpSkipped'],
             $stats['errors'],
         ));
-    }
-
-    /**
-     * @return int
-     */
-    protected function now(): int
-    {
-        return time();
     }
 }
