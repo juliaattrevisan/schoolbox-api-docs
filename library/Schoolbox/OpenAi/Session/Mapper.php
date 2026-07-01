@@ -144,10 +144,6 @@ class Mapper extends BaseMapper
     /**
      * Fetch a page of sessions with logs for the admin usage log, newest first.
      *
-     * The log format is derived from each session's first viewable log, ordered by earliest created_at and then id.
-     * This is a summary hint for the admin list, not a guarantee that every log in the session has this format.
-     * The error flag is derived from all logs in the session.
-     *
      * @param string|null               $keyword This filters sessions to those with at least one log whose prompt or
      *                                           response contains this text.
      * @param string|null               $feature This filters sessions to those created for this AI feature.

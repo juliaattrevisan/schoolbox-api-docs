@@ -43,6 +43,7 @@ class Model
 
     /**
      * Log format derived from the session's first log.
+     * This is a summary hint for the admin list, not a guarantee that every log in the session has this format.
      * This is used to determine whether any log in the session is renderable (since rendering requires a known log
      * format - see aul-agent-chat.vue).
      * Populated by {@see Mapper::getFilteredSessions(), SessionSummariser::hydrateSessionWithSummaryInfo()}
