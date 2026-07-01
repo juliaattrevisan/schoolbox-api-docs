@@ -223,6 +223,14 @@ XML);
             ->method('captureException')
             ->with($this->isInstanceOf(\RuntimeException::class));
 
+        $config = new \Calendar_Api_Config_Record();
+        $config->setId(123)->setFailedCount(2);
+        $configMapper = $this->createMock(\Calendar_Api_Config_Mapper::class);
+        $configMapper->expects($this->once())->method('findById')->with(123)->willReturn($config);
+        $configMapper->expects($this->once())->method('save')->with($this->callback(
+            static fn (\Calendar_Api_Config_Record $record): bool => $record->getFailedCount() === 3
+        ));
+
         $source = new Calendar_Api_EventType_Event_Socs_Default(
             123,
             $user,
@@ -253,6 +261,7 @@ XML);
                 'eventColour' => '#9ad39b',
             ]],
             $sentry,
+            $configMapper,
         );
 
         $events = $source->getEvents(strtotime('2026-06-18 00:00:00'), strtotime('2026-06-19 00:00:00'));
@@ -272,6 +281,14 @@ XML);
         $sentry->expects($this->once())
             ->method('captureException')
             ->with($this->isInstanceOf(\RuntimeException::class));
+
+        $config = new \Calendar_Api_Config_Record();
+        $config->setId(456)->setFailedCount(4);
+        $configMapper = $this->createMock(\Calendar_Api_Config_Mapper::class);
+        $configMapper->expects($this->once())->method('findById')->with(456)->willReturn($config);
+        $configMapper->expects($this->once())->method('save')->with($this->callback(
+            static fn (\Calendar_Api_Config_Record $record): bool => $record->getFailedCount() === 5
+        ));
 
         $source = new Calendar_Api_EventType_Event_SocsMusic_Default(
             456,
@@ -303,6 +320,7 @@ XML);
                 'eventColour' => '#9ad39b',
             ]],
             $sentry,
+            $configMapper,
         );
 
         $events = $source->getEvents(strtotime('2026-05-19 00:00:00'), strtotime('2026-05-20 00:00:00'));
@@ -321,6 +339,10 @@ XML);
 
         $sentry = $this->createMock(HubInterface::class);
         $sentry->expects($this->never())->method('captureException');
+
+        $configMapper = $this->createMock(\Calendar_Api_Config_Mapper::class);
+        $configMapper->expects($this->never())->method('findById');
+        $configMapper->expects($this->never())->method('save');
 
         $source = new Calendar_Api_EventType_Event_SocsMusic_Default(
             456,
@@ -352,6 +374,7 @@ XML);
                 'eventColour' => '#9ad39b',
             ]],
             $sentry,
+            $configMapper,
         );
 
         $events = $source->getEvents(strtotime('2026-05-19 00:00:00'), strtotime('2026-05-20 00:00:00'));

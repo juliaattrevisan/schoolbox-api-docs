@@ -43,6 +43,7 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
         private HttpClient $httpClient,
         ?array $allLuEventTypes = null,
         private ?HubInterface $sentry = null,
+        private ?Calendar_Api_Config_Mapper $configMapper = null,
     ) {
         parent::__construct($connectorId, $user, $viewer);
         $this->allLuEventTypes = $allLuEventTypes ?? (new Calendar())->getTypeList();
@@ -220,6 +221,19 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
         }
 
         $this->sentry?->captureException($e);
+        $this->addConnectorFailedCount();
+    }
+
+    private function addConnectorFailedCount(): void
+    {
+        try {
+            $mapper = $this->configMapper ?? Calendar_Api_Config_Mapper::getInstance();
+            $config = $mapper->findById($this->getConnectorId());
+            $config->addFailedCount();
+            $mapper->save($config);
+        } catch (\Throwable $e) {
+            $this->sentry?->captureException($e);
+        }
     }
 
     /**

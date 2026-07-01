@@ -353,6 +353,7 @@ class Calendar_Api_Factory
                     \Schoolbox\UserMapper::getInstance(),
                     null,
                     $this->sentry,
+                    Calendar_Api_Config_Mapper::getInstance(),
                 );
             case Calendar_Api_EventType_Event_Socs_Default::class:
                 return new Calendar_Api_EventType_Event_Socs_Default(
@@ -371,6 +372,7 @@ class Calendar_Api_Factory
                     ),
                     null,
                     $this->sentry,
+                    Calendar_Api_Config_Mapper::getInstance(),
                 );
             case Calendar_Api_EventType_Event_Vcal_Default::class:
                 return new Calendar_Api_EventType_Event_Vcal_Default($connectorId, $user, $viewer, $this->redis, $this->cache);

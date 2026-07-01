@@ -47,6 +47,7 @@ class Calendar_Api_EventType_Event_SocsMusic_Default extends Calendar_Api_EventT
         private UserMapper $userMapper,
         ?array $allLuEventTypes = null,
         private ?HubInterface $sentry = null,
+        private ?Calendar_Api_Config_Mapper $configMapper = null,
     ) {
         parent::__construct($connectorId, $user, $viewer);
         $this->allLuEventTypes = $allLuEventTypes ?? (new Calendar())->getTypeList();
@@ -149,6 +150,19 @@ class Calendar_Api_EventType_Event_SocsMusic_Default extends Calendar_Api_EventT
         }
 
         $this->sentry?->captureException($e);
+        $this->addConnectorFailedCount();
+    }
+
+    private function addConnectorFailedCount(): void
+    {
+        try {
+            $mapper = $this->configMapper ?? Calendar_Api_Config_Mapper::getInstance();
+            $config = $mapper->findById($this->getConnectorId());
+            $config->addFailedCount();
+            $mapper->save($config);
+        } catch (\Throwable $e) {
+            $this->sentry?->captureException($e);
+        }
     }
 
     private function getConfiguredEventTypeId(): int
