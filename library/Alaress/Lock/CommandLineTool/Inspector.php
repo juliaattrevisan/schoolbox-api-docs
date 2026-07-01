@@ -132,7 +132,7 @@ class Inspector extends CliTool\App
         \Schoolbox\Admin\DataRetention\CommandLineTool::LOCK_NAME => 'Data Retention Cleanup tool (./tools/dataRetention/process.php)',
 
         // AI moderation queue placeholder
-        ModerationQueueTool::LOCK_NAME => 'AI Moderation Queue (./tools/openai/moderation-queue.php)',
+        ModerationQueueTool::LOCK_NAME => 'AI Moderation Queue (./tools/ai/moderation-queue.php)',
     ];
 
 

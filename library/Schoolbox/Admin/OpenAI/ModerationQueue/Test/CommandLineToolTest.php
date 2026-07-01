@@ -25,7 +25,7 @@ class CommandLineToolTest extends TestCase
     {
         $cron = file_get_contents(SITE_root . '/tools/cron/schoolbox');
 
-        $this->assertStringContainsString('tools/openai/moderation-queue.php', $cron);
+        $this->assertStringContainsString('tools/ai/moderation-queue.php', $cron);
         $this->assertStringContainsString('-n1000', $cron);
         $this->assertStringContainsString('--batch=100', $cron);
         $this->assertStringContainsString('--max-time=1800', $cron);
@@ -39,7 +39,7 @@ class CommandLineToolTest extends TestCase
      */
     public function testModerationQueueWrapperIsExecutable(): void
     {
-        $this->assertTrue(is_executable(SITE_root . '/tools/openai/moderation-queue.php'));
+        $this->assertTrue(is_executable(SITE_root . '/tools/ai/moderation-queue.php'));
     }
 
     /**
@@ -64,6 +64,6 @@ class CommandLineToolTest extends TestCase
         $inspector = file_get_contents(SITE_root . '/library/Alaress/Lock/CommandLineTool/Inspector.php');
 
         $this->assertStringContainsString('ModerationQueueTool::LOCK_NAME', $inspector);
-        $this->assertStringContainsString('AI Moderation Queue (./tools/openai/moderation-queue.php)', $inspector);
+        $this->assertStringContainsString('AI Moderation Queue (./tools/ai/moderation-queue.php)', $inspector);
     }
 }
