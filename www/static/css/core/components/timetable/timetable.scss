@@ -8,6 +8,7 @@
     /* Remove padding on cells containing classes
      */
     td {
+        overflow: hidden;
         padding: 0;
 
         /* Active subject(s) decoration
@@ -42,6 +43,9 @@
             color-adjust: exact;
             -webkit-print-color-adjust: exact;
             padding: 1rem;
+            transition:
+                opacity 0.15s ease,
+                filter 0.15s ease;
             /* override global icon colour.
             *  make it normal icon size.
             */
@@ -70,6 +74,12 @@
         display: block;
         font-weight: normal;
     }
+}
+
+.fc-event.sbx-related-event-muted,
+.timetable-subject.sbx-related-event-muted {
+    filter: grayscale(35%);
+    opacity: 0.38;
 }
 
 /* Fifty-fifty split on small devices

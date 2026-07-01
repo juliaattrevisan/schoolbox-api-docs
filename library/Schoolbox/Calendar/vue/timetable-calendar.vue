@@ -344,9 +344,10 @@ export default {
          */
         events(fetchInfo, callback) {
             const toast = window.sbProps.toastActivate("Retrieving timetable events...");
+            const eventFetchRange = this.fullCalendarHelper_expandEventFetchRange(fetchInfo);
             const params = {
-                start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
-                end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
+                start: Number((eventFetchRange.start.getTime() / 1000).toFixed(0)),
+                end: Number((eventFetchRange.end.getTime() / 1000).toFixed(0)),
                 userId: this.config.userId,
 
                 /* This param lets you load the specific set of subscriptions
@@ -361,13 +362,13 @@ export default {
             })
                 .then((response) => response.json())
                 .then((response) => {
-                    callback(
-                        response.filter((v) => {
-                            return "start" in v;
-                        }),
-                    );
+                    const visibleEvents = response.filter((event) => {
+                        return "start" in event && this.fullCalendarHelper_eventOverlapsFetchRange(event, fetchInfo);
+                    });
 
-                    let slots = this.findSlotBoundaries(response);
+                    callback(visibleEvents);
+
+                    let slots = this.findSlotBoundaries(visibleEvents);
 
                     this.calendarApi.setOption("slotMinTime", slots.slotMinTime);
                     this.calendarApi.setOption("slotMaxTime", slots.slotMaxTime);
@@ -438,7 +439,7 @@ export default {
             /* Filters Modal doesn't exist in the Timetable Calendar special screen
              * Everything always renders
              */
-            return true;
+            return this.fullCalendarHelper_eventRender(eventRenderInfo);
         },
 
         /**

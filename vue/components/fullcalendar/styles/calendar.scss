@@ -211,6 +211,12 @@
     opacity: 0.5;
 }
 
+.fc.sbx-related-events-active .fc-event {
+    transition:
+        opacity 0.15s ease,
+        filter 0.15s ease;
+}
+
 .fc-agenda-slots td div {
     height: 31px;
 }

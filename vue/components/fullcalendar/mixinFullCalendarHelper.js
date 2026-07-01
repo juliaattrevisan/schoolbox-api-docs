@@ -5,6 +5,12 @@
 
 import { EVENT_VARIANTS } from "@schoolboxCalendarEvent/event-variants";
 
+const RELATED_EVENT_ACTIVE_CLASS = "sbx-related-events-active";
+const RELATED_EVENT_MUTED_CLASS = "sbx-related-event-muted";
+const RELATED_EVENT_RELATION_ATTRIBUTE = "data-calendar-event-relation";
+const EVENT_FETCH_DAYS_BEFORE_VISIBLE_RANGE = 30;
+const EVENT_FETCH_DAYS_AFTER_VISIBLE_RANGE = 100;
+
 export default {
     methods: {
         /**
@@ -57,9 +63,91 @@ export default {
                 eventRenderInfo.el.classList.add(calEvent?.extendedProps?.data?.styles?.visible);
             }
 
+            this.fullCalendarHelper_attachRelatedEventHighlighting(eventRenderInfo);
+
             calEvent.setProp("display", "block");
 
             return true;
+        },
+
+        /**
+         * Add relation metadata and hover/focus handlers for events that belong
+         * to an existing FullCalendar group. Keeping this opt-in avoids grouping
+         * unrelated calendar events that only share broad fallback metadata.
+         *
+         * @param {object} eventRenderInfo
+         */
+        fullCalendarHelper_attachRelatedEventHighlighting(eventRenderInfo) {
+            const relationKey = this.fullCalendarHelper_getRelatedEventKey(eventRenderInfo.event);
+
+            if (!relationKey) {
+                return;
+            }
+
+            eventRenderInfo.el.setAttribute(RELATED_EVENT_RELATION_ATTRIBUTE, relationKey);
+            eventRenderInfo.el.addEventListener("mouseenter", this.fullCalendarHelper_highlightRelatedEvents);
+            eventRenderInfo.el.addEventListener("focusin", this.fullCalendarHelper_highlightRelatedEvents);
+            eventRenderInfo.el.addEventListener("mouseleave", this.fullCalendarHelper_clearRelatedEventHighlights);
+            eventRenderInfo.el.addEventListener("focusout", this.fullCalendarHelper_clearRelatedEventHighlights);
+        },
+
+        /**
+         * Return a relation key for group-linked events only. Other event types
+         * need explicit relation metadata before they can be safely grouped.
+         *
+         * @param {object} event
+         * @return {?string}
+         */
+        fullCalendarHelper_getRelatedEventKey(event) {
+            const groupClass = event?.classNames?.find((className) => /^group\d+$/u.test(className));
+            if (groupClass) {
+                return groupClass.replace(/^group/u, "group:");
+            }
+
+            return null;
+        },
+
+        /**
+         * Dim events outside the active group while preserving the original
+         * rendering of grouped events to avoid FullCalendar repaint issues.
+         *
+         * @param {Event} event
+         */
+        fullCalendarHelper_highlightRelatedEvents(event) {
+            const relationKey = event.currentTarget.getAttribute(RELATED_EVENT_RELATION_ATTRIBUTE);
+            const calendar = event.currentTarget.closest(".fc");
+
+            if (!relationKey || !calendar || event.currentTarget.closest(".fc-list")) {
+                return;
+            }
+
+            calendar.classList.add(RELATED_EVENT_ACTIVE_CLASS);
+            calendar.querySelectorAll(`[${RELATED_EVENT_RELATION_ATTRIBUTE}]`).forEach((calendarEvent) => {
+                if (calendarEvent.getAttribute(RELATED_EVENT_RELATION_ATTRIBUTE) === relationKey) {
+                    calendarEvent.classList.remove(RELATED_EVENT_MUTED_CLASS);
+                } else {
+                    calendarEvent.classList.add(RELATED_EVENT_MUTED_CLASS);
+                }
+            });
+        },
+
+        /**
+         * Remove hover/focus styling from the current FullCalendar instance.
+         * This keeps the effect scoped when multiple calendars are rendered.
+         *
+         * @param {Event} event
+         */
+        fullCalendarHelper_clearRelatedEventHighlights(event) {
+            const calendar = event.currentTarget.closest(".fc");
+
+            if (!calendar) {
+                return;
+            }
+
+            calendar.classList.remove(RELATED_EVENT_ACTIVE_CLASS);
+            calendar.querySelectorAll(`[${RELATED_EVENT_RELATION_ATTRIBUTE}]`).forEach((calendarEvent) => {
+                calendarEvent.classList.remove(RELATED_EVENT_MUTED_CLASS);
+            });
         },
 
         /**
@@ -80,6 +168,45 @@ export default {
          */
         fullCalendarHelper_isEOTC(event) {
             return event?.extendedProps?.data?.custom?.isEOTC === true;
+        },
+
+        /**
+         * Expand a visible FullCalendar range before requesting events.
+         *
+         * @param {{ start: Date, end: Date }} range
+         * @return {{ start: Date, end: Date }}
+         */
+        fullCalendarHelper_expandEventFetchRange(range) {
+            const start = new Date(range.start);
+            start.setDate(start.getDate() - EVENT_FETCH_DAYS_BEFORE_VISIBLE_RANGE);
+
+            const end = new Date(range.end);
+            end.setDate(end.getDate() + EVENT_FETCH_DAYS_AFTER_VISIBLE_RANGE);
+
+            return {
+                ...range,
+                start,
+                end,
+            };
+        },
+
+        /**
+         * Determine whether an event overlaps a FullCalendar fetch range.
+         *
+         * @param {{ start: string|Date, end?: string|Date }} event
+         * @param {{ start: Date, end: Date }} range
+         * @return {boolean}
+         */
+        fullCalendarHelper_eventOverlapsFetchRange(event, range) {
+            const eventStart = new Date(event.start).getTime();
+            const rangeStart = range.start.getTime();
+            const rangeEnd = range.end.getTime();
+
+            if (!event.end) {
+                return eventStart >= rangeStart && eventStart < rangeEnd;
+            }
+
+            return new Date(event.end).getTime() > rangeStart && eventStart < rangeEnd;
         },
 
         /**
