@@ -1394,15 +1394,15 @@ class OverallDataset
                                  */
                                 $assessmentWeight = $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight'][$node] ?? null;
 
-                                if (null !== $assessmentWeight) {
+                                /* Skip if this is null; it doesn't count toward their total
+                                 */
+                                $normalisedMark = $capabilityData[$node]['normalisedMark'];
+
+                                if (null !== $assessmentWeight && null !== $normalisedMark) {
                                     $gridWeight = $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'];
                                     $effectiveWeight = $assessmentWeight * $gridWeight;
-                                    $numerator = $capabilityData[$node]['normalisedMark'] * $effectiveWeight;
-                                    if ($capabilityId == 19) {
-                                        if ($studentId == 65) {
-//                                            var_dump($capabilityData);
-                                        }
-                                    }
+                                    $numerator = $normalisedMark * $effectiveWeight;
+
                                     /* Jez Maths
                                      */
                                     $overallMarks[$capabilityId]['students'][$studentId][$node]['formula']['numerator'] += $numerator;
@@ -1421,7 +1421,7 @@ class OverallDataset
 
                                     $overallMarks[$capabilityId]['students'][$studentId][$node]['reasoning'][] = sprintf(
                                         'numerator += %s * %s, denominator += %s * %s',
-                                        $capabilityData[$node]['normalisedMark'],
+                                        $normalisedMark,
                                         $effectiveWeight,
                                         $assessmentWeight,
                                         $gridWeight,
@@ -1467,10 +1467,14 @@ class OverallDataset
                                      */
                                     $assessmentWeight = $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight'][$node] ?? null;
 
-                                    if (null !== $assessmentWeight) {
+                                    /* Skip if this is null; it doesn't count toward their total
+                                     */
+                                    $normalisedMark = $capabilityData['indicators'][$indicatorId][$node]['normalisedMark'];
+
+                                    if (null !== $assessmentWeight && null !== $normalisedMark) {
                                         $gridWeight = $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'];
                                         $effectiveWeight = $assessmentWeight * $gridWeight;
-                                        $numerator = $capabilityData['indicators'][$indicatorId][$node]['normalisedMark'] * $effectiveWeight;
+                                        $numerator = $normalisedMark * $effectiveWeight;
 
                                         /* Jez Maths
                                          */
@@ -1490,7 +1494,7 @@ class OverallDataset
 
                                         $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId][$node]['reasoning'][] = sprintf(
                                             'numerator += %s * %s, denominator += %s * %s',
-                                            $capabilityData['indicators'][$indicatorId][$node]['normalisedMark'],
+                                            $normalisedMark,
                                             $effectiveWeight,
                                             $assessmentWeight,
                                             $gridWeight,
