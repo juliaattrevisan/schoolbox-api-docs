@@ -1399,7 +1399,7 @@ class OverallDataset
                                 $normalisedMark = $capabilityData[$node]['normalisedMark'];
 
                                 if (null !== $assessmentWeight && null !== $normalisedMark) {
-                                    $gridWeight = $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'];
+                                    $gridWeight = $assessments[$assessmentId]['gridData'][$rubricInstanceId]['weight'] ?? null;
                                     $effectiveWeight = $assessmentWeight * $gridWeight;
                                     $numerator = $normalisedMark * $effectiveWeight;
 
@@ -1472,7 +1472,7 @@ class OverallDataset
                                     $normalisedMark = $capabilityData['indicators'][$indicatorId][$node]['normalisedMark'];
 
                                     if (null !== $assessmentWeight && null !== $normalisedMark) {
-                                        $gridWeight = $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'];
+                                        $gridWeight = $assessments[$assessmentId]['gridData'][$rubricInstanceId]['weight'] ?? null;
                                         $effectiveWeight = $assessmentWeight * $gridWeight;
                                         $numerator = $normalisedMark * $effectiveWeight;
 
