@@ -197,53 +197,14 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Find the registration candidate that is ready for student verification.
+     * Find the registration candidate that has completed the preparation phase.
      *
      * @param User $user
      * @return Model|null
      * @throws BaseMapper\DefinitionException
      * @throws BaseMapper\Exception
      */
-    public function findUnconfirmedForUser(User $user): ?Model
-    {
-        if (!$user->getId()) {
-            return null;
-        }
-
-        try {
-            $pb = $this->getPredicateBuilder();
-            $pb->equals('user_id', $user->getId());
-            $pb->equals('status', Model::STATUS_UNCONFIRMED);
-
-            $student = $this->findOneByPredicates($pb, [
-                'order' => [
-                    'updated_at' => 'DESC',
-                    'id'         => 'DESC',
-                ],
-                'limit' => 1,
-            ]);
-
-            if (!$student instanceof Model) {
-                return null;
-            }
-
-            return $this->enrichStudentForUser($student, $user);
-        } catch (BaseMapper\Exception\NotFound) {
-            return null;
-        }
-    }
-
-    /**
-     * Find the most recent active registration session student record for the given user,
-     * where "active" means the student is awaiting confirmation (Unconfirmed) or has
-     * already confirmed (Confirmed).
-     *
-     * @param User $user
-     * @return Model|null
-     * @throws BaseMapper\DefinitionException
-     * @throws BaseMapper\Exception
-     */
-    public function findActiveRegistrationForUser(User $user): ?Model
+    public function findCompletedPreparationForUser(User $user): ?Model
     {
         if (!$user->getId()) {
             return null;
@@ -461,6 +422,110 @@ class Mapper extends BaseMapper
         return (int) $statement->fetchColumn() > 0;
     }
 
+    /**
+     * Find candidates waiting to be submitted to IBIS.
+     *
+     * @param int $limit
+     * @return GenericCollection|Model[]
+     * @throws BaseMapper\DefinitionException
+     * @throws BaseMapper\Exception
+     * @throws Predicate\InvalidColumnException
+     */
+    public function findPendingCandidateRegistrations(int $limit): GenericCollection
+    {
+        if ($limit <= 0) {
+            return $this->createCollection();
+        }
+
+        $pb = $this->getPredicateBuilder();
+        $pb->equals('status', Model::STATUS_IN_PROGRESS);
+
+        $students = $this->findByPredicates($pb, [
+            'order' => [
+                'updated_at' => 'ASC',
+                'id' => 'ASC',
+            ],
+            'limit' => $limit,
+        ]);
+
+        if ($students->count() === 0) {
+            return $students;
+        }
+
+        /** @var UserMapper $userMapper */
+        $userMapper = $this->getJoinMapper('user');
+        $userIds = [];
+        $systemPurposeIdsByUserId = [];
+
+        foreach ($students as $student) {
+            if (!$student instanceof Model || !$student->getUser()?->getId()) {
+                continue;
+            }
+
+            $userId = $student->getUser()->getId();
+            $userIds[$userId] = $userId;
+
+            $systemPurposeId = $student->getRegistrationSession()?->getSystemPurpose()?->getId();
+            if ($systemPurposeId !== null) {
+                $systemPurposeIdsByUserId[$userId] = $systemPurposeId;
+            }
+        }
+
+        if ($userIds === []) {
+            return $students;
+        }
+
+        $users = $userMapper->findByPredicates(
+            $userMapper->getPredicateBuilder()->in('id', array_values($userIds))
+        );
+        $usersById = [];
+
+        foreach ($users as $user) {
+            $usersById[$user->getId()] = $user;
+        }
+
+        $groupSubjectsBySystemPurposeAndUserId = [];
+
+        foreach (array_unique($systemPurposeIdsByUserId) as $systemPurposeId) {
+            $usersForSystemPurpose = [];
+
+            foreach ($systemPurposeIdsByUserId as $userId => $studentSystemPurposeId) {
+                if ($studentSystemPurposeId === $systemPurposeId && isset($usersById[$userId])) {
+                    $usersForSystemPurpose[$userId] = $usersById[$userId];
+                }
+            }
+
+            $groupSubjectsBySystemPurposeAndUserId[$systemPurposeId] = $this->findIbGroupSubjectsForUsers(
+                $usersForSystemPurpose,
+                $systemPurposeId
+            );
+        }
+
+        foreach ($students as $student) {
+            if (!$student instanceof Model || !$student->getUser()?->getId()) {
+                continue;
+            }
+
+            $userId = $student->getUser()->getId();
+            $systemPurposeId = $student->getRegistrationSession()?->getSystemPurpose()?->getId();
+
+            if (isset($usersById[$userId])) {
+                $student->setUser($usersById[$userId]);
+            }
+
+            if ($systemPurposeId !== null) {
+                $student->setIbGroupSubjects(
+                    $groupSubjectsBySystemPurposeAndUserId[$systemPurposeId][$userId]
+                        ?? new GenericCollection(GroupSubjectModel::class)
+                );
+            }
+        }
+
+        $this->applySubjectLanguageOverrides($students);
+
+        return $students;
+    }
+
     protected function getSubjectLanguageMapper(): SubjectLanguageMapper
     {
         return SubjectLanguageMapper::getInstance();
@@ -654,6 +719,7 @@ class Mapper extends BaseMapper
                     g.sequence AS group_sequence,
                     s.id AS subject_id,
                     s.name AS subject_name,
+                    s.transcript_name as transcript_name,
                     l.id AS language_id,
                     l.code AS language_code,
                     l.name AS language_name
@@ -703,6 +769,7 @@ class Mapper extends BaseMapper
                     g.sequence AS group_sequence,
                     s.id AS subject_id,
                     s.name AS subject_name,
+                    s.transcript_name as transcript_name,
                     l.id AS language_id,
                     l.code AS language_code,
                     l.name AS language_name
@@ -759,6 +826,7 @@ class Mapper extends BaseMapper
                     (new IBSubjectModel())
                         ->setId((int) $row['subject_id'])
                         ->setName((string) $row['subject_name'])
+                        ->setTranscriptName($row['transcript_name'] ?? null)
                 )
                 ->setLanguages(new GenericCollection(GroupSubjectLanguageModel::class));
 

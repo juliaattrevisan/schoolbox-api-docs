@@ -43,6 +43,7 @@ class ModelToArrayTest extends TestCase
         $this->assertSame(123, $payload['userId']);
         $this->assertSame(456, $payload['registrationSessionStudentId']);
         $this->assertSame(RegistrationSessionStudentModel::STATUS_CONFIRMED, $payload['status']);
+        $this->assertNull($payload['errorMessage']);
         $this->assertSame('Nguyen, Alex', $payload['userName']);
         $this->assertNull($payload['ibCandidateNumber']);
         $this->assertFalse($payload['hasMissingDetails']);
@@ -318,6 +319,21 @@ class ModelToArrayTest extends TestCase
             '/adminv2/international-baccalaureate/registrations/sessions/12/candidates/renotify',
             $payload['_routes']['renotify']
         );
+    }
+
+    public function testBuildsPayloadWitherrorMessage(): void
+    {
+        $payload = $this->createTranslator()(
+            $this->buildStudent()->setStatus(RegistrationSessionStudentModel::STATUS_FAILED),
+            [
+                'StudentBirthDate' => '2009-04-12',
+                'StudentGender' => 'F',
+            ],
+            'Example School',
+            'Candidate rejected by IBIS'
+        );
+
+        $this->assertSame('Candidate rejected by IBIS', $payload['errorMessage']);
     }
 
     private function createTranslator(): ModelToArray

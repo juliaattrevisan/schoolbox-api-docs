@@ -17,6 +17,7 @@ import {
     defineCustomElement,
     useTemplateRef,
     provide,
+    toRef,
 } from "vue";
 window.Vue = {};
 window.Vue.ref = ref;
@@ -29,6 +30,7 @@ window.Vue.nextTick = nextTick;
 window.Vue.defineCustomElement = defineCustomElement;
 window.Vue.useTemplateRef = useTemplateRef;
 window.Vue.provide = provide;
+window.Vue.toRef = toRef;
 
 /**
  * Assign defaults to sbProps to prevent errors in tests

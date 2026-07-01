@@ -13,6 +13,7 @@ defineEmits<{
     completePreparation: [];
     renotify: [];
     approveOnBehalf: [];
+    registerViaApi: [];
     resetDetails: [];
     manuallyRegister: [];
     clearSelection: [];
@@ -25,67 +26,74 @@ defineEmits<{
             <em>{{ selectedCount }} student{{ selectedCount === 1 ? "" : "s" }} selected</em>
         </span>
         <button type="button" class="button-clear" @click="$emit('clearSelection')">Clear selection</button>
-        <div class="u-flex-row u-flex--justify u-gap-xs">
-            <button
-                v-if="activeSection === 'preparation'"
-                type="button"
-                class="button sbx-button--has-icon u-flex__item--1-auto"
-                :disabled="isLoading"
-                @click="$emit('completePreparation')"
-            >
-                <sbx-icon name="notifications-hollow"></sbx-icon>
-                Complete preparation
-            </button>
-            <button
-                v-if="activeSection === 'unconfirmed'"
-                type="button"
-                class="button sbx-button--has-icon u-flex__item--1-auto"
-                :disabled="isLoading"
-                @click="$emit('renotify')"
-            >
-                <sbx-icon name="notifications-hollow"></sbx-icon>
-                Renotify
-            </button>
-            <button
-                v-if="activeSection === 'unconfirmed'"
-                type="button"
-                class="button sbx-button--has-icon u-flex__item--1-auto"
-                :disabled="isLoading"
-                @click="$emit('approveOnBehalf')"
-            >
-                <sbx-icon name="approve"></sbx-icon>
-                Approve on behalf of student
-            </button>
-            <button
-                v-if="activeSection === 'unconfirmed' || activeSection === 'confirmed' || activeSection === 'failed'"
-                type="button"
-                class="button sbx-button--has-icon u-flex__item--1-auto"
-                :disabled="isLoading"
-                @click="$emit('resetDetails')"
-            >
-                <sbx-icon name="undo"></sbx-icon>
-                Reset all details
-            </button>
-            <button
-                v-if="activeSection === 'confirmed' || activeSection === 'failed'"
-                type="button"
-                class="button sbx-button--has-icon u-flex__item--1-auto"
-                :disabled="isLoading"
-                @click="$emit('manuallyRegister')"
-            >
-                <sbx-icon name="international-baccalaureate"></sbx-icon>
-                Mark as manually registered
-            </button>
-            <button
-                type="button"
-                class="button sbx-button--has-icon u-flex__item--1-auto"
-                disabled
-                aria-disabled="true"
-                title="Coming soon"
-            >
-                Submit to IB
-            </button>
-        </div>
+        <ul class="flex-list buttons">
+            <li v-if="activeSection === 'preparation'">
+                <button
+                    type="button"
+                    class="button sbx-button--has-icon"
+                    :disabled="isLoading"
+                    @click="$emit('completePreparation')"
+                >
+                    <sbx-icon name="notifications-hollow"></sbx-icon>
+                    Complete preparation
+                </button>
+            </li>
+            <li v-if="activeSection === 'unconfirmed'">
+                <button
+                    type="button"
+                    class="button sbx-button--has-icon"
+                    :disabled="isLoading"
+                    @click="$emit('renotify')"
+                >
+                    <sbx-icon name="notifications-hollow"></sbx-icon>
+                    Renotify
+                </button>
+            </li>
+            <li v-if="activeSection === 'unconfirmed'">
+                <button
+                    type="button"
+                    class="button sbx-button--has-icon l-flex__item--1-auto"
+                    :disabled="isLoading"
+                    @click="$emit('approveOnBehalf')"
+                >
+                    <sbx-icon name="approve"></sbx-icon>
+                    Approve on behalf of student
+                </button>
+            </li>
+            <li v-if="activeSection === 'unconfirmed' || activeSection === 'confirmed' || activeSection === 'failed'">
+                <button
+                    type="button"
+                    class="button sbx-button--has-icon"
+                    :disabled="isLoading"
+                    @click="$emit('resetDetails')"
+                >
+                    <sbx-icon name="undo"></sbx-icon>
+                    Reset all details
+                </button>
+            </li>
+            <li v-if="activeSection === 'confirmed' || activeSection === 'failed'">
+                <button
+                    type="button"
+                    class="button sbx-button--has-icon l-flex__item--1-auto"
+                    :disabled="isLoading"
+                    @click="$emit('manuallyRegister')"
+                >
+                    <sbx-icon name="international-baccalaureate"></sbx-icon>
+                    Mark as manually registered
+                </button>
+            </li>
+            <li v-if="activeSection === 'confirmed' || activeSection === 'failed'">
+                <button
+                    type="button"
+                    class="button submit sbx-button--has-icon"
+                    :disabled="isLoading"
+                    @click="$emit('registerViaApi')"
+                >
+                    <sbx-icon name="export"></sbx-icon>
+                    Register via API
+                </button>
+            </li>
+        </ul>
     </bottom-drawer>
 </template>
 

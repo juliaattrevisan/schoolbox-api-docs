@@ -32,6 +32,7 @@ class Mapper extends BaseMapper
         $this->hasTable('lu_ib_subjects');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('transcript_name', self::TYPE_STRING);
         $this->uses('name', self::TYPE_STRING);
     }
 

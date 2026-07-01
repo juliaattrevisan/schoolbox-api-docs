@@ -9,7 +9,7 @@ import IbReportInProgressTable from "./components/ib-report-in-progress-table.vu
 import IbReportRegisteredTable from "./components/ib-report-registered-table.vue";
 import IbUpdateLanguageModal from "./components/ib-update-language-modal.vue";
 import IbReportActionDrawer from "./components/ib-report-action-drawer.vue";
-import IbResetDetailsModal from "./components/ib-reset-details-modal.vue";
+import IbStudentConfirmationModal from "./components/ib-student-confirmation-modal.vue";
 import { useIbReportUpdateLanguageStore } from "./store/ibReportUpdateLanguageStore";
 import type {
     StudentRow,
@@ -32,6 +32,7 @@ interface Props {
     searchLanguagesEndpoint: string;
     renotifyEndpoint: string;
     completePreparationEndpoint: string;
+    registerViaApiEndpoint: string;
     resetDetailsEndpoint: string;
     manuallyRegisterEndpoint: string;
     sessionTitle: string;
@@ -93,11 +94,14 @@ window.Vue.watch(failedSelected, (newVal) => {
 });
 
 const isCompleting = window.Vue.ref<boolean>(false);
+const isRegistering = window.Vue.ref<boolean>(false);
 const isResetting = window.Vue.ref<boolean>(false);
 const isManuallyRegistering = window.Vue.ref<boolean>(false);
 const isApprovingOnBehalf = window.Vue.ref<boolean>(false);
 const isRenotifying = window.Vue.ref<boolean>(false);
+const registerViaApiModalOpen = window.Vue.ref<boolean>(false);
 const resetModalOpen = window.Vue.ref<boolean>(false);
+const studentsToRegister = window.Vue.ref<Pick<StudentRow, "id" | "userId" | "name" | "subjects">[]>([]);
 const studentsToReset = window.Vue.ref<Pick<StudentRow, "id" | "userId" | "name">[]>([]);
 
 /**
@@ -174,7 +178,12 @@ async function loadCandidates(): Promise<void> {
         unconfirmed.value = (byKey["unconfirmed"] ?? []).map((s) => mapStudentRow(s, "unconfirmed", renotifyEndpoint));
         confirmed.value = (byKey["confirmed"] ?? []).map((s) => mapStudentRow(s, "confirmed"));
         inProgress.value = (byKey["inProgress"] ?? []).map((s) => mapStudentRow(s, "inProgress"));
-        failed.value = (byKey["failed"] ?? []).map((s) => mapStudentRow(s, "failed") as FailedRow);
+        failed.value = (byKey["failed"] ?? []).map(
+            (s): FailedRow => ({
+                ...mapStudentRow(s, "failed"),
+                errorMessage: s.errorMessage,
+            }),
+        );
         registered.value = (byKey["registered"] ?? []).map(
             (s): RegisteredRow => ({
                 ...mapStudentRow(s, "registered"),
@@ -244,6 +253,64 @@ async function handleCompletePreparation(studentIds: number[]): Promise<void> {
         toast.timeout({ text: "Failed to complete preparation.", isSuccess: false });
     } finally {
         isCompleting.value = false;
+    }
+}
+
+/**
+ * Opens the register-via-API confirmation modal for the given student IDs.
+ * @param studentIds The ids to queue for API registration.
+ */
+function promptRegisterViaApi(studentIds: number[]): void {
+    studentsToRegister.value = [...confirmed.value, ...failed.value]
+        .filter((s) => studentIds.includes(s.id))
+        .map((s) => ({ id: s.id, userId: s.userId, name: s.name, subjects: s.subjects }));
+    if (studentsToRegister.value.length === 0) return;
+    registerViaApiModalOpen.value = true;
+}
+
+/**
+ * Queues the selected confirmed students for API registration and moves them into the in-progress section.
+ */
+async function handleRegisterViaApi(): Promise<void> {
+    if (studentsToRegister.value.length === 0) return;
+    if (isRegistering.value) return;
+    isRegistering.value = true;
+    registerViaApiModalOpen.value = false;
+
+    const studentIds = studentsToRegister.value.map((s) => s.id);
+    const toast = window.sbProps.toastActivate("Queueing API registration...");
+
+    try {
+        const response = await apiRequest<{ success: boolean; message?: string }, { studentIds: number[] }>({
+            url: props.registerViaApiEndpoint,
+            method: "POST",
+            body: { studentIds },
+        });
+
+        if (!response.success) {
+            toast.timeout({ text: response.message ?? "Failed to queue API registration.", isSuccess: false });
+            return;
+        }
+
+        const removedIds = new Set(studentIds);
+        const queuedStudents = studentsToRegister.value.map(({ id, name, subjects }) => ({
+            id,
+            name,
+            subjects,
+        }));
+        confirmed.value = confirmed.value.filter((s) => !removedIds.has(s.id));
+        failed.value = failed.value.filter((s) => !removedIds.has(s.id));
+        inProgress.value = [...queuedStudents, ...inProgress.value];
+        clearSelection();
+        toast.timeout({
+            text: `Queued ${studentIds.length} student${studentIds.length === 1 ? "" : "s"} for API registration.`,
+        });
+    } catch (e) {
+        console.error("Failed to queue API registration", e);
+        toast.timeout({ text: "Failed to queue API registration.", isSuccess: false });
+    } finally {
+        isRegistering.value = false;
+        studentsToRegister.value = [];
     }
 }
 
@@ -532,6 +599,7 @@ window.Vue.onMounted((): void => {
                     :search-languages-endpoint="props.searchLanguagesEndpoint"
                     section="confirmed"
                     :active-selection-section="activeSelectionSection"
+                    @register-via-api-single="(id) => promptRegisterViaApi([id])"
                     @reset-details-single="(id) => promptResetDetails([id])"
                     @manually-register-single="(id) => handleManuallyRegister([id])"
                 />
@@ -546,6 +614,7 @@ window.Vue.onMounted((): void => {
                     v-model:selected-list="failedSelected"
                     :students="failed"
                     :active-selection-section="activeSelectionSection"
+                    @register-via-api-single="(id) => promptRegisterViaApi([id])"
                     @reset-details-single="(id) => promptResetDetails([id])"
                     @manually-register-single="(id) => handleManuallyRegister([id])"
                 />
@@ -560,9 +629,21 @@ window.Vue.onMounted((): void => {
 
         <ib-update-language-modal />
 
-        <ib-reset-details-modal
+        <ib-student-confirmation-modal
+            v-model:is-open="registerViaApiModalOpen"
+            :students="studentsToRegister"
+            description="Registering via API will queue the selected student(s) for the next IBIS submission run."
+            confirm-label="Register via API"
+            :is-loading="isRegistering"
+            @confirm="handleRegisterViaApi"
+            @cancel="registerViaApiModalOpen = false"
+        />
+
+        <ib-student-confirmation-modal
             v-model:is-open="resetModalOpen"
             :students="studentsToReset"
+            description="Resetting will clear all registration details and move the selected student(s) back to Preparation."
+            confirm-label="Reset all details"
             :is-loading="isResetting"
             @confirm="handleResetDetails"
             @cancel="resetModalOpen = false"
@@ -575,11 +656,19 @@ window.Vue.onMounted((): void => {
                 confirmedSelected.length +
                 failedSelected.length
             "
-            :is-loading="isCompleting || isResetting || isManuallyRegistering || isApprovingOnBehalf || isRenotifying"
+            :is-loading="
+                isCompleting ||
+                isRegistering ||
+                isResetting ||
+                isApprovingOnBehalf ||
+                isManuallyRegistering ||
+                isRenotifying
+            "
             :active-section="activeSelectionSection"
             @complete-preparation="handleCompletePreparation(preparationSelected.map((s) => s.id))"
-            @renotify="handleRenotifySelected(unconfirmedSelected)"
+            @register-via-api="promptRegisterViaApi([...confirmedSelected, ...failedSelected].map((s) => s.id))"
             @approve-on-behalf="handleApproveOnBehalf(unconfirmedSelected)"
+            @renotify="handleRenotifySelected(unconfirmedSelected)"
             @reset-details="
                 promptResetDetails([...unconfirmedSelected, ...confirmedSelected, ...failedSelected].map((s) => s.id))
             "

@@ -27,6 +27,7 @@ use Schoolbox\Collection;
 use Schoolbox\Config\ArrayLoader;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\IB\Registrations\Api\ResponseLog\Helper as RegistrationApiResponseLogHelper;
 use Schoolbox\IB\Group\Mapper as IBGroupMapper;
 use Schoolbox\IB\Group\Subject\Language\Mapper as GroupSubjectLanguageMapper;
 use Schoolbox\IB\Group\Subject\Mapper as IBGroupSubjectMapper;
@@ -74,10 +75,18 @@ class ControllerTest extends TestCase
                 ['S234', ['StudentBirthDate' => '2008-09-24', 'StudentGender' => 'M']],
             ]);
 
+        $responseLogHelper = $this->createMock(RegistrationApiResponseLogHelper::class);
+        $responseLogHelper
+            ->expects($this->once())
+            ->method('getLatestErrorMessagesByStudentId')
+            ->with(12)
+            ->willReturn([789 => 'Candidate rejected by IBIS']);
+
         $controller = $this->buildController(
             $registrationSessionMapper,
             $registrationSessionStudentMapper,
-            $externalUser
+            $externalUser,
+            registrationApiResponseLogHelper: $responseLogHelper
         );
 
         $controller->getRegistrationSessionStudents(12);
@@ -97,6 +106,7 @@ class ControllerTest extends TestCase
                     'userId' => 123,
                     'registrationSessionStudentId' => 456,
                     'status' => RegistrationSessionStudentModel::STATUS_CONFIRMED,
+                    'errorMessage' => null,
                     'userName' => 'Nguyen, Alex',
                     'ibCandidateNumber' => null,
                     'hasMissingDetails' => false,
@@ -194,6 +204,7 @@ class ControllerTest extends TestCase
                     'userId' => 234,
                     'registrationSessionStudentId' => 789,
                     'status' => RegistrationSessionStudentModel::STATUS_FAILED,
+                    'errorMessage' => 'Candidate rejected by IBIS',
                     'userName' => 'Patel, Sam',
                     'ibCandidateNumber' => null,
                     'hasMissingDetails' => false,
@@ -995,6 +1006,167 @@ class ControllerTest extends TestCase
         $this->assertSame(RegistrationSessionStudentModel::STATUS_PREPARATION, $studentThree->getStatus());
     }
 
+    public function testSessionRegisterViaApiTransitionsSelectedConfirmedStudents(): void
+    {
+        $studentOne = $this->buildStudent(
+            456,
+            123,
+            RegistrationSessionStudentModel::STATUS_CONFIRMED,
+            'Alex',
+            'Nguyen',
+            'S123'
+        );
+        $studentTwo = $this->buildStudent(
+            789,
+            234,
+            RegistrationSessionStudentModel::STATUS_CONFIRMED,
+            'Sam',
+            'Patel',
+            'S234'
+        );
+        $studentThree = $this->buildStudent(
+            890,
+            345,
+            RegistrationSessionStudentModel::STATUS_UNCONFIRMED,
+            'Jordan',
+            'Smith',
+            'S345'
+        );
+
+        $database = $this->createMock(IConnector::class);
+        $database
+            ->expects($this->once())
+            ->method('beginTransaction')
+            ->willReturn(true);
+        $database
+            ->expects($this->once())
+            ->method('commit');
+        $database
+            ->expects($this->never())
+            ->method('rollBack');
+
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->method('getDatabase')
+            ->willReturn($database);
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('findStudentsForSession')
+            ->with(12)
+            ->willReturn(new Collection([$studentOne, $studentTwo, $studentThree]));
+
+        $savedUserIds = [];
+        $registrationSessionStudentMapper
+            ->expects($this->exactly(2))
+            ->method('save')
+            ->with($this->callback(function (RegistrationSessionStudentModel $student) use (&$savedUserIds): bool {
+                $savedUserIds[] = $student->getUser()?->getId();
+                $this->assertSame(RegistrationSessionStudentModel::STATUS_IN_PROGRESS, $student->getStatus());
+
+                return true;
+            }));
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class)
+        );
+        $controller->setRequestPost(new Values([
+            'studentIds' => [123, '234', 234],
+        ]));
+
+        $controller->sessionRegisterViaApi((new RegistrationSessionModel())->setId(12));
+
+        $this->assertSame([123, 234], $savedUserIds);
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(200, $response->getStatusCode());
+
+        $payload = json_decode((string) $response->getBody(), true);
+        $this->assertTrue($payload['success']);
+        $this->assertSame(2, $payload['transitionedCount']);
+        $this->assertSame(RegistrationSessionStudentModel::STATUS_UNCONFIRMED, $studentThree->getStatus());
+    }
+
+    public function testSessionRegisterViaApiRejectsMissingSchoolCode(): void
+    {
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('getDatabase');
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('findStudentsForSession');
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('save');
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class),
+            configOverrides: [
+                ConfigMapper::NAME_IB_SCHOOL_CODE => '',
+            ]
+        );
+        $controller->setRequestPost(new Values([
+            'studentIds' => [123],
+        ]));
+
+        $controller->sessionRegisterViaApi((new RegistrationSessionModel())->setId(12));
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(400, $response->getStatusCode());
+
+        $payload = json_decode((string) $response->getBody(), true);
+        $this->assertSame(400, $payload['status']);
+        $this->assertSame(
+            'School code and School name must be configured before registering candidates via API.',
+            $payload['title']
+        );
+    }
+
+    public function testSessionRegisterViaApiRejectsMissingSchoolName(): void
+    {
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('getDatabase');
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('findStudentsForSession');
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('save');
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class),
+            configOverrides: [
+                ConfigMapper::NAME_IB_SCHOOL_NAME => '',
+            ]
+        );
+        $controller->setRequestPost(new Values([
+            'studentIds' => [123],
+        ]));
+
+        $controller->sessionRegisterViaApi((new RegistrationSessionModel())->setId(12));
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(400, $response->getStatusCode());
+
+        $payload = json_decode((string) $response->getBody(), true);
+        $this->assertSame(400, $payload['status']);
+        $this->assertSame(
+            'School code and School name must be configured before registering candidates via API.',
+            $payload['title']
+        );
+    }
+
     public function testRenotifyUnconfirmedReportsPartialSuccess(): void
     {
         $unconfirmedStudent = $this->buildStudent(
@@ -1089,6 +1261,61 @@ class ControllerTest extends TestCase
         $payload = json_decode((string) $response->getBody(), true);
         $this->assertSame(400, $payload['status']);
         $this->assertSame('Student IDs are required.', $payload['title']);
+    }
+
+    public function testSessionRegisterViaApiRejectsStudentThatIsNotConfirmed(): void
+    {
+        $database = $this->createMock(IConnector::class);
+        $database
+            ->expects($this->never())
+            ->method('beginTransaction');
+        $database
+            ->expects($this->never())
+            ->method('commit');
+        $database
+            ->expects($this->never())
+            ->method('rollBack');
+
+        $registrationSessionStudentMapper = $this->createMock(RegistrationSessionStudentMapper::class);
+        $registrationSessionStudentMapper
+            ->method('getDatabase')
+            ->willReturn($database);
+        $registrationSessionStudentMapper
+            ->expects($this->once())
+            ->method('findStudentsForSession')
+            ->with(12)
+            ->willReturn(new Collection([
+                $this->buildStudent(
+                    456,
+                    123,
+                    RegistrationSessionStudentModel::STATUS_UNCONFIRMED,
+                    'Alex',
+                    'Nguyen',
+                    'S123'
+                ),
+            ]));
+        $registrationSessionStudentMapper
+            ->expects($this->never())
+            ->method('save');
+
+        $controller = $this->buildController(
+            $this->createStub(RegistrationSessionMapper::class),
+            $registrationSessionStudentMapper,
+            $this->createStub(\External_UserInterface::class)
+        );
+        $controller->setRequestPost(new Values([
+            'studentIds' => [123],
+        ]));
+
+        $controller->sessionRegisterViaApi((new RegistrationSessionModel())->setId(12));
+
+        $response = $controller->getResponse();
+        $this->assertNotNull($response);
+        $this->assertSame(400, $response->getStatusCode());
+
+        $payload = json_decode((string) $response->getBody(), true);
+        $this->assertSame(400, $payload['status']);
+        $this->assertSame('No eligible students found for API registration.', $payload['title']);
     }
 
     public function testRenotifyUnconfirmedReportsMissingCandidate(): void
@@ -2108,7 +2335,9 @@ class ControllerTest extends TestCase
         ?RegistrationSessionStudentSubjectLanguageMapper $subjectLanguageMapper = null,
         ?UserMapper $userMapper = null,
         ?User $currentUser = null,
-        ?Environment $twig = null
+        ?Environment $twig = null,
+        ?RegistrationApiResponseLogHelper $registrationApiResponseLogHelper = null,
+        array $configOverrides = []
     ): Controller {
         $registrationSessionStudentHelper = new RegistrationSessionStudentHelper();
         $routeGenerator = $this->createStub(Generator::class);
@@ -2176,6 +2405,13 @@ class ControllerTest extends TestCase
                     );
                 }
 
+                if ($route === 'internationalBaccalaureate.sessionRegisterViaApi') {
+                    return sprintf(
+                        '/adminv2/international-baccalaureate/registrations/sessions/%d/register',
+                        $params['sessionId']
+                    );
+                }
+
                 if ($route === 'internationalBaccalaureate.sessionResetDetails') {
                     return sprintf(
                         '/adminv2/international-baccalaureate/registrations/sessions/%d/reset-details',
@@ -2224,6 +2460,12 @@ class ControllerTest extends TestCase
                 $currentUser,
             ),
             $registrationSessionStudentHelper,
+            $registrationApiResponseLogHelper ?? $this->createConfiguredStub(
+                RegistrationApiResponseLogHelper::class,
+                [
+                    'getLatestErrorMessagesByStudentId' => [],
+                ]
+            ),
             $externalUser,
             $userMapper ?? $this->createStub(UserMapper::class),
             $this->createStub(FieldStrategyFactory::class),
@@ -2240,7 +2482,7 @@ class ControllerTest extends TestCase
             )
         );
         $controller->setRequest($httpFactory->createServerRequest('GET', '/')->withParsedBody([]));
-        $controller->setDi($this->buildContainer());
+        $controller->setDi($this->buildContainer($configOverrides));
         $controller->setAuthorizer($authorizer);
         $controller->setRouteGenerator($routeGenerator);
         $controller->setUser($currentUser);
@@ -2248,9 +2490,9 @@ class ControllerTest extends TestCase
         return $controller;
     }
 
-    private function buildContainer(): ContainerInterface
+    private function buildContainer(array $configOverrides = []): ContainerInterface
     {
-        $configLoader = $this->buildConfigLoader();
+        $configLoader = $this->buildConfigLoader($configOverrides);
 
         return new class ($configLoader) implements ContainerInterface {
             public function __construct(private IConfigLoader $configLoader)
@@ -2273,15 +2515,16 @@ class ControllerTest extends TestCase
         };
     }
 
-    private function buildConfigLoader(): IConfigLoader
+    private function buildConfigLoader(array $configOverrides = []): IConfigLoader
     {
-        return new ArrayLoader([
+        return new ArrayLoader(array_replace([
             ConfigMapper::NAME_IB_SCHOOL_NAME => 'Example School',
+            ConfigMapper::NAME_IB_SCHOOL_CODE => '123456',
             ConfigMapper::NAME_NAME_FORMAT => '{title} {firstname} {lastname}',
             'debug_mode' => true,
             'debug_templates' => false,
             'strict_templates' => false,
-        ]);
+        ], $configOverrides));
     }
 
     private function buildRegistrationSession(): RegistrationSessionModel

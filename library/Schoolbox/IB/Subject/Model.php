@@ -31,6 +31,12 @@ class Model implements JsonSerializable
     private ?string $name = null;
 
     /**
+     * Transcript Name
+     * @var string|null
+     */
+    private ?string $transcriptName = null;
+
+    /**
      * @return string|null
      */
     public function getName(): ?string
@@ -45,6 +51,24 @@ class Model implements JsonSerializable
     public function setName(?string $name): self
     {
         $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getTranscriptName(): ?string
+    {
+        return $this->transcriptName;
+    }
+
+    /**
+     * @param string|null $transcriptName
+     * @return self
+     */
+    public function setTranscriptName(?string $transcriptName): self
+    {
+        $this->transcriptName = $transcriptName;
         return $this;
     }
 

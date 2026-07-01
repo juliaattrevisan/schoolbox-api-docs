@@ -21,6 +21,7 @@ const updateLanguageStore = useIbReportUpdateLanguageStore();
 const emit = defineEmits<{
     completePreparationSingle: [studentId: number];
     renotifySingle: [userId: number];
+    registerViaApiSingle: [studentId: number];
     resetDetailsSingle: [studentId: number];
     manuallyRegisterSingle: [studentId: number];
     approveOnBehalfSingle: [studentId: number];
@@ -115,6 +116,15 @@ function openModal(student: StudentRow): void {
                                 Update language selection
                             </button>
                         </li>
+                        <li v-if="student.stage === 'confirmed'">
+                            <button
+                                class="sbx-button--has-icon"
+                                @click.prevent="emit('registerViaApiSingle', student.id)"
+                            >
+                                <sbx-icon name="export"></sbx-icon>
+                                Register via API
+                            </button>
+                        </li>
                         <li v-if="student.renotifyEndpoint !== null">
                             <button
                                 class="sbx-button--has-icon"
@@ -142,15 +152,6 @@ function openModal(student: StudentRow): void {
                                 Approve on behalf of student
                             </button>
                         </li>
-                        <li v-if="student.stage === 'unconfirmed' || student.stage === 'confirmed'">
-                            <button
-                                class="sbx-button--has-icon"
-                                @click.prevent="emit('resetDetailsSingle', student.id)"
-                            >
-                                <sbx-icon name="undo"></sbx-icon>
-                                Reset all details
-                            </button>
-                        </li>
                         <li v-if="student.stage === 'confirmed'">
                             <button
                                 class="sbx-button--has-icon"
@@ -158,6 +159,15 @@ function openModal(student: StudentRow): void {
                             >
                                 <sbx-icon name="international-baccalaureate"></sbx-icon>
                                 Mark as manually registered
+                            </button>
+                        </li>
+                        <li v-if="student.stage === 'unconfirmed' || student.stage === 'confirmed'">
+                            <button
+                                class="sbx-button--has-icon"
+                                @click.prevent="emit('resetDetailsSingle', student.id)"
+                            >
+                                <sbx-icon name="undo"></sbx-icon>
+                                Reset all details
                             </button>
                         </li>
                     </ul>

@@ -19,6 +19,8 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IB\Registrations\Api\ResponseLog\Helper as RegistrationApiResponseLogHelper;
+use Schoolbox\IB\Registrations\Api\ResponseLog\Mapper as RegistrationApiResponseLogMapper;
 use Schoolbox\IB\Group\Subject\Language\Mapper as IBGroupSubjectLanguageMapper;
 use Schoolbox\IB\Group\Subject\Mapper as IBGroupSubjectMapper;
 use Schoolbox\IB\Group\Mapper as IBGroupMapper;
@@ -35,12 +37,15 @@ use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+/**
+ * Wires the IB admin UI routes and controller dependencies.
+ */
 class Module extends BaseModule
 {
     protected $basename = 'internationalBaccalaureate';
 
     /**
-     * @return void
+     * @inheritdoc
      */
     protected function registerRoutes(): void
     {
@@ -53,7 +58,8 @@ class Module extends BaseModule
                 new Rule\HasServicePermission(UserAccess::SERVICE_IB_COORDINATOR, UserAccess::ACCESS_FULL)
             )
         );
-        /* IB Coordinator access is required to confirm details, but students can also confirm their own details.
+        /* IB Coordinator access is required for admin workflows, but students
+         * can confirm their own candidate and subject details.
          */
         $ruleIBConfirmingDetailsPerms = new Rule\Any(
             $ruleIBCoordinatorAccess,
@@ -94,6 +100,7 @@ class Module extends BaseModule
         /* Transition between states
          */
         $this->register('POST', '/registrations/sessions/{sessionId:\\d+}/complete-preparation', 'sessionCompletePreparation', $ruleIBCoordinatorAccess, $preloadRegistrationSession);
+        $this->register('POST', '/registrations/sessions/{sessionId:\\d+}/register', 'sessionRegisterViaApi', $ruleIBCoordinatorAccess, $preloadRegistrationSession);
         $this->register('POST', '/registrations/sessions/{sessionId:\\d+}/reset-details', 'sessionResetDetails', $ruleIBCoordinatorAccess, $preloadRegistrationSession);
         $this->register('POST', '/registrations/sessions/{sessionId:\\d+}/mark-as-manually-registered', 'sessionMarkAsManuallyRegistered', $ruleIBCoordinatorAccess, $preloadRegistrationSession);
         $this->register('PUT', '/registrations/sessions/{sessionId:\\d+}/candidates/{studentId:\\d+}/confirmation', 'updateRegistrationSessionStudentConfirmation', $ruleIBConfirmingDetailsPerms);
@@ -128,6 +135,9 @@ class Module extends BaseModule
                 $this->injector->get('user'),
             ),
             $registrationSessionStudentHelper,
+            new RegistrationApiResponseLogHelper(
+                $this->getMapperFactory()->get(RegistrationApiResponseLogMapper::class)
+            ),
             $this->injector->get('externalUser'),
             $this->getMapperFactory()->get(UserMapper::class),
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
@@ -145,7 +155,8 @@ class Module extends BaseModule
     }
 
     /**
-     * Preload an existing registration session
+     * Preload an existing registration session for routes that receive a
+     * session ID.
      *
      * @param array<string, mixed> $params
      * @return array<string, mixed>

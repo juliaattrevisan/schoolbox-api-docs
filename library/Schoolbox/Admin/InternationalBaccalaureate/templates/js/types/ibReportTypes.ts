@@ -42,7 +42,7 @@ export type StudentRow = {
  * A student row used in the Failed Registrations section, extending StudentRow with an error message.
  */
 export type FailedRow = StudentRow & {
-    errorMessage?: string;
+    errorMessage?: string | null;
 };
 
 /**
@@ -100,6 +100,7 @@ export type ApiStudent = {
     missingFields: string[];
     manuallyRegisteredBy: string | null;
     manuallyRegisteredAt: string | null;
+    errorMessage: string | null;
     _routes: {
         updateLanguages: string | null;
         manuallyRegister: string | null;
