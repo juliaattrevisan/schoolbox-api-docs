@@ -30,8 +30,6 @@ $twigVars = (new Helper($configMapper, $config))->buildPersistedData();
 /** @var Environment $twig */
 $twig = $kernel->get('templateEngine');
 
-// This is a CSS file, cached for a while
+// This is a CSS file
 header('Content-Type: text/css');
-$kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
-
 echo $twig->render('css/skin.twig', $twigVars);
