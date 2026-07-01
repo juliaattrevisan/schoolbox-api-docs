@@ -1213,6 +1213,17 @@ class Controller extends ConfigController
      */
     public function sessionRegisterViaApi(RegistrationSessionModel $registrationSession): void
     {
+        $configLoader = $this->getConfigLoader();
+        $schoolCode = $configLoader->get(ConfigMapper::NAME_IB_SCHOOL_CODE);
+        $schoolName = $configLoader->get(ConfigMapper::NAME_IB_SCHOOL_NAME);
+
+        /* Making sure the school code and school name are configured before allowing candidates to be registered via the API.
+         */
+        if ((string)$schoolCode === '' || (string)$schoolName === '') {
+            $this->sendJsonError('School code and School name must be configured before registering candidates via API.', 400);
+            return;
+        }
+
         $post       = $this->requestPost;
         $studentIds = $post->get('studentIds');
 

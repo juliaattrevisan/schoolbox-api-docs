@@ -147,7 +147,6 @@ class RegisterCandidatesTool extends CliTool\App
 
         $candidateBuilder = new RegisterCandidatesCandidateBuilder();
         $sessionBuilder = new RegisterSessionsSessionBuilder();
-        $candidates = [];
         $schoolCode = $clientFactory->getSchoolCode();
         $failed = 0;
 
