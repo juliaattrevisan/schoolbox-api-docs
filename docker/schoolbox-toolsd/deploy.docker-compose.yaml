@@ -14,6 +14,8 @@ services:
       context: ./schoolbox-toolsd
       args:
         PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
+    environment:
+      TOOLSD_API_KEY: ${TOOLSD_API_KEY:-}
     env_file:
       - path: ./schoolbox-toolsd/default.env
         required: true

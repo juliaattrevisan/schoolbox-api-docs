@@ -12,6 +12,8 @@ services:
     build:
       context: ../../toolsd
       dockerfile: schoolbox.Dockerfile
+    environment:
+      TOOLSD_API_KEY: ${TOOLSD_API_KEY:-}
     env_file:
       - path: ./schoolbox-toolsd/default.env
         required: true
