@@ -127,6 +127,23 @@ services:
     volumes:
       - toolsd-code:/usr/src/app
 
+  # Reverse proxy in front of the toolsd HTTP API.
+  # A real deployment terminates TLS here and may load-balance across
+  # multiple schoolbox-toolsd-api containers; in dev this is a plain HTTP
+  # passthrough so the same topology is exercised locally.
+  schoolbox-toolsd-proxy:
+    depends_on:
+      - schoolbox-toolsd-api
+    build:
+      context: ./schoolbox-toolsd/proxy
+    configs:
+      - source: toolsd-proxy
+        target: /etc/caddy/
+
+configs:
+  toolsd-proxy:
+    file: ./schoolbox-toolsd/proxy/config/
+
 # Also mount toolsd's code, so that changes are available without rebuilding
 volumes:
   toolsd-code:
