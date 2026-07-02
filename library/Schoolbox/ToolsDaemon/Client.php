@@ -45,16 +45,10 @@ class Client implements IClient
     public function run(JobRequest $request): string
     {
         try {
-            $options = [
-                RequestOptions::JSON => $request->toPayload(),
-            ];
-            if (isset($this->apiKey)) {
-                $options[RequestOptions::HEADERS][self::API_KEY_HEADER] = $this->apiKey;
-            }
             $response = $this->httpClient->request(
                 'POST',
                 $this->baseUri->withPath('/run'),
-                $options,
+                $this->buildBaseOptions() + [RequestOptions::JSON => $request->toPayload()],
             );
         } catch (GuzzleException $e) {
             throw new ClientException('Tools daemon returned an error: ' . $e->getMessage(), $e->getCode(), $e);
@@ -81,6 +75,7 @@ class Client implements IClient
             $response = $this->httpClient->request(
                 'GET',
                 $this->baseUri->withPath("/jobs/$jobId"),
+                $this->buildBaseOptions(),
             );
         } catch (GuzzleException $e) {
             throw new ClientException('Tools daemon returned an error: ' . $e->getMessage(), $e->getCode(), $e);
@@ -109,6 +104,7 @@ class Client implements IClient
             $response = $this->httpClient->request(
                 'GET',
                 $this->baseUri->withPath("/jobs/$jobId/output"),
+                $this->buildBaseOptions(),
             );
         } catch (GuzzleException $e) {
             throw new ClientException('Tools daemon returned an error: ' . $e->getMessage(), $e->getCode(), $e);
@@ -125,5 +121,21 @@ class Client implements IClient
             isset($responseBody['stdout']) ? (array)$responseBody['stdout'] : [],
             isset($responseBody['stderr']) ? (array)$responseBody['stderr'] : [],
         );
+    }
+
+    /**
+     * Build base options for the request.
+     *
+     * This will include the API key in its header, if it's set.
+     *
+     * @return array
+     */
+    private function buildBaseOptions(): array
+    {
+        $options = [];
+        if (isset($this->apiKey)) {
+            $options[RequestOptions::HEADERS][self::API_KEY_HEADER] = $this->apiKey;
+        }
+        return $options;
     }
 }
