@@ -546,6 +546,7 @@ class Controller extends Assessment\Controller
 
         /* The most recent authoritative and self-graded feedbacks appear here as usual
          */
+
         $twigData['rubricMarkedGridPayloads'] = new Payload(
             $this->rubricMapper,
             $this->getConfigLoader()->get(ConfigMapper::NAME_RUBRIC_SHOW_POINTS),
