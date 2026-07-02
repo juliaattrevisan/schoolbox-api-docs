@@ -36,6 +36,30 @@ test.describe("Pastoral Care - Management Settings", () => {
         await tester.loginAsAdmin();
     });
 
+    test("role modal opens after changing pastoral type and subtype", async ({ page, tester }) => {
+        pastoralRecordSettings = new PastoralExpiry(page, tester);
+        createPastoralRecord = new CreatePastoralRecord(page);
+
+        await tester.impersonate("Jack Coles");
+        await createPastoralRecord.goto(25);
+        await createPastoralRecord.selectType("1");
+        await createPastoralRecord.selectSubType("22");
+        await pastoralRecordSettings.openRoleModal();
+    });
+
+    test("role modal state is correct on reporting management page", async ({ page, tester }) => {
+        pastoralRecordSettings = new PastoralExpiry(page, tester);
+
+        await tester.impersonate("Jack Coles");
+        await pastoralRecordSettings.gotoReporting();
+
+        if (await pastoralRecordSettings.hasAddableRoles()) {
+            await pastoralRecordSettings.openRoleModal();
+        } else {
+            await pastoralRecordSettings.expectVisibilityRoleLinkToBeDisabled();
+        }
+    });
+
     test("set and check pastoral care management settings: lock visibility", async ({ page, tester, db }) => {
         pastoralRecordSettings = new PastoralExpiry(page, tester);
         common = new Common(page);

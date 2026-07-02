@@ -2,7 +2,7 @@
  * Utility class for the Pastoral expiry feature
  */
 
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import CreatePastoralRecord from "@schoolboxTest/playwright/support/page/pastoralCare/CreatePastoralRecord";
@@ -26,6 +26,9 @@ export default class PastoralExpiry {
     // Route for the Bullying type settings page.
     static readonly URL_BULLYING = "/pastoral/management/audience/type/4/modify";
 
+    // Route for the Reporting subtype settings page.
+    static readonly URL_REPORTING = "/pastoral/management/audience/subtype/22/modify";
+
     // Test id for the pastoral flag dropdown.
     static readonly DATA_TEST_FLAG_SELECT = "audiences-modify-pastoral-flag-select";
 
@@ -46,7 +49,13 @@ export default class PastoralExpiry {
     static readonly DATA_TEST_MANAGE_SAVE_BUTTON = "audiences-modify-pastoral-save-button";
 
     // Selector for the visibility role link that opens the add role modal.
-    static readonly SELECTOR_VISIBILITY_ROLE_LINK = 'a[title="Add Role"]';
+    static readonly SELECTOR_VISIBILITY_ROLE_LINK = 'a[title="Add Role"]:visible';
+
+    // Selector for the add role modal.
+    static readonly SELECTOR_ROLE_MODAL = "#modal-role";
+
+    // Selector for visible role options that can still be added.
+    static readonly SELECTOR_ADDABLE_ROLE_OPTIONS = "#modal-role [data-role-add]:not(.hide)";
 
     // Test id for the lock visibility toggle.
     static readonly DATA_TEST_LOCK_VISIBILITY_TOGGLE = "pastoral-settings-lock-visibility-toggle";
@@ -103,6 +112,13 @@ export default class PastoralExpiry {
      */
     async gotoBullying(): Promise<void> {
         await this.page.goto(PastoralExpiry.URL_BULLYING);
+    }
+
+    /**
+     * Navigates to the Manage Academic › Reporting type
+     */
+    async gotoReporting(): Promise<void> {
+        await this.page.goto(PastoralExpiry.URL_REPORTING);
     }
 
     /**
@@ -200,6 +216,40 @@ export default class PastoralExpiry {
     }
 
     /**
+     * Click the visibility role link and expect the role modal to open
+     */
+    async openRoleModal(): Promise<void> {
+        await this.clickVisibilityRoleLink();
+        await this.expectRoleModalToBeOpen();
+    }
+
+    /**
+     * Expects the role modal to be open
+     */
+    async expectRoleModalToBeOpen(): Promise<void> {
+        await expect(this.page.locator(PastoralExpiry.SELECTOR_ROLE_MODAL)).toBeVisible();
+    }
+
+    /**
+     * Check if there are roles available to add in the role modal
+     * @returns true if the role modal has at least one available role
+     */
+    async hasAddableRoles(): Promise<boolean> {
+        return (await this.page.locator(PastoralExpiry.SELECTOR_ADDABLE_ROLE_OPTIONS).count()) > 0;
+    }
+
+    /**
+     * Expects the visible add role link to be disabled
+     */
+    async expectVisibilityRoleLinkToBeDisabled(): Promise<void> {
+        const roleLink = this.getVisibilityRoleLink();
+        await expect(roleLink).toBeVisible();
+        await expect(roleLink).toHaveAttribute("disabled", "disabled");
+        await expect(roleLink).toHaveAttribute("aria-disabled", "true");
+        await expect(roleLink).toHaveClass(/disabled/);
+    }
+
+    /**
      * click one or more roles in the visibility modal: Administration, Teacher, parent, student
      * @param roles - array of role names to click
      */
@@ -292,5 +342,13 @@ export default class PastoralExpiry {
         for (const value of values) {
             await expect(container).toContainText(value);
         }
+    }
+
+    /**
+     * Get the locator for the visibility role link
+     * @returns Locator for the visibility role link
+     */
+    private getVisibilityRoleLink(): Locator {
+        return this.page.locator(PastoralExpiry.SELECTOR_VISIBILITY_ROLE_LINK);
     }
 }
