@@ -171,7 +171,8 @@ HELP;
                     $stats['dryRunSkipped']++;
                     $dryRunOffset++;
                     $logger->info(sprintf(
-                        'Dry-run: would moderate AI session "%s" last messaged at %s.',
+                        'Dry-run: would moderate AI feature "%s" session "%s" last messaged at %s.',
+                        $candidate->getFeature(),
                         $candidate->getSessionId(),
                         $candidate->getLastMessageSentAt()->getDatabase(),
                     ));
@@ -185,7 +186,8 @@ HELP;
                     $stats['errors']++;
                     $performOffset++;
                     $logger->error(sprintf(
-                        'Failed to moderate AI session "%s": %s',
+                        'Failed to moderate AI feature "%s" session "%s": %s',
+                        $candidate->getFeature(),
                         $candidate->getSessionId(),
                         $e->getMessage(),
                     ), ['exception' => $e]);
@@ -195,14 +197,15 @@ HELP;
 
                 if ($result->isModerated()) {
                     $stats['moderated']++;
-                    $logger->info(sprintf('Moderated AI session "%s".', $candidate->getSessionId()));
+                    $logger->info(sprintf('Moderated AI feature "%s" session "%s".', $candidate->getFeature(), $candidate->getSessionId()));
                     $this->refreshLock($lock);
                     continue;
                 }
 
                 $stats['noOpSkipped']++;
                 $logger->info(sprintf(
-                    'Skipped AI session "%s": %s.',
+                    'Skipped AI feature "%s" session "%s": %s.',
+                    $candidate->getFeature(),
                     $candidate->getSessionId(),
                     $result->getReason() ?? 'no-op',
                 ));

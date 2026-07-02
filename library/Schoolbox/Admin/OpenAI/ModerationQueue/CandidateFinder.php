@@ -39,12 +39,14 @@ class CandidateFinder
             SELECT
                 session_id,
                 last_message_sent_at,
-                last_moderated_at
+                last_moderated_at,
+                feature
             FROM (
                 SELECT
                     `ai_session`.id AS session_id,
                     MAX(`ai_session_log`.created_at) AS last_message_sent_at,
-                    MAX(`ai_moderation_event`.created_at) AS last_moderated_at
+                    MAX(`ai_moderation_event`.created_at) AS last_moderated_at,
+                    ai_session.feature as feature
                 FROM `ai_session`
                 JOIN `ai_session_log` ON `ai_session_log`.ai_session_id = `ai_session`.id
                 LEFT JOIN `ai_moderation_event`
@@ -78,6 +80,7 @@ class CandidateFinder
             null === $row['last_moderated_at']
                 ? null
                 : new \Alaress_Date_Format($row['last_moderated_at'], \Alaress_Date_Format::DATABASE_FORMAT),
+            $row['feature'],
         );
     }
 }
