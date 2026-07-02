@@ -40,6 +40,20 @@ use UnexpectedValueException;
 class OverallDataset
 {
     /**
+     * These ar regularly-used strings for important nodes in the hash lookup
+     * I've compiled them up here in case of typos throughout the hash lookup which is REALLY ANNOYING to find/fix
+     */
+    private const string MARK_NODE_PUBLISHED = 'published';
+    private const string MARK_NODE_DRAFT = 'draft';
+
+
+    /**
+     * These are repeatedly-used indexes in the hash lookup. They are calculated synonymously with each other.
+     */
+    private const array MARK_NODES = [self::MARK_NODE_PUBLISHED, self::MARK_NODE_DRAFT];
+
+
+    /**
      * @param IConnector $internalDb
      * @param Decimal $decimalHydrator Used to calculate human-readable and normalised marks for each student for capabilities and indicators
      * @param TotalMarkFractional $totalMarkScheme Used to calculate human-readable and normalised marks for each student for capabilities and indicators
@@ -718,14 +732,14 @@ class OverallDataset
                     'name' => $row['capability_name'],
                     /* Published normalised and human-readable marks from the authoritative feedback
                      */
-                    'published' => [
+                    self::MARK_NODE_PUBLISHED => [
                         'normalisedMark' => $normalisedMark,
                         'humanReadableMark' => $humanReadableMark,
                     ],
                     /* Normalised and human-readable marks from the most recent feedback: these would typically be draft
                      * marks, but could end up being the same as the Published ones by sheer coincidence.
                      */
-                    'draft' => [
+                    self::MARK_NODE_DRAFT => [
                         'normalisedMark' => null,
                         'humanReadableMark' => null,
                     ],
@@ -751,7 +765,7 @@ class OverallDataset
                         'name' => $row['indicator_name'],
                         /* Published normalised and human-readable marks from the authoritative feedback
                          */
-                        'published' => [
+                        self::MARK_NODE_PUBLISHED => [
                             'normalisedMark' => $normalisedMark,
                             'humanReadableMark' => $humanReadableMark,
                             'selectedLevel' => $row['level_name'],
@@ -761,7 +775,7 @@ class OverallDataset
                         /* Normalised and human-readable marks from the most recent feedback: these would typically be draft
                          * marks, but could end up being the same as the Published ones by sheer coincidence.
                          */
-                        'draft' => [
+                        self::MARK_NODE_DRAFT => [
                             'normalisedMark' => null,
                             'humanReadableMark' => null,
                             'selectedLevel' => null,
@@ -1007,7 +1021,7 @@ class OverallDataset
                     'name' => $row['capability_name'],
                     /* Published normalised and human-readable marks from the authoritative feedback
                      */
-                    'published' => [
+                    self::MARK_NODE_PUBLISHED => [
                         'normalisedMark' => null,
                         'humanReadableMark' => null,
                         'selectedLevel' => null,
@@ -1017,7 +1031,7 @@ class OverallDataset
                     /* Normalised and human-readable marks from the most recent feedback: these would typically be draft
                      * marks, but could end up being the same as the Published ones by sheer coincidence.
                      */
-                    'draft' => [
+                    self::MARK_NODE_DRAFT => [
                         'normalisedMark' => null,
                         'humanReadableMark' => null,
                         'selectedLevel' => null,
@@ -1048,7 +1062,7 @@ class OverallDataset
                 $humanReadableMark = $row['capability_human_readable_mark'];
             }
 
-            $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['draft'] = [
+            $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']][self::MARK_NODE_DRAFT] = [
                 'normalisedMark' => $normalisedMark,
                 'humanReadableMark' => $humanReadableMark,
             ];
@@ -1066,7 +1080,7 @@ class OverallDataset
                         'name' => $row['indicator_name'],
                         /* Published normalised and human-readable marks from the authoritative feedback
                          */
-                        'published' => [
+                        self::MARK_NODE_PUBLISHED => [
                             'normalisedMark' => null,
                             'humanReadableMark' => null,
                             'selectedLevel' => null,
@@ -1076,7 +1090,7 @@ class OverallDataset
                         /* Normalised and human-readable marks from the most recent feedback: these would typically be draft
                          * marks, but could end up being the same as the Published ones by sheer coincidence.
                          */
-                        'draft' => [
+                        self::MARK_NODE_DRAFT => [
                             'normalisedMark' => null,
                             'humanReadableMark' => null,
                             'selectedLevel' => null,
@@ -1094,7 +1108,7 @@ class OverallDataset
                 $normalisedMark = $marks['normalisedMark'];
                 $humanReadableMark = $marks['humanReadableMark'];
 
-                $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['draft'] = [
+                $students[$row['student_id']]['gridData'][$row['assessment_id']][$row['rubric_instance_id']]['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']][self::MARK_NODE_DRAFT] = [
                     'normalisedMark' => $normalisedMark,
                     'humanReadableMark' => $humanReadableMark,
                     'selectedLevel' => $row['level_name'],
@@ -1211,66 +1225,13 @@ class OverallDataset
         ?Folder\Model $folder,
         bool $includeDiagnostic
     ): array {
-        /* Non-iterable Coefficients Lookup
-         *
-         * Coefficients of a weighted sum algorithm are tabulated here, per student, for convenience.
-         * This saves you having to constantly traverse data sets to get something for the WeightedAggregator formula.
-         *
-         * NOTE That this is intended as a HASH LOOKUP ONLY.
-         * IT IS NOT intended for you to foreach() because of its intentional structure.
-         *
-         * I didn't really have the time or inclination to convert this to a tightly-typed struct with limited access.
-         * The next evolution of this would be a defined object, Coefficients, which is immutable: pass $assessments
-         * as a dependency, ->generate(), and only have read methods to a coordinate in the struct. This would make it
-         * effectively readonly once generated.
-         */
-
-        /* $coefficients is a set of supposedly-convenient values that we can quickly reference
-         *
-        $coefficient['assessments'][$assessmentId]
-          The weight of an individual assessment.
-
-        $coefficients['grids'][$rubricInstanceId]
-          The weight of a particular rubric grid.
-
-        $coefficients['grids']['assessments'][$assessmentId]
-          The total weight of the rubric grids in $assessmentId. This is used to calculate a weight sum of each rubric
-          grid's contribution to the overall value.
-
-        $coefficients[capability][$capabilityId][student][$studentId]['totalAssessmentWeight']['published']
-          The total weight of the capability's usages across all the assessments where the student had a mark.
-          This aggregates toward a denominator for "assessment total weight" for this constituent of a rubric grid.
-          It only accumulates if a student had a mark in it; this denominator is specifically for a particular guy
-          There's a "published" and "draft" variants of this
-
-        $coefficients[capability][$capabilityId][indicators][student][$studentId]['totalAssessmentWeight']['published']
-          The total weight of the indicator's usages across all the assessments where the student had a mark.
-          This aggregates toward a denominator for "assessment total weight" for this constituent of a rubric grid.
-          It only accumulates if a student had a mark in it; this denominator is specifically for a particular guy
-          There's a "published" and "draft" variants of this
-        */
-        $coefficients = [];
-
         /* Precalculate all the coefficients now that we have assembled $assessments in its entirety with all its
          * capabilities and indicators and their max_values.
          */
         $overallMarks = [];
 
         foreach ($assessments as $assessmentId => $assessmentData) {
-            $coefficients['assessments'][$assessmentId] = $assessmentData['weight'];
-
             foreach ($assessmentData['gridData'] as $rubricInstanceId => $rubricGridData) {
-                if (!isset($coefficients['grids']['assessments'][$assessmentId])) {
-                    $coefficients['grids']['assessments'][$assessmentId] = [
-                        'totalGridWeight' => 0,
-                    ];
-                }
-
-                /* Total weight of all the grids in a particular assessment
-                 */
-                $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'] += $rubricGridData['weight'];
-                $coefficients['grids'][$rubricInstanceId] = $rubricGridData['weight'] ? (float)$rubricGridData['weight'] : null;
-
                 /* Set up OverallMarks struct
                  *
                  * This pre-compiles capability/indicator structs while we're traversing this $assessments struct.
@@ -1305,57 +1266,163 @@ class OverallDataset
             }
         }
 
-        /* Precompute denominators for each student's capabilities and indicators
+        /* Accumulate the numerator and denominator for our formula. Sadly we need to do this first before we can
+         * actually use the formula
          */
         foreach ($studentMarks as $studentId => $studentData) {
             foreach ($studentData['gridData'] as $assessmentId => $rubricInstanceData) {
                 foreach ($rubricInstanceData as $rubricInstanceId => $rubricGridData) {
                     foreach ($rubricGridData['capabilities'] as $capabilityId => $capabilityData) {
-                        if (null !== $capabilityData['published']['normalisedMark']) {
-                            /* Initialise and add it to the published capability total for this guy
-                             */
-                            if (!isset($coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['published'])) {
-                                $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['published'] = 0;
-                            }
+                        /* Excluded guys get null for this calculation
+                         */
+                        if (!isset($overallMarks[$capabilityId]['students'][$studentId])) {
+                            $overallMarks[$capabilityId]['students'][$studentId] = [
+                                self::MARK_NODE_PUBLISHED => [
+                                    'normalisedMark' => null,
+                                    'humanReadableMark' => null,
+                                    'formula' => [
+                                        'numerator' => null,
+                                        'denominator' => null,
+                                    ],
+                                    'reasoning' => [],
 
-                            $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['published'] += $coefficients['assessments'][$assessmentId];
+                                ],
+                                self::MARK_NODE_DRAFT => [
+                                    'normalisedMark' => null,
+                                    'humanReadableMark' => null,
+                                    'formula' => [
+                                        'numerator' => null,
+                                        'denominator' => null,
+                                    ],
+                                    'reasoning' => [],
+                                ],
+                            ];
                         }
 
-                        if (null !== $capabilityData['draft']['normalisedMark']) {
-                            /* Initialise and add it to the draft capability total for this guy
-                             */
-                            if (!isset($coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['draft'])) {
-                                $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['draft'] = 0;
-                            }
+                        if (!isset($exclusions[$assessmentId][$studentId])) {
+                            foreach (self::MARK_NODES as $node) {
+                                /* Jez Math Pieces
+                                 */
+                                $assessmentWeight = $assessments[$assessmentId]['weight'] ?? null;
 
-                            $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['draft'] += $coefficients['assessments'][$assessmentId];
+                                /* Skip if this is null; it doesn't count toward their total
+                                 */
+                                $normalisedMark = $capabilityData[$node]['normalisedMark'];
+
+                                if (null !== $assessmentWeight && null !== $normalisedMark) {
+                                    $gridWeight = $assessments[$assessmentId]['gridData'][$rubricInstanceId]['weight'] ?? null;
+                                    $effectiveWeight = $assessmentWeight * $gridWeight;
+                                    $numerator = $normalisedMark * $effectiveWeight;
+
+                                    /* Jez Maths
+                                     */
+                                    $overallMarks[$capabilityId]['students'][$studentId][$node]['formula']['numerator'] += $numerator;
+                                    $overallMarks[$capabilityId]['students'][$studentId][$node]['formula']['denominator'] += $effectiveWeight;
+
+                                    /* Jez reasoning
+                                     */
+                                    $overallMarks[$capabilityId]['students'][$studentId][$node]['reasoning'][] = sprintf(
+                                        'assessmentId: %s, assessmentWeight: %s, gridWeight: %s, numerator: %s, denominator: %s',
+                                        $assessmentId,
+                                        $assessmentWeight,
+                                        $gridWeight,
+                                        $numerator,
+                                        $effectiveWeight,
+                                    );
+
+                                    $overallMarks[$capabilityId]['students'][$studentId][$node]['reasoning'][] = sprintf(
+                                        'numerator += %s * %s, denominator += %s * %s',
+                                        $normalisedMark,
+                                        $effectiveWeight,
+                                        $assessmentWeight,
+                                        $gridWeight,
+                                    );
+
+                                    $overallMarks[$capabilityId]['students'][$studentId][$node]['reasoning'][] = null;
+                                }
+                            }
                         }
 
+                        /* Now dig into each indicator within this capability and aggregate their values in a very
+                         * similar fashion.
+                         */
                         foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
-                            if (null !== $indicatorData['published']['normalisedMark']) {
-                                /* Initialise and add it to the published indicator total for this guy
-                                 */
-                                if (!isset($coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['published'])) {
-                                    $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['published'] = 0;
-                                }
-
-                                $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['published'] += $coefficients['assessments'][$assessmentId];
+                            /* Excluded guys get null for this calculation
+                             */
+                            if (!isset($overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId])) {
+                                $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId] = [
+                                    self::MARK_NODE_PUBLISHED => [
+                                        'normalisedMark' => null,
+                                        'humanReadableMark' => null,
+                                        'formula' => [
+                                            'numerator' => null,
+                                            'denominator' => null,
+                                        ],
+                                        'reasoning' => [],
+                                    ],
+                                    self::MARK_NODE_DRAFT => [
+                                        'normalisedMark' => null,
+                                        'humanReadableMark' => null,
+                                        'formula' => [
+                                            'numerator' => null,
+                                            'denominator' => null,
+                                        ],
+                                        'reasoning' => [],
+                                    ],
+                                ];
                             }
 
-                            if (null !== $indicatorData['draft']['normalisedMark']) {
-                                /* Initialise and add it to the draft indicator total for this guy
-                                 */
-                                if (!isset($coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['draft'])) {
-                                    $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['draft'] = 0;
-                                }
+                            if (!isset($exclusions[$assessmentId][$studentId])) {
+                                foreach (self::MARK_NODES as $node) {
+                                    /* Jez Math Pieces
+                                     */
+                                    $assessmentWeight = $assessments[$assessmentId]['weight'] ?? null;
 
-                                $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['draft'] += $coefficients['assessments'][$assessmentId];
+                                    /* Skip if this is null; it doesn't count toward their total
+                                     */
+                                    $normalisedMark = $capabilityData['indicators'][$indicatorId][$node]['normalisedMark'];
+
+                                    if (null !== $assessmentWeight && null !== $normalisedMark) {
+                                        $gridWeight = $assessments[$assessmentId]['gridData'][$rubricInstanceId]['weight'] ?? null;
+                                        $effectiveWeight = $assessmentWeight * $gridWeight;
+                                        $numerator = $normalisedMark * $effectiveWeight;
+
+                                        /* Jez Maths
+                                         */
+                                        $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId][$node]['formula']['numerator'] += $numerator;
+                                        $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId][$node]['formula']['denominator'] += $effectiveWeight;
+
+                                        /* Jez reasoning
+                                         */
+                                        $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId][$node]['reasoning'][] = sprintf(
+                                            'assessmentId: %s, assessmentWeight: %s, gridWeight: %s, numerator: %s, denominator: %s',
+                                            $assessmentId,
+                                            $assessmentWeight,
+                                            $gridWeight,
+                                            $numerator,
+                                            $effectiveWeight,
+                                        );
+
+                                        $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId][$node]['reasoning'][] = sprintf(
+                                            'numerator += %s * %s, denominator += %s * %s',
+                                            $normalisedMark,
+                                            $effectiveWeight,
+                                            $assessmentWeight,
+                                            $gridWeight,
+                                        );
+
+                                        $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId][$node]['reasoning'][] = null;
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
         }
+
+        /* Now that we accumulated everything, go back and calculate normalised and human-readable marks
+         */
 
         /* Now precompute overall marks for each student.
          *
@@ -1370,183 +1437,6 @@ class OverallDataset
          */
         $aggregator = new WeightedAggregator();
 
-        foreach ($studentMarks as $studentId => $studentData) {
-            foreach ($studentData['gridData'] as $assessmentId => $rubricInstanceData) {
-                foreach ($rubricInstanceData as $rubricInstanceId => $rubricGridData) {
-                    foreach ($rubricGridData['capabilities'] as $capabilityId => $capabilityData) {
-                        /* Excluded guys get null for this calculation
-                         */
-                        if (!isset($overallMarks[$capabilityId]['students'][$studentId])) {
-                            $overallMarks[$capabilityId]['students'][$studentId] = [
-                                'published' => [
-                                    'normalisedMark' => null,
-                                    'humanReadableMark' => null,
-                                    'reasoning' => [],
-
-                                ],
-                                'draft' => [
-                                    'normalisedMark' => null,
-                                    'humanReadableMark' => null,
-                                    'reasoning' => [],
-                                ],
-                            ];
-                        }
-
-                        if (!isset($exclusions[$assessmentId][$studentId])) {
-                            /* Published capability mark for this student
-                             */
-                            $val = $aggregator->calculate(
-                                $coefficients['assessments'][$assessmentId],
-                                $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['published'] ?? null,
-                                $coefficients['grids'][$rubricInstanceId],
-                                $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'],
-                                /* This is a value between 0-100; $aggregator does the division internally to convert this
-                                 * value appropriately. It's a byproduct of assembling data that we've augmented earlier.
-                                 */
-                                $capabilityData['published']['normalisedMark'],
-                                sprintf(
-                                    'Assessment %s',
-                                    $assessmentId,
-                                ),
-                            );
-
-                            /* Only aggregate if not null
-                             */
-                            if (null !== $val) {
-                                $overallMarks[$capabilityId]['students'][$studentId]['published']['normalisedMark'] += $val['val'];
-
-                                /* You could compound $val's diagnostic here if you wanted to expose it on the frontend as a tooltip or something
-                                 * because debugging this in prod will not be easy without being able to see the math behind it.
-                                 */
-                                if ($includeDiagnostic) {
-                                    $overallMarks[$capabilityId]['students'][$studentId]['published']['reasoning'][] = $val['diagnostic'];
-                                }
-                            }
-
-                            /* Draft capability mark for this student
-                             */
-                            $val = $aggregator->calculate(
-                                $coefficients['assessments'][$assessmentId],
-                                $coefficients['capabilities'][$capabilityId]['students'][$studentId]['totalAssessmentWeight']['draft'] ?? null,
-                                $coefficients['grids'][$rubricInstanceId],
-                                $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'],
-                                /* This is a value between 0-100; $aggregator does the division internally to convert this
-                                 * value appropriately. It's a byproduct of assembling data that we've augmented earlier.
-                                 */
-                                $capabilityData['draft']['normalisedMark'],
-                                sprintf(
-                                    'Assessment %s (draft)',
-                                    $assessmentId,
-                                ),
-                            );
-
-                            /* Only aggregate if not null
-                             */
-                            if (null !== $val) {
-                                $overallMarks[$capabilityId]['students'][$studentId]['draft']['normalisedMark'] += $val['val'];
-
-                                /* You could compound $val's diagnostic here if you wanted to expose it on the frontend as a tooltip or something
-                                 * because debugging this in prod will not be easy without being able to see the math behind it.
-                                 */
-                                if ($includeDiagnostic) {
-                                    $overallMarks[$capabilityId]['students'][$studentId]['draft']['reasoning'][] = $val['diagnostic'];
-                                }
-                            }
-                        }
-
-                        /* Now dig into each indicator within this capability and aggregate their values in a very
-                         * similar fashion.
-                         */
-                        foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
-                            /* Excluded guys get null for this calculation
-                             */
-                            if (!isset($overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId])) {
-                                $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId] = [
-                                    'published' => [
-                                        'normalisedMark' => null,
-                                        'humanReadableMark' => null,
-                                        'reasoning' => [],
-                                    ],
-                                    'draft' => [
-                                        'normalisedMark' => null,
-                                        'humanReadableMark' => null,
-                                        'reasoning' => [],
-                                    ],
-                                ];
-                            }
-
-                            if (!isset($exclusions[$assessmentId][$studentId])) {
-                                /* Published indicator mark for this student
-                                 */
-                                $val = $aggregator->calculate(
-                                    $coefficients['assessments'][$assessmentId],
-                                    $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['published'] ?? null,
-                                    $coefficients['grids'][$rubricInstanceId],
-                                    $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'],
-                                    /* This is a value between 0-100; $aggregator does the division internally to convert this
-                                     * value appropriately. It's a byproduct of assembling data that we've augmented earlier.
-                                     */
-                                    $indicatorData['published']['normalisedMark'],
-                                    sprintf(
-                                        'Assessment %s',
-                                        $assessmentId,
-                                    ),
-                                );
-
-                                /* Only aggregate if not null
-                                 */
-                                if (null !== $val) {
-                                    $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['published']['normalisedMark'] += $val['val'];
-
-                                    /* You could compound $val's diagnostic here if you wanted to expose it on the frontend as a tooltip or something
-                                     * because debugging this in prod will not be easy without being able to see the math behind it.
-                                     */
-                                    if ($includeDiagnostic) {
-                                        $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['published']['reasoning'][] = $val['diagnostic'];
-                                    }
-                                }
-
-                                /* Draft indicator mark for this student
-                                 */
-                                $val = $aggregator->calculate(
-                                    $coefficients['assessments'][$assessmentId],
-                                    $coefficients['capabilities'][$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['totalAssessmentWeight']['draft'] ?? null,
-                                    $coefficients['grids'][$rubricInstanceId],
-                                    $coefficients['grids']['assessments'][$assessmentId]['totalGridWeight'],
-                                    /* This is a value between 0-100; $aggregator does the division internally to convert this
-                                     * value appropriately. It's a byproduct of assembling data that we've augmented earlier.
-                                     */
-                                    $indicatorData['draft']['normalisedMark'],
-                                    sprintf(
-                                        'Assessment %s (draft)',
-                                        $assessmentId,
-                                    ),
-                                );
-
-                                /* Only aggregate if not null
-                                 */
-                                if (null !== $val) {
-                                    $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['draft']['normalisedMark'] += $val['val'];
-
-                                    /* You could compound $val's diagnostic here if you wanted to expose it on the frontend as a tooltip or something
-                                     * because debugging this in prod will not be easy without being able to see the math behind it.
-                                     */
-                                    if ($includeDiagnostic) {
-                                        $overallMarks[$capabilityId]['indicators'][$indicatorId]['students'][$studentId]['draft']['reasoning'][] = $val['diagnostic'];
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        /* lol in $overallMarks, all the normalisedMark values are represented as fractions of 100, e.g. 0.99
-         * This needs to be converted to is non-fractional equivalent: i.e. 99 instead of 0.99
-         *
-         * This is for compatibility with MarkScheme classes that are used to derive human-readable values.
-         */
         /**
          * Logic for the mark scheme...
          *
@@ -1563,30 +1453,40 @@ class OverallDataset
         }
 
         foreach ($overallMarks as $capabilityId => &$capabilityData) {
-            foreach ($capabilityData['students'] as &$studentCapabilityData) {
-                if (null !== $studentCapabilityData['published']['normalisedMark']) {
-                    $studentCapabilityData['published']['humanReadableMark'] = $markScheme->getHumanReadableMark((float)$studentCapabilityData['published']['normalisedMark']);
-                }
+            foreach ($capabilityData['students'] as $studentId => &$studentCapabilityData) {
+                foreach (self::MARK_NODES as $node) {
+                    $val = $aggregator->calculate(
+                        $studentCapabilityData[$node]['formula']['numerator'],
+                        $studentCapabilityData[$node]['formula']['denominator'],
+                    );
 
-                if (null !== $studentCapabilityData['draft']['normalisedMark']) {
-                    $studentCapabilityData['draft']['humanReadableMark'] = $markScheme->getHumanReadableMark((float)$studentCapabilityData['draft']['normalisedMark']);
+                    if (null !== $val) {
+                        $studentCapabilityData[$node]['normalisedMark'] = $val['val'];
+                        $studentCapabilityData[$node]['humanReadableMark'] = $markScheme->getHumanReadableMark((float)$val['val']);
+                        $studentCapabilityData[$node]['reasoning'][] = $val['diagnostic'];
+                    }
                 }
             }
 
-            foreach ($capabilityData['indicators'] as &$indicatorStudentData) {
-                foreach ($indicatorStudentData['students'] as &$studentIndicatorData) {
-                    if (null !== $studentIndicatorData['published']['normalisedMark']) {
-                        $studentIndicatorData['published']['humanReadableMark'] = $markScheme->getHumanReadableMark((float)$studentIndicatorData['published']['normalisedMark']);
-                    }
+            foreach ($capabilityData['indicators'] as $indicatorId => &$indicatorData) {
+                foreach ($indicatorData['students'] as $studentId => &$studentIndicatorData) {
+                    foreach (self::MARK_NODES as $node) {
+                        $val = $aggregator->calculate(
+                            $studentIndicatorData[$node]['formula']['numerator'],
+                            $studentIndicatorData[$node]['formula']['denominator'],
+                        );
 
-                    if (null !== $studentIndicatorData['draft']['normalisedMark']) {
-                        $studentIndicatorData['draft']['humanReadableMark'] = $markScheme->getHumanReadableMark((float)$studentIndicatorData['draft']['normalisedMark']);
+                        if (null !== $val) {
+                            $studentIndicatorData[$node]['normalisedMark'] = $val['val'];
+                            $studentIndicatorData[$node]['humanReadableMark'] = $markScheme->getHumanReadableMark((float)$val['val']);
+                            $studentIndicatorData[$node]['reasoning'][] = $val['diagnostic'];
+                        }
                     }
                 }
             }
         }
 
-        unset($capabilityData, $studentCapabilityData, $studentIndicatorData);
+        unset($capabilityData, $studentCapabilityData, $indicatorData, $studentIndicatorData);
 
         return $overallMarks;
     }
