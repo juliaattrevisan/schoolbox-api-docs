@@ -118,6 +118,8 @@ class Controller extends ConfigController
                     'title'       => $config->getTitle(),
                     'description' => $config->getDescription(),
                 ];
+            } elseif ($config->getHidden()) {
+                return $carry;
             } else {
                 $categoryName  = $config->getSkinSubcategory()->getCategory()->getName();
                 $subcategoryId = $config->getSkinSubcategory()->getId();
