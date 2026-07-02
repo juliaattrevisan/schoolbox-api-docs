@@ -69,7 +69,7 @@ class CandidateFinder
     }
 
     /**
-     * @param array{session_id: string, last_message_sent_at: string, last_moderated_at: string|null} $row
+     * @param array{session_id: string, last_message_sent_at: string, last_moderated_at: string|null, feature: string|null} $row
      * @return Candidate
      */
     private function hydrateCandidate(array $row): Candidate
