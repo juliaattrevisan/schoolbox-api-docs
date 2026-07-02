@@ -160,11 +160,6 @@ class Module extends BaseModule
             AssessmentType::TYPE_DIALOG_AGENT,
         ];
 
-        $customParticipationCopyAssessmentTypes = [
-            ...$customParticipationAssessmentTypes,
-            AssessmentType::TYPE_REPORTING,
-        ];
-
         $canDelete = new Rule\Any(
             $isSuper,
             new Rule\All(
@@ -299,7 +294,13 @@ class Module extends BaseModule
             new IsCustomParticipationCopyable(),
             /* Create Copy is limited to custom participation activity types.
              */
-            new ValidAssessmentType($customParticipationCopyAssessmentTypes)
+            new Rule\Any(
+                new ValidAssessmentType($customParticipationAssessmentTypes),
+                new Rule\All(
+                    new ValidAssessmentType([AssessmentType::TYPE_REPORTING]),
+                    new Rule\IsConfigOn(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE, $this->getConfig())
+                )
+            )
         );
 
         // pluralise for REST
