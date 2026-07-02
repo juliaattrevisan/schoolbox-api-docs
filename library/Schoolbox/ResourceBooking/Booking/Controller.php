@@ -711,8 +711,7 @@ class Controller extends Base
 
     private function shouldShowQuantityInput(Model $booking): bool
     {
-        return $booking->getResource()->getCapacity() > Model::DEFAULT_QUANTITY
-            || $booking->getQuantity() > Model::DEFAULT_QUANTITY;
+        return $booking->getResource()->hasDisplayableCapacity($booking->getQuantity());
     }
 
     private function getMaxQuantity(Model $booking): int

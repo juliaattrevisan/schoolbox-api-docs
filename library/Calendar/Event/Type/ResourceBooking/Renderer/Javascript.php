@@ -119,9 +119,11 @@ class Javascript extends Base
                 'title'  => $relatedBooking->getResource()->getName(),
                 'item'   => [
                     'id'   => $relatedBooking->getResource()->getId(),
-                    'name' => $relatedBooking->getResource()->getName(),
+                    'name' => $relatedBooking->getResource()->getNameForBookingDisplay($relatedBooking->getQuantity()),
+                    'capacity' => $relatedBooking->getResource()->getCapacity(),
                 ],
                 'quantity' => $relatedBooking->getQuantity(),
+                'showQuantity' => $relatedBooking->getResource()->hasDisplayableCapacity($relatedBooking->getQuantity()),
                 'status' => $relatedBooking->getStatus()->jsonSerialize(),
                 'href'   => $reviewHref,
             ];
@@ -213,9 +215,15 @@ class Javascript extends Base
                     'id'       => $this->getEvent()->getBooking()->getId(),
                     'item'     => [
                         'id'   => $this->getEvent()->getBooking()->getResource()->getId(),
-                        'name' => $this->getEvent()->getBooking()->getResource()->getName(),
+                        'name' => $this->getEvent()->getBooking()->getResource()->getNameForBookingDisplay(
+                            $this->getEvent()->getBooking()->getQuantity()
+                        ),
+                        'capacity' => $this->getEvent()->getBooking()->getResource()->getCapacity(),
                     ],
                     'quantity' => $this->getEvent()->getBooking()->getQuantity(),
+                    'showQuantity' => $this->getEvent()->getBooking()->getResource()->hasDisplayableCapacity(
+                        $this->getEvent()->getBooking()->getQuantity()
+                    ),
                     'status'   => $this->getEvent()->getBooking()->getStatus()->jsonSerialize(),
                     'buttons'  => $bookingButtons,
                     'reviewer' => $reviewerRender,

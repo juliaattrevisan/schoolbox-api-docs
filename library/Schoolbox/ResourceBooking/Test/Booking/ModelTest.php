@@ -22,4 +22,16 @@ class ModelTest extends TestCase
 
         $this->assertSame(3, $booking->getQuantity());
     }
+
+    public function testJsonSerializeIncludesShowQuantityFromResourceCapacityRule(): void
+    {
+        $resource = (new \Schoolbox\ResourceBooking\Item\Model())->setCapacity(1);
+        $booking = (new Model())
+            ->setResource($resource)
+            ->setQuantity(2);
+
+        $serializedBooking = $booking->jsonSerialize();
+
+        $this->assertTrue($serializedBooking['showQuantity']);
+    }
 }

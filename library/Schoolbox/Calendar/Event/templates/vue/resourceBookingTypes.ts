@@ -6,6 +6,7 @@ export type Booking = {
     name: string;
     notes: string;
     quantity: number;
+    showQuantity: boolean;
     resource: Resource;
     status: BookingStatus;
     start: string;

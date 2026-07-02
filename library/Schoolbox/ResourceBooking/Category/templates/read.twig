@@ -50,11 +50,14 @@
             cellContent: function(args) {
                 let resourceDetails = document.createElement('span');
                 resourceDetails.setAttribute('class', 'meta');
-                let resourceDetailsText = ' · Capacity: ' + args.resource.extendedProps.capacity;
-                if (!args.resource.extendedProps.allowClashBookings) {
-                    resourceDetailsText += ' · Only allow booking requests up to capacity.';
+                let resourceDetailsText = [];
+                if (args.resource.extendedProps.capacity > 1) {
+                    resourceDetailsText.push('Capacity: ' + args.resource.extendedProps.capacity);
                 }
-                resourceDetails.innerText = resourceDetailsText;
+                if (!args.resource.extendedProps.allowClashBookings) {
+                    resourceDetailsText.push('Only allow booking requests up to capacity.');
+                }
+                resourceDetails.innerText = resourceDetailsText.length ? ' · ' + resourceDetailsText.join(' · ') : '';
 
                 let link = document.createElement('a');
                 link.setAttribute('href', '/resource-booking/item/' + args.fieldValue);
