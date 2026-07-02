@@ -22,19 +22,9 @@ class WeightedAggregator
     /**
      * Calculate a weighted aggregation contribution of a rubric capability or indicator.
      *
-     * TODO Update all this lot
-     * This individual formula is used to calculate how an indicator's mark (the selected descriptor's value) from a
-     * particular grid contributes to its overall value across multiple grids in multiple assessments. It can also be
-     * used to calculate a capability value (if applicable).
-     *
-     * Weighted contribution = (assessment weight/assessment total weight that used this capability or indicator where student had a mark)
-     *                       * (rubric grid weight/total rubric grid weights in the assessment that used this capability or indicator)
-     *                       * capability value or indicator value as a percentage between 0 and 100
-     *
-     * Overall value of a capability or indicator = sum of its weighted contributions
-     *
-     * (I'm not a statistician so maybe this needs to be double-checked more closely; thanks Jonathan Kerslake for
-     * joining me in this adventure)
+     * Jez and I have implemented a data struct where numerators and denominators are stored per student per cap/ind,
+     * as a result of an accumulation over the entire data set; the weighted average becomes a simple division of those
+     * two data points.
      *
      * @param float|null $numerator
      * @param float|null $denominator
@@ -45,11 +35,14 @@ class WeightedAggregator
         ?float $denominator,
     ): ?array {
         /* Avoid divide-by-zero scenarios: exit early
+         * Note that zero is a valid $numerator value; null means "nothing here to calculate"
          */
-        if (!$numerator) {
+        if (null === $numerator) {
             return null;
         }
 
+        /* Falsey/zero/null denominators: exit early
+         */
         if (!$denominator) {
             return null;
         }
