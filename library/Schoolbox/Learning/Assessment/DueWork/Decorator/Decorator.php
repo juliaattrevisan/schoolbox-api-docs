@@ -431,8 +431,8 @@ class Decorator implements DecoratorInterface
             /* The max mark is the aggregation of each grid's maximum
              */
             $assessment
-                ->setMaxMark($maxMark)
-                ->setInstructorMaxMark($maxMark);
+                ->setMaxMark($this->getMaxMark() ?? $maxMark)
+                ->setInstructorMaxMark($this->getInstructorMaxMark() ?? $maxMark);
         }
 
         // Only spawn the mark scheme after the max mark is finalized
