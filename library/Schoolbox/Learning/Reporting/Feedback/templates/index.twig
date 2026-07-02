@@ -27,7 +27,7 @@
 {# Vars required in both contexts
  # These vars exist regardless of who is looking
 #}
-{% set readonly = interactionLocked and not USER.superUser %}
+{% set readonly = (interactionLocked or participant.excluded) and not USER.superUser %}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}

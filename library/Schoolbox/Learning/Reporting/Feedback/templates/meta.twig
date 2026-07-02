@@ -19,6 +19,9 @@
                 {% if readonly %}
                     <li class="icon-archive">{{ locale.term.proper }} has been archived</li>
                 {% endif %}
+                {% if participant.excluded %}
+                    <li class="icon-close">Student has been excluded from this {{ locale.activity }}</li>
+                {% endif %}
             </ul>
         </div>
     </div>
