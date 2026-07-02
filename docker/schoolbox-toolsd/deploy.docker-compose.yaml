@@ -71,43 +71,43 @@ services:
       - source: toolsd
         target: /conf/
 
-  # An example Celery queue for UPS jobs.
-  schoolbox-toolsd-celery-ups:
-    depends_on:
-      redis-storage:
-        condition: service_healthy
-    build:
-      context: ./schoolbox-toolsd
-      args:
-        PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
-    env_file:
-      - path: ./schoolbox-toolsd/default.env
-        required: true
-      - path: ./../docker-toolsd.env
-        required: false
-    command: [
-      src/main.py, worker,
-      -Q, ups,
-      --working-dir, /usr/share/schoolbox,
-      --tools-config, library/Schoolbox/ToolsDaemon/conf/tools.yaml,
-      --pools-config, library/Schoolbox/ToolsDaemon/conf/pools.yaml,
-      -vv,
-    ]
-    volumes:
-      - code:/usr/share/schoolbox
-      - storage:/var/lib/schoolbox/${PRIMARY_INSTANCE_ID}/storage
-      - storage2:/var/lib/schoolbox/${SECONDARY_INSTANCE_ID}/storage
-    configs:
-      - source: frankenphp-php
-        target: /usr/local/etc/php/conf.d/01-base-settings.ini
-      - source: frankenphp-php-env
-        target: /usr/local/etc/php/conf.d/02-env-settings.ini
-      - source: schoolbox-cli-php
-        target: /usr/local/etc/php/conf.d/03-cli-settings.ini
-      - source: schoolbox
-        target: /etc/schoolbox
-      - source: toolsd
-        target: /conf/
+#  # An example Celery queue for UPS jobs.
+#  schoolbox-toolsd-celery-ups:
+#    depends_on:
+#      redis-storage:
+#        condition: service_healthy
+#    build:
+#      context: ./schoolbox-toolsd
+#      args:
+#        PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
+#    env_file:
+#      - path: ./schoolbox-toolsd/default.env
+#        required: true
+#      - path: ./../docker-toolsd.env
+#        required: false
+#    command: [
+#      src/main.py, worker,
+#      -Q, ups,
+#      --working-dir, /usr/share/schoolbox,
+#      --tools-config, library/Schoolbox/ToolsDaemon/conf/tools.yaml,
+#      --pools-config, library/Schoolbox/ToolsDaemon/conf/pools.yaml,
+#      -vv,
+#    ]
+#    volumes:
+#      - code:/usr/share/schoolbox
+#      - storage:/var/lib/schoolbox/${PRIMARY_INSTANCE_ID}/storage
+#      - storage2:/var/lib/schoolbox/${SECONDARY_INSTANCE_ID}/storage
+#    configs:
+#      - source: frankenphp-php
+#        target: /usr/local/etc/php/conf.d/01-base-settings.ini
+#      - source: frankenphp-php-env
+#        target: /usr/local/etc/php/conf.d/02-env-settings.ini
+#      - source: schoolbox-cli-php
+#        target: /usr/local/etc/php/conf.d/03-cli-settings.ini
+#      - source: schoolbox
+#        target: /etc/schoolbox
+#      - source: toolsd
+#        target: /conf/
 
   # Flower is Celery's web-based monitoring tool.
   schoolbox-toolsd-flower:
