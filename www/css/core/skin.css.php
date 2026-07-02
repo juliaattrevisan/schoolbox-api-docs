@@ -32,5 +32,5 @@ $twig = $kernel->get('templateEngine');
 
 // This is a CSS file
 header('Content-Type: text/css');
-$kernel->outputCacheControlMaxAgeHeader(0);
+$kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
 echo $twig->render('css/skin.twig', $twigVars);
