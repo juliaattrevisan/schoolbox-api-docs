@@ -329,6 +329,15 @@ class Decorator implements DecoratorInterface
             $assessment
                 ->setMaxMark($maxMark)
                 ->setInstructorMaxMark($maxMark);
+
+            /* The max mark is generally the aggregation of each grid's maximum,
+             * but can be overridden in order to set a custom max mark for the assessment
+             * that differs from the rubric's total (as of 26.1).
+             * Use the form alues if possible, otherwise fall back to the aggregated rubric values.
+             */
+            $assessment
+                ->setMaxMark($this->getMaxMark() ?? $maxMark)
+                ->setInstructorMaxMark($this->getInstructorMaxMark() ?? $maxMark);
         } else {
             /* The max mark is always whatever got sent in the form; it was entered by a human
              */
@@ -415,8 +424,8 @@ class Decorator implements DecoratorInterface
             /* The max mark is the aggregation of each grid's maximum
              */
             $assessment
-                ->setMaxMark($maxMark)
-                ->setInstructorMaxMark($maxMark);
+                ->setMaxMark($this->getMaxMark() ?? $maxMark)
+                ->setInstructorMaxMark($this->getInstructorMaxMark() ?? $maxMark);
         }
 
         // Only spawn the mark scheme after the max mark is finalized

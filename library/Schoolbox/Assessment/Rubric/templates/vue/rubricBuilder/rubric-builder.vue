@@ -77,33 +77,123 @@ const allRubricsSum = window.Vue.computed(() => {
     return parseFloat(totalSum.toFixed(2));
 });
 
+/* to ensure all available fields are accounted for, track which IDs we've added listeners to.
+ * (this could be in an onMounted but i'm not confident that the page load order will
+ * always be correct, especially if in a mage form)
+ */
+const knownMaxMarkFields = window.Vue.ref<string[]>([]);
+
+/**
+ * Update whether the assign from button is visible or not
+ * @param input - the max mark input field
+ * @param assignBtn - the "Assign from Rubric" button
+ */
+function updateAssignFromButtonState(input: HTMLInputElement, assignBtn: HTMLAnchorElement): void {
+    if (input.value === "" || parseFloat(input.value) !== allRubricsSum.value) {
+        assignBtn.style.display = "";
+    } else {
+        assignBtn.style.display = "none";
+    }
+}
+
+/**
+ * Update a legacy max mark input and notify listeners that sync related fields.
+ * @param input - the max mark input field
+ * @param value - the value to assign
+ */
+function updateMaxMarkInputValue(input: HTMLInputElement, value: string): void {
+    input.value = value;
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
+/**
+ * Keep the max mark input in sync with the rubric grid's max value
+ * @param prevSum - the previous sum of all rubric max values, null if this is the first time syncing (to avoid unnecessary updates)
+ */
+function syncMaxMarkInputs(prevSum: number | null): void {
+    ["maxMark", "instructor-maxMark"].forEach((id) => {
+        const input = document.getElementById(id);
+        if (!(input instanceof HTMLInputElement)) {
+            return; // not found or not an input
+        }
+
+        const assignBtn = document.querySelector<HTMLAnchorElement>(`[data-assign-max-marks-from-rubric="${id}"]`);
+        if (!assignBtn) {
+            return; // no assign button, nothing to do
+        }
+
+        if (rubricGrids.value.length === 0) {
+            // no rubrics to assign from, the assign button shouldn't show.
+            // deleting the last rubric will retain the value, that's probably fine.
+            assignBtn.style.display = "none";
+            return;
+        }
+
+        // Update the term used for "Rubric"/"Rubrics" depending on the number of grids
+        const rubricTerm = assignBtn.querySelector<HTMLElement>(`[data-rubric-term]`);
+        if (rubricTerm) {
+            rubricTerm.textContent = rubricGrids.value.length === 1 ? "Rubric" : "Rubrics";
+        }
+
+        // Initialise listeners if that hasn't been done already
+        if (!knownMaxMarkFields.value.includes(id)) {
+            knownMaxMarkFields.value.push(id);
+
+            // Editing the input manually re-enables the assign button if the value is different from the rubric sum
+            input.addEventListener("input", () => {
+                updateAssignFromButtonState(input, assignBtn);
+            });
+
+            // Clicking the assign button sets the field to the max value from the grids
+            assignBtn.addEventListener("click", (e) => {
+                e.preventDefault();
+
+                updateMaxMarkInputValue(input, allRubricsSum.value.toString());
+                updateAssignFromButtonState(input, assignBtn);
+            });
+        }
+
+        // The "Assign XXX from Rubric" button exists, fill in the relevant value
+        assignBtn.querySelector<HTMLElement>("[data-rubric-sum]")!.textContent = allRubricsSum.value.toString();
+
+        // if not customised, sync
+        if (
+            input.value === "" ||
+            parseFloat(input.value) === prevSum ||
+            parseFloat(input.value) === allRubricsSum.value
+        ) {
+            updateMaxMarkInputValue(input, allRubricsSum.value.toString());
+        }
+
+        // update the button's customised state (only visible when customised)
+        updateAssignFromButtonState(input, assignBtn);
+    });
+}
+
 /**
  * Assuming the assessment uses the "Total Mark" mark type (should always update even if not as the mark type could change),
- * Keep the max mark input in sync with the rubric grid's max value
  */
 window.Vue.watch(
     () => [allRubricsSum.value, rubricGrids.value.length],
-    () => {
+    (_, prev) => {
         // TODO: ignore when {% if not courseManaged.isReadonly %} if needed (the old one did)
-
         // TODO: ideally deal with this fully inside of vue instead
-        const maxMarkInputs: HTMLInputElement[] = [
-            document.getElementById("maxMark"),
-            document.getElementById("instructor-maxMark"),
-        ].filter((el) => el instanceof HTMLInputElement);
-
-        const shouldOverrideMaxMark = rubricGrids.value.length > 0;
-        maxMarkInputs.forEach((input) => {
-            if (shouldOverrideMaxMark) {
-                input.setAttribute("readonly", "1");
-                input.value = allRubricsSum.value.toString();
-            } else {
-                input.removeAttribute("readonly");
-            }
-        });
+        syncMaxMarkInputs(prev === undefined ? null : prev[0]);
     },
     { immediate: true },
 );
+
+window.Vue.onMounted(() => {
+    // initial sync
+    syncMaxMarkInputs(null);
+
+    if (document.readyState !== "complete") {
+        // if the page isn't fully loaded yet, wait for it to be before syncing again
+        window.addEventListener("load", () => {
+            syncMaxMarkInputs(null);
+        });
+    }
+});
 
 const showRubricCreate = window.Vue.ref(false);
 
