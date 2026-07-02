@@ -53,13 +53,15 @@ body.sbx-body {
 
     // ensure container border-radius is applied in list contexts that paint list-item backgrounds
     .island section > :is(.action-list, .information-list) > li:first-child,
-    .island section > .list-container > :is(.action-list, .information-list) > li:first-child {
+    .island section > .list-container > :is(.action-list, .information-list) > li:first-child,
+    .island section > .configList > :is(.action-list, .information-list) > li:first-child {
         border-top-left-radius: var(--sbx-config-container-corner-radius);
         border-top-right-radius: var(--sbx-config-container-corner-radius);
     }
 
     .island section > :is(.action-list, .information-list) > li:last-child,
-    .island section > .list-container > :is(.action-list, .information-list) > li:last-child {
+    .island section > .list-container > :is(.action-list, .information-list) > li:last-child,
+    .island section > .configList > :is(.action-list, .information-list) > li:last-child {
         border-bottom-left-radius: var(--sbx-config-container-corner-radius);
         border-bottom-right-radius: var(--sbx-config-container-corner-radius);
     }
@@ -85,7 +87,8 @@ body.sbx-body {
     // bottom only rounded elements
     .reveal-modal .component-action section,
     .VueTables__table-footer,
-    .island .tabs-content {
+    .island .tabs-content,
+    .component-configurator .editPanel {
         border-radius: 0 0 var(--sbx-config-container-corner-radius) var(--sbx-config-container-corner-radius);
     }
 
