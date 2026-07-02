@@ -136,10 +136,10 @@ class Mapper extends BaseMapper
          * Note the polymorphic (feedback_id, feedback_table) usage here.
          */
         $query = "
-            DELETE FROM {$this->getTable()} rcm
-            WHERE rcm.feedback_id = :feedbackId
-            AND rcm.feedback_table = :feedbackTable
-            AND rcm.rubric_instance_id = :rubricInstanceId
+            DELETE FROM {$this->getTable()}
+            WHERE feedback_id = :feedbackId
+            AND feedback_table = :feedbackTable
+            AND rubric_instance_id = :rubricInstanceId
         ";
 
         $statement = $this->database->prepare($query);
