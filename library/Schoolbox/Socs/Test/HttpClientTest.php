@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Socs\Test;
 
+use Alaress\Http\Cache;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Request;
@@ -186,6 +187,38 @@ class HttpClientTest extends TestCase
         $this->expectExceptionMessage('Unable to parse SOCS XML payload; aborting.');
 
         $client->get('fixturecalendar.ashx', []);
+    }
+
+    public function testGetCachedUsesTwentyMinuteCacheTtl(): void
+    {
+        $guzzle = $this->getMockBuilder(Client::class)
+            ->onlyMethods(['request'])
+            ->getMock();
+        $guzzle
+            ->expects($this->never())
+            ->method('request');
+
+        $cache = $this->getMockBuilder(Cache::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['request'])
+            ->getMock();
+        $cache
+            ->expects($this->once())
+            ->method('request')
+            ->with(
+                'https://socs.example.test/socs/xml/tuition.ashx?ID=school&key=token&data=musiclessons',
+                'socs-calendar-',
+                [],
+                1200,
+            )
+            ->willReturn('<lessons />');
+
+        $client = new HttpClient('https://socs.example.test', 'school', 'token', $guzzle, $cache);
+
+        $response = $client->getCached('/socs/xml/tuition.ashx', ['data' => 'musiclessons']);
+
+        $this->assertInstanceOf(\SimpleXMLElement::class, $response);
+        $this->assertSame('lessons', $response->getName());
     }
 
     /**

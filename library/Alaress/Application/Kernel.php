@@ -1974,6 +1974,7 @@ abstract class Kernel
                         $di->get('redis.cache'),
                         $di->get('httpClient'),
                         $di->get('httpClient.cache'),
+                        $di->has('sentry') ? $di->get('sentry') : null,
                     );
                 }
             )

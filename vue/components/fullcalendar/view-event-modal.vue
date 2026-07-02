@@ -170,6 +170,10 @@ export default {
                     code: data?.timetable?.code,
                     staff: data?.timetable?.staff,
                 },
+                socsMusic: {
+                    staff: data?.socsMusic?.staff || [],
+                    students: data?.socsMusic?.students || [],
+                },
                 attendance: {
                     payload: this.payload,
                 },
@@ -994,6 +998,36 @@ export default {
                                     ><span v-if="index != Object.keys(eventExtendedProps.timetable.staff).length - 1"
                                         >,
                                     </span>
+                                </template>
+                            </meta-item>
+                        </template>
+                        <template v-if="eventExtendedProps.socsMusic.staff.length">
+                            <meta-item icon="staff">
+                                Staff:
+                                <template
+                                    v-for="(person, index) in eventExtendedProps.socsMusic.staff"
+                                    :key="person.id"
+                                >
+                                    <template v-if="person.url">
+                                        <a :href="person.url">{{ person.name }}</a>
+                                    </template>
+                                    <template v-else>{{ person.name }}</template
+                                    ><span v-if="index != eventExtendedProps.socsMusic.staff.length - 1">, </span>
+                                </template>
+                            </meta-item>
+                        </template>
+                        <template v-if="eventExtendedProps.socsMusic.students.length">
+                            <meta-item icon="staff-students">
+                                Student:
+                                <template
+                                    v-for="(person, index) in eventExtendedProps.socsMusic.students"
+                                    :key="person.id"
+                                >
+                                    <template v-if="person.url">
+                                        <a :href="person.url">{{ person.name }}</a>
+                                    </template>
+                                    <template v-else>{{ person.name }}</template
+                                    ><span v-if="index != eventExtendedProps.socsMusic.students.length - 1">, </span>
                                 </template>
                             </meta-item>
                         </template>

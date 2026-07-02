@@ -19,6 +19,7 @@ use Schoolbox\Socs\Calendar\Parser;
 use Schoolbox\Socs\Fixtures\Registry;
 use Schoolbox\Socs\HttpClient;
 use Schoolbox\User;
+use Sentry\State\HubInterface;
 
 /**
  * Calendar event source backed by the SOCS XML calendar feed.
@@ -36,11 +37,13 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
         int $connectorId,
         User $user,
         User $viewer,
-        private IConfigLoader $configLoader,
+        protected IConfigLoader $configLoader,
         private EventTypeMapper $eventTypeMapper,
         private CampusMapper $campusMapper,
         private HttpClient $httpClient,
         ?array $allLuEventTypes = null,
+        private ?HubInterface $sentry = null,
+        private ?Calendar_Api_Config_Mapper $configMapper = null,
     ) {
         parent::__construct($connectorId, $user, $viewer);
         $this->allLuEventTypes = $allLuEventTypes ?? (new Calendar())->getTypeList();
@@ -106,7 +109,15 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
         $allCampuses = $this->campusMapper->findAll();
         $matcher = new CampusMatcher();
 
-        foreach ($this->readEvents($startTimestamp, $endTimestamp) as $sourceEvent) {
+        try {
+            $sourceEvents = $this->readEvents($startTimestamp, $endTimestamp);
+        } catch (\JsonException | \RuntimeException | \Sabre\VObject\ParseException $e) {
+            $this->reportFeedFailure($e);
+
+            return $collection;
+        }
+
+        foreach ($sourceEvents as $sourceEvent) {
             if (!$filterFunction($sourceEvent)) {
                 continue;
             }
@@ -128,7 +139,7 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
     /**
      * Determine whether the SOCS calendar feed has enough configuration to be queried.
      */
-    private function isConfigured(): bool
+    protected function isConfigured(): bool
     {
         return (bool)$this->configLoader->get(ConfigMapper::NAME_SOCS_ENABLED)
             && (bool)$this->configLoader->get(ConfigMapper::NAME_SOCS_IMPORT_CALENDAR_EVENTS)
@@ -145,7 +156,7 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
      */
     private function readEvents(?int $startTimestamp = null, ?int $endTimestamp = null): array
     {
-        $xml = $this->httpClient->getCached(self::CALENDAR_PATH, $this->buildFeedQuery($startTimestamp, $endTimestamp));
+        $xml = $this->httpClient->getCached(static::CALENDAR_PATH, $this->buildFeedQuery($startTimestamp, $endTimestamp));
 
         return (new Parser())->parse($xml);
     }
@@ -203,10 +214,58 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
         return $event;
     }
 
+    private function reportFeedFailure(\Throwable $e): void
+    {
+        if ($this->isEmptyFeedFailure($e)) {
+            return;
+        }
+
+        if (!$this->shouldIgnoreSentryForFeedFailure($e)) {
+            $this->sentry?->captureException($e);
+        }
+
+        $this->addConnectorFailedCount();
+    }
+
+    /**
+     * Return whether this failure is a known empty SOCS response that should be ignored.
+     *
+     * The checked message comes from Schoolbox\Socs\HttpClient. Matching is case-insensitive
+     * so minor casing changes do not start recording admin-visible failures for empty feeds.
+     */
+    private function isEmptyFeedFailure(\Throwable $e): bool
+    {
+        return stripos($e->getMessage(), 'returned an empty payload') !== false;
+    }
+
+    /**
+     * Return whether this feed failure is already represented by the connector failed count.
+     *
+     * The checked `Not available.` message comes from Schoolbox\Socs\HttpClient for SOCS'
+     * invalid-credential response. Matching is case-insensitive so minor casing changes do not
+     * start producing Sentry noise for admin-correctable configuration issues.
+     */
+    private function shouldIgnoreSentryForFeedFailure(\Throwable $e): bool
+    {
+        return stripos($e->getMessage(), 'Not available.') !== false;
+    }
+
+    private function addConnectorFailedCount(): void
+    {
+        try {
+            $mapper = $this->configMapper ?? Calendar_Api_Config_Mapper::getInstance();
+            $config = $mapper->findById($this->getConnectorId());
+            $config->addFailedCount();
+            $mapper->save($config);
+        } catch (\Throwable $e) {
+            $this->sentry?->captureException($e);
+        }
+    }
+
     /**
      * Return the configured Schoolbox calendar category for SOCS events.
      */
-    private function getConfiguredEventTypeId(): int
+    protected function getConfiguredEventTypeId(): int
     {
         return (int)$this->configLoader->get(ConfigMapper::NAME_SOCS_CALENDAR_DEFAULT_EVENT_TYPE);
     }

@@ -14,6 +14,7 @@ use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
 use Calendar_Api_Config_Connector_Abstract;
 use Calendar_Api_Config_Connector_Socs;
+use Calendar_Api_Config_Connector_SocsMusic;
 use Calendar_Api_Config_Mapper;
 use Calendar_Api_Config_Record;
 use Psr\SimpleCache\CacheInterface;
@@ -59,7 +60,7 @@ class Controller extends ConfigController
         $postData = $this->requestPost->getArrayCopy();
 
         $this->updateConfig($postData, $this->buildConfigPredicate());
-        $this->syncCalendarConnector($postData);
+        $this->syncCalendarConnector();
 
         $this->response = $this->redirectAfterPost($this->routeGenerator->generate('socsadmin.getSettings'));
     }
@@ -69,10 +70,14 @@ class Controller extends ConfigController
         return $this->getConfigMapper()->getPredicateBuilder()->equals(ConfigMapper::COL_TYPE, ConfigMapper::TYPE_SOCS);
     }
 
-    private function syncCalendarConnector(array $postData): void
+    private function syncCalendarConnector(): void
     {
+        $configValues = $this->getConfigMapper()
+            ->findByPredicates($this->buildConfigPredicate())
+            ->indexBy(ConfigMapper::COL_NAME);
+
         $connector = new Calendar_Api_Config_Connector_Socs();
-        $calendarName = trim((string)($postData[ConfigMapper::NAME_SOCS_CALENDAR_NAME] ?? ''));
+        $calendarName = trim((string)$configValues[ConfigMapper::NAME_SOCS_CALENDAR_NAME]->getValue());
         if ($calendarName === '') {
             $calendarName = 'SOCS Events';
         }
@@ -80,12 +85,29 @@ class Controller extends ConfigController
         $connector->setLabel($calendarName);
         $connector->setEventType('Event');
         $connector->setConnectorClass('Socs');
-        $connector->setLuEventType((int)($postData[ConfigMapper::NAME_SOCS_CALENDAR_DEFAULT_EVENT_TYPE] ?? 1));
+        $connector->setLuEventType((int)$configValues[ConfigMapper::NAME_SOCS_CALENDAR_DEFAULT_EVENT_TYPE]->getValue());
 
         $this->syncManagedConnector(
             $connector,
-            !empty($postData[ConfigMapper::NAME_SOCS_ENABLED])
-                && !empty($postData[ConfigMapper::NAME_SOCS_IMPORT_CALENDAR_EVENTS])
+            (bool)$configValues[ConfigMapper::NAME_SOCS_ENABLED]->getValue()
+                && (bool)$configValues[ConfigMapper::NAME_SOCS_IMPORT_CALENDAR_EVENTS]->getValue()
+        );
+
+        $musicConnector = new Calendar_Api_Config_Connector_SocsMusic();
+        $musicLessonsName = trim((string)$configValues[ConfigMapper::NAME_SOCS_MUSIC_LESSONS_NAME]->getValue());
+        if ($musicLessonsName === '') {
+            $musicLessonsName = 'SOCS Music Lessons';
+        }
+
+        $musicConnector->setLabel($musicLessonsName);
+        $musicConnector->setEventType('Event');
+        $musicConnector->setConnectorClass('SocsMusic');
+        $musicConnector->setLuEventType((int)$configValues[ConfigMapper::NAME_SOCS_MUSIC_LESSONS_DEFAULT_EVENT_TYPE]->getValue());
+
+        $this->syncManagedConnector(
+            $musicConnector,
+            (bool)$configValues[ConfigMapper::NAME_SOCS_ENABLED]->getValue()
+                && (bool)$configValues[ConfigMapper::NAME_SOCS_IMPORT_MUSIC_LESSONS]->getValue()
         );
     }
 

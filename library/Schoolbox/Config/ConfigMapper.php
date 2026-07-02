@@ -538,6 +538,9 @@ class ConfigMapper extends Mapper
     public const string NAME_SOCS_IMPORT_CALENDAR_EVENTS = 'socs_import_calendar_events';
     public const string NAME_SOCS_CALENDAR_NAME = 'socs_calendar_name';
     public const string NAME_SOCS_CALENDAR_DEFAULT_EVENT_TYPE = 'socs_calendar_default_event_type';
+    public const string NAME_SOCS_IMPORT_MUSIC_LESSONS = 'socs_import_music_lessons';
+    public const string NAME_SOCS_MUSIC_LESSONS_NAME = 'socs_music_lessons_name';
+    public const string NAME_SOCS_MUSIC_LESSONS_DEFAULT_EVENT_TYPE = 'socs_music_lessons_default_event_type';
     public const string NAME_SOCS_IMPORT_SPORTS_FIXTURES = 'socs_import_sports_fixtures';
 
 
