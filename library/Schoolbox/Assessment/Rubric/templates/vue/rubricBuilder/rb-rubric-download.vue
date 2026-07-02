@@ -44,7 +44,8 @@ async function download(): Promise<void> {
     // precise moment of download
     let filename = "rubric";
     const rubricTitle = parsedProps.value.rubricGrid.title.trim();
-    const assessmentTitle = document.getElementById("title").value.trim();
+    const titleElement = document.getElementById("title");
+    const assessmentTitle = titleElement ? titleElement.value.trim() : "";
 
     if ("" !== rubricTitle) {
         filename = rubricTitle;
