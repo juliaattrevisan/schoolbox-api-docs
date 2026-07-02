@@ -27,6 +27,7 @@ class CandidateFinderTest extends TestCase
                 'session_id'            => 'session-never-moderated',
                 'last_message_sent_at' => '2026-07-01 09:00:00',
                 'last_moderated_at'    => null,
+                'feature' => null,
             ],
         ]);
 
@@ -37,6 +38,7 @@ class CandidateFinderTest extends TestCase
         $this->assertSame('session-never-moderated', $candidates[0]->getSessionId());
         $this->assertSame('2026-07-01 09:00:00', $candidates[0]->getLastMessageSentAt()->getDatabase());
         $this->assertNull($candidates[0]->getLastModeratedAt());
+        $this->assertNull($candidates[0]->getFeature());
     }
 
     /**
@@ -49,6 +51,7 @@ class CandidateFinderTest extends TestCase
                 'session_id'            => 'session-newer-log',
                 'last_message_sent_at' => '2026-07-01 10:00:00',
                 'last_moderated_at'    => '2026-07-01 09:00:00',
+                'feature' => 'chat'
             ],
         ]);
 
@@ -58,8 +61,7 @@ class CandidateFinderTest extends TestCase
         $this->assertSame('session-newer-log', $candidates[0]->getSessionId());
         $this->assertSame('2026-07-01 10:00:00', $candidates[0]->getLastMessageSentAt()->getDatabase());
         $this->assertSame('2026-07-01 09:00:00', $candidates[0]->getLastModeratedAt()?->getDatabase());
-        $this->assertSame(['excludedFeature' => Feature::AI_MODERATION_AGENT->value], $statement->executedParams);
-        $this->assertStringContainsString('`ai_session`.feature <> :excludedFeature', $statement->sql);
+        $this->assertSame('chat', $candidates[0]->getFeature());
         $this->assertStringContainsString('LEFT JOIN `ai_moderation_event`', $statement->sql);
         $this->assertStringContainsString('MAX(`ai_moderation_event`.created_at) AS last_moderated_at', $statement->sql);
         $this->assertStringContainsString('last_moderated_at IS NULL', $statement->sql);
@@ -80,19 +82,6 @@ class CandidateFinderTest extends TestCase
 
         $this->assertSame([], $candidates);
         $this->assertStringContainsString('last_message_sent_at > last_moderated_at', $statement->sql);
-    }
-
-    /**
-     * @return void
-     */
-    public function testModerationAgentSessionsAreSkippedByEligibilitySql(): void
-    {
-        $statement = new CandidateFinderStatement([]);
-
-        $this->createFinder($statement)->find(10);
-
-        $this->assertSame(['excludedFeature' => Feature::AI_MODERATION_AGENT->value], $statement->executedParams);
-        $this->assertStringContainsString('`ai_session`.feature <> :excludedFeature', $statement->sql);
     }
 
     /**

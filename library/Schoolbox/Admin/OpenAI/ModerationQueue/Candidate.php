@@ -15,13 +15,13 @@ class Candidate
      * @param string                   $sessionId          The AI session requiring moderation.
      * @param \Alaress_Date_Format     $lastMessageSentAt  The latest log timestamp for the session.
      * @param \Alaress_Date_Format|null $lastModeratedAt   The latest moderation event timestamp, when one exists.
-     * @param string                   $feature            The feature of the session, which is used to determine if it supports moderation.
+     * @param ?string                  $feature            The feature of the session, which is used to determine if it supports moderation.
      */
     public function __construct(
         private readonly string $sessionId,
         private readonly \Alaress_Date_Format $lastMessageSentAt,
         private readonly ?\Alaress_Date_Format $lastModeratedAt,
-        private readonly string $feature,
+        private readonly ?string $feature,
     ) {
     }
 
@@ -50,9 +50,9 @@ class Candidate
     }
 
     /**
-     * @return string
+     * @return ?string
      */
-    public function getFeature(): string
+    public function getFeature(): ?string
     {
         return $this->feature;
     }
