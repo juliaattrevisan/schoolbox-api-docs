@@ -9,9 +9,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\OpenAI\ModerationQueue;
 
+use Alaress\Lock\LockRefreshException;
 use Schoolbox\Application\CliTool;
 use Schoolbox\OpenAi\Moderation\Event\Mapper as ModerationEventMapper;
 use Schoolbox\OpenAi\Session\Log\Mapper as SessionLogMapper;
+use Symfony\Component\Lock\Exception\LockReleasingException;
 use Symfony\Component\Lock\LockInterface;
 
 /**
@@ -142,80 +144,85 @@ HELP;
         $dryRunOffset = 0;
         $performOffset = 0;
 
-        while ($stats['inspected'] < $limit) {
-            if (time() > $endTime) {
-                $this->logSummary($stats, 'maximum runtime reached before next batch');
-                return;
-            }
-
-            $remaining = $limit - $stats['inspected'];
-            $currentBatchSize = min($batchSize, $remaining);
-            $offset = $this->perform() ? $performOffset : $dryRunOffset;
-            $candidates = $this->getCandidateFinder()->find($currentBatchSize, $offset);
-
-            if (count($candidates) === 0) {
-                $this->logSummary($stats, 'no candidates found');
-                return;
-            }
-
-            foreach ($candidates as $candidate) {
+        try {
+            while ($stats['inspected'] < $limit) {
                 if (time() > $endTime) {
-                    $this->refreshLock($lock);
-                    $this->logSummary($stats, 'maximum runtime reached during batch');
+                    $this->logSummary($stats, 'maximum runtime reached before next batch');
                     return;
                 }
 
-                $stats['inspected']++;
+                $remaining = $limit - $stats['inspected'];
+                $currentBatchSize = min($batchSize, $remaining);
+                $offset = $this->perform() ? $performOffset : $dryRunOffset;
+                $candidates = $this->getCandidateFinder()->find($currentBatchSize, $offset);
 
-                if (!$this->perform()) {
-                    $stats['dryRunSkipped']++;
-                    $dryRunOffset++;
+                if (count($candidates) === 0) {
+                    $this->logSummary($stats, 'no candidates found');
+                    return;
+                }
+
+                foreach ($candidates as $candidate) {
+                    if (time() > $endTime) {
+                        $this->refreshLock($lock);
+                        $this->logSummary($stats, 'maximum runtime reached during batch');
+                        return;
+                    }
+
+                    $stats['inspected']++;
+
+                    if (!$this->perform()) {
+                        $stats['dryRunSkipped']++;
+                        $dryRunOffset++;
+                        $logger->info(sprintf(
+                            'Dry-run: would moderate AI feature "%s" session "%s" last messaged at %s.',
+                            $candidate->getFeature(),
+                            $candidate->getSessionId(),
+                            $candidate->getLastMessageSentAt()->getDatabase(),
+                        ));
+                        $this->refreshLock($lock);
+                        continue;
+                    }
+
+                    try {
+                        $result = $this->getModerator()->moderate($candidate->getSessionId());
+                    } catch (\Throwable $e) {
+                        $stats['errors']++;
+                        $performOffset++;
+                        $logger->error(sprintf(
+                            'Failed to moderate AI feature "%s" session "%s": %s',
+                            $candidate->getFeature(),
+                            $candidate->getSessionId(),
+                            $e->getMessage(),
+                        ), ['exception' => $e]);
+                        $this->refreshLock($lock);
+                        continue;
+                    }
+
+                    if ($result->isModerated()) {
+                        $stats['moderated']++;
+                        $logger->info(sprintf('Moderated AI feature "%s" session "%s".', $candidate->getFeature(), $candidate->getSessionId()));
+                        $this->refreshLock($lock);
+                        continue;
+                    }
+
+                    $stats['noOpSkipped']++;
                     $logger->info(sprintf(
-                        'Dry-run: would moderate AI feature "%s" session "%s" last messaged at %s.',
+                        'Skipped AI feature "%s" session "%s": %s.',
                         $candidate->getFeature(),
                         $candidate->getSessionId(),
-                        $candidate->getLastMessageSentAt()->getDatabase(),
+                        $result->getReason() ?? 'no-op',
                     ));
                     $this->refreshLock($lock);
-                    continue;
                 }
 
-                try {
-                    $result = $this->getModerator()->moderate($candidate->getSessionId());
-                } catch (\Throwable $e) {
-                    $stats['errors']++;
-                    $performOffset++;
-                    $logger->error(sprintf(
-                        'Failed to moderate AI feature "%s" session "%s": %s',
-                        $candidate->getFeature(),
-                        $candidate->getSessionId(),
-                        $e->getMessage(),
-                    ), ['exception' => $e]);
-                    $this->refreshLock($lock);
-                    continue;
+                if (time() > $endTime) {
+                    $this->logSummary($stats, 'maximum runtime reached after batch');
+                    return;
                 }
-
-                if ($result->isModerated()) {
-                    $stats['moderated']++;
-                    $logger->info(sprintf('Moderated AI feature "%s" session "%s".', $candidate->getFeature(), $candidate->getSessionId()));
-                    $this->refreshLock($lock);
-                    continue;
-                }
-
-                $stats['noOpSkipped']++;
-                $logger->info(sprintf(
-                    'Skipped AI feature "%s" session "%s": %s.',
-                    $candidate->getFeature(),
-                    $candidate->getSessionId(),
-                    $result->getReason() ?? 'no-op',
-                ));
-                $this->refreshLock($lock);
             }
-
-            if (time() > $endTime) {
-                $this->logSummary($stats, 'maximum runtime reached after batch');
-                return;
-            }
+        } catch (LockRefreshException) {
+            $this->logSummary($stats, 'process lock could not be refreshed');
+            return;
         }
 
         $this->logSummary($stats, 'limit reached');
@@ -248,7 +255,17 @@ HELP;
      */
     private function releaseLock(LockInterface $lock): void
     {
-        $lock->release();
+        try {
+            $lock->release();
+        } catch (LockReleasingException $e) {
+            $this->getLogger()->warning(
+                'AI moderation queue complete: process lock could not be released.',
+                ['exception' => $e],
+            );
+
+            return;
+        }
+
         $this->getLogger()->info('AI moderation queue complete: released process lock.');
     }
 

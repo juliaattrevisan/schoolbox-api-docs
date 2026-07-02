@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\OpenAI\ModerationQueue\Test;
 
+use Alaress\Lock\LockRefreshException;
 use Alaress\Database\Connector\NullConnector;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -20,6 +21,7 @@ use Schoolbox\Admin\OpenAI\ModerationQueue\ModerationResult;
 use Schoolbox\Admin\OpenAI\ModerationQueue\Moderator;
 use Schoolbox\Config\ArrayLoader;
 use Schoolbox\OpenAi\Moderation\Event\Model as ModerationEventModel;
+use Symfony\Component\Lock\Exception\LockReleasingException;
 use Symfony\Component\Lock\LockInterface;
 
 /**
@@ -210,6 +212,55 @@ class CommandLineToolTest extends TestCase
     }
 
     /**
+     * @return void
+     */
+    public function testLockRefreshFailureStopsProcessingCleanly(): void
+    {
+        $finder = $this->createFinder([
+            [$this->createCandidate('session-a'), $this->createCandidate('session-b')],
+        ]);
+        $moderator = $this->createMock(Moderator::class);
+        $moderator
+            ->expects($this->once())
+            ->method('moderate')
+            ->with('session-a')
+            ->willReturn(ModerationResult::moderated(new ModerationEventModel()));
+
+        $this->createTool($finder, $moderator, ['n' => 10, 'batch' => 2], true, 1)->run();
+
+        $this->assertSame([[2, 0]], $this->findCalls);
+    }
+
+    /**
+     * @return void
+     */
+    public function testReleaseLockFailureDoesNotEscapeShutdownHandler(): void
+    {
+        $lock = $this->createMock(LockInterface::class);
+        $lock
+            ->expects($this->once())
+            ->method('release')
+            ->willThrowException(new LockReleasingException('expired lock'));
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger
+            ->expects($this->once())
+            ->method('warning')
+            ->with('AI moderation queue complete: process lock could not be released.');
+
+        $tool = new CommandLineTool();
+        $container = $this->createStub(ContainerInterface::class);
+        $container->method('get')->willReturnMap([
+            ['config', new ArrayLoader()],
+            ['databaseInternal', new NullConnector()],
+        ]);
+        $tool->setup([], $container, fopen('php://memory', 'w+'), $logger, false);
+
+        $releaseLock = new \ReflectionMethod($tool, 'releaseLock');
+        $releaseLock->invoke($tool, $lock);
+    }
+
+    /**
      * Ensures the packaged cron template runs the moderation queue with bounded work settings.
      *
      * @return void
@@ -287,6 +338,7 @@ class CommandLineToolTest extends TestCase
      * @param Moderator $moderator
      * @param array<string, int> $options
      * @param bool $perform
+     * @param int|null $failRefreshAfter
      * @return CommandLineTool
      */
     private function createTool(
@@ -294,13 +346,17 @@ class CommandLineToolTest extends TestCase
         Moderator $moderator,
         array $options,
         bool $perform,
+        ?int $failRefreshAfter = null,
     ): CommandLineTool {
         $lock = $this->createStub(LockInterface::class);
-        $tool = new class ($finder, $moderator, $lock) extends CommandLineTool {
+        $tool = new class ($finder, $moderator, $lock, $failRefreshAfter) extends CommandLineTool {
+            private int $refreshCount = 0;
+
             public function __construct(
                 CandidateFinder $candidateFinder,
                 Moderator $moderator,
                 private readonly LockInterface $lock,
+                private readonly ?int $failRefreshAfter,
             ) {
                 parent::__construct($candidateFinder, $moderator);
             }
@@ -308,6 +364,15 @@ class CommandLineToolTest extends TestCase
             protected function acquireLock(string $lockName, ?float $timeout): LockInterface
             {
                 return $this->lock;
+            }
+
+            protected function refreshLock(LockInterface $lock): void
+            {
+                $this->refreshCount++;
+
+                if ($this->failRefreshAfter === $this->refreshCount) {
+                    throw new LockRefreshException('Could not refresh lock; perhaps expired');
+                }
             }
         };
 
@@ -340,6 +405,7 @@ class CommandLineToolTest extends TestCase
             $sessionId,
             new \Alaress_Date_Format('2026-07-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT),
             null,
+            'dialog_agent',
         );
     }
 }
