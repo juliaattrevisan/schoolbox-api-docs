@@ -96,6 +96,11 @@ function updateAssignFromButtonState(input: HTMLInputElement, assignBtn: HTMLAnc
     }
 }
 
+/**
+ * Update a legacy max mark input and notify listeners that sync related fields.
+ * @param input - the max mark input field
+ * @param value - the value to assign
+ */
 function updateMaxMarkInputValue(input: HTMLInputElement, value: string): void {
     input.value = value;
     input.dispatchEvent(new Event("input", { bubbles: true }));
@@ -125,7 +130,7 @@ function syncMaxMarkInputs(prevSum: number | null): void {
         }
 
         // Update the term used for "Rubric"/"Rubrics" depending on the number of grids
-        const rubricTerm = document.querySelector<HTMLElement>(`[data-rubric-term]`);
+        const rubricTerm = assignBtn.querySelector<HTMLElement>(`[data-rubric-term]`);
         if (rubricTerm) {
             rubricTerm.textContent = rubricGrids.value.length === 1 ? "Rubric" : "Rubrics";
         }

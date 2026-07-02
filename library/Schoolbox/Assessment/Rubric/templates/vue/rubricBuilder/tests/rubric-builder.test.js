@@ -22,12 +22,20 @@ function makeRubric(id, maxValue, weight = 1) {
     };
 }
 
-function mountRubricBuilder(rubrics) {
+function mountRubricBuilder(rubrics, includeInstructorMaxMark = false) {
     document.body.innerHTML = `
         <input id="maxMark" value="5">
         <a href="#" data-assign-max-marks-from-rubric="maxMark">
             Assign <span data-rubric-sum></span> from <span data-rubric-term>Rubric</span>
         </a>
+        ${
+            includeInstructorMaxMark
+                ? `<input id="instructor-maxMark" value="5">
+                    <a href="#" data-assign-max-marks-from-rubric="instructor-maxMark">
+                        Assign <span data-rubric-sum></span> from <span data-rubric-term>Rubric</span>
+                    </a>`
+                : ""
+        }
     `;
 
     return mount(RubricBuilder, {
@@ -48,7 +56,7 @@ function mountRubricBuilder(rubrics) {
         },
         global: {
             stubs: {
-                FieldsetCollapsible: { template: "<fieldset><slot name=\"legend\" /><slot /></fieldset>" },
+                FieldsetCollapsible: { template: '<fieldset><slot name="legend" /><slot /></fieldset>' },
                 BasicModal: true,
                 RbRubricFields: true,
                 RbEditableGrid: true,
@@ -66,7 +74,7 @@ describe("rubric-builder", () => {
     it("dispatches input when assigning the rubric max mark", async () => {
         const wrapper = mountRubricBuilder([makeRubric(1, 7)]);
         const input = document.getElementById("maxMark");
-        const assignLink = document.querySelector("[data-assign-max-marks-from-rubric=\"maxMark\"]");
+        const assignLink = document.querySelector('[data-assign-max-marks-from-rubric="maxMark"]');
         const inputListener = jest.fn();
 
         input.addEventListener("input", inputListener);
@@ -74,6 +82,15 @@ describe("rubric-builder", () => {
 
         expect(input.value).toBe("7");
         expect(inputListener).toHaveBeenCalledTimes(1);
+
+        wrapper.unmount();
+    });
+
+    it("pluralises all assign links when multiple rubrics exist", () => {
+        const wrapper = mountRubricBuilder([makeRubric(1, 7), makeRubric(2, 3)], true);
+        const rubricTerms = [...document.querySelectorAll("[data-rubric-term]")].map((term) => term.textContent);
+
+        expect(rubricTerms).toEqual(["Rubrics", "Rubrics"]);
 
         wrapper.unmount();
     });
