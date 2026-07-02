@@ -42,13 +42,13 @@ async function download(): Promise<void> {
 
     // This is a default placeholder name in case assessment title and rubric title were both empty at the
     // precise moment of download
-    let filename = 'rubric';
+    let filename = "rubric";
     const rubricTitle = parsedProps.value.rubricGrid.title.trim();
-    const assessmentTitle = document.getElementById('title').value.trim();
+    const assessmentTitle = document.getElementById("title").value.trim();
 
-    if ('' !== rubricTitle) {
+    if ("" !== rubricTitle) {
         filename = rubricTitle;
-    } else if ('' !== assessmentTitle) {
+    } else if ("" !== assessmentTitle) {
         filename = assessmentTitle;
     }
 
