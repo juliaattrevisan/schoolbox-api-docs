@@ -170,7 +170,7 @@ class Mapper extends BaseMapper
         ?int $limit = 100,
         ?int $offset = 0
     ): GenericCollection {
-        [$where, $params] = $this->buildSessionFilter($keyword, $feature, $user, $start, $end, $moderationStatuses, true);
+        [$where, $params] = $this->buildSessionFilter($keyword, $feature, $user, $start, $end, $moderationStatuses);
 
         $limitSql  = null !== $limit ? 'LIMIT :limit' : '';
         $offsetSql = null !== $limit && null !== $offset ? 'OFFSET :offset' : '';
@@ -228,7 +228,7 @@ class Mapper extends BaseMapper
         ?\Alaress_Date_Format $end,
         GenericCollection $moderationStatuses,
     ): int {
-        [$where, $params] = $this->buildSessionFilter($keyword, $feature, $user, $start, $end, $moderationStatuses, true);
+        [$where, $params] = $this->buildSessionFilter($keyword, $feature, $user, $start, $end, $moderationStatuses);
 
         $statement = $this->getDatabase()->prepare(
             "SELECT COUNT(*) FROM `{$this->table}` {$where}"
@@ -261,7 +261,7 @@ class Mapper extends BaseMapper
         ?\Alaress_Date_Format $start,
         ?\Alaress_Date_Format $end,
         GenericCollection $moderationStatuses,
-        bool $requireSessionLog = false,
+        bool $requireSessionLog = true,
     ): array {
         $pb = $this->getPredicateBuilder();
         $keywordPredicate = null;
