@@ -337,7 +337,10 @@ const rubricRows = window.Vue.computed(() => {
                 />
             </li>
             <li>
-                <button class="button icon-delete" type="button" @click="() => deleteRubric(rubric.id)">Delete</button>
+                <button class="sbx-button--has-icon" type="button" @click="() => deleteRubric(rubric.id)">
+                    <sbx-icon name="delete"></sbx-icon>
+                    Delete
+                </button>
             </li>
         </ul>
     </div>
