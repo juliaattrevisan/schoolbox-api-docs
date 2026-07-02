@@ -88,7 +88,7 @@
     <div class="small-12 island">
         {% for namespace in msgConfig %}
             {% if ns[namespace.id] is defined %}
-                <h3 class="subheader">Receive {{ locale.translateSentence(namespace.label) }} notifications when&hellip;</h3>
+                <h3 class="subheader">Receive {{ locale.translateSentence(namespace.label) | title }} notifications when&hellip;</h3>
                 <section>
                     <ul class='permission-list' data-roles data-digest-settings>
                         {% for source in namespace.sources %}

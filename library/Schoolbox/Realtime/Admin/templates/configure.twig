@@ -402,7 +402,7 @@
                         {% for namespace in msgConfig %}
                             {% if ns[namespace.id] is defined %}
                             <div class="actions-small-1">
-                                <h3 class="subheader f-no-margins">{{ locale.translateSentence(ns[namespace.id].label) }}</h3>
+                                <h3 class="subheader f-no-margins">{{ locale.translateSentence(ns[namespace.id].label) | title }}</h3>
                                 <nav>
                                     <sbx-pop-out content-id="feature-pop-out-{{ namespace.id }}"></sbx-pop-out>
                                 </nav>
