@@ -644,7 +644,14 @@ class Module extends BaseModule
         }
 
         if ($assessmentSpec->isImplementation()) {
-            //if not spec, error
+            if ($assessmentSpec->getId() === $assessmentImpl->getId()) {
+                return [
+                    'assessment' => $assessmentSpec,
+                    'assessmentSpec' => $assessmentSpec,
+                    'assessmentImpl' => $assessmentImpl
+                ];
+            }
+
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
