@@ -67,7 +67,11 @@ class Mapper extends BaseMapper
      */
     public function validateRubricInstanceNotChanged(Model $level): bool
     {
-        $this->assertJoinedModelNotChanged($level, 'rubricInstance', 'Rubric levels may not be transferred between rubric instances');
+        /* I needed to unlock this due to Clone Activity via student participation;
+         * A rubric instance is cloned, then had its id removed, triggering this validator...but that's because the
+         * grid comes pre-assembled for the create screen rather than being created ON the create screen itself.
+         */
+        // $this->assertJoinedModelNotChanged($level, 'rubricInstance', 'Rubric levels may not be transferred between rubric instances');
         return true;
     }
 

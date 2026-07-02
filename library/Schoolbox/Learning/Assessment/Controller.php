@@ -632,17 +632,35 @@ abstract class Controller extends ListController implements IAssessmentControlle
              * and only apply it when the rubric is being used in the original assessment
              */
             if ($assessment instanceof DueWork\Model && $assessment->getRubricInstances()?->count()) {
-                $rubricGrid = $this->rubricMapper->retrieveGrid($assessment, true, true);
-
-                /**
-                 * list of all rubric grids for this assessment
-                 * @see also in /library/Schoolbox/Learning/Assessment/DueWork/Controller.php::generateRubricTwigData
-                 */
-
-                // TODO: for now, just one grid support, in the format of multiple
                 $rubricGridTranslator = new RubricGridTranslator\Full();
-                $data['rubricGrids'] = [$rubricGrid];
-                $data['rubricGridsPayload'] = [$rubricGridTranslator($rubricGrid)];
+
+                /* Somehow remove the rubric instance id before continuing, so we spawn a new record here.
+                 */
+                $negativeIds = -1;
+
+                /* Assemble each rubric grid via its instance, separately, for now. Maybe there's a shortcut to all this that
+                 * is cheaper, but this will be the simplest for the time being.
+                 */
+                foreach ($assessment->getRubricInstances() as $rubricInstance) {
+                    /* Obtain the levels, caps/ind/desc data for a given rubric instance, compiling them into a struct that you
+                     * can render in the vue component in the frontend
+                     */
+                    $rubricGrid = $this->rubricMapper->retrieveOneGrid($assessment, $rubricInstance, true);
+
+                    /* Arbitrarily supply two placeholder levels if the grid never had any, such as when you're making a whole
+                     * new grid from scratch for the first time. This prompts users to fill them in. This is the only place
+                     * where this happens: otherwise I would have considered pushing this into retrieveOneGrid()
+                     */
+                    if (count($rubricGrid->getLevels()) === 0) {
+                        $rubricGrid->getLevels()
+                            ->add(new Level())
+                            ->add(new Level());
+                    }
+
+                    $rubricGrid->getRubricInstance()->setId($negativeIds--);
+
+                    $data['rubricGridsPayload'][] = $rubricGridTranslator($rubricGrid);
+                }
             }
         }
 
