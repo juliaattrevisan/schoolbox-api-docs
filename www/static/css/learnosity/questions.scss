@@ -244,6 +244,9 @@ body.sbx-body .lrn_widget.lrn_mcq .lrn_response .lrn_mcqgroup-block .lrn-mcq-opt
 .lrn .lrn_btn_sort {
     color: var(--sbx-color-text-primary, #000);
 }
+body.sbx-body .lrn_sort_gripper {
+    font-family: "LearnosityIconsRegular" !important;
+}
 .lrn_widget.lrn_sortlist .lrn_arrow_top span {
     border-bottom: 1em solid var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
