@@ -110,8 +110,8 @@ const selectedGradeGroup = window.Vue.computed(() => {
 window.Vue.watch(
     () => selectedMarkType.value,
     (newMarkType) => {
-        if (newMarkType === MarkTypeSlug.LETTER && selectedGradeGroupId.value === null) {
-            selectedGradeGroupId.value = props.defaultGradeGroup;
+        if (newMarkType === MarkTypeSlug.LETTER && selectedGradeGroupModel.value === null) {
+            selectedGradeGroupModel.value = props.defaultGradeGroup;
         }
     },
     { immediate: true },
