@@ -329,6 +329,64 @@ XML);
     }
 
 
+    public function testSocsMusicCredentialFailureTracksFailureWithoutReporting(): void
+    {
+        $eventTypeMapper = $this->createMock(EventTypeMapper::class);
+        $eventTypeMapper->expects($this->never())->method('findFirstMeaningfulId');
+
+        $userMapper = $this->createMock(UserMapper::class);
+        $userMapper->expects($this->never())->method('findByExternalId');
+
+        $sentry = $this->createMock(HubInterface::class);
+        $sentry->expects($this->never())->method('captureException');
+
+        $config = new \Calendar_Api_Config_Record();
+        $config->setId(456)->setFailedCount(1);
+        $configMapper = $this->createMock(\Calendar_Api_Config_Mapper::class);
+        $configMapper->expects($this->once())->method('findById')->with(456)->willReturn($config);
+        $configMapper->expects($this->once())->method('save')->with($this->callback(
+            static fn (\Calendar_Api_Config_Record $record): bool => $record->getFailedCount() === 2
+        ));
+
+        $source = new Calendar_Api_EventType_Event_SocsMusic_Default(
+            456,
+            $this->createUser(91, 'STUDENT-9', 'Jill', 'Student'),
+            new User(),
+            new ArrayLoader([
+                ConfigMapper::NAME_SOCS_ENABLED => true,
+                ConfigMapper::NAME_SOCS_IMPORT_MUSIC_LESSONS => true,
+                ConfigMapper::NAME_SOCS_ENDPOINT_HOST => 'https://socs.example.test',
+                ConfigMapper::NAME_SOCS_ENDPOINT_ID => 'school',
+                ConfigMapper::NAME_SOCS_ENDPOINT_TOKEN => 'token',
+                ConfigMapper::NAME_SOCS_MUSIC_LESSONS_DEFAULT_EVENT_TYPE => 1,
+            ]),
+            $eventTypeMapper,
+            new class extends HttpClient {
+                public function __construct()
+                {
+                }
+
+                public function getCached(string $path, array $query): \SimpleXMLElement
+                {
+                    throw new \RuntimeException('SOCS endpoint returned known error string; aborting. Not available.');
+                }
+            },
+            $userMapper,
+            [[
+                'eventTypeID' => 1,
+                'eventType' => 'SOCS Music',
+                'eventColour' => '#9ad39b',
+            ]],
+            $sentry,
+            $configMapper,
+        );
+
+        $events = $source->getEvents(strtotime('2026-05-19 00:00:00'), strtotime('2026-05-20 00:00:00'));
+
+        self::assertCount(0, $events);
+    }
+
+
     public function testSocsMusicEmptyFeedFailureReturnsEmptyCollectionWithoutReporting(): void
     {
         $eventTypeMapper = $this->createMock(EventTypeMapper::class);

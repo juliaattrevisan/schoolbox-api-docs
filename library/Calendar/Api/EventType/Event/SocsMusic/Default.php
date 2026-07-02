@@ -145,12 +145,38 @@ class Calendar_Api_EventType_Event_SocsMusic_Default extends Calendar_Api_EventT
 
     private function reportFeedFailure(\Throwable $e): void
     {
-        if (str_contains($e->getMessage(), 'returned an empty payload')) {
+        if ($this->isEmptyFeedFailure($e)) {
             return;
         }
 
-        $this->sentry?->captureException($e);
+        if (!$this->shouldIgnoreSentryForFeedFailure($e)) {
+            $this->sentry?->captureException($e);
+        }
+
         $this->addConnectorFailedCount();
+    }
+
+    /**
+     * Return whether this failure is a known empty SOCS response that should be ignored.
+     *
+     * The checked message comes from Schoolbox\Socs\HttpClient. Matching is case-insensitive
+     * so minor casing changes do not start recording admin-visible failures for empty feeds.
+     */
+    private function isEmptyFeedFailure(\Throwable $e): bool
+    {
+        return stripos($e->getMessage(), 'returned an empty payload') !== false;
+    }
+
+    /**
+     * Return whether this feed failure is already represented by the connector failed count.
+     *
+     * The checked `Not available.` message comes from Schoolbox\Socs\HttpClient for SOCS'
+     * invalid-credential response. Matching is case-insensitive so minor casing changes do not
+     * start producing Sentry noise for admin-correctable configuration issues.
+     */
+    private function shouldIgnoreSentryForFeedFailure(\Throwable $e): bool
+    {
+        return stripos($e->getMessage(), 'Not available.') !== false;
     }
 
     private function addConnectorFailedCount(): void
