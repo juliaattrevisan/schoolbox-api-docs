@@ -311,24 +311,15 @@ class Mapper extends BaseMapper
             );
         }
 
-        if ($logClauses) {
-            $pb->rawWhere(
-                'EXISTS (
+        $logClauseSql = $logClauses ? ' AND ' . implode("\nAND ", $logClauses) : '';
+
+        $pb->rawWhere(
+            'EXISTS (
                     SELECT 1 FROM `ai_session_log` l
-                    WHERE l.ai_session_id = `' . $this->table . '`.id
-                    AND ' . implode("\nAND ", $logClauses) . '
+                    WHERE l.ai_session_id = `' . $this->table . '`.id' . $logClauseSql . '
                 )',
-                $logParams
-            );
-        } else {
-            $pb->rawWhere(
-                'EXISTS (
-                    SELECT 1 FROM `ai_session_log` l
-                    WHERE l.ai_session_id = `' . $this->table . '`.id
-                )',
-                []
-            );
-        }
+            $logParams
+        );
 
         $where = $pb->getWhere() ? 'WHERE ' . implode("\nAND ", $pb->getWhere()) : '';
 
