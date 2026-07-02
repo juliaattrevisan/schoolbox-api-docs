@@ -313,7 +313,7 @@ function install_instance() {
     --config backup_dir "'/var/lib/schoolbox/${INSTANCE_ID}/backups'" \
     --config presidio_analysis_host "'http://presidio-analyzer:3000'" \
     --config presidio_anonymisation_host "'http://presidio-anonymizer:3000'" \
-    --config toolsd_host "'http://schoolbox-toolsd-api:8080'" \
+    --config toolsd_host "'http://schoolbox-toolsd-proxy:8080'" \
     ;
   then
     error "Unable to install instance. Exiting."
