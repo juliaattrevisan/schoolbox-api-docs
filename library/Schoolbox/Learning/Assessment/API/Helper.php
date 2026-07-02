@@ -5,6 +5,8 @@
  * @link      https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\Learning\Assessment\API;
 
 use Alaress\Web\Request\Values;
@@ -52,10 +54,10 @@ class Helper
     }
 
     /**
-     * @param string $assessmentId
+     * @param int $assessmentId
      * @return array|null
      */
-    public function getAssessment(string $assessmentId): array | null
+    public function getAssessment(int $assessmentId): array | null
     {
         $assessments = $this->searchForAssessments(['assessmentId' => $assessmentId], 0, 0, true);
 
@@ -121,8 +123,8 @@ class Helper
                 $ids = explode(',', $row['yearLevelId']);
                 foreach ($ids as $id => $name) {
                     $yearLevel[] = [
-                        'id'    => $this->getYearlevel($name)->getId(),
-                        'name'    => $this->getYearlevel($name)->getName(),
+                        'id'    => $this->getYearlevel((int)$name)->getId(),
+                        'name'    => $this->getYearlevel((int)$name)->getName(),
                     ];
                 }
             }
