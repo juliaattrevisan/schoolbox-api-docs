@@ -634,6 +634,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
             if ($assessment instanceof DueWork\Model && $assessment->getRubricInstances()?->count()) {
                 $rubricGridTranslator = new RubricGridTranslator\Full();
 
+                /* Somehow remove the rubric instance id before continuing, so we spawn a new record here.
+                 */
+                $negativeIds = -1;
+
                 /* Assemble each rubric grid via its instance, separately, for now. Maybe there's a shortcut to all this that
                  * is cheaper, but this will be the simplest for the time being.
                  */
@@ -652,6 +656,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
                             ->add(new Level())
                             ->add(new Level());
                     }
+
+                    $rubricGrid->getRubricInstance()->setId($negativeIds--);
 
                     $data['rubricGridsPayload'][] = $rubricGridTranslator($rubricGrid);
                 }
