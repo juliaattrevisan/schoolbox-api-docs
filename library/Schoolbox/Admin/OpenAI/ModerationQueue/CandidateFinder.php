@@ -24,6 +24,8 @@ class CandidateFinder
     /**
      * Finds sessions that have never been moderated, or have newer logs than their latest moderation event.
      *
+     * We are only finding ai logs that have a log_format (so they can be shown in the admin ai usage ui)
+     *
      * @param int $limit  The maximum number of candidates to return.
      * @param int $offset The number of eligible candidates to skip.
      * @return Candidate[]
@@ -47,7 +49,7 @@ class CandidateFinder
                 JOIN `ai_session_log` ON `ai_session_log`.ai_session_id = `ai_session`.id
                 LEFT JOIN `ai_moderation_event`
                     ON `ai_moderation_event`.target_ai_session_id = `ai_session`.id
-                WHERE `ai_session`.feature <> :excludedFeature
+                WHERE `ai_session_log`.log_format IS NOT NULL
                 GROUP BY `ai_session`.id
             ) candidates
             WHERE last_moderated_at IS NULL
@@ -56,7 +58,7 @@ class CandidateFinder
             LIMIT {$limit}
             OFFSET {$offset}
         ");
-        $statement->execute(['excludedFeature' => Feature::AI_MODERATION_AGENT->value]);
+        $statement->execute();
 
         return array_map(
             $this->hydrateCandidate(...),

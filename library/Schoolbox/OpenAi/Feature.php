@@ -24,7 +24,8 @@ enum Feature: string
     case AI_MODERATION_AGENT = 'aimoderationagent';
 
     /**
-     * Whether this feature can be configured to use AI moderation.
+     * Whether this feature can be configured to use the inline AI moderation.
+     * This is NOT the nightly cron moderation, that uses the logic ai_session_log.log_format to handle if we moderate those
      */
     public function supportsAiModeration(): bool
     {
