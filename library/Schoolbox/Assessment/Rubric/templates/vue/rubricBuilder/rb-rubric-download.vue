@@ -39,9 +39,18 @@ async function download(): Promise<void> {
     //
     // There doesn't seem to be much appetite to encodeURIComponent the filename either as we never use it in a
     // url - it just goes straight to Downloads: https://stackoverflow.com/questions/71048100/should-we-enclose-filename-with-encodeuricomponent-in-javascript
-    const filenameParts = [parsedProps.value.rubricGrid.title];
 
-    const filename = filenameParts.filter(Boolean).join("-");
+    // This is a default placeholder name in case assessment title and rubric title were both empty at the
+    // precise moment of download
+    let filename = 'rubric';
+    const rubricTitle = parsedProps.value.rubricGrid.title.trim();
+    const assessmentTitle = document.getElementById('title').value.trim();
+
+    if ('' !== rubricTitle) {
+        filename = rubricTitle;
+    } else if ('' !== assessmentTitle) {
+        filename = assessmentTitle;
+    }
 
     const toast = window.sbProps.toastActivate("Downloading rubric...");
     const response = await downloadApiRequest({
