@@ -514,7 +514,7 @@ class Controller extends BaseController
             : $this->unitImplementationMapper->findAllByUnitSpecificationId($assessmentSpec->getBaseContext()->getId());
 
         // find all assessment impl for the assessment spec
-        $allAssessmentImpls = $this->assessmentDataSource->findAllImplementationsBySpecificationId($assessmentSpec->getId())
+        $allAssessmentImpls = $this->assessmentDataSource->findAllImplementationsBySpecificationId($assessmentSpec->getId(), ['cache' => false])
                                                          ->indexByCallback(static function (IAssessable $assessable) {
                                                              return $assessable->getBaseContext()->getId();
                                                          });
