@@ -239,11 +239,12 @@ class Controller extends ConfigController
             $database->beginTransaction();
 
             $toggleEnabled = $this->extractPostedToggleEnabled($postedConfigs);
-            if ($toggleEnabled !== null) {
-                $this->persistSonarToggleConfig($toggleEnabled);
-            }
+            $hasChanges = $toggleEnabled !== null && $this->persistSonarToggleConfig($toggleEnabled);
+            $hasChanges = $this->persistPostedConfigs($this->flattenPostedConfigs($postedConfigs)) || $hasChanges;
 
-            $this->persistPostedConfigs($this->flattenPostedConfigs($postedConfigs));
+            if ($hasChanges) {
+                $this->touchSkinConfigLastModified();
+            }
 
             $database->commit();
             $this->response = $this->responseAsJson(['success' => true]);
@@ -438,14 +439,15 @@ class Controller extends ConfigController
     /**
      * Persist the Advanced UI feature toggle as a separate named config row.
      */
-    private function persistSonarToggleConfig(string $enabled): void
+    private function persistSonarToggleConfig(string $enabled): bool
     {
         $toggleConfig = $this->getConfigMapper()->findOneByColumn('name', ConfigMapper::NAME_SONAR_UI_TOGGLE);
         if ($toggleConfig->getValue() === $enabled) {
-            return;
+            return false;
         }
 
         $this->getConfigMapper()->save($toggleConfig->setValue($enabled));
+        return true;
     }
 
     /**
@@ -456,10 +458,11 @@ class Controller extends ConfigController
      *
      * @param array<int, string|null> $postedConfigs
      */
-    private function persistPostedConfigs(array $postedConfigs): void
+    private function persistPostedConfigs(array $postedConfigs): bool
     {
         $database        = $this->getConfigMapper()->getDatabase();
         $existingConfigs = $this->getConfigMapper()->findByPredicates($this->buildConfigPredicate())->indexBy('id');
+        $hasChanges      = false;
 
         foreach ($postedConfigs as $configId => $value) {
             if (!$existingConfigs->keyExists($configId)) {
@@ -484,7 +487,19 @@ class Controller extends ConfigController
                     'configID' => $existingConfig->getId(),
                 ]
             )->execute();
+            $hasChanges = true;
         }
+
+        return $hasChanges;
+    }
+
+    /**
+     * Update the public skin stylesheet version token after persisted Skin Config changes.
+     */
+    private function touchSkinConfigLastModified(): void
+    {
+        $lastModified = $this->getConfigMapper()->findOneByColumn('name', ConfigMapper::NAME_SKIN_CONFIG_LAST_MODIFIED);
+        $this->getConfigMapper()->save($lastModified->setValue((string) time()));
     }
 
     /**
