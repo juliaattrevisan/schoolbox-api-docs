@@ -311,12 +311,11 @@ class Mapper extends BaseMapper
             );
         }
 
-        $logClauseSql = $logClauses ? ' AND ' . implode("\nAND ", $logClauses) : '';
-
         $pb->rawWhere(
             'EXISTS (
                     SELECT 1 FROM `ai_session_log` l
-                    WHERE l.ai_session_id = `' . $this->table . '`.id' . $logClauseSql . '
+                    WHERE l.ai_session_id = `' . $this->table . '`.id
+                    ' . ($logClauses ? ' AND ' . implode("\nAND ", $logClauses) : '') . '
                 )',
             $logParams
         );
