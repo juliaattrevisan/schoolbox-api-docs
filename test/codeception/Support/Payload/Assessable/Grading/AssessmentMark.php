@@ -55,11 +55,6 @@ class AssessmentMark extends Request
         return $this->assessmentId;
     }
 
-    public function addMarkRubricDescriptorSelect(int $descriptorId): void
-    {
-        $this->setFormParam("rubric[descriptors][$descriptorId][selected]", 1);
-    }
-
     protected function getUrl(): string
     {
         return $this->submissionId === null

@@ -250,21 +250,6 @@ class SchoolboxCli extends \Codeception\Module
     }
 
     /**
-     * Returns a rubric grid based on assessment id
-     *
-     * @param int $assessmentId
-     * @return \Schoolbox\Assessment\Rubric\Grid\Grid
-     */
-    public function grabAssessmentRubricGrid(int $assessmentId): \Schoolbox\Assessment\Rubric\Grid\Grid
-    {
-        /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy */
-        $assessableDataSource = $this->cliKernel->get('assessmentDataSource');
-        $assessable           = $assessableDataSource->findById($assessmentId);
-
-        return \Schoolbox\Assessment\Rubric\DataModel\DataSource::getInstance()->retrieveGrid($assessable, true);
-    }
-
-    /**
      * Returns first pastoral record based on its title
      *
      * @param string $heading
