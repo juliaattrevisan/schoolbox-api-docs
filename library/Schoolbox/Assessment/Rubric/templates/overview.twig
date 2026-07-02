@@ -148,7 +148,7 @@
 
                                             {# Published Marks #}
                                             {% if publishedMarks is not null and publishedMarks.humanReadableMark is not null %}
-                                                <p data-actual-mark>{{ (publishedMarks.selectedDescriptorText ?? null) | markdown }}</p>
+                                                <div data-actual-mark>{{ (publishedMarks.selectedDescriptorText ?? null) | markdown }}</div>
 
                                                 {% set max = rubricInstanceData.capabilities[capabilityId].indicators[indicatorId].max ?? null %}
 
@@ -156,18 +156,18 @@
                                                     {# Colour the human readable mark using the normalised mark #}
                                                     {% set gradientClass = urgency.marks(publishedMarks.normalisedMark) %}
 
-                                                    <p class="{{ gradientClass }}" data-actual-mark>{{ publishedMarks.selectedDescriptorValue|round }} / {{ max }}</p>
+                                                    <div class="{{ gradientClass }}" data-actual-mark>{{ publishedMarks.selectedDescriptorValue|round }} / {{ max }}</div>
                                                 {% endif %}
                                             {% endif %}
 
                                             {# Draft Marks #}
                                             {% if draftMarks is not null and draftMarks.humanReadableMark is not null %}
-                                                <p data-draft-mark>{{ (draftMarks.selectedDescriptorText ?? null) | markdown }}</p>
+                                                <div class="meta" data-draft-mark>{{ (draftMarks.selectedDescriptorText ?? null) | markdown }}</div>
 
                                                 {% set max = rubricInstanceData.capabilities[capabilityId].indicators[indicatorId].max ?? null %}
 
                                                 {% if max is not null and max > 0 %}
-                                                    <p class="meta" data-draft-mark>{{ draftMarks.selectedDescriptorValue|round }} / {{ max }}</p>
+                                                    <div class="meta" data-draft-mark>{{ draftMarks.selectedDescriptorValue|round }} / {{ max }}</div>
                                                 {% endif %}
                                             {% endif %}
                                         </td>
@@ -186,12 +186,12 @@
                                                 {# Colour the human readable mark using the normalised mark #}
                                                 {% set gradientClass = urgency.marks(publishedMarks.normalisedMark) %}
 
-                                                <p class="{{ gradientClass }}" data-actual-mark>{{ publishedMarks.humanReadableMark }}</p>
+                                                <div class="{{ gradientClass }}" data-actual-mark>{{ publishedMarks.humanReadableMark }}</div>
                                             {% endif %}
 
                                             {# Draft Marks #}
                                             {% if draftMarks is not null and draftMarks.humanReadableMark is not null %}
-                                                <p class="meta" data-draft-mark>{{ draftMarks.humanReadableMark }}</p>
+                                                <div class="meta" data-draft-mark>{{ draftMarks.humanReadableMark }}</div>
                                             {% endif %}
                                         </td>
                                     {% endif %}
