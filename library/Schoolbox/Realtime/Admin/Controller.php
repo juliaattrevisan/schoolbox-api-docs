@@ -443,7 +443,8 @@ class Controller extends BaseController
             'lms'              => [NSMapper::NS_DUEWORK, NSMapper::NS_ONLINE_ASSESS, NSMapper::NS_REPORT_CARD],
             'badges'           => [NSMapper::NS_BADGE],
             'eportfolio'       => [NSMapper::NS_EPORTFOLIO_BLOG],
-            'learning_moments' => [NSMapper::NS_EVIDENCE, NSMapper::NS_EVIDENCE_COMMENT]
+            'learning_moments' => [NSMapper::NS_EVIDENCE, NSMapper::NS_EVIDENCE_COMMENT],
+            'ib'               => [NSMapper::NS_IB_REGISTRATION],
         ];
 
         $config = $this->getConfigLoader();
