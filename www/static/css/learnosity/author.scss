@@ -802,6 +802,9 @@ li.lrn-author-list-view-item.lrn-author-flyout-wrapper {
 .lrn.lrn-author .lrn-author-tool-panel-search {
     padding: 0px;
 }
+.lrn-author.lrn-author .lrn-author-tool-panel-search .lrn-author-field-info {
+    border-radius: var(--sbx-config-container-corner-radius, 0px);
+}
 .lrn.lrn-author .lrn-item-for-activity-list .lrn-author-item-for-activity-pagination-top .lrn-author-pagination ul {
     background: var(--body-background);
 }
