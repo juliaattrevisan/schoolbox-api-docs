@@ -143,7 +143,7 @@ class Helper
             ];
 
             if (!isset($output[$assessmentId])) {
-                $rubrics = $this->getRubrics((string)$assessmentId);
+                $rubrics = $this->getRubrics($assessmentId);
                 $output[$assessmentId] = [
                     'id'               => $assessmentId,
                     'title'            => $row['title'],
@@ -1010,10 +1010,10 @@ class Helper
      * Returns a list of rubrics (each with its own title and weight). Empty when the assessment has
      * no rubric instances. Decoupled from submission_box so it works for any assessment type.
      *
-     * @param string $assessmentId
+     * @param int $assessmentId
      * @return array<int, array>
      */
-    public function getRubrics(string $assessmentId): array
+    public function getRubrics(int $assessmentId): array
     {
         $statement = $this->mapper->getDatabase()->prepare("
         SELECT
@@ -1131,13 +1131,13 @@ class Helper
      * view, whose INNER JOIN to v_rubric_indicator_mark_extend (only selected descriptors, for the
      * rubric markbook) would omit those unmarked indicators/capabilities from the feedback payload.
      *
-     * @param string $assessmentId
+     * @param int    $assessmentId
      * @param int    $feedbackID
      * @param string $feedbackTable Source table for this feedback (e.g. 'submission_return',
      *                              'reporting_feedback'); disambiguates feedback_id across sources.
      * @return array<int, array>
      */
-    public function getRubricsFeedback(string $assessmentId, int $feedbackID, string $feedbackTable): array
+    public function getRubricsFeedback(int $assessmentId, int $feedbackID, string $feedbackTable): array
     {
         $statement = $this->mapper->getDatabase()->prepare("
             SELECT
