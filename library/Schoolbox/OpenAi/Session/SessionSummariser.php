@@ -201,10 +201,7 @@ class SessionSummariser
             ORDER BY target_ai_session_id ASC, id ASC'
         );
 
-        foreach (Builder::getArrayParameters($sessionIds, 'session_id') as $name => $value) {
-            $statement->bindValue($name, $value);
-        }
-        $statement->execute();
+        $statement->execute(Builder::getArrayParameters($sessionIds, 'session_id'));
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $sessionId = (string)$row['target_ai_session_id'];
