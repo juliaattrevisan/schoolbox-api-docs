@@ -180,19 +180,16 @@ class Model
     }
 
     /**
-     * @param string|ModerationEventStatus|null $derivedModerationStatus
+     * @param string|null $derivedModerationStatus
      * @return $this
      */
-    public function setDerivedModerationStatus(string|ModerationEventStatus|null $derivedModerationStatus): self
+    public function setDerivedModerationStatus(string|null $derivedModerationStatus): self
     {
-        if (null === $derivedModerationStatus) {
-            $this->derivedModerationStatus = null;
-            return $this;
-        }
-
-        $this->derivedModerationStatus = $derivedModerationStatus instanceof ModerationEventStatus
-            ? $derivedModerationStatus->value
-            : ModerationEventStatus::from($derivedModerationStatus)->value;
+        $this->derivedModerationStatus = (
+            null === $derivedModerationStatus
+            ? null
+            : ModerationEventStatus::from($derivedModerationStatus)->value
+        );
 
         return $this;
     }
