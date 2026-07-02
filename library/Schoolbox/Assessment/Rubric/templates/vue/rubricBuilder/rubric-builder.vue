@@ -96,6 +96,11 @@ function updateAssignFromButtonState(input: HTMLInputElement, assignBtn: HTMLAnc
     }
 }
 
+function updateMaxMarkInputValue(input: HTMLInputElement, value: string): void {
+    input.value = value;
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
 /**
  * Keep the max mark input in sync with the rubric grid's max value
  * @param prevSum - the previous sum of all rubric max values, null if this is the first time syncing (to avoid unnecessary updates)
@@ -138,7 +143,7 @@ function syncMaxMarkInputs(prevSum: number | null): void {
             assignBtn.addEventListener("click", (e) => {
                 e.preventDefault();
 
-                input.value = allRubricsSum.value.toString();
+                updateMaxMarkInputValue(input, allRubricsSum.value.toString());
                 updateAssignFromButtonState(input, assignBtn);
             });
         }
@@ -152,7 +157,7 @@ function syncMaxMarkInputs(prevSum: number | null): void {
             parseFloat(input.value) === prevSum ||
             parseFloat(input.value) === allRubricsSum.value
         ) {
-            input.value = allRubricsSum.value.toString();
+            updateMaxMarkInputValue(input, allRubricsSum.value.toString());
         }
 
         // update the button's customised state (only visible when customised)
