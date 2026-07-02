@@ -9,11 +9,15 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\OpenAI\ModerationQueue;
 
+use Alaress\Lock\LockRefreshException;
 use Schoolbox\Application\CliTool;
+use Schoolbox\OpenAi\Moderation\Event\Mapper as ModerationEventMapper;
+use Schoolbox\OpenAi\Session\Log\Mapper as SessionLogMapper;
+use Symfony\Component\Lock\Exception\LockReleasingException;
 use Symfony\Component\Lock\LockInterface;
 
 /**
- * Placeholder command-line tool for future AI moderation queueing.
+ * Command-line tool for processing AI moderation queue candidates.
  */
 class CommandLineTool extends CliTool\App
 {
@@ -30,6 +34,16 @@ class CommandLineTool extends CliTool\App
     private const string OPT_LONG_HELP = 'help';
     private const string OPT_LONG_BATCH_SIZE = 'batch:';
     private const string OPT_LONG_MAX_TIME = 'max-time:';
+
+    /**
+     * @param CandidateFinder|null $candidateFinder Optional candidate finder, primarily for tests.
+     * @param Moderator|null       $moderator       Optional moderator, primarily for tests.
+     */
+    public function __construct(
+        private ?CandidateFinder $candidateFinder = null,
+        private ?Moderator $moderator = null,
+    ) {
+    }
 
     /**
      * Provides the short options handled by this command.
@@ -62,11 +76,7 @@ class CommandLineTool extends CliTool\App
     }
 
     /**
-     * Runs the placeholder AI moderation queue scheduler.
-     *
-     * This command intentionally does not fetch OpenAI logs, enqueue work, or call moderation APIs yet. It creates the
-     * bounded and lock-protected scheduled entry point so follow-up moderation tickets can add that behaviour in one
-     * place.
+     * Runs the AI moderation queue scheduler.
      *
      * @return void
      */
@@ -81,8 +91,8 @@ SYNOPSIS
     moderation-queue.php [OPTION]...
 
 DESCRIPTION
-    Placeholder scheduler for future AI moderation queueing work. This command currently acquires a lock, calculates
-    bounded batch settings, logs where future moderation queueing code will be added, and exits successfully.
+    Finds eligible AI sessions and moderates them in bounded batches. Without -p this command only logs the sessions
+    that would be moderated.
 
 OPTIONS
     -h, --help:              Print this help text and exit
@@ -112,7 +122,7 @@ HELP;
         );
         $endTime = time() + $maxTime;
 
-        $logger->notice(sprintf('Running AI moderation queue placeholder %s.', $this->perform() ? 'with perform' : 'in dry-run mode'));
+        $logger->notice(sprintf('Running AI moderation queue %s.', $this->perform() ? 'with perform' : 'in dry-run mode'));
         $logger->notice(sprintf('Limit: %d; batch size: %d; max time: %d seconds.', $limit, $batchSize, $maxTime));
 
         try {
@@ -124,27 +134,98 @@ HELP;
 
         register_shutdown_function($this->releaseLock(...), $lock);
 
-        $processed = 0;
-        while ($processed < $limit) {
-            if (time() > $endTime) {
-                $logger->notice('Maximum runtime reached, stopping for now.');
-                return;
+        $stats = [
+            'inspected' => 0,
+            'moderated' => 0,
+            'dryRunSkipped' => 0,
+            'noOpSkipped' => 0,
+            'errors' => 0,
+        ];
+        $dryRunOffset = 0;
+        $performOffset = 0;
+
+        try {
+            while ($stats['inspected'] < $limit) {
+                if (time() > $endTime) {
+                    $this->logSummary($stats, 'maximum runtime reached before next batch');
+                    return;
+                }
+
+                $remaining = $limit - $stats['inspected'];
+                $currentBatchSize = min($batchSize, $remaining);
+                $offset = $this->perform() ? $performOffset : $dryRunOffset;
+                $candidates = $this->getCandidateFinder()->find($currentBatchSize, $offset);
+
+                if (count($candidates) === 0) {
+                    $this->logSummary($stats, 'no candidates found');
+                    return;
+                }
+
+                foreach ($candidates as $candidate) {
+                    if (time() > $endTime) {
+                        $this->refreshLock($lock);
+                        $this->logSummary($stats, 'maximum runtime reached during batch');
+                        return;
+                    }
+
+                    $stats['inspected']++;
+
+                    if (!$this->perform()) {
+                        $stats['dryRunSkipped']++;
+                        $dryRunOffset++;
+                        $logger->info(sprintf(
+                            'Dry-run: would moderate AI feature "%s" session "%s" last messaged at %s.',
+                            $candidate->getFeature(),
+                            $candidate->getSessionId(),
+                            $candidate->getLastMessageSentAt()->getDatabase(),
+                        ));
+                        $this->refreshLock($lock);
+                        continue;
+                    }
+
+                    try {
+                        $result = $this->getModerator()->moderate($candidate->getSessionId());
+                    } catch (\Throwable $e) {
+                        $stats['errors']++;
+                        $performOffset++;
+                        $logger->error(sprintf(
+                            'Failed to moderate AI feature "%s" session "%s": %s',
+                            $candidate->getFeature(),
+                            $candidate->getSessionId(),
+                            $e->getMessage(),
+                        ), ['exception' => $e]);
+                        $this->refreshLock($lock);
+                        continue;
+                    }
+
+                    if ($result->isModerated()) {
+                        $stats['moderated']++;
+                        $logger->info(sprintf('Moderated AI feature "%s" session "%s".', $candidate->getFeature(), $candidate->getSessionId()));
+                        $this->refreshLock($lock);
+                        continue;
+                    }
+
+                    $stats['noOpSkipped']++;
+                    $logger->info(sprintf(
+                        'Skipped AI feature "%s" session "%s": %s.',
+                        $candidate->getFeature(),
+                        $candidate->getSessionId(),
+                        $result->getReason() ?? 'no-op',
+                    ));
+                    $this->refreshLock($lock);
+                }
+
+                if (time() > $endTime) {
+                    $this->logSummary($stats, 'maximum runtime reached after batch');
+                    return;
+                }
             }
-
-            $remaining = $limit - $processed;
-            $currentBatchSize = min($batchSize, $remaining);
-
-            $queued = $this->processPlaceholderBatch($currentBatchSize);
-            if ($queued === 0) {
-                $logger->notice('No AI moderation queue candidates found.');
-                return;
-            }
-
-            $processed += $queued;
-            $lock->refresh();
+        } catch (LockRefreshException) {
+            $this->logSummary($stats, 'process lock could not be refreshed');
+            return;
         }
 
-        $logger->notice(sprintf('Processed placeholder limit of %d candidate sessions.', $processed));
+        $this->logSummary($stats, 'limit reached');
     }
 
     /**
@@ -167,28 +248,6 @@ HELP;
     }
 
     /**
-     * Processes one placeholder batch.
-     *
-     * The method currently returns zero so the scheduler exits cleanly after proving the bounded loop, logging, and
-     * lock lifecycle. Future moderation tickets should replace the placeholder body with candidate lookup and queueing.
-     *
-     * @param int $batchSize The maximum number of candidate sessions that future code should process in this batch.
-     * @return int The number of candidate sessions queued by this placeholder batch.
-     */
-    private function processPlaceholderBatch(int $batchSize): int
-    {
-        $this->getLogger()->info(sprintf('Planning AI moderation queue batch of up to %d candidate sessions.', $batchSize));
-
-        // Future SA-21802 work: fetch candidate OpenAI sessions or conversations for this batch.
-        // Future SA-21802 work: skip sessions that are already queued or moderated for their latest message.
-        // Future SA-21802 work: enqueue moderation work instead of processing moderation directly in this scheduler.
-        // Future SA-21801 work: worker loads conversation context and sends it to the AI moderation agent.
-        // Future SA-21803 work: persist moderation outcome, flagged state, and last moderated timestamp.
-
-        return 0;
-    }
-
-    /**
      * Releases the command lock on shutdown.
      *
      * @param LockInterface $lock The process lock acquired for this command run.
@@ -196,7 +255,64 @@ HELP;
      */
     private function releaseLock(LockInterface $lock): void
     {
-        $lock->release();
-        $this->getLogger()->info('AI moderation queue placeholder complete: released process lock.');
+        try {
+            $lock->release();
+        } catch (LockReleasingException $e) {
+            $this->getLogger()->warning(
+                'AI moderation queue complete: process lock could not be released.',
+                ['exception' => $e],
+            );
+
+            return;
+        }
+
+        $this->getLogger()->info('AI moderation queue complete: released process lock.');
+    }
+
+    /**
+     * @return CandidateFinder
+     */
+    private function getCandidateFinder(): CandidateFinder
+    {
+        if (null === $this->candidateFinder) {
+            $this->candidateFinder = new CandidateFinder($this->getDatabaseInternal());
+        }
+
+        return $this->candidateFinder;
+    }
+
+    /**
+     * @return Moderator
+     */
+    private function getModerator(): Moderator
+    {
+        if (null === $this->moderator) {
+            $this->moderator = new Moderator(
+                SessionLogMapper::getInstance(),
+                ModerationEventMapper::getInstance(),
+                $this->getConfig(),
+                $this->getDi()->get('ai.clientFactory'),
+            );
+        }
+
+        return $this->moderator;
+    }
+
+    /**
+     * @param array{inspected: int, moderated: int, dryRunSkipped: int, noOpSkipped: int, errors: int} $stats
+     * @param string $reason
+     * @return void
+     */
+    private function logSummary(array $stats, string $reason): void
+    {
+        $this->getLogger()->notice(sprintf(
+            'AI moderation queue stopped: %s. Candidates inspected: %d; moderated: %d; dry-run skipped: %d; no-op skipped: %d; errors: %d.',
+            $reason,
+            $stats['inspected'],
+            $stats['moderated'],
+            $stats['dryRunSkipped'],
+            $stats['noOpSkipped'],
+            $stats['errors'],
+        ));
     }
 }
