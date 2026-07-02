@@ -48,7 +48,7 @@ readonly class JobRequest
      */
     public function withTool(string $tool): self
     {
-        return new self($tool, $this->options, $this->instanceId, $this->environment, $this->webhook);
+        return new self($tool, $this->instanceId, $this->options, $this->environment, $this->webhook);
     }
 
     /**
@@ -59,7 +59,7 @@ readonly class JobRequest
      */
     public function withOptions(array $options): self
     {
-        return new self($this->tool, $options, $this->instanceId, $this->environment, $this->webhook);
+        return new self($this->tool, $this->instanceId, $options, $this->environment, $this->webhook);
     }
 
     /**
@@ -70,7 +70,7 @@ readonly class JobRequest
      */
     public function withInstanceId(?string $instanceId): self
     {
-        return new self($this->tool, $this->options, $instanceId, $this->environment, $this->webhook);
+        return new self($this->tool, $instanceId, $this->options, $this->environment, $this->webhook);
     }
 
     /**
@@ -81,7 +81,7 @@ readonly class JobRequest
      */
     public function withEnvironment(?array $environment): self
     {
-        return new self($this->tool, $this->options, $this->instanceId, $environment, $this->webhook);
+        return new self($this->tool, $this->instanceId, $this->options, $environment, $this->webhook);
     }
 
     /**
@@ -92,7 +92,7 @@ readonly class JobRequest
      */
     public function withWebhook(?UriInterface $webhook): self
     {
-        return new self($this->tool, $this->options, $this->instanceId, $this->environment, $webhook);
+        return new self($this->tool, $this->instanceId, $this->options, $this->environment, $webhook);
     }
 
     /**
