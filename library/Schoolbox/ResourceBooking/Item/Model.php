@@ -462,6 +462,29 @@ class Model implements ISoftDeletable, JsonSerializable
         return $this;
     }
 
+    public function hasDisplayableCapacity(int $quantity = 1): bool
+    {
+        return $this->getCapacity() > 1 || $quantity > 1;
+    }
+
+    public function getCapacityDisplayText(): ?string
+    {
+        if ($this->getCapacity() === 1) {
+            return null;
+        }
+
+        return 'Capacity: ' . $this->getCapacity() . ' concurrent bookings';
+    }
+
+    public function getNameForBookingDisplay(int $quantity = 1): string
+    {
+        if (!$this->hasDisplayableCapacity($quantity)) {
+            return $this->getName();
+        }
+
+        return $this->getName() . ' (' . $quantity . ')';
+    }
+
     /**
      * @param  RolePermission\Model $role
      * @return $this

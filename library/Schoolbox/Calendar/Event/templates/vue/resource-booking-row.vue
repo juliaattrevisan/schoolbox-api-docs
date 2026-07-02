@@ -56,7 +56,7 @@ const bookingNotes = window.Vue.ref<string>(props.booking.notes);
 const startDate = window.Vue.ref<string>(props.booking.start);
 const endDate = window.Vue.ref<string>(props.booking.end);
 const bookingQuantity = window.Vue.ref<string>(String(props.booking.quantity));
-const showQuantityInput = window.Vue.computed(() => props.booking.resource.capacity > 1 || props.booking.quantity > 1);
+const showQuantityInput = window.Vue.computed(() => props.booking.showQuantity);
 const quantityMax = window.Vue.computed(() => Math.max(props.booking.resource.capacity, props.booking.quantity));
 const isQuantityValid = window.Vue.computed(() => {
     const quantity = Number(bookingQuantity.value);
