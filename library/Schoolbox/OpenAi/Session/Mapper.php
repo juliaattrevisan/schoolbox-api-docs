@@ -251,7 +251,6 @@ class Mapper extends BaseMapper
      * @param \Alaress_Date_Format|null $start
      * @param \Alaress_Date_Format|null $end
      * @param GenericCollection<ModerationEventStatus> $moderationStatuses
-     * @param bool                      $requireSessionLog Whether to exclude sessions without logs.
      * @return array{0: string, 1: array<string, mixed>}
      */
     private function buildSessionFilter(
@@ -261,7 +260,6 @@ class Mapper extends BaseMapper
         ?\Alaress_Date_Format $start,
         ?\Alaress_Date_Format $end,
         GenericCollection $moderationStatuses,
-        bool $requireSessionLog = true,
     ): array {
         $pb = $this->getPredicateBuilder();
         $keywordPredicate = null;
@@ -322,7 +320,7 @@ class Mapper extends BaseMapper
                 )',
                 $logParams
             );
-        } elseif ($requireSessionLog) {
+        } else {
             $pb->rawWhere(
                 'EXISTS (
                     SELECT 1 FROM `ai_session_log` l
