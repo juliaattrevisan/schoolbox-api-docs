@@ -38,9 +38,14 @@ class ClientFactory
      */
     public function build(): IClient
     {
-        $host = $this->config->get(ConfigMapper::NAME_TOOLSD_HOST);
+        $host   = $this->config->get(ConfigMapper::NAME_TOOLSD_HOST);
+        $apiKey = $this->config->get(ConfigMapper::NAME_TOOLSD_API_KEY);
         if (!empty($host)) {
-            return new Client($this->httpClient, new Uri($host));
+            return new Client(
+                $this->httpClient,
+                new Uri($host),
+                $apiKey ?: null,
+            );
         }
         return new NullClient();
     }

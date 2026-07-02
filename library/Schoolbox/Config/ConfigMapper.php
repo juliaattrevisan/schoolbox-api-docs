@@ -478,6 +478,7 @@ class ConfigMapper extends Mapper
 
     // Tools daemon
     public const string NAME_TOOLSD_HOST = 'toolsd_host';
+    public const string NAME_TOOLSD_API_KEY = 'toolsd_api_key';
 
     /* Differentiation profiles
      */

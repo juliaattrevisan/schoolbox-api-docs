@@ -21,14 +21,21 @@ use Psr\Http\Message\UriInterface;
 class Client implements IClient
 {
     /**
+     * The name of the HTTP header within which the API key is sent.
+     */
+    public const API_KEY_HEADER = 'x-api-key';
+
+    /**
      * Constructor
      *
      * @param ClientInterface $httpClient The HTTP client to send requests to.
      * @param UriInterface    $baseUri    The base URI of the client.
+     * @param string|null     $apiKey     If provided: the API key to use.
      */
     public function __construct(
         private ClientInterface $httpClient,
         private UriInterface $baseUri,
+        #[SensitiveParameter] private ?string $apiKey,
     ) {
     }
 
@@ -38,10 +45,16 @@ class Client implements IClient
     public function run(JobRequest $request): string
     {
         try {
+            $options = [
+                RequestOptions::JSON => $request->toPayload(),
+            ];
+            if (isset($this->apiKey)) {
+                $options[RequestOptions::HEADERS][self::API_KEY_HEADER] = $this->apiKey;
+            }
             $response = $this->httpClient->request(
                 'POST',
                 $this->baseUri->withPath('/run'),
-                [RequestOptions::JSON => $request->toPayload()],
+                $options,
             );
         } catch (GuzzleException $e) {
             throw new ClientException('Tools daemon returned an error: ' . $e->getMessage(), $e->getCode(), $e);
