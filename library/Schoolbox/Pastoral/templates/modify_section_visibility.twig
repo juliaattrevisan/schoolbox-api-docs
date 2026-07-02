@@ -126,9 +126,8 @@
             window.rolesAdded = [];
             window.usersAdded = [];
             window.groupsAdded = [];
-            $('[data-role-add]').removeClass('hide');
+            $(document).trigger('pastoral:updateRolesModal');
             $('[data-group-add]').removeClass('hide');
-            $("[data-reveal-id='modal-role']").removeAttr('disabled');
 
         }
 
