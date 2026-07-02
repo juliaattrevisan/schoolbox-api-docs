@@ -28,7 +28,7 @@ interface Props {
     markData: AssessmentMarkData; // the mark type data linked to the assessment
     urls?: StudentUrls; // the urls to use for the students to update their scores and comments
     statusPage?: string; // the status page to link to once user has finished marking
-    editorTemplates: Template[];
+    editorTemplates?: Template[];
 }
 
 const props = defineProps<Props>();
@@ -42,7 +42,7 @@ const studentStore = useStudentStore();
  */
 window.Vue.onMounted(async () => {
     store.init(props.isReadOnly, props.hasMarkVisibility, props.markData, props.statusPage);
-    studentItemStore.init(props.editorTemplates);
+    studentItemStore.init(props.editorTemplates ?? []);
     useStudentStore().init(props.student, props.itemResponses, props.attemptResponse, props.urls, props.isReviewed);
     await window.Vue.nextTick(); // update the DOM to ensure the elements are available for the reports to be loaded into
     loadReport(props.reportInitOptions, props.hasMarkVisibility);
