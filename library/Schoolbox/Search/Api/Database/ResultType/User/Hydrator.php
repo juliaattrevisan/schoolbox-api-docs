@@ -180,8 +180,20 @@ class Hydrator extends BaseHydrator
         $params  = ['userId' => $searchResultUser->getId(), 'user' => $searchResultUser];
         $links[] = $this->generateLinkIfRouteAuthorized($route, $params, $viewer, 'Modify', 'icon-modify');
 
-        $route   = 'user.impersonate';
-        $links[] = $this->generateLinkIfRouteAuthorized($route, $params, $viewer, 'Impersonate', 'icon-staff-students');
+        $route          = 'user.impersonate';
+        $isUserDisabled = $searchResultUser->isDeleted() || !$searchResultUser->getEnabled();
+        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+            try {
+                $links[] = [
+                    'title'    => 'Impersonate',
+                    'icon'     => 'icon-staff-students',
+                    'url'      => $this->routeGenerator->generate($route, $params),
+                    'disabled' => $isUserDisabled,
+                ];
+            } catch (RouteNotFound) {
+                // Route not registered; skip the link.
+            }
+        }
 
 
         $route  = 'calendar.getCalendar';
