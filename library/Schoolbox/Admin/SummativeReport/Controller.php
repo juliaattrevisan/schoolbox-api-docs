@@ -81,6 +81,9 @@ class Controller extends ConfigController
      */
     public const SUMMATIVE_REPORT_STATUS_KEY = 'summativeReport_%s';
 
+    private const STUDENT_SELECTIZE_LABEL_FORMAT = '%s - %s';
+    private const STUDENT_SELECTIZE_META_FORMAT = '%s%s%s';
+
     /**
      * This file contains the footer for the summative reports, as well as
      * customisable section that allows the school to add custom footer which
@@ -524,10 +527,7 @@ class Controller extends ConfigController
         $options['students'] = [];
 
         foreach ($students as $student) {
-            $options['students'][] = [
-                'id'   => $student->getId(),
-                'name' => $student->getFullName(),
-            ];
+            $options['students'][] = $this->formatStudentSelectizeOption($student);
         }
 
         return $options;
@@ -670,10 +670,7 @@ class Controller extends ConfigController
      */
     private function findStudentsByExternalIdsOrUsernames(array $tokens): array
     {
-        return array_values(array_filter(
-            $this->findUsersByExternalIdsOrUsernames($tokens),
-            static fn (User $student): bool => $student->getRole()->getType() === Role::STUDENT
-        ));
+        return $this->findUsersByExternalIdsOrUsernames($tokens, Role::STUDENT);
     }
 
 
@@ -710,16 +707,27 @@ class Controller extends ConfigController
      * Find users by exact external ID or username matches.
      *
      * @param array $tokens
+     * @param string|null $roleType
      * @return array
      */
-    private function findUsersByExternalIdsOrUsernames(array $tokens): array
+    private function findUsersByExternalIdsOrUsernames(array $tokens, ?string $roleType = null): array
     {
         if ($tokens === []) {
             return [];
         }
 
-        $users = $this->userMapper->findByColumnList(['synergy_id' => $tokens])
-            ->mergeUnique($this->userMapper->findByColumnList(['username' => $tokens]), 'id');
+        $matchTokens = $this->userMapper->getPredicateBuilder()
+            ->in('synergy_id', $tokens)
+            ->in('username', $tokens);
+
+        $predicate = $this->userMapper->getPredicateBuilder()
+            ->any($matchTokens);
+
+        if ($roleType !== null) {
+            $predicate->equals('g.group_type', $roleType);
+        }
+
+        $users = $this->userMapper->findByPredicates($predicate);
 
         return iterator_to_array($users);
     }
@@ -764,47 +772,34 @@ class Controller extends ConfigController
      */
     private function formatStudentSelectizeOption(User $student, bool $isListMatch = false): array
     {
-        $person = sprintf(
-            '%s - %s',
+        $label = sprintf(
+            self::STUDENT_SELECTIZE_LABEL_FORMAT,
             $student->getFullName(),
             $this->formatStudentSelectizeMeta($student)
         );
 
         return [
-            'name'        => $person,
-            'id'          => $student->getId(),
-            'first_name'  => $student->getFirstname(),
-            'last_name'   => $student->getLastname(),
-            'full_name'   => $student->getFullName(),
-            'role'        => $student->getRole()->getName(),
-            'role_id'     => $student->getRole()->getId(),
-            'roleType'    => $student->getRole()->getType(),
-            'external_id' => $student->getExternalId(),
-            'list_match'  => $isListMatch,
+            'id'         => $student->getId(),
+            'name'       => $label,
+            'list_match' => $isListMatch,
         ];
     }
 
 
     /**
-     * Format the student role/year/external-id metadata shown in selectize.
+     * Format the student year/role/external-id metadata shown in selectize.
      *
      * @param User $student
      * @return string
      */
     private function formatStudentSelectizeMeta(User $student): string
     {
-        $meta = '';
-        if ($student->getYear()) {
-            $meta .= $student->getYear()->getLongName('Year') . ', ';
-        }
-
-        $meta .= $student->getRole()->getName();
-
-        if ($student->getExternalId() !== null) {
-            $meta .= " ({$student->getExternalId()})";
-        }
-
-        return $meta;
+        return sprintf(
+            self::STUDENT_SELECTIZE_META_FORMAT,
+            $student->getYear() ? $student->getYear()->getLongName('Year') . ', ' : '',
+            $student->getRole()->getName(),
+            $student->getExternalId() !== null ? " ({$student->getExternalId()})" : ''
+        );
     }
 
     /**

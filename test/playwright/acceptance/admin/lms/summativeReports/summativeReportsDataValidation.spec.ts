@@ -90,7 +90,7 @@ test.describe("Admin LMS - Summative Reports Data Validation", () => {
         }
     });
 
-    test("create summative reports from external ID and username lists", async ({ tester, db }) => {
+    test("create summative reports from external ID and username lists", async ({ tester, db, page }) => {
         const listReportTitle = "Summative Report Student List Test";
         const externalIds = ["507", "509"];
         const usernames = await Promise.all(
@@ -119,6 +119,27 @@ test.describe("Admin LMS - Summative Reports Data Validation", () => {
             await db.grabFromDatabase("user", "firstname", { username: nonStudentUsername }),
         )} ${String(await db.grabFromDatabase("user", "lastname", { username: nonStudentUsername }))}`;
 
+        const studentLookupResponse = await page.request.get(
+            `/adminv2/summative-report/students?query=${encodeURIComponent(externalIds.join(","))}`,
+        );
+        expect(studentLookupResponse.ok()).toBe(true);
+        const studentLookupResults = (await studentLookupResponse.json()) as Array<Record<string, unknown>>;
+        expect(studentLookupResults).toHaveLength(2);
+        expect(studentLookupResults.map((student) => Object.keys(student).sort())).toEqual([
+            ["id", "list_match", "name"],
+            ["id", "list_match", "name"],
+        ]);
+        expect(studentLookupResults.every((student) => student.list_match === true)).toBe(true);
+
+        const mixedRoleQuery = [...externalIds, nonStudentExternalId].join(",");
+        const mixedRoleLookupResponse = await page.request.get(
+            `/adminv2/summative-report/students?query=${encodeURIComponent(mixedRoleQuery)}`,
+        );
+        expect(mixedRoleLookupResponse.ok()).toBe(true);
+        const mixedRoleLookupResults = (await mixedRoleLookupResponse.json()) as Array<{ name: string }>;
+        expect(mixedRoleLookupResults.some((student) => student.name.includes(nonStudentFullName))).toBe(false);
+        expect(mixedRoleLookupResults).toHaveLength(2);
+
         try {
             tester.isGoingTo("create a summative report using a comma-separated external ID list");
             await createSummativeReport.goto();
@@ -139,7 +160,7 @@ test.describe("Admin LMS - Summative Reports Data Validation", () => {
 
             tester.isGoingTo("check saved student list selections load when modifying the report");
             await summativeReportList.clickSummativeReportActionButton("modify", `${listReportTitle} - External IDs`);
-            await createSummativeReport.checkStudentSelectionContains(["Jana Reed", "Tim Reed"]);
+            await createSummativeReport.checkStudentSelectionContains(["Jana Reed -", "Tim Reed -", "(507)", "(509)"]);
             await summativeReportList.goto();
 
             tester.isGoingTo("check the external ID list report generates one report per selected student");
