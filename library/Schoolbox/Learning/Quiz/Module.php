@@ -118,11 +118,12 @@ class Module extends RestfulModule
     /**
      * Locates the assessment context used by quiz write authorization.
      *
-     * Existing quiz routes preload an assessment or participant, but the quiz
-     * import route used by the create page preloads only the target context
-     * because there is no assessment yet. Resolving all supported shapes here
-     * lets IsInstructorOrHasHomepageAccess check the correct folder without
-     * assuming that every authorized quiz route has an assessment.
+     * Routes that operate on a saved quiz preload an assessment or participant,
+     * but the quiz import route used by the create page preloads only the
+     * target context because there is no assessment yet. Resolving all
+     * supported shapes here lets IsInstructorOrHasHomepageAccess check the
+     * correct folder without assuming that every authorized quiz route has an
+     * assessment.
      *
      * @param array $params Route parameters after preload callbacks have run.
      * @return AssessmentContext
