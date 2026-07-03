@@ -211,3 +211,13 @@ h3.lrn-report-item-title {
 .lrn-author .lrn-author-ui .lrn-author-activity-button-legacy .lrn-author-button-text {
     padding-left: 8px;
 }
+
+/* Update the border radius of the response input wrapper to match the container */
+.lrn_response_input_wrapper {
+    border-radius: var(--sbx-config-container-corner-radius, 0px);
+    overflow: hidden;
+}
+.lrn_response_input_wrapper .lrn_widget_footer {
+    border-bottom-left-radius: inherit;
+    border-bottom-right-radius: inherit;
+}
