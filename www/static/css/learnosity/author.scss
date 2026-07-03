@@ -514,6 +514,9 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
     color: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground)) !important;
     text-decoration: none !important;
 }
+.lrn-qe .lrn-qe-ui .lrn-add-array-multiple + .lrn-add-array-multiple {
+    margin-block-start: var(--spacing-s);
+}
 .lrn-qe .lrn-qe-ui .lrn-qe-switch-trigger {
     background-color: var(--sbx-color-foreground-primary, var(--content-ui-background));
     border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
