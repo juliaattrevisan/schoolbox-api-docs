@@ -1191,7 +1191,7 @@ button.lrn-author-activity-button.lrn-author-btn-i-xs.lrn-author-btn-sec {
 .lrn .lrn-author-ui-no-preview .lrn-author-label-group-btn.lrn-author-i-cross:focus {
     background: var(--sbx-color-foreground-primary, #fff) !important;
     border: 1px solid #ccc;
-    border-radius: 0 !important;
+    border: 1px solid var(--sbx-color-border, #ccc) !important;
     display: inline-flex;
     align-items: center;
     justify-content: center;

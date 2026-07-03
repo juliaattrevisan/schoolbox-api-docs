@@ -69,7 +69,11 @@
 }
 body.sbx-body .lrn_widget.lrn_mcq .lrn_response .lrn_mcqgroup-block .lrn-mcq-option > input.lrn-input[type="radio"],
 .lrn_widget.lrn_mcq .lrn_response .lrn_mcqgroup-horizontal .lrn-mcq-option > input.lrn-input[type="radio"] {
-    display: none;
+    position: absolute !important;
+    opacity: 0 !important;
+    width: 1px;
+    height: 1px;
+    margin: 0;
 }
 /* update border color in the mutiplechoice-block layout */
 .lrn_widget.lrn_mcq
