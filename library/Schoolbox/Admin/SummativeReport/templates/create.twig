@@ -137,7 +137,6 @@
 
         const reportStudentsSearch = document.getElementById('report-students-search-component');
         const reportStudentsValue = document.getElementById('report-students');
-        const reportStudentsHiddenFields = document.getElementById('report-students-hidden-fields');
 
         function normaliseSearchSelectSelection(eventDetail) {
             if (Array.isArray(eventDetail) && Array.isArray(eventDetail[0])) {
@@ -152,15 +151,6 @@
             });
 
             reportStudentsValue.value = studentIds.join(',');
-            reportStudentsHiddenFields.innerHTML = '';
-
-            studentIds.forEach(function (studentId) {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'students[]';
-                input.value = studentId;
-                reportStudentsHiddenFields.appendChild(input);
-            });
         }
 
         function mergeReportStudentSelection(students) {
@@ -501,8 +491,7 @@
                                 </div>
                                 <div class="small-12 columns">
                                     <label for="report-students-search">Students</label>
-                                    <input type="hidden" id="report-students" />
-                                    <div id="report-students-hidden-fields"></div>
+                                    <input type="hidden" id="report-students" name="students" />
                                     <sbx-search-select
                                         id="report-students-search-component"
                                         label-id="report-students-search"

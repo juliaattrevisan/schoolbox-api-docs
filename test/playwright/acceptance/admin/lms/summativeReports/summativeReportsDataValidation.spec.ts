@@ -1,3 +1,4 @@
+import { expect } from "@playwright/test";
 import { test } from "@schoolboxTest/playwright/support/integrations";
 import CreateSummativeReport from "@schoolboxTest/playwright/support/page/admin/lms/summativeReports/CreateSummativeReport";
 import SummativeList from "@schoolboxTest/playwright/support/page/admin/lms/summativeReports/SummativeReportList";
@@ -127,6 +128,19 @@ test.describe("Admin LMS - Summative Reports Data Validation", () => {
             await createSummativeReport.checkStudentSelectionContains(["Jana Reed", "Tim Reed"]);
             await createSummativeReport.clickSaveButton();
             await summativeReportList.checkSummativeReportTitleIsPresented(`${listReportTitle} - External IDs`);
+            const savedOptions = JSON.parse(
+                String(
+                    await db.grabFromDatabase("summative_report", "options", {
+                        title: `${listReportTitle} - External IDs`,
+                    }),
+                ),
+            ) as { students: string };
+            expect(savedOptions.students).toBe(externalIds.join(","));
+
+            tester.isGoingTo("check saved student list selections load when modifying the report");
+            await summativeReportList.clickSummativeReportActionButton("modify", `${listReportTitle} - External IDs`);
+            await createSummativeReport.checkStudentSelectionContains(["Jana Reed", "Tim Reed"]);
+            await summativeReportList.goto();
 
             tester.isGoingTo("check the external ID list report generates one report per selected student");
             await summativeReportList.clickSummativeReportActionButton("download", `${listReportTitle} - External IDs`);
