@@ -188,35 +188,41 @@
                 });
             }
 
-            {# Enable/Disable add pastoral role button depending on if there are any more roles available to add #}
-
+            /**
+             * Recalculate the role modal from the current visibility rows.
+             *
+             * Type/subtype changes clear and repopulate the visibility table, so role options and Add Role
+             * triggers can otherwise keep stale hidden/disabled state from the previous audience.
+             */
             function updateRolesModal() {
-                let tableRolesAdded = $('[data-role-id]');
-
-                $("[data-role-add]").removeClass('hide');
-
-                if (tableRolesAdded.length > 1) {
-                    tableRolesAdded.each(function () {
-                        let roleId = $(this).attr('data-role-id');
-
-                        if (roleId !== '{ID}') {
-                            if (window.rolesAdded.indexOf(roleId) !== -1) {
-                                $("[data-role-add=" + roleId + "]").addClass('hide');
-                            } else {
-                                $("[data-role-add=" + roleId + "]").removeClass('hide');
-                            }
-                        }
-                    });
-                }
-
+                let tableRolesAdded = $('[data-role-id]').filter(function () {
+                    return $(this).attr('data-role-id') !== '{ID}';
+                });
                 let roleModalButtons = $("[data-reveal-id='modal-role']");
+                let roleOptions = $("[data-role-add]");
 
-                if ($("[data-role-add]:not(.hide)").length === 0) {
-                    roleModalButtons.prop('disabled', true);
-                } else {
-                    roleModalButtons.removeAttr('disabled');
+                roleOptions.removeClass('hide');
+                roleModalButtons.prop('disabled', false)
+                    .removeClass('disabled')
+                    .removeAttr('disabled aria-disabled');
+
+                tableRolesAdded.each(function () {
+                    let roleId = $(this).attr('data-role-id');
+
+                    roleOptions.filter(function () {
+                        return $(this).attr('data-role-add') === roleId;
+                    }).addClass('hide');
+                });
+
+                if (roleOptions.not('.hide').length === 0) {
+                    roleModalButtons.prop('disabled', true)
+                        .attr('disabled', 'disabled')
+                        .attr('aria-disabled', 'true')
+                        .addClass('disabled');
                 }
             }
+
+            $(document).on('pastoral:updateRolesModal', updateRolesModal);
 
             {# Add role to table #}
 
