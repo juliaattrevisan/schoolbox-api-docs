@@ -174,6 +174,12 @@ class Controller extends Base
                 }
 
                 $statusLabel = $status->translate();
+                /**
+                 * Normal carousel navigation excludes excluded students, so reaching this state should be rare.
+                 * Stale, direct, or deliberate URLs can still target an excluded student when interrogating
+                 * specific customer or regional information, so expose this pseudo-status to render the selected
+                 * participant on a readonly explanatory page.
+                 */
                 if ($participant->isExcluded()) {
                     $status = 'excluded';
                     $statusLabel = 'Excluded';
