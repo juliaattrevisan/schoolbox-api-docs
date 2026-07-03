@@ -403,7 +403,7 @@ export default {
                         ></relative-time>
                     </p>
                     <template v-if="award.badge.curriculumNodes.length">
-                        <p class="meta">
+                        <p class="meta u-flex u-flex--justify-center u-gap-xs">
                             Curriculum Codes:
                             <codes-list :nodes="award.badge.curriculumNodes" @selected="onCodeSelected" />
                         </p>
@@ -443,7 +443,11 @@ export default {
                             >
                                 Award with evidence
                             </a>
-                            <button v-if="hasGoalAwardLink() && isUnawardedGoal()" @click.prevent="awardAchievement">
+                            <button
+                                v-if="hasGoalAwardLink() && isUnawardedGoal()"
+                                class="button"
+                                @click.prevent="awardAchievement"
+                            >
                                 Award
                             </button>
                         </section>

@@ -224,7 +224,8 @@
         min-height: 2.5rem;
         padding: 0 1rem;
 
-        [class*="icon-"],
+        [class^="icon-"],
+        [class*=" icon-"],
         sbx-icon.compact-card-icon {
             width: 2rem;
             margin-top: 0;

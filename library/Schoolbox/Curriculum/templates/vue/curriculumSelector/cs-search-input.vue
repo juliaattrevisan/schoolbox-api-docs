@@ -222,5 +222,9 @@ const isActive = window.Vue.computed(() => {
 .curriculum-selector .button {
     flex: 0 0 auto;
     width: auto;
+    @media only print, screen and (max-width: 40em) {
+        flex: auto;
+        margin-bottom: var(--sbx-size-m, 1rem);
+    }
 }
 </style>

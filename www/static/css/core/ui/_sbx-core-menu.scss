@@ -224,6 +224,7 @@ body.sbx-body {
     // Left menu styles
     #left-menu {
         background: var(--sbx-color-foreground-primary);
+        border-radius: var(--sbx-config-container-corner-radius);
         h3 {
             color: var(--sbx-color-text-primary);
             text-transform: none;
@@ -259,7 +260,6 @@ body.sbx-body {
     // Left menu styles when menu is not open
     .off-canvas-wrap.move-right :not(.left-open) {
         & #left-menu {
-            border-radius: var(--sbx-config-container-corner-radius);
             box-shadow: var(--sbx-shadow-m);
             left: 1rem;
             top: 1rem;

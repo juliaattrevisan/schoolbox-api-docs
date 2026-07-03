@@ -97,7 +97,7 @@ window.Vue.onMounted(async () => {
             <div class="birthday-container__foreground u-flex u-flex--center">
                 <sbx-icon
                     name="notifications"
-                    color="var(--navigation-foreground)"
+                    color="var(--sbx-config-color-menu-foreground, var(--navigation-foreground))"
                     size="xl"
                     data-birthday-bell
                 ></sbx-icon>
@@ -116,7 +116,7 @@ window.Vue.onMounted(async () => {
 }
 
 .birthday-container {
-    background: var(--navigation-background);
+    background: var(--sbx-config-color-menu-background, var(--navigation-background));
     display: grid;
     height: 4.5rem;
     line-height: normal;

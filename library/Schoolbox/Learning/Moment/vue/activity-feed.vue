@@ -1205,7 +1205,10 @@ window.Vue.onMounted(async () => {
                 </template>
             </div>
 
-            <div v-else-if="metadata.cursor && metadata.cursor.next && data.length > 0" class="feed-load-more content">
+            <div
+                v-else-if="metadata.cursor && metadata.cursor.next && data.length > 0"
+                class="feed-load-more content u-c-cr-bottom"
+            >
                 <button class="load-more expand" title="Load more" @click="append(metadata.cursor.next)">
                     Load more
                 </button>

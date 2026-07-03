@@ -75,7 +75,7 @@ async function download(): Promise<void> {
 </script>
 
 <template>
-    <button class="button sbx-button--has-icon" type="button" :disabled="!parsedProps" @click="download">
+    <button class="sbx-button--has-icon" type="button" :disabled="!parsedProps" @click="download">
         <sbx-icon name="download"></sbx-icon>
         Download
     </button>

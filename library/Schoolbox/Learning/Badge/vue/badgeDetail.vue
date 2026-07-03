@@ -82,7 +82,7 @@ export default {
             Achievement expires: {{ achievementExpiryLabel }} after awarding
         </p>
         <p class="meta" v-if="badgeTagNames.length > 0">Tags: {{ badgeTagNames }}</p>
-        <p v-if="badge.curriculumNodes.length" class="meta">
+        <p v-if="badge.curriculumNodes.length" class="meta u-flex u-gap-xs">
             Curriculum Codes:
             <codes-list :nodes="curriculumNodesWithCode" @selected="onCodeSelected" />
         </p>
