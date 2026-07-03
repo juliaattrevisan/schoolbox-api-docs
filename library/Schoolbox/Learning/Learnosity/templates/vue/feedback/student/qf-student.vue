@@ -82,7 +82,13 @@ function onAttemptMarkUpdated(mark: string): void {
 
 <style scoped>
 .response-content {
-    /* this contains the html from Learnosity, which has the response DOM elements that are extracted as we move through the items */
-    display: none;
+    /* Keep measurable for Learnosity rendering, but not visible/interactive in the UI */
+    height: 100vh;
+    left: 0;
+    pointer-events: none;
+    position: fixed;
+    top: 0;
+    visibility: hidden;
+    width: 100vw;
 }
 </style>

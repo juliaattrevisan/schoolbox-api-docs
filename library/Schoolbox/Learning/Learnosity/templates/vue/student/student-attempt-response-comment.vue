@@ -18,13 +18,15 @@ interface Props {
 const props = defineProps<Props>();
 
 const editorId = `final-review-comment-${props.student.elementId}`;
-const comment = useEditor(props.student.attemptResponse.comment ?? "", `#${editorId}`, {
-    targetElements: [`#${editorId}`],
-    hasTokens: true,
-    maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
-    toolbar: EditorToolbar.COMMENT_AI,
-    templates: useStudentItemStore().editorTemplates,
-});
+const comment = props.isReadOnly
+    ? window.Vue.ref("")
+    : useEditor(props.student.attemptResponse.comment ?? "", `#${editorId}`, {
+          targetElements: [`#${editorId}`],
+          hasTokens: true,
+          maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
+          toolbar: EditorToolbar.COMMENT_AI,
+          templates: useStudentItemStore().editorTemplates,
+      });
 const isSaving = window.Vue.ref(false);
 const hasSaved = window.Vue.ref(false);
 const hasError = window.Vue.ref(false);
@@ -71,7 +73,7 @@ function beforeUnloadHandler(event: BeforeUnloadEvent): void {
  * Save the comment if it's changed
  */
 async function saveComment(): Promise<void> {
-    if (isSaving.value) {
+    if (props.isReadOnly || isSaving.value) {
         return;
     }
     if (comment.value === props.student.attemptResponse.comment) {
