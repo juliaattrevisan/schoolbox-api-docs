@@ -216,7 +216,7 @@
     }) %}
     {# Can only import on creation, not modify #}
     {% set canImportQuizzes = importRoute is not null and (assessment is not defined or assessment.id is null) %}
-    {% if canImportQuizzes ?? false %}
+    {% if canImportQuizzes %}
     <div id="importModal" class="reveal-modal" data-reveal>
         <h2>Import a quiz</h2>
 
