@@ -14,6 +14,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use JsonException;
 use Psr\Http\Message\UriInterface;
+use SensitiveParameter;
 
 /**
  * A client to Schoolbox's tools daemon.
