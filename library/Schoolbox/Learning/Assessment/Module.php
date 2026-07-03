@@ -1550,11 +1550,26 @@ class Module extends BaseModule
                     $this->buildAuthRuleHasInstructorOrHomepageAccess(),
                     new Rule\IsUser('studentId')
                 ),
-                // Normal participants (whether explicit or dynamic):
-                // Check after instructor check, so that the summary can show a
-                // polite "User {studentID} is excluded from this assessment"
-                // message.
-                new CanSeeParticipation($this->getAccess(), $this->getConfig()->get('restrict_student_submissions'))
+                new Rule\All(
+                    // Normal participants (whether explicit or dynamic):
+                    // Check after instructor check, so that the summary can show a
+                    // polite "User {studentID} is excluded from this assessment"
+                    // message.
+                    new CanSeeParticipation($this->getAccess(), $this->getConfig()->get('restrict_student_submissions')),
+                    /*
+                     * Reporting Activities do not yet have a student or parent summary view.
+                     * Keep them out of this route until that workflow is added.
+                     */
+                    new ValidAssessmentType([
+                        AssessmentType::TYPE_DUE_WORK,
+                        AssessmentType::TYPE_TASK,
+                        AssessmentType::TYPE_QUIZ,
+                        AssessmentType::TYPE_LTI_ASSESSMENT,
+                        AssessmentType::TYPE_PROJECT,
+                        AssessmentType::TYPE_DIALOG_AGENT,
+                        AssessmentType::TYPE_LESSON_PLAN,
+                    ]),
+                )
             )
         );
     }
