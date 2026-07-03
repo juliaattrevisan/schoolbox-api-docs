@@ -116,7 +116,7 @@ class Module extends RestfulModule
     }
 
     /**
-     * Locates the assessment context used by quiz write authorization.
+     * Locates the assessment context needed for quiz write authorization.
      *
      * Routes that operate on a saved quiz preload an assessment or participant,
      * but the quiz import route used by the create page preloads only the
