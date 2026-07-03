@@ -321,6 +321,9 @@ class Report extends CliTool\App
             case 'set':
                 $length = array_sum(array_map('strlen', $redis->smembers($key)));
                 break;
+            case 'list':
+                $length = array_sum(array_map('strlen', $redis->lrange($key, 0, -1)));
+                break;
             case 'none':
                 $length = 0;
                 break;
