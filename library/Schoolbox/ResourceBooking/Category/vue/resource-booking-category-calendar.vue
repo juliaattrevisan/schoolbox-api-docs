@@ -413,4 +413,11 @@ export default {
 
 <style lang="scss">
 @import "@schoolboxVue/components/fullcalendar/styles/calendar";
+
+// FullCalendar clips resource labels (nowrap + hidden overflow),
+// leaving its horizontal scrollbar nothing to scroll; wrap long names instead.
+.fc .resource-booking-resource-column .fc-datagrid-cell-cushion {
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
 </style>

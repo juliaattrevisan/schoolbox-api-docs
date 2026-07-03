@@ -47,6 +47,7 @@
         resourceId:             Number('{{ category.id }}'),
         resourceColumns: [{
             headerContent: 'Resource',
+            cellClassNames: 'resource-booking-resource-column',
             cellContent: function(args) {
                 let resourceDetails = document.createElement('span');
                 resourceDetails.setAttribute('class', 'meta');
