@@ -12,7 +12,7 @@ gsap.registerPlugin(ScrollToPlugin);
 export const ANIMATION_DURATION = 0.5; // duration for animations in seconds
 
 export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
-    const unexpandedUnitHeight: number = 300; // The default unexpanded height of a unit, in px
+    const unexpandedUnitHeight: number = 350; // The default unexpanded height of a unit, in px
     const dragUnitHeight: number = 80; // The height of a unit when it is being dragged, in px
 
     const courseId = window.Vue.ref(0);
