@@ -212,7 +212,8 @@
 {% if assessmentType == 'quiz' %}
     {% set importRoute = routeLookupIfAuthorized('learningQuiz.postImport', {
         contextId: context.id,
-        contextType: contextType
+        contextType: contextType,
+        context: context
     }) %}
     {# Can only import on creation, not modify #}
     {% set canImportQuizzes = importRoute is not null and (assessment is not defined or assessment.id is null) %}
