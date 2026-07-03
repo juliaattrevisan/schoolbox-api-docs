@@ -153,6 +153,11 @@ class Registry
             // * nonces
             // * refresh tokens
             CacheHelper::BASE_SERVER_KEY . '\\.' . self::INSTANCE_ID_MATCH . ':',
+
+            // Tools daemon data: this may be in the storage instance.
+            // Technically, its prefix is configurable: however this report will
+            // assume it's hard-coded.
+            'toolsd:*',
         ],
         // Queue patterns go here
         // (Note that queue is the same instance as cache, so it's not an issue
