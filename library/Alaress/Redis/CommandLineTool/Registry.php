@@ -155,9 +155,11 @@ class Registry
             CacheHelper::BASE_SERVER_KEY . '\\.' . self::INSTANCE_ID_MATCH . ':',
 
             // Tools daemon data: this may be in the storage instance.
-            // Technically, its prefix is configurable: however this report will
-            // assume it's hard-coded.
-            'toolsd:*',
+            // Eventually, it will have a prefix: however, it does not yet.
+            '^toolsd:output:[0-9a-f-]*:stderr',
+            '^toolsd:output:[0-9a-f-]*:stdout',
+            '^_kombu.binding.',
+            '^celery-task-meta-[0-9a-f-]*',
         ],
         // Queue patterns go here
         // (Note that queue is the same instance as cache, so it's not an issue
