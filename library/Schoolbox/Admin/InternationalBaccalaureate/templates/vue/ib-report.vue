@@ -138,6 +138,7 @@ function mapStudentRow(
         userId: s.userId,
         ibCandidateNumber: s.ibCandidateNumber,
         candidateDetailsStatus: s.hasMissingDetails ? "unconfirmed" : "confirmed",
+        missingFields: s.missingFields,
         subjects: {
             hl: s.ibGroupSubjects.HL.map(mapSubjectEntry),
             sl: s.ibGroupSubjects.SL.map(mapSubjectEntry),

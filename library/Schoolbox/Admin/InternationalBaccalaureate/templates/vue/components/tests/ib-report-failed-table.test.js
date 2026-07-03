@@ -13,6 +13,7 @@ const failedStudent = {
     userId: 456,
     candidateDetailsStatus: "confirmed",
     ibCandidateNumber: "000123",
+    missingFields: [],
     subjects: {
         hl: [],
         sl: [],
