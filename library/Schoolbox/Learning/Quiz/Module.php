@@ -77,7 +77,7 @@ class Module extends RestfulModule
                 new Rule\IsSuperuser(),
                 new IsInstructorOrHasHomepageAccess(
                     Access::getInstance(),
-                    self::resolveHomepageAccessContext(...),
+                    $this->resolveHomepageAccessContext(...),
                 )
             )
         );
@@ -129,7 +129,7 @@ class Module extends RestfulModule
      * @return AssessmentContext
      * @throws NotFound When no assessment, participant, or context has been preloaded.
      */
-    private static function resolveHomepageAccessContext(array $params): AssessmentContext
+    private function resolveHomepageAccessContext(array $params): AssessmentContext
     {
         if (($params['assessment'] ?? null) instanceof IAssessable) {
             return $params['assessment']->getContext();
