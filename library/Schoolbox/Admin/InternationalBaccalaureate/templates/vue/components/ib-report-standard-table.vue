@@ -19,7 +19,7 @@ const { selectedList, allSelected, isIndeterminate, showCheckboxes } = useSelect
 const updateLanguageStore = useIbReportUpdateLanguageStore();
 
 const emit = defineEmits<{
-    completePreparationSingle: [studentId: number];
+    completePreparationSingle: [student: StudentRow];
     renotifySingle: [userId: number];
     registerViaApiSingle: [studentId: number];
     resetDetailsSingle: [studentId: number];
@@ -65,19 +65,19 @@ function openModal(student: StudentRow): void {
             </tr>
         </thead>
         <tbody>
-            <tr v-for="student in students" :key="student.id">
+            <tr v-for="student in students" :key="student.userId">
                 <td class="checklist">
                     <template
                         v-if="props.activeSelectionSection === null || props.activeSelectionSection === props.section"
                     >
                         <input
-                            :id="`select-${student.id}`"
+                            :id="`select-${props.section}-${student.userId}`"
                             v-model="selectedList"
                             type="checkbox"
                             :value="student"
                             :disabled="student.stage !== props.section"
                             :aria-label="`Select ${student.name}`"
-                        /><label class="checkbox-label" :for="`select-${student.id}`"></label>
+                        /><label class="checkbox-label" :for="`select-${props.section}-${student.userId}`"></label>
                     </template>
                 </td>
                 <td>{{ student.name }}</td>
@@ -101,11 +101,11 @@ function openModal(student: StudentRow): void {
                 <td><ib-report-subject-labels :entry="student.subjects.core" /></td>
                 <td>
                     <sbx-pop-out
-                        :content-id="`ib-row-dropdown-${student.id}`"
+                        :content-id="`ib-row-dropdown-${props.section}-${student.userId}`"
                         move-to="#ib-report-pop-out-container"
                     ></sbx-pop-out>
                     <ul
-                        :id="`ib-row-dropdown-${student.id}`"
+                        :id="`ib-row-dropdown-${props.section}-${student.userId}`"
                         class="f-dropdown"
                         data-dropdown-content
                         aria-hidden="true"
@@ -137,7 +137,7 @@ function openModal(student: StudentRow): void {
                         <li v-if="student.stage === 'preparation'">
                             <button
                                 class="sbx-button--has-icon"
-                                @click.prevent="emit('completePreparationSingle', student.id)"
+                                @click.prevent="emit('completePreparationSingle', student)"
                             >
                                 <sbx-icon name="notifications-hollow"></sbx-icon>
                                 Complete preparation

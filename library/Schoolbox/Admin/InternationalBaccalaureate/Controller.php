@@ -1139,12 +1139,12 @@ class Controller extends ConfigController
      */
     public function sessionCompletePreparation(RegistrationSessionModel $registrationSession): void
     {
-        $post       = $this->requestPost;
-        $studentIds = $post->get('studentIds');
+        $post    = $this->requestPost;
+        $userIds = $post->get('userIds');
         $studentsToTransition = [];
 
         try {
-            $studentIds = $this->normalisePreparationStudentIds($studentIds);
+            $userIds = $this->normalisePreparationStudentIds($userIds);
         } catch (\InvalidArgumentException $e) {
             $this->sendJsonError($e->getMessage(), 400);
             return;
@@ -1155,7 +1155,7 @@ class Controller extends ConfigController
 
         try {
             $students             = $this->registrationSessionStudentMapper->findStudentsForSession((int)$registrationSession->getId());
-            $studentsToTransition = $this->resolvePreparationStudentsForTransition($students, $studentIds);
+            $studentsToTransition = $this->resolvePreparationStudentsByUserId($students, $userIds);
 
             $transactionStarted = $database->beginTransaction();
 
@@ -1710,44 +1710,36 @@ class Controller extends ConfigController
     }
 
     /**
-     * Resolve selected preparation candidates and reject ambiguous IDs.
+     * Resolve selected preparation candidates by user ID.
      *
-     * Candidate rows may be addressed by registration-session-student ID or
-     * user ID, so this helper validates that each requested ID maps to exactly
-     * one preparation candidate.
+     * Preparation candidates may be loaded dynamically before a session-student
+     * row exists, so user ID is the stable identifier for this transition.
+     * Do not mix row IDs and user IDs here because the numeric ID spaces can collide.
      *
      * @param iterable<mixed> $students
-     * @param int[] $studentIds
+     * @param int[] $userIds
      * @return RegistrationSessionStudentModel[]
      */
-    private function resolvePreparationStudentsForTransition(iterable $students, array $studentIds): array
+    private function resolvePreparationStudentsByUserId(iterable $students, array $userIds): array
     {
-        $studentsByRequestedId = [];
+        $studentsByUserId = [];
 
         foreach ($students as $student) {
             if (!$student instanceof RegistrationSessionStudentModel) {
                 continue;
             }
 
-            $candidateIds = [];
+            $userId = $student->getUser()?->getId();
 
-            if ($student->getId() !== null) {
-                $candidateIds[] = $student->getId();
-            }
-
-            if ($student->getUser()?->getId() !== null) {
-                $candidateIds[] = $student->getUser()->getId();
-            }
-
-            foreach (array_unique($candidateIds) as $candidateId) {
-                $studentsByRequestedId[$candidateId][] = $student;
+            if ($userId !== null) {
+                $studentsByUserId[$userId][] = $student;
             }
         }
 
         $studentsToTransition = [];
 
-        foreach ($studentIds as $studentId) {
-            $matches = $studentsByRequestedId[$studentId] ?? [];
+        foreach ($userIds as $userId) {
+            $matches = $studentsByUserId[$userId] ?? [];
 
             if ($matches === []) {
                 throw new \InvalidArgumentException('One or more selected students could not be found in this registration session.');
@@ -1773,8 +1765,7 @@ class Controller extends ConfigController
                 );
             }
 
-            $studentKey                        = $student->getUser()?->getId() ?? $student->getId() ?? $studentId;
-            $studentsToTransition[$studentKey] = $student;
+            $studentsToTransition[$userId] = $student;
         }
 
         return array_values($studentsToTransition);
