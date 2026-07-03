@@ -111,7 +111,7 @@ class CalendarApiFactory
                 continue;
             }
             $resourceIds[] = $resource->getId();
-            $roomCode      = trim($resource->getRoomCode());
+            $roomCode      = trim((string)$resource->getRoomCode());
             if (strlen($roomCode) > 0) {
                 $roomCodes[$roomCode] = $resource->getId();
             }
