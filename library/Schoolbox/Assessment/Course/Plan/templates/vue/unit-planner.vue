@@ -90,8 +90,6 @@ function updateContainerHeight(): void {
     });
 }
 
-const unitElements = window.Vue.ref<HTMLElement[]>([]);
-
 // Ensure the container is monitored for scroll events after it is first available
 window.Vue.watch(
     () => unitPlannerContainerEl.value,
@@ -198,7 +196,6 @@ window.Vue.onUnmounted(() => {
                     <div
                         v-for="unit in dragStore.isDragging ? dragStore.dragOrderedUnits : store.orderedUnits"
                         :key="unit.id"
-                        ref="unitElements"
                         class="grid-row unit-row"
                         :data-test="`unit-row-${unit.id}`"
                         :data-test-unit-id="unit.id"
