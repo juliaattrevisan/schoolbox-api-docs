@@ -13,6 +13,7 @@ namespace Schoolbox\OpenAi\Session;
 
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\OpenAi\Feature;
+use Schoolbox\OpenAi\Moderation\Event\Status as ModerationEventStatus;
 use Schoolbox\User;
 
 class Model
@@ -41,20 +42,37 @@ class Model
     private ?string $feature = null;
 
     /**
-     * Log format derived from the session's first log, for the admin list only.
-     * Not a column; populated by {@see Mapper::getFilteredSessions()}.
+     * Log format derived from the session's first log.
+     * This is a summary hint for the admin list, not a guarantee that every log in the session has this format.
+     * This is used to determine whether any log in the session is renderable (since rendering requires a known log
+     * format - see aul-agent-chat.vue).
+     * Populated by:
+     *  - @see Mapper::getFilteredSessions()
+     *  - @see SessionSummariser::hydrateSessionsWithSummaryInfo()
      *
      * @var string|null
      */
-    private ?string $derivedLogFormat = null;
+    private ?string $derivedFirstViewableLogFormat = null;
 
     /**
-     * Whether any log in this session has an error condition, for the admin list only.
-     * Not a column; populated by {@see Mapper::getFilteredSessions()}.
+     * Whether any log in this session has an error condition.
+     * Populated by:
+     *  - @see Mapper::getFilteredSessions()
+     *  - @see SessionSummariser::hydrateSessionsWithSummaryInfo()
      *
      * @var bool
      */
     private bool $derivedHasError = false;
+
+    /**
+     * The highest-priority moderation event status for this session.
+     * Populated by:
+     *  - @see Mapper::getFilteredSessions()
+     *  - @see SessionSummariser::hydrateSessionsWithSummaryInfo()
+     *
+     * @var string|null
+     */
+    private ?string $derivedModerationStatus = null;
 
     /**
      * @return string|null
@@ -120,18 +138,18 @@ class Model
     /**
      * @return string|null
      */
-    public function getDerivedLogFormat(): ?string
+    public function getDerivedFirstViewableLogFormat(): ?string
     {
-        return $this->derivedLogFormat;
+        return $this->derivedFirstViewableLogFormat;
     }
 
     /**
-     * @param string|null $derivedLogFormat
+     * @param string|null $derivedFirstViewableLogFormat
      * @return $this
      */
-    public function setDerivedLogFormat(?string $derivedLogFormat): self
+    public function setDerivedFirstViewableLogFormat(?string $derivedFirstViewableLogFormat): self
     {
-        $this->derivedLogFormat = $derivedLogFormat;
+        $this->derivedFirstViewableLogFormat = $derivedFirstViewableLogFormat;
         return $this;
     }
 
@@ -150,6 +168,29 @@ class Model
     public function setDerivedHasError(bool $derivedHasError): self
     {
         $this->derivedHasError = $derivedHasError;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDerivedModerationStatus(): ?string
+    {
+        return $this->derivedModerationStatus;
+    }
+
+    /**
+     * @param string|null $derivedModerationStatus
+     * @return $this
+     */
+    public function setDerivedModerationStatus(string|null $derivedModerationStatus): self
+    {
+        $this->derivedModerationStatus = (
+            null === $derivedModerationStatus
+            ? null
+            : ModerationEventStatus::from($derivedModerationStatus)->value
+        );
+
         return $this;
     }
 }

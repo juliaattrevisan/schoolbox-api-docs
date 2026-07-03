@@ -29,8 +29,6 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends BaseMapper
 {
-    private const int HTTP_STATUS_CODE_OK = 200;
-
     /**
      * @inheritDoc
      *
@@ -115,15 +113,7 @@ class Mapper extends BaseMapper
     /**
      * @inheritDoc
      *
-     * TODO:
-     * The derived properties in this class are not hydrated by this function.
-     * There ought to be a way to get the derived properties hydrated.
-     * Possibilities:
-     *  1. Add hydration of the derived fields to this function so findById() would return a fully hydrated object.
-     *  2. Add a findByIdWithDerivedProperties() function as an alternative to findById()
-     *  3. Add a hydrateDerivedProperties() function that could be used to hydrate an object returned by findById().
-     *
-     * Note derived properties are hydrated by $this->getFilteredSessions().
+     * Note derived properties are hydrated by $this->getFilteredSessions() and by the SessionSummariser.
      *
      * @param \PDOStatement $statement
      * @return GenericCollection<Model>
@@ -153,10 +143,6 @@ class Mapper extends BaseMapper
 
     /**
      * Fetch a page of sessions with logs for the admin usage log, newest first.
-     *
-     * The logFormat and returnCode values are derived from each session's first viewable log, ordered by earliest
-     * created_at and then id. This is a summary hint for the admin list, not a guarantee that every log in the session
-     * has this format. The error flag is derived from all logs in the session.
      *
      * @param string|null               $keyword This filters sessions to those with at least one log whose prompt or
      *                                           response contains this text.
@@ -189,48 +175,14 @@ class Mapper extends BaseMapper
         $limitSql  = null !== $limit ? 'LIMIT :limit' : '';
         $offsetSql = null !== $limit && null !== $offset ? 'OFFSET :offset' : '';
 
-        /* Notes
-         * - Requiring anyLog here keeps orphan sessions off the admin list. The details button is controlled by
-         *   firstViewableLog, because a session's first raw log may not have a format the admin UI can render.
-         * - derived_log_format is used to determine whether any log in the session is renderable (since rendering
-         *   requires a known log format - see aul-agent-chat.vue).  This usage makes sense, although the name does
-         *   not imply this usage.
-         * - derived_has_error indicates that at least one log within a session finished with an error condition
-         *   based on if an error_message exists or had a non-200 return code (and non-null return code, as some requests
-         *   won't have any return code if they didn't actually send a request to an AI service, e.g. non LLM guardrails).
-         */
         $query = "
             SELECT
                 `{$this->table}`.id AS id,
                 `{$this->table}`.feature AS feature,
                 `{$this->table}`.created_at AS created_at,
-                firstViewableLog.log_format AS derived_log_format,
-                EXISTS (
-                    SELECT 1 FROM `ai_session_log` errorLog
-                    WHERE errorLog.ai_session_id = `{$this->table}`.id
-                    AND (
-                        (
-                            errorLog.return_code IS NOT NULL
-                            AND errorLog.return_code <> :successfulReturnCode
-                        )
-                        OR errorLog.error_message IS NOT NULL
-                    )
-                ) AS derived_has_error,
                 {$this->getJoinColumnString('user', 'u')}
             FROM `{$this->table}`
             LEFT JOIN {$this->getJoinSql('user', '', 'u', true)}
-            JOIN `ai_session_log` anyLog ON anyLog.id = (
-                SELECT id FROM `ai_session_log`
-                WHERE ai_session_id = `{$this->table}`.id
-                LIMIT 1
-            )
-            LEFT JOIN `ai_session_log` firstViewableLog ON firstViewableLog.id = (
-                SELECT id FROM `ai_session_log`
-                WHERE ai_session_id = `{$this->table}`.id
-                AND log_format IS NOT NULL
-                ORDER BY created_at ASC, id ASC
-                LIMIT 1
-            )
             {$where}
             ORDER BY `{$this->table}`.created_at DESC
             {$limitSql}
@@ -241,7 +193,6 @@ class Mapper extends BaseMapper
         foreach ($params as $name => $value) {
             $statement->bindValue($name, $value);
         }
-        $statement->bindValue('successfulReturnCode', self::HTTP_STATUS_CODE_OK, \PDO::PARAM_INT);
         if (null !== $limit) {
             $statement->bindValue('limit', $limit, \PDO::PARAM_INT);
         }
@@ -250,24 +201,10 @@ class Mapper extends BaseMapper
         }
         $statement->execute();
 
-        $collection = $this->createCollection();
-        $userMapper = $this->getJoinMapper('user');
+        $sessions = $this->hydrateSelect($statement);
+        new SessionSummariser($this->getDatabase())->hydrateSessionsWithSummaryInfo($sessions);
 
-        foreach ($statement as $row) {
-            $session = $this->hydrate($row)
-                ->setDerivedLogFormat($row['derived_log_format'] ?? null)
-                ->setDerivedHasError((bool)$row['derived_has_error']);
-
-            /** @var \Schoolbox\User|null $sessionUser */
-            $sessionUser = $userMapper->hydrate($row, 'u');
-            if ($sessionUser) {
-                $session->setUser($sessionUser);
-            }
-
-            $collection->add($session);
-        }
-
-        return $collection;
+        return $sessions;
     }
 
     /**
@@ -291,7 +228,7 @@ class Mapper extends BaseMapper
         ?\Alaress_Date_Format $end,
         GenericCollection $moderationStatuses,
     ): int {
-        [$where, $params] = $this->buildSessionFilter($keyword, $feature, $user, $start, $end, $moderationStatuses, true);
+        [$where, $params] = $this->buildSessionFilter($keyword, $feature, $user, $start, $end, $moderationStatuses);
 
         $statement = $this->getDatabase()->prepare(
             "SELECT COUNT(*) FROM `{$this->table}` {$where}"
@@ -314,7 +251,6 @@ class Mapper extends BaseMapper
      * @param \Alaress_Date_Format|null $start
      * @param \Alaress_Date_Format|null $end
      * @param GenericCollection<ModerationEventStatus> $moderationStatuses
-     * @param bool                      $requireSessionLog Whether to exclude sessions without logs.
      * @return array{0: string, 1: array<string, mixed>}
      */
     private function buildSessionFilter(
@@ -324,7 +260,6 @@ class Mapper extends BaseMapper
         ?\Alaress_Date_Format $start,
         ?\Alaress_Date_Format $end,
         GenericCollection $moderationStatuses,
-        bool $requireSessionLog = false,
     ): array {
         $pb = $this->getPredicateBuilder();
         $keywordPredicate = null;
@@ -376,24 +311,15 @@ class Mapper extends BaseMapper
             );
         }
 
-        if ($logClauses) {
-            $pb->rawWhere(
-                'EXISTS (
+        $pb->rawWhere(
+            // This ensures that at least one matching ai_session_log row exists, and adds any $logClauses.
+            'EXISTS (
                     SELECT 1 FROM `ai_session_log` l
                     WHERE l.ai_session_id = `' . $this->table . '`.id
-                    AND ' . implode("\nAND ", $logClauses) . '
+                    ' . ($logClauses ? ' AND ' . implode("\nAND ", $logClauses) : '') . '
                 )',
-                $logParams
-            );
-        } elseif ($requireSessionLog) {
-            $pb->rawWhere(
-                'EXISTS (
-                    SELECT 1 FROM `ai_session_log` l
-                    WHERE l.ai_session_id = `' . $this->table . '`.id
-                )',
-                []
-            );
-        }
+            $logParams
+        );
 
         $where = $pb->getWhere() ? 'WHERE ' . implode("\nAND ", $pb->getWhere()) : '';
 

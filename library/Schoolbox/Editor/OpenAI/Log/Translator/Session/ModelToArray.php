@@ -43,11 +43,11 @@ class ModelToArray
 
             // The admin UI currently needs a session-scope logFormat to choose a details renderer. This can be
             // misleading for mixed-format sessions, but each log entry has its own logFormat and is rendered individually.
-            'logFormat' => $session->getDerivedLogFormat(),
+            'logFormat' => $session->getDerivedFirstViewableLogFormat(),
             'createdAt' => $session->getCreatedAt()?->getUsingFormat(DATE_ATOM),
             'createdBy' => $session->getUser() ? $this->userTranslator->__invoke($session->getUser()) : null,
             'hasError' => $session->getDerivedHasError(),
-            'moderationStatus' => null, // TODO
+            'moderationStatus' => $session->getDerivedModerationStatus(),
             '_routes' => $routes,
         ];
     }
