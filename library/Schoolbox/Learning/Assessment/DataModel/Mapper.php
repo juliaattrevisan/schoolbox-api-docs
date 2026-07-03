@@ -862,7 +862,7 @@ class Mapper extends BaseMapper
          * Course Outline component which were being fulfilled but never used. In the spirit of maybe-completeness I've
          * left what *would* have been here.
          */
-        // $modelList = $this->augmentListWithRubricInstances($modelList);
+        $modelList = $this->augmentListWithRubricInstances($modelList);
 
         return $modelList;
     }
