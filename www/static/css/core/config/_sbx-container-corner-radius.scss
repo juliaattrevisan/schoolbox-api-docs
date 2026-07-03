@@ -98,6 +98,12 @@ body.sbx-body {
         border-top-right-radius: 0;
     }
 
+    #component-layout .component-container .empty-state,
+    #component-layout .component-container .empty-state-flex-centered {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+
     // tables need to be rounded uniquely
     table {
         border-spacing: 0;
