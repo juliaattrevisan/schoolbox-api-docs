@@ -24,12 +24,15 @@ class Model
     public const string REQUEST_TYPE_REGISTER_SESSIONS = 'register_sessions';
     public const string STATUS_SUCCESS = 'success';
     public const string STATUS_ERROR = 'error';
+    public const string SOURCE_IBIS_API = 'ibis_api';
+    public const string SOURCE_LOCAL_VALIDATION = 'local_validation';
 
     private ?RegistrationSessionModel $registrationSession = null;
     private ?RegistrationSessionStudentModel $registrationSessionStudent = null;
-    private string $msgId = '';
+    private ?string $msgId = null;
     private string $requestType = self::REQUEST_TYPE_REGISTER_CANDIDATES;
     private string $status = self::STATUS_ERROR;
+    private string $source = self::SOURCE_IBIS_API;
     private ?string $message = null;
 
     public function getRegistrationSession(): ?RegistrationSessionModel
@@ -54,12 +57,12 @@ class Model
         return $this;
     }
 
-    public function getMsgId(): string
+    public function getMsgId(): ?string
     {
         return $this->msgId;
     }
 
-    public function setMsgId(string $msgId): self
+    public function setMsgId(?string $msgId): self
     {
         $this->msgId = $msgId;
         return $this;
@@ -84,6 +87,17 @@ class Model
     public function setStatus(string $status): self
     {
         $this->status = $status;
+        return $this;
+    }
+
+    public function getSource(): string
+    {
+        return $this->source;
+    }
+
+    public function setSource(string $source): self
+    {
+        $this->source = $source;
         return $this;
     }
 

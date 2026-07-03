@@ -189,6 +189,12 @@ class RegisterCandidatesTool extends CliTool\App
                         );
 
                         if ($this->perform()) {
+                            $this->saveLocalValidationError(
+                                $responseLogHelper,
+                                $student,
+                                RegistrationApiResponseLogModel::REQUEST_TYPE_REGISTER_CANDIDATES,
+                                $e
+                            );
                             $this->markCandidateRegistrationFailed($student, $studentMapper);
                         }
                         continue;
@@ -231,6 +237,16 @@ class RegisterCandidatesTool extends CliTool\App
                     ),
                     ['exception' => $e]
                 );
+                if ($this->perform() && $e instanceof InvalidArgumentException) {
+                    $this->saveLocalValidationError(
+                        $responseLogHelper,
+                        $student,
+                        RegistrationApiResponseLogModel::REQUEST_TYPE_REGISTER_CANDIDATES,
+                        $e
+                    );
+                    $this->markCandidateRegistrationFailed($student, $studentMapper);
+                }
+                continue;
             }
 
             if (!$this->perform()) {
@@ -314,6 +330,14 @@ class RegisterCandidatesTool extends CliTool\App
                         ['exception' => $logException]
                     );
                 }
+            }
+            if ($sessionRequest === null && $e instanceof InvalidArgumentException) {
+                $this->saveLocalValidationError(
+                    $responseLogHelper,
+                    $student,
+                    RegistrationApiResponseLogModel::REQUEST_TYPE_REGISTER_SESSIONS,
+                    $e
+                );
             }
 
             $this->getLogger()->error(
@@ -559,6 +583,28 @@ class RegisterCandidatesTool extends CliTool\App
         }
 
         return $successful;
+    }
+
+    /**
+     * Persist a local validation error if possible, without masking the original failure.
+     */
+    private function saveLocalValidationError(
+        RegistrationApiResponseLogHelper $responseLogHelper,
+        RegistrationSessionStudentModel $student,
+        string $requestType,
+        Throwable|string $error
+    ): void {
+        try {
+            $responseLogHelper->saveValidationError($student, $requestType, $error);
+        } catch (Throwable $e) {
+            $this->getLogger()->error(
+                sprintf(
+                    'Saving IBIS registration validation error log failed for candidate #%s.',
+                    $student->getId() ?? 'unknown'
+                ),
+                ['exception' => $e]
+            );
+        }
     }
 
     /**
