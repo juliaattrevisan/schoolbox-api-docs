@@ -5,8 +5,8 @@ pools:
   default:
     maxWorkers: 16
 
-  # However, there's a separate pool for UPS runs:
-  # these can run in the background for a long time,
-  # and should not be allowed to block the running of other tools.
-  ups:
-    maxWorkers: 4
+#  # However, there's a separate pool for UPS runs:
+#  # these can run in the background for a long time,
+#  # and should not be allowed to block the running of other tools.
+#  ups:
+#    maxWorkers: 4
