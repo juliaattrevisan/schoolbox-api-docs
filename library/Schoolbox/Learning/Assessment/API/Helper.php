@@ -319,7 +319,7 @@ class Helper
         }
 
         if (array_key_exists('assessmentType', $filter)) {
-            $where .= " 
+            $where .= "
                 AND COALESCE(
                     IF(task.id, 'task', NULL),
                     IF(assess.assessment_id, 'quiz', NULL),
@@ -329,7 +329,7 @@ class Helper
                     IF(lesson_plan.id, 'lessonPlan', NULL),
                     IF(dialog_agent.id, 'dialogAgent', NULL),
                     IF(reporting.id, 'reporting', NULL)
-                ) = :assessmentType 
+                ) = :assessmentType
             ";
 
             $params['assessmentType'] = $filter['assessmentType'];
@@ -1106,10 +1106,11 @@ class Helper
 
     /**
      * Reduce a list of rubrics to the deprecated singular `rubric` payload: the first rubric's
-     * capabilities only (no id/title/weight), or null when there are no rubrics.
+     * capabilities,indicators,descriptors (no id/title/weight), or null when there are no rubrics.
      *
      * @param array<int, array> $rubrics
      * @return array|null
+     * @deprecated Fallback to allow transition to new multiple rubric format, to be removed in 26.2+
      */
     private static function firstRubricAsLegacy(array $rubrics): ?array
     {
@@ -1284,7 +1285,7 @@ class Helper
 
             if (!isset($rubrics[$instanceId]['capabilities'][$capabilityId]['indicators'][$indicatorId])) {
                 $descriptor = null;
-                if (null != $row['descriptor_name']) {
+                if (null !== $row['descriptor_name']) {
                     $descriptor = [
                         'id'          => (int)$row['descriptor_id'],
                         'description' => $row['descriptor_name'],
