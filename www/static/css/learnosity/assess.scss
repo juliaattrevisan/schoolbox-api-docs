@@ -89,8 +89,14 @@
 }
 
 /* the vertical menu running down the right hand side */
+.lrn.lrn-assess .lrn-right-region .right-wrapper {
+    border: 1px solid var(--sbx-color-border, var(--content-ui-foreground));
+}
 .lrn.lrn-assess .lrn-right-region .right-wrapper .menu-overlay {
     background: var(--sbx-color-foreground-primary, var(--content-ui-background));
+}
+.lrn.lrn-assess .lrn-vertical-toc {
+    border: 1px solid var(--sbx-color-border, var(--content-ui-foreground));
 }
 
 /* remove the background from the review screen */
