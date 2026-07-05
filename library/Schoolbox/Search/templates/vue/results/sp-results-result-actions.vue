@@ -40,7 +40,7 @@ async function awardBadge(type: SPBadgeAward["type"]): Promise<void> {
             <a
                 v-else-if="link.action === undefined && link.disabled"
                 :class="link.icon"
-                class="disabled"
+                class="menu_disabled"
                 aria-disabled="true"
                 >{{ link.title }}</a
             >

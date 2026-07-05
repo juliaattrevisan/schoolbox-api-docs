@@ -171,7 +171,7 @@ class Hydrator extends BaseHydrator
      *
      * @param User $viewer
      * @param User $searchResultUser
-     * @return array array<array{"title": string, "icon": string, "url": string, "action"?: string}>
+     * @return array array<array{"title": string, "icon": string, "url": string, "action"?: string, "disabled"?: bool}>
      */
     private function getSearchResultLinks(User $searchResultUser, User $viewer): array
     {
@@ -182,18 +182,7 @@ class Hydrator extends BaseHydrator
 
         $route          = 'user.impersonate';
         $isUserDisabled = $searchResultUser->isDeleted() || !$searchResultUser->getEnabled();
-        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
-            try {
-                $links[] = [
-                    'title'    => 'Impersonate',
-                    'icon'     => 'icon-staff-students',
-                    'url'      => $this->routeGenerator->generate($route, $params),
-                    'disabled' => $isUserDisabled,
-                ];
-            } catch (RouteNotFound) {
-                // Route not registered; skip the link.
-            }
-        }
+        $links[]        = $this->generateLinkIfRouteAuthorized($route, $params, $viewer, 'Impersonate', 'icon-staff-students', $isUserDisabled);
 
 
         $route  = 'calendar.getCalendar';
@@ -261,6 +250,7 @@ class Hydrator extends BaseHydrator
      * @param User   $viewer
      * @param string $title
      * @param string $icon
+     * @param bool   $disabled
      * @return array|null
      */
     private function generateLinkIfRouteAuthorized(
@@ -269,14 +259,19 @@ class Hydrator extends BaseHydrator
         User $viewer,
         string $title,
         string $icon,
+        bool $disabled = false,
     ): ?array {
         if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
             try {
-                return [
+                $link = [
                     'title' => $title,
                     'icon'  => $icon,
                     'url'   => $this->routeGenerator->generate($route, $params),
                 ];
+                if ($disabled) {
+                    $link['disabled'] = true;
+                }
+                return $link;
             } catch (RouteNotFound) {
                 // `isPathAuthorizedForUser` doesn't catch or even detect if the
                 // route exists: need to catch when calling `generate`.
