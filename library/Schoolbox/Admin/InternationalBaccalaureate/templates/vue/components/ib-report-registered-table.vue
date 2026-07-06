@@ -4,6 +4,7 @@
  * Includes the student's IB candidate number and manual registration metadata.
  */
 import IbReportSubjectLabels from "./ib-report-subject-labels.vue";
+import { candidateDetailsTitle } from "./ib-report-candidate-details-title";
 import type { RegisteredRow } from "../../js/types/ibReportTypes";
 
 interface Props {
@@ -50,7 +51,7 @@ function formatDate(isoString: string): string {
                         name="alert"
                         color="var(--sbx-color-warning, #e67e22)"
                         aria-label="Candidate details unconfirmed"
-                        title="Missing required candidate details."
+                        :title="candidateDetailsTitle(student.missingFields)"
                     ></sbx-icon>
                 </td>
                 <td><ib-report-subject-labels :entry="student.subjects.hl" /></td>

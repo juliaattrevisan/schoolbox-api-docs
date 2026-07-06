@@ -88,6 +88,28 @@ class HelperTest extends TestCase
         $this->assertSame(456, $saved->getRegistrationSessionStudent()?->getId());
         $this->assertSame(Model::STATUS_ERROR, $saved->getStatus());
         $this->assertSame('IBIS unavailable', $saved->getMessage());
+        $this->assertSame(Model::SOURCE_IBIS_API, $saved->getSource());
+    }
+
+    public function testSavesValidationErrorWithoutMsgId(): void
+    {
+        $saved = null;
+        $mapper = $this->mapperSavingTo($saved);
+
+        (new Helper($mapper))->saveValidationError(
+            $this->student(),
+            Model::REQUEST_TYPE_REGISTER_CANDIDATES,
+            new \InvalidArgumentException('Selected candidate is missing required IBIS data: email.')
+        );
+
+        $this->assertInstanceOf(Model::class, $saved);
+        $this->assertSame(12, $saved->getRegistrationSession()?->getId());
+        $this->assertSame(456, $saved->getRegistrationSessionStudent()?->getId());
+        $this->assertNull($saved->getMsgId());
+        $this->assertSame(Model::REQUEST_TYPE_REGISTER_CANDIDATES, $saved->getRequestType());
+        $this->assertSame(Model::STATUS_ERROR, $saved->getStatus());
+        $this->assertSame(Model::SOURCE_LOCAL_VALIDATION, $saved->getSource());
+        $this->assertSame('Selected candidate is missing required IBIS data: email.', $saved->getMessage());
     }
 
     public function testReturnsLatestErrorMessagesByStudentId(): void

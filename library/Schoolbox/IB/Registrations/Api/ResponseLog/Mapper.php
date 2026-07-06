@@ -33,6 +33,7 @@ class Mapper extends BaseMapper
         $this->uses('msg_id', self::TYPE_STRING, null, 'msgId');
         $this->uses('request_type', self::TYPE_STRING, null, 'requestType');
         $this->uses('status', self::TYPE_STRING);
+        $this->uses('source', self::TYPE_STRING);
         $this->uses('message', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
     }

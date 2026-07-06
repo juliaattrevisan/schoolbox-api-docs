@@ -86,19 +86,43 @@ class Helper
         string $requestType,
         Throwable|string $error
     ): void {
-        $message = $error instanceof Throwable ? $error->getMessage() : $error;
         $registrationSession = $student?->getRegistrationSession()
             ?? (new RegistrationSessionModel())->setId($registrationSessionId);
 
-        $log = $this->mapper->createModel()
-            ->setRegistrationSession($registrationSession)
-            ->setRegistrationSessionStudent($student)
-            ->setMsgId($msgId)
-            ->setRequestType($requestType)
-            ->setStatus(Model::STATUS_ERROR)
-            ->setMessage($message !== '' ? $message : null);
+        $this->saveErrorLog(
+            $registrationSession,
+            $student,
+            $msgId,
+            $requestType,
+            Model::SOURCE_IBIS_API,
+            $error
+        );
+    }
 
-        $this->mapper->save($log);
+    /**
+     * Save a local validation failure before a request has been submitted to IBIS.
+     *
+     * @param Throwable|string $error Exception or raw error message to store.
+     */
+    public function saveValidationError(
+        RegistrationSessionStudentModel $student,
+        string $requestType,
+        Throwable|string $error
+    ): void {
+        $registrationSession = $student->getRegistrationSession();
+
+        if ($registrationSession === null || $registrationSession->getId() === null || $student->getId() === null) {
+            throw new \InvalidArgumentException('Registration session and student IDs are required to log IBIS validation errors.');
+        }
+
+        $this->saveErrorLog(
+            $registrationSession,
+            $student,
+            null,
+            $requestType,
+            Model::SOURCE_LOCAL_VALIDATION,
+            $error
+        );
     }
 
     /**
@@ -150,7 +174,34 @@ class Helper
             ->setMsgId($msgId)
             ->setRequestType($requestType)
             ->setStatus($successful ? Model::STATUS_SUCCESS : Model::STATUS_ERROR)
+            ->setSource(Model::SOURCE_IBIS_API)
             ->setMessage($message !== null && trim($message) !== '' ? trim($message) : null);
+
+        $this->mapper->save($log);
+    }
+
+    /**
+     * Persist an error row shared by IBIS request errors and local validation errors.
+     */
+    private function saveErrorLog(
+        RegistrationSessionModel $registrationSession,
+        ?RegistrationSessionStudentModel $student,
+        ?string $msgId,
+        string $requestType,
+        string $source,
+        Throwable|string $error
+    ): void {
+        $message = $error instanceof Throwable ? $error->getMessage() : $error;
+        $message = trim($message);
+
+        $log = $this->mapper->createModel()
+            ->setRegistrationSession($registrationSession)
+            ->setRegistrationSessionStudent($student)
+            ->setMsgId($msgId)
+            ->setRequestType($requestType)
+            ->setStatus(Model::STATUS_ERROR)
+            ->setSource($source)
+            ->setMessage($message !== '' ? $message : null);
 
         $this->mapper->save($log);
     }

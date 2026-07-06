@@ -31,6 +31,7 @@ export type StudentRow = {
     userId: number;
     candidateDetailsStatus: CandidateDetailsStatus;
     ibCandidateNumber: string | null;
+    missingFields: string[];
     subjects: SubjectGroup;
     updateLanguageEndpoint: string | null;
     updateConfirmationEndpoint: string | null;

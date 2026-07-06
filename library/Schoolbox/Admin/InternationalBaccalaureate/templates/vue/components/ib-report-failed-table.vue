@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useSelectedList } from "@schoolboxVue/composables/form/useSelectedList";
 import IbReportSubjectLabels from "./ib-report-subject-labels.vue";
+import { candidateDetailsTitle } from "./ib-report-candidate-details-title";
 import { useIbReportUpdateLanguageStore } from "../store/ibReportUpdateLanguageStore";
 import type { FailedRow, StudentRow } from "../../js/types/ibReportTypes";
 
@@ -86,7 +87,7 @@ function openModal(student: FailedRow): void {
                         name="alert"
                         color="var(--sbx-color-warning, #e67e22)"
                         aria-label="Candidate details unconfirmed"
-                        title="Missing required candidate details."
+                        :title="candidateDetailsTitle(student.missingFields)"
                     ></sbx-icon>
                 </td>
                 <td><ib-report-subject-labels :entry="student.subjects.hl" /></td>

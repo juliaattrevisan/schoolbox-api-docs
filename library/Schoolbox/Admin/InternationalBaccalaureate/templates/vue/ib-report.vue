@@ -138,6 +138,7 @@ function mapStudentRow(
         userId: s.userId,
         ibCandidateNumber: s.ibCandidateNumber,
         candidateDetailsStatus: s.hasMissingDetails ? "unconfirmed" : "confirmed",
+        missingFields: s.missingFields,
         subjects: {
             hl: s.ibGroupSubjects.HL.map(mapSubjectEntry),
             sl: s.ibGroupSubjects.SL.map(mapSubjectEntry),
@@ -212,21 +213,23 @@ function clearSelection(): void {
 }
 
 /**
- * Submits the given student ids to the complete-preparation endpoint,
+ * Submits the given students to the complete-preparation endpoint,
  * moves them from Preparation to Unconfirmed on success, and shows a toast notification.
- * @param studentIds The ids of the students to mark as preparation-complete.
+ * @param students The students to mark as preparation-complete.
  */
-async function handleCompletePreparation(studentIds: number[]): Promise<void> {
+async function handleCompletePreparation(students: StudentRow[]): Promise<void> {
+    if (students.length === 0) return;
     if (isCompleting.value) return;
     isCompleting.value = true;
 
+    const userIds = Array.from(new Set(students.map((s) => s.userId)));
     const toast = window.sbProps.toastActivate("Completing preparation...");
 
     try {
-        const response = await apiRequest<{ success: boolean; message?: string }, { studentIds: number[] }>({
+        const response = await apiRequest<{ success: boolean; message?: string }, { userIds: number[] }>({
             url: props.completePreparationEndpoint,
             method: "POST",
-            body: { studentIds },
+            body: { userIds },
         });
 
         if (!response.success) {
@@ -234,15 +237,15 @@ async function handleCompletePreparation(studentIds: number[]): Promise<void> {
             return;
         }
 
-        const removedIds = new Set(studentIds);
+        const removedUserIds = new Set(userIds);
         const completedStudents = preparation.value
-            .filter((s) => removedIds.has(s.id))
+            .filter((s) => removedUserIds.has(s.userId))
             .map((s) => ({ ...s, stage: "unconfirmed" as const, renotifyEndpoint }));
-        preparation.value = preparation.value.filter((s) => !removedIds.has(s.id));
+        preparation.value = preparation.value.filter((s) => !removedUserIds.has(s.userId));
         unconfirmed.value = [...completedStudents, ...unconfirmed.value];
         clearSelection();
         toast.timeout({
-            text: `Preparation completed for ${studentIds.length} student${studentIds.length === 1 ? "" : "s"}.`,
+            text: `Preparation completed for ${userIds.length} student${userIds.length === 1 ? "" : "s"}.`,
         });
         // Reload to get the real registrationSessionStudentId for students that didn't have a
         // persisted row before completePreparation. Without this, subsequent actions (e.g. manual
@@ -572,7 +575,7 @@ window.Vue.onMounted((): void => {
                     :search-languages-endpoint="props.searchLanguagesEndpoint"
                     section="preparation"
                     :active-selection-section="activeSelectionSection"
-                    @complete-preparation-single="(id) => handleCompletePreparation([id])"
+                    @complete-preparation-single="(student) => handleCompletePreparation([student])"
                     @reset-details-single="(id) => promptResetDetails([id])"
                 />
             </ib-report-section>
@@ -665,7 +668,7 @@ window.Vue.onMounted((): void => {
                 isRenotifying
             "
             :active-section="activeSelectionSection"
-            @complete-preparation="handleCompletePreparation(preparationSelected.map((s) => s.id))"
+            @complete-preparation="handleCompletePreparation(preparationSelected)"
             @register-via-api="promptRegisterViaApi([...confirmedSelected, ...failedSelected].map((s) => s.id))"
             @approve-on-behalf="handleApproveOnBehalf(unconfirmedSelected)"
             @renotify="handleRenotifySelected(unconfirmedSelected)"
