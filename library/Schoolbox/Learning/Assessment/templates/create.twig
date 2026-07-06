@@ -209,13 +209,15 @@
 {% endif %}
 
 
-{% set importRoute = routeLookupIfAuthorized('learningQuiz.postImport', {
-    contextId: context.id,
-    contextType: contextType
-}) %}
-{# Can only import on creation, not modify #}
-{% set canImport = importRoute is not null and (assessment is not defined or assessment.id is null) %}
-{% if canImport %}
+{% if assessmentType is defined and assessmentType == 'quiz' %}
+    {% set importRoute = routeLookupIfAuthorized('learningQuiz.postImport', {
+        contextId: context.id,
+        contextType: contextType,
+        context: context
+    }) %}
+    {# Can only import on creation, not modify #}
+    {% set canImportQuizzes = importRoute is not null and (assessment is not defined or assessment.id is null) %}
+    {% if canImportQuizzes %}
     <div id="importModal" class="reveal-modal" data-reveal>
         <h2>Import a quiz</h2>
 
@@ -268,6 +270,7 @@
             });
         });
     </script>
+    {% endif %}
 {% endif %}
 
 {% if assessmentType is defined and assessmentType|length %}

@@ -14,10 +14,12 @@ use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Authorizer\Rule\IsInstructorOrHasHomepageAccess;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
@@ -31,7 +33,6 @@ use Alaress\Authorizer\Rule;
 use Schoolbox\Learning\Authorizer\Rule\IsModifyUnLocked;
 use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\Assessment\Term;
@@ -74,15 +75,9 @@ class Module extends RestfulModule
             new Rule\Any(
                 new Rule\HasRole(Role::STAFF),
                 new Rule\IsSuperuser(),
-                new Rule\HasHomepageAccess(
-                    UserAccess::ACCESS_WRITE,
-                    static function ($params) {
-                        if ($params['assessment'] instanceof IAssessable) {
-                            return $params['assessment']->getBaseContext()->getFolder()->getId();
-                        }
-                        return null;
-                    },
-                    Access::getInstance()
+                new IsInstructorOrHasHomepageAccess(
+                    Access::getInstance(),
+                    $this->resolveHomepageAccessContext(...),
                 )
             )
         );
@@ -118,6 +113,37 @@ class Module extends RestfulModule
         $this->register('GET', "/quiz/summary/{assessmentId}", 'getQuizSummary', $canModify, $preloadAssessment);
 //        $this->register('GET', "/quiz/{assessmentId}/attempts/export", 'getExportAttempts', $canModify, $preloadAssessment);
         $this->register('POST', "/quiz/import/{contextType:$contextTypes}/{contextId:\\d+}", 'postImport', $canWrite, $preloadContext);
+    }
+
+    /**
+     * Locates the assessment context needed for quiz write authorization.
+     *
+     * Routes that operate on a saved quiz preload an assessment or participant,
+     * but the quiz import route used by the create page preloads only the
+     * target context because there is no assessment yet. Resolving all
+     * supported shapes here lets IsInstructorOrHasHomepageAccess check the
+     * correct folder without assuming that every authorized quiz route has an
+     * assessment.
+     *
+     * @param array $params Route parameters after preload callbacks have run.
+     * @return AssessmentContext
+     * @throws NotFound When no assessment, participant, or context has been preloaded.
+     */
+    private function resolveHomepageAccessContext(array $params): AssessmentContext
+    {
+        if (($params['assessment'] ?? null) instanceof IAssessable) {
+            return $params['assessment']->getContext();
+        }
+
+        if (isset($params['participant'])) {
+            return $params['participant']->getAssessable()->getContext();
+        }
+
+        if (($params['context'] ?? null) instanceof AssessmentContext) {
+            return $params['context'];
+        }
+
+        throw new NotFound('No assessment or context preloaded');
     }
 
 
