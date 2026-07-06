@@ -2,6 +2,7 @@ import type { Ref } from "vue";
 import { applyMarkScheme } from "../rubricUtils";
 import type { RubricGrid, RubricMarkedGrid } from "../types";
 import type { MarkScheme } from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/markScheme";
+import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 
 /**
  * To calculate aggregated mark info for several rubrics
@@ -116,8 +117,18 @@ export function useRubricMarks(
             totalNormalisedMark += weightedMark ?? 0;
         }
 
-        // figure out the 'scaled mark' so we can apply the mark scheme to it
-        let scaledMark = (totalNormalisedMark / 100) * derivedMaxMark.value;
+        /* figure out the 'scaled mark' so we can apply the mark scheme to it.
+         *
+         * If using the "Total Mark" mark scheme, the max mark is derived from that.
+         * otherwise, it falls back to the derived max mark from the rubric grids (although it could probably remain normalised,
+         * depending on if we care about the rounding or not?? maybe it was intentionally like this in the old code...)
+         */
+        const maxMark =
+            assessmentMarkScheme.mode === MarkTypeSlug.TOTAL
+                ? assessmentMarkScheme.conf.totalMark
+                : derivedMaxMark.value;
+
+        let scaledMark = (totalNormalisedMark / 100) * maxMark;
 
         // if the normalised or scaled mark is not a whole number, round to 2dp
         if (scaledMark % 1 !== 0) {
@@ -128,7 +139,10 @@ export function useRubricMarks(
             totalNormalisedMark = parseFloat(totalNormalisedMark.toFixed(2));
         }
 
-        const { humanReadableMark } = applyMarkScheme(scaledMark, derivedMaxMark.value, assessmentMarkScheme);
+        // TODO: this would be a whole lot simpler if we always used a normalised mark,
+        // but there's several layers to actually achieving that which we didn't get around to refactoring yet.
+
+        const { humanReadableMark } = applyMarkScheme(scaledMark, maxMark, assessmentMarkScheme);
 
         return {
             normalisedMark: totalNormalisedMark,
