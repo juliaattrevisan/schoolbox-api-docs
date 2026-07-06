@@ -10,6 +10,7 @@
 namespace Alaress\WorkerCrew\Worker;
 
 use OutOfBoundsException;
+use Psr\Log\LoggerInterface;
 
 interface WorkerBundleInterface
 {
@@ -113,9 +114,13 @@ interface WorkerBundleInterface
     /**
      * Return the status of the workers
      *
+     * @param LoggerInterface|null $log Logger to record workers whose memory
+     *                                  usage could not be determined (e.g.
+     *                                  because they died before being
+     *                                  queried)
      * @return array
      */
-    public function getStatus();
+    public function getStatus(?LoggerInterface $log = null);
 
 
     /**

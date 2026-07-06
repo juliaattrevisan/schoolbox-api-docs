@@ -44,41 +44,33 @@ class Memory
      */
     public static function getUsage(int $pid): ?int
     {
+        // Suppressed: the process may have died between being listed and
+        // being queried here, which is an expected race, not an error.
+        // Callers that care should log the null return themselves: raising a
+        // warning here would, in daemon contexts, be escalated by the
+        // daemon's error handler into a fatal exception (see
+        // Schoolbox\Application\Daemon\Kernel::onWarning), which would abort
+        // the whole daemon over one worker's disappearance.
         $usage = @file_get_contents("/proc/$pid/statm");
-        if ($usage) {
-            // statm values:
-            // first value is vmSize (all allocated memory)
-            // second value is vmRss (currently used memory)
-            $usages = preg_split('/\s+/', $usage, flags: PREG_SPLIT_NO_EMPTY);
-            $vmRss  = filter_var($usages[1] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
-            if (!isset($vmRss)) {
-                trigger_error(
-                    'Could not determine memory usage from process statm, thus cannot accurately report memory usage',
-                    E_USER_WARNING,
-                );
-                return null;
-            }
-
-            $pageSize = self::getPageSize();
-            if (!isset(self::$pageSize)) {
-                trigger_error(
-                    'Could not determine memory page size, thus cannot accurately report memory usage',
-                    E_USER_WARNING,
-                );
-                return null;
-            }
-
-            return $vmRss * $pageSize;
-        } else {
-            // Process might have died between this method call and now?
-            // Either that or this may be running on an OS which doesn't support
-            // that metric?
-            trigger_error(
-                'Could not load process statm, thus cannot report memory usage',
-                E_USER_WARNING,
-            );
+        if (!$usage) {
             return null;
         }
+
+        // statm values:
+        // first value is vmSize (all allocated memory)
+        // second value is vmRss (currently used memory)
+        $usages = preg_split('/\s+/', $usage, flags: PREG_SPLIT_NO_EMPTY);
+        $vmRss  = filter_var($usages[1] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        if (!isset($vmRss)) {
+            return null;
+        }
+
+        $pageSize = self::getPageSize();
+        if (!isset($pageSize)) {
+            return null;
+        }
+
+        return $vmRss * $pageSize;
     }
 
     /**

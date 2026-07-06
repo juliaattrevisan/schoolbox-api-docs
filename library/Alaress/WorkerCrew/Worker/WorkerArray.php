@@ -11,6 +11,7 @@ namespace Alaress\WorkerCrew\Worker;
 
 use Alaress\WorkerCrew\IPC\AlaressIPCProtocol;
 use OutOfBoundsException;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\Realtime\Memory;
 
@@ -225,9 +226,13 @@ class WorkerArray implements WorkerBundleInterface
     /**
      * Return the status of the workers
      *
+     * @param LoggerInterface|null $log Logger to record workers whose memory
+     *                                  usage could not be determined (e.g.
+     *                                  because they died before being
+     *                                  queried)
      * @return array
      */
-    public function getStatus()
+    public function getStatus(?LoggerInterface $log = null)
     {
         $status = [];
         $list = [
@@ -241,6 +246,11 @@ class WorkerArray implements WorkerBundleInterface
 
         $time = microtime(true);
         foreach ($this->workers as $pid => $w) {
+            $memory = Memory::getUsage((int)$pid);
+            if ($memory === null) {
+                $log?->warning("Could not determine memory usage for worker {{$pid}}");
+            }
+
             $status[$pid] = [
                 'proc'     => $w->getCommand(),
                 'status'   => $list[$w->getStatus()],
@@ -248,7 +258,7 @@ class WorkerArray implements WorkerBundleInterface
                 'start'    => $w->getStart(),
                 'uptime'   => $time - $w->getStart(),
                 'requests' => $w->getRequestCount(),
-                'memory'   => Memory::getUsage((int)$pid),
+                'memory'   => $memory,
             ];
             if ($w->getTask() instanceof Task) {
                 $status[$pid]['task'] = $w->getTask()->getCommand();
