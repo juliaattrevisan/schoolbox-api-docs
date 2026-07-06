@@ -351,7 +351,7 @@ class Pool extends EventEmitter implements PoolInterface
     public function getStatus(): array
     {
         return array(
-            'workers' => $this->workers->getStatus()
+            'workers' => $this->workers->getStatus($this->log)
         );
     }
 

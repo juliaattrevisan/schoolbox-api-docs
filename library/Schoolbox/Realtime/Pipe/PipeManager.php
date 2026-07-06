@@ -854,8 +854,12 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         $pid             = getmypid();
         $dispatcherStats = $this->taskDispatcher->getStatus();
         $poolStats       = $this->taskDispatcher->getPoolStatus();
+        $memory          = $pid ? Memory::getUsage($pid) : null;
+        if ($memory === null) {
+            $this->log->warning("Could not determine memory usage for pipe manager process {{$pid}}");
+        }
         return [
-            'memory'     => $pid ? Memory::getUsage($pid) : null,
+            'memory'     => $memory,
             'dispatcher' => $dispatcherStats,
             'pool'       => $poolStats,
         ];
