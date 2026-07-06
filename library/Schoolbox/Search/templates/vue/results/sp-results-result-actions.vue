@@ -34,7 +34,16 @@ async function awardBadge(type: SPBadgeAward["type"]): Promise<void> {
     <sbx-pop-out :content-id="`dropdown-${props.result.id}`"></sbx-pop-out>
     <ul :id="`dropdown-${props.result.id}`" class="f-dropdown" data-dropdown-content>
         <li v-for="link in props.result._links" :key="link.id">
-            <a v-if="link.action === undefined" :href="link.url" :class="link.icon">{{ link.title }}</a>
+            <a v-if="link.action === undefined && !link.disabled" :href="link.url" :class="link.icon">{{
+                link.title
+            }}</a>
+            <a
+                v-else-if="link.action === undefined && link.disabled"
+                :class="link.icon"
+                class="menu_disabled"
+                aria-disabled="true"
+                >{{ link.title }}</a
+            >
             <template v-else-if="link.action === 'awardAchievementModal'">
                 <a :class="link.icon" @click.prevent="awardBadge('achievement')">{{ link.title }}</a>
             </template>

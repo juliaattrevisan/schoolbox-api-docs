@@ -7,4 +7,5 @@ export type ResultLink = {
     title: string;
     icon?: string;
     action?: "awardAchievementModal" | "setGoalModal"; // actions that aren't just a link (for example opening a modal)
+    disabled?: boolean;
 };
