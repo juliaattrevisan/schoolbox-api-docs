@@ -84,6 +84,9 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
                                     >?</span
                                 >
                             </label>
+                            <label v-if="props.colourErrors[option.id]" class="error" :for="`${option.name}-field`">
+                                {{ props.colourErrors[option.id] }}
+                            </label>
                             <div v-if="option.type === 'colour'">
                                 <input
                                     :id="`${option.name}-field`"
@@ -96,9 +99,6 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
                                     @input="onPreviewRefresh"
                                     @change="onPreviewRefresh"
                                 />
-                                <label v-if="props.colourErrors[option.id]" class="error" :for="`${option.name}-field`">
-                                    {{ props.colourErrors[option.id] }}
-                                </label>
                             </div>
                             <div v-else-if="option.type === 'textarea'">
                                 <textarea

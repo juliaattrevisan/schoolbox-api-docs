@@ -408,6 +408,7 @@ class ConfigMapper extends Mapper
     public const string NAME_SONAR_SKIN_COLOUR_ACCENT = 'skin_colour_accent';
     public const string NAME_SONAR_SKIN_COLOUR_ACCENT_TEXT = 'skin_colour_accent_text';
     public const string NAME_SONAR_SKIN_COLOUR_ACTIVE = 'skin_colour_active';
+    public const string NAME_SKIN_CONFIG_LAST_MODIFIED = 'skin_config_last_modified';
 
 
     /* Skin Config Categories
