@@ -49,6 +49,7 @@ class Mapper extends BaseMapper
     {
         $collection = $this->createCollection();
 
+        $folderToHydrateCode = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $participant = $this->hydrate($row);
             $planMapper = $this->getJoinMapper('plan');
@@ -64,12 +65,6 @@ class Mapper extends BaseMapper
                 );
             }
 
-            /* Hydrating participant if they already exist in the collection but handles
-             * where the participant might have properties that might be a collection (ie Campus or Folde Codes)
-             * that need to be added to the existing participant in the collection
-             */
-            /** @var \Schoolbox\Resource\Folder\Code\Model $folderCode */
-            $folderCode = $assessmentMapper->getJoinMapper('assessment_course_unit_implementation.course.folder')->hydrateJoin($row, 'codes', 'fc');
             $campus =  $this->getJoinMapper('user.userCampus')->hydrate($row, 'c');
             if ($collection->keyExists($participant->getId())) {
                 /** @var Model $participation */
@@ -84,10 +79,10 @@ class Mapper extends BaseMapper
                 } else {
                     $folder = $assessmentContext ?? $participation->getPlan()->getAssessment()->getContextFolder();
                 }
-                /* Append folder code
+                /* Append folder for code hydration later
                  */
-                if ($folder && $folderCode !== null) {
-                    $folder->addCode($folderCode);
+                if ($folder !== null) {
+                    $folderToHydrateCode[] = $folder;
                 }
                 /* Append campus
                  */
@@ -117,15 +112,12 @@ class Mapper extends BaseMapper
             $courseImplementation = $assessmentMapper->hydrateJoin($row, 'assessment_course_unit_implementation.course', 'ci');
             /** @var \Schoolbox\Resource\Folder\Model $folder */
             $folder = $assessmentMapper->hydrateJoin($row, 'assessment_course_unit_implementation.course.folder', 'f');
-            /* Always create a new collection for folder codes as there
-             * might be multiple folder codes for the same folder depending on the number
-             * of records returned from the query
+
+            /* Append folder for code hydration later
              */
-            $folderCodeCollection = FolderCode::createCollection();
-            if (null !== $folderCode) {
-                $folderCodeCollection->add($folderCode);
+            if ($folder !== null) {
+                $folderToHydrateCode[] = $folder;
             }
-            $folder->setCodes($folderCodeCollection);
 
             if (null !== $courseImplementation) {
                 /* Hydrating folder for class details
@@ -161,6 +153,14 @@ class Mapper extends BaseMapper
             $collection[$participant->getId()] = $participant;
         }
 
+        if ($folderToHydrateCode !== []) {
+            /** @var \Schoolbox\Resource\Folder\Code\Mapper $folderCodeMapper */
+            $folderCodeMapper = $assessmentMapper->getJoinMapper('assessment_course_unit_implementation.course.folder.codes');
+            $folderCodeMapper->applyCodesToCategories(
+                new GenericCollection(\Schoolbox\Resource\Folder\Model::class, $folderToHydrateCode)
+            );
+        }
+
         return $collection;
     }
 
@@ -180,8 +180,7 @@ class Mapper extends BaseMapper
                    {$this->getJoinColumnString('plan.assessment.work_type', 'wt')},
                    {$this->getJoinColumnString('plan.assessment.assessment_course_unit_implementation', 'cui')},
                    {$this->getJoinMapper('plan.assessment.assessment_course_unit_implementation')->getJoinColumnString('course', 'ci')},
-                   {$this->getJoinMapper('plan.assessment.assessment_course_unit_implementation')->getJoinColumnString('course.folder', 'f')},
-                   {$this->getJoinMapper('plan.assessment.assessment_course_unit_implementation')->getJoinColumnString('course.folder.codes', 'fc')}
+                   {$this->getJoinMapper('plan.assessment.assessment_course_unit_implementation')->getJoinColumnString('course.folder', 'f')}
         ";
     }
 
@@ -208,7 +207,6 @@ class Mapper extends BaseMapper
             LEFT JOIN course_unit_implementation cui ON mvar.course_unit_implementation_id = cui.id
             LEFT JOIN course_implementation ci ON mvar.course_implementation_id = ci.id
             LEFT JOIN folder f ON mvar.folder_id = f.id
-            LEFT JOIN folder_code fc ON f.id = fc.folder_id AND fc.deleted_at IS NULL
             LEFT JOIN assessment oa ON a.original_assessment_id = oa.id
             LEFT JOIN lu_work_type wt ON a.work_type_id = wt.id
             LEFT JOIN differentiation_profiles ON differentiation_profiles.student_id = u.id
