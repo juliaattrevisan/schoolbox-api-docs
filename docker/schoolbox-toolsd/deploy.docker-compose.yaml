@@ -14,6 +14,8 @@ services:
       context: ./schoolbox-toolsd
       args:
         PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
+    environment:
+      TOOLSD_API_KEY: ${TOOLSD_API_KEY:-}
     env_file:
       - path: ./schoolbox-toolsd/default.env
         required: true
@@ -126,3 +128,20 @@ services:
     ports:
       - ${TOOLSD_FLOWER_PUBLISHED_PORT:-5555}:5555
     command: [src/main.py, flower]
+
+  # Reverse proxy in front of the toolsd HTTP API.
+  # A real deployment terminates TLS here and may load-balance across
+  # multiple schoolbox-toolsd-api containers; in this testing environment
+  # it's a plain HTTP passthrough so the same topology is exercised locally.
+  schoolbox-toolsd-proxy:
+    depends_on:
+      - schoolbox-toolsd-api
+    build:
+      context: ./schoolbox-toolsd/proxy
+    configs:
+      - source: toolsd-proxy
+        target: /etc/caddy/
+
+configs:
+  toolsd-proxy:
+    file: ./schoolbox-toolsd/proxy/config/

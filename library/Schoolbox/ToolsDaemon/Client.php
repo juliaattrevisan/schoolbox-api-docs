@@ -14,6 +14,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use JsonException;
 use Psr\Http\Message\UriInterface;
+use SensitiveParameter;
 
 /**
  * A client to Schoolbox's tools daemon.
@@ -21,14 +22,21 @@ use Psr\Http\Message\UriInterface;
 class Client implements IClient
 {
     /**
+     * The name of the HTTP header within which the API key is sent.
+     */
+    public const API_KEY_HEADER = 'x-api-key';
+
+    /**
      * Constructor
      *
      * @param ClientInterface $httpClient The HTTP client to send requests to.
      * @param UriInterface    $baseUri    The base URI of the client.
+     * @param string|null     $apiKey     If provided: the API key to use.
      */
     public function __construct(
         private ClientInterface $httpClient,
         private UriInterface $baseUri,
+        #[SensitiveParameter] private ?string $apiKey,
     ) {
     }
 
@@ -41,7 +49,7 @@ class Client implements IClient
             $response = $this->httpClient->request(
                 'POST',
                 $this->baseUri->withPath('/run'),
-                [RequestOptions::JSON => $request->toPayload()],
+                $this->buildBaseOptions() + [RequestOptions::JSON => $request->toPayload()],
             );
         } catch (GuzzleException $e) {
             throw new ClientException('Tools daemon returned an error: ' . $e->getMessage(), $e->getCode(), $e);
@@ -68,6 +76,7 @@ class Client implements IClient
             $response = $this->httpClient->request(
                 'GET',
                 $this->baseUri->withPath("/jobs/$jobId"),
+                $this->buildBaseOptions(),
             );
         } catch (GuzzleException $e) {
             throw new ClientException('Tools daemon returned an error: ' . $e->getMessage(), $e->getCode(), $e);
@@ -96,6 +105,7 @@ class Client implements IClient
             $response = $this->httpClient->request(
                 'GET',
                 $this->baseUri->withPath("/jobs/$jobId/output"),
+                $this->buildBaseOptions(),
             );
         } catch (GuzzleException $e) {
             throw new ClientException('Tools daemon returned an error: ' . $e->getMessage(), $e->getCode(), $e);
@@ -112,5 +122,21 @@ class Client implements IClient
             isset($responseBody['stdout']) ? (array)$responseBody['stdout'] : [],
             isset($responseBody['stderr']) ? (array)$responseBody['stderr'] : [],
         );
+    }
+
+    /**
+     * Build base options for the request.
+     *
+     * This will include the API key in its header, if it's set.
+     *
+     * @return array
+     */
+    private function buildBaseOptions(): array
+    {
+        $options = [];
+        if (isset($this->apiKey)) {
+            $options[RequestOptions::HEADERS][self::API_KEY_HEADER] = $this->apiKey;
+        }
+        return $options;
     }
 }

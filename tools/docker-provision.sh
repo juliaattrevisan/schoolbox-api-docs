@@ -9,6 +9,7 @@ declare REQUIRED_CONSTS=(SITE_ROOT CACHE_DIR)
 # Variables which must be provided directly via env vars
 declare CONFIG_DATE_TIMEZONE
 declare INSTANCE_ID
+declare TOOLSD_API_KEY
 declare REQUIRED_ENV_VARS=(CONFIG_DATE_TIMEZONE INSTANCE_ID)
 
 # Variables which must be provided in the config files
@@ -313,7 +314,8 @@ function install_instance() {
     --config backup_dir "'/var/lib/schoolbox/${INSTANCE_ID}/backups'" \
     --config presidio_analysis_host "'http://presidio-analyzer:3000'" \
     --config presidio_anonymisation_host "'http://presidio-anonymizer:3000'" \
-    --config toolsd_host "'http://schoolbox-toolsd-api:8080'" \
+    --config toolsd_host "'http://schoolbox-toolsd-proxy:8080'" \
+    --config toolsd_api_key "'${TOOLSD_API_KEY:-}'" \
     ;
   then
     error "Unable to install instance. Exiting."
