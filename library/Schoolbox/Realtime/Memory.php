@@ -44,7 +44,7 @@ class Memory
      */
     public static function getUsage(int $pid): ?int
     {
-        $usage = file_get_contents("/proc/$pid/statm");
+        $usage = @file_get_contents("/proc/$pid/statm");
         if ($usage) {
             // statm values:
             // first value is vmSize (all allocated memory)
