@@ -321,6 +321,10 @@ class Report extends CliTool\App
             case 'set':
                 $length = array_sum(array_map('strlen', $redis->smembers($key)));
                 break;
+            case 'list':
+                // Read from list in chunks, rather than all at once
+                $length = $this->readListLength($key, $redis->llen(...), $redis->lrange(...));
+                break;
             case 'none':
                 $length = 0;
                 break;
@@ -608,5 +612,28 @@ class Report extends CliTool\App
             return -1;
         }
         return strcmp($instanceIdA, $instanceIdB);
+    }
+
+    /**
+     * Read list length, given a function which:
+     * * reads the length of a list
+     * * reads items from a list in a range
+     *
+     * @param string                                    $key        The Redis key to read from
+     * @param callable(string): int                     $lengthFunc The function for reading the length of the list
+     * @param callable(string, int, int): array<string> $rangeFunc  The function for reading elements from the list,
+     *                                                              given a key, start and end offset.
+     * @return int
+     */
+    private function readListLength(string $key, callable $lengthFunc, callable $rangeFunc): int
+    {
+        $length     = 0;
+        $listLength = $lengthFunc($key);
+        $chunkSize  = 1000;
+        for ($i = 0; $i < $listLength; $i += $chunkSize) {
+            $values = $rangeFunc($key, $i, min($i + $chunkSize - 1, $listLength - 1));
+            $length += array_sum(array_map('strlen', $values));
+        }
+        return $length;
     }
 }
