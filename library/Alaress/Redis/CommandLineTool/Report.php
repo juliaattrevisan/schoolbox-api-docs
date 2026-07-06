@@ -329,7 +329,7 @@ class Report extends CliTool\App
                 $length = 0;
                 break;
             case 'zset':
-                $length = $this->readListLength($key, $redis->zcard(...), $redis->zrange(...));
+                $length = array_sum(array_map('strlen', $redis->zrange($key, 0, -1)));
                 break;
             default:
                 $this->getLogger()->warning("Unrecognised payload: '{$type}'");
