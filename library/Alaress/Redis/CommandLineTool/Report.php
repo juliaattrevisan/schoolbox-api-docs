@@ -322,7 +322,14 @@ class Report extends CliTool\App
                 $length = array_sum(array_map('strlen', $redis->smembers($key)));
                 break;
             case 'list':
-                $length = array_sum(array_map('strlen', $redis->lrange($key, 0, -1)));
+                // Read from list in chunks, rather than all at once
+                $length     = 0;
+                $listLength = $redis->llen($key);
+                $chunkSize  = 1000;
+                for ($i = 0; $i < $listLength; $i += $chunkSize) {
+                    $values = $redis->lrange($key, $i, min($i + $chunkSize - 1, $listLength - 1));
+                    $length += array_sum(array_map('strlen', $values));
+                }
                 break;
             case 'none':
                 $length = 0;
