@@ -147,8 +147,8 @@ class Controller extends Base
             /** since this route is loaded for a specific participant, only that participant is hydrated by the module. we need the rest */
             $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment);
             foreach ($assessment->getAllParticipants() as $participant) {
-                /* Are they excluded? ignore them */
-                if ($participant->isExcluded()) {
+                /* Are they excluded? ignore them, unless this direct URL is for that learner. */
+                if ($participant->isExcluded() && $participant->getUser()->getId() !== $learner->getId()) {
                     continue;
                 }
 
@@ -173,6 +173,18 @@ class Controller extends Base
                     }
                 }
 
+                $statusLabel = $status->translate();
+                /**
+                 * Normal carousel navigation excludes excluded students, so reaching this state should be rare.
+                 * Stale, direct, or deliberate URLs can still target an excluded student when interrogating
+                 * specific customer or regional information, so expose this pseudo-status to render the selected
+                 * participant on a readonly explanatory page.
+                 */
+                if ($participant->isExcluded()) {
+                    $status = 'excluded';
+                    $statusLabel = 'Excluded';
+                }
+
                 $participantCarousel[] = [
                     'id' => $participant->getUser()->getId(),
                     'value' => $this->getRouteIfAuthorized('learningReportingFeedback.getParticularFeedback', [
@@ -184,7 +196,7 @@ class Controller extends Base
                     ]),
                     'user' => (new User\Translator\Author\ModelToArray())->__invoke($participant->getUser()),
                     'status' => $status,
-                    'statusLabel' => $status->translate(),
+                    'statusLabel' => $statusLabel,
                 ];
             }
         }
