@@ -449,7 +449,7 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
         $poolStats       = $this->dispatcher->getPoolStatus();
         $memory          = $pid ? Memory::getUsage($pid) : null;
         if ($memory === null) {
-            $this->log?->warning("Could not determine memory usage for scheduler process {{$pid}}");
+            $this->log->warning("Could not determine memory usage for scheduler process {{$pid}}");
         }
         return [
             'memory'     => $memory,
