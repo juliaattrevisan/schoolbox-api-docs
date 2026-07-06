@@ -14,8 +14,6 @@ use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\Assessment\Participant\Model;
 use Schoolbox\Assessment\Participant\Plan\Mapper as PlanMapper;
-use Schoolbox\Campus;
-use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\Filter\Filters\CustomisationRecord;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
