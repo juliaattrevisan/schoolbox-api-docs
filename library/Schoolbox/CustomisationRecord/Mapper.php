@@ -49,11 +49,17 @@ class Mapper extends BaseMapper
     {
         $collection = $this->createCollection();
 
+        $planMapper = $this->getJoinMapper('plan');
+        $assessmentMapper = $planMapper->getJoinMapper('assessment');
+        $campusMapper = $this->getJoinMapper('user.userCampus');
+        $userMapper = $this->getJoinMapper('user');
+
         $folderToHydrateCode = [];
+        $userToHydrateCampus = [];
+
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $participant = $this->hydrate($row);
-            $planMapper = $this->getJoinMapper('plan');
-            $assessmentMapper = $planMapper->getJoinMapper('assessment');
+
             /* Hydrate plan with the assessment details too
              */
             $plan = $planMapper->hydrate($row, 'pp');
@@ -65,7 +71,6 @@ class Mapper extends BaseMapper
                 );
             }
 
-            $campus =  $this->getJoinMapper('user.userCampus')->hydrate($row, 'c');
             if ($collection->keyExists($participant->getId())) {
                 /** @var Model $participation */
                 $participation = $collection[$participant->getId()];
@@ -83,16 +88,6 @@ class Mapper extends BaseMapper
                  */
                 if ($folder !== null) {
                     $folderToHydrateCode[] = $folder;
-                }
-                /* Append campus
-                 */
-                if (null !== $campus) {
-                    $user = $participation->getUser();
-                    $campusCollection = $user->getCampusCollection();
-
-                    if (!$campusCollection->contains($campus)) {
-                        $user->setCampusCollection($campusCollection->add($campus));
-                    }
                 }
                 continue;
             }
@@ -137,28 +132,37 @@ class Mapper extends BaseMapper
             /** @var User $user */
             $user = $this->getJoinMapper('user')->hydrate($row, 'u');
             $user->setYear($this->getJoinMapper('user.year')->hydrate($row, 'y'));
-            /* Making sure the campus collection is not null and adding the campus to the collection if it exists,
-             * as there might be multiple campuses for a user depending on the number of records returned from the query
-             */
-            $campusCollection = Campus::createCollection();
-            if (null !== $campus) {
-                $campusCollection->add($campus);
-            }
-            $user->setCampusCollection($campusCollection);
 
             $participant->setPlan($plan);
             if (null !== $user) {
                 $participant->setUser($user);
+                $userToHydrateCampus[$user->getId()] = $user;
             }
             $collection[$participant->getId()] = $participant;
         }
 
+        /* Hydrating folder codes for the folders that are associated with the assessments
+         */
         if ($folderToHydrateCode !== []) {
             /** @var \Schoolbox\Resource\Folder\Code\Mapper $folderCodeMapper */
             $folderCodeMapper = $assessmentMapper->getJoinMapper('assessment_course_unit_implementation.course.folder.codes');
             $folderCodeMapper->applyCodesToCategories(
                 new GenericCollection(\Schoolbox\Resource\Folder\Model::class, $folderToHydrateCode)
             );
+        }
+
+        /* Hydrating campus collection for user
+         */
+        if ($userToHydrateCampus !== []) {
+            $campusesByUserId = $campusMapper->findForOtherMapper(
+                $userMapper,
+                'userCampus',
+                array_keys($userToHydrateCampus)
+            );
+
+            foreach ($userToHydrateCampus as $userId => $user) {
+                $user->setCampusCollection($campusesByUserId[$userId] ?? $campusMapper->createCollection());
+            }
         }
 
         return $collection;
@@ -174,7 +178,6 @@ class Mapper extends BaseMapper
                    {$this->getJoinColumnString('plan', 'pp')},
                    {$this->getJoinColumnString('user', 'u')},
                    {$this->getJoinColumnString('user.year', 'y')},
-                   {$this->getJoinColumnString('user.userCampus', 'c')},
                    {$this->getJoinColumnString('plan.assessment', 'a')},
                    {$this->getJoinColumnString('plan.assessment', 'oa')},
                    {$this->getJoinColumnString('plan.assessment.work_type', 'wt')},
