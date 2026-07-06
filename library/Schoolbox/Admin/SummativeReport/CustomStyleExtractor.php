@@ -26,6 +26,7 @@ class CustomStyleExtractor
      * increased specificity and thus override our existing html/css
      */
     private const REGEX = '/\.summative-report[^{]*{[^}]*}/';
+    private const WRAPPED_IMPORT_REGEX = '/^\s*\.summative-report\s*{\s*(@import\b[^}]*;)\s*}\s*$/';
 
 
     /**
@@ -54,11 +55,26 @@ class CustomStyleExtractor
         if (\count($matches[0])) {
             /* Return it, because then it gets rammed into the bottom of an existing inline stylesheet somewhere
              */
-            return implode("\n", $matches[0]);
+            return implode("\n", array_map($this->extractWrappedImport(...), $matches[0]));
         }
 
         /* No custom styles detected; return empty string
          */
         return '';
+    }
+
+    /**
+     * Returns a wrapped @import rule without the .summative-report selector.
+     *
+     * @param string $style
+     * @return string
+     */
+    private function extractWrappedImport(string $style): string
+    {
+        if (preg_match(self::WRAPPED_IMPORT_REGEX, $style, $matches)) {
+            return $matches[1];
+        }
+
+        return $style;
     }
 }
