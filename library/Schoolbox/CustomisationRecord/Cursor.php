@@ -81,7 +81,7 @@ class Cursor implements ICursor
         if (null === $context) {
             /* Assessment in a project, then look at the project context
              */
-            $context = $lastRecord->getPlan()->getAssessment()->getContextProject()->getAssessmentModel()->getContextUnitImplementation();
+            $context = $lastRecord->getPlan()->getAssessment()->getContextProject()?->getAssessmentModel()->getContextUnitImplementation();
         }
 
         /* Return customisation record cursor when ordered by class name
