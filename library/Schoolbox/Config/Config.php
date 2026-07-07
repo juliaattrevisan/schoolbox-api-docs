@@ -32,7 +32,7 @@ class Config
     /** @var string */
     private $title;
 
-    /** @var string */
+    /** @var null|string */
     private $description;
 
     /** @var int */
@@ -128,7 +128,7 @@ class Config
 
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getDescription(): ?string
     {
@@ -137,10 +137,10 @@ class Config
 
 
     /**
-     * @param string $description
+     * @param null|string $description
      * @return $this
      */
-    public function setDescription(string $description): self
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
         return $this;
