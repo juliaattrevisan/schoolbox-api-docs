@@ -10,4 +10,4 @@ CREATE TABLE `user_qualification` (
     UNIQUE KEY `unique_user_qualification` (`user_id`, `qualification_id`),
     KEY `idx_user_id` (`user_id`),
     KEY `idx_qualification_id` (`qualification_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

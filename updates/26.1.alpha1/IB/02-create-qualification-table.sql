@@ -49,7 +49,7 @@ CREATE TABLE `lu_qualification` (
         FOREIGN KEY (`system_purpose_id`) REFERENCES `ib_system_purposes` (`id`)
             ON DELETE SET NULL
             ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Insert initial qualification data that was previously hardcoded
 INSERT INTO `lu_qualification` (`name`, `system_purpose_id`, `sequence`) VALUES

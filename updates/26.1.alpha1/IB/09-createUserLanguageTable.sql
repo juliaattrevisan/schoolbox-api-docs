@@ -5,7 +5,7 @@ CREATE TABLE user_language
     language    int(11)    NOT NULL,
     CONSTRAINT fk_user_language_user_id
         FOREIGN KEY (user_id) REFERENCES user (id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE INDEX idx_user_language_user_id
     ON user_language (user_id);

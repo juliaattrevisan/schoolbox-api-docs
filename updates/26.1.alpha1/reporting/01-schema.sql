@@ -52,7 +52,7 @@ CREATE TABLE `reporting` (
         REFERENCES `user` (`id`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- This is different to curriculum_node_for_assessment despite being the same schema.
 -- rcn means "filter the mega markbook to only show assessments that used descendents of this curriculum node(s)"
@@ -76,7 +76,7 @@ CREATE TABLE `reporting_curriculum_node` (
             REFERENCES `curriculum_node` (`id`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Similarly, this means "filter the mega markbook to only show assessments that had one or more of these work types"
 -- It does not mean "this reporting activity has this work type" (that's on the assessment table)
@@ -96,7 +96,7 @@ CREATE TABLE `reporting_work_type` (
             REFERENCES `lu_work_type` (`id`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- A somewhat teacher-discretionary feedback that is meant to represent the student's achievements holistically
 --
@@ -142,8 +142,7 @@ CREATE TABLE `reporting_feedback` (
             REFERENCES `user` (`id`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
-);
-
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Reporting is a Terminology row
 INSERT INTO
