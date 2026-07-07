@@ -430,6 +430,14 @@ class Processor
             }
         }
 
+        /* No rows? No trabajo
+         */
+        if (0 === $i) {
+            $this->log('No data rows found.', IStrategy::WARNING);
+
+            $errors++;
+        }
+
         /* Collect all the messages from all the feedback strats
          */
         $messages = array_merge(
