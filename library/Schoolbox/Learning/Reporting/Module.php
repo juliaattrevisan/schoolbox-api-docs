@@ -13,14 +13,12 @@ namespace Schoolbox\Learning\Reporting;
 use Alaress\Authorizer\Rule;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Module\Module as BaseModule;
-use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use Schoolbox\Learning\Authorizer\Rule\HasParticipant;
 use Schoolbox\Learning\Markbook\FeedbackFolders;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -44,7 +42,6 @@ class Module extends BaseModule
     protected function registerRoutes(): void
     {
         /* LMS-friendly Staff can see the form
-         * Check for participants to avoid showing the feedback pages when it'll go nowhere useful
          */
         $canGiveFeedbackForAssessment = new Rule\All(
             new Rule\IsLoggedIn(),
@@ -52,7 +49,6 @@ class Module extends BaseModule
                 new Rule\IsSuperuser(),
                 new Rule\HasRolePermission(Role::PERMISSION_VIEW_STUDENT_GRADES, Role::STAFF),
             ),
-            new HasParticipant(),
         );
 
         /* Preloaders
