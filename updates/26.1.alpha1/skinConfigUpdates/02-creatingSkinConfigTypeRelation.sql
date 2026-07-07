@@ -4,7 +4,7 @@
 CREATE TABLE lu_skin_config_category (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO
     lu_skin_config_category (`name`)
@@ -19,7 +19,7 @@ CREATE TABLE lu_skin_config_subcategory (
     name VARCHAR(100),
     KEY idx_skin_config_category_category_id (category_id),
     CONSTRAINT fk_skin_config_category_category FOREIGN KEY (category_id) REFERENCES lu_skin_config_category (id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 SET
     @category_colours = (
@@ -178,7 +178,7 @@ CREATE TABLE skin_config_category (
     KEY idx_skin_config_category_subcategoryId (subcategory_id),
     CONSTRAINT fk_skin_config_category_config FOREIGN KEY (configID) REFERENCES config (configID),
     CONSTRAINT fk_skin_config_category_subcategory FOREIGN KEY (subcategory_id) REFERENCES lu_skin_config_subcategory (id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO
     skin_config_category (configID, subcategory_id)

@@ -5,14 +5,14 @@ CREATE TABLE `lu_ib_groups` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `name` varchar(255) NOT NULL,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Table for IB Subjects
 CREATE TABLE `lu_ib_subjects` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `name` varchar(255) NOT NULL,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Junction table for Group-Subject relationships with levels
 CREATE TABLE `ib_group_subjects` (
@@ -26,7 +26,7 @@ CREATE TABLE `ib_group_subjects` (
     KEY `idx_level` (`level`),
     CONSTRAINT `fk_ib_group_subjects_group` FOREIGN KEY (`group_id`) REFERENCES `lu_ib_groups` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_ib_group_subjects_subject` FOREIGN KEY (`subject_id`) REFERENCES `lu_ib_subjects` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Insert IB Groups (Groups 1-6 + Core)
 INSERT INTO `lu_ib_groups` (`name`) VALUES
