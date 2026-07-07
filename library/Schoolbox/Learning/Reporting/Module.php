@@ -44,7 +44,6 @@ class Module extends BaseModule
     protected function registerRoutes(): void
     {
         /* LMS-friendly Staff can see the form
-         * Check for participants to avoid showing the feedback pages when it'll go nowhere useful
          */
         $canGiveFeedbackForAssessment = new Rule\All(
             new Rule\IsLoggedIn(),
@@ -52,7 +51,6 @@ class Module extends BaseModule
                 new Rule\IsSuperuser(),
                 new Rule\HasRolePermission(Role::PERMISSION_VIEW_STUDENT_GRADES, Role::STAFF),
             ),
-            new HasParticipant(),
         );
 
         /* Preloaders
