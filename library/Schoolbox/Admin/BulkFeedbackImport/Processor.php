@@ -311,17 +311,17 @@ class Processor
 
             if (\count($candidateAssessments) > 1) {
                 $this->log(sprintf(
-                    'Row %s: multiple %s found for %s "%s" in folder "%s" (%s) using Work Type "%s" (%s).
+                    'Row %s: multiple matching %s found for %s "%s" in folder "%s" (%s) using Work Type "%s" (%s).
                     Please ensure %s are uniquely identifiable before continuing.',
                     $i,
                     $this->rosettaStone->translate('activity', true),
                     $this->rosettaStone->translate('activity', false),
-                    $this->rosettaStone->translate('activity', true),
                     $this->assessmentTitle,
                     $folder['title'],
                     $folder['id'],
                     $this->workType->getName(),
-                    $this->workType->getId()
+                    $this->workType->getId(),
+                    $this->rosettaStone->translate('activity', true),
                 ), IStrategy::WARNING);
 
                 $errors++;
