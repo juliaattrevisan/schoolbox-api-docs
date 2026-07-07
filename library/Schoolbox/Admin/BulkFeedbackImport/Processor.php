@@ -413,7 +413,7 @@ class Processor
                  * containing only the Mark Scheme chosen by the assessment...
                  */
                 /** @var \Schoolbox\Learning\Assessment\Reporting\Model $assessment */
-                $assessment = $this->assessmentMapperProxy->findById($assessmentData['assessment_id']);
+                $assessment = $this->assessmentMapperProxy->findByIdForReview($assessmentData['assessment_id']);
 
                 /* Interpret the csv structure to figure out where marks come from and how to derive all three pieces
                  */
