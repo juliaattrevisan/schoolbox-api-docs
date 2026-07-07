@@ -86,6 +86,20 @@ class OauthProviderIssued extends Base
             )
         );
 
+        // If no issuer is provided: always return true:
+        // it cannot be taken for granted that third-party providers will even
+        // contain this claim, as it is technically optional.
+        if ($oauthIssuer === '') {
+            $this->log->warning(
+                sprintf(
+                    'Config "%s" is empty: accepting regardless of JWT claim "%s". (This should be removed in the future)',
+                    ConfigMapper::NAME_OAUTH_ISSUER,
+                    self::CLAIM_ISS,
+                )
+            );
+            return true;
+        }
+
         // If the issuer is provided: it must match the issuer in the JWT
         return $jwtIssuer === $oauthIssuer;
     }
