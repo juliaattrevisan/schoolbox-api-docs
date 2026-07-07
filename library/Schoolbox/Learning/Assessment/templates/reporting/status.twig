@@ -19,30 +19,35 @@
             <h1 data-test="assessment-status-meta-title">Status of {{ assessment.title }}</h1>
         </div>
     </div>
-    <nav>
-        <sbx-pop-out content-id="header-options" data-test="sbx-pop-out-header-options"></sbx-pop-out>
-    </nav>
-    <ul id="header-options" class="f-dropdown" data-dropdown-content data-assessment="{{ assessment.id }}">
-        {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
 
-        {% if modifyRoute %}
-            {% include '@learningAssessment/fragments/modifyLinks.twig' with {
-                assessment: assessment,
-                modifyRoute: modifyRoute,
-                returnUrlName: RETURN_URL.name,
-                returnUrl: RETURN_URL.current,
-            } only %}
-        {% endif %}
+    {# Only show the tot if at least one of these is meaningful #}
+    {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
 
-        {% set viewCustomParticipationRoute = routeLookupIfAuthorized('learningAssessment.getAssessmentParticipationForm', {
-            assessmentId: assessment.id,
-            assessment: assessment
-        }) %}
+    {% set viewCustomParticipationRoute = routeLookupIfAuthorized('learningAssessment.getAssessmentParticipationForm', {
+        assessmentId: assessment.id,
+        assessment: assessment
+    }) %}
 
-        {% if viewCustomParticipationRoute %}
-            <li><a href="{{ viewCustomParticipationRoute }}" class="sbx-button--has-icon"><sbx-icon name="group"></sbx-icon>Student Participation</a></li>
-        {% endif %}
-    </ul>
+    {% if modifyRoute or viewCustomParticipationRoute %}
+        <nav>
+            <sbx-pop-out content-id="header-options" data-test="sbx-pop-out-header-options"></sbx-pop-out>
+        </nav>
+
+        <ul id="header-options" class="f-dropdown" data-dropdown-content data-assessment="{{ assessment.id }}">
+            {% if modifyRoute %}
+                {% include '@learningAssessment/fragments/modifyLinks.twig' with {
+                    assessment: assessment,
+                    modifyRoute: modifyRoute,
+                    returnUrlName: RETURN_URL.name,
+                    returnUrl: RETURN_URL.current,
+                } only %}
+            {% endif %}
+
+            {% if viewCustomParticipationRoute %}
+                <li><a href="{{ viewCustomParticipationRoute }}" class="sbx-button--has-icon"><sbx-icon name="group"></sbx-icon>Student Participation</a></li>
+            {% endif %}
+        </ul>
+    {% endif %}
 </div>
 
 <div id="reporting-markbook-container" class="marksheet-wrapper row" data-markbook-outer-container>
