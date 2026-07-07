@@ -440,6 +440,22 @@ class Processor
                  * it relies on the mapper callbacks to execute.
                  */
                 try {
+                    $participant = $assessment->getParticipantIfExtant($learner);
+
+                    /* Check at Preview screen
+                     */
+                    if (null === $participant) {
+                        $this->log(sprintf(
+                            'Row %s: participation error (most likely due to exclusion for student %s, or other participation plan errors)',
+                            $i,
+                            $externalId,
+                        ), IStrategy::WARNING);
+
+                        $errors++;
+
+                        continue;
+                    }
+
                     $feedbackStrategy->processRow(
                         $i,
                         $folder,
@@ -454,6 +470,8 @@ class Processor
                         $creator
                     );
                 } catch (InvalidState $e) {
+                    /* Safeguard at Perform screen
+                     */
                     $this->log(sprintf(
                         'Row %s: participation error (most likely due to exclusion for student %s, or other participation plan errors)',
                         $i,
