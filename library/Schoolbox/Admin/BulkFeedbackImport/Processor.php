@@ -19,6 +19,7 @@ use Schoolbox\Admin\BulkFeedbackImport\Strategy\Mark\NormalisedMark;
 use Schoolbox\Admin\Import\Profile\Reader;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Participant\Plan\InvalidState;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
@@ -431,19 +432,38 @@ class Processor
                     continue;
                 }
 
-                $feedbackStrategy->processRow(
-                    $i,
-                    $folder,
-                    $learner,
-                    $assessment,
-                    $assessmentData,
-                    $adf,
-                    $vals['normalisedMark'],
-                    $vals['learnerHumanReadableMark'],
-                    $vals['instructorHumanReadableMark'],
-                    $row['Comment'],
-                    $creator
-                );
+                /* Deep in the swamp, the Assessment Mapper Proxy throws InvalidState exceptions which are totally
+                 * undocumented through the docblocks. They're thrown when participation plans, for whatever reason,
+                 * deny saving via the participation-related callbacks that use insertParticipationOnFirstInteraction()
+                 *
+                 * You can only experience this when Performing the import as it requires an actual save to occur;
+                 * it relies on the mapper callbacks to execute.
+                 */
+                try {
+                    $feedbackStrategy->processRow(
+                        $i,
+                        $folder,
+                        $learner,
+                        $assessment,
+                        $assessmentData,
+                        $adf,
+                        $vals['normalisedMark'],
+                        $vals['learnerHumanReadableMark'],
+                        $vals['instructorHumanReadableMark'],
+                        $row['Comment'],
+                        $creator
+                    );
+                } catch (InvalidState $e) {
+                    $this->log(sprintf(
+                        'Row %s: participation error (most likely due to exclusion for student %s, or other participation plan errors)',
+                        $i,
+                        $externalId,
+                    ), IStrategy::WARNING);
+
+                    $errors++;
+
+                    continue;
+                }
             }
         }
 
