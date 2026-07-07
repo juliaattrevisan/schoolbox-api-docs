@@ -23,6 +23,7 @@ use Schoolbox\Assessment\Participant\Plan\InvalidState;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -413,7 +414,7 @@ class Processor
                  * containing only the Mark Scheme chosen by the assessment...
                  */
                 /** @var \Schoolbox\Learning\Assessment\Reporting\Model $assessment */
-                $assessment = $this->assessmentMapperProxy->findByIdForReview($assessmentData['assessment_id']);
+                $assessment = $this->assessmentMapperProxy->findById($assessmentData['assessment_id']);
 
                 /* Interpret the csv structure to figure out where marks come from and how to derive all three pieces
                  */
@@ -440,6 +441,12 @@ class Processor
                  * it relies on the mapper callbacks to execute.
                  */
                 try {
+                    /* TODO Maybe this would benefit from locally caching an assessment, but then again, there might be
+                     *  thousands upon thousands of rows (and assessments) so storing them all in memory might be way
+                     *  too expensive. Instead, just care about one; trade space for time.
+                     */
+                    $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection((new \Schoolbox\GenericCollection(IAssessable::class))->add($assessment));
+
                     $participant = $assessment->getParticipantIfExtant($learner);
 
                     /* Check at Preview screen
