@@ -139,7 +139,11 @@ class Controller extends Base
             // Try to process a rubric.
             // If there was none, copy it from the last feedback
             if (!$this->processRubric($participant, $post, $feedback)) {
-                if ($assessment->getRubricInstances()->count() && $feedback->getId() != $mostRecentFeedback->getId()) {
+                if (
+                    $mostRecentFeedback !== null
+                    && $assessment->getRubricInstances()->count()
+                    && $feedback->getId() != $mostRecentFeedback->getId()
+                ) {
                     $this->rubricMapper->copySelections($mostRecentFeedback, $feedback);
                 }
             }
