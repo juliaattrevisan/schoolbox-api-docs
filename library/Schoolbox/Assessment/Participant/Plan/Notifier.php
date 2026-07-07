@@ -494,12 +494,12 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         );
 
         // Write-users see all participants, others see only themselves
-        $contextUser = $user;
+        $users = (new \Schoolbox\Collection())->add($user);
         if ($access->getFolderAccess($user, (int)$context) >= UserAccess::ACCESS_WRITE) {
-            $contextUser = null;
+            $users = null;
         }
 
-        $assessments = $this->assessmentDataSource->findAllByFolderIdForReview(folderId: $context, users: (new \Schoolbox\Collection())->add($contextUser))
+        $assessments = $this->assessmentDataSource->findAllByFolderIdForReview(folderId: $context, users: $users)
             ->map([$mutator, 'map'])
             ->filter([$mutator, 'filter']);
 
