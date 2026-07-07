@@ -782,7 +782,7 @@ CREATE TABLE `calendar_connector` (
   KEY `status_idx` (`status`),
   KEY `connector_idx` (`connector_class`(191)),
   KEY `type_idx` (`event_type`(191))
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -867,7 +867,7 @@ CREATE TABLE `clipboard_import_log` (
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `finish_at_idx` (`finish_at`,`status`)
-) ENGINE=InnoDB AUTO_INCREMENT=17434 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17435 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1243,7 +1243,7 @@ CREATE TABLE `config` (
   KEY `config_type_id` (`type_id`),
   CONSTRAINT `fk_config_field_id` FOREIGN KEY (`field_id`) REFERENCES `lu_config_field` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_config_type_id` FOREIGN KEY (`type_id`) REFERENCES `lu_config_type` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=785 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=798 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3304,7 +3304,7 @@ CREATE TABLE `ib_group_subjects` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `group_id` int(11) NOT NULL,
   `subject_id` int(11) NOT NULL,
-  `level` enum('HL','SL') DEFAULT NULL COMMENT 'Level is null for Core subjects',
+  `level` enum('HL','SL','EE','TK','MY') DEFAULT NULL COMMENT 'Level is null for Creative, Activity, Service (CAS) as it doesn''t have grading',
   PRIMARY KEY (`id`),
   KEY `idx_group_id` (`group_id`),
   KEY `idx_subject_id` (`subject_id`),
@@ -3312,6 +3312,33 @@ CREATE TABLE `ib_group_subjects` (
   CONSTRAINT `fk_ib_group_subjects_group` FOREIGN KEY (`group_id`) REFERENCES `lu_ib_groups` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_ib_group_subjects_subject` FOREIGN KEY (`subject_id`) REFERENCES `lu_ib_subjects` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `ib_registration_api_response_log`
+--
+
+DROP TABLE IF EXISTS `ib_registration_api_response_log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `ib_registration_api_response_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `registration_session_id` int(11) NOT NULL,
+  `registration_session_student_id` int(11) DEFAULT NULL,
+  `msg_id` char(96) CHARACTER SET ascii COLLATE ascii_general_ci DEFAULT NULL,
+  `request_type` varchar(50) NOT NULL,
+  `status` varchar(20) NOT NULL,
+  `source` varchar(30) NOT NULL DEFAULT 'ibis_api',
+  `message` text DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_ib_registration_api_response_log_session_id` (`registration_session_id`),
+  KEY `idx_ib_registration_api_response_log_student_id` (`registration_session_student_id`),
+  KEY `idx_ib_registration_api_response_log_msg_id` (`msg_id`),
+  KEY `idx_ib_registration_api_response_log_created_at` (`created_at`),
+  CONSTRAINT `fk_ib_registration_api_response_log_session` FOREIGN KEY (`registration_session_id`) REFERENCES `ib_registration_sessions` (`id`),
+  CONSTRAINT `fk_ib_registration_api_response_log_student` FOREIGN KEY (`registration_session_student_id`) REFERENCES `ib_registration_session_student` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3937,7 +3964,7 @@ CREATE TABLE `lu_config_type` (
   `sequence` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `lu_config_type_type` (`type`)
-) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3979,8 +4006,11 @@ DROP TABLE IF EXISTS `lu_ib_subjects`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `lu_ib_subjects` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `transcript_name` varchar(255) DEFAULT NULL COMMENT 'The name of the subject as it should appear on the transcript and used to send to API. ie. THEORY KNOWL. instead of Theory of Knowledge',
   `name` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `idx_lu_ib_subjects_transcript_name` (`transcript_name`),
+  KEY `idx_lu_ib_subjects_name` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -6479,7 +6509,7 @@ CREATE TABLE `rubric_instance` (
   CONSTRAINT `fk_ri_assessment` FOREIGN KEY (`assessment_id`) REFERENCES `assessment` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_ri_rcggi` FOREIGN KEY (`rubric_capability_grade_group_id`) REFERENCES `submission_grade_group` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_ri_rcmti` FOREIGN KEY (`rubric_capability_mark_type_id`) REFERENCES `submission_mark_type` (`mark_type_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=630 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1024 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -7646,9 +7676,9 @@ CREATE TABLE `submission_box` (
   `_mark_visibility` tinyint(1) NOT NULL DEFAULT 0,
   `mark_visibility` enum('staffOnly','staffAndStudent','staffAndParent','staffStudentAndParent') NOT NULL DEFAULT 'staffOnly',
   `skip_unsubmitted` int(1) NOT NULL DEFAULT 0 COMMENT 'Skip students who haven''t submitted Due Work, in the People Selector',
-  `use_rubric` int(1) unsigned NOT NULL DEFAULT 0,
-  `rubric_capability_mark_type_id` int(11) DEFAULT NULL,
-  `rubric_capability_grade_group_id` int(11) DEFAULT NULL,
+  `_use_rubric` int(1) unsigned NOT NULL DEFAULT 0,
+  `_rubric_capability_mark_type_id` int(11) DEFAULT NULL,
+  `_rubric_capability_grade_group_id` int(11) DEFAULT NULL,
   `_rubric_mark_range` int(1) unsigned NOT NULL DEFAULT 0,
   `self_reviewability` enum('none','reflect-only','full') NOT NULL,
   `similarity_check_enabled` tinyint(4) NOT NULL DEFAULT 0,
@@ -7659,13 +7689,9 @@ CREATE TABLE `submission_box` (
   KEY `submission_grade_group_id` (`submission_grade_group_id`),
   KEY `fk_submission_box_mark_type` (`mark_type`),
   KEY `idx_submission_box_external_id` (`external_id`),
-  KEY `fk_rubric_capability_mark_type` (`rubric_capability_mark_type_id`),
-  KEY `fk_rubric_capability_grade_group` (`rubric_capability_grade_group_id`),
   KEY `submission_box_storage_hash_fk` (`worksheet_template_hash`),
   KEY `fk_submission_box_instructor_mark_type` (`instructor_mark_type`),
   KEY `fk_submission_box_submission_instructor_grade_group_id` (`submission_instructor_grade_group_id`),
-  CONSTRAINT `fk_rubric_capability_grade_group` FOREIGN KEY (`rubric_capability_grade_group_id`) REFERENCES `submission_grade_group` (`id`),
-  CONSTRAINT `fk_rubric_capability_mark_type` FOREIGN KEY (`rubric_capability_mark_type_id`) REFERENCES `submission_mark_type` (`mark_type_id`),
   CONSTRAINT `fk_submission_box_assessment_id` FOREIGN KEY (`assessment_id`) REFERENCES `assessment` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_submission_box_instructor_mark_type` FOREIGN KEY (`instructor_mark_type`) REFERENCES `submission_mark_type` (`mark_type_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_submission_box_mark_type` FOREIGN KEY (`mark_type`) REFERENCES `submission_mark_type` (`mark_type_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -8861,7 +8887,7 @@ CREATE TABLE `user_qualification` (
   UNIQUE KEY `unique_user_qualification` (`user_id`,`qualification_id`),
   KEY `idx_user_id` (`user_id`),
   KEY `idx_qualification_id` (`qualification_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -9005,6 +9031,8 @@ SET character_set_client = utf8mb4;
   1 AS `assessment_grade_group_id`,
   1 AS `assessment_weight`,
   1 AS `rubric_instance_id`,
+  1 AS `rubric_instance_title`,
+  1 AS `rubric_instance_weight`,
   1 AS `capability_mark_type_id`,
   1 AS `capability_grade_group_id`,
   1 AS `capability_id`,
@@ -9331,7 +9359,7 @@ CREATE TABLE `wikiRevision` (
 /*!50001 SET collation_connection      = utf8mb4_uca1400_ai_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
 /*!50013 DEFINER=`schoolboxdocker`@`%` SQL SECURITY DEFINER */
-/*!50001 VIEW `v_rubric` AS select `rubricSummary`.`assessment_id` AS `assessment_id`,`rubricSummary`.`assessment_title` AS `assessment_title`,`rubricSummary`.`assessment_mark_type` AS `assessment_mark_type`,`rubricSummary`.`assessment_max_mark` AS `assessment_max_mark`,`rubricSummary`.`assessment_grade_group_id` AS `assessment_grade_group_id`,`rubricSummary`.`assessment_weight` AS `assessment_weight`,`rubricSummary`.`rubric_instance_id` AS `rubric_instance_id`,`rubricSummary`.`capability_mark_type_id` AS `capability_mark_type_id`,`rubricSummary`.`capability_grade_group_id` AS `capability_grade_group_id`,`rubricSummary`.`capability_id` AS `capability_id`,`rubricSummary`.`capability_name` AS `capability_name`,`rubricSummary`.`capability_max_value` AS `capability_max_value`,`rubricSummary`.`capability_sequence` AS `capability_sequence`,`rubricSummary`.`indicator_id` AS `indicator_id`,`rubricSummary`.`indicator_name` AS `indicator_name`,`rubricSummary`.`indicator_sequence` AS `indicator_sequence`,`rubricSummary`.`indicator_max_value` AS `indicator_max_value` from (select `a`.`id` AS `assessment_id`,`a`.`title` AS `assessment_title`,`sb`.`mark_type` AS `assessment_mark_type`,`sb`.`max_mark` AS `assessment_max_mark`,`sb`.`submission_grade_group_id` AS `assessment_grade_group_id`,`a`.`weight` AS `assessment_weight`,`rubric_instance`.`id` AS `rubric_instance_id`,`rubric_instance`.`rubric_capability_mark_type_id` AS `capability_mark_type_id`,`rubric_instance`.`rubric_capability_grade_group_id` AS `capability_grade_group_id`,`rc`.`id` AS `capability_id`,`rc`.`name` AS `capability_name`,`rcu`.`max_value` AS `capability_max_value`,`rcu`.`sequence` AS `capability_sequence`,`ri`.`id` AS `indicator_id`,`ri`.`name` AS `indicator_name`,`riu`.`sequence` AS `indicator_sequence`,`riu`.`max_value` AS `indicator_max_value` from ((((((`assessment` `a` join `submission_box` `sb` on(`a`.`id` = `sb`.`assessment_id`)) join `rubric_instance` on(`a`.`id` = `rubric_instance`.`assessment_id`)) join `rubric_capability_usage` `rcu` on(`rcu`.`rubric_instance_id` = `rubric_instance`.`id`)) join `rubric_capability` `rc` on(`rc`.`id` = `rcu`.`rubric_capability_id`)) join `rubric_indicator_usage` `riu` on(`riu`.`rubric_instance_id` = `rubric_instance`.`id`)) join `rubric_indicator` `ri` on(`ri`.`id` = `riu`.`rubric_indicator_id`)) where `a`.`deleted_at` is null and `rc`.`deleted_at` is null and `ri`.`deleted_at` is null and `ri`.`rubric_capability_id` = `rc`.`id` and `rubric_instance`.`deleted_at` is null union select `a`.`id` AS `assessment_id`,`a`.`title` AS `assessment_title`,`r`.`mark_type` AS `assessment_mark_type`,`r`.`max_mark` AS `assessment_max_mark`,`r`.`grade_group_id` AS `assessment_grade_group_id`,`a`.`weight` AS `assessment_weight`,`rubric_instance`.`id` AS `rubric_instance_id`,`rubric_instance`.`rubric_capability_mark_type_id` AS `capability_mark_type_id`,`rubric_instance`.`rubric_capability_grade_group_id` AS `capability_grade_group_id`,`rc`.`id` AS `capability_id`,`rc`.`name` AS `capability_name`,`rcu`.`max_value` AS `capability_max_value`,`rcu`.`sequence` AS `capability_sequence`,`ri`.`id` AS `indicator_id`,`ri`.`name` AS `indicator_name`,`riu`.`sequence` AS `indicator_sequence`,`riu`.`max_value` AS `indicator_max_value` from ((((((`assessment` `a` join `reporting` `r` on(`a`.`id` = `r`.`assessment_id`)) join `rubric_instance` on(`a`.`id` = `rubric_instance`.`assessment_id`)) join `rubric_capability_usage` `rcu` on(`rcu`.`rubric_instance_id` = `rubric_instance`.`id`)) join `rubric_capability` `rc` on(`rc`.`id` = `rcu`.`rubric_capability_id`)) join `rubric_indicator_usage` `riu` on(`riu`.`rubric_instance_id` = `rubric_instance`.`id`)) join `rubric_indicator` `ri` on(`ri`.`id` = `riu`.`rubric_indicator_id`)) where `a`.`deleted_at` is null and `rc`.`deleted_at` is null and `ri`.`deleted_at` is null and `ri`.`rubric_capability_id` = `rc`.`id` and `rubric_instance`.`deleted_at` is null) `rubricSummary` order by `rubricSummary`.`assessment_id`,`rubricSummary`.`rubric_instance_id`,`rubricSummary`.`capability_sequence`,`rubricSummary`.`capability_id`,`rubricSummary`.`indicator_sequence`,`rubricSummary`.`indicator_id` */;
+/*!50001 VIEW `v_rubric` AS select `rubricSummary`.`assessment_id` AS `assessment_id`,`rubricSummary`.`assessment_title` AS `assessment_title`,`rubricSummary`.`assessment_mark_type` AS `assessment_mark_type`,`rubricSummary`.`assessment_max_mark` AS `assessment_max_mark`,`rubricSummary`.`assessment_grade_group_id` AS `assessment_grade_group_id`,`rubricSummary`.`assessment_weight` AS `assessment_weight`,`rubricSummary`.`rubric_instance_id` AS `rubric_instance_id`,`rubricSummary`.`rubric_instance_title` AS `rubric_instance_title`,`rubricSummary`.`rubric_instance_weight` AS `rubric_instance_weight`,`rubricSummary`.`capability_mark_type_id` AS `capability_mark_type_id`,`rubricSummary`.`capability_grade_group_id` AS `capability_grade_group_id`,`rubricSummary`.`capability_id` AS `capability_id`,`rubricSummary`.`capability_name` AS `capability_name`,`rubricSummary`.`capability_max_value` AS `capability_max_value`,`rubricSummary`.`capability_sequence` AS `capability_sequence`,`rubricSummary`.`indicator_id` AS `indicator_id`,`rubricSummary`.`indicator_name` AS `indicator_name`,`rubricSummary`.`indicator_sequence` AS `indicator_sequence`,`rubricSummary`.`indicator_max_value` AS `indicator_max_value` from (select `a`.`id` AS `assessment_id`,`a`.`title` AS `assessment_title`,`sb`.`mark_type` AS `assessment_mark_type`,`sb`.`max_mark` AS `assessment_max_mark`,`sb`.`submission_grade_group_id` AS `assessment_grade_group_id`,`a`.`weight` AS `assessment_weight`,`rubric_instance`.`id` AS `rubric_instance_id`,`rubric_instance`.`title` AS `rubric_instance_title`,`rubric_instance`.`weight` AS `rubric_instance_weight`,`rubric_instance`.`rubric_capability_mark_type_id` AS `capability_mark_type_id`,`rubric_instance`.`rubric_capability_grade_group_id` AS `capability_grade_group_id`,`rc`.`id` AS `capability_id`,`rc`.`name` AS `capability_name`,`rcu`.`max_value` AS `capability_max_value`,`rcu`.`sequence` AS `capability_sequence`,`ri`.`id` AS `indicator_id`,`ri`.`name` AS `indicator_name`,`riu`.`sequence` AS `indicator_sequence`,`riu`.`max_value` AS `indicator_max_value` from ((((((`assessment` `a` join `submission_box` `sb` on(`a`.`id` = `sb`.`assessment_id`)) join `rubric_instance` on(`a`.`id` = `rubric_instance`.`assessment_id`)) join `rubric_capability_usage` `rcu` on(`rcu`.`rubric_instance_id` = `rubric_instance`.`id`)) join `rubric_capability` `rc` on(`rc`.`id` = `rcu`.`rubric_capability_id`)) join `rubric_indicator_usage` `riu` on(`riu`.`rubric_instance_id` = `rubric_instance`.`id`)) join `rubric_indicator` `ri` on(`ri`.`id` = `riu`.`rubric_indicator_id`)) where `a`.`deleted_at` is null and `rc`.`deleted_at` is null and `ri`.`deleted_at` is null and `ri`.`rubric_capability_id` = `rc`.`id` and `rubric_instance`.`deleted_at` is null union select `a`.`id` AS `assessment_id`,`a`.`title` AS `assessment_title`,`r`.`mark_type` AS `assessment_mark_type`,`r`.`max_mark` AS `assessment_max_mark`,`r`.`grade_group_id` AS `assessment_grade_group_id`,`a`.`weight` AS `assessment_weight`,`rubric_instance`.`id` AS `rubric_instance_id`,`rubric_instance`.`title` AS `rubric_instance_title`,`rubric_instance`.`weight` AS `rubric_instance_weight`,`rubric_instance`.`rubric_capability_mark_type_id` AS `capability_mark_type_id`,`rubric_instance`.`rubric_capability_grade_group_id` AS `capability_grade_group_id`,`rc`.`id` AS `capability_id`,`rc`.`name` AS `capability_name`,`rcu`.`max_value` AS `capability_max_value`,`rcu`.`sequence` AS `capability_sequence`,`ri`.`id` AS `indicator_id`,`ri`.`name` AS `indicator_name`,`riu`.`sequence` AS `indicator_sequence`,`riu`.`max_value` AS `indicator_max_value` from ((((((`assessment` `a` join `reporting` `r` on(`a`.`id` = `r`.`assessment_id`)) join `rubric_instance` on(`a`.`id` = `rubric_instance`.`assessment_id`)) join `rubric_capability_usage` `rcu` on(`rcu`.`rubric_instance_id` = `rubric_instance`.`id`)) join `rubric_capability` `rc` on(`rc`.`id` = `rcu`.`rubric_capability_id`)) join `rubric_indicator_usage` `riu` on(`riu`.`rubric_instance_id` = `rubric_instance`.`id`)) join `rubric_indicator` `ri` on(`ri`.`id` = `riu`.`rubric_indicator_id`)) where `a`.`deleted_at` is null and `rc`.`deleted_at` is null and `ri`.`deleted_at` is null and `ri`.`rubric_capability_id` = `rc`.`id` and `rubric_instance`.`deleted_at` is null) `rubricSummary` order by `rubricSummary`.`assessment_id`,`rubricSummary`.`rubric_instance_id`,`rubricSummary`.`capability_sequence`,`rubricSummary`.`capability_id`,`rubricSummary`.`indicator_sequence`,`rubricSummary`.`indicator_id` */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
@@ -9417,4 +9445,4 @@ CREATE TABLE `wikiRevision` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2026-06-24  3:33:33
+-- Dump completed on 2026-07-07  0:07:39
