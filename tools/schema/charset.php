@@ -26,7 +26,6 @@ require_once __DIR__ . '/../../conf/core/require.php';
  */
 $app = new class extends CliTool\App
 {
-
     /**
      * --help
      *
@@ -425,7 +424,7 @@ HELP;
 
                 foreach ($allSql as $tableName => $sql) {
                     echo "{$white}{$tableName}\n";
-                    echo "    {$grey}{$sql}\n\n";
+                    echo "    {$grey}{$sql};\n\n";
                 }
             } else {
                 $this->getLogger()->info('No sql changes required.');
