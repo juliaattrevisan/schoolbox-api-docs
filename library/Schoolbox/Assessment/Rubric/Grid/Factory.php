@@ -134,7 +134,6 @@ class Factory
             }
         }
 
-
         // cache capabilities
         /** @var Capability[] $capabilityCache */
         $capabilityCache     = [];
@@ -189,6 +188,7 @@ class Factory
             $indicatorId      = (int)$indicatorData['id'];
             $indicatorName    = $indicatorData['name'];
             $indicatorEnabled = isset($indicatorData['on']) && $indicatorData['on'];
+            $indicatorSequence = (int)$indicatorData['sequence'];
 
             if (!$indicatorEnabled) {
                 continue;
@@ -207,8 +207,7 @@ class Factory
                 $indicator->setName($indicatorName);
             }
 
-
-            $indicatorUsage = new IndicatorUsage($indicator);
+            $indicatorUsage = new IndicatorUsage($indicator, $indicatorSequence);
 
             foreach ($grid->getLevels() as $levelSequence => $level) {
                 if (empty($descriptors[$indicatorId][$levelSequence])) {

@@ -610,7 +610,7 @@ class DataSource
                     continue;
                 }
 
-                $indicatorUsage = new \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage($indicator);
+                $indicatorUsage = new \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage($indicator, $indicatorUsageModel->getSequence());
 
                 // Add descriptors, and apply min value
                 $levelIndex = 0;
@@ -846,10 +846,6 @@ class DataSource
 
             $capabilityUsageModels->add($capabilityUsageModel);
 
-            /* Increment sequence throughout the foreach, assuming it's given to us in the intended order
-             */
-            $indicatorSequence = IndicatorUsageModel::SEQUENCE_BASE;
-
             foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
                 $indicatorModel = $indicatorModels[$indicatorUsage->getIndicator()->getId()];
 
@@ -857,7 +853,7 @@ class DataSource
                     ->setRubricInstance($rubricInstance)
                     ->setIndicator($indicatorModel)
                     ->setMaxValue($indicatorUsage->calculateMaxValueFromDescriptors())
-                    ->setSequence($indicatorSequence++);
+                    ->setSequence($indicatorUsage->getSequence());
 
                 $indicatorUsageModels->add($indicatorUsageModel);
 
