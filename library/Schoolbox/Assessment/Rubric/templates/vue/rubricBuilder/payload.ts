@@ -85,7 +85,7 @@ export function translateGridToFormPayload(grid: RubricGrid): RubricGridFormPayl
                 groupId: capability.id,
                 name: indicator.name,
                 on: indicator.hasUsage ? 1 : undefined,
-                sequence: i++,
+                sequence: i,
             };
 
             gridData.descriptor[indicator.id] = indicator.descriptors.map((descriptor) => ({
@@ -97,6 +97,9 @@ export function translateGridToFormPayload(grid: RubricGrid): RubricGridFormPayl
                 text: descriptor.description.trim() === "" ? descriptor.description : descriptor.description.trim(),
                 points: (descriptor.maxValue ?? "").toString(),
             }));
+
+            // ...because we've never seen javascript concat numbers and strings before, but ok
+            i += 1;
         }
     }
 
