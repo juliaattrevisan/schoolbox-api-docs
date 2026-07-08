@@ -121,6 +121,7 @@ const configImport = defineConfig([
                         "playwright.config.ts",
                         "eslint.config.ts",
                         "stories/**/*.stories.ts",
+                        "**/tests/*.test.ts",
                     ],
                 },
             ],

@@ -2,6 +2,11 @@ import { mount } from "@vue/test-utils";
 import type { RubricGridCapability, RubricMarkedGridCapability } from "../../rubricMarkable/types";
 import RrGridCapability from "../rr-grid-capability.vue";
 
+/**
+ * Build a minimal rubric grid capability for testing.
+ * @param showCapabilityMark Whether the rubric grid says marks should show for this capability.
+ * @returns A capability with no indicators, for testing the summary row alone.
+ */
 function makeCapability(showCapabilityMark: boolean): RubricGridCapability {
     return {
         id: 1,
@@ -13,6 +18,10 @@ function makeCapability(showCapabilityMark: boolean): RubricGridCapability {
     };
 }
 
+/**
+ * Build a minimal instructor-given capability mark for testing.
+ * @returns A capability mark with a fixed human-readable value.
+ */
 function makeCapabilityMark(): RubricMarkedGridCapability {
     return {
         id: 1,
@@ -23,7 +32,12 @@ function makeCapabilityMark(): RubricMarkedGridCapability {
     };
 }
 
-function mountCapability(showCapabilityMark: boolean) {
+/**
+ * Mount rr-grid-capability with a single capability and its mark.
+ * @param showCapabilityMark Whether the rubric grid says marks should show for this capability.
+ * @returns The mounted component wrapper.
+ */
+function mountCapability(showCapabilityMark: boolean): ReturnType<typeof mount> {
     return mount(RrGridCapability, {
         props: {
             capability: makeCapability(showCapabilityMark),
