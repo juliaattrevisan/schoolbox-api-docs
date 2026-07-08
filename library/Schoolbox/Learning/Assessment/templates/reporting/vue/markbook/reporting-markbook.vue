@@ -79,7 +79,7 @@ window.Vue.onMounted(async () => {
     </div>
 
     <!-- Search -->
-    <div v-if="mbStore.data !== null && mbStore.data.hasStudents" class="row" >
+    <div v-if="mbStore.data !== null && mbStore.data.hasStudents" class="row">
         <div class="small-12 columns">
             <input v-model="mbStore.participantSearchFilter" type="search" placeholder="Search for a student" />
         </div>
