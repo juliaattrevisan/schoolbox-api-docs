@@ -77,7 +77,8 @@ class CanvasDb
         $this->news_author = (int)$config->get(ConfigMapper::NAME_CANVAS_NEWS_AUTHOR);
         $this->redirect_assessments = (bool)$config->get(ConfigMapper::NAME_CANVAS_REDIRECT_ASSESSMENTS);
         $this->redirect_homepages = (bool)$config->get(ConfigMapper::NAME_CANVAS_REDIRECT_HOMEPAGES);
-        $this->code_redirect_homepages = $config->get(ConfigMapper::NAME_CANVAS_CODE_REDIRECT_HOMEPAGES);
+        $this->code_redirect_homepages = $config->get(ConfigMapper::NAME_CANVAS_CODE_REDIRECT_HOMEPAGES)
+            ?? self::REDIRECT_COURSE_CODE;
     }
 
     /**
