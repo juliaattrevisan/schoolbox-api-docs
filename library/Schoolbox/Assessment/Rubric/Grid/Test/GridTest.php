@@ -70,12 +70,12 @@ class GridTest extends TestCase
         $groupUsage1                                             = (new RubricGrid\CapabilityUsage($group1))->setMaxValue(15);
         $indicatorUsage1                                         = new RubricGrid\IndicatorUsage($indicator1);
         $indicatorUsage2                                         = new RubricGrid\IndicatorUsage($indicator2);
-        $groupUsage1->getIndicatorUsages()[$indicator1->getId()] = $indicatorUsage1;
-        $groupUsage1->getIndicatorUsages()[$indicator2->getId()] = $indicatorUsage2;
+        $groupUsage1->getIndicatorUsages()[$indicator1->getId()] = $indicatorUsage1->setSequence(1);
+        $groupUsage1->getIndicatorUsages()[$indicator2->getId()] = $indicatorUsage2->setSequence(2);
         $grid->getCapabilityUsages()[$group1->getId()]           = $groupUsage1;
 
         $groupUsage2                                             = (new RubricGrid\CapabilityUsage($group2))->setMaxValue(15);
-        $indicatorUsage6                                         = new RubricGrid\IndicatorUsage($indicator6);
+        $indicatorUsage6                                         = new RubricGrid\IndicatorUsage($indicator6)->setSequence(1);
         $groupUsage2->getIndicatorUsages()[$indicator6->getId()] = $indicatorUsage6;
         $grid->getCapabilityUsages()[$group2->getId()]           = $groupUsage2;
 
@@ -146,13 +146,13 @@ class GridTest extends TestCase
         $groupUsage1                                             = (new RubricGrid\CapabilityUsage($group1))->setMaxValue(15);
         $indicatorUsage1                                         = new RubricGrid\IndicatorUsage($indicator1);
         $indicatorUsage2                                         = new RubricGrid\IndicatorUsage($indicator2);
-        $groupUsage1->getIndicatorUsages()[$indicator1->getId()] = $indicatorUsage1;
-        $groupUsage1->getIndicatorUsages()[$indicator2->getId()] = $indicatorUsage2;
+        $groupUsage1->getIndicatorUsages()[$indicator1->getId()] = $indicatorUsage1->setSequence(1);
+        $groupUsage1->getIndicatorUsages()[$indicator2->getId()] = $indicatorUsage2->setSequence(2);
         $grid->getCapabilityUsages()[$group1->getId()]           = $groupUsage1;
 
         $groupUsage2                                             = (new RubricGrid\CapabilityUsage($group2))->setMaxValue(15);
         $indicatorUsage6                                         = new RubricGrid\IndicatorUsage($indicator6);
-        $groupUsage2->getIndicatorUsages()[$indicator6->getId()] = $indicatorUsage6;
+        $groupUsage2->getIndicatorUsages()[$indicator6->getId()] = $indicatorUsage6->setSequence(1);
         $grid->getCapabilityUsages()[$group2->getId()]           = $groupUsage2;
 
         yield 'indicator 1.1: in use'     => [$grid, $indicator1, $indicatorUsage1];
@@ -220,8 +220,8 @@ class GridTest extends TestCase
         $groupUsage1                                             = (new RubricGrid\CapabilityUsage($group1))->setMaxValue(15);
         $indicatorUsage1                                         = new RubricGrid\IndicatorUsage($indicator1);
         $indicatorUsage2                                         = new RubricGrid\IndicatorUsage($indicator2);
-        $groupUsage1->getIndicatorUsages()[$indicator1->getId()] = $indicatorUsage1;
-        $groupUsage1->getIndicatorUsages()[$indicator2->getId()] = $indicatorUsage2;
+        $groupUsage1->getIndicatorUsages()[$indicator1->getId()] = $indicatorUsage1->setSequence(1);
+        $groupUsage1->getIndicatorUsages()[$indicator2->getId()] = $indicatorUsage2->setSequence(2);
 
         // Max values from descriptor:
         // indicator 1: 2
@@ -234,7 +234,7 @@ class GridTest extends TestCase
 
         $groupUsage2                                             = (new RubricGrid\CapabilityUsage($group2))->setMaxValue(3);
         $indicatorUsage6                                         = new RubricGrid\IndicatorUsage($indicator6);
-        $groupUsage2->getIndicatorUsages()[$indicator6->getId()] = $indicatorUsage6;
+        $groupUsage2->getIndicatorUsages()[$indicator6->getId()] = $indicatorUsage6->setSequence(1);
         $indicatorUsage6->getDescriptors()[1]                    = (new RubricGrid\Descriptor())->setMaxValue(5);
         $indicatorUsage6->getDescriptors()[2]                    = (new RubricGrid\Descriptor())->setMaxValue(5);
 
