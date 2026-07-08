@@ -125,6 +125,7 @@ class Controller extends ConfigController
         }
 
         $record->updateConfig($connector);
+        $record->setFailedCount(0); // we have saved the calendar page, reset the failed count
         if ($isActive) {
             $record->activate();
         } else {
