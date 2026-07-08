@@ -96,7 +96,7 @@ class Import implements IStrategy
                 $this->log->debug(sprintf('Previous: %s', $e->getPrevious()->getMessage()));
                 $this->log->debug($e->getPrevious()->getTraceAsString());
             }
-            return;
+            throw $e;
         }
 
         $imported = 0;
