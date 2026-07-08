@@ -147,6 +147,7 @@ class Markbook
      * @param array|null $studentIds A reductive filter that operates on $assessments: a set of user ids
      * @param array|null $curriculumCodes A reductive filter that operates on $assessments: a set of curriculum codes
      * @param array|null $folderIds A reductive filter that operates on $assessments: a set of folder ids
+     * @param bool|null $includeExcluded Set this to false to strictly disregard any excluded students
      */
     public function __construct(
         GenericCollection $assessments,
@@ -155,7 +156,8 @@ class Markbook
         private ?bool $overallStatistics = true,
         private ?array $studentIds = null,
         private ?array $curriculumCodes = null,
-        private ?array $folderIds = null
+        private ?array $folderIds = null,
+        private ?bool $includeExcluded = true,
     ) {
         /* We'll reduce this set further by applying the reductive filters for student ids, curric codes and folder ids
          */
@@ -284,6 +286,12 @@ class Markbook
                      * if we did, and this user isn't one of those people, skip them
                      */
                     if (!$this->isFilteredStudent($student->getId())) {
+                        continue;
+                    }
+
+                    /* If this student was excluded, and $includeExcluded is false, skip this person
+                     */
+                    if (false === $this->includeExcluded && $participant->isExcluded()) {
                         continue;
                     }
 
@@ -498,6 +506,12 @@ class Markbook
                  *    - just those 3 people?
                  */
                 if (!$this->isFilteredStudent($participant->getUser()->getId())) {
+                    continue;
+                }
+
+                /* If this student was excluded, and $includeExcluded is false, skip this person
+                 */
+                if (false === $this->includeExcluded && $participant->isExcluded()) {
                     continue;
                 }
 

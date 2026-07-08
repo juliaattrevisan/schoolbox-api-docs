@@ -608,6 +608,9 @@ class Controller extends Base
             studentIds: null,
             curriculumCodes: null,
             folderIds: null,
+            /* We don't want Excluded Students here
+             */
+            includeExcluded: false,
         );
 
         $markbook->sortAssessables();
