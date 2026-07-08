@@ -65,21 +65,21 @@ window.Vue.onMounted(async () => {
 </script>
 
 <template>
-    <div class="row">
-        <!-- Metadata about the activity -->
-        <div class="small-12 large-4 columns">
-            <slot name="meta"></slot>
-        </div>
-
-        <!-- Status filters -->
-        <!-- TODO: implement filters (out of scope for now according to SA-22474's AC) -->
-        <!-- <div class="small-12 large-8 columns u-ta-right">
-            <rmb-filters v-model:filters="filters" />
-        </div> -->
+  <div class="row">
+    <!-- Metadata about the activity -->
+    <div class="small-12 large-4 columns">
+      <slot name="meta"></slot>
     </div>
 
+    <!-- Status filters -->
+    <!-- TODO: implement filters (out of scope for now according to SA-22474's AC) -->
+    <!-- <div class="small-12 large-8 columns u-ta-right">
+        <rmb-filters v-model:filters="filters" />
+    </div> -->
+  </div>
+
     <!-- Search -->
-    <div class="row">
+    <div class="row" v-if="mbStore.data !== null && mbStore.data.hasStudents">
         <div class="small-12 columns">
             <input v-model="mbStore.participantSearchFilter" type="search" placeholder="Search for a student" />
         </div>
@@ -92,7 +92,18 @@ window.Vue.onMounted(async () => {
 
     <request-error v-if="loadError !== null" :further-info="loadError" />
     <loading-table v-else-if="mbStore.data === null" />
-    <markbook-inner v-else :type="MarkbookType.REPORTING" />
+    <markbook-inner v-else-if="mbStore.data !== null && mbStore.data.hasStudents" :type="MarkbookType.REPORTING" />
 
     <markbook-popout />
+
+    <template v-if="mbStore.data !== null && !mbStore.data.hasStudents">
+      <div class="row">
+        <div class="small-12 columns">
+          <div class="empty-state">
+            <sbx-icon name="progress" size="2.5rem"></sbx-icon>
+            <p>No data available.</p>
+          </div>
+        </div>
+      </div>
+    </template>
 </template>

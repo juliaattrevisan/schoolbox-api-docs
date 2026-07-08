@@ -96,6 +96,9 @@ class Controller extends Base
         );
 
         $data = [
+            /* Whether this reporting markbook had at least one participating non-excluded student
+             */
+            'hasStudents' => $markbook->getStudents()->count() > 0,
             /* Only show class ranking if the config allows it. It seemingly ranks based on Student Weighted Average.
              */
             'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $markbook->getRanking() : null,
