@@ -970,6 +970,8 @@ class DataSource
 
         /* The feedback instance determines ultimately which schema we explore to find capability marks (ugh!)
          * This is pretty horrible but I don't really have many answers for a polymorphic schema like this
+         *
+         * TODO replace this with FeedbackMeta enum derivation instead, which basically does all this; SA-22879
          */
         if ($feedback instanceof \Schoolbox\Learning\Assessment\DueWork\Feedback\Model) {
             $feedbackTable = SubmissionBox\ReturnedWorkMapper::getInstance()->getTable();
