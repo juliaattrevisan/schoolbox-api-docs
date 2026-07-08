@@ -444,7 +444,7 @@ class Subnav
                 'children'   => [
                     '/adminv2/terms' => [
                         'name'        => 'Academic Period',
-                        'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
+                        'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_ACADEMIC_PERIOD_ENABLED),
                         'description' => 'Configure the blocks of time that assessments will be visible within, often called terms or semesters.',
                     ],
                     '/adminv2/bulk-feedback-import' => [
