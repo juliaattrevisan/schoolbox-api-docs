@@ -63,7 +63,7 @@ if (is_numeric($_GET['categoryId'])) {
             case 'textbox':
             default:
                 $textboxMapper = new \Schoolbox\Resource\Textbox\Mapper();
-                $allTextboxes  = $textboxMapper->findByColumn('categoryID', $_GET['categoryId']);
+                $allTextboxes  = $textboxMapper->findByColumn('folder_id', $_GET['categoryId']);
 
                 foreach ($allTextboxes as $currentTextbox) {
                     $element = [
