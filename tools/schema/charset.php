@@ -425,7 +425,7 @@ HELP;
 
                 foreach ($allSql as $tableName => $sql) {
                     echo "{$white}{$tableName}\n";
-                    echo "    {$grey}{$sql}\n\n";
+                    echo "    {$grey}{$sql};\n\n";
                 }
             } else {
                 $this->getLogger()->info('No sql changes required.');
