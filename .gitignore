@@ -13,6 +13,7 @@ www/static/css/core/schoolbox-ck-content.css
 www/static/css/core/*.css.map
 *.log
 *.swp
+.phpunit.cache/
 vendor/
 # Rspack bundle export directory
 www/static/js/bundle/
