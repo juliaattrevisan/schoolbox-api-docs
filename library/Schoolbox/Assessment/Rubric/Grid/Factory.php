@@ -207,7 +207,7 @@ class Factory
                 $indicator->setName($indicatorName);
             }
 
-            $indicatorUsage = new IndicatorUsage($indicator, $indicatorSequence);
+            $indicatorUsage = (new IndicatorUsage($indicator))->setSequence($indicatorSequence);
 
             foreach ($grid->getLevels() as $levelSequence => $level) {
                 if (empty($descriptors[$indicatorId][$levelSequence])) {

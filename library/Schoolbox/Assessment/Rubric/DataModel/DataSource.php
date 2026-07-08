@@ -610,7 +610,7 @@ class DataSource
                     continue;
                 }
 
-                $indicatorUsage = new \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage($indicator, $indicatorUsageModel->getSequence());
+                $indicatorUsage = (new \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage($indicator))->setSequence($indicatorUsageModel->getSequence());
 
                 // Add descriptors, and apply min value
                 $levelIndex = 0;

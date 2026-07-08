@@ -52,13 +52,19 @@ class IndicatorUsage
 
 
     /**
+     * Ordering of this indicator/descriptor combo inside a capability. Used for sorting after compilation
+     *
+     * @var int|null
+     */
+    private ?int $sequence = null;
+
+
+    /**
      * Constructor
      *
      * @param Indicator $indicator
-     * @param int $sequence Ordering of this indicator/descriptor combo inside a capability. Used for sorting after compilation
-     *
      */
-    public function __construct(Indicator $indicator, private int $sequence)
+    public function __construct(Indicator $indicator)
     {
         $this->indicator   = $indicator;
         $this->descriptors = new GenericCollection(Descriptor::class);
