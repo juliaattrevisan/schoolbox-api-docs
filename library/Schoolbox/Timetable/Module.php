@@ -119,7 +119,7 @@ class Module extends BaseModule
     {
         /** @var External_Timetable $timetable */
         $timetable = $this->getExternalTimetable();
-        return new Controller($timetable);
+        return new Controller($timetable, new \Schoolbox\External\User());
     }
 
 
