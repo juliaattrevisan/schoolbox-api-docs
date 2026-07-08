@@ -867,7 +867,7 @@ CREATE TABLE `clipboard_import_log` (
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `finish_at_idx` (`finish_at`,`status`)
-) ENGINE=InnoDB AUTO_INCREMENT=17435 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17434 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3311,7 +3311,7 @@ CREATE TABLE `ib_group_subjects` (
   KEY `idx_level` (`level`),
   CONSTRAINT `fk_ib_group_subjects_group` FOREIGN KEY (`group_id`) REFERENCES `lu_ib_groups` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_ib_group_subjects_subject` FOREIGN KEY (`subject_id`) REFERENCES `lu_ib_subjects` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3994,7 +3994,7 @@ CREATE TABLE `lu_ib_groups` (
   `name` varchar(255) NOT NULL,
   `sequence` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4011,7 +4011,7 @@ CREATE TABLE `lu_ib_subjects` (
   PRIMARY KEY (`id`),
   KEY `idx_lu_ib_subjects_transcript_name` (`transcript_name`),
   KEY `idx_lu_ib_subjects_name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4237,7 +4237,7 @@ CREATE TABLE `lu_qualification` (
   KEY `idx_sequence` (`sequence`),
   KEY `idx_system_purpose_id` (`system_purpose_id`),
   CONSTRAINT `fk_lu_qualification_system_purpose` FOREIGN KEY (`system_purpose_id`) REFERENCES `ib_system_purposes` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -8887,7 +8887,7 @@ CREATE TABLE `user_qualification` (
   UNIQUE KEY `unique_user_qualification` (`user_id`,`qualification_id`),
   KEY `idx_user_id` (`user_id`),
   KEY `idx_qualification_id` (`qualification_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -9445,4 +9445,4 @@ CREATE TABLE `wikiRevision` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2026-07-07  0:07:39
+-- Dump completed on 2026-07-08  3:00:12
