@@ -25,10 +25,13 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param External_Timetable $externalTimetable
+     * @param External_Timetable       $externalTimetable
+     * @param \Schoolbox\External\User $userRelationHydrator
      */
-    public function __construct(External_Timetable $externalTimetable)
-    {
+    public function __construct(
+        External_Timetable $externalTimetable,
+        private \Schoolbox\External\User $userRelationHydrator,
+    ) {
         $this->setExternalTimetableHandler($externalTimetable);
     }
 
@@ -48,14 +51,17 @@ class Controller extends Base
 
         // The children of $loggedInUser will be passed to the Twig template as $userOptions.
         $userOptions = [];
-        foreach ($loggedInUser->getChildren() as $child) {
-            $campuses = $child->getCampusCollection();
-            $userOptions[] = [
-                'userId' => $child->getId(),
-                'firstCampusName' => (count($campuses) === 0) ? null : $campuses->first()->getName(),
-                'formattedName' => $child->formatName(),
-                'yearLevel' => $child->getYear()?->getLongName('Year')
-            ];
+        if ($loggedInUser->getRole()->isParent()) {
+            $this->userRelationHydrator->loadChildren([$loggedInUser]);
+            foreach ($loggedInUser->getChildren() as $child) {
+                $campuses = $child->getCampusCollection();
+                $userOptions[] = [
+                    'userId' => $child->getId(),
+                    'firstCampusName' => (count($campuses) === 0) ? null : $campuses->first()->getName(),
+                    'formattedName' => $child->formatName(),
+                    'yearLevel' => $child->getYear()?->getLongName('Year')
+                ];
+            }
         }
 
         if (
