@@ -28,7 +28,12 @@ const showSummaryForThisCapability = window.Vue.computed(() => {
     if (props.selfAssessmentCapabilityMark && props.selfAssessmentCapabilityMark.humanReadableMark !== null) {
         return true;
     }
-    return props.showSummaryCapability && props.capabilityMark && props.capabilityMark.humanReadableMark !== null;
+    return (
+        props.showSummaryCapability &&
+        props.capability.showCapabilityMark &&
+        props.capabilityMark &&
+        props.capabilityMark.humanReadableMark !== null
+    );
 });
 
 /**
