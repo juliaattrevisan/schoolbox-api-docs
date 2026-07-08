@@ -166,6 +166,7 @@ class Import implements IStrategy
                 ->setVenue($venue)
                 ->setName($teamName)
                 ->setStartAt($startAt)
+                ->setFinishAt($startAt)
                 ->setNotes($details)
                 ->setHomeTeam($team)
                 ->setAwayTeam(null)
