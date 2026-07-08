@@ -86,9 +86,11 @@ class OauthProviderIssued extends Base
             )
         );
 
-        // If no issuer is provided: always return true:
-        // it cannot be taken for granted that third-party providers will even
-        // contain this claim, as it is technically optional.
+        // If no issuer is configured in Schoolbox: always return true for now.
+        // The issuer would likely have only been configured if the school uses
+        // the oAuth identity provider as an actual OIDC provider, instead of
+        // the flow which Digistorm uses (which is to just pass a JWT from the
+        // ID provider to Schoolbox).
         if ($oauthIssuer === '') {
             $this->log->warning(
                 sprintf(
