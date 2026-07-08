@@ -88,7 +88,7 @@ class Broker extends Base
     {
         // When connecting: use the login timeout
         $this->connectionOptions = [
-            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4',
+            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci',
             PDO::ATTR_PERSISTENT         => false,
             PDO::ATTR_TIMEOUT            => self::LOGIN_TIMEOUT,
             PDO::MYSQL_ATTR_LOCAL_INFILE => true,
