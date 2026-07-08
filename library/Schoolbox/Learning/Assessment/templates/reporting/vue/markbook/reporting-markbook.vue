@@ -65,18 +65,18 @@ window.Vue.onMounted(async () => {
 </script>
 
 <template>
-  <div class="row">
-    <!-- Metadata about the activity -->
-    <div class="small-12 large-4 columns">
-      <slot name="meta"></slot>
-    </div>
+    <div class="row">
+        <!-- Metadata about the activity -->
+        <div class="small-12 large-4 columns">
+            <slot name="meta"></slot>
+        </div>
 
-    <!-- Status filters -->
-    <!-- TODO: implement filters (out of scope for now according to SA-22474's AC) -->
-    <!-- <div class="small-12 large-8 columns u-ta-right">
+        <!-- Status filters -->
+        <!-- TODO: implement filters (out of scope for now according to SA-22474's AC) -->
+        <!-- <div class="small-12 large-8 columns u-ta-right">
         <rmb-filters v-model:filters="filters" />
     </div> -->
-  </div>
+    </div>
 
     <!-- Search -->
     <div class="row" v-if="mbStore.data !== null && mbStore.data.hasStudents">
@@ -97,13 +97,13 @@ window.Vue.onMounted(async () => {
     <markbook-popout />
 
     <template v-if="mbStore.data !== null && !mbStore.data.hasStudents">
-      <div class="row">
-        <div class="small-12 columns">
-          <div class="empty-state">
-            <sbx-icon name="progress" size="2.5rem"></sbx-icon>
-            <p>No data available.</p>
-          </div>
+        <div class="row">
+            <div class="small-12 columns">
+                <div class="empty-state">
+                    <sbx-icon name="progress" size="2.5rem"></sbx-icon>
+                    <p>No data available.</p>
+                </div>
+            </div>
         </div>
-      </div>
     </template>
 </template>
