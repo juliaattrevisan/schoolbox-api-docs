@@ -86,6 +86,22 @@ class OauthProviderIssued extends Base
             )
         );
 
+        // If no issuer is configured in Schoolbox: always return true for now.
+        // The issuer would likely have only been configured if the school uses
+        // the oAuth identity provider as an actual OIDC provider, instead of
+        // the flow which Digistorm uses (which is to just pass a JWT from the
+        // ID provider to Schoolbox).
+        if ($oauthIssuer === '') {
+            $this->log->warning(
+                sprintf(
+                    'Config "%s" is empty: accepting regardless of JWT claim "%s". (This should be removed in the future)',
+                    ConfigMapper::NAME_OAUTH_ISSUER,
+                    self::CLAIM_ISS,
+                )
+            );
+            return true;
+        }
+
         // If the issuer is provided: it must match the issuer in the JWT
         return $jwtIssuer === $oauthIssuer;
     }
