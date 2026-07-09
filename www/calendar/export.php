@@ -555,7 +555,7 @@ try {
                 ],
                 true,
                 $sentry
-                      ));
+            ));
 
             // SOCS Music
             $api->add(buildApiClass(
