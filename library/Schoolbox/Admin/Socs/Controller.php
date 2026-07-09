@@ -43,6 +43,28 @@ class Controller extends ConfigController
             [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false],
         );
 
+        // grab the calendar failed counts if they exist
+        try {
+            $calendarEventsSub = $this->calendarConfigMapper->findOneByColumnList([
+                'event_type' => 'Event',
+                'connector_class' => 'Socs',
+            ]);
+        } catch (\Throwable) {
+            $calendarEventsSub = new Calendar_Api_Config_Record();
+            $calendarEventsSub->setEventType('Event');
+            $calendarEventsSub->setConnectorClass('Socs');
+        }
+        try {
+            $musicLessonsSub = $this->calendarConfigMapper->findOneByColumnList([
+                'event_type' => 'Event',
+                'connector_class' => 'SocsMusic',
+            ]);
+        } catch (\Throwable) {
+            $musicLessonsSub = new Calendar_Api_Config_Record();
+            $musicLessonsSub->setEventType('Event');
+            $musicLessonsSub->setConnectorClass('SocsMusic');
+        }
+
         $this->response = $this->responseFromTemplate(
             '@socsadmin/index.twig',
             [
@@ -50,6 +72,8 @@ class Controller extends ConfigController
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))
                     ->generateBreadcrumbs($this->routeGenerator->generate('socsadmin.getSettings')),
                 'configContext' => $configContext,
+                'musicLessonsSub' => $musicLessonsSub,
+                'calendarEventsSub' => $calendarEventsSub,
             ],
             'SOCS System Settings',
         );

@@ -21,6 +21,36 @@
                 </div>
             </div>
 
+            {# if socs Calendar Events subscription has failed, there may be a creds issue #}
+            {% if calendarEventsSub.getFailedCount() >= 5 %}
+                <div class="small-12 island">
+                    <div class="alert-box alert">
+                        The Calendar Events subscription has failed {{ calendarEventsSub.getFailedCount() }} times.<br>
+                        It may be one of the following issues:<br>
+                        <ul>
+                            <li>The request to the remote server has timed out. </li>
+                            <li>The remote server is unavailable.</li>
+                            <li>The Authorisation token is malformed or expired.</li>
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+
+            {# if socs Music Lessons subscription has failed, there may be a creds issue #}
+            {% if musicLessonsSub.getFailedCount() >= 5 %}
+                <div class="small-12 island">
+                    <div class="alert-box alert">
+                        The Music Lessons subscription has failed {{ musicLessonsSub.getFailedCount() }} times.<br>
+                        It may be one of the following issues:<br>
+                        <ul>
+                            <li>The request to the remote server has timed out. </li>
+                            <li>The remote server is unavailable.</li>
+                            <li>The Authorisation token is malformed or expired.</li>
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+
             {% include '@settings/moduleConfig.twig' with configContext only %}
         </div>
     </div>
