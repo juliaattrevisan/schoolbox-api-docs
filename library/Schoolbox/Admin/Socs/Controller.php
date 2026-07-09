@@ -82,10 +82,10 @@ class Controller extends ConfigController
             $calendarName = 'SOCS Events';
         }
 
-        $connector->setLabel($calendarName);
-        $connector->setEventType('Event');
-        $connector->setConnectorClass('Socs');
-        $connector->setLuEventType((int)$configValues[ConfigMapper::NAME_SOCS_CALENDAR_DEFAULT_EVENT_TYPE]->getValue());
+        $connector->setLabel($calendarName)
+            ->setEventType('Event')
+            ->setConnectorClass('Socs')
+            ->setLuEventType((int)$configValues[ConfigMapper::NAME_SOCS_CALENDAR_DEFAULT_EVENT_TYPE]->getValue());
 
         $this->syncManagedConnector(
             $connector,
@@ -99,10 +99,10 @@ class Controller extends ConfigController
             $musicLessonsName = 'SOCS Music Lessons';
         }
 
-        $musicConnector->setLabel($musicLessonsName);
-        $musicConnector->setEventType('Event');
-        $musicConnector->setConnectorClass('SocsMusic');
-        $musicConnector->setLuEventType((int)$configValues[ConfigMapper::NAME_SOCS_MUSIC_LESSONS_DEFAULT_EVENT_TYPE]->getValue());
+        $musicConnector->setLabel($musicLessonsName)
+            ->setEventType('Event')
+            ->setConnectorClass('SocsMusic')
+            ->setLuEventType((int)$configValues[ConfigMapper::NAME_SOCS_MUSIC_LESSONS_DEFAULT_EVENT_TYPE]->getValue());
 
         $this->syncManagedConnector(
             $musicConnector,
