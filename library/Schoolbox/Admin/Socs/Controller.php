@@ -22,6 +22,7 @@ use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Admin\Settings\ModuleConfig;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class Controller extends ConfigController
 {
@@ -49,7 +50,7 @@ class Controller extends ConfigController
                 'event_type' => 'Event',
                 'connector_class' => 'Socs',
             ]);
-        } catch (\Throwable) {
+        } catch (MapperException\NotFound | MapperException\Deleted) {
             $calendarEventsSub = new Calendar_Api_Config_Record();
             $calendarEventsSub->setEventType('Event');
             $calendarEventsSub->setConnectorClass('Socs');
@@ -59,7 +60,7 @@ class Controller extends ConfigController
                 'event_type' => 'Event',
                 'connector_class' => 'SocsMusic',
             ]);
-        } catch (\Throwable) {
+        } catch (MapperException\NotFound | MapperException\Deleted) {
             $musicLessonsSub = new Calendar_Api_Config_Record();
             $musicLessonsSub->setEventType('Event');
             $musicLessonsSub->setConnectorClass('SocsMusic');
