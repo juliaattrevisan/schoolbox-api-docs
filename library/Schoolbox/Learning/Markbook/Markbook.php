@@ -278,6 +278,7 @@ class Markbook
     {
         if (!isset($this->students)) {
             $participants = new Collection();
+
             foreach ($this->getAssessments() as $assessment) {
                 foreach ($assessment->getAllParticipants() as $participant) {
                     $student = $participant->getUser();
@@ -300,9 +301,12 @@ class Markbook
                     }
                 }
             }
+
             $participants->sortByCallback((new SortUsersByName())->getCallable(), true);
+
             $this->students = $participants;
         }
+
         return $this->students;
     }
 
@@ -345,13 +349,6 @@ class Markbook
 
         $visibleAssessmentIds = $visibleAssessments->getPropertyValues('id');
         foreach ($this->getStudents() as $student) {
-            /* Check if we had a specific set of $studentIds to care about:
-             * if we did, and this user isn't one of those people, skip them
-             */
-            if (!$this->isFilteredStudent($student->getId())) {
-                continue;
-            }
-
             // Check whether latest feedback is draft
             $statsHasDraft = false;
             foreach ($this->assessments as $assessment) {
@@ -367,16 +364,19 @@ class Markbook
                 $this->defaultMarkScheme->getHumanReadableMark(
                     $weightedSummator->summateAllAssessablesForUser($visibleAssessments, $student, true)
                 );
+
             $this->studentStatistics[$student->getId()]['meanNormalised'] =
                 $weightedSummator->summate($visibleAssessments, $student, true);
 
             $this->studentStatistics[$student->getId()]['draftWeightedMean'] = null;
             $this->studentStatistics[$student->getId()]['meanDraftNormalised'] = null;
+
             if ($statsHasDraft) {
                 $this->studentStatistics[$student->getId()]['draftWeightedMean'] =
                     $this->defaultMarkScheme->getHumanReadableMark(
                         $weightedSummator->summateAllAssessablesForUser($visibleAssessments, $student, false)
                     );
+
                 $this->studentStatistics[$student->getId()]['meanDraftNormalised'] =
                     $weightedSummator->summate($visibleAssessments, $student, false);
             }
@@ -420,6 +420,7 @@ class Markbook
     private function isMostRecentFeedbackDraft(IAssessable $assessment, User $student): bool
     {
         $participant = $assessment->getParticipantIfExtant($student);
+
         if (!$participant || $participant->isExcluded()) {
             return false;
         }
@@ -427,6 +428,7 @@ class Markbook
         // If a due work:
         if ($assessment instanceof DueWork) {
             $latestFeedback = $participant->findMostRecentInstructorGivenFeedback();
+
             return $latestFeedback && $latestFeedback->isDraft();
         }
 

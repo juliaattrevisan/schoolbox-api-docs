@@ -16,6 +16,7 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
@@ -45,6 +46,7 @@ class FeedbackFolders
      * You can still use findForStudents() independently of this method, if you wanted.
      *
      * @param FolderModel $folder
+     * @param array $excluded A list of excluded students' (userId, externalId) that were excluded from the reporting activity
      * @param \Alaress_Date_Format $from
      * @param \Alaress_Date_Format $to
      * @return array
@@ -53,10 +55,11 @@ class FeedbackFolders
      */
     public function findForFolder(
         FolderModel $folder,
+        array $excluded,
         \Alaress_Date_Format $from,
         \Alaress_Date_Format $to
     ): array {
-        $studentIds = $this->findStudents($folder)->getPropertyValues('id');
+        $studentIds = $this->findStudents($folder, $excluded)->getPropertyValues('id');
 
         return $this->findForStudents($studentIds, $from, $to);
     }
@@ -70,16 +73,23 @@ class FeedbackFolders
      * list. You don't need to show that.
      *
      * @param FolderModel $folder
+     * @param array $excluded A list of excluded students' externalIds that were excluded from the reporting activity
      * @return Collection<\Schoolbox\User>
      * @throws Exception
      * @throws NotFound
      */
-    public function findStudents(FolderModel $folder): Collection
+    public function findStudents(FolderModel $folder, array $excluded): Collection
     {
         /* Find a list of students currently involved in $folder, according to the sis
          */
         $students = $this->externalClass->getStudents($folder->getCodeString());
         $externalIds = array_column($students, 'synergy_id');
+
+        /* Subtract the excluded folks
+         */
+        if (\count($excluded)) {
+            $externalIds = array_values(array_diff($externalIds, $excluded));
+        }
 
         /* Need their user ids, not the external ids
          *

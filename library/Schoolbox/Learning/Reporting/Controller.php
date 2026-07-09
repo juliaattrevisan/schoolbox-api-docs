@@ -499,14 +499,26 @@ class Controller extends Base
                 ->map(fn(CurriculumNode $curriculumNode) => $curriculumNode->getCode())
                 ->getAll();
 
+            /* Find students who were excluded from this reporting activity: we don't care about their supporting
+             * datums and they shouldn't appear in the Activity Grades markbook. These are their externalIds that we can
+             * subtract from $this->feedbackFolders->findStudents($folder) below.
+             */
+            $excluded = [];
+
+            foreach ($assessment->getAllParticipants() as $participant) {
+                if ($participant->isExcluded()) {
+                    $excluded[] = $participant->getUser()->getExternalId();
+                }
+            }
+
             /* Note that the first arg to findAllByFolderIdForReview() can actually be a set of folder ids
              */
             $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview(
                 /* For the students in $folder, find all the folders where they had a published feedback.
-                 * Or, use just the current class folder this activity is imported to to show content only from that page.
+                 * Or, use just the current class folder this activity is imported to show content only from that page.
                  */
                 folderId: match ($supportingDataFolders) {
-                    SupportingDataFolder::ANY_FOLDERS => $this->feedbackFolders->findForFolder($folder, $from, $to),
+                    SupportingDataFolder::ANY_FOLDERS => $this->feedbackFolders->findForFolder($folder, $excluded, $from, $to),
                     SupportingDataFolder::CURRENT_ONLY => [$folder->getId()],
                 },
                 /* For the $studentIds provided, find all the folders where they had a published feedback
@@ -538,7 +550,7 @@ class Controller extends Base
                 /* Only hydrate these particular participants and their feedbacks, if specified: otherwise swamp hydrates
                  * everyone who participated in each $assessment which might be more than you need.
                  */
-                users: $this->feedbackFolders->findStudents($folder),
+                users: $this->feedbackFolders->findStudents($folder, $excluded),
                 /* Somewhat experimental:
                  * Don't need any response instances. You get some mixed results here, since the markbook infers states:
                  * a response existing, but no feedback given yet, is shown as a hyphen - ...but if a response doesn't
