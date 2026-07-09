@@ -94,7 +94,7 @@ class FeedbackFolders
         /* Everyone might be excluded; exit early
          */
         if (!\count($externalIds)) {
-           return $this->userMapper->createCollection();
+            return $this->userMapper->createCollection();
         }
 
         /* Need their user ids, not the external ids
