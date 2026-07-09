@@ -8,6 +8,7 @@ import MetaList from "@schoolboxVue/components/meta/list";
 import MetaItem from "@schoolboxVue/components/meta/item";
 import MediaArticle from "@schoolboxVue/components/media-article";
 import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
+import SocsMusicParticipantMetaItem from "@schoolboxVue/components/fullcalendar/socs-music-participant-meta-item";
 
 /* Path aliases like @schoolboxCalendarEvent are defined in rspack.common.js
  */
@@ -62,6 +63,7 @@ export default {
         MetaList,
         RevealModal,
         MediaArticle,
+        SocsMusicParticipantMetaItem,
     },
 
     mixins: [fullCalendarHelper],
@@ -998,36 +1000,16 @@ export default {
                                 </template>
                             </meta-item>
                         </template>
-                        <template v-if="eventExtendedProps.socsMusic.staff.length">
-                            <meta-item icon="staff">
-                                Staff:
-                                <template
-                                    v-for="(person, index) in eventExtendedProps.socsMusic.staff"
-                                    :key="person.id"
-                                >
-                                    <template v-if="person.url">
-                                        <a :href="person.url">{{ person.name }}</a>
-                                    </template>
-                                    <template v-else>{{ person.name }}</template
-                                    ><span v-if="index != eventExtendedProps.socsMusic.staff.length - 1">, </span>
-                                </template>
-                            </meta-item>
-                        </template>
-                        <template v-if="eventExtendedProps.socsMusic.students.length">
-                            <meta-item icon="staff-students">
-                                Student:
-                                <template
-                                    v-for="(person, index) in eventExtendedProps.socsMusic.students"
-                                    :key="person.id"
-                                >
-                                    <template v-if="person.url">
-                                        <a :href="person.url">{{ person.name }}</a>
-                                    </template>
-                                    <template v-else>{{ person.name }}</template
-                                    ><span v-if="index != eventExtendedProps.socsMusic.students.length - 1">, </span>
-                                </template>
-                            </meta-item>
-                        </template>
+                        <socs-music-participant-meta-item
+                            icon="staff"
+                            label="Staff"
+                            :participants="eventExtendedProps.socsMusic.staff"
+                        />
+                        <socs-music-participant-meta-item
+                            icon="staff-students"
+                            label="Student"
+                            :participants="eventExtendedProps.socsMusic.students"
+                        />
                         <meta-item
                             icon="class-list"
                             v-if="this.showAttendanceMeta(eventExtendedProps.attendance.payload.level)"
