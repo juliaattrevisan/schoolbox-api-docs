@@ -91,6 +91,12 @@ class FeedbackFolders
             $externalIds = array_values(array_diff($externalIds, $excluded));
         }
 
+        /* Everyone might be excluded; exit early
+         */
+        if (!\count($externalIds)) {
+           return $this->userMapper->createCollection();
+        }
+
         /* Need their user ids, not the external ids
          *
          * TODO you could also put a Role::STUDENT as the second arg, but that would preclude any staff
