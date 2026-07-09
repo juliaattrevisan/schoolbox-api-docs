@@ -30,6 +30,7 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint as TassApiEndpoint;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint as VeracrossEndpoint;
 use Schoolbox\External\Connector\Wonde\Base\Endpoint as WondeEndpoint;
+use Schoolbox\External\Connector\Edlink\Base\Endpoint as EdlinkEndpoint;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
@@ -62,6 +63,7 @@ class Factory implements IFactory
     public const LISS = 'liss';
     public const VERACROSS = 'veracross';
     public const CIVICA = 'civica';
+    public const EDLINK = 'edlink';
     public const CSV = 'csv';
 
 
@@ -82,6 +84,7 @@ class Factory implements IFactory
         self::LISS => 'LISS',
         self::VERACROSS => 'Veracross',
         self::CIVICA => 'Civica',
+        self::EDLINK => 'Edlink',
         self::CSV => 'External',
 
         /* When you've not chosen a SUDS Data Source
@@ -101,7 +104,8 @@ class Factory implements IFactory
         Factory::SENTRAL,
         Factory::TASS_API,
         Factory::COMPASS,
-        Factory::VERACROSS
+        Factory::VERACROSS,
+        Factory::EDLINK
     ];
 
 
@@ -353,6 +357,32 @@ class Factory implements IFactory
                 UserProfile\Parent\Mapper::getInstance()->disableCache(),
                 UserProfile\Staff\Mapper::getInstance()->disableCache(),
                 UserProfile\Relationship\Mapper::getInstance()->disableCache(),
+                /* Timetable pieces
+                 */
+                \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
+                ClassEntryMapper::getInstance()->disableCache(),
+                ClassInvolvementMapper::getInstance()->disableCache(),
+                ClassPeriodMapper::getInstance()->disableCache(),
+                TimetablePeriodMapper::getInstance()->disableCache(),
+                \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
+            )->produce(),
+
+            self::EDLINK => new EdlinkEndpoint\Factory(
+                $this->validStrats,
+                $this->logger,
+                $this->perform,
+                $this->host,
+                $this->key,
+                $this->watchlist,
+                Loader::getInstance()->get('photo_sis_import'),
+                /* Profile pieces
+                 */
+                UserProfile\Mapper::getInstance()->disableCache(),
+                UserProfile\Student\Mapper::getInstance()->disableCache(),
+                UserProfile\Parent\Mapper::getInstance()->disableCache(),
+                UserProfile\Staff\Mapper::getInstance()->disableCache(),
+                UserProfile\Relationship\Mapper::getInstance()->disableCache(),
+                StorageMapper::getInstance()->disableCache(),
                 /* Timetable pieces
                  */
                 \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),

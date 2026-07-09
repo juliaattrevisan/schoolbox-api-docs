@@ -58,6 +58,9 @@ class DSNFactory
 
             case \Schoolbox\External\Importer\Endpoint\Factory::CIVICA:
                 return new \Schoolbox\External\Connector\Civica\Base\Endpoint\Codec\DSN();
+
+            case \Schoolbox\External\Importer\Endpoint\Factory::EDLINK:
+                return new \Schoolbox\External\Connector\Edlink\Base\Endpoint\Codec\DSN();
         }
 
         return null;
