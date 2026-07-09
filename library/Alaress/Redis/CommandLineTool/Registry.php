@@ -83,6 +83,11 @@ class Registry
             // Old keys
             '^fc:' . self::INSTANCE_ID_MATCH . ':system_usage_',
 
+            // SOCS calendar cache
+            'httpClient\\.' . self::INSTANCE_ID_MATCH . ':socs-calendar-',
+            // SOCS music lessons cache
+            'httpClient\\.' . self::INSTANCE_ID_MATCH . ':socs-music-',
+
             // HTTP client cache
             'httpClient\\.' . self::INSTANCE_ID_MATCH . ':',
 
