@@ -177,7 +177,7 @@
                                             <label for="group">Role</label>
                                             <select id="group" name="group">
                                                 {% for role in roles %}
-                                                    <option value="{{ role.id }}" {% if user.role.id == role.id %}selected{% endif %}>{{ role.name }}</option>
+                                                    <option value="{{ role.id }}" data-role-type="{{ role.type }}" {% if user.role.id == role.id %}selected{% endif %}>{{ role.name }}</option>
                                                 {% endfor %}
                                             </select>
                                         </div>
@@ -257,7 +257,7 @@
                                 </div>
                             </fieldset>
 
-                            <fieldset>
+                            <fieldset data-role="qualification-fieldset" {% if user.role.type != 'student' %}class="hide"{% endif %}>
                                 <label class="content">{{ locale.translate('qualification', false, true) }} being undertaken</label>
                                 <div class="row content">
                                     {% for qualification in qualifications ?? [] %}
@@ -884,6 +884,15 @@
         $('#groupSelect').on('change', function() {
             $('form[data-validatable-as="addGroup"]').find(':submit').prop('disabled', false);
         });
+
+        var roleSelector = $("#group");
+        var qualificationFieldset = $("[data-role=\"qualification-fieldset\"]");
+        var toggleQualificationFieldset = function () {
+            qualificationFieldset.toggleClass("hide", roleSelector.find(":selected").data("role-type") !== "student");
+        };
+
+        roleSelector.on('change', toggleQualificationFieldset);
+        toggleQualificationFieldset();
 
         {# Validate user details#}
 

@@ -769,7 +769,8 @@ class Controller extends Base
         $user->setPreferredName($post['preferred_name']);
         $user->setLastname($post['lastname']);
         $user->setExternalId($post['database_id'] == '' ? null : $post['database_id']);
-        $user->getRole()->setId($post['group']);
+        $role = $this->roleMapper->findById((int)$post['group']);
+        $user->setRole($role);
         $user->setPositionTitle($post['position_title']);
         $user->setAltEmail(trim($post['alt_email']) == '' ? null : trim($post['alt_email']));
         $user->setYear($year);
@@ -795,13 +796,17 @@ class Controller extends Base
             }
         }
 
-        $qualificationCollection = new GenericCollection(QualificationModel::class);
-        foreach ($post['qualification'] ?? [] as $qualificationId) {
-            $qualification = new QualificationModel();
-            $qualification->setId((int) $qualificationId);
-            $qualificationCollection->add($qualification);
+        /* Ignore the qualification update even if the user is not of the correct roletype
+         */
+        if (QualificationUpdateEligibility::isAllowedForRoleType($role->getType())) {
+            $qualificationCollection = new GenericCollection(QualificationModel::class);
+            foreach ($post['qualification'] ?? [] as $qualificationId) {
+                $qualification = new QualificationModel();
+                $qualification->setId((int) $qualificationId);
+                $qualificationCollection->add($qualification);
+            }
+            $user->setQualificationCollection($qualificationCollection);
         }
-        $user->setQualificationCollection($qualificationCollection);
 
         /* Pronoun Logic
          *
