@@ -183,19 +183,36 @@ class Processor
         $reader = new Reader($this->filesystemProxy->readStream($file), true);
         $headerRow = $reader->readHeaderRow();
 
+        /* A list of warnings/errors/scenarios that schools must fix before we can continue
+         */
+        $errors = 0;
+
         /* Figure out what column to use as a basis for discovering (normalised mark, learner human readable mark and
          * instructor human readable mark) tuple. It's presumed to be consistent throughout the csv.
          */
-        $markStrategy = $this->selectMarkStrategy($headerRow);
+        try {
+            $markStrategy = $this->selectMarkStrategy($headerRow);
+        } catch (\Schoolbox\Application\Exception\Exception $e) {
+            $this->log(
+                'The CSV must contain either the “Human Readable Grade” or “Normalised Mark” column.',
+                IStrategy::WARNING
+            );
+
+            $errors++;
+
+            /* Exit early: there's no way to successfully continue from here
+             */
+            return [
+                'messages' => $this->messages,
+                'errors' => $errors,
+                'links' => [],
+            ];
+        }
 
         /* Load a particular file
          */
         $reader = new Reader($this->filesystemProxy->readStream($file), true);
         $reader->setExpectedColumns($markStrategy->getExpectedColumns());
-
-        /* A list of warnings/errors/scenarios that schools must fix before we can continue
-         */
-        $errors = 0;
 
         /* Maintain a row counter
          */
