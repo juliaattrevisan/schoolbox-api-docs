@@ -533,6 +533,55 @@ try {
                 $sentry
             ));
 
+            // SOCS calendar
+            $api->add(buildApiClass(
+                Calendar_Api_EventType_Event_Socs_Default::class,
+                [
+                    $user,
+                    $viewer,
+                    $kernel->getDependencyInjector()->get('config'),
+                    \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                    \Schoolbox\CampusMapper::getInstance(),
+                    new \Schoolbox\Socs\HttpClient(
+                        (string)$config->get(\Schoolbox\Config\ConfigMapper::NAME_SOCS_ENDPOINT_HOST),
+                        (string)$config->get(\Schoolbox\Config\ConfigMapper::NAME_SOCS_ENDPOINT_ID),
+                        (string)$config->get(\Schoolbox\Config\ConfigMapper::NAME_SOCS_ENDPOINT_TOKEN),
+                        $kernel->getDependencyInjector()->get('httpClient'),
+                        $kernel->getDependencyInjector()->get('httpClient.cache'),
+                    ),
+                    null,
+                    $sentry,
+                    Calendar_Api_Config_Mapper::getInstance(),
+                ],
+                true,
+                $sentry
+                      ));
+
+            // SOCS Music
+            $api->add(buildApiClass(
+                Calendar_Api_EventType_Event_SocsMusic_Default::class,
+                [
+                    $user,
+                    $viewer,
+                    $kernel->getDependencyInjector()->get('config'),
+                    \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                    new \Schoolbox\Socs\HttpClient(
+                        (string)$config->get(\Schoolbox\Config\ConfigMapper::NAME_SOCS_ENDPOINT_HOST),
+                        (string)$config->get(\Schoolbox\Config\ConfigMapper::NAME_SOCS_ENDPOINT_ID),
+                        (string)$config->get(\Schoolbox\Config\ConfigMapper::NAME_SOCS_ENDPOINT_TOKEN),
+                        $kernel->getDependencyInjector()->get('httpClient'),
+                        $kernel->getDependencyInjector()->get('httpClient.cache'),
+                        'socs-music-'
+                    ),
+                    \Schoolbox\UserMapper::getInstance(),
+                    null,
+                    $sentry,
+                    Calendar_Api_Config_Mapper::getInstance(),
+                ],
+                true,
+                $sentry
+            ));
+
             $filename = ExportType::EXTERNAL_FILE;
             break;
 
@@ -697,6 +746,55 @@ try {
                         $user,
                         $viewer,
                         \Schoolbox\Calendar\EventTypeMapper::getInstance()
+                    ],
+                    true,
+                    $sentry
+                ));
+
+                // SOCS calendar
+                $api->add(buildApiClass(
+                    Calendar_Api_EventType_Event_Socs_Default::class,
+                    [
+                      $user,
+                      $viewer,
+                      $kernel->getDependencyInjector()->get('config'),
+                      \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                      \Schoolbox\CampusMapper::getInstance(),
+                      new \Schoolbox\Socs\HttpClient(
+                          (string)$config->get(\Schoolbox\Config\ConfigMapper::NAME_SOCS_ENDPOINT_HOST),
+                          (string)$config->get(\Schoolbox\Config\ConfigMapper::NAME_SOCS_ENDPOINT_ID),
+                          (string)$config->get(\Schoolbox\Config\ConfigMapper::NAME_SOCS_ENDPOINT_TOKEN),
+                          $kernel->getDependencyInjector()->get('httpClient'),
+                          $kernel->getDependencyInjector()->get('httpClient.cache'),
+                      ),
+                      null,
+                      $sentry,
+                      Calendar_Api_Config_Mapper::getInstance(),
+                    ],
+                    true,
+                    $sentry
+                ));
+
+                // SOCS Music
+                $api->add(buildApiClass(
+                    Calendar_Api_EventType_Event_SocsMusic_Default::class,
+                    [
+                      $user,
+                      $viewer,
+                      $kernel->getDependencyInjector()->get('config'),
+                      \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                      new \Schoolbox\Socs\HttpClient(
+                          (string)$config->get(\Schoolbox\Config\ConfigMapper::NAME_SOCS_ENDPOINT_HOST),
+                          (string)$config->get(\Schoolbox\Config\ConfigMapper::NAME_SOCS_ENDPOINT_ID),
+                          (string)$config->get(\Schoolbox\Config\ConfigMapper::NAME_SOCS_ENDPOINT_TOKEN),
+                          $kernel->getDependencyInjector()->get('httpClient'),
+                          $kernel->getDependencyInjector()->get('httpClient.cache'),
+                          'socs-music-'
+                      ),
+                      \Schoolbox\UserMapper::getInstance(),
+                      null,
+                      $sentry,
+                      Calendar_Api_Config_Mapper::getInstance(),
                     ],
                     true,
                     $sentry
