@@ -21,11 +21,11 @@
                 </div>
             </div>
 
-            {# if socs Calendar Events subscription has failed, there may be a creds issue #}
+            {# if socs Calendar Events Import has failed, there may be a creds issue #}
             {% if calendarEventsSub.getFailedCount() >= 5 %}
                 <div class="small-12 island">
                     <div class="alert-box alert">
-                        The Calendar Events subscription has failed {{ calendarEventsSub.getFailedCount() }} times.<br>
+                        The Calendar Events Import has failed {{ calendarEventsSub.getFailedCount() }} times.<br>
                         It may be one of the following issues:<br>
                         <ul>
                             <li>The request to the remote server has timed out. </li>
@@ -36,11 +36,11 @@
                 </div>
             {% endif %}
 
-            {# if socs Music Lessons subscription has failed, there may be a creds issue #}
+            {# if socs Music Lessons Import has failed, there may be a creds issue #}
             {% if musicLessonsSub.getFailedCount() >= 5 %}
                 <div class="small-12 island">
                     <div class="alert-box alert">
-                        The Music Lessons subscription has failed {{ musicLessonsSub.getFailedCount() }} times.<br>
+                        The Music Lessons Import has failed {{ musicLessonsSub.getFailedCount() }} times.<br>
                         It may be one of the following issues:<br>
                         <ul>
                             <li>The request to the remote server has timed out. </li>
