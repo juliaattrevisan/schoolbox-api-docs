@@ -147,6 +147,7 @@ class Markbook
      * @param array|null $studentIds A reductive filter that operates on $assessments: a set of user ids
      * @param array|null $curriculumCodes A reductive filter that operates on $assessments: a set of curriculum codes
      * @param array|null $folderIds A reductive filter that operates on $assessments: a set of folder ids
+     * @param bool|null $includeExcluded Set this to false to strictly disregard any excluded students
      */
     public function __construct(
         GenericCollection $assessments,
@@ -155,7 +156,8 @@ class Markbook
         private ?bool $overallStatistics = true,
         private ?array $studentIds = null,
         private ?array $curriculumCodes = null,
-        private ?array $folderIds = null
+        private ?array $folderIds = null,
+        private ?bool $includeExcluded = true,
     ) {
         /* We'll reduce this set further by applying the reductive filters for student ids, curric codes and folder ids
          */
@@ -276,6 +278,7 @@ class Markbook
     {
         if (!isset($this->students)) {
             $participants = new Collection();
+
             foreach ($this->getAssessments() as $assessment) {
                 foreach ($assessment->getAllParticipants() as $participant) {
                     $student = $participant->getUser();
@@ -287,14 +290,23 @@ class Markbook
                         continue;
                     }
 
+                    /* If this student was excluded, and $includeExcluded is false, skip this person
+                     */
+                    if (false === $this->includeExcluded && $participant->isExcluded()) {
+                        continue;
+                    }
+
                     if (!$participants->offsetExists($student->getId())) {
                         $participants->setOffset($student->getId(), $student);
                     }
                 }
             }
+
             $participants->sortByCallback((new SortUsersByName())->getCallable(), true);
+
             $this->students = $participants;
         }
+
         return $this->students;
     }
 
@@ -337,13 +349,6 @@ class Markbook
 
         $visibleAssessmentIds = $visibleAssessments->getPropertyValues('id');
         foreach ($this->getStudents() as $student) {
-            /* Check if we had a specific set of $studentIds to care about:
-             * if we did, and this user isn't one of those people, skip them
-             */
-            if (!$this->isFilteredStudent($student->getId())) {
-                continue;
-            }
-
             // Check whether latest feedback is draft
             $statsHasDraft = false;
             foreach ($this->assessments as $assessment) {
@@ -359,16 +364,19 @@ class Markbook
                 $this->defaultMarkScheme->getHumanReadableMark(
                     $weightedSummator->summateAllAssessablesForUser($visibleAssessments, $student, true)
                 );
+
             $this->studentStatistics[$student->getId()]['meanNormalised'] =
                 $weightedSummator->summate($visibleAssessments, $student, true);
 
             $this->studentStatistics[$student->getId()]['draftWeightedMean'] = null;
             $this->studentStatistics[$student->getId()]['meanDraftNormalised'] = null;
+
             if ($statsHasDraft) {
                 $this->studentStatistics[$student->getId()]['draftWeightedMean'] =
                     $this->defaultMarkScheme->getHumanReadableMark(
                         $weightedSummator->summateAllAssessablesForUser($visibleAssessments, $student, false)
                     );
+
                 $this->studentStatistics[$student->getId()]['meanDraftNormalised'] =
                     $weightedSummator->summate($visibleAssessments, $student, false);
             }
@@ -412,6 +420,7 @@ class Markbook
     private function isMostRecentFeedbackDraft(IAssessable $assessment, User $student): bool
     {
         $participant = $assessment->getParticipantIfExtant($student);
+
         if (!$participant || $participant->isExcluded()) {
             return false;
         }
@@ -419,6 +428,7 @@ class Markbook
         // If a due work:
         if ($assessment instanceof DueWork) {
             $latestFeedback = $participant->findMostRecentInstructorGivenFeedback();
+
             return $latestFeedback && $latestFeedback->isDraft();
         }
 
@@ -498,6 +508,12 @@ class Markbook
                  *    - just those 3 people?
                  */
                 if (!$this->isFilteredStudent($participant->getUser()->getId())) {
+                    continue;
+                }
+
+                /* If this student was excluded, and $includeExcluded is false, skip this person
+                 */
+                if (false === $this->includeExcluded && $participant->isExcluded()) {
                     continue;
                 }
 

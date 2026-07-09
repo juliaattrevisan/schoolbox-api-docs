@@ -158,6 +158,7 @@ export interface MarkbookClassImpl {
 }
 
 export interface Markbook {
+    hasStudents: boolean | null;
     /** Student ranking based on the whole cohort/class  */
     rank: Record<UserId, number> | null;
     /** An overview of all the assessments that will be shown, in the order that they should be presented */
