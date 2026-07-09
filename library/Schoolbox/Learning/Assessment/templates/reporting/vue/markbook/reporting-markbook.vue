@@ -3,6 +3,7 @@
  * The reporting markbook / reporting status page
  */
 
+import locale from "@js/terminology/rosettaStone";
 import type { Template } from "@js/editor/types/editorTypes";
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import type { Node } from "@schoolboxCurriculum/types/Node";
@@ -101,7 +102,7 @@ window.Vue.onMounted(async () => {
             <div class="small-12 columns">
                 <div class="empty-state">
                     <sbx-icon name="progress" size="2.5rem"></sbx-icon>
-                    <p>No data available.</p>
+                    <p>There are no students participating in this {{ locale.activity.singular() }}.</p>
                 </div>
             </div>
         </div>
