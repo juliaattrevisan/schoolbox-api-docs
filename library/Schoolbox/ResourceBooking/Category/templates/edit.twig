@@ -32,7 +32,11 @@
         form.alaressValidate({
             rules: {
                 name: {
-                    minlength: 2
+                    requiredNotBlank: true,
+                    minlength: 2,
+                    normalizer(value) {
+                        return value.trim();
+                    }
                 }
             }
         });
