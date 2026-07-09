@@ -30,6 +30,7 @@ type RubricGridFormPayload = {
             groupId: number;
             name: string;
             on?: 1;
+            sequence: number;
         }
     >;
     descriptor: Record<
@@ -75,12 +76,16 @@ export function translateGridToFormPayload(grid: RubricGrid): RubricGridFormPayl
     };
 
     for (const capability of grid.capabilities) {
+        // Indicator sequencing
+        let i = 1;
+
         for (const indicator of capability.indicators) {
             gridData.criterion[indicator.id] = {
                 id: indicator.id >= 0 ? indicator.id : "", // the backend expects empty IDs for new indicators
                 groupId: capability.id,
                 name: indicator.name,
                 on: indicator.hasUsage ? 1 : undefined,
+                sequence: i,
             };
 
             gridData.descriptor[indicator.id] = indicator.descriptors.map((descriptor) => ({
@@ -92,6 +97,9 @@ export function translateGridToFormPayload(grid: RubricGrid): RubricGridFormPayl
                 text: descriptor.description.trim() === "" ? descriptor.description : descriptor.description.trim(),
                 points: (descriptor.maxValue ?? "").toString(),
             }));
+
+            // ...because we've never seen javascript concat numbers and strings before, but ok
+            i += 1;
         }
     }
 

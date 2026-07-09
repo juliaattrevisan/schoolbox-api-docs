@@ -115,28 +115,28 @@ class CapabilityUsageTest extends TestCase
 
 
         $capabilityUsage2                                             = new RubricGrid\CapabilityUsage($capability);
-        $capabilityUsage2->getIndicatorUsages()[$indicator1->getId()] = new RubricGrid\IndicatorUsage($indicator1);
+        $capabilityUsage2->getIndicatorUsages()[$indicator1->getId()] = (new RubricGrid\IndicatorUsage($indicator1))->setSequence(1);
 
         yield 'Capability 1 used' => [$capabilityUsage2, [$indicator1, $indicator2, $indicator3]];
 
 
         $capabilityUsage3                                             = new RubricGrid\CapabilityUsage($capability);
-        $capabilityUsage3->getIndicatorUsages()[$indicator3->getId()] = new RubricGrid\IndicatorUsage($indicator3);
+        $capabilityUsage3->getIndicatorUsages()[$indicator3->getId()] = (new RubricGrid\IndicatorUsage($indicator3))->setSequence(1);
 
         yield 'Capability 3 used' => [$capabilityUsage3, [$indicator3, $indicator1, $indicator2]];
 
 
         $capabilityUsage4                                             = new RubricGrid\CapabilityUsage($capability);
-        $capabilityUsage4->getIndicatorUsages()[$indicator3->getId()] = new RubricGrid\IndicatorUsage($indicator3);
-        $capabilityUsage4->getIndicatorUsages()[$indicator2->getId()] = new RubricGrid\IndicatorUsage($indicator2);
+        $capabilityUsage4->getIndicatorUsages()[$indicator3->getId()] = (new RubricGrid\IndicatorUsage($indicator3))->setSequence(1);
+        $capabilityUsage4->getIndicatorUsages()[$indicator2->getId()] = (new RubricGrid\IndicatorUsage($indicator2))->setSequence(2);
 
         yield 'Capability 3, 2 used' => [$capabilityUsage4, [$indicator3, $indicator2, $indicator1]];
 
 
         $capabilityUsage5                                             = new RubricGrid\CapabilityUsage($capability);
-        $capabilityUsage5->getIndicatorUsages()[$indicator1->getId()] = new RubricGrid\IndicatorUsage($indicator1);
-        $capabilityUsage5->getIndicatorUsages()[$indicator3->getId()] = new RubricGrid\IndicatorUsage($indicator3);
-        $capabilityUsage5->getIndicatorUsages()[$indicator2->getId()] = new RubricGrid\IndicatorUsage($indicator2);
+        $capabilityUsage5->getIndicatorUsages()[$indicator1->getId()] = (new RubricGrid\IndicatorUsage($indicator1))->setSequence(1);
+        $capabilityUsage5->getIndicatorUsages()[$indicator3->getId()] = (new RubricGrid\IndicatorUsage($indicator3))->setSequence(2);
+        $capabilityUsage5->getIndicatorUsages()[$indicator2->getId()] = (new RubricGrid\IndicatorUsage($indicator2))->setSequence(3);
 
         yield 'Capability 1, 3, 2 used' => [$capabilityUsage5, [$indicator1, $indicator3, $indicator2]];
     }
@@ -203,22 +203,22 @@ class CapabilityUsageTest extends TestCase
 
 
         $capabilityUsage2                                             = new RubricGrid\CapabilityUsage($capability);
-        $capabilityUsage2->getIndicatorUsages()[$indicator4->getId()] = $indicatorUsage4;
+        $capabilityUsage2->getIndicatorUsages()[$indicator4->getId()] = $indicatorUsage4->setSequence(1);
 
         yield 'No indicators with descriptors' => [$capabilityUsage2, 0];
 
 
         $capabilityUsage3                                             = new RubricGrid\CapabilityUsage($capability);
-        $capabilityUsage3->getIndicatorUsages()[$indicator2->getId()] = $indicatorUsage2;
+        $capabilityUsage3->getIndicatorUsages()[$indicator2->getId()] = $indicatorUsage2->setSequence(1);
 
         yield 'No indicators with descriptors with marks' => [$capabilityUsage3, 0];
 
 
         $capabilityUsage4                                             = new RubricGrid\CapabilityUsage($capability);
-        $capabilityUsage4->getIndicatorUsages()[$indicator1->getId()] = $indicatorUsage1;
-        $capabilityUsage4->getIndicatorUsages()[$indicator2->getId()] = $indicatorUsage2;
-        $capabilityUsage4->getIndicatorUsages()[$indicator3->getId()] = $indicatorUsage3;
-        $capabilityUsage4->getIndicatorUsages()[$indicator4->getId()] = $indicatorUsage4;
+        $capabilityUsage4->getIndicatorUsages()[$indicator1->getId()] = $indicatorUsage1->setSequence(1);
+        $capabilityUsage4->getIndicatorUsages()[$indicator2->getId()] = $indicatorUsage2->setSequence(2);
+        $capabilityUsage4->getIndicatorUsages()[$indicator3->getId()] = $indicatorUsage3->setSequence(3);
+        $capabilityUsage4->getIndicatorUsages()[$indicator4->getId()] = $indicatorUsage4->setSequence(4);
 
         yield 'Descriptors with marks' => [$capabilityUsage4, 15];
     }
@@ -283,22 +283,22 @@ class CapabilityUsageTest extends TestCase
 
 
         $capabilityUsage2                                             = new RubricGrid\CapabilityUsage($capability);
-        $capabilityUsage2->getIndicatorUsages()[$indicator4->getId()] = $indicatorUsage4;
+        $capabilityUsage2->getIndicatorUsages()[$indicator4->getId()] = $indicatorUsage4->setSequence(1);
 
         yield 'No indicators with descriptors' => [$capabilityUsage2, false];
 
 
         $capabilityUsage3                                             = new RubricGrid\CapabilityUsage($capability);
-        $capabilityUsage3->getIndicatorUsages()[$indicator2->getId()] = $indicatorUsage2;
+        $capabilityUsage3->getIndicatorUsages()[$indicator2->getId()] = $indicatorUsage2->setSequence(1);
 
         yield 'No indicators with descriptors with marks' => [$capabilityUsage3, false];
 
 
         $capabilityUsage4                                             = new RubricGrid\CapabilityUsage($capability);
-        $capabilityUsage4->getIndicatorUsages()[$indicator1->getId()] = $indicatorUsage1;
-        $capabilityUsage4->getIndicatorUsages()[$indicator2->getId()] = $indicatorUsage2;
-        $capabilityUsage4->getIndicatorUsages()[$indicator3->getId()] = $indicatorUsage3;
-        $capabilityUsage4->getIndicatorUsages()[$indicator4->getId()] = $indicatorUsage4;
+        $capabilityUsage4->getIndicatorUsages()[$indicator1->getId()] = $indicatorUsage1->setSequence(1);
+        $capabilityUsage4->getIndicatorUsages()[$indicator2->getId()] = $indicatorUsage2->setSequence(2);
+        $capabilityUsage4->getIndicatorUsages()[$indicator3->getId()] = $indicatorUsage3->setSequence(3);
+        $capabilityUsage4->getIndicatorUsages()[$indicator4->getId()] = $indicatorUsage4->setSequence(4);
 
         yield 'Descriptors with marks' => [$capabilityUsage4, true];
     }

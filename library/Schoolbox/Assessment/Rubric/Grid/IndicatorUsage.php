@@ -52,6 +52,14 @@ class IndicatorUsage
 
 
     /**
+     * Ordering of this indicator/descriptor combo inside a capability. Used for sorting after compilation
+     *
+     * @var int|null
+     */
+    private ?int $sequence = null;
+
+
+    /**
      * Constructor
      *
      * @param Indicator $indicator
@@ -308,7 +316,7 @@ class IndicatorUsage
 
 
     /**
-     * @return GenericCollection|Descriptor[]
+     * @return GenericCollection<Descriptor>
      */
     public function getDescriptors(): GenericCollection
     {
@@ -317,12 +325,32 @@ class IndicatorUsage
 
 
     /**
-     * @param GenericCollection|Descriptor[] $descriptors
+     * @param GenericCollection<Descriptor> $descriptors
      * @return static
      */
     public function setDescriptors(GenericCollection $descriptors): self
     {
         $this->descriptors = $descriptors;
+        return $this;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getSequence(): int
+    {
+        return $this->sequence;
+    }
+
+
+    /**
+     * @param int $sequence
+     * @return $this
+     */
+    public function setSequence(int $sequence): self
+    {
+        $this->sequence = $sequence;
         return $this;
     }
 }

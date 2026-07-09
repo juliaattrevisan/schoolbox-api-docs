@@ -610,7 +610,7 @@ class DataSource
                     continue;
                 }
 
-                $indicatorUsage = new \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage($indicator);
+                $indicatorUsage = (new \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage($indicator))->setSequence($indicatorUsageModel->getSequence());
 
                 // Add descriptors, and apply min value
                 $levelIndex = 0;
@@ -846,10 +846,6 @@ class DataSource
 
             $capabilityUsageModels->add($capabilityUsageModel);
 
-            /* Increment sequence throughout the foreach, assuming it's given to us in the intended order
-             */
-            $indicatorSequence = IndicatorUsageModel::SEQUENCE_BASE;
-
             foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
                 $indicatorModel = $indicatorModels[$indicatorUsage->getIndicator()->getId()];
 
@@ -857,7 +853,7 @@ class DataSource
                     ->setRubricInstance($rubricInstance)
                     ->setIndicator($indicatorModel)
                     ->setMaxValue($indicatorUsage->calculateMaxValueFromDescriptors())
-                    ->setSequence($indicatorSequence++);
+                    ->setSequence($indicatorUsage->getSequence());
 
                 $indicatorUsageModels->add($indicatorUsageModel);
 
@@ -970,6 +966,8 @@ class DataSource
 
         /* The feedback instance determines ultimately which schema we explore to find capability marks (ugh!)
          * This is pretty horrible but I don't really have many answers for a polymorphic schema like this
+         *
+         * TODO replace this with FeedbackMeta enum derivation instead, which basically does all this; SA-22879
          */
         if ($feedback instanceof \Schoolbox\Learning\Assessment\DueWork\Feedback\Model) {
             $feedbackTable = SubmissionBox\ReturnedWorkMapper::getInstance()->getTable();
