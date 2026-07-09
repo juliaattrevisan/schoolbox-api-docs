@@ -86,6 +86,7 @@ class UserBulkMapper extends UserMapper
                 u.synergy_id as external_id,
                 u.eportfolio_enabled,
                 g.name as role,
+                g.group_type as role_type,
                 c.name as campus,
                 lyl.name as year,
                 (jwt.jwt_id IS NOT NULL) as token,
