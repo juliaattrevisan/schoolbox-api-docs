@@ -786,7 +786,7 @@ then
 fi
 echo "Restoring database '$sourcedb'";
 ## Restore specified database (commenting out VIEW DEFINER clause on the fly)
-if ! (echo 'SET MAX_STATEMENT_TIME=0; '; cat "$sourcedb") | pv -s "$(du -b "$sourcedb" | cut -f 1)" | sed -E "s/^\/\*!50013 DEFINER=.+\*\//\/\* Fallback to default DEFINER \*\//g" | mariadb -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb; then
+if ! (echo 'SET MAX_STATEMENT_TIME=0; SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci; '; cat "$sourcedb") | pv -s "$(du -b "$sourcedb" | cut -f 1)" | sed -E "s/^\/\*!50013 DEFINER=.+\*\//\/\* Fallback to default DEFINER \*\//g" | mariadb -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb; then
   error "Unable to import database from backup file. Exiting."
 fi
 

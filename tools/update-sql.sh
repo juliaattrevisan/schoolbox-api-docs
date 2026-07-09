@@ -145,7 +145,7 @@ execute_upgrade_script(){
   log "Starting script: $script"
   if [[ $script == *".sql" ]]; then
     # Check for and report errors
-    if ! (echo 'SET MAX_STATEMENT_TIME=0; '; cat "$script") | mariadb  -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db"; then
+    if ! (echo 'SET MAX_STATEMENT_TIME=0; SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;'; cat "$script") | mariadb  -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db"; then
       error "Error running update: $script"
       error_int=1;
       error_msg="$error_msg,$script";
