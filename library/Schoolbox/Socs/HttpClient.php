@@ -55,9 +55,12 @@ class HttpClient
     private const NOT_AVAILABLE = 'Not available.';
 
     /**
-     * @param string $host Base URL of the SOCS API, without trailing slash.
-     * @param string $schoolId School ID
-     * @param string $token Schoolbox API token
+     * @param string      $host     Base URL of the SOCS API, without trailing slash.
+     * @param string      $schoolId School ID
+     * @param string      $token    Schoolbox API token
+     * @param Client|null $client
+     * @param Cache|null  $cache
+     * @param string      $cachePrefix redis prefix used for cache keys
      */
     public function __construct(
         string $host,
@@ -65,6 +68,7 @@ class HttpClient
         #[SensitiveParameter] private string $token = '',
         ?Client $client = null,
         private ?Cache $cache = null,
+        private string $cachePrefix = self::CALENDAR_CACHE_PREFIX,
     ) {
         $this->baseUrl = rtrim($host, '/');
         $this->client = $client ?? new Client([
@@ -186,7 +190,7 @@ class HttpClient
         $fullQuery = ['ID' => $this->schoolId, 'key' => $this->token] + $query;
         $content = $this->cache->request(
             $url . '?' . http_build_query($fullQuery),
-            self::CALENDAR_CACHE_PREFIX,
+            $this->cachePrefix,
             [],
             self::CALENDAR_CACHE_TTL,
         );

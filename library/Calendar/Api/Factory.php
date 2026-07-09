@@ -349,6 +349,7 @@ class Calendar_Api_Factory
                         (string)$this->configLoader->get(\Schoolbox\Config\ConfigMapper::NAME_SOCS_ENDPOINT_TOKEN),
                         $this->httpClient,
                         $this->cache,
+                        'socs-music-'
                     ),
                     \Schoolbox\UserMapper::getInstance(),
                     null,
