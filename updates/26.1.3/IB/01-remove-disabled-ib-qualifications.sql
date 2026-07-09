@@ -7,7 +7,7 @@ WHERE q.system_purpose_id IS NOT NULL
       SELECT 1
       FROM config c
       WHERE c.name = 'ib_enabled'
-        AND c.value = '1';
+        AND c.value = '1'
   );
 
 -- Remove any IB qualifications if IB is not enabled
@@ -18,5 +18,5 @@ WHERE q.system_purpose_id IS NOT NULL
       SELECT 1
       FROM config c
       WHERE c.name = 'ib_enabled'
-        AND LOWER(c.value) IN ('1', 'true', 'yes', 'on')
+        AND c.value= '1'
   );
