@@ -62,6 +62,27 @@ class ConfigMapper extends Mapper
     public const string NAME_IBIS_APP_ID = 'ibis_app_id';
     public const string NAME_IBIS_SECRET_KEY = 'ibis_secret_key';
 
+    /**
+     * IB qualifications to create when IB is enabled.
+     *
+     * Existing active qualifications are matched by system purpose, so a "Diploma Programme" qualification already
+     * linked to the "Diploma Programme Year 2" system purpose is treated as present.
+     *
+     * @var array<int, array{qualificationName: string, systemPurposeName: string, categoryName: string}>
+     */
+    private const array IB_QUALIFICATIONS = [
+        [
+            'qualificationName' => 'Diploma Programme',
+            'systemPurposeName' => 'Diploma Programme Year 2',
+            'categoryName' => 'DIPLOMA',
+        ],
+        [
+            'qualificationName' => 'Diploma Course',
+            'systemPurposeName' => 'Diploma Course',
+            'categoryName' => 'COURSE',
+        ],
+    ];
+
     // Field enum (kinda)
     public const int FIELD_INPUT         =  1;
     public const int FIELD_TEXT_AREA     =  2;
@@ -765,6 +786,62 @@ class ConfigMapper extends Mapper
     }
 
     /**
+     * Create the required IB qualifications if they do not already exist.
+     *
+     * @return void
+     */
+    protected function ensureIbQualificationsExist(): void
+    {
+        $query = "
+            INSERT INTO `lu_qualification` (`name`, `system_purpose_id`, `sequence`)
+            SELECT :qualificationName, sp.`id`, (SELECT COALESCE(MAX(`sequence`), 0) + 1 FROM `lu_qualification`)
+            FROM `ib_system_purposes` sp
+            INNER JOIN `lu_ib_category` c ON c.`id` = sp.`category_id`
+            WHERE sp.`name` = :systemPurposeName
+              AND c.`name` = :categoryName
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM `lu_qualification` q
+                  WHERE q.`system_purpose_id` = sp.`id`
+                    AND q.`deleted_at` IS NULL
+              )
+        ";
+
+        foreach (self::IB_QUALIFICATIONS as $qualification) {
+            $this->getDatabase()->query($query, $qualification);
+        }
+    }
+
+    /**
+     * Show or hide IB packages based on the IB enabled configuration value.
+     *
+     * @param bool $ibEnabled
+     * @return void
+     * @throws Exception
+     */
+    protected function setIbPackageVisibility(bool $ibEnabled): void
+    {
+        $packageMapper = \Schoolbox\Admin\Package\Mapper::getInstance();
+        /* IB packages are hidden/shown based on the IB Enabled setting. They are not deleted as they contain
+         * configuration data which we want to preserve when toggling IB on/off.
+         */
+        $pb = $packageMapper->getPredicateBuilder()->in('location', [
+            'IBPYPTransDis2025',
+            'IBDPCore',
+            'IBProgramme',
+            'IBPYPProgramme',
+            'IBMYPProgramme',
+            'IBBadges',
+        ]);
+        $packages = $packageMapper->findByPredicates($pb);
+        /** @var PackageModel $package */
+        foreach ($packages as $package) {
+            $package->setHidden(!$ibEnabled);
+            $packageMapper->save($package);
+        }
+    }
+
+    /**
      * Post save callback to ensure IB is enabled/disabled when the relevant setting is toggled
      *
      * @param Config $model
@@ -775,24 +852,10 @@ class ConfigMapper extends Mapper
     {
         if ($model->getName() === self::NAME_IB_ENABLED && $prev !== null && $model->getValue() !== $prev->getValue()) {
             $ibEnabled = (bool)$model->getValue();
-            $packageMapper = \Schoolbox\Admin\Package\Mapper::getInstance();
-            /* IB packages are hidden/shown based on the IB Enabled setting. They are not deleted as they contain
-             * configuration data which we want to preserve when toggling IB on/off.
-             */
-            $pb = $packageMapper->getPredicateBuilder()->in('location', [
-                'IBPYPTransDis2025',
-                'IBDPCore',
-                'IBProgramme',
-                'IBPYPProgramme',
-                'IBMYPProgramme',
-                'IBBadges',
-            ]);
-            $packages = $packageMapper->findByPredicates($pb);
-            /** @var PackageModel $package */
-            foreach ($packages as $package) {
-                $package->setHidden(!$ibEnabled);
-                $packageMapper->save($package);
+            if ($ibEnabled) {
+                $this->ensureIbQualificationsExist();
             }
+            $this->setIbPackageVisibility($ibEnabled);
         }
         return true;
     }
