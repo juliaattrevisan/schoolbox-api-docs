@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import MetaItem from "../meta/item.vue";
+import MetaItem from "@schoolboxVue/components/meta/item";
 
 export default {
     name: "SocsMusicParticipantMetaItem",
