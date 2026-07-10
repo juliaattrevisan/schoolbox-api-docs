@@ -273,7 +273,6 @@
                 data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}"
             {% endif %}
         >
-            {# TODO the showGroupTotal and showRubricTotal settings here might not be exactly right #}
             {% include '@rubric/grid.twig' with {
                 assessment: assessment,
                 markVisibility: currentFeedback.isSelfAssessment or participant.assessable.isFeedbackVisibleToUser(USER),
