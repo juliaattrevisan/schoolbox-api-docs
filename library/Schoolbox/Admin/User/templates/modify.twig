@@ -885,13 +885,19 @@
             $('form[data-validatable-as="addGroup"]').find(':submit').prop('disabled', false);
         });
 
-        var roleSelector = $("#group");
-        var qualificationFieldset = $("[data-role=\"qualification-fieldset\"]");
+        var roleSelector = document.getElementById('group');
+        var qualificationFieldset = document.querySelector('[data-role="qualification-fieldset"]');
         var toggleQualificationFieldset = function () {
-            qualificationFieldset.toggleClass("hide", roleSelector.find(":selected").data("role-type") !== "student");
+            var selected = roleSelector && roleSelector.options[roleSelector.selectedIndex];
+            var roleType = selected && selected.getAttribute('data-role-type');
+            if (qualificationFieldset) {
+                qualificationFieldset.classList.toggle('hide', roleType !== 'student');
+            }
         };
 
-        roleSelector.on('change', toggleQualificationFieldset);
+        if (roleSelector) {
+            roleSelector.addEventListener('change', toggleQualificationFieldset);
+        }
         toggleQualificationFieldset();
 
         {# Validate user details#}
