@@ -553,7 +553,7 @@ class OverallDataset
                 rcm.rubric_capability_id = vr.capability_id AND
                 rcm.feedback_id = sr.id AND
                 rcm.feedback_table = 'submission_return'
-            INNER JOIN v_rubric_indicator_mark_extend rim ON
+            LEFT JOIN v_rubric_indicator_mark_extend rim ON
                 rim.rubric_capability_mark_id = rcm.id AND
                 vr.indicator_id = rim.rubric_indicator_id
             WHERE vr.assessment_id IN {$submissionAssessmentPlaceholder}
@@ -596,7 +596,7 @@ class OverallDataset
                 rcm.rubric_capability_id = vr.capability_id AND
                 rcm.feedback_id = rf.id AND
                 rcm.feedback_table = 'reporting_feedback'
-            INNER JOIN v_rubric_indicator_mark_extend rim ON
+            LEFT JOIN v_rubric_indicator_mark_extend rim ON
                 rim.rubric_capability_mark_id = rcm.id AND
                 vr.indicator_id = rim.rubric_indicator_id
             WHERE vr.assessment_id IN {$reportingAssessmentPlaceholder}
