@@ -5,6 +5,9 @@
 --
 -- Note that reporting_feedback doesn't mention review_route: it's implied by usage that it's always 'instructor'
 -- since students can't self-assess themselves in any way.
+--
+-- Capability marks can be assigned without selecting indicator descriptors. The indicator-mark relationship must
+-- therefore remain a LEFT JOIN; an INNER JOIN would omit otherwise valid capability-only marks from this view.
 
 CREATE OR REPLACE VIEW v_rubric_mark AS
 SELECT *
@@ -41,6 +44,7 @@ FROM
             AND rcm.rubric_capability_id = vr.capability_id
             AND rcm.feedback_id = sr.id
             AND rcm.feedback_table = 'submission_return'
+        -- Keep this as a LEFT JOIN to retain capability-only marks when no indicator descriptor was selected.
         LEFT JOIN v_rubric_indicator_mark_extend rim ON rim.rubric_capability_mark_id = rcm.id
             AND vr.indicator_id = rim.rubric_indicator_id
         WHERE sr.deleted_at IS NULL
@@ -80,6 +84,7 @@ FROM
             AND rcm.rubric_capability_id = vr.capability_id
             AND rcm.feedback_id = rf.id
             AND rcm.feedback_table = 'reporting_feedback'
+        -- Keep this as a LEFT JOIN to retain capability-only marks when no indicator descriptor was selected.
         LEFT JOIN v_rubric_indicator_mark_extend rim ON rim.rubric_capability_mark_id = rcm.id
             AND vr.indicator_id = rim.rubric_indicator_id
         WHERE rf.deleted_at IS NULL
