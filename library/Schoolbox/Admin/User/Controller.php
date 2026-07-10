@@ -796,7 +796,7 @@ class Controller extends Base
             }
         }
 
-        /* Ignore the qualification update even if the user is not of the correct roletype
+        /* Ignore the qualification update if the user is not of the correct role type
          */
         if (QualificationUpdateEligibility::isAllowedForRoleType($role->getType())) {
             $qualificationCollection = new GenericCollection(QualificationModel::class);
