@@ -1,5 +1,7 @@
 import { expect, test } from "@schoolboxTest/playwright/support/integrations";
 import QualificationList from "@schoolboxTest/playwright/support/page/admin/userManagement/QualificationList";
+import type { Page } from "@playwright/test";
+import AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 
 /**
  * check the Qualifications list admin page is accessible at /adminv2/lists/qualification
@@ -18,8 +20,35 @@ test.describe.serial("Admin User Management - Lists: Qualifications", () => {
 
     const qualificationName = "Test Qualification PLW";
 
-    test.beforeAll(async ({ db }) => {
-        await db.updateInDatabase("config", { value: "1" }, { "name like": "ib_enabled" });
+    test.beforeAll(async ({ baseURL, browser, db }) => {
+        await db.updateInDatabase(
+            "config",
+            { value: "1", editable: "true", hidden: "false" },
+            { "name like": "ib_enabled" },
+        );
+
+        const setupContext = await browser.newContext({
+            baseURL,
+            ignoreHTTPSErrors: true,
+            viewport: { width: 1920, height: 1080 },
+        });
+        const setupPage: Page = await setupContext.newPage();
+        const setupTester = new AcceptanceTester(setupPage);
+        const ibEnabledToggle = setupPage.locator('.switch label[for="ib_enabled-field"]');
+
+        try {
+            await setupTester.loginAsAdmin();
+
+            await setupPage.goto("/adminv2/setting/Modules");
+            await ibEnabledToggle.click();
+            await setupPage.getByTestId("save-admin-settings-submit").click();
+
+            await setupPage.goto("/adminv2/setting/Modules");
+            await ibEnabledToggle.click();
+            await setupPage.getByTestId("save-admin-settings-submit").click();
+        } finally {
+            await setupContext.close();
+        }
     });
 
     test.beforeEach(async ({ tester, page }) => {
@@ -106,8 +135,8 @@ test.describe.serial("Admin User Management - Lists: Qualifications", () => {
             tester.isGoingTo(
                 "navigate to the Qualifications list, resort the items and verify the order is persisted after save and page reload",
             );
-            const item1 = 1;
-            const item2 = 2;
+            const item1 = 3;
+            const item2 = 4;
 
             await qualificationList.goto();
 
@@ -162,6 +191,10 @@ test.describe.serial("Admin User Management - Lists: Qualifications", () => {
             { deleted_at: "2022-01-15 11:22:34" },
             { "name like": "Test Qualification PLW%", deleted_at: null },
         );
-        await db.updateInDatabase("config", { value: "0" }, { "name like": "ib_enabled" });
+        await db.updateInDatabase(
+            "config",
+            { value: "0", editable: "false", hidden: "true" },
+            { "name like": "ib_enabled" },
+        );
     });
 });
