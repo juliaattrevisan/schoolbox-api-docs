@@ -209,7 +209,11 @@ class AbstractRedirect
                 'outputColumn' => 'section_id',
             ],
         ];
-        $searchColumn = $columns[$this->canvasDb->code_redirect_homepages]['searchColumn'];
+        $column = $columns[$this->canvasDb->code_redirect_homepages] ?? null;
+        if ($column === null) {
+            return null;
+        }
+        $searchColumn = $column['searchColumn'];
 
         $query = "
         SELECT c.id as course_id, cs.id as section_id, cs.sis_source_id, term.name as term_name, term.sis_source_id as term_sis_id
@@ -228,7 +232,7 @@ class AbstractRedirect
 
         $row = $statement->fetch();
 
-        return $row ? (int)$row[$columns[$this->canvasDb->code_redirect_homepages]['outputColumn']] : null;
+        return $row ? (int)$row[$column['outputColumn']] : null;
     }
 
     /**

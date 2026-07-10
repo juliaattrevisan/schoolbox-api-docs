@@ -52,7 +52,7 @@ class CanvasDb
     public readonly ?int $news_author;
     public readonly bool $redirect_assessments;
     public readonly bool $redirect_homepages;
-    public readonly string $code_redirect_homepages;
+    public readonly ?string $code_redirect_homepages;
     // options
     // course code:subject code:subject code from section
     public const REDIRECT_COURSE_CODE = 'course_code';
@@ -77,8 +77,7 @@ class CanvasDb
         $this->news_author = (int)$config->get(ConfigMapper::NAME_CANVAS_NEWS_AUTHOR);
         $this->redirect_assessments = (bool)$config->get(ConfigMapper::NAME_CANVAS_REDIRECT_ASSESSMENTS);
         $this->redirect_homepages = (bool)$config->get(ConfigMapper::NAME_CANVAS_REDIRECT_HOMEPAGES);
-        $this->code_redirect_homepages = $config->get(ConfigMapper::NAME_CANVAS_CODE_REDIRECT_HOMEPAGES)
-            ?? self::REDIRECT_COURSE_CODE;
+        $this->code_redirect_homepages = $config->get(ConfigMapper::NAME_CANVAS_CODE_REDIRECT_HOMEPAGES);
     }
 
     /**
