@@ -34,7 +34,7 @@
                 name: {
                     requiredNotBlank: true,
                     minlength: 2,
-                    normalizer(value) {
+                    normalizer: function(value) {
                         return value.trim();
                     }
                 }
