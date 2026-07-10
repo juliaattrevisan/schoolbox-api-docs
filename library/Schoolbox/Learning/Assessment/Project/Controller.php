@@ -255,22 +255,8 @@ class Controller extends Assessment\Controller
             $assessments = $this->getUnitAssessments($assessment, false);
             /** @var Project $assessment */
             foreach ($assessments as $assessment) {
-                // Calculate summary totals for display purposes
-                $participants = $assessment->getAllParticipants();
-
-                $participantStats = new GenericCollection(Assessment\ParticipantStatistics::class);
-                foreach ($participants as $participant) {
-                    $participantStats[$participant->getUser()->getId()] = new Assessment\ParticipantStatistics($participant);
-                }
-
-                $twigData['participantStats'][$assessment->getId()] = $participantStats;
                 $twigData['aImpls'][$assessment->getId()] = [
-                    'participantCount' => $participants->count(),
-                    'participantIndexCount' => $participants->count(),
-                    'participantCursor' => null,
                     'assessment' => $assessment,
-                    'participantStats' => $participantStats,
-                    'participants' => $participants,
                 ];
             }
         }
