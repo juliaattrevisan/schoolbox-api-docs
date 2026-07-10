@@ -181,6 +181,7 @@ window.Vue.onMounted(() => {
                 v-else
                 :id="`rb-capability-name-textarea-${componentId}`"
                 v-model.trim.lazy="capabilityName"
+                :name="`rb-capability-name-textarea-${componentId}`"
                 :maxlength="capabilityNameHasChanged ? MAX_CAPABILITY_LENGTH : undefined"
                 :placeholder="`${locale.rubricGroup.proper()} name`"
                 @change.once="capabilityNameHasChanged = true"
@@ -226,6 +227,7 @@ window.Vue.onMounted(() => {
             <input
                 :id="`rb-capability-mark-max-value-${componentId}`"
                 v-model.number="capabilityMaxValue"
+                :name="`rb-capability-mark-max-value-${componentId}`"
                 type="number"
                 class="rb-value-input"
                 required

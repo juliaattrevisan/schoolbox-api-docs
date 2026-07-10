@@ -80,6 +80,7 @@ defineExpose({ textareaRef });
         <input
             :id="`rb-descriptor-max-value-${componentId}`"
             v-model.number.lazy="descriptorMaxValue"
+            :name="`rb-descriptor-max-value-${componentId}`"
             class="rb-value rb-value-input"
             type="number"
             min="0"

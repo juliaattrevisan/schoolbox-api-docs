@@ -24,6 +24,7 @@ const componentId = window.Vue.useId();
         <input
             :id="`rb-level-name-${componentId}`"
             v-model.trim="levelName"
+            :name="`rb-level-name-${componentId}`"
             type="text"
             :placeholder="`${locale.rubricLevel.proper()} name`"
             maxlength="128"
