@@ -87,6 +87,7 @@ class Controller extends Base
             $roles[] = [
                 'id'   => $role->getId(),
                 'name' => $role->getName(),
+                'type' => $role->getType(),
             ];
         }
         $yearLevelList = $this->yearLevelMapper->findAll()->sortBy('sequence', 'ASC');

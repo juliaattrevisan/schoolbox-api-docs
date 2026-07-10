@@ -14,6 +14,7 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use PDOException;
 use Schoolbox\Collection;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserBulkMapper;
 
@@ -296,7 +297,7 @@ class BulkUpdater
             $statements['qualifications']['delete']['statement']->execute($statements['qualifications']['delete']['params']);
             $updated = true;
             /* Log the qualification removals */
-            foreach ($this->userIds as $userId) {
+            foreach ($statements['qualifications']['delete']['userIds'] as $userId) {
                 $messages[] = "{$this->sessionUser->getFullname()} ({$this->sessionUser->getId()}) updated qualifications for {$lookup[$userId]} ({$userId})";
             }
         }
@@ -442,6 +443,7 @@ class BulkUpdater
                 'delete' => [
                     'statement' => null,
                     'params'    => [],
+                    'userIds'   => [],
                 ],
                 'insert' => [
                     'statement' => null,
@@ -506,29 +508,35 @@ class BulkUpdater
 
         /* Qualification Updater */
         if (\count($this->qualificationIds) || $this->removeFromAllQualifications) {
-            $statements['qualifications']['delete']['statement'] = $this->userBulkMapper->getDatabase()->prepare(
-                "DELETE FROM user_qualification WHERE user_id IN ({$bindings->getPlaceholder()})"
-            );
-            $statements['qualifications']['delete']['params'] = $bindings->getParams();
+            $qualificationUserIds = $this->getQualificationUpdateUserIds();
 
-            /* Only insert new qualifications if not removing from all and we have qualifications */
-            if (!$this->removeFromAllQualifications && \count($this->qualificationIds)) {
-                $qualificationInsertPlaceholders = [];
-                foreach ($this->userIds as $userId) {
-                    foreach ($this->qualificationIds as $qualificationId) {
-                        $qualificationInsertPlaceholders[] = "({$userId}, {$qualificationId})";
-                        $statements['qualifications']['insert']['params'][] = [
-                            'userId' => $userId,
-                            'qualificationId' => $qualificationId,
-                        ];
-                    }
-                }
-
-                $qualificationInsertPlaceholder = implode(",\n", $qualificationInsertPlaceholders);
-
-                $statements['qualifications']['insert']['statement'] = $this->userBulkMapper->getDatabase()->prepare(
-                    "INSERT INTO user_qualification (user_id, qualification_id) VALUES {$qualificationInsertPlaceholder}"
+            if (\count($qualificationUserIds)) {
+                $qualificationBindings = Builder::getBindings($qualificationUserIds, 'qu');
+                $statements['qualifications']['delete']['statement'] = $this->userBulkMapper->getDatabase()->prepare(
+                    "DELETE FROM user_qualification WHERE user_id IN ({$qualificationBindings->getPlaceholder()})"
                 );
+                $statements['qualifications']['delete']['params'] = $qualificationBindings->getParams();
+                $statements['qualifications']['delete']['userIds'] = $qualificationUserIds;
+
+                /* Only insert new qualifications if not removing from all and we have qualifications */
+                if (!$this->removeFromAllQualifications && \count($this->qualificationIds)) {
+                    $qualificationInsertPlaceholders = [];
+                    foreach ($qualificationUserIds as $userId) {
+                        foreach ($this->qualificationIds as $qualificationId) {
+                            $qualificationInsertPlaceholders[] = "({$userId}, {$qualificationId})";
+                            $statements['qualifications']['insert']['params'][] = [
+                                'userId' => $userId,
+                                'qualificationId' => $qualificationId,
+                            ];
+                        }
+                    }
+
+                    $qualificationInsertPlaceholder = implode(",\n", $qualificationInsertPlaceholders);
+
+                    $statements['qualifications']['insert']['statement'] = $this->userBulkMapper->getDatabase()->prepare(
+                        "INSERT INTO user_qualification (user_id, qualification_id) VALUES {$qualificationInsertPlaceholder}"
+                    );
+                }
             }
         }
 
@@ -662,5 +670,36 @@ class BulkUpdater
         }
 
         return $statements;
+    }
+
+    private function getQualificationUpdateUserIds(): array
+    {
+        if ($this->role !== self::UNCHANGED) {
+            $statement = $this->userBulkMapper->getDatabase()->query(
+                "SELECT group_type FROM `groups` WHERE id = :roleId AND deleted_at IS NULL",
+                ['roleId' => $this->role]
+            );
+            $roleType = $statement->fetchColumn();
+
+            if (QualificationUpdateEligibility::isAllowedForRoleType($roleType ?: null)) {
+                return $this->userIds;
+            }
+
+            return [];
+        }
+
+        $bindings = Builder::getBindings($this->userIds, 'qru');
+        $statement = $this->userBulkMapper->getDatabase()->query(
+            "
+            SELECT u.id
+            FROM `user` u
+            INNER JOIN `groups` g ON u.group_id = g.id AND g.deleted_at IS NULL
+            WHERE u.id IN ({$bindings->getPlaceholder()})
+              AND g.group_type = :roleType
+            ",
+            array_merge($bindings->getParams(), ['roleType' => Role::STUDENT])
+        );
+
+        return array_map('intval', $statement->fetchAll(\PDO::FETCH_COLUMN));
     }
 }
