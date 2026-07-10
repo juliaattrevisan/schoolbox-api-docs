@@ -502,6 +502,112 @@ class OverallDataset
 
 
     /**
+     * This used to use the v_rubric_mark view, which has effectively been copied here so joins target a scoped
+     * dataset instead of an unindexed view.
+     *
+     * These queries must be manually kept in sync with the views to prevent discrepancies between view consumers,
+     * such as the API, and product business logic.
+     */
+    private function getScopedRubricMarksSql(
+        string $submissionAssessmentPlaceholder,
+        string $reportingAssessmentPlaceholder,
+        bool $includeUpdatedDate,
+    ): string {
+        $distinct = $includeUpdatedDate ? '' : 'DISTINCT ';
+        $submissionUpdatedDate = $includeUpdatedDate ? 'sr.updated_at AS updated_date,' : '';
+        $reportingUpdatedDate = $includeUpdatedDate ? 'rf.updated_at AS updated_date,' : '';
+        $submissionPublishedConstraint = $includeUpdatedDate ? '' : 'AND sr.published_at IS NOT NULL';
+        $reportingPublishedConstraint = $includeUpdatedDate ? '' : 'AND rf.published_at IS NOT NULL';
+
+        return "
+            SELECT {$distinct}
+                vr.assessment_id AS assessment_id,
+                rcm.feedback_id AS feedback_id,
+                rcm.feedback_table AS feedback_table,
+                sr.owner AS student_id,
+                sr.marker AS marker_id,
+                sr.published_at AS feedback_date,
+                {$submissionUpdatedDate}
+                sr.review_route AS feedback_type,
+                vr.rubric_instance_id AS rubric_instance_id,
+                vr.capability_mark_type_id AS capability_mark_type_id,
+                vr.capability_grade_group_id AS capability_grade_group_id,
+                vr.capability_id AS capability_id,
+                vr.capability_name AS capability_name,
+                vr.capability_max_value AS capability_max_value,
+                IF(rcm.valid, rcm.value, NULL) AS capability_mark,
+                IF(rcm.valid, rcm.human_readable_value, NULL) AS capability_human_readable_mark,
+                vr.capability_sequence AS capability_sequence,
+                vr.indicator_id AS indicator_id,
+                vr.indicator_name AS indicator_name,
+                vr.indicator_max_value AS indicator_max_value,
+                IF(rim.valid, rim.value, NULL) AS indicator_mark,
+                vr.indicator_sequence AS indicator_sequence,
+                rim.descriptor_id AS descriptor_id,
+                rim.descriptor_name AS descriptor_name
+            FROM v_rubric vr
+            INNER JOIN submission_box sb ON vr.assessment_id = sb.assessment_id
+            INNER JOIN submission_return sr ON sb.id = sr.box_id
+            INNER JOIN rubric_capability_mark rcm ON
+                vr.rubric_instance_id = rcm.rubric_instance_id AND
+                rcm.rubric_capability_id = vr.capability_id AND
+                rcm.feedback_id = sr.id AND
+                rcm.feedback_table = 'submission_return'
+            INNER JOIN v_rubric_indicator_mark_extend rim ON
+                rim.rubric_capability_mark_id = rcm.id AND
+                vr.indicator_id = rim.rubric_indicator_id
+            WHERE vr.assessment_id IN {$submissionAssessmentPlaceholder}
+            AND sr.deleted_at IS NULL
+            {$submissionPublishedConstraint}
+            AND (rcm.valid IS TRUE OR rim.valid IS TRUE)
+
+            UNION
+
+            SELECT {$distinct}
+                vr.assessment_id AS assessment_id,
+                rcm.feedback_id AS feedback_id,
+                rcm.feedback_table AS feedback_table,
+                rf.learner_id AS student_id,
+                rf.instructor_id AS marker_id,
+                rf.published_at AS feedback_date,
+                {$reportingUpdatedDate}
+                'instructor' AS feedback_type,
+                vr.rubric_instance_id AS rubric_instance_id,
+                vr.capability_mark_type_id AS capability_mark_type_id,
+                vr.capability_grade_group_id AS capability_grade_group_id,
+                vr.capability_id AS capability_id,
+                vr.capability_name AS capability_name,
+                vr.capability_max_value AS capability_max_value,
+                IF(rcm.valid, rcm.value, NULL) AS capability_mark,
+                IF(rcm.valid, rcm.human_readable_value, NULL) AS capability_human_readable_mark,
+                vr.capability_sequence AS capability_sequence,
+                vr.indicator_id AS indicator_id,
+                vr.indicator_name AS indicator_name,
+                vr.indicator_max_value AS indicator_max_value,
+                IF(rim.valid, rim.value, NULL) AS indicator_mark,
+                vr.indicator_sequence AS indicator_sequence,
+                rim.descriptor_id AS descriptor_id,
+                rim.descriptor_name AS descriptor_name
+            FROM v_rubric vr
+            INNER JOIN reporting r ON vr.assessment_id = r.assessment_id
+            INNER JOIN reporting_feedback rf ON r.id = rf.reporting_id
+            INNER JOIN rubric_capability_mark rcm ON
+                vr.rubric_instance_id = rcm.rubric_instance_id AND
+                rcm.rubric_capability_id = vr.capability_id AND
+                rcm.feedback_id = rf.id AND
+                rcm.feedback_table = 'reporting_feedback'
+            INNER JOIN v_rubric_indicator_mark_extend rim ON
+                rim.rubric_capability_mark_id = rcm.id AND
+                vr.indicator_id = rim.rubric_indicator_id
+            WHERE vr.assessment_id IN {$reportingAssessmentPlaceholder}
+            AND rf.deleted_at IS NULL
+            {$reportingPublishedConstraint}
+            AND (rcm.valid IS TRUE OR rim.valid IS TRUE)
+        ";
+    }
+
+
+    /**
      * Find each student in a folder and their marks (if extant), and return an array indexed by student ID
      *
      * @param array<int,array> $assessments
@@ -529,15 +635,28 @@ class OverallDataset
 
         // If enabled, but nothing selected? (probably because no options available)
         if ($filteringByRubricUsage && !count($selectedCapabilities) && !count($selectedIndicators)) {
-            return $assessments;
+            return $students;
         }
 
         /* Effectively a safe shortcut to an IN() clause
          */
         $assessmentIds = array_keys($assessments);
 
-        $assessmentsPlaceholder = Builder::getArrayPlaceholders($assessmentIds, 'assessmentIds');
-        $assessmentsParameters = Builder::getArrayParameters($assessmentIds, 'assessmentIds');
+        $latestSubmissionPlaceholder = Builder::getArrayPlaceholders($assessmentIds, 'latestSubmissionAssessmentIds');
+        $latestReportingPlaceholder = Builder::getArrayPlaceholders($assessmentIds, 'latestReportingAssessmentIds');
+        $markSubmissionPlaceholder = Builder::getArrayPlaceholders($assessmentIds, 'markSubmissionAssessmentIds');
+        $markReportingPlaceholder = Builder::getArrayPlaceholders($assessmentIds, 'markReportingAssessmentIds');
+        $assessmentsParameters = array_merge(
+            Builder::getArrayParameters($assessmentIds, 'latestSubmissionAssessmentIds'),
+            Builder::getArrayParameters($assessmentIds, 'latestReportingAssessmentIds'),
+            Builder::getArrayParameters($assessmentIds, 'markSubmissionAssessmentIds'),
+            Builder::getArrayParameters($assessmentIds, 'markReportingAssessmentIds'),
+        );
+        $scopedRubricMarksSql = $this->getScopedRubricMarksSql(
+            $markSubmissionPlaceholder,
+            $markReportingPlaceholder,
+            false,
+        );
 
         $outerPb = (new Database\Predicate\Builder($this->internalDb->getQuoter(), ''))
             ->equals('vrm.feedback_type', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
@@ -583,20 +702,38 @@ class OverallDataset
                 FROM (
                     SELECT
                         sb.assessment_id,
-                        sr.owner,
-                        MAX(sr.published_at) AS max_published_at
+                        sr.owner AS student_id,
+                        'submission_return' AS feedback_table,
+                        MAX(sr.published_at) AS latest_date
                     FROM submission_return sr
-                    INNER JOIN submission_box sb on sr.box_id = sb.id
+                    INNER JOIN submission_box sb ON sr.box_id = sb.id
                     WHERE sr.deleted_at IS NULL
                     AND sr.published_at IS NOT NULL
                     AND sr.review_route = :reviewRoute
-                    AND sb.assessment_id IN {$assessmentsPlaceholder}
+                    AND sb.assessment_id IN {$latestSubmissionPlaceholder}
                     GROUP BY sb.assessment_id, sr.owner
+
+                    UNION
+
+                    SELECT
+                        r.assessment_id,
+                        rf.learner_id AS student_id,
+                        'reporting_feedback' AS feedback_table,
+                        MAX(rf.published_at) AS latest_date
+                    FROM reporting_feedback rf
+                    INNER JOIN reporting r ON rf.reporting_id = r.id
+                    WHERE rf.deleted_at IS NULL
+                    AND rf.published_at IS NOT NULL
+                    AND r.assessment_id IN {$latestReportingPlaceholder}
+                    GROUP BY r.assessment_id, rf.learner_id
                 ) latest_published_feedback
-                INNER JOIN v_rubric_mark vrm ON
-                    vrm.feedback_date = latest_published_feedback.max_published_at AND
+                INNER JOIN (
+                    {$scopedRubricMarksSql}
+                ) vrm ON
+                    vrm.feedback_date = latest_published_feedback.latest_date AND
                     vrm.assessment_id = latest_published_feedback.assessment_id AND
-                    vrm.student_id    = latest_published_feedback.owner
+                    vrm.student_id = latest_published_feedback.student_id AND
+                    vrm.feedback_table = latest_published_feedback.feedback_table
                 INNER JOIN rubric_instance ON vrm.rubric_instance_id = rubric_instance.id
                 INNER JOIN user u ON vrm.student_id = u.id
                 LEFT JOIN rubric_descriptor rd ON vrm.descriptor_id = rd.id AND rd.rubric_indicator_id = vrm.indicator_id
@@ -826,15 +963,28 @@ class OverallDataset
 
         // If enabled, but nothing selected? (probably because no options available)
         if ($filteringByRubricUsage && !count($selectedCapabilities) && !count($selectedIndicators)) {
-            return $assessments;
+            return $students;
         }
 
         /* Effectively a safe shortcut to an IN() clause
          */
         $assessmentIds = array_keys($assessments);
 
-        $assessmentsPlaceholder = Builder::getArrayPlaceholders($assessmentIds, 'assessmentIds');
-        $assessmentsParameters = Builder::getArrayParameters($assessmentIds, 'assessmentIds');
+        $latestSubmissionPlaceholder = Builder::getArrayPlaceholders($assessmentIds, 'latestSubmissionAssessmentIds');
+        $latestReportingPlaceholder = Builder::getArrayPlaceholders($assessmentIds, 'latestReportingAssessmentIds');
+        $markSubmissionPlaceholder = Builder::getArrayPlaceholders($assessmentIds, 'markSubmissionAssessmentIds');
+        $markReportingPlaceholder = Builder::getArrayPlaceholders($assessmentIds, 'markReportingAssessmentIds');
+        $assessmentsParameters = array_merge(
+            Builder::getArrayParameters($assessmentIds, 'latestSubmissionAssessmentIds'),
+            Builder::getArrayParameters($assessmentIds, 'latestReportingAssessmentIds'),
+            Builder::getArrayParameters($assessmentIds, 'markSubmissionAssessmentIds'),
+            Builder::getArrayParameters($assessmentIds, 'markReportingAssessmentIds'),
+        );
+        $scopedRubricMarksSql = $this->getScopedRubricMarksSql(
+            $markSubmissionPlaceholder,
+            $markReportingPlaceholder,
+            true,
+        );
 
         $outerPb = (new Database\Predicate\Builder($this->internalDb->getQuoter(), ''))
             ->equals('vrm.feedback_type', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
@@ -881,19 +1031,36 @@ class OverallDataset
                 FROM (
                     SELECT
                         sb.assessment_id,
-                        sr.owner,
-                        MAX(sr.updated_at) AS max_updated_at
+                        sr.owner AS student_id,
+                        'submission_return' AS feedback_table,
+                        MAX(sr.updated_at) AS latest_date
                     FROM submission_return sr
-                    INNER JOIN submission_box sb on sr.box_id = sb.id
+                    INNER JOIN submission_box sb ON sr.box_id = sb.id
                     WHERE sr.deleted_at IS NULL
                     AND sr.review_route = :reviewRoute
-                    AND sb.assessment_id IN {$assessmentsPlaceholder}
+                    AND sb.assessment_id IN {$latestSubmissionPlaceholder}
                     GROUP BY sb.assessment_id, sr.owner
+
+                    UNION
+
+                    SELECT
+                        r.assessment_id,
+                        rf.learner_id AS student_id,
+                        'reporting_feedback' AS feedback_table,
+                        MAX(rf.updated_at) AS latest_date
+                    FROM reporting_feedback rf
+                    INNER JOIN reporting r ON rf.reporting_id = r.id
+                    WHERE rf.deleted_at IS NULL
+                    AND r.assessment_id IN {$latestReportingPlaceholder}
+                    GROUP BY r.assessment_id, rf.learner_id
                 ) latest_draft_feedback
-                INNER JOIN v_most_recent_rubric_mark vrm ON
-                    vrm.updated_date = latest_draft_feedback.max_updated_at AND
+                INNER JOIN (
+                    {$scopedRubricMarksSql}
+                ) vrm ON
+                    vrm.updated_date = latest_draft_feedback.latest_date AND
                     vrm.assessment_id = latest_draft_feedback.assessment_id AND
-                    vrm.student_id    = latest_draft_feedback.owner AND
+                    vrm.student_id = latest_draft_feedback.student_id AND
+                    vrm.feedback_table = latest_draft_feedback.feedback_table AND
                     vrm.feedback_date IS NULL
                 INNER JOIN rubric_instance ON vrm.rubric_instance_id = rubric_instance.id
                 INNER JOIN user u ON vrm.student_id = u.id
