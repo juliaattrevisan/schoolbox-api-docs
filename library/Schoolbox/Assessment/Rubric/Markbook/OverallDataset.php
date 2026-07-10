@@ -501,7 +501,14 @@ class OverallDataset
     }
 
 
-    private static function getScopedRubricMarksSql(
+    /**
+     * This used to use the v_rubric_mark view, which has effectively been copied here so joins target a scoped
+     * dataset instead of an unindexed view.
+     *
+     * These queries must be manually kept in sync with the views to prevent discrepancies between view consumers,
+     * such as the API, and product business logic.
+     */
+    private function getScopedRubricMarksSql(
         string $submissionAssessmentPlaceholder,
         string $reportingAssessmentPlaceholder,
         bool $includeUpdatedDate,
@@ -645,7 +652,7 @@ class OverallDataset
             Builder::getArrayParameters($assessmentIds, 'markSubmissionAssessmentIds'),
             Builder::getArrayParameters($assessmentIds, 'markReportingAssessmentIds'),
         );
-        $scopedRubricMarksSql = self::getScopedRubricMarksSql(
+        $scopedRubricMarksSql = $this->getScopedRubricMarksSql(
             $markSubmissionPlaceholder,
             $markReportingPlaceholder,
             false,
@@ -973,7 +980,7 @@ class OverallDataset
             Builder::getArrayParameters($assessmentIds, 'markSubmissionAssessmentIds'),
             Builder::getArrayParameters($assessmentIds, 'markReportingAssessmentIds'),
         );
-        $scopedRubricMarksSql = self::getScopedRubricMarksSql(
+        $scopedRubricMarksSql = $this->getScopedRubricMarksSql(
             $markSubmissionPlaceholder,
             $markReportingPlaceholder,
             true,
