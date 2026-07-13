@@ -111,10 +111,10 @@ class TokenTest extends TestCase
      */
     public static function providerLongTokenRoundTrip(): array
     {
-        /* 44-character base64 key from the COOLBCC status payload in SA-22752,
-         * which decodes to a 32-byte (256-bit) key.
+        /* A synthetic 44-character base64 key, decoding to a 32-byte (256-bit)
+         * key, representative of the token format TASS introduced in May 2026.
          */
-        $longToken = 'K1jGi3SXybL+eMGmm2HvvthgVxmZnlvCm7rQVAGmx+w=';
+        $longToken = 'SDlwE2qnbzaQzo+XiBT41uffo8erv5vqzV/kZwwjAT0=';
 
         return [
             'getStudentSubjects' => [
