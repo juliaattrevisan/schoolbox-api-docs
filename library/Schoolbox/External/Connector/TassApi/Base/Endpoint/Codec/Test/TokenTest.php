@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Test;
 
+use External\Tass\Api\Exception\InvalidApiKey;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Token;
 
@@ -61,6 +62,76 @@ class TokenTest extends TestCase
         $outcome = (new Token($tassProductToken))->unpackToken($encrypted);
 
         $this->assertEquals($data, $outcome);
+    }
+
+
+    /**
+     * The TASS May 2026 release introduced 44-character base64 token keys, which
+     * decode to a 32-byte key and require aes-256-ecb. We don't have a pinned
+     * TASS-produced ciphertext fixture for this cipher, so prove the path works
+     * by round-tripping: unpacking a freshly generated token must return the
+     * original data.
+     *
+     * @param string $tassProductToken A 44-character base64 (256-bit) token key
+     * @param array  $data
+     * @throws \External\Tass\Api\Exception\InvalidApiKey
+     * @throws \PHPUnit\Framework\ExpectationFailedException
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerLongTokenRoundTrip')]
+    public function testLongTokenRoundTrip(string $tassProductToken, array $data)
+    {
+        $codec = new Token($tassProductToken);
+
+        $encrypted = $codec->generateToken($data, true);
+        $outcome   = $codec->unpackToken($encrypted);
+
+        $this->assertEquals($data, $outcome);
+    }
+
+
+    /**
+     * A validly-base64 token whose decoded key is neither 16 nor 32 bytes cannot
+     * map to a supported cipher and must be rejected up front.
+     *
+     * @throws \External\Tass\Api\Exception\InvalidApiKey
+     */
+    public function testUnsupportedKeyLengthThrows()
+    {
+        $this->expectException(InvalidApiKey::class);
+
+        // 'c2hvcnRrZXk=' is valid base64 that decodes to 'shortkey' (8 bytes).
+        new Token('c2hvcnRrZXk=');
+    }
+
+
+    /**
+     * Data provider for testLongTokenRoundTrip
+     *
+     * @return array
+     */
+    public static function providerLongTokenRoundTrip(): array
+    {
+        /* 44-character base64 key from the COOLBCC status payload in SA-22752,
+         * which decodes to a 32-byte (256-bit) key.
+         */
+        $longToken = 'K1jGi3SXybL+eMGmm2HvvthgVxmZnlvCm7rQVAGmx+w=';
+
+        return [
+            'getStudentSubjects' => [
+                $longToken,
+                [
+                    'code' => 'ALLZ002',
+                ],
+            ],
+            'getCommunicationRulesDetails' => [
+                $longToken,
+                [
+                    'currentstatus' => 'current',
+                    'commtype'      => 'ec',
+                    'code'          => 'HINE001',
+                ],
+            ],
+        ];
     }
 
 
