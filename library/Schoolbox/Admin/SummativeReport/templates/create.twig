@@ -138,6 +138,12 @@
         const reportStudentsSearch = document.getElementById('report-students-search-component');
         const reportStudentsValue = document.getElementById('report-students');
 
+        /**
+         * SearchSelect emits different selected payload shapes depending on
+         * whether the update comes from its selected setter or an update event.
+         * Normalising here keeps the summative-report form code independent of
+         * that component implementation detail.
+         */
         function normaliseSearchSelectSelection(eventDetail) {
             if (Array.isArray(eventDetail) && Array.isArray(eventDetail[0])) {
                 return eventDetail[0];
@@ -145,6 +151,12 @@
             return Array.isArray(eventDetail) ? eventDetail : [];
         }
 
+        /**
+         * Summative report options already store explicit students as a
+         * comma-separated list of internal user IDs. Keep writing the hidden
+         * field in that legacy scalar format so Model::decode() and report
+         * generation continue to read saved reports consistently.
+         */
         function syncReportStudentFields(selectedStudents) {
             const studentIds = selectedStudents.map(function (student) {
                 return student.id;
@@ -153,6 +165,12 @@
             reportStudentsValue.value = studentIds.join(',');
         }
 
+        /**
+         * Pasted username/external-ID lists can resolve several students from a
+         * single search response. Merge those results into the selected chips
+         * without dropping students that were already selected on load or from a
+         * previous search.
+         */
         function mergeReportStudentSelection(students) {
             const selectedById = new Map();
             normaliseSearchSelectSelection(reportStudentsSearch.selected).forEach(function (student) {
@@ -173,6 +191,11 @@
         reportStudentsSearch.selected = {{ options.students|json_encode|raw }};
         syncReportStudentFields(reportStudentsSearch.selected);
 
+        /**
+         * The endpoint marks exact pasted-list matches with list_match. Only
+         * those responses should auto-select; normal name searches must remain
+         * manual so typing a common surname does not add every matching student.
+         */
         function handleReportStudentSearchResponse(event) {
             const results = normaliseSearchSelectSelection(event.detail);
             reportStudentsSearch.results = results;

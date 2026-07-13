@@ -154,46 +154,9 @@ export default class CreateSummativeReport {
      * @param data - The data to fill in
      */
     async fillStudentSelectionField(studentSelection: string, data: string): Promise<void> {
-        if (studentSelection === "students") {
-            await this.page.locator("input#report-students-search").click();
-            await this.page.keyboard.type(data, { delay: 500 });
-            return;
-        }
-
         await this.page.locator(`input[id="report-${studentSelection}-selectized"]`).click();
         await this.page.keyboard.type(data, { delay: 500 });
         await this.page.keyboard.press("Enter");
-    }
-
-    /**
-     * check the student selection field contains selected students
-     * @param expectedStudents - The students expected in the selected options
-     */
-    async checkStudentSelectionContains(expectedStudents: string[]): Promise<void> {
-        const selectedStudents = this.page.locator("sbx-search-select#report-students-search-component");
-
-        for (const expectedStudent of expectedStudents) {
-            await expect(selectedStudents).toContainText(expectedStudent);
-        }
-    }
-
-    /**
-     * check the student selection field does not contain selected students
-     * @param unexpectedStudents - The students not expected in the selected options
-     */
-    async checkStudentSelectionDoesNotContain(unexpectedStudents: string[]): Promise<void> {
-        const selectedStudents = this.page.locator("sbx-search-select#report-students-search-component");
-
-        for (const unexpectedStudent of unexpectedStudents) {
-            await expect(selectedStudents).not.toContainText(unexpectedStudent);
-        }
-    }
-
-    /**
-     * check the student selection search displays no matching results
-     */
-    async checkStudentSelectionHasNoResults(): Promise<void> {
-        await expect(this.page.getByText("No results found for your current search.")).toBeVisible();
     }
 
     /**
