@@ -93,6 +93,64 @@ class SessionSummariserTest extends TestCase
     }
 
     /**
+     * A legacy empty or whitespace-only error_message must not mark a session as errored.
+     */
+    public function testHydrateSessionWithSummaryIgnoresEmptyErrorMessage(): void
+    {
+        $summariser = $this->createSummariserWithRows(
+            [
+                [
+                    'id' => 10,
+                    'ai_session_id' => 'session-1',
+                    'created_at' => '2026-01-01 10:00:00',
+                    'log_format' => 'agent-chat',
+                    'return_code' => 200,
+                    'error_message' => '',
+                ],
+                [
+                    'id' => 11,
+                    'ai_session_id' => 'session-1',
+                    'created_at' => '2026-01-01 10:01:00',
+                    'log_format' => 'agent-chat',
+                    'return_code' => 200,
+                    'error_message' => '   ',
+                ],
+            ],
+            []
+        );
+        $session = new Model()->setId('session-1');
+
+        $summariser->hydrateSessionsWithSummaryInfo($this->createSessionCollection($session));
+
+        $this->assertFalse($session->getDerivedHasError());
+    }
+
+    /**
+     * A non-empty error_message still marks a session as errored, even with a success return code.
+     */
+    public function testHydrateSessionWithSummaryFlagsNonEmptyErrorMessage(): void
+    {
+        $summariser = $this->createSummariserWithRows(
+            [
+                [
+                    'id' => 10,
+                    'ai_session_id' => 'session-1',
+                    'created_at' => '2026-01-01 10:00:00',
+                    'log_format' => 'agent-chat',
+                    'return_code' => 200,
+                    'error_message' => 'Something went wrong.',
+                ],
+            ],
+            []
+        );
+        $session = new Model()->setId('session-1');
+
+        $summariser->hydrateSessionsWithSummaryInfo($this->createSessionCollection($session));
+
+        $this->assertTrue($session->getDerivedHasError());
+    }
+
+    /**
      * Moderation event rows are summarised using the highest-priority status.
      */
     public function testHydrateSessionWithSummaryUsesMostImportantModerationStatus(): void
