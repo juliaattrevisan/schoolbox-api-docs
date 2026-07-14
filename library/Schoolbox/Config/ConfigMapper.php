@@ -276,6 +276,7 @@ class ConfigMapper extends Mapper
     public const string NAME_NOTIFICATIONS_ENABLED = 'messaging_enabled';
     public const string NAME_MOBILE_DAEMON_ENABLED = 'mobile_daemon_enabled';
     public const string NAME_LMS_ENABLED = 'lms_enabled';
+    public const string NAME_ACADEMIC_PERIOD_ENABLED = 'academic_period_enabled';
     public const string NAME_RESTRICT_STUDENT_SUBMISSIONS = 'restrict_student_submissions';
     public const string NAME_MARK_VISIBILITY_ALLOW_STUDENTS = 'mark_visibility_allow_students';
     public const string NAME_MARK_VISIBILITY_ALLOW_PARENTS  = 'mark_visibility_allow_parents';

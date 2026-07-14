@@ -19,6 +19,7 @@ config:
   kami_enabled: {edit: true}
   geosnapshot_enabled: {edit: true}
   lms_enabled: {value: true}
+  academic_period_enabled: {value: true, hide: true, edit: false}
   qr_login_enabled: {value: true, edit: true}
   summative_report_enabled: {edit: true}
   curriculum_coverage_report_enabled: {value: true, edit: true}
