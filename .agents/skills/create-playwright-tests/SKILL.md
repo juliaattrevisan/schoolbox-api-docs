@@ -50,6 +50,7 @@ description: Use when the user asks to create or update Schoolbox Playwright acc
 - Helper files are stored in `test/playwright/support/page/dummy/` where dummy is the name of the test.
 - The files `test/playwright/support/page/curriculum/selector/CurriculumSelector.ts`, `test/playwright/support/page/curriculum/report/CurriculumCoverageReport.ts`, and `test/playwright/support/page/pastoralCare/ManageDifferentiationProfiles.ts` should be referenced to match structure and conventions.
 - The file should be a class.
+- All methods should have documentation in JSDoc format, including a summary of the method, parameters, and return value.
 - Before adding another method, ensure there is not already an existing method for the same action, or a method that can have a parameter provided if this will not make the method too complicated.
 
 # Coverage documentation
