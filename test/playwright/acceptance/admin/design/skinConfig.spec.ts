@@ -6,6 +6,7 @@
 
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import SkinConfig from "@schoolboxTest/playwright/support/page/admin/design/SkinConfig";
+import { getCssCustomProperty } from "@js/util/cssUtils";
 
 const ADVANCED_UI_CONFIG = "advanced_ui_enabled";
 
@@ -29,7 +30,7 @@ test.describe("Skin Config", () => {
             await expect(skinConfig.getSaveSuccessToast()).not.toBeVisible();
 
             tester.isGoingTo("change Top Menu Foreground to white and save");
-            await skinConfig.setColour(configName, "rgb(255, 255, 255)");
+            await tester.common.setColour(skinConfig.getField(configName), "rgb(255, 255, 255)");
             await expect(skinConfig.getValidationError(configName)).not.toBeVisible();
             await skinConfig.save();
             await expect(skinConfig.getSaveSuccessToast()).toBeVisible();
@@ -50,12 +51,14 @@ test.describe("Skin Config", () => {
             await skinConfig.goto();
 
             tester.isGoingTo("preview no container radius and a large field radius");
-            await skinConfig.selectOption("skin_container_corner_radius", "None");
-            await skinConfig.selectOption("skin_field_corner_radius", "Large");
+            await tester.common.selectOption(skinConfig.getField("skin_container_corner_radius"), "None");
+            await tester.common.selectOption(skinConfig.getField("skin_field_corner_radius"), "Large");
 
-            await expect.poll(() => skinConfig.getCssCustomProperty("--sbx-config-container-corner-radius")).toBe("0");
             await expect
-                .poll(() => skinConfig.getCssCustomProperty("--sbx-config-field-corner-radius"))
+                .poll(() => page.evaluate(getCssCustomProperty, "--sbx-config-container-corner-radius"))
+                .toBe("0");
+            await expect
+                .poll(() => page.evaluate(getCssCustomProperty, "--sbx-config-field-corner-radius"))
                 .toBe("0.75rem");
         } finally {
             await db.updateInDatabase("config", { value: "0" }, { name: ADVANCED_UI_CONFIG });
@@ -70,12 +73,15 @@ test.describe("Skin Config", () => {
             await skinConfig.goto();
 
             tester.isGoingTo("preview the large container drop shadow");
-            await skinConfig.selectOption("skin_container_drop_shadow", "Large");
+            await tester.common.selectOption(skinConfig.getField("skin_container_drop_shadow"), "Large");
 
             await expect
                 .poll(async () => {
-                    const containerShadow = await skinConfig.getCssCustomProperty("--sbx-config-container-drop-shadow");
-                    const largeShadow = await skinConfig.getCssCustomProperty("--sbx-shadow-l");
+                    const containerShadow = await page.evaluate(
+                        getCssCustomProperty,
+                        "--sbx-config-container-drop-shadow",
+                    );
+                    const largeShadow = await page.evaluate(getCssCustomProperty, "--sbx-shadow-l");
                     return containerShadow === largeShadow;
                 })
                 .toBe(true);
@@ -135,7 +141,7 @@ test.describe("Skin Config", () => {
             await skinConfig.goto();
 
             tester.isGoingTo("save a green Accent colour");
-            await skinConfig.setColour(configName, accentColour);
+            await tester.common.setColour(skinConfig.getField(configName), accentColour);
             await skinConfig.save();
             await expect(skinConfig.getSaveSuccessToast()).toBeVisible();
 

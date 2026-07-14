@@ -43,28 +43,6 @@ export default class SkinConfig {
     }
 
     /**
-     * Sets a colour field using the colour picker.
-     * @param configName - The name of the Skin Config colour setting.
-     * @param value - The CSS colour value to enter.
-     * @returns A promise that resolves when the colour picker is closed.
-     */
-    async setColour(configName: string, value: string): Promise<void> {
-        await this.getField(configName).click();
-        await this.page.getByRole("textbox", { name: "Color value field" }).fill(value);
-        await this.page.getByRole("button", { name: "Close color picker" }).click();
-    }
-
-    /**
-     * Selects an option for a Skin Config field.
-     * @param configName - The name of the Skin Config setting.
-     * @param label - The visible label of the option to select.
-     * @returns A promise that resolves when the option is selected.
-     */
-    async selectOption(configName: string, label: string): Promise<void> {
-        await this.getField(configName).selectOption({ label });
-    }
-
-    /**
      * Sets the Custom CSS field value.
      * @param value - The CSS to enter.
      * @returns A promise that resolves when the field is filled.
@@ -95,18 +73,6 @@ export default class SkinConfig {
      */
     getSaveSuccessToast(): Locator {
         return this.page.getByTestId("toast").filter({ hasText: "Skin config successfully updated" });
-    }
-
-    /**
-     * Gets a computed CSS custom property from the document root.
-     * @param property - The CSS custom property name.
-     * @returns The trimmed computed property value.
-     */
-    async getCssCustomProperty(property: string): Promise<string> {
-        return this.page.evaluate(
-            (customProperty) => getComputedStyle(document.documentElement).getPropertyValue(customProperty).trim(),
-            property,
-        );
     }
 
     /**
