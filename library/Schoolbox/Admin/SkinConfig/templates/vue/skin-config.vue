@@ -233,7 +233,13 @@ window.Vue.onMounted(() => {
                 is-full-width
             />
             <div class="u-flex u-flex--justify u-gap-xs">
-                <button v-if="hasUnsavedChanges" type="button" class="button u-flex__item--1" @click="onUndoChanges">
+                <button
+                    v-if="hasUnsavedChanges"
+                    type="button"
+                    class="button u-flex__item--1"
+                    data-test="skin-config-undo-changes"
+                    @click="onUndoChanges"
+                >
                     Undo Changes
                 </button>
                 <button class="button submit u-flex__item--1" data-test="skin-config-save-submit">

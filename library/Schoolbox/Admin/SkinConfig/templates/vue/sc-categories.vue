@@ -84,7 +84,12 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
                                     >?</span
                                 >
                             </label>
-                            <label v-if="props.colourErrors[option.id]" class="error" :for="`${option.name}-field`">
+                            <label
+                                v-if="props.colourErrors[option.id]"
+                                class="error"
+                                :for="`${option.name}-field`"
+                                :data-test="`skin-config-${option.name}-error`"
+                            >
                                 {{ props.colourErrors[option.id] }}
                             </label>
                             <div v-if="option.type === 'colour'">
@@ -94,6 +99,7 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
                                     type="text"
                                     :name="option.name"
                                     data-colour-picker
+                                    :data-test="`skin-config-${option.name}-field`"
                                     :class="{ error: props.colourErrors[option.id] }"
                                     :disabled="!option.editable"
                                     @input="onPreviewRefresh"
@@ -105,6 +111,7 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
                                     :id="`${option.name}-field`"
                                     v-model="option.value"
                                     :name="option.name"
+                                    :data-test="`skin-config-${option.name}-field`"
                                     rows="8"
                                     :disabled="!option.editable"
                                     @input="onPreviewRefresh"
@@ -116,6 +123,7 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
                                     :id="`${option.name}-field`"
                                     v-model="option.value"
                                     :name="option.name"
+                                    :data-test="`skin-config-${option.name}-field`"
                                     :disabled="!option.editable"
                                     @change="onPreviewRefresh"
                                 >
