@@ -628,7 +628,7 @@ $allow-sidebar-stash: $large-up;
 .profile-options-mobile {
     .account-menu__link {
         align-items: center;
-        color: var(--sbx-config-color-accent, var(--content-ui-foreground));
+        color: var(--sbx-config-color-accent, var(--accounts-menu-foreground));
         display: flex;
         gap: var(--spacing-s);
 
