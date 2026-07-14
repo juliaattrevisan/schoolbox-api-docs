@@ -265,7 +265,7 @@ export default {
                 this.eventExtendedProps.classAttendance.url ||
                 (this.eventExtendedProps.booking &&
                     this.eventExtendedProps.variant === EVENT_VARIANTS.BOOKING &&
-                    this.eventExtendedProps.booking.linkedEventType === 'Day' &&
+                    this.eventExtendedProps.booking.linkedEventType === "Day" &&
                     this.eventExtendedProps.booking.canAddToCalendar) ||
                 this.eventExtendedProps.booking?.actions.length > 0 ||
                 this.canRsvp(
