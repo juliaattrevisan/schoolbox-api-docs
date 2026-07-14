@@ -88,28 +88,15 @@ class Module extends BaseModule
                 new Any(
                     new IsSuperuser(),
                     new Callback(function (array $params) {
-                        if ($this->canUserModifyEvent((int)$params['eventId'])) {
-                            return true;
-                        }
-
-                        throw new Unauthorized();
-                    })
-                )
-            );
-        });
-
-        $addToCalendarPerms = new LazyCallback(function () {
-            return new All(
-                new IsLoggedIn(),
-                new Any(
-                    new IsSuperuser(),
-                    new Callback(function (array $params) {
-                        $eventId = (int)$params['eventId'];
-                        if (
-                            $this->canUserModifyEvent($eventId)
-                            || $this->canUserModerateBookingEvent($eventId)
-                        ) {
-                            return true;
+                        try {
+                            $event = $this->getEventMapper()->findById($params['eventId']);
+                            //hydrate parents for further permission checks
+                            $this->getRelationshipHydrator()->loadParents([$event->getOwner()]);
+                            if ((new Event\Access(Access::getInstance()))->checkExisting($this->getAuthorizer()->getUser(), $event)) {
+                                return true;
+                            }
+                        } catch (Exception $e) {
+                            // noop
                         }
 
                         throw new Unauthorized();
@@ -130,7 +117,7 @@ class Module extends BaseModule
         $this->register('POST', '/{eventId:\d+}/addBookings', 'addBookings', $modifyPerms, $preloadEvent);
         $this->register('POST', '/{eventId:\d+}/editBooking/{bookingId}', 'editBooking', $modifyPerms, $preloadEvent);
         $this->register('DELETE', '/{eventId:\d+}/deleteBooking/{bookingId}', 'deleteBooking', $modifyPerms, $preloadEvent);
-        $this->register('POST', '/{eventId:\d+}/addToCalendar', 'addToCalendar', $addToCalendarPerms, $preloadEvent);
+        $this->register('POST', '/{eventId:\d+}/addToCalendar', 'addToCalendar', $modifyPerms, $preloadEvent);
     }
 
     /**
@@ -195,35 +182,6 @@ class Module extends BaseModule
     private function getEventMapper(): EventMapper
     {
         return $this->getMapperFactory()->get(EventMapper::class);
-    }
-
-    private function canUserModifyEvent(int $eventId): bool
-    {
-        try {
-            $event = $this->getEventMapper()->findById($eventId);
-            //hydrate parents for further permission checks
-            $this->getRelationshipHydrator()->loadParents([$event->getOwner()]);
-            return (new Event\Access(Access::getInstance()))->checkExisting(
-                $this->getAuthorizer()->getUser(),
-                $event
-            );
-        } catch (Exception $e) {
-            return false;
-        }
-    }
-
-    private function canUserModerateBookingEvent(int $eventId): bool
-    {
-        $user = $this->getAuthorizer()->getUser();
-
-        $bookings = $this->getMapperFactory()->get(ResourceBookingMapper::class)->findByEventId($eventId);
-        foreach ($bookings as $booking) {
-            if ($booking->getResource()->canUserModerateThisItem($user)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
