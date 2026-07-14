@@ -15,7 +15,7 @@ test.describe("Skin Config", () => {
         await tester.loginAsAdmin();
     });
 
-    test("requires valid colour contrast before saving", async ({ tester, page, db }) => {
+    test("verify valid colour contrast is required before saving", async ({ tester, page, db }) => {
         const skinConfig = new SkinConfig(page);
         const configName = "skin_colour_menu_foreground";
         const originalValue = (await db.grabFromDatabase("config", "value", { name: configName })) as string;
@@ -43,7 +43,7 @@ test.describe("Skin Config", () => {
         }
     });
 
-    test("previews container and field corner radii", async ({ tester, page, db }) => {
+    test("verify Corner Radius can be changed", async ({ tester, page, db }) => {
         const skinConfig = new SkinConfig(page);
 
         try {
@@ -65,7 +65,7 @@ test.describe("Skin Config", () => {
         }
     });
 
-    test("previews a large container drop shadow", async ({ tester, page, db }) => {
+    test("verify Drop Shadow can be changed", async ({ tester, page, db }) => {
         const skinConfig = new SkinConfig(page);
 
         try {
@@ -90,7 +90,7 @@ test.describe("Skin Config", () => {
         }
     });
 
-    test("previews custom CSS", async ({ tester, page, db }) => {
+    test("verify Custom CSS can be previewed", async ({ tester, page, db }) => {
         const skinConfig = new SkinConfig(page);
 
         try {
@@ -105,7 +105,7 @@ test.describe("Skin Config", () => {
         }
     });
 
-    test("undoes custom CSS changes", async ({ tester, page, db }) => {
+    test("verify Custom CSS changes can be undone", async ({ tester, page, db }) => {
         const skinConfig = new SkinConfig(page);
 
         try {
@@ -125,7 +125,7 @@ test.describe("Skin Config", () => {
         }
     });
 
-    test("persists Accent styling on Pantry buttons", async ({ tester, page, db }) => {
+    test("verify Accent styling persists on page save", async ({ tester, page, db }) => {
         const skinConfig = new SkinConfig(page);
         const configName = "skin_colour_accent";
         const foregroundConfigName = "skin_colour_menu_foreground";
