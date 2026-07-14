@@ -107,8 +107,10 @@ class SessionSummariser
             }
 
             $returnCode = $row['return_code'];
+
+            // any row with an error message, or a non-null and non-200 return code is considered an error.
             if (
-                null !== $row['error_message']
+                '' !== trim((string)$row['error_message'])
                 || (null !== $returnCode && self::HTTP_STATUS_CODE_OK !== $returnCode)
             ) {
                 $derivedHasError = true;
