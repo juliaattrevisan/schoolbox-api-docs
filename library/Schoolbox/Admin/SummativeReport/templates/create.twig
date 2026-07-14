@@ -135,17 +135,81 @@
             },
         });
 
-        $('#report-students').userSelectizeSelector({
-            multiple: true,
-            value: {{ options.students|json_encode|raw }},
-            ajax: {
-                data: {
-                    roleTypeID: 'student',
-                },
-            },
-            selectize: {
-                placeholder: 'Search students',
-            },
+        const reportStudentsSearch = document.getElementById('report-students-search-component');
+        const reportStudentsValue = document.getElementById('report-students');
+
+        /**
+         * SearchSelect emits different selected payload shapes depending on
+         * whether the update comes from its selected setter or an update event.
+         * Normalising here keeps the summative-report form code independent of
+         * that component implementation detail.
+         */
+        function normaliseSearchSelectSelection(eventDetail) {
+            if (Array.isArray(eventDetail) && Array.isArray(eventDetail[0])) {
+                return eventDetail[0];
+            }
+            return Array.isArray(eventDetail) ? eventDetail : [];
+        }
+
+        /**
+         * Summative report options already store explicit students as a
+         * comma-separated list of internal user IDs. Keep writing the hidden
+         * field in that legacy scalar format so Model::decode() and report
+         * generation continue to read saved reports consistently.
+         */
+        function syncReportStudentFields(selectedStudents) {
+            const studentIds = selectedStudents.map(function (student) {
+                return student.id;
+            });
+
+            reportStudentsValue.value = studentIds.join(',');
+        }
+
+        /**
+         * Pasted username/external-ID lists can resolve several students from a
+         * single search response. Merge those results into the selected chips
+         * without dropping students that were already selected on load or from a
+         * previous search.
+         */
+        function mergeReportStudentSelection(students) {
+            const selectedById = new Map();
+            normaliseSearchSelectSelection(reportStudentsSearch.selected).forEach(function (student) {
+                selectedById.set(String(student.id), student);
+            });
+            students.forEach(function (student) {
+                selectedById.set(String(student.id), student);
+            });
+
+            reportStudentsSearch.selected = Array.from(selectedById.values());
+            syncReportStudentFields(reportStudentsSearch.selected);
+        }
+
+        reportStudentsSearch.endpoint = '{{ routeLookup('adminSummativeReport.getStudents') }}';
+        reportStudentsSearch.formValueName = 'studentsSearchSelected';
+        reportStudentsSearch.manageSearchResponse = true;
+        reportStudentsSearch.placeholder = 'Search students, or paste usernames/external IDs';
+        reportStudentsSearch.selected = {{ options.students|json_encode|raw }};
+        syncReportStudentFields(reportStudentsSearch.selected);
+
+        /**
+         * The endpoint marks exact pasted-list matches with list_match. Only
+         * those responses should auto-select; normal name searches must remain
+         * manual so typing a common surname does not add every matching student.
+         */
+        function handleReportStudentSearchResponse(event) {
+            const results = normaliseSearchSelectSelection(event.detail);
+            reportStudentsSearch.results = results;
+
+            if (results.length && results.every(function (item) { return item.list_match; })) {
+                mergeReportStudentSelection(results);
+            }
+        }
+
+        reportStudentsSearch.addEventListener('search-response', handleReportStudentSearchResponse);
+        reportStudentsSearch.addEventListener('searchResponse', handleReportStudentSearchResponse);
+
+        reportStudentsSearch.addEventListener('update:selected', function (event) {
+            syncReportStudentFields(normaliseSearchSelectSelection(event.detail));
         });
 
         /* Dynamically enable sections
@@ -449,8 +513,16 @@
                                     <input type="text" id="report-campuses" name="campuses" />
                                 </div>
                                 <div class="small-12 columns">
-                                    <label for="report-students">Students</label>
-                                    <input type="text" id="report-students" name="students" />
+                                    <label for="report-students-search">Students</label>
+                                    <input type="hidden" id="report-students" name="students" />
+                                    <sbx-search-select
+                                        id="report-students-search-component"
+                                        label-id="report-students-search"
+                                        endpoint="{{ routeLookup('adminSummativeReport.getStudents') }}"
+                                        form-value-name="studentsSearchSelected"
+                                        manage-search-response="true"
+                                        placeholder="Search students, or paste usernames/external IDs"
+                                    ></sbx-search-select>
                                 </div>
                             </div>
                         </div>

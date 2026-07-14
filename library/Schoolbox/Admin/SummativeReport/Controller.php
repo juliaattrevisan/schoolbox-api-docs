@@ -81,6 +81,9 @@ class Controller extends ConfigController
      */
     public const SUMMATIVE_REPORT_STATUS_KEY = 'summativeReport_%s';
 
+    private const STUDENT_SELECTIZE_LABEL_FORMAT = '%s - %s';
+    private const STUDENT_SELECTIZE_META_FORMAT = '%s%s%s';
+
     /**
      * This file contains the footer for the summative reports, as well as
      * customisable section that allows the school to add custom footer which
@@ -524,10 +527,7 @@ class Controller extends ConfigController
         $options['students'] = [];
 
         foreach ($students as $student) {
-            $options['students'][] = [
-                'id'   => $student->getId(),
-                'name' => $student->getFullName(),
-            ];
+            $options['students'][] = $this->formatStudentSelectizeOption($student);
         }
 
         return $options;
@@ -600,6 +600,207 @@ class Controller extends ConfigController
         $this->response = $this->responseAsJson($output);
     }
 
+
+    /**
+     * Get students for selectize.
+     *
+     * Supports the existing name/external-id/username search behavior, plus
+     * comma-separated or space-separated exact matches for external IDs and
+     * usernames.
+     *
+     * @return void
+     * @api GET /adminv2/summative-report/students
+     */
+    public function getStudents(): void
+    {
+        $query = trim((string)$this->requestQuery->get('query'));
+
+        $hasListDelimiter = str_contains($query, ',') || preg_match('/\s+/', $query);
+        if (strlen($query) <= 1 || (!$hasListDelimiter && strlen($query) >= 64)) {
+            $this->response = $this->responseAsJson([]);
+            return;
+        }
+
+        $students = [];
+        $isListMatch = false;
+
+        if (str_contains($query, ',')) {
+            $students = $this->findStudentsByExternalIdsOrUsernames($this->splitStudentListQuery($query));
+            $isListMatch = true;
+        } elseif (preg_match('/\s+/', $query)) {
+            $tokens = $this->splitStudentListQuery($query);
+            $exactStudents = $this->findStudentsByExternalIdsOrUsernames($tokens);
+
+            if ($this->allUserListTokensMatched($tokens)) {
+                $students = $exactStudents;
+                $isListMatch = true;
+            }
+        }
+
+        if (!$isListMatch && $students === []) {
+            $students = $this->searchStudents($query);
+        }
+
+        $this->response = $this->responseAsJson(array_map(
+            fn (User $student): array => $this->formatStudentSelectizeOption($student, $isListMatch),
+            $students
+        ));
+    }
+
+    /**
+     * Split a pasted student list into external-id/username search tokens.
+     *
+     * @param string $query
+     * @return array
+     */
+    private function splitStudentListQuery(string $query): array
+    {
+        return array_values(array_unique(array_filter(
+            preg_split('/[\s,]+/', $query) ?: [],
+            static fn (string $token): bool => $token !== ''
+        )));
+    }
+
+
+    /**
+     * Find student users by exact external ID or username matches.
+     *
+     * @param array $tokens
+     * @return array
+     */
+    private function findStudentsByExternalIdsOrUsernames(array $tokens): array
+    {
+        return $this->findUsersByExternalIdsOrUsernames($tokens, Role::STUDENT);
+    }
+
+
+    /**
+     * Search students using the same broad matching rules as the standard user
+     * selectize endpoint.
+     *
+     * @param string $query
+     * @return array
+     */
+    private function searchStudents(string $query): array
+    {
+        $roleIds = $this->roleMapper
+            ->findByColumn('group_type', Role::STUDENT)
+            ->indexBy('id')
+            ->keys();
+
+        $userList = (new \User())->ajaxSearch($query, $roleIds, [], 30);
+        if (!is_array($userList) || $userList === []) {
+            return [];
+        }
+
+        $studentIds = array_map('intval', array_column($userList, 'uid'));
+        $students = iterator_to_array($this->userMapper->findByColumn('id', $studentIds));
+
+        return array_values(array_filter(
+            $students,
+            static fn (User $student): bool => $student->getRole()->getType() === Role::STUDENT
+        ));
+    }
+
+
+    /**
+     * Find users by exact external ID or username matches.
+     *
+     * @param array $tokens
+     * @param string|null $roleType
+     * @return array
+     */
+    private function findUsersByExternalIdsOrUsernames(array $tokens, ?string $roleType = null): array
+    {
+        if ($tokens === []) {
+            return [];
+        }
+
+        $matchTokens = $this->userMapper->getPredicateBuilder()
+            ->in('synergy_id', $tokens)
+            ->in('username', $tokens);
+
+        $predicate = $this->userMapper->getPredicateBuilder()
+            ->any($matchTokens);
+
+        if ($roleType !== null) {
+            $predicate->equals('g.group_type', $roleType);
+        }
+
+        $users = $this->userMapper->findByPredicates($predicate);
+
+        return iterator_to_array($users);
+    }
+
+
+    /**
+     * Decide whether a whitespace-separated query is a complete username or
+     * external-id list instead of a full-name search.
+     *
+     * Matches against all role types so parent/staff tokens keep the query in
+     * list mode, but non-students are filtered out of the returned options.
+     *
+     * @param array $tokens
+     * @return bool
+     */
+    private function allUserListTokensMatched(array $tokens): bool
+    {
+        $matchedTokens = [];
+
+        foreach ($this->findUsersByExternalIdsOrUsernames($tokens) as $user) {
+            $matchedTokens[] = mb_strtolower((string)$user->getExternalId(), 'UTF-8');
+            $matchedTokens[] = mb_strtolower((string)$user->getUsername(), 'UTF-8');
+        }
+
+        $matchedTokens = array_filter($matchedTokens, static fn (string $token): bool => $token !== '');
+
+        foreach ($tokens as $token) {
+            if (!in_array(mb_strtolower($token, 'UTF-8'), $matchedTokens, true)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
+    /**
+     * Format a student for the selectize user picker.
+     *
+     * @param User $student
+     * @return array
+     */
+    private function formatStudentSelectizeOption(User $student, bool $isListMatch = false): array
+    {
+        $label = sprintf(
+            self::STUDENT_SELECTIZE_LABEL_FORMAT,
+            $student->getFullName(),
+            $this->formatStudentSelectizeMeta($student)
+        );
+
+        return [
+            'id'         => $student->getId(),
+            'name'       => $label,
+            'list_match' => $isListMatch,
+        ];
+    }
+
+
+    /**
+     * Format the student year/role/external-id metadata shown in selectize.
+     *
+     * @param User $student
+     * @return string
+     */
+    private function formatStudentSelectizeMeta(User $student): string
+    {
+        return sprintf(
+            self::STUDENT_SELECTIZE_META_FORMAT,
+            $student->getYear() ? $student->getYear()->getLongName('Year') . ', ' : '',
+            $student->getRole()->getName(),
+            $student->getExternalId() !== null ? " ({$student->getExternalId()})" : ''
+        );
+    }
 
     /**
      * Duplicate a report's settings
