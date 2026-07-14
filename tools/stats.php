@@ -167,7 +167,7 @@ $app = new class extends CliTool\App {
 
             //Dialog Agents
             'dialog_agent' => 'SELECT count(*) FROM dialog_agent WHERE deleted_at is null',
-            /*To do: add course_dialog_agent */
+            'course_dialog_agent' => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a ON assessment.id = a.assessment_id JOIN dialog_agent da ON assessment.id = da.assessment_id WHERE assessment.deleted_at IS NULL AND da.deleted_at IS NULL',
             'curriculum_assessment_dialog_agent' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN dialog_agent da ON da.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND da.deleted_at IS NULL',         
             'dialog_agent_interview' => 'SELECT count(*) FROM dialog_agent da JOIN dialog_agent_scenario das ON da.scenario_id = das.id WHERE das.title = "Character Interview" AND type="system" AND da.deleted_at is null',
             'dialog_agent_project' => 'SELECT count(*) FROM dialog_agent da JOIN dialog_agent_scenario das ON da.scenario_id = das.id WHERE das.title = "Project Ideation" AND type="system" AND da.deleted_at is null',
@@ -206,7 +206,7 @@ $app = new class extends CliTool\App {
 
             //Lesson Plans
             'lesson_plans'      => 'SELECT count(*) FROM lesson_plan JOIN assessment a on lesson_plan.assessment_id = a.id WHERE a.deleted_at IS NULL',
-            /*To do: add course_lesson_plan*/
+            'course_lesson_plan' => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a ON assessment.id = a.assessment_id JOIN lesson_plan lp ON assessment.id = lp.assessment_id WHERE assessment.deleted_at IS NULL AND lp.deleted_at IS NULL',
             'curriculum_assessment_lesson_plan' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN lesson_plan lp ON lp.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND lp.deleted_at IS NULL',
             'lesson_plan_template' => 'SELECT COUNT(*) FROM lesson_plan_template WHERE deleted_at IS NULL',           
 
@@ -228,7 +228,7 @@ $app = new class extends CliTool\App {
             
             // Reporting
             'reporting_activities' => 'SELECT COUNT(*) FROM reporting r JOIN assessment a ON r.assessment_id = a.id WHERE r.deleted_at IS NULL AND a.deleted_at IS NULL',
-            /*To do: add course_reporting_activity */
+            'course_reporting_activity' => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a ON assessment.id = a.assessment_id JOIN reporting r ON assessment.id = r.assessment_id WHERE assessment.deleted_at IS NULL AND r.deleted_at IS NULL',
             'curriculum_assessment_reporting' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN reporting r ON r.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND r.deleted_at IS NULL',           
             /* To add once available: rubric_instance_reporting' => 'SELECT COUNT(*) FROM rubric_instance ri JOIN assessment a ON ri.assessment_id = a.id JOIN reporting r ON a.id = r.assessment_id WHERE ri.deleted_at IS NULL AND a.deleted_at IS NULL AND r.deleted_at IS NULL',*/
             'reporting_supporting_data_range_current_academic_period' => "SELECT COUNT(*) FROM reporting r JOIN assessment a ON r.assessment_id = a.id WHERE r.deleted_at IS NULL AND a.deleted_at IS NULL AND r.supporting_data_range = 'current_academic_period'",
@@ -428,7 +428,7 @@ $app = new class extends CliTool\App {
             'openai_differentiation' => "SELECT count(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'differentiation'",
             'openai_dialogagent' => "SELECT count(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'dialogagent'",
             'openai_learning_customisation' => "SELECT count(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'learningactivitycustomisation'",
-            /*To do: add aimoderationagent */
+            'openai_aimoderationagent' => "SELECT count(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'aimoderationagent'",
 
             // AI moderation
             'ai_moderation_events' => 'SELECT COUNT(id) FROM ai_moderation_event',
