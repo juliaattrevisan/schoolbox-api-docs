@@ -52,7 +52,7 @@ class CanvasDb
     public readonly ?int $news_author;
     public readonly bool $redirect_assessments;
     public readonly bool $redirect_homepages;
-    public readonly string $code_redirect_homepages;
+    public readonly ?string $code_redirect_homepages;
     // options
     // course code:subject code:subject code from section
     public const REDIRECT_COURSE_CODE = 'course_code';
