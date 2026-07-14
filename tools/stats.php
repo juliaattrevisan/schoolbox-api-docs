@@ -95,10 +95,8 @@ $app = new class extends CliTool\App {
             'logins_parent'    => 'SELECT count(*) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON user.group_id = `groups`.id WHERE login = 1 and `groups`.group_type = "parent"',
             'logins_student'    => 'SELECT count(*) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON user.group_id = `groups`.id WHERE login = 1 and `groups`.group_type = "student"',
             'logins'            => 'SELECT count(*) FROM login_log l WHERE login = 1',
-            'unique_logins_yesterday_student_junior' => "SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 1 DAY) AND date < DATE(NOW()) AND group_type = 'student' AND
-                                                            user.year_id IN ( SELECT id FROM lu_year_level WHERE REGEXP_REPLACE(name, '[^0-9]', '') != '' AND CAST(REGEXP_REPLACE(name, '[^0-9]', '') AS UNSIGNED) < 7 OR name LIKE 'ELC' OR name like 'Prep%' OR name like 'Kind%')",
-            'unique_logins_yesterday_student_senior' => "SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 1 DAY) AND date < DATE(NOW()) AND group_type = 'student' AND
-                                                            user.year_id IN ( SELECT id FROM lu_year_level WHERE REGEXP_REPLACE(name, '[^0-9]', '') != '' AND CAST(REGEXP_REPLACE(name, '[^0-9]', '') AS UNSIGNED) > 6)",
+            'unique_logins_yesterday_student_junior' => "SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 1 DAY) AND date < DATE(NOW()) AND group_type = 'student' AND user.year_id IN ( SELECT id FROM lu_year_level WHERE REGEXP_REPLACE(name, '[^0-9]', '') != '' AND CAST(REGEXP_REPLACE(name, '[^0-9]', '') AS UNSIGNED) < 7 OR name LIKE 'ELC' OR name like 'Prep%' OR name like 'Kind%')",
+            'unique_logins_yesterday_student_senior' => "SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 1 DAY) AND date < DATE(NOW()) AND group_type = 'student' AND user.year_id IN ( SELECT id FROM lu_year_level WHERE REGEXP_REPLACE(name, '[^0-9]', '') != '' AND CAST(REGEXP_REPLACE(name, '[^0-9]', '') AS UNSIGNED) > 6)",
             'user_assume' => 'SELECT COUNT(*) FROM user_assume_log',
 
             //LMS
@@ -157,14 +155,10 @@ $app = new class extends CliTool\App {
             'plan_excluded'  => 'SELECT count(*) FROM participant WHERE excluded_at is not null',
             'assessment_differentiated' => 'SELECT count(*) FROM assessment WHERE original_assessment_id is not null AND deleted_at is null',
             'dialog_agent' => 'SELECT count(*) FROM dialog_agent WHERE deleted_at is null',
-            'dialog_agent_interview' => 'SELECT count(*) FROM dialog_agent da JOIN dialog_agent_scenario das ON da.scenario_id = das.id
-                                          WHERE das.title = "Character Interview" AND type="system" AND da.deleted_at is null',
-            'dialog_agent_project' => 'SELECT count(*) FROM dialog_agent da JOIN dialog_agent_scenario das ON da.scenario_id = das.id
-                                          WHERE das.title = "Project Ideation" AND type="system" AND da.deleted_at is null',
-            'dialog_agent_self_reflection' => 'SELECT count(*) FROM dialog_agent da JOIN dialog_agent_scenario das ON da.scenario_id = das.id
-                                          WHERE das.title = "Self-Reflection" AND type="system" AND da.deleted_at is null',
-            'dialog_agent_tutor' => 'SELECT count(*) FROM dialog_agent da JOIN dialog_agent_scenario das ON da.scenario_id = das.id
-                                          WHERE das.title = "Socratic Tutor" AND type="system" AND da.deleted_at is null',
+            'dialog_agent_interview' => 'SELECT count(*) FROM dialog_agent da JOIN dialog_agent_scenario das ON da.scenario_id = das.id WHERE das.title = "Character Interview" AND type="system" AND da.deleted_at is null',
+            'dialog_agent_project' => 'SELECT count(*) FROM dialog_agent da JOIN dialog_agent_scenario das ON da.scenario_id = das.id WHERE das.title = "Project Ideation" AND type="system" AND da.deleted_at is null',
+            'dialog_agent_self_reflection' => 'SELECT count(*) FROM dialog_agent da JOIN dialog_agent_scenario das ON da.scenario_id = das.id WHERE das.title = "Self-Reflection" AND type="system" AND da.deleted_at is null',
+            'dialog_agent_tutor' => 'SELECT count(*) FROM dialog_agent da JOIN dialog_agent_scenario das ON da.scenario_id = das.id WHERE das.title = "Socratic Tutor" AND type="system" AND da.deleted_at is null',
             'dialog_agent_attempt' => 'SELECT count(*) FROM dialog_agent_response WHERE deleted_at is null',
 
             // Reporting
@@ -187,55 +181,25 @@ $app = new class extends CliTool\App {
 
             // More quiz info:
             // Quizzes which for some reason have no Learnosity reference
-            'quiz_without_learnosity_reference' => "
-                SELECT COUNT(*) FROM assess
-                WHERE availability = 'assess'
-                AND learnosity_reference IS NULL
-                AND deleted_at IS NULL
-            ",
+            'quiz_without_learnosity_reference' => "SELECT COUNT(*) FROM assess WHERE availability = 'assess' AND learnosity_reference IS NULL AND deleted_at IS NULL",
             // Quizzes which for some reason have an empty Learnosity reference:
             // I've seen this happen before, and am not sure why
-            'quiz_with_empty_learnosity_reference' => "
-                SELECT COUNT(*) FROM assess
-                WHERE availability = 'assess'
-                AND learnosity_reference = ''
-                AND deleted_at IS NULL
-            ",
+            'quiz_with_empty_learnosity_reference' => "SELECT COUNT(*) FROM assess WHERE availability = 'assess' AND learnosity_reference = '' AND deleted_at IS NULL",
             // Quizzes pending processing:
             // some number is acceptable, but a consistent number might indicate
             // a quiz unable to even begin processing
-            'quiz_status_pending' => "
-                SELECT COUNT(*) FROM assess
-                WHERE availability = 'assess'
-                AND learnosity_job_status = 'pending'
-                AND deleted_at IS NULL
-            ",
+            'quiz_status_pending' => "SELECT COUNT(*) FROM assess WHERE availability = 'assess' AND learnosity_job_status = 'pending' AND deleted_at IS NULL",
             // Quizzes currently processing:
             // again, some number is acceptable
-            'quiz_status_processing' => "
-                SELECT COUNT(*) FROM assess
-                WHERE availability = 'assess'
-                AND learnosity_job_status = 'processing'
-                AND deleted_at IS NULL
-            ",
+            'quiz_status_processing' => "SELECT COUNT(*) FROM assess WHERE availability = 'assess' AND learnosity_job_status = 'processing' AND deleted_at IS NULL",
             // Quizzes failed processing:
             // eventually this number should revert to zero, as they will be put
             // back to pending and eventually unprocessable
-            'quiz_status_failed' => "
-                SELECT COUNT(*) FROM assess
-                WHERE availability = 'assess'
-                AND learnosity_job_status = 'failed'
-                AND deleted_at IS NULL
-            ",
+            'quiz_status_failed' => "SELECT COUNT(*) FROM assess WHERE availability = 'assess' AND learnosity_job_status = 'failed' AND deleted_at IS NULL",
             // Quizzes unprocessable:
             // clearly these quizzes have an issue preventing them from being
             // processed
-            'quiz_status_unprocessable' => "
-                SELECT COUNT(*) FROM assess
-                WHERE availability = 'assess'
-                AND learnosity_job_status = 'unprocessable'
-                AND deleted_at IS NULL
-            ",
+            'quiz_status_unprocessable' => "SELECT COUNT(*) FROM assess WHERE availability = 'assess' AND learnosity_job_status = 'unprocessable' AND deleted_at IS NULL",
 
             // Activity audiences
             'feedback_visibility_staff' => "SELECT COUNT(*) FROM (SELECT sb.mark_visibility FROM assessment a JOIN submission_box sb ON a.id = sb.assessment_id WHERE a.deleted_at IS NULL UNION ALL SELECT COALESCE(q.mark_visibility, 'staffAndStudent') FROM assessment a JOIN assess q ON a.id = q.assessment_id WHERE a.deleted_at IS NULL AND q.deleted_at IS NULL AND q.availability = 'assess' UNION ALL SELECT COALESCE(p.mark_visibility, 'staffAndStudent') FROM assessment a JOIN project p ON a.id = p.assessment_id WHERE a.deleted_at IS NULL AND p.deleted_at IS NULL UNION ALL SELECT COALESCE(lti.mark_visibility, 'staffOnly') FROM assessment a JOIN lti_assessment lti ON a.id = lti.assessment_id WHERE a.deleted_at IS NULL UNION ALL SELECT COALESCE(r.mark_visibility, 'staffOnly') FROM assessment a JOIN reporting r ON a.id = r.assessment_id WHERE a.deleted_at IS NULL AND r.deleted_at IS NULL) feedback WHERE mark_visibility = 'staffOnly'",
@@ -314,8 +278,7 @@ $app = new class extends CliTool\App {
             'pastoral_records'  => 'SELECT count(*) FROM `pastoral` WHERE deleted_at IS NULL',
             'pastoral_groups'   => 'SELECT count(*) FROM `pastoral_group` WHERE deleted_at IS NULL',
             'pastoral_flags'   => 'SELECT COUNT(*) FROM lu_pastoral_type lpt LEFT JOIN lu_pastoral_subtype lps on lpt.id = lps.pastoral_type_id WHERE (lpt.icon IS NOT NULL OR lps.icon IS NOT NULL) AND lpt.deleted_at IS NULL AND lps.deleted_at IS NULL ',
-            'pastoral_templates'   => 'SELECT COUNT(*) FROM lu_pastoral_type lpt LEFT JOIN lu_pastoral_subtype lps on lpt.id = lps.pastoral_type_id WHERE
-            ((lpt.template IS NOT NULL AND  lpt.template != "") OR (lps.template IS NOT NULL AND lps.template != "")) AND lpt.deleted_at IS NULL AND lps.deleted_at IS NULL',
+            'pastoral_templates'   => 'SELECT COUNT(*) FROM lu_pastoral_type lpt LEFT JOIN lu_pastoral_subtype lps on lpt.id = lps.pastoral_type_id WHERE ((lpt.template IS NOT NULL AND  lpt.template != "") OR (lps.template IS NOT NULL AND lps.template != "")) AND lpt.deleted_at IS NULL AND lps.deleted_at IS NULL',
             'pastoral_actions_total'  => 'SELECT COUNT(*) FROM pastoral_record_action WHERE deleted_at IS NULL',
             'pastoral_actions_completed' => 'SELECT COUNT(*) FROM pastoral_record_action WHERE completed = 1 AND deleted_at IS NULL',
             'pastoral_comment'   => 'SELECT COUNT(*) FROM pastoral_comment WHERE deleted_at IS NULL',
@@ -329,9 +292,7 @@ $app = new class extends CliTool\App {
             'pastoral_attachments'      => 'SELECT count(*) FROM pastoral_attachment WHERE deleted_at IS NULL',
             'pastoral_attachment_size' => 'SELECT SUM(filesize) FROM pastoral_attachment JOIN storage ON pastoral_attachment.hash = storage.hash',
             'differentiation_profiles'      => 'SELECT count(*) FROM differentiation_profiles WHERE deleted_at IS NULL',
-            'differentation_types'      => 'SELECT
-                                            (SELECT COUNT(*) FROM lu_pastoral_type WHERE contribute_differentiation_profile = 1 AND deleted_at IS NULL) +
-                                            (SELECT COUNT(*) FROM lu_pastoral_subtype WHERE contribute_differentiation_profile = 1 AND deleted_at IS NULL)',
+            'differentation_types'      => 'SELECT (SELECT COUNT(*) FROM lu_pastoral_type WHERE contribute_differentiation_profile = 1 AND deleted_at IS NULL) + (SELECT COUNT(*) FROM lu_pastoral_subtype WHERE contribute_differentiation_profile = 1 AND deleted_at IS NULL)',
 
             //EOTC
             'eotc_events'       => 'SELECT count(*) FROM eotc_event WHERE deleted_at IS NULL',
@@ -396,54 +357,10 @@ $app = new class extends CliTool\App {
             'moment_folder'     => 'SELECT count(*) FROM moment_folder JOIN moment ON moment_folder.moment_id = moment.id WHERE moment.deleted_at IS NULL',
             'moment_tag'        => 'SELECT count(*) FROM moment_tag JOIN moment ON moment_tag.moment_id = moment.id WHERE moment.deleted_at IS NULL',
             'evidence_comments' => 'SELECT count(*) FROM moment JOIN discussion_thread_comment dtc on moment.discussion_thread_id = dtc.discussion_thread_id',
-            'moment_junior'   => "
-                SELECT COUNT(*)
-                FROM moment m
-                JOIN user u ON m.user_id = u.id
-                JOIN `groups` g ON u.group_id = g.id AND g.group_type = 'student'
-                JOIN lu_year_level yl ON u.year_id = yl.id
-                WHERE m.deleted_at IS NULL
-                  AND u.deleted_at IS NULL
-                  AND u.enabled = 1
-                  AND (
-                        (REGEXP_REPLACE(yl.name, '[^0-9]', '') != '' AND CAST(REGEXP_REPLACE(yl.name, '[^0-9]', '') AS UNSIGNED) < 7)
-                        OR yl.name LIKE 'ELC'
-                        OR yl.name LIKE 'Prep%'
-                        OR yl.name LIKE 'Kind%'
-                  )
-            ",
-            'moment_senior'   => "
-                SELECT COUNT(*)
-                FROM moment m
-                JOIN user u ON m.user_id = u.id
-                JOIN `groups` g ON u.group_id = g.id AND g.group_type = 'student'
-                JOIN lu_year_level yl ON u.year_id = yl.id
-                WHERE m.deleted_at IS NULL
-                  AND u.deleted_at IS NULL
-                  AND u.enabled = 1
-                  AND (
-                        REGEXP_REPLACE(yl.name, '[^0-9]', '') != ''
-                        AND CAST(REGEXP_REPLACE(yl.name, '[^0-9]', '') AS UNSIGNED) > 6
-                  )
-            ",
-            'moment_staff'    => "
-                SELECT COUNT(*)
-                FROM moment m
-                JOIN user u ON m.created_by = u.id
-                JOIN `groups` g ON u.group_id = g.id AND g.group_type = 'staff'
-                WHERE m.deleted_at IS NULL
-                  AND u.deleted_at IS NULL
-                  AND u.enabled = 1
-            ",
-            'moment_parent'   => "
-                SELECT COUNT(*)
-                FROM moment m
-                JOIN user u ON m.created_by = u.id
-                JOIN `groups` g ON u.group_id = g.id AND g.group_type = 'parent'
-                WHERE m.deleted_at IS NULL
-                  AND u.deleted_at IS NULL
-                  AND u.enabled = 1
-            ",
+            'moment_junior'     => "SELECT COUNT(*) FROM moment m JOIN user u ON m.user_id = u.id JOIN `groups` g ON u.group_id = g.id AND g.group_type = 'student' JOIN lu_year_level yl ON u.year_id = yl.id WHERE m.deleted_at IS NULL AND u.deleted_at IS NULL AND u.enabled = 1 AND ((REGEXP_REPLACE(yl.name, '[^0-9]', '') != '' AND CAST(REGEXP_REPLACE(yl.name, '[^0-9]', '') AS UNSIGNED) < 7) OR yl.name LIKE 'ELC' OR yl.name LIKE 'Prep%' OR yl.name LIKE 'Kind%')",
+            'moment_senior'     => "SELECT COUNT(*) FROM moment m JOIN user u ON m.user_id = u.id JOIN `groups` g ON u.group_id = g.id AND g.group_type = 'student' JOIN lu_year_level yl ON u.year_id = yl.id WHERE m.deleted_at IS NULL AND u.deleted_at IS NULL AND u.enabled = 1 AND (REGEXP_REPLACE(yl.name, '[^0-9]', '') != '' AND CAST(REGEXP_REPLACE(yl.name, '[^0-9]', '') AS UNSIGNED) > 6)",
+            'moment_staff'      => "SELECT COUNT(*) FROM moment m JOIN user u ON m.created_by = u.id JOIN `groups` g ON u.group_id = g.id AND g.group_type = 'staff' WHERE m.deleted_at IS NULL AND u.deleted_at IS NULL AND u.enabled = 1",
+            'moment_parent'     => "SELECT COUNT(*) FROM moment m JOIN user u ON m.created_by = u.id JOIN `groups` g ON u.group_id = g.id AND g.group_type = 'parent' WHERE m.deleted_at IS NULL AND u.deleted_at IS NULL AND u.enabled = 1",
 
             //Badges
             'badges'            => 'SELECT count(*) FROM badge WHERE deleted_at IS NULL',
