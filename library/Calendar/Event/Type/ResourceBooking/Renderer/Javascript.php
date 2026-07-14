@@ -151,6 +151,10 @@ class Javascript extends Base
         //       are used.  If not, consider removing them and allowing null values on `resource_booking.event_id`.
         $resourceBookingMapper = ResourceBookingMapper::getInstance();
         $eotcEventId = $resourceBookingMapper->getEotcEventId($booking->getId());
+        $canAddToCalendar = (bool)$this->getRouteIfAuthorized(
+            'calendarEvent.addToCalendar',
+            ['eventId' => $this->getEvent()->getEventId()]
+        );
 
         // Set title from resource name, and code and booking name
         // if either are there.
@@ -224,10 +228,11 @@ class Javascript extends Base
                     'showQuantity' => $this->getEvent()->getBooking()->getResource()->hasDisplayableCapacity(
                         $this->getEvent()->getBooking()->getQuantity()
                     ),
-                    'status'   => $this->getEvent()->getBooking()->getStatus()->jsonSerialize(),
-                    'buttons'  => $bookingButtons,
-                    'reviewer' => $reviewerRender,
-                    'related'  => $relatedBookings,
+                    'status'           => $this->getEvent()->getBooking()->getStatus()->jsonSerialize(),
+                    'buttons'          => $bookingButtons,
+                    'reviewer'         => $reviewerRender,
+                    'related'          => $relatedBookings,
+                    'canAddToCalendar' => $canAddToCalendar,
 
                     // Event type 'EOTC' refers to library/Calendar/Event/Type/EOTC/Event.php.
                     // Event type 'Day' refers to library/Calendar/Event/Type/Day/Event.php.
