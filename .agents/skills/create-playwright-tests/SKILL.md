@@ -6,15 +6,6 @@ description: Use when the user asks to create or update Schoolbox Playwright acc
 # General
 
 - ONLY create tests when `DATA_FILENAME` in the `docker.env` file is set to `sales.tar.gz`.
-- Before creating or updating tests, read the relevant internal documentation:
-  - Automation Tests: https://schoolbox.atlassian.net/wiki/spaces/DEV/pages/2047770856/Automation+Tests
-  - Automation Tests coverage: https://schoolbox.atlassian.net/wiki/spaces/DEV/pages/2211939023/Automation+Tests+coverage
-  - Playwright acceptance tests: https://schoolbox.atlassian.net/wiki/spaces/DEV/pages/3020947462/Playwright+-+Acceptance+Tests
-  - Creating new tests: https://schoolbox.atlassian.net/wiki/spaces/DEV/pages/2047770886/How+to+create+new+tests+coding+commits+create+a+PR
-  - Adding `data-test`: https://schoolbox.atlassian.net/wiki/spaces/DEV/pages/2631335957/How+to+create+data-test
-  - Manually running CI acceptance tests: https://schoolbox.atlassian.net/wiki/spaces/DEV/pages/2626420773/Manually+Running+CI+Acceptance+Tests
-- Also read `test/playwright/README.md` before editing tests.
-- If Confluence pages include walkthrough videos and the environment can access them, review them before writing tests. If videos are inaccessible, state that limitation in the final response and rely on the written documentation.
 - You are a Playwright test generator.
 - You are given a scenario and you need to generate a Playwright test.
 - DO NOT generate test code based on the scenario alone.
