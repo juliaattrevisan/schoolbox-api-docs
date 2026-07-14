@@ -31,43 +31,39 @@ $app = new class extends CliTool\App {
 
         $queryList = [
             //Users
-            'students_enabled'  => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled = 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "student")',
-            'students_disabled' => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled <> 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "student")',
-            'students_deleted'  => 'SELECT count(*) FROM user u WHERE u.deleted_at IS not NULL AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "student")',
             'staff_enabled'     => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled = 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "staff")',
             'staff_disabled'    => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled <> 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "staff")',
             'staff_deleted'     => 'SELECT count(*) FROM user u WHERE u.deleted_at IS not NULL AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "staff")',
+            'students_enabled'  => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled = 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "student")',
+            'students_disabled' => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled <> 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "student")',
+            'students_deleted'  => 'SELECT count(*) FROM user u WHERE u.deleted_at IS not NULL AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "student")',
+            'students_junior'   => "SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled = 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = 'student') AND u.year_id IN ( SELECT id FROM lu_year_level WHERE REGEXP_REPLACE(name, '[^0-9]', '') != '' AND CAST(REGEXP_REPLACE(name, '[^0-9]', '') AS UNSIGNED) < 7 OR name LIKE 'ELC' OR name like 'Prep%' OR name like 'Kind%')",
+            'students_senior'   => "SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled = 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = 'student') AND u.year_id IN ( SELECT id FROM lu_year_level WHERE REGEXP_REPLACE(name, '[^0-9]', '') != '' AND CAST(REGEXP_REPLACE(name, '[^0-9]', '') AS UNSIGNED) > 6)",            
             'parents_enabled'   => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled = 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "parent")',
             'parents_disabled'  => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled <> 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "parent")',
             'parents_deleted'   => 'SELECT count(*) FROM user u WHERE u.deleted_at IS not NULL AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "parent")',
             'guests_enabled'    => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled = 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "guest")',
             'guests_disabled'   => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled <> 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "guest")',
             'guests_deleted'    => 'SELECT count(*) FROM user u WHERE u.deleted_at IS not NULL AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "guest")',
-            'superusers'        => 'SELECT count(*) FROM user u JOIN superusers s on u.id = s.id WHERE u.deleted_at IS NULL',
-            'students_junior'   => "SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled = 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = 'student') AND u.year_id IN ( SELECT id FROM lu_year_level WHERE REGEXP_REPLACE(name, '[^0-9]', '') != '' AND CAST(REGEXP_REPLACE(name, '[^0-9]', '') AS UNSIGNED) < 7 OR name LIKE 'ELC' OR name like 'Prep%' OR name like 'Kind%')",
-            'students_senior'   => "SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled = 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = 'student') AND u.year_id IN ( SELECT id FROM lu_year_level WHERE REGEXP_REPLACE(name, '[^0-9]', '') != '' AND CAST(REGEXP_REPLACE(name, '[^0-9]', '') AS UNSIGNED) > 6)",
             'linked_users'      => 'SELECT count(*) FROM user_link',
 
-            //Moderators
+
+            //Superusers & Moderators
+            'superusers'        => 'SELECT count(*) FROM user u JOIN superusers s on u.id = s.id WHERE u.deleted_at IS NULL',
+            'badge_moderator'        => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_BADGE . ' AND type=' . UserAccess::ACCESS_FULL,
             'calendar_moderator'     => 'SELECT count(distinct u.id) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_CALENDAR . ' AND type=' . UserAccess::ACCESS_FULL, // distinct u.id, so we can see the count of humans, not service permissions.  A single human can have multiple Calendar service permissions.
-            'news_moderator'         => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_NEWS . ' AND type=' . UserAccess::ACCESS_FULL,
             'cms_moderator'          => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_CMS . ' AND type=' . UserAccess::ACCESS_FULL,
             'curriculum_moderator'   => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_CURRICULUM . ' AND type=' . UserAccess::ACCESS_WRITE, // write as there is no curric mod as yet 24.1
-            'resources_moderator'    => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_RESOURCE_BOOKING . ' AND type=' . UserAccess::ACCESS_FULL,
-            'fixtures_moderator'     => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_SPORTS_ADMINISTRATOR . ' AND type=' . UserAccess::ACCESS_FULL,
-            'pastoral_moderator'     => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_PASTORAL . ' AND type=' . UserAccess::ACCESS_FULL,
-            'badge_moderator'        => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_BADGE . ' AND type=' . UserAccess::ACCESS_FULL,
-            'timetable_moderator'    => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_TIMETABLE . ' AND type=' . UserAccess::ACCESS_FULL,
             'design_moderator'       => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_DESIGN . ' AND type=' . UserAccess::ACCESS_FULL,
-            'lms_moderator'          => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_LMS . ' AND type=' . UserAccess::ACCESS_FULL,
-            'impersonator_moderator' => 'SELECT count(distinct u.id) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_IMPERSONATOR . ' AND type=' . UserAccess::ACCESS_FULL, // distinct u.id, so we can see the count of humans, not service permissions.  A single human can have multiple Impersonator service permissions.
             'ib_moderator'           => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_IB_COORDINATOR . ' AND type=' . UserAccess::ACCESS_FULL,
+            'impersonator_moderator' => 'SELECT count(distinct u.id) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_IMPERSONATOR . ' AND type=' . UserAccess::ACCESS_FULL, // distinct u.id, so we can see the count of humans, not service permissions.  A single human can have multiple Impersonator service permissions.
+            'fixtures_moderator'     => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_SPORTS_ADMINISTRATOR . ' AND type=' . UserAccess::ACCESS_FULL,
+            'lms_moderator'          => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_LMS . ' AND type=' . UserAccess::ACCESS_FULL,
+            'news_moderator'         => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_NEWS . ' AND type=' . UserAccess::ACCESS_FULL,
+            'pastoral_moderator'     => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_PASTORAL . ' AND type=' . UserAccess::ACCESS_FULL,
+            'resources_moderator'    => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_RESOURCE_BOOKING . ' AND type=' . UserAccess::ACCESS_FULL,
+            'timetable_moderator'    => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_TIMETABLE . ' AND type=' . UserAccess::ACCESS_FULL,
 
-            //IBIS
-            'ib_registration_sessions'              => 'SELECT COUNT(*) FROM ib_registration_sessions',
-            'ib_registration_students'              => 'SELECT COUNT(*) FROM ib_registration_session_student',
-            'ib_registration_students_registered'   => 'SELECT COUNT(*) FROM ib_registration_session_student WHERE status = ' . RegistrationSessionStudentModel::STATUS_REGISTERED,
-            'ib_students_with_candidate_numbers'    => 'SELECT COUNT(*) FROM user u WHERE u.ib_candidate_number IS NOT NULL AND u.ib_candidate_number != ""',
 
             //Logins
             'unique_logins_yesterday' => "SELECT COUNT(DISTINCT username) FROM login_log WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 1 DAY) AND date < DATE(NOW())",
@@ -99,113 +95,40 @@ $app = new class extends CliTool\App {
             'unique_logins_yesterday_student_senior' => "SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 1 DAY) AND date < DATE(NOW()) AND group_type = 'student' AND user.year_id IN ( SELECT id FROM lu_year_level WHERE REGEXP_REPLACE(name, '[^0-9]', '') != '' AND CAST(REGEXP_REPLACE(name, '[^0-9]', '') AS UNSIGNED) > 6)",
             'user_assume' => 'SELECT COUNT(*) FROM user_assume_log',
 
+
+            //Mobile Users
+            'mobile_registrations'      => 'SELECT count(*) FROM `mobile_app_registry` WHERE mobile_app_registry.deleted_at is null',
+            'mobile_digistorm'          => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "Digistorm") WHERE mobile_app_registry.deleted_at is null',
+            'mobile_digistorm_apns'     => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "APNS") WHERE mobile_app_registry.deleted_at is null',
+            'mobile_digistorm_gcm'      => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "GCM") WHERE mobile_app_registry.deleted_at is null',
+            'mobile_firebase'           => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "Firebase") WHERE mobile_app_registry.deleted_at is null',
+            'mobile_firebase_android'   => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "Firebase") WHERE device_id = "Android" AND mobile_app_registry.deleted_at is null',
+            'mobile_firebase_browser'   => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "Firebase") WHERE device_id = "Browser" AND mobile_app_registry.deleted_at is null',
+            'mobile_firebase_ios'       => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "Firebase") WHERE device_id = "iOS" AND mobile_app_registry.deleted_at is null',
+            'mobile_tass_orbit'         => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "TassOrbit") WHERE mobile_app_registry.deleted_at is null',
+            'mobile_firebase_inklass'   => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "Firebase") WHERE device_id like "%Inklass%" AND mobile_app_registry.deleted_at is null',
+            
+
             //LMS
+            'course_framework'  => 'SELECT count(*) FROM courseTemplates WHERE deleted_at IS NULL',
+            'course_specifications'       => 'SELECT COUNT(*) FROM course_specification WHERE deleted_at IS NULL',
+            'course_unit_specifications'  => 'SELECT count(*) FROM course_unit_specification cs WHERE cs.deleted_at IS NULL',
+            'course_unit_implementations' => 'SELECT count(*) FROM course_unit_implementation ci WHERE ci.deleted_at IS NULL',
             'classes'           => 'SELECT count(f.id) from folder f JOIN folder_code fc ON f.id = fc.folder_id where f.deleted_at is null and fc.deleted_at is null',
             'classes_with_course_implementations' => 'SELECT count(*) FROM folder f WHERE f.id IN (SELECT ci.folder_id FROM course_implementation ci WHERE ci.deleted_at IS NULL) AND f.id IN (SELECT folder_id FROM folder_code)',
-            'class_assessments' => 'SELECT COUNT(*) FROM assessment JOIN assessment_folder af on assessment.id = af.assessment_id WHERE assessment.deleted_at IS NULL',
-            'student_submissions' => 'SELECT COUNT(*) FROM student_submission WHERE deleted_at IS NULL',
-            'student_submissions_size' => 'SELECT SUM(filesize) FROM student_submission_file JOIN storage on student_submission_file.hash = storage.hash',
-            'student_submissions_worksheet' => 'SELECT COUNT(*) FROM student_submission LEFT join student_submission_file on student_submission.id = student_submission_file.student_submission_id WHERE student_submission.deleted_at IS NULL AND student_submission_file.deleted_at IS NULL AND student_submission_file.is_worksheet = 1',
-            'feedback_self_graded' => 'SELECT COUNT(*) FROM submission_return WHERE deleted_at IS  NULL AND review_route = "self-grading"',
-            'feedback_teacher'  => 'SELECT COUNT(*) FROM submission_return WHERE deleted_at IS  NULL AND review_route = "instructor"',
-            'assessment_student_views'    => 'SELECT COUNT(*) FROM assessment_view WHERE user_id = participant_id',
-            'assessment_parent_views'     => 'SELECT COUNT(*) FROM assessment_view WHERE user_id != participant_id',
-            'lti_response'      => 'SELECT COUNT(*) FROM lti_assessment_score WHERE deleted_at IS NULL AND is_response = 1',
-            'lti_feedback'      => 'SELECT COUNT(*) FROM lti_assessment_score WHERE deleted_at IS NULL AND is_feedback = 1',
-            'quiz_attempts'     => 'SELECT COUNT(*) FROM assess_attempt WHERE deleted_at IS NULL AND learnosity_reference IS NOT NULL',
-            'quiz_feedback'     => 'SELECT COUNT(*) FROM quiz_feedback WHERE deleted_at IS NULL',
-            'course_unit_implementations' => 'SELECT count(*) FROM course_unit_implementation ci WHERE ci.deleted_at IS NULL',
-            'course_unit_specifications'  => 'SELECT count(*) FROM course_unit_specification cs WHERE cs.deleted_at IS NULL',
-            'course_specifications'       => 'SELECT COUNT(*) FROM course_specification WHERE deleted_at IS NULL',
-            'course_implementation_assessments' => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id WHERE assessment.deleted_at IS NULL',
-            'course_due_work'   => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL',
-            'course_quiz'       => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id JOIN assess ON assessment.id = assess.assessment_id WHERE assess.availability = "assess" AND assessment.deleted_at IS NULL',
-            'course_tasks'      => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id JOIN task ON assessment.id = task.assessment_id WHERE assessment.deleted_at IS NULL',
-            'course_lti'        => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id JOIN lti_assessment ON assessment.id = lti_assessment.assessment_id WHERE assessment.deleted_at IS NULL',
-            'course_projects'   => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id JOIN project ON assessment.id = project.assessment_id WHERE assessment.deleted_at IS NULL',
-            'course_framework'  => 'SELECT count(*) FROM courseTemplates WHERE deleted_at IS NULL',
-            'assessments'       => 'SELECT count(*) FROM assessment WHERE deleted_at IS NULL',
-            'quizzes'           => 'SELECT count(*) FROM assess WHERE availability = "assess" AND deleted_at IS NULL',
-            'due_works'         => 'SELECT count(*) FROM submission_box sb JOIN assessment a ON a.id = sb.assessment_id WHERE a.deleted_at IS NULL',
-            'projects'          => 'SELECT count(*) FROM project JOIN assessment a ON a.id = project.assessment_id WHERE a.deleted_at IS NULL',
-            'tasks'             => 'SELECT count(*) FROM task JOIN assessment a ON a.id = task.assessment_id WHERE a.deleted_at IS NULL',
-            'lti_assessment'    => 'SELECT count(*) FROM lti_assessment JOIN assessment a on lti_assessment.assessment_id = a.id WHERE a.deleted_at IS NULL',
-            'lesson_plans'      => 'SELECT count(*) FROM lesson_plan JOIN assessment a on lesson_plan.assessment_id = a.id WHERE a.deleted_at IS NULL',
-            'lesson_plan_template' => 'SELECT COUNT(*) FROM lesson_plan_template WHERE deleted_at IS NULL',
-            'due_work_self_assessments' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND self_reviewability != "none"',
-            'due_work_online_submission' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND accept_submission = 1',
-            'due_work_offline_submission' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND accept_submission = 0',
-            'due_work_common_assessment' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND course_managed = 1',
-            'due_work_interactive_worksheet' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND enable_worksheet = 1',
-            'due_work_in_person' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND enable_offline = 1',
-            'due_work_use_text' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND enable_text = 1',
-            'due_work_use_files' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND enable_files = 1',
-            'due_work_show_policy' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND enable_policy = 1',
-            'due_work_seb'      => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND seb_enabled = 1',
-
-            'kami_docs'         => 'SELECT count(*) FROM kami_document WHERE status = "done" and deleted_at is null',
-            'kami_processing'   => 'SELECT count(*) FROM kami_document WHERE status = "processing" and deleted_at is null',
-            'kami_errors'       => 'SELECT count(*) FROM kami_document WHERE status = "error" and deleted_at is null',
-            'turnitin_docs'     => 'SELECT count(*) FROM turnitin_report WHERE status = "complete" and deleted_at is null',
-            'turnitin_assessments' => 'SELECT COUNT(*) FROM turnitin_group WHERE status = "complete" AND deleted_at is null',
-            'turnitin_errors'   => 'SELECT count(*) FROM turnitin_report WHERE status = "error" and deleted_at is null',
             'summative_report'  => 'SELECT count(*) FROM summative_report WHERE deleted_at is null',
-            'activity_plans'  => 'SELECT count(*) FROM participant_plan WHERE deleted_at is null AND is_dynamic = 0',
-            'plan_participants'  => 'SELECT count(*) FROM participant JOIN participant_plan ON participant.participant_plan_id = participant_plan.id WHERE excluded_at is null AND is_dynamic = 0 AND participant_plan.deleted_at is null',
-            'plan_excluded'  => 'SELECT count(*) FROM participant WHERE excluded_at is not null',
-            'assessment_differentiated' => 'SELECT count(*) FROM assessment WHERE original_assessment_id is not null AND deleted_at is null',
-            'dialog_agent' => 'SELECT count(*) FROM dialog_agent WHERE deleted_at is null',
-            'dialog_agent_interview' => 'SELECT count(*) FROM dialog_agent da JOIN dialog_agent_scenario das ON da.scenario_id = das.id WHERE das.title = "Character Interview" AND type="system" AND da.deleted_at is null',
-            'dialog_agent_project' => 'SELECT count(*) FROM dialog_agent da JOIN dialog_agent_scenario das ON da.scenario_id = das.id WHERE das.title = "Project Ideation" AND type="system" AND da.deleted_at is null',
-            'dialog_agent_self_reflection' => 'SELECT count(*) FROM dialog_agent da JOIN dialog_agent_scenario das ON da.scenario_id = das.id WHERE das.title = "Self-Reflection" AND type="system" AND da.deleted_at is null',
-            'dialog_agent_tutor' => 'SELECT count(*) FROM dialog_agent da JOIN dialog_agent_scenario das ON da.scenario_id = das.id WHERE das.title = "Socratic Tutor" AND type="system" AND da.deleted_at is null',
-            'dialog_agent_attempt' => 'SELECT count(*) FROM dialog_agent_response WHERE deleted_at is null',
 
-            // Reporting
-            'reporting_activities' => 'SELECT COUNT(*) FROM reporting r JOIN assessment a ON r.assessment_id = a.id WHERE r.deleted_at IS NULL AND a.deleted_at IS NULL',
-            'reporting_supporting_data_range_current_academic_period' => "SELECT COUNT(*) FROM reporting r JOIN assessment a ON r.assessment_id = a.id WHERE r.deleted_at IS NULL AND a.deleted_at IS NULL AND r.supporting_data_range = 'current_academic_period'",
-            'reporting_supporting_data_range_previous_academic_period' => "SELECT COUNT(*) FROM reporting r JOIN assessment a ON r.assessment_id = a.id WHERE r.deleted_at IS NULL AND a.deleted_at IS NULL AND r.supporting_data_range = 'previous_academic_period'",
-            'reporting_supporting_data_range_current_and_previous_academic_period' => "SELECT COUNT(*) FROM reporting r JOIN assessment a ON r.assessment_id = a.id WHERE r.deleted_at IS NULL AND a.deleted_at IS NULL AND r.supporting_data_range = 'current_and_previous_academic_period'",
-            'reporting_supporting_data_range_current_academic_year' => "SELECT COUNT(*) FROM reporting r JOIN assessment a ON r.assessment_id = a.id WHERE r.deleted_at IS NULL AND a.deleted_at IS NULL AND r.supporting_data_range = 'current_academic_year'",
-            'reporting_supporting_data_range_current_and_previous_academic_year' => "SELECT COUNT(*) FROM reporting r JOIN assessment a ON r.assessment_id = a.id WHERE r.deleted_at IS NULL AND a.deleted_at IS NULL AND r.supporting_data_range = 'current_and_previous_academic_year'",
-            'reporting_supporting_data_folders_current_only' => "SELECT COUNT(*) FROM reporting r JOIN assessment a ON r.assessment_id = a.id WHERE r.deleted_at IS NULL AND a.deleted_at IS NULL AND r.supporting_data_folders = 'current_only'",
-            'reporting_supporting_data_folders_any_folders' => "SELECT COUNT(*) FROM reporting r JOIN assessment a ON r.assessment_id = a.id WHERE r.deleted_at IS NULL AND a.deleted_at IS NULL AND r.supporting_data_folders = 'any_folders'",
-            'reporting_supporting_data_markbook_enabled' => 'SELECT COUNT(*) FROM reporting r JOIN assessment a ON r.assessment_id = a.id WHERE r.deleted_at IS NULL AND a.deleted_at IS NULL AND r.supporting_data_markbook_enable = 1',
-            'reporting_supporting_data_markbook_disabled' => 'SELECT COUNT(*) FROM reporting r JOIN assessment a ON r.assessment_id = a.id WHERE r.deleted_at IS NULL AND a.deleted_at IS NULL AND r.supporting_data_markbook_enable = 0',
-            // Agnostic rubrics
-            'rubric_instances' => 'SELECT COUNT(*) FROM rubric_instance ri JOIN assessment a ON ri.assessment_id = a.id WHERE ri.deleted_at IS NULL AND a.deleted_at IS NULL',
-            'due_work_rubrics' => 'SELECT COUNT(*) FROM rubric_instance ri JOIN assessment a ON ri.assessment_id = a.id JOIN submission_box sb ON a.id = sb.assessment_id WHERE ri.deleted_at IS NULL AND a.deleted_at IS NULL',
-            // 'rubric_instance_quiz' => "SELECT COUNT(*) FROM rubric_instance ri JOIN assessment a ON ri.assessment_id = a.id JOIN assess q ON a.id = q.assessment_id WHERE ri.deleted_at IS NULL AND a.deleted_at IS NULL AND q.deleted_at IS NULL AND q.availability = 'assess'",
-            // 'rubric_instance_lti' => 'SELECT COUNT(*) FROM rubric_instance ri JOIN assessment a ON ri.assessment_id = a.id JOIN lti_assessment lti ON a.id = lti.assessment_id WHERE ri.deleted_at IS NULL AND a.deleted_at IS NULL',
-            // 'rubric_instance_reporting' => 'SELECT COUNT(*) FROM rubric_instance ri JOIN assessment a ON ri.assessment_id = a.id JOIN reporting r ON a.id = r.assessment_id WHERE ri.deleted_at IS NULL AND a.deleted_at IS NULL AND r.deleted_at IS NULL',
 
-            // More quiz info:
-            // Quizzes which for some reason have no Learnosity reference
-            'quiz_without_learnosity_reference' => "SELECT COUNT(*) FROM assess WHERE availability = 'assess' AND learnosity_reference IS NULL AND deleted_at IS NULL",
-            // Quizzes which for some reason have an empty Learnosity reference:
-            // I've seen this happen before, and am not sure why
-            'quiz_with_empty_learnosity_reference' => "SELECT COUNT(*) FROM assess WHERE availability = 'assess' AND learnosity_reference = '' AND deleted_at IS NULL",
-            // Quizzes pending processing:
-            // some number is acceptable, but a consistent number might indicate
-            // a quiz unable to even begin processing
-            'quiz_status_pending' => "SELECT COUNT(*) FROM assess WHERE availability = 'assess' AND learnosity_job_status = 'pending' AND deleted_at IS NULL",
-            // Quizzes currently processing:
-            // again, some number is acceptable
-            'quiz_status_processing' => "SELECT COUNT(*) FROM assess WHERE availability = 'assess' AND learnosity_job_status = 'processing' AND deleted_at IS NULL",
-            // Quizzes failed processing:
-            // eventually this number should revert to zero, as they will be put
-            // back to pending and eventually unprocessable
-            'quiz_status_failed' => "SELECT COUNT(*) FROM assess WHERE availability = 'assess' AND learnosity_job_status = 'failed' AND deleted_at IS NULL",
-            // Quizzes unprocessable:
-            // clearly these quizzes have an issue preventing them from being
-            // processed
-            'quiz_status_unprocessable' => "SELECT COUNT(*) FROM assess WHERE availability = 'assess' AND learnosity_job_status = 'unprocessable' AND deleted_at IS NULL",
+            //Curriculum
+            'curriculum'                    => 'SELECT count(*) FROM curriculum_node WHERE deleted_at IS NULL',
+            'curriculum_rubric_indicator'   => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_rubric_indicator cnfri on curriculum_node.id = cnfri.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
+            'curriculum_rubric_capability'  => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_rubric_capability cnfrc on curriculum_node.id = cnfrc.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
+            'curriculum_folder'             => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_category cnfc on curriculum_node.id = cnfc.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
+            /*See each activity for details on usage.*/
+            'package_installed' => 'SELECT COUNT(*) FROM package WHERE installed = 1',
 
-            // Activity audiences
-            'feedback_visibility_staff' => "SELECT COUNT(*) FROM (SELECT sb.mark_visibility FROM assessment a JOIN submission_box sb ON a.id = sb.assessment_id WHERE a.deleted_at IS NULL UNION ALL SELECT COALESCE(q.mark_visibility, 'staffAndStudent') FROM assessment a JOIN assess q ON a.id = q.assessment_id WHERE a.deleted_at IS NULL AND q.deleted_at IS NULL AND q.availability = 'assess' UNION ALL SELECT COALESCE(p.mark_visibility, 'staffAndStudent') FROM assessment a JOIN project p ON a.id = p.assessment_id WHERE a.deleted_at IS NULL AND p.deleted_at IS NULL UNION ALL SELECT COALESCE(lti.mark_visibility, 'staffOnly') FROM assessment a JOIN lti_assessment lti ON a.id = lti.assessment_id WHERE a.deleted_at IS NULL UNION ALL SELECT COALESCE(r.mark_visibility, 'staffOnly') FROM assessment a JOIN reporting r ON a.id = r.assessment_id WHERE a.deleted_at IS NULL AND r.deleted_at IS NULL) feedback WHERE mark_visibility = 'staffOnly'",
-            'feedback_visibility_staff_students' => "SELECT COUNT(*) FROM (SELECT sb.mark_visibility FROM assessment a JOIN submission_box sb ON a.id = sb.assessment_id WHERE a.deleted_at IS NULL UNION ALL SELECT COALESCE(q.mark_visibility, 'staffAndStudent') FROM assessment a JOIN assess q ON a.id = q.assessment_id WHERE a.deleted_at IS NULL AND q.deleted_at IS NULL AND q.availability = 'assess' UNION ALL SELECT COALESCE(p.mark_visibility, 'staffAndStudent') FROM assessment a JOIN project p ON a.id = p.assessment_id WHERE a.deleted_at IS NULL AND p.deleted_at IS NULL UNION ALL SELECT COALESCE(lti.mark_visibility, 'staffOnly') FROM assessment a JOIN lti_assessment lti ON a.id = lti.assessment_id WHERE a.deleted_at IS NULL UNION ALL SELECT COALESCE(r.mark_visibility, 'staffOnly') FROM assessment a JOIN reporting r ON a.id = r.assessment_id WHERE a.deleted_at IS NULL AND r.deleted_at IS NULL) feedback WHERE mark_visibility = 'staffAndStudent'",
-            'feedback_visibility_staff_parents' => "SELECT COUNT(*) FROM (SELECT sb.mark_visibility FROM assessment a JOIN submission_box sb ON a.id = sb.assessment_id WHERE a.deleted_at IS NULL UNION ALL SELECT COALESCE(q.mark_visibility, 'staffAndStudent') FROM assessment a JOIN assess q ON a.id = q.assessment_id WHERE a.deleted_at IS NULL AND q.deleted_at IS NULL AND q.availability = 'assess' UNION ALL SELECT COALESCE(p.mark_visibility, 'staffAndStudent') FROM assessment a JOIN project p ON a.id = p.assessment_id WHERE a.deleted_at IS NULL AND p.deleted_at IS NULL UNION ALL SELECT COALESCE(lti.mark_visibility, 'staffOnly') FROM assessment a JOIN lti_assessment lti ON a.id = lti.assessment_id WHERE a.deleted_at IS NULL UNION ALL SELECT COALESCE(r.mark_visibility, 'staffOnly') FROM assessment a JOIN reporting r ON a.id = r.assessment_id WHERE a.deleted_at IS NULL AND r.deleted_at IS NULL) feedback WHERE mark_visibility = 'staffAndParent'",
-            'feedback_visibility_staff_students_parents' => "SELECT COUNT(*) FROM (SELECT sb.mark_visibility FROM assessment a JOIN submission_box sb ON a.id = sb.assessment_id WHERE a.deleted_at IS NULL UNION ALL SELECT COALESCE(q.mark_visibility, 'staffAndStudent') FROM assessment a JOIN assess q ON a.id = q.assessment_id WHERE a.deleted_at IS NULL AND q.deleted_at IS NULL AND q.availability = 'assess' UNION ALL SELECT COALESCE(p.mark_visibility, 'staffAndStudent') FROM assessment a JOIN project p ON a.id = p.assessment_id WHERE a.deleted_at IS NULL AND p.deleted_at IS NULL UNION ALL SELECT COALESCE(lti.mark_visibility, 'staffOnly') FROM assessment a JOIN lti_assessment lti ON a.id = lti.assessment_id WHERE a.deleted_at IS NULL UNION ALL SELECT COALESCE(r.mark_visibility, 'staffOnly') FROM assessment a JOIN reporting r ON a.id = r.assessment_id WHERE a.deleted_at IS NULL AND r.deleted_at IS NULL) feedback WHERE mark_visibility = 'staffStudentAndParent'",
+
+            // Work Types & Activity Audiences
             'work_types' => 'SELECT COUNT(*) FROM lu_work_type WHERE deleted_at IS NULL',
             'activity_audience_staff' => 'SELECT COUNT(*) FROM lu_work_type WHERE deleted_at IS NULL AND is_visible_to_learners = 0 AND is_visible_to_parents = 0',
             'activity_audience_staff_students' => 'SELECT COUNT(*) FROM lu_work_type WHERE deleted_at IS NULL AND is_visible_to_learners = 1 AND is_visible_to_parents = 0',
@@ -219,6 +142,148 @@ $app = new class extends CliTool\App {
             'work_types_permitted_lesson_plan' => 'SELECT COUNT(*) FROM lu_work_type WHERE deleted_at IS NULL AND permitted_lesson_plan = 1',
             'work_types_permitted_dialog_agent' => 'SELECT COUNT(*) FROM lu_work_type WHERE deleted_at IS NULL AND permitted_dialog_agent = 1',
             'work_types_permitted_reporting' => 'SELECT COUNT(*) FROM lu_work_type WHERE deleted_at IS NULL AND permitted_reporting_activity = 1',
+
+            
+            // Activities and Assessments
+            'assessments'       => 'SELECT count(*) FROM assessment WHERE deleted_at IS NULL',
+            'course_implementation_assessments' => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id WHERE assessment.deleted_at IS NULL',
+            'class_assessments' => 'SELECT COUNT(*) FROM assessment JOIN assessment_folder af on assessment.id = af.assessment_id WHERE assessment.deleted_at IS NULL',
+            'curriculum_assessment'         => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa on curriculum_node.id = cnfa.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
+            'rubric_instances' => 'SELECT COUNT(*) FROM rubric_instance ri JOIN assessment a ON ri.assessment_id = a.id WHERE ri.deleted_at IS NULL AND a.deleted_at IS NULL',
+            'activity_plans'  => 'SELECT count(*) FROM participant_plan WHERE deleted_at is null AND is_dynamic = 0',
+            'plan_participants'  => 'SELECT count(*) FROM participant JOIN participant_plan ON participant.participant_plan_id = participant_plan.id WHERE excluded_at is null AND is_dynamic = 0 AND participant_plan.deleted_at is null',
+            'plan_excluded'  => 'SELECT count(*) FROM participant WHERE excluded_at is not null',
+            'assessment_differentiated' => 'SELECT count(*) FROM assessment WHERE original_assessment_id is not null AND deleted_at is null',        
+            'assessment_student_views'    => 'SELECT COUNT(*) FROM assessment_view WHERE user_id = participant_id',
+            'assessment_parent_views'     => 'SELECT COUNT(*) FROM assessment_view WHERE user_id != participant_id',
+           
+
+            //Feedback Visibility
+            'feedback_visibility_staff' => "SELECT COUNT(*) FROM (SELECT sb.mark_visibility FROM assessment a JOIN submission_box sb ON a.id = sb.assessment_id WHERE a.deleted_at IS NULL UNION ALL SELECT COALESCE(q.mark_visibility, 'staffAndStudent') FROM assessment a JOIN assess q ON a.id = q.assessment_id WHERE a.deleted_at IS NULL AND q.deleted_at IS NULL AND q.availability = 'assess' UNION ALL SELECT COALESCE(p.mark_visibility, 'staffAndStudent') FROM assessment a JOIN project p ON a.id = p.assessment_id WHERE a.deleted_at IS NULL AND p.deleted_at IS NULL UNION ALL SELECT COALESCE(lti.mark_visibility, 'staffOnly') FROM assessment a JOIN lti_assessment lti ON a.id = lti.assessment_id WHERE a.deleted_at IS NULL UNION ALL SELECT COALESCE(r.mark_visibility, 'staffOnly') FROM assessment a JOIN reporting r ON a.id = r.assessment_id WHERE a.deleted_at IS NULL AND r.deleted_at IS NULL) feedback WHERE mark_visibility = 'staffOnly'",
+            'feedback_visibility_staff_students' => "SELECT COUNT(*) FROM (SELECT sb.mark_visibility FROM assessment a JOIN submission_box sb ON a.id = sb.assessment_id WHERE a.deleted_at IS NULL UNION ALL SELECT COALESCE(q.mark_visibility, 'staffAndStudent') FROM assessment a JOIN assess q ON a.id = q.assessment_id WHERE a.deleted_at IS NULL AND q.deleted_at IS NULL AND q.availability = 'assess' UNION ALL SELECT COALESCE(p.mark_visibility, 'staffAndStudent') FROM assessment a JOIN project p ON a.id = p.assessment_id WHERE a.deleted_at IS NULL AND p.deleted_at IS NULL UNION ALL SELECT COALESCE(lti.mark_visibility, 'staffOnly') FROM assessment a JOIN lti_assessment lti ON a.id = lti.assessment_id WHERE a.deleted_at IS NULL UNION ALL SELECT COALESCE(r.mark_visibility, 'staffOnly') FROM assessment a JOIN reporting r ON a.id = r.assessment_id WHERE a.deleted_at IS NULL AND r.deleted_at IS NULL) feedback WHERE mark_visibility = 'staffAndStudent'",
+            'feedback_visibility_staff_parents' => "SELECT COUNT(*) FROM (SELECT sb.mark_visibility FROM assessment a JOIN submission_box sb ON a.id = sb.assessment_id WHERE a.deleted_at IS NULL UNION ALL SELECT COALESCE(q.mark_visibility, 'staffAndStudent') FROM assessment a JOIN assess q ON a.id = q.assessment_id WHERE a.deleted_at IS NULL AND q.deleted_at IS NULL AND q.availability = 'assess' UNION ALL SELECT COALESCE(p.mark_visibility, 'staffAndStudent') FROM assessment a JOIN project p ON a.id = p.assessment_id WHERE a.deleted_at IS NULL AND p.deleted_at IS NULL UNION ALL SELECT COALESCE(lti.mark_visibility, 'staffOnly') FROM assessment a JOIN lti_assessment lti ON a.id = lti.assessment_id WHERE a.deleted_at IS NULL UNION ALL SELECT COALESCE(r.mark_visibility, 'staffOnly') FROM assessment a JOIN reporting r ON a.id = r.assessment_id WHERE a.deleted_at IS NULL AND r.deleted_at IS NULL) feedback WHERE mark_visibility = 'staffAndParent'",
+            'feedback_visibility_staff_students_parents' => "SELECT COUNT(*) FROM (SELECT sb.mark_visibility FROM assessment a JOIN submission_box sb ON a.id = sb.assessment_id WHERE a.deleted_at IS NULL UNION ALL SELECT COALESCE(q.mark_visibility, 'staffAndStudent') FROM assessment a JOIN assess q ON a.id = q.assessment_id WHERE a.deleted_at IS NULL AND q.deleted_at IS NULL AND q.availability = 'assess' UNION ALL SELECT COALESCE(p.mark_visibility, 'staffAndStudent') FROM assessment a JOIN project p ON a.id = p.assessment_id WHERE a.deleted_at IS NULL AND p.deleted_at IS NULL UNION ALL SELECT COALESCE(lti.mark_visibility, 'staffOnly') FROM assessment a JOIN lti_assessment lti ON a.id = lti.assessment_id WHERE a.deleted_at IS NULL UNION ALL SELECT COALESCE(r.mark_visibility, 'staffOnly') FROM assessment a JOIN reporting r ON a.id = r.assessment_id WHERE a.deleted_at IS NULL AND r.deleted_at IS NULL) feedback WHERE mark_visibility = 'staffStudentAndParent'",
+
+
+            //Dialog Agents
+            'dialog_agent' => 'SELECT count(*) FROM dialog_agent WHERE deleted_at is null',
+            /*To do: add course_dialog_agent */
+            'curriculum_assessment_dialog_agent' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN dialog_agent da ON da.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND da.deleted_at IS NULL',         
+            'dialog_agent_interview' => 'SELECT count(*) FROM dialog_agent da JOIN dialog_agent_scenario das ON da.scenario_id = das.id WHERE das.title = "Character Interview" AND type="system" AND da.deleted_at is null',
+            'dialog_agent_project' => 'SELECT count(*) FROM dialog_agent da JOIN dialog_agent_scenario das ON da.scenario_id = das.id WHERE das.title = "Project Ideation" AND type="system" AND da.deleted_at is null',
+            'dialog_agent_self_reflection' => 'SELECT count(*) FROM dialog_agent da JOIN dialog_agent_scenario das ON da.scenario_id = das.id WHERE das.title = "Self-Reflection" AND type="system" AND da.deleted_at is null',
+            'dialog_agent_tutor' => 'SELECT count(*) FROM dialog_agent da JOIN dialog_agent_scenario das ON da.scenario_id = das.id WHERE das.title = "Socratic Tutor" AND type="system" AND da.deleted_at is null',
+            'dialog_agent_attempt' => 'SELECT count(*) FROM dialog_agent_response WHERE deleted_at is null',
+
+
+            // Due Works
+            'due_works'         => 'SELECT count(*) FROM submission_box sb JOIN assessment a ON a.id = sb.assessment_id WHERE a.deleted_at IS NULL',
+            'course_due_work'   => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL',
+            'curriculum_assessment_due_work' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN submission_box sb ON sb.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL',
+            'due_work_rubrics' => 'SELECT COUNT(*) FROM rubric_instance ri JOIN assessment a ON ri.assessment_id = a.id JOIN submission_box sb ON a.id = sb.assessment_id WHERE ri.deleted_at IS NULL AND a.deleted_at IS NULL',
+            'due_work_self_assessments' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND self_reviewability != "none"',
+            'due_work_online_submission' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND accept_submission = 1',
+            'due_work_offline_submission' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND accept_submission = 0',
+            'due_work_common_assessment' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND course_managed = 1',
+            'due_work_interactive_worksheet' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND enable_worksheet = 1',
+            'due_work_in_person' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND enable_offline = 1',
+            'due_work_use_text' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND enable_text = 1',
+            'due_work_use_files' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND enable_files = 1',
+            'due_work_show_policy' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND enable_policy = 1',
+            'due_work_seb'      => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND seb_enabled = 1',
+            'kami_docs'         => 'SELECT count(*) FROM kami_document WHERE status = "done" and deleted_at is null',
+            'kami_processing'   => 'SELECT count(*) FROM kami_document WHERE status = "processing" and deleted_at is null',
+            'kami_errors'       => 'SELECT count(*) FROM kami_document WHERE status = "error" and deleted_at is null',
+            'turnitin_docs'     => 'SELECT count(*) FROM turnitin_report WHERE status = "complete" and deleted_at is null',
+            'turnitin_assessments' => 'SELECT COUNT(*) FROM turnitin_group WHERE status = "complete" AND deleted_at is null',
+            'turnitin_errors'   => 'SELECT count(*) FROM turnitin_report WHERE status = "error" and deleted_at is null',
+            'student_submissions' => 'SELECT COUNT(*) FROM student_submission WHERE deleted_at IS NULL',
+            'student_submissions_size' => 'SELECT SUM(filesize) FROM student_submission_file JOIN storage on student_submission_file.hash = storage.hash',
+            'student_submissions_worksheet' => 'SELECT COUNT(*) FROM student_submission LEFT join student_submission_file on student_submission.id = student_submission_file.student_submission_id WHERE student_submission.deleted_at IS NULL AND student_submission_file.deleted_at IS NULL AND student_submission_file.is_worksheet = 1',
+            'feedback_self_graded' => 'SELECT COUNT(*) FROM submission_return WHERE deleted_at IS  NULL AND review_route = "self-grading"',
+            'feedback_teacher'  => 'SELECT COUNT(*) FROM submission_return WHERE deleted_at IS  NULL AND review_route = "instructor"',
+
+
+            //Lesson Plans
+            'lesson_plans'      => 'SELECT count(*) FROM lesson_plan JOIN assessment a on lesson_plan.assessment_id = a.id WHERE a.deleted_at IS NULL',
+            /*To do: add course_lesson_plan*/
+            'curriculum_assessment_lesson_plan' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN lesson_plan lp ON lp.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND lp.deleted_at IS NULL',
+            'lesson_plan_template' => 'SELECT COUNT(*) FROM lesson_plan_template WHERE deleted_at IS NULL',           
+
+
+            //LTI
+            'lti_assessment'    => 'SELECT count(*) FROM lti_assessment JOIN assessment a on lti_assessment.assessment_id = a.id WHERE a.deleted_at IS NULL',
+            /*To do: add course_lti */
+            'curriculum_assessment_lti' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN lti_assessment la ON la.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL',
+            /* To add once available: 'rubric_instance_lti' => 'SELECT COUNT(*) FROM rubric_instance ri JOIN assessment a ON ri.assessment_id = a.id JOIN lti_assessment lti ON a.id = lti.assessment_id WHERE ri.deleted_at IS NULL AND a.deleted_at IS NULL', */
+            'lti_response'      => 'SELECT COUNT(*) FROM lti_assessment_score WHERE deleted_at IS NULL AND is_response = 1',
+            'lti_feedback'      => 'SELECT COUNT(*) FROM lti_assessment_score WHERE deleted_at IS NULL AND is_feedback = 1',
+
+
+            // Project
+            'projects'          => 'SELECT count(*) FROM project JOIN assessment a ON a.id = project.assessment_id WHERE a.deleted_at IS NULL',
+            'course_projects'   => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id JOIN project ON assessment.id = project.assessment_id WHERE assessment.deleted_at IS NULL',
+            'curriculum_assessment_project' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN project p ON p.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND p.deleted_at IS NULL',
+
+            
+            // Reporting
+            'reporting_activities' => 'SELECT COUNT(*) FROM reporting r JOIN assessment a ON r.assessment_id = a.id WHERE r.deleted_at IS NULL AND a.deleted_at IS NULL',
+            /*To do: add course_reporting_activity */
+            'curriculum_assessment_reporting' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN reporting r ON r.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND r.deleted_at IS NULL',           
+            /* To add once available: rubric_instance_reporting' => 'SELECT COUNT(*) FROM rubric_instance ri JOIN assessment a ON ri.assessment_id = a.id JOIN reporting r ON a.id = r.assessment_id WHERE ri.deleted_at IS NULL AND a.deleted_at IS NULL AND r.deleted_at IS NULL',*/
+            'reporting_supporting_data_range_current_academic_period' => "SELECT COUNT(*) FROM reporting r JOIN assessment a ON r.assessment_id = a.id WHERE r.deleted_at IS NULL AND a.deleted_at IS NULL AND r.supporting_data_range = 'current_academic_period'",
+            'reporting_supporting_data_range_previous_academic_period' => "SELECT COUNT(*) FROM reporting r JOIN assessment a ON r.assessment_id = a.id WHERE r.deleted_at IS NULL AND a.deleted_at IS NULL AND r.supporting_data_range = 'previous_academic_period'",
+            'reporting_supporting_data_range_current_and_previous_academic_period' => "SELECT COUNT(*) FROM reporting r JOIN assessment a ON r.assessment_id = a.id WHERE r.deleted_at IS NULL AND a.deleted_at IS NULL AND r.supporting_data_range = 'current_and_previous_academic_period'",
+            'reporting_supporting_data_range_current_academic_year' => "SELECT COUNT(*) FROM reporting r JOIN assessment a ON r.assessment_id = a.id WHERE r.deleted_at IS NULL AND a.deleted_at IS NULL AND r.supporting_data_range = 'current_academic_year'",
+            'reporting_supporting_data_range_current_and_previous_academic_year' => "SELECT COUNT(*) FROM reporting r JOIN assessment a ON r.assessment_id = a.id WHERE r.deleted_at IS NULL AND a.deleted_at IS NULL AND r.supporting_data_range = 'current_and_previous_academic_year'",
+            'reporting_supporting_data_folders_current_only' => "SELECT COUNT(*) FROM reporting r JOIN assessment a ON r.assessment_id = a.id WHERE r.deleted_at IS NULL AND a.deleted_at IS NULL AND r.supporting_data_folders = 'current_only'",
+            'reporting_supporting_data_folders_any_folders' => "SELECT COUNT(*) FROM reporting r JOIN assessment a ON r.assessment_id = a.id WHERE r.deleted_at IS NULL AND a.deleted_at IS NULL AND r.supporting_data_folders = 'any_folders'",
+            'reporting_supporting_data_markbook_enabled' => 'SELECT COUNT(*) FROM reporting r JOIN assessment a ON r.assessment_id = a.id WHERE r.deleted_at IS NULL AND a.deleted_at IS NULL AND r.supporting_data_markbook_enable = 1',
+            'reporting_supporting_data_markbook_disabled' => 'SELECT COUNT(*) FROM reporting r JOIN assessment a ON r.assessment_id = a.id WHERE r.deleted_at IS NULL AND a.deleted_at IS NULL AND r.supporting_data_markbook_enable = 0',
+            
+
+            //Quizzes
+            'quizzes'           => 'SELECT count(*) FROM assess WHERE availability = "assess" AND deleted_at IS NULL',
+            'course_quiz'       => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id JOIN assess ON assessment.id = assess.assessment_id WHERE assess.availability = "assess" AND assessment.deleted_at IS NULL',
+            'curriculum_assessment_quiz' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN assess q ON q.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND q.availability = "assess" AND q.deleted_at IS NULL',
+            /* To add once available: 'rubric_instance_quiz' => "SELECT COUNT(*) FROM rubric_instance ri JOIN assessment a ON ri.assessment_id = a.id JOIN assess q ON a.id = q.assessment_id WHERE ri.deleted_at IS NULL AND a.deleted_at IS NULL AND q.deleted_at IS NULL AND q.availability = 'assess'",*/
+            'quiz_attempts'     => 'SELECT COUNT(*) FROM assess_attempt WHERE deleted_at IS NULL AND learnosity_reference IS NOT NULL',
+            'quiz_feedback'     => 'SELECT COUNT(*) FROM quiz_feedback WHERE deleted_at IS NULL',
+            /*Learnosity specific stats, these are useful for checking the health of the Learnosity processing system, and can be used to identify issues with quizzes which are not processing correctl*/
+            /* Quizzes which for some reason have no Learnosity reference.*/
+            'quiz_without_learnosity_reference' => "SELECT COUNT(*) FROM assess WHERE availability = 'assess' AND learnosity_reference IS NULL AND deleted_at IS NULL",
+            /* Quizzes which for some reason have an empty Learnosity reference, I've seen this happen before, and am not sure why:*/
+            'quiz_with_empty_learnosity_reference' => "SELECT COUNT(*) FROM assess WHERE availability = 'assess' AND learnosity_reference = ''AND deleted_at IS NULL",
+            /* Quizzes pending processing, some number is acceptable, but a consistent number might indicate a quiz unable to even begin processing:*/ 
+            'quiz_status_pending' => "SELECT COUNT(*) FROM assess WHERE availability = 'assess' AND learnosity_job_status = 'pending' AND deleted_at IS NULL",
+            /* Quizzes currently processing, again, some number is acceptable:*/ 
+            'quiz_status_processing' => "SELECT COUNT(*) FROM assess WHERE availability = 'assess' AND learnosity_job_status = 'processing' AND deleted_at IS NULL",
+            /* Quizzes failed processing, eventually this number should revert to zero, as they will be put back to pending and eventually unprocessable */
+            'quiz_status_failed' => "SELECT COUNT(*) FROM assess WHERE availability = 'assess' AND learnosity_job_status = 'failed' AND deleted_at IS NULL",
+            /* Quizzes unprocessable, clearly these quizzes have an issue preventing them from being processed */
+            'quiz_status_unprocessable' => "SELECT COUNT(*) FROM assess WHERE availability = 'assess' AND learnosity_job_status = 'unprocessable' AND deleted_at IS NULL",
+
+
+            //Tasks
+            'tasks'             => 'SELECT count(*) FROM task JOIN assessment a ON a.id = task.assessment_id WHERE a.deleted_at IS NULL',
+            'course_tasks'      => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id JOIN task ON assessment.id = task.assessment_id WHERE assessment.deleted_at IS NULL',
+            'curriculum_assessment_task' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN task t ON t.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND t.deleted_at IS NULL',
+
+
+            //ePortfolio
+            'eportfolio_pages'  => 'SELECT count(*) FROM `eportfolio_page` WHERE deleted_at IS NULL',
+            'eportfolio_enabled_student' => 'SELECT COUNT(*) FROM user JOIN `groups` ON user.group_id = `groups`.id WHERE user.deleted_at is null AND eportfolio_enabled = 1 and group_type = "student"',
+            'eportfolio_enabled_staff' => 'SELECT COUNT(*) FROM user JOIN `groups` ON user.group_id = `groups`.id WHERE user.deleted_at is null AND eportfolio_enabled = 1 and group_type = "staff"',
+            'eportfolio_blog_posts' => 'SELECT COUNT(*) FROM eportfolio_component_blog WHERE deleted_at is null',
+            'showcased_work'        => 'SELECT COUNT(*) FROM eportfolio_showcase_item WHERE deleted_at is null',
+
+            //Homepage Views
+            'views_total'       => 'SELECT SUM(hitcount) FROM homepage_log',
+            'views_groups'      => 'SELECT SUM(hitcount) FROM homepage_log JOIN userGroups u on homepage_log.folder_id = u.cid',
+            'views_classes'     => 'SELECT SUM(hitcount) FROM homepage_log JOIN (SELECT * FROM folder_code WHERE folder_code.code IN (SELECT MAX(code) FROM folder_code GROUP BY folder_id)) AS folder_id_max ON homepage_log.folder_id = folder_id_max.folder_id',
+            'views_course_specifications' => 'SELECT SUM(hitcount) FROM homepage_log JOIN course_specification cs ON homepage_log.folder_id = cs.folder_id',
+            'views_course_unit_specifications' => 'SELECT SUM(hitcount) FROM homepage_log JOIN course_unit_specification ON course_unit_specification.folder_id = homepage_log.folder_id',
+
 
             //Homepages
             'forum_posts'       => 'SELECT count(*) FROM `forumPost` WHERE `deleted_at` IS NULL',
@@ -235,6 +300,9 @@ $app = new class extends CliTool\App {
             'etherpad'          => 'SELECT count(*) FROM etherpad_pad WHERE deleted_at IS NULL',
             'google_file'       => 'SELECT count(*) FROM google_file WHERE deleted_at IS NULL',
             'dropbox'           => 'SELECT count(*) FROM dropbox WHERE deleted_at IS NULL',
+            
+            
+            //Groups
             'groups'            => 'SELECT COUNT(*) FROM userGroups JOIN folder f on userGroups.cid = f.id WHERE f.deleted_at is null',
             'groups_open'       => 'SELECT COUNT(*) FROM userGroups JOIN folder f on userGroups.cid = f.id WHERE userGroups.type = ' . \Schoolbox\Resource\Group::FREE_GROUP . ' AND f.deleted_at is null',
             'groups_moderated'  => 'SELECT COUNT(*) FROM userGroups JOIN folder f on userGroups.cid = f.id WHERE userGroups.type = ' . \Schoolbox\Resource\Group::MODERATED_GROUP . ' AND f.deleted_at is null',
@@ -242,11 +310,7 @@ $app = new class extends CliTool\App {
             'groups_members'     => 'SELECT COUNT(*) FROM userAccess WHERE service = ' . UserAccess::SERVICE_HOMEPAGE,
             'groups_admin'       => 'SELECT COUNT(*) FROM userAccess WHERE service = ' . UserAccess::SERVICE_HOMEPAGE . ' AND type =' . UserAccess::ACCESS_FULL,
             'groups_favourite'   => 'SELECT COUNT(*) FROM userAccess WHERE service = ' . UserAccess::SERVICE_HOMEPAGE . ' AND favourite = 1',
-            'views_total'       => 'SELECT SUM(hitcount) FROM homepage_log',
-            'views_groups'      => 'SELECT SUM(hitcount) FROM homepage_log JOIN userGroups u on homepage_log.folder_id = u.cid',
-            'views_classes'     => 'SELECT SUM(hitcount) FROM homepage_log JOIN (SELECT * FROM folder_code WHERE folder_code.code IN (SELECT MAX(code) FROM folder_code GROUP BY folder_id)) AS folder_id_max ON homepage_log.folder_id = folder_id_max.folder_id',
-            'views_course_specifications' => 'SELECT SUM(hitcount) FROM homepage_log JOIN course_specification cs ON homepage_log.folder_id = cs.folder_id',
-            'views_course_unit_specifications' => 'SELECT SUM(hitcount) FROM homepage_log JOIN course_unit_specification ON course_unit_specification.folder_id = homepage_log.folder_id',
+            
 
             //News
             'news_posts'         => 'SELECT count(*) FROM comms_news_article WHERE deleted_at is null',
@@ -259,20 +323,16 @@ $app = new class extends CliTool\App {
             'news_views_parent'  => 'SELECT sum(num) FROM comms_news_article_statistics_cumulative WHERE deleted_at IS NULL AND role_type = "parent"',
             'news_views_student' => 'SELECT sum(num) FROM comms_news_article_statistics_cumulative WHERE deleted_at IS NULL AND role_type = "student"',
 
-            //ePortfolio
-            'eportfolio_pages'  => 'SELECT count(*) FROM `eportfolio_page` WHERE deleted_at IS NULL',
-            'eportfolio_enabled_student' => 'SELECT COUNT(*) FROM user JOIN `groups` ON user.group_id = `groups`.id WHERE user.deleted_at is null AND eportfolio_enabled = 1 and group_type = "student"',
-            'eportfolio_enabled_staff' => 'SELECT COUNT(*) FROM user JOIN `groups` ON user.group_id = `groups`.id WHERE user.deleted_at is null AND eportfolio_enabled = 1 and group_type = "staff"',
-            'eportfolio_blog_posts' => 'SELECT COUNT(*) FROM eportfolio_component_blog WHERE deleted_at is null',
-            'showcased_work'        => 'SELECT COUNT(*) FROM eportfolio_showcase_item WHERE deleted_at is null',
 
             //Resource Booking
             'resource_booking_items'    => 'SELECT COUNT(*) FROM resource WHERE deleted_at IS NULL',
             'resource_booking_events'   => 'SELECT COUNT(*) FROM resource_booking WHERE deleted_at IS NULL',
 
+
             //Fixtures
             'fixtures_teams'            => 'SELECT COUNT(*) FROM sportsfixtures_team WHERE deleted_at IS NULL',
             'fixtures_matches'            => 'SELECT COUNT(*) FROM sportsfixtures_match WHERE deleted_at IS NULL',
+
 
             //Pastoral
             'pastoral_records'  => 'SELECT count(*) FROM `pastoral` WHERE deleted_at IS NULL',
@@ -294,47 +354,17 @@ $app = new class extends CliTool\App {
             'differentiation_profiles'      => 'SELECT count(*) FROM differentiation_profiles WHERE deleted_at IS NULL',
             'differentation_types'      => 'SELECT (SELECT COUNT(*) FROM lu_pastoral_type WHERE contribute_differentiation_profile = 1 AND deleted_at IS NULL) + (SELECT COUNT(*) FROM lu_pastoral_subtype WHERE contribute_differentiation_profile = 1 AND deleted_at IS NULL)',
 
+
             //EOTC
             'eotc_events'       => 'SELECT count(*) FROM eotc_event WHERE deleted_at IS NULL',
 
-            //Curriculum
-            'curriculum'                    => 'SELECT count(*) FROM curriculum_node WHERE deleted_at IS NULL',
-            'curriculum_assessment'         => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa on curriculum_node.id = cnfa.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
-            'curriculum_assessment_project' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN project p ON p.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND p.deleted_at IS NULL',
-            'curriculum_assessment_due_work' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN submission_box sb ON sb.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL',
-            'curriculum_assessment_quiz' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN assess q ON q.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND q.availability = "assess" AND q.deleted_at IS NULL',
-            'curriculum_assessment_task' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN task t ON t.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND t.deleted_at IS NULL',
-            'curriculum_assessment_lti' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN lti_assessment la ON la.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL',
-            'curriculum_assessment_lesson_plan' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN lesson_plan lp ON lp.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND lp.deleted_at IS NULL',
-            'curriculum_assessment_dialog_agent' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN dialog_agent da ON da.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND da.deleted_at IS NULL',
-            'curriculum_assessment_reporting' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa ON curriculum_node.id = cnfa.curriculum_node_id JOIN assessment a ON a.id = cnfa.assessment_id JOIN reporting r ON r.assessment_id = a.id WHERE curriculum_node.deleted_at IS NULL AND a.deleted_at IS NULL AND r.deleted_at IS NULL',
-            'curriculum_rubric_indicator'   => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_rubric_indicator cnfri on curriculum_node.id = cnfri.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
-            'curriculum_rubric_capability'  => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_rubric_capability cnfrc on curriculum_node.id = cnfrc.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
-            'curriculum_folder'             => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_category cnfc on curriculum_node.id = cnfc.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
-            'curriculum_badge'              => 'SELECT count(*) FROM curriculum_node JOIN curriculum_badge cb on curriculum_node.id = cb.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
-            /* This should be curriculum_moment at some point,
-             * to reflect that we're collecting usage about learning moments,
-             * not their evidence.
-             */
-            'curriculum_evidence'           => 'SELECT count(*) FROM curriculum_node JOIN curriculum_moment cm on curriculum_node.id = cm.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
-
-            //Mobile Users
-            'mobile_registrations'      => 'SELECT count(*) FROM `mobile_app_registry` WHERE mobile_app_registry.deleted_at is null',
-            'mobile_digistorm'          => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "Digistorm") WHERE mobile_app_registry.deleted_at is null',
-            'mobile_digistorm_apns'     => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "APNS") WHERE mobile_app_registry.deleted_at is null',
-            'mobile_digistorm_gcm'      => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "GCM") WHERE mobile_app_registry.deleted_at is null',
-            'mobile_firebase'           => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "Firebase") WHERE mobile_app_registry.deleted_at is null',
-            'mobile_firebase_android'   => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "Firebase") WHERE device_id = "Android" AND mobile_app_registry.deleted_at is null',
-            'mobile_firebase_browser'   => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "Firebase") WHERE device_id = "Browser" AND mobile_app_registry.deleted_at is null',
-            'mobile_firebase_ios'       => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "Firebase") WHERE device_id = "iOS" AND mobile_app_registry.deleted_at is null',
-            'mobile_tass_orbit'         => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "TassOrbit") WHERE mobile_app_registry.deleted_at is null',
-            'mobile_firebase_inklass'   => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "Firebase") WHERE device_id like "%Inklass%" AND mobile_app_registry.deleted_at is null',
 
             //Calendar
             'event_school'      => 'SELECT COUNT(*) FROM event WHERE type = ' . Schoolbox\Calendar\Event::ACCESS_CAMPUS . ' AND deleted_at IS NULL',
             'event_group'       => 'SELECT COUNT(*) FROM event WHERE type = ' . Schoolbox\Calendar\Event::ACCESS_GROUP . ' AND deleted_at IS NULL',
             'event_personal'    => 'SELECT COUNT(*) FROM event WHERE type = ' . Schoolbox\Calendar\Event::ACCESS_PERSONAL . ' AND deleted_at IS NULL',
 
+            
             //CMS
             'storage'           => 'SELECT count(*) FROM `storage`',
             'storage_size'      => 'SELECT sum(filesize) FROM `storage`',
@@ -346,8 +376,11 @@ $app = new class extends CliTool\App {
             'myfile_size'       => 'SELECT sum(filesize) FROM my_file JOIN storage ON my_file.hash = storage.hash',
             'editor_templates'  => 'SELECT count(*) FROM editor_template WHERE deleted_at IS NULL',
 
-            //Learning Moments / Evidence
+            //Learning Moments & Evidence
+            /*This should be moment at some point, to reflect that we're collecting usage about learning moments, not their evidence.*/
             'evidence'          => 'SELECT count(*) FROM moment WHERE deleted_at IS NULL',
+            /* This should be curriculum_moment at some point, to reflect that we're collecting usage about learning moments, not their evidence.*/
+            'curriculum_evidence' => 'SELECT count(*) FROM curriculum_node JOIN curriculum_moment cm on curriculum_node.id = cm.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
             'moment_draft'      => 'SELECT count(*) FROM moment WHERE submitted_at IS NULL AND published_at IS NULL AND rejected_at IS NULL AND deleted_at IS NULL',
             'moment_pending'    => 'SELECT count(*) FROM moment WHERE submitted_at IS NOT NULL AND published_at IS NULL AND rejected_at IS NULL AND deleted_at IS NULL',
             'moment_approved'   => 'SELECT count(*) FROM moment WHERE published_at IS NOT NULL AND rejected_at IS NULL AND deleted_at IS NULL',
@@ -359,18 +392,22 @@ $app = new class extends CliTool\App {
             'evidence_comments' => 'SELECT count(*) FROM moment JOIN discussion_thread_comment dtc on moment.discussion_thread_id = dtc.discussion_thread_id',
             'moment_junior'     => "SELECT COUNT(*) FROM moment m JOIN user u ON m.user_id = u.id JOIN `groups` g ON u.group_id = g.id AND g.group_type = 'student' JOIN lu_year_level yl ON u.year_id = yl.id WHERE m.deleted_at IS NULL AND u.deleted_at IS NULL AND u.enabled = 1 AND ((REGEXP_REPLACE(yl.name, '[^0-9]', '') != '' AND CAST(REGEXP_REPLACE(yl.name, '[^0-9]', '') AS UNSIGNED) < 7) OR yl.name LIKE 'ELC' OR yl.name LIKE 'Prep%' OR yl.name LIKE 'Kind%')",
             'moment_senior'     => "SELECT COUNT(*) FROM moment m JOIN user u ON m.user_id = u.id JOIN `groups` g ON u.group_id = g.id AND g.group_type = 'student' JOIN lu_year_level yl ON u.year_id = yl.id WHERE m.deleted_at IS NULL AND u.deleted_at IS NULL AND u.enabled = 1 AND (REGEXP_REPLACE(yl.name, '[^0-9]', '') != '' AND CAST(REGEXP_REPLACE(yl.name, '[^0-9]', '') AS UNSIGNED) > 6)",
-            'moment_staff'      => "SELECT COUNT(*) FROM moment m JOIN user u ON m.created_by = u.id JOIN `groups` g ON u.group_id = g.id AND g.group_type = 'staff' WHERE m.deleted_at IS NULL AND u.deleted_at IS NULL AND u.enabled = 1",
+            'moment_staff'      => "SELECT COUNT(*) FROM moment m JOIN user u ON m.created_by = u.id JOIN `groups` g ON u.group_id = g.id AND g.group_type = 'staff' WHERE m.deleted_at IS NULL AND u.deleted_at IS NULL AND u.enabled = 1", 
             'moment_parent'     => "SELECT COUNT(*) FROM moment m JOIN user u ON m.created_by = u.id JOIN `groups` g ON u.group_id = g.id AND g.group_type = 'parent' WHERE m.deleted_at IS NULL AND u.deleted_at IS NULL AND u.enabled = 1",
+
 
             //Badges
             'badges'            => 'SELECT count(*) FROM badge WHERE deleted_at IS NULL',
+            'curriculum_badge'              => 'SELECT count(*) FROM curriculum_node JOIN curriculum_badge cb on curriculum_node.id = cb.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
             'badge_goals'       => 'SELECT count(*) FROM badge_user WHERE status = "goal" AND deleted_at IS NULL',
             'badge_achieved'    => 'SELECT count(*) FROM badge_user WHERE status = "achievement" AND deleted_at IS NULL',
+
 
             //Whats new
             'whats_new_started' => 'SELECT COUNT(*) FROM tour_status INNER JOIN tour ON tour_status.tour_uuid = tour.uuid WHERE tour.title like "%Release" AND tour.deleted_at IS NULL AND tour_status.status = "' . Schoolbox\Tour\Status\Model::STATUS_STARTED . '"',
             'whats_new_dismissed' => 'SELECT COUNT(*) FROM tour_status INNER JOIN tour ON tour_status.tour_uuid = tour.uuid WHERE tour.title like "%Release" AND tour.deleted_at IS NULL AND tour_status.status = "' . Schoolbox\Tour\Status\Model::STATUS_DISMISSED . '"',
             'whats_new_completed' => 'SELECT COUNT(*) FROM tour_status INNER JOIN tour ON tour_status.tour_uuid = tour.uuid WHERE tour.title like "%Release" AND tour.deleted_at IS NULL AND tour_status.status = "' . Schoolbox\Tour\Status\Model::STATUS_COMPLETED . '"',
+
 
             //AI Usage
             'openai_success'    => 'SELECT COUNT(*) FROM ai_session_log WHERE return_code = 200',
@@ -379,7 +416,7 @@ $app = new class extends CliTool\App {
             'openai_output_tokens' => 'SELECT SUM(output_tokens) FROM ai_session_log WHERE return_code = 200',
             'openai_tokens' => 'SELECT SUM(output_tokens) + SUM(input_tokens) FROM ai_session_log WHERE return_code = 200',
 
-            //image tokens
+            //Image tokens
             'openai_input_tokens_image' => 'SELECT SUM(input_tokens) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE return_code = 200 AND s.feature = "image"',
             'openai_output_tokens_image' => 'SELECT SUM(output_tokens) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE return_code = 200 AND s.feature = "image"',
             'openai_tokens_image' => 'SELECT SUM(output_tokens) + SUM(input_tokens) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE return_code = 200 AND s.feature = "image"',
@@ -391,6 +428,7 @@ $app = new class extends CliTool\App {
             'openai_differentiation' => "SELECT count(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'differentiation'",
             'openai_dialogagent' => "SELECT count(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'dialogagent'",
             'openai_learning_customisation' => "SELECT count(*) FROM ai_session_log l JOIN ai_session s ON s.id = l.ai_session_id WHERE s.feature = 'learningactivitycustomisation'",
+            /*To do: add aimoderationagent */
 
             // AI moderation
             'ai_moderation_events' => 'SELECT COUNT(id) FROM ai_moderation_event',
@@ -399,8 +437,13 @@ $app = new class extends CliTool\App {
             'ai_moderation_events_further_action_required' => "SELECT COUNT(id) FROM ai_moderation_event WHERE status = 'further_action_required'",
             'ai_moderation_events_further_action_taken' => "SELECT COUNT(id) FROM ai_moderation_event WHERE status = 'further_action_taken'",
 
-            //Packages
-            'package_installed' => 'SELECT COUNT(*) FROM package WHERE installed = 1',
+
+            //IBIS
+            'ib_registration_sessions'              => 'SELECT COUNT(*) FROM ib_registration_sessions',
+            'ib_registration_students'              => 'SELECT COUNT(*) FROM ib_registration_session_student',
+            'ib_registration_students_registered'   => 'SELECT COUNT(*) FROM ib_registration_session_student WHERE status = ' . RegistrationSessionStudentModel::STATUS_REGISTERED,
+            'ib_students_with_candidate_numbers'    => 'SELECT COUNT(*) FROM user u WHERE u.ib_candidate_number IS NOT NULL AND u.ib_candidate_number != ""',
+            
 
             //UI Themes
             'sonar_ui'  => "SELECT COUNT(*) FROM config WHERE name = 'advanced_ui_enabled' AND value = 1",
