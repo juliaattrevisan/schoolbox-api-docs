@@ -960,7 +960,11 @@ class Controller extends Base
         )
         -- Export every class page, course, and unit with its effective permission source and role groups.
         SELECT
-            ft.name AS 'Folder/Page Name',
+            CASE
+                WHEN LEFT(ft.name, 1) IN ('=', '+', '-', '@')
+                    THEN CONCAT(CHAR(39), ft.name)
+                ELSE ft.name
+                END AS 'Folder/Page Name',
             ft.id AS 'Folder/Page ID',
             CASE
                 WHEN cus.id IS NOT NULL THEN 'Unit'
@@ -969,9 +973,21 @@ class Controller extends Base
             END AS 'Page Type',
             IF(ft.inherit, 'Inherited', 'Direct') AS 'Permission Mode',
             ft.permission_folder_id AS 'Permissions From Folder ID',
-            pg.none_roles AS 'None',
-            pg.read_roles AS 'Read',
-            pg.write_roles AS 'Write'
+            CASE
+                WHEN LEFT(pg.none_roles, 1) IN ('=', '+', '-', '@')
+                    THEN CONCAT(CHAR(39), pg.none_roles)
+                ELSE pg.none_roles
+                END AS 'None',
+            CASE
+                WHEN LEFT(pg.read_roles, 1) IN ('=', '+', '-', '@')
+                    THEN CONCAT(CHAR(39), pg.read_roles)
+                ELSE pg.read_roles
+                END AS 'Read',
+            CASE
+                WHEN LEFT(pg.write_roles, 1) IN ('=', '+', '-', '@')
+                    THEN CONCAT(CHAR(39), pg.write_roles)
+                ELSE pg.write_roles
+                END AS 'Write'
         FROM
             folder_tree ft
         LEFT JOIN
