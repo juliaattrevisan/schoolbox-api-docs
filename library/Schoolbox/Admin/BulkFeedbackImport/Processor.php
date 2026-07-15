@@ -458,8 +458,9 @@ class Processor
                      */
                     if ($participant->isExcluded()) {
                         $this->log(sprintf(
-                            'Row %s: student %s has been excluded from this activity',
+                            'Row %s: student %s (%s) has been excluded from this activity',
                             $i,
+                            $learner->getFullName(),
                             $externalId,
                         ), IStrategy::WARNING);
 
@@ -474,8 +475,9 @@ class Processor
                      */
                     if (null === $participant) {
                         $this->log(sprintf(
-                            'Row %s: no participation record found for student %s; maybe they were deleted',
+                            'Row %s: no participation record found for student %s (%s); maybe they were deleted',
                             $i,
+                            $learner->getFullName(),
                             $externalId,
                         ), IStrategy::WARNING);
 
