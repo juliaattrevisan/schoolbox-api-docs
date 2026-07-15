@@ -879,7 +879,7 @@ class Controller extends Base
     public function classCourseUnit()
     {
         $database = FolderMapper::getInstance()->getDatabase();
-        $statement = $database->prepare("
+        $statement = $database->prepareQuery("
         WITH RECURSIVE
         -- Rank non-deleted folders within each parent so the recursive tree can keep the same sibling ordering.
         ranked_folders AS (
@@ -975,7 +975,7 @@ class Controller extends Base
             ft.sort_path ASC;
         ");
         $statement->execute();
-        (new Helper())->queryToCSV($statement, 'classCourseUnit.csv');
+        (new Helper())->queryToCSV($statement->getPDOStatement(), 'classCourseUnit.csv');
     }
 
     /**
