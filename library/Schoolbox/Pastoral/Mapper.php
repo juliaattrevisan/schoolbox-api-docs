@@ -955,20 +955,63 @@ class Mapper extends BaseMapper
         // If filtering on involvement, only show records the logged in user is involved with via audience/role/ownership
 
         if ($involved || !$this->isUserInPastoralService($user)) {
+            /* The viewer should be either the owner of the record or have specific access to the record
+             * and should not be denied in any way (ie staff accessible but denied by the user id)
+             */
             $this->filters[] = "
-                (
-                    (SELECT COUNT(*) FROM `pastoral_access` WHERE `role_id` = :user_role_id_0 AND `pastoral_id` = `pastoral`.`id`) > 0 OR
-                    (SELECT COUNT(*) FROM `pastoral_access` WHERE `user_id` = :user_id_0      AND `pastoral_id` = `pastoral`.`id`) > 0 OR
-                    (
-                        SELECT COUNT(*) FROM `pastoral_access` WHERE `group_id` IN (
-                            SELECT `group_id`
-                            FROM `pastoral_group_member`
-                            WHERE `user_id` = :user_id_1
-                        ) AND `pastoral_id` = `pastoral`.`id`
-                    ) > 0 OR
-                    `pastoral`.`owner_id` = :user_id_2
+            (
+                `pastoral`.`owner_id` = :user_id_2
+                 OR (
+                    NOT EXISTS (
+                        SELECT 1
+                        FROM `pastoral_access` pa_deny
+                        WHERE pa_deny.`pastoral_id` = `pastoral`.`id`
+                          AND pa_deny.`deleted_at` IS NULL
+                          AND pa_deny.`access` = 0
+                          AND (
+                              pa_deny.`role_id` = :user_role_id_0
+                              OR pa_deny.`user_id` = :user_id_0
+                              OR pa_deny.`group_id` IN (
+                                  SELECT pgm.`group_id`
+                                  FROM `pastoral_group_member` pgm
+                                  WHERE pgm.`user_id` = :user_id_1
+                                    AND pgm.`deleted_at` IS NULL
+                              )
+                          )
+                    )
+                    AND (
+                        EXISTS (
+                            SELECT 1
+                            FROM `pastoral_access` pa_role
+                            WHERE pa_role.`role_id` = :user_role_id_0
+                              AND pa_role.`pastoral_id` = `pastoral`.`id`
+                              AND pa_role.`deleted_at` IS NULL
+                              AND pa_role.`access` > 0
+                        )
+                        OR EXISTS (
+                            SELECT 1
+                            FROM `pastoral_access` pa_user
+                            WHERE pa_user.`user_id` = :user_id_0
+                              AND pa_user.`pastoral_id` = `pastoral`.`id`
+                              AND pa_user.`deleted_at` IS NULL
+                              AND pa_user.`access` > 0
+                        )
+                        OR EXISTS (
+                            SELECT 1
+                            FROM `pastoral_access` pa_group
+                            WHERE pa_group.`group_id` IN (
+                                SELECT pgm.`group_id`
+                                FROM `pastoral_group_member` pgm
+                                WHERE pgm.`user_id` = :user_id_1
+                                  AND pgm.`deleted_at` IS NULL
+                            )
+                              AND pa_group.`pastoral_id` = `pastoral`.`id`
+                              AND pa_group.`deleted_at` IS NULL
+                              AND pa_group.`access` > 0
+                        )
+                    )
                 )
-            ";
+            )";
             $this->bindings['user_role_id_0'] = $user->getRole()->getId();
             $this->bindings['user_id_0']      = $user->getId();
             $this->bindings['user_id_1']      = $user->getId();

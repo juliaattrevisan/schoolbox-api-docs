@@ -17,6 +17,8 @@ use Schoolbox\Pastoral\ReportBuilder\TabType\StudentByMonth;
 use Schoolbox\Pastoral\ReportBuilder\TabType\StudentByWeek;
 use Schoolbox\Pastoral\Type\Model as Type;
 use Schoolbox\Pastoral\SubType\Model as Subtype;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Role;
 use Schoolbox\User;
 use DateTimeZone;
 
@@ -36,6 +38,84 @@ class helperMethodsTest extends TestCase
                 'calendar_start_day' => 1, // Monday as week start
             ]
         );
+    }
+
+    public function testSetFiltersBuildsDenyAwareAccessFilter(): void
+    {
+        $viewer = (new User())
+            ->setId(123)
+            ->setRole((new Role())->setId(456)->setType(Role::STAFF))
+            ->setAccessList(new GenericCollection(UserAccess::class));
+
+        $pastoralMapper = $this->createMock(PastoralMapper::class);
+        $pastoralMapper
+            ->method('isUserInPastoralService')
+            ->with($viewer)
+            ->willReturn(false);
+
+        $helper = new Helper(
+            $this->buildBaseReport($viewer),
+            $pastoralMapper,
+            $this->configLoader,
+            $viewer,
+            $this->createStub(AccessLevelCensor::class),
+        );
+
+        $helper->setFilters();
+
+        $accessFilter = current(
+            array_filter(
+                $helper->getFilters(),
+                fn(string $filter): bool => str_contains($filter, ':user_role_id_0')
+            )
+        );
+
+        $this->assertIsString($accessFilter);
+        $this->assertStringContainsString('NOT EXISTS', $accessFilter);
+        $this->assertStringContainsString('pa_deny.`access` = 0', $accessFilter);
+        $this->assertStringContainsString('pa_role.`access` > 0', $accessFilter);
+        $this->assertStringContainsString('pa_user.`access` > 0', $accessFilter);
+        $this->assertStringContainsString('pa_group.`access` > 0', $accessFilter);
+        $this->assertStringContainsString('`pastoral`.`owner_id` = :user_id_2', $accessFilter);
+        $this->assertStringNotContainsString('COUNT(*)', $accessFilter);
+        $this->assertSame(
+            [
+                'user_role_id_0' => 456,
+                'user_id_0' => 123,
+                'user_id_1' => 123,
+                'user_id_2' => 123,
+                'viewerCampusId_0' => -1,
+                'viewerId' => 123,
+                'accessDeny' => 0,
+                'viewerRoleId' => 456,
+                'viewerRoleType' => Role::STAFF,
+            ],
+            $helper->getParams()
+        );
+    }
+
+    private function buildBaseReport(User $user): array
+    {
+        return [
+            'types' => new GenericCollection(Type::class),
+            'subtypes' => new GenericCollection(Subtype::class),
+            'beforeDate' => null,
+            'afterDate' => null,
+            'severity' => null,
+            'students' => new GenericCollection(User::class),
+            'includeStudentsWithoutYear' => false,
+            'years' => new Collection(),
+            'includeStudentsWithoutHouse' => false,
+            'houses' => new Collection(),
+            'campuses' => new Collection(),
+            'authors' => new GenericCollection(User::class),
+            'actions' => new Collection(),
+            'includeRecordsWithoutAction' => false,
+            'involved' => true,
+            'includeArchivedRecords' => true,
+            'tags' => new Collection(),
+            'user' => $user,
+        ];
     }
 
     /**
