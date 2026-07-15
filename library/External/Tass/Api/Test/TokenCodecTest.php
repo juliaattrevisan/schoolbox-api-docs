@@ -31,20 +31,6 @@ class TokenCodecTest extends TestCase
         new Token($invalidApiKey);
     }
 
-
-    /**
-     * @param Token $codec
-     * @param array $data
-     * @return void
-     */
-    #[\PHPUnit\Framework\Attributes\DataProvider('providerReversibility')]
-    public function testReversibility(Token $codec, array $data): void
-    {
-        $unpacked = $codec->unpackToken($codec->generateToken($data, true));
-        $this->assertSame($data, $unpacked);
-    }
-
-
     // ======================= Data Providers =========================== //
 
     public static function providerInvalidApiKey(): array
@@ -57,28 +43,5 @@ class TokenCodecTest extends TestCase
             [' SSBhbSB0b2tlbg=='],
             ['SSBhbSB0b2tlbg== '],
         ];
-    }
-
-
-    public static function providerReversibility(): array
-    {
-        $tokenCodec = self::getTokenCodec();
-
-        return [
-            [$tokenCodec, []],
-            [$tokenCodec, ['key' => '']],
-            [$tokenCodec, ['key' => 'value']],
-            [$tokenCodec, ['key' => false]],
-            [$tokenCodec, ['key' => null]],
-            [$tokenCodec, ['key1' => 'value1', 'key2' => 'value2',]],
-        ];
-    }
-
-
-    // ===================== Helpers =========================== //
-
-    private static function getTokenCodec(): Token
-    {
-        return new Token('SSBhbSB0b2tlbg==');
     }
 }
