@@ -148,6 +148,10 @@ class Controller extends Base
                     $this->taskDHelper->addSource('lms', 'lmsSettings');
                     $this->taskDHelper->addSource('lms', 'yearLevelPermissions');
                     $this->taskDHelper->addSource('lms', 'homepageTemplates');
+                    $this->taskDHelper->addSource('lms', 'aiServices');
+                    $this->taskDHelper->addSource('lms', 'lessonPlanTemplate');
+                    $this->taskDHelper->addSource('lms', 'courseFramework');
+                    $this->taskDHelper->addSource('lms', 'classCourseUnit');
                     break;
                 case 'community':
                     /**
@@ -755,6 +759,223 @@ class Controller extends Base
         ");
         $statement->execute();
         (new Helper())->queryToCSV($statement, 'yearLevelPermissions.csv');
+    }
+
+    /**
+     * LMS
+     * aiServices.csv
+     */
+    public function aiServices()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepareQuery("
+        SELECT
+            c.title AS 'Service Type',
+            IF(
+                COALESCE(JSON_VALUE(c.value, '$.provider.value'), 'Off') <> 'Off',
+                'True',
+                'False'
+            ) AS 'Enabled',
+            IF(
+                COALESCE(JSON_VALUE(c.value, '$.general.system_prompt.value'), '') <> '',
+                'True',
+                'False'
+            ) AS 'System Prompt Enabled',
+            JSON_VALUE(c.value, '$.general.system_prompt.value') AS 'System Prompt Text',
+            JSON_VALUE(c.value, '$.provider.value') AS 'Provider',
+            CASE JSON_VALUE(c.value, '$.provider.value')
+                WHEN 'OpenAI' THEN JSON_VALUE(c.value, '$.OpenAI.model.value')
+                WHEN 'Azure' THEN COALESCE(
+                    NULLIF(JSON_VALUE(c.value, '$.Azure.deployment_model.value'), ''),
+                    JSON_VALUE(c.value, '$.Azure.deployment_id.value')
+                )
+                ELSE NULL
+            END AS 'Model'
+        FROM
+            config c
+        WHERE
+            c.module = 'ai-services'
+            AND JSON_VALID(c.value) = 1
+        ORDER BY
+            c.title ASC;
+        ");
+        $statement->execute();
+        (new Helper())->queryToCSV($statement->getPDOStatement(), 'aiServices.csv');
+    }
+
+    /**
+     * LMS
+     * lessonPlanTemplate.csv
+     */
+    public function lessonPlanTemplate()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepareQuery("
+        SELECT
+            lpt.title AS 'Template Name',
+            lptf.title AS 'Field Title',
+            lptf.description AS 'Description',
+            lptf.visibility AS 'Visibility',
+            lptf.sequence AS 'Sequence',
+            IF(lpt.enabled, 'TRUE', 'FALSE') AS 'Enabled'
+        FROM
+            lesson_plan_template lpt
+        INNER JOIN
+            lesson_plan_template_field lptf ON lptf.lesson_plan_template_id = lpt.id
+        WHERE
+            lpt.deleted_at IS NULL
+        AND
+            lptf.deleted_at IS NULL
+        ORDER BY
+            lpt.title ASC,
+            lptf.sequence ASC;
+        ");
+        $statement->execute();
+        (new Helper())->queryToCSV($statement->getPDOStatement(), 'lessonPlanTemplate.csv');
+    }
+
+    /**
+     * LMS
+     * courseFramework.csv
+     */
+    public function courseFramework()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepareQuery("
+        SELECT
+            ct.name AS 'Framework Name',
+            coursePage.name AS 'Course Page Template',
+            unitPage.name AS 'Unit Page Template',
+            (
+                SELECT
+                    COUNT(*)
+                FROM
+                    course_specification cs
+                WHERE
+                    cs.template_id = ct.id
+                AND
+                    cs.deleted_at IS NULL
+            ) AS 'Count'
+        FROM
+            courseTemplates ct
+        LEFT JOIN
+            homepageTemplate coursePage ON coursePage.id = ct.courseTemplateId
+        LEFT JOIN
+            homepageTemplate unitPage ON unitPage.id = ct.unitTemplateId
+        WHERE
+            ct.deleted_at IS NULL
+        ORDER BY
+            ct.sequence ASC,
+            ct.id ASC;
+        ");
+        $statement->execute();
+        (new Helper())->queryToCSV($statement->getPDOStatement(), 'courseFramework.csv');
+    }
+
+    /**
+     * LMS
+     * classCourseUnit.csv
+     */
+    public function classCourseUnit()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        WITH RECURSIVE
+        -- Rank non-deleted folders within each parent so the recursive tree can keep the same sibling ordering.
+        ranked_folders AS (
+            SELECT
+                f.id,
+                f.name,
+                f.parent,
+                f.inherit,
+                ROW_NUMBER() OVER (
+                    PARTITION BY f.parent
+                    ORDER BY f.name ASC, f.id ASC
+                ) AS sibling_position
+            FROM
+                folder f
+            WHERE
+                f.deleted_at IS NULL
+        ),
+        -- Walk the folder hierarchy and track which folder supplies permissions for inherited descendants.
+        folder_tree AS (
+            -- Root folder inherits permissions from root folder.
+            SELECT
+                rf.id,
+                rf.name,
+                rf.parent,
+                rf.inherit,
+                rf.id AS permission_folder_id,
+                CAST(LPAD(rf.sibling_position, 5, '0') AS CHAR(1000)) AS sort_path
+            FROM
+                ranked_folders rf
+            WHERE
+                rf.parent = 0
+
+            UNION ALL
+            -- Children folder inherits permissions from parent folder.
+            SELECT
+                rf.id,
+                rf.name,
+                rf.parent,
+                rf.inherit,
+                IF(rf.inherit, ft.permission_folder_id, rf.id) AS permission_folder_id,
+                CONCAT(ft.sort_path, '/', LPAD(rf.sibling_position, 5, '0')) AS sort_path
+            FROM
+                ranked_folders rf
+            INNER JOIN
+                folder_tree ft ON rf.parent = ft.id
+        ),
+        -- Collapse permission rows into one CSV-friendly set of role names for each permission folder.
+        permission_groups AS (
+            SELECT
+                p.cid,
+                GROUP_CONCAT(
+                    CASE WHEN p.type = 0 THEN g.name END
+                    ORDER BY g.name SEPARATOR ','
+                ) AS none_roles,
+                GROUP_CONCAT(
+                    CASE WHEN p.type = 1 THEN g.name END
+                    ORDER BY g.name SEPARATOR ','
+                ) AS read_roles,
+                GROUP_CONCAT(
+                    CASE WHEN p.type = 2 THEN g.name END
+                    ORDER BY g.name SEPARATOR ','
+                ) AS write_roles
+            FROM
+                perms p
+            INNER JOIN
+                groups g ON g.id = p.gid
+            GROUP BY
+                p.cid
+        )
+        -- Export every class page, course, and unit with its effective permission source and role groups.
+        SELECT
+            ft.name AS 'Folder/Page Name',
+            ft.id AS 'Folder/Page ID',
+            CASE
+                WHEN cus.id IS NOT NULL THEN 'Unit'
+                WHEN cs.id IS NOT NULL THEN 'Course'
+                ELSE 'Class Page / Folder'
+            END AS 'Page Type',
+            IF(ft.inherit, 'Inherited', 'Direct') AS 'Permission Mode',
+            ft.permission_folder_id AS 'Permissions From Folder ID',
+            pg.none_roles AS 'None',
+            pg.read_roles AS 'Read',
+            pg.write_roles AS 'Write'
+        FROM
+            folder_tree ft
+        LEFT JOIN
+            course_specification cs ON cs.folder_id = ft.id AND cs.deleted_at IS NULL
+        LEFT JOIN
+            course_unit_specification cus ON cus.folder_id = ft.id AND cus.deleted_at IS NULL
+        LEFT JOIN
+            permission_groups pg ON pg.cid = ft.permission_folder_id
+        ORDER BY
+            ft.sort_path ASC;
+        ");
+        $statement->execute();
+        (new Helper())->queryToCSV($statement, 'classCourseUnit.csv');
     }
 
     /**
