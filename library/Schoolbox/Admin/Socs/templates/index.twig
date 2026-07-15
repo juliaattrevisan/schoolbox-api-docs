@@ -1,8 +1,12 @@
 {##
  # Configure SOCS integration settings.
  #
- # @param string pageCurrent
- # @param array configContext
+ # @param array allBreadcrumbs // The breadcrumbs for the page.
+ # @param string pageCurrent The current page name, used to highlight the correct navigation item.
+ # @param array configContext // The config entries for the SOCS settings.
+ # @param int calendarMaxFailed the const Calendar_Api_Config_Record::MAXFAILED
+ # @param array musicLessonsSub // SOCS Music Lessons Import subscription data
+ # @param array calendarEventsSub // SOCS Calendar Events Import subscription data
 #}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
