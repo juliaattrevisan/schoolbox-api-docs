@@ -955,8 +955,8 @@ class Mapper extends BaseMapper
         // If filtering on involvement, only show records the logged in user is involved with via audience/role/ownership
 
         if ($involved || !$this->isUserInPastoralService($user)) {
-            /* The viewer should be either the owner of the record or have specific access to the record
-             * and should not be denied in any way (ie staff accessible but denied by the user id)
+            /* The viewer should be either the owner of the record, or have specific access to the record.
+             * For non-owners, explicit deny rules must be respected (i.e. staff-accessible but denied by user ID).
              */
             $this->filters[] = "
             (
