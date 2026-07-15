@@ -248,7 +248,7 @@ class Processor
                  */
                 try {
                     $combined = sprintf('%s %s', $datetime, self::PUBLISH_TIME);
-                    $format = $this->dateLocal . ' H:i:s';
+                    $format = sprintf('%s %s', $this->dateLocal, 'H:i:s');
 
                     $adf = new \Alaress_Date_Format($combined, $format);
                 } catch (\Carbon\Exceptions\InvalidFormatException $e) {
@@ -445,7 +445,11 @@ class Processor
                      *  thousands upon thousands of rows (and assessments) so storing them all in memory might be way
                      *  too expensive. Instead, just care about one; trade space for time.
                      */
-                    $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection((new \Schoolbox\GenericCollection(IAssessable::class))->add($assessment));
+                    $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection(
+                        collection: (new \Schoolbox\GenericCollection(IAssessable::class))->add($assessment),
+                        users: (new \Schoolbox\Collection())->add($learner),
+                        includeResponses: false
+                    );
 
                     $participant = $assessment->getParticipantIfExtant($learner);
 
