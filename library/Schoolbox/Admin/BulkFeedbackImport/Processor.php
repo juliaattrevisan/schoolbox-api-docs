@@ -451,13 +451,14 @@ class Processor
                         includeResponses: false
                     );
 
-                    $participant = $assessment->getParticipantIfExtant($learner);
+                    $participant = $assessment->getParticipantIfExtant($learner, false);
 
                     /* Check at Preview screen
+                     * First, see if they were excluded from this reporting activity
                      */
-                    if (null === $participant) {
+                    if ($participant->isExcluded()) {
                         $this->log(sprintf(
-                            'Row %s: participation error (most likely due to exclusion for student %s, or other participation plan errors)',
+                            'Row %s: student %s has been excluded from this activity',
                             $i,
                             $externalId,
                         ), IStrategy::WARNING);
@@ -467,6 +468,24 @@ class Processor
                         continue;
                     }
 
+                    /* Otherwise, they're meant to exist, but for some reason - don't.
+                     * Most obvious reason is they were deleted, but deep in the swamp/CAP, there might be a more
+                     * sinister (and undocumented) reason
+                     */
+                    if (null === $participant) {
+                        $this->log(sprintf(
+                            'Row %s: no participation record found for student %s; maybe they were deleted',
+                            $i,
+                            $externalId,
+                        ), IStrategy::WARNING);
+
+                        $errors++;
+
+                        continue;
+                    }
+
+                    /* Continue processing this row's data into a persisted feedback
+                     */
                     $feedbackStrategy->processRow(
                         $i,
                         $folder,
