@@ -732,33 +732,39 @@ class Controller extends Base
     public function yearLevelPermissions()
     {
         $database = FolderMapper::getInstance()->getDatabase();
-        $statement = $database->prepare("
+        $statement = $database->prepareQuery("
         SELECT
-               name                                       AS 'Name',
-                CASE overall_grade
-                    WHEN '1' THEN 'Standard'
-                    WHEN '-1' THEN 'None'
-                    WHEN '-2' THEN 'Percentage'
-                ELSE 'Not Selected'
-               END                                        AS 'Overall Grade',
-               if(show_overall_grade, 'Yes', 'No')        AS 'Show Overall Grade',
-               if(display_grade_page, 'Yes', 'No')        AS 'Display Grade Page',
-               if(display_assessment_grade, 'Yes', 'No')  AS 'Display Assessment Grade',
-               if(display_rubric_grade, 'Yes', 'No')      AS 'Display Rubric Grade',
-               if(display_capability_grade, 'Yes', 'No')  AS 'Display Capability Grade',
-               if(display_progression_grade, 'Yes', 'No') AS 'Display Progression Grade',
-               if(show_rubric_points, 'Yes', 'No')        AS 'Show Rubric Points',
-               if(lms_cohort_comparison, 'Yes', 'No')     AS 'Display Cohort Comparison',
-               if(learning_moments_enabled, 'Yes', 'No')  AS 'Learning Moments Enabled'
-        FROM
-            lu_year_level
+            yl.name                                         AS 'Name',
+            CASE
+               WHEN yl.overall_grade = 1  THEN 'Standard'
+               WHEN yl.overall_grade = -1 THEN 'None'
+               WHEN yl.overall_grade = -2 THEN 'Percentage'
+               WHEN yl.overall_grade IS NULL THEN 'Not Selected'
+               -- If overall grade is defined otherwise, and if group grade is deleted should be displayed as 'Not Selected'
+               ELSE COALESCE(sgg.name, 'Not Selected')
+               END AS 'Overall Grade',
+            IF(yl.show_overall_grade, 'Yes', 'No')          AS 'Display Overall Grade',
+            IF(yl.display_grade_page, 'Yes', 'No')          AS 'Display Class Grades',
+            IF(yl.display_assessment_grade, 'Yes', 'No')    AS 'Display Assessment Graph',
+            IF(yl.display_rubric_grade, 'Yes', 'No')        AS 'Display Learning Levels',
+            IF(yl.display_capability_grade, 'Yes', 'No')    AS 'Display Capability Marks',
+            IF(yl.display_progression_grade, 'Yes', 'No')   AS 'Display Progression Graph',
+            IF(yl.show_rubric_points, 'Yes', 'No')          AS 'Show Points on Rubrics',
+            IF(yl.lms_cohort_comparison, 'Yes', 'No')       AS 'Enable Cohort Comparison',
+            IF(yl.learning_moments_enabled, 'Yes', 'No')    AS 'Learning Moments',
+            IF(yl.learning_moments_moderation, 'Yes', 'No') AS 'Learning Moments Moderation',
+            IF(yl.qrcode_enabled, 'Yes', 'No')              AS 'QR Code Generation Enabled'
+        FROM lu_year_level yl
+        LEFT JOIN submission_grade_group sgg
+        ON sgg.id = yl.overall_grade
+               AND sgg.deleted_at IS NULL
         WHERE
-            deleted_at IS NULL
-        ORDER
-            BY sequence ASC;
+            yl.deleted_at IS NULL
+        ORDER BY
+            yl.sequence ASC;
         ");
         $statement->execute();
-        (new Helper())->queryToCSV($statement, 'yearLevelPermissions.csv');
+        (new Helper())->queryToCSV($statement->getPDOStatement(), 'yearLevelPermissions.csv');
     }
 
     /**
