@@ -970,6 +970,7 @@ class Mapper extends BaseMapper
                           AND pa_deny.`access` = 0
                           AND (
                               pa_deny.`role_id` = :user_role_id_0
+                              OR pa_deny.`role_type` = :user_role_type_0
                               OR pa_deny.`user_id` = :user_id_0
                               OR pa_deny.`group_id` IN (
                                   SELECT pgm.`group_id`
@@ -983,7 +984,10 @@ class Mapper extends BaseMapper
                         EXISTS (
                             SELECT 1
                             FROM `pastoral_access` pa_role
-                            WHERE pa_role.`role_id` = :user_role_id_0
+                             WHERE (
+                                pa_role.`role_id` = :user_role_id_0
+                                OR pa_role.`role_type` = :user_role_type_0
+                            )
                               AND pa_role.`pastoral_id` = `pastoral`.`id`
                               AND pa_role.`deleted_at` IS NULL
                               AND pa_role.`access` > 0
@@ -1012,10 +1016,11 @@ class Mapper extends BaseMapper
                     )
                 )
             )";
-            $this->bindings['user_role_id_0'] = $user->getRole()->getId();
-            $this->bindings['user_id_0']      = $user->getId();
-            $this->bindings['user_id_1']      = $user->getId();
-            $this->bindings['user_id_2']      = $user->getId();
+            $this->bindings['user_role_id_0']   = $user->getRole()->getId();
+            $this->bindings['user_role_type_0'] = $user->getRole()->getType();
+            $this->bindings['user_id_0']        = $user->getId();
+            $this->bindings['user_id_1']        = $user->getId();
+            $this->bindings['user_id_2']        = $user->getId();
         }
 
         $criteriaParts = [];

@@ -73,6 +73,8 @@ class helperMethodsTest extends TestCase
         $this->assertIsString($accessFilter);
         $this->assertStringContainsString('NOT EXISTS', $accessFilter);
         $this->assertStringContainsString('pa_deny.`access` = 0', $accessFilter);
+        $this->assertStringContainsString('pa_deny.`role_type` = :user_role_type_0', $accessFilter);
+        $this->assertStringContainsString('pa_role.`role_type` = :user_role_type_0', $accessFilter);
         $this->assertStringContainsString('pa_role.`access` > 0', $accessFilter);
         $this->assertStringContainsString('pa_user.`access` > 0', $accessFilter);
         $this->assertStringContainsString('pa_group.`access` > 0', $accessFilter);
@@ -81,6 +83,7 @@ class helperMethodsTest extends TestCase
         $this->assertSame(
             [
                 'user_role_id_0' => 456,
+                'user_role_type_0' => Role::STAFF,
                 'user_id_0' => 123,
                 'user_id_1' => 123,
                 'user_id_2' => 123,
