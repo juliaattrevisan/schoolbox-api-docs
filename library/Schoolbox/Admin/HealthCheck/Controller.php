@@ -852,22 +852,25 @@ class Controller extends Base
             ct.name AS 'Framework Name',
             coursePage.name AS 'Course Page Template',
             unitPage.name AS 'Unit Page Template',
-            (
-                SELECT
-                    COUNT(*)
-                FROM
-                    course_specification cs
-                WHERE
-                    cs.template_id = ct.id
-                AND
-                    cs.deleted_at IS NULL
-            ) AS 'Count'
+            COALESCE(cs_count.course_count, 0) AS 'Count'
         FROM
             courseTemplates ct
         LEFT JOIN
             homepageTemplate coursePage ON coursePage.id = ct.courseTemplateId
         LEFT JOIN
             homepageTemplate unitPage ON unitPage.id = ct.unitTemplateId
+        LEFT JOIN
+             (
+                 SELECT
+                     template_id,
+                     COUNT(*) AS course_count
+                 FROM
+                     course_specification
+                 WHERE
+                     deleted_at IS NULL
+                 GROUP BY
+                     template_id
+             ) cs_count ON cs_count.template_id = ct.id
         WHERE
             ct.deleted_at IS NULL
         ORDER BY
