@@ -954,7 +954,7 @@ class Controller extends Base
             FROM
                 perms p
             INNER JOIN
-                groups g ON g.id = p.gid
+                groups g ON g.id = p.gid AND g.deleted_at IS NULL
             GROUP BY
                 p.cid
         )
