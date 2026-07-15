@@ -168,7 +168,7 @@ class Timetable implements IStrategy
                 } else {
                     /* These ones are broken */
                     if ($allPeriods->count() === 0) {
-                        $this->log->warning(sprintf("publishTimetable: Failed to find period %s on day %s", trim((string)($struct['DayNumber']?->me['i4'] ?? 'null')), trim((string)($struct['Period']?->me['string'] ?? 'null'))));
+                        $this->log->warning(sprintf("publishTimetable: Failed to find period %s on day %s", trim((string)($struct['Period']?->me['string'] ?? 'null')), trim((string)($struct['DayNumber']?->me['i4'] ?? 'null'))));
                     }
 
                     if ($allClasses->count() === 0) {
