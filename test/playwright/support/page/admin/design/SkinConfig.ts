@@ -1,6 +1,6 @@
 /**
  * Utility class for interacting with the Skin Config admin page
- * linked primarily to: library/Schoolbox/Admin/templates/vue/skinConfig/skin-config.vue
+ * linked primarily to: library/Schoolbox/Admin/SkinConfig/templates/vue/skin-config.vue
  */
 
 import type { Locator, Page } from "@playwright/test";
