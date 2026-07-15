@@ -50,7 +50,7 @@ class Controller extends ConfigController
                 'event_type' => 'Event',
                 'connector_class' => 'Socs',
             ]);
-        } catch (MapperException\NotFound | MapperException\Deleted) {
+        } catch (MapperException\NotFound) {
             $calendarEventsSub = $this->calendarConfigMapper->createModel()
                 ->setEventType('Event')
                 ->setConnectorClass('Socs');
@@ -60,7 +60,7 @@ class Controller extends ConfigController
                 'event_type' => 'Event',
                 'connector_class' => 'SocsMusic',
             ]);
-        } catch (MapperException\NotFound | MapperException\Deleted) {
+        } catch (MapperException\NotFound) {
             $musicLessonsSub = $this->calendarConfigMapper->createModel()
                 ->setEventType('Event')
                 ->setConnectorClass('SocsMusic');
