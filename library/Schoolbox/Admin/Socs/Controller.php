@@ -51,9 +51,9 @@ class Controller extends ConfigController
                 'connector_class' => 'Socs',
             ]);
         } catch (MapperException\NotFound | MapperException\Deleted) {
-            $calendarEventsSub = new Calendar_Api_Config_Record();
-            $calendarEventsSub->setEventType('Event');
-            $calendarEventsSub->setConnectorClass('Socs');
+            $calendarEventsSub = $this->calendarConfigMapper->createModel()
+                ->setEventType('Event')
+                ->setConnectorClass('Socs');
         }
         try {
             $musicLessonsSub = $this->calendarConfigMapper->findOneByColumnList([
@@ -61,9 +61,9 @@ class Controller extends ConfigController
                 'connector_class' => 'SocsMusic',
             ]);
         } catch (MapperException\NotFound | MapperException\Deleted) {
-            $musicLessonsSub = new Calendar_Api_Config_Record();
-            $musicLessonsSub->setEventType('Event');
-            $musicLessonsSub->setConnectorClass('SocsMusic');
+            $musicLessonsSub = $this->calendarConfigMapper->createModel()
+                ->setEventType('Event')
+                ->setConnectorClass('SocsMusic');
         }
 
         $this->response = $this->responseFromTemplate(
@@ -145,9 +145,9 @@ class Controller extends ConfigController
                 'connector_class' => $connector->getConnectorClass(),
             ]);
         } catch (\Throwable) {
-            $record = new Calendar_Api_Config_Record();
-            $record->setEventType($connector->getEventType());
-            $record->setConnectorClass($connector->getConnectorClass());
+            $record = $this->calendarConfigMapper->createModel()
+                ->setEventType($connector->getEventType())
+                ->setConnectorClass($connector->getConnectorClass());
         }
 
         $record->updateConfig($connector);
