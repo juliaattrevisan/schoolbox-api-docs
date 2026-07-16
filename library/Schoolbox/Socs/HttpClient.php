@@ -45,7 +45,8 @@ class HttpClient
     /**
      * Cache key prefix for SOCS calendar feed requests.
      */
-    private const string CALENDAR_CACHE_PREFIX = 'socs-calendar-';
+    public const string CALENDAR_CACHE_PREFIX = 'socs-calendar-';
+    public const string MUSIC_LESSONS_CACHE_PREFIX = 'socs-music-';
 
     private Client $client;
 
