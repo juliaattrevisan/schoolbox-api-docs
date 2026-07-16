@@ -5,8 +5,7 @@
  # @param string pageCurrent The current page name, used to highlight the correct navigation item.
  # @param array configContext // The config entries for the SOCS settings.
  # @param int calendarMaxFailed the const Calendar_Api_Config_Record::MAXFAILED
- # @param array musicLessonsSub // SOCS Music Lessons Import subscription data
- # @param array calendarEventsSub // SOCS Calendar Events Import subscription data
+ # @param array subscriptions // SOCS calendar subscription data
 #}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
@@ -25,39 +24,24 @@
                 </div>
             </div>
 
-            {# if socs Calendar Events Import has failed, there may be a creds issue #}
-            {% if calendarEventsSub.failedCount >= calendarMaxFailed %}
-                <div class="small-12 island">
-                    <div class="alert-box alert">
-                        The Calendar Events Import has failed {{ calendarEventsSub.failedCount }} times.<br>
-                        It may be one of the following issues:<br>
-                        <ul>
-                            <li>The request to the remote server has timed out. </li>
-                            <li>The remote server is unavailable.</li>
-                            <li>The General Feed Host is incorrect.</li>
-                            <li>The SOCS Endpoint ID is incorrect.</li>
-                            <li>The SOCS Endpoint Token is incorrect or expired.</li>
-                        </ul>
+            {% for calendarSub in subscriptions %}
+                {# if socs Calendar Import has failed, there may be a creds issue #}
+                {% if calendarSub.failedCount >= calendarMaxFailed %}
+                    <div class="small-12 island">
+                        <div class="alert-box alert">
+                            The {{ calendarSub.title }} Import has failed {{ subscriptions.calendarEvents.failedCount }} times.<br>
+                            It may be one of the following issues:<br>
+                            <ul>
+                                <li>The request to the remote server has timed out. </li>
+                                <li>The remote server is unavailable.</li>
+                                <li>The General Feed Host is incorrect.</li>
+                                <li>The SOCS Endpoint ID is incorrect.</li>
+                                <li>The SOCS Endpoint Token is incorrect or expired.</li>
+                            </ul>
+                        </div>
                     </div>
-                </div>
-            {% endif %}
-
-            {# if socs Music Lessons Import has failed, there may be a creds issue #}
-            {% if musicLessonsSub.failedCount >= calendarMaxFailed %}
-                <div class="small-12 island">
-                    <div class="alert-box alert">
-                        The Music Lessons Import has failed {{ musicLessonsSub.failedCount }} times.<br>
-                        It may be one of the following issues:<br>
-                        <ul>
-                            <li>The request to the remote server has timed out. </li>
-                            <li>The remote server is unavailable.</li>
-                            <li>The General Feed Host is incorrect.</li>
-                            <li>The SOCS Endpoint ID is incorrect.</li>
-                            <li>The SOCS Endpoint Token is incorrect or expired.</li>
-                        </ul>
-                    </div>
-                </div>
-            {% endif %}
+                {% endif %}
+            {% endfor %}
 
             {% include '@settings/moduleConfig.twig' with configContext only %}
         </div>

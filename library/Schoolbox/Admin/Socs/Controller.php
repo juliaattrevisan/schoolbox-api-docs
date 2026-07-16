@@ -45,24 +45,24 @@ class Controller extends ConfigController
         );
 
         // grab the calendar failed counts if they exist
-        [$eventType, $socsCalendarClass, $socsMusicClass] = ['Events', Calendar_Api_Config_Connector_Socs::CONNECTOR_CLASS, Calendar_Api_Config_Connector_SocsMusic::CONNECTOR_CLASS];
+        [$eventType, $socsCalendarClass, $socsMusicClass] = ['Event', Calendar_Api_Config_Connector_Socs::CONNECTOR_CLASS, Calendar_Api_Config_Connector_SocsMusic::CONNECTOR_CLASS];
         try {
-            $calendarEventsSub = $this->calendarConfigMapper->findOneByColumnList([
+            $calendarEvents = $this->calendarConfigMapper->findOneByColumnList([
                 'event_type' => $eventType,
                 'connector_class' => $socsCalendarClass,
             ]);
         } catch (MapperException\NotFound) {
-            $calendarEventsSub = $this->calendarConfigMapper->createModel()
+            $calendarEvents = $this->calendarConfigMapper->createModel()
                 ->setEventType($eventType)
                 ->setConnectorClass($socsCalendarClass);
         }
         try {
-            $musicLessonsSub = $this->calendarConfigMapper->findOneByColumnList([
+            $musicLessons = $this->calendarConfigMapper->findOneByColumnList([
                 'event_type' => $eventType,
                 'connector_class' => $socsMusicClass,
             ]);
         } catch (MapperException\NotFound) {
-            $musicLessonsSub = $this->calendarConfigMapper->createModel()
+            $musicLessons = $this->calendarConfigMapper->createModel()
                 ->setEventType($eventType)
                 ->setConnectorClass($socsMusicClass);
         }
@@ -74,8 +74,10 @@ class Controller extends ConfigController
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))
                     ->generateBreadcrumbs($this->routeGenerator->generate('socsadmin.getSettings')),
                 'configContext' => $configContext,
-                'musicLessonsSub' => $musicLessonsSub,
-                'calendarEventsSub' => $calendarEventsSub,
+                'subscriptions' => [
+                    'musicLessons' => ['title' => 'Music Lessons', 'failedCount' => $musicLessons->getFailedCount()],
+                    'calendarEvents' => ['title' => 'Calendar Events', 'failedCount' => $calendarEvents->getFailedCount()],
+                ],
                 'calendarMaxFailed' => Calendar_Api_Config_Record::MAXFAILED,
             ],
             'SOCS System Settings',
