@@ -78,7 +78,6 @@ class Controller extends ConfigController
                     'musicLessons' => $musicLessons,
                     'calendarEvents' => $calendarEvents,
                 ],
-                'calendarMaxFailed' => Calendar_Api_Config_Record::MAXFAILED,
             ],
             'SOCS System Settings',
         );
