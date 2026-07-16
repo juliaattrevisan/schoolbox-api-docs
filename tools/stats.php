@@ -249,11 +249,11 @@ $app = new class extends CliTool\App {
             /* To add once available: 'rubric_instance_quiz' => "SELECT COUNT(*) FROM rubric_instance ri JOIN assessment a ON ri.assessment_id = a.id JOIN assess q ON a.id = q.assessment_id WHERE ri.deleted_at IS NULL AND a.deleted_at IS NULL AND q.deleted_at IS NULL AND q.availability = 'assess'",*/
             'quiz_attempts'     => 'SELECT COUNT(*) FROM assess_attempt WHERE deleted_at IS NULL AND learnosity_reference IS NOT NULL',
             'quiz_feedback'     => 'SELECT COUNT(*) FROM quiz_feedback WHERE deleted_at IS NULL',
-            /*Learnosity specific stats, these are useful for checking the health of the Learnosity processing system, and can be used to identify issues with quizzes which are not processing correctl*/
+            /*Learnosity specific stats, these are useful for checking the health of the Learnosity processing system, and can be used to identify issues with quizzes which are not processing correctly*/
             /* Quizzes which for some reason have no Learnosity reference.*/
             'quiz_without_learnosity_reference' => "SELECT COUNT(*) FROM assess WHERE availability = 'assess' AND learnosity_reference IS NULL AND deleted_at IS NULL",
             /* Quizzes which for some reason have an empty Learnosity reference, I've seen this happen before, and am not sure why:*/
-            'quiz_with_empty_learnosity_reference' => "SELECT COUNT(*) FROM assess WHERE availability = 'assess' AND learnosity_reference = ''AND deleted_at IS NULL",
+            'quiz_with_empty_learnosity_reference' => "SELECT COUNT(*) FROM assess WHERE availability = 'assess' AND learnosity_reference = '' AND deleted_at IS NULL",
             /* Quizzes pending processing, some number is acceptable, but a consistent number might indicate a quiz unable to even begin processing:*/
             'quiz_status_pending' => "SELECT COUNT(*) FROM assess WHERE availability = 'assess' AND learnosity_job_status = 'pending' AND deleted_at IS NULL",
             /* Quizzes currently processing, again, some number is acceptable:*/
@@ -353,6 +353,7 @@ $app = new class extends CliTool\App {
             'pastoral_attachment_size' => 'SELECT SUM(filesize) FROM pastoral_attachment JOIN storage ON pastoral_attachment.hash = storage.hash',
             'differentiation_profiles'      => 'SELECT count(*) FROM differentiation_profiles WHERE deleted_at IS NULL',
             'differentation_types'      => 'SELECT (SELECT COUNT(*) FROM lu_pastoral_type WHERE contribute_differentiation_profile = 1 AND deleted_at IS NULL) + (SELECT COUNT(*) FROM lu_pastoral_subtype WHERE contribute_differentiation_profile = 1 AND deleted_at IS NULL)',
+            'differentiation_types'      => 'SELECT (SELECT COUNT(*) FROM lu_pastoral_type WHERE contribute_differentiation_profile = 1 AND deleted_at IS NULL) + (SELECT COUNT(*) FROM lu_pastoral_subtype WHERE contribute_differentiation_profile = 1 AND deleted_at IS NULL)',
 
 
             //EOTC
