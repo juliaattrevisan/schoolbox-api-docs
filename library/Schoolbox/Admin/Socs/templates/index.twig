@@ -25,7 +25,7 @@
             </div>
 
             {# if socs Calendar Import has failed, there may be a creds issue #}
-            {% if subscriptions.calendarEvents.failedCount + subscriptions.musicLessons.failedCount > 0 %}
+            {% if subscriptions.calendarEvents.failedCount >= calendarMaxFailed or subscriptions.musicLessons.failedCount >= calendarMaxFailed %}
                 <div class="small-12 island">
                     <div class="alert-box alert">
                         {% if subscriptions.calendarEvents.failedCount >= calendarMaxFailed %}
