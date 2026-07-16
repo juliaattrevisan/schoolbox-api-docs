@@ -75,8 +75,8 @@ class Controller extends ConfigController
                     ->generateBreadcrumbs($this->routeGenerator->generate('socsadmin.getSettings')),
                 'configContext' => $configContext,
                 'subscriptions' => [
-                    'musicLessons' => ['title' => 'Music Lessons', 'failedCount' => $musicLessons->getFailedCount()],
-                    'calendarEvents' => ['title' => 'Calendar Events', 'failedCount' => $calendarEvents->getFailedCount()],
+                    'musicLessons' => $musicLessons,
+                    'calendarEvents' => $calendarEvents,
                 ],
                 'calendarMaxFailed' => Calendar_Api_Config_Record::MAXFAILED,
             ],
