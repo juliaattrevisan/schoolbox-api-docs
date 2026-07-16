@@ -1723,15 +1723,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
             [$filters,] = $this->convertRequestToFilters($courseSpec, $queryArgs, false);
             $assessmentIds  = $this->filtersAssessmentIdFinder->findIdsByFilters($filters, $this->getUser());
 
-            // Fetch assessments
-            $assessments = $this->getAssessmentMapper()->findAllByIds($assessmentIds);
-
-            // tmp var to make it easier to filter (the loop and the spec passed through)
-            $assessmentSpec = $assessment;
-            // filter to only the assessment we are looking for (those that match the filter and are children of the assessment spec)
-            $assessments = $assessments->filter(static function (IAssessable $assessment) use ($assessmentSpec) {
-                return $assessment->getSpecificationAssessment()?->getId() === $assessmentSpec->getId();
-            });
+            // Fetch only implementations of this assessment spec before hydrating domain objects.
+            $assessments = $this->getAssessmentMapper()->findAllImplementationsBySpecificationId(
+                $assessment->getId(),
+                ['ids' => $assessmentIds]
+            );
 
             // sort the assessments in a standard order (class page name naturally) which appears to be the same as the main markbook screen
             $assessments = $assessments->sortByCallback(function (IAssessable $a, IAssessable $b) {
