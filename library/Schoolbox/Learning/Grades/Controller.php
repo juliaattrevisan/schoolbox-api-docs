@@ -39,7 +39,6 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Grades\Cohort\ClassResults;
 use Schoolbox\Learning\Grades\Cohort\ValidUseCohortMarks;
@@ -198,7 +197,13 @@ class Controller extends Base
         $filteredWorkTypes = WorkType\Mapper::getInstance()->findByColumn('show_on_grades_page', 1);
         $assessmentTasks   = (
             ($filteredWorkTypes->count() > 0) ?
-            $gradeHelper->filterAssessments($viewModeContext->effectiveViewer, $assessments, $filteredWorkTypes, null) :
+            $gradeHelper->filterAssessments(
+                $viewModeContext->effectiveViewer,
+                $assessments,
+                $filteredWorkTypes,
+                null,
+                $viewee
+            ) :
             new Collection()
         );
 
@@ -427,13 +432,19 @@ class Controller extends Base
         $canSeeCapabilityGrade = $this->isTabEnabled('capabilities', $subject);
         $canSeeProgression     = $this->isTabEnabled('progression', $subject);
 
-        $visibility = new Visibility($this->access);
+        $markSchemeFactory = new Factory($this->getConfigLoader());
+        $gradeHelper       = new Helper(
+            $this->folderMapper,
+            $this->assessmentMapperProxy,
+            $this->access,
+            $markSchemeFactory
+        );
 
         // Need to load other participants if we can see graph to get assessment mark statistics
         $assessments = $this
             ->findByFiltersWithParticipants($filters, $viewee, $hasPermissionsAndSettings)
-            ->filter(function (IAssessable $a) use ($visibility, $viewModeContext) {
-                return $visibility->isVisibleToUser($a, $viewModeContext->effectiveViewer, true);
+            ->filter(function (IAssessable $a) use ($gradeHelper, $viewModeContext, $viewee) {
+                return $gradeHelper->isVisibleToGradesViewer($a, $viewModeContext->effectiveViewer, $viewee, true);
             });
 
         // Only show the "send to showcase" trophy button to teachers and students, not parents
@@ -442,7 +453,6 @@ class Controller extends Base
             || $viewModeContext->effectiveViewer->getRole()->isStudent();
 
         // Let markbook calculate the statistics
-        $markSchemeFactory = new Factory($this->getConfigLoader());
         $overallMarkScheme = $markSchemeFactory->spawnForFolder(
             $subject,
             $viewModeContext->viewModeValue === ViewModeValue::STAFF
