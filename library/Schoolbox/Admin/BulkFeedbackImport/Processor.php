@@ -454,28 +454,30 @@ class Processor
                     $participant = $assessment->getParticipantIfExtant($learner, false);
 
                     /* Check at Preview screen
-                     * First, see if they were excluded from this reporting activity
                      */
-                    if ($participant->isExcluded()) {
+
+                    /* A participant might not exist here, due to a deep CAP-related reason that wasn't fully documented.
+                     * I'm still not entirely sure what the scenario was, but there's some way that a participation plan
+                     * might fail to exist.
+                     */
+                    if (null === $participant) {
                         $this->log(sprintf(
-                            'Row %s: student %s (%s) has been excluded from this activity',
-                            $i,
-                            $learner->getFullName(),
-                            $externalId,
-                        ), IStrategy::WARNING);
+                           'Row %s: no participation record found for student %s (%s); maybe they were deleted',
+                           $i,
+                           $learner->getFullName(),
+                           $externalId,
+                       ), IStrategy::WARNING);
 
                         $errors++;
 
                         continue;
                     }
 
-                    /* Otherwise, they're meant to exist, but for some reason - don't.
-                     * Most obvious reason is they were deleted, but deep in the swamp/CAP, there might be a more
-                     * sinister (and undocumented) reason
+                    /* See if they were excluded from this reporting activity
                      */
-                    if (null === $participant) {
+                    if ($participant->isExcluded()) {
                         $this->log(sprintf(
-                            'Row %s: no participation record found for student %s (%s); maybe they were deleted',
+                            'Row %s: student %s (%s) has been excluded from this activity',
                             $i,
                             $learner->getFullName(),
                             $externalId,
