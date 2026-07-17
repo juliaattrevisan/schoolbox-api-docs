@@ -22,6 +22,7 @@ use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Admin\Settings\ModuleConfig;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class Controller extends ConfigController
 {
@@ -43,6 +44,29 @@ class Controller extends ConfigController
             [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false],
         );
 
+        // grab the calendar failed counts if they exist
+        [$eventType, $socsCalendarClass, $socsMusicClass] = ['Event', Calendar_Api_Config_Connector_Socs::CONNECTOR_CLASS, Calendar_Api_Config_Connector_SocsMusic::CONNECTOR_CLASS];
+        try {
+            $calendarEvents = $this->calendarConfigMapper->findOneByColumnList([
+                'event_type' => $eventType,
+                'connector_class' => $socsCalendarClass,
+            ]);
+        } catch (MapperException\NotFound) {
+            $calendarEvents = $this->calendarConfigMapper->createModel()
+                ->setEventType($eventType)
+                ->setConnectorClass($socsCalendarClass);
+        }
+        try {
+            $musicLessons = $this->calendarConfigMapper->findOneByColumnList([
+                'event_type' => $eventType,
+                'connector_class' => $socsMusicClass,
+            ]);
+        } catch (MapperException\NotFound) {
+            $musicLessons = $this->calendarConfigMapper->createModel()
+                ->setEventType($eventType)
+                ->setConnectorClass($socsMusicClass);
+        }
+
         $this->response = $this->responseFromTemplate(
             '@socsadmin/index.twig',
             [
@@ -50,6 +74,10 @@ class Controller extends ConfigController
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))
                     ->generateBreadcrumbs($this->routeGenerator->generate('socsadmin.getSettings')),
                 'configContext' => $configContext,
+                'subscriptions' => [
+                    'musicLessons' => $musicLessons,
+                    'calendarEvents' => $calendarEvents,
+                ],
             ],
             'SOCS System Settings',
         );
@@ -82,10 +110,10 @@ class Controller extends ConfigController
             $calendarName = 'SOCS Events';
         }
 
-        $connector->setLabel($calendarName);
-        $connector->setEventType('Event');
-        $connector->setConnectorClass('Socs');
-        $connector->setLuEventType((int)$configValues[ConfigMapper::NAME_SOCS_CALENDAR_DEFAULT_EVENT_TYPE]->getValue());
+        $connector->setLabel($calendarName)
+            ->setEventType('Event')
+            ->setConnectorClass(Calendar_Api_Config_Connector_Socs::CONNECTOR_CLASS)
+            ->setLuEventType((int)$configValues[ConfigMapper::NAME_SOCS_CALENDAR_DEFAULT_EVENT_TYPE]->getValue());
 
         $this->syncManagedConnector(
             $connector,
@@ -99,10 +127,10 @@ class Controller extends ConfigController
             $musicLessonsName = 'SOCS Music Lessons';
         }
 
-        $musicConnector->setLabel($musicLessonsName);
-        $musicConnector->setEventType('Event');
-        $musicConnector->setConnectorClass('SocsMusic');
-        $musicConnector->setLuEventType((int)$configValues[ConfigMapper::NAME_SOCS_MUSIC_LESSONS_DEFAULT_EVENT_TYPE]->getValue());
+        $musicConnector->setLabel($musicLessonsName)
+            ->setEventType('Event')
+            ->setConnectorClass(Calendar_Api_Config_Connector_SocsMusic::CONNECTOR_CLASS)
+            ->setLuEventType((int)$configValues[ConfigMapper::NAME_SOCS_MUSIC_LESSONS_DEFAULT_EVENT_TYPE]->getValue());
 
         $this->syncManagedConnector(
             $musicConnector,
@@ -119,9 +147,9 @@ class Controller extends ConfigController
                 'connector_class' => $connector->getConnectorClass(),
             ]);
         } catch (\Throwable) {
-            $record = new Calendar_Api_Config_Record();
-            $record->setEventType($connector->getEventType());
-            $record->setConnectorClass($connector->getConnectorClass());
+            $record = $this->calendarConfigMapper->createModel()
+                ->setEventType($connector->getEventType())
+                ->setConnectorClass($connector->getConnectorClass());
         }
 
         $record->updateConfig($connector);

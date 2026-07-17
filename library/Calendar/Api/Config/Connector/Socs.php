@@ -12,7 +12,9 @@ declare(strict_types=1);
  */
 class Calendar_Api_Config_Connector_Socs extends Calendar_Api_Config_Connector_Abstract
 {
-    protected string $connectorClass = 'Socs';
+    public const string CONNECTOR_CLASS = 'Socs';
+
+    protected string $connectorClass = self::CONNECTOR_CLASS;
 
     /**
      * Return the default label used for the SOCS calendar source.

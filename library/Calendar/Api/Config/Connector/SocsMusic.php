@@ -9,7 +9,9 @@ declare(strict_types=1);
 
 class Calendar_Api_Config_Connector_SocsMusic extends Calendar_Api_Config_Connector_Socs
 {
-    protected string $connectorClass = 'SocsMusic';
+    public const string CONNECTOR_CLASS = 'SocsMusic';
+
+    protected string $connectorClass = self::CONNECTOR_CLASS;
 
     public function getDefaultLabel(): string
     {

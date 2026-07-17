@@ -11,6 +11,8 @@ declare(strict_types=1);
 namespace Calendar\Api;
 
 use Calendar_Api_Config_Connector_Interface;
+use Calendar_Api_Config_Connector_Socs;
+use Calendar_Api_Config_Connector_SocsMusic;
 
 /**
  * Responsible for determining which calender connections are enabled for this SB instance
@@ -62,7 +64,7 @@ class ApiHierarchyGenerator
 
                 // SOCS is configured from the SOCS admin screen, so it should not be listed
                 // with user-managed calendar subscriptions.
-                if (in_array($connectorClassFilename, ['Socs', 'SocsMusic'], true)) {
+                if (in_array($connectorClassFilename, [Calendar_Api_Config_Connector_Socs::CONNECTOR_CLASS, Calendar_Api_Config_Connector_SocsMusic::CONNECTOR_CLASS], true)) {
                     continue;
                 }
 
