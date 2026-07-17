@@ -272,7 +272,7 @@ class HelperTest extends TestCase
 
     /**
      * Wires a Helper whose mappers return a single folder containing a single participating, published,
-     * open DueWork with the supplied work type. Access is stubbed so the viewee is a learner-participant
+     * open assessment with the supplied work type. Access is stubbed so the viewee is a learner-participant
      * and the parent is a parent of that learner.
      *
      * @param WorkType\Model $workType Activity audience used by the fixture assessment.
