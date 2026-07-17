@@ -123,7 +123,7 @@ class Module extends BaseModule
             return $this->preloadAssessment($params);
         };
         $preloadAssessmentForStatus = function ($params) {
-            return $this->preloadAssessmentForStatus($params);
+            return $this->preloadSlimAssessmentForStatus($params);
         };
         $preloadCourseClassAssessment = function ($params) {
             return $this->preloadCourseClassAssessment($params);
@@ -622,6 +622,7 @@ class Module extends BaseModule
 
     /**
      * Convert route params into the lightweight assessment object needed by the status shell.
+     * No Participant or Student is loaded, initally created for the project status page
      *
      * @param array $params
      * @return array
@@ -629,7 +630,7 @@ class Module extends BaseModule
      * @throws InvalidArgumentException If assessment class not registered
      * @throws Mapper\DefinitionException If a specified join mapper is not found
      */
-    protected function preloadAssessmentForStatus(array $params): array
+    protected function preloadSlimAssessmentForStatus(array $params): array
     {
         try {
             $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
@@ -665,7 +666,7 @@ class Module extends BaseModule
      */
     protected function preloadCourseClassAssessment(array $params, ?User $student = null): array
     {
-        $assessmentSpec  = $this->preloadAssessmentForStatus($params)['assessment'];
+        $assessmentSpec  = $this->preloadSlimAssessmentForStatus($params)['assessment'];
         try {
             $assessmentImpl = $this->getAssessmentMapperProxy()->findById($params['assessmentImplId']);
         } catch (MapperException\Deleted $e) {
