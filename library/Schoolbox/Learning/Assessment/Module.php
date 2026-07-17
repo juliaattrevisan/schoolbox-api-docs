@@ -123,7 +123,7 @@ class Module extends BaseModule
             return $this->preloadAssessment($params);
         };
         $preloadAssessmentForStatus = function ($params) {
-            return $this->preloadSlimAssessmentForStatus($params);
+            return $this->preloadAssessmentForStatus($params);
         };
         $preloadCourseClassAssessment = function ($params) {
             return $this->preloadCourseClassAssessment($params);
@@ -622,7 +622,7 @@ class Module extends BaseModule
 
     /**
      * Convert route params into the lightweight assessment object needed by the status shell.
-     * No Participant or Student is loaded, initally created for the project status page
+     * If the assessment is a Spec, only load the spec assessment, otherwise load the impl assessment and participants
      *
      * @param array $params
      * @return array
@@ -630,7 +630,7 @@ class Module extends BaseModule
      * @throws InvalidArgumentException If assessment class not registered
      * @throws Mapper\DefinitionException If a specified join mapper is not found
      */
-    protected function preloadSlimAssessmentForStatus(array $params): array
+    protected function preloadAssessmentForStatus(array $params): array
     {
         try {
             $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
@@ -642,6 +642,11 @@ class Module extends BaseModule
         } catch (MapperException $e) {
             // Possibly thrown by base findByOne() mapper call, but masked by overriding @method annotation
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        // if this is a impl assessment we need to load participant data for the student, otherwise the status page will not load correctly
+        if ($assessment->isImplementation()) {
+            return $this->preloadAssessment($params);
         }
 
         $this->setControllerFromAssessment($assessment);
@@ -666,7 +671,7 @@ class Module extends BaseModule
      */
     protected function preloadCourseClassAssessment(array $params, ?User $student = null): array
     {
-        $assessmentSpec  = $this->preloadSlimAssessmentForStatus($params)['assessment'];
+        $assessmentSpec  = $this->preloadAssessmentForStatus($params)['assessment'];
         try {
             $assessmentImpl = $this->getAssessmentMapperProxy()->findById($params['assessmentImplId']);
         } catch (MapperException\Deleted $e) {
@@ -680,6 +685,7 @@ class Module extends BaseModule
         }
 
         if ($assessmentSpec->isImplementation()) {
+            $assessmentSpec  = $this->preloadAssessment($params, $student)['assessment'];
             if ($assessmentSpec->getId() === $assessmentImpl->getId()) {
                 return [
                     'assessment' => $assessmentSpec,
