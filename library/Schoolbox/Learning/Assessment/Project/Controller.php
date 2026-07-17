@@ -229,9 +229,6 @@ class Controller extends Assessment\Controller
             $assessment->setAssessables($this->getAssessmentMapper()->findAllByProjectId($assessment->getId()));
         }
 
-        // Calculate summary totals for display purposes
-        $participants = $assessment->getAllParticipants();
-
         $assessmentStats = new GenericCollection(Assessment\Statistics::class);
         $assessmentStats[$assessment->getId()] = new Assessment\Statistics($assessment);
         foreach ($assessment->getAssessables() as $subAssessable) {
