@@ -57,6 +57,14 @@ abstract class BaseTool extends CliTool\App
      */
     private const OPT_LONG_TO = 'to:';
     /**
+     * --batch-size
+     *
+     * Maximum number of quizzes to process per run.
+     */
+    private const OPT_LONG_BATCH_SIZE = 'batch-size:';
+
+    private const DEFAULT_BATCH_SIZE = 50;
+    /**
      * Short options:
      * * -h: help
      */
@@ -71,10 +79,17 @@ abstract class BaseTool extends CliTool\App
      * * --from:       from date
      * * --to:         to date
      * * --assessment: a particular quiz to process
+     * * --batch-size: maximum number of quizzes to process
      */
     public function getLongOpts(): array
     {
-        return [self::OPT_LONG_HELP, self::OPT_LONG_FROM, self::OPT_LONG_TO, self::OPT_LONG_ASSESSMENT_ID];
+        return [
+            self::OPT_LONG_HELP,
+            self::OPT_LONG_FROM,
+            self::OPT_LONG_TO,
+            self::OPT_LONG_ASSESSMENT_ID,
+            self::OPT_LONG_BATCH_SIZE,
+        ];
     }
 
     /**
@@ -148,8 +163,13 @@ abstract class BaseTool extends CliTool\App
         );
 
         // Build assessment data source
+        $batchSize = $this->getOptAsInt(self::OPT_LONG_BATCH_SIZE, self::DEFAULT_BATCH_SIZE);
+        if ($batchSize === null || $batchSize <= 0) {
+            throw new \InvalidArgumentException('Batch size must be a positive integer.');
+        }
+
         $this->assessmentDataSource = $this->getDi()->get('assessmentDataSource');
-        $quizzes                    = $this->findQuizzes();
+        $quizzes                    = $this->findQuizzes($batchSize);
 
         $this->getLogger()->info(sprintf('Found %d quizzes', count($quizzes)));
         foreach ($quizzes as $quiz) {
@@ -178,18 +198,21 @@ abstract class BaseTool extends CliTool\App
      * Find quizzes which match this tool's targeted quiz status, and which are
      * also within the date span or assessment ID list.
      *
+     * @param int $batchSize
      * @return GenericCollection<IAssessable>
      */
-    private function findQuizzes(): GenericCollection
+    private function findQuizzes(int $batchSize): GenericCollection
     {
         $whereParts = [
             "quiz.learnosity_job_status = :learnosityJobStatus",
         ];
         $params = [
             'learnosityJobStatus' => $this->getTargetedQuizStatus(),
+            'batchSize' => $batchSize,
         ];
         $this->getLogger()->info('Filtering quizzes to those which match:');
         $this->getLogger()->info(sprintf('* learnosity_job_status = %s', $params['learnosityJobStatus']));
+        $this->getLogger()->info(sprintf('* batch size <= %d', $batchSize));
 
         $fromDate = $this->buildDate($this->getOpt(self::OPT_LONG_FROM));
         if ($fromDate) {
@@ -222,7 +245,10 @@ abstract class BaseTool extends CliTool\App
                 FROM assess AS quiz
                 INNER JOIN assessment ON quiz.assessment_id = assessment.id
                 WHERE
-            " . implode(' AND ', $whereParts),
+            " . implode(' AND ', $whereParts) . "
+                ORDER BY quiz.created_at ASC, quiz.assess_id ASC
+                LIMIT :batchSize
+            ",
         );
         $quizQuery->execute($params);
         $quizIds = $quizQuery->fetchColumnArray('id');
@@ -286,6 +312,7 @@ abstract class BaseTool extends CliTool\App
         $green      = self::COLOUR_GREEN;
         $white      = self::COLOUR_WHITE;
         $yellow     = self::COLOUR_YELLOW;
+        $batchSize  = self::DEFAULT_BATCH_SIZE;
         echo <<<HELP
 NAME:
     {$this->getToolName()}
@@ -320,6 +347,10 @@ OPTIONS
         If provided, only only perform changes on quizzes created on {$yellow}TO_DATE{$white} and before.
 
         {$yellow}TO_DATE{$white} will be parsed using the same rules as {$yellow}FROM_DATE{$white}, and will cause this script to fail for the same reasons.
+
+    $yellow--batch-size=BATCH_SIZE$white
+        If provided, process at most {$yellow}BATCH_SIZE{$white} matching quizzes.
+        Defaults to {$yellow}{$batchSize}{$white}.
 
 
 HELP;
