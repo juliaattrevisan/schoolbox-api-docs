@@ -260,12 +260,17 @@ class Helper
     ): bool {
         $now = $now ?? \Alaress_Date_Format::now();
 
-        if ((new Visibility($this->access))->isVisibleToUser($assessment, $viewer, $showClosed, $now)) {
+        $visibility = new Visibility($this->access);
+        if ($visibility->isVisibleToUser($assessment, $viewer, $showClosed, $now)) {
             return $assessment->isFeedbackVisibleToUser($viewer);
         }
 
         $participant = $assessment->getParticipantIfExtant($viewee);
         if ($participant === null || !$assessment->isPublished($viewee, $now)) {
+            return false;
+        }
+
+        if ($visibility->isHiddenByLessonPlanVisibility($assessment, $viewee)) {
             return false;
         }
 
@@ -283,7 +288,7 @@ class Helper
                 return false;
             }
         } elseif ($viewer->getRole()->isParent()) {
-            if ($workType === null || !$workType->isVisibleToParents() || !$this->isParentOfViewee($viewer, $viewee)) {
+            if ($workType === null || !$workType->isVisibleToParents() || !$viewer->isParentOf($viewee)) {
                 return false;
             }
         } else {
@@ -293,32 +298,6 @@ class Helper
         $closeDate = $participant->getCloseDate();
 
         return $showClosed || $closeDate === null || $now->lt($closeDate);
-    }
-
-    /**
-     * Returns whether the viewer is linked to the student whose grades are being viewed.
-     *
-     * Historical Grades cannot depend on current folder learner access, but parent access still needs to be bounded to
-     * an existing parent-child relationship that has already been hydrated by the caller or session.
-     *
-     * @param User $parent Potential parent viewer.
-     * @param User $viewee Student whose grades are being viewed.
-     * @return bool
-     */
-    private function isParentOfViewee(User $parent, User $viewee): bool
-    {
-        $children = $parent->getChildren();
-        if ($children === null) {
-            return false;
-        }
-
-        foreach ($children as $child) {
-            if ($child->getId() === $viewee->getId()) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

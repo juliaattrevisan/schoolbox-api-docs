@@ -13,6 +13,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\LessonPlan;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Plan;
 use Schoolbox\Learning\Assessment\Project\ResultCache;
@@ -99,6 +100,7 @@ class HelperTest extends TestCase
      * @param bool $workTypeVisibleToParents Whether the activity is visible to parents.
      * @param bool $workTypeVisibleToLearners Whether the activity is visible to learners.
      * @param string $markVisibility Feedback visibility configured on the assessment.
+     * @param string|null $lessonPlanVisibility Optional lesson plan visibility for lesson-plan fixtures.
      * @param bool $expected Whether the historical grade should remain visible.
      * @return void
      */
@@ -109,6 +111,7 @@ class HelperTest extends TestCase
         bool $workTypeVisibleToParents,
         bool $workTypeVisibleToLearners,
         string $markVisibility,
+        ?string $lessonPlanVisibility,
         bool $expected
     ): void {
         $viewee = (new User())->setId(self::VIEWEE_ID)->setRole((new Role())->setType(Role::STUDENT));
@@ -126,7 +129,8 @@ class HelperTest extends TestCase
             $viewee,
             $viewer,
             false,
-            $markVisibility
+            $markVisibility,
+            $lessonPlanVisibility
         );
 
         [, , $assessmentsPerFolder] = $helper->generateGrades($viewer, $viewee, $term, false);
@@ -171,7 +175,7 @@ class HelperTest extends TestCase
     /**
      * Provides visible and hidden historical grade cases after current folder READ access has been removed.
      *
-     * @return array<string, array{string, bool, bool, bool, string, bool}>
+     * @return array<string, array{string, bool, bool, bool, string, string|null, bool}>
      */
     public static function providerHistoricalGradeVisibility(): array
     {
@@ -182,6 +186,7 @@ class HelperTest extends TestCase
                 true,
                 true,
                 IAssessable::MARK_VISIBILITY_PARENT_STUDENT,
+                null,
                 true,
             ],
             'Valid parent of former student participant' => [
@@ -190,6 +195,7 @@ class HelperTest extends TestCase
                 true,
                 true,
                 IAssessable::MARK_VISIBILITY_PARENT_STUDENT,
+                null,
                 true,
             ],
             'Invalid former student hidden by learner audience' => [
@@ -198,6 +204,7 @@ class HelperTest extends TestCase
                 true,
                 false,
                 IAssessable::MARK_VISIBILITY_PARENT_STUDENT,
+                null,
                 false,
             ],
             'Invalid former student hidden by staff-only feedback' => [
@@ -206,6 +213,7 @@ class HelperTest extends TestCase
                 true,
                 true,
                 IAssessable::MARK_VISIBILITY_PRIVATE,
+                null,
                 false,
             ],
             'Invalid parent hidden by parent audience' => [
@@ -214,6 +222,7 @@ class HelperTest extends TestCase
                 false,
                 true,
                 IAssessable::MARK_VISIBILITY_PARENT_STUDENT,
+                null,
                 false,
             ],
             'Invalid parent hidden by student-only feedback' => [
@@ -222,6 +231,25 @@ class HelperTest extends TestCase
                 true,
                 true,
                 IAssessable::MARK_VISIBILITY_STUDENT,
+                null,
+                false,
+            ],
+            'Invalid former student hidden by lesson plan visibility' => [
+                Role::STUDENT,
+                false,
+                true,
+                true,
+                IAssessable::MARK_VISIBILITY_PARENT_STUDENT,
+                Role::STAFF,
+                false,
+            ],
+            'Invalid parent hidden by lesson plan visibility' => [
+                Role::PARENT,
+                true,
+                true,
+                true,
+                IAssessable::MARK_VISIBILITY_PARENT_STUDENT,
+                Role::STAFF,
                 false,
             ],
         ];
@@ -252,6 +280,7 @@ class HelperTest extends TestCase
      * @param User $viewer Effective viewer whose visibility rules are being tested.
      * @param bool $vieweeIsLearner Whether current folder READ access should be granted to the viewee.
      * @param string $markVisibility Feedback visibility used by the fixture assessment.
+     * @param string|null $lessonPlanVisibility Optional lesson plan visibility for lesson-plan fixtures.
      * @return array{Helper, Term}
      */
     private function buildHelper(
@@ -259,7 +288,8 @@ class HelperTest extends TestCase
         User $viewee,
         User $viewer,
         bool $vieweeIsLearner = true,
-        string $markVisibility = IAssessable::MARK_VISIBILITY_PARENT_STUDENT
+        string $markVisibility = IAssessable::MARK_VISIBILITY_PARENT_STUDENT,
+        ?string $lessonPlanVisibility = null
     ): array {
         $now = new Alaress_Date_Format(self::NOW_DATABASE, Alaress_Date_Format::DATABASE_FORMAT);
 
@@ -274,7 +304,7 @@ class HelperTest extends TestCase
         $folder->setId(1)->setName('A Subject');
         $folder->setCodes(new GenericCollection(Code\Model::class));
 
-        $assessable = $this->buildAssessable($folder, $workType, $viewee, $now, $markVisibility);
+        $assessable = $this->buildAssessable($folder, $workType, $viewee, $now, $markVisibility, $lessonPlanVisibility);
 
         $term = $this->createStub(Term::class);
         $term->method('getStart')->willReturn((clone $now)->addDays(-30));
@@ -305,27 +335,31 @@ class HelperTest extends TestCase
     }
 
     /**
-     * Builds a published, open DueWork in $folder with $viewee as a participant.
+     * Builds a published, open assessment in $folder with $viewee as a participant.
      *
      * @param Folder\Model $folder Folder used as the assessment context.
      * @param WorkType\Model $workType Activity audience used by the fixture assessment.
      * @param User $viewee Student participant attached to the fixture assessment.
      * @param Alaress_Date_Format $now Fixed date used to derive publish and close dates.
      * @param string $markVisibility Feedback visibility used by the fixture assessment.
-     * @return DueWork\Model
+     * @param string|null $lessonPlanVisibility Optional lesson plan visibility for lesson-plan fixtures.
+     * @return IAssessable
      */
     private function buildAssessable(
         Folder\Model $folder,
         WorkType\Model $workType,
         User $viewee,
         Alaress_Date_Format $now,
-        string $markVisibility
-    ): DueWork\Model {
-        $assessable = (new DueWork\Model())
+        string $markVisibility,
+        ?string $lessonPlanVisibility = null
+    ): IAssessable {
+        $assessable = $lessonPlanVisibility === null
+            ? (new DueWork\Model())->setTitle('A DueWork')
+            : (new LessonPlan\Model())->setTitle('A Lesson Plan')->setVisibility($lessonPlanVisibility);
+
+        $assessable
             ->setId(self::ASSESSMENT_ID)
-            ->setTitle('A DueWork')
             ->setContext($folder)
-            ->setAcceptsMultiple() // Avoid due/close date magic in DueWork::getCloseAt().
             ->setPublishAt((clone $now)->addDays(-2))
             ->setOpenAt((clone $now)->addDays(-1))
             ->setDueAt((clone $now)->addDays(1))
@@ -333,6 +367,10 @@ class HelperTest extends TestCase
             ->setWorkType($workType)
             ->setMarkVisibility($markVisibility)
             ->setMarkScheme(new None()); // Non-quantitative scheme keeps Markbook statistics trivial.
+
+        if ($assessable instanceof DueWork\Model) {
+            $assessable->setAcceptsMultiple(); // Avoid due/close date magic in DueWork::getCloseAt().
+        }
 
         $plan = (new Plan($assessable))->setIsDynamic(PlanMapper::PLAN_TYPE_DYNAMIC);
         $plan->getParticipants()[$viewee->getId()] = new Participant($viewee, $plan, ResultCache\Mapper::getInstance());
