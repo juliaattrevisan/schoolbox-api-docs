@@ -225,7 +225,7 @@ class Controller extends Assessment\Controller
      */
     public function getStatus(IAssessable $assessment): void
     {
-        if ($assessment instanceof Project) {
+        if ($assessment instanceof Project && $assessment->isSpecification()) {
             $assessment->setAssessables($this->getAssessmentMapper()->findAllByProjectId($assessment->getId()));
         }
 
