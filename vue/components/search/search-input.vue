@@ -167,7 +167,6 @@ function onMouseOut(event: MouseEvent): void {
         color: var(--sbx-color-text-primary, var(--color-text-primary));
         font-size: var(--base-font-size);
         height: var(--tabbar-height);
-        padding: var(--base-font-size);
         margin: 0;
         line-height: calc(var(--tabbar-height) / 2);
     }
