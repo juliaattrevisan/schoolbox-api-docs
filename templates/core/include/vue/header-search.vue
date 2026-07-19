@@ -6,7 +6,7 @@
  */
 import { debounce } from "es-toolkit";
 import { vOnClickOutside } from "@vueuse/components";
-import SearchInput from "@schoolboxVue/components/search/search-input.vue";
+import HsInput from "./hs-input.vue";
 
 interface MetaContext {
     name: string;
@@ -250,7 +250,7 @@ const searchButtonText = window.Vue.computed(() => {
         action="/search"
         :class="{ focus: isSelected }"
     >
-        <search-input
+        <hs-input
             :is-active-when-empty="false"
             :is-selected="isSelected"
             @input="onInput"
