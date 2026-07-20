@@ -212,7 +212,7 @@ abstract class BaseTool extends CliTool\App
         ];
         $this->getLogger()->info('Filtering quizzes to those which match:');
         $this->getLogger()->info(sprintf('* learnosity_job_status = %s', $params['learnosityJobStatus']));
-        $this->getLogger()->info(sprintf('* batch size <= %d', $batchSize));
+        $this->getLogger()->info(sprintf('* batch size = %d', $batchSize));
 
         $fromDate = $this->buildDate($this->getOpt(self::OPT_LONG_FROM));
         if ($fromDate) {
