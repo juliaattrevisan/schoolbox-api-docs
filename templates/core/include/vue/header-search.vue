@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * The search bar that currently appears within the top menu.
- * It is currently used to search for users and prompt a full search,
+ * It is currently used as a quick search and to prompt a full search,
  * providing the option to be redirected to the search page.
  */
 import { debounce } from "es-toolkit";

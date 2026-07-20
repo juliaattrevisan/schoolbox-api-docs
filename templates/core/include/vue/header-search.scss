@@ -1,6 +1,11 @@
 @import "@css/core/base/_functions";
 @import "@css/core/base/_settings";
 
+:root {
+    --sbx-header-tabbar-height: 4.5rem;
+    --sbx-header-tabbar-icon-width: 4.5rem;
+}
+
 .sbx-header-search {
     margin: 0;
     position: absolute;
@@ -17,39 +22,33 @@
         grid-template-columns: 0 4.5rem;
 
         input[type="text"].sbx-search-input__field {
-            border: 2px solid var(--sbx-config-color-accent, var(--form-border-color));
-            background-color: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
-            color: var(--sbx-color-text-primary, var(--color-text-primary));
             font-size: var(--base-font-size);
-            height: var(--tabbar-height);
+            height: var(--sbx-header-tabbar-height);
             margin: 0;
-            line-height: calc(var(--tabbar-height) / 2);
+            line-height: calc(var(--sbx-header-tabbar-height) / 2);
         }
 
+        // field is hidden by default, and only revealed when the user hovers over the search bar
         &__field {
             opacity: 0;
             padding: 0;
             transition: opacity 0.2s ease-out;
         }
         &__button {
-            align-items: center;
-            background-color: var(--sbx-config-color-menu-primary, var(--navigation-background));
+            background-color: var(--sbx-config-color-menu-background, var(--navigation-background));
             color: var(--sbx-config-color-menu-foreground, var(--navigation-foreground));
-            display: flex;
-            height: var(--tabbar-height);
-            justify-content: center;
-            margin: 0;
-            padding: 0;
+            height: var(--sbx-header-tabbar-height);
             transition:
                 background-color 0.15s linear,
                 color 0.15s linear;
         }
     }
 
+    // When the user hovers over the search bar, the input field is revealed and the search button is highlighted
     &:hover,
     &.focus {
+        padding-left: calc(var(--sbx-header-tabbar-icon-width) * 2);
         width: 100%;
-        padding-left: calc(var(--tabbar-icon-width) * 2);
         .sbx-search-input {
             grid-template-columns: 1fr 4.5rem;
         }
@@ -74,24 +73,17 @@
             margin: 0; // clear .tab-bar h3 margins
         }
     }
-
-    &__search-button {
-        align-items: center;
-        display: flex;
-        gap: var(--spacing-xs);
-        justify-content: center;
-    }
 }
 
 @mixin header-search-properties($right-multiplier, $padding-left-multiplier) {
     @if $right-multiplier >= 0 {
-        right: calc(var(--tabbar-icon-width) * #{$right-multiplier});
+        right: calc(var(--sbx-header-tabbar-icon-width) * #{$right-multiplier});
     }
 
     &:hover,
     &.focus {
         @if $padding-left-multiplier >= 0 {
-            padding-left: calc(var(--tabbar-icon-width) * #{$padding-left-multiplier});
+            padding-left: calc(var(--sbx-header-tabbar-icon-width) * #{$padding-left-multiplier});
         }
     }
 }
@@ -111,7 +103,7 @@
     }
 }
 
-// Browser width is large enough to allow only the menu (left pael) to be pinned/stashed
+// Browser width is large enough to allow only the menu (left panel) to be pinned/stashed
 @media #{$large-only} {
     body {
         // Search bar properties when notifications are enabled

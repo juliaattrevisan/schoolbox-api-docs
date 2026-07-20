@@ -1,10 +1,7 @@
 <script setup lang="ts">
 /**
  * To display the search input field, accompanied by a search button.
- * As the input can be part of a larger component, the prop isActive is used to
- * add the active styles as the input may not always be active if it is
- * within a larger component. In this instance (header-search.vue), and
- * the search-input is only revealed when the user moves over the input in the header.
+ * The input is only revealed when the user moves over the input in the header.
  */
 
 interface Props {
@@ -151,7 +148,7 @@ function onMouseOut(event: MouseEvent): void {
             @mouseout="onMouseOut"
             @click.prevent="onClicked"
         >
-            <sbx-icon name="search" size="1rem" color="currentColor" />
+            <sbx-icon name="search" />
         </button>
     </div>
 </template>
