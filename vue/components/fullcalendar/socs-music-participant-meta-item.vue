@@ -1,3 +1,19 @@
+<script setup lang="ts">
+import MetaItem from "@schoolboxVue/components/meta/item.vue";
+
+interface Participant {
+    id: number | string;
+    name: string;
+    url?: string;
+}
+
+defineProps<{
+    icon: string;
+    label: string;
+    participants: Participant[];
+}>();
+</script>
+
 <template>
     <meta-item v-if="participants.length" :icon="icon">
         {{ label }}:
@@ -10,30 +26,3 @@
         </template>
     </meta-item>
 </template>
-
-<script>
-import MetaItem from "../meta/item.vue";
-
-export default {
-    name: "SocsMusicParticipantMetaItem",
-
-    components: {
-        MetaItem,
-    },
-
-    props: {
-        icon: {
-            type: String,
-            required: true,
-        },
-        label: {
-            type: String,
-            required: true,
-        },
-        participants: {
-            type: Array,
-            required: true,
-        },
-    },
-};
-</script>
