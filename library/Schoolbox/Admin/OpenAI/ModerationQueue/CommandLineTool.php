@@ -11,6 +11,7 @@ namespace Schoolbox\Admin\OpenAI\ModerationQueue;
 
 use Alaress\Lock\LockRefreshException;
 use Schoolbox\Application\CliTool;
+use Schoolbox\OpenAi\Feature;
 use Schoolbox\OpenAi\Moderation\Event\Mapper as ModerationEventMapper;
 use Schoolbox\OpenAi\Session\Log\Mapper as SessionLogMapper;
 use Symfony\Component\Lock\Exception\LockReleasingException;
@@ -107,6 +108,18 @@ HELP;
         }
 
         $logger = $this->getLogger();
+
+        // before we start, lets check if the ai moderation agent is even enabled
+        try {
+            $this->getDi()->get(
+                'ai.clientFactory'
+            )->buildForFeature(
+                Feature::AI_MODERATION_AGENT
+            );
+        } catch (\Schoolbox\OpenAi\Exception\AgentNotEnabled) {
+            $logger->notice('AI moderation agent is not enabled, skipping moderation queue.');
+            return;
+        }
 
         $limit = $this->normalisePositiveInt(
             $this->getOptAsInt(self::OPT_SHORT_LIMIT, self::DEFAULT_LIMIT),
