@@ -4,7 +4,7 @@ import MetaItem from "@schoolboxVue/components/meta/item.vue";
 interface Participant {
     id: number | string;
     name: string;
-    url?: string;
+    url?: string | null;
 }
 
 defineProps<{
