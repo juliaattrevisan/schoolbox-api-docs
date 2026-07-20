@@ -204,7 +204,8 @@ abstract class BaseTool extends CliTool\App
     private function findQuizzes(int $batchSize): GenericCollection
     {
         $whereParts = [
-            "quiz.learnosity_job_status = :learnosityJobStatus",
+            "quiz.learnosity_job_status = :learnosityJobStatus
+            AND quiz.deleted_at IS NULL", // assessmentDataSource->findAllByIds($quizIds) only returns quizzes which are not deleted, but we want to filter them out here too so that the log output is accurate
         ];
         $params = [
             'learnosityJobStatus' => $this->getTargetedQuizStatus(),
