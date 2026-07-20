@@ -69,7 +69,10 @@ class Payload
 
         /* Converts the grid structure
          */
-        $rubricGridTranslator = new \Schoolbox\Assessment\Rubric\Grid\Translator\ModelToArray\Base($this->rubricShowPoints);
+        $rubricGridTranslator = new \Schoolbox\Assessment\Rubric\Grid\Translator\ModelToArray\Base(
+            $this->rubricShowPoints,
+            $this->viewer,
+        );
 
         /* TODO: similar to Grid->jsonSerialize, this is not final and will be easier to figure out what needs
          *  to be changed once we can see all the payloads for the builder/readonly/markable grids in action.

@@ -14,10 +14,13 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Rubric\Grid as RubricGrid;
 use Schoolbox\Assessment\Rubric\RowSet;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Role;
+use Schoolbox\User;
+use Schoolbox\YearLevel;
 
 /**
  * @codeCoverageIgnore
@@ -25,6 +28,84 @@ use Schoolbox\Resource\Folder\Model as Folder;
 #[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Assessment\Rubric\Grid\Grid::class)]
 class GridTest extends TestCase
 {
+    /**
+     * Data provider for `testShowDescriptorValue`.
+     *
+     * @return iterable
+     */
+    public static function getShowDescriptorValueData(): iterable
+    {
+        yield 'staff ignores disabled settings' => [Role::STAFF, [false], false, true];
+        yield 'staff sees values when settings are enabled' => [Role::STAFF, [true], true, true];
+        yield 'student uses disabled year level instead of enabled default' => [
+            Role::STUDENT,
+            [false],
+            true,
+            false,
+        ];
+        yield 'student uses enabled year level instead of disabled default' => [
+            Role::STUDENT,
+            [true],
+            false,
+            true,
+        ];
+        yield 'parent uses disabled year level instead of enabled default' => [
+            Role::PARENT,
+            [false],
+            true,
+            false,
+        ];
+        yield 'parent uses enabled year level instead of disabled default' => [
+            Role::PARENT,
+            [true],
+            false,
+            true,
+        ];
+        yield 'student without year levels uses enabled default' => [Role::STUDENT, null, true, true];
+        yield 'student without year levels uses disabled default' => [Role::STUDENT, null, false, false];
+        yield 'parent without year levels uses enabled default' => [Role::PARENT, null, true, true];
+        yield 'parent without year levels uses disabled default' => [Role::PARENT, null, false, false];
+        yield 'mixed year-level settings show values' => [Role::STUDENT, [false, true], false, true];
+    }
+
+
+    /**
+     * Verify role, year-level and system settings determine descriptor value visibility.
+     *
+     * @param string $roleType The viewer's role type.
+     * @param bool[]|null $yearLevelSettings The folder's year-level settings, or null for no year levels.
+     * @param bool $default The system-wide default.
+     * @param bool $expected The expected visibility.
+     * @return void
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getShowDescriptorValueData')]
+    public function testShowDescriptorValue(
+        string $roleType,
+        ?array $yearLevelSettings,
+        bool $default,
+        bool $expected,
+    ): void {
+        $folder = new Folder();
+        if ($yearLevelSettings !== null) {
+            $yearLevels = new GenericCollection(YearLevel\Model::class);
+            foreach ($yearLevelSettings as $showRubricPoints) {
+                $yearLevels[] = (new YearLevel\Model())->setShowRubricPoints($showRubricPoints);
+            }
+            $folder->setYearLevels($yearLevels);
+        }
+
+        $assessment = (new DueWork())->setContext($folder);
+        $grid = new RubricGrid\Grid(
+            $assessment,
+            (new \Schoolbox\Assessment\Rubric\Instance\Model())->setId(117),
+            new RowSet\RowSet(new Folder()),
+        );
+        $viewer = (new User())->setRole((new Role())->setType($roleType));
+
+        $this->assertSame($expected, $grid->showDescriptorValue($viewer, $default));
+    }
+
+
     /**
      * Data provider for `testRetrieveGroupUsage`.
      *

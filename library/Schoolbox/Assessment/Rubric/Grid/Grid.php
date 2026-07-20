@@ -19,6 +19,8 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Role;
+use Schoolbox\User;
 
 /**
  * A rubric grid.
@@ -134,15 +136,22 @@ class Grid
     }
 
     /**
-     * Descriptor value display setting from folder year level
+     * Determine whether descriptor values should be displayed to a viewer.
+     *
+     * @param User $viewer The user viewing the rubric.
+     * @param bool $default The system-wide default used when the folder has no year levels.
      * @return bool
      */
-    public function showDescriptorValue(): bool
+    public function showDescriptorValue(User $viewer, bool $default): bool
     {
+        if ($viewer->getRole()->getType() === Role::STAFF) {
+            return true;
+        }
+
         $folder = $this->assessment->getContext()->getFolder();
 
         if (!($folder instanceof Folder) || !$folder->getYearLevels() || $folder->getYearLevels()->count() === 0) {
-            return true;
+            return $default;
         }
 
         $showDescriptorValue = array_unique($folder->getYearLevels()->getPropertyValues('showRubricPoints'));

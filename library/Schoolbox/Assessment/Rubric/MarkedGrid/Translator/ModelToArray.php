@@ -153,8 +153,7 @@ class ModelToArray
             // the mark is only shown if the viewer has permission (essentially the same config check in the rubric grid translator)
             'value' => (
                 $indicatorMark->getDescriptor()?->hasValue() &&
-                $markedGrid->getGrid()->showDescriptorValue() &&
-                $this->showPoints
+                $markedGrid->getGrid()->showDescriptorValue($this->viewer, $this->showPoints)
             ) ? $value : null,
         ];
     }
