@@ -208,7 +208,6 @@ abstract class BaseTool extends CliTool\App
         ];
         $params = [
             'learnosityJobStatus' => $this->getTargetedQuizStatus(),
-            'batchSize' => $batchSize,
         ];
         $this->getLogger()->info('Filtering quizzes to those which match:');
         $this->getLogger()->info(sprintf('* learnosity_job_status = %s', $params['learnosityJobStatus']));
@@ -249,8 +248,9 @@ abstract class BaseTool extends CliTool\App
                 ORDER BY quiz.created_at ASC, quiz.assess_id ASC
                 LIMIT :batchSize
             ",
+            array_merge($params, ['batchSize' => $batchSize])
         );
-        $quizQuery->execute($params);
+        $quizQuery->execute();
         $quizIds = $quizQuery->fetchColumnArray('id');
         return $this->assessmentDataSource->findAllByIds($quizIds);
     }
