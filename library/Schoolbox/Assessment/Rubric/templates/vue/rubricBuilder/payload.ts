@@ -63,7 +63,11 @@ export function translateGridToFormPayload(grid: RubricGrid): RubricGridFormPayl
         })),
         group: grid.capabilities.map((capability) => ({
             id: capability.id >= 0 ? capability.id : "", // the backend expects empty IDs for new capabilities
-            name: capability.name,
+            /* a whitespace-only capability is considered deliberate
+             * in order to get a blank cell, so it must not be trimmed.
+             * For normal text, still trim to avoid accidental whitespace.
+             */
+            name: capability.name.trim() === "" ? capability.name : capability.name.trim(),
             maxValue: capability.maxValue,
         })),
         criterion: {},
@@ -83,7 +87,11 @@ export function translateGridToFormPayload(grid: RubricGrid): RubricGridFormPayl
             gridData.criterion[indicator.id] = {
                 id: indicator.id >= 0 ? indicator.id : "", // the backend expects empty IDs for new indicators
                 groupId: capability.id,
-                name: indicator.name,
+                /* a whitespace-only indicator is considered deliberate
+                 * in order to get a blank cell, so it must not be trimmed.
+                 * For normal text, still trim to avoid accidental whitespace.
+                 */
+                name: indicator.name.trim() === "" ? indicator.name : indicator.name.trim(),
                 on: indicator.hasUsage ? 1 : undefined,
                 sequence: i,
             };
