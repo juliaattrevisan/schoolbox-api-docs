@@ -2,15 +2,15 @@
 @import "@css/core/base/_settings";
 
 :root {
-    --sbx-header-tabbar-height: 4.5rem;
-    --sbx-header-tabbar-icon-width: 4.5rem;
+    --sbx-header-height: 4.5rem;
+    --sbx-header-button-width: 4.5rem;
 }
 
 .sbx-header-search {
     margin: 0;
     position: absolute;
     top: 0;
-    width: 4.5rem;
+    width: var(--sbx-header-button-width);
     z-index: calc(var(--sbx-depth-menu) - 1); // -1 to avoid overlap with the side menus, which should sit on top
     ::placeholder {
         color: transparent;
@@ -19,13 +19,13 @@
 
     .sbx-search-input {
         display: grid;
-        grid-template-columns: 0 4.5rem;
+        grid-template-columns: 0 var(--sbx-header-button-width);
 
         input[type="text"].sbx-search-input__field {
             font-size: var(--base-font-size);
-            height: var(--sbx-header-tabbar-height);
+            height: var(--sbx-header-height);
             margin: 0;
-            line-height: calc(var(--sbx-header-tabbar-height) / 2);
+            line-height: calc(var(--sbx-header-height) / 2);
         }
 
         // field is hidden by default, and only revealed when the user hovers over the search bar
@@ -37,7 +37,7 @@
         &__button {
             background-color: var(--sbx-config-color-menu-background, var(--navigation-background));
             color: var(--sbx-config-color-menu-foreground, var(--navigation-foreground));
-            height: var(--sbx-header-tabbar-height);
+            height: var(--sbx-header-height);
             transition:
                 background-color 0.15s linear,
                 color 0.15s linear;
@@ -47,10 +47,10 @@
     // When the user hovers over the search bar, the input field is revealed and the search button is highlighted
     &:hover,
     &.focus {
-        padding-left: calc(var(--sbx-header-tabbar-icon-width) * 2);
+        padding-left: calc(var(--sbx-header-button-width) * 2);
         width: 100%;
         .sbx-search-input {
-            grid-template-columns: 1fr 4.5rem;
+            grid-template-columns: 1fr var(--sbx-header-button-width);
         }
         .sbx-search-input__field {
             opacity: 1;
@@ -77,13 +77,13 @@
 
 @mixin header-search-properties($right-multiplier, $padding-left-multiplier) {
     @if $right-multiplier >= 0 {
-        right: calc(var(--sbx-header-tabbar-icon-width) * #{$right-multiplier});
+        right: calc(var(--sbx-header-button-width) * #{$right-multiplier});
     }
 
     &:hover,
     &.focus {
         @if $padding-left-multiplier >= 0 {
-            padding-left: calc(var(--sbx-header-tabbar-icon-width) * #{$padding-left-multiplier});
+            padding-left: calc(var(--sbx-header-button-width) * #{$padding-left-multiplier});
         }
     }
 }
