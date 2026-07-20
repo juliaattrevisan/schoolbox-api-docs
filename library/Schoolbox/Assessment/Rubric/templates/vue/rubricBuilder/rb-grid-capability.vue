@@ -180,7 +180,7 @@ window.Vue.onMounted(() => {
             <textarea
                 v-else
                 :id="`rb-capability-name-textarea-${componentId}`"
-                v-model.trim.lazy="capabilityName"
+                v-model.lazy="capabilityName"
                 :name="`rb-capability-name-textarea-${componentId}`"
                 :maxlength="capabilityNameHasChanged ? MAX_CAPABILITY_LENGTH : undefined"
                 :placeholder="`${locale.rubricGroup.proper()} name`"
