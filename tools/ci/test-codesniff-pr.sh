@@ -53,13 +53,7 @@ else
 fi
 
 echo "Gather changed files"
-chmod 777 .git/resource/metadata.json ##We need a peak at the metadata for the test.
-BASESHA=$(cat .git/resource/metadata.json | jq -r ' .[] | select(.name=="base_sha") | .value')
-
-echo "Base sha = $BASESHA"
-
-# Exclude deleted files and non-PHP files from the list of files to check
-CHANGED_FILES=$(git diff "$BASESHA" --name-only --diff-filter=d | grep .php\$)
+CHANGED_FILES=$(git diff HEAD origin/$BASE_BRANCH --name-only --diff-filter=d | grep .php\$)
 if [[ -z $CHANGED_FILES ]]; then
         echo "No PHP files changed: skipping PHPCS check";
         exit 0;
