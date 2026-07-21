@@ -24,7 +24,11 @@ use Schoolbox\Test\MockConnector;
 class MapperTest extends TestCase
 {
     /**
-     * @param class-string<IAssessable> $assessmentClass
+     * Tests that assessment rubric mark lookups exclude soft-deleted rubric instances.
+     *
+     * @param class-string<IAssessable> $assessmentClass     The assessment class to test.
+     * @param string                    $assessmentReference The assessment ID column used by the query.
+     * @return void
      */
     #[DataProvider('assessmentProvider')]
     public function testFindMarkedByAssessmentIgnoresMarksForDeletedRubricInstances(
@@ -59,6 +63,8 @@ class MapperTest extends TestCase
     }
 
     /**
+     * Provides supported assessment classes and their corresponding SQL assessment references.
+     *
      * @return array<string, array{class-string<IAssessable>, string}>
      */
     public static function assessmentProvider(): array
