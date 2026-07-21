@@ -65,12 +65,12 @@ class Import implements IStrategy
         try {
             $response = $this->httpClient->get(self::RESULTS_PATH, $query);
         } catch (\RuntimeException $e) {
-            $this->log->warning(sprintf('Failed to contact SOCS fixtures endpoint: %s', $e->getMessage()));
+            $this->log->warning(sprintf('Failed to contact SOCS fixtures endpoint: %s Error: %s', self::RESULTS_PATH, $e->getMessage()));
             if ($e->getPrevious()) {
                 $this->log->debug(sprintf('Previous: %s', $e->getPrevious()->getMessage()));
                 $this->log->debug($e->getPrevious()->getTraceAsString());
             }
-            return;
+            throw $e;
         }
 
         $imported = 0;
