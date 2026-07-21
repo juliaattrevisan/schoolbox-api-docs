@@ -1493,9 +1493,12 @@ class DataSource
             return;
         }
 
+        // Only copy marks linked to rubric instances that are still active on the assessment.
+        $activeRubricInstanceIds = $sourceFeedback->getAssessable()->getRubricInstances()?->getPropertyValues('id') ?? [];
         $sourceDescriptorMarks = $this->indicatorMarkMapper->findByColumnList([
             'cm.feedback_id' => $sourceId,
             'cm.feedback_table' => $sourceTable,
+            'cm.rubric_instance_id' => $activeRubricInstanceIds,
         ]);
 
         $destinationCapabilityMarks = $this->capabilityMarkMapper->createCollection();
