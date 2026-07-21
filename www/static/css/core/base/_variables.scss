@@ -11,9 +11,9 @@ $navigation-foreground: var(--sbx-config-color-menu-foreground, var(--navigation
 $navigation-background: var(--sbx-config-color-menu-background, var(--navigation-background)) !default;
 $navigation-hover: var(--sbx-config-color-menu-hover, var(--navigation-hover)) !default;
 
-$off-canvas-foreground: var(--sbx-config-color-menu-background, var(--off-canvas-foreground)) !default;
-$off-canvas-background: var(--sbx-config-color-menu-foreground, var(--off-canvas-background)) !default;
-$off-canvas-hover: var(--sbx-config-color-menu-hover, var(--off-canvas-hover)) !default;
+$off-canvas-foreground: var(--sbx-color-text-primary, var(--off-canvas-foreground)) !default;
+$off-canvas-background: var(--sbx-color-foreground-primary, var(--off-canvas-background)) !default;
+$off-canvas-hover: var(--sbx-config-color-active, var(--off-canvas-hover)) !default;
 
 $content-ui-foreground: var(--sbx-config-color-accent, var(--content-ui-foreground)) !default;
 $content-ui-background: var(--sbx-config-color-active, var(--content-ui-background)) !default;
