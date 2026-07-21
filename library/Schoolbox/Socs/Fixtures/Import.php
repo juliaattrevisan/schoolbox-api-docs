@@ -166,6 +166,8 @@ class Import implements IStrategy
                 ->setVenue($venue)
                 ->setName($teamName)
                 ->setStartAt($startAt)
+                ->setFinishAt($startAt) // currently we don't have an official 'end datetime' for socs, but we need a finish for this to show in the calendar.
+                // There is `enddatefull` undocumented in the payload we get from socs, but I won't use it just yet
                 ->setNotes($details)
                 ->setHomeTeam($team)
                 ->setAwayTeam(null)
