@@ -1253,12 +1253,14 @@ class DataSource
             return false;
         }
 
-        // Determine if there's valid capability marks for this participant.
+        // Determine if there's valid capability marks for this participant linked to a non-soft-deleted rubric instance.
         // Don't need to check descriptor marks separately, because they cannot
         // exist without capability marks.
-        $validCapMarkCount = $this->indicatorMarkMapper->countByColumnList([
-            'cm.feedback_id' => $feedbackIds,
+        // Note 'ri.deleted_at' will be defined because the query is constructed using $this->capabilityMarkMapper->getFromString().
+        $validCapMarkCount = $this->capabilityMarkMapper->countByColumnList([
+            'feedback_id' => $feedbackIds,
             'valid' => true,
+            'ri.deleted_at' => null,
         ]);
 
         return $validCapMarkCount > 0;
