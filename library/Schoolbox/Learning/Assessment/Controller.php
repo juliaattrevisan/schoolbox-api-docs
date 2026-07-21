@@ -645,7 +645,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                     /* Obtain the levels, caps/ind/desc data for a given rubric instance, compiling them into a struct that you
                      * can render in the vue component in the frontend
                      */
-                    $rubricGrid = $this->rubricMapper->retrieveOneGrid($assessment, $rubricInstance, true);
+                    $rubricGrid = $this->rubricMapper->retrieveOneGrid($assessment, $rubricInstance, true, true);
 
                     /* Arbitrarily supply two placeholder levels if the grid never had any, such as when you're making a whole
                      * new grid from scratch for the first time. This prompts users to fill them in. This is the only place
