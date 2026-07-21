@@ -1493,7 +1493,8 @@ class DataSource
             return;
         }
 
-        // Only copy marks linked to rubric instances that are still active on the assessment.
+        // Only copy marks linked to non-deleted rubric instances.
+        // Note 'ri.deleted_at' will be defined because the query is constructed using $this->capabilityMarkMapper->getFromString().
         $activeRubricInstanceIds = $sourceFeedback->getAssessable()->getRubricInstances()?->getPropertyValues('id') ?? [];
         $sourceDescriptorMarks = $this->indicatorMarkMapper->findByColumnList([
             'cm.feedback_id' => $sourceId,
