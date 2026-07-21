@@ -181,6 +181,8 @@ class Controller extends Web\Controller\Base
      */
     public function postProcess(): void
     {
+        $this->extendExecutionTime(15 * 60);
+
         $post         = $this->requestPost;
         $errors       = [];
         $responseJson = ['success' => false];
