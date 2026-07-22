@@ -130,12 +130,12 @@ class Controller extends Base
      * There are currently three options: campus, residentialHouse, none
      * Also represent those as an iterable
      */
-    private const IDENTIFIER_NONE = 'none';
-    private const IDENTIFIER_CAMPUS = 'campus';
-    private const IDENTIFIER_RESIDENTIAL_HOUSE = 'residentialHouse';
-    private const IDENTIFIER_ROLE = 'role';
+    private const string IDENTIFIER_NONE = 'none';
+    private const string IDENTIFIER_CAMPUS = 'campus';
+    private const string IDENTIFIER_RESIDENTIAL_HOUSE = 'residentialHouse';
+    private const string IDENTIFIER_ROLE = 'role';
 
-    private const IDENTIFIERS = [
+    private const array IDENTIFIERS = [
         'none' => self::IDENTIFIER_NONE,
         'campus' => self::IDENTIFIER_CAMPUS,
         'residentialHouse' => self::IDENTIFIER_RESIDENTIAL_HOUSE,
@@ -145,7 +145,7 @@ class Controller extends Base
     /**
      * Access Levels
      */
-    private const ACCESS_LEVELS = [
+    private const array ACCESS_LEVELS = [
         'read' => UserAccess::ACCESS_READ,
         'write' => UserAccess::ACCESS_WRITE,
         'moderate' => UserAccess::ACCESS_FULL
@@ -156,7 +156,7 @@ class Controller extends Base
      *
      * @var array
      */
-    private const SERVICE_MAPPING = [
+    private const array SERVICE_MAPPING = [
         // Note this list should be sorted by the value of 'name' ascending.
         //
         // Description of fields in each item below:
@@ -1009,6 +1009,9 @@ class Controller extends Base
                 ]
             ];
         }
+        /* Sort the services alphabetically by name
+         */
+        sort($services);
         return $services;
     }
 }
