@@ -1,10 +1,7 @@
 <script setup lang="ts">
 /**
  * To display the search input field, accompanied by a search button.
- * As the input can be part of a larger component, the prop isActive is used to
- * add the active styles as the input may not always be active if it is
- * within a larger component. In this instance (header-search.vue), and
- * the search-input is only revealed when the user moves over the input in the header.
+ * The input is only revealed when the user moves over the input in the header.
  */
 
 interface Props {
@@ -151,48 +148,7 @@ function onMouseOut(event: MouseEvent): void {
             @mouseout="onMouseOut"
             @click.prevent="onClicked"
         >
-            <sbx-icon name="search" size="1rem" color="currentColor" />
+            <sbx-icon name="search" />
         </button>
     </div>
 </template>
-
-<style lang="scss">
-.sbx-search-input {
-    display: grid;
-    grid-template-columns: 1fr 4.5rem;
-
-    input[type="text"].sbx-search-input__field {
-        border: 2px solid var(--sbx-config-color-accent, var(--form-border-color));
-        background-color: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
-        color: var(--sbx-color-text-primary, var(--color-text-primary));
-        font-size: var(--base-font-size);
-        height: var(--tabbar-height);
-        padding: var(--base-font-size);
-        margin: 0;
-        line-height: calc(var(--tabbar-height) / 2);
-    }
-
-    &__button {
-        align-items: center;
-        background-color: var(--sbx-config-color-menu-background, var(--content-ui-submit-background));
-        color: var(--navigation-foreground);
-        display: flex;
-        height: var(--tabbar-height);
-        justify-content: center;
-        margin: 0;
-        padding: 0;
-        sbx-icon {
-            display: block;
-            transition: all 0.2s ease-in;
-            color: var(--sbx-config-color-menu-foreground, var(--navigation-foreground));
-        }
-        &:hover,
-        &:focus,
-        &:focus-visible,
-        &:active {
-            background-color: var(--navigation-background);
-            color: var(--navigation-foreground);
-        }
-    }
-}
-</style>

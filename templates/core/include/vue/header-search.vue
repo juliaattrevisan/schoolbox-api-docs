@@ -1,12 +1,12 @@
 <script setup lang="ts">
 /**
  * The search bar that currently appears within the top menu.
- * It is currently used to search for users and prompt a full search,
+ * It is currently used as a quick search and to prompt a full search,
  * providing the option to be redirected to the search page.
  */
 import { debounce } from "es-toolkit";
 import { vOnClickOutside } from "@vueuse/components";
-import SearchInput from "@schoolboxVue/components/search/search-input.vue";
+import HsInput from "./hs-input.vue";
 
 interface MetaContext {
     name: string;
@@ -250,7 +250,7 @@ const searchButtonText = window.Vue.computed(() => {
         action="/search"
         :class="{ focus: isSelected }"
     >
-        <search-input
+        <hs-input
             :is-active-when-empty="false"
             :is-selected="isSelected"
             @input="onInput"
