@@ -43,6 +43,7 @@ use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as RubricDescriptorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper as RubricLevelMapper;
+use Schoolbox\Assessment\Rubric\Instance\Mapper as RubricInstanceMapper;
 use Schoolbox\Learning\Turnitin\Group\Mapper as TurnitinGroupMapper;
 use Schoolbox\Blog;
 use Schoolbox\Collection;
@@ -205,6 +206,9 @@ class RecursiveUndeleter
             Project\Mapper::class,
             Assessment\LessonPlan\Mapper::class,
             \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::class,
+            RubricInstanceMapper::class,
+            // Rubric levels are deleted by due work deletion, but their rubric instances may remain undeleted.
+            RubricLevelMapper::class => 'ri.assessment_id',
         ],
 
         /* Projects. Note that despite being a container of activities, they are also considered an activity.
@@ -219,7 +223,6 @@ class RecursiveUndeleter
         SubmissionBoxMapper::class => [
             SubmissionMapper::class => 'box_id',
             ReturnedWorkMapper::class => 'box_id',
-            RubricLevelMapper::class => 'box_id',
             TurnitinGroupMapper::class => 'submission_box_id',
             Eportfolio\ShowcaseMapper::class,
         ],
@@ -228,6 +231,9 @@ class RecursiveUndeleter
         ],
         ReturnedWorkMapper::class => [
             ReturnedWorkFile\Mapper::class,
+        ],
+        RubricInstanceMapper::class => [
+            RubricLevelMapper::class => 'rubric_instance_id',
         ],
         RubricLevelMapper::class => [
             RubricDescriptorMapper::class => 'rubric_descriptor.level_id',
