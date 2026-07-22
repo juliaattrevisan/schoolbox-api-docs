@@ -127,7 +127,7 @@ class Controller extends Base
 
     /**
      * These identifier consts determine which dropdown to use when choosing the Service Identifier
-     * There are currently three options: campus, residentialHouse, none
+     * There are currently four options: campus, residentialHouse, none, role
      * Also represent those as an iterable
      */
     private const string IDENTIFIER_NONE = 'none';
@@ -1011,7 +1011,7 @@ class Controller extends Base
         }
         /* Sort the services alphabetically by name
          */
-        sort($services);
+        uasort($services, static fn (array $a, array $b): int => strnatcasecmp($a['name'], $b['name']));
         return $services;
     }
 }
