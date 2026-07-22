@@ -1880,7 +1880,21 @@ class MapperProxy
                  * TODO There might be a nicer way to load each grid's construct than one-at-a-time
                  */
                 foreach ($assessment->getRubricInstances() as $rubricInstance) {
-                    $rubricInstance->setGrid($this->rubricMapper->retrieveOneGrid($assessment, $rubricInstance, false));
+                    /* Only refetch from the db if we didn't already know it
+                     *
+                     * This used to just set the result of retrieveOneGrid() arbitrarily. This had a strange effect
+                     * where the fleet's grids wouldn't persist changes (that's because it loads the last-known
+                     * grid from the db, discarding any ui changes) BUT ONLY WHEN External Markbook Sync is turned
+                     * on. A syncToExternalMarkbook() callback uses a $this->dataSource->findOneByColumn() which
+                     * sends you here...except nowhere else do we really use such a method for an asessment instance
+                     * in a way that would have landed you here.
+                     *
+                     * Also, external markbook sync tends to be off in our development environment so discovery by
+                     * accident is pretty slim.
+                     */
+                    if (null === $rubricInstance->getGrid()) {
+                        $rubricInstance->setGrid($this->rubricMapper->retrieveOneGrid($assessment, $rubricInstance, false));
+                    }
                 }
 
                 return $assessment;
