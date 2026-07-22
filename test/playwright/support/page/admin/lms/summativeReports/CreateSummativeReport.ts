@@ -154,7 +154,12 @@ export default class CreateSummativeReport {
      * @param data - The data to fill in
      */
     async fillStudentSelectionField(studentSelection: string, data: string): Promise<void> {
-        await this.page.locator(`input[id="report-${studentSelection}-selectized"]`).click();
+        const field =
+            studentSelection === "students"
+                ? this.page.getByTestId("search-select-report-students-search").getByLabel("Students")
+                : this.page.locator(`input[id="report-${studentSelection}-selectized"]`);
+
+        await field.click();
         await this.page.keyboard.type(data, { delay: 500 });
         await this.page.keyboard.press("Enter");
     }
@@ -164,7 +169,12 @@ export default class CreateSummativeReport {
      * @param studentSelection - The field to delete data from: campuses, year-levels or students
      */
     async deleteStudentSelectionFieldData(studentSelection: string): Promise<void> {
-        await this.page.locator(`input#report-${studentSelection}-selectized`).click();
+        const field =
+            studentSelection === "students"
+                ? this.page.getByTestId("search-select-report-students-search").getByLabel("Students")
+                : this.page.locator(`input#report-${studentSelection}-selectized`);
+
+        await field.click();
         await this.page.keyboard.press("Backspace");
     }
 
