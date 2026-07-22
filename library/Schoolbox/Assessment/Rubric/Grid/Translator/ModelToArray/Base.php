@@ -14,6 +14,7 @@ use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 use Schoolbox\Assessment\Rubric\Grid\Level;
+use Schoolbox\User;
 
 /**
  * Translator for converting a Rubric Grid into an array representation,
@@ -27,10 +28,12 @@ use Schoolbox\Assessment\Rubric\Grid\Level;
 class Base
 {
     /**
-     * @param bool $showPoints the value of config.rubricShowPoints
+     * @param bool $showPoints The value of config.rubricShowPoints.
+     * @param User $viewer The user viewing the rubric.
      */
     public function __construct(
         private bool $showPoints,
+        private User $viewer,
     ) {
     }
 
@@ -113,8 +116,7 @@ class Base
             $value = null;
             if (
                 $descriptor->hasValue() &&
-                $rubricGrid->showDescriptorValue() &&
-                $this->showPoints
+                $rubricGrid->showDescriptorValue($this->viewer, $this->showPoints)
             ) {
                 $value = $rubricGrid->isUseMarkRange() && $descriptor->hasRange()
                     ? [ 'left' => $descriptor->retrieveLeftValue(), 'right' => $descriptor->retrieveRightValue() ]
