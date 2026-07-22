@@ -176,18 +176,23 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function removeFromAssessment(IAssessable $assessment, array $preserve): void
     {
-        $pb = $this->getPredicateBuilder()
-            ->notIn('id', $preserve);
+        $params = ['assessmentId' => $assessment->getId()];
+        $preserveCondition = '';
 
-        $where = $pb->getWhere()[0];
+        if ($preserve) {
+            $pb = $this->getPredicateBuilder()
+                ->notIn('id', $preserve);
+
+            $preserveCondition = "AND {$pb->getWhere()[0]}";
+            $params = array_merge($pb->getParams(), $params);
+        }
 
         $this->getDatabase()->executeQuery("
             UPDATE {$this->getTable()}
             SET deleted_at = NOW()
             WHERE assessment_id = :assessmentId
-            AND {$where}
-        ", array_merge($pb->getParams(), [
-            'assessmentId' => $assessment->getId(),
-        ]));
+            AND deleted_at IS NULL
+            {$preserveCondition}
+        ", $params);
     }
 }

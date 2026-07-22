@@ -482,20 +482,10 @@ class Controller extends BaseController
      */
     public function determineMarkInvalidation(): void
     {
-        /* This $_POST['rubric'] node is a set of json-encoded grid(s), indexed by rubric_instance.id
+        /* This $_POST['rubric'] node is a set of json-encoded grid(s), indexed by rubric_instance.id.
+         * A missing node means the final rubric was deleted, so compare the existing grids with an empty set.
          */
-        $post = $this->requestPost->get('rubric');
-
-        // TODO: no rubric data? always compatible?
-        /* This scenario is  a special circumstance: you can't turn them off anymore, you can only delete rubric grids.
-         * That means you either have no usages or at least 1 usage, and no usages means your previously-rubric-oriented
-         * feedback is mostly irrelevant. I'm not really sure what happens to such feedbacks that used rubric grids, but
-         * said rubric grids are no longer existing. I guess that means it passes validation.
-         */
-        if (null === $post) {
-            $this->response = $this->responseAsJson(ValidGridSet::DEFAULT_RESPONSE)->withStatus(200);
-            return;
-        }
+        $post = $this->requestPost->get('rubric') ?? [];
 
         /* This assessment gets fetched along with all its rubric instances. We inspect each rubric instance to see if
          * the new grid is compatible with the existing, exiting early if -any- of the grids are incompatible.
