@@ -9,17 +9,13 @@
 namespace Schoolbox\Assessment\Rubric;
 
 use Alaress\Json\Decorator\LinkDecorator;
-use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
-use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Learning\Assessment\ISelfAssessable;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\File\Codec\Filename;
-use UnexpectedValueException;
 use Schoolbox\Assessment\Rubric\DataModel\Capability;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
