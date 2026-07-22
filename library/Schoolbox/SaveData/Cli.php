@@ -153,7 +153,7 @@ HELP;
         $backup_name = "dataset-backup-$timestamp.sql";
         $this->mysqlDump($instance_dir, $backup_name);
         $this->maintenanceMode(1);
-        $tempdir = '/tmp/' . INSTANCE_ID . "-dataset";
+        $tempdir = "$instance_dir/dataset-tmp";
         try {
             if (is_dir($tempdir)) {
                 $this->deleteDir($tempdir);
@@ -170,14 +170,17 @@ HELP;
             $this->getLogger()->error($e->getMessage());
             $this->restoreBackup("$instance_dir/$backup_name");
             $this->maintenanceMode(0);
+            $this->deleteDir($tempdir);
             exit(1);
         }
         $this->restoreBackup("$instance_dir/$backup_name");
         $this->maintenanceMode(0);
-        $tarName = "/tmp/{$this->name}";
+        $tarName = "$instance_dir/{$this->name}";
         $this->createTarball($tempdir, $tarName);
+        $this->deleteDir($tempdir);
         if ($this->upload) {
             $this->uploadTarball("$tarName.tar.gz", false);
+            unlink("$tarName.tar.gz");
         }
         foreach ($missingFromS3 as $hash) {
             echo "WARNING: hash $hash exists in storage table but was not found in S3" . PHP_EOL;
