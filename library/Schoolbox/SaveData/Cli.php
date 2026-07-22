@@ -282,8 +282,18 @@ HELP;
     private function restoreBackup(string $backup_path): void
     {
         $this->getLogger()->info("restoring from backup");
-        $sql = file_get_contents($backup_path);
-        $this->getDatabaseInternal()->execute($sql);
+        $cmd = sprintf(
+            "mariadb -h %s -u %s -p%s %s < %s",
+            SQL_host,
+            SQL_user,
+            SQL_passwd,
+            SQL_db,
+            escapeshellarg($backup_path)
+        );
+        exec($cmd, $output, $code);
+        if ($code !== 0) {
+            throw new RuntimeException("restore failed");
+        }
     }
 
     private function createTarball(string $directory, string $name): void
