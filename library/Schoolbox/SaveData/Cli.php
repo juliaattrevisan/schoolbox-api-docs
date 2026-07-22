@@ -9,13 +9,14 @@
 namespace Schoolbox\SaveData;
 
 use Alaress_Date_Format;
+use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
-use Aws\S3\Transfer;
 use Exception;
 use RuntimeException;
 use Schoolbox\Application\CliTool\App;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\FilesystemFactory;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\S3\Migration;
 use Schoolbox\Version\Version;
 
@@ -161,7 +162,7 @@ HELP;
             if ($this->initial) {
                 $this->cleanForInitial();
             }
-            $this->downloadBucket($tempdir);
+            $missingFromS3 = $this->downloadBucket($tempdir);
             $this->clearSecrets();
             $this->makeLocal();
             $this->mysqlDump($tempdir);
@@ -177,6 +178,9 @@ HELP;
         $this->createTarball($tempdir, $tarName);
         if ($this->upload) {
             $this->uploadTarball("$tarName.tar.gz", false);
+        }
+        foreach ($missingFromS3 as $hash) {
+            echo "WARNING: hash $hash exists in storage table but was not found in S3" . PHP_EOL;
         }
     }
 
@@ -370,7 +374,7 @@ HELP;
         $bytes /= 1024 ** $power;
         return round($bytes, 2) . $units[$power];
     }
-    private function downloadBucket(string $dir): void
+    private function downloadBucket(string $dir): array
     {
         $accessKey = $this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_CRED_KEY);
         $secretKey = $this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_CRED_SECRET);
@@ -407,9 +411,34 @@ HELP;
         if ($freeSpace - $bucketSize <= 0) {
             throw new RuntimeException("not enough free space in disk: $freeSpace available, $bucketSize in s3 bucket");
         }
-        $manager = new Transfer($client, "s3://$finalBucket/storage", "$dir/storage");
-        $manager->transfer();
+
+        $query = $this->getDatabaseInternal()->prepareQuery("SELECT hash FROM storage");
+        $query->execute();
+        $hashes = $query->fetchColumnArray('hash');
+
+        $missing = [];
+        foreach ($hashes as $hash) {
+            $relativePath = FilesystemProxy::getPathFromHash($hash);
+            $localPath = "$dir/storage/$relativePath";
+            if (!is_dir(dirname($localPath))) {
+                mkdir(dirname($localPath), 0777, true);
+            }
+            try {
+                $client->getObject([
+                    'Bucket' => $finalBucket,
+                    'Key'    => "storage/$relativePath",
+                    'SaveAs' => $localPath,
+                ]);
+            } catch (S3Exception $e) {
+                if ($e->getAwsErrorCode() === 'NoSuchKey') {
+                    $missing[] = $hash;
+                } else {
+                    throw $e;
+                }
+            }
+        }
         $this->getLogger()->info("files downloaded");
+        return $missing;
     }
     private function getBucketStorage(S3Client $client, string $bucket, string $prefix): float
     {
