@@ -732,11 +732,13 @@ $train-line-unvisited-color: $content-ui-background;
                 &:after {
                     background: var(--sbx-color-foreground-primary, $content-ui-background);
                 }
-                a :is(span, sbx-icon) {
+                a span,
+                a sbx-icon {
                     background: var(--sbx-color-foreground-primary, $content-ui-background);
                 }
             }
-            a :is(span, sbx-icon) {
+            a span,
+            a sbx-icon {
                 box-shadow: 0 0 $train-line-visited-glow-blur var(--sbx-config-color-active, $content-ui-foreground);
                 color: var(--sbx-color-text-primary, $content-ui-foreground-contrast);
             }
@@ -747,30 +749,28 @@ $train-line-unvisited-color: $content-ui-background;
             // Smaller stops that have no icons (Nub)
             // The 0.4 multiplier and offset is empirical - I don't know what the math is
             // to derive it from the stop size or segment width
-            :is(span, sbx-icon) {
+            span,
+            sbx-icon {
                 background: var(--sbx-config-color-active, $content-ui-foreground);
                 border-radius: calc($train-line-stop-size / 2);
                 // DONE use contrasting color
                 color: var(--sbx-color-text-primary, $content-ui-foreground-contrast);
-                height: 0.5 * $train-line-stop-size;
-                left: calc(50% - (#{calc($train-line-stop-size / 2)}) + 0.4rem);
                 padding: calc(($train-line-stop-size - (rem-calc($base-font-size) * 1.5)) / 2)
                     calc(($train-line-stop-size - rem-calc($base-font-size)) / 2);
                 position: absolute;
-                top: -0.4 * (calc(($train-line-stop-size - $train-line-segment-width) / 2));
-                width: 0.5 * $train-line-stop-size;
                 z-index: var(--sbx-depth-default);
                 transition: all 200ms ease-out;
-
-                // You specified an icon for this stop (Knurl)
-                &[class^="icon-"] {
-                    height: $train-line-stop-size;
-                    left: calc(50% - (#{calc($train-line-stop-size / 2)}));
-                    top: -1 * (calc(($train-line-stop-size - $train-line-segment-width) / 2));
-                    width: $train-line-stop-size;
-                }
             }
 
+            span {
+                height: 0.5 * $train-line-stop-size;
+                left: calc(50% - (#{calc($train-line-stop-size / 2)}) + 0.4rem);
+                top: -0.4 * (calc(($train-line-stop-size - $train-line-segment-width) / 2));
+                width: 0.5 * $train-line-stop-size;
+            }
+
+            // You specified an icon for this stop (Knurl)
+            span[class^="icon-"],
             sbx-icon {
                 height: $train-line-stop-size;
                 left: calc(50% - (#{calc($train-line-stop-size / 2)}));
