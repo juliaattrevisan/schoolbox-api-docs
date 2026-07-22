@@ -7,7 +7,7 @@ interface Participant {
     url?: string | null;
 }
 
-defineProps<{
+const props = defineProps<{
     icon: string;
     label: string;
     participants: Participant[];
@@ -15,14 +15,14 @@ defineProps<{
 </script>
 
 <template>
-    <meta-item v-if="participants.length" :icon="icon">
-        {{ label }}:
-        <template v-for="(person, index) in participants" :key="person.id">
+    <meta-item v-if="props.participants.length" :icon="props.icon">
+        {{ props.label }}:
+        <template v-for="(person, index) in props.participants" :key="person.id">
             <template v-if="person.url">
                 <a :href="person.url">{{ person.name }}</a>
             </template>
             <template v-else>{{ person.name }}</template
-            ><span v-if="index !== participants.length - 1">, </span>
+            ><span v-if="index !== props.participants.length - 1">, </span>
         </template>
     </meta-item>
 </template>
