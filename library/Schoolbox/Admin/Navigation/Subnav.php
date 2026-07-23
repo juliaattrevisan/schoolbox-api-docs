@@ -613,7 +613,7 @@ class Subnav
                     ],
                     '/adminv2/zenda' => [
                         'name' => 'Zenda Configuration',
-                        'visible' => true,
+                        'visible' => (bool)$this->configLoader->get(ConfigMapper::NAME_ZENDA_ENABLED),
                         'description' => 'Configure the Zenda integration',
                         'searchable' => true,
                         'children' => []
