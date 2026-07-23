@@ -462,10 +462,10 @@ class Processor
                      */
                     if (null === $participant) {
                         $this->log(sprintf(
-                           'Row %s: no participation record found for student %s (%s); maybe they were deleted',
-                           $i,
-                           $learner->getFullName(),
-                           $externalId,
+                            'Row %s: no participation record found for student %s (%s); maybe they were deleted',
+                            $i,
+                            $learner->getFullName(),
+                            $externalId,
                         ), IStrategy::WARNING);
 
                         $errors++;
