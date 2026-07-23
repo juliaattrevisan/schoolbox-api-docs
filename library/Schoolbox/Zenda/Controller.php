@@ -48,6 +48,14 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
-        new \Alaress_Probe($url);
+        /* Get the url and redirect to it, I guess
+         */
+        if ('' !== trim((string)$url)) {
+            $this->response = $this->redirectFound($url);
+        }
+
+        /* Generic 404 for now I suppose
+         */
+        throw $this->errorMapper->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
     }
 }
