@@ -2,13 +2,13 @@
 
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2025, Schoolbox Pty Ltd
+ * @copyright   Copyright 2026, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\OpenAI;
+namespace Schoolbox\Admin\Zenda;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
@@ -23,7 +23,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    protected $basename = 'adminOpenAi';
+    protected $basename = 'adminZenda';
 
 
     /**

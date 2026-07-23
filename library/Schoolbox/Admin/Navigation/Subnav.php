@@ -611,6 +611,13 @@ class Subnav
                         'searchable' => true,
                         'children' => []
                     ],
+                    '/adminv2/zenda' => [
+                        'name' => 'Zenda',
+                        'visible' => true,
+                        'description' => 'Configure the Zenda integration',
+                        'searchable' => true,
+                        'children' => []
+                    ],
                 ],
             ],
             '/adminv2/news' => [
