@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Zenda;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
 class Controller extends Base
@@ -31,11 +32,16 @@ class Controller extends Base
      */
     public function getUrl(): void
     {
-        /* Temporary only to shut up phpstannis
-         * Eventually url derivation via Zenda might throw errors: not sure yet
-         */
-        $temp = $this->errorMapper->createModel();
+        $api = new Api(
+            $this->getConfigLoader()->get(ConfigMapper::NAME_ZENDA_CLIENT_ID),
+            $this->getConfigLoader()->get(ConfigMapper::NAME_ZENDA_CLIENT_SECRET)
+        );
 
-        echo 'url generation goes here';
+        $params = [
+        ];
+
+        $url = $api->retrieve(Api::ENDPOINT_REDIRECT, $params);
+
+        new \Alaress_Probe($url);
     }
 }
