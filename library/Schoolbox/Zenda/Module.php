@@ -58,14 +58,4 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(ErrorMapper::class),
         );
     }
-
-
-    /**
-     * @return Mapper|UserMapper
-     * @throws \InvalidArgumentException If cannot find mapper class
-     */
-    protected function getUserMapper()
-    {
-        return $this->getMapperFactory()->get(UserMapper::class);
-    }
 }
