@@ -153,7 +153,11 @@ export default class CreateSummativeReport {
      * @param studentSelection - The field to fill in: campuses, year-levels or students
      * @param data - The data to fill in
      */
-    async fillStudentSelectionField(studentSelection: string, data: string): Promise<void> {
+    async fillStudentSelectionField(
+        studentSelection: "campuses" | "year-levels" | "students",
+        data: string,
+    ): Promise<void> {
+        // Students now use the search-select component, while campuses and year levels still use jQuery Selectize.
         const field =
             studentSelection === "students"
                 ? this.page.getByTestId("search-select-report-students-search").getByLabel("Students")
@@ -168,7 +172,10 @@ export default class CreateSummativeReport {
      * delete data from the student selection field
      * @param studentSelection - The field to delete data from: campuses, year-levels or students
      */
-    async deleteStudentSelectionFieldData(studentSelection: string): Promise<void> {
+    async deleteStudentSelectionFieldData(
+        studentSelection: "campuses" | "year-levels" | "students",
+    ): Promise<void> {
+        // Students now use the search-select component, while campuses and year levels still use jQuery Selectize.
         const field =
             studentSelection === "students"
                 ? this.page.getByTestId("search-select-report-students-search").getByLabel("Students")
