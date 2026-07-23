@@ -19,10 +19,12 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper $errorMapper
+     * @param ErrorMapper    $errorMapper
+     * @param \External_User $externalUser
      */
     public function __construct(
         private ErrorMapper $errorMapper,
+        private \External_User $externalUser,
     ) {
     }
 
@@ -32,15 +34,19 @@ class Controller extends Base
      */
     public function getUrl(): void
     {
-        $api = new Api(
-            $this->getConfigLoader()->get(ConfigMapper::NAME_ZENDA_CLIENT_ID),
-            $this->getConfigLoader()->get(ConfigMapper::NAME_ZENDA_CLIENT_SECRET)
-        );
+        $params = (new PayloadGenerator($this->externalUser))->generate($this->getUser());
 
-        $params = [
-        ];
-
-        $url = $api->retrieve(Api::ENDPOINT_REDIRECT, $params);
+        try {
+            $url = (new Api(
+                $this->getConfigLoader()->get(ConfigMapper::NAME_ZENDA_CLIENT_ID),
+                $this->getConfigLoader()->get(ConfigMapper::NAME_ZENDA_CLIENT_SECRET)
+            ))->retrieve(Api::ENDPOINT_REDIRECT, $params);
+        } catch (\DomainException $e) {
+            /* Could not determine identifier in payload: there wasn't a meaningful email/phone value
+             * for this user; throw an arbitrary error for now
+             */
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+        }
 
         new \Alaress_Probe($url);
     }
