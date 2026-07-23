@@ -31,6 +31,11 @@ class Controller extends Base
      */
     public function getUrl(): void
     {
+        /* Temporary only to shut up phpstannis
+         * Eventually url derivation via Zenda might throw errors: not sure yet
+         */
+        $temp = $this->errorMapper->createModel();
+
         echo 'url generation goes here';
     }
 }
