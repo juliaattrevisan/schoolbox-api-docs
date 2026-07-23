@@ -12,5 +12,6 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
+        {% include '@settings/moduleConfig.twig' with configContext only %}
     </div>
 </div>

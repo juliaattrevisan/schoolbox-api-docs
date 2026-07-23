@@ -53,6 +53,7 @@ class ConfigMapper extends Mapper
     public const string MODULE_AI_SERVICES = 'ai-services';
     public const string MODULE_DIFFERENTIATION_PROFILES = 'differentiation-profiles';
     public const string MODULE_IB = 'ib';
+    public const string MODULE_ZENDA = 'zenda';
 
     // IB config name constants
     public const string NAME_IB_ENABLED     = 'ib_enabled';
