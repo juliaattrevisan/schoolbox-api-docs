@@ -466,7 +466,7 @@ class Processor
                            $i,
                            $learner->getFullName(),
                            $externalId,
-                       ), IStrategy::WARNING);
+                        ), IStrategy::WARNING);
 
                         $errors++;
 
