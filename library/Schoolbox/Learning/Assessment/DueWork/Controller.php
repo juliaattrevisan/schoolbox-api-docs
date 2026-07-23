@@ -784,7 +784,7 @@ class Controller extends Assessment\Controller
             '%s%s',
             /* Maybe we set the Show Drafts option
              */
-            $showDrafts ? 'Draft -' : '',
+            $showDrafts ? 'Draft - ' : '',
             $assessment->getTitle()
         ), 'csv');
 
