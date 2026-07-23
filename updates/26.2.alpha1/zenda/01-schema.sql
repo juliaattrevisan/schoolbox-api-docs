@@ -44,7 +44,7 @@ VALUES (
         WHERE type = 'Modules'
     ),
     'true',
-    'false',
+    'true',
     'false',
     'settings',
     (
