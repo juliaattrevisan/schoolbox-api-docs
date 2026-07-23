@@ -12,6 +12,14 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
+        <div class="small-12 columns">
+            <div class="actions-small-1">
+                <div class="list-item">
+                    <h2 class="subheader">Zenda Configuration</h2>
+                </div>
+            </div>
+        </div>
+
         {% include '@settings/moduleConfig.twig' with configContext only %}
     </div>
 </div>

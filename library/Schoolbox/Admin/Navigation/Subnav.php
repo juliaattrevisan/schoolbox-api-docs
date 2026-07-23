@@ -612,7 +612,7 @@ class Subnav
                         'children' => []
                     ],
                     '/adminv2/zenda' => [
-                        'name' => 'Zenda',
+                        'name' => 'Zenda Configuration',
                         'visible' => true,
                         'description' => 'Configure the Zenda integration',
                         'searchable' => true,
