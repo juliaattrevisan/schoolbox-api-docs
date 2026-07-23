@@ -17,6 +17,7 @@ VALUES
 -- Add a Zenda feature flag
 INSERT INTO config (
     `name`,
+    `value`,
     `title`,
     `description`,
     `field_id`,
@@ -29,6 +30,7 @@ INSERT INTO config (
 )
 VALUES (
     'zenda_enabled',
+    1,
     'Enable Zenda',
     "If toggled to 'ON', the Zenda integration will be enabled. If toggled to 'OFF', it will be disabled for all users.",
     (
@@ -56,6 +58,7 @@ VALUES (
 INSERT INTO
     config (
     `name`,
+    `value`,
     `title`,
     `description`,
     `field_id`,
@@ -69,6 +72,7 @@ INSERT INTO
 VALUES
     (
         'zenda_active',
+        1,
         'Activate Zenda',
         '',
         (
@@ -93,6 +97,7 @@ VALUES
     ),
     (
         'zenda_client_id',
+        '',
         'Zenda Client ID',
         '',
         (
@@ -117,6 +122,7 @@ VALUES
     ),
     (
         'zenda_client_secret',
+        '',
         'Zenda Client Secret',
         '',
         (
