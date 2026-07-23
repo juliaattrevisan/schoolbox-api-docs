@@ -783,7 +783,7 @@ class Controller extends Assessment\Controller
             ->withHeader('Cache-Control', ' ')
             ->withHeader('Content-Type', 'text/csv')
             ->withHeader('Content-Length', strlen($contents))
-            ->withHeader('Content-Disposition', "attachment; filename=\"{$filename}.csv\"");
+            ->withHeader('Content-Disposition', "attachment; filename=\"{$filename}\"");
     }
 
 
