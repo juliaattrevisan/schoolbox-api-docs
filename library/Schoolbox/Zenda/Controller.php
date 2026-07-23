@@ -48,14 +48,14 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
-        /* Get the url and redirect to it, I guess
-         */
-        if ('' !== trim((string)$url)) {
-            $this->response = $this->redirectFound($url);
-        }
-
         /* Generic 404 for now I suppose
          */
-        throw $this->errorMapper->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        if ('' === trim((string)$url)) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        /* Get the url and redirect to it, I guess
+         */
+        $this->response = $this->redirectFound($url);
     }
 }

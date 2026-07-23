@@ -74,7 +74,7 @@ class PayloadGenerator
 
         /* No emails? Try phone numbers
          */
-        if (null === $val) {
+        if ('' === $val) {
             $identifier = self::IDENTIFIER_PHONE;
 
             $val = (new FirstMeaningfulValue())->find([
@@ -85,7 +85,7 @@ class PayloadGenerator
 
             /* Couldn't find either: I guess this is a misconfiguration somewhere in the sis, but we can't continue
              */
-            if (null === $val) {
+            if ('' === $val) {
                 throw new \RuntimeException('Indeterminate zenda identifier');
             }
         }
