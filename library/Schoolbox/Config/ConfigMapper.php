@@ -726,6 +726,7 @@ class ConfigMapper extends Mapper
                 self::MODULE_AI_SERVICES,
                 self::MODULE_DIFFERENTIATION_PROFILES,
                 self::MODULE_IB,
+                self::MODULE_ZENDA,
             ]
         );
         $this->joins(self::COL_TYPE, Type\Mapper::class, 'id', self::TYPE_MODEL, null, 'type', 'type');

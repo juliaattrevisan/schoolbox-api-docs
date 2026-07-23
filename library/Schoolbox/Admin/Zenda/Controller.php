@@ -46,6 +46,21 @@ class Controller extends ConfigController
     {
         $postData = $this->requestPost->getArrayCopy();
 
+        /* This is a generally not-recommended way to do this, but the evolution of Zenda is yet to be determined.
+         * This will suffice for the time being until we know more about the configuration requirements for Cognita
+         */
+        $configs = $this->getConfigMapper()->findByColumn('module', ConfigMapper::MODULE_ZENDA);
+
+        foreach ($configs as $config) {
+            if (isset($postData[$config->getName()])) {
+                /* If this config var was in the post payload, update it
+                 */
+                $config->setValue($postData[$config->getName()]);
+
+                $this->getConfigMapper()->save($config);
+            }
+        }
+
         /* Go back to the place from whence you came
          */
         $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminZenda.getIndex'));
