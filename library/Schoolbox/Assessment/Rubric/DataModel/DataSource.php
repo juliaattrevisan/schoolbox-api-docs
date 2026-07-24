@@ -1425,7 +1425,6 @@ class DataSource
             $indicatorSequence = 0;
 
             foreach ($capability['indicators'] as $indicator) {
-
                 // Likewise if $indicatorObject is null here, that's a problem
                 $indicatorObject = $capabilityObject->retrieveIndicatorByName($indicator['name']);
 
