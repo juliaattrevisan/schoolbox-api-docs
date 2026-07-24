@@ -114,7 +114,7 @@ async function createCapabilityOrIndicator<TType extends "capability" | "indicat
     capability: TType extends "indicator" ? RubricGridCapability : null,
     nameRef: Ref<string, string>,
 ): Promise<void> {
-    const name = nameRef.value.trim();
+    const name = nameRef.value;
     if (name.length === 0 || isCreating.value) {
         return; // prevent blank and double-fire from keydown / blur
     }
@@ -354,7 +354,7 @@ window.Vue.onMounted(() => {
                     <!-- Add a new group -->
                     <th :colspan="totalColumns">
                         <textarea
-                            v-model.trim="newCapabilityName"
+                            v-model="newCapabilityName"
                             :placeholder="`+ Type to add new ${locale.rubricGroup.singular()}`"
                             :maxlength="MAX_CAPABILITY_LENGTH"
                             :disabled="isCreating || undefined"

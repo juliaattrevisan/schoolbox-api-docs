@@ -180,7 +180,7 @@ window.Vue.onMounted(() => {
             <textarea
                 v-else
                 :id="`rb-capability-name-textarea-${componentId}`"
-                v-model.trim.lazy="capabilityName"
+                v-model.lazy="capabilityName"
                 :name="`rb-capability-name-textarea-${componentId}`"
                 :maxlength="capabilityNameHasChanged ? MAX_CAPABILITY_LENGTH : undefined"
                 :placeholder="`${locale.rubricGroup.proper()} name`"
@@ -208,7 +208,7 @@ window.Vue.onMounted(() => {
         <!-- Add a new indicator (criterion) -->
         <th :colspan="totalColumns - 1 /* subtract the capability column */">
             <textarea
-                v-model.trim="newIndicatorName"
+                v-model="newIndicatorName"
                 :placeholder="`+ Type to add new ${locale.rubricCriterion.singular()} ${capabilityName ? `to ${capabilityName}` : ''}`"
                 :maxlength="MAX_INDICATOR_LENGTH"
                 :disabled="isCreating || undefined"

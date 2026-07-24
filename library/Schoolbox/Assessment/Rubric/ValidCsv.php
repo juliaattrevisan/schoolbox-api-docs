@@ -139,14 +139,18 @@ class ValidCsv
          */
         if (isset($secondRow[0]) && isset($secondRow[1])) {
             /* A meaningful capability wasn't mentioned
+             * A whitespace-only string is acceptable as some schools don't require both levels to evaluate students, they only need one
              */
-            if ('' === trim((string)$secondRow[0])) {
+            // if ('' === trim((string)$secondRow[0])) {
+            if ('' === (string)$secondRow[0]) {
                 return false;
             }
 
             /* A meaningful indicator wasn't mentioned
+             * A whitespace-only string is acceptable as some schools don't require both levels to evaluate students, they only need one
              */
-            if ('' === trim((string)$secondRow[1])) {
+            // if ('' === trim((string)$secondRow[1])) {
+            if ('' === (string)$secondRow[1]) {
                 return false;
             }
 
@@ -180,8 +184,10 @@ class ValidCsv
                 $cell = $secondRow[$i];
 
                 /* Found a descriptor text somewhere in this row
+                 * A whitespace-only string is acceptable as some schools don't require both levels to evaluate students, they only need one
                  */
-                if ('' !== trim((string)$cell)) {
+                // if ('' !== trim((string)$cell)) {
+                if ('' !== (string)$cell) {
                     return true;
                 }
             }
@@ -197,8 +203,10 @@ class ValidCsv
                     $cell = $thirdRow[$i];
 
                     /* Found a descriptor points somewhere in this row
+                     * A whitespace-only string is acceptable as some schools don't require both levels to evaluate students, they only need one
                      */
-                    if ('' !== trim((string)$cell)) {
+                    // if ('' !== trim((string)$cell)) {
+                    if ('' !== (string)$cell) {
                         return true;
                     }
                 }

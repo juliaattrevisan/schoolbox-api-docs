@@ -150,32 +150,32 @@ Observation,No,staffOnly
                 false
             ],
 
-            'bad capability 1' => [
+            'bad capability (empty)' => [
                 '"capabilityMarkType: none","useMarkRange: Off",,,,,
 "",Engaged,,,,,
 ,,,4,3,2,1',
                 false
             ],
 
-            'bad capability 2' => [
+            'whitespace-only capability' => [
                 '"capabilityMarkType: none","useMarkRange: Off",,,,,
 "         ",Engaged,,,,,
 ,,,4,3,2,1',
-                false
+                true
             ],
 
-            'bad indicator 1' => [
+            'bad indicator (empty)' => [
                 '"capabilityMarkType: none","useMarkRange: Off",,,,,
 "Approaches to Learning","",,,,,
 ,,,4,3,2,1',
                 false
             ],
 
-            'bad indicator 2' => [
+            'whitespace-only indicator' => [
                 '"capabilityMarkType: none","useMarkRange: Off",,,,,
 "Approaches to Learning","                            ",,,,,
 ,,,4,3,2,1',
-                false
+                true
             ],
         ];
     }

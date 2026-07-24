@@ -142,7 +142,7 @@ window.Vue.onMounted(() => {
                 >
                     <textarea
                         :id="`rb-indicator-textarea-${componentId}`"
-                        v-model.trim.lazy="indicatorName"
+                        v-model.lazy="indicatorName"
                         :name="`rb-indicator-textarea-${componentId}`"
                         class="rb-indicator-textarea"
                         :maxlength="indicatorNameHasChanged ? MAX_INDICATOR_LENGTH : undefined"
