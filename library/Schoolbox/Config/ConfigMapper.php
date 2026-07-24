@@ -573,6 +573,7 @@ class ConfigMapper extends Mapper
     public const string NAME_SOCS_MUSIC_LESSONS_NAME = 'socs_music_lessons_name';
     public const string NAME_SOCS_MUSIC_LESSONS_DEFAULT_EVENT_TYPE = 'socs_music_lessons_default_event_type';
     public const string NAME_SOCS_IMPORT_SPORTS_FIXTURES = 'socs_import_sports_fixtures';
+    public const string NAME_SOCS_IMPORT_CO_CURRICULAR = 'socs_import_co_curricular';
 
     /* Zenda
      */
