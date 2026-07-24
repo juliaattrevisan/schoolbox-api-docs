@@ -168,7 +168,7 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * Soft-deletes rubric instances that were associated with $assessment->getId(), but aren't needed anymore.
      * This is effectively the result of a diff between rubric instances we added, modified and deleted.
-     * We remove everything associated with $assessment->getId() that *isn't* in $preserve
+     * We remove everything associated with $assessment->getId() that *isn't* in $rubricInstanceIdsToKeep.
      *
      * @param IAssessable $assessment
      * @param array $rubricInstanceIdsToKeep - A set of rubric_instance.id values that we wanted to keep
