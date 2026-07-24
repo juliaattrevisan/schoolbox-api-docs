@@ -114,7 +114,7 @@ async function createCapabilityOrIndicator<TType extends "capability" | "indicat
     capability: TType extends "indicator" ? RubricGridCapability : null,
     nameRef: Ref<string, string>,
 ): Promise<void> {
-    const name = nameRef.value.trim();
+    const name = nameRef.value;
     if (name.length === 0 || isCreating.value) {
         return; // prevent blank and double-fire from keydown / blur
     }
