@@ -361,7 +361,9 @@ class Factory
         $hohTeacher = null;
 
         if (isset($externalUser['StudentHeadOfHouse']) && (string)$externalUser['StudentHeadOfHouse'] !== '') {
-            if ($externalUser['HeadOfHouseID']) {
+            // Key 'HeadOfHouseID' may not exist because Edumate for example does not include it.
+            // See External\Edumate\User->getStudent().
+            if (!empty($externalUser['HeadOfHouseID'])) {
                 try {
                     $hohTeacher = $this->userMapper->findByExternalId($externalUser['HeadOfHouseID'], Role::STAFF);
                 } catch (MapperException $e) {
