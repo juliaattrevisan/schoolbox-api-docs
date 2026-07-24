@@ -213,6 +213,7 @@ HELP;
             ConfigMapper::NAME_OTFS_S3_ALT_SECRET_KEY => '',
             ConfigMapper::NAME_OTFS_S3_ALT_BUCKET => '',
             ConfigMapper::NAME_OTFS_S3_ALT_REGION => '',
+            ConfigMapper::NAME_CLAMD_HOST => '',
         ];
         $query = "UPDATE config set value = :value where name = :name limit 1;";
         $statement = $this->getDatabaseInternal()->prepareQuery($query);
