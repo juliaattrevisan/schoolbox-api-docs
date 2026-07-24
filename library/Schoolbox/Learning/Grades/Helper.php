@@ -101,20 +101,19 @@ class Helper
         /* Apply work-type / activity-audience visibility for the *viewer*.
          *
          * The set above is bounded to the student's (viewee's) published participations. This pass
-         * additionally applies Visibility::isVisibleToUser for the viewer, so the Grades summary's
+         * additionally applies Grades visibility for the viewer, so the Grades summary's
          * 'view as student/parent' hides activities whose work type excludes that role
-         * (is_visible_to_learners / is_visible_to_parents) - matching the subject report page
-         * (Controller::postReport), which already filters its markbook this way.
+         * (is_visible_to_learners / is_visible_to_parents) while still allowing historical grades
+         * for students who remain assessment participants after class rollover.
          *
          * For a staff viewer this is a no-op: the staff branch of isVisibleToUser returns true for
          * every activity, so real staff and the Summative Report caller are unaffected. showClosed is
          * true to mirror the subject report and preserve the summary's listing of closed-but-published
          * activities.
          */
-        $visibility           = new Visibility($this->access);
         $assessmentsPerFolder = $assessmentsPerFolder
-            ->filter(function (IAssessable $a) use ($visibility, $viewer) {
-                return $visibility->isVisibleToUser($a, $viewer, true);
+            ->filter(function (IAssessable $a) use ($viewer, $viewee) {
+                return $this->isVisibleToGradesViewer($a, $viewer, $viewee, true);
             })
             ->groupByCallback(function (IAssessable $assessment) {
                 return $assessment->getBaseContext()->getFolder()->getId();
@@ -173,11 +172,17 @@ class Helper
      * @param Collection $assessments
      * @param Collection $workTypes
      * @param null|array $activityTypes
+     * @param User|null $viewee Student whose historical participation should be considered for Grades.
      * @return Collection
      * @throws MapperException
      */
-    public function filterAssessments(User $viewer, Collection $assessments, Collection $workTypes, ?array $activityTypes): Collection
-    {
+    public function filterAssessments(
+        User $viewer,
+        Collection $assessments,
+        Collection $workTypes,
+        ?array $activityTypes,
+        ?User $viewee = null
+    ): Collection {
         $visibility                  = new Visibility($this->access);
         $workTypeAssessmentsByFolder = new Collection();
 
@@ -208,7 +213,17 @@ class Helper
                     in_array(get_class($folderAssessment), $allowedActivities) &&
                     $folderAssessment->getWorkType() &&
                     \in_array($folderAssessment->getWorkType()->getId(), $workTypes->getPropertyValues('id'), true) &&
-                    $visibility->isVisibleToUser($folderAssessment, $viewer, true, null, !$this->access->isInstructor($viewer, $folderAssessment->getBaseContext()->getFolder()))
+                    (
+                        $viewee === null
+                            ? $visibility->isVisibleToUser(
+                                $folderAssessment,
+                                $viewer,
+                                true,
+                                null,
+                                !$this->access->isInstructor($viewer, $folderAssessment->getBaseContext()->getFolder())
+                            )
+                            : $this->isVisibleToGradesViewer($folderAssessment, $viewer, $viewee, true)
+                    )
                 ) {
                     $workTypeAssessments->add($folderAssessment);
                 }
@@ -219,6 +234,70 @@ class Helper
         }
 
         return $workTypeAssessmentsByFolder;
+    }
+
+    /**
+     * Returns whether a Grades surface may show an assessment for a student's historical participation.
+     *
+     * Grades can be reached after rollover through recorded assessment interactions even when the student no longer has
+     * READ access to the class folder. This method keeps the shared assessment visibility rules for current access, then
+     * adds a narrow historical path bounded to the selected student's participant record, role audience, publish/close
+     * dates, and feedback visibility.
+     *
+     * @param IAssessable $assessment Assessment being rendered in Grades.
+     * @param User $viewer Effective viewer whose role controls activity and feedback visibility.
+     * @param User $viewee Student whose grade history is being viewed.
+     * @param bool $showClosed Whether closed assessments remain visible.
+     * @param \Alaress_Date_Format|null $now Optional fixed time for tests.
+     * @return bool
+     */
+    public function isVisibleToGradesViewer(
+        IAssessable $assessment,
+        User $viewer,
+        User $viewee,
+        bool $showClosed,
+        ?\Alaress_Date_Format $now = null
+    ): bool {
+        $now = $now ?? \Alaress_Date_Format::now();
+
+        $visibility = new Visibility($this->access);
+        if ($visibility->isVisibleToUser($assessment, $viewer, $showClosed, $now)) {
+            return $assessment->isFeedbackVisibleToUser($viewer);
+        }
+
+        $participant = $assessment->getParticipantIfExtant($viewee);
+        if ($participant === null || !$assessment->isPublished($viewee, $now)) {
+            return false;
+        }
+
+        if ($visibility->isHiddenByLessonPlanVisibility($assessment, $viewee)) {
+            return false;
+        }
+
+        if (!$assessment->isFeedbackVisibleToUser($viewer)) {
+            return false;
+        }
+
+        $workType = $assessment->getWorkType();
+        if ($viewer->getRole()->isStudent()) {
+            if ($viewer->getId() !== $viewee->getId()) {
+                return false;
+            }
+
+            if ($workType !== null && !$workType->isVisibleToLearners()) {
+                return false;
+            }
+        } elseif ($viewer->getRole()->isParent()) {
+            if ($workType === null || !$workType->isVisibleToParents() || !$viewer->isParentOf($viewee)) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+
+        $closeDate = $participant->getCloseDate();
+
+        return $showClosed || $closeDate === null || $now->lt($closeDate);
     }
 
     /**

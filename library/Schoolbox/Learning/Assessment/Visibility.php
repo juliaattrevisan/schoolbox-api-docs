@@ -145,7 +145,7 @@ class Visibility
         }
 
         // Apply special lesson plan visibility logic.
-        if ($this->hideAssessmentDueToLessonPlanVisibility($assessable, $learnerParticipant)) {
+        if ($this->isHiddenByLessonPlanVisibility($assessable, $learnerParticipant)) {
             return false;
         }
 
@@ -199,7 +199,7 @@ class Visibility
 
             // Since the user who is not a learner-participant may still have
             // role type 'student', apply special lesson plan visibility logic.
-            if ($this->hideAssessmentDueToLessonPlanVisibility($assessable, $nonInstructorNonLearnerParticipant)) {
+            if ($this->isHiddenByLessonPlanVisibility($assessable, $nonInstructorNonLearnerParticipant)) {
                 return false;
             }
 
@@ -223,7 +223,7 @@ class Visibility
             foreach ($childLearners as $childLearner) {
                 // Apply special lesson plan visibility logic.
                 // (If lesson plan is hidden from students, it should be hidden from parents also).
-                if ($this->hideAssessmentDueToLessonPlanVisibility($assessable, $childLearner)) {
+                if ($this->isHiddenByLessonPlanVisibility($assessable, $childLearner)) {
                     continue; // Skip student due to special lesson plan visibility logic.
                 }
 
@@ -269,12 +269,16 @@ class Visibility
     }
 
     /**
-     * Lesson Plans have some specific logic for visibility:
-     * - Lesson Plans can be hidden from students via a Visibility switch
-     * If you're a student, hide any lesson plans that were hidden from you
-     * - Lesson Plans that are not hidden from students should be visible to all students
+     * Returns whether the lesson-plan visibility switch hides an assessment from the supplied viewer.
+     *
+     * Grades uses this outside the current folder access path for historical participants, so this predicate is public
+     * to keep the special lesson-plan rule in one place.
+     *
+     * @param IAssessable $assessable Assessment being checked.
+     * @param User $viewer Viewer whose role controls whether student-only lesson-plan hiding applies.
+     * @return bool
      */
-    private function hideAssessmentDueToLessonPlanVisibility(IAssessable $assessable, User $viewer): bool
+    public function isHiddenByLessonPlanVisibility(IAssessable $assessable, User $viewer): bool
     {
         return (
             $assessable instanceof LessonPlan\Model &&
