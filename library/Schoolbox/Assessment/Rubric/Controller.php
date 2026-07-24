@@ -479,8 +479,9 @@ class Controller extends BaseController
     public function determineMarkInvalidation(): void
     {
         /* This $_POST['rubric'] node is a set of json-encoded grid(s), indexed by rubric_instance.id.
-         * A missing node means the final rubric was deleted, so fall back to an empty array in that case.
-         * The empty array will then pass the ValidGridSet->isValid() test below.
+         * A missing node means the user has deleted all rubrics from the form, so fall back to an empty array in that
+         * case.  The empty array still must be passed to ValidGridSet->isValid() so each rubric to be deleted can be
+         * checked, and any participants whose rubric marks will be affected can be identified.
          */
         $postedRubrics = $this->requestPost->get('rubric') ?? [];
 
