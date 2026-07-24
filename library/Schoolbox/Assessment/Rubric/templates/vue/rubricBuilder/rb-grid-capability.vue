@@ -208,7 +208,7 @@ window.Vue.onMounted(() => {
         <!-- Add a new indicator (criterion) -->
         <th :colspan="totalColumns - 1 /* subtract the capability column */">
             <textarea
-                v-model.trim="newIndicatorName"
+                v-model="newIndicatorName"
                 :placeholder="`+ Type to add new ${locale.rubricCriterion.singular()} ${capabilityName ? `to ${capabilityName}` : ''}`"
                 :maxlength="MAX_INDICATOR_LENGTH"
                 :disabled="isCreating || undefined"

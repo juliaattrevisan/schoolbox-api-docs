@@ -354,7 +354,7 @@ window.Vue.onMounted(() => {
                     <!-- Add a new group -->
                     <th :colspan="totalColumns">
                         <textarea
-                            v-model.trim="newCapabilityName"
+                            v-model="newCapabilityName"
                             :placeholder="`+ Type to add new ${locale.rubricGroup.singular()}`"
                             :maxlength="MAX_CAPABILITY_LENGTH"
                             :disabled="isCreating || undefined"
