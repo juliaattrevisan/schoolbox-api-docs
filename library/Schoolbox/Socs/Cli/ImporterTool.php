@@ -68,6 +68,12 @@ class ImporterTool extends CliTool\App
             return;
         }
 
+        /**
+         * Stream filters are independent: an unfiltered run selects every stream,
+         * then saved feature toggles decide which selected streams execute. In
+         * particular, disabled sports fixtures must not prevent co-curricular data
+         * from running when its own toggle is enabled.
+         */
         $sportsEnabled = (bool)$this->getConfig()->get(ConfigMapper::NAME_SOCS_IMPORT_SPORTS_FIXTURES);
         $coCurricularEnabled = (bool)$this->getConfig()->get(ConfigMapper::NAME_SOCS_IMPORT_CO_CURRICULAR);
         $runFixtures = (bool)$this->getOpt(self::OPT_LONG_FIXTURES);

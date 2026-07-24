@@ -189,7 +189,7 @@ class Factory
 
         if ($coCurricular) {
             $coRegistry = new Fixtures\Registry($this->log, $this->perform, $seasonMapper, $sportMapper, $divisionMapper, $teamMapper, $venueMapper, $schoolMapper, CoCurricular\Import::EXTERNAL_PREFIX, CoCurricular\Import::SEASON);
-            $bus->add(new CoCurricular\Import($this->log, $this->perform, $this->lock, new HttpClient($this->coHost ?? $this->host, $this->schoolId, $this->token), new CoCurricular\Parser(), $coRegistry, $matchupMapper, $sportMapper, $seasonMapper, $divisionMapper, $venueMapper, $teamMapper, $teamPlayerMapper, $userMapper, new Person($userMapper)));
+            $bus->add(new CoCurricular\Import($this->log, $this->perform, $this->lock, new HttpClient($this->coHost ?? $this->host, $this->schoolId, $this->token), new CoCurricular\Parser(), $coRegistry, $matchupMapper, $sportMapper, $seasonMapper, $divisionMapper, $venueMapper, $teamMapper, $teamPlayerMapper, $teamCoachMapper, $coachMapper, $userMapper, new Person($userMapper)));
         }
 
         return $bus;

@@ -25,6 +25,8 @@ final class Event
         public readonly DateTimeImmutable $finish,
         public readonly bool $allDay,
         public readonly string $recurringId,
+        /** @var string[] */
+        public readonly array $staffIds,
     ) {
     }
 }

@@ -18,11 +18,13 @@ final class DataSet
      * @param array<string,Club>     $clubsById
      * @param array<string,Event>    $eventsById
      * @param array<string,string[]> $pupilIdsByClubId
+     * @param array<string,string[]> $staffIdsByClubId
      */
     public function __construct(
         public readonly array $clubsById,
         public readonly array $eventsById,
         public readonly array $pupilIdsByClubId,
+        public readonly array $staffIdsByClubId,
     ) {
     }
 }

@@ -43,8 +43,9 @@ final class Parser
         $clubs = $this->parseClubs($clubsXml);
         $events = $this->parseEvents($eventsXml);
         $pupilIdsByClubId = $this->parseRegisters($registersXml, $events);
+        $staffIdsByClubId = $this->parseStaff($events);
 
-        return new DataSet($clubs, $events, $pupilIdsByClubId);
+        return new DataSet($clubs, $events, $pupilIdsByClubId, $staffIdsByClubId);
     }
 
     /**
@@ -129,10 +130,32 @@ final class Parser
                 $finish,
                 $allDay,
                 trim((string)$eventXml->recurringid),
+                array_values(array_filter(array_map('trim', explode(',', (string)$eventXml->staff)), 'strlen')),
             );
         }
 
         return $events;
+    }
+
+    /**
+     * Union staff IDs supplied on event records by ClubID for team coaches.
+     *
+     * @param array<string,Event> $events
+     * @return array<string,string[]>
+     */
+    private function parseStaff(array $events): array
+    {
+        $staffByClubId = [];
+        foreach ($events as $event) {
+            foreach ($event->staffIds as $staffId) {
+                $staffByClubId[$event->clubId][$staffId] = true;
+            }
+        }
+        foreach ($staffByClubId as $clubId => $staffIds) {
+            $staffByClubId[$clubId] = array_keys($staffIds);
+            sort($staffByClubId[$clubId]);
+        }
+        return $staffByClubId;
     }
 
     /**

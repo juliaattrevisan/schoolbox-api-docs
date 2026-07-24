@@ -6,6 +6,7 @@ namespace Schoolbox\Socs\CoCurricular;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\Fixtures\Coach\Mapper as CoachMapper;
+use Schoolbox\Fixtures\Team\Coach\Mapper as TeamCoachMapper;
 use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
 use Schoolbox\Fixtures\Season\Mapper as SeasonMapper;
@@ -46,6 +47,8 @@ final class Import implements IStrategy
         private VenueMapper $venueMapper,
         private TeamMapper $teamMapper,
         private TeamPlayerMapper $teamPlayerMapper,
+        private TeamCoachMapper $teamCoachMapper,
+        private CoachMapper $coachMapper,
         private UserMapper $userMapper,
         private Person $personLookup,
     ) {
@@ -63,7 +66,7 @@ final class Import implements IStrategy
         $this->log->info(sprintf('Downloading SOCS co-curricular feeds from %s to %s', $start, $end));
 
         $clubsXml = $this->httpClient->get(self::PATH, ['data' => 'clubs']);
-        $eventsXml = $this->httpClient->get(self::PATH, ['data' => 'events', 'startdate' => $start, 'enddate' => $end]);
+        $eventsXml = $this->httpClient->get(self::PATH, ['data' => 'events', 'startdate' => $start, 'enddate' => $end, 'staff' => 1]);
         $registersXml = $this->httpClient->get(self::PATH, ['data' => 'registers', 'startdate' => $start, 'enddate' => $end]);
         $data = $this->parser->parse($clubsXml, $eventsXml, $registersXml);
 
@@ -93,7 +96,7 @@ final class Import implements IStrategy
         }
 
         foreach ($data->clubsById as $club) {
-            $this->replaceMembership($teams[$club->id], $data->pupilIdsByClubId[$club->id] ?? []);
+            $this->replaceMembership($teams[$club->id], $data->pupilIdsByClubId[$club->id] ?? [], $data->staffIdsByClubId[$club->id] ?? []);
         }
 
         if ($this->perform) {
@@ -136,10 +139,10 @@ final class Import implements IStrategy
      *
      * @param string[] $pupilIds
      */
-    private function replaceMembership(\Schoolbox\Fixtures\Team\Model $team, array $pupilIds): void
+    private function replaceMembership(\Schoolbox\Fixtures\Team\Model $team, array $pupilIds, array $staffIds): void
     {
         if ($this->perform) {
-            foreach (StaleSql::buildTeamMembershipDeleteQueries($this->teamPlayerMapper->getTable(), 'sportsfixtures_team_coach', (int)$team->getId()) as $query) {
+            foreach (StaleSql::buildTeamMembershipDeleteQueries($this->teamPlayerMapper->getTable(), $this->teamCoachMapper->getTable(), (int)$team->getId()) as $query) {
                 $this->teamPlayerMapper->getDatabase()->query($query);
             }
         }
@@ -155,6 +158,33 @@ final class Import implements IStrategy
                 ->setFirstname($user['firstname'])->setLastname($user['lastname'])->setPreferredName($user['preferred_name']);
             if ($this->perform) {
                 $this->teamPlayerMapper->save($this->teamPlayerMapper->createModel()->setTeam($team)->setUser($userModel)->setSequence($sequence));
+            }
+        }
+
+        foreach ($staffIds as $staffId) {
+            $user = $this->personLookup->fetchUser($staffId);
+            if ($user === null) {
+                $this->log->warning(sprintf('SOCS co-curricular staff %s has no matching Schoolbox user; skipping', $staffId));
+                continue;
+            }
+            $coachName = trim(sprintf('%s %s', $user['preferred_name'] ?: $user['firstname'], $user['lastname']));
+            try {
+                $coach = $this->coachMapper->findOneByColumn('user_id', $user['id']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $userModel = $this->userMapper->createModel()->setId((int)$user['id'])
+                    ->setExternalId($user['external_id'])->setFirstname($user['firstname'])
+                    ->setLastname($user['lastname'])->setPreferredName($user['preferred_name']);
+                $coach = $this->coachMapper->createModel()->setUser($userModel)->setName($coachName);
+                if ($this->perform) {
+                    $this->coachMapper->save($coach);
+                }
+            }
+            try {
+                $this->teamCoachMapper->findOneByColumnList(['team_id' => $team->getId(), 'coach_id' => $coach->getId()]);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                if ($this->perform) {
+                    $this->teamCoachMapper->save($this->teamCoachMapper->createModel()->setTeam($team)->setCoach($coach));
+                }
             }
         }
     }
