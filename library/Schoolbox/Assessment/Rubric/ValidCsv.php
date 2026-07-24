@@ -139,8 +139,7 @@ class ValidCsv
          */
         if (isset($secondRow[0]) && isset($secondRow[1])) {
             /* A meaningful capability wasn't mentioned
-             * A whitespace-only string is acceptable some schools use whitespace-only to add blank cells and avoid
-             * entering capability/indicator/descriptor names.
+             * A whitespace-only string is acceptable as some schools don't require both levels to evaluate students, they only need one
              */
             // if ('' === trim((string)$secondRow[0])) {
             if ('' === (string)$secondRow[0]) {
@@ -148,8 +147,7 @@ class ValidCsv
             }
 
             /* A meaningful indicator wasn't mentioned
-             * A whitespace-only string is acceptable some schools use whitespace-only to add blank cells and avoid
-             * entering capability/indicator/descriptor names.
+             * A whitespace-only string is acceptable as some schools don't require both levels to evaluate students, they only need one
              */
             // if ('' === trim((string)$secondRow[1])) {
             if ('' === (string)$secondRow[1]) {
@@ -186,8 +184,7 @@ class ValidCsv
                 $cell = $secondRow[$i];
 
                 /* Found a descriptor text somewhere in this row
-                 * A whitespace-only string is acceptable some schools use whitespace-only to add blank cells and avoid
-                 * entering capability/indicator/descriptor names.
+                 * A whitespace-only string is acceptable as some schools don't require both levels to evaluate students, they only need one
                  */
                 // if ('' !== trim((string)$cell)) {
                 if ('' !== (string)$cell) {
@@ -206,8 +203,7 @@ class ValidCsv
                     $cell = $thirdRow[$i];
 
                     /* Found a descriptor points somewhere in this row
-                     * A whitespace-only string is acceptable some schools use whitespace-only to add blank cells and avoid
-                     * entering capability/indicator/descriptor names.
+                     * A whitespace-only string is acceptable as some schools don't require both levels to evaluate students, they only need one
                      */
                     // if ('' !== trim((string)$cell)) {
                     if ('' !== (string)$cell) {
