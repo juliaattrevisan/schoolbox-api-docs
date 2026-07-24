@@ -24,6 +24,8 @@ use Interop\Queue\Exception\InvalidMessageException;
 use InvalidArgumentException;
 use LogicException;
 use PDOException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use RangeException;
 use Schoolbox\Application\Exception\Exception;
@@ -642,16 +644,25 @@ class Controller extends Assessment\Controller
      * Shows a rubric overview
      *
      * @param Model $assessment
-     * @throws DomainException
      * @throws MapperException
      * @throws RouteNotFound
-     * @throws UnexpectedValueException
-     * @throws DefinitionException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws \Twig\Error\Error
      * @api   GET /learning/assessments/:assessmentId/overview
      * @since 165
      */
     public function getOverview(IAssessable $assessment): void
     {
+        /* We didn't care to do this check in getOverview() originally: not sure why. It's here now, anyway
+         *
+         * You only get to this point by accessing the url directly for an assessment that never used rubric instances;
+         * even though the ui doesn't provide the link, you still might know of this endpoint
+         */
+        if (!$assessment->getRubricInstances()->count()) {
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_PAGE_NOT_FOUND);
+        }
+
         /* The folder where this assessment lives can be found in the base context instance.
          */
         $folder = $assessment->getBaseContext()->getFolder();
@@ -719,7 +730,6 @@ class Controller extends Assessment\Controller
     public function downloadOverview(IAssessable $assessment): void
     {
         /* We didn't care to do this check in getOverview(), so I wonder why we care here in the csv?
-         * TODO work out why
          */
         if (!$assessment->getRubricInstances()->count()) {
             throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_PAGE_NOT_FOUND);
@@ -774,7 +784,7 @@ class Controller extends Assessment\Controller
             '%s%s',
             /* Maybe we set the Show Drafts option
              */
-            $showDrafts ? 'Draft -' : '',
+            $showDrafts ? 'Draft - ' : '',
             $assessment->getTitle()
         ), 'csv');
 
@@ -783,7 +793,7 @@ class Controller extends Assessment\Controller
             ->withHeader('Cache-Control', ' ')
             ->withHeader('Content-Type', 'text/csv')
             ->withHeader('Content-Length', strlen($contents))
-            ->withHeader('Content-Disposition', "attachment; filename=\"{$filename}.csv\"");
+            ->withHeader('Content-Disposition', "attachment; filename=\"{$filename}\"");
     }
 
 
