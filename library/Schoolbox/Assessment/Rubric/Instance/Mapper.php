@@ -171,19 +171,20 @@ class Mapper extends \Schoolbox\Mapper
      * We remove everything associated with $assessment->getId() that *isn't* in $preserve
      *
      * @param IAssessable $assessment
-     * @param array $preserve A set of rubric_instance.id values that we wanted to keep
+     * @param array $rubricInstanceIdsToKeep - A set of rubric_instance.id values that we wanted to keep
      * @return void
      */
-    public function removeFromAssessment(IAssessable $assessment, array $preserve): void
+    public function removeFromAssessment(IAssessable $assessment, array $rubricInstanceIdsToKeep): void
     {
         $params = ['assessmentId' => $assessment->getId()];
-        $preserveCondition = '';
+        $keepCondition = '';
 
-        if ($preserve) {
+        if (count($rubricInstanceIdsToKeep) > 0) {
+            // Only generate the 'NOT IN (...)' clause if there are rubric instance IDs to keep.
             $pb = $this->getPredicateBuilder()
-                ->notIn('id', $preserve);
+                ->notIn('id', $rubricInstanceIdsToKeep);
 
-            $preserveCondition = "AND {$pb->getWhere()[0]}";
+            $keepCondition = "AND {$pb->getWhere()[0]}";
             $params = array_merge($pb->getParams(), $params);
         }
 
@@ -192,7 +193,7 @@ class Mapper extends \Schoolbox\Mapper
             SET deleted_at = NOW()
             WHERE assessment_id = :assessmentId
             AND deleted_at IS NULL
-            {$preserveCondition}
+            {$keepCondition}
         ", $params);
     }
 }
