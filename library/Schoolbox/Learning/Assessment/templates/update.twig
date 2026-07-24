@@ -30,8 +30,11 @@
          */
         function formWillSubmit() {
             var formData = this;
-            // The rubric builder is only rendered for editable rubric assessments. Check even when no rubric data was
-            // serialized, because that represents deletion of the final rubric and may invalidate existing marks.
+
+            // The Promise below must be run even if formData contains no rubric instances, because that situation
+            // occurs when the user has deleted all rubrics, which will mean any marks using those rubrics should be
+            // invalidated.  That is why we check for the presence of rubric-builder-container here.  That will exist
+            // if the assessment had one or more editable rubrics at the time the form was generated.
             if ($('#rubric-builder-container').length > 0) {
 
                 return new Promise(function(resolve, reject) {
