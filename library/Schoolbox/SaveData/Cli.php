@@ -203,7 +203,16 @@ HELP;
         $this->getLogger()->info("making DB local");
         $configs = [
             ConfigMapper::NAME_OTFS_ADAPTER => FilesystemFactory::FILE_SYSTEM_ADAPTER_LOCAL,
-            ConfigMapper::NAME_DATASET_INSTANCE => 0
+            ConfigMapper::NAME_DATASET_INSTANCE => 0,
+            ConfigMapper::NAME_OTFS_S3_CRED_KEY => '',
+            ConfigMapper::NAME_OTFS_S3_CRED_SECRET => '',
+            ConfigMapper::NAME_OTFS_S3_BUCKET => '',
+            ConfigMapper::NAME_OTFS_S3_REGION => '',
+            ConfigMapper::NAME_OTFS_S3_ALT_HOST => '',
+            ConfigMapper::NAME_OTFS_S3_ALT_ACCESS_KEY => '',
+            ConfigMapper::NAME_OTFS_S3_ALT_SECRET_KEY => '',
+            ConfigMapper::NAME_OTFS_S3_ALT_BUCKET => '',
+            ConfigMapper::NAME_OTFS_S3_ALT_REGION => '',
         ];
         $query = "UPDATE config set value = :value where name = :name limit 1;";
         $statement = $this->getDatabaseInternal()->prepareQuery($query);
