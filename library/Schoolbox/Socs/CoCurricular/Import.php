@@ -121,8 +121,8 @@ final class Import implements IStrategy
         }
         $venue = $this->registry->recallVenue($event->location !== '' ? $event->location : 'Unspecified location');
         $matchup->setDivision($team->getDivision())->setSeason($season)->setVenue($venue)
-            ->setName($event->title)->setStartAt(new \Alaress_Date_Format($event->start->format('Y-m-d H:i:s')))
-            ->setFinishAt(new \Alaress_Date_Format($event->finish->format('Y-m-d H:i:s')))
+            ->setName($event->title)->setStartAt(new \Alaress_Date_Format($event->start->format('Y-m-d H:i:s'), \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setFinishAt(new \Alaress_Date_Format($event->finish->format('Y-m-d H:i:s'), \Alaress_Date_Format::DATABASE_FORMAT))
             ->setNotes($event->recurringId !== '' ? 'SOCS recurring ID: ' . $event->recurringId : '')
             ->setHomeTeam($team)->setAwayTeam(null)->setHomeSchool(null)->setAwaySchool(null)->setExternalId($externalId);
         if ($this->perform) {
