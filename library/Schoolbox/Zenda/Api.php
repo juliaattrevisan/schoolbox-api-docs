@@ -113,12 +113,14 @@ class Api
                 /* Try multiple times in case sis dies for a random reason
                  */
                 while ($fails < self::NUM_RETRY) {
-                    new \Alaress_Probe(sprintf(
-                        'type:%s payload:%s fails:%s',
-                        $type,
-                        json_encode($payload),
-                        $fails
-                    ));
+                    /* Diagnostic to see what it's sending
+                     */
+//                    new \Alaress_Probe(sprintf(
+//                        'type:%s payload:%s fails:%s',
+//                        $type,
+//                        json_encode($payload),
+//                        $fails
+//                    ));
 
                     /* Any exception thrown by guzzle might as well be a reason to nap and retry
                      */
