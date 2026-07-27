@@ -32,7 +32,7 @@ VALUES (
     'zenda_enabled',
     0,
     'Enable Zenda',
-    "If toggled to 'ON', the Zenda integration will be enabled. If toggled to 'OFF', it will be disabled for all users.",
+    "If toggled to 'ON', parents will have access to the Zenda application.",
     (
         SELECT id
         FROM lu_config_field
@@ -73,8 +73,8 @@ VALUES
     (
         'zenda_active',
         0,
-        'Activate Zenda',
-        '',
+        'Enable Zenda Authentication',
+        "If toggled to 'ON', parents will have access to the Zenda application.",
         (
             SELECT id
             FROM lu_config_field
@@ -99,7 +99,7 @@ VALUES
         'zenda_client_id',
         '',
         'Zenda Client ID',
-        '',
+        'Insert the Client ID for Zenda.',
         (
             SELECT id
             FROM lu_config_field
@@ -124,7 +124,7 @@ VALUES
         'zenda_client_secret',
         '',
         'Zenda Client Secret',
-        '',
+        'Insert the Client Secret for Zenda',
         (
             SELECT id
             FROM lu_config_field
