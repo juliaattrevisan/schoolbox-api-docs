@@ -18,6 +18,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Model as CurriculumNode;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\AssessmentType;
@@ -59,6 +60,7 @@ class Controller extends Base
         private AssessmentDataSource $assessmentDataSource,
         private Project\ResultCache\Mapper $projectResultCacheMapper,
         private FeedbackFolders $feedbackFolders,
+        private EditorTemplateHelper $editorTemplateHelper,
     ) {
         /* TODO Technical Uplift Candidate
          *  StateMapper.
@@ -225,6 +227,7 @@ class Controller extends Base
              */
             'supportingDataMarkbook' => $supportingDataMarkbook,
             'supportingDataTree' => $supportingDataTree,
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ], 'Feedback');
     }
 

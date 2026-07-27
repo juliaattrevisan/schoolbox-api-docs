@@ -14,6 +14,9 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Admin\Editor\Templates\Category\Model as EditorTemplatesCategoryModel;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
+use Schoolbox\Editor\Templates\Mapper as EditorTemplateMapper;
 use Schoolbox\Error;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
@@ -174,6 +177,11 @@ class Module extends BaseModule
             $this->injector->get('assessmentDataSource'),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::class),
             $this->getFeedbackFolders(),
+            new EditorTemplateHelper(
+                $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                EditorTemplatesCategoryModel::FEEDBACK,
+                $this->injector->get('user'),
+            ),
         );
     }
 
