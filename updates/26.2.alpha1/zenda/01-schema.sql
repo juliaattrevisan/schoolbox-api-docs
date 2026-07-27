@@ -90,7 +90,7 @@ VALUES
         'false',
         'zenda',
         (
-            SELECT MAX(sequence) + 1
+            SELECT COALESCE(MAX(sequence), 0) + 1
             FROM config c
             WHERE c.module = "zenda"
         )
@@ -115,7 +115,7 @@ VALUES
         'false',
         'zenda',
         (
-            SELECT MAX(sequence) + 1
+            SELECT COALESCE(MAX(sequence), 0) + 1
             FROM config c
             WHERE c.module = "zenda"
         )
@@ -142,7 +142,7 @@ VALUES
         'false',
         'zenda',
         (
-            SELECT MAX(sequence) + 1
+            SELECT COALESCE(MAX(sequence), 0) + 1
             FROM config c
             WHERE
             c.module = "zenda"
