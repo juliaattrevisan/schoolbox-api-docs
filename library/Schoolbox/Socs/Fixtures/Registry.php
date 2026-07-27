@@ -204,6 +204,7 @@ class Registry
     public function recallDivision(string $divisionName, SportModel $sport, SeasonModel $season, ?string $identity = null): DivisionModel
     {
         $externalId = $this->externalIdPrefix . ($identity ?? $divisionName);
+        // Co-curricular divisions use their ClubID identity; standard fixtures need sport/season context to prevent same-named divisions crossing sports.
         $cacheKey = $identity ?? sprintf('%s:%s:%s', spl_object_id($sport), spl_object_id($season), $divisionName);
         if (isset($this->divisions[$cacheKey])) {
             return $this->divisions[$cacheKey];
