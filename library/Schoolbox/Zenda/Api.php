@@ -90,71 +90,68 @@ class Api
     /**
      * Ask zenda for a redirect url
      *
-     * @return mixed|void
-     * @throws \JsonException
+     * @param string $endpoint
+     * @param array  $params
+     * @return array|null
      */
-    public function retrieve(string $endpoint, array $params)
+    public function retrieve(string $endpoint, array $params): ?array
     {
-        $response = null;
-
-        /* Mine out an error message if you try to access a thing that doesn't exist
+        /* Try for each identifier: email first.
+         * For each of the possibilities designated by that identifier: Email, OccupEmail, etc.
+         * Any one of those could succeed (potentially...)
+         *
+         * Then repeat the process for phones.
+         * For each of the possibilities designated by that identifier: work phone, home phone, etc.
+         * Any one of those could succeed (potentially...)
          */
-        $fails = 0;
+        foreach ($params as $type => $payloads) {
+            foreach ($payloads as $payload) {
+                /* Mine out an error message if you try to access a thing that doesn't exist
+                 */
+                $fails = 0;
 
-        /* Try multiple times in case sis dies for a random reason
-         */
-        while ($fails < self::NUM_RETRY) {
-            /* Any exception thrown by guzzle might as well be a reason to nap and retry
-             */
-            try {
-                $response = $this->client->post($endpoint, [
-                    RequestOptions::JSON => $params
-                ]);
-            } catch (\GuzzleHttp\Exception\GuzzleException $e) {
-                $fails++;
-
-                sleep(self::NAP_TIMEOUT);
-
-                continue;
-            }
-
-            /* Successful response from server, but it might not send a valid data payload back
-             * so try to decode it. If it can't decode properly, return null
-             */
-            if ($response->getStatusCode() === 200) {
-                try {
-                    return json_decode(
-                        $response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR
-                    );
-                } catch (\JsonException $e) {
-                    /* Couldn't decode json, or server refused something, or something else died
-                     * noop; just increase the $fails counter
+                /* Try multiple times in case sis dies for a random reason
+                 */
+                while ($fails < self::NUM_RETRY) {
+                    /* Any exception thrown by guzzle might as well be a reason to nap and retry
                      */
+                    try {
+                        $response = $this->client->post($endpoint, [
+                            RequestOptions::JSON => $params
+                        ]);
+                    } catch (\GuzzleHttp\Exception\GuzzleException $e) {
+                        $fails++;
+
+                        sleep(self::NAP_TIMEOUT);
+
+                        continue;
+                    }
+
+                    /* Successful response from server, but it might not send a valid data payload back
+                     * so try to decode it. If it can't decode properly, return null
+                     */
+                    if ($response->getStatusCode() === 200) {
+                        try {
+                            /* Return the first successful doodad we found from Zenda
+                             */
+                            return json_decode(
+                                $response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR
+                            );
+                        } catch (\JsonException $e) {
+                            /* Couldn't decode json, or server refused something, or something else died
+                             * noop; just increase the $fails counter
+                             */
+                        }
+                    }
+
+                    $fails++;
                 }
             }
-
-            $fails++;
         }
 
-        /* We tried multiple times and failed multiple times
-         * This might as well have died
-         */
-        if ($response) {
-            throw new \RuntimeException(
-                sprintf(
-                    'Bad endpoint %s %s: %s %s after %s retries.',
-                    'GET',
-                    $endpoint,
-                    $response->getStatusCode(),
-                    $response->getReasonPhrase(),
-                    self::NUM_RETRY,
-                ),
-                $response->getStatusCode(),
-                $e ?? null
-            );
-        }
-
-        /* Couldn't decode json, or server refused something, or something else died
+        /* You might have retried a LOT of times if you get here.
+         *
+         * Couldn't decode json, or server refused something, or something else died
          * Guzzle repeatedly failed too many times and kept throwing exceptions when $response
          * was being requested, so I guess you ended up here
          */

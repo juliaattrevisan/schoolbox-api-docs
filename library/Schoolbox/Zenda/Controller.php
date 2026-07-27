@@ -49,9 +49,8 @@ class Controller extends Base
              *
              * TODO find out how to reuse this (if we can)
              */
-        } catch (\DomainException $e) {
-            /* Could not determine identifier in payload: there wasn't a meaningful email/phone value
-             * for this user; throw an arbitrary error for now
+        } catch (\LogicException $e) {
+            /* Could not determine identifier in payload: something was chosen as an identifier that we don't support.
              */
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }

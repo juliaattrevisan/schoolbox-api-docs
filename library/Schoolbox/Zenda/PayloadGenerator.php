@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Zenda;
 
 use Schoolbox\External\Connector\FirstMeaningfulValue;
+use Schoolbox\User;
 
 class PayloadGenerator
 {
@@ -52,9 +53,9 @@ class PayloadGenerator
 
 
     /**
-     * Generate a payload
+     * Generate a set of payloads to iteratively try sending to zenda: hopefully one of them succeeds.
      *
-     * @param \Schoolbox\User $user
+     * @param User   $user
      * @return array
      */
     public function generate(\Schoolbox\User $user): array
@@ -63,39 +64,36 @@ class PayloadGenerator
          */
         $parent = $this->externalUser->getParent($user->getExternalId());
 
-        /* First check emails
+        /* Pile in all the possibilities here. It's actually fairly cheap considering we just invested in getParent()
          */
-        $identifier = self::IDENTIFIER_EMAIL;
+        $possibilities = [];
 
-        $val = (new FirstMeaningfulValue())->find([
-            $parent['Email'],
-            $parent['OccupEmail'],
-        ]);
-
-        /* No emails? Try phone numbers
-         */
-        if ('' === $val) {
-            $identifier = self::IDENTIFIER_PHONE;
-
-            $val = (new FirstMeaningfulValue())->find([
+        $data = [
+            self::IDENTIFIER_EMAIL => [
+                $parent['Email'],
+                $parent['OccupEmail'],
+            ],
+            self::IDENTIFIER_PHONE => [
                 $parent['HomePhone'],
                 $parent['MobilePhone'],
                 $parent['WorkPhone'],
-            ]);
-
-            /* Couldn't find either: I guess this is a misconfiguration somewhere in the sis, but we can't continue
-             */
-            if ('' === $val) {
-                throw new \RuntimeException('Indeterminate zenda identifier');
-            }
-        }
+            ]
+        ];
 
         /* Construct the payload using the identifier
          */
-        $params = self::DEFAULT_STRUCT;
+        foreach ($data as $type => $vals) {
+            foreach ($vals as $val) {
+                $params = self::DEFAULT_STRUCT;
 
-        $params['parentDetails'][$identifier] = $val;
+                $params['parentDetails'][$type] = trim((string)$val);
 
-        return $params;
+                /* Add it to the pile of payloads to Potentially Try
+                 */
+                $possibilities[$type][] = $params;
+            }
+        }
+
+        return $possibilities;
     }
 }
