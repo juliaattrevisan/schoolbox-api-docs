@@ -70,7 +70,6 @@ final class Import implements IStrategy
         $registersXml = $this->httpClient->get(self::PATH, ['data' => 'registers', 'startdate' => $start, 'enddate' => $end]);
         $data = $this->parser->parse($clubsXml, $eventsXml, $registersXml);
 
-        $season = $this->registry->recallSeason();
         if ($this->perform) {
             $this->lock->refresh();
             foreach (StaleSql::buildPrepareQueries($this->tables(), self::EXTERNAL_PREFIX, self::SEASON) as $query) {
@@ -78,6 +77,7 @@ final class Import implements IStrategy
             }
         }
 
+        $season = $this->registry->recallSeason();
         $teams = [];
         foreach ($data->clubsById as $club) {
             $identity = 'club:' . $club->id;

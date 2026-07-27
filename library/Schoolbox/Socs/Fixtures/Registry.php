@@ -204,7 +204,7 @@ class Registry
     public function recallDivision(string $divisionName, SportModel $sport, SeasonModel $season, ?string $identity = null): DivisionModel
     {
         $externalId = $this->externalIdPrefix . ($identity ?? $divisionName);
-        $cacheKey = $externalId;
+        $cacheKey = $identity ?? sprintf('%s:%s:%s', spl_object_id($sport), spl_object_id($season), $divisionName);
         if (isset($this->divisions[$cacheKey])) {
             return $this->divisions[$cacheKey];
         }
