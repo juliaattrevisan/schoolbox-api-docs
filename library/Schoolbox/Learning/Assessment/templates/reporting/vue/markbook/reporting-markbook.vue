@@ -25,6 +25,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
+mbStore.init(props.editorTemplates ?? []);
 
 // TODO: implement filters (out of scope for now according to SA-22474's AC)
 // const filters = window.Vue.ref<Record<ReportingFeedbackStatus, boolean>>(
@@ -60,7 +61,6 @@ async function loadData(): Promise<void> {
 }
 
 window.Vue.onMounted(async () => {
-    mbStore.init(props.editorTemplates ?? []);
     await loadData();
 });
 </script>

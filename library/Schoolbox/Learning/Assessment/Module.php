@@ -1166,7 +1166,7 @@ class Module extends BaseModule
                     $unitImplementationMapper,
                     editorTemplateHelper: new EditorTemplateHelper(
                         $this->getMapperFactory()->get(EditorTemplateMapper::class),
-                        EditorTemplatesCategoryModel::LEARNING_ACTIVITY,
+                        EditorTemplatesCategoryModel::FEEDBACK,
                         $this->injector->get('user')
                     )
                 );

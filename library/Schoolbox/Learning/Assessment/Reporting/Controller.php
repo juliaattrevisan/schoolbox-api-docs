@@ -348,6 +348,7 @@ class Controller extends Assessment\Controller
                 ),
                 'assessment' => $assessment,
                 'assessments' => $assessmentsPayload,
+                'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
             ]
         );
     }
