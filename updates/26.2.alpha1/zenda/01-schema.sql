@@ -30,7 +30,7 @@ INSERT INTO config (
 )
 VALUES (
     'zenda_enabled',
-    1,
+    0,
     'Enable Zenda',
     "If toggled to 'ON', the Zenda integration will be enabled. If toggled to 'OFF', it will be disabled for all users.",
     (
@@ -72,7 +72,7 @@ INSERT INTO
 VALUES
     (
         'zenda_active',
-        1,
+        0,
         'Activate Zenda',
         '',
         (
