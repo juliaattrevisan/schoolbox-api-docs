@@ -55,8 +55,9 @@ class Api
      *
      * @param string $clientId
      * @param string $clientSecret
+     * @param string $host
      */
-    public function __construct(private string $clientId, private string $clientSecret)
+    public function __construct(private string $clientId, private string $clientSecret, private string $host)
     {
         /* An authentication token is a special encoding of a concatted set of config vars
          */
@@ -79,9 +80,9 @@ class Api
              * There's a little thing about relative urls here
              */
             /* TODO Find out from zenda where their endpoint actually exists
-             *  We sadly don't know atm
+             *  We sadly don't know atm; double-down on this if/when we know more.
              */
-            'base_uri' => 'https://zenda.com',
+            'base_uri' => trim($this->host),
         ]);
     }
 

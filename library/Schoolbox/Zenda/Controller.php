@@ -40,7 +40,8 @@ class Controller extends Base
         try {
             $url = (new Api(
                 $this->getConfigLoader()->get(ConfigMapper::NAME_ZENDA_CLIENT_ID),
-                $this->getConfigLoader()->get(ConfigMapper::NAME_ZENDA_CLIENT_SECRET)
+                $this->getConfigLoader()->get(ConfigMapper::NAME_ZENDA_CLIENT_SECRET),
+                $this->getConfigLoader()->get(ConfigMapper::NAME_ZENDA_HOST),
             ))->retrieve(Api::ENDPOINT_REDIRECT, $params)['redirectURL'];
         } catch (\DomainException $e) {
             /* Could not determine identifier in payload: there wasn't a meaningful email/phone value

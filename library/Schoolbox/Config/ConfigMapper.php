@@ -580,6 +580,7 @@ class ConfigMapper extends Mapper
     public const string NAME_ZENDA_ACTIVE = 'zenda_active';
     public const string NAME_ZENDA_CLIENT_ID = 'zenda_client_id';
     public const string NAME_ZENDA_CLIENT_SECRET = 'zenda_client_secret';
+    public const string NAME_ZENDA_HOST = 'zenda_host';
 
     // Debug settings
     public const string NAME_DEBUG_MODE = 'debug_mode';

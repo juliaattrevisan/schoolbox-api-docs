@@ -96,6 +96,34 @@ VALUES
         )
     ),
     (
+        'zenda_host',
+        '',
+        'Zenda Host',
+        'Insert the Zenda host url.',
+        (
+            SELECT id
+            FROM lu_config_field
+            WHERE
+                field = 'input'
+        ),
+        (
+            SELECT id
+            FROM lu_config_type
+            WHERE
+                type = 'Zenda'
+        ),
+        'true',
+        'false',
+        'false',
+        'zenda',
+        (
+            SELECT COALESCE(MAX(sequence), 0) + 1
+            FROM config c
+            WHERE
+                c.module = "zenda"
+        )
+    ),
+    (
         'zenda_client_id',
         '',
         'Zenda Client ID',
