@@ -84,6 +84,12 @@ class PayloadGenerator
          */
         foreach ($data as $type => $vals) {
             foreach ($vals as $val) {
+                /* Inspect $val: meaningless ones get skipped
+                 */
+                if ('' === trim((string)$val)) {
+                    continue;
+                }
+
                 $params = self::DEFAULT_STRUCT;
 
                 $params['parentDetails'][$type] = trim((string)$val);
