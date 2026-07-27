@@ -37,25 +37,30 @@ class Controller extends Base
     {
         $params = (new PayloadGenerator($this->externalUser))->generate($this->getUser());
 
+        /* This can throw a DomainException in the case of an Ultimate Failure...but what do we do about that?
+         * I guess we'd need to make an error screen of some kind
+         */
         try {
             $url = (new Api(
                 $this->getConfigLoader()->get(ConfigMapper::NAME_ZENDA_CLIENT_ID),
                 $this->getConfigLoader()->get(ConfigMapper::NAME_ZENDA_CLIENT_SECRET),
                 $this->getConfigLoader()->get(ConfigMapper::NAME_ZENDA_HOST),
             ))->retrieve(Api::ENDPOINT_REDIRECT, $params)['redirectURL'];
-
-            /* They send us an expiryAt too; probably expecting us to continually reuse it until it dies. We aren't
-             * storing and reusing that atm, forcing us to send new requests every time.
-             *
-             * TODO find out how to reuse this (if we can)
+        } catch (\DomainException $e) {
+            /* No url could be found for this user for some reason...Zenda couldn't find anything or we can't connect
+             * to the Zenda itself. Since we retry EVERY POSSIBILITY you might have waited a long time to see this
+             * error screen :/
              */
-        } catch (\LogicException $e) {
-            /* Could not determine identifier in payload: something was chosen as an identifier that we don't support.
-             */
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
-        /* Generic 404 for now I suppose
+        /* They send us an expiryAt too; probably expecting us to continually reuse it until it dies. We aren't
+         * storing and reusing that atm, forcing us to send new requests every time.
+         *
+         * TODO find out how to reuse this (if we can)
+         */
+
+        /* Generic 404 for now I suppose: they didn't send us a meaningful url
          */
         if ('' === trim((string)$url)) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
