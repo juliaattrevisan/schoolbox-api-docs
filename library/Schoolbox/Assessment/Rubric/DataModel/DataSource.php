@@ -1436,7 +1436,7 @@ class DataSource
 
                 /* Assign indicator sequence here, explicitly, instead of inferring
                  */
-                $indicatorUsage = (new IndicatorUsage($indicatorObject))->setSequence($indicatorSequence);
+                $indicatorUsage = (new IndicatorUsage($indicatorObject))->setSequence(++$indicatorSequence);
 
                 foreach ($indicator['descriptors'] as $level => $descriptor) {
                     if ($descriptor !== null) {
