@@ -92,7 +92,7 @@ class Api
      * @return mixed|void
      * @throws \JsonException
      */
-    public function retrieve(string $endpoint, $params)
+    public function retrieve(string $endpoint, array $params)
     {
         $response = null;
 

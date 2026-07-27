@@ -31,6 +31,7 @@ class Controller extends Base
 
     /**
      * Endpoint that will eventually derive a Zenda redirect
+     * @throws \JsonException  When a $params couldn't be encoded, but it's always an array from here; shouldn't happen.
      */
     public function getUrl(): void
     {
@@ -40,7 +41,7 @@ class Controller extends Base
             $url = (new Api(
                 $this->getConfigLoader()->get(ConfigMapper::NAME_ZENDA_CLIENT_ID),
                 $this->getConfigLoader()->get(ConfigMapper::NAME_ZENDA_CLIENT_SECRET)
-            ))->retrieve(Api::ENDPOINT_REDIRECT, $params);
+            ))->retrieve(Api::ENDPOINT_REDIRECT, $params)['redirectURL'];
         } catch (\DomainException $e) {
             /* Could not determine identifier in payload: there wasn't a meaningful email/phone value
              * for this user; throw an arbitrary error for now
