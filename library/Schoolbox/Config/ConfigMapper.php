@@ -650,6 +650,7 @@ class ConfigMapper extends Mapper
         self::NAME_PWA_ENABLED,
         self::NAME_CURRICULUM_COVERAGE_REPORT_ENABLED,
         self::NAME_IB_ENABLED,
+        self::NAME_ZENDA_ENABLED,
     ];
 
     /**
