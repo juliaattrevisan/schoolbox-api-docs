@@ -142,14 +142,12 @@ class Api
         if ($response) {
             throw new \RuntimeException(
                 sprintf(
-                    'Bad endpoint %s %s: %s %s after %s retries. Body: %s. Payload: %s',
+                    'Bad endpoint %s %s: %s %s after %s retries.',
                     'GET',
                     $endpoint,
                     $response->getStatusCode(),
                     $response->getReasonPhrase(),
                     self::NUM_RETRY,
-                    $response->getBody()->getContents(),
-                    json_encode($params, JSON_THROW_ON_ERROR)
                 ),
                 $response->getStatusCode(),
                 $e ?? null
