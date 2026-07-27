@@ -43,6 +43,12 @@ class Controller extends Base
                 $this->getConfigLoader()->get(ConfigMapper::NAME_ZENDA_CLIENT_SECRET),
                 $this->getConfigLoader()->get(ConfigMapper::NAME_ZENDA_HOST),
             ))->retrieve(Api::ENDPOINT_REDIRECT, $params)['redirectURL'];
+
+            /* They send us an expiryAt too; probably expecting us to continually reuse it until it dies. We aren't
+             * storing and reusing that atm, forcing us to send new requests every time.
+             *
+             * TODO find out how to reuse this (if we can)
+             */
         } catch (\DomainException $e) {
             /* Could not determine identifier in payload: there wasn't a meaningful email/phone value
              * for this user; throw an arbitrary error for now
