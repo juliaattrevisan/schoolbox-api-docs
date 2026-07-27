@@ -117,7 +117,7 @@ class Api
                      */
                     try {
                         $response = $this->client->post($endpoint, [
-                            RequestOptions::JSON => $params
+                            RequestOptions::JSON => $payload
                         ]);
                     } catch (\GuzzleHttp\Exception\GuzzleException $e) {
                         $fails++;
