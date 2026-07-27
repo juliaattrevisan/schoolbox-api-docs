@@ -67,7 +67,7 @@ class Api
 
         $this->client = new Client([
             'headers' => [
-                'Authorization' => "Bearer {$accessToken}",
+                'Authorization' => "Basic {$accessToken}",
                 'Content-Type' => 'application/json'
             ],
             'timeout' => self::DEFAULT_TIMEOUT,
@@ -106,7 +106,7 @@ class Api
             /* Any exception thrown by guzzle might as well be a reason to nap and retry
              */
             try {
-                $response = $this->client->get($endpoint, [
+                $response = $this->client->post($endpoint, [
                     RequestOptions::JSON => $params
                 ]);
             } catch (\GuzzleHttp\Exception\GuzzleException $e) {
