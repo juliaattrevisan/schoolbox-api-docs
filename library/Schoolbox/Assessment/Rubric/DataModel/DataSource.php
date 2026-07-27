@@ -1422,7 +1422,7 @@ class DataSource
 
             /* Sequence indicators in situ
              */
-            $indicatorSequence = 0;
+            $indicatorSequence = IndicatorUsageModel::SEQUENCE_BASE;
 
             foreach ($capability['indicators'] as $indicator) {
                 // Likewise if $indicatorObject is null here, that's a problem
@@ -1436,7 +1436,7 @@ class DataSource
 
                 /* Assign indicator sequence here, explicitly, instead of inferring
                  */
-                $indicatorUsage = (new IndicatorUsage($indicatorObject))->setSequence(++$indicatorSequence);
+                $indicatorUsage = (new IndicatorUsage($indicatorObject))->setSequence($indicatorSequence++);
 
                 foreach ($indicator['descriptors'] as $level => $descriptor) {
                     if ($descriptor !== null) {
