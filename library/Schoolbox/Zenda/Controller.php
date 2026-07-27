@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Zenda;
 
 use Alaress\Web\Controller\Base;
+use http\Url;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
@@ -31,7 +32,7 @@ class Controller extends Base
 
     /**
      * Endpoint that will eventually derive a Zenda redirect
-     * @throws \JsonException  When a $params couldn't be encoded, but it's always an array from here; shouldn't happen.
+     * @throws \Exception
      */
     public function getUrl(): void
     {
@@ -54,6 +55,20 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
+        /* Check for bad link formatting
+         */
+        try {
+            $urlFormatter = new \Url($url);
+
+            $urlFormatter->normalise();
+
+            $url = \Scrub::text($urlFormatter->getUrl());
+        } catch (\InvalidArgumentException $e) {
+            /* Invalid link formatting
+             */
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_LINK_FORMAT);
+        }
+
         /* They send us an expiryAt too; probably expecting us to continually reuse it until it dies. We aren't
          * storing and reusing that atm, forcing us to send new requests every time.
          *
@@ -62,7 +77,7 @@ class Controller extends Base
 
         /* Generic 404 for now I suppose: they didn't send us a meaningful url
          */
-        if ('' === trim((string)$url)) {
+        if ('' === trim($url)) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
