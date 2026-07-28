@@ -179,6 +179,7 @@ HELP;
             }
             $missingFromS3 = $this->downloadBucket($tempdir);
             $this->clearSecrets();
+            $this->clearTransforms();
             $this->makeLocal();
             $this->mysqlDump($tempdir);
         } catch (Exception $e) {
@@ -275,8 +276,22 @@ HELP;
         $sql = file_get_contents(SITE_root . "/sql/vagrant-cleanup.sql");
         $this->getDatabaseInternal()->execute($sql);
         $this->getLogger()->info("cleaning transforms");
-        # transform files are named `{hash}-{cacheKey}`, so they are not fetched by the storage hash
-        # download: clear the table entirely rather than leaving rows pointing at absent files
+        $query = "DELETE st FROM storage_transform st LEFT JOIN storage s ON st.hash = s.hash WHERE s.storage_id IS NULL";
+        $this->getDatabaseInternal()->execute($query);
+    }
+
+    /**
+     * Clears image transform metadata from the dataset.
+     *
+     * Transforms are persisted as `<hashed path>-<cache key>`, which the storage hash download does not reach,
+     * so every row would otherwise point at a file absent from the dataset. They are regenerated on demand.
+     *
+     * Cloud mode only: the vagrant path archives the local storage tree, transform files included, and has no
+     * full database restore to undo this on the source instance.
+     */
+    private function clearTransforms(): void
+    {
+        $this->getLogger()->info("clearing transforms");
         $this->getDatabaseInternal()->execute("TRUNCATE storage_transform");
     }
 
