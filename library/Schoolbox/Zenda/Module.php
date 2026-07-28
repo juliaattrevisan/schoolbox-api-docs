@@ -15,9 +15,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Mapper;
 use Schoolbox\Role;
-use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
@@ -56,6 +54,7 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(ErrorMapper::class),
+            new \External_User(),
         );
     }
 }

@@ -32,7 +32,7 @@ VALUES (
     'zenda_enabled',
     0,
     'Enable Zenda',
-    "If toggled to 'ON', parents will have access to the Zenda application.",
+    "If toggled to 'ON', the Zenda integration will be enabled. If toggled to 'OFF', it will be disabled for all users.",
     (
         SELECT id
         FROM lu_config_field
@@ -93,6 +93,34 @@ VALUES
             SELECT COALESCE(MAX(sequence), 0) + 1
             FROM config c
             WHERE c.module = "zenda"
+        )
+    ),
+    (
+        'zenda_host',
+        '',
+        'Zenda Host',
+        'Insert the Zenda host url.',
+        (
+            SELECT id
+            FROM lu_config_field
+            WHERE
+                field = 'input'
+        ),
+        (
+            SELECT id
+            FROM lu_config_type
+            WHERE
+                type = 'Zenda'
+        ),
+        'true',
+        'false',
+        'false',
+        'zenda',
+        (
+            SELECT COALESCE(MAX(sequence), 0) + 1
+            FROM config c
+            WHERE
+                c.module = "zenda"
         )
     ),
     (
