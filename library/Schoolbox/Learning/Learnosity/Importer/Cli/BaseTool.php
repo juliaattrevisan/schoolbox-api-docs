@@ -164,31 +164,51 @@ abstract class BaseTool extends CliTool\App
 
         // Build assessment data source
         $batchSize = $this->getOptAsInt(self::OPT_LONG_BATCH_SIZE, self::DEFAULT_BATCH_SIZE);
-        if ($batchSize === null || $batchSize <= 0) {
+        if ($batchSize === null || $batchSize <= 1) {
             throw new \InvalidArgumentException('Batch size must be a positive integer.');
         }
 
         $this->assessmentDataSource = $this->getDi()->get('assessmentDataSource');
-        $quizzes                    = $this->findQuizzes($batchSize);
 
-        $this->getLogger()->info(sprintf('Found %d quizzes', count($quizzes)));
-        foreach ($quizzes as $quiz) {
-            // Not a quiz somehow? Skip
-            $toolLock->refresh();
-            if (!$quiz instanceof QuizDomainModel) {
-                $this->getLogger()->warning(
-                    sprintf(
-                        'Assessment #%d (%s) is not a quiz: skipping',
-                        $quiz->getTitle(),
-                        $quiz->getId(),
-                    )
+        $cursorId = null;
+        // loop through quizzes till the count of $quizzes is less than the batchSize (we should have gotten them all then)
+        do {
+            $quizzes = $this->findQuizzes(
+                $batchSize, $cursorId
+            );
+
+            $this->getLogger()->info(
+                sprintf(
+                    'Found %d quizzes', count(
+                    $quizzes
+                )
+                )
+            );
+            foreach ($quizzes as $quiz) {
+                // Not a quiz somehow? Skip
+                $toolLock->refresh();
+                if (!$quiz instanceof QuizDomainModel) {
+                    $this->getLogger()->warning(
+                        sprintf(
+                            'Assessment #%d (%s) is not a quiz: skipping',
+                            $quiz->getTitle(),
+                            $quiz->getId(),
+                        )
+                    );
+                    return;
+                }
+
+                /** @noinspection PhpUnhandledExceptionInspection - I want this exception to fall on carpet */
+                $this->processQuiz(
+                    $quiz
                 );
-                return;
+                // remember the last quiz ID so we can pass that through on the next loop
+                $cursorId = $quiz->getId();
             }
-
-            /** @noinspection PhpUnhandledExceptionInspection - I want this exception to fall on carpet */
-            $this->processQuiz($quiz);
-        }
+            // refresh for another loop
+            $toolLock->refresh();
+            // if the count of quizzes is the same as batchSize then we should probably loop
+        } while ($batchSize === $quizzes->count());
 
         $toolLock->release();
         $this->getLogger()->notice($this->perform() ? 'Quizzes modified.' : 'Planning finished.');
@@ -198,10 +218,11 @@ abstract class BaseTool extends CliTool\App
      * Find quizzes which match this tool's targeted quiz status, and which are
      * also within the date span or assessment ID list.
      *
-     * @param int $batchSize
+     * @param int      $batchSize
+     * @param int|null $cursorId
      * @return GenericCollection<IAssessable>
      */
-    private function findQuizzes(int $batchSize): GenericCollection
+    private function findQuizzes(int $batchSize, ?int $cursorId = null): GenericCollection
     {
         $whereParts = [
             "quiz.learnosity_job_status = :learnosityJobStatus
@@ -213,6 +234,15 @@ abstract class BaseTool extends CliTool\App
         $this->getLogger()->info('Filtering quizzes to those which match:');
         $this->getLogger()->info(sprintf('* learnosity_job_status = %s', $params['learnosityJobStatus']));
         $this->getLogger()->info(sprintf('* batch size = %d', $batchSize));
+
+        //if we have a cursorId, we should start the sql assessment.Id from that point, and log it
+        if ($cursorId !== null) {
+            $whereParts[] = 'assessment.id > :cursorId';
+            $params['cursorId'] = $cursorId;
+            $this->getLogger()->info(
+                sprintf('* assessment.id > %d', $params['cursorId']),
+            );
+        }
 
         $fromDate = $this->buildDate($this->getOpt(self::OPT_LONG_FROM));
         if ($fromDate) {
