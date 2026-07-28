@@ -429,25 +429,9 @@ HELP;
         $client = new S3Client($cfg);
         $finalBucket = !empty($s3AltHost) && !empty($s3AltBucket) ? $s3AltBucket : $s3Bucket;
 
-        $bucketSize = $this->getBucketStorage($client, $finalBucket, 'storage/');
-        $bucketSizeFormat = $this->formatBytes($bucketSize);
-        $this->getLogger()->info("downloading bucket ($bucketSizeFormat)");
-        $freeSpace = disk_free_space($dir);
-        if ($freeSpace - $bucketSize <= 0) {
-            throw new RuntimeException("not enough free space in disk: $freeSpace available, $bucketSize in s3 bucket");
-        }
-
         $query = $this->getDatabaseInternal()->prepareQuery("SELECT hash FROM storage");
         $query->execute();
         $hashes = $query->fetchColumnArray('hash');
-
-        $missing = [];
-        foreach ($hashes as $hash) {
-            $relativePath = FilesystemProxy::getPathFromHash($hash);
-            if (!$this->downloadObject($client, $finalBucket, $relativePath, $dir)) {
-                $missing[] = $hash;
-            }
-        }
 
         # Transcoded media is persisted alongside the original as `<hashed path>-<transform>`. Those objects are
         # not reachable from the storage hashes above, and a completed video_queue row is never picked up again by
@@ -456,12 +440,48 @@ HELP;
             "SELECT hash FROM video_queue WHERE status = :status"
         );
         $query->execute(["status" => QueueMapper::STATUS_COMPLETED]);
-        foreach ($query->fetchColumnArray('hash') as $hash) {
+        $transcodedHashes = $query->fetchColumnArray('hash');
+
+        # Size the download from the objects actually wanted: the bucket may hold objects the storage table no
+        # longer references, and totalling those would fail the free space check over files never downloaded.
+        $objectSizes = $this->getBucketStorage($client, $finalBucket, 'storage/');
+
+        # Absence of a storage object is reported, while absence of a transform is not: not every transform
+        # exists for every transcode.
+        $wanted = [];
+        foreach ($hashes as $hash) {
+            $wanted[] = ['path' => FilesystemProxy::getPathFromHash($hash), 'reportIfMissing' => $hash];
+        }
+        foreach ($transcodedHashes as $hash) {
             $relativePath = FilesystemProxy::getPathFromHash($hash);
             foreach (self::VIDEO_TRANSFORMS as $transform) {
-                # Not every transform exists for every transcode, so absences here are expected and ignored.
-                $this->downloadObject($client, $finalBucket, "$relativePath-$transform", $dir);
+                $wanted[] = ['path' => "$relativePath-$transform", 'reportIfMissing' => null];
             }
+        }
+
+        $downloadSize = 0;
+        foreach ($wanted as $object) {
+            $downloadSize += $objectSizes["storage/{$object['path']}"] ?? 0;
+        }
+        $downloadSizeFormat = $this->formatBytes($downloadSize);
+        $this->getLogger()->info("downloading bucket ($downloadSizeFormat)");
+        $freeSpace = disk_free_space($dir);
+        if ($freeSpace - $downloadSize <= 0) {
+            throw new RuntimeException(
+                "not enough free space in disk: $freeSpace available, $downloadSize to download from s3 bucket"
+            );
+        }
+
+        $missing = [];
+        foreach ($wanted as $object) {
+            # Absent keys are known from the listing, so skip the request rather than provoking a NoSuchKey.
+            if (!isset($objectSizes["storage/{$object['path']}"])) {
+                if ($object['reportIfMissing'] !== null) {
+                    $missing[] = $object['reportIfMissing'];
+                }
+                continue;
+            }
+            $this->downloadObject($client, $finalBucket, $object['path'], $dir);
         }
 
         $this->getLogger()->info("files downloaded");
@@ -493,19 +513,24 @@ HELP;
         }
         return true;
     }
-    private function getBucketStorage(S3Client $client, string $bucket, string $prefix): float
+    /**
+     * Lists the objects under a prefix of the bucket.
+     *
+     * @return array<string, int> key: the object key, value: its size in bytes
+     */
+    private function getBucketStorage(S3Client $client, string $bucket, string $prefix): array
     {
-        $size = 0;
+        $sizes = [];
         $objects = $client->getPaginator('ListObjectsV2', [
             'Bucket' => $bucket,
             'Prefix' => $prefix
         ]);
         foreach ($objects as $res) {
-            foreach ($res["Contents"] as $object) {
-                $size += $object['Size'];
+            foreach ($res["Contents"] ?? [] as $object) {
+                $sizes[$object['Key']] = $object['Size'];
             }
         }
 
-        return $size;
+        return $sizes;
     }
 }
