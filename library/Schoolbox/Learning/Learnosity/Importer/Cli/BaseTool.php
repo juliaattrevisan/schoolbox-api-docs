@@ -164,26 +164,19 @@ abstract class BaseTool extends CliTool\App
 
         // Build assessment data source
         $batchSize = $this->getOptAsInt(self::OPT_LONG_BATCH_SIZE, self::DEFAULT_BATCH_SIZE);
-        if ($batchSize === null || $batchSize <= 1) {
+        if ($batchSize === null || $batchSize <= 0) {
             throw new \InvalidArgumentException('Batch size must be a positive integer.');
         }
 
         $this->assessmentDataSource = $this->getDi()->get('assessmentDataSource');
 
-        $cursorId = null;
-        // loop through quizzes till the count of $quizzes is less than the batchSize (we should have gotten them all then)
+        $lastCreatedAt = null;
+        $lastAssessId  = null;
         do {
-            $quizzes = $this->findQuizzes(
-                $batchSize, $cursorId
-            );
+            $result  = $this->findQuizzes($batchSize, $lastCreatedAt, $lastAssessId);
+            $quizzes = $result['quizzes'];
 
-            $this->getLogger()->info(
-                sprintf(
-                    'Found %d quizzes', count(
-                    $quizzes
-                )
-                )
-            );
+            $this->getLogger()->info(sprintf('Found %d quizzes', count($quizzes)));
             foreach ($quizzes as $quiz) {
                 // Not a quiz somehow? Skip
                 $toolLock->refresh();
@@ -202,13 +195,12 @@ abstract class BaseTool extends CliTool\App
                 $this->processQuiz(
                     $quiz
                 );
-                // remember the last quiz ID so we can pass that through on the next loop
-                $cursorId = $quiz->getId();
             }
-            // refresh for another loop
+
+            $lastCreatedAt = $result['lastCreatedAt'];
+            $lastAssessId  = $result['lastAssessId'];
             $toolLock->refresh();
-            // if the count of quizzes is the same as batchSize then we should probably loop
-        } while ($batchSize === $quizzes->count());
+        } while ($quizzes->count() === $batchSize);
 
         $toolLock->release();
         $this->getLogger()->notice($this->perform() ? 'Quizzes modified.' : 'Planning finished.');
@@ -218,12 +210,16 @@ abstract class BaseTool extends CliTool\App
      * Find quizzes which match this tool's targeted quiz status, and which are
      * also within the date span or assessment ID list.
      *
-     * @param int      $batchSize
-     * @param int|null $cursorId
-     * @return GenericCollection<IAssessable>
+     * @param int         $batchSize
+     * @param string|null $lastCreatedAt
+     * @param int|null    $lastAssessId
+     * @return array{quizzes: GenericCollection<IAssessable>, lastCreatedAt: string|null, lastAssessId: int|null}
      */
-    private function findQuizzes(int $batchSize, ?int $cursorId = null): GenericCollection
-    {
+    private function findQuizzes(
+        int $batchSize,
+        ?string $lastCreatedAt = null,
+        ?int $lastAssessId = null,
+    ): array {
         $whereParts = [
             "quiz.learnosity_job_status = :learnosityJobStatus
             AND quiz.deleted_at IS NULL", // assessmentDataSource->findAllByIds($quizIds) only returns quizzes which are not deleted, but we want to filter them out here too so that the log output is accurate
@@ -235,13 +231,23 @@ abstract class BaseTool extends CliTool\App
         $this->getLogger()->info(sprintf('* learnosity_job_status = %s', $params['learnosityJobStatus']));
         $this->getLogger()->info(sprintf('* batch size = %d', $batchSize));
 
-        //if we have a cursorId, we should start the sql assessment.Id from that point, and log it
-        if ($cursorId !== null) {
-            $whereParts[] = 'assessment.id > :cursorId';
-            $params['cursorId'] = $cursorId;
-            $this->getLogger()->info(
-                sprintf('* assessment.id > %d', $params['cursorId']),
-            );
+        if ($lastAssessId !== null) {
+            if ($lastCreatedAt === null) {
+                $whereParts[] = '(
+                    quiz.created_at IS NOT NULL
+                    OR (quiz.created_at IS NULL AND quiz.assess_id > :lastAssessId)
+                )';
+            } else {
+                $whereParts[] = '(
+                    quiz.created_at > :lastCreatedAt
+                    OR (
+                        quiz.created_at = :lastCreatedAt
+                        AND quiz.assess_id > :lastAssessId
+                    )
+                )';
+                $params['lastCreatedAt'] = $lastCreatedAt;
+            }
+            $params['lastAssessId'] = $lastAssessId;
         }
 
         $fromDate = $this->buildDate($this->getOpt(self::OPT_LONG_FROM));
@@ -271,19 +277,26 @@ abstract class BaseTool extends CliTool\App
 
         $quizQuery = $this->getDatabaseInternal()->prepareQuery(
             "
-                SELECT assessment.id
+                SELECT assessment.id, quiz.created_at, quiz.assess_id
                 FROM assess AS quiz
                 INNER JOIN assessment ON quiz.assessment_id = assessment.id
                 WHERE
             " . implode(' AND ', $whereParts) . "
-                ORDER BY quiz.created_at ASC, quiz.assess_id ASC
+                ORDER BY quiz.created_at IS NOT NULL ASC, quiz.created_at ASC, quiz.assess_id ASC
                 LIMIT :batchSize
             ",
             array_merge($params, ['batchSize' => $batchSize])
         );
         $quizQuery->execute();
-        $quizIds = $quizQuery->fetchColumnArray('id');
-        return $this->assessmentDataSource->findAllByIds($quizIds);
+        $rows    = $quizQuery->fetchAll(\PDO::FETCH_ASSOC);
+        $quizIds = array_column($rows, 'id');
+        $lastRow = $rows[array_key_last($rows)] ?? null;
+
+        return [
+            'quizzes'      => $this->assessmentDataSource->findAllByIds($quizIds),
+            'lastCreatedAt' => $lastRow['created_at'] ?? null,
+            'lastAssessId'  => isset($lastRow['assess_id']) ? (int)$lastRow['assess_id'] : null,
+        ];
     }
 
     /**
