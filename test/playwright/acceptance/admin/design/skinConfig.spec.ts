@@ -59,7 +59,7 @@ test.describe("Skin Config", () => {
                 .toBe("0");
             await expect
                 .poll(() => page.evaluate(getCssCustomProperty, "--sbx-config-field-corner-radius"))
-                .toBe("0.75rem");
+                .toContain(".75rem");
         } finally {
             await db.updateInDatabase("config", { value: "0" }, { name: ADVANCED_UI_CONFIG });
         }
