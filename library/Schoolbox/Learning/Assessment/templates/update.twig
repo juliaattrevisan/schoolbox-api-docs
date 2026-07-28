@@ -33,7 +33,7 @@
 
             // Run the check if the assessment had rubrics when the form was generated, even if formData now contains
             // none because the user deleted them all. Any marks using those deleted rubrics may need to be invalidated.
-            if ($('#rubric-builder-container').attr('data-had-rubrics') === 'true') {
+            if (document.getElementById('rubric-builder-container')?.dataset.hadRubrics === 'true') {
 
                 return new Promise(function(resolve, reject) {
 
