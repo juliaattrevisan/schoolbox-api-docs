@@ -671,7 +671,12 @@ class Module extends BaseModule
      */
     protected function preloadCourseClassAssessment(array $params, ?User $student = null): array
     {
-        $assessmentSpec  = $this->preloadAssessmentForStatus($params)['assessment'];
+        /**
+         * Assessment could be the spec (if we came from a course project status page)
+         * or Assessment could be an impl (if we came from a class project status page)
+         * in this case both assessment and assessmentImpl will be identical
+         */
+        $assessment  = $this->preloadAssessmentForStatus($params)['assessment'];
         try {
             $assessmentImpl = $this->getAssessmentMapperProxy()->findById($params['assessmentImplId']);
         } catch (MapperException\Deleted $e) {
@@ -684,11 +689,11 @@ class Module extends BaseModule
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
-        if ($assessmentSpec->isImplementation()) {
-            if ($assessmentSpec->getId() === $assessmentImpl->getId()) {
+        if ($assessment->isImplementation()) {
+            if ($assessment->getId() === $assessmentImpl->getId()) {
                 return [
-                    'assessment' => $assessmentSpec,
-                    'assessmentSpec' => $assessmentSpec,
+                    'assessment' => $assessment,
+                    'assessmentSpec' => $assessment,
                     'assessmentImpl' => $assessmentImpl
                 ];
             }
@@ -697,13 +702,13 @@ class Module extends BaseModule
         }
 
         // check if the class assessment is a child of the course assessment
-        if ($assessmentImpl->getSpecificationAssessment()?->getId() !== $assessmentSpec->getId()) {
+        if ($assessmentImpl->getSpecificationAssessment()?->getId() !== $assessment->getId()) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
         return [
-            'assessment' => $assessmentSpec,
-            'assessmentSpec' => $assessmentSpec,
+            'assessment' => $assessment,
+            'assessmentSpec' => $assessment,
             'assessmentImpl' => $assessmentImpl
         ];
     }
