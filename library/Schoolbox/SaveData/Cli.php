@@ -194,12 +194,21 @@ HELP;
         $tarName = "$instance_dir/{$this->name}";
         $this->createTarball($tempdir, $tarName);
         $this->deleteDir($tempdir);
-        if ($this->upload) {
-            $this->uploadTarball("$tarName.tar.gz", false);
-            unlink("$tarName.tar.gz");
-        }
+        # Reported before any upload: the dataset is incomplete, and uploading publishes it under a name that
+        # may already be in use. uploadTarball() prompts for credentials, so there is a chance to abort.
         foreach ($missingFromS3 as $hash) {
             echo "WARNING: hash $hash exists in storage table but was not found in S3" . PHP_EOL;
+        }
+        if ($this->upload) {
+            if (!empty($missingFromS3)) {
+                echo sprintf(
+                    "WARNING: %d storage files are missing from this dataset, press Ctrl-C to abort the upload"
+                        . PHP_EOL,
+                    count($missingFromS3)
+                );
+            }
+            $this->uploadTarball("$tarName.tar.gz", false);
+            unlink("$tarName.tar.gz");
         }
     }
 
