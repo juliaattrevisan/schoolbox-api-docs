@@ -16,13 +16,10 @@ use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder;
 use Tests\Support\IntegrationTester;
-use Tests\Support\Page\Duework\AssessmentForm;
 use Tests\Support\Payload;
 
 class RubricMarkInvalidationCest
 {
-    private const string FEEDBACK_TABLE = 'submission_return';
-
     /**
      * Logs in as an administrator before each test.
      *
@@ -37,116 +34,70 @@ class RubricMarkInvalidationCest
     }
 
     /**
-     * Tests that an incompatible rubric edit invalidates marks only for the changed rubric instance.
+     * Tests that changing a descriptor value invalidates Reporting Activity rubric marks.
      *
      * @param IntegrationTester $i
      * @return void
      * @throws JsonException
      */
-    public function invalidateMarksOnlyForChangedRubricInstance(IntegrationTester $i): void
+    public function invalidateReportingMarksAfterDescriptorValueChange(IntegrationTester $i): void
     {
         $timestamp = time();
         $folder = $this->createHomepage($i, "Testing rubric mark invalidation at $timestamp");
-        $assessment = $this->createAssessment(
+        $markTypeId = (int)$i->grabFromDatabase(
+            'submission_mark_type',
+            'mark_type_id',
+            ['slug' => MarkType::SLUG_PERCENT],
+        );
+        $assessment = $this->createReportingActivity(
             $i,
             $folder,
-            "Testing rubric instance mark invalidation at $timestamp",
+            "Testing reporting rubric mark invalidation at $timestamp",
+            $markTypeId,
         );
-
         $admin = $i->grabUser('alaress');
         $student = $i->grabUser('jreed');
-        $submissionBoxId = (int)$i->grabFromDatabase(
-            'submission_box',
+        $reportingId = (int)$i->grabFromDatabase(
+            'reporting',
             'id',
             ['assessment_id' => $assessment->getId()],
         );
         $date = date('Y-m-d H:i:s');
-        $feedbackId = $i->haveInDatabase('submission_return', [
-            'box_id' => $submissionBoxId,
-            'marker' => $admin->getId(),
-            'owner' => $student->getId(),
-            'review_route' => 'instructor',
-            'created_at' => $date,
-            'published_by' => $admin->getId(),
+        $feedbackId = $i->haveInDatabase('reporting_feedback', [
+            'reporting_id' => $reportingId,
+            'learner_id' => $student->getId(),
+            'instructor_id' => $admin->getId(),
             'published_at' => $date,
+            'published_by' => $admin->getId(),
+            'created_at' => $date,
             'updated_at' => $date,
         ]);
-
-        $definitions = $this->createCapabilityDefinitions($i, $folder);
-        $changedRubric = $this->createRubric(
-            $i,
-            $assessment,
-            'Changed rubric',
-            $definitions,
-            $feedbackId,
-        );
-        $unchangedRubric = $this->createRubric(
-            $i,
-            $assessment,
-            'Unchanged rubric',
-            $definitions,
-            $feedbackId,
-        );
-
-        $i->seeInDatabase('rubric_capability_mark', [
-            'id' => $changedRubric['capabilityMarkId'],
-            'valid' => 1,
-        ]);
-        $i->seeInDatabase('rubric_indicator_mark', [
-            'id' => $changedRubric['indicatorMarkId'],
-            'valid' => 1,
-        ]);
-        $i->seeInDatabase('rubric_capability_mark', [
-            'id' => $unchangedRubric['capabilityMarkId'],
-            'valid' => 1,
-        ]);
-        $i->seeInDatabase('rubric_indicator_mark', [
-            'id' => $unchangedRubric['indicatorMarkId'],
-            'valid' => 1,
-        ]);
-
-        $changedPayload = $changedRubric['payload'];
-        $removedCapability = array_pop($changedPayload['group']);
-        $removedIndicatorId = $definitions[$removedCapability['id']]['indicatorId'];
-        unset(
-            $changedPayload['criterion'][$removedIndicatorId],
-            $changedPayload['descriptor'][$removedIndicatorId],
-        );
+        $rubric = $this->createMarkedRubric($i, $folder, $assessment, $feedbackId);
+        $payload = $rubric['payload'];
+        $payload['descriptor'][$rubric['indicatorId']][1]['points'] = '2';
 
         $update = new Payload\Assessable\Update($assessment, '');
+        $update->setFormParam('instructor-markType', $markTypeId);
         $update->setFormParam(
-            "rubric[{$changedRubric['rubricInstanceId']}]",
-            json_encode($changedPayload, JSON_THROW_ON_ERROR),
-        );
-        $update->setFormParam(
-            "rubric[{$unchangedRubric['rubricInstanceId']}]",
-            json_encode($unchangedRubric['payload'], JSON_THROW_ON_ERROR),
+            "rubric[{$rubric['rubricInstanceId']}]",
+            json_encode($payload, JSON_THROW_ON_ERROR),
         );
 
-        $i->amGoingTo('Update one of two rubric grids with an incompatible structural change');
+        $i->amGoingTo('Change the point value of a selected Reporting Activity rubric descriptor');
         $i->sendRequest($update);
         $i->seeResponseCodeIs(303);
-
         $i->seeInDatabase('rubric_capability_mark', [
-            'id' => $changedRubric['capabilityMarkId'],
+            'id' => $rubric['capabilityMarkId'],
             'valid' => 0,
         ]);
         $i->seeInDatabase('rubric_indicator_mark', [
-            'id' => $changedRubric['indicatorMarkId'],
+            'id' => $rubric['indicatorMarkId'],
             'valid' => 0,
-        ]);
-        $i->seeInDatabase('rubric_capability_mark', [
-            'id' => $unchangedRubric['capabilityMarkId'],
-            'valid' => 1,
-        ]);
-        $i->seeInDatabase('rubric_indicator_mark', [
-            'id' => $unchangedRubric['indicatorMarkId'],
-            'valid' => 1,
         ]);
     }
 
     /**
-     * Creates a homepage to contain the assessment under test.
+     * Creates a homepage to contain the Reporting Activity.
      *
      * @param IntegrationTester $i
      * @param string            $title
@@ -166,27 +117,33 @@ class RubricMarkInvalidationCest
     }
 
     /**
-     * Creates a due work assessment in the supplied homepage.
+     * Creates a Reporting Activity in the supplied homepage.
      *
      * @param IntegrationTester $i
      * @param Folder\Model      $folder
      * @param string            $title
+     * @param int               $markTypeId
      * @return IAssessable
      * @throws JsonException
      */
-    private function createAssessment(
+    private function createReportingActivity(
         IntegrationTester $i,
         Folder\Model $folder,
         string $title,
+        int $markTypeId,
     ): IAssessable {
         $payload = new Payload\Assessable\Create(
             AssessmentContextType::TYPE_FOLDER,
             $folder->getId(),
             $folder->getId(),
-            AssessmentType::TYPE_DUE_WORK,
+            AssessmentType::TYPE_REPORTING,
         );
         $payload->setTitle($title);
-        $payload->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK);
+        $payload->setFormParam(
+            'workType',
+            $i->grabFromDatabase('lu_work_type', 'id', ['permitted_reporting_activity' => 1]),
+        );
+        $payload->setFormParam('instructor-markType', $markTypeId);
 
         $i->sendRequest($payload);
         $i->seeResponseCodeIs(303);
@@ -195,74 +152,40 @@ class RubricMarkInvalidationCest
     }
 
     /**
-     * Creates two capabilities and their indicators for the rubric grids.
+     * Creates a rubric with a selected four-point descriptor on Reporting feedback.
      *
      * @param IntegrationTester $i
-     * @param Folder\Model $folder
-     * @return array<int, array{capabilityName: string, indicatorId: int, indicatorName: string}>
-     */
-    private function createCapabilityDefinitions(IntegrationTester $i, Folder\Model $folder): array
-    {
-        $definitions = [];
-
-        foreach (['Knowledge', 'Communication'] as $name) {
-            $capabilityId = $i->haveInDatabase('rubric_capability', [
-                'name' => $name,
-                'parent_id' => $folder->getId(),
-                'parent_type' => 'category',
-            ]);
-            $indicatorName = "$name indicator";
-            $indicatorId = $i->haveInDatabase('rubric_indicator', [
-                'rubric_capability_id' => $capabilityId,
-                'name' => $indicatorName,
-            ]);
-            $definitions[$capabilityId] = [
-                'capabilityName' => $name,
-                'indicatorId' => $indicatorId,
-                'indicatorName' => $indicatorName,
-            ];
-        }
-
-        return $definitions;
-    }
-
-    /**
-     * Creates a persisted rubric grid and a valid capability and indicator mark.
-     *
-     * @param IntegrationTester $i
-     * @param IAssessable $assessment
-     * @param string $title
-     * @param array<int, array{capabilityName: string, indicatorId: int, indicatorName: string}> $definitions
-     * @param int $feedbackId
+     * @param Folder\Model      $folder
+     * @param IAssessable       $assessment
+     * @param int               $feedbackId
      * @return array{
      *     rubricInstanceId: int,
+     *     indicatorId: int,
      *     capabilityMarkId: int,
      *     indicatorMarkId: int,
-     *     payload: array{
-     *         level: list<array{id: int, name: string}>,
-     *         group: list<array{id: int, name: string, maxValue: int}>,
-     *         criterion: array<int, array{id: int, groupId: int, name: string, on: int, sequence: int}>,
-     *         descriptor: array<int, list<array{id: int, text: string, points: string}>>,
-     *         title: string,
-     *         weight: int,
-     *         useMarkRange: bool,
-     *         capabilityMarkType: string,
-     *         capabilityGradeGroup: null
-     *     }
+     *     payload: array
      * }
      */
-    private function createRubric(
+    private function createMarkedRubric(
         IntegrationTester $i,
+        Folder\Model $folder,
         IAssessable $assessment,
-        string $title,
-        array $definitions,
         int $feedbackId,
     ): array {
+        $capabilityId = $i->haveInDatabase('rubric_capability', [
+            'name' => 'Achievement',
+            'parent_id' => $folder->getId(),
+            'parent_type' => 'category',
+        ]);
+        $indicatorId = $i->haveInDatabase('rubric_indicator', [
+            'rubric_capability_id' => $capabilityId,
+            'name' => 'Achievement indicator',
+        ]);
         $date = date('Y-m-d H:i:s');
         $rubricInstanceId = $i->haveInDatabase('rubric_instance', [
             'assessment_id' => $assessment->getId(),
-            'title' => $title,
-            'weight' => 50,
+            'title' => 'Reporting rubric',
+            'weight' => 100,
             'rubric_capability_mark_type_id' => (int)$i->grabFromDatabase(
                 'submission_mark_type',
                 'mark_type_id',
@@ -276,103 +199,94 @@ class RubricMarkInvalidationCest
             [
                 'id' => $i->haveInDatabase('rubric_level', [
                     'rubric_instance_id' => $rubricInstanceId,
-                    'name' => 'Developing',
+                    'name' => 'Not met',
                     'sequence' => 1,
                 ]),
-                'name' => 'Developing',
+                'name' => 'Not met',
             ],
             [
                 'id' => $i->haveInDatabase('rubric_level', [
                     'rubric_instance_id' => $rubricInstanceId,
-                    'name' => 'Accomplished',
+                    'name' => 'Met',
                     'sequence' => 2,
                 ]),
-                'name' => 'Accomplished',
+                'name' => 'Met',
             ],
         ];
-        $groups = [];
-        $criteria = [];
-        $descriptors = [];
-
-        foreach ($definitions as $capabilityId => $definition) {
-            $i->haveInDatabase('rubric_capability_usage', [
-                'rubric_capability_id' => $capabilityId,
-                'rubric_instance_id' => $rubricInstanceId,
-                'max_value' => 2,
-                'sequence' => count($groups) + 1,
-            ]);
-            $i->haveInDatabase('rubric_indicator_usage', [
-                'rubric_indicator_id' => $definition['indicatorId'],
-                'rubric_instance_id' => $rubricInstanceId,
-                'max_value' => 2,
-                'sequence' => 1,
-            ]);
-
-            $groups[] = [
-                'id' => $capabilityId,
-                'name' => $definition['capabilityName'],
-                'maxValue' => 2,
-            ];
-            $criteria[$definition['indicatorId']] = [
-                'id' => $definition['indicatorId'],
-                'groupId' => $capabilityId,
-                'name' => $definition['indicatorName'],
-                'on' => 1,
-                'sequence' => 1,
-            ];
-            $descriptors[$definition['indicatorId']] = [
-                [
-                    'id' => $i->haveInDatabase('rubric_descriptor', [
-                        'rubric_indicator_id' => $definition['indicatorId'],
-                        'level_id' => $levels[0]['id'],
-                        'max_value' => 1,
-                        'description' => 'Developing',
-                    ]),
-                    'text' => 'Developing',
-                    'points' => '1',
-                ],
-                [
-                    'id' => $i->haveInDatabase('rubric_descriptor', [
-                        'rubric_indicator_id' => $definition['indicatorId'],
-                        'level_id' => $levels[1]['id'],
-                        'max_value' => 2,
-                        'description' => 'Accomplished',
-                    ]),
-                    'text' => 'Accomplished',
-                    'points' => '2',
-                ],
-            ];
-        }
-
-        $firstCapabilityId = array_key_first($definitions);
-        $firstIndicatorId = $definitions[$firstCapabilityId]['indicatorId'];
+        $i->haveInDatabase('rubric_capability_usage', [
+            'rubric_capability_id' => $capabilityId,
+            'rubric_instance_id' => $rubricInstanceId,
+            'max_value' => 4,
+            'sequence' => 1,
+        ]);
+        $i->haveInDatabase('rubric_indicator_usage', [
+            'rubric_indicator_id' => $indicatorId,
+            'rubric_instance_id' => $rubricInstanceId,
+            'max_value' => 4,
+            'sequence' => 1,
+        ]);
+        $descriptors = [
+            [
+                'id' => $i->haveInDatabase('rubric_descriptor', [
+                    'rubric_indicator_id' => $indicatorId,
+                    'level_id' => $levels[0]['id'],
+                    'max_value' => 0,
+                    'description' => 'Not met',
+                ]),
+                'text' => 'Not met',
+                'points' => '0',
+            ],
+            [
+                'id' => $i->haveInDatabase('rubric_descriptor', [
+                    'rubric_indicator_id' => $indicatorId,
+                    'level_id' => $levels[1]['id'],
+                    'max_value' => 4,
+                    'description' => 'Met',
+                ]),
+                'text' => 'Met',
+                'points' => '4',
+            ],
+        ];
         $capabilityMarkId = $i->haveInDatabase('rubric_capability_mark', [
             'feedback_id' => $feedbackId,
-            'feedback_table' => self::FEEDBACK_TABLE,
+            'feedback_table' => 'reporting_feedback',
             'rubric_instance_id' => $rubricInstanceId,
-            'rubric_capability_id' => $firstCapabilityId,
-            'human_readable_value' => '2',
-            'value' => 2,
+            'rubric_capability_id' => $capabilityId,
+            'human_readable_value' => '4',
+            'value' => 4,
             'valid' => 1,
         ]);
         $indicatorMarkId = $i->haveInDatabase('rubric_indicator_mark', [
             'rubric_capability_mark_id' => $capabilityMarkId,
-            'descriptor_id' => $descriptors[$firstIndicatorId][1]['id'],
-            'value' => 2,
+            'descriptor_id' => $descriptors[1]['id'],
+            'value' => 4,
             'valid' => 1,
         ]);
 
         return [
             'rubricInstanceId' => $rubricInstanceId,
+            'indicatorId' => $indicatorId,
             'capabilityMarkId' => $capabilityMarkId,
             'indicatorMarkId' => $indicatorMarkId,
             'payload' => [
                 'level' => $levels,
-                'group' => $groups,
-                'criterion' => $criteria,
-                'descriptor' => $descriptors,
-                'title' => $title,
-                'weight' => 50,
+                'group' => [[
+                    'id' => $capabilityId,
+                    'name' => 'Achievement',
+                    'maxValue' => 4,
+                ]],
+                'criterion' => [
+                    $indicatorId => [
+                        'id' => $indicatorId,
+                        'groupId' => $capabilityId,
+                        'name' => 'Achievement indicator',
+                        'on' => 1,
+                        'sequence' => 1,
+                    ],
+                ],
+                'descriptor' => [$indicatorId => $descriptors],
+                'title' => 'Reporting rubric',
+                'weight' => 100,
                 'useMarkRange' => false,
                 'capabilityMarkType' => MarkType::SLUG_NONE,
                 'capabilityGradeGroup' => null,
