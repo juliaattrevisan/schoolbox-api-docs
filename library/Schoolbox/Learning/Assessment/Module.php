@@ -685,7 +685,6 @@ class Module extends BaseModule
         }
 
         if ($assessmentSpec->isImplementation()) {
-            $assessmentSpec  = $this->preloadAssessment($params, $student)['assessment'];
             if ($assessmentSpec->getId() === $assessmentImpl->getId()) {
                 return [
                     'assessment' => $assessmentSpec,
