@@ -19,9 +19,11 @@ use Schoolbox\Admin\BulkFeedbackImport\Strategy\Mark\NormalisedMark;
 use Schoolbox\Admin\Import\Profile\Reader;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Participant\Plan\InvalidState;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -246,7 +248,7 @@ class Processor
                  */
                 try {
                     $combined = sprintf('%s %s', $datetime, self::PUBLISH_TIME);
-                    $format = $this->dateLocal . ' H:i:s';
+                    $format = sprintf('%s %s', $this->dateLocal, 'H:i:s');
 
                     $adf = new \Alaress_Date_Format($combined, $format);
                 } catch (\Carbon\Exceptions\InvalidFormatException $e) {
@@ -431,19 +433,89 @@ class Processor
                     continue;
                 }
 
-                $feedbackStrategy->processRow(
-                    $i,
-                    $folder,
-                    $learner,
-                    $assessment,
-                    $assessmentData,
-                    $adf,
-                    $vals['normalisedMark'],
-                    $vals['learnerHumanReadableMark'],
-                    $vals['instructorHumanReadableMark'],
-                    $row['Comment'],
-                    $creator
-                );
+                /* Deep in the swamp, the Assessment Mapper Proxy throws InvalidState exceptions which are totally
+                 * undocumented through the docblocks. They're thrown when participation plans, for whatever reason,
+                 * deny saving via the participation-related callbacks that use insertParticipationOnFirstInteraction()
+                 *
+                 * You can only experience this when Performing the import as it requires an actual save to occur;
+                 * it relies on the mapper callbacks to execute.
+                 */
+                try {
+                    /* TODO Maybe this would benefit from locally caching an assessment, but then again, there might be
+                     *  thousands upon thousands of rows (and assessments) so storing them all in memory might be way
+                     *  too expensive. Instead, just care about one; trade space for time.
+                     */
+                    $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection(
+                        collection: (new \Schoolbox\GenericCollection(IAssessable::class))->add($assessment),
+                        users: (new \Schoolbox\Collection())->add($learner),
+                        includeResponses: false
+                    );
+
+                    $participant = $assessment->getParticipantIfExtant($learner, false);
+
+                    /* Check at Preview screen
+                     */
+
+                    /* A participant might not exist here, due to a deep CAP-related reason that wasn't fully documented.
+                     * I'm still not entirely sure what the scenario was, but there's some way that a participation plan
+                     * might fail to exist.
+                     */
+                    if (null === $participant) {
+                        $this->log(sprintf(
+                            'Row %s: no participation record found for student %s (%s); maybe they were deleted',
+                            $i,
+                            $learner->getFullName(),
+                            $externalId,
+                        ), IStrategy::WARNING);
+
+                        $errors++;
+
+                        continue;
+                    }
+
+                    /* See if they were excluded from this reporting activity
+                     */
+                    if ($participant->isExcluded()) {
+                        $this->log(sprintf(
+                            'Row %s: student %s (%s) has been excluded from this activity',
+                            $i,
+                            $learner->getFullName(),
+                            $externalId,
+                        ), IStrategy::WARNING);
+
+                        $errors++;
+
+                        continue;
+                    }
+
+                    /* Continue processing this row's data into a persisted feedback
+                     */
+                    $feedbackStrategy->processRow(
+                        $i,
+                        $folder,
+                        $learner,
+                        $assessment,
+                        $assessmentData,
+                        $adf,
+                        $vals['normalisedMark'],
+                        $vals['learnerHumanReadableMark'],
+                        $vals['instructorHumanReadableMark'],
+                        $row['Comment'],
+                        $creator
+                    );
+                } catch (InvalidState $e) {
+                    /* Safeguard at Perform screen
+                     */
+                    $this->log(sprintf(
+                        'Row %s: participation error (most likely due to exclusion for student %s, or other participation plan errors)',
+                        $i,
+                        $externalId,
+                    ), IStrategy::WARNING);
+
+                    $errors++;
+
+                    continue;
+                }
             }
         }
 
