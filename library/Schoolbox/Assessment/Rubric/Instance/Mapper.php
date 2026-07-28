@@ -168,26 +168,32 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * Soft-deletes rubric instances that were associated with $assessment->getId(), but aren't needed anymore.
      * This is effectively the result of a diff between rubric instances we added, modified and deleted.
-     * We remove everything associated with $assessment->getId() that *isn't* in $preserve
+     * We remove everything associated with $assessment->getId() that *isn't* in $rubricInstanceIdsToKeep.
      *
      * @param IAssessable $assessment
-     * @param array $preserve A set of rubric_instance.id values that we wanted to keep
+     * @param array $rubricInstanceIdsToKeep - A set of rubric_instance.id values that we wanted to keep
      * @return void
      */
-    public function removeFromAssessment(IAssessable $assessment, array $preserve): void
+    public function removeFromAssessment(IAssessable $assessment, array $rubricInstanceIdsToKeep): void
     {
-        $pb = $this->getPredicateBuilder()
-            ->notIn('id', $preserve);
+        $params = ['assessmentId' => $assessment->getId()];
+        $keepCondition = '';
 
-        $where = $pb->getWhere()[0];
+        if (count($rubricInstanceIdsToKeep) > 0) {
+            // Only generate the 'NOT IN (...)' clause if there are rubric instance IDs to keep.
+            $pb = $this->getPredicateBuilder()
+                ->notIn('id', $rubricInstanceIdsToKeep);
+
+            $keepCondition = "AND {$pb->getWhere()[0]}";
+            $params = array_merge($pb->getParams(), $params);
+        }
 
         $this->getDatabase()->executeQuery("
             UPDATE {$this->getTable()}
             SET deleted_at = NOW()
             WHERE assessment_id = :assessmentId
-            AND {$where}
-        ", array_merge($pb->getParams(), [
-            'assessmentId' => $assessment->getId(),
-        ]));
+            AND deleted_at IS NULL
+            {$keepCondition}
+        ", $params);
     }
 }

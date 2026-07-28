@@ -35,7 +35,10 @@
         <div class="small-12 columns">
             <div class="small-12 columns no-pad">
                 {% set assessmentId = assessment.id ? assessment.id : null %}
-                <div id="rubric-builder-container">
+                <div
+                    id="rubric-builder-container"
+                    data-had-rubrics="{{ assessment.rubricInstances.count > 0 ? 'true' : 'false' }}"
+                >
                     <rubric-builder
                         :rubric-grids-payload="{{ rubricGridsPayload|json_encode }}"
                         :rubric-blank-grid="{{ rubricBlankGrid|json_encode }}"

@@ -234,6 +234,8 @@ class Mapper extends BaseMapper
      */
     private function findMarkedByAssessmentDueWork(int $assessmentId): array
     {
+        // Note rubric_instance is joined only to ensure that rubric_capability_mark
+        // rows linked to deleted rubric_instance rows are excluded.
         $query = "
             SELECT sr.owner AS student_id
             FROM submission_return sr
@@ -252,6 +254,9 @@ class Mapper extends BaseMapper
                 GROUP BY sr.owner
             ) t1 ON t1.owner = sr.owner AND t1.max_updated_at = sr.updated_at
             INNER JOIN rubric_capability_mark rcm ON sr.id = rcm.feedback_id AND rcm.feedback_table = :feedbackTable
+            INNER JOIN rubric_instance ri ON rcm.rubric_instance_id = ri.id
+                AND ri.assessment_id = sb.assessment_id
+                AND ri.deleted_at IS NULL
             WHERE
                 sb.assessment_id = :assessment_id_2 AND
                 sr.review_route = :review_route_2 AND
@@ -294,6 +299,8 @@ class Mapper extends BaseMapper
      */
     private function findMarkedByAssessmentReporting(int $assessmentId): array
     {
+        // Note rubric_instance is joined only to ensure that rubric_capability_mark
+        // rows linked to deleted rubric_instance rows are excluded.
         $query = "
             SELECT rf.learner_id AS student_id
             FROM reporting_feedback rf
@@ -311,6 +318,9 @@ class Mapper extends BaseMapper
                 GROUP BY rf.learner_id
             ) t1 ON t1.learner_id = rf.learner_id AND t1.max_updated_at = rf.updated_at
             INNER JOIN rubric_capability_mark rcm ON rf.id = rcm.feedback_id AND rcm.feedback_table = :feedbackTable
+            INNER JOIN rubric_instance ri ON rcm.rubric_instance_id = ri.id
+                AND ri.assessment_id = r.assessment_id
+                AND ri.deleted_at IS NULL
             WHERE
                 r.assessment_id = :assessment_id_2 AND
                 rf.deleted_at IS NULL AND

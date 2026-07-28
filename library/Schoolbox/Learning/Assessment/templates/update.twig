@@ -30,15 +30,10 @@
          */
         function formWillSubmit() {
             var formData = this;
-            var rubricObjects = formData.filter(function(item) {
-                var name = item.name;
-                var regex = /^rubric\[\-?\d+\]$/;
-                return name.match(regex);
-            });
 
-            // If no rubric objects are in the serialized form data, we're probably not on a due work page
-            if (rubricObjects.length > 0) {
-                // TODO once multi rubrics exist properly, this logic probably isn't right. Should deleting the only rubric trigger this check/warning?
+            // Run the check if the assessment had rubrics when the form was generated, even if formData now contains
+            // none because the user deleted them all. Any marks using those deleted rubrics may need to be invalidated.
+            if (document.getElementById('rubric-builder-container')?.dataset.hadRubrics === 'true') {
 
                 return new Promise(function(resolve, reject) {
 

@@ -1239,9 +1239,7 @@ class DataSource
 
         foreach ($participant->getAllFeedbacks() as $feedback) {
             if (
-                /* TODO Remove requirement to be a due work feedback instance and check the validCapMarkCount
-                 *  against a feedback table too
-                 */
+                /* TODO Remove requirement to be a due work feedback instance */
                 $feedback instanceof DueWorkFeedbackModel
                 && \in_array($feedback->getReviewRoute(), $feedbackTypes, true)
             ) {
@@ -1253,12 +1251,18 @@ class DataSource
             return false;
         }
 
-        // Determine if there's valid capability marks for this participant.
-        // Don't need to check descriptor marks separately, because they cannot
-        // exist without capability marks.
-        $validCapMarkCount = $this->indicatorMarkMapper->countByColumnList([
-            'cm.feedback_id' => $feedbackIds,
+        // Determine if there are valid capability marks for this participant linked to a non-soft-deleted rubric instance.
+        // Don't need to check descriptor marks separately, because they cannot exist without capability marks.
+        // Notes:
+        //  * 'ri.deleted_at' will be defined below because the query is constructed using
+        //    capabilityMarkMapper->getFromString(), where the alias 'ri' is defined.
+        //  * feedback_id is polymorphic, so feedback_table must also be checked to avoid
+        //    matching a feedback record from another table that happens to have the same ID.
+        $validCapMarkCount = $this->capabilityMarkMapper->countByColumnList([
+            'feedback_id' => $feedbackIds,
+            'feedback_table' => SubmissionBox\ReturnedWorkMapper::getInstance()->getTable(),
             'valid' => true,
+            'ri.deleted_at' => null,
         ]);
 
         return $validCapMarkCount > 0;
@@ -1491,9 +1495,12 @@ class DataSource
             return;
         }
 
+        // Only copy marks linked to non-deleted rubric instances.
+        $activeRubricInstanceIds = $sourceFeedback->getAssessable()->getRubricInstances()?->getPropertyValues('id') ?? [];
         $sourceDescriptorMarks = $this->indicatorMarkMapper->findByColumnList([
             'cm.feedback_id' => $sourceId,
             'cm.feedback_table' => $sourceTable,
+            'cm.rubric_instance_id' => $activeRubricInstanceIds,
         ]);
 
         $destinationCapabilityMarks = $this->capabilityMarkMapper->createCollection();

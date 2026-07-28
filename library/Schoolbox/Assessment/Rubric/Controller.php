@@ -9,17 +9,13 @@
 namespace Schoolbox\Assessment\Rubric;
 
 use Alaress\Json\Decorator\LinkDecorator;
-use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
-use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Learning\Assessment\ISelfAssessable;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\File\Codec\Filename;
-use UnexpectedValueException;
 use Schoolbox\Assessment\Rubric\DataModel\Capability;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
@@ -482,20 +478,12 @@ class Controller extends BaseController
      */
     public function determineMarkInvalidation(): void
     {
-        /* This $_POST['rubric'] node is a set of json-encoded grid(s), indexed by rubric_instance.id
+        /* This $_POST['rubric'] node is a set of json-encoded grid(s), indexed by rubric_instance.id.
+         * A missing node means the user has deleted all rubrics from the form, so fall back to an empty array in that
+         * case.  The empty array still must be passed to ValidGridSet->isValid() so each rubric to be deleted can be
+         * checked, and any participants whose rubric marks will be affected can be identified.
          */
-        $post = $this->requestPost->get('rubric');
-
-        // TODO: no rubric data? always compatible?
-        /* This scenario is  a special circumstance: you can't turn them off anymore, you can only delete rubric grids.
-         * That means you either have no usages or at least 1 usage, and no usages means your previously-rubric-oriented
-         * feedback is mostly irrelevant. I'm not really sure what happens to such feedbacks that used rubric grids, but
-         * said rubric grids are no longer existing. I guess that means it passes validation.
-         */
-        if (null === $post) {
-            $this->response = $this->responseAsJson(ValidGridSet::DEFAULT_RESPONSE)->withStatus(200);
-            return;
-        }
+        $postedRubrics = $this->requestPost->get('rubric') ?? [];
 
         /* This assessment gets fetched along with all its rubric instances. We inspect each rubric instance to see if
          * the new grid is compatible with the existing, exiting early if -any- of the grids are incompatible.
@@ -513,7 +501,7 @@ class Controller extends BaseController
             return;
         }
 
-        /* Find out if any of the grids configured in $post are incompatible with those known to $assessment
+        /* Find out if any of the grids configured in $postedRubrics are incompatible with those known to $assessment
          * If any are invalid, feedback for $assessment is invalid. LinkDecorator is injected as a dependency because
          * it's way more convenient than passing routeGenerator and authorizer only to spawn it inside ValidGridSet
          * in the same manner here.
@@ -523,7 +511,7 @@ class Controller extends BaseController
             $this->mapper,
             $this->rubricInstanceMapper,
             $this->markTypeMapper
-        ))->isValid($post, $currentAssessment);
+        ))->isValid($postedRubrics, $currentAssessment);
 
         // Response code is always 200:
         // this is a valid request even if marks would've been invalidated.

@@ -1437,7 +1437,7 @@ class MapperProxy
          * Anyway, disregard grid changes if CourseManaged is on, having said all that...lol
          * Course Managed activities don't let you change some stuff in an implementation, incl. rubric grids afaik
          */
-        if ($assessable->getRubricInstances()->count() && !(new CourseManagedFields($currentUser, $assessable))->isReadonly()) {
+        if (!new CourseManagedFields($currentUser, $assessable)->isReadonly()) {
             /* At this point, both the subobject and the assessment should have been persisted already.
              *
              * if (!$isCreate) { ... }
