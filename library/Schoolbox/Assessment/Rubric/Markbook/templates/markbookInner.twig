@@ -156,7 +156,7 @@
 
                                                 {% for studentId, student in students %}
                                                     {% if studentId in (exclusions[assessmentId] ?? []) %}
-                                                        <th class="fixed-left excluded" title="Excluded from assessment"></th>
+                                                        <td class="excluded" title="Excluded from assessment"></td>
                                                     {% else %}
                                                         {# A link to the assessment's summary screen which, for some reason, we store in a different data struct
                                                          # A bit wierd but ok, I guess it saves some repeated data...
