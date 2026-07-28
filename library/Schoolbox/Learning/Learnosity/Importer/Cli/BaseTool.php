@@ -172,7 +172,10 @@ abstract class BaseTool extends CliTool\App
 
         $lastCreatedAt = null;
         $lastAssessId  = null;
+        $runningCount = 0;
+        $loops = 0;
         do {
+            $loops++;
             $result  = $this->findQuizzes($batchSize, $lastCreatedAt, $lastAssessId);
             $quizzes = $result['quizzes'];
 
@@ -191,6 +194,7 @@ abstract class BaseTool extends CliTool\App
                     return;
                 }
 
+                $runningCount++;
                 /** @noinspection PhpUnhandledExceptionInspection - I want this exception to fall on carpet */
                 $this->processQuiz(
                     $quiz
@@ -201,7 +205,7 @@ abstract class BaseTool extends CliTool\App
             $lastAssessId  = $result['lastAssessId'];
             $toolLock->refresh();
         } while ($quizzes->count() === $batchSize);
-
+        $this->getLogger()->info(sprintf('Processed %d quizzes over %d loops', $runningCount, $loops));
         $toolLock->release();
         $this->getLogger()->notice($this->perform() ? 'Quizzes modified.' : 'Planning finished.');
     }
