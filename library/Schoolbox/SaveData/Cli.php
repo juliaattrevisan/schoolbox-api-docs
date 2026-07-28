@@ -182,7 +182,9 @@ HELP;
             $this->clearTransforms();
             $this->makeLocal();
             $this->mysqlDump($tempdir);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
+            # Throwable, not Exception: an Error (a TypeError from unexpected row data, say) would otherwise
+            # escape and leave the instance in maintenance mode with the initial cleanup truncations applied.
             $this->getLogger()->error($e->getMessage());
             $this->restoreBackup("$instance_dir/$backup_name");
             $this->maintenanceMode(0);
@@ -465,7 +467,8 @@ HELP;
         $client = new S3Client($cfg);
         $finalBucket = !empty($s3AltHost) && !empty($s3AltBucket) ? $s3AltBucket : $s3Bucket;
 
-        $query = $this->getDatabaseInternal()->prepareQuery("SELECT hash FROM storage");
+        # `hash` is nullable on both tables, and a row without one has no object to fetch.
+        $query = $this->getDatabaseInternal()->prepareQuery("SELECT hash FROM storage WHERE hash IS NOT NULL");
         $query->execute();
         $hashes = $query->fetchColumnArray('hash');
 
@@ -473,7 +476,7 @@ HELP;
         # not reachable from the storage hashes above, and a completed video_queue row is never picked up again by
         # QueueMapper::getPending(), so they have to be fetched or the media cannot play once provisioned.
         $query = $this->getDatabaseInternal()->prepareQuery(
-            "SELECT hash FROM video_queue WHERE status = :status"
+            "SELECT hash FROM video_queue WHERE status = :status AND hash IS NOT NULL"
         );
         $query->execute(["status" => QueueMapper::STATUS_COMPLETED]);
         $transcodedHashes = $query->fetchColumnArray('hash');
