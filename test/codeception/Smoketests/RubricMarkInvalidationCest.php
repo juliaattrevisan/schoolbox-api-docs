@@ -46,11 +46,11 @@ class RubricMarkInvalidationCest
     public function invalidateMarksOnlyForChangedRubricInstance(IntegrationTester $i): void
     {
         $timestamp = time();
-        $folder = $this->createHomepage($i, "Testing rubric mark invalidation at {$timestamp}");
+        $folder = $this->createHomepage($i, "Testing rubric mark invalidation at $timestamp");
         $assessment = $this->createAssessment(
             $i,
             $folder,
-            "Testing rubric instance mark invalidation at {$timestamp}",
+            "Testing rubric instance mark invalidation at $timestamp",
         );
 
         $admin = $i->grabUser('alaress');
@@ -149,13 +149,14 @@ class RubricMarkInvalidationCest
      * Creates a homepage to contain the assessment under test.
      *
      * @param IntegrationTester $i
-     * @param string $title
+     * @param string            $title
      * @return Folder\Model
+     * @throws JsonException
      */
     private function createHomepage(IntegrationTester $i, string $title): Folder\Model
     {
         $payload = new Payload\Resource\Folder\Create();
-        $payload->setTemplate(Payload\Resource\Folder\Create::TEMPLATE_BLANK);
+        $payload->setTemplate(Payload\Resource\Folder\Modify::TEMPLATE_BLANK);
         $payload->setName($title);
 
         $i->sendRequest($payload);
@@ -168,9 +169,10 @@ class RubricMarkInvalidationCest
      * Creates a due work assessment in the supplied homepage.
      *
      * @param IntegrationTester $i
-     * @param Folder\Model $folder
-     * @param string $title
+     * @param Folder\Model      $folder
+     * @param string            $title
      * @return IAssessable
+     * @throws JsonException
      */
     private function createAssessment(
         IntegrationTester $i,
@@ -209,7 +211,7 @@ class RubricMarkInvalidationCest
                 'parent_id' => $folder->getId(),
                 'parent_type' => 'category',
             ]);
-            $indicatorName = "{$name} indicator";
+            $indicatorName = "$name indicator";
             $indicatorId = $i->haveInDatabase('rubric_indicator', [
                 'rubric_capability_id' => $capabilityId,
                 'name' => $indicatorName,
@@ -261,7 +263,11 @@ class RubricMarkInvalidationCest
             'assessment_id' => $assessment->getId(),
             'title' => $title,
             'weight' => 50,
-            'rubric_capability_mark_type_id' => MarkType::TYPE_NONE,
+            'rubric_capability_mark_type_id' => (int)$i->grabFromDatabase(
+                'submission_mark_type',
+                'mark_type_id',
+                ['slug' => MarkType::SLUG_NONE],
+            ),
             'rubric_mark_range' => 0,
             'created_at' => $date,
             'updated_at' => $date,
