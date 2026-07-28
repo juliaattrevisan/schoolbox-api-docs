@@ -55,12 +55,14 @@ export default {
 <template>
     <div>
         <reveal-modal ref="outputLogModal">
-            <div class="output-log">
+            <div class="output-log" data-test="log-modal-output">
                 <div v-if="hasDataError" class="alert-box alert">{{ errorMessage }}</div>
                 <textarea v-model="logData"></textarea>
             </div>
             <div>
-                <button @click.prevent="onLogCloseSelected" class="button submit">Close</button>
+                <button @click.prevent="onLogCloseSelected" class="button submit" data-test="log-modal-close-button">
+                    Close
+                </button>
             </div>
         </reveal-modal>
     </div>

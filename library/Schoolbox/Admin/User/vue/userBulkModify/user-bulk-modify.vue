@@ -546,7 +546,7 @@ export default {
         />
         <reveal-modal ref="deleteModal">
             <h2>Please Confirm Multiple User Deletion</h2>
-            <div data-alert class="alert-box alert">
+            <div data-alert class="alert-box alert" data-test="user-bulk-modify-delete-confirmation-modal">
                 You are about to permanently delete <strong>{{ selectedRowsCountWithRowName }}</strong
                 >. Deleting users will prevent them from logging into the system and from accessing resources that
                 belong to them. Attached resources that will be removed include; ePortfolio, My Files, Pastoral Records
@@ -555,7 +555,11 @@ export default {
             </div>
             <ul class="flex-list buttons">
                 <li>
-                    <button @click.prevent="onConfirmDeleteUsersSelected" class="button submit">
+                    <button
+                        @click.prevent="onConfirmDeleteUsersSelected"
+                        class="button submit"
+                        data-test="user-bulk-modify-confirm-delete-button"
+                    >
                         Confirm Deletion
                     </button>
                 </li>
