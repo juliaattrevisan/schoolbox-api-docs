@@ -19,6 +19,8 @@ use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\S3\Migration;
 use Schoolbox\Version\Version;
+use Schoolbox\Video\QueueMapper;
+use Schoolbox\Video\ResourceVideo;
 
 /**
  * CLI Tool
@@ -36,6 +38,14 @@ class Cli extends App
     private const OPT_SHORT_NAME = "n:";
     private const OPT_SHORT_INITIAL = "i";
     private const S3_BUCKET = 'schoolbox-data';
+
+    /** Transform suffixes persisted alongside a transcoded video or audio storage object. */
+    private const VIDEO_TRANSFORMS = [
+        ResourceVideo::TRANSCODE,
+        ResourceVideo::POSTER,
+        ResourceVideo::POSTER_LETTERBOX,
+        ResourceVideo::THUMBNAIL,
+    ];
 
     private string $name;
     private bool $initial;
@@ -434,26 +444,54 @@ HELP;
         $missing = [];
         foreach ($hashes as $hash) {
             $relativePath = FilesystemProxy::getPathFromHash($hash);
-            $localPath = "$dir/storage/$relativePath";
-            if (!is_dir(dirname($localPath))) {
-                mkdir(dirname($localPath), 0777, true);
-            }
-            try {
-                $client->getObject([
-                    'Bucket' => $finalBucket,
-                    'Key'    => "storage/$relativePath",
-                    'SaveAs' => $localPath,
-                ]);
-            } catch (S3Exception $e) {
-                if ($e->getAwsErrorCode() === 'NoSuchKey') {
-                    $missing[] = $hash;
-                } else {
-                    throw $e;
-                }
+            if (!$this->downloadObject($client, $finalBucket, $relativePath, $dir)) {
+                $missing[] = $hash;
             }
         }
+
+        # Transcoded media is persisted alongside the original as `<hashed path>-<transform>`. Those objects are
+        # not reachable from the storage hashes above, and a completed video_queue row is never picked up again by
+        # QueueMapper::getPending(), so they have to be fetched or the media cannot play once provisioned.
+        $query = $this->getDatabaseInternal()->prepareQuery(
+            "SELECT hash FROM video_queue WHERE status = :status"
+        );
+        $query->execute(["status" => QueueMapper::STATUS_COMPLETED]);
+        foreach ($query->fetchColumnArray('hash') as $hash) {
+            $relativePath = FilesystemProxy::getPathFromHash($hash);
+            foreach (self::VIDEO_TRANSFORMS as $transform) {
+                # Not every transform exists for every transcode, so absences here are expected and ignored.
+                $this->downloadObject($client, $finalBucket, "$relativePath-$transform", $dir);
+            }
+        }
+
         $this->getLogger()->info("files downloaded");
         return $missing;
+    }
+
+    /**
+     * Downloads a single object from the storage prefix of the bucket.
+     *
+     * @return bool false if the object does not exist in the bucket.
+     */
+    private function downloadObject(S3Client $client, string $bucket, string $relativePath, string $dir): bool
+    {
+        $localPath = "$dir/storage/$relativePath";
+        if (!is_dir(dirname($localPath))) {
+            mkdir(dirname($localPath), 0777, true);
+        }
+        try {
+            $client->getObject([
+                'Bucket' => $bucket,
+                'Key'    => "storage/$relativePath",
+                'SaveAs' => $localPath,
+            ]);
+        } catch (S3Exception $e) {
+            if ($e->getAwsErrorCode() === 'NoSuchKey') {
+                return false;
+            }
+            throw $e;
+        }
+        return true;
     }
     private function getBucketStorage(S3Client $client, string $bucket, string $prefix): float
     {
