@@ -9,7 +9,8 @@
 namespace Schoolbox\SaveData;
 
 use Alaress_Date_Format;
-use Aws\S3\Exception\S3Exception;
+use Aws\CommandPool;
+use Aws\Exception\AwsException;
 use Aws\S3\S3Client;
 use Exception;
 use RuntimeException;
@@ -21,6 +22,7 @@ use Schoolbox\Resource\Storage\S3\Migration;
 use Schoolbox\Version\Version;
 use Schoolbox\Video\QueueMapper;
 use Schoolbox\Video\ResourceVideo;
+use Throwable;
 
 /**
  * CLI Tool
@@ -38,6 +40,9 @@ class Cli extends App
     private const OPT_SHORT_NAME = "n:";
     private const OPT_SHORT_INITIAL = "i";
     private const S3_BUCKET = 'schoolbox-data';
+
+    /** Number of storage objects to download from the bucket at a time. */
+    private const DOWNLOAD_CONCURRENCY = 25;
 
     /** Transform suffixes persisted alongside a transcoded video or audio storage object. */
     private const VIDEO_TRANSFORMS = [
@@ -472,46 +477,71 @@ HELP;
             );
         }
 
+        # Absent keys are known from the listing, so they are never requested.
         $missing = [];
+        $toDownload = [];
         foreach ($wanted as $object) {
-            # Absent keys are known from the listing, so skip the request rather than provoking a NoSuchKey.
             if (!isset($objectSizes["storage/{$object['path']}"])) {
                 if ($object['reportIfMissing'] !== null) {
                     $missing[] = $object['reportIfMissing'];
                 }
                 continue;
             }
-            $this->downloadObject($client, $finalBucket, $object['path'], $dir);
+            $toDownload[] = $object['path'];
         }
 
+        $this->downloadObjects($client, $finalBucket, $toDownload, $dir);
         $this->getLogger()->info("files downloaded");
         return $missing;
     }
 
     /**
-     * Downloads a single object from the storage prefix of the bucket.
+     * Downloads objects from the storage prefix of the bucket.
      *
-     * @return bool false if the object does not exist in the bucket.
+     * Downloads run concurrently: a dataset holds mostly small objects, so downloading them one at a time
+     * accumulates a network round trip per object rather than being limited by bandwidth.
+     *
+     * @param string[] $relativePaths paths within the storage prefix, as returned by FilesystemProxy
      */
-    private function downloadObject(S3Client $client, string $bucket, string $relativePath, string $dir): bool
+    private function downloadObjects(S3Client $client, string $bucket, array $relativePaths, string $dir): void
     {
-        $localPath = "$dir/storage/$relativePath";
-        if (!is_dir(dirname($localPath))) {
-            mkdir(dirname($localPath), 0777, true);
-        }
-        try {
-            $client->getObject([
-                'Bucket' => $bucket,
-                'Key'    => "storage/$relativePath",
-                'SaveAs' => $localPath,
-            ]);
-        } catch (S3Exception $e) {
-            if ($e->getAwsErrorCode() === 'NoSuchKey') {
-                return false;
+        $commands = function () use ($client, $bucket, $relativePaths, $dir) {
+            foreach ($relativePaths as $index => $relativePath) {
+                $localPath = "$dir/storage/$relativePath";
+                if (!is_dir(dirname($localPath))) {
+                    mkdir(dirname($localPath), 0777, true);
+                }
+                yield $index => $client->getCommand('GetObject', [
+                    'Bucket' => $bucket,
+                    'Key'    => "storage/$relativePath",
+                    'SaveAs' => $localPath,
+                ]);
             }
-            throw $e;
+        };
+
+        $failures = [];
+        $pool = new CommandPool($client, $commands(), [
+            'concurrency' => self::DOWNLOAD_CONCURRENCY,
+            'preserve_iterator_keys' => true,
+            'rejected' => function (Throwable $reason, int $index) use (&$failures, $relativePaths): void {
+                $failures[$relativePaths[$index]] = $reason instanceof AwsException
+                    ? ($reason->getAwsErrorCode() ?? $reason->getMessage())
+                    : $reason->getMessage();
+            },
+        ]);
+        $pool->promise()->wait();
+
+        if (!empty($failures)) {
+            # These objects were in the listing, so a failure is not an absent file: fail the run rather than
+            # packaging a dataset quietly short of the files its database references.
+            $summary = [];
+            foreach ($failures as $relativePath => $error) {
+                $summary[] = "$relativePath ($error)";
+            }
+            throw new RuntimeException(
+                sprintf('failed to download %d storage objects: %s', count($failures), implode(', ', $summary))
+            );
         }
-        return true;
     }
     /**
      * Lists the objects under a prefix of the bucket.
