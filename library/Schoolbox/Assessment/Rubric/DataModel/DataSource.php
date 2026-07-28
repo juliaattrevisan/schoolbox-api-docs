@@ -886,11 +886,9 @@ class DataSource
         // wash up before dinner, kids
 
 
-        // Invalidate all marks, if the grid and original grid are incompatible
+        // Invalidate marks for this rubric instance if the grid and original grid are incompatible.
         if ($originalGrid && !$newGrid->isCompatibleWith($originalGrid)) {
-            /* TODO This needs fixing: submission returns are here
-             */
-            $this->invalidateMarks($newGrid->getAssessment()->getId());
+            $this->capabilityMarkMapper->invalidateForRubricInstance($rubricInstance->getId());
         }
 
 
@@ -1541,42 +1539,6 @@ class DataSource
         $this->capabilityMarkMapper->save($destinationCapabilityMarks);
         $this->indicatorMarkMapper->save($destinationDescriptorMarks);
     }
-
-
-    /**
-     * Invalidate ALL the rubric marks given for this assessment.
-     *
-     * This includes:
-     * * capability marks
-     * * descriptor marks
-     *
-     * @param int $assessmentId
-     */
-    private function invalidateMarks(int $assessmentId): void
-    {
-        /* TODO replace this whole return_id idea when we get up to reusing this method; I suspect that a particular
-         *  grid becomes invalid once you change something important about its setup. It probably doesn't require you to
-         *  update *ALL GRIDS* for a given assessment.
-         */
-
-        /* Invalidate rubric grids for due works' submission_return records
-         */
-        $query = "
-            UPDATE rubric_indicator_mark rim
-            INNER JOIN rubric_capability_mark rcm ON rim.rubric_capability_mark_id = rcm.id
-            INNER JOIN submission_return sr ON rcm.feedback_id  = sr.id AND rcm.feedback_table = 'submission_return'
-            INNER JOIN submission_box sb ON sr.box_id = sb.id
-            SET rim.valid = FALSE,
-                rcm.valid = FALSE
-            WHERE sb.assessment_id = :assessmentId
-        ";
-
-        $this->database->prepare($query)->execute(['assessmentId' => $assessmentId]);
-
-        /* Repeat for all other assessments' feedback types, such as reporting_feedback et al.
-         */
-    }
-
 
     /**
      * A polymorphic method that uses a corresponding $mapper to delete indicator mark instances (or level instances)

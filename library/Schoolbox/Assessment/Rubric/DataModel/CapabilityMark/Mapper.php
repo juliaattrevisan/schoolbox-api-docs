@@ -8,6 +8,7 @@
 namespace Schoolbox\Assessment\Rubric\DataModel\CapabilityMark;
 
 use PDO;
+use PDOException;
 use PDOStatement;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as CapabilityMapper;
 use Schoolbox\GenericCollection;
@@ -151,6 +152,29 @@ class Mapper extends BaseMapper
         ]);
 
         return $statement->rowCount();
+    }
+
+
+    /**
+     * Invalidates all capability and indicator marks associated with a rubric instance.
+     *
+     * @param int $rubricInstanceId The rubric instance whose marks should be invalidated.
+     * @return void
+     * @throws PDOException
+     */
+    public function invalidateForRubricInstance(int $rubricInstanceId): void
+    {
+        $query = "
+            UPDATE rubric_capability_mark rcm
+            LEFT JOIN rubric_indicator_mark rim ON rim.rubric_capability_mark_id = rcm.id
+            SET rcm.valid = FALSE,
+                rim.valid = FALSE
+            WHERE rcm.rubric_instance_id = :rubricInstanceId
+        ";
+
+        $this->database->prepare($query)->execute([
+            'rubricInstanceId' => $rubricInstanceId,
+        ]);
     }
 
 
