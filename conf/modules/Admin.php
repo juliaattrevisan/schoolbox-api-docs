@@ -172,5 +172,11 @@ class Admin extends ModuleLoader
         /* Data Retention
          */
         $this->loadModule($di, \Schoolbox\Admin\DataRetention\Module::class, '/adminv2/data-retention');
+
+        /* Zenda
+         */
+        if ($di->get('config')->get(ConfigMapper::NAME_ZENDA_ENABLED)) {
+            $this->loadModule($di, \Schoolbox\Admin\Zenda\Module::class, '/adminv2/zenda');
+        }
     }
 }

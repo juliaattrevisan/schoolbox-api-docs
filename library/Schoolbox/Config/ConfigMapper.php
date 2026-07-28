@@ -53,6 +53,7 @@ class ConfigMapper extends Mapper
     public const string MODULE_AI_SERVICES = 'ai-services';
     public const string MODULE_DIFFERENTIATION_PROFILES = 'differentiation-profiles';
     public const string MODULE_IB = 'ib';
+    public const string MODULE_ZENDA = 'zenda';
 
     // IB config name constants
     public const string NAME_IB_ENABLED     = 'ib_enabled';
@@ -573,6 +574,12 @@ class ConfigMapper extends Mapper
     public const string NAME_SOCS_MUSIC_LESSONS_DEFAULT_EVENT_TYPE = 'socs_music_lessons_default_event_type';
     public const string NAME_SOCS_IMPORT_SPORTS_FIXTURES = 'socs_import_sports_fixtures';
 
+    /* Zenda
+     */
+    public const string NAME_ZENDA_ENABLED = 'zenda_enabled';
+    public const string NAME_ZENDA_ACTIVE = 'zenda_active';
+    public const string NAME_ZENDA_CLIENT_ID = 'zenda_client_id';
+    public const string NAME_ZENDA_CLIENT_SECRET = 'zenda_client_secret';
 
     // Debug settings
     public const string NAME_DEBUG_MODE = 'debug_mode';
@@ -643,6 +650,7 @@ class ConfigMapper extends Mapper
         self::NAME_PWA_ENABLED,
         self::NAME_CURRICULUM_COVERAGE_REPORT_ENABLED,
         self::NAME_IB_ENABLED,
+        self::NAME_ZENDA_ENABLED,
     ];
 
     /**
@@ -719,6 +727,7 @@ class ConfigMapper extends Mapper
                 self::MODULE_AI_SERVICES,
                 self::MODULE_DIFFERENTIATION_PROFILES,
                 self::MODULE_IB,
+                self::MODULE_ZENDA,
             ]
         );
         $this->joins(self::COL_TYPE, Type\Mapper::class, 'id', self::TYPE_MODEL, null, 'type', 'type');
