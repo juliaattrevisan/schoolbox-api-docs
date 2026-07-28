@@ -10,6 +10,7 @@ namespace Schoolbox\Admin\Service;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\CampusMapper;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\RoleMapper;
@@ -47,7 +48,8 @@ class Controller extends Base
             $this->userMapper,
             $this->userAccessMapper,
             $this->campusMapper,
-            $this->roleMapper
+            $this->roleMapper,
+            (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_IB_ENABLED),
         );
 
         $this->response = $this->responseFromTemplate(
