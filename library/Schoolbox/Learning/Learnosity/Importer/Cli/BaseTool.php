@@ -286,7 +286,7 @@ abstract class BaseTool extends CliTool\App
                 INNER JOIN assessment ON quiz.assessment_id = assessment.id
                 WHERE
             " . implode(' AND ', $whereParts) . "
-                ORDER BY quiz.created_at IS NOT NULL ASC, quiz.created_at ASC, quiz.assess_id ASC
+                ORDER BY quiz.created_at ASC, quiz.assess_id ASC
                 LIMIT :batchSize
             ",
             array_merge($params, ['batchSize' => $batchSize])
