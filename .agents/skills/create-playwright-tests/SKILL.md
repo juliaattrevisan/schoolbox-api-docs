@@ -1,47 +1,62 @@
 ---
 name: create-playwright-tests
-description: Use when the user asks to create or update Playwright tests based on a scenario. Generate tests iteratively by running steps with Playwright MCP, and only emit the final test code after all steps have been completed successfully.
+description: Use when the user asks to create or update Schoolbox Playwright acceptance tests based on a scenario.
 ---
 
 # General
 
-- ONLY create tests when `DATA_FILENAME` in the `docker.env` file is set to `sales.tar.gz`
-- You are a playwright test generator.
-- You are given a scenario and you need to generate a playwright test.
+- ONLY create tests when `DATA_FILENAME` in the `docker.env` file is set to `sales.tar.gz`.
+- You are a Playwright test generator.
+- You are given a scenario and you need to generate a Playwright test.
 - DO NOT generate test code based on the scenario alone.
 - DO run steps one by one using the tools provided by Playwright MCP.
-- To login to https://docker.dev.schoolbox.cloud/ the username is alaress and the password is alaress
+- To login to https://docker.dev.schoolbox.cloud/ the username is alaress and the password is alaress.
 - Only after all steps are completed, emit a Playwright TypeScript test.
 - If unable to find a link/button containing the specified text, also look for any links/buttons containing the text as a title attribute.
 - If Playwright MCP is not able to execute the steps given, stop running after 15 seconds, provide explanation of error, and DO NOT create/update tests.
 - Execute the test file and iterate until the test passes.
 - To run a test use `DOCKER=1 npx playwright test dummy.spec.ts` where dummy is the name of the test file created.
-- When choosing selectors ALWAYS use the data-test attribute if on the element.
-- ALWAYS use the DOCKER=1 environment variable when running playwright
-- Run the entire test file once any new tests have been added
+- ALWAYS use the `DOCKER=1` environment variable when running Playwright.
+- If running outside the Melbourne timezone and time inputs behave incorrectly, set `TZ='Australia/Melbourne'` when running Playwright.
+- Run the specific new test first, then run the entire test file once any new tests have been added.
+- Inspect failure artifacts under `test/playwright/_output/`.
 
 # Playwright test file
 
 - The test files should be written in TypeScript.
-- If the test file does not already exist save generated test file in the folder `test/playwright/acceptance/dummy directory` where dummy is the name of the test.
+- If the test file does not already exist, save the generated test file in the folder `test/playwright/acceptance/dummy directory` where dummy is the name of the test.
 - The file should be saved as `dummy.spec.ts` where dummy is the name of the test file.
-- The test files `test/playwright/acceptance/curriculum/selector/curriculumSelector.spec.ts`, `test/playwright/acceptance/curriculum/report/curriculumCoverageReport.spec.ts` and `test/playwright/acceptance/pastoralCare/differentiationProfiles/manageDifferentiationProfiles.spec.ts` should be referenced to match structure and conventions.
-- It should import test/playwright/support/integrations.ts and use the exported test and expect methods as required.
+- The test files `test/playwright/acceptance/curriculum/selector/curriculumSelector.spec.ts`, `test/playwright/acceptance/curriculum/report/curriculumCoverageReport.spec.ts`, and `test/playwright/acceptance/pastoralCare/differentiationProfiles/manageDifferentiationProfiles.spec.ts` should be referenced to match structure and conventions.
+- It should import `test/playwright/support/integrations.ts` and use the exported `test` and `expect` methods as required.
 - Before each test use the existing `loginAsAdmin` function to login.
 - A JSDoc should be added to the top of the file, containing a summary of the entire test file, a reminder to `1 Provision sales.tar.gz data` and `Execute DOCKER=1 npx playwright test dummy.spec.ts` where dummy is the test file name.
-- As much as possible, each test should be completely stand alone and not rely on previous tests for the test to pass successfully.
-- After a test has been created/updated, review the entire test file and look for any repetitions that can instead by put in the helper file.
+- As much as possible, each test should be completely standalone and not rely on previous tests for the test to pass successfully.
+- Keep each `test.describe` under the 5 minute CI timeout. Split scenarios when needed.
+- Use `tester.isGoingTo()` to document intent in longer flows.
+- After a test has been created/updated, review the entire test file and look for any repetitions that can instead be put in the helper file.
 - To impersonate a user, use the existing method `await tester.impersonateViaUserProfilePage("User");` where `User` is the user to impersonate.
-- When using data-test attributes, they should be written like for example `await page.getByTestId("confirm-dialog-confirm-button").click();` not `await page.locator('[data-test="confirm-dialog-confirm-button"]').click();`.
+- When choosing selectors, ALWAYS use the `data-test` attribute if one is on the element.
+- When using data-test attributes, they should be written like `await page.getByTestId("confirm-dialog-confirm-button").click();` not `await page.locator('[data-test="confirm-dialog-confirm-button"]').click();`.
 - Whenever possible, data-test attributes should be added to the relevant element when not already referenced by a data-test attribute, and the new data-test attribute should be used in the test instead of other selectors.
-- Wrap tests in `try/finally` with any clean up occurring within `finally`.
-- Avoid adding cleanup in `afterAll`, instead cleanup within each tests `finally` block.
-- When a new test is added, test individually before running all tests in the file again.
+- Name new `data-test` values uniquely, using a feature/field pattern such as `profile-editor-name-input`.
+- Avoid fragile CSS selectors unless there is a clear reason.
+- Wrap tests in `try/finally` with any cleanup occurring within `finally`.
+- Avoid adding cleanup in `afterAll`; instead cleanup within each test's `finally` block.
+- When a new test is added, test it individually before running all tests in the file again.
 
 # Playwright helper files
 
-- When it's like a test will do an action or group of actions more than once, that action should be split out into a helper file.
+- When it is likely a test will do an action or group of actions more than once, that action should be split out into a helper file.
 - Helper files are stored in `test/playwright/support/page/dummy/` where dummy is the name of the test.
-- The files `test/playwright/support/page/curriculum/selector/CurriculumSelector.ts`, `test/playwright/support/page/curriculum/report/CurriculumCoverageReport.ts` and `test/playwright/support/page/pastoralCare/ManageDifferentiationProfiles.ts` should be referenced to match structure and conventions.
+- The files `test/playwright/support/page/curriculum/selector/CurriculumSelector.ts`, `test/playwright/support/page/curriculum/report/CurriculumCoverageReport.ts`, and `test/playwright/support/page/pastoralCare/ManageDifferentiationProfiles.ts` should be referenced to match structure and conventions.
 - The file should be a class.
-- Before adding another method in, ensure there isn't already an existing method for the same action, or a method that can have a parameter provided this wont make the method too complicated.
+- All methods should have documentation in JSDoc format, including a summary of the method, parameters, and return value.
+- Before adding another method, ensure there is not already an existing method for the same action, or a method that can have a parameter provided if this will not make the method too complicated.
+
+# Coverage documentation
+
+- Once the new tests are committed, update the Confluence Automation Tests coverage page with the list of tests added: https://schoolbox.atlassian.net/wiki/spaces/DEV/pages/2211939023/Automation+Tests+coverage
+- Add the entry under the Acceptance Tests section for Playwright UI coverage.
+- Include the feature/module name, relevant URL if applicable, spec file name, and a concise list of behaviors covered.
+- Include any meaningful limitations, skipped cases, or dependencies.
+- If Confluence cannot be edited from the environment, include the exact coverage entry text in the final response so the PR author can paste it into the page.

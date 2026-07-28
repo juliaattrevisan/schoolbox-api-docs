@@ -174,6 +174,29 @@ export default class Common {
     }
 
     /**
+     * Sets a colour field using the colour picker.
+     * @param field - The colour field to update.
+     * @param value - The CSS colour value to enter.
+     * @returns A promise that resolves when the colour picker is closed.
+     */
+    async setColour(field: Locator, value: string): Promise<void> {
+        await field.click();
+        await this.page.getByRole("textbox", { name: "Color value field" }).fill(value);
+        await this.page.getByRole("button", { name: "Close color picker" }).click();
+    }
+
+    /**
+     * Selects an option from a native select element.
+     * @param select - The select element to update.
+     * @param label - The visible label of the option to select.
+     * @returns A promise that resolves when the option is selected.
+     */
+    // eslint-disable-next-line class-methods-use-this -- Keep form control helpers on the tester.common instance.
+    async selectOption(select: Locator, label: string): Promise<void> {
+        await select.selectOption({ label });
+    }
+
+    /**
      * Ensures the page is loaded and ready to be interacted with (mostly)
      * This completes some specific checks to ensure that components such as the search bar are interactable
      *

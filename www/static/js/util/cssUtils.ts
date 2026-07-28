@@ -4,6 +4,15 @@
  */
 
 /**
+ * Gets a computed CSS custom property from the document root.
+ * @param property - The CSS custom property name.
+ * @returns The trimmed computed property value.
+ */
+export function getCssCustomProperty(property: string): string {
+    return getComputedStyle(document.documentElement).getPropertyValue(property).trim();
+}
+
+/**
  * Remove classes from the target element and any descendants
  * @param element - the target element
  * @param classNames - the classes to remove
