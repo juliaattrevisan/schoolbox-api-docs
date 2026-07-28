@@ -419,6 +419,13 @@ HELP;
         $bytes /= 1024 ** $power;
         return round($bytes, 2) . $units[$power];
     }
+    /**
+     * Downloads the storage objects the database references into the dataset directory.
+     *
+     * @param  string $dir Directory to download into, under its `storage` subdirectory.
+     * @return string[] hashes present in the storage table with no corresponding object in the bucket
+     * @throws RuntimeException if the objects do not fit in the directory's filesystem, or one fails to download.
+     */
     private function downloadBucket(string $dir): array
     {
         $accessKey = $this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_CRED_KEY);
@@ -516,7 +523,11 @@ HELP;
      * Downloads run concurrently: a dataset holds mostly small objects, so downloading them one at a time
      * accumulates a network round trip per object rather than being limited by bandwidth.
      *
-     * @param string[] $relativePaths paths within the storage prefix, as returned by FilesystemProxy
+     * @param S3Client $client        Client used to fetch the objects.
+     * @param string   $bucket        Bucket holding the storage prefix.
+     * @param string[] $relativePaths Paths within the storage prefix, as returned by FilesystemProxy.
+     * @param string   $dir           Directory to download into, under its `storage` subdirectory.
+     * @throws RuntimeException if any object fails to download.
      */
     private function downloadObjects(S3Client $client, string $bucket, array $relativePaths, string $dir): void
     {
@@ -561,6 +572,9 @@ HELP;
     /**
      * Lists the objects under a prefix of the bucket.
      *
+     * @param  S3Client $client Client used to list the objects.
+     * @param  string   $bucket Bucket to list.
+     * @param  string   $prefix Prefix to restrict the listing to.
      * @return array<string, int> key: the object key, value: its size in bytes
      */
     private function getBucketStorage(S3Client $client, string $bucket, string $prefix): array
