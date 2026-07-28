@@ -3,6 +3,7 @@
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
@@ -53,6 +54,7 @@ $permissions = new Permissions(
     new UserAccessMapper(),
     new CampusMapper(),
     new RoleMapper(),
+    $this->getDi()->get('config'),
 );
 $serviceUserList = $permissions->generate();
 foreach ($serviceUserList as $service => $serviceUsers) {

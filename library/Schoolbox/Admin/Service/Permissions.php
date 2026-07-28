@@ -11,12 +11,20 @@
 namespace Schoolbox\Admin\Service;
 
 use Schoolbox\CampusMapper;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+/**
+ * Builds the service-permission summaries used by the user administration pages.
+ *
+ * Services belonging to disabled modules are excluded from the generated display
+ * data without deleting or modifying their stored userAccess assignments.
+ */
 class Permissions
 {
     /**
@@ -25,24 +33,30 @@ class Permissions
     private const SERVICE_TUTORIAL = 4;
 
     /**
-     * Constructor.
-     * @param UserMapper $userMapper
-     * @param UserAccessMapper $userAccessMapper
-     * @param CampusMapper $campusMapper
-     * @param RoleMapper $roleMapper
+     * Configure the permission builder and module-specific service visibility.
+     *
+     * @param UserMapper $userMapper Loads users referenced by service-permission assignments.
+     * @param UserAccessMapper $userAccessMapper Loads service definitions and their assigned users.
+     * @param CampusMapper $campusMapper Resolves campus identifiers displayed in the detailed report.
+     * @param RoleMapper $roleMapper Resolves role identifiers displayed in the detailed report.
+     * @param IConfigLoader $configLoader Loads configuration settings for the instance.
      */
     public function __construct(
         private readonly UserMapper $userMapper,
         private readonly UserAccessMapper $userAccessMapper,
         private readonly CampusMapper $campusMapper,
-        private readonly RoleMapper $roleMapper
+        private readonly RoleMapper $roleMapper,
+        private readonly IConfigLoader $configLoader
     ) {
     }
 
     /**
-     * Generate the list
+     * Generate the service summary displayed on the user administration page.
      *
-     * @return array
+     * The returned array is keyed by service name. Services belonging to disabled
+     * modules are omitted before their assigned users are loaded.
+     *
+     * @return array<string, \Schoolbox\Collection>
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
@@ -70,6 +84,10 @@ class Permissions
         ]);
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            if (!$this->isServiceVisible((int)$row['id'])) {
+                continue;
+            }
+
             $services[$row['name']] = $this->userAccessMapper->findUsersForService($row['id'])->getUnique('id')->indexBy('id');
         }
 
@@ -77,6 +95,12 @@ class Permissions
     }
 
     /**
+     * Build the table data displayed by the detailed service-permissions report.
+     *
+     * Unavailable services are removed from the lookup before userAccess rows are
+     * queried. This hides existing IB Coordinator assignments while IB is disabled
+     * without deleting them, allowing them to reappear when IB is enabled again.
+     *
      * @return array<string, list<array{user: User, accessName: string, sidLabel: string, sidDisplayValue: string}>>
      */
     public function getReportTablesData(): array
@@ -95,6 +119,12 @@ class Permissions
                 'tutorialConst' => self::SERVICE_TUTORIAL
             ]
         )->fetchColumnArray('name', 'id');
+
+        $serviceNameLookup = array_filter(
+            $serviceNameLookup,
+            fn (int $serviceId): bool => $this->isServiceVisible($serviceId),
+            ARRAY_FILTER_USE_KEY
+        );
 
         $userAccessRows = $this->userAccessMapper->getDatabase()->executeQuery(
             'SELECT
@@ -166,5 +196,18 @@ class Permissions
         }
 
         return $servicePermissionTablesData;
+    }
+
+    /**
+     * Determine whether a service should appear in service-permission listings.
+     *
+     * @param int $serviceId One of the UserAccess::SERVICE_* constants.
+     * @return bool True when the service should be visible.
+     */
+    private function isServiceVisible(int $serviceId): bool
+    {
+        /* IB Coordinator follows the IB module feature flag.
+         */
+        return $serviceId !== UserAccess::SERVICE_IB_COORDINATOR || (bool)$this->configLoader->get(ConfigMapper::NAME_IB_ENABLED);
     }
 }
