@@ -12,7 +12,7 @@ namespace Schoolbox\Socs\CoCurricular;
 /**
  * Normalized SOCS co-curricular club data.
  */
-final class Club
+class Club
 {
     public function __construct(
         public readonly string $id,

@@ -68,21 +68,20 @@ class ImporterTool extends CliTool\App
             return;
         }
 
-        /**
-         * Stream filters are independent: an unfiltered run selects every stream,
-         * then saved feature toggles decide which selected streams execute. In
-         * particular, disabled sports fixtures must not prevent co-curricular data
-         * from running when its own toggle is enabled.
-         */
+        // Explicit options select individual import streams. With no stream
+        // option, all streams are selected before their feature toggles apply.
         $sportsEnabled = (bool)$this->getConfig()->get(ConfigMapper::NAME_SOCS_IMPORT_SPORTS_FIXTURES);
         $coCurricularEnabled = (bool)$this->getConfig()->get(ConfigMapper::NAME_SOCS_IMPORT_CO_CURRICULAR);
         $runFixtures = (bool)$this->getOpt(self::OPT_LONG_FIXTURES);
         $runResults = (bool)$this->getOpt(self::OPT_LONG_RESULTS);
         $runCoCurricular = (bool)$this->getOpt(self::OPT_LONG_CO_CURRICULAR);
         if (!$runFixtures && !$runResults && !$runCoCurricular) {
-            $runFixtures = $runResults = true;
+            $runFixtures = true;
+            $runResults = true;
             $runCoCurricular = true;
         }
+
+        // A selected stream only runs when its corresponding saved setting is enabled.
         $runFixtures = $runFixtures && $sportsEnabled;
         $runResults = $runResults && $sportsEnabled;
         $runCoCurricular = $runCoCurricular && $coCurricularEnabled;
@@ -100,7 +99,6 @@ class ImporterTool extends CliTool\App
 
         $this->setMaxExecutionTime(self::DEFAULT_TIMEOUT);
 
-
         $host = $this->resolveFixtureEndpointHost();
         $token = (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_TOKEN);
         $schoolId = (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_ID);
@@ -111,13 +109,13 @@ class ImporterTool extends CliTool\App
 
         $scriptParts = [];
         if ($runFixtures) {
-            $scriptParts[] = 'fixtures';
+            $scriptParts[] = self::OPT_LONG_FIXTURES;
         }
         if ($runResults) {
-            $scriptParts[] = 'results';
+            $scriptParts[] = self::OPT_LONG_RESULTS;
         }
         if ($runCoCurricular) {
-            $scriptParts[] = 'co-curricular';
+            $scriptParts[] = self::OPT_LONG_CO_CURRICULAR;
         }
         $scriptName = sprintf('socs:%s', implode('+', $scriptParts));
 

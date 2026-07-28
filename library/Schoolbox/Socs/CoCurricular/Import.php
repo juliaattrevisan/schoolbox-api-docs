@@ -7,13 +7,8 @@ namespace Schoolbox\Socs\CoCurricular;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Fixtures\Coach\Mapper as CoachMapper;
 use Schoolbox\Fixtures\Team\Coach\Mapper as TeamCoachMapper;
-use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
-use Schoolbox\Fixtures\Season\Mapper as SeasonMapper;
-use Schoolbox\Fixtures\Sport\Mapper as SportMapper;
-use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
 use Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
-use Schoolbox\Fixtures\Venue\Mapper as VenueMapper;
 use Schoolbox\Socs\Fixtures\Lookup\Person;
 use Schoolbox\Socs\Fixtures\Registry;
 use Schoolbox\Socs\Fixtures\StaleSql;
@@ -25,13 +20,17 @@ use Symfony\Component\Lock\LockInterface;
 /**
  * Import SOCS co-curricular clubs, events, and registrations as Fixtures.
  */
-final class Import implements IStrategy
+class Import implements IStrategy
 {
     private const string PATH = '/socs/xml/cocurricular.ashx';
+    /** Number of days before today included in the import window. */
     private const int FROM = -30;
+    /** Number of days after today included in the import window. */
     private const int TO = 100;
-    public const string EXTERNAL_PREFIX = 'socs-co-curricular:';
-    public const string SEASON = 'SOCS Co-Curricular';
+    public const string EXTERNAL_ID_PREFIX = 'socs-co-curricular:';
+    public const string SEASON_NAME = 'SOCS Co-Curricular';
+    private const string CLUB_EXTERNAL_ID_PREFIX = 'club:';
+    private const string EVENT_EXTERNAL_ID_PREFIX = 'event:';
 
     public function __construct(
         private LoggerInterface $log,
@@ -41,11 +40,6 @@ final class Import implements IStrategy
         private Parser $parser,
         private Registry $registry,
         private MatchupMapper $matchupMapper,
-        private SportMapper $sportMapper,
-        private SeasonMapper $seasonMapper,
-        private DivisionMapper $divisionMapper,
-        private VenueMapper $venueMapper,
-        private TeamMapper $teamMapper,
         private TeamPlayerMapper $teamPlayerMapper,
         private TeamCoachMapper $teamCoachMapper,
         private CoachMapper $coachMapper,
@@ -55,7 +49,7 @@ final class Import implements IStrategy
     }
 
     /**
-     * Download and validate every feed before stale marking or cleanup.
+     * Download and validate every feed before importing any records.
      *
      * @throws \Throwable When a request or feed parse fails.
      */
@@ -68,52 +62,62 @@ final class Import implements IStrategy
         $clubsXml = $this->httpClient->get(self::PATH, ['data' => 'clubs']);
         $eventsXml = $this->httpClient->get(self::PATH, ['data' => 'events', 'startdate' => $start, 'enddate' => $end, 'staff' => 1]);
         $registersXml = $this->httpClient->get(self::PATH, ['data' => 'registers', 'startdate' => $start, 'enddate' => $end]);
-        $data = $this->parser->parse($clubsXml, $eventsXml, $registersXml);
-
-        if ($this->perform) {
-            $this->lock->refresh();
-            foreach (StaleSql::buildPrepareQueries($this->tables(), self::EXTERNAL_PREFIX, self::SEASON) as $query) {
-                $this->matchupMapper->getDatabase()->query($query);
-            }
-        }
+        [$clubs, $events, $pupilIdsByClubId, $staffIdsByClubId] = $this->parser->parse(
+            $clubsXml,
+            $eventsXml,
+            $registersXml,
+        );
 
         $season = $this->registry->recallSeason();
         $teams = [];
-        foreach ($data->clubsById as $club) {
-            $identity = 'club:' . $club->id;
+        foreach ($clubs as $club) {
+            $this->lock->refresh();
+            $identity = self::CLUB_EXTERNAL_ID_PREFIX . $club->id;
             $sport = $this->registry->recallSport($club->getDisplayName(), $identity);
             $division = $this->registry->recallDivision($club->getDisplayName(), $sport, $season, $identity);
             $team = $this->registry->recallTeam($club->getDisplayName(), $division, $identity);
             $teams[$club->id] = $team;
         }
 
-        foreach ($data->eventsById as $event) {
-            if (!isset($data->clubsById[$event->clubId], $teams[$event->clubId])) {
-                $this->log->warning(sprintf('Skipping SOCS co-curricular event %s with unmatched ClubID %s', $event->id, $event->clubId));
+        foreach ($events as $event) {
+            $this->lock->refresh();
+            if (!isset($clubs[$event->clubId], $teams[$event->clubId])) {
+                $this->log->info(sprintf(
+                    'Skipping SOCS co-curricular event "%s" (%s) with unmatched ClubID %s',
+                    $event->title,
+                    $event->id,
+                    $event->clubId,
+                ));
                 continue;
             }
-            $this->importEvent($event, $data->clubsById[$event->clubId], $teams[$event->clubId], $season);
+            $this->importEvent($event, $teams[$event->clubId], $season);
         }
 
-        foreach ($data->clubsById as $club) {
-            $this->replaceMembership($teams[$club->id], $data->pupilIdsByClubId[$club->id] ?? [], $data->staffIdsByClubId[$club->id] ?? []);
-        }
-
-        if ($this->perform) {
+        foreach ($clubs as $club) {
             $this->lock->refresh();
-            foreach (StaleSql::buildCleanupQueries($this->tables(), self::EXTERNAL_PREFIX, self::SEASON) as $query) {
-                $this->matchupMapper->getDatabase()->query($query);
-            }
+            $this->replaceMembership(
+                $teams[$club->id],
+                $pupilIdsByClubId[$club->id] ?? [],
+                $staffIdsByClubId[$club->id] ?? [],
+            );
         }
-        $this->log->info(sprintf('SOCS co-curricular import complete; processed %d clubs and %d events', count($data->clubsById), count($data->eventsById)));
+
+        $this->log->info(sprintf(
+            'SOCS co-curricular import complete; processed %d clubs and %d events',
+            count($clubs),
+            count($events),
+        ));
     }
 
     /**
      * Import one event occurrence as a matchup.
      */
-    private function importEvent(Event $event, Club $club, \Schoolbox\Fixtures\Team\Model $team, \Schoolbox\Fixtures\Season\Model $season): void
-    {
-        $externalId = self::EXTERNAL_PREFIX . 'event:' . $event->id;
+    private function importEvent(
+        Event $event,
+        \Schoolbox\Fixtures\Team\Model $team,
+        \Schoolbox\Fixtures\Season\Model $season,
+    ): void {
+        $externalId = self::EXTERNAL_ID_PREFIX . self::EVENT_EXTERNAL_ID_PREFIX . $event->id;
         try {
             $matchup = $this->matchupMapper->findOneByColumn('external_id', $externalId);
         } catch (\Schoolbox\Mapper\Exception $e) {
@@ -121,8 +125,7 @@ final class Import implements IStrategy
         }
         $venue = $this->registry->recallVenue($event->location !== '' ? $event->location : 'Unspecified location');
         $matchup->setDivision($team->getDivision())->setSeason($season)->setVenue($venue)
-            ->setName($event->title)->setStartAt(new \Alaress_Date_Format($event->start->format('Y-m-d H:i:s'), \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setFinishAt(new \Alaress_Date_Format($event->finish->format('Y-m-d H:i:s'), \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setName($event->title)->setStartAt($event->start)->setFinishAt($event->finish)
             ->setNotes($event->recurringId !== '' ? 'SOCS recurring ID: ' . $event->recurringId : '')
             ->setHomeTeam($team)->setAwayTeam(null)->setHomeSchool(null)->setAwaySchool(null)->setExternalId($externalId);
         if ($this->perform) {
@@ -148,9 +151,13 @@ final class Import implements IStrategy
         }
         $sequence = 0;
         foreach ($pupilIds as $pupilId) {
+            $this->lock->refresh();
             $user = $this->personLookup->fetchUser($pupilId);
             if ($user === null) {
-                $this->log->warning(sprintf('SOCS co-curricular pupil %s has no matching Schoolbox user; skipping', $pupilId));
+                $this->log->info(sprintf(
+                    'SOCS co-curricular pupil %s has no matching Schoolbox user; skipping',
+                    $pupilId,
+                ));
                 continue;
             }
             $sequence++;
@@ -162,9 +169,13 @@ final class Import implements IStrategy
         }
 
         foreach ($staffIds as $staffId) {
+            $this->lock->refresh();
             $user = $this->personLookup->fetchUser($staffId);
             if ($user === null) {
-                $this->log->warning(sprintf('SOCS co-curricular staff %s has no matching Schoolbox user; skipping', $staffId));
+                $this->log->info(sprintf(
+                    'SOCS co-curricular staff %s has no matching Schoolbox user; skipping',
+                    $staffId,
+                ));
                 continue;
             }
             $coachName = trim(sprintf('%s %s', $user['preferred_name'] ?: $user['firstname'], $user['lastname']));
@@ -187,11 +198,5 @@ final class Import implements IStrategy
                 }
             }
         }
-    }
-
-    /** @return array{matchup:string,sport:string,season:string,division:string,team:string,venue:string} */
-    private function tables(): array
-    {
-        return ['matchup' => $this->matchupMapper->getTable(), 'sport' => $this->sportMapper->getTable(), 'season' => $this->seasonMapper->getTable(), 'division' => $this->divisionMapper->getTable(), 'team' => $this->teamMapper->getTable(), 'venue' => $this->venueMapper->getTable()];
     }
 }

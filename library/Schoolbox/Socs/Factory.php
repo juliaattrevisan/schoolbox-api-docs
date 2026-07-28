@@ -52,7 +52,7 @@ class Factory
         private string $host,
         private string $schoolId,
         #[SensitiveParameter] private string $token,
-        private ?string $coHost = null
+        private string $coHost,
     ) {
     }
 
@@ -62,7 +62,7 @@ class Factory
      * @throws DomainException
      * @throws InvalidArgumentException
      */
-    public function produce(bool $fixtures, bool $results, bool $coCurricular = false): GenericCollection
+    public function produce(bool $fixtures, bool $results, bool $coCurricular): GenericCollection
     {
         if ('' === $this->host) {
             throw new DomainException('Missing SOCS endpoint host; exiting SOCS importer');
@@ -188,8 +188,59 @@ class Factory
         }
 
         if ($coCurricular) {
-            $coRegistry = new Fixtures\Registry($this->log, $this->perform, $seasonMapper, $sportMapper, $divisionMapper, $teamMapper, $venueMapper, $schoolMapper, CoCurricular\Import::EXTERNAL_PREFIX, CoCurricular\Import::SEASON);
-            $bus->add(new CoCurricular\Import($this->log, $this->perform, $this->lock, new HttpClient($this->coHost ?? $this->host, $this->schoolId, $this->token), new CoCurricular\Parser(), $coRegistry, $matchupMapper, $sportMapper, $seasonMapper, $divisionMapper, $venueMapper, $teamMapper, $teamPlayerMapper, $teamCoachMapper, $coachMapper, $userMapper, new Person($userMapper)));
+            $coRegistry = new Fixtures\Registry(
+                $this->log,
+                $this->perform,
+                $seasonMapper,
+                $sportMapper,
+                $divisionMapper,
+                $teamMapper,
+                $venueMapper,
+                $schoolMapper,
+                CoCurricular\Import::EXTERNAL_ID_PREFIX,
+                CoCurricular\Import::SEASON_NAME,
+            );
+            $coHttpClient = new HttpClient(
+                trim($this->coHost) !== '' ? $this->coHost : $this->host,
+                $this->schoolId,
+                $this->token,
+            );
+            $bus->add(new CoCurricular\Prepare(
+                $this->log,
+                $this->perform,
+                $this->lock,
+                $matchupMapper,
+                $sportMapper,
+                $seasonMapper,
+                $divisionMapper,
+                $venueMapper,
+                $teamMapper,
+            ))
+            ->add(new CoCurricular\Import(
+                $this->log,
+                $this->perform,
+                $this->lock,
+                $coHttpClient,
+                new CoCurricular\Parser($this->log),
+                $coRegistry,
+                $matchupMapper,
+                $teamPlayerMapper,
+                $teamCoachMapper,
+                $coachMapper,
+                $userMapper,
+                new Person($userMapper),
+            ))
+            ->add(new CoCurricular\Cleanup(
+                $this->log,
+                $this->perform,
+                $this->lock,
+                $matchupMapper,
+                $sportMapper,
+                $seasonMapper,
+                $divisionMapper,
+                $venueMapper,
+                $teamMapper,
+            ));
         }
 
         return $bus;
