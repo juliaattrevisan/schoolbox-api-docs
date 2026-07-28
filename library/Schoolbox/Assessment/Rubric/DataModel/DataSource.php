@@ -1424,6 +1424,10 @@ class DataSource
             $capabilityUsage = (new CapabilityUsage($capabilityObject))
                 ->setMaxValue($capability['maxValue']);
 
+            /* Sequence indicators in situ
+             */
+            $indicatorSequence = IndicatorUsageModel::SEQUENCE_BASE;
+
             foreach ($capability['indicators'] as $indicator) {
                 // Likewise if $indicatorObject is null here, that's a problem
                 $indicatorObject = $capabilityObject->retrieveIndicatorByName($indicator['name']);
@@ -1434,7 +1438,9 @@ class DataSource
                     );
                 }
 
-                $indicatorUsage = new IndicatorUsage($indicatorObject);
+                /* Assign indicator sequence here, explicitly, instead of inferring
+                 */
+                $indicatorUsage = (new IndicatorUsage($indicatorObject))->setSequence($indicatorSequence++);
 
                 foreach ($indicator['descriptors'] as $level => $descriptor) {
                     if ($descriptor !== null) {
