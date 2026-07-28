@@ -11,6 +11,8 @@
 namespace Schoolbox\Admin\Service;
 
 use Schoolbox\CampusMapper;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\RoleMapper;
@@ -37,14 +39,14 @@ class Permissions
      * @param UserAccessMapper $userAccessMapper Loads service definitions and their assigned users.
      * @param CampusMapper $campusMapper Resolves campus identifiers displayed in the detailed report.
      * @param RoleMapper $roleMapper Resolves role identifiers displayed in the detailed report.
-     * @param bool $ibEnabled Whether the International Baccalaureate module is enabled for this instance.
+     * @param IConfigLoader $configLoader Loads configuration settings for the instance.
      */
     public function __construct(
         private readonly UserMapper $userMapper,
         private readonly UserAccessMapper $userAccessMapper,
         private readonly CampusMapper $campusMapper,
         private readonly RoleMapper $roleMapper,
-        private readonly bool $ibEnabled
+        private readonly IConfigLoader $configLoader
     ) {
     }
 
@@ -206,6 +208,6 @@ class Permissions
     {
         /* IB Coordinator follows the IB module feature flag.
          */
-        return $serviceId !== UserAccess::SERVICE_IB_COORDINATOR || $this->ibEnabled;
+        return $serviceId !== UserAccess::SERVICE_IB_COORDINATOR || (bool)$this->configLoader->get(ConfigMapper::NAME_IB_ENABLED);
     }
 }

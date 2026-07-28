@@ -49,7 +49,7 @@ class Controller extends Base
             $this->userAccessMapper,
             $this->campusMapper,
             $this->roleMapper,
-            (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_IB_ENABLED),
+            $this->getConfigLoader(),
         );
 
         $this->response = $this->responseFromTemplate(

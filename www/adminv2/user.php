@@ -54,7 +54,7 @@ $permissions = new Permissions(
     new UserAccessMapper(),
     new CampusMapper(),
     new RoleMapper(),
-    (bool)$this->getDi()->get('config')->get(ConfigMapper::NAME_IB_ENABLED),
+    $this->getDi()->get('config'),
 );
 $serviceUserList = $permissions->generate();
 foreach ($serviceUserList as $service => $serviceUsers) {
