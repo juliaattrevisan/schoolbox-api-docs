@@ -260,8 +260,9 @@ HELP;
         $sql = file_get_contents(SITE_root . "/sql/vagrant-cleanup.sql");
         $this->getDatabaseInternal()->execute($sql);
         $this->getLogger()->info("cleaning transforms");
-        $query = "DELETE st FROM storage_transform st LEFT JOIN storage s ON st.hash = s.hash WHERE s.storage_id IS NULL";
-        $this->getDatabaseInternal()->execute($query);
+        # transform files are named `{hash}-{cacheKey}`, so they are not fetched by the storage hash
+        # download: clear the table entirely rather than leaving rows pointing at absent files
+        $this->getDatabaseInternal()->execute("TRUNCATE storage_transform");
     }
 
     private function mysqlDump(string $directory, string $filename = "schoolbox.sql"): void
