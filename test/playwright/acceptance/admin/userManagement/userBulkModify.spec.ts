@@ -9,15 +9,12 @@
 
 import { test } from "@schoolboxTest/playwright/support/integrations";
 import UserBulkModify from "@schoolboxTest/playwright/support/page/admin/userManagement/UserBulkModify";
-import Common from "@schoolboxTest/playwright/support/page/Common";
 
 test.describe("User bulk modify: filters, sort, pagination and delete", () => {
     let userBulkModify: UserBulkModify;
-    let common: Common;
 
     test.beforeEach(async ({ tester, page }) => {
         userBulkModify = new UserBulkModify(tester, page);
-        common = new Common(page);
 
         tester.isGoingTo("Login as admin");
         await tester.loginAsAdmin();
@@ -89,8 +86,8 @@ test.describe("User bulk modify: filters, sort, pagination and delete", () => {
             await userBulkModify.expectVisibleRows(1);
             await userBulkModify.selectFirstUser();
             await userBulkModify.clickDeleteButton();
-            await common.clickModalDeleteButton();
-            await common.closeModal();
+            await userBulkModify.confirmDeleteUsers();
+            await userBulkModify.closeOutputLogModal();
 
             await userBulkModify.searchUsers("staff 20");
             await userBulkModify.expectNoMatchingUsers();

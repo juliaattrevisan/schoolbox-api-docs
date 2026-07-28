@@ -20,6 +20,14 @@ export default class UserBulkModify {
 
     static readonly DATA_TEST_DELETE_BUTTON = "user-bulk-modify-delete-button";
 
+    static readonly DATA_TEST_DELETE_CONFIRMATION_MODAL = "user-bulk-modify-delete-confirmation-modal";
+
+    static readonly DATA_TEST_CONFIRM_DELETE_BUTTON = "user-bulk-modify-confirm-delete-button";
+
+    static readonly DATA_TEST_LOG_MODAL_OUTPUT = "log-modal-output";
+
+    static readonly DATA_TEST_LOG_MODAL_CLOSE_BUTTON = "log-modal-close-button";
+
     static readonly COLUMN_FIRST_NAME = 1;
 
     static readonly COLUMN_SURNAME = 3;
@@ -68,6 +76,7 @@ export default class UserBulkModify {
         await searchInput.click();
         await searchInput.clear();
         await searchInput.fill(searchText);
+        await expect(searchInput).toHaveValue(searchText);
     }
 
     /**
@@ -78,6 +87,7 @@ export default class UserBulkModify {
         const searchInput = this.page.getByLabel(UserBulkModify.SELECTOR_INPUT_SEARCH);
         await searchInput.click();
         await searchInput.clear();
+        await expect(searchInput).toHaveValue("");
     }
 
     /**
@@ -176,6 +186,32 @@ export default class UserBulkModify {
     async clickDeleteButton(): Promise<void> {
         this.tester.isGoingTo("Click the delete users button");
         await this.page.getByTestId(UserBulkModify.DATA_TEST_DELETE_BUTTON).click();
+    }
+
+    /**
+     * Confirm the selected users should be deleted.
+     */
+    async confirmDeleteUsers(): Promise<void> {
+        this.tester.isGoingTo("Confirm selected users should be deleted");
+        const deleteModal = this.page.locator("div[data-reveal].open", {
+            has: this.page.getByTestId(UserBulkModify.DATA_TEST_DELETE_CONFIRMATION_MODAL),
+        });
+        await expect(deleteModal).toBeVisible();
+        await deleteModal.getByTestId(UserBulkModify.DATA_TEST_CONFIRM_DELETE_BUTTON).click();
+        await expect(deleteModal).not.toBeVisible();
+    }
+
+    /**
+     * Close the output log modal shown after a bulk action completes.
+     */
+    async closeOutputLogModal(): Promise<void> {
+        this.tester.isGoingTo("Close the bulk modify output log");
+        const outputLogModal = this.page.locator("div[data-reveal].open", {
+            has: this.page.getByTestId(UserBulkModify.DATA_TEST_LOG_MODAL_OUTPUT),
+        });
+        await expect(outputLogModal).toBeVisible();
+        await outputLogModal.getByTestId(UserBulkModify.DATA_TEST_LOG_MODAL_CLOSE_BUTTON).click();
+        await expect(outputLogModal).not.toBeVisible();
     }
 
     /**
