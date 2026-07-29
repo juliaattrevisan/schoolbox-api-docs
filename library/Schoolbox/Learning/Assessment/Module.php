@@ -645,7 +645,8 @@ class Module extends BaseModule
         }
 
         // if this is a impl assessment we need to load participant data for the student, otherwise the status page will not load correctly
-        if ($assessment->isImplementation()) {
+        // for projects we chunk the participants in the controller, lets do the bear minimum here
+        if (!$assessment instanceof Project && $assessment->isImplementation()) {
             return $this->preloadAssessment($params);
         }
 
