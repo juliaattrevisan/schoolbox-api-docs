@@ -318,8 +318,7 @@ export default class QualificationList {
 
     /**
      * Asserts that the System Purpose dropdown for the given row contains all expected options:
-     * Not Selected, Diploma Programme Year 2 [DIPLOMA], Diploma Programme Year 1 [ANTICIPATED],
-     * Diploma Course [COURSE].
+     * Not Selected, Diploma Programme Year 2 [DIPLOMA], Diploma Course [COURSE].
      * @param rowIndex - zero-based row index
      */
     async checkSystemPurposeOptionsArePresented(rowIndex: number): Promise<void> {

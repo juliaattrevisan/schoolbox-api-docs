@@ -12,6 +12,7 @@ import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceT
 import type { Page } from "@playwright/test";
 import type DatabaseHelper from "@schoolboxTest/playwright/support/DatabaseHelper";
 import Resources from "@schoolboxTest/playwright/support/page/resources/Resources";
+import SearchPage from "@schoolboxTest/playwright/support/page/search/SearchPage";
 
 /**
  * create a lesson plan, check if the teacher and student can view the fields as per its visibility configuration
@@ -178,6 +179,7 @@ test.describe("Lesson Plan Activity", () => {
     test("Lesson Plan Fields Visibility", async ({ tester, page, db }) => {
         const courseList = new CourseList(tester, page);
         const importCourseIntoClass = new ImportCourseIntoClass(page);
+        const searchPage = new SearchPage(page);
 
         const teacher = "Mr Jack Coles";
         const student = "Ms Eden Reed";
@@ -219,8 +221,16 @@ test.describe("Lesson Plan Activity", () => {
         await page.goto(`/homepage/${folderId}`);
         await expect(page.locator('ul[class="information-list"]')).toContainText("Romeo and Juliet");
         await expect(page.locator('ul[class="information-list"]')).toContainText(lessonPlanName);
+        await tester.rebuildSearchIndex();
         tester.isGoingTo("as a student view the lesson plan");
         await tester.impersonateViaUserProfilePage(student);
+        tester.isGoingTo("check if the hidden lesson plan field is not presented in advanced search");
+        await searchPage.goto();
+        await searchPage.inputKeyword("Automation Field 2 not visible to students");
+        await searchPage.clearFilters();
+        await searchPage.clickFilterType("assessment");
+        await searchPage.clickApplyFilters();
+        await searchPage.verifyResultsTextPresence("Automation Field 2 not visible to students", false);
         await page.goto(`/homepage/${folderId}`);
         await page.waitForTimeout(3000);
         await page.click("a[title='Lesson Plan']");
@@ -234,6 +244,13 @@ test.describe("Lesson Plan Activity", () => {
         );
         tester.isGoingTo("as a teacher view the lesson plan");
         await tester.impersonateViaUserProfilePage(teacher);
+        tester.isGoingTo("check if the hidden lesson plan field is presented in advanced search");
+        await searchPage.goto();
+        await searchPage.inputKeyword("Automation Field 2 not visible to students");
+        await searchPage.clearFilters();
+        await searchPage.clickFilterType("assessment");
+        await searchPage.clickApplyFilters();
+        await searchPage.verifyResultsTextPresence("Automation Field 2 not visible to students");
         await page.goto(`/homepage/${folderId}`);
         await page.waitForTimeout(3000);
         await page.click("a[title='Lesson Plan']");
