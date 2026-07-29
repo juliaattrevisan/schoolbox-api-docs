@@ -206,7 +206,7 @@ abstract class BaseTool extends CliTool\App
             $lastAssessId  = $result['lastAssessId'];
             $toolLock->refresh();
         } while ($result['hasMore']);
-        $this->getLogger()->info(sprintf('Processed %d quizz%s over %d loop%s', $runningCount, 1 === $runningCount ? '' : 'es', $loops, 1 === $loops ? '' : 's'));
+        $this->getLogger()->info(sprintf('Processed %d quiz%s over %d loop%s', $runningCount, 1 === $runningCount ? '' : 'zes', $loops, 1 === $loops ? '' : 's'));
         $toolLock->release();
         $this->getLogger()->notice($this->perform() ? 'Quizzes modified.' : 'Planning finished.');
     }
