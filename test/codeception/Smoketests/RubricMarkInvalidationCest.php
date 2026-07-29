@@ -34,7 +34,7 @@ class RubricMarkInvalidationCest
     }
 
     /**
-     * Tests that changing a descriptor value invalidates Reporting Activity rubric marks.
+     * Tests that changing a descriptor value invalidates marks only for the changed rubric.
      *
      * @param IntegrationTester $i
      * @return void
@@ -72,27 +72,52 @@ class RubricMarkInvalidationCest
             'created_at' => $date,
             'updated_at' => $date,
         ]);
-        $rubric = $this->createMarkedRubric($i, $folder, $assessment, $feedbackId);
-        $payload = $rubric['payload'];
-        $payload['descriptor'][$rubric['indicatorId']][1]['points'] = '2';
+        $changedRubric = $this->createMarkedRubric(
+            $i,
+            $folder,
+            $assessment,
+            $feedbackId,
+            'Changed reporting rubric',
+        );
+        $unchangedRubric = $this->createMarkedRubric(
+            $i,
+            $folder,
+            $assessment,
+            $feedbackId,
+            'Unchanged reporting rubric',
+        );
+        $changedPayload = $changedRubric['payload'];
+        $changedPayload['descriptor'][$changedRubric['indicatorId']][1]['points'] = '2';
 
         $update = new Payload\Assessable\Update($assessment, '');
         $update->setFormParam('instructor-markType', $markTypeId);
         $update->setFormParam(
-            "rubric[{$rubric['rubricInstanceId']}]",
-            json_encode($payload, JSON_THROW_ON_ERROR),
+            "rubric[{$changedRubric['rubricInstanceId']}]",
+            json_encode($changedPayload, JSON_THROW_ON_ERROR),
+        );
+        $update->setFormParam(
+            "rubric[{$unchangedRubric['rubricInstanceId']}]",
+            json_encode($unchangedRubric['payload'], JSON_THROW_ON_ERROR),
         );
 
-        $i->amGoingTo('Change the point value of a selected Reporting Activity rubric descriptor');
+        $i->amGoingTo('Change a descriptor value on one of two Reporting Activity rubrics');
         $i->sendRequest($update);
         $i->seeResponseCodeIs(303);
         $i->seeInDatabase('rubric_capability_mark', [
-            'id' => $rubric['capabilityMarkId'],
+            'id' => $changedRubric['capabilityMarkId'],
             'valid' => 0,
         ]);
         $i->seeInDatabase('rubric_indicator_mark', [
-            'id' => $rubric['indicatorMarkId'],
+            'id' => $changedRubric['indicatorMarkId'],
             'valid' => 0,
+        ]);
+        $i->seeInDatabase('rubric_capability_mark', [
+            'id' => $unchangedRubric['capabilityMarkId'],
+            'valid' => 1,
+        ]);
+        $i->seeInDatabase('rubric_indicator_mark', [
+            'id' => $unchangedRubric['indicatorMarkId'],
+            'valid' => 1,
         ]);
     }
 
@@ -158,6 +183,7 @@ class RubricMarkInvalidationCest
      * @param Folder\Model      $folder
      * @param IAssessable       $assessment
      * @param int               $feedbackId
+     * @param string            $title
      * @return array{
      *     rubricInstanceId: int,
      *     indicatorId: int,
@@ -171,6 +197,7 @@ class RubricMarkInvalidationCest
         Folder\Model $folder,
         IAssessable $assessment,
         int $feedbackId,
+        string $title,
     ): array {
         $capabilityId = $i->haveInDatabase('rubric_capability', [
             'name' => 'Achievement',
@@ -184,8 +211,8 @@ class RubricMarkInvalidationCest
         $date = date('Y-m-d H:i:s');
         $rubricInstanceId = $i->haveInDatabase('rubric_instance', [
             'assessment_id' => $assessment->getId(),
-            'title' => 'Reporting rubric',
-            'weight' => 100,
+            'title' => $title,
+            'weight' => 50,
             'rubric_capability_mark_type_id' => (int)$i->grabFromDatabase(
                 'submission_mark_type',
                 'mark_type_id',
@@ -285,8 +312,8 @@ class RubricMarkInvalidationCest
                     ],
                 ],
                 'descriptor' => [$indicatorId => $descriptors],
-                'title' => 'Reporting rubric',
-                'weight' => 100,
+                'title' => $title,
+                'weight' => 50,
                 'useMarkRange' => false,
                 'capabilityMarkType' => MarkType::SLUG_NONE,
                 'capabilityGradeGroup' => null,
