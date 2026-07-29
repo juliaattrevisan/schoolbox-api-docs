@@ -176,6 +176,7 @@ abstract class BaseTool extends CliTool\App
         $loops = 0;
         do {
             $loops++;
+            $this->getLogger()->info(sprintf('Loop %d: fetching next batch of quizzes to process...', $loops));
             $result  = $this->findQuizzes($batchSize, $lastCreatedAt, $lastAssessId);
             $quizzes = $result['quizzes'];
 
@@ -205,7 +206,7 @@ abstract class BaseTool extends CliTool\App
             $lastAssessId  = $result['lastAssessId'];
             $toolLock->refresh();
         } while ($quizzes->count() === $batchSize);
-        $this->getLogger()->info(sprintf('Processed %d quizzes over %d loops', $runningCount, $loops));
+        $this->getLogger()->info(sprintf('Processed %d quizz%s over %d loop%s', $runningCount, 1 === $runningCount ? '' : 'es', $loops, 1 === $loops ? '' : 's'));
         $toolLock->release();
         $this->getLogger()->notice($this->perform() ? 'Quizzes modified.' : 'Planning finished.');
     }
