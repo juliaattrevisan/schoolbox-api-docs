@@ -258,7 +258,7 @@
                             </fieldset>
 
                             {% if qualifications|length %}
-                            <fieldset data-role="qualification-fieldset" {% if user.role.type != 'student' %}class="hide"{% endif %}>
+                            <fieldset data-role="qualification-fieldset" {% if not user.role.isStudent %}class="hide"{% endif %}>
                                 <label class="content">{{ locale.translate('qualification', false, true) }} being undertaken</label>
                                 <div class="row content">
                                     {% for qualification in qualifications ?? [] %}
