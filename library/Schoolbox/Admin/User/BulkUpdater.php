@@ -15,6 +15,7 @@ use PDOException;
 use Schoolbox\Collection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
+use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserBulkMapper;
 
@@ -161,6 +162,7 @@ class BulkUpdater
      * @param int            $displayGradeGraph
      * @param int            $revokeToken
      * @param int            $clearGroups
+     * @param RoleMapper     $roleMapper
      */
     public function __construct(
         User $sessionUser,
@@ -181,7 +183,8 @@ class BulkUpdater
         string $position,
         int $displayGradeGraph,
         int $revokeToken,
-        private int $clearGroups
+        private int $clearGroups,
+        private RoleMapper $roleMapper,
     ) {
         $this->sessionUser    = $sessionUser;
         $this->userBulkMapper = $userBulkMapper;
@@ -675,11 +678,7 @@ class BulkUpdater
     private function getQualificationUpdateUserIds(): array
     {
         if ($this->role !== self::UNCHANGED) {
-            $statement = $this->userBulkMapper->getDatabase()->query(
-                "SELECT group_type FROM `groups` WHERE id = :roleId AND deleted_at IS NULL",
-                ['roleId' => $this->role]
-            );
-            $roleType = $statement->fetchColumn();
+            $roleType = $this->roleMapper->findOneByColumn('id', $this->role);
 
             if (QualificationUpdateEligibility::isAllowedForRoleType($roleType ?: null)) {
                 return $this->userIds;
