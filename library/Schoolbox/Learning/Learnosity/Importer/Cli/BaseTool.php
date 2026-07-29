@@ -226,8 +226,9 @@ abstract class BaseTool extends CliTool\App
         ?int $lastAssessId = null,
     ): array {
         $whereParts = [
-            "quiz.learnosity_job_status = :learnosityJobStatus
-            AND quiz.deleted_at IS NULL", // assessmentDataSource->findAllByIds($quizIds) only returns quizzes which are not deleted, but we want to filter them out here too so that the log output is accurate
+            "quiz.learnosity_job_status = :learnosityJobStatus",
+            "quiz.deleted_at IS NULL",
+            "assessment.deleted_at IS NULL", // to prevent assessmentDataSource->findAllByIds($quizIds) causing issues for us (it only hydrates quizzes that are not deleted, lets ensure we fetch nothing that could be half deleted
         ];
         $params = [
             'learnosityJobStatus' => $this->getTargetedQuizStatus(),
