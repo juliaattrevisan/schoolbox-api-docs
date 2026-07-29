@@ -205,7 +205,7 @@ abstract class BaseTool extends CliTool\App
             $lastCreatedAt = $result['lastCreatedAt'];
             $lastAssessId  = $result['lastAssessId'];
             $toolLock->refresh();
-        } while ($quizzes->count() === $batchSize);
+        } while ($result['hasMore']);
         $this->getLogger()->info(sprintf('Processed %d quizz%s over %d loop%s', $runningCount, 1 === $runningCount ? '' : 'es', $loops, 1 === $loops ? '' : 's'));
         $toolLock->release();
         $this->getLogger()->notice($this->perform() ? 'Quizzes modified.' : 'Planning finished.');
@@ -218,7 +218,7 @@ abstract class BaseTool extends CliTool\App
      * @param int         $batchSize
      * @param string|null $lastCreatedAt
      * @param int|null    $lastAssessId
-     * @return array{quizzes: GenericCollection<IAssessable>, lastCreatedAt: string|null, lastAssessId: int|null}
+     * @return array{quizzes: GenericCollection<IAssessable>, hasMore:bool, lastCreatedAt: string|null, lastAssessId: int|null}
      */
     private function findQuizzes(
         int $batchSize,
@@ -300,6 +300,7 @@ abstract class BaseTool extends CliTool\App
 
         return [
             'quizzes'      => $this->assessmentDataSource->findAllByIds($quizIds),
+            'hasMore'       => count($rows) === $batchSize,
             'lastCreatedAt' => $lastRow['created_at'] ?? null,
             'lastAssessId'  => isset($lastRow['assess_id']) ? (int)$lastRow['assess_id'] : null,
         ];
