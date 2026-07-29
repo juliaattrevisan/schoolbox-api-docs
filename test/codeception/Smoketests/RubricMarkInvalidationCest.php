@@ -68,6 +68,7 @@ class RubricMarkInvalidationCest
             'published_at' => $date,
             'updated_at' => $date,
         ]);
+        $this->createCapabilityDefinition($i, $folder);
         $changedRubric = $this->createMarkedRubric(
             $i,
             $folder,
@@ -188,12 +189,12 @@ class RubricMarkInvalidationCest
         int $feedbackId,
         string $title,
     ): array {
-        $capabilityId = $i->haveInDatabase('rubric_capability', [
+        $capabilityId = (int)$i->grabFromDatabase('rubric_capability', 'id', [
             'name' => 'Achievement',
             'parent_id' => $folder->getId(),
             'parent_type' => 'category',
         ]);
-        $indicatorId = $i->haveInDatabase('rubric_indicator', [
+        $indicatorId = (int)$i->grabFromDatabase('rubric_indicator', 'id', [
             'rubric_capability_id' => $capabilityId,
             'name' => 'Achievement indicator',
         ]);
@@ -308,5 +309,25 @@ class RubricMarkInvalidationCest
                 'capabilityGradeGroup' => null,
             ],
         ];
+    }
+
+    /**
+     * Creates a capability and indicator shared by both rubric grids.
+     *
+     * @param IntegrationTester $i
+     * @param Folder\Model      $folder
+     * @return void
+     */
+    private function createCapabilityDefinition(IntegrationTester $i, Folder\Model $folder): void
+    {
+        $capabilityId = $i->haveInDatabase('rubric_capability', [
+            'name' => 'Achievement',
+            'parent_id' => $folder->getId(),
+            'parent_type' => 'category',
+        ]);
+        $i->haveInDatabase('rubric_indicator', [
+            'rubric_capability_id' => $capabilityId,
+            'name' => 'Achievement indicator',
+        ]);
     }
 }
