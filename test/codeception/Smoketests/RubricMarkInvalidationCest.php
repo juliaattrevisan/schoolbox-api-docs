@@ -16,6 +16,7 @@ use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder;
 use Tests\Support\IntegrationTester;
+use Tests\Support\Page\Duework\AssessmentForm;
 use Tests\Support\Payload;
 
 class RubricMarkInvalidationCest
@@ -40,36 +41,31 @@ class RubricMarkInvalidationCest
      * @return void
      * @throws JsonException
      */
-    public function invalidateReportingMarksAfterDescriptorValueChange(IntegrationTester $i): void
+    public function invalidateDueWorkMarksAfterDescriptorValueChange(IntegrationTester $i): void
     {
         $timestamp = time();
         $folder = $this->createHomepage($i, "Testing rubric mark invalidation at $timestamp");
-        $markTypeId = (int)$i->grabFromDatabase(
-            'submission_mark_type',
-            'mark_type_id',
-            ['slug' => MarkType::SLUG_PERCENT],
-        );
-        $assessment = $this->createReportingActivity(
+        $assessment = $this->createAssessment(
             $i,
             $folder,
-            "Testing reporting rubric mark invalidation at $timestamp",
-            $markTypeId,
+            "Testing rubric instance mark invalidation at $timestamp",
         );
         $admin = $i->grabUser('alaress');
         $student = $i->grabUser('jreed');
-        $reportingId = (int)$i->grabFromDatabase(
-            'reporting',
+        $submissionBoxId = (int)$i->grabFromDatabase(
+            'submission_box',
             'id',
             ['assessment_id' => $assessment->getId()],
         );
         $date = date('Y-m-d H:i:s');
-        $feedbackId = $i->haveInDatabase('reporting_feedback', [
-            'reporting_id' => $reportingId,
-            'learner_id' => $student->getId(),
-            'instructor_id' => $admin->getId(),
-            'published_at' => $date,
-            'published_by' => $admin->getId(),
+        $feedbackId = $i->haveInDatabase('submission_return', [
+            'box_id' => $submissionBoxId,
+            'marker' => $admin->getId(),
+            'owner' => $student->getId(),
+            'review_route' => 'instructor',
             'created_at' => $date,
+            'published_by' => $admin->getId(),
+            'published_at' => $date,
             'updated_at' => $date,
         ]);
         $changedRubric = $this->createMarkedRubric(
@@ -77,20 +73,19 @@ class RubricMarkInvalidationCest
             $folder,
             $assessment,
             $feedbackId,
-            'Changed reporting rubric',
+            'Changed rubric',
         );
         $unchangedRubric = $this->createMarkedRubric(
             $i,
             $folder,
             $assessment,
             $feedbackId,
-            'Unchanged reporting rubric',
+            'Unchanged rubric',
         );
         $changedPayload = $changedRubric['payload'];
         $changedPayload['descriptor'][$changedRubric['indicatorId']][1]['points'] = '2';
 
         $update = new Payload\Assessable\Update($assessment, '');
-        $update->setFormParam('instructor-markType', $markTypeId);
         $update->setFormParam(
             "rubric[{$changedRubric['rubricInstanceId']}]",
             json_encode($changedPayload, JSON_THROW_ON_ERROR),
@@ -100,7 +95,7 @@ class RubricMarkInvalidationCest
             json_encode($unchangedRubric['payload'], JSON_THROW_ON_ERROR),
         );
 
-        $i->amGoingTo('Change a descriptor value on one of two Reporting Activity rubrics');
+        $i->amGoingTo('Change a descriptor value on one of two Due Work rubrics');
         $i->sendRequest($update);
         $i->seeResponseCodeIs(303);
         $i->seeInDatabase('rubric_capability_mark', [
@@ -122,7 +117,7 @@ class RubricMarkInvalidationCest
     }
 
     /**
-     * Creates a homepage to contain the Reporting Activity.
+     * Creates a homepage to contain the assessment under test.
      *
      * @param IntegrationTester $i
      * @param string            $title
@@ -142,33 +137,27 @@ class RubricMarkInvalidationCest
     }
 
     /**
-     * Creates a Reporting Activity in the supplied homepage.
+     * Creates a Due Work assessment in the supplied homepage.
      *
      * @param IntegrationTester $i
      * @param Folder\Model      $folder
      * @param string            $title
-     * @param int               $markTypeId
      * @return IAssessable
      * @throws JsonException
      */
-    private function createReportingActivity(
+    private function createAssessment(
         IntegrationTester $i,
         Folder\Model $folder,
         string $title,
-        int $markTypeId,
     ): IAssessable {
         $payload = new Payload\Assessable\Create(
             AssessmentContextType::TYPE_FOLDER,
             $folder->getId(),
             $folder->getId(),
-            AssessmentType::TYPE_REPORTING,
+            AssessmentType::TYPE_DUE_WORK,
         );
         $payload->setTitle($title);
-        $payload->setFormParam(
-            'workType',
-            $i->grabFromDatabase('lu_work_type', 'id', ['permitted_reporting_activity' => 1]),
-        );
-        $payload->setFormParam('instructor-markType', $markTypeId);
+        $payload->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK);
 
         $i->sendRequest($payload);
         $i->seeResponseCodeIs(303);
@@ -177,7 +166,7 @@ class RubricMarkInvalidationCest
     }
 
     /**
-     * Creates a rubric with a selected four-point descriptor on Reporting feedback.
+     * Creates a rubric with a selected four-point descriptor on submission feedback.
      *
      * @param IntegrationTester $i
      * @param Folder\Model      $folder
@@ -276,7 +265,7 @@ class RubricMarkInvalidationCest
         ];
         $capabilityMarkId = $i->haveInDatabase('rubric_capability_mark', [
             'feedback_id' => $feedbackId,
-            'feedback_table' => 'reporting_feedback',
+            'feedback_table' => 'submission_return',
             'rubric_instance_id' => $rubricInstanceId,
             'rubric_capability_id' => $capabilityId,
             'human_readable_value' => '4',
