@@ -22,15 +22,15 @@ class StaleSql
      * @param array{matchup:string,sport:string,season:string,division:string,team:string,venue:string} $tables
      * @return string[]
      */
-    public static function buildPrepareQueries(array $tables): array
+    public static function buildPrepareQueries(array $tables, string $externalIdPrefix = Registry::EXTERNAL_ID_PREFIX, string $seasonName = Registry::SOCS_FIXTURES): array
     {
         return [
-            self::buildMarkStaleByExternalId($tables['matchup']),
-            self::buildMarkStaleByExternalId($tables['sport']),
-            self::buildMarkStaleBySeasonName($tables['season']),
-            self::buildMarkStaleByExternalId($tables['division']),
-            self::buildMarkStaleByExternalId($tables['venue']),
-            self::buildMarkStaleByExternalId($tables['team']),
+            self::buildMarkStaleByExternalId($tables['matchup'], $externalIdPrefix),
+            self::buildMarkStaleByExternalId($tables['sport'], $externalIdPrefix),
+            self::buildMarkStaleBySeasonName($tables['season'], $seasonName),
+            self::buildMarkStaleByExternalId($tables['division'], $externalIdPrefix),
+            self::buildMarkStaleByExternalId($tables['venue'], $externalIdPrefix),
+            self::buildMarkStaleByExternalId($tables['team'], $externalIdPrefix),
         ];
     }
 
@@ -42,15 +42,15 @@ class StaleSql
      * @param array{matchup:string,sport:string,season:string,division:string,team:string,venue:string} $tables
      * @return string[]
      */
-    public static function buildCleanupQueries(array $tables): array
+    public static function buildCleanupQueries(array $tables, string $externalIdPrefix = Registry::EXTERNAL_ID_PREFIX, string $seasonName = Registry::SOCS_FIXTURES): array
     {
         return [
-            self::buildSoftDeleteByExternalId($tables['matchup']),
-            self::buildSoftDeleteByExternalId($tables['sport']),
-            self::buildSoftDeleteBySeasonName($tables['season']),
-            self::buildSoftDeleteByExternalId($tables['division']),
-            self::buildSoftDeleteByExternalId($tables['venue']),
-            self::buildSoftDeleteByExternalId($tables['team']),
+            self::buildSoftDeleteByExternalId($tables['matchup'], $externalIdPrefix),
+            self::buildSoftDeleteByExternalId($tables['sport'], $externalIdPrefix),
+            self::buildSoftDeleteBySeasonName($tables['season'], $seasonName),
+            self::buildSoftDeleteByExternalId($tables['division'], $externalIdPrefix),
+            self::buildSoftDeleteByExternalId($tables['venue'], $externalIdPrefix),
+            self::buildSoftDeleteByExternalId($tables['team'], $externalIdPrefix),
         ];
     }
 
@@ -77,13 +77,13 @@ class StaleSql
      *
      * Fixtures use a known sentinel timestamp so unsynced records can be identified and removed in a later phase.
      */
-    private static function buildMarkStaleByExternalId(string $table): string
+    private static function buildMarkStaleByExternalId(string $table, string $externalIdPrefix): string
     {
         return sprintf(
             "UPDATE %s SET updated_at = '%s' WHERE external_id LIKE '%s%%'",
             $table,
             self::STALE_UPDATED_AT,
-            Registry::EXTERNAL_ID_PREFIX
+            $externalIdPrefix
         );
     }
 
@@ -92,13 +92,13 @@ class StaleSql
      *
      * Season rows do not use the same external ID convention, so name-based matching keeps stale tracking consistent.
      */
-    private static function buildMarkStaleBySeasonName(string $table): string
+    private static function buildMarkStaleBySeasonName(string $table, string $seasonName): string
     {
         return sprintf(
             "UPDATE %s SET updated_at = '%s' WHERE name = '%s'",
             $table,
             self::STALE_UPDATED_AT,
-            Registry::SOCS_FIXTURES
+            $seasonName
         );
     }
 
@@ -107,13 +107,13 @@ class StaleSql
      *
      * Using soft-delete preserves auditability while removing inactive fixture records from active views.
      */
-    private static function buildSoftDeleteByExternalId(string $table): string
+    private static function buildSoftDeleteByExternalId(string $table, string $externalIdPrefix): string
     {
         return sprintf(
             "UPDATE %s SET deleted_at = NOW() WHERE updated_at = '%s' AND external_id LIKE '%s%%'",
             $table,
             self::STALE_UPDATED_AT,
-            Registry::EXTERNAL_ID_PREFIX
+            $externalIdPrefix
         );
     }
 
@@ -122,13 +122,13 @@ class StaleSql
      *
      * This mirrors external-ID cleanup logic for season data that is keyed by name in this fixture domain.
      */
-    private static function buildSoftDeleteBySeasonName(string $table): string
+    private static function buildSoftDeleteBySeasonName(string $table, string $seasonName): string
     {
         return sprintf(
             "UPDATE %s SET deleted_at = NOW() WHERE updated_at = '%s' AND name = '%s'",
             $table,
             self::STALE_UPDATED_AT,
-            Registry::SOCS_FIXTURES
+            $seasonName
         );
     }
 }

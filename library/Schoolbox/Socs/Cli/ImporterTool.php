@@ -31,6 +31,7 @@ class ImporterTool extends CliTool\App
     private const string OPT_LONG_INSTANCE = 'instance:';
     private const string OPT_LONG_FIXTURES = 'fixtures';
     private const string OPT_LONG_RESULTS = 'results';
+    private const string OPT_LONG_CO_CURRICULAR = 'co-curricular';
     private const int LOCK_TTL = 120;
     private const int DEFAULT_TIMEOUT = 3600;
 
@@ -46,6 +47,7 @@ class ImporterTool extends CliTool\App
             self::OPT_LONG_INSTANCE,
             self::OPT_LONG_FIXTURES,
             self::OPT_LONG_RESULTS,
+            self::OPT_LONG_CO_CURRICULAR,
         ];
     }
 
@@ -66,8 +68,25 @@ class ImporterTool extends CliTool\App
             return;
         }
 
-        if (!$this->getConfig()->get(ConfigMapper::NAME_SOCS_IMPORT_SPORTS_FIXTURES)) {
-            $logger->info('SOCS sports fixture import is not enabled; exiting');
+        // Explicit options select individual import streams. With no stream
+        // option, all streams are selected before their feature toggles apply.
+        $sportsEnabled = (bool)$this->getConfig()->get(ConfigMapper::NAME_SOCS_IMPORT_SPORTS_FIXTURES);
+        $coCurricularEnabled = (bool)$this->getConfig()->get(ConfigMapper::NAME_SOCS_IMPORT_CO_CURRICULAR);
+        $runFixtures = (bool)$this->getOpt(self::OPT_LONG_FIXTURES);
+        $runResults = (bool)$this->getOpt(self::OPT_LONG_RESULTS);
+        $runCoCurricular = (bool)$this->getOpt(self::OPT_LONG_CO_CURRICULAR);
+        if (!$runFixtures && !$runResults && !$runCoCurricular) {
+            $runFixtures = true;
+            $runResults = true;
+            $runCoCurricular = true;
+        }
+
+        // A selected stream only runs when its corresponding saved setting is enabled.
+        $runFixtures = $runFixtures && $sportsEnabled;
+        $runResults = $runResults && $sportsEnabled;
+        $runCoCurricular = $runCoCurricular && $coCurricularEnabled;
+        if (!$runFixtures && !$runResults && !$runCoCurricular) {
+            $logger->info('No enabled SOCS import streams selected; exiting');
             return;
         }
 
@@ -80,14 +99,6 @@ class ImporterTool extends CliTool\App
 
         $this->setMaxExecutionTime(self::DEFAULT_TIMEOUT);
 
-        $runFixtures = (bool)$this->getOpt(self::OPT_LONG_FIXTURES);
-        $runResults = (bool)$this->getOpt(self::OPT_LONG_RESULTS);
-
-        // if nothing is set, run them all
-        if (!$runFixtures && !$runResults) {
-            $runFixtures = $runResults = true;
-        }
-
         $host = $this->resolveFixtureEndpointHost();
         $token = (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_TOKEN);
         $schoolId = (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_ID);
@@ -98,10 +109,13 @@ class ImporterTool extends CliTool\App
 
         $scriptParts = [];
         if ($runFixtures) {
-            $scriptParts[] = 'fixtures';
+            $scriptParts[] = self::OPT_LONG_FIXTURES;
         }
         if ($runResults) {
-            $scriptParts[] = 'results';
+            $scriptParts[] = self::OPT_LONG_RESULTS;
+        }
+        if ($runCoCurricular) {
+            $scriptParts[] = self::OPT_LONG_CO_CURRICULAR;
         }
         $scriptName = sprintf('socs:%s', implode('+', $scriptParts));
 
@@ -112,10 +126,12 @@ class ImporterTool extends CliTool\App
                 $lock,
                 $host,
                 $schoolId,
-                $token
+                $token,
+                (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_HOST)
             ))->produce(
                 $runFixtures,
-                $runResults
+                $runResults,
+                $runCoCurricular
             );
         } catch (\DomainException $e) {
             if ($this->perform()) {
@@ -193,12 +209,12 @@ Import SOCS sport fixtures into the Schoolbox Fixtures module using the
 SOCS XML fixtures feed, synchronise SOCS results via the results feed,
 and synchronise SOCS teams via the mso-sport feed.
 
-Usage: php importer.php [--perform] [--fixtures] [--results]
+Usage: php importer.php [--perform] [--fixtures] [--results] [--co-curricular]
 
 When --perform is omitted, the importer will run in planning mode and
 log what would happen without persisting any changes.
 
-When none of --fixtures or --results are provided, all
+When none of --fixtures, --results, or --co-curricular are provided, all
 synchronisations will run. When one or more are provided, only the
 selected synchronisations will run.
 

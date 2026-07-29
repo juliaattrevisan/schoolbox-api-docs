@@ -74,7 +74,9 @@ class Registry
         private DivisionMapper $divisionMapper,
         private TeamMapper $teamMapper,
         private VenueMapper $venueMapper,
-        private SchoolMapper $schoolMapper
+        private SchoolMapper $schoolMapper,
+        private string $externalIdPrefix = self::EXTERNAL_ID_PREFIX,
+        private string $seasonName = self::SOCS_FIXTURES,
     ) {
     }
 
@@ -104,7 +106,7 @@ class Registry
 
         try {
             /** @var SeasonModel $season */
-            $season = $this->seasonMapper->findOneByColumn('name', self::SOCS_FIXTURES);
+            $season = $this->seasonMapper->findOneByColumn('name', $this->seasonName);
 
             $this->logger->debug(sprintf(
                 'Reusing existing SOCS season %s %s-%s',
@@ -124,14 +126,14 @@ class Registry
             $season = $this->seasonMapper->createModel();
             $this->logger->debug(sprintf(
                 'Creating new SOCS season %s',
-                self::SOCS_FIXTURES,
+                $this->seasonName,
             ));
         }
 
         // update updated at, we have seen this, we need to record it
         // the season name and dates in case they have changed since the last import run
         $season->setUpdatedAt($now)
-            ->setName(self::SOCS_FIXTURES)
+            ->setName($this->seasonName)
             ->setStart($start)
             ->setEnd($end);
 
@@ -151,15 +153,16 @@ class Registry
      * @return SportModel
      * @throws Exception
      */
-    public function recallSport(string $sportName): SportModel
+    public function recallSport(string $sportName, ?string $identity = null): SportModel
     {
-        if (isset($this->sports[$sportName])) {
-            return $this->sports[$sportName];
+        $externalId = $this->externalIdPrefix . ($identity ?? $sportName);
+        if (isset($this->sports[$externalId])) {
+            return $this->sports[$externalId];
         }
 
         try {
             /** @var SportModel $sport */
-            $sport = $this->sportMapper->findOneByColumn('name', $sportName);
+            $sport = $this->sportMapper->findOneByColumn($identity === null ? 'name' : 'external_id', $identity === null ? $sportName : $externalId);
             $this->logger->debug(sprintf('Reusing existing SOCS sport %s', $sport->getName()));
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             /** @var SportModel $sport */
@@ -178,13 +181,13 @@ class Registry
         // the sport name and externalID in case they have changed since the last import run
         $sport->setUpdatedAt(\Alaress_Date_Format::now())
               ->setName($sportName)
-              ->setExternalId(self::EXTERNAL_ID_PREFIX . $sportName);
+              ->setExternalId($externalId);
 
         if ($this->perform) {
             $this->sportMapper->save($sport);
         }
 
-        $this->sports[$sportName] = $sport;
+        $this->sports[$externalId] = $sport;
 
         return $sport;
     }
@@ -198,20 +201,22 @@ class Registry
      * @return DivisionModel
      * @throws Exception
      */
-    public function recallDivision(string $divisionName, SportModel $sport, SeasonModel $season): DivisionModel
+    public function recallDivision(string $divisionName, SportModel $sport, SeasonModel $season, ?string $identity = null): DivisionModel
     {
-        $cacheKey = sprintf('%s:%s:%s', $season->getName(), $sport->getName(), $divisionName);
+        $externalId = $this->externalIdPrefix . ($identity ?? $divisionName);
+        // Co-curricular divisions use their ClubID identity; standard fixtures need sport/season context to prevent same-named divisions crossing sports.
+        $cacheKey = $identity ?? sprintf('%s:%s:%s', spl_object_id($sport), spl_object_id($season), $divisionName);
         if (isset($this->divisions[$cacheKey])) {
             return $this->divisions[$cacheKey];
         }
 
         try {
             /** @var DivisionModel $division */
-            $division = $this->divisionMapper->findOneByColumnList([
+            $division = $identity === null ? $this->divisionMapper->findOneByColumnList([
                 'name' => $divisionName,
                 'sport_id' => $sport->getId(),
                 'season_id' => $season->getId(),
-            ]);
+            ]) : $this->divisionMapper->findOneByColumn('external_id', $externalId);
             $this->logger->debug(sprintf('Reusing existing SOCS division %s', $division->getName()));
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             /** @var DivisionModel $division */
@@ -232,7 +237,7 @@ class Registry
             ->setName($divisionName)
             ->setSport($sport)
             ->setSeason($season)
-            ->setExternalId(self::EXTERNAL_ID_PREFIX . $divisionName);
+            ->setExternalId($externalId);
 
         if ($this->perform) {
             $this->divisionMapper->save($division);
@@ -251,14 +256,15 @@ class Registry
      * @return TeamModel
      * @throws Exception
      */
-    public function recallTeam(string $teamName, DivisionModel $division): TeamModel
+    public function recallTeam(string $teamName, DivisionModel $division, ?string $identity = null): TeamModel
     {
+        $externalId = $this->externalIdPrefix . ($identity ?? $teamName);
         $cacheKey = sprintf(
             '%s:%s:%s:%s',
             $division->getSeason()->getName(),
             $division->getSport()->getName(),
             $division->getName(),
-            $teamName
+            $externalId
         );
         if (isset($this->teams[$cacheKey])) {
             return $this->teams[$cacheKey];
@@ -266,10 +272,10 @@ class Registry
 
         try {
             /** @var TeamModel $team */
-            $team = $this->teamMapper->findOneByColumnList([
+            $team = $identity === null ? $this->teamMapper->findOneByColumnList([
                 'name' => $teamName,
                 'division_id' => $division->getId(),
-            ]);
+            ]) : $this->teamMapper->findOneByColumn('external_id', $externalId);
             $this->logger->debug(sprintf('Reusing existing SOCS team %s', $team->getName()));
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             /** @var TeamModel $team */
@@ -289,7 +295,7 @@ class Registry
         $team->setUpdatedAt(\Alaress_Date_Format::now())
              ->setName($teamName)
              ->setDivision($division)
-             ->setExternalId(self::EXTERNAL_ID_PREFIX . $teamName);
+             ->setExternalId($externalId);
 
         if ($this->perform) {
             $this->teamMapper->save($team);
@@ -309,13 +315,17 @@ class Registry
      */
     public function recallVenue(string $venueName): VenueModel
     {
-        if (isset($this->venues[$venueName])) {
-            return $this->venues[$venueName];
+        $venueKey = $this->externalIdPrefix . $venueName;
+        if (isset($this->venues[$venueKey])) {
+            return $this->venues[$venueKey];
         }
 
         try {
             /** @var VenueModel $venue */
-            $venue = $this->venueMapper->findOneByColumn('name', $venueName);
+            $venue = $this->venueMapper->findOneByColumn(
+                $this->externalIdPrefix === self::EXTERNAL_ID_PREFIX ? 'name' : 'external_id',
+                $this->externalIdPrefix === self::EXTERNAL_ID_PREFIX ? $venueName : $this->externalIdPrefix . $venueName,
+            );
             $this->logger->debug(sprintf('Reusing existing SOCS venue %s', $venue->getName()));
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             /** @var VenueModel $venue */
@@ -334,13 +344,13 @@ class Registry
         // venue name and externalID in case they have changed since the last import run
         $venue->setUpdatedAt(\Alaress_Date_Format::now())
               ->setName($venueName)
-              ->setExternalId(self::EXTERNAL_ID_PREFIX . $venueName);
+              ->setExternalId($this->externalIdPrefix . $venueName);
 
         if ($this->perform) {
             $this->venueMapper->save($venue);
         }
 
-        $this->venues[$venueName] = $venue;
+        $this->venues[$venueKey] = $venue;
 
         return $venue;
     }
