@@ -59,7 +59,7 @@ abstract class BaseTool extends CliTool\App
     /**
      * --batch-size
      *
-     * Maximum number of quizzes to process per run.
+     * Maximum number of quizzes to process per batch, till there are no batches left.
      */
     private const OPT_LONG_BATCH_SIZE = 'batch-size:';
 
@@ -79,7 +79,7 @@ abstract class BaseTool extends CliTool\App
      * * --from:       from date
      * * --to:         to date
      * * --assessment: a particular quiz to process
-     * * --batch-size: maximum number of quizzes to process
+     * * --batch-size: maximum number of quizzes to process per batch
      */
     public function getLongOpts(): array
     {
@@ -400,7 +400,7 @@ OPTIONS
         {$yellow}TO_DATE{$white} will be parsed using the same rules as {$yellow}FROM_DATE{$white}, and will cause this script to fail for the same reasons.
 
     $yellow--batch-size=BATCH_SIZE$white
-        If provided, process at most {$yellow}BATCH_SIZE{$white} matching quizzes.
+        If provided, process quizzes in {$yellow}BATCH_SIZE{$white} chunks, till we find no more matching quizzes.
         Defaults to {$yellow}{$batchSize}{$white}.
 
 
