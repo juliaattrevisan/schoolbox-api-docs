@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Editor\OpenAI\Payload;
 
+use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
 
 /**
@@ -177,16 +178,21 @@ class PayloadFinaliser
      * If `$endpoint` is an Azure endpoint, use the `$azureDeploymentId`:
      * otherwise, use `$openAiModel`.
      *
-     * @param string $endpoint
-     * @param string $openAiModel
-     * @param string $azureDeploymentId
+     * @param string $endpoint          The endpoint that the request is being sent to.
+     * @param string $openAiModel       The model in the OpenAI configuration.
+     * @param string $azureDeploymentId The model in the Azure configuration: this may be either the deployment ID
+     *                                  (which is set in the payload's `model` key), or the configured deployment model
+     *                                  (which is used to modify the payload).
      * @return string
      */
     private function determinePayloadModel(string $endpoint, string $openAiModel, string $azureDeploymentId): string
     {
-        return $endpoint === Helper::ENDPOINT_TYPE_AZURE
-            ? $azureDeploymentId
-            : $openAiModel;
+        // Is the endpoint OpenAI?
+        // If so, and the model is shutdown: revert to the recommendation
+        if ($endpoint === Helper::ENDPOINT_TYPE_AZURE) {
+            return $azureDeploymentId;
+        }
+        return Config::MODEL_SHUTDOWNS[$openAiModel] ?? $openAiModel;
     }
 
     /**
@@ -203,8 +209,9 @@ class PayloadFinaliser
      */
     private function determineFilterModel(string $endpoint, string $openAiModel, string $azureDeploymentModel): string
     {
-        return $endpoint === Helper::ENDPOINT_TYPE_AZURE
-            ? $azureDeploymentModel
-            : $openAiModel;
+        if ($endpoint === Helper::ENDPOINT_TYPE_AZURE) {
+            return $azureDeploymentModel;
+        }
+        return Config::MODEL_SHUTDOWNS[$openAiModel] ?? $openAiModel;
     }
 }
