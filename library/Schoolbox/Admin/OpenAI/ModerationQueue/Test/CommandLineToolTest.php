@@ -21,6 +21,8 @@ use Schoolbox\Admin\OpenAI\ModerationQueue\ModerationResult;
 use Schoolbox\Admin\OpenAI\ModerationQueue\Moderator;
 use Schoolbox\Config\ArrayLoader;
 use Schoolbox\OpenAi\ClientFactory;
+use Schoolbox\OpenAi\Exception\AgentNotEnabled;
+use Schoolbox\OpenAi\Feature;
 use Schoolbox\OpenAi\IClient;
 use Schoolbox\OpenAi\Moderation\Event\Model as ModerationEventModel;
 use Symfony\Component\Lock\Exception\LockReleasingException;
@@ -68,6 +70,41 @@ class CommandLineToolTest extends TestCase
         $this->createTool($finder, $moderator, ['n' => 10, 'batch' => 5], true)->run();
 
         $this->assertSame([[5, 0], [5, 0]], $this->findCalls);
+    }
+
+    /**
+     * @return void
+     */
+    public function testDisabledModerationAgentSkipsQueue(): void
+    {
+        $finder = $this->createMock(CandidateFinder::class);
+        $finder->expects($this->never())->method('find');
+
+        $moderator = $this->createMock(Moderator::class);
+        $moderator->expects($this->never())->method('moderate');
+
+        $clientFactory = $this->createMock(ClientFactory::class);
+        $clientFactory
+            ->expects($this->once())
+            ->method('buildForFeature')
+            ->with(Feature::AI_MODERATION_AGENT)
+            ->willThrowException(new AgentNotEnabled('AI queries are not enabled for this feature.'));
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger
+            ->expects($this->once())
+            ->method('notice')
+            ->with('AI moderation agent is not enabled, skipping moderation queue.');
+
+        $this->createTool(
+            $finder,
+            $moderator,
+            ['n' => 10, 'batch' => 5],
+            true,
+            null,
+            $clientFactory,
+            $logger,
+        )->run();
     }
 
     /**
@@ -341,6 +378,8 @@ class CommandLineToolTest extends TestCase
      * @param array<string, int> $options
      * @param bool $perform
      * @param int|null $failRefreshAfter
+     * @param ClientFactory|null $clientFactory
+     * @param LoggerInterface|null $logger
      * @return CommandLineTool
      */
     private function createTool(
@@ -349,6 +388,8 @@ class CommandLineToolTest extends TestCase
         array $options,
         bool $perform,
         ?int $failRefreshAfter = null,
+        ?ClientFactory $clientFactory = null,
+        ?LoggerInterface $logger = null,
     ): CommandLineTool {
         $lock = $this->createStub(LockInterface::class);
         $tool = new class ($finder, $moderator, $lock, $failRefreshAfter) extends CommandLineTool {
@@ -379,10 +420,12 @@ class CommandLineToolTest extends TestCase
         };
 
         $container = $this->createStub(ContainerInterface::class);
-        $clientFactory = $this->createStub(ClientFactory::class);
-        $clientFactory
-            ->method('buildForFeature')
-            ->willReturn($this->createStub(IClient::class));
+        if ($clientFactory === null) {
+            $clientFactory = $this->createStub(ClientFactory::class);
+            $clientFactory
+                ->method('buildForFeature')
+                ->willReturn($this->createStub(IClient::class));
+        }
 
         $container->method('get')->willReturnMap([
             ['config', new ArrayLoader()],
@@ -390,7 +433,13 @@ class CommandLineToolTest extends TestCase
             ['ai.clientFactory', $clientFactory],
         ]);
 
-        $tool->setup($options, $container, fopen('php://memory', 'w+'), $this->createStub(LoggerInterface::class), $perform);
+        $tool->setup(
+            $options,
+            $container,
+            fopen('php://memory', 'w+'),
+            $logger ?? $this->createStub(LoggerInterface::class),
+            $perform,
+        );
 
         return $tool;
     }
