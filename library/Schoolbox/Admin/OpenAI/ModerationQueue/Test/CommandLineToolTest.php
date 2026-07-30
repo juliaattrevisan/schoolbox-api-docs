@@ -20,6 +20,8 @@ use Schoolbox\Admin\OpenAI\ModerationQueue\CommandLineTool;
 use Schoolbox\Admin\OpenAI\ModerationQueue\ModerationResult;
 use Schoolbox\Admin\OpenAI\ModerationQueue\Moderator;
 use Schoolbox\Config\ArrayLoader;
+use Schoolbox\OpenAi\ClientFactory;
+use Schoolbox\OpenAi\IClient;
 use Schoolbox\OpenAi\Moderation\Event\Model as ModerationEventModel;
 use Symfony\Component\Lock\Exception\LockReleasingException;
 use Symfony\Component\Lock\LockInterface;
@@ -377,9 +379,15 @@ class CommandLineToolTest extends TestCase
         };
 
         $container = $this->createStub(ContainerInterface::class);
+        $clientFactory = $this->createStub(ClientFactory::class);
+        $clientFactory
+            ->method('buildForFeature')
+            ->willReturn($this->createStub(IClient::class));
+
         $container->method('get')->willReturnMap([
             ['config', new ArrayLoader()],
             ['databaseInternal', new NullConnector()],
+            ['ai.clientFactory', $clientFactory],
         ]);
 
         $tool->setup($options, $container, fopen('php://memory', 'w+'), $this->createStub(LoggerInterface::class), $perform);
