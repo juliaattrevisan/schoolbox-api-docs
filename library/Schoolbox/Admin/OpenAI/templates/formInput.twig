@@ -147,6 +147,28 @@
             {{ recommendedOptions }}
             {{ otherOptions }}
         {% endif %}
+
+        {# Deprecated options: show them if they are there, and don't allow them to be selected #}
+        {% for option, recommendedOption in formInput.deprecatedOptions ?? [] %}
+            {% if loop.first %}
+                <optgroup label="Deprecated">
+            {% endif %}
+                <option value="{{ option }}"
+                        {% if inputValue == option %}selected{% else %}disabled{% endif %}
+                >{{ option }} ( => {{ recommendedOption }})</option>
+            {% if loop.last %}
+                </optgroup>
+            {% endif %}
+        {% endfor %}
+
+        {# Retired options: show them only if selected #}
+        {% for option, recommendedOption in formInput.shutdownOptions ?? [] %}
+            {% if inputValue == option %}
+                <optgroup label="Retired">
+                    <option value="{{ option }}" selected>{{ option }} ( => {{ recommendedOption }})</option>
+                </optgroup>
+            {% endif %}
+        {% endfor %}
     </select>
 {% elseif type == 'checkbox' %}
     <div class="switch" {{ dataAttrs }} {{ style }}>

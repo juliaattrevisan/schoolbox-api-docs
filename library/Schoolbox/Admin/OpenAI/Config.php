@@ -767,6 +767,8 @@ class Config
         );
         $formInputs[self::FIELD_MODEL]['recommendedOptions'] = $splitOptions['recommended'];
         $formInputs[self::FIELD_MODEL]['options']            = $splitOptions['others'];
+        $formInputs[self::FIELD_MODEL]['deprecatedOptions']  = $splitOptions['deprecations'];
+        $formInputs[self::FIELD_MODEL]['shutdownOptions']    = $splitOptions['shutdowns'];
 
         // Set recommended vs. all for Azure deployment models too:
         // whilst this setting must follow their deployment, it might inform
@@ -779,6 +781,8 @@ class Config
         );
         $formInputs[self::FIELD_DEPLOYMENT_MODEL]['recommendedOptions'] = $splitOptions['recommended'];
         $formInputs[self::FIELD_DEPLOYMENT_MODEL]['options']            = $splitOptions['others'];
+        $formInputs[self::FIELD_DEPLOYMENT_MODEL]['deprecatedOptions']  = $splitOptions['deprecations'];
+        $formInputs[self::FIELD_DEPLOYMENT_MODEL]['shutdownOptions']    = $splitOptions['shutdowns'];
 
         if (Feature::tryFrom($feature)?->supportsAiModeration()) {
             // Any feature with AI moderation support gets a config for it
@@ -810,6 +814,8 @@ class Config
                 'type'               => self::FIELD_TYPE_SELECT,
                 'recommendedOptions' => $splitOptions['recommended'],
                 'options'            => $splitOptions['others'],
+                'deprecatedOptions'  => $splitOptions['deprecations'],
+                'shutdownOptions'    => $splitOptions['shutdowns'],
                 'section'            => self::SECTION_OPENAI,
                 'allowUnselected'    => false,
             ];
