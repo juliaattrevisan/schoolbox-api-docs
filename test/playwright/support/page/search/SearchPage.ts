@@ -97,13 +97,19 @@ export default class SearchPage {
      * @param shouldBePresented - Whether the text should be presented
      */
     async verifyResultsTextPresence(text: string, shouldBePresented: boolean = true): Promise<void> {
-        const results = expect(this.page.locator(SearchPage.SELECTOR_RESULTS));
+        // Ensure the search has finished rendering either results, a no-results state, or an error.
+        const searchComplete = this.page
+            .getByTestId(SearchPage.RESULTS_NONE)
+            .or(this.page.getByTestId(SearchPage.RESULTS_ERROR))
+            .or(this.page.locator(SearchPage.SELECTOR_RESULTS));
+        await expect(searchComplete).toBeVisible();
+        const resultsContainer = this.page.locator(SearchPage.SELECTOR_RESULTS);
         if (shouldBePresented) {
-            await results.toContainText(text);
+            await expect(resultsContainer).toContainText(text);
             return;
         }
 
-        await results.not.toContainText(text);
+        await expect(resultsContainer).not.toContainText(text);
     }
 
     /**
