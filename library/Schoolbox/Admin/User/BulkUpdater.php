@@ -675,6 +675,16 @@ class BulkUpdater
         return $statements;
     }
 
+    /**
+     * Get the IDs of users eligible for qualification updates.
+     *
+     * Eligibility is based on the new role when the role is being updated, or
+     * the users' current roles when it is unchanged.
+     *
+     * @return list<int>
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
     private function getQualificationUpdateUserIds(): array
     {
         if ($this->role !== self::UNCHANGED) {
