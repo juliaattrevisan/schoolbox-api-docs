@@ -14,7 +14,7 @@ import RevealModal from "@schoolboxVue/components/reveal-modal";
  * we still need to keep this high enough, so that it doesn't lock database
  */
 const MAX_LENGTH = 5000;
-const STUDENT_ROLE = 'student';
+const STUDENT_ROLE = "student";
 
 export default {
     components: {
