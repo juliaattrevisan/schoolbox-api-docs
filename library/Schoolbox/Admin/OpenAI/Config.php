@@ -125,7 +125,7 @@ class Config
         ],
         Feature::IMAGE->value => [
             'text'  => ['gpt-5.4-nano'],
-            'image' => ['gpt-image-1.5'],
+            'image' => ['gpt-image-2'],
         ],
         Feature::LEARNING_ACTIVITY_CUSTOMISATION->value => [
             'text' => ['gpt-5.4-nano'],
@@ -138,7 +138,7 @@ class Config
     /**
      * The default image generation model.
      */
-    public const string IMAGE_MODEL_DEFAULT = 'gpt-image-1.5';
+    public const string IMAGE_MODEL_DEFAULT = 'gpt-image-2';
 
     /**
      * The models which may be selected for image generation.
@@ -720,15 +720,31 @@ class Config
     /**
      * Split options into recommended and other options
      *
-     * @param array<string> $options         All available options
-     * @param array<string> $recommendations A subset of `$options` which is recommended for use
-     * @return array{recommended: array<string>, others: array<string>}
+     * @param array<string>          $options         All available options
+     * @param array<string>          $recommendations A subset of `$options` which is recommended for use
+     * @param ?array<string, string> $deprecations    A subset of `$options` which has been deprecated: these will not
+     *                                                be shown unless they're currently selected
+     * @param ?array<string, string> $shutdowns       A subset of `$options` which has been shut down: these will not
+     *                                                be shown unless they're currently selected
+     * @return array{recommended: array<string>, others: array<string>, deprecations:array<string, string>, shutdowns:array<string, string>}
      */
-    private function splitOptions(array $options, array $recommendations): array
-    {
+    private function splitOptions(
+        array $options,
+        array $recommendations,
+        ?array $deprecations,
+        ?array $shutdowns,
+    ): array {
+        // Assume no recommendations are deprecated or shutdown
         return [
-            'recommended' => $recommendations,
-            'others'      => array_diff($options, $recommendations),
+            'recommended'  => $recommendations,
+            'others'       => array_diff(
+                $options,
+                $recommendations,
+                array_keys($deprecations ?? []),
+                array_keys($shutdowns ?? []),
+            ),
+            'deprecations' => $deprecations,
+            'shutdowns'    => $shutdowns,
         ];
     }
 
@@ -746,6 +762,8 @@ class Config
         $splitOptions = $this->splitOptions(
             $formInputs[self::FIELD_MODEL]['options'],
             self::RECOMMENDED_MODELS[$feature]['text'] ?? [],
+            self::MODEL_DEPRECATIONS,
+            self::MODEL_SHUTDOWNS,
         );
         $formInputs[self::FIELD_MODEL]['recommendedOptions'] = $splitOptions['recommended'];
         $formInputs[self::FIELD_MODEL]['options']            = $splitOptions['others'];
@@ -756,6 +774,8 @@ class Config
         $splitOptions = $this->splitOptions(
             $formInputs[self::FIELD_DEPLOYMENT_MODEL]['options'],
             self::RECOMMENDED_MODELS[$feature]['text'] ?? [],
+            null,
+            null,
         );
         $formInputs[self::FIELD_DEPLOYMENT_MODEL]['recommendedOptions'] = $splitOptions['recommended'];
         $formInputs[self::FIELD_DEPLOYMENT_MODEL]['options']            = $splitOptions['others'];
@@ -783,6 +803,8 @@ class Config
             $splitOptions = $this->splitOptions(
                 self::AI_IMAGE_MODELS,
                 self::RECOMMENDED_MODELS[$feature]['image'],
+                self::MODEL_DEPRECATIONS,
+                self::MODEL_SHUTDOWNS,
             );
             $formInputs[self::FIELD_IMAGE_MODEL]    = [
                 'type'               => self::FIELD_TYPE_SELECT,
