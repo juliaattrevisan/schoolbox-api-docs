@@ -76,7 +76,7 @@ class Config
      * They may not be selected as a model to use, if they weren't already
      * selected.
      */
-    private const array MODEL_DEPRECATIONS = [
+    public const array MODEL_DEPRECATIONS = [
         'gpt-image-1'      => 'gpt-image-2',
         'gpt-image-1-mini' => 'gpt-image-2',
         'gpt-image-1.5'    => 'gpt-image-2',
@@ -89,7 +89,7 @@ class Config
      * They may not be selected as a model to use, if they weren't already
      * selected.
      */
-    private const array MODEL_SHUTDOWNS = [
+    public const array MODEL_SHUTDOWNS = [
         'gpt-5-chat-latest'   => 'gpt-5.5',
         'gpt-5.1-chat-latest' => 'gpt-5.5',
         'gpt-5.2-chat-latest' => 'gpt-5.5',
@@ -743,8 +743,8 @@ class Config
                 array_keys($deprecations ?? []),
                 array_keys($shutdowns ?? []),
             ),
-            'deprecations' => $deprecations,
-            'shutdowns'    => $shutdowns,
+            'deprecations' => array_intersect_key($deprecations ?? [], array_combine($options, $options)),
+            'shutdowns'    => array_intersect_key($shutdowns ?? [], array_combine($options, $options)),
         ];
     }
 
