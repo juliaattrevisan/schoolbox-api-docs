@@ -819,8 +819,10 @@ class ConfigMapper extends Mapper
               )
         ";
 
+        $statement = $this->getDatabase()->prepareQuery($query);
+
         foreach (self::IB_QUALIFICATIONS as $qualification) {
-            $this->getDatabase()->query($query, $qualification);
+            $statement->execute($qualification);
         }
     }
 
