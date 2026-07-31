@@ -10,6 +10,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Reporting;
 
+use Alaress_Date_Format;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
+
 /**
  * This is just a statically-accessible lookup instance like I'd normally have written.
  */
@@ -38,6 +41,74 @@ enum Range: string
             Range::CURRENT_AND_PREVIOUS_ACADEMIC_PERIOD->value => 'Current and previous academic period',
             Range::CURRENT_ACADEMIC_YEAR->value => 'Current academic year',
             Range::CURRENT_AND_PREVIOUS_ACADEMIC_YEAR->value => 'Current and previous academic year',
+        ];
+    }
+
+    /**
+     * Resolve this configured supporting-data range from one reference date.
+     *
+     * Term boundaries are cloned because markbook callers normalise their times
+     * in place and must not alter dates held by persisted term models.
+     *
+     * @param Alaress_Date_Format $referenceDate Date on which the reporting page is loaded.
+     * @param TermMapper $termMapper Mapper used to find ordinary academic periods.
+     * @return array{from: Alaress_Date_Format, to: Alaress_Date_Format}|null Inclusive date boundaries, or null when a required period is unavailable.
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     */
+    public function resolve(Alaress_Date_Format $referenceDate, TermMapper $termMapper): ?array
+    {
+        if ($this === self::CURRENT_ACADEMIC_YEAR) {
+            return [
+                'from' => $referenceDate->getStartOfSchoolYear(),
+                'to' => $referenceDate->endOfSchoolYear(),
+            ];
+        }
+
+        if ($this === self::CURRENT_AND_PREVIOUS_ACADEMIC_YEAR) {
+            return [
+                'from' => (clone $referenceDate)->getStartOfSchoolYear()->addYears(-1),
+                'to' => $referenceDate->endOfSchoolYear(),
+            ];
+        }
+
+        $currentTerm = $termMapper->findForDate($referenceDate);
+        if ($currentTerm->getId() === null) {
+            return null;
+        }
+
+        $currentFrom = clone $currentTerm->getStart();
+        $currentTo = clone $currentTerm->getDisplayFinish();
+
+        if ($this === self::CURRENT_ACADEMIC_PERIOD) {
+            return [
+                'from' => $currentFrom,
+                'to' => $currentTo,
+            ];
+        }
+
+        $previousTerm = null;
+        foreach ($termMapper->findAllNonExtraordinary() as $term) {
+            if ($term->getStart()->lt($currentTerm->getStart())) {
+                $previousTerm = $term;
+                break;
+            }
+        }
+
+        if ($this === self::PREVIOUS_ACADEMIC_PERIOD) {
+            if ($previousTerm === null) {
+                return null;
+            }
+
+            return [
+                'from' => clone $previousTerm->getStart(),
+                'to' => clone $previousTerm->getDisplayFinish(),
+            ];
+        }
+
+        return [
+            'from' => $previousTerm === null ? $currentFrom : clone $previousTerm->getStart(),
+            'to' => $currentTo,
         ];
     }
 }
