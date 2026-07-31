@@ -32,6 +32,7 @@ use Schoolbox\Learning\Assessment\Reporting;
 use Schoolbox\Learning\Assessment\Reporting\Folder as SupportingDataFolder;
 use Schoolbox\Learning\Assessment\Reporting\Model;
 use Schoolbox\Learning\Assessment\Reporting\Feedback\Model as Feedback;
+use Schoolbox\Learning\Assessment\Reporting\Range as SupportingDataRange;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\Markbook\FeedbackFolders;
@@ -578,18 +579,11 @@ class Controller extends Base
      * @throws NotFound
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     private function buildSupportingDataMarkbook(Reporting\Model $assessment, User $learner): Markbook
     {
         $folder = $assessment->getBaseContext()->getFolder();
-
-        /* Find data between these date ranges
-        */
-        // TODO: SA-22532 - handle each of the cases of $assessment->getSupportingDataRange(), for now just always uses the current academic year
-        $now = Alaress_Date_Format::now();
-
-        $from = $now->getStartOfSchoolYear();
-        $to = $now->endOfSchoolYear();
 
         $assessments = $this->assessmentDataSource->createCollection();
 
@@ -600,7 +594,17 @@ class Controller extends Base
          * the only type of supporting data that can show are via activities currently,
          * it's there for the future when we have other types of supporting data to show.
          */
+        $dateRange = null;
         if ($assessment->getSupportingDataEnable() && $assessment->getSupportingDataMarkbookEnable()) {
+            $supportingDataRange = SupportingDataRange::tryFrom($assessment->getSupportingDataRange())
+                ?? SupportingDataRange::CURRENT_ACADEMIC_YEAR;
+            $dateRange = $supportingDataRange->resolve(Alaress_Date_Format::now(), $this->termMapper);
+        }
+
+        if ($dateRange !== null) {
+            $from = $dateRange['from'];
+            $to = $dateRange['to'];
+
             /* The folders to filter to, fall back to current only if for some reason this is unset */
             $supportingDataFolders = SupportingDataFolder::tryFrom($assessment->getSupportingDataFolders())
                 ?? SupportingDataFolder::CURRENT_ONLY;
