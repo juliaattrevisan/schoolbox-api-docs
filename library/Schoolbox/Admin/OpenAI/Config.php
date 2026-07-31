@@ -90,10 +90,10 @@ class Config
      * selected.
      */
     public const array MODEL_SHUTDOWNS = [
-        'gpt-5-chat-latest'   => 'gpt-5.5',
-        'gpt-5.1-chat-latest' => 'gpt-5.5',
-        'gpt-5.2-chat-latest' => 'gpt-5.5',
-        'gpt-5.3-chat-latest' => 'gpt-5.5',
+        'gpt-5-chat-latest'   => 'gpt-5.4-nano',
+        'gpt-5.1-chat-latest' => 'gpt-5.4-nano',
+        'gpt-5.2-chat-latest' => 'gpt-5.4-nano',
+        'gpt-5.3-chat-latest' => 'gpt-5.4-nano',
     ];
 
     /**
