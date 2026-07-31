@@ -51,8 +51,18 @@
 $(function () {
     // listen for any dimension changes to the tile to trigger fixTileHeightAndFontSize
     const tile = document.querySelector("#{{ componentId }}-tile-{{ tile.id }}");
-    const resizeObserver = new ResizeObserver((entries) => {
-        $(tile).fixTileHeightAndFontSize();
+    let previousWidth;
+
+    const resizeObserver = new ResizeObserver(([entry]) => {
+        if (entry.contentRect.width === previousWidth) {
+            return;
+        }
+
+        previousWidth = entry.contentRect.width;
+
+        requestAnimationFrame(() => {
+            $(tile).fixTileHeightAndFontSize();
+        });
     });
     resizeObserver.observe(tile);
 });
