@@ -690,7 +690,7 @@ class BulkUpdater
         if ($this->role !== self::UNCHANGED) {
             $roleType = $this->roleMapper->findOneByColumn('id', $this->role);
 
-            if (QualificationUpdateEligibility::isAllowedForRoleType($roleType ?: null)) {
+            if ($roleType->isStudent()) {
                 return $this->userIds;
             }
 

@@ -798,7 +798,7 @@ class Controller extends Base
 
         /* Ignore the qualification update if the user is not of the correct role type
          */
-        if (QualificationUpdateEligibility::isAllowedForRoleType($role->getType())) {
+        if ($role->isStudent()) {
             $qualificationCollection = $this->qualificationMapper->createCollection();
             foreach ($post['qualification'] ?? [] as $qualificationId) {
                 $qualification = $this->qualificationMapper->createModel();
