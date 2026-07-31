@@ -57,6 +57,14 @@ abstract class BaseTool extends CliTool\App
      */
     private const OPT_LONG_TO = 'to:';
     /**
+     * --batch-size
+     *
+     * Maximum number of quizzes to process per batch, till there are no batches left.
+     */
+    private const OPT_LONG_BATCH_SIZE = 'batch-size:';
+
+    private const DEFAULT_BATCH_SIZE = 50;
+    /**
      * Short options:
      * * -h: help
      */
@@ -71,10 +79,17 @@ abstract class BaseTool extends CliTool\App
      * * --from:       from date
      * * --to:         to date
      * * --assessment: a particular quiz to process
+     * * --batch-size: maximum number of quizzes to process per batch
      */
     public function getLongOpts(): array
     {
-        return [self::OPT_LONG_HELP, self::OPT_LONG_FROM, self::OPT_LONG_TO, self::OPT_LONG_ASSESSMENT_ID];
+        return [
+            self::OPT_LONG_HELP,
+            self::OPT_LONG_FROM,
+            self::OPT_LONG_TO,
+            self::OPT_LONG_ASSESSMENT_ID,
+            self::OPT_LONG_BATCH_SIZE,
+        ];
     }
 
     /**
@@ -148,28 +163,50 @@ abstract class BaseTool extends CliTool\App
         );
 
         // Build assessment data source
-        $this->assessmentDataSource = $this->getDi()->get('assessmentDataSource');
-        $quizzes                    = $this->findQuizzes();
-
-        $this->getLogger()->info(sprintf('Found %d quizzes', count($quizzes)));
-        foreach ($quizzes as $quiz) {
-            // Not a quiz somehow? Skip
-            $toolLock->refresh();
-            if (!$quiz instanceof QuizDomainModel) {
-                $this->getLogger()->warning(
-                    sprintf(
-                        'Assessment #%d (%s) is not a quiz: skipping',
-                        $quiz->getTitle(),
-                        $quiz->getId(),
-                    )
-                );
-                return;
-            }
-
-            /** @noinspection PhpUnhandledExceptionInspection - I want this exception to fall on carpet */
-            $this->processQuiz($quiz);
+        $batchSize = $this->getOptAsInt(self::OPT_LONG_BATCH_SIZE, self::DEFAULT_BATCH_SIZE);
+        if ($batchSize === null || $batchSize <= 0) {
+            throw new \InvalidArgumentException('Batch size must be a positive integer.');
         }
 
+        $this->assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+
+        $lastCreatedAt = null;
+        $lastAssessId  = null;
+        $runningCount = 0;
+        $loops = 0;
+        do {
+            $loops++;
+            $this->getLogger()->info(sprintf('Loop %d: fetching next batch of quizzes to process...', $loops));
+            $result  = $this->findQuizzes($batchSize, $lastCreatedAt, $lastAssessId);
+            $quizzes = $result['quizzes'];
+
+            $this->getLogger()->info(sprintf('Found %d quizzes', count($quizzes)));
+            foreach ($quizzes as $quiz) {
+                // Not a quiz somehow? Skip
+                $toolLock->refresh();
+                if (!$quiz instanceof QuizDomainModel) {
+                    $this->getLogger()->warning(
+                        sprintf(
+                            'Assessment #%d (%s) is not a quiz: skipping',
+                            $quiz->getTitle(),
+                            $quiz->getId(),
+                        )
+                    );
+                    return;
+                }
+
+                $runningCount++;
+                /** @noinspection PhpUnhandledExceptionInspection - I want this exception to fall on carpet */
+                $this->processQuiz(
+                    $quiz
+                );
+            }
+
+            $lastCreatedAt = $result['lastCreatedAt'];
+            $lastAssessId  = $result['lastAssessId'];
+            $toolLock->refresh();
+        } while ($result['hasMore']);
+        $this->getLogger()->info(sprintf('Processed %d quiz%s over %d loop%s', $runningCount, 1 === $runningCount ? '' : 'zes', $loops, 1 === $loops ? '' : 's'));
         $toolLock->release();
         $this->getLogger()->notice($this->perform() ? 'Quizzes modified.' : 'Planning finished.');
     }
@@ -178,18 +215,46 @@ abstract class BaseTool extends CliTool\App
      * Find quizzes which match this tool's targeted quiz status, and which are
      * also within the date span or assessment ID list.
      *
-     * @return GenericCollection<IAssessable>
+     * @param int         $batchSize
+     * @param string|null $lastCreatedAt
+     * @param int|null    $lastAssessId
+     * @return array{quizzes: GenericCollection<IAssessable>, hasMore:bool, lastCreatedAt: string|null, lastAssessId: int|null}
      */
-    private function findQuizzes(): GenericCollection
-    {
+    private function findQuizzes(
+        int $batchSize,
+        ?string $lastCreatedAt = null,
+        ?int $lastAssessId = null,
+    ): array {
         $whereParts = [
             "quiz.learnosity_job_status = :learnosityJobStatus",
+            "quiz.deleted_at IS NULL",
+            "assessment.deleted_at IS NULL", // to prevent assessmentDataSource->findAllByIds($quizIds) causing issues for us (it only hydrates quizzes that are not deleted, lets ensure we fetch nothing that could be half deleted
         ];
         $params = [
             'learnosityJobStatus' => $this->getTargetedQuizStatus(),
         ];
         $this->getLogger()->info('Filtering quizzes to those which match:');
         $this->getLogger()->info(sprintf('* learnosity_job_status = %s', $params['learnosityJobStatus']));
+        $this->getLogger()->info(sprintf('* batch size = %d', $batchSize));
+
+        if ($lastAssessId !== null) {
+            if ($lastCreatedAt === null) {
+                $whereParts[] = '(
+                    quiz.created_at IS NOT NULL
+                    OR (quiz.created_at IS NULL AND quiz.assess_id > :lastAssessId)
+                )';
+            } else {
+                $whereParts[] = '(
+                    quiz.created_at > :lastCreatedAt
+                    OR (
+                        quiz.created_at = :lastCreatedAt
+                        AND quiz.assess_id > :lastAssessId
+                    )
+                )';
+                $params['lastCreatedAt'] = $lastCreatedAt;
+            }
+            $params['lastAssessId'] = $lastAssessId;
+        }
 
         $fromDate = $this->buildDate($this->getOpt(self::OPT_LONG_FROM));
         if ($fromDate) {
@@ -218,15 +283,27 @@ abstract class BaseTool extends CliTool\App
 
         $quizQuery = $this->getDatabaseInternal()->prepareQuery(
             "
-                SELECT assessment.id
+                SELECT assessment.id, quiz.created_at, quiz.assess_id
                 FROM assess AS quiz
                 INNER JOIN assessment ON quiz.assessment_id = assessment.id
                 WHERE
-            " . implode(' AND ', $whereParts),
+            " . implode(' AND ', $whereParts) . "
+                ORDER BY quiz.created_at ASC, quiz.assess_id ASC
+                LIMIT :batchSize
+            ",
+            array_merge($params, ['batchSize' => $batchSize])
         );
-        $quizQuery->execute($params);
-        $quizIds = $quizQuery->fetchColumnArray('id');
-        return $this->assessmentDataSource->findAllByIds($quizIds);
+        $quizQuery->execute();
+        $rows    = $quizQuery->fetchAll(\PDO::FETCH_ASSOC);
+        $quizIds = array_column($rows, 'id');
+        $lastRow = $rows[array_key_last($rows)] ?? null;
+
+        return [
+            'quizzes'      => $this->assessmentDataSource->findAllByIds($quizIds),
+            'hasMore'       => count($rows) === $batchSize,
+            'lastCreatedAt' => $lastRow['created_at'] ?? null,
+            'lastAssessId'  => isset($lastRow['assess_id']) ? (int)$lastRow['assess_id'] : null,
+        ];
     }
 
     /**
@@ -286,6 +363,7 @@ abstract class BaseTool extends CliTool\App
         $green      = self::COLOUR_GREEN;
         $white      = self::COLOUR_WHITE;
         $yellow     = self::COLOUR_YELLOW;
+        $batchSize  = self::DEFAULT_BATCH_SIZE;
         echo <<<HELP
 NAME:
     {$this->getToolName()}
@@ -320,6 +398,10 @@ OPTIONS
         If provided, only only perform changes on quizzes created on {$yellow}TO_DATE{$white} and before.
 
         {$yellow}TO_DATE{$white} will be parsed using the same rules as {$yellow}FROM_DATE{$white}, and will cause this script to fail for the same reasons.
+
+    $yellow--batch-size=BATCH_SIZE$white
+        If provided, process quizzes in {$yellow}BATCH_SIZE{$white} chunks, till we find no more matching quizzes.
+        Defaults to {$yellow}{$batchSize}{$white}.
 
 
 HELP;
