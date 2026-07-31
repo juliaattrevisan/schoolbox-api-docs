@@ -15,6 +15,7 @@ use PDOException;
 use Schoolbox\Collection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
+use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserBulkMapper;
 
@@ -161,6 +162,7 @@ class BulkUpdater
      * @param int            $displayGradeGraph
      * @param int            $revokeToken
      * @param int            $clearGroups
+     * @param RoleMapper     $roleMapper
      */
     public function __construct(
         User $sessionUser,
@@ -181,7 +183,8 @@ class BulkUpdater
         string $position,
         int $displayGradeGraph,
         int $revokeToken,
-        private int $clearGroups
+        private int $clearGroups,
+        private RoleMapper $roleMapper,
     ) {
         $this->sessionUser    = $sessionUser;
         $this->userBulkMapper = $userBulkMapper;
@@ -672,34 +675,35 @@ class BulkUpdater
         return $statements;
     }
 
+    /**
+     * Get the IDs of users eligible for qualification updates.
+     *
+     * Eligibility is based on the new role when the role is being updated, or
+     * the users' current roles when it is unchanged.
+     *
+     * @return list<int>
+     */
     private function getQualificationUpdateUserIds(): array
     {
         if ($this->role !== self::UNCHANGED) {
-            $statement = $this->userBulkMapper->getDatabase()->query(
-                "SELECT group_type FROM `groups` WHERE id = :roleId AND deleted_at IS NULL",
-                ['roleId' => $this->role]
-            );
-            $roleType = $statement->fetchColumn();
+            try {
+                $roleType = $this->roleMapper->findOneByColumn('id', $this->role);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                return [];
+            }
 
-            if (QualificationUpdateEligibility::isAllowedForRoleType($roleType ?: null)) {
+            if ($roleType->isStudent()) {
                 return $this->userIds;
             }
 
             return [];
         }
 
-        $bindings = Builder::getBindings($this->userIds, 'qru');
-        $statement = $this->userBulkMapper->getDatabase()->query(
-            "
-            SELECT u.id
-            FROM `user` u
-            INNER JOIN `groups` g ON u.group_id = g.id AND g.deleted_at IS NULL
-            WHERE u.id IN ({$bindings->getPlaceholder()})
-              AND g.group_type = :roleType
-            ",
-            array_merge($bindings->getParams(), ['roleType' => Role::STUDENT])
-        );
-
-        return array_map('intval', $statement->fetchAll(\PDO::FETCH_COLUMN));
+        /** Returning the IDs of users who are currently students, as only students are eligible for qualification updates.
+         */
+        $pb = $this->userBulkMapper->getPredicateBuilder();
+        $pb->in('id', $this->userIds);
+        $pb->equals('g.group_type', Role::STUDENT);
+        return array_map('intval', $this->userBulkMapper->findIdsByPredicates($pb));
     }
 }

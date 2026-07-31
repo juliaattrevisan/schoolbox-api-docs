@@ -193,7 +193,8 @@ class Controller extends Base
                 $params->get('positionTitle'),
                 (int)$params->get('displayGradeGraph'),
                 (int)$params->get('revokeToken'),
-                (int)$params->get('clearGroups')
+                (int)$params->get('clearGroups'),
+                $this->roleMapper,
             ))->update();
         } catch (SchoolboxException $e) {
             $problem        = (new ApiProblem('Campus has been deleted or does not exist'))

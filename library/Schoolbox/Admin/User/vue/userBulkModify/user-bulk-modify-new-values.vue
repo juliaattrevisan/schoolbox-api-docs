@@ -14,6 +14,7 @@ import RevealModal from "@schoolboxVue/components/reveal-modal";
  * we still need to keep this high enough, so that it doesn't lock database
  */
 const MAX_LENGTH = 5000;
+const STUDENT_ROLE = "student";
 
 export default {
     components: {
@@ -97,16 +98,31 @@ export default {
             return this.roles.find((role) => String(role.id) === String(this.updateFields.roleId));
         },
 
+        /**
+         * Qualifications can only be bulk updated for student users.
+         *
+         * When the role is unchanged, we inspect the selected rows and allow the
+         * qualification controls if any selected user is currently a student.
+         * When a new role is selected, we instead use that target role to decide.
+         *
+         * @returns {boolean}
+         */
         canUpdateQualifications() {
             if (Number(this.updateFields.roleId) === -1) {
-                return this.selectedRows.some((row) => row.role_type === "student");
+                return this.selectedRows.some((row) => row.role_type === STUDENT_ROLE);
             }
 
-            return this.selectedRole?.type === "student";
+            return this.selectedRole?.type === STUDENT_ROLE;
         },
     },
 
     watch: {
+        /**
+         * Clear qualification updates when the current selection is no longer
+         * eligible for qualification changes.
+         *
+         * @param {boolean} canUpdate
+         */
         canUpdateQualifications(canUpdate) {
             if (!canUpdate) {
                 this.updateFields.qualificationIds = [];

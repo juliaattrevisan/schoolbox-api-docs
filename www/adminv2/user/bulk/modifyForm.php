@@ -35,6 +35,7 @@ if (!isset($_POST['userId']) || empty($_POST['userId'])) {
 SitePage::extendExecutionTime();
 
 $userMapper = \Schoolbox\UserBulkMapper::getInstance();
+$roleMapper = \Schoolbox\RoleMapper::getInstance();
 
 $modified = new \Schoolbox\Collection();
 
@@ -68,7 +69,8 @@ if (isset($_POST['updateUsers'])) {
         (int)$_POST['apply_hidetimetable'],
         $_POST['apply_position_title'],
         (int)$_POST['apply_displaygradegraph'],
-        (int)$_POST['apply_revokeToken']
+        (int)$_POST['apply_revokeToken'],
+        $roleMapper,
     ))->update();
 } else {
     if (isset($_POST['deleteUsers'])) {
