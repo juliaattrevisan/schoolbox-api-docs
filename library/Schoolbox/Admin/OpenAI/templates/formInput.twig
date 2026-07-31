@@ -155,7 +155,7 @@
             {% endif %}
                 <option value="{{ option }}"
                         {% if inputValue == option %}selected{% else %}disabled{% endif %}
-                >{{ option }} ( => {{ recommendedOption }})</option>
+                >{{ option }}{% if inputValue == option %} (migrate to {{ recommendedOption }}){% endif %}</option>
             {% if loop.last %}
                 </optgroup>
             {% endif %}
@@ -165,7 +165,7 @@
         {% for option, recommendedOption in formInput.shutdownOptions ?? [] %}
             {% if inputValue == option %}
                 <optgroup label="Retired">
-                    <option value="{{ option }}" selected>{{ option }} ( => {{ recommendedOption }})</option>
+                    <option value="{{ option }}" selected>{{ option }} (auto-migrated to {{ recommendedOption }})</option>
                 </optgroup>
             {% endif %}
         {% endfor %}
