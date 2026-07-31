@@ -225,8 +225,9 @@ class Controller extends Assessment\Controller
      */
     public function getStatus(IAssessable $assessment): void
     {
-        // Calculate summary totals for display purposes
-        $participants = $assessment->getAllParticipants();
+        if ($assessment instanceof Project && $assessment->isSpecification()) {
+            $assessment->setAssessables($this->getAssessmentMapper()->findAllByProjectId($assessment->getId()));
+        }
 
         $assessmentStats = new GenericCollection(Assessment\Statistics::class);
         $assessmentStats[$assessment->getId()] = new Assessment\Statistics($assessment);
@@ -260,16 +261,6 @@ class Controller extends Assessment\Controller
                 ];
             }
         }
-
-        /**
-         * somehow there is a hydration inside
-         * getUnitAssessments
-         * $assessments = $this->getAssessmentMapper()->findAllByIds($assessmentIds);
-         *
-         * which is causing deleted sub-assessments to appear in $assessment->getAssessables()
-         * lets just filter them out here
-         */
-        $twigData['assessment']->setAssessables($twigData['assessment']->getAssessables()->filterBy('deletedAt', null));
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/project/status/staff.twig',
