@@ -10,10 +10,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Reporting;
 
+use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
 use Alaress\HTMLPurifier\IPurifier;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Curriculum\Node\Model as CurriculumNode;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -24,6 +28,7 @@ use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Quiz;
 use Schoolbox\Learning\Assessment\Reporting;
 use Schoolbox\Learning\Assessment\Reporting\Folder as SupportingDataFolder;
+use Schoolbox\Learning\Assessment\Reporting\Range as SupportingDataRange;
 use Schoolbox\Learning\Assessment\Task;
 use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
@@ -51,12 +56,17 @@ class Controller extends Base
      * @param StateMapper           $stateMapper
      * @param IPurifier             $purifier
      * @param FeedbackFolders       $feedbackFolders
+     * @param RubricDataSource      $rubricMapper
+     * @param TermMapper            $termMapper
+     * @return void
      */
     public function __construct(
         private AssessmentMapperProxy $assessmentMapperProxy,
         private StateMapper $stateMapper,
         private IPurifier $purifier,
         private FeedbackFolders $feedbackFolders,
+        private RubricDataSource $rubricMapper,
+        private TermMapper $termMapper,
     ) {
     }
 
@@ -467,18 +477,11 @@ class Controller extends Base
      * @throws NotFound
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     private function buildMarkbook(Reporting\Model $assessment): Markbook
     {
         $folder = $assessment->getBaseContext()->getFolder();
-
-        /* Find data between these date ranges
-        */
-        // TODO: SA-22532 - handle each of the cases of $assessment->getSupportingDataRange(), for now just always uses the current academic year
-        $now = \Alaress_Date_Format::now();
-
-        $from = $now->getStartOfSchoolYear();
-        $to = $now->endOfSchoolYear();
 
         $assessments = $this->assessmentMapperProxy->createCollection();
 
@@ -489,7 +492,17 @@ class Controller extends Base
          * the only type of supporting data that can show are via activities currently,
          * it's there for the future when we have other types of supporting data to show.
          */
+        $dateRange = null;
         if ($assessment->getSupportingDataEnable() && $assessment->getSupportingDataMarkbookEnable()) {
+            $supportingDataRange = SupportingDataRange::tryFrom($assessment->getSupportingDataRange())
+                ?? SupportingDataRange::CURRENT_ACADEMIC_YEAR;
+            $dateRange = $supportingDataRange->resolve(Alaress_Date_Format::now(), $this->termMapper);
+        }
+
+        if ($dateRange !== null) {
+            $from = $dateRange['from'];
+            $to = $dateRange['to'];
+
             /* The folders to filter to, fall back to current only if for some reason this is unset */
             $supportingDataFolders = SupportingDataFolder::tryFrom($assessment->getSupportingDataFolders())
                 ?? SupportingDataFolder::CURRENT_ONLY;
