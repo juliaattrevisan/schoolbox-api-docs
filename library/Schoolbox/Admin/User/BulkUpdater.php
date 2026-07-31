@@ -697,18 +697,11 @@ class BulkUpdater
             return [];
         }
 
-        $bindings = Builder::getBindings($this->userIds, 'qru');
-        $statement = $this->userBulkMapper->getDatabase()->query(
-            "
-            SELECT u.id
-            FROM `user` u
-            INNER JOIN `groups` g ON u.group_id = g.id AND g.deleted_at IS NULL
-            WHERE u.id IN ({$bindings->getPlaceholder()})
-              AND g.group_type = :roleType
-            ",
-            array_merge($bindings->getParams(), ['roleType' => Role::STUDENT])
-        );
-
-        return array_map('intval', $statement->fetchAll(\PDO::FETCH_COLUMN));
+        /** Returning the IDs of users who are currently students, as only students are eligible for qualification updates.
+         */
+        $pb = $this->userBulkMapper->getPredicateBuilder();
+        $pb->in('id', $this->userIds);
+        $pb->equals('g.group_type', Role::STUDENT);
+        return array_map('intval', $this->userBulkMapper->findIdsByPredicates($pb));
     }
 }
