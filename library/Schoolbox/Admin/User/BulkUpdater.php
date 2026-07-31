@@ -682,13 +682,15 @@ class BulkUpdater
      * the users' current roles when it is unchanged.
      *
      * @return list<int>
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
     private function getQualificationUpdateUserIds(): array
     {
         if ($this->role !== self::UNCHANGED) {
-            $roleType = $this->roleMapper->findOneByColumn('id', $this->role);
+            try {
+                $roleType = $this->roleMapper->findOneByColumn('id', $this->role);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                return [];
+            }
 
             if ($roleType->isStudent()) {
                 return $this->userIds;
