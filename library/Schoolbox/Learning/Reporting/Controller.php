@@ -15,9 +15,7 @@ use Alaress\Web\Controller\Base;
 use Alaress\HTMLPurifier\IPurifier;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Curriculum\Node\Model as CurriculumNode;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -56,7 +54,6 @@ class Controller extends Base
      * @param StateMapper           $stateMapper
      * @param IPurifier             $purifier
      * @param FeedbackFolders       $feedbackFolders
-     * @param RubricDataSource      $rubricMapper
      * @param TermMapper            $termMapper
      * @return void
      */
@@ -65,7 +62,6 @@ class Controller extends Base
         private StateMapper $stateMapper,
         private IPurifier $purifier,
         private FeedbackFolders $feedbackFolders,
-        private RubricDataSource $rubricMapper,
         private TermMapper $termMapper,
     ) {
     }

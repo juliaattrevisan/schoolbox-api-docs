@@ -104,7 +104,6 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\Learning\DueWork\StateMapper::class),
             new ScrubAdapter(),
             $this->getFeedbackFolders(),
-            $this->getMapperFactory()->get(\Schoolbox\Assessment\Rubric\DataModel\DataSource::class),
             $this->getMapperFactory()->get(\Schoolbox\Assessment\Term\Mapper::class),
         );
     }
