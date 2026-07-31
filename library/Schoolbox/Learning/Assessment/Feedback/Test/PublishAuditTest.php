@@ -22,6 +22,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Rubric\Instance\Mapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\AbstractFeedback;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
@@ -366,6 +367,7 @@ class PublishAuditTest extends TestCase
             $this->createStub(AssessmentDataSource::class),
             $projectResultCacheMapper,
             $this->createStub(FeedbackFolders::class),
+            $this->createStub(EditorTemplateHelper::class),
         );
 
         $this->configureControllerResponseFactory($controller);
