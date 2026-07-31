@@ -121,7 +121,7 @@ class Config
             'text' => ['gpt-5.4-nano'],
         ],
         Feature::DIALOG_AGENT->value => [
-            'text' => ['gpt-5.3-chat-latest'],
+            'text' => ['gpt-5.4-nano'],
         ],
         Feature::IMAGE->value => [
             'text'  => ['gpt-5.4-nano'],
