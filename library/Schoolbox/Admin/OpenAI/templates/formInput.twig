@@ -168,6 +168,7 @@
            type="{{ name == 'ai_key' ? 'password' : 'text' }}"
            name="{{ inputName }}"
            value="{{ inputValue }}"
+           {% if name == 'ai_key' %}autocomplete="new-password"{% endif %}
             {{ dataAttrs }}
            style="display:none"
            data-test="ai-feature-option-input-{{ name }}"
