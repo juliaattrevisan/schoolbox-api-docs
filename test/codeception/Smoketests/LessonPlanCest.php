@@ -25,6 +25,18 @@ class LessonPlanCest
         $i->stopFollowingRedirects();
     }
 
+    public function linkedActivitiesOnlyExposeParticipatingLearners(IntegrationTester $i): void
+    {
+        $student = $i->grabUser('jreed');
+
+        $i->impersonateUser($student->getId());
+        $i->sendGet('/learning/assessments/433/activities');
+        $i->seeResponseCodeIs(200);
+        $i->dontSeeResponseContainsJson(['id' => 3]);
+        $i->dontSeeResponseContainsJson(['id' => 4]);
+        $i->dontSeeResponseContainsJson(['id' => 900]);
+    }
+
     /**
      * Creates a lesson plan using a curl payload with Visible to students OFF
      * Check the student cannot see the lesson plan
