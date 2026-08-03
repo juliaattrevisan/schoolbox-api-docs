@@ -53,7 +53,7 @@ else
 fi
 
 echo "Gather changed files"
-CHANGED_FILES=$(git diff HEAD origin/$BASE_BRANCH --name-only --diff-filter=d | grep .php\$)
+CHANGED_FILES=$(git diff origin/$BASE_BRANCH...HEAD --name-only --diff-filter=d | grep .php\$)
 if [[ -z $CHANGED_FILES ]]; then
         echo "No PHP files changed: skipping PHPCS check";
         exit 0;
