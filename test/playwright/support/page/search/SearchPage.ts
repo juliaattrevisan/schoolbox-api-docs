@@ -37,7 +37,7 @@ export default class SearchPage {
 
     static readonly CREATOR_SEARCH_SELECT_RESULT = "ss-results-item-container"; // Append "-id"
 
-    static readonly SELECTOR_RESULTS = ".sbx-search-page__results";
+    static readonly DATA_TEST_RESULTS = "sp-results";
 
     constructor(page: Page) {
         this.page = page;
@@ -101,9 +101,9 @@ export default class SearchPage {
         const searchComplete = this.page
             .getByTestId(SearchPage.RESULTS_NONE)
             .or(this.page.getByTestId(SearchPage.RESULTS_ERROR))
-            .or(this.page.locator(SearchPage.SELECTOR_RESULTS));
+            .or(this.page.getByTestId(SearchPage.DATA_TEST_RESULTS));
         await expect(searchComplete).toBeVisible();
-        const resultsContainer = this.page.locator(SearchPage.SELECTOR_RESULTS);
+        const resultsContainer = this.page.getByTestId(SearchPage.DATA_TEST_RESULTS);
         if (shouldBePresented) {
             await expect(resultsContainer).toContainText(text);
             return;
