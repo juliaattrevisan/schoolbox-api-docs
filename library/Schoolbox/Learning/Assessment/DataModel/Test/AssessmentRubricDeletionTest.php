@@ -10,15 +10,17 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DataModel\Test;
 
 use Alaress\Database\Statement\Query\IQuery;
+use Closure;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use ReflectionFunction;
 use Schoolbox\Assessment\Rubric\Instance\Mapper as RubricInstanceMapper;
-use Schoolbox\Learning\Assessment\DataModel\Mapper;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\Model;
 use Schoolbox\Test\MockConnector;
 
-#[CoversClass(Mapper::class)]
+#[CoversClass(AssessmentMapper::class)]
 #[AllowMockObjectsWithoutExpectations]
 class AssessmentRubricDeletionTest extends TestCase
 {
@@ -27,8 +29,39 @@ class AssessmentRubricDeletionTest extends TestCase
      *
      * @return void
      */
-    public function testSoftDeleteRubricInstancesDeletesEveryInstanceForAssessment(): void
+    public function testRegisteredRubricCallbackDeletesEveryInstanceForAssessment(): void
     {
+        // Extend the AssessmentMapper so the findPostSoftDeleteCallback() method will have access to its callbacks.
+        $assessmentMapper = new class extends AssessmentMapper {
+            /**
+             * Finds a post-soft-delete callback by its method name.
+             *
+             * @param string $methodName
+             * @return Closure|null
+             */
+            public function findPostSoftDeleteCallback(string $methodName): ?Closure
+            {
+                $callbacks = $this->callback_queue[self::CALLBACK_POSTSOFTDELETE] ?? [];
+
+                foreach ($callbacks as $callback) {
+                    $closure = $callback(...);
+
+                    if (new ReflectionFunction($closure)->getName() === $methodName) {
+                        return $closure;
+                    }
+                }
+
+                return null;
+            }
+        };
+
+        $callback = $assessmentMapper->findPostSoftDeleteCallback('softDeleteRubricInstances');
+
+        self::assertNotNull(
+            $callback,
+            'The rubric cleanup must be registered as a post-soft-delete callback.',
+        );
+
         $database = new class ($this, $this->createStub(IQuery::class)) extends MockConnector {
             public string $query = '';
             public ?array $parameters = null;
@@ -65,7 +98,7 @@ class AssessmentRubricDeletionTest extends TestCase
         $rubricInstanceMapper->setDatabase($database);
 
         try {
-            (new Mapper())->softDeleteRubricInstances((new Model())->setId(123));
+            $callback(new Model()->setId(123));
         } finally {
             $rubricInstanceMapper->setDatabase($originalDatabase);
         }
