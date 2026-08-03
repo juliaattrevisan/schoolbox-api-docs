@@ -594,7 +594,7 @@ class Mapper extends BaseMapper
                 WHERE {$where}
 
                 -- Reporting activity doesn't have any responses
-
+                
                 ORDER BY id ASC
             ";
 
@@ -1550,7 +1550,7 @@ class Mapper extends BaseMapper
         /* $this->>getTable() is the assessment table
          */
         $query = "
-            SELECT
+            SELECT 
                 rcn.reporting_id AS reporting_id,
                 cn.*
             FROM reporting_curriculum_node rcn
@@ -1626,7 +1626,7 @@ class Mapper extends BaseMapper
         /* $this->>getTable() is the assessment table
          */
         $query = "
-            SELECT
+            SELECT 
                 rwt.reporting_id AS reporting_id,
                 lwt.*
             FROM reporting_work_type rwt

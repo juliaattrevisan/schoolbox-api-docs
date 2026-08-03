@@ -14,12 +14,11 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Rubric\Instance\Mapper;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Test\MockConnector;
 
 #[CoversClass(Mapper::class)]
 #[AllowMockObjectsWithoutExpectations]
-class RubricInstanceRemovalTest extends TestCase
+class MapperTest extends TestCase
 {
     /**
      * Tests that an empty preservation list soft-deletes every active rubric instance for an assessment.
@@ -46,9 +45,9 @@ class RubricInstanceRemovalTest extends TestCase
             }
         };
 
-        new Mapper()
+        (new Mapper())
             ->setDatabase($database)
-            ->removeFromAssessment(new DueWork()->setId(123), []);
+            ->removeFromAssessmentId(123, []);
 
         $query = preg_replace('/\s+/', ' ', trim($database->query));
 
