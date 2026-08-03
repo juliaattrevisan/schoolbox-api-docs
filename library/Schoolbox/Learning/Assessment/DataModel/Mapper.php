@@ -321,6 +321,8 @@ class Mapper extends BaseMapper
      */
     public function softDeleteRubricInstances(Model $assessment): bool
     {
+        // This callback receives a persistence model, not the IAssessable domain model required by
+        // removeFromAssessment(), so the assessment ID must be passed instead.
         RubricInstanceMapper::getInstance()->removeFromAssessmentId($assessment->getId(), []);
 
         return true;
