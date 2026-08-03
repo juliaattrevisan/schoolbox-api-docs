@@ -176,7 +176,20 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function removeFromAssessment(IAssessable $assessment, array $rubricInstanceIdsToKeep): void
     {
-        $params = ['assessmentId' => $assessment->getId()];
+        $this->removeFromAssessmentId($assessment->getId(), $rubricInstanceIdsToKeep);
+    }
+
+
+    /**
+     * Soft-deletes rubric instances associated with an assessment ID, except those explicitly retained.
+     *
+     * @param int $assessmentId
+     * @param int[] $rubricInstanceIdsToKeep
+     * @return void
+     */
+    public function removeFromAssessmentId(int $assessmentId, array $rubricInstanceIdsToKeep): void
+    {
+        $params = ['assessmentId' => $assessmentId];
         $keepCondition = '';
 
         if (count($rubricInstanceIdsToKeep) > 0) {

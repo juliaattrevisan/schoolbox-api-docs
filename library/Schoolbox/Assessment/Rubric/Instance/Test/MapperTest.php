@@ -14,7 +14,6 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Rubric\Instance\Mapper;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Test\MockConnector;
 
 #[CoversClass(Mapper::class)]
@@ -48,7 +47,7 @@ class MapperTest extends TestCase
 
         (new Mapper())
             ->setDatabase($database)
-            ->removeFromAssessment((new DueWork())->setId(123), []);
+            ->removeFromAssessmentId(123, []);
 
         $query = preg_replace('/\s+/', ' ', trim($database->query));
 

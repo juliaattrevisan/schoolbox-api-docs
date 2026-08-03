@@ -20,6 +20,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Participant\Plan;
+use Schoolbox\Assessment\Rubric\Instance\Mapper as RubricInstanceMapper;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\GenericCollection;
@@ -220,6 +221,7 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteDialogAgent(...));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteReporting(...));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteCustomisation(...));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteRubricInstances(...));
 
         $this->registerPersistSearchIndexCallbacks();
     }
@@ -314,6 +316,19 @@ class Mapper extends BaseMapper
 
     protected function reorderSequenceIfCustomised(Model $assessment): bool
     {
+        return true;
+    }
+
+    /**
+     * Soft-delete every rubric instance associated with a deleted assessment.
+     *
+     * @param Model $assessment
+     * @return bool
+     */
+    public function softDeleteRubricInstances(Model $assessment): bool
+    {
+        RubricInstanceMapper::getInstance()->removeFromAssessmentId($assessment->getId(), []);
+
         return true;
     }
 
