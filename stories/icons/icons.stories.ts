@@ -188,6 +188,7 @@ const icons: IconStoryEntry[] = [
     { name: "wiki", label: "wiki" },
     { name: "withdraw-achievement", label: "withdraw-achievement" },
     { name: "wolfram-alpha", label: "wolfram-alpha" },
+    { name: "zenda", label: "zenda" },
 ];
 
 /**

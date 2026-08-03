@@ -2028,6 +2028,16 @@ function alertInvalidIconName(): false {
                     d="M16 5.333l4.944-4.55 1.325 6.587 6.675-0.775-2.8 6.108 5.855 3.296-5.855 3.296 2.8 6.108-6.675-0.775-1.325 6.587-4.944-4.55-4.944 4.55-1.325-6.587-6.675 0.775 2.8-6.108-5.855-3.296 5.855-3.296-2.8-6.108 6.675 0.775 1.325-6.587z"
                 ></path>
             </svg>
+            <svg
+                v-else-if="props.name === 'zenda'"
+                class="sbx-icon__svg"
+                viewBox="0 0 32 32"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <circle cx="7.108" cy="16" r="3.728" fill="#ed5395"></circle>
+                <circle cx="15.996" cy="16" r="3.728" fill="#33b0ff"></circle>
+                <circle cx="24.892" cy="16" r="3.728" fill="#3ddad8"></circle>
+            </svg>
             <template v-else-if="alertInvalidIconName()"></template>
         </slot>
     </span>
