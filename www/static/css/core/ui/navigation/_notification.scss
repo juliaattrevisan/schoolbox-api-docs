@@ -102,6 +102,7 @@ $allow-notification-stash: $xlarge-up;
         left: 0;
         position: absolute;
         top: 1rem;
+        z-index: calc(var(--sbx-depth-default) + 1);
         &:hover {
             color: $navigation-background;
         }
@@ -117,6 +118,7 @@ $allow-notification-stash: $xlarge-up;
         position: absolute;
         right: 0;
         top: 1rem;
+        z-index: calc(var(--sbx-depth-default) + 1);
         &:hover {
             color: $navigation-background;
         }

@@ -415,6 +415,7 @@ $allow-sidebar-stash: $large-up;
             display: inline-flex;
             position: absolute;
             right: 0;
+            z-index: var(--sbx-depth-default);
 
             &:hover {
                 background-color: $off-canvas-hover;
