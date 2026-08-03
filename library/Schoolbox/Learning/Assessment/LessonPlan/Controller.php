@@ -298,7 +298,10 @@ class Controller extends Assessment\Controller
 
                 // only show the linked assessments that the student is a participant of
                 $linkedAssessments = $linkedAssessments->filter(function (IAssessable $assessable) use ($student) {
-                    return ($assessable->getParticipantIfExtant($student) instanceof Participant);
+                    return (
+                        $assessable->getParticipantIfExtant($student) instanceof Participant &&
+                        ($assessable->getWorkType()?->isVisibleToLearners() ?? true)
+                    );
                 });
             }
         }
@@ -431,9 +434,16 @@ class Controller extends Assessment\Controller
      */
     public function getActivities(Model $assessment): void
     {
+        $linkedAssessments = $assessment->getLinkedAssessments();
+        if (!$this->getUser()->getRole()->isStaff()) {
+            $linkedAssessments = $linkedAssessments?->filter(function (IAssessable $assessable) {
+                return $assessable->getWorkType()?->isVisibleToLearners() ?? true;
+            });
+        }
+
         $this->response = $this->responseAsJson(
-            $assessment->getLinkedAssessments()
-                ? $assessment->getLinkedAssessments()->reindex()->map(
+            $linkedAssessments
+                ? $linkedAssessments->reindex()->map(
                     new Assessment\Translator\UnitAssessments(
                         $this->routeGenerator,
                         $this->getAuthorizer(),
