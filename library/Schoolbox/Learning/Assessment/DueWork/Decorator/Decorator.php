@@ -378,8 +378,13 @@ class Decorator implements DecoratorInterface
              * assessment's maximum marks but we'll just not entertain that theory for now
              */
             $maxMark = 0;
+            $rubricData = $this->getRubricData() ?? [];
 
             foreach ($this->original->getRubricInstances() as $originalRubricInstance) {
+                if (!isset($rubricData[$originalRubricInstance->getId()])) {
+                    continue;
+                }
+
                 /* Make a copy of what it originally did, but unlink its identifier so it spawns anew.
                  */
                 /** @var \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance */
@@ -392,7 +397,11 @@ class Decorator implements DecoratorInterface
                  * to find out what the settings *were*.
                  */
                 $existingGrid = new Grid($this->original, $rubricInstance, $rowSetBeforeMove);
-                $existingGrid = $gridFactory->buildFromPostData($existingGrid, $this->getRubricData()[$originalRubricInstance->getId()], false);
+                $existingGrid = $gridFactory->buildFromPostData(
+                    $existingGrid,
+                    $rubricData[$originalRubricInstance->getId()],
+                    false
+                );
 
                 $importer = new GenericImporter(
                     $existingGrid,
