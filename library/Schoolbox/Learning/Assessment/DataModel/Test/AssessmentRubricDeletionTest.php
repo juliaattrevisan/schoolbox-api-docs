@@ -22,17 +22,35 @@ use Schoolbox\Test\MockConnector;
 #[AllowMockObjectsWithoutExpectations]
 class AssessmentRubricDeletionTest extends TestCase
 {
+    /**
+     * Tests that deleting an assessment soft-deletes all of its rubric instances.
+     *
+     * @return void
+     */
     public function testSoftDeleteRubricInstancesDeletesEveryInstanceForAssessment(): void
     {
         $database = new class ($this, $this->createStub(IQuery::class)) extends MockConnector {
             public string $query = '';
             public ?array $parameters = null;
 
+            /**
+             * Builds a connector that records the query executed by the mapper.
+             *
+             * @param TestCase $testCase
+             * @param IQuery $queryResult
+             */
             public function __construct(TestCase $testCase, private readonly IQuery $queryResult)
             {
                 parent::__construct($testCase);
             }
 
+            /**
+             * Records a query and returns the configured query result.
+             *
+             * @param string $sql
+             * @param array|null $parameters
+             * @return IQuery
+             */
             public function executeQuery($sql, $parameters = null): IQuery
             {
                 $this->query = $sql;
