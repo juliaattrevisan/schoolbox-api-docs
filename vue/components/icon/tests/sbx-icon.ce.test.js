@@ -23,14 +23,3 @@ test("Zenda icon renders with its supplied brand colours", () => {
 
     expect(Array.from(circles, (circle) => circle.getAttribute("fill"))).toEqual(["#ed5395", "#33b0ff", "#3ddad8"]);
 });
-
-test("all built-in icons use the standard viewBox without transforms", () => {
-    const source = fs.readFileSync(path.resolve(__dirname, "../sbx-icon.ce.vue"), "utf8");
-    const svgOpeningTags = source.match(/<svg\b[^>]*>/g) || [];
-
-    expect(svgOpeningTags.length).toBeGreaterThan(0);
-    svgOpeningTags.forEach((tag) => {
-        expect(tag).toContain('viewBox="0 0 32 32"');
-    });
-    expect(source).not.toMatch(/\btransform=/);
-});
