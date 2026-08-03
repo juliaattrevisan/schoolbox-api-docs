@@ -210,7 +210,6 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_PRESAVE, $this->validateDateOrder(...));
         $this->registerCallback(self::CALLBACK_POSTSAVE, $this->createDynamicPlanIfNew(...));
         $this->registerCallback(self::CALLBACK_POSTSAVE, $this->updateAssessmentRelationView(...));
-        $this->registerCallback(self::CALLBACK_POSTSAVE, $this->reorderSequenceIfCustomised(...));
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteQuiz(...));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteTask(...));
@@ -311,11 +310,6 @@ class Mapper extends BaseMapper
             return false;
         }
 
-        return true;
-    }
-
-    protected function reorderSequenceIfCustomised(Model $assessment): bool
-    {
         return true;
     }
 
