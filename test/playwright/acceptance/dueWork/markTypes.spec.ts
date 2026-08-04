@@ -4,6 +4,7 @@
  * 2. Execute npx playwright test markTypes.spec.ts
  */
 
+import { access } from "node:fs/promises";
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
 import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
@@ -23,16 +24,6 @@ import Common from "@schoolboxTest/playwright/support/page/Common";
 
 test("Grades remain readable when grade colours are disabled", async ({ page }) => {
     await page.setContent(`
-        <style>
-            :root {
-                --sbx-color-primary-background: #fff;
-                --sbx-color-secondary-background: #f4f2f2;
-                --sbx-color-secondary-text: #525252;
-                --sbx-color-foreground-primary: #fff;
-                --sbx-color-foreground-secondary: #f4f2f2;
-                --sbx-color-text-secondary: #525252;
-            }
-        </style>
         <div class="flex-grade">
             <div class="grade gradient-none-bg">
                 <span>75 %</span>
@@ -42,11 +33,29 @@ test("Grades remain readable when grade colours are disabled", async ({ page }) 
             </div>
         </div>
     `);
-    await page.addStyleTag({ path: "www/static/css/core/core.css" });
+
+    const coreCssPath = "www/static/css/core/core.css";
+    try {
+        await access(coreCssPath);
+    } catch {
+        throw new Error(`Compiled core stylesheet not found at "${coreCssPath}". Run "npm run build" first.`);
+    }
+    await page.addStyleTag({ path: coreCssPath });
+
+    // These differ from the core defaults so the test proves the semantic tokens are applied.
+    await page.addStyleTag({
+        content: `
+            :root {
+                --sbx-color-foreground-primary: #fff;
+                --sbx-color-foreground-secondary: #e8edf2;
+                --sbx-color-text-secondary: #364152;
+            }
+        `,
+    });
 
     const grade = page.locator(".grade.gradient-none-bg");
-    await expect(grade).toHaveCSS("background-color", "rgb(244, 242, 242)");
-    await expect(grade.locator("span")).toHaveCSS("color", "rgb(82, 82, 82)");
+    await expect(grade).toHaveCSS("background-color", "rgb(232, 237, 242)");
+    await expect(grade.locator("span")).toHaveCSS("color", "rgb(54, 65, 82)");
     await expect(page.locator(".grade.gradient-5-bg span")).toHaveCSS("color", "rgb(255, 255, 255)");
 });
 

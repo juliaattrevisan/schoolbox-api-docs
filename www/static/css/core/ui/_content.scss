@@ -427,7 +427,7 @@ nav {
             line-height: inherit;
         }
         &.gradient-none-bg span {
-            color: var(--sbx-color-text-secondary, $body-font-color);
+            color: var(--sbx-color-text-secondary);
         }
         &.review {
             background-color: var(--sbx-color-warning, $warning-color);
