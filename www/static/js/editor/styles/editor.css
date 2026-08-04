@@ -87,9 +87,9 @@ body.ck-fullscreen {
     }
     &:hover {
         background-color: var(--sbx-config-color-active, var(--content-ui-submit-background));
-        color: var(--sbx-config-color-accent, var(--content-ui-submit-background));
+        color: var(--sbx-config-color-accent, var(--content-ui-submit-foreground));
         .ck-button__label {
-            color: var(--sbx-config-color-accent, var(--content-ui-submit-background));
+            color: var(--sbx-config-color-accent, var(--content-ui-submit-foreground));
         }
     }
 }
