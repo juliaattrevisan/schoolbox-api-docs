@@ -53,10 +53,6 @@ class Status implements IStatus
      */
     public function isReachable(): bool
     {
-        if (!$this->hasBatchOAuthSecret()) {
-            return false;
-        }
-
         try {
             $api = new Api\Batch\Api($this->host, $this->dsn, Codec\DSN::MODULE_BATCHXML);
             $api->checkConnection();
@@ -76,14 +72,6 @@ class Status implements IStatus
      */
     public function getReport(): array
     {
-        if (!$this->hasBatchOAuthSecret()) {
-            return [[
-                'message' => 'Cannot access api endpoint',
-                'reason' => 'Batch OAuth client secret is not configured.',
-                'status' => ISpecification::STATUS_ERROR
-            ]];
-        }
-
         $specification = new Specification($this->host, $this->dsn);
 
         try {
@@ -95,19 +83,5 @@ class Status implements IStatus
                 'status' => ISpecification::STATUS_ERROR
             ]];
         }
-    }
-
-
-    /**
-     * Determine whether Batch OAuth credentials are configured.
-     *
-     * @return bool True when the Batch OAuth client secret is present.
-     * @throws \DomainException When the iSAMS DSN cannot be decoded.
-     */
-    private function hasBatchOAuthSecret(): bool
-    {
-        $credentials = (new Codec\DSN())->decode($this->dsn);
-
-        return ($credentials['modules'][Codec\DSN::MODULE_BATCHXML]['clientsecret'] ?? '') !== '';
     }
 }
