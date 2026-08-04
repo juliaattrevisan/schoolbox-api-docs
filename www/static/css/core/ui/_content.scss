@@ -377,7 +377,7 @@ nav {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
     &.gradient-none-bg {
-        background-color: var(--sbx-color-foreground-secondary, $aluminum);
+        background-color: var(--sbx-color-foreground-secondary, #f4f2f2);
     }
     span {
         display: block;
@@ -414,7 +414,7 @@ nav {
         padding: 0.5rem 0.75rem;
     }
     .gradient-none-bg {
-        background-color: var(--sbx-color-foreground-secondary, $aluminum);
+        background-color: var(--sbx-color-foreground-secondary, #f4f2f2);
     }
     .grade {
         align-items: center;
@@ -427,7 +427,7 @@ nav {
             line-height: inherit;
         }
         &.gradient-none-bg span {
-            color: var(--sbx-color-text-secondary);
+            color: var(--sbx-color-text-secondary, #525252);
         }
         &.review {
             background-color: var(--sbx-color-warning, $warning-color);
