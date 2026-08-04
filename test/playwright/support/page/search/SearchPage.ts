@@ -37,6 +37,8 @@ export default class SearchPage {
 
     static readonly CREATOR_SEARCH_SELECT_RESULT = "ss-results-item-container"; // Append "-id"
 
+    static readonly DATA_TEST_RESULTS = "sp-results";
+
     constructor(page: Page) {
         this.page = page;
     }
@@ -87,6 +89,27 @@ export default class SearchPage {
      */
     async verifyNoResults(): Promise<void> {
         await expect(this.page.getByTestId(SearchPage.RESULTS_NONE)).toBeVisible();
+    }
+
+    /**
+     * Verify whether the search results contain text. Pass `shouldBePresented` as false to check that the text is not present.
+     * @param text - The text to check in the search results
+     * @param shouldBePresented - Whether the text should be presented
+     */
+    async verifyResultsTextPresence(text: string, shouldBePresented: boolean = true): Promise<void> {
+        // Ensure the search has finished rendering either results, a no-results state, or an error.
+        const searchComplete = this.page
+            .getByTestId(SearchPage.RESULTS_NONE)
+            .or(this.page.getByTestId(SearchPage.RESULTS_ERROR))
+            .or(this.page.getByTestId(SearchPage.DATA_TEST_RESULTS));
+        await expect(searchComplete).toBeVisible();
+        const resultsContainer = this.page.getByTestId(SearchPage.DATA_TEST_RESULTS);
+        if (shouldBePresented) {
+            await expect(resultsContainer).toContainText(text);
+            return;
+        }
+
+        await expect(resultsContainer).not.toContainText(text);
     }
 
     /**
