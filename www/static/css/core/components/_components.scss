@@ -377,14 +377,12 @@ ul.tileList {
             transition: background-color 0.1s;
         }
         .edit a.sbx-icon-only-button {
-            background-color: $content-ui-background;
-
+            background-color: var(--sbx-color-foreground-primary, $white);
             &:hover {
-                background-color: $content-ui-hover;
+                background-color: var(--sbx-config-color-active, var(--content-ui-hover));
             }
-
             &:focus {
-                background-color: $content-ui-background;
+                background-color: var(--sbx-color-foreground-primary, $white);
             }
         }
     }
