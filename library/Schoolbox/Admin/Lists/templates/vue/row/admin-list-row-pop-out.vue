@@ -211,15 +211,15 @@ export default {
     padding: 5px 10px;
     border-radius: var(--sbx-config-field-corner-radius, 0);
     color: var(--sbx-config-color-accent, #000);
-    font-size: 0.7rem;
+    font-size: var(--sbx-font-size-xs, 0.7rem);
     text-align: center;
     background: var(--sbx-config-color-active, $body-bg);
     transition: all 0.3s;
-    opacity: 0.8;
 }
 
 .item-active {
-    opacity: 1;
+    background: var(--sbx-config-color-accent, var(--content-ui-submit-background));
+    color: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground));
 }
 
 .update-button {
