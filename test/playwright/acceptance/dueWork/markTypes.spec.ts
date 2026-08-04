@@ -21,6 +21,35 @@ import ActivityFeed from "@schoolboxTest/playwright/support/page/profilePage/Act
 import CourseOutline from "@schoolboxTest/playwright/support/page/homepage/CourseOutline";
 import Common from "@schoolboxTest/playwright/support/page/Common";
 
+test("Grades remain readable when grade colours are disabled", async ({ page }) => {
+    await page.setContent(`
+        <style>
+            :root {
+                --sbx-color-primary-background: #fff;
+                --sbx-color-secondary-background: #f4f2f2;
+                --sbx-color-secondary-text: #525252;
+                --sbx-color-foreground-primary: #fff;
+                --sbx-color-foreground-secondary: #f4f2f2;
+                --sbx-color-text-secondary: #525252;
+            }
+        </style>
+        <div class="flex-grade">
+            <div class="grade gradient-none-bg">
+                <span>75 %</span>
+            </div>
+            <div class="grade gradient-5-bg">
+                <span>85 %</span>
+            </div>
+        </div>
+    `);
+    await page.addStyleTag({ path: "www/static/css/core/core.css" });
+
+    const grade = page.locator(".grade.gradient-none-bg");
+    await expect(grade).toHaveCSS("background-color", "rgb(244, 242, 242)");
+    await expect(grade.locator("span")).toHaveCSS("color", "rgb(82, 82, 82)");
+    await expect(page.locator(".grade.gradient-5-bg span")).toHaveCSS("color", "rgb(255, 255, 255)");
+});
+
 test.describe("Due Work - Mark type tests", () => {
     test.describe.configure({ mode: "serial" });
 

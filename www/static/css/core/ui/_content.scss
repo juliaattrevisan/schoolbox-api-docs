@@ -426,6 +426,9 @@ nav {
             color: var(--sbx-color-foreground-primary, $white);
             line-height: inherit;
         }
+        &.gradient-none-bg span {
+            color: var(--sbx-color-text-secondary, $body-font-color);
+        }
         &.review {
             background-color: var(--sbx-color-warning, $warning-color);
         }
