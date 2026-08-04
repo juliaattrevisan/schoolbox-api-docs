@@ -177,7 +177,7 @@ class Hydrator
                     /** @var DueWorkFeedback|null $dueWorkFeedback */
                     $dueWorkFeedback = $dueWorkFeedbackResults->offsetGet((int)$result['id']);
                     /** @var IAssessable|null $assessment */
-                    $assessment = $assessments->offsetGet($dueWorkFeedback?->getAssessable()->getId());
+                    $assessment = $assessments->offsetGet($dueWorkFeedback?->getAssessable()?->getId());
                     if (
                         !$assessment
                         || !$this->visibility->isVisibleToParticipantActivity(
@@ -202,7 +202,7 @@ class Hydrator
                     /** @var QuizFeedback|null $quizFeedback */
                     $quizFeedback = $quizFeedbackResults->offsetGet((int)$result['id']);
                     /** @var IAssessable|null $assessment */
-                    $assessment = $assessments->offsetGet($quizFeedback?->getAssessable()->getId());
+                    $assessment = $assessments->offsetGet($quizFeedback?->getAssessable()?->getId());
                     if (
                         !$assessment
                         || !$this->visibility->isVisibleToParticipantActivity(
