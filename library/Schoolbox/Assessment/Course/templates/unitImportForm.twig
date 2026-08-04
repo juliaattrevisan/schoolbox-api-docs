@@ -77,7 +77,7 @@
     <input type="hidden" name="course_impl_id" value="{{ courseImplId is defined ? courseImplId : '' }}"/>
     <input type="hidden" name="component_id" value="{{ componentId }}"/>
     <p data-mage-helptext class="meta">Select the {{ locale.unit.plural }} to be imported, and their open and close dates.</p>
-    <ul class="information-list">
+    <ul class="information-list u-pad-m--bottom">
 
         {# Iterate each unit and create checkbox and dates #}
 
@@ -93,7 +93,7 @@
 
                         {# Checkbox & Unit Name #}
 
-                        <div class="card small-12 large-4">
+                        <div class="card small-12 large-4 sbx-checkbox-radio-container">
                             <input id="import-{{ loop.index }}"
                                    name="unit[{{ loop.index }}][import]"
                                    {% if unitImpl.id %}checked="checked" data-warn-removal {% endif %}
@@ -101,7 +101,7 @@
                                    data-interaction="enable"
                                    data-checkbox-group="unit" />
                             <label for="import-{{ loop.index }}" class="checkbox-label">
-                                {{ unitImpl.title }}<span class="icon-unit"></span>
+                                <sbx-icon name="unit"></sbx-icon> {{ unitImpl.title }}
                             </label>
                         </div>
 
