@@ -47,6 +47,174 @@ class VisibilityTest extends TestCase
     private const NOW_DATABASE = '2010-01-10 00:00:00';    // To ensure test repeatability, freeze time
 
     /**
+     * Proves that historical participation grants only the explicitly permitted activity visibility paths.
+     *
+     * @param array{
+     *     viewer: 'student'|'other student'|'parent'|'staff',
+     *     linkedParent: bool,
+     *     currentLearner: bool,
+     *     currentParent: bool,
+     *     participant: bool,
+     *     published: bool,
+     *     hasWorkType: bool,
+     *     visibleToLearners: bool,
+     *     visibleToParents: bool,
+     *     hiddenLessonPlan: bool,
+     *     closed: bool
+     * } $scenario Visibility inputs for the historical or current access path.
+     * @param bool $expected Whether the assessment should be visible to the effective viewer.
+     * @return void
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerParticipationAwareVisibility')]
+    public function testParticipationAwareVisibility(array $scenario, bool $expected): void
+    {
+        $now = new Alaress_Date_Format(self::NOW_DATABASE, Alaress_Date_Format::DATABASE_FORMAT);
+        $viewee = (new User())->setId(101)->setRole((new Role())->setType(Role::STUDENT));
+
+        $viewer = match ($scenario['viewer']) {
+            'student' => $viewee,
+            'other student' => (new User())->setId(102)->setRole((new Role())->setType(Role::STUDENT)),
+            'parent' => (new User())->setId(103)->setRole((new Role())->setType(Role::PARENT)),
+            'staff' => (new User())->setId(104)->setRole((new Role())->setType(Role::STAFF)),
+        };
+
+        if ($viewer->getRole()->isParent()) {
+            $children = new GenericCollection(User::class);
+            if ($scenario['linkedParent']) {
+                $children->setOffset($viewee->getId(), $viewee);
+            }
+            $viewer->setChildren($children);
+        }
+
+        $assessable = $scenario['hiddenLessonPlan']
+            ? self::buildLessonPlan($now, Role::STAFF)
+            : (new DueWork\Model())
+                ->setId(1)
+                ->setTitle('Participation-aware Due Work')
+                ->setContext((new Folder\Model())->setId(1))
+                ->setAcceptsMultiple()
+                ->setPublishAt((clone $now)->addDays($scenario['published'] ? -2 : 2))
+                ->setOpenAt((clone $now)->addDays(-1))
+                ->setDueAt((clone $now)->addDays(1))
+                ->setCloseAt((clone $now)->addDays($scenario['closed'] ? -1 : 2));
+
+        if ($scenario['hasWorkType']) {
+            $assessable->setWorkType(
+                (new WorkType\Model())
+                    ->setIsVisibleToLearners($scenario['visibleToLearners'])
+                    ->setIsVisibleToParents($scenario['visibleToParents'])
+            );
+        }
+
+        $plan = (new Plan($assessable))->setIsDynamic(PlanMapper::PLAN_TYPE_DYNAMIC);
+        if ($scenario['participant']) {
+            $plan->getParticipants()[$viewee->getId()] = new Participant(
+                $viewee,
+                $plan,
+                ResultCache\Mapper::getInstance()
+            );
+        }
+        $assessable->setPlans($assessable->getPlans()->emptyClone()->add($plan));
+
+        /** @var Access&Stub $access */
+        $access = $this->createStub(Access::class);
+        $access->method('isInstructor')->willReturn(false);
+        $access->method('isLearner')->willReturnCallback(
+            static fn (User $user, Folder\Model $folder): bool => $scenario['currentLearner']
+                && $user->getId() === $viewee->getId()
+        );
+        $access->method('getChildLearnersOfParent')->willReturnCallback(
+            static fn (User $user, Folder\Model $folder): GenericCollection => $scenario['currentParent']
+                && $user->getId() === $viewer->getId()
+                ? new GenericCollection(User::class, [$viewee])
+                : new GenericCollection(User::class)
+        );
+
+        $visibility = new Visibility($access);
+
+        self::assertSame(
+            $expected,
+            $visibility->isVisibleToParticipantActivity($assessable, $viewer, $viewee, false, $now)
+        );
+    }
+
+    /**
+     * Provides historical fallback denials alongside unchanged current-access visibility paths.
+     *
+     * @return array<string, array{array{
+     *     viewer: 'student'|'other student'|'parent'|'staff',
+     *     linkedParent: bool,
+     *     currentLearner: bool,
+     *     currentParent: bool,
+     *     participant: bool,
+     *     published: bool,
+     *     hasWorkType: bool,
+     *     visibleToLearners: bool,
+     *     visibleToParents: bool,
+     *     hiddenLessonPlan: bool,
+     *     closed: bool
+     * }, bool}>
+     */
+    public static function providerParticipationAwareVisibility(): array
+    {
+        $historicalStudent = [
+            'viewer' => 'student',
+            'linkedParent' => false,
+            'currentLearner' => false,
+            'currentParent' => false,
+            'participant' => true,
+            'published' => true,
+            'hasWorkType' => true,
+            'visibleToLearners' => true,
+            'visibleToParents' => true,
+            'hiddenLessonPlan' => false,
+            'closed' => false,
+        ];
+
+        return [
+            'former student participant' => [$historicalStudent, true],
+            'linked parent of former participant' => [[
+                ...$historicalStudent,
+                'viewer' => 'parent',
+                'linkedParent' => true,
+            ], true],
+            'another student' => [[...$historicalStudent, 'viewer' => 'other student'], false],
+            'unlinked parent' => [[...$historicalStudent, 'viewer' => 'parent'], false],
+            'missing participant' => [[...$historicalStudent, 'participant' => false], false],
+            'unpublished assessment' => [[...$historicalStudent, 'published' => false], false],
+            'learner-hidden activity' => [[...$historicalStudent, 'visibleToLearners' => false], false],
+            'parent-hidden activity' => [[
+                ...$historicalStudent,
+                'viewer' => 'parent',
+                'linkedParent' => true,
+                'visibleToParents' => false,
+            ], false],
+            'hidden lesson plan' => [[...$historicalStudent, 'hiddenLessonPlan' => true], false],
+            'closed participant when closed activities are hidden' => [[...$historicalStudent, 'closed' => true], false],
+            'null work type for former student' => [[...$historicalStudent, 'hasWorkType' => false], true],
+            'null work type for parent' => [[
+                ...$historicalStudent,
+                'viewer' => 'parent',
+                'linkedParent' => true,
+                'hasWorkType' => false,
+            ], false],
+            'current learner path' => [[...$historicalStudent, 'currentLearner' => true], true],
+            'current parent path' => [[
+                ...$historicalStudent,
+                'viewer' => 'parent',
+                'linkedParent' => true,
+                'currentParent' => true,
+            ], true],
+            'current staff path' => [[
+                ...$historicalStudent,
+                'viewer' => 'staff',
+                'participant' => false,
+                'published' => false,
+            ], true],
+        ];
+    }
+
+    /**
      * @param bool                $isParticipant
      * @param Role                $role
      * @param User                $user

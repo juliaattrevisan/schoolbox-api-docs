@@ -76,7 +76,11 @@ class Controller extends Base
     /**
      * Retrieve a user's learning moments and badges, in one API endpoint.
      *
-     * @param User $user
+     * The route user is the profile student whose activity is being requested, while the session user remains the
+     * effective viewer used for role, relationship, and feedback visibility checks.
+     *
+     * @param User $user Profile student whose Activity Feed is being retrieved.
+     * @return void
      * @since 20.2
      *
      * @api   GET /learning/evidenceFeed/user/{userId}/
@@ -102,6 +106,7 @@ class Controller extends Base
             $this->attemptDataSource,
             $this->assessmentDataSource,
             $this->visibility,
+            $user,
             $this->getUser()
         );
         $prefixGenerator = new PrefixGenerator($this->getConfigLoader());

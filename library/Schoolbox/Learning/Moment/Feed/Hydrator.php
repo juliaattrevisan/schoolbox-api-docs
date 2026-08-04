@@ -36,7 +36,9 @@ class Hydrator
      * @param QuizFeedbackMapperProxy $attemptDataSource
      * @param MapperProxy $assessmentDataSource
      * @param Visibility $visibility
-     * @param User $viewer
+     * @param User $viewee Profile student whose participant record anchors historical feedback access.
+     * @param User $viewer Effective viewer whose role controls activity and Feedback Visibility.
+     * @return void
      */
     public function __construct(
         private EvidenceMapper $evidenceMapper,
@@ -45,6 +47,7 @@ class Hydrator
         private QuizFeedbackMapperProxy $attemptDataSource,
         private MapperProxy $assessmentDataSource,
         private Visibility $visibility,
+        private User $viewee,
         private User $viewer,
     ) {
     }
@@ -174,10 +177,15 @@ class Hydrator
                     /** @var DueWorkFeedback|null $dueWorkFeedback */
                     $dueWorkFeedback = $dueWorkFeedbackResults->offsetGet((int)$result['id']);
                     /** @var IAssessable|null $assessment */
-                    $assessment = $assessments->offsetGet($dueWorkFeedback?->getAssessable()->getId());
+                    $assessment = $assessments->offsetGet($dueWorkFeedback?->getAssessable()?->getId());
                     if (
                         !$assessment
-                        || !$this->visibility->isVisibleToUser($assessment, $this->viewer, true)
+                        || !$this->visibility->isVisibleToParticipantActivity(
+                            $assessment,
+                            $this->viewer,
+                            $this->viewee,
+                            true
+                        )
                         || !$assessment->isFeedbackVisibleToUser($this->viewer)
                     ) {
                         break;
@@ -194,10 +202,15 @@ class Hydrator
                     /** @var QuizFeedback|null $quizFeedback */
                     $quizFeedback = $quizFeedbackResults->offsetGet((int)$result['id']);
                     /** @var IAssessable|null $assessment */
-                    $assessment = $assessments->offsetGet($quizFeedback?->getAssessable()->getId());
+                    $assessment = $assessments->offsetGet($quizFeedback?->getAssessable()?->getId());
                     if (
                         !$assessment
-                        || !$this->visibility->isVisibleToUser($assessment, $this->viewer, true)
+                        || !$this->visibility->isVisibleToParticipantActivity(
+                            $assessment,
+                            $this->viewer,
+                            $this->viewee,
+                            true
+                        )
                         || !$assessment->isFeedbackVisibleToUser($this->viewer)
                     ) {
                         break;

@@ -95,6 +95,64 @@ class Visibility
     }
 
     /**
+     * Determines whether an activity is visible through current access or a viewee's historical participation.
+     *
+     * This opt-in operation preserves the normal visibility rules, then permits a former student participant or their
+     * linked parent to see the historical activity without granting access to its folder or other folder content.
+     * Feedback visibility remains a separate caller responsibility.
+     *
+     * @param IAssessable $assessable Assessment whose activity visibility is being checked.
+     * @param User $viewer Effective viewer whose role controls the permitted activity audience.
+     * @param User $viewee Student whose participant record anchors historical access.
+     * @param bool $showClosed Whether activities remain visible after the participant close date.
+     * @param Alaress_Date_Format|null $now Optional fixed time for deterministic checks.
+     * @return bool
+     */
+    public function isVisibleToParticipantActivity(
+        IAssessable $assessable,
+        User $viewer,
+        User $viewee,
+        bool $showClosed,
+        ?Alaress_Date_Format $now = null
+    ): bool {
+        $now = $now ?? Alaress_Date_Format::now();
+
+        if ($this->isVisibleToUser($assessable, $viewer, $showClosed, $now)) {
+            return true;
+        }
+
+        $participant = $assessable->getParticipantIfExtant($viewee);
+        if ($participant === null || !$assessable->isPublished($viewee, $now)) {
+            return false;
+        }
+
+        if ($this->isHiddenByLessonPlanVisibility($assessable, $viewee)) {
+            return false;
+        }
+
+        $workType = $assessable->getWorkType();
+        if ($viewer->getRole()->isStudent()) {
+            if ($viewer->getId() !== $viewee->getId()) {
+                return false;
+            }
+
+            if ($workType !== null && !$workType->isVisibleToLearners()) {
+                return false;
+            }
+        } elseif ($viewer->getRole()->isParent()) {
+            if ($workType === null || !$workType->isVisibleToParents() || !$viewer->isParentOf($viewee)) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+
+        $closeDate = $participant->getCloseDate();
+
+        return $showClosed || $closeDate === null || $now->lt($closeDate);
+    }
+
+    /**
      * Is the assessable visible to the Instructor? (Assumes the user is an instructor)
      *
      * @param IAssessable         $assessable
