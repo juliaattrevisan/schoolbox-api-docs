@@ -376,6 +376,15 @@ ul.tileList {
             width: 100%;
             transition: background-color 0.1s;
         }
+        .edit a.sbx-icon-only-button {
+            background-color: var(--sbx-color-foreground-primary, $white);
+            &:hover {
+                background-color: var(--sbx-config-color-active, var(--content-ui-hover));
+            }
+            &:focus {
+                background-color: var(--sbx-color-foreground-primary, $white);
+            }
+        }
     }
 
     .button {
