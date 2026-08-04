@@ -859,12 +859,12 @@ input[type="checkbox"].plain {
     }
 }
 
-input[type="radio"]:not(.plain) {
+input[type="radio"]:not(.plain, .lrn-input) {
     @include fancy-check("radio-label");
     @include vaporwave("input-toggle");
 }
 
-input[type="checkbox"]:not(.plain) {
+input[type="checkbox"]:not(.plain, .lrn-input) {
     @include fancy-check("checkbox-label");
     @include vaporwave("input-toggle");
 }
@@ -1159,7 +1159,7 @@ input.invalid-data:focus {
 
 // UI uplift styles (.sbx-body) overrides for when UI uplift toggle is active
 body.sbx-body {
-    input[type="radio"]:not(.plain) {
+    input[type="radio"]:not(.plain, .lrn-input) {
         &:has(+ label.block),
         &:has(+ label.input-toggle) {
             display: none;
@@ -1182,7 +1182,7 @@ body.sbx-body {
         }
     }
 
-    input[type="checkbox"]:not(.plain) {
+    input[type="checkbox"]:not(.plain, .lrn-input) {
         &:has(+ label.input-toggle) {
             display: none;
         }
@@ -1232,8 +1232,8 @@ body:not(.sbx-body) {
         }
     }
 
-    input[type="radio"]:not(.plain),
-    input[type="checkbox"]:not(.plain) {
+    input[type="radio"]:not(.plain, .lrn-input),
+    input[type="checkbox"]:not(.plain, .lrn-input) {
         @include fancy-check("radio-label");
         @include vaporwave("input-toggle");
     }
@@ -1245,10 +1245,10 @@ body:not(.sbx-body) {
         }
     }
 
-    input[type="checkbox"]:not(.plain):disabled,
-    input[type="radio"]:not(.plain):disabled,
-    input[type="checkbox"][readonly]:not(.plain),
-    input[type="radio"][readonly]:not(.plain) {
+    input[type="checkbox"]:not(.plain, .lrn-input):disabled,
+    input[type="radio"]:not(.plain, .lrn-input):disabled,
+    input[type="checkbox"][readonly]:not(.plain, .lrn-input),
+    input[type="radio"][readonly]:not(.plain, .lrn-input) {
         & + label {
             cursor: $cursor-default-value;
             opacity: 0.5;
