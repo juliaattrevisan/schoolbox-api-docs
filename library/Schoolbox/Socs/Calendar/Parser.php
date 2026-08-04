@@ -32,10 +32,14 @@ class Parser
     /**
      * Parse all calendar event nodes from a SOCSCalendar XML document.
      *
+     * Feed-level errors remain fatal, while a callback lets callers isolate malformed
+     * individual events without losing valid events from the same response.
+     *
+     * @param callable(ParseException): void|null $onEventMappingFailure
      * @return Event[]
      * @throws ParseException
      */
-    public function parse(SimpleXMLElement $xml): array
+    public function parse(SimpleXMLElement $xml, ?callable $onEventMappingFailure = null): array
     {
         if (strcasecmp($xml->getName(), 'SOCSCalendar') !== 0) {
             throw new ParseException('SOCS calendar XML feed must use SOCSCalendar as the root element');
@@ -43,7 +47,14 @@ class Parser
 
         $events = [];
         foreach ($xml->xpath('//*[local-name()="CalendarEvent"]') ?: [] as $index => $eventNode) {
-            $events[] = $this->buildEvent($eventNode, $index + 1);
+            try {
+                $events[] = $this->buildEvent($eventNode, $index + 1);
+            } catch (ParseException $e) {
+                if (null === $onEventMappingFailure) {
+                    throw $e;
+                }
+                $onEventMappingFailure($e);
+            }
         }
 
         return $events;
@@ -71,9 +82,9 @@ class Parser
             throw new ParseException("SOCS XML calendar event {$uid} is missing a StartDate field");
         }
 
-        $startTime = $this->getChildValue($eventNode, ['StartTime']);
+        $startTime = $this->normalizeTime($this->getChildValue($eventNode, ['StartTime']));
         $endDate = $this->getChildValue($eventNode, ['EndDate', 'FinishDate', 'End']) ?: $startDate;
-        $endTime = $this->getChildValue($eventNode, ['EndTime', 'FinishTime']);
+        $endTime = $this->normalizeTime($this->getChildValue($eventNode, ['EndTime', 'FinishTime']));
 
         $start = $this->parseDateTime($startDate, $startTime, "start date for SOCS XML calendar event {$uid}");
         $end = $endTime === '' && $startTime !== ''
@@ -142,6 +153,20 @@ class Parser
         }
 
         throw new ParseException("Could not parse {$fieldDescription}: {$value}");
+    }
+
+    /**
+     * Normalize SOCS' textual all-day marker to the parser's existing empty-time convention.
+     *
+     * This keeps all-day detection in one representation and avoids treating feed wording
+     * as a clock value.
+     *
+     * @param string $time
+     * @return string
+     */
+    private function normalizeTime(string $time): string
+    {
+        return 0 === strcasecmp($time, 'All Day') ? '' : $time;
     }
 
     /**

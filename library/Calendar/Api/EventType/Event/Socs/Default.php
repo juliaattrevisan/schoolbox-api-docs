@@ -157,8 +157,45 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
     private function readEvents(?int $startTimestamp = null, ?int $endTimestamp = null): array
     {
         $xml = $this->httpClient->getCached(static::CALENDAR_PATH, $this->buildFeedQuery($startTimestamp, $endTimestamp));
+        $mappingFailedCount = 0;
+        $events = (new Parser())->parse(
+            $xml,
+            function (\Sabre\VObject\ParseException $e) use (&$mappingFailedCount): void {
+                $mappingFailedCount++;
+                $this->sentry?->captureException($e);
+            }
+        );
 
-        return (new Parser())->parse($xml);
+        $this->updateMappingFailedCount($mappingFailedCount);
+
+        return $events;
+    }
+
+    /**
+     * Persist the latest partial mapping result without changing connector health.
+     *
+     * Persistence is best-effort so a database/config error cannot discard otherwise valid
+     * calendar events. Unchanged values are not saved because calendar reads are frequent.
+     *
+     * @param int $failedCount
+     */
+    private function updateMappingFailedCount(int $failedCount): void
+    {
+        if (null === $this->configMapper) {
+            return;
+        }
+
+        try {
+            $config = $this->configMapper->findById($this->getConnectorId());
+            if ($config->getMappingFailedCount() === $failedCount) {
+                return;
+            }
+
+            $config->setMappingFailedCount($failedCount);
+            $this->configMapper->save($config);
+        } catch (\Throwable $e) {
+            $this->sentry?->captureException($e);
+        }
     }
 
     /**
@@ -217,6 +254,7 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
     private function reportFeedFailure(\Throwable $e): void
     {
         if ($this->isEmptyFeedFailure($e)) {
+            $this->updateMappingFailedCount(0);
             return;
         }
 
@@ -250,12 +288,24 @@ class Calendar_Api_EventType_Event_Socs_Default extends Calendar_Api_EventType_A
         return stripos($e->getMessage(), 'Not available.') !== false;
     }
 
+    /**
+     * Record a fatal feed failure separately from partial event mapping failures.
+     *
+     * Clearing the partial count ensures the admin warning describes the latest request
+     * instead of retaining mapping failures from an older successful response. The reset
+     * is best-effort so invalid connector JSON cannot prevent the fatal counter being saved.
+     */
     private function addConnectorFailedCount(): void
     {
         try {
             $mapper = $this->configMapper ?? Calendar_Api_Config_Mapper::getInstance();
             $config = $mapper->findById($this->getConnectorId());
             $config->addFailedCount();
+            try {
+                $config->setMappingFailedCount(0);
+            } catch (\JsonException $e) {
+                $this->sentry?->captureException($e);
+            }
             $mapper->save($config);
         } catch (\Throwable $e) {
             $this->sentry?->captureException($e);

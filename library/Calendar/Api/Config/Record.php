@@ -360,6 +360,48 @@ class Calendar_Api_Config_Record
     }
 
     /**
+     * Return the number of events rejected during the most recent SOCS calendar mapping.
+     *
+     * This lives in connector JSON rather than failedCount because partial mapping failures
+     * must remain visible without contributing to the threshold that disables a connector.
+     *
+     * @return int
+     */
+    public function getMappingFailedCount(): int
+    {
+        try {
+            $config = json_decode($this->getConfig() ?? '', true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            return 0;
+        }
+
+        return is_array($config) ? max(0, (int)($config['mappingFailedCount'] ?? 0)) : 0;
+    }
+
+    /**
+     * Store the latest SOCS calendar mapping failure count in connector JSON.
+     *
+     * Existing configuration keys are retained because the same JSON object also contains
+     * the connector label and mapped Schoolbox event type.
+     *
+     * @param int $count
+     * @return Calendar_Api_Config_Record
+     * @throws JsonException
+     */
+    public function setMappingFailedCount(int $count): self
+    {
+        $config = json_decode($this->getConfig() ?: '{}', true, 512, JSON_THROW_ON_ERROR);
+        if (!is_array($config)) {
+            $config = [];
+        }
+
+        $config['mappingFailedCount'] = max(0, $count);
+        $this->setConfig(json_encode($config, JSON_THROW_ON_ERROR));
+
+        return $this;
+    }
+
+    /**
      * Set id
      *
      * @param int|null $id
