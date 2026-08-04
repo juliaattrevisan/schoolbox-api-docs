@@ -12,9 +12,14 @@
             <div class="small-12 columns">
                 <h3>iSAMS Configuration</h3>
 
+                <h4 class="no-margin">Batch API Authentication</h4>
+
                 <div class="row">
                     <div class="small-12 columns">
-                        <label class="required">Batch XML Key</label>
+                        <label class="required">Batch API Key / OAuth Client ID</label>
+                        <span class="meta">
+                            These credentials are separate from the optional REST API credentials below.
+                        </span>
                         <input type="password" autocomplete="new-password" class='required suds-crypto' name="dsn[isams][modules][batchxml][key]" value="{{ modules.batchxml.key ?? ''}}" />
                     </div>
                 </div>
@@ -23,12 +28,39 @@
                     <div class="small-12 columns">
                         <label>Batch OAuth Client Secret</label>
                         <span class="meta">
-                            The Batch XML Key is also the OAuth client ID. Enter the school-specific client secret
-                            provisioned with the <code>apiv1</code> scope. OAuth becomes mandatory on 2 November 2026.
+                            Enter the school-specific client secret provisioned with the <code>apiv1</code> scope.
+                            OAuth becomes mandatory on 2 November 2026.
                         </span>
                         <input type="password" autocomplete="new-password" class='suds-crypto' name="dsn[isams][modules][batchxml][clientsecret]" value="{{ modules.batchxml.clientsecret ?? ''}}" />
                     </div>
                 </div>
+
+                <hr />
+
+                <h4 class="no-margin">REST API Profile Photos</h4>
+
+                <p class="meta">
+                    If configured, the iSAMS REST API will be used to obtain higher-quality profile images.
+                </p>
+
+                <div class="row">
+                    <div class="small-12 medium-4 columns">
+                        <label>REST API Host</label>
+                        <input type="text" class='suds-crypto' name="dsn[isams][modules][restapi][host]" value="{{ modules.restapi.host ?? ''}}" />
+                    </div>
+                    <div class="small-12 medium-4 columns">
+                        <label>REST OAuth Client ID</label>
+                        <input type="text" class='suds-crypto' name="dsn[isams][modules][restapi][clientid]" value="{{ modules.restapi.clientid ?? ''}}" />
+                    </div>
+                    <div class="small-12 medium-4 columns">
+                        <label>REST OAuth Client Secret</label>
+                        <input type="password" autocomplete="new-password" class='suds-crypto' name="dsn[isams][modules][restapi][clientsecret]" value="{{ modules.restapi.clientsecret ?? ''}}" />
+                    </div>
+                </div>
+
+                <hr />
+
+                <h4 class="no-margin">Import Settings</h4>
 
                 <div class="row">
                     <div class="small-12 columns">
@@ -58,31 +90,6 @@
                         </select>
                     </div>
                 </div>
-
-                <hr />
-
-                <h4 class="no-margin">REST API Configuration</h4>
-
-                <p class="meta">
-                    If configured, the iSAMS REST API will be used to obtain higher-quality profile images.
-                </p>
-
-                <div class="row">
-                    <div class="small-12 medium-4 columns">
-                        <label>Host</label>
-                        <input type="text" class='suds-crypto' name="dsn[isams][modules][restapi][host]" value="{{ modules.restapi.host ?? ''}}" />
-                    </div>
-                    <div class="small-12 medium-4 columns">
-                        <label>Client ID</label>
-                        <input type="text" class='suds-crypto' name="dsn[isams][modules][restapi][clientid]" value="{{ modules.restapi.clientid ?? ''}}" />
-                    </div>
-                    <div class="small-12 medium-4 columns">
-                        <label>Client Secret</label>
-                        <input type="password" autocomplete="new-password" class='suds-crypto' name="dsn[isams][modules][restapi][clientsecret]" value="{{ modules.restapi.clientsecret ?? ''}}" />
-                    </div>
-                </div>
-
-                <hr />
 
                 <div class="row">
                     <div class="small-12 columns">
