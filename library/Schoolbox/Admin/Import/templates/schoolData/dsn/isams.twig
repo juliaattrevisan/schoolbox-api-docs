@@ -14,23 +14,20 @@
 
                 <h4 class="no-margin">Batch API Authentication</h4>
 
-                <div class="row">
-                    <div class="small-12 columns">
-                        <label class="required">Batch API Key / OAuth Client ID</label>
-                        <span class="meta">
-                            These credentials are separate from the optional REST API credentials below.
-                        </span>
-                        <input type="password" autocomplete="new-password" class='required suds-crypto' name="dsn[isams][modules][batchxml][key]" value="{{ modules.batchxml.key ?? ''}}" />
-                    </div>
-                </div>
+                <p class="meta">
+                    The Batch API Key is used as the OAuth client ID and must be paired with the school-specific client
+                    secret provisioned with the <code>apiv1</code> scope.
+                    These credentials are separate from the optional REST API credentials below.
+                    OAuth becomes mandatory on 2 November 2026.
+                </p>
 
                 <div class="row">
-                    <div class="small-12 columns">
+                    <div class="small-12 medium-4 columns">
+                        <label class="required">Batch API Key / OAuth Client ID</label>
+                        <input type="password" autocomplete="new-password" class='required suds-crypto' name="dsn[isams][modules][batchxml][key]" value="{{ modules.batchxml.key ?? ''}}" />
+                    </div>
+                    <div class="small-12 medium-4 columns">
                         <label>Batch OAuth Client Secret</label>
-                        <span class="meta">
-                            Enter the school-specific client secret provisioned with the <code>apiv1</code> scope.
-                            OAuth becomes mandatory on 2 November 2026.
-                        </span>
                         <input type="password" autocomplete="new-password" class='suds-crypto' name="dsn[isams][modules][batchxml][clientsecret]" value="{{ modules.batchxml.clientsecret ?? ''}}" />
                     </div>
                 </div>
