@@ -46,6 +46,7 @@ use Schoolbox\Learning\Authorizer\Rule\CanPreview;
 use Schoolbox\Learning\Authorizer\Rule\CanRespondToAssessment;
 use Schoolbox\Learning\Authorizer\Rule\CanSeeParticipation;
 use Schoolbox\Learning\Authorizer\Rule\CanViewAssessable;
+use Schoolbox\Learning\Authorizer\Rule\CanViewParticipantActivity;
 use Schoolbox\Learning\Assessment\DueWork\Authorizer\Rule\CanSelfAssess;
 use Schoolbox\Learning\Authorizer\Rule\IsAssessmentOpen;
 use Schoolbox\Learning\Authorizer\Rule\IsDeletionUnLocked;
@@ -1589,7 +1590,7 @@ class Module extends BaseModule
         return new Rule\All(
             new Rule\IsLoggedIn(),
             new AssessmentNotDeleted(),
-            new CanViewAssessable(new Visibility($this->getAccess())),
+            new CanViewParticipantActivity(new Visibility($this->getAccess())),
             new Rule\Any(
                 // Instructor/staff viewing their own summary page
                 new Rule\All(
