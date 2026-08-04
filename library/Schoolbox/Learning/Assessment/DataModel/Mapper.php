@@ -20,6 +20,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Participant\Plan;
+use Schoolbox\Assessment\Rubric\Instance\Mapper as RubricInstanceMapper;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\GenericCollection;
@@ -209,7 +210,6 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_PRESAVE, $this->validateDateOrder(...));
         $this->registerCallback(self::CALLBACK_POSTSAVE, $this->createDynamicPlanIfNew(...));
         $this->registerCallback(self::CALLBACK_POSTSAVE, $this->updateAssessmentRelationView(...));
-        $this->registerCallback(self::CALLBACK_POSTSAVE, $this->reorderSequenceIfCustomised(...));
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteQuiz(...));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteTask(...));
@@ -220,6 +220,7 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteDialogAgent(...));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteReporting(...));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteCustomisation(...));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteRubricInstances(...));
 
         $this->registerPersistSearchIndexCallbacks();
     }
@@ -312,8 +313,18 @@ class Mapper extends BaseMapper
         return true;
     }
 
-    protected function reorderSequenceIfCustomised(Model $assessment): bool
+    /**
+     * Soft-delete every rubric instance associated with a deleted assessment.
+     *
+     * @param Model $assessment
+     * @return bool
+     */
+    public function softDeleteRubricInstances(Model $assessment): bool
     {
+        // This callback receives a persistence model, not the IAssessable domain model required by
+        // removeFromAssessment(), so the assessment ID must be passed instead.
+        RubricInstanceMapper::getInstance()->removeFromAssessmentId($assessment->getId(), []);
+
         return true;
     }
 
