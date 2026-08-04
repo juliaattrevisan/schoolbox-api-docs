@@ -53,20 +53,18 @@ class Status implements IStatus
      */
     public function isReachable(): bool
     {
-        /* BatchXML is configured to dump you the entire xml feed; you can't just get a portion
-         * which means you're downloading boatloads of data just to see if you could
-         *
-         * Use an ultra cheep way at the cost of some neatness
-         */
-        $api = new Api\Batch\Api($this->host, $this->dsn, Codec\DSN::MODULE_BATCHXML);
-
-        $result = @get_headers((string)$api->getUrl());
-
-        if (is_array($result)) {
-            return strpos($result[0], '200') > -1;
+        if (!$this->hasBatchOAuthSecret()) {
+            return false;
         }
 
-        return false;
+        try {
+            $api = new Api\Batch\Api($this->host, $this->dsn, Codec\DSN::MODULE_BATCHXML);
+            $api->checkConnection();
+
+            return true;
+        } catch (\RuntimeException) {
+            return false;
+        }
     }
 
 
@@ -74,9 +72,18 @@ class Status implements IStatus
      * @inheritDoc
      *
      * @return array
+     * @throws \DomainException When the iSAMS DSN cannot be decoded.
      */
     public function getReport(): array
     {
+        if (!$this->hasBatchOAuthSecret()) {
+            return [[
+                'message' => 'Cannot access api endpoint',
+                'reason' => 'Batch OAuth client secret is not configured.',
+                'status' => ISpecification::STATUS_ERROR
+            ]];
+        }
+
         $specification = new Specification($this->host, $this->dsn);
 
         try {
@@ -88,5 +95,19 @@ class Status implements IStatus
                 'status' => ISpecification::STATUS_ERROR
             ]];
         }
+    }
+
+
+    /**
+     * Determine whether Batch OAuth credentials are configured.
+     *
+     * @return bool True when the Batch OAuth client secret is present.
+     * @throws \DomainException When the iSAMS DSN cannot be decoded.
+     */
+    private function hasBatchOAuthSecret(): bool
+    {
+        $credentials = (new Codec\DSN())->decode($this->dsn);
+
+        return ($credentials['modules'][Codec\DSN::MODULE_BATCHXML]['clientsecret'] ?? '') !== '';
     }
 }

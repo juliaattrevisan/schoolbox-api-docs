@@ -21,6 +21,17 @@
 
                 <div class="row">
                     <div class="small-12 columns">
+                        <label>Batch OAuth Client Secret</label>
+                        <span class="meta">
+                            The Batch XML Key is also the OAuth client ID. Enter the school-specific client secret
+                            provisioned with the <code>apiv1</code> scope. OAuth becomes mandatory on 2 November 2026.
+                        </span>
+                        <input type="password" autocomplete="new-password" class='suds-crypto' name="dsn[isams][modules][batchxml][clientsecret]" value="{{ modules.batchxml.clientsecret ?? ''}}" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="small-12 columns">
                         <label class="required">Day Number Offset</label>
                         <span class="meta">If iSAMS calendar is aligned to the wrong day number at the start of the week, use this to realign them. Use zero if your day numbers don't need any alteration.</span>
                         <select name="dsn[isams][options][dayNumberOffset]">
