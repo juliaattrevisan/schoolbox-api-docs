@@ -92,6 +92,12 @@ body.sbx-body {
         border-radius: 0 0 var(--sbx-config-container-corner-radius) var(--sbx-config-container-corner-radius);
     }
 
+    // Elements directly below tabs only need their bottom corners rounded
+    #content > .row:has(> .columns > .tabs) + .row > .island > section {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+
     // Component layout fixes
     #component-layout .component-container .row > .island section:last-child {
         border-top-left-radius: 0;
