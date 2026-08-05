@@ -245,7 +245,7 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
          */
         $answer = $this->getByField('question_id', $questionId);
 
-        $values = unserialize($answer['answer']);
+        $values = $this->safeUnserialize($answer['answer']);
 
         /* Prefill a "scoreboard" of zeroes for each individual response item
          * This represents each individual response item's position in the stack
@@ -273,7 +273,7 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
          */
         if (is_array($allResults)) {
             foreach ($allResults as $currentResult) {
-                $response = unserialize($currentResult['response']);
+                $response = $this->safeUnserialize($currentResult['response']);
 
                 if (!is_array($response)) {
                     continue;
@@ -316,7 +316,7 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
         $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
 
         if ($existing['response']) {
-            $right = unserialize($existing['response']);
+            $right = $this->safeUnserialize($existing['response']);
         }
 
         /* Define special blocks to handle this special answerOptions scenario,
@@ -334,7 +334,7 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
                 )
             );
 
-            $allAnswers = unserialize($answerGroup['answer']);
+            $allAnswers = $this->safeUnserialize($answerGroup['answer']);
 
             for ($i = 0; $i < count($allAnswers); $i++) {
                 $page->setVar(

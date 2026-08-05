@@ -90,7 +90,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
             $answerGroup = parent::getForQuestion($question_id);
 
             if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
-                $allAnswers = unserialize($answerGroup['answer']);
+                $allAnswers = $this->safeUnserialize($answerGroup['answer']);
 
                 if (is_array($allAnswers) && count($allAnswers)) {
                     foreach ($allAnswers as $currentAnswer) {
@@ -125,7 +125,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
     public function modifyInQuestionBank(SitePage $page, $answerGroup)
     {
         if (strlen($answerGroup)) {
-            $allAnswers = unserialize($answerGroup);
+            $allAnswers = $this->safeUnserialize($answerGroup);
 
             if (is_array($allAnswers) && count($allAnswers)) {
                 foreach ($allAnswers as $currentAnswer) {
@@ -153,7 +153,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
      */
     protected function getAnswersFromAnswerGroup($answerGroup)
     {
-        return unserialize($answerGroup['answer'] ?? '');
+        return $this->safeUnserialize($answerGroup['answer'] ?? '');
     }
 
     /**
@@ -246,7 +246,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
                 ));
 
                 if (isset($existing['response']) && is_string($existing['response'])) {
-                    if ($this->isAnswerSelected($currentAnswer->value, unserialize($existing['response']))) {
+                    if ($this->isAnswerSelected($currentAnswer->value, $this->safeUnserialize($existing['response']))) {
                         $page->setVar(array(
                             'ANSWER_CHECKED' => 'checked=\'checked\'',
                         ));
@@ -314,7 +314,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
         $page->setVar('answerOption_block', '');
 
         if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
-            $allAnswers = unserialize($answerGroup['answer']);
+            $allAnswers = $this->safeUnserialize($answerGroup['answer']);
 
             if (is_array($allAnswers)) {
                 foreach ($allAnswers as $currentAnswer) {
@@ -391,7 +391,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
 
         $postprocessed = [];
 
-        $data = (array)unserialize($response['response'] ?? '');
+        $data = (array)$this->safeUnserialize($response['response'] ?? '');
 
 
         /* Answer text to appear in export
@@ -433,7 +433,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
         $answer = $this->getByQuestionID($question_id);
 
         if (isset($answer['answer']) && is_string($answer['answer'])) {
-            $allOptions = unserialize($answer['answer']);
+            $allOptions = $this->safeUnserialize($answer['answer']);
 
             foreach ($allOptions as $currentOption) {
                 if ($currentOption->value == $value) {
@@ -460,7 +460,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
          * then $response['response'] might not even exist; return empty array
          */
         if (isset($response['response']) && is_string($response['response'])) {
-            return unserialize($response['response']);
+            return $this->safeUnserialize($response['response']);
         }
 
         return [];
@@ -487,7 +487,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
         $answerGroup = $this->getByQuestionID($question_id);
 
         if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
-            $allAnswers = unserialize($answerGroup['answer']);
+            $allAnswers = $this->safeUnserialize($answerGroup['answer']);
 
             $page->setVar(array(
                 'ANSWER_ID' => $answerGroup['answer_id'],
@@ -555,7 +555,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
         $answerGroup = $this->getByQuestionID($currentQuestion['question_id']);
 
         if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
-            $allAnswers = unserialize($answerGroup['answer']);
+            $allAnswers = $this->safeUnserialize($answerGroup['answer']);
 
             $page->setVar(array(
                 'RESPONSE_USER_ID' => $currentQuestion['user_id'],
@@ -645,7 +645,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
         $answerGroup = $this->getByQuestionID($currentQuestion['question_id']);
 
         if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
-            $allAnswers = unserialize($answerGroup['answer']);
+            $allAnswers = $this->safeUnserialize($answerGroup['answer']);
 
             $page->setVar(array(
                 'ANSWER_ID' => $answerGroup['answer_id'],
@@ -715,6 +715,6 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
      */
     protected function getAnswersFromResponse($answer)
     {
-        return unserialize($answer);
+        return $this->safeUnserialize($answer);
     }
 }
