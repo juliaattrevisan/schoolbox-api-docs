@@ -379,7 +379,14 @@
                             </div>
                         </div>
                         <nav>
-                            <a href="#" data-reveal-id="legend-modal" class="sbx-icon-only-button" title="View Help" aria-label="View Help">
+                            <a
+                                href="#"
+                                data-reveal-id="legend-modal"
+                                data-test="notifications-configure-help-button"
+                                class="sbx-icon-only-button"
+                                title="View Help"
+                                aria-label="View Help"
+                            >
                                 <sbx-icon name="help"></sbx-icon>
                             </a>
                         </nav>
@@ -528,7 +535,7 @@
 </div>
 <div id="slider-modal" class="reveal-modal" data-reveal></div>
 
-<div id="legend-modal" class="reveal-modal" data-reveal>
+<div id="legend-modal" class="reveal-modal" data-reveal data-test="notifications-delivery-options-modal">
     {% include '@notifications/legend.twig' with { digest: true, mobile: 'plural', who: 'users' } %}
 
     <a class="close-reveal-modal">&#215;</a>
