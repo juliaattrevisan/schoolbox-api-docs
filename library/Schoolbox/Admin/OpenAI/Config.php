@@ -737,11 +737,13 @@ class Config
         // Assume no recommendations are deprecated or shutdown
         return [
             'recommended'  => $recommendations,
-            'others'       => array_diff(
-                $options,
-                $recommendations,
-                array_keys($deprecations ?? []),
-                array_keys($shutdowns ?? []),
+            'others'       => array_values(
+                array_diff(
+                    $options,
+                    $recommendations,
+                    array_keys($deprecations ?? []),
+                    array_keys($shutdowns ?? []),
+                ),
             ),
             'deprecations' => array_intersect_key($deprecations ?? [], array_combine($options, $options)),
             'shutdowns'    => array_intersect_key($shutdowns ?? [], array_combine($options, $options)),

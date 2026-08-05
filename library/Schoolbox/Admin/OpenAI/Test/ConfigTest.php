@@ -349,7 +349,7 @@ class ConfigTest extends TestCase
                 ['gpt-3.5' => 'gpt-5'],
                 [
                     'recommended'  => ['gpt-5'],
-                    'others'       => [1 => 'gpt-4o'],
+                    'others'       => ['gpt-4o'],
                     'deprecations' => ['gpt-4' => 'gpt-5'],
                     'shutdowns'    => ['gpt-3.5' => 'gpt-5'],
                 ],
@@ -364,7 +364,7 @@ class ConfigTest extends TestCase
                 null,
                 [
                     'recommended'  => ['gpt-5'],
-                    'others'       => [1 => 'gpt-4o', 2 => 'gpt-4'],
+                    'others'       => ['gpt-4o', 'gpt-4'],
                     'deprecations' => [],
                     'shutdowns'    => [],
                 ],
@@ -419,7 +419,7 @@ class ConfigTest extends TestCase
                 null,
                 [
                     'recommended'  => [],
-                    'others'       => [1 => 'gpt-4o'],
+                    'others'       => ['gpt-4o'],
                     'deprecations' => ['gpt-4' => 'gpt-5 or gpt-5-mini'],
                     'shutdowns'    => [],
                 ],
@@ -450,18 +450,20 @@ class ConfigTest extends TestCase
 
     /**
      * `others` is built with `array_diff`, which keeps the keys of the array it
-     * filters. The list therefore has gaps in it, and `json_encode` renders a
-     * gapped list as an object rather than an array.
+     * filters, so the models that survive the filter are left with the gaps of
+     * the ones that did not.
      *
-     * Twig does not care, so this is only a trap for a future caller that sends
-     * these options to the browser as JSON.
+     * The keys are reindexed to close those gaps, which keeps `others` a list:
+     * `json_encode` renders a gapped list as an object, so without this a caller
+     * sending these options to the browser as JSON gets an object of models
+     * keyed by their position among all models.
      */
-    public function testSplitOptionsLeavesGapsInTheKeysOfOthers(): void
+    public function testSplitOptionsClosesTheGapsInTheKeysOfOthers(): void
     {
         $split = $this->splitOptions(['gpt-5', 'gpt-4o', 'gpt-4'], ['gpt-4o'], null, null);
 
-        $this->assertSame([0 => 'gpt-5', 2 => 'gpt-4'], $split['others']);
-        $this->assertSame('{"0":"gpt-5","2":"gpt-4"}', json_encode($split['others'], JSON_THROW_ON_ERROR));
+        $this->assertSame([0 => 'gpt-5', 1 => 'gpt-4'], $split['others']);
+        $this->assertSame('["gpt-5","gpt-4"]', json_encode($split['others'], JSON_THROW_ON_ERROR));
     }
 
     /**
@@ -478,7 +480,7 @@ class ConfigTest extends TestCase
 
         $this->assertSame(['gpt-4'], $split['recommended']);
         $this->assertSame(['gpt-4' => 'gpt-5'], $split['deprecations']);
-        $this->assertSame([1 => 'gpt-5'], $split['others']);
+        $this->assertSame(['gpt-5'], $split['others']);
     }
 
     /**
