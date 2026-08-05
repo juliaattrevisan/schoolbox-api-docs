@@ -722,8 +722,8 @@ class Config
      *
      * @param array<string>          $options         All available options
      * @param array<string>          $recommendations A subset of `$options` which is recommended for use
-     * @param ?array<string, string> $deprecations    A subset of `$options` which has been deprecated: these will not
-     *                                                be shown unless they're currently selected
+     * @param ?array<string, string> $deprecations    A subset of `$options` which has been deprecated: these will be
+     *                                                shown, but will be disabled unless they're currently selected
      * @param ?array<string, string> $shutdowns       A subset of `$options` which has been shut down: these will not
      *                                                be shown unless they're currently selected
      * @return array{recommended: array<string>, others: array<string>, deprecations:array<string, string>, shutdowns:array<string, string>}
