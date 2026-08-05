@@ -343,7 +343,7 @@ class Controller extends Assessment\Controller
             [
                 'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
                     [
-                        sprintf('Status for %s', $assessment->getTitle()),
+                        $assessment->getTitle(),
                     ]
                 ),
                 'assessment' => $assessment,
