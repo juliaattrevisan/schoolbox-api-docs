@@ -411,7 +411,8 @@ class Controller extends Assessment\Controller
         return $linkedAssessments->filter(function (IAssessable $assessable) use ($learner) {
             return (
                 $assessable->getParticipantIfExtant($learner) instanceof Participant &&
-                ($assessable->getWorkType()?->isVisibleToLearners() ?? true)
+                ($assessable->getWorkType()?->isVisibleToLearners() ?? true) &&
+                $assessable->isPublished($learner)
             );
         });
     }
