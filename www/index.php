@@ -26,9 +26,19 @@ $trace->startTransaction();
 register_shutdown_function($trace->finishTransaction(...));
 
 if ($path !== "/index.php" && preg_match('/.+\.php$/', $path) && file_exists(WEB_root . $path)) {
-    // Verify that $path is in WEB_root, and exit otherwise
-    $realpath = realpath(WEB_root . $path);
-    if (!str_starts_with($realpath, WEB_root)) {
+    // Verify that $path resolves inside WEB_root, and exit otherwise
+    $webRootRealpath = realpath(WEB_root);
+    $realpath        = realpath(WEB_root . $path);
+
+    // Web root or path not found? Exit
+    if ($webRootRealpath === false || $realpath === false) {
+        http_response_code(404);
+        exit;
+    }
+
+    // Verify that path is in the webroot, or a subfolder thereof
+    $webRootPrefix = rtrim($webRootRealpath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+    if (!str_starts_with($realpath, $webRootPrefix)) {
         http_response_code(404);
         exit;
     }
