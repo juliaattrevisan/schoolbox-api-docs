@@ -529,17 +529,9 @@ class Controller extends BaseController
     {
         $fp = fopen('php://temp', 'r+b');
         foreach ($array as $row) {
-            // Whitespace-only rubric cells are intentional and must survive export so the CSV can be re-imported.
-            // Continue trimming cells containing text to retain the existing export normalization.
-            // See similar comments in Rubric/templates/vue/rubricBuilder/payload.ts (translateGridToFormPayload()).
-            $row = array_map(
-                static function ($value) {
-                    $stringValue = (string)$value;
-                    $trimmedValue = trim($stringValue);
-                    return $trimmedValue === '' ? $stringValue : $trimmedValue;
-                },
-                $row
-            );
+            // Note there is no need to trim fields here.  An export should not modify data.
+            // Another reason not to trim here is that whitespace-only values are deliberately not trimmed on import.
+            // See comments in Rubric/templates/vue/rubricBuilder/payload.ts (translateGridToFormPayload()).
             fputcsv($fp, $row, escape: '');
         }
         rewind($fp);
