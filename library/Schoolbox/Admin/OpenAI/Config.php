@@ -61,13 +61,39 @@ class Config
         "gpt-5.1-chat-latest",
         "gpt-5.2",
         "gpt-5.2-chat-latest",
-//        "gpt-5.2-pro",
         "gpt-5.3-chat-latest",
         "gpt-5.4",
-//        "gpt-5.4-pro",
         "gpt-5.4-mini",
         "gpt-5.4-nano",
         "gpt-5.5",
+    ];
+
+    /**
+     * Deprecated models: if a feature uses one of these models, it will be
+     * presented as deprecated, and a replacement model will be suggested.
+     * (The deprecated model will still be used.)
+     *
+     * They may not be selected as a model to use, if they weren't already
+     * selected.
+     */
+    public const array MODEL_DEPRECATIONS = [
+        'gpt-image-1'      => 'gpt-image-2',
+        'gpt-image-1-mini' => 'gpt-image-2',
+        'gpt-image-1.5'    => 'gpt-image-2',
+    ];
+
+    /**
+     * Retired models: if a feature uses one of these models, it will be
+     * presented as retired, and a replacement model will be used instead.
+     *
+     * They may not be selected as a model to use, if they weren't already
+     * selected.
+     */
+    public const array MODEL_SHUTDOWNS = [
+        'gpt-5-chat-latest'   => 'gpt-5.4-nano',
+        'gpt-5.1-chat-latest' => 'gpt-5.4-nano',
+        'gpt-5.2-chat-latest' => 'gpt-5.4-nano',
+        'gpt-5.3-chat-latest' => 'gpt-5.4-nano',
     ];
 
     /**
@@ -95,11 +121,11 @@ class Config
             'text' => ['gpt-5.4-nano'],
         ],
         Feature::DIALOG_AGENT->value => [
-            'text' => ['gpt-5.3-chat-latest'],
+            'text' => ['gpt-5.4-nano'],
         ],
         Feature::IMAGE->value => [
             'text'  => ['gpt-5.4-nano'],
-            'image' => ['gpt-image-1.5'],
+            'image' => ['gpt-image-2'],
         ],
         Feature::LEARNING_ACTIVITY_CUSTOMISATION->value => [
             'text' => ['gpt-5.4-nano'],
@@ -112,7 +138,7 @@ class Config
     /**
      * The default image generation model.
      */
-    public const string IMAGE_MODEL_DEFAULT = 'gpt-image-1.5';
+    public const string IMAGE_MODEL_DEFAULT = 'gpt-image-2';
 
     /**
      * The models which may be selected for image generation.
@@ -694,15 +720,45 @@ class Config
     /**
      * Split options into recommended and other options
      *
-     * @param array<string> $options         All available options
-     * @param array<string> $recommendations A subset of `$options` which is recommended for use
-     * @return array{recommended: array<string>, others: array<string>}
+     * @param array<string>          $options         All available options
+     * @param array<string>          $recommendations A subset of `$options` which is recommended for use
+     * @param ?array<string, string> $deprecations    A subset of `$options` which has been deprecated: these will be
+     *                                                shown, but will be disabled unless they're currently selected
+     * @param ?array<string, string> $shutdowns       A subset of `$options` which has been shut down: these will not
+     *                                                be shown unless they're currently selected
+     * @return array{recommended: array<string>, others: array<string>, deprecations:array<string, string>, shutdowns:array<string, string>}
      */
-    private function splitOptions(array $options, array $recommendations): array
-    {
+    private function splitOptions(
+        array $options,
+        array $recommendations,
+        ?array $deprecations,
+        ?array $shutdowns,
+    ): array {
+        $deprecations ??= [];
+        $shutdowns    ??= [];
+
+        // A model can be named by more than one of these lists: it can be
+        // recommended for a feature and since have been deprecated or shut
+        // down. Shutdown takes precedence over deprecation, which takes
+        // precedence over recommendation, so that each model is offered in one
+        // list only and the form does not show it twice.
+        $deprecations    = array_diff_key($deprecations, $shutdowns);
+        $recommendations = array_diff($recommendations, array_keys($deprecations), array_keys($shutdowns));
+
+        $available = array_combine($options, $options);
+
         return [
-            'recommended' => $recommendations,
-            'others'      => array_diff($options, $recommendations),
+            'recommended'  => array_values($recommendations),
+            'others'       => array_values(
+                array_diff(
+                    $options,
+                    $recommendations,
+                    array_keys($deprecations),
+                    array_keys($shutdowns),
+                ),
+            ),
+            'deprecations' => array_intersect_key($deprecations, $available),
+            'shutdowns'    => array_intersect_key($shutdowns, $available),
         ];
     }
 
@@ -720,9 +776,13 @@ class Config
         $splitOptions = $this->splitOptions(
             $formInputs[self::FIELD_MODEL]['options'],
             self::RECOMMENDED_MODELS[$feature]['text'] ?? [],
+            self::MODEL_DEPRECATIONS,
+            self::MODEL_SHUTDOWNS,
         );
         $formInputs[self::FIELD_MODEL]['recommendedOptions'] = $splitOptions['recommended'];
         $formInputs[self::FIELD_MODEL]['options']            = $splitOptions['others'];
+        $formInputs[self::FIELD_MODEL]['deprecatedOptions']  = $splitOptions['deprecations'];
+        $formInputs[self::FIELD_MODEL]['shutdownOptions']    = $splitOptions['shutdowns'];
 
         // Set recommended vs. all for Azure deployment models too:
         // whilst this setting must follow their deployment, it might inform
@@ -730,9 +790,13 @@ class Config
         $splitOptions = $this->splitOptions(
             $formInputs[self::FIELD_DEPLOYMENT_MODEL]['options'],
             self::RECOMMENDED_MODELS[$feature]['text'] ?? [],
+            null,
+            null,
         );
         $formInputs[self::FIELD_DEPLOYMENT_MODEL]['recommendedOptions'] = $splitOptions['recommended'];
         $formInputs[self::FIELD_DEPLOYMENT_MODEL]['options']            = $splitOptions['others'];
+        $formInputs[self::FIELD_DEPLOYMENT_MODEL]['deprecatedOptions']  = $splitOptions['deprecations'];
+        $formInputs[self::FIELD_DEPLOYMENT_MODEL]['shutdownOptions']    = $splitOptions['shutdowns'];
 
         if (Feature::tryFrom($feature)?->supportsAiModeration()) {
             // Any feature with AI moderation support gets a config for it
@@ -757,11 +821,15 @@ class Config
             $splitOptions = $this->splitOptions(
                 self::AI_IMAGE_MODELS,
                 self::RECOMMENDED_MODELS[$feature]['image'],
+                self::MODEL_DEPRECATIONS,
+                self::MODEL_SHUTDOWNS,
             );
             $formInputs[self::FIELD_IMAGE_MODEL]    = [
                 'type'               => self::FIELD_TYPE_SELECT,
                 'recommendedOptions' => $splitOptions['recommended'],
                 'options'            => $splitOptions['others'],
+                'deprecatedOptions'  => $splitOptions['deprecations'],
+                'shutdownOptions'    => $splitOptions['shutdowns'],
                 'section'            => self::SECTION_OPENAI,
                 'allowUnselected'    => false,
             ];
