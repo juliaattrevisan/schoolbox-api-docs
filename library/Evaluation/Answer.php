@@ -240,6 +240,27 @@ abstract class Evaluation_Answer extends DeprecatedModel
     }
 
     /**
+     * Unserializes a response/answer value, treating null, empty, and
+     * malformed data as "no value" instead of raising a warning.
+     *
+     * `assess_response.response` is legitimately NULL for unanswered
+     * questions, and historical rows may contain non-serialized garbage;
+     * neither should surface as a PHP warning.
+     *
+     * @param mixed $value
+     * @return mixed The unserialized value, or false if $value isn't valid
+     *               serialized data.
+     */
+    protected function safeUnserialize($value)
+    {
+        if (!is_string($value) || $value === '') {
+            return false;
+        }
+
+        return @unserialize($value);
+    }
+
+    /**
      * Save the reviewed mark
      *
      * @param array $data
