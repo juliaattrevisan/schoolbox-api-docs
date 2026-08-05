@@ -24,7 +24,7 @@ use Schoolbox\User;
 #[CoversClass(Calendar_Api_EventType_Submission_Schoolbox_Default::class)]
 class DefaultTest extends TestCase
 {
-    public function testCalendarUsesViewerAndStudentForParticipantActivityVisibility(): void
+    public function testCalendarUsesStudentVisibilityBeforeScopedHistoricalParticipantVisibility(): void
     {
         $student = (new User())->setId(10)->setRole((new Role())->setType(Role::STUDENT));
         $viewer = (new User())->setId(20)->setRole((new Role())->setType(Role::PARENT));
@@ -46,7 +46,16 @@ class DefaultTest extends TestCase
         $visibility = $this->createMock(Visibility::class);
         $visibility
             ->expects($this->once())
-            ->method('isVisibleToParticipantActivity')
+            ->method('isVisibleToUser')
+            ->with(
+                $this->identicalTo($assessment),
+                $this->identicalTo($student),
+                true
+            )
+            ->willReturn(false);
+        $visibility
+            ->expects($this->once())
+            ->method('isVisibleToHistoricalParticipantActivity')
             ->with(
                 $this->identicalTo($assessment),
                 $this->identicalTo($viewer),

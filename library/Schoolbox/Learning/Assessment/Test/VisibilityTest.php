@@ -138,6 +138,43 @@ class VisibilityTest extends TestCase
         );
     }
 
+    public function testScopedParticipantVisibilityDoesNotUseStaffAccess(): void
+    {
+        $now = new Alaress_Date_Format(self::NOW_DATABASE, Alaress_Date_Format::DATABASE_FORMAT);
+        $student = (new User())->setId(101)->setRole((new Role())->setType(Role::STUDENT));
+        $staff = (new User())->setId(104)->setRole((new Role())->setType(Role::STAFF));
+        $assessable = (new DueWork\Model())
+            ->setId(1)
+            ->setTitle('Scoped Due Work')
+            ->setContext((new Folder\Model())->setId(1))
+            ->setAcceptsMultiple()
+            ->setPublishAt((clone $now)->addDays(-2))
+            ->setOpenAt((clone $now)->addDays(-1))
+            ->setDueAt((clone $now)->addDays(1))
+            ->setCloseAt((clone $now)->addDays(2));
+        $plan = (new Plan($assessable))->setIsDynamic(PlanMapper::PLAN_TYPE_DYNAMIC);
+        $plan->getParticipants()[$student->getId()] = new Participant(
+            $student,
+            $plan,
+            ResultCache\Mapper::getInstance()
+        );
+        $assessable->setPlans($assessable->getPlans()->emptyClone()->add($plan));
+
+        /** @var Access&Stub $access */
+        $access = $this->createStub(Access::class);
+        $access->method('isInstructor')->willReturn(false);
+        $access->method('isLearner')->willReturn(false);
+
+        $visibility = new Visibility($access);
+
+        self::assertTrue(
+            $visibility->isVisibleToParticipantActivity($assessable, $staff, $student, true, $now)
+        );
+        self::assertFalse(
+            $visibility->isVisibleToHistoricalParticipantActivity($assessable, $staff, $student, true, $now)
+        );
+    }
+
     /**
      * Provides historical fallback denials alongside unchanged current-access visibility paths.
      *
