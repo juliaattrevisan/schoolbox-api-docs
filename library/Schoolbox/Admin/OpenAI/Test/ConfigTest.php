@@ -467,20 +467,103 @@ class ConfigTest extends TestCase
     }
 
     /**
-     * `splitOptions` documents that it assumes no recommendation is deprecated
-     * or shut down, and it does not enforce that assumption: a model that is
-     * both is reported in both lists, and `formInput.twig` renders it twice.
+     * Data provider for splitOptions precedence
      *
-     * Pinned as the behaviour that is there, not as the behaviour that is
-     * wanted, so that enforcing the assumption is a deliberate change.
+     * A model can appear in more than one of the lists given to `splitOptions`.
+     * Shutdown beats deprecation, which beats recommendation, so that whichever
+     * list a model is reported in, it is reported in only that one and the form
+     * offers it once.
+     *
+     * @return array
      */
-    public function testSplitOptionsReportsARecommendedModelThatIsAlsoDeprecatedInBothLists(): void
+    public static function providerSplitOptionsPrecedence(): array
     {
-        $split = $this->splitOptions(['gpt-4', 'gpt-5'], ['gpt-4'], ['gpt-4' => 'gpt-5'], null);
+        return [
+            'shutdown beats recommendation' => [
+                ['gpt-3.5', 'gpt-5'],
+                ['gpt-3.5'],
+                null,
+                ['gpt-3.5' => 'gpt-5'],
+                [
+                    'recommended'  => [],
+                    'others'       => ['gpt-5'],
+                    'deprecations' => [],
+                    'shutdowns'    => ['gpt-3.5' => 'gpt-5'],
+                ],
+            ],
+            'deprecation beats recommendation' => [
+                ['gpt-4', 'gpt-5'],
+                ['gpt-4'],
+                ['gpt-4' => 'gpt-5'],
+                null,
+                [
+                    'recommended'  => [],
+                    'others'       => ['gpt-5'],
+                    'deprecations' => ['gpt-4' => 'gpt-5'],
+                    'shutdowns'    => [],
+                ],
+            ],
+            'shutdown beats deprecation' => [
+                ['gpt-3.5', 'gpt-5'],
+                [],
+                ['gpt-3.5' => 'gpt-4o'],
+                ['gpt-3.5' => 'gpt-5'],
+                [
+                    'recommended'  => [],
+                    'others'       => ['gpt-5'],
+                    'deprecations' => [],
+                    'shutdowns'    => ['gpt-3.5' => 'gpt-5'],
+                ],
+            ],
+            'shutdown beats both deprecation and recommendation' => [
+                ['gpt-3.5', 'gpt-5'],
+                ['gpt-3.5'],
+                ['gpt-3.5' => 'gpt-4o'],
+                ['gpt-3.5' => 'gpt-5'],
+                [
+                    'recommended'  => [],
+                    'others'       => ['gpt-5'],
+                    'deprecations' => [],
+                    'shutdowns'    => ['gpt-3.5' => 'gpt-5'],
+                ],
+            ],
+            /* Only the model that is in more than one list loses its place: the
+             * recommendations either side of it are untouched.
+             */
+            'the other recommendations survive' => [
+                ['gpt-5', 'gpt-4', 'gpt-5-mini'],
+                ['gpt-5', 'gpt-4', 'gpt-5-mini'],
+                ['gpt-4' => 'gpt-5'],
+                null,
+                [
+                    'recommended'  => ['gpt-5', 'gpt-5-mini'],
+                    'others'       => [],
+                    'deprecations' => ['gpt-4' => 'gpt-5'],
+                    'shutdowns'    => [],
+                ],
+            ],
+        ];
+    }
 
-        $this->assertSame(['gpt-4'], $split['recommended']);
-        $this->assertSame(['gpt-4' => 'gpt-5'], $split['deprecations']);
-        $this->assertSame(['gpt-5'], $split['others']);
+    /**
+     * @param array<string>          $options
+     * @param array<string>          $recommendations
+     * @param ?array<string, string> $deprecations
+     * @param ?array<string, string> $shutdowns
+     * @param array                  $expected
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerSplitOptionsPrecedence')]
+    public function testSplitOptionsPrecedence(
+        array $options,
+        array $recommendations,
+        ?array $deprecations,
+        ?array $shutdowns,
+        array $expected,
+    ): void {
+        $this->assertSame(
+            $expected,
+            $this->splitOptions($options, $recommendations, $deprecations, $shutdowns),
+        );
     }
 
     /**

@@ -734,19 +734,31 @@ class Config
         ?array $deprecations,
         ?array $shutdowns,
     ): array {
-        // Assume no recommendations are deprecated or shutdown
+        $deprecations ??= [];
+        $shutdowns    ??= [];
+
+        // A model can be named by more than one of these lists: it can be
+        // recommended for a feature and since have been deprecated or shut
+        // down. Shutdown takes precedence over deprecation, which takes
+        // precedence over recommendation, so that each model is offered in one
+        // list only and the form does not show it twice.
+        $deprecations    = array_diff_key($deprecations, $shutdowns);
+        $recommendations = array_diff($recommendations, array_keys($deprecations), array_keys($shutdowns));
+
+        $available = array_combine($options, $options);
+
         return [
-            'recommended'  => $recommendations,
+            'recommended'  => array_values($recommendations),
             'others'       => array_values(
                 array_diff(
                     $options,
                     $recommendations,
-                    array_keys($deprecations ?? []),
-                    array_keys($shutdowns ?? []),
+                    array_keys($deprecations),
+                    array_keys($shutdowns),
                 ),
             ),
-            'deprecations' => array_intersect_key($deprecations ?? [], array_combine($options, $options)),
-            'shutdowns'    => array_intersect_key($shutdowns ?? [], array_combine($options, $options)),
+            'deprecations' => array_intersect_key($deprecations, $available),
+            'shutdowns'    => array_intersect_key($shutdowns, $available),
         ];
     }
 
