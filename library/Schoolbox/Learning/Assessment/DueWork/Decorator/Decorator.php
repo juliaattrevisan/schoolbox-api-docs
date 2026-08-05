@@ -378,6 +378,9 @@ class Decorator implements DecoratorInterface
             $rubricData = $this->getRubricData() ?? [];
 
             foreach ($this->original->getRubricInstances() as $originalRubricInstance) {
+                /* Rubrics deleted while changing location are omitted from the submitted data but remain on
+                 * the original assessment. Skip them so they are not recreated on the relocated assessment.
+                 */
                 if (!isset($rubricData[$originalRubricInstance->getId()])) {
                     continue;
                 }
