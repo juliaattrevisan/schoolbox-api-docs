@@ -32,7 +32,7 @@ Visit https://vagrant.dev.schoolbox.cloud/adminv2/import/schoolDataImport and se
 - The day-number offset and parent relationship settings where required.
 - The optional REST API credentials when higher-quality profile images are required.
 
-The Batch OAuth client secret must be configured before iSAMS makes OAuth mandatory on 2 November 2026. Existing API-key-only configuration remains readable during migration, but the School Data Import status report will flag the missing secret.
+The Batch OAuth client secret must be configured before iSAMS makes OAuth mandatory on 2 November 2026. Existing API-key-only configuration remains readable during migration.
 
 ## 3. Importing
 
