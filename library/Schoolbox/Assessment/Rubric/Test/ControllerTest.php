@@ -15,7 +15,7 @@ use Schoolbox\Assessment\Rubric\Controller;
 class ControllerTest extends TestCase
 {
     /**
-     * Ensures exporting a rubric does not turn a whitespace-only cell into an empty cell.
+     * Ensures exporting a rubric preserves whitespace-only cells while trimming cells containing text.
      */
     public function testArrayToCsvPreservesWhitespaceOnlyCells(): void
     {
@@ -39,7 +39,7 @@ class ControllerTest extends TestCase
 
         $csv = $controller->convertToCsv([
             ['capabilityMarkType: none', 'useMarkRange: Off', 'Level'],
-            ['Capability', ' ', 'Descriptor'],
+            ['Capability', ' ', ' Descriptor '],
         ]);
 
         $rows = array_map(
@@ -48,5 +48,6 @@ class ControllerTest extends TestCase
         );
 
         $this->assertSame(' ', $rows[1][1]);
+        $this->assertSame('Descriptor', $rows[1][2]);
     }
 }
