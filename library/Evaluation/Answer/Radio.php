@@ -284,7 +284,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
         /* Enforce array format for radio answers
            */
         if (!isset($data['answer'])) {
-            $processedResponse = 'NULL';
+            $processedResponse = null;
         } else {
             $processedResponse = serialize(array($data['answer']));
         }

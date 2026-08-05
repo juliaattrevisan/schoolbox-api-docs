@@ -292,7 +292,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
     public function saveResponse($data)
     {
         if (!isset($data['answer'])) {
-            $processedResponse = 'NULL';
+            $processedResponse = null;
         } else {
             $processedResponse = serialize($data['answer']);
         }
