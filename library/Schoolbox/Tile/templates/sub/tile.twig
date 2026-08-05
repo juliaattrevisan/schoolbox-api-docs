@@ -49,10 +49,23 @@
 
 <script type="text/javascript">
 $(function () {
-    // listen for any dimension changes to the tile to trigger fixTileHeightAndFontSize
+    // Tile height and font size depend on its width, not its height.
     const tile = document.querySelector("#{{ componentId }}-tile-{{ tile.id }}");
-    const resizeObserver = new ResizeObserver((entries) => {
-        $(tile).fixTileHeightAndFontSize();
+    let previousWidth;
+
+    const resizeObserver = new ResizeObserver(([entry]) => {
+        // The resize function changes the tile height, which triggers this observer again.
+        // Ignore same-width notifications to prevent height-only feedback.
+        if (entry.contentRect.width === previousWidth) {
+            return;
+        }
+
+        previousWidth = entry.contentRect.width;
+
+        // Mutate the DOM after the current observer delivery cycle to avoid loop warnings.
+        requestAnimationFrame(() => {
+            $(tile).fixTileHeightAndFontSize();
+        });
     });
     resizeObserver.observe(tile);
 });
