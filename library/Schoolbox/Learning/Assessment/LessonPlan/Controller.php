@@ -293,13 +293,7 @@ class Controller extends Assessment\Controller
             if ($this->getUser()->getRole()->isStaff()) {
                 $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection(collection: $linkedAssessments);
             } else {
-                // only hydrate for the user who's lesson plan this is
-                $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection(collection: $linkedAssessments, users: (new \Schoolbox\Collection())->add($student));
-
-                // only show the linked assessments that the student is a participant of
-                $linkedAssessments = $linkedAssessments->filter(function (IAssessable $assessable) use ($student) {
-                    return ($assessable->getParticipantIfExtant($student) instanceof Participant);
-                });
+                $linkedAssessments = $this->filterLinkedAssessmentsForLearner($linkedAssessments, $student);
             }
         }
 
@@ -398,6 +392,32 @@ class Controller extends Assessment\Controller
     }
 
     /**
+     * Removes linked activities whose metadata must not be disclosed to a learner.
+     *
+     * @param GenericCollection<IAssessable> $linkedAssessments
+     * @param User                           $learner
+     * @return GenericCollection<IAssessable>
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \DomainException
+     * @throws \UnexpectedValueException
+     */
+    private function filterLinkedAssessmentsForLearner(GenericCollection $linkedAssessments, User $learner): GenericCollection
+    {
+        $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection(
+            collection: $linkedAssessments,
+            users: (new \Schoolbox\Collection())->add($learner),
+        );
+
+        return $linkedAssessments->filter(function (IAssessable $assessable) use ($learner) {
+            return (
+                $assessable->getParticipantIfExtant($learner) instanceof Participant &&
+                ($assessable->getWorkType()?->isVisibleToLearners() ?? true) &&
+                $assessable->isPublished($learner)
+            );
+        });
+    }
+
+    /**
      * Lesson Plans don't have any responses.
      *
      * @param IAssessable $assessment
@@ -431,9 +451,16 @@ class Controller extends Assessment\Controller
      */
     public function getActivities(Model $assessment): void
     {
+        $linkedAssessments = $assessment->getLinkedAssessments();
+        if (!$this->getUser()->getRole()->isStaff()) {
+            $linkedAssessments = $linkedAssessments
+                ? $this->filterLinkedAssessmentsForLearner($linkedAssessments, $this->getUser())
+                : null;
+        }
+
         $this->response = $this->responseAsJson(
-            $assessment->getLinkedAssessments()
-                ? $assessment->getLinkedAssessments()->reindex()->map(
+            $linkedAssessments
+                ? $linkedAssessments->reindex()->map(
                     new Assessment\Translator\UnitAssessments(
                         $this->routeGenerator,
                         $this->getAuthorizer(),
