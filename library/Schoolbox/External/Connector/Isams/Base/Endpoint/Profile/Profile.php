@@ -60,6 +60,14 @@ class Profile implements IStrategy
      */
     private const MAX_POSITION_LENGTH = 255;
 
+    /**
+     * sis_user_profile_student.alert_message and .alert_comment are both varchar(1024).
+     * Both are aggregated from unbounded iSAMS data (parent SOS fields / SEN requirement
+     * types) and can exceed this without a cap, causing the profile save to fail outright.
+     * Same class of issue as PHONE_DB_LIMIT/MAX_POSITION_LENGTH above (SA-14272) - SA-23150
+     */
+    private const MAX_ALERT_TEXT_LENGTH = 1024;
+
 
     /**
      * Campuses are separated by semicolons here.
@@ -477,7 +485,19 @@ class Profile implements IStrategy
 
         /* Glue together
          */
-        return implode("\n", $comments);
+        $alertComment = implode("\n", $comments);
+
+        if (self::MAX_ALERT_TEXT_LENGTH <= mb_strlen($alertComment)) {
+            $this->log->warning(sprintf(
+                'Student %s has an aggregated alert_comment exceeding the %s char limit; truncating',
+                $studentId,
+                self::MAX_ALERT_TEXT_LENGTH
+            ));
+
+            $alertComment = mb_substr($alertComment, 0, self::MAX_ALERT_TEXT_LENGTH, 'UTF-8');
+        }
+
+        return $alertComment;
     }
 
 
@@ -919,7 +939,20 @@ class Profile implements IStrategy
             }
         }
 
-        return implode("\n", $messages);
+        $alertMessage = implode("\n", $messages);
+
+        if (self::MAX_ALERT_TEXT_LENGTH <= mb_strlen($alertMessage)) {
+            $this->log->warning(sprintf(
+                'Student %s (%s) has an aggregated parent alert_message exceeding the %s char limit; truncating',
+                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"),
+                $studentExternalId,
+                self::MAX_ALERT_TEXT_LENGTH
+            ));
+
+            $alertMessage = mb_substr($alertMessage, 0, self::MAX_ALERT_TEXT_LENGTH, 'UTF-8');
+        }
+
+        return $alertMessage;
     }
 
 
