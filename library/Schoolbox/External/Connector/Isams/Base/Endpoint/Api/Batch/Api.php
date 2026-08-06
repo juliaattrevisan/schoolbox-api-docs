@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Api\Batch;
 
-use Alaress_Curl_Url;
 use RuntimeException;
 use Schoolbox\Url\Uri;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
@@ -36,17 +35,43 @@ class Api implements IApi
 
 
     /**
+     * Batch API key.
+     */
+    private string $batchKey;
+
+
+    /**
+     * Batch HTTP client.
+     */
+    private Client $client;
+
+
+    /**
      * Constructor
      *
-     * @param string $host    The host of the iSAMS server
-     * @param string $apiKey  The API key for this call, provided by the school
-     * @param string $module  The iSAMS module that you're accessing; corresponds to one of the DSN consts
+     * @param string $host The host of the iSAMS server.
+     * @param string $dsn Encoded iSAMS DSN.
+     * @param string $module The iSAMS module being accessed.
+     * @param Client|null $client Batch HTTP client.
+     * @throws \DomainException When the DSN cannot be decoded.
+     * @todo Migrate the Batch OAuth secret out of the legacy encoded DSN during configuration cleanup.
      */
     public function __construct(
         private string $host,
-        #[SensitiveParameter] private string $apiKey,
-        private string $module
+        #[SensitiveParameter] string $dsn,
+        private string $module,
+        ?Client $client = null
     ) {
+        $credentials = (new DSN())->decode($dsn);
+        $moduleCredentials = $credentials['modules'][$this->module];
+
+        $this->options = $credentials['options'] ?? [];
+        $this->batchKey = $moduleCredentials['key'];
+        $this->client = $client ?? new Client(
+            $this->host,
+            $this->batchKey,
+            $moduleCredentials['clientsecret'] ?? ''
+        );
     }
 
 
@@ -60,35 +85,20 @@ class Api implements IApi
      */
     public function retrieveDocument(): ?string
     {
-        $curl = $this->initCurl();
-        $curl->exec();
-
-        if (empty($curl->getErrors())) {
-            // Too big to parse
-            return $curl->getResult();
-        }
-
-        throw new RuntimeException(
-            sprintf(
-                'XML retrieval failed: response code %d, message: %s',
-                $curl->getResponseCode(),
-                implode(', ', $curl->getErrors())
-            ),
-            $curl->getResponseCode()
-        );
+        return $this->client->get(DSN::PATHS[$this->module]);
     }
 
-
     /**
-     * Set up curl instance
+     * Check the configured Batch endpoint without downloading its XML body.
      *
-     * @return Alaress_Curl_Url
+     * @return void
+     * @throws RuntimeException if the endpoint cannot be reached
      * @throws \DomainException
      * @throws \InvalidArgumentException
      */
-    private function initCurl(): \Alaress_Curl_Url
+    public function checkConnection(): void
     {
-        return new Alaress_Curl_Url((string)$this->getUrl());
+        $this->client->check(DSN::PATHS[$this->module]);
     }
 
 
@@ -101,12 +111,6 @@ class Api implements IApi
      */
     public function getUrl(): Uri
     {
-        $credentials = (new DSN())->decode($this->apiKey);
-
-        /* Remember the optional pieces we offer
-         */
-        $this->options = $credentials['options'] ?? [];
-
         if (!$this->url) {
             /* Find the path corresponding to the module we found
              * The module we found is in $matches[1]
@@ -120,7 +124,7 @@ class Api implements IApi
                 ->withScheme('https')
                 ->withHost(rtrim($this->host, "/ \n\r\t\v\x00"))
                 ->withPath("/{$path}")
-                ->appendQueryParameters(['apikey' => $credentials['modules'][$this->module]['key']]);
+                ->appendQueryParameters(['apikey' => $this->batchKey]);
         }
 
         return $this->url;

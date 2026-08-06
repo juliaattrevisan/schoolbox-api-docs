@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\Images;
 
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Api\Batch\Client;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use Schoolbox\Role;
-use Schoolbox\Url\Uri;
 use SensitiveParameter;
 use ZipArchive;
 
@@ -43,17 +43,9 @@ class BatchPhotoDownloader implements IPhotoDownloader
 
 
     /**
-     * The host of the iSAMS server
-     *
-     * @var string
+     * Batch HTTP client.
      */
-    private string $host;
-
-
-    /**
-     * @var string
-     */
-    private string $key;
+    private Client $client;
 
 
     /**
@@ -74,15 +66,20 @@ class BatchPhotoDownloader implements IPhotoDownloader
      * @param string $host
      * @param array $credentials
      * @param string $zipDir
+     * @param Client|null $client Batch HTTP client.
      */
-    public function __construct(string $host, #[SensitiveParameter] array $credentials, string $zipDir)
-    {
-        $this->host = $host;
-
-        /* Store this locally just once
-         */
-        $this->key = $credentials['modules'][DSN::MODULE_BATCHXML]['key'];
-
+    public function __construct(
+        string $host,
+        #[SensitiveParameter] array $credentials,
+        string $zipDir,
+        ?Client $client = null
+    ) {
+        $batchCredentials = $credentials['modules'][DSN::MODULE_BATCHXML];
+        $this->client = $client ?? new Client(
+            $host,
+            $batchCredentials['key'],
+            $batchCredentials['clientsecret'] ?? ''
+        );
         $this->cacheDir = $zipDir . '/' . self::ISAMS_CACHE_DIR;
 
         /* Make subfolders
@@ -110,7 +107,7 @@ class BatchPhotoDownloader implements IPhotoDownloader
      */
     public function downloadStudentPhotos(): void
     {
-        $this->download('photos.ashx', $this->key, Role::STUDENT);
+        $this->download('photos.ashx', Role::STUDENT);
     }
 
 
@@ -122,7 +119,7 @@ class BatchPhotoDownloader implements IPhotoDownloader
      */
     public function downloadStaffPhotos(): void
     {
-        $this->download('staffphotos.ashx', $this->key, Role::STAFF);
+        $this->download('staffphotos.ashx', Role::STAFF);
     }
 
 
@@ -130,11 +127,11 @@ class BatchPhotoDownloader implements IPhotoDownloader
      * Constructs a zip file on the local filesystem
      *
      * @param string $path
-     * @param string $key
      * @param string $type
      * @return void
+     * @throws \RuntimeException When the download fails.
      */
-    private function download(string $path, string $key, string $type): void
+    private function download(string $path, string $type): void
     {
         /* Forcibly create isams subdir
          */
@@ -159,22 +156,12 @@ class BatchPhotoDownloader implements IPhotoDownloader
         $filename = tempnam($this->cacheDir, self::DOWNLOAD_PREFIX);
         $filepointer = fopen($filename, 'wb+');
 
-        $url = (new Uri())
-            ->withScheme('https')
-            ->withHost(rtrim($this->host, "/ \n\r\t\v\x00"))
-            ->withPath("/{$path}")
-            ->appendQueryParameters(['apikey' => $key]);
-
-        $curl = new \Alaress_Curl_Url((string)$url);
-        $curl->exec();
-
-        if (empty($curl->getErrors())) {
-            // Too big to parse
-            $data = $curl->getResult();
+        try {
+            $data = $this->client->get($path);
             fwrite($filepointer, $data);
+        } finally {
+            fclose($filepointer);
         }
-
-        fclose($filepointer);
 
         $this->extract($filename, $type);
     }

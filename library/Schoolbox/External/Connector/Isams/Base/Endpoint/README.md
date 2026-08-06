@@ -24,23 +24,49 @@ delete from sis_timetable_cycle;
 
 ## 2. Connector Setup
 
-Visit https://vagrant.dev.schoolbox.cloud/adminv2/import/schoolDataImport and set the `Data Source` to `iSAMS`. Set up the `School Data Endpoint Host` and `School Data Endpoint Key` accordingly.
+Visit https://vagrant.dev.schoolbox.cloud/adminv2/import/schoolDataImport and set the `Data Source` to `iSAMS`. Configure:
 
-For testing, you can use an endpoint host and key from a Schoolbox instance which already uses iSAMS (e.g. GEMS):
-visit the instance's School Data Import admin section and copy the endpoint host and key from there.
+- `School Data Endpoint Host`: the school-specific iSAMS host.
+- `Batch XML Key`: the existing Batch API key, which is also the OAuth client ID.
+- `Batch OAuth Client Secret`: the secret provisioned for the same school and Batch key with the `apiv1` scope.
+- The day-number offset and parent relationship settings where required.
+- The optional REST API credentials when higher-quality profile images are required.
+
+The Batch OAuth client secret must be configured before iSAMS makes OAuth mandatory on 2 November 2026. Existing API-key-only configuration remains readable during migration.
 
 ## 3. Importing
 
-Then run the sisImporter. The easiest way is to shank down an xml:
+Schoolbox obtains and reuses a Bearer token automatically for live imports. To download an authenticated XML fixture manually without putting the OAuth secret or token in the URL:
 
-```
-wget https://{School Data Endpoint Host}/api/batch/1.0/xml.ashx?apikey={School Data Endpoint Key} -O test.xml
+```bash
+read -r -p 'iSAMS host: ' ISAMS_HOST
+read -r -p 'Batch API key: ' ISAMS_BATCH_KEY
+read -r -s -p 'Batch OAuth client secret: ' ISAMS_BATCH_SECRET
+echo
+
+TOKEN_RESPONSE=$(curl --silent --show-error --fail-with-body \
+    --request POST "https://${ISAMS_HOST}/auth/connect/token" \
+    --header 'Content-Type: application/x-www-form-urlencoded' \
+    --data-urlencode "client_id=${ISAMS_BATCH_KEY}" \
+    --data-urlencode "client_secret=${ISAMS_BATCH_SECRET}" \
+    --data-urlencode 'grant_type=client_credentials' \
+    --data-urlencode 'scope=apiv1')
+
+ACCESS_TOKEN=$(printf '%s' "${TOKEN_RESPONSE}" | php -r \
+    '$response = json_decode(stream_get_contents(STDIN), true, 512, JSON_THROW_ON_ERROR); echo $response["access_token"];')
+
+curl --silent --show-error --fail-with-body \
+    --header "Authorization: Bearer ${ACCESS_TOKEN}" \
+    "https://${ISAMS_HOST}/xml.ashx?apikey=${ISAMS_BATCH_KEY}" \
+    --output test.xml
+
+unset ISAMS_BATCH_SECRET ACCESS_TOKEN TOKEN_RESPONSE
 ```
 
-Then, pop it into the www directory as test.xml, then run this:
+Then run the importer against the local fixture:
 
-```
-vagrant ssh
+```bash
+docker/ssh
 cd /usr/share/schoolbox/tools/synchronise
 php sisImporter.php --perform -vvv --file ../../www/test.xml
 ```

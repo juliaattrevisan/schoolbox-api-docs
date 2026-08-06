@@ -53,20 +53,14 @@ class Status implements IStatus
      */
     public function isReachable(): bool
     {
-        /* BatchXML is configured to dump you the entire xml feed; you can't just get a portion
-         * which means you're downloading boatloads of data just to see if you could
-         *
-         * Use an ultra cheep way at the cost of some neatness
-         */
-        $api = new Api\Batch\Api($this->host, $this->dsn, Codec\DSN::MODULE_BATCHXML);
+        try {
+            $api = new Api\Batch\Api($this->host, $this->dsn, Codec\DSN::MODULE_BATCHXML);
+            $api->checkConnection();
 
-        $result = @get_headers((string)$api->getUrl());
-
-        if (is_array($result)) {
-            return strpos($result[0], '200') > -1;
+            return true;
+        } catch (\RuntimeException) {
+            return false;
         }
-
-        return false;
     }
 
 
@@ -74,6 +68,7 @@ class Status implements IStatus
      * @inheritDoc
      *
      * @return array
+     * @throws \DomainException When the iSAMS DSN cannot be decoded.
      */
     public function getReport(): array
     {
