@@ -107,12 +107,23 @@ const exportReportRoute = window.Vue.computed(() => {
 
     return url.toString();
 });
+
+/**
+ * On the reporting markbook the indicator key and Show Drafts toggle only relate to supporting data,
+ * so hide them when there's no supporting data showing.
+ * TODO: SA-23169 ideally resolves the fact that "Show Display Marks" is confusing and applies to both currently.
+ */
+const showLegendOrDraftControls = window.Vue.computed(() => {
+    const hasSupportingData = mbStore.activityGroups.some((group) => !group.splitComments);
+    return props.type !== MarkbookType.REPORTING || hasSupportingData;
+});
 </script>
 
 <template>
     <div class="u-flex u-flex-row u-flex--align-center u-flex--justify-end u-gap-l u-mar-s--bottom">
-        <div class="legend">
+        <div v-if="showLegendOrDraftControls" class="legend">
             <div class="indicators">
+                <p v-if="props.type === MarkbookType.REPORTING" class="meta">Supporting Data:</p>
                 <p class="meta"><span class="legend-indicator indicator-none"></span>Unmarked</p>
                 <p class="meta"><span class="legend-indicator indicator-pending"></span>Unpublished draft</p>
                 <p class="meta"><span class="legend-indicator indicator-resubmit"></span>Resubmit</p>
@@ -133,7 +144,7 @@ const exportReportRoute = window.Vue.computed(() => {
                 </span>
             </label>
         </div>
-        <div class="checklist">
+        <div v-if="showLegendOrDraftControls" class="checklist">
             <input id="show-drafts" v-model="mbStore.showDrafts" type="checkbox" />
             <label for="show-drafts" class="f-no-margins">Show Drafts</label>
         </div>
