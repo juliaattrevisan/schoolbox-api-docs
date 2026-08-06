@@ -54,15 +54,23 @@ const participant = window.Vue.computed(() => {
 });
 
 /**
- * Whether this cell belongs to the reporting activity being viewed on the reporting status page;
- * splitComments is only ever true for that activity
+ * Whether the draft values should be shown if they exist.
+ * For normal activities, this is controlled by the "Show Drafts" toggle in the markbook.
+ * On the reporting status page, the cells for the activity itself aren't affected by the toggle and always prefer draft
+ * values if they exist, to match the behaviour of the other status pages.
  */
-const isCurrentReportingActivity = window.Vue.computed(() => Boolean(assessment.value?.splitComments));
+const preferDraftFeedback = window.Vue.computed(() => {
+    if (assessment.value === null) return false;
 
-/**
- * The reporting activity always prefers draft feedback; every other activity follows the Show Drafts toggle
- */
-const preferDraftFeedback = window.Vue.computed(() => isCurrentReportingActivity.value || mbStore.showDrafts);
+    if (assessment.value.splitComments) {
+        /* "splitComments" is the way to define "the activity itself" for reporting activities at the moment,
+         * I expect this will change in the near future though to something more explicit.
+         */
+        return true;
+    }
+
+    return mbStore.showDrafts;
+});
 
 const canGiveFeedbackMarks = window.Vue.computed(
     () => aImpl.value && aImpl.value.instructorMarkScheme.mode !== MarkTypeSlug.NONE,
@@ -98,11 +106,10 @@ const hasPopOutMenu = window.Vue.computed(() => {
 });
 
 /**
- * The indicator and notch title for due work/quiz;
- * the reporting activity's mark column has no indicator
+ * The indicator and notch title for due work/quiz
  */
 const decorator = window.Vue.computed(() => {
-    if (participant.value === null || isCurrentReportingActivity.value) {
+    if (participant.value === null) {
         return null;
     }
 
