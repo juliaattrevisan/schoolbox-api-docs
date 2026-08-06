@@ -56,6 +56,7 @@ function onSelected(e: Event): void {
     justify-content: space-between;
     margin: 0;
     padding: 0.5rem 1rem;
+    text-align: left;
     text-wrap: pretty; /* prevent text orphans on supported browsers */
     user-select: none;
     width: 100%;
