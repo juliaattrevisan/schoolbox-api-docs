@@ -144,8 +144,6 @@ export function useDynamicFeedback(
         /* the first time a draft is saved, the "Draft saved"/"Saving failed"/etc dialogue should be shown */
         showDraftDialogue.value = true;
 
-        const toast = window.sbProps.toastActivate("Autosaving...");
-
         try {
             const resp = await fetch(postModify.route, {
                 method: "POST",
@@ -165,8 +163,6 @@ export function useDynamicFeedback(
                 throw new Error(`Failed to auto-save draft feedback`);
             }
 
-            toast.timeout({ text: "Draft saved", isSuccess: true });
-
             // persist the draft data
             dataDraft.responseId.value = respData.id;
             dataDraft.normMark.value = respData.normalisedMark;
@@ -180,7 +176,6 @@ export function useDynamicFeedback(
             }
         } catch (error) {
             console.error("Error auto-saving draft feedback:", error);
-            toast.timeout({ text: "Unable to save draft", isSuccess: false });
             isAutoSaveInProgress.value = false;
             hasAutoSaveError.value = true;
             return;
@@ -256,8 +251,6 @@ export function useDynamicFeedback(
         showDraftDialogue.value = false;
         onFeedbackChangedDebounced.cancel();
 
-        const toast = window.sbProps.toastActivate("Publishing...");
-
         try {
             const resp = await fetch(postModify.route, {
                 method: "POST",
@@ -276,8 +269,6 @@ export function useDynamicFeedback(
             if (!respData.success) {
                 throw new Error(`Failed to publish feedback`);
             }
-
-            toast.timeout({ text: "Feedback published", isSuccess: true });
 
             dataExtra.hasPublishedFeedback.value = true;
             Object.assign(dataExtra.plan, respData.plan);
@@ -303,7 +294,7 @@ export function useDynamicFeedback(
             }
         } catch (error) {
             console.error("Error publishing feedback:", error);
-            toast.timeout({ text: "Unable to publish feedback", isSuccess: false });
+            window.sbProps.toastActivate("Unable to publish feedback").timeout({ isSuccess: false });
             isPublishInProgress.value = false;
             hasPublishError.value = true;
             return false;

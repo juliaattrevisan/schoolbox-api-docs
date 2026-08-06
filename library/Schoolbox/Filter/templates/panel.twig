@@ -42,7 +42,6 @@ Usage:
         var $appliedFilters      = $filterPanel.find('[data-applied-filters]');
         var $submitButton        = $('#submit_button'); // using this ID in `vue/components/menu/pop-out-menu-markbook.vue`
         var $optionInputs        = $filterPanel.find('input[type=checkbox], input[type=hidden], input[type=text], select');
-        var $toast               = $('[data-relation="submit-label"]');
         var $serverErrorFeedback = $filterPanel.find('#server_error_feedback');
         var $filterLoaderIcon    = $filterPanel.find('#filter-loader');
         var $resetToDefaultsBtn  = $filterPanel.find('#defaults_reset');
@@ -623,7 +622,6 @@ Usage:
             // Remove previous alerts
             $serverErrorFeedback.children().remove();
 
-            $toast.toastTimeout({text: 'Failure!', css: 'alert'});
             $alert.removeClass('alert-close');
             $serverErrorFeedback.append($alert);
             $serverErrorFeedback.show();
@@ -944,8 +942,6 @@ Usage:
     </ul>
     <a class="close-reveal-modal" aria-label="Close">×</a>
 </div>
-
-<div class="toast" data-alert data-relation="submit-label"></div>
 
 <div class="row">
     <div class="small-12 island" id="filter_panel">

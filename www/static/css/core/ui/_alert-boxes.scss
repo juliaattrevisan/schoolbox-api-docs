@@ -250,7 +250,6 @@ $alert-default-background: css-darken($body-bg, 10%);
     opacity: 0;
     padding: 0.875rem 1.25rem;
     position: fixed;
-    right: -999px; //ensure doesn't interfere while inactive
     text-align: center;
     z-index: var(--sbx-depth-toast);
     transition: opacity 0.3s;
@@ -263,6 +262,15 @@ $alert-default-background: css-darken($body-bg, 10%);
         &::before {
             animation: pulse 1.5s infinite;
         }
+    }
+    &:not(.pop) {
+        /* Ensure the toast doesn't interfere with elements while inactive.
+         * Requires !important since there's styles elsewhere that move the toast around, e.g. when the notif panel is pinned
+         *
+         * i feel like this could totally be a display: none -> block change,
+         * but perhaps there's a historical reason for this being a right: -999px (transitions or something foundation related?)
+         */
+        right: -999px !important;
     }
     &.success {
         color: var(--sbx-color-foreground-primary, $white);
