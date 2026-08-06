@@ -313,7 +313,7 @@ const showCommentsColumn = window.Vue.computed(() => {
         }"
         :data-test="`markbook-cell-${assessment.id}-${student.id}`"
         :data-pop-out-menu="hasPopOutMenu || undefined"
-        @click="onClickCell(cellEl)"
+        @click="onClickCell(cellEl, MarkbookGridCellType.MARK)"
     >
         <template v-if="participant === null || participant.isExcluded"></template>
         <div v-else-if="participant.progressTick" style="display: flex; justify-content: center">
@@ -381,7 +381,7 @@ const showCommentsColumn = window.Vue.computed(() => {
         }"
         :data-test="`markbook-cell-${assessment.id}-${student.id}-comment`"
         :data-pop-out-menu="hasPopOutMenu || undefined"
-        @click="onClickCell(commentCellEl)"
+        @click="onClickCell(commentCellEl, MarkbookGridCellType.COMMENT)"
     >
         <template v-if="participant === null || participant.isExcluded"></template>
 
