@@ -40,13 +40,13 @@ class Profile implements IStrategy
     /**
      * Used in the profile category field to identify teacher or employee users coming from iSAMS into the staff table
      */
-    public const EMPLOYEE = 'employee';
-    public const TEACHER = 'teacher';
+    public const string EMPLOYEE = 'employee';
+    public const string TEACHER = 'teacher';
 
     /**
      * Phone number db limit
      */
-    public const PHONE_DB_LIMIT = 45;
+    public const int PHONE_DB_LIMIT = 45;
 
     /**
      * Maximum number of chars that a position_title can be
@@ -58,7 +58,7 @@ class Profile implements IStrategy
      * This is utterly unrealistic but we've seen it crash imports
      * when schools are first setting up
      */
-    private const MAX_POSITION_LENGTH = 255;
+    private const int MAX_POSITION_LENGTH = 255;
 
     /**
      * sis_user_profile_student.alert_message and .alert_comment are both varchar(1024).
@@ -66,18 +66,18 @@ class Profile implements IStrategy
      * types) and can exceed this without a cap, causing the profile save to fail outright.
      * Same class of issue as PHONE_DB_LIMIT/MAX_POSITION_LENGTH above (SA-14272) - SA-23150
      */
-    private const MAX_ALERT_TEXT_LENGTH = 1024;
+    private const int MAX_ALERT_TEXT_LENGTH = 1024;
 
 
     /**
      * Campuses are separated by semicolons here.
      */
-    private const CAMPUS_SEPARATOR = ';';
+    private const string CAMPUS_SEPARATOR = ';';
 
     /**
      * Parent type are separated by commas here.
      */
-    private const PARENT_TYPE_SEPARATOR = ',';
+    private const string PARENT_TYPE_SEPARATOR = ',';
 
     /**
      * A list of (strat, externalid) tuples that each have one or more error messages
