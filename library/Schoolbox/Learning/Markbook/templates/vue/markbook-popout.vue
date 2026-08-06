@@ -25,7 +25,8 @@ import PopOutMenuDivider from "@schoolboxVue/components/menu/pop-out-menu-divide
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import { useMarkbookStore } from "./store/markbookStore";
 import type { MarkbookClassImplActivityParticipant } from "./types/payload";
-import type { MarkbookPopoutSelectedCellInfo } from "./types/types";
+import { MarkbookGridCellType, type MarkbookPopoutSelectedCellInfo } from "./types/types";
+import MbPopoutActionsBulkCopy from "./mb-popout-actions-bulk-copy.vue";
 
 const mbStore = useMarkbookStore();
 
@@ -733,6 +734,21 @@ function onToggleSelected(): void {
                 >
                     {{ viewHistoryText }}
                 </pop-out-menu-item>
+
+                <!-- reporting status page: bulk copy actions are only shown for the mark/comment columns for the reporting activity itself -->
+                <mb-popout-actions-bulk-copy
+                    v-if="
+                        cellInfo.participant &&
+                        cellInfo.activity.splitComments &&
+                        (cellInfo.cellType === MarkbookGridCellType.MARK ||
+                            cellInfo.cellType === MarkbookGridCellType.COMMENT)
+                    "
+                    :cell-type="cellInfo.cellType"
+                    :class-impl="cellInfo.classImpl"
+                    :a-impl="cellInfo.aImpl"
+                    :student-id="cellInfo.studentId"
+                    :participant="cellInfo.participant"
+                />
             </div>
         </div>
         <reveal-modal ref="excludeModalEl">
