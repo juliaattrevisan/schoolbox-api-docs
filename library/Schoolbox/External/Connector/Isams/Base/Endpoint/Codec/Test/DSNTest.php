@@ -59,6 +59,19 @@ class DSNTest extends TestCase
                 ]
             ],
 
+            'Valid DSN with optional Batch OAuth client secret' => [
+                'batchxml:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h;clientsecret=batch-oauth-secret',
+                [
+                    'modules' => [
+                        'batchxml' => [
+                            'key' => '920zfddd-x9u7-gg654-glhf-d9j25nf9h72h',
+                            'clientsecret' => 'batch-oauth-secret',
+                        ],
+                    ],
+                    'options' => []
+                ]
+            ],
+
 
             /* Batch XML and Staff Photos
              */
@@ -246,6 +259,11 @@ class DSNTest extends TestCase
             'Valid DSN Re-encode 2' => [
                 'batchxml:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h,staffphoto:key=zka7ght5-pp91-k28dy-zm28g-e1janv9777,studentphoto:key=aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a,restapi:host=https://www.schoolbox.com.au;clientid=123456;clientsecret=abcd-1F2G3H-444555?dayNumberOffset=-3',
                 'batchxml:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h,staffphoto:key=zka7ght5-pp91-k28dy-zm28g-e1janv9777,studentphoto:key=aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a,restapi:host=https://www.schoolbox.com.au;clientid=123456;clientsecret=abcd-1F2G3H-444555?dayNumberOffset=-3'
+            ],
+
+            'Valid DSN Re-encode with optional Batch OAuth client secret' => [
+                'batchxml:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h;clientsecret=batch-oauth-secret',
+                'batchxml:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h;clientsecret=batch-oauth-secret'
             ],
         ];
     }
