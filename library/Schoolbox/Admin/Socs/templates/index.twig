@@ -23,10 +23,14 @@
                 </div>
             </div>
 
-            {# if socs Calendar Import has failed, there may be a creds issue #}
-            {% if subscriptions.calendarEvents.isDead or subscriptions.musicLessons.isDead %}
+            {% set calendarMappingFailedCount = subscriptions.calendarEvents.mappingFailedCount %}
+            {% if subscriptions.calendarEvents.isDead or subscriptions.musicLessons.isDead or calendarMappingFailedCount > 0 %}
                 <div class="small-12 island">
                     <div class="alert-box alert">
+                        {% if calendarMappingFailedCount > 0 %}
+                            <strong>{{ calendarMappingFailedCount }} calendar events</strong> failed to import due to mapping issues.<br>
+                        {% endif %}
+
                         {% if subscriptions.calendarEvents.isDead %}
                             The <strong>Calendar Events Import</strong> has failed {{ subscriptions.calendarEvents.failedCount }} times.<br>
                         {% endif %}
@@ -34,14 +38,17 @@
                         {% if subscriptions.musicLessons.isDead %}
                             The <strong>Music Lessons Import</strong> has failed {{ subscriptions.musicLessons.failedCount }} times.<br>
                         {% endif %}
-                        It may be one of the following issues:<br>
-                        <ul>
-                            <li>The request to the remote server has timed out. </li>
-                            <li>The remote server is unavailable.</li>
-                            <li>The General Feed Host is incorrect.</li>
-                            <li>The SOCS Endpoint ID is incorrect.</li>
-                            <li>The SOCS Endpoint Token is incorrect or expired.</li>
-                        </ul>
+
+                        {% if subscriptions.calendarEvents.isDead or subscriptions.musicLessons.isDead %}
+                            It may be one of the following issues:<br>
+                            <ul>
+                                <li>The request to the remote server has timed out. </li>
+                                <li>The remote server is unavailable.</li>
+                                <li>The General Feed Host is incorrect.</li>
+                                <li>The SOCS Endpoint ID is incorrect.</li>
+                                <li>The SOCS Endpoint Token is incorrect or expired.</li>
+                            </ul>
+                        {% endif %}
                     </div>
                 </div>
             {% endif %}
