@@ -53,6 +53,17 @@ const participant = window.Vue.computed(() => {
     return aImpl.value.participants[student.value.id] || null;
 });
 
+/**
+ * Whether this cell belongs to the reporting activity being viewed on the reporting status page;
+ * splitComments is only ever true for that activity
+ */
+const isCurrentReportingActivity = window.Vue.computed(() => Boolean(assessment.value?.splitComments));
+
+/**
+ * The reporting activity always prefers draft feedback; every other activity follows the Show Drafts toggle
+ */
+const preferDraftFeedback = window.Vue.computed(() => isCurrentReportingActivity.value || mbStore.showDrafts);
+
 const canGiveFeedbackMarks = window.Vue.computed(
     () => aImpl.value && aImpl.value.instructorMarkScheme.mode !== MarkTypeSlug.NONE,
 );
@@ -87,10 +98,11 @@ const hasPopOutMenu = window.Vue.computed(() => {
 });
 
 /**
- * The indicator and notch title for due work/quiz
+ * The indicator and notch title for due work/quiz;
+ * the reporting activity's mark column has no indicator
  */
 const decorator = window.Vue.computed(() => {
-    if (participant.value === null) {
+    if (participant.value === null || isCurrentReportingActivity.value) {
         return null;
     }
 
@@ -103,7 +115,7 @@ const decorator = window.Vue.computed(() => {
         return null;
     }
 
-    if (mbStore.showDrafts && participant.value.marks.draft.responseId !== null) {
+    if (preferDraftFeedback.value && participant.value.marks.draft.responseId !== null) {
         return {
             indicator: "pending",
             notchTitle: "Unpublished Draft",
@@ -306,7 +318,7 @@ const showCommentsColumn = window.Vue.computed(() => {
         </div>
         <template v-else>
             <span
-                v-if="mbStore.showDrafts && participant.marks.draft.responseId !== null"
+                v-if="preferDraftFeedback && participant.marks.draft.responseId !== null"
                 :title="plaintextComments?.draft ?? undefined"
                 class="meta"
             >
@@ -366,7 +378,7 @@ const showCommentsColumn = window.Vue.computed(() => {
 
         <!-- eslint-disable vue/no-v-html -- scrubbed in the backend -->
         <span
-            v-else-if="mbStore.showDrafts && participant.marks.draft.responseId !== null"
+            v-else-if="preferDraftFeedback && participant.marks.draft.responseId !== null"
             class="meta"
             v-html="participant.marks.draft.comment"
         />
