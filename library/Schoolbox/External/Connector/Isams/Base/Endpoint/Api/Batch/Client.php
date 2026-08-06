@@ -101,7 +101,7 @@ class Client
                 ];
             }
 
-            $curl = $this->createCurl((string)$this->createBatchUrl($path));
+            $curl = new Alaress_Curl_Url((string)$this->createBatchUrl($path));
 
             if ($options !== []) {
                 $curl->addOptions($options);
@@ -153,11 +153,11 @@ class Client
      */
     private function getAccessToken(): string
     {
-        if ($this->accessToken !== null && $this->getCurrentTime() < $this->accessTokenExpiresAt) {
+        if ($this->accessToken !== null && time() < $this->accessTokenExpiresAt) {
             return $this->accessToken;
         }
 
-        $curl = $this->createCurl((string)$this->createTokenUrl());
+        $curl = new Alaress_Curl_Url((string)$this->createTokenUrl());
         $curl->addOptions([
             CURLOPT_HTTPHEADER => [
                 'Accept: application/json',
@@ -197,7 +197,7 @@ class Client
         }
 
         $this->accessToken = $accessToken;
-        $this->accessTokenExpiresAt = $this->getCurrentTime() + (int)$expiresIn;
+        $this->accessTokenExpiresAt = time() + (int)$expiresIn;
 
         return $this->accessToken;
     }
@@ -274,28 +274,5 @@ class Client
                 $responseCode
             );
         }
-    }
-
-
-    /**
-     * Create the curl request wrapper.
-     *
-     * @param string $url Request URL.
-     * @return Alaress_Curl_Url Curl request wrapper.
-     */
-    protected function createCurl(string $url): Alaress_Curl_Url
-    {
-        return new Alaress_Curl_Url($url);
-    }
-
-
-    /**
-     * Return the current Unix timestamp.
-     *
-     * @return int Current Unix timestamp.
-     */
-    protected function getCurrentTime(): int
-    {
-        return time();
     }
 }
