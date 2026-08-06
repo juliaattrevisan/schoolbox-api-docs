@@ -294,6 +294,7 @@ export function useDynamicFeedback(
             }
         } catch (error) {
             console.error("Error publishing feedback:", error);
+            window.sbProps.toastActivate("Unable to publish feedback").timeout({ isSuccess: false });
             isPublishInProgress.value = false;
             hasPublishError.value = true;
             return false;
