@@ -748,6 +748,7 @@ function onToggleSelected(): void {
                     :a-impl="cellInfo.aImpl"
                     :student-id="cellInfo.studentId"
                     :participant="cellInfo.participant"
+                    @copying="() => close()"
                 />
             </div>
         </div>

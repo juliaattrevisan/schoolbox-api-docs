@@ -37,7 +37,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits<{ copied: [] }>();
+const emit = defineEmits(["copying"]);
 const mbStore = useMarkbookStore();
 
 const isConfirmModalOpen = window.Vue.ref(false);
@@ -188,6 +188,7 @@ async function copyFeedbackToParticipants(targets: TargetParticipant[], targetLa
         return; // already copying, don't allow another copy to start
     }
 
+    emit("copying"); // close the popout at this point
     isCopying.value = true;
 
     /* close any open feedback drawer first: its editable state is bound to a single participant's
@@ -258,7 +259,6 @@ async function copyFeedbackToParticipants(targets: TargetParticipant[], targetLa
 
     isCopying.value = false;
     isConfirmModalOpen.value = false;
-    emit("copied");
 }
 
 /**
