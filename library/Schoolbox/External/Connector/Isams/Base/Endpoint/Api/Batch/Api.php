@@ -50,7 +50,7 @@ class Api implements IApi
      * Constructor
      *
      * @param string $host The host of the iSAMS server.
-     * @param string $apiKey Encoded iSAMS DSN.
+     * @param string $dsn Encoded iSAMS DSN.
      * @param string $module The iSAMS module being accessed.
      * @param Client|null $client Batch HTTP client.
      * @throws \DomainException When the DSN cannot be decoded.
@@ -58,11 +58,11 @@ class Api implements IApi
      */
     public function __construct(
         private string $host,
-        #[SensitiveParameter] string $apiKey,
+        #[SensitiveParameter] string $dsn,
         private string $module,
         ?Client $client = null
     ) {
-        $credentials = (new DSN())->decode($apiKey);
+        $credentials = (new DSN())->decode($dsn);
         $moduleCredentials = $credentials['modules'][$this->module];
 
         $this->options = $credentials['options'] ?? [];
