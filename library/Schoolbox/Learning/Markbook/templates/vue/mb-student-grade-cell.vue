@@ -106,10 +106,12 @@ const hasPopOutMenu = window.Vue.computed(() => {
 });
 
 /**
- * The indicator and notch title for due work/quiz
+ * The indicator and notch title for due work/quiz.
+ * This is not shown for splitComments/rubric cells as they have their own indicator on the reporting markbook.
+ * TODO: ^ add the indicator in this cenario (in SA-23168), also splitComments could do with a better name.
  */
 const decorator = window.Vue.computed(() => {
-    if (participant.value === null) {
+    if (participant.value === null || assessment.value?.splitComments) {
         return null;
     }
 
