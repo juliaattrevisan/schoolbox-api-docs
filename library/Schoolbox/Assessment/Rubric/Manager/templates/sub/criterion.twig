@@ -65,14 +65,18 @@ so if there are bullet points in the textbox they count as 3 characters, and wil
         {% if new %}
             {# New criterion: show delete button, no are you sure #}
             {# Hide it until the item is actually in use, though #}
-            <a class="sbx-icon-only-button no-text hide"
-               data-template="rubric-criterion-delete"
-               data-rubric-criterion-name=""
-               data-rubric-criterion=""
-               data-role="remove-criterion"
-               title="Delete {{ locale.rubricCriterion.proper }}"
-               aria-label="Delete {{ locale.rubricCriterion.proper }}"
-               href="#"><sbx-icon name="delete"></sbx-icon></a>
+            <a
+                class="sbx-button--has-icon hide"
+                data-template="rubric-criterion-delete"
+                data-rubric-criterion-name=""
+                data-rubric-criterion=""
+                data-role="remove-criterion"
+                title="Delete {{ locale.rubricCriterion.proper }}"
+                aria-label="Delete {{ locale.rubricCriterion.proper }}"
+                href="#">
+                    <sbx-icon name="delete"></sbx-icon>
+                    Delete {{ locale.rubricCriterion.proper }}
+            </a>
         {% else %}
             {# Existing criteria: #}
             {# If in use: show usage #}
@@ -105,14 +109,15 @@ so if there are bullet points in the textbox they count as 3 characters, and wil
         {% endif %}
         <li>
                 <a
-                    class="sbx-icon-only-button no-text"
+                    class="sbx-button--has-icon"
                     data-rubric-criterion="{{ criterionId }}"
                     data-rubric-criterion-name="{{ new ? '' : criterion.name }}"
                     data-role="remove-criterion"
                     href="#"
                     title="Delete {{ locale.rubricCriterion.proper }}"
                     aria-label="Delete {{ locale.rubricCriterion.proper }}">
-                     <sbx-icon name="delete"></sbx-icon>
+                        <sbx-icon name="delete"></sbx-icon>
+                        Delete {{ locale.rubricCriterion.proper }}
                 </a>
         </li>
     </ul>
