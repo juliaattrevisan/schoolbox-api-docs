@@ -150,8 +150,19 @@ class Download implements IStrategy
                     $externalId
                 ));
 
-                /** @var UserProfile\Model $baseProfile */
+                /** @var UserProfile\Model|null $baseProfile */
                 $baseProfile = $users->getBy('externalId', $externalId);
+
+                if (null === $baseProfile) {
+                    $this->log->warning(sprintf(
+                        'Could not find base profile for %s %s (%s) while updating profile photo metadata; skipping',
+                        $data['person']['firstname'],
+                        $data['person']['lastname'],
+                        $externalId
+                    ));
+
+                    continue;
+                }
 
                 // seeing as we are updating the photo, we need to remember this
                 $baseProfile->setMetadata((new Metadata\Builder())->build(['profile' => [
