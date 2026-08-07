@@ -159,8 +159,17 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
         }
 
         foreach ($assessables as $assessment) {
-            // Permission check to see the assessment
-            if (!$this->visibility->isVisibleToUser($assessment, $this->getUser(), true)) {
+            // Calendar events are scoped to the viewed user. Historical participation is a fallback only.
+            $isVisible = $this->visibility->isVisibleToUser($assessment, $this->getUser(), true);
+            if (!$isVisible) {
+                $isVisible = $this->visibility->isVisibleToHistoricalParticipantActivity(
+                    $assessment,
+                    $this->getViewer(),
+                    $this->getUser(),
+                    true
+                );
+            }
+            if (!$isVisible) {
                 continue;
             }
 

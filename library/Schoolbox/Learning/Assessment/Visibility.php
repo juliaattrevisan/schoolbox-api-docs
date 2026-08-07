@@ -121,6 +121,28 @@ class Visibility
             return true;
         }
 
+        return $this->isVisibleToHistoricalParticipantActivity($assessable, $viewer, $viewee, $showClosed, $now);
+    }
+
+    /**
+     * Determines whether an activity is visible through a viewee's historical participation only.
+     *
+     * @param IAssessable $assessable Assessment whose historical activity visibility is being checked.
+     * @param User $viewer Effective viewer whose role controls the permitted activity audience.
+     * @param User $viewee Student whose participant record anchors historical access.
+     * @param bool $showClosed Whether activities remain visible after the participant close date.
+     * @param Alaress_Date_Format|null $now Optional fixed time for deterministic checks.
+     * @return bool
+     */
+    public function isVisibleToHistoricalParticipantActivity(
+        IAssessable $assessable,
+        User $viewer,
+        User $viewee,
+        bool $showClosed,
+        ?Alaress_Date_Format $now = null
+    ): bool {
+        $now = $now ?? Alaress_Date_Format::now();
+
         $participant = $assessable->getParticipantIfExtant($viewee);
         if ($participant === null || !$assessable->isPublished($viewee, $now)) {
             return false;
