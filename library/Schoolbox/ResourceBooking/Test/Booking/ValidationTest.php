@@ -2207,15 +2207,6 @@ class ValidationTest extends TestCase
                 'expectedHasNonClashErrors' => false,
                 'expectedClashDateCount'    => 0,
             ],
-            'timetabled class, override validation by moderator: error remains a hard blocker' => [
-                'errorsFromValidation'      => $errorsWithTimetabledClass,
-                'allowClashBookings'        => false,
-                'overrideValidation'        => true,
-                'userIsModerator'           => true,
-                'expectedHasClashErrors'    => true,
-                'expectedHasNonClashErrors' => false,
-                'expectedClashDateCount'    => 0,
-            ],
         ];
     }
 

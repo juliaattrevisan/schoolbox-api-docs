@@ -1203,6 +1203,9 @@ class Validation
         // of using $clashBookingStartDatesAsKeys to find clashing bookings.
         // So, we could remove $clashBookingStartDatesAsKeys, and modify affected code to instead use $this->getConflictingBookings().
 
+        $overrideValidation = (
+            !empty($bookingDetailsForItem['override_validation']) && $item->canUserModerateThisItem($this->user)
+        );
         $clashBookingStartDatesAsKeys = [];
         if (count($errorsStruct) > 0) {
             // Remember the start dates of capacity conflicts.
@@ -1220,18 +1223,20 @@ class Validation
             // a moderator user has ordered that all validation rules should be bypassed...
             if (
                 $item->getAllowClashBookings() ||
-                (!empty($bookingDetailsForItem['override_validation']) && $item->canUserModerateThisItem($this->user))
+                $overrideValidation
             ) {
-                // Clear capacity conflict errors from the $errorsStruct array,
+                // Clear overridable conflict errors from the $errorsStruct array,
                 // leaving only errors that cannot be overridden.
                 // The conflict errors will have been left in by $this->validateBookingFromPostData()
                 // to allow us to find the start dates of clash bookings (as has been done above).
-                // Timetabled class errors remain hard blockers and cannot create pending bookings.
                 $errorsStructFiltered = [];
                 foreach ($errorsStruct as $key => $errorsByDate) {
                     foreach ($errorsByDate as $date => $errors) {
                         foreach ($errors as $error) {
-                            if ($error !== self::ERROR_CONFLICT) {
+                            if (
+                                $error !== self::ERROR_CONFLICT
+                                && (!$overrideValidation || $error !== self::ERROR_TIMETABLED_CLASS)
+                            ) {
                                 if (!array_key_exists($key, $errorsStructFiltered)) {
                                     $errorsStructFiltered[$key] = [];
                                 }
