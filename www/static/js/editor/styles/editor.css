@@ -78,9 +78,26 @@ body.ck-fullscreen {
 }
 
 /* Override the default save button to match our submit button colours */
+.ck.ck-form__row.ck-table-form__action-row .ck-button.ck-button-save,
 .ck.ck-button.ck-button-save {
     background-color: var(--sbx-config-color-accent, var(--content-ui-submit-background));
     color: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground));
+}
+
+.ck.ck-form__row.ck-table-form__action-row .ck-button.ck-button-save .ck-button__label,
+.ck.ck-button.ck-button-save .ck-button__label {
+    color: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground));
+}
+
+.ck.ck-form__row.ck-table-form__action-row .ck-button.ck-button-save:hover,
+.ck.ck-button.ck-button-save:hover {
+    background-color: var(--sbx-config-color-active, var(--content-ui-submit-background));
+    color: var(--sbx-config-color-accent, var(--content-ui-submit-foreground));
+}
+
+.ck.ck-form__row.ck-table-form__action-row .ck-button.ck-button-save:hover .ck-button__label,
+.ck.ck-button.ck-button-save:hover .ck-button__label {
+    color: var(--sbx-config-color-accent, var(--content-ui-submit-foreground));
 }
 
 /* update the text so it sits well on the active background colour */

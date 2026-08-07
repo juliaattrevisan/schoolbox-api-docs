@@ -113,7 +113,7 @@
                             {% if isImplOnly %}disabled data-mage-disabled{% endif %}
                     />
                     <label for="a_import-{{ assessment.id}}" class="checkbox-label" {% if isImplOnly %}title="Created in class. Not imported from Course"{% endif %}>
-                        <span class="{{ icon.renderClass(assessment) }}" title="{{ assessment.defaultTypeName }}"></span>
+                        <sbx-icon name="{{ icon.renderName(assessment) }}" title="{{ assessment.defaultTypeName }}"></sbx-icon>
                         <span>{{ assessment.title }} {% if assessment.workType.name %}<span class="pipe meta">{{ assessment.workType.name }}</span>{% endif %}</span>
                         {% if assessmentImpl and assessmentSpec and assessmentImpl.title != assessmentSpec.title %}
                             <br><span class="meta">Imported from '{{ assessmentSpec.title }}'</span>

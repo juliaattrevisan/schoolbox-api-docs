@@ -27,7 +27,7 @@ body.sbx-body {
     .calendar,
     .calendar-container,
     .v-card,
-    .sbx-card,
+    div.sbx-card,
     .sbx-island,
     .fc,
     .fc-event,
@@ -90,6 +90,12 @@ body.sbx-body {
     .island .tabs-content,
     .component-configurator .editPanel {
         border-radius: 0 0 var(--sbx-config-container-corner-radius) var(--sbx-config-container-corner-radius);
+    }
+
+    // Elements directly below tabs only need their bottom corners rounded
+    #content > .row:has(> .columns > .tabs) + .row > .island > section {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
     }
 
     // Component layout fixes

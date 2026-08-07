@@ -47,9 +47,7 @@
 {% endmacro %}
 
 {% macro renderName(assessment) %}
-    {% apply spaceless %}
-        {% if assessment and assessment.familyName is defined %}
-            {{ _self.renderNameForType(assessment.familyName)|trim }}
-        {% endif %}
-    {% endapply %}
+    {%- if assessment and assessment.familyName is defined -%}
+        {{- _self.renderNameForType(assessment.familyName)|trim -}}
+    {%- endif -%}
 {% endmacro %}
