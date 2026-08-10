@@ -105,7 +105,14 @@ export default {
             </li>
         </template>
         <li>
-            <button type="submit" class="submit" id="news-submit" ref="newsSubmit" :disabled="isDisabled">
+            <button
+                type="submit"
+                class="submit"
+                id="news-submit"
+                ref="newsSubmit"
+                data-test="news-article-form-submit"
+                :disabled="isDisabled"
+            >
                 {{ submitText }}
             </button>
         </li>

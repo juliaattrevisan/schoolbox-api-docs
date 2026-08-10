@@ -408,12 +408,15 @@
                     <div id="configurator">
                         {% for namespace in msgConfig %}
                             {% if ns[namespace.id] is defined %}
-                            <div class="actions-small-1">
+                            <div
+                                class="actions-small-1"
+                                data-test="notifications-configure-namespace-{{ ns[namespace.id].slug }}"
+                            >
                                 <h3 class="subheader f-no-margins u-ts-capitalize">{{ locale.translateSentence(ns[namespace.id].label) }}</h3>
                                 <nav>
-                                    <sbx-pop-out content-id="feature-pop-out-{{ namespace.id }}"></sbx-pop-out>
+                                    <sbx-pop-out content-id="notifications-configure-actions-{{ ns[namespace.id].slug }}"></sbx-pop-out>
                                 </nav>
-                                <ul id="feature-pop-out-{{ namespace.id }}" class="f-dropdown" data-dropdown-content>
+                                <ul id="notifications-configure-actions-{{ ns[namespace.id].slug }}" class="f-dropdown" data-dropdown-content>
                                     <li>
                                         <a
                                             class="sbx-button--has-icon"
@@ -423,6 +426,7 @@
                                             data-roletype-formatted="{{ roletypeFormatted }}"
                                             data-namespace="{{ locale.translateSentence(ns[namespace.id].slug) }}"
                                             data-namespace-formatted="{{ locale.translateSentence(ns[namespace.id].label) | capitalize }}"
+                                            data-test="notifications-configure-apply-default-{{ ns[namespace.id].slug }}"
                                         >
                                             <sbx-icon name="export"></sbx-icon>
                                             Apply default settings to all {{ roletypeFormatted }}...
@@ -438,17 +442,30 @@
                             {% endif %}
                         {% endfor %}
                     </div>
-                    <div data-reveal id="default-settings-modal" class="reveal-modal">
+                    <div
+                        data-reveal
+                        id="default-settings-modal"
+                        class="reveal-modal"
+                        data-test="notifications-configure-apply-default-modal"
+                    >
                         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
                         <h2>Please confirm</h2>
                         <p>Are you sure you wish to apply default <span id="default-settings-namespace"></span> settings to all <span id="default-settings-roletype"></span>?</p>
                         <div id="default-settings-error-message" class="alert-box alert" hidden></div>
                         <ul class="flex-list buttons">
                             <li>
-                                <a id="confirm-default-settings" class="button submit">Yes</a>
+                                <a
+                                    id="confirm-default-settings"
+                                    class="button submit"
+                                    data-test="notifications-configure-apply-default-confirm"
+                                >Yes</a>
                             </li>
                             <li>
-                                <a id="cancel-default-settings" class="button">Cancel</a>
+                                <a
+                                    id="cancel-default-settings"
+                                    class="button"
+                                    data-test="notifications-configure-apply-default-cancel"
+                                >Cancel</a>
                             </li>
                         </ul>
                     </div>
@@ -533,7 +550,7 @@
         </div><!-- small-12 columns -->
     </div><!-- admin-content -->
 </div>
-<div id="slider-modal" class="reveal-modal" data-reveal></div>
+<div id="slider-modal" class="reveal-modal" data-reveal data-test="notifications-configure-advanced-modal"></div>
 
 <div id="legend-modal" class="reveal-modal" data-reveal data-test="notifications-delivery-options-modal">
     {% include '@notifications/legend.twig' with { digest: true, mobile: 'plural', who: 'users' } %}

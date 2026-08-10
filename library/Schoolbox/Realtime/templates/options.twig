@@ -32,11 +32,13 @@ set labelDisplayNames = {
         <input id="{{ permInputId }}"
                name="data[{{ ns[namespace.id].slug ?: 0 }}][{{ sources[source.id].key ?: 0 }}]{% if role %}[{{ role.id }}]{% endif %}[perm][]"
                value="{{ level }}" data-perm="{{ level }}" type="{{ level <= 1 or level > 4 ? 'radio' : 'checkbox' }}"
+               data-test="notification-delivery-input-{{ ns[namespace.id].slug }}-{{ sources[source.id].key }}{% if role %}-{{ role.id }}{% endif %}-{{ labelDisplayNames[perm[1]] | lower }}"
                {% if isChecked %}checked="checked"{% endif %}
                {% if isDisabled %}disabled="disabled"{% endif %}
         />
         <label for="{{ permInputId }}"
                title="{{ labelDisplayNames[perm[1]] }}{% if isDisabled %} (disabled){% endif %}"
+               data-test="notification-delivery-{{ ns[namespace.id].slug }}-{{ sources[source.id].key }}{% if role %}-{{ role.id }}{% endif %}-{{ labelDisplayNames[perm[1]] | lower }}"
                class="input-toggle">
             <sbx-icon name="{{ iconClassnames[perm[1]] }}" size="l" color="currentColor"></sbx-icon>
         </label>

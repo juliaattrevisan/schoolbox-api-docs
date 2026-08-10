@@ -761,7 +761,12 @@ export default {
                     :placeholder="audiencePlaceholder"
                     required
                 />
-                <button type="button" class="button" @click.prevent="openBrowseModal">
+                <button
+                    type="button"
+                    class="button"
+                    data-test="news-item-audience-select-browse"
+                    @click.prevent="openBrowseModal"
+                >
                     <sbx-icon name="drag-drop"></sbx-icon>
                     Browse&hellip;
                 </button>
@@ -793,6 +798,7 @@ export default {
                         <button
                             v-if="!audienceOption.hideFromModal"
                             class="button-block"
+                            :data-test="`news-item-audience-select-type-${audienceOption.entityType}`"
                             @click="changePage(audienceOption)"
                         >
                             <sbx-icon
@@ -865,7 +871,12 @@ export default {
                                         }}</label>
                                     </li>
                                     <li v-if="showModifierParentsCheckbox">
-                                        <input type="checkbox" id="audience-select-parents" v-model="includeParents" />
+                                        <input
+                                            type="checkbox"
+                                            id="audience-select-parents"
+                                            v-model="includeParents"
+                                            data-test="news-item-audience-select-include-parents"
+                                        />
                                         <label for="audience-select-parents">Parents of students</label>
                                     </li>
                                     <li v-if="showModifierTeachersCheckbox">
@@ -878,7 +889,12 @@ export default {
                                     </li>
                                 </ul>
                             </fieldset>
-                            <button class="button submit" @click.prevent="addAudienceSimple" :disabled="!submitEnable">
+                            <button
+                                class="button submit"
+                                data-test="news-item-audience-select-add"
+                                @click.prevent="addAudienceSimple"
+                                :disabled="!submitEnable"
+                            >
                                 Add
                             </button>
                         </div>
