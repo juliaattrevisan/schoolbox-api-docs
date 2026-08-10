@@ -20,7 +20,11 @@ const NEWS_NAMESPACE = "news";
 const NEWS_POSTED_SOURCE = "posted";
 const NEWS_ARTICLE_TITLE = "Automation Test notification default settings";
 const NEWS_POSTED_STUDENT_SOURCE_ID = 34;
+const NEWS_POSTED_PARENT_SOURCE_ID = 35;
+const NEWS_POSTED_STAFF_SOURCE_ID = 36;
+const TEACHER_ROLE_ID = 2;
 const SENIOR_AND_JUNIOR_STUDENT_ROLE_IDS = [3, 5];
+const PARENT_ROLE_ID = 4;
 const MIDDLE_STUDENT_ROLE_ID = 6;
 
 test.describe.serial("Notification default settings", () => {
@@ -142,6 +146,16 @@ test.describe.serial("Notification default settings", () => {
             "msg_route_perm",
             { mask: "MU", role_default: "MU" },
             { msg_source_id: NEWS_POSTED_STUDENT_SOURCE_ID, role_id: MIDDLE_STUDENT_ROLE_ID },
+        );
+        await db.updateInDatabase(
+            "msg_route_perm",
+            { role_default: "DI" },
+            { msg_source_id: NEWS_POSTED_STAFF_SOURCE_ID, role_id: TEACHER_ROLE_ID },
+        );
+        await db.updateInDatabase(
+            "msg_route_perm",
+            { role_default: "DI" },
+            { msg_source_id: NEWS_POSTED_PARENT_SOURCE_ID, role_id: PARENT_ROLE_ID },
         );
 
         await db.updateInDatabase(

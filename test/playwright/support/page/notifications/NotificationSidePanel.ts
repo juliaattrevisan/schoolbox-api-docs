@@ -13,8 +13,20 @@ export default class NotificationSidePanel {
 
     static readonly DATA_TEST_NOTIFICATION_TITLE = "notification-side-panel-item-title";
 
+    static readonly SELECTOR_FOOTER = "[data-msgfooter-action]";
+
     constructor(page: Page) {
         this.page = page;
+    }
+
+    /**
+     * Waits for the initial notification fetch to populate the side panel.
+     * @returns A promise that resolves when the notification list has loaded.
+     */
+    private async waitForNotifications(): Promise<void> {
+        await expect(this.page.locator(NotificationSidePanel.SELECTOR_FOOTER)).toHaveText(
+            /^(See All|No Notifications)$/,
+        );
     }
 
     /**
@@ -24,6 +36,7 @@ export default class NotificationSidePanel {
     async open(): Promise<void> {
         await this.page.getByTestId(NotificationSidePanel.DATA_TEST_TOGGLE).click();
         await expect(this.page.getByTestId(NotificationSidePanel.DATA_TEST_PANEL)).toBeVisible();
+        await this.waitForNotifications();
     }
 
     /**
@@ -41,6 +54,7 @@ export default class NotificationSidePanel {
      * @returns A promise that resolves after the assertion completes.
      */
     async expectNotification(text: string): Promise<void> {
+        await this.waitForNotifications();
         await expect(this.locateNotification(text).first()).toBeVisible({ timeout: 60000 });
     }
 
@@ -50,6 +64,7 @@ export default class NotificationSidePanel {
      * @returns A promise that resolves after the assertion completes.
      */
     async expectNoNotification(text: string): Promise<void> {
+        await this.waitForNotifications();
         await expect(this.locateNotification(text)).toHaveCount(0);
     }
 }
