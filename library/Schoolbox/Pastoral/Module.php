@@ -346,30 +346,26 @@ class Module extends BaseModule
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
-        $this->addRoutePreload($matcher, '.*', function ($params) {
+        // A studentId of '0' is used as a sentinel meaning "no single
+        // student", for bulk-creating pastoral records from a class list -
+        // see Controller::getStudentRecordInsertForm(), which is the only
+        // pastoral action that accepts a nullable student for this reason.
+        // Every other action requires a real student, so this is scoped to
+        // that one route rather than the general preload below.
+        $this->addRoutePreload($matcher, 'getStudentRecordInsertForm', function ($params) {
+            if (array_key_exists('studentId', $params) && $params['studentId'] !== '0') {
+                return ['student' => $this->loadStudent($params['studentId'])];
+            }
+            return [];
+        });
+
+        $this->addRoutePreload($matcher, '(?!getStudentRecordInsertForm$).*', function ($params) {
             $injectedValues = [];
 
             // Load student record
 
-            if (array_key_exists('studentId', $params) && $params['studentId'] !== '0') {
-                try {
-                    /** @var UserMapper $userMapper */
-                    $userMapper = $this->getMapperFactory()->get(UserMapper::class);
-
-                    $student = $userMapper->findWithSubjects($params['studentId']);
-
-                    // Only students can have pastoral records
-                    if (!$student->getRole()->isStudent()) {
-                        throw $this->generateError(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
-                    }
-
-                    $this->getRelationshipHydrator()->loadTeachers([$student]);
-                    $this->getRelationshipHydrator()->loadParents([$student]);
-
-                    $injectedValues['student'] = $student;
-                } catch (MapperException $e) {
-                    throw $this->generateError(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
-                }
+            if (array_key_exists('studentId', $params)) {
+                $injectedValues['student'] = $this->loadStudent($params['studentId']);
             }
 
             // Load linked student details
@@ -482,6 +478,36 @@ class Module extends BaseModule
         $errorMapper = $this->getMapperFactory()->get(ErrorMapper::class);
         return $errorMapper->generateException($errorCode);
     }
+
+    /**
+     * Loads a student by id for use in pastoral route preloads.
+     *
+     * @param string $id
+     * @return User
+     * @throws SchoolboxException if $id doesn't resolve to a student
+     */
+    private function loadStudent($id): User
+    {
+        try {
+            /** @var UserMapper $userMapper */
+            $userMapper = $this->getMapperFactory()->get(UserMapper::class);
+
+            $student = $userMapper->findWithSubjects($id);
+
+            // Only students can have pastoral records
+            if (!$student->getRole()->isStudent()) {
+                throw $this->generateError(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
+            }
+
+            $this->getRelationshipHydrator()->loadTeachers([$student]);
+            $this->getRelationshipHydrator()->loadParents([$student]);
+
+            return $student;
+        } catch (MapperException $e) {
+            throw $this->generateError(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
+        }
+    }
+
     /**
      * Quick call to build the external user relationship hydrator
      *
