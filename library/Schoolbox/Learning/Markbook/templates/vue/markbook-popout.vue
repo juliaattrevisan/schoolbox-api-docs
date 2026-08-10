@@ -24,7 +24,8 @@ import PopOutMenuItem from "@schoolboxVue/components/menu/pop-out-menu-item.vue"
 import PopOutMenuDivider from "@schoolboxVue/components/menu/pop-out-menu-divider.vue";
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import { useMarkbookStore } from "./store/markbookStore";
-import type { MarkbookPopoutSelectedCellInfo, MarkbookClassImplActivityParticipant } from "./types/payload";
+import type { MarkbookClassImplActivityParticipant } from "./types/payload";
+import type { MarkbookPopoutSelectedCellInfo } from "./types/types";
 
 const mbStore = useMarkbookStore();
 
@@ -209,7 +210,7 @@ const viewAllText = window.Vue.computed(() => {
  */
 const viewHistoryText = window.Vue.computed(() => {
     if (cellInfo.value === null) {
-        return "";
+        return null;
     }
     switch (cellInfo.value.activity.assessmentType) {
         case ACTIVITY_TYPE_DUE_WORK:
@@ -424,7 +425,7 @@ async function onMenuItemSelected(target: string | null, action: string | null =
     }
 }
 
-const canUpdateFeedback = window.Vue.computed(() => {
+const canOpenFeedbackDrawer = window.Vue.computed(() => {
     if (cellInfo.value === null) {
         return false;
     }
@@ -463,7 +464,7 @@ function onUpdateFeedbackSelected(): void {
         throw new Error("No selected cell to update feedback for");
     }
 
-    if (!canUpdateFeedback.value) {
+    if (!canOpenFeedbackDrawer.value) {
         return;
     }
 
@@ -642,7 +643,7 @@ function onToggleSelected(): void {
                     <template v-if="cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK">
                         <pop-out-menu-item
                             v-if="!cellInfo.participant.isExcluded"
-                            :class="{ 'is-disabled': !canUpdateFeedback }"
+                            :class="{ 'is-disabled': !canOpenFeedbackDrawer }"
                             :link="routes.updateRoute ? getReturnUrl(routes.updateRoute) : undefined"
                             force-callback
                             @selected="onUpdateFeedbackSelected"
@@ -667,7 +668,7 @@ function onToggleSelected(): void {
                         <!-- notable omission of :link, routes.updateRoute is due work only it seems -->
                         <pop-out-menu-item
                             v-if="!cellInfo.participant.isExcluded"
-                            :class="{ 'is-disabled': !canUpdateFeedback }"
+                            :class="{ 'is-disabled': !canOpenFeedbackDrawer }"
                             force-callback
                             @selected="onUpdateFeedbackSelected"
                         >
@@ -678,7 +679,7 @@ function onToggleSelected(): void {
                         <!-- notable omission of :link, routes.updateRoute is due work only it seems -->
                         <pop-out-menu-item
                             v-if="!cellInfo.participant.isExcluded"
-                            :class="{ 'is-disabled': !canUpdateFeedback }"
+                            :class="{ 'is-disabled': !canOpenFeedbackDrawer }"
                             force-callback
                             @selected="onUpdateFeedbackSelected"
                         >
@@ -719,7 +720,7 @@ function onToggleSelected(): void {
                     Exclude Student
                 </pop-out-menu-item>
                 <pop-out-menu-item
-                    v-if="cellInfo.participant && !cellInfo.participant.isExcluded"
+                    v-if="cellInfo.participant && !cellInfo.participant.isExcluded && viewHistoryText !== null"
                     :class="{
                         'is-disabled':
                             !routes.historyRoute ||

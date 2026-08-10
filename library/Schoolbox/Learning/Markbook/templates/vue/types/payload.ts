@@ -200,18 +200,3 @@ export type ActivityInfoResponsePayload = {
     };
     marks: MarkInfo;
 };
-
-/** -------- other types -------- */
-
-export type MarkbookPopoutSelectedCellInfo = {
-    classImplId: number;
-    studentId: UserId;
-    activityId: MarkbookActivity["id"];
-    referenceElement: HTMLTableCellElement;
-};
-
-export type MarkbookFeedbackSelectedCellInfo = {
-    classImplId: number;
-    studentId: UserId;
-    activityId: MarkbookActivity["id"];
-};
