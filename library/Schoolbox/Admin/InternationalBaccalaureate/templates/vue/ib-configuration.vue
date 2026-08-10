@@ -27,6 +27,8 @@ const isLoading = window.Vue.ref<boolean>(false);
 const loadError = window.Vue.ref<string | null>(null);
 const currentConfigurations = window.Vue.ref<IBConfiguration[]>([]);
 const currentSubjectsFromAPI = window.Vue.ref<IBSubject[]>([]);
+const isSubjectLoading = window.Vue.ref<boolean>(false);
+const subjectLoadError = window.Vue.ref<string | null>(null);
 const categoryParamName = "category";
 
 // Computed property to check if current tab is general config
@@ -44,15 +46,21 @@ const isGeneralConfigTab = window.Vue.computed(
 async function loadCategorySubjects(): Promise<void> {
     if (!props.subjectsEndpoint || isGeneralConfigTab.value) {
         currentSubjectsFromAPI.value = [];
+        subjectLoadError.value = null;
         return;
     }
 
+    isSubjectLoading.value = true;
+    subjectLoadError.value = null;
+
     const url = props.subjectsEndpoint.replace("{groupId}", currentCategory.value.id.toString());
     const response = await apiRequest<IBSubject[]>({ url, method: "GET" });
+    isSubjectLoading.value = false;
 
     if (!response.success || !Array.isArray(response.data)) {
         console.error("Failed to load subjects:", response.success ? "Unexpected format" : response.message);
         currentSubjectsFromAPI.value = [];
+        subjectLoadError.value = response.success ? "Unexpected response format" : response.message;
         return;
     }
 
@@ -169,6 +177,8 @@ window.Vue.onMounted((): void => {
                     :search-languages-endpoint="props.routes.searchLanguages"
                     :search-class-codes-endpoint="props.routes.searchClassCodes"
                     :student-count-endpoint="props.routes.studentCount"
+                    :is-loading="isSubjectLoading"
+                    :load-error="subjectLoadError"
                 />
             </div>
         </section>
