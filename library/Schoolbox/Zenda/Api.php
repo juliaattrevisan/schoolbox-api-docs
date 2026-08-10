@@ -18,7 +18,7 @@ class Api
     /**
      * The Zenda url which gives us a redirect url eventually
      */
-    public const string ENDPOINT_REDIRECT = '/api/external/token/v2';
+    public const string ENDPOINT_REDIRECT = 'api/external/token/v2';
 
 
     /**
@@ -82,7 +82,7 @@ class Api
             /* TODO Find out from zenda where their endpoint actually exists
              *  We sadly don't know atm; double-down on this if/when we know more.
              */
-            'base_uri' => trim($this->host),
+            'base_uri' => rtrim(trim($this->host), '/') . '/',
         ]);
     }
 
