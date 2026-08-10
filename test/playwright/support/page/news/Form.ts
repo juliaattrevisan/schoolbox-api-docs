@@ -42,8 +42,6 @@ export default class Form {
 
     static readonly DATA_TEST_AUDIENCE_TYPE = "news-item-audience-select-type-";
 
-    static readonly DATA_TEST_AUDIENCE_INCLUDE = "news-item-audience-select-include-";
-
     static readonly DATA_TEST_AUDIENCE_ADD = "news-item-audience-select-add";
 
     static readonly FORM_CREATE = "form#createForm";
@@ -219,10 +217,7 @@ export default class Form {
      * @param audience - tick a checkbox: Class/Group Members (users) and Parents of Students(parents)
      */
     async selectIncludeUsers(audience: string): Promise<void> {
-        await this.page
-            .getByTestId(`${Form.DATA_TEST_AUDIENCE_INCLUDE}${audience}`)
-            .or(this.page.locator(`label[for="audience-select-${audience}"]`))
-            .click();
+        await this.page.locator(`label[for="audience-select-${audience}"]`).click();
     }
 
     /**

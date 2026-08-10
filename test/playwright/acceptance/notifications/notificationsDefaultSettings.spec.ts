@@ -28,6 +28,18 @@ const PARENT_ROLE_ID = 4;
 const MIDDLE_STUDENT_ROLE_ID = 6;
 
 test.describe.serial("Notification default settings", () => {
+    test.beforeAll(async ({ baseTester }) => {
+        baseTester.isGoingTo("clear notifications and restart the notification services");
+        await baseTester.runShellCommand(
+            "php /usr/share/schoolbox/test/socket/destroy-notification-redis-data.php -vvv",
+        );
+        if (process.env.DOCKER === "1") {
+            await baseTester.runHostShellCommand(
+                "docker/compose restart schoolbox-digestd schoolbox-mobiled schoolbox-socketd schoolbox-scheduled",
+            );
+        }
+    });
+
     test.beforeEach(async ({ tester }) => {
         await tester.loginAsAdmin();
     });

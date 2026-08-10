@@ -8,6 +8,38 @@ import { existsSync } from "fs";
  */
 export default class BaseTester {
     /**
+     * Executes a shell command in the current environment.
+     * @param command - The command to execute.
+     * @returns The stdout from the command.
+     * @throws { Error } If the command fails.
+     */
+    // eslint-disable-next-line class-methods-use-this -- this method makes sense as non-static despite not using this
+    async runHostShellCommand(command: string): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const child = spawn(command, { shell: true });
+
+            let output = "";
+
+            child.stdout.on("data", (data: string) => {
+                process.stdout.write(data);
+                output += data.toString();
+            });
+
+            child.stderr.on("data", (data: string) => {
+                process.stderr.write(data);
+            });
+
+            child.on("close", (code) => {
+                if (code === 0) {
+                    resolve(output);
+                } else {
+                    reject(new Error(`Command failed with exit code ${code}`));
+                }
+            });
+        });
+    }
+
+    /**
      * Executes a shell command and returns the result.
      * Looks for a /usr/share/schoolbox directory and if not found, attempts to run the command within a Docker or
      * Vagrant environment.
