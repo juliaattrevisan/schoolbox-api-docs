@@ -25,7 +25,8 @@ import PopOutMenuDivider from "@schoolboxVue/components/menu/pop-out-menu-divide
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import { useMarkbookStore } from "./store/markbookStore";
 import type { MarkbookClassImplActivityParticipant } from "./types/payload";
-import { MarkbookGridCellType, type MarkbookPopoutSelectedCellInfo } from "./types/types";
+import { MarkbookGridCellType } from "./types/types";
+import type { MarkbookPopoutSelectedCellInfo } from "./types/types";
 import MbPopoutActionsBulkCopy from "./mb-popout-actions-bulk-copy.vue";
 
 const mbStore = useMarkbookStore();

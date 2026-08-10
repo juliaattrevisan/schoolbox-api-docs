@@ -8,6 +8,8 @@
  */
 
 import locale from "@js/terminology/rosettaStone";
+import { apiRequest } from "@js/util/sbx/apiUtils";
+import { assertUnreachable } from "@js/util/errorUtils";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import PopOutMenuItem from "@schoolboxVue/components/menu/pop-out-menu-item.vue";
 import PopOutMenuDivider from "@schoolboxVue/components/menu/pop-out-menu-divider.vue";
@@ -18,7 +20,6 @@ import type {
     MarkbookClassImplActivityParticipant,
 } from "./types/payload";
 import { MarkbookGridCellType } from "./types/types";
-import { assertUnreachable } from "@js/util/errorUtils";
 
 interface Props {
     /** The popout cell to copy from; mutable row data is re-read from the store, not this prop */
@@ -219,7 +220,7 @@ async function copyFeedbackToParticipants(targets: TargetParticipant[], targetLa
             assertUnreachable(props.cellType);
         }
 
-        const response = await window.sbProps.apiRequest<{
+        const response = await apiRequest<{
             id: number; // Response/Attempt ID
             normalisedMark: number | null;
             humanReadableMark: string | null;
