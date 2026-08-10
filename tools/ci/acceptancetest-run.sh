@@ -41,10 +41,8 @@ echo "acceptancetest setup"
 cd /usr/share/schoolbox
 
 ## Run tests
-# shard="${ACCEPTANCE_TEST_SHARD}/${ACCEPTANCE_TEST_SHARD_TOTAL}"
-# INSTANCE_ID=smoketest CI=true TZ='Australia/Melbourne' npx playwright test --shard="$shard"
-INSTANCE_ID=smoketest CI=true TZ='Australia/Melbourne' npx playwright test notificationsDefaultSettings news"
-
+shard="${ACCEPTANCE_TEST_SHARD}/${ACCEPTANCE_TEST_SHARD_TOTAL}"
+INSTANCE_ID=smoketest CI=true TZ='Australia/Melbourne' npx playwright test notificationsDefaultSettings.spec.ts news --shard="$shard"
 
 testResult=$?;
 
