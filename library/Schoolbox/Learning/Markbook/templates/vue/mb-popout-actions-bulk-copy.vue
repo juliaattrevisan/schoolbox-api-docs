@@ -179,6 +179,7 @@ const overrideCount = window.Vue.computed(() => targetParticipants.value.filter(
 /**
  * Copy the visible feedback to particular participants
  * @param targets The participants to copy to
+ * @param targetLabel A label to use in the toast message, "Copying {fieldLabel} to {targetLabel} field(s)..."
  */
 async function copyFeedbackToParticipants(targets: TargetParticipant[], targetLabel: string): Promise<void> {
     if (visibleFeedback.value === null) {
