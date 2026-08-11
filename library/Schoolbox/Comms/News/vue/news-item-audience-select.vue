@@ -871,13 +871,12 @@ export default {
                                         }}</label>
                                     </li>
                                     <li v-if="showModifierParentsCheckbox">
-                                        <input
-                                            type="checkbox"
-                                            id="audience-select-parents"
-                                            v-model="includeParents"
+                                        <input type="checkbox" id="audience-select-parents" v-model="includeParents" />
+                                        <label
+                                            for="audience-select-parents"
                                             data-test="news-item-audience-select-include-parents"
-                                        />
-                                        <label for="audience-select-parents">Parents of students</label>
+                                            >Parents of students</label
+                                        >
                                     </li>
                                     <li v-if="showModifierTeachersCheckbox">
                                         <input
