@@ -38,7 +38,7 @@ export default class NotificationsDefaultSettings {
 
     static readonly DATA_TEST_NAMESPACE = "notifications-configure-namespace-";
 
-    static readonly DATA_TEST_NAMESPACE_ACTIONS = "sbx-pop-out-notifications-configure-actions-";
+    static readonly DATA_TEST_NAMESPACE_ACTIONS = "notifications-configure-actions-";
 
     static readonly DATA_TEST_APPLY_DEFAULT = "notifications-configure-apply-default-";
 
@@ -229,7 +229,8 @@ export default class NotificationsDefaultSettings {
             `${NotificationsDefaultSettings.DATA_TEST_NAMESPACE}${namespace}`,
         );
         await namespaceActions
-            .getByTestId(`${NotificationsDefaultSettings.DATA_TEST_NAMESPACE_ACTIONS}${namespace}-button`)
+            .getByTestId(`${NotificationsDefaultSettings.DATA_TEST_NAMESPACE_ACTIONS}${namespace}`)
+            .getByRole("button", { name: "Actions" })
             .click();
         await this.page.getByTestId(`${NotificationsDefaultSettings.DATA_TEST_APPLY_DEFAULT}${namespace}`).click();
 

@@ -414,9 +414,12 @@
                             >
                                 <h3 class="subheader f-no-margins u-ts-capitalize">{{ locale.translateSentence(ns[namespace.id].label) }}</h3>
                                 <nav>
-                                    <sbx-pop-out content-id="notifications-configure-actions-{{ ns[namespace.id].slug }}"></sbx-pop-out>
+                                    <sbx-pop-out
+                                        content-id="feature-pop-out-{{ namespace.id }}"
+                                        data-test="notifications-configure-actions-{{ ns[namespace.id].slug }}"
+                                    ></sbx-pop-out>
                                 </nav>
-                                <ul id="notifications-configure-actions-{{ ns[namespace.id].slug }}" class="f-dropdown" data-dropdown-content>
+                                <ul id="feature-pop-out-{{ namespace.id }}" class="f-dropdown" data-dropdown-content>
                                     <li>
                                         <a
                                             class="sbx-button--has-icon"
