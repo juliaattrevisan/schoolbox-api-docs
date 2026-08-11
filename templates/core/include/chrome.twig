@@ -330,13 +330,7 @@
                     {% block messaging %}
                         {% if ws.enabled and user.current.id %}
                             <section class="right-small" id="notifications">
-                                <a
-                                    class="right-off-canvas-toggle"
-                                    id="notification-toggle"
-                                    data-unread="{{ ws.unread }}"
-                                    data-test="notification-side-panel-toggle"
-                                    aria-label="Notifications"
-                                >
+                                <a class="right-off-canvas-toggle" id="notification-toggle" data-unread="{{ ws.unread }}" aria-label="Notifications">
                                     <sbx-icon name="notifications" color="currentColor" size="1rem"></sbx-icon>
                                     <span data-unread-count>{{ ws.unread ?? '' }}</span>
                                 </a>
@@ -419,12 +413,7 @@
             {% if ws.enabled and user.current.id %}
                 {% set dockNotifsTitle = 'Pin notifications' %}
                 {% set undockNotifsTitle = 'Unpin notifications' %}
-                <aside
-                    class="right-off-canvas-menu island no-pad hide-for-print"
-                    id="msgs"
-                    data-unread="{{ ws.unread }}"
-                    data-test="notification-side-panel"
-                >
+                <aside class="right-off-canvas-menu island no-pad hide-for-print" id="msgs" data-unread="{{ ws.unread }}">
                     <ul class="off-canvas-list" id="message-list">
                         <li>
                             <a
@@ -448,15 +437,15 @@
                         </li>
                         <li>
                             <section>
-                                <ul id="msg-content" class="action-list" data-test="notification-side-panel-list">
-                                    <li data-msgitem data-test="notification-side-panel-item" class="actions-small-1">
+                                <ul id="msg-content" class="action-list">
+                                    <li data-msgitem class="actions-small-1">
                                         <div class="list-item">
                                             <div class="compact card wrap-down small-12">
                                                 <a data-msgitem-href class="no-pad">
                                                     <div class="u-flex u-flex--align-start">
                                                         <img data-msgitem-thumb class="u-flex__item--none" />
                                                         <div>
-                                                            <p data-msgitem-title data-test="notification-side-panel-item-title"></p>
+                                                            <p data-msgitem-title></p>
                                                             <p class="meta spaced" data-msgitem-time></p>
                                                         </div>
                                                     </div>

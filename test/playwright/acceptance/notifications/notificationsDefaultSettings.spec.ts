@@ -7,18 +7,17 @@
  * Execute: DOCKER=1 npx playwright test notificationsDefaultSettings.spec.ts
  */
 
-import { test } from "@schoolboxTest/playwright/support/integrations";
+import { expect, test } from "@schoolboxTest/playwright/support/integrations";
 import NotificationsDefaultSettings, {
     NOTIFICATION_DELIVERY_OPTIONS,
 } from "@schoolboxTest/playwright/support/page/notifications/NotificationsDefaultSettings";
 import NotificationSettings from "@schoolboxTest/playwright/support/page/notifications/NotificationSettings";
-import NotificationSidePanel from "@schoolboxTest/playwright/support/page/notifications/NotificationSidePanel";
 import Form from "@schoolboxTest/playwright/support/page/news/Form";
 import Common from "@schoolboxTest/playwright/support/page/Common";
 
 const NEWS_NAMESPACE = "news";
 const NEWS_POSTED_SOURCE = "posted";
-const NEWS_ARTICLE_TITLE = "Automation Test notification default settings";
+const NEWS_ARTICLE_TITLE = `Automation Test notification default settings ${Date.now()}`;
 const NEWS_POSTED_STUDENT_SOURCE_ID = 34;
 const NEWS_POSTED_PARENT_SOURCE_ID = 35;
 const NEWS_POSTED_STAFF_SOURCE_ID = 36;
@@ -28,18 +27,6 @@ const PARENT_ROLE_ID = 4;
 const MIDDLE_STUDENT_ROLE_ID = 6;
 
 test.describe.serial("Notification default settings", () => {
-    test.beforeAll(async ({ baseTester }) => {
-        baseTester.isGoingTo("clear notifications and restart the notification services");
-        await baseTester.runShellCommand(
-            "php /usr/share/schoolbox/test/socket/destroy-notification-redis-data.php -vvv",
-        );
-        if (process.env.DOCKER === "1") {
-            await baseTester.runHostShellCommand(
-                "docker/compose restart schoolbox-digestd schoolbox-mobiled schoolbox-socketd schoolbox-scheduled",
-            );
-        }
-    });
-
     test.beforeEach(async ({ tester }) => {
         await tester.loginAsAdmin();
     });
@@ -119,28 +106,25 @@ test.describe.serial("Notification default settings", () => {
 
     test("Applies News defaults and delivers notifications to the configured users", async ({ tester, page }) => {
         const notificationSettings = new NotificationSettings(page);
-        const notificationSidePanel = new NotificationSidePanel(page);
 
         tester.isGoingTo("check Jana Reed has the Instant default and News notification");
         await tester.impersonateViaUserProfilePage(Common.USER_JANAREED);
         await notificationSettings.goto();
         await notificationSettings.expectDelivery(NEWS_NAMESPACE, NEWS_POSTED_SOURCE, "Instant");
-        await notificationSidePanel.open();
-        await notificationSidePanel.expectNotification(NEWS_ARTICLE_TITLE);
+        await tester.common.findNotification(NEWS_ARTICLE_TITLE, true);
 
         tester.isGoingTo("check Jenni Reed has the Instant default and News notification");
         await tester.impersonateViaUserProfilePage(Common.USER_JENNIREED);
         await notificationSettings.goto();
         await notificationSettings.expectDelivery(NEWS_NAMESPACE, NEWS_POSTED_SOURCE, "Instant");
-        await notificationSidePanel.open();
-        await notificationSidePanel.expectNotification(NEWS_ARTICLE_TITLE);
+        await tester.common.findNotification(NEWS_ARTICLE_TITLE, true);
 
         tester.isGoingTo("check Jack Coles has the Muted default and no News notification");
         await tester.impersonateViaUserProfilePage(Common.USER_JACKCOLES);
         await notificationSettings.goto();
         await notificationSettings.expectDelivery(NEWS_NAMESPACE, NEWS_POSTED_SOURCE, "Muted");
-        await notificationSidePanel.open();
-        await notificationSidePanel.expectNoNotification(NEWS_ARTICLE_TITLE);
+        const notification = await tester.common.findNotification(NEWS_ARTICLE_TITLE, false, 1);
+        await expect(notification).toHaveCount(0);
     });
 
     test.afterAll(async ({ baseTester, db }) => {
