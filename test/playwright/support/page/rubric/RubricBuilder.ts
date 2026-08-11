@@ -101,4 +101,51 @@ export default class RubricBuilder {
         const pointsInput = descriptor.getByTestId(RubricBuilder.DATA_TEST_RUBRIC_DESCRIPTOR_MAX_VALUE);
         await pointsInput.fill(value.toString());
     }
+
+    /**
+     * Creates a manual rubric with one selected indicator.
+     * @param rubricId - The temporary negative ID assigned to the new rubric
+     * @param title - The rubric title
+     * @param capabilityId - The capability containing the indicator
+     * @param indicatorId - The indicator to select
+     * @param points - Descriptor point values, ordered by level
+     */
+    public async createManualRubric(
+        rubricId: number,
+        title: string,
+        capabilityId: number,
+        indicatorId: number,
+        points: number[],
+    ): Promise<void> {
+        await this.clickAddRubric();
+        await this.clickCreateRubricManually();
+
+        const rubricIndex = Math.abs(rubricId) - 1;
+        const titleInput = this.page.getByTestId(RubricBuilder.DATA_TEST_RUBRIC_TITLE).nth(rubricIndex);
+        await titleInput.fill(title);
+        await titleInput.blur();
+
+        const grid = this.locateGrid(rubricId);
+        await grid.getByTestId(RubricBuilder.DATA_TEST_RUBRIC_SPAWN_LEVEL).click();
+
+        const indicator = grid.getByTestId(
+            `${RubricBuilder.DATA_TEST_RUBRIC_INDICATOR_ROW}-${capabilityId}-${indicatorId}`,
+        );
+        await indicator.getByTestId(RubricBuilder.DATA_TEST_RUBRIC_INDICATOR_TOGGLE).click();
+
+        const pointInputs = indicator.getByTestId(RubricBuilder.DATA_TEST_RUBRIC_DESCRIPTOR_MAX_VALUE);
+        for (let index = 0; index < points.length; index += 1) {
+            await pointInputs.nth(index).fill(points[index].toString());
+        }
+    }
+
+    /**
+     * Deletes a persisted rubric from an assessment form and confirms the action.
+     * @param rubricId - The persisted rubric instance ID
+     */
+    public async deleteRubric(rubricId: number): Promise<void> {
+        await this.page.getByTestId(`sbx-pop-out-rubric-${rubricId}-dropdown-button`).click();
+        await this.page.locator(`#rubric-${rubricId}-dropdown`).getByRole("button", { name: "Delete" }).click();
+        await this.page.getByRole("button", { name: /Delete/ }).click();
+    }
 }

@@ -10,11 +10,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DueWork\Decorator;
 
-use DomainException;
 use InvalidArgumentException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use RangeException;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
@@ -34,7 +32,6 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecifi
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use UnexpectedValueException;
 
 /**
  * Class Decorator
@@ -378,8 +375,16 @@ class Decorator implements DecoratorInterface
              * assessment's maximum marks but we'll just not entertain that theory for now
              */
             $maxMark = 0;
+            $rubricData = $this->getRubricData() ?? [];
 
             foreach ($this->original->getRubricInstances() as $originalRubricInstance) {
+                /* Rubrics deleted while changing location are omitted from the submitted data but remain on
+                 * the original assessment. Skip them so they are not recreated on the relocated assessment.
+                 */
+                if (!isset($rubricData[$originalRubricInstance->getId()])) {
+                    continue;
+                }
+
                 /* Make a copy of what it originally did, but unlink its identifier so it spawns anew.
                  */
                 /** @var \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance */
@@ -392,7 +397,11 @@ class Decorator implements DecoratorInterface
                  * to find out what the settings *were*.
                  */
                 $existingGrid = new Grid($this->original, $rubricInstance, $rowSetBeforeMove);
-                $existingGrid = $gridFactory->buildFromPostData($existingGrid, $this->getRubricData()[$originalRubricInstance->getId()], false);
+                $existingGrid = $gridFactory->buildFromPostData(
+                    $existingGrid,
+                    $rubricData[$originalRubricInstance->getId()],
+                    false
+                );
 
                 $importer = new GenericImporter(
                     $existingGrid,
