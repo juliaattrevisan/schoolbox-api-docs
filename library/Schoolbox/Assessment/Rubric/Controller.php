@@ -525,11 +525,13 @@ class Controller extends BaseController
      * @param array $array
      * @return string
      */
-    protected function array2csv(array $array)
+    protected function array2csv(array $array): string
     {
         $fp = fopen('php://temp', 'r+b');
         foreach ($array as $row) {
-            $row = array_map(fn ($x) => trim($x ?? ''), $row);
+            // Note there is no need to trim fields here.  An export should not modify data.
+            // Another reason not to trim here is that whitespace-only values are deliberately not trimmed on import.
+            // See comments in Rubric/templates/vue/rubricBuilder/payload.ts (translateGridToFormPayload()).
             fputcsv($fp, $row, escape: '');
         }
         rewind($fp);
