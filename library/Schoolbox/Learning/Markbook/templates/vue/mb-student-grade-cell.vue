@@ -53,6 +53,25 @@ const participant = window.Vue.computed(() => {
     return aImpl.value.participants[student.value.id] || null;
 });
 
+/**
+ * Whether the draft values should be shown if they exist.
+ * For normal activities, this is controlled by the "Show Drafts" toggle in the markbook.
+ * On the reporting status page, the cells for the activity itself aren't affected by the toggle and always prefer draft
+ * values if they exist, to match the behaviour of the other status pages.
+ */
+const preferDraftFeedback = window.Vue.computed(() => {
+    if (assessment.value === null) return false;
+
+    if (assessment.value.splitComments) {
+        /* "splitComments" is the way to define "the activity itself" for reporting activities at the moment,
+         * I expect this will change in the near future though to something more explicit.
+         */
+        return true;
+    }
+
+    return mbStore.showDrafts;
+});
+
 const canGiveFeedbackMarks = window.Vue.computed(
     () => aImpl.value && aImpl.value.instructorMarkScheme.mode !== MarkTypeSlug.NONE,
 );
@@ -87,10 +106,12 @@ const hasPopOutMenu = window.Vue.computed(() => {
 });
 
 /**
- * The indicator and notch title for due work/quiz
+ * The indicator and notch title for due work/quiz.
+ * This is not shown for splitComments/rubric cells as they have their own indicator on the reporting markbook.
+ * TODO: ^ add the indicator in this scenario (in SA-23168), also splitComments could do with a better name.
  */
 const decorator = window.Vue.computed(() => {
-    if (participant.value === null) {
+    if (participant.value === null || assessment.value?.splitComments) {
         return null;
     }
 
@@ -103,7 +124,7 @@ const decorator = window.Vue.computed(() => {
         return null;
     }
 
-    if (mbStore.showDrafts && participant.value.marks.draft.responseId !== null) {
+    if (preferDraftFeedback.value && participant.value.marks.draft.responseId !== null) {
         return {
             indicator: "pending",
             notchTitle: "Unpublished Draft",
@@ -306,7 +327,7 @@ const showCommentsColumn = window.Vue.computed(() => {
         </div>
         <template v-else>
             <span
-                v-if="mbStore.showDrafts && participant.marks.draft.responseId !== null"
+                v-if="preferDraftFeedback && participant.marks.draft.responseId !== null"
                 :title="plaintextComments?.draft ?? undefined"
                 class="meta"
             >
@@ -366,7 +387,7 @@ const showCommentsColumn = window.Vue.computed(() => {
 
         <!-- eslint-disable vue/no-v-html -- scrubbed in the backend -->
         <span
-            v-else-if="mbStore.showDrafts && participant.marks.draft.responseId !== null"
+            v-else-if="preferDraftFeedback && participant.marks.draft.responseId !== null"
             class="meta"
             v-html="participant.marks.draft.comment"
         />
