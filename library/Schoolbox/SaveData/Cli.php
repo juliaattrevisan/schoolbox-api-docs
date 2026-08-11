@@ -9,15 +9,20 @@
 namespace Schoolbox\SaveData;
 
 use Alaress_Date_Format;
+use Aws\CommandPool;
+use Aws\Exception\AwsException;
 use Aws\S3\S3Client;
-use Aws\S3\Transfer;
 use Exception;
 use RuntimeException;
 use Schoolbox\Application\CliTool\App;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\FilesystemFactory;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\S3\Migration;
 use Schoolbox\Version\Version;
+use Schoolbox\Video\QueueMapper;
+use Schoolbox\Video\ResourceVideo;
+use Throwable;
 
 /**
  * CLI Tool
@@ -35,6 +40,17 @@ class Cli extends App
     private const OPT_SHORT_NAME = "n:";
     private const OPT_SHORT_INITIAL = "i";
     private const S3_BUCKET = 'schoolbox-data';
+
+    /** Number of storage objects to download from the bucket at a time. */
+    private const DOWNLOAD_CONCURRENCY = 25;
+
+    /** Transform suffixes persisted alongside a transcoded video or audio storage object. */
+    private const VIDEO_TRANSFORMS = [
+        ResourceVideo::TRANSCODE,
+        ResourceVideo::POSTER,
+        ResourceVideo::POSTER_LETTERBOX,
+        ResourceVideo::THUMBNAIL,
+    ];
 
     private string $name;
     private bool $initial;
@@ -152,7 +168,7 @@ HELP;
         $backup_name = "dataset-backup-$timestamp.sql";
         $this->mysqlDump($instance_dir, $backup_name);
         $this->maintenanceMode(1);
-        $tempdir = '/tmp/' . INSTANCE_ID . "-dataset";
+        $tempdir = "$instance_dir/dataset-tmp";
         try {
             if (is_dir($tempdir)) {
                 $this->deleteDir($tempdir);
@@ -161,22 +177,40 @@ HELP;
             if ($this->initial) {
                 $this->cleanForInitial();
             }
-            $this->downloadBucket($tempdir);
+            $missingFromS3 = $this->downloadBucket($tempdir);
             $this->clearSecrets();
+            $this->clearTransforms();
             $this->makeLocal();
             $this->mysqlDump($tempdir);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
+            # Throwable, not Exception: an Error (a TypeError from unexpected row data, say) would otherwise
+            # escape and leave the instance in maintenance mode with the initial cleanup truncations applied.
             $this->getLogger()->error($e->getMessage());
             $this->restoreBackup("$instance_dir/$backup_name");
             $this->maintenanceMode(0);
+            $this->deleteDir($tempdir);
             exit(1);
         }
         $this->restoreBackup("$instance_dir/$backup_name");
         $this->maintenanceMode(0);
-        $tarName = "/tmp/{$this->name}";
+        $tarName = "$instance_dir/{$this->name}";
         $this->createTarball($tempdir, $tarName);
+        $this->deleteDir($tempdir);
+        # Reported before any upload: the dataset is incomplete, and uploading publishes it under a name that
+        # may already be in use. uploadTarball() prompts for credentials, so there is a chance to abort.
+        foreach ($missingFromS3 as $hash) {
+            echo "WARNING: hash $hash exists in storage table but was not found in S3" . PHP_EOL;
+        }
         if ($this->upload) {
+            if (!empty($missingFromS3)) {
+                echo sprintf(
+                    "WARNING: %d storage files are missing from this dataset, press Ctrl-C to abort the upload"
+                        . PHP_EOL,
+                    count($missingFromS3)
+                );
+            }
             $this->uploadTarball("$tarName.tar.gz", false);
+            unlink("$tarName.tar.gz");
         }
     }
 
@@ -196,7 +230,18 @@ HELP;
         $this->getLogger()->info("making DB local");
         $configs = [
             ConfigMapper::NAME_OTFS_ADAPTER => FilesystemFactory::FILE_SYSTEM_ADAPTER_LOCAL,
-            ConfigMapper::NAME_DATASET_INSTANCE => 0
+            ConfigMapper::NAME_DATASET_INSTANCE => 0,
+            ConfigMapper::NAME_OTFS_S3_CRED_KEY => '',
+            ConfigMapper::NAME_OTFS_S3_CRED_SECRET => '',
+            ConfigMapper::NAME_OTFS_S3_BUCKET => '',
+            ConfigMapper::NAME_OTFS_S3_REGION => '',
+            ConfigMapper::NAME_OTFS_S3_ALT_HOST => '',
+            ConfigMapper::NAME_OTFS_S3_ALT_ACCESS_KEY => '',
+            ConfigMapper::NAME_OTFS_S3_ALT_SECRET_KEY => '',
+            ConfigMapper::NAME_OTFS_S3_ALT_BUCKET => '',
+            ConfigMapper::NAME_OTFS_S3_ALT_REGION => '',
+            ConfigMapper::NAME_CLAMD_HOST => '',
+            ConfigMapper::NAME_SITE_STATIC_ASSET_SERVE_FROM_CDN => 0,
         ];
         $query = "UPDATE config set value = :value where name = :name limit 1;";
         $statement = $this->getDatabaseInternal()->prepareQuery($query);
@@ -246,6 +291,21 @@ HELP;
         $this->getDatabaseInternal()->execute($query);
     }
 
+    /**
+     * Clears image transform metadata from the dataset.
+     *
+     * Transforms are persisted as `<hashed path>-<cache key>`, which the storage hash download does not reach,
+     * so every row would otherwise point at a file absent from the dataset. They are regenerated on demand.
+     *
+     * Cloud mode only: the vagrant path archives the local storage tree, transform files included, and has no
+     * full database restore to undo this on the source instance.
+     */
+    private function clearTransforms(): void
+    {
+        $this->getLogger()->info("clearing transforms");
+        $this->getDatabaseInternal()->execute("TRUNCATE storage_transform");
+    }
+
     private function mysqlDump(string $directory, string $filename = "schoolbox.sql"): void
     {
         if (!is_writable($directory)) {
@@ -282,8 +342,18 @@ HELP;
     private function restoreBackup(string $backup_path): void
     {
         $this->getLogger()->info("restoring from backup");
-        $sql = file_get_contents($backup_path);
-        $this->getDatabaseInternal()->execute($sql);
+        $cmd = sprintf(
+            "mariadb -h %s -u %s -p%s %s < %s",
+            SQL_host,
+            SQL_user,
+            SQL_passwd,
+            SQL_db,
+            escapeshellarg($backup_path)
+        );
+        exec($cmd, $output, $code);
+        if ($code !== 0) {
+            throw new RuntimeException("restore failed");
+        }
     }
 
     private function createTarball(string $directory, string $name): void
@@ -360,7 +430,14 @@ HELP;
         $bytes /= 1024 ** $power;
         return round($bytes, 2) . $units[$power];
     }
-    private function downloadBucket(string $dir): void
+    /**
+     * Downloads the storage objects the database references into the dataset directory.
+     *
+     * @param  string $dir Directory to download into, under its `storage` subdirectory.
+     * @return string[] hashes present in the storage table with no corresponding object in the bucket
+     * @throws RuntimeException if the objects do not fit in the directory's filesystem, or one fails to download.
+     */
+    private function downloadBucket(string $dir): array
     {
         $accessKey = $this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_CRED_KEY);
         $secretKey = $this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_CRED_SECRET);
@@ -390,30 +467,141 @@ HELP;
         $client = new S3Client($cfg);
         $finalBucket = !empty($s3AltHost) && !empty($s3AltBucket) ? $s3AltBucket : $s3Bucket;
 
-        $bucketSize = $this->getBucketStorage($client, $finalBucket, 'storage/');
-        $bucketSizeFormat = $this->formatBytes($bucketSize);
-        $this->getLogger()->info("downloading bucket ($bucketSizeFormat)");
-        $freeSpace = disk_free_space($dir);
-        if ($freeSpace - $bucketSize <= 0) {
-            throw new RuntimeException("not enough free space in disk: $freeSpace available, $bucketSize in s3 bucket");
+        # `hash` is nullable on both tables, and a row without one has no object to fetch.
+        $query = $this->getDatabaseInternal()->prepareQuery("SELECT hash FROM storage WHERE hash IS NOT NULL");
+        $query->execute();
+        $hashes = $query->fetchColumnArray('hash');
+
+        # Transcoded media is persisted alongside the original as `<hashed path>-<transform>`. Those objects are
+        # not reachable from the storage hashes above, and a completed video_queue row is never picked up again by
+        # QueueMapper::getPending(), so they have to be fetched or the media cannot play once provisioned.
+        $query = $this->getDatabaseInternal()->prepareQuery(
+            "SELECT hash FROM video_queue WHERE status = :status AND hash IS NOT NULL"
+        );
+        $query->execute(["status" => QueueMapper::STATUS_COMPLETED]);
+        $transcodedHashes = $query->fetchColumnArray('hash');
+
+        # Size the download from the objects actually wanted: the bucket may hold objects the storage table no
+        # longer references, and totalling those would fail the free space check over files never downloaded.
+        $objectSizes = $this->getBucketStorage($client, $finalBucket, 'storage/');
+
+        # Absence of a storage object is reported, while absence of a transform is not: not every transform
+        # exists for every transcode.
+        $wanted = [];
+        foreach ($hashes as $hash) {
+            $wanted[] = ['path' => FilesystemProxy::getPathFromHash($hash), 'reportIfMissing' => $hash];
         }
-        $manager = new Transfer($client, "s3://$finalBucket/storage", "$dir/storage");
-        $manager->transfer();
+        foreach ($transcodedHashes as $hash) {
+            $relativePath = FilesystemProxy::getPathFromHash($hash);
+            foreach (self::VIDEO_TRANSFORMS as $transform) {
+                $wanted[] = ['path' => "$relativePath-$transform", 'reportIfMissing' => null];
+            }
+        }
+
+        $downloadSize = 0;
+        foreach ($wanted as $object) {
+            $downloadSize += $objectSizes["storage/{$object['path']}"] ?? 0;
+        }
+        $downloadSizeFormat = $this->formatBytes($downloadSize);
+        $this->getLogger()->info("downloading bucket ($downloadSizeFormat)");
+        $freeSpace = disk_free_space($dir);
+        if ($freeSpace - $downloadSize <= 0) {
+            throw new RuntimeException(
+                "not enough free space in disk: $freeSpace available, $downloadSize to download from s3 bucket"
+            );
+        }
+
+        # Absent keys are known from the listing, so they are never requested.
+        $missing = [];
+        $toDownload = [];
+        foreach ($wanted as $object) {
+            if (!isset($objectSizes["storage/{$object['path']}"])) {
+                if ($object['reportIfMissing'] !== null) {
+                    $missing[] = $object['reportIfMissing'];
+                }
+                continue;
+            }
+            $toDownload[] = $object['path'];
+        }
+
+        $this->downloadObjects($client, $finalBucket, $toDownload, $dir);
         $this->getLogger()->info("files downloaded");
+        return $missing;
     }
-    private function getBucketStorage(S3Client $client, string $bucket, string $prefix): float
+
+    /**
+     * Downloads objects from the storage prefix of the bucket.
+     *
+     * Downloads run concurrently: a dataset holds mostly small objects, so downloading them one at a time
+     * accumulates a network round trip per object rather than being limited by bandwidth.
+     *
+     * @param S3Client $client        Client used to fetch the objects.
+     * @param string   $bucket        Bucket holding the storage prefix.
+     * @param string[] $relativePaths Paths within the storage prefix, as returned by FilesystemProxy.
+     * @param string   $dir           Directory to download into, under its `storage` subdirectory.
+     * @throws RuntimeException if any object fails to download.
+     */
+    private function downloadObjects(S3Client $client, string $bucket, array $relativePaths, string $dir): void
     {
-        $size = 0;
+        $commands = function () use ($client, $bucket, $relativePaths, $dir) {
+            foreach ($relativePaths as $index => $relativePath) {
+                $localPath = "$dir/storage/$relativePath";
+                if (!is_dir(dirname($localPath))) {
+                    mkdir(dirname($localPath), 0777, true);
+                }
+                yield $index => $client->getCommand('GetObject', [
+                    'Bucket' => $bucket,
+                    'Key'    => "storage/$relativePath",
+                    'SaveAs' => $localPath,
+                ]);
+            }
+        };
+
+        $failures = [];
+        $pool = new CommandPool($client, $commands(), [
+            'concurrency' => self::DOWNLOAD_CONCURRENCY,
+            'preserve_iterator_keys' => true,
+            'rejected' => function (Throwable $reason, int $index) use (&$failures, $relativePaths): void {
+                $failures[$relativePaths[$index]] = $reason instanceof AwsException
+                    ? ($reason->getAwsErrorCode() ?? $reason->getMessage())
+                    : $reason->getMessage();
+            },
+        ]);
+        $pool->promise()->wait();
+
+        if (!empty($failures)) {
+            # These objects were in the listing, so a failure is not an absent file: fail the run rather than
+            # packaging a dataset quietly short of the files its database references.
+            $summary = [];
+            foreach ($failures as $relativePath => $error) {
+                $summary[] = "$relativePath ($error)";
+            }
+            throw new RuntimeException(
+                sprintf('failed to download %d storage objects: %s', count($failures), implode(', ', $summary))
+            );
+        }
+    }
+    /**
+     * Lists the objects under a prefix of the bucket.
+     *
+     * @param  S3Client $client Client used to list the objects.
+     * @param  string   $bucket Bucket to list.
+     * @param  string   $prefix Prefix to restrict the listing to.
+     * @return array<string, int> key: the object key, value: its size in bytes
+     */
+    private function getBucketStorage(S3Client $client, string $bucket, string $prefix): array
+    {
+        $sizes = [];
         $objects = $client->getPaginator('ListObjectsV2', [
             'Bucket' => $bucket,
             'Prefix' => $prefix
         ]);
         foreach ($objects as $res) {
-            foreach ($res["Contents"] as $object) {
-                $size += $object['Size'];
+            foreach ($res["Contents"] ?? [] as $object) {
+                $sizes[$object['Key']] = $object['Size'];
             }
         }
 
-        return $size;
+        return $sizes;
     }
 }
