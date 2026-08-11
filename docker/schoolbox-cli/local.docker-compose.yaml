@@ -11,6 +11,7 @@
 
 services:
   schoolbox-cli:
+    image: ${PROJECT_NAME:-docker}-schoolbox-cli:${LOCAL_IMAGE_TAG:-latest}
     pull_policy: never
     command: cron -f -L 15
     restart: always

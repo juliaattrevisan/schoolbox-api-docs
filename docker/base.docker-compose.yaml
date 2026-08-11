@@ -103,6 +103,7 @@ services:
   # Not-yet-essential services:
   # These will be implemented as separate containers (if they aren't already).
   schoolbox-digestd:
+    image: ${PROJECT_NAME:-docker}-schoolbox-digestd:${LOCAL_IMAGE_TAG:-latest}
     pull_policy: never
     depends_on:
       mariadb:
@@ -138,6 +139,7 @@ services:
         target: /etc/schoolbox
 
   schoolbox-scheduled:
+    image: ${PROJECT_NAME:-docker}-schoolbox-scheduled:${LOCAL_IMAGE_TAG:-latest}
     pull_policy: never
     depends_on:
       mariadb:
@@ -173,6 +175,7 @@ services:
         target: /etc/schoolbox
 
   schoolbox-mobiled:
+    image: ${PROJECT_NAME:-docker}-schoolbox-mobiled:${LOCAL_IMAGE_TAG:-latest}
     pull_policy: never
     depends_on:
       mariadb:
@@ -210,6 +213,7 @@ services:
   # Second instance's notif daemons:
   # These are the same as above, but use the second instance ID instead.
   schoolbox2-digestd:
+    image: ${PROJECT_NAME:-docker}-schoolbox2-digestd:${LOCAL_IMAGE_TAG:-latest}
     pull_policy: never
     depends_on:
       mariadb:
@@ -246,6 +250,7 @@ services:
         target: /etc/schoolbox
 
   schoolbox2-scheduled:
+    image: ${PROJECT_NAME:-docker}-schoolbox2-scheduled:${LOCAL_IMAGE_TAG:-latest}
     pull_policy: never
     depends_on:
       mariadb:
@@ -282,6 +287,7 @@ services:
         target: /etc/schoolbox
 
   schoolbox2-mobiled:
+    image: ${PROJECT_NAME:-docker}-schoolbox2-mobiled:${LOCAL_IMAGE_TAG:-latest}
     pull_policy: never
     depends_on:
       mariadb:
@@ -318,6 +324,7 @@ services:
         target: /etc/schoolbox
 
   schoolbox-socketd:
+    image: ${PROJECT_NAME:-docker}-schoolbox-socketd:${LOCAL_IMAGE_TAG:-latest}
     pull_policy: never
     depends_on:
       mariadb:
