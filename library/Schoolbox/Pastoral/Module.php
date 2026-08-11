@@ -372,10 +372,8 @@ class Module extends BaseModule
 
             if (array_key_exists('linkedStudentId', $params)) {
                 try {
-                    if (!isset($userMapper)) {
-                        /** @var UserMapper $userMapper */
-                        $userMapper = $this->getMapperFactory()->get(UserMapper::class);
-                    }
+                    /** @var UserMapper $userMapper */
+                    $userMapper = $this->getMapperFactory()->get(UserMapper::class);
 
                     $student = $userMapper->findWithSubjects($params['linkedStudentId']);
 
