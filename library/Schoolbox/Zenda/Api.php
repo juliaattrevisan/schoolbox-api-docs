@@ -144,7 +144,10 @@ class Api
                             /* Return the first successful doodad we found from Zenda
                              */
                             return json_decode(
-                                $response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR
+                                $response->getBody()->getContents(),
+                                true,
+                                512,
+                                JSON_THROW_ON_ERROR
                             );
                         } catch (\JsonException $e) {
                             /* Couldn't decode json, or server refused something, or something else died
