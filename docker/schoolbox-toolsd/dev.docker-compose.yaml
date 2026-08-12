@@ -6,12 +6,16 @@
 services:
   # HTTP API for posting jobs to, and querying their status.
   schoolbox-toolsd-api:
+    image: ${PROJECT_NAME:-docker}-schoolbox-toolsd:${LOCAL_IMAGE_TAG:-latest}
+    pull_policy: never
     depends_on:
       redis-storage:
         condition: service_healthy
     build:
       context: ../../toolsd
       dockerfile: schoolbox.Dockerfile
+      args:
+        BASE_PHP_IMAGE: ${SCHOOLBOX_CLI_IMAGE}
     environment:
       TOOLSD_API_KEY: ${TOOLSD_API_KEY:-}
     env_file:
@@ -36,12 +40,16 @@ services:
   # The default Celery queue:
   # unless otherwise specified, jobs will be sent to this queue.
   schoolbox-toolsd-celery:
+    image: ${PROJECT_NAME:-docker}-schoolbox-toolsd:${LOCAL_IMAGE_TAG:-latest}
+    pull_policy: never
     depends_on:
       redis-storage:
         condition: service_healthy
     build:
       context: ../../toolsd
       dockerfile: schoolbox.Dockerfile
+      args:
+        BASE_PHP_IMAGE: ${SCHOOLBOX_CLI_IMAGE}
     env_file:
       - path: ./schoolbox-toolsd/default.env
         required: true
@@ -74,12 +82,16 @@ services:
 
 #  # An example Celery queue for UPS jobs.
 #  schoolbox-toolsd-celery-ups:
+#    image: ${PROJECT_NAME:-docker}-schoolbox-toolsd:${LOCAL_IMAGE_TAG:-latest}
+#    pull_policy: never
 #    depends_on:
 #      redis-storage:
 #        condition: service_healthy
 #    build:
 #      context: ../../toolsd
 #      dockerfile: schoolbox.Dockerfile
+#      args:
+#        BASE_PHP_IMAGE: ${SCHOOLBOX_CLI_IMAGE}
 #    env_file:
 #      - path: ./schoolbox-toolsd/default.env
 #        required: true
@@ -112,12 +124,16 @@ services:
 
   # Flower is Celery's web-based monitoring tool.
   schoolbox-toolsd-flower:
+    image: ${PROJECT_NAME:-docker}-schoolbox-toolsd:${LOCAL_IMAGE_TAG:-latest}
+    pull_policy: never
     depends_on:
       redis-storage:
         condition: service_healthy
     build:
       context: ../../toolsd
       dockerfile: schoolbox.Dockerfile
+      args:
+        BASE_PHP_IMAGE: ${SCHOOLBOX_CLI_IMAGE}
     env_file:
       - path: ./schoolbox-toolsd/default.env
         required: true
