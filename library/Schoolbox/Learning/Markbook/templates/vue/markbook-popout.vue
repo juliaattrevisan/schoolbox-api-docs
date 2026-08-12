@@ -740,6 +740,7 @@ function onToggleSelected(): void {
                 <mb-popout-actions-bulk-copy
                     v-if="
                         cellInfo.participant &&
+                        !cellInfo.participant.isExcluded &&
                         cellInfo.activity.splitComments &&
                         (cellInfo.cellType === MarkbookGridCellType.MARK ||
                             cellInfo.cellType === MarkbookGridCellType.COMMENT)

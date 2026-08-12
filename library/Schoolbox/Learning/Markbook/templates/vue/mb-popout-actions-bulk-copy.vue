@@ -152,7 +152,7 @@ const targetParticipants = window.Vue.computed<TargetParticipant[]>(() => {
         .map((student): TargetParticipant | null => {
             const participant = props.aImpl.participants[student.id] ?? null;
             const postFeedback = props.aImpl._routes.student[student.id]?.postFeedback ?? null;
-            if (participant === null || postFeedback === null) {
+            if (participant === null || postFeedback === null || participant.isExcluded) {
                 // can't post feedback for this participant, skip it
                 return null;
             }
