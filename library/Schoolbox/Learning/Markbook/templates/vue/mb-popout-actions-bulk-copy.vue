@@ -236,14 +236,12 @@ async function copyFeedbackToParticipants(targets: TargetParticipant[], targetLa
             failures += 1;
         } else {
             /* persist the new draft locally (rubrics are left untouched) */
-            Object.assign(target.participant.marks.draft, {
-                responseId: response.data.id,
-                norm: response.data.normalisedMark,
-                hr: response.data.humanReadableMark,
-                hrInstructor: response.data.humanReadableInstructorMark,
-                comment: body.comment,
-                resubmissionRequired: body.resubmissionRequired,
-            });
+            target.participant.marks.draft.responseId = response.data.id;
+            target.participant.marks.draft.norm = response.data.normalisedMark;
+            target.participant.marks.draft.hr = response.data.humanReadableMark;
+            target.participant.marks.draft.hrInstructor = response.data.humanReadableInstructorMark;
+            target.participant.marks.draft.comment = body.comment;
+            target.participant.marks.draft.resubmissionRequired = body.resubmissionRequired ?? false;
         }
     }
 
