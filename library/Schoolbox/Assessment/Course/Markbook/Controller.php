@@ -277,6 +277,7 @@ class Controller extends WebController\Base
                             'id'    => $unitSpecs[$assessment->getId()]->getId(),
                             'title' => $unitSpecs[$assessment->getId()]->getTitle(),
                         ] : null,
+                        'splitComments'     => false, /* only used on the reporting markbook atm */
                         /* stats here are only relevant for specs */
                         'stats' => $assessment->isSpecification() ? array_map(
                             /* Get the stats in the same format as returned by the class markbook */

@@ -280,10 +280,10 @@ $rotate-span-width: 11rem;
 
                 // Prevent data showing under fixed cells when scrolling horizontally.
                 &:has(div:empty) {
-                    background-color: var(--sbx-color-foreground-primary, $body-bg);
+                    background-color: var(--sbx-config-color-body-background);
 
                     div {
-                        background-color: var(--sbx-color-foreground-primary, $body-bg);
+                        background-color: var(--sbx-config-color-body-background);
                     }
                 }
 

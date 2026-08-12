@@ -8,11 +8,10 @@ import type {
     MarkbookActivity,
     MarkbookClassImpl,
     MarkbookClassImplActivity,
-    MarkbookPopoutSelectedCellInfo,
-    MarkbookFeedbackSelectedCellInfo,
     ActivityInfoResponsePayload,
     MarkbookClassImplActivityParticipant,
 } from "../types/payload";
+import type { MarkbookPopoutSelectedCellInfo, MarkbookFeedbackSelectedCellInfo } from "../types/types";
 
 export const useMarkbookStore = defineStore("markbookStore", () => {
     const data = window.Vue.ref<Markbook | null>(null);

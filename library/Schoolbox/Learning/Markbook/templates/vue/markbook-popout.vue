@@ -24,7 +24,10 @@ import PopOutMenuItem from "@schoolboxVue/components/menu/pop-out-menu-item.vue"
 import PopOutMenuDivider from "@schoolboxVue/components/menu/pop-out-menu-divider.vue";
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import { useMarkbookStore } from "./store/markbookStore";
-import type { MarkbookPopoutSelectedCellInfo, MarkbookClassImplActivityParticipant } from "./types/payload";
+import type { MarkbookClassImplActivityParticipant } from "./types/payload";
+import { MarkbookGridCellType } from "./types/types";
+import type { MarkbookPopoutSelectedCellInfo } from "./types/types";
+import MbPopoutActionsBulkCopy from "./mb-popout-actions-bulk-copy.vue";
 
 const mbStore = useMarkbookStore();
 
@@ -209,7 +212,7 @@ const viewAllText = window.Vue.computed(() => {
  */
 const viewHistoryText = window.Vue.computed(() => {
     if (cellInfo.value === null) {
-        return "";
+        return null;
     }
     switch (cellInfo.value.activity.assessmentType) {
         case ACTIVITY_TYPE_DUE_WORK:
@@ -424,7 +427,7 @@ async function onMenuItemSelected(target: string | null, action: string | null =
     }
 }
 
-const canUpdateFeedback = window.Vue.computed(() => {
+const canOpenFeedbackDrawer = window.Vue.computed(() => {
     if (cellInfo.value === null) {
         return false;
     }
@@ -463,7 +466,7 @@ function onUpdateFeedbackSelected(): void {
         throw new Error("No selected cell to update feedback for");
     }
 
-    if (!canUpdateFeedback.value) {
+    if (!canOpenFeedbackDrawer.value) {
         return;
     }
 
@@ -642,7 +645,7 @@ function onToggleSelected(): void {
                     <template v-if="cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK">
                         <pop-out-menu-item
                             v-if="!cellInfo.participant.isExcluded"
-                            :class="{ 'is-disabled': !canUpdateFeedback }"
+                            :class="{ 'is-disabled': !canOpenFeedbackDrawer }"
                             :link="routes.updateRoute ? getReturnUrl(routes.updateRoute) : undefined"
                             force-callback
                             @selected="onUpdateFeedbackSelected"
@@ -667,7 +670,7 @@ function onToggleSelected(): void {
                         <!-- notable omission of :link, routes.updateRoute is due work only it seems -->
                         <pop-out-menu-item
                             v-if="!cellInfo.participant.isExcluded"
-                            :class="{ 'is-disabled': !canUpdateFeedback }"
+                            :class="{ 'is-disabled': !canOpenFeedbackDrawer }"
                             force-callback
                             @selected="onUpdateFeedbackSelected"
                         >
@@ -678,7 +681,7 @@ function onToggleSelected(): void {
                         <!-- notable omission of :link, routes.updateRoute is due work only it seems -->
                         <pop-out-menu-item
                             v-if="!cellInfo.participant.isExcluded"
-                            :class="{ 'is-disabled': !canUpdateFeedback }"
+                            :class="{ 'is-disabled': !canOpenFeedbackDrawer }"
                             force-callback
                             @selected="onUpdateFeedbackSelected"
                         >
@@ -719,7 +722,7 @@ function onToggleSelected(): void {
                     Exclude Student
                 </pop-out-menu-item>
                 <pop-out-menu-item
-                    v-if="cellInfo.participant && !cellInfo.participant.isExcluded"
+                    v-if="cellInfo.participant && !cellInfo.participant.isExcluded && viewHistoryText !== null"
                     :class="{
                         'is-disabled':
                             !routes.historyRoute ||
@@ -732,6 +735,23 @@ function onToggleSelected(): void {
                 >
                     {{ viewHistoryText }}
                 </pop-out-menu-item>
+
+                <!-- reporting status page: bulk copy actions are only shown for the mark/comment columns for the reporting activity itself -->
+                <mb-popout-actions-bulk-copy
+                    v-if="
+                        cellInfo.participant &&
+                        !cellInfo.participant.isExcluded &&
+                        cellInfo.activity.splitComments &&
+                        (cellInfo.cellType === MarkbookGridCellType.MARK ||
+                            cellInfo.cellType === MarkbookGridCellType.COMMENT)
+                    "
+                    :cell-type="cellInfo.cellType"
+                    :class-impl="cellInfo.classImpl"
+                    :a-impl="cellInfo.aImpl"
+                    :student-id="cellInfo.studentId"
+                    :participant="cellInfo.participant"
+                    @copying="() => close()"
+                />
             </div>
         </div>
         <reveal-modal ref="excludeModalEl">

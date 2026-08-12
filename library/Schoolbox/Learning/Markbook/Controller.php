@@ -162,6 +162,7 @@ class Controller extends Base
                             'id'    => $unitSpec->getId(),
                             'title' => $unitSpec->getTitle(),
                         ] : null,
+                        'splitComments'     => false, /* only used on the reporting markbook atm */
                         /* the class markbook doesn't need any of the below, as this is always an implementation */
                         'isSpecification' => $assessment->isSpecification(),
                         'stats'           => null,

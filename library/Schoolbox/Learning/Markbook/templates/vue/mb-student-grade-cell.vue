@@ -13,6 +13,7 @@ import {
 } from "@schoolboxAssessment/Types/assessmentTypes";
 import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 import { useMarkbookStore } from "./store/markbookStore";
+import { MarkbookGridCellType } from "./types/types";
 
 interface Props {
     classImplId: number;
@@ -182,8 +183,12 @@ const lastClick = window.Vue.ref<number>(0);
 /**
  * When the user clicks the cell, open the pop-out menu if available, otherwise do nothing
  * @param referenceElement The element to anchor the pop-out to
+ * @param cellType Track the type of cell clicked (as rubric cells have different behaviour for dbl click/update feedback)
  */
-async function onClickCell(referenceElement: HTMLTableCellElement | null): Promise<void> {
+async function onClickCell(
+    referenceElement: HTMLTableCellElement | null,
+    cellType: MarkbookGridCellType,
+): Promise<void> {
     if (!hasPopOutMenu.value || referenceElement === null) {
         return; // must have access to the pop-out and a mounted cell element
     }
@@ -235,6 +240,7 @@ async function onClickCell(referenceElement: HTMLTableCellElement | null): Promi
         studentId: props.studentId,
         activityId: props.assessmentId,
         referenceElement,
+        cellType,
     };
 
     lastClick.value = Date.now();
@@ -313,7 +319,7 @@ const showCommentsColumn = window.Vue.computed(() => {
         }"
         :data-test="`markbook-cell-${assessment.id}-${student.id}`"
         :data-pop-out-menu="hasPopOutMenu || undefined"
-        @click="onClickCell(cellEl)"
+        @click="onClickCell(cellEl, MarkbookGridCellType.MARK)"
     >
         <template v-if="participant === null || participant.isExcluded"></template>
         <div v-else-if="participant.progressTick" style="display: flex; justify-content: center">
@@ -381,7 +387,7 @@ const showCommentsColumn = window.Vue.computed(() => {
         }"
         :data-test="`markbook-cell-${assessment.id}-${student.id}-comment`"
         :data-pop-out-menu="hasPopOutMenu || undefined"
-        @click="onClickCell(commentCellEl)"
+        @click="onClickCell(commentCellEl, MarkbookGridCellType.COMMENT)"
     >
         <template v-if="participant === null || participant.isExcluded"></template>
 

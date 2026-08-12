@@ -25,8 +25,13 @@ const emit = defineEmits(["selected"]);
  * Dispatch to notify of selection
  * @param e - the event
  */
-function onSelected(e: Event): void {
+function onSelected(e: PointerEvent): void {
     if (props.link && !props.forceCallback) {
+        return;
+    }
+
+    // If ctrl/cmd is pressed, let the browser handle it (open in new tab)
+    if (e.ctrlKey || e.metaKey) {
         return;
     }
 
@@ -56,6 +61,7 @@ function onSelected(e: Event): void {
     justify-content: space-between;
     margin: 0;
     padding: 0.5rem 1rem;
+    text-align: left;
     text-wrap: pretty; /* prevent text orphans on supported browsers */
     user-select: none;
     width: 100%;
