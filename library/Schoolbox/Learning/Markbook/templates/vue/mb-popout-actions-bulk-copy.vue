@@ -186,6 +186,10 @@ async function copyFeedbackToParticipants(targets: TargetParticipant[], targetLa
         return; // nothing to copy, shouldn't end up here
     }
 
+    if (targets.length === 0) {
+        return; // nothing to copy to, this might happen if the user uses a keyboard to click the button (css disable won't stop that)
+    }
+
     if (isCopying.value) {
         return; // already copying, don't allow another copy to start
     }
