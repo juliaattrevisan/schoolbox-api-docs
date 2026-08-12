@@ -115,14 +115,20 @@ class ValidCsv
         }
 
         /* First unique marker not present: exit early
+         * Note that this is a case-insensitive detection in case people had tinkered on their own, and to support
+         * legacy csv files which might have lowercased the t
          */
-        if (!str_contains($firstRow[0], self::IDENTIFIER_CAPABILITY)) {
+        if (!str_contains(strtolower($firstRow[0]), strtolower(self::IDENTIFIER_CAPABILITY))) {
             return false;
         }
 
         /* Second unique marker not present: exit early
+         * Note that this is a case-insensitive detection in case people had tinkered on their own, and to support
+         * legacy csv files which might have lowercased some of the letters randomly. We haven't seen this occur in the
+         * wild yet, but given what happened to capabilityMarkType/capabilityMarktype, I can't discount it from also
+         * occurring here
          */
-        if (!str_contains($firstRow[1], self::IDENTIFIER_MARK_RANGE)) {
+        if (!str_contains(strtolower($firstRow[1]), strtolower(self::IDENTIFIER_MARK_RANGE))) {
             return false;
         }
 

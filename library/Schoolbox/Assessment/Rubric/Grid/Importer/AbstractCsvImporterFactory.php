@@ -72,12 +72,12 @@ abstract class AbstractCsvImporterFactory
                     break;
             }
 
-            switch (trim($setting)) {
-                case 'useMarkRange':
+            switch (strtolower(trim($setting))) {
+                case 'usemarkrange':
                     $useMarkRange = $boolValue;
                     break;
 
-                case 'capabilityMarkType':
+                case 'capabilitymarktype':
                     [$capabilityMarkTypeSlug, $capabilityGradeGroup] = array_pad(
                         array_map('trim', explode(':', $value)),
                         2,
@@ -93,7 +93,7 @@ abstract class AbstractCsvImporterFactory
                 // Legacy mark-per-capability setting, superseded by capabilityMarkType.
                 // if on: set capability mark type + grade group to due work's, or Total if that type is None
                 // If off: set capability mark type to None
-                case 'markPerCapability':
+                case 'markpercapability':
                     $capabilityGradeGroup = null;
                     if ($boolValue) {
                         // No known mark type?

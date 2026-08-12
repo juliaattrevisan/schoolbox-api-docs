@@ -177,6 +177,13 @@ Observation,No,staffOnly
 ,,,4,3,2,1',
                 true
             ],
+
+            'case-insensitive markers' => [
+                '"CapAbiLITyMaRKtYPe: lEtTer:1","uSeMARKrAnge: Off",,,,,
+"         ",Engaged,,,,,
+,,,4,3,2,1',
+                true
+            ],
         ];
     }
 }

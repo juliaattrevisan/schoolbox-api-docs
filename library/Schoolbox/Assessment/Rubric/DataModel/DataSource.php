@@ -1360,7 +1360,7 @@ class DataSource
 
 
         // Now start building the grid
-        $capabilityMarkType   = $this->markTypeMapper->createModel()->setId($importer->getCapabilityMarkType());
+        $capabilityMarkType   = $this->markTypeMapper->findById($importer->getCapabilityMarkType());
         $capabilityGradeGroup = $this->gradeGroupMapper->createModel()->setId($importer->getCapabilityGradeGroup());
 
         /* Spawn a rubric instance for this due work.
