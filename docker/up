@@ -369,6 +369,18 @@ function start_containers() {
             ;;
     esac
 
+    # The toolsd image builds FROM the schoolbox-cli image, so when that is
+    # built locally it must exist before the main `compose up`: Compose builds
+    # services concurrently, and knows nothing of the dependency between them.
+    # On the prebuilt path there is nothing to do, as the image is pulled.
+    case "${SCHOOLBOX_CLI_IMAGE_BUILD_FROM_LOCAL}" in
+        1 | true | yes | on)
+            "$(dirname "$0")/compose" build schoolbox-cli
+            ;;
+        *)
+            ;;
+    esac
+
     # If TASKD_BUILD_FROM_LOCAL:
     # run `composer install` locally
     case "${TASKD_BUILD_FROM_LOCAL}" in
