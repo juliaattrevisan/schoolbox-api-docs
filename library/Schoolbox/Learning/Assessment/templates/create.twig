@@ -209,7 +209,7 @@
 {% endif %}
 
 
-{% if assessmentType is defined and assessmentType == 'quiz' %}
+{% if assessmentType is not defined or assessmentType == 'quiz' %}
     {% set importRoute = routeLookupIfAuthorized('learningQuiz.postImport', {
         contextId: context.id,
         contextType: contextType,
