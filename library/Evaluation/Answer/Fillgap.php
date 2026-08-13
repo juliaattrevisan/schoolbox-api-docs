@@ -150,7 +150,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
         $currentAnswer = $this->getByQuestionID($question_id);
 
         if (isset($existing['response']) && is_string($existing['response'])) {
-            $existingAnswer = unserialize($existing['response']);
+            $existingAnswer = $this->safeUnserialize($existing['response']);
 
             /* Prepare a special way to show Fillgap answers. This replaces
              * %%token%% tokens with inputs and the already-submitted values
@@ -287,7 +287,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
             ];
         }
 
-        $data = unserialize($response['response'] ?? '');
+        $data = $this->safeUnserialize($response['response'] ?? '');
 
         if (is_array($data)) {
             if ($this->getLegendHTML() !== false) {
@@ -343,7 +343,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
          * then $response['response'] might not even exist; return empty array
          */
         if (isset($response['response']) && is_string($response['response'])) {
-            return unserialize($response['response']);
+            return $this->safeUnserialize($response['response']);
         }
 
         return [];
@@ -382,7 +382,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
         $correctResponse = preg_replace($pattern, $replace, $decodedAnswer);
 
         if (isset($existing['response']) && is_string($existing['response'])) {
-            $existingAnswer = unserialize($existing['response']);
+            $existingAnswer = $this->safeUnserialize($existing['response']);
 
             /* Prepare a special way to show Fillgap answers. This replaces
                 * %%token%% tokens with inputs and the already-submitted values
@@ -477,7 +477,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
         ));
 
         if (isset($existing['response']) && is_string($existing['response'])) {
-            $existingAnswer = unserialize($existing['response']);
+            $existingAnswer = $this->safeUnserialize($existing['response']);
 
             /* Prepare a special way to show Fillgap answers. This replaces
              * %%token%% tokens with inputs and the already-submitted values

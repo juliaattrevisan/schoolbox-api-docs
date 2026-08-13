@@ -1,5 +1,7 @@
 <?php
 
+use Evaluation\Answer\SafeUnserialize;
+
 /**
  * Evaluation_Answer
  *
@@ -11,6 +13,8 @@
  */
 abstract class Evaluation_Answer extends DeprecatedModel
 {
+    use SafeUnserialize;
+
     /**
      * @var string
      */

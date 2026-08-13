@@ -90,7 +90,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
             $answerGroup = parent::getForQuestion($question_id);
 
             if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
-                $allAnswers = unserialize($answerGroup['answer']);
+                $allAnswers = $this->safeUnserialize($answerGroup['answer']);
 
                 if (is_array($allAnswers) && count($allAnswers)) {
                     foreach ($allAnswers as $currentAnswer) {
@@ -125,7 +125,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
     public function modifyInQuestionBank($page, $answerGroup)
     {
         if (strlen($answerGroup)) {
-            $allAnswers = unserialize($answerGroup);
+            $allAnswers = $this->safeUnserialize($answerGroup);
 
             if (is_array($allAnswers) && count($allAnswers)) {
                 foreach ($allAnswers as $currentAnswer) {
@@ -213,12 +213,12 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
         $answerGroup = $this->getByQuestionID($question_id);
 
         if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
-            $allAnswers = unserialize($answerGroup['answer']);
+            $allAnswers = $this->safeUnserialize($answerGroup['answer']);
 
             /* Just unserialize this once, dude
              */
             if (isset($existing['response']) && is_string($existing['response'])) {
-                $existingAnswer = unserialize($existing['response']);
+                $existingAnswer = $this->safeUnserialize($existing['response']);
             } else {
                 $existingAnswer = false;
             }
@@ -310,7 +310,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
     public function saveResponse($data)
     {
         if (!isset($data['answer'])) {
-            $processedResponse = 'NULL';
+            $processedResponse = null;
         } else {
             $processedResponse = serialize($data['answer']);
         }
@@ -332,7 +332,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
         $page->setVar('answerOption_block', '');
 
         if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
-            $allAnswers = unserialize($answerGroup['answer']);
+            $allAnswers = $this->safeUnserialize($answerGroup['answer']);
 
             if (is_array($allAnswers)) {
                 foreach ($allAnswers as $currentAnswer) {
@@ -406,7 +406,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
             ];
         }
 
-        $data = unserialize($response['response'] ?? '');
+        $data = $this->safeUnserialize($response['response'] ?? '');
 
         if (is_array($data)) {
             /* Answer text to appear in export
@@ -464,7 +464,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
         $answer = $this->getByQuestionID($question_id);
 
         if (isset($answer['answer']) && is_string($answer['answer'])) {
-            $allOptions = unserialize($answer['answer']);
+            $allOptions = $this->safeUnserialize($answer['answer']);
 
             $other              = new StdClass();
             $other->description = 'Other';
@@ -497,7 +497,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
          * then $response['response'] might not even exist; return empty array
          */
         if (isset($response['response']) && is_string($response['response'])) {
-            return unserialize($response['response']);
+            return $this->safeUnserialize($response['response']);
         }
 
         return [];
@@ -517,14 +517,14 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
         $existing       = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
         $existingAnswer = null;
         if (isset($existing['response']) && is_string($existing['response'])) {
-            $existingAnswer = unserialize($existing['response']);
+            $existingAnswer = $this->safeUnserialize($existing['response']);
         }
 
         $answerGroup = $this->getByQuestionID($question_id);
 
         if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
             /** @var stdClass[] $allAnswers */
-            $allAnswers = unserialize($answerGroup['answer']);
+            $allAnswers = $this->safeUnserialize($answerGroup['answer']);
 
             $other = new StdClass();
             $other->description = 'Other';

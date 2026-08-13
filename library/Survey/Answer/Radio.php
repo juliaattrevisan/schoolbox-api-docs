@@ -60,13 +60,13 @@ class Survey_Answer_Radio extends Evaluation_Answer_Radio
         $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
 
         if ($existing) {
-            $existingAnswer = unserialize($existing['response']);
+            $existingAnswer = $this->safeUnserialize($existing['response']);
         }
 
         $answerGroup = $this->getByQuestionID($question_id);
 
         if ($answerGroup) {
-            $allAnswers = unserialize($answerGroup['answer']);
+            $allAnswers = $this->safeUnserialize($answerGroup['answer']);
 
             $page->setVar(array(
                 'ANSWER_ID' => $answerGroup['answer_id'],

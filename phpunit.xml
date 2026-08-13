@@ -15,6 +15,7 @@
       <directory suffix="Test.php">library/Proxy/</directory>
       <directory suffix="Test.php">library/Alaress/</directory>
       <directory suffix="Test.php">library/Schoolbox/</directory>
+      <directory suffix="Test.php">library/Evaluation/Answer/Test/</directory>
       <exclude>library/Alaress/Database/Test</exclude>
       <exclude>library/Schoolbox/Database/Test</exclude>
       <exclude>library/Schoolbox/Profile/Test/Generator.php</exclude>

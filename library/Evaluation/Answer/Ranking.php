@@ -106,7 +106,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
             );
 
             if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
-                $allAnswers = unserialize($answerGroup['answer']);
+                $allAnswers = $this->safeUnserialize($answerGroup['answer']);
 
                 if (is_array($allAnswers) && count($allAnswers)) {
                     foreach ($allAnswers as $currentAnswer) {
@@ -137,7 +137,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
     public function modifyInQuestionBank($page, $answerGroup)
     {
         if (strlen($answerGroup)) {
-            $allAnswers = unserialize($answerGroup);
+            $allAnswers = $this->safeUnserialize($answerGroup);
 
             foreach ($allAnswers as $currentAnswer) {
                 $page->setVar(
@@ -194,7 +194,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
 
         if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
             $answerCount = 0;
-            $allAnswers  = unserialize($answerGroup['answer']);
+            $allAnswers  = $this->safeUnserialize($answerGroup['answer']);
 
             foreach ($allAnswers as $currentAnswer) {
                 $right[] = $currentAnswer->answerRight;
@@ -203,7 +203,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
             }
 
             if (isset($existing['response']) && is_string($existing['response'])) {
-                $right = unserialize($existing['response']);
+                $right = $this->safeUnserialize($existing['response']);
             } else {
                 $originalRight = $right;
 
@@ -280,7 +280,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
         $answerGroup = $this->getByQuestionID($question_id);
 
         if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
-            $allAnswers = unserialize($answerGroup['answer']);
+            $allAnswers = $this->safeUnserialize($answerGroup['answer']);
             if (is_array($allAnswers)) {
                 foreach ($allAnswers as $currentAnswer) {
                     $page->setVar('ANSWER_RIGHT_VALUE', Scrub::text($currentAnswer->answerRight));
@@ -341,7 +341,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
             ];
         }
 
-        $data = unserialize($response['response'] ?? '');
+        $data = $this->safeUnserialize($response['response'] ?? '');
 
         if (is_array($data)) {
             if ($this->getLegendHTML() !== false) {
@@ -380,7 +380,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
         $answer = $this->getByQuestionID($question_id);
 
         if (isset($answer['answer']) && is_string($answer['answer'])) {
-            $allOptions = unserialize($answer['answer']);
+            $allOptions = $this->safeUnserialize($answer['answer']);
 
             foreach ($allOptions as $currentOption) {
                 /* Skip the answer if the value does not exist
@@ -413,7 +413,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
          * then $response['response'] might not even exist; return empty array
          */
         if (isset($response['response']) && is_string($response['response'])) {
-            return unserialize($response['response']);
+            return $this->safeUnserialize($response['response']);
         }
 
         return [];
@@ -434,7 +434,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
         $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
 
         if (isset($existing['response']) && is_string($existing['response'])) {
-            $right = unserialize($existing['response']);
+            $right = $this->safeUnserialize($existing['response']);
         }
 
         /* Define special blocks to handle this special answerOptions scenario,
@@ -456,7 +456,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
                 )
             );
 
-            $allAnswers = unserialize($answerGroup['answer'] ?? '');
+            $allAnswers = $this->safeUnserialize($answerGroup['answer'] ?? '');
 
             for ($i = 0; $i < count($allAnswers); $i++) {
                 $currentAnswer = $allAnswers[$i];
@@ -497,7 +497,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
         $existing = $this->getResponseHandler()->isResponseExists($attemptId, $currentQuestion['question_id']);
 
         if (isset($existing['response']) && is_string($existing['response'])) {
-            $right = unserialize($existing['response']);
+            $right = $this->safeUnserialize($existing['response']);
         }
 
         /* Define special blocks to handle this special answerOptions scenario,
@@ -521,7 +521,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
                 )
             );
 
-            $allAnswers = unserialize($answerGroup['answer']);
+            $allAnswers = $this->safeUnserialize($answerGroup['answer']);
 
             for ($i = 0; $i < count($allAnswers); $i++) {
                 $currentAnswer = $allAnswers[$i];
@@ -566,7 +566,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
         $answerGroup = $this->getByQuestionID($currentQuestion['question_id']);
 
         if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
-            $allAnswers = unserialize($answerGroup['answer']);
+            $allAnswers = $this->safeUnserialize($answerGroup['answer']);
 
             for ($i = 0; $i < count($allAnswers); $i++) {
                 $currentAnswer = $allAnswers[$i];
