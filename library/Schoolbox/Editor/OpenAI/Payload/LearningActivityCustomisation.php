@@ -36,14 +36,21 @@ class LearningActivityCustomisation
         1. Suggested Considerations (teacher-facing):
         Provide a concise, structured list of recommended adjustments for this learning activity (prioritise 2–4 high-impact recommendations).
 
-        You MUST format each recommendation using a numbered main point and indented sub-bullets exactly like this:
+        You MUST format the recommendations as valid HTML using one ordered list, with an unordered list nested inside each numbered recommendation, exactly like this:
 
-        1. **[Action-Oriented Summary Title]**
-           - **Recommended Adjustment:** [Describe a practical action the teacher can take for this specific activity.]
-           - **Rationale:** [Briefly explain why this adjustment supports the student, directly referencing relevant information from the student's differentiation profile.]
+        <ol>
+          <li>
+            <strong>[Action-Oriented Summary Title]</strong>
+            <ul>
+              <li><strong>Recommended Adjustment:</strong> [Describe a practical action the teacher can take for this specific activity.]</li>
+              <li><strong>Rationale:</strong> [Briefly explain why this adjustment supports the student, directly referencing relevant information from the student's differentiation profile.]</li>
+            </ul>
+          </li>
+        </ol>
 
         *Section 1 Constraints:*
-        - Do NOT run titles, adjustments, and rationales together on a single line. Each recommendation MUST use a numbered heading followed by two indented sub-bullets (`-`).
+        - Return valid HTML only in this field. Do NOT use Markdown syntax, plain-text numbering, or hyphens to create the list.
+        - Each recommendation MUST be an <li> within a single <ol>, with a nested <ul> containing exactly two <li> elements labelled <strong>Recommended Adjustment:</strong> and <strong>Rationale:</strong>.
         - Include only recommendations directly supported by the student's differentiation profile and relevant to this specific activity. Do not restate the entire profile, infer unstated learning needs, or provide generic advice.
 
         2. Suggested Learning Activity Update (student-facing):
