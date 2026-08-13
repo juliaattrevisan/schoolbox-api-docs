@@ -63,6 +63,12 @@ class LearningActivityCustomisation
         - Do NOT reference the student's profile, diagnosis, accommodations, or reasons for modification.
         - Do NOT include any teacher-facing notes, headers, or rationale in this section.
 
+        *HTML Safety Constraints:*
+        - In the Suggested Considerations field, use only these HTML elements: <ol>, <ul>, <li>, and <strong>.
+        - In the Suggested Learning Activity Update field, use only these HTML elements: <p>, <h2>, <h3>, <ol>, <ul>, <li>, <strong>, <em>, and <br>.
+        - Do NOT include HTML attributes of any kind, including style, class, id, href, src, or event-handler attributes such as onclick.
+        - Do NOT include any other HTML elements, including <script>, <style>, <iframe>, <object>, <embed>, <form>, <input>, <button>, <link>, <meta>, <svg>, or <math>.
+
         All output must be presented in a single JSON object including HTML.
         Adhere strictly to the following rules:
         1. Prioritize actionable, in-the-moment strategies.
