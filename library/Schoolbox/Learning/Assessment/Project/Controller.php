@@ -229,17 +229,10 @@ class Controller extends Assessment\Controller
             $assessment->setAssessables($this->getAssessmentMapper()->findAllByProjectId($assessment->getId()));
         }
 
-        $assessmentStats = new GenericCollection(Assessment\Statistics::class);
-        $assessmentStats[$assessment->getId()] = new Assessment\Statistics($assessment);
-        foreach ($assessment->getAssessables() as $subAssessable) {
-            $assessmentStats[$subAssessable->getId()] = new Assessment\Statistics($subAssessable);
-        }
-
         $twigData = [
             'breadcrumbs'      => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]),
             'baseContext'      => $assessment->getBaseContext(),
             'assessment'       => $assessment,
-            'assessmentStats'  => $assessmentStats,
             'aImpls'           => [],
             'returnUrl'        =>
                 $this->requestQuery->get(Redirect::RETURN_URL)
@@ -254,13 +247,30 @@ class Controller extends Assessment\Controller
             $twigData['aImpls'][$assessment->getId()] = $this->getParticipantPageData($pagedAssessment);
         } else {
             $assessments = $this->getUnitAssessments($assessment, false);
-            /** @var Project $assessment */
-            foreach ($assessments as $assessment) {
-                $twigData['aImpls'][$assessment->getId()] = [
-                    'assessment' => $assessment,
+            foreach ($assessments as $unitAssessment) {
+                $twigData['aImpls'][$unitAssessment->getId()] = [
+                    'assessment' => $unitAssessment,
                 ];
             }
         }
+
+        /* The statistics are derived last, because hydrating the implementations above also rehydrates
+         * this project from its data model, which deliberately links soft-deleted children onto their
+         * project so that a deleted assessable can still find its parent - see
+         * Assessment\DataModel\Mapper::augmentListWithProjectContexts().
+         * Dropping those children first means the statistics always describe exactly what the template
+         * renders.
+         */
+        $assessmentStats = new GenericCollection(Assessment\Statistics::class);
+        $assessmentStats[$assessment->getId()] = new Assessment\Statistics($assessment);
+        if ($assessment instanceof Project) {
+            $assessment->setAssessables($assessment->getAssessables()->filterBy('deletedAt', null));
+
+            foreach ($assessment->getAssessables() as $subAssessable) {
+                $assessmentStats[$subAssessable->getId()] = new Assessment\Statistics($subAssessable);
+            }
+        }
+        $twigData['assessmentStats'] = $assessmentStats;
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/project/status/staff.twig',
