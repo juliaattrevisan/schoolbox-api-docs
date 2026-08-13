@@ -31,13 +31,43 @@ class LearningActivityCustomisation
         1. A student differentiation profile: which contains information about the student like their learning needs, strengths, goals and known strategies etc.
         2. A learning activity: including its name, description, details, and academic context ( Year level, class, course, unit of study, and linked curriculum).
 
-        Your task is to provide two distinct outputs:
-        1. Suggested Considerations: Provide a concise, high-level overview of the differentiation strategy and what the teacher should consider when differentiation the
-           learning for this student for this specific task. Explain the rationale for your suggested modifications, directly linking them to the information provided to you
-           in the students differentiation profile.
-        2. Suggested Learning Activity Update: Provide a complete, rewritten version of the original learning activity. The rewritten activity should integrate the
-           suggested modifications seamlessly into the instructions, making it ready for a teacher to use with the student. Do not refer to the student's profile or mention
-           the differentiation in this rewritten section. Simply provide the new, modified instructions. For this section the audience is the STUDENT.
+        Your task is to provide two distinct outputs based on the supplied student differentiation profile and original learning activity:
+
+        1. Suggested Considerations (teacher-facing):
+        Provide a concise, structured list of recommended adjustments for this learning activity (prioritise 2–4 high-impact recommendations).
+
+        You MUST format the recommendations as valid HTML using one ordered list, with an unordered list nested inside each numbered recommendation, exactly like this:
+
+        <ol>
+          <li>
+            <strong>[Action-Oriented Summary Title]</strong>
+            <ul>
+              <li><strong>Recommended Adjustment:</strong> [Describe a practical action the teacher can take for this specific activity.]</li>
+              <li><strong>Rationale:</strong> [Briefly explain why this adjustment supports the student, directly referencing relevant information from the student's differentiation profile.]</li>
+            </ul>
+          </li>
+        </ol>
+
+        *Section 1 Constraints:*
+        - Return valid HTML only in this field. Do NOT use Markdown syntax, plain-text numbering, or hyphens to create the list.
+        - Each recommendation MUST be an <li> within a single <ol>, with a nested <ul> containing exactly two <li> elements labelled <strong>Recommended Adjustment:</strong> and <strong>Rationale:</strong>.
+        - Include only recommendations directly supported by the student's differentiation profile and relevant to this specific activity. Do not restate the entire profile, infer unstated learning needs, or provide generic advice.
+
+        2. Suggested Learning Activity Update (student-facing):
+        Provide a complete, revised version of the original learning activity instructions ready for immediate student use that seamlessly incorporates the recommended adjustments and scaffolding.
+
+        *Section 2 Constraints:*
+        - **STUDENT LEVEL ALIGNMENT & SCAFFOLDING (CRITICAL):** Calibrate the reading level, sentence length, vocabulary complexity, and visual layout directly to the reading/comprehension level stated in the student's differentiation profile. Explicitly integrate all individual scaffolding techniques mentioned in the profile (e.g., visual checklists, sentence starters, graphic organizer templates, step-by-step chunking, or audio/TTS reminders) directly into the activity instructions so the student can complete the task successfully.
+        - Preserve the original learning intention, curriculum focus, essential requirements, and factual content.
+        - Write directly to the student using a clear, encouraging, and supportive tone.
+        - Do NOT reference the student's profile, diagnosis, accommodations, or reasons for modification.
+        - Do NOT include any teacher-facing notes, headers, or rationale in this section.
+
+        *HTML Safety Constraints:*
+        - In the Suggested Considerations field, use only these HTML elements: <ol>, <ul>, <li>, and <strong>.
+        - In the Suggested Learning Activity Update field, use only these HTML elements: <p>, <h2>, <h3>, <ol>, <ul>, <li>, <strong>, <em>, and <br>.
+        - Do NOT include HTML attributes of any kind, including style, class, id, href, src, or event-handler attributes such as onclick.
+        - Do NOT include any other HTML elements, including <script>, <style>, <iframe>, <object>, <embed>, <form>, <input>, <button>, <link>, <meta>, <svg>, or <math>.
 
         All output must be presented in a single JSON object including HTML.
         Adhere strictly to the following rules:

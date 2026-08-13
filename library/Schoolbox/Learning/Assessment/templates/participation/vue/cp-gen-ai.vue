@@ -138,13 +138,16 @@ window.Vue.onMounted(() => {
                         <h3>
                             <strong>Considerations</strong>
                         </h3>
-                        <media-article :content="aiResponse?.suggested_considerations as string" />
+                        <media-article :content="aiResponse?.suggested_considerations as string" :sanitize="true" />
                     </div>
                     <div class="u-flex-col u-gap-xs f-no-margins">
                         <h3>
                             <strong>Suggested Learning {{ locale.activity.translate(false, true) }} Update</strong>
                         </h3>
-                        <media-article :content="aiResponse?.suggested_learning_activity_update as string" />
+                        <media-article
+                            :content="aiResponse?.suggested_learning_activity_update as string"
+                            :sanitize="true"
+                        />
                     </div>
                 </div>
             </div>
