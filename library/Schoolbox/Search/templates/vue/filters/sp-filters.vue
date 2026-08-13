@@ -110,9 +110,11 @@ window.Vue.watch(
         <div :class="`sbx-island filters u-flex-col  ${isOpen ? 'u-gap-m' : ''} u-pad-m`">
             <button
                 v-if="store.isSingleColumn"
-                :class="`filters__toggle-button ${isOpen ? 'icon-up-arrow' : 'icon-down-arrow'}`"
+                class="filters__toggle-button sbx-button--has-icon"
+                :aria-expanded="isOpen"
                 @click.prevent="onToggleSelected"
             >
+                <sbx-icon :name="isOpen ? 'up-arrow' : 'down-arrow'"></sbx-icon>
                 {{ titleText }}
             </button>
             <div class="filters__container" :style="{ 'grid-template-rows': containerHeight }">
@@ -149,10 +151,14 @@ window.Vue.watch(
         display: grid;
         transition: grid-template-rows 300ms;
     }
+    &__inner-container {
+        overflow: hidden;
+    }
     &__toggle-button {
         background: none;
         color: var(--sbx-config-color-accent, var(--content-ui-foreground));
         font-weight: bold;
+        justify-content: flex-start;
         padding: var(--spacing-xs) 0;
         text-align: left;
     }
