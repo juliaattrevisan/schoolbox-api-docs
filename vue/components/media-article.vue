@@ -28,9 +28,8 @@ const articleEl = window.Vue.ref<HTMLElement | null>(null);
 
 /**
  * Get the content to display, optionally sanitising it.
- * Currently sanitizeHtml is only used for:
- * library/Schoolbox/Learning/Learnosity/templates/vue/student/student-item-question-display.vue
- * As this is coming from Learnosity directly to the front-end
+ * Sanitisation is used for content supplied directly to the front-end, such as
+ * Learnosity item content and AI-generated learning activity customisations.
  * @returns the content to display
  */
 function getContent(): string {
