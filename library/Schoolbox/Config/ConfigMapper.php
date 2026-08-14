@@ -502,6 +502,7 @@ class ConfigMapper extends Mapper
     public const string NAME_AI_RUBRIC_GENERATION = 'ai_rubric_generation';
     public const string NAME_AI_MODERATION_KEY   = 'ai_moderation_key';
     public const string NAME_AI_MODERATION_AGENT = 'ai_moderation_agent';
+    public const string NAME_AI_RUBRIC_GENERATION = 'ai_rubric_generation';
     public const string NAME_AI_TEXT_CHAT_ENABLED = 'ai_text_chat_enabled';
     public const string NAME_AI_LESSONPLAN_ENABLED = 'ai_lessonplan_enabled';
     public const string NAME_AI_DIALOGAGENT_ENABLED = 'ai_dialogagent_enabled';

@@ -13,6 +13,7 @@ use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as SchoolboxException;
 use Schoolbox\OpenAi\Feature;
+use Schoolbox\IConfigLoader;
 
 /**
  * Configuration options for AI features.
@@ -32,6 +33,20 @@ class Config
         Feature::LEARNING_ACTIVITY_CUSTOMISATION->value => ConfigMapper::NAME_AI_LEARNING_ACTIVITY_CUSTOMISATION,
         Feature::RUBRIC_GENERATION->value               => ConfigMapper::NAME_AI_RUBRIC_GENERATION,
         Feature::AI_MODERATION_AGENT->value             => ConfigMapper::NAME_AI_MODERATION_AGENT,
+    ];
+
+    /**
+     * Maps AI features to the plan controls that make them available.
+     */
+    public const array PLAN_FLAGS = [
+        ConfigMapper::NAME_AI_TEXT_CHAT => ConfigMapper::NAME_AI_TEXT_CHAT_ENABLED,
+        ConfigMapper::NAME_AI_LESSONPLAN => ConfigMapper::NAME_AI_LESSONPLAN_ENABLED,
+        ConfigMapper::NAME_AI_DIFFERENTIATION => ConfigMapper::NAME_AI_DIFFERENTIATION_ENABLED,
+        ConfigMapper::NAME_AI_DIALOGAGENT => ConfigMapper::NAME_AI_DIALOGAGENT_ENABLED,
+        ConfigMapper::NAME_AI_IMAGE_GENERATION => ConfigMapper::NAME_AI_IMAGE_GENERATION_ENABLED,
+        ConfigMapper::NAME_AI_LEARNING_ACTIVITY_CUSTOMISATION => ConfigMapper::NAME_AI_LEARNING_ACTIVITY_CUSTOMISATION_ENABLED,
+        ConfigMapper::NAME_AI_MODERATION_AGENT => ConfigMapper::NAME_AI_MODERATION_AGENT_ENABLED,
+        ConfigMapper::NAME_AI_RUBRIC_GENERATION => ConfigMapper::NAME_AI_RUBRIC_GENERATION_ENABLED,
     ];
 
     /**
@@ -568,6 +583,40 @@ class Config
     }
 
     /**
+     * Checks whether the plan enables an AI feature.
+     *
+     * @param string        $feature
+     * @param IConfigLoader $configLoader
+     * @return bool
+     */
+    public function isPlanEnabled(string $feature, IConfigLoader $configLoader): bool
+    {
+        $configName = self::ALL_MODULES[$feature] ?? null;
+        if ($configName === null) {
+            return false;
+        }
+
+        return $this->isConfigurationPlanEnabled($configName, $configLoader);
+    }
+
+    /**
+     * Checks whether the plan enables an AI configuration.
+     *
+     * @param string        $featureConfigName
+     * @param IConfigLoader $configLoader
+     * @return bool
+     */
+    public function isConfigurationPlanEnabled(string $featureConfigName, IConfigLoader $configLoader): bool
+    {
+        $flag = self::PLAN_FLAGS[$featureConfigName] ?? null;
+        if ($flag === null) {
+            return false;
+        }
+
+        return filter_var($configLoader->get($flag), FILTER_VALIDATE_BOOLEAN);
+    }
+
+    /**
      * Check if the feature has AI moderation enabled
      *
      * @param array $config
@@ -614,7 +663,7 @@ class Config
      * @return array
      * @throws \JsonException
      */
-    public function fetchFeatures(ConfigMapper $configMapper): array
+    public function fetchFeatures(ConfigMapper $configMapper, IConfigLoader $configLoader): array
     {
         if ($this->features === null) {
             // hit the db once, get all module configs for AI features, then build the array
@@ -627,6 +676,10 @@ class Config
             // TODO set which options are allowed: e.g. provider options, fields
             foreach ($rows as $row) {
                 $feature = array_search($row->getName(), self::ALL_MODULES, true);
+                if (!is_string($feature) || !$this->isConfigurationPlanEnabled($row->getName(), $configLoader)) {
+                    continue;
+                }
+
                 $this->features[$feature] = [
                     'feature' => $feature,
                     'title' => $row->getTitle(),

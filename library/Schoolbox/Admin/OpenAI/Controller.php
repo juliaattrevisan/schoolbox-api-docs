@@ -24,7 +24,7 @@ class Controller extends ConfigController
     public function getIndex(): void
     {
         $config                      = new Config();
-        $features                    = $config->fetchFeatures($this->getConfigMapper());
+        $features                    = $config->fetchFeatures($this->getConfigMapper(), $this->getConfigLoader());
         $reasoningEffortModelOptions = [];
         $textVerbosityModelOptions   = [];
         foreach (array_keys($features) as $feature) {

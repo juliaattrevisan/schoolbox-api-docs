@@ -965,7 +965,7 @@ abstract class Kernel
                             $sideMenuMapper,
                             $bookMarkMapper,
                         ),
-                        'aiFeatures' => new \Schoolbox\Admin\OpenAI\DataGenerator($mapperFactory->get(ConfigMapper::class)),
+                        'aiFeatures' => new \Schoolbox\Admin\OpenAI\DataGenerator($mapperFactory->get(ConfigMapper::class), $config),
                         'scripts' => new Output\DataGenerator\Scripts($config, $_SERVER),
                         'assessmentTypes' => new Output\DataGenerator\AssessmentTypes($config, $session->getAuthUser()),
                     ];
