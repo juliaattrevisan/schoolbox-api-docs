@@ -233,7 +233,6 @@ HELP;
             ConfigMapper::NAME_DATASET_INSTANCE => 0,
             ConfigMapper::NAME_OTFS_S3_CRED_KEY => '',
             ConfigMapper::NAME_OTFS_S3_CRED_SECRET => '',
-            ConfigMapper::NAME_OTFS_S3_BUCKET => '',
             ConfigMapper::NAME_OTFS_S3_REGION => '',
             ConfigMapper::NAME_OTFS_S3_ALT_HOST => '',
             ConfigMapper::NAME_OTFS_S3_ALT_ACCESS_KEY => '',
