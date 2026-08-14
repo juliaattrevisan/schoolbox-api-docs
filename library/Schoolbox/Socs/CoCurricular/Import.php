@@ -61,11 +61,22 @@ class Import implements IStrategy
 
         $clubsXml = $this->httpClient->get(self::PATH, ['data' => 'clubs']);
         $eventsXml = $this->httpClient->get(self::PATH, ['data' => 'events', 'startdate' => $start, 'enddate' => $end, 'staff' => 1]);
-        $registersXml = $this->httpClient->get(self::PATH, ['data' => 'registers', 'startdate' => $start, 'enddate' => $end]);
+        $eventDates = [];
+        foreach ($this->parser->parseEvents($eventsXml) as $event) {
+            $eventDates[$event->start->getUsingFormat(Registry::SOCS_DATE_FORMAT)] = true;
+        }
+        $registersXml = [];
+        foreach (array_keys($eventDates) as $eventDate) {
+            $this->lock->refresh();
+            $registersXml[] = $this->httpClient->get(
+                self::PATH,
+                ['data' => 'registers', 'startdate' => $eventDate],
+            );
+        }
         [$clubs, $events, $pupilIdsByClubId, $staffIdsByClubId] = $this->parser->parse(
             $clubsXml,
             $eventsXml,
-            $registersXml,
+            ...$registersXml,
         );
 
         $season = $this->registry->recallSeason();
