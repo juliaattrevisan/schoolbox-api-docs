@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\OpenAI\Test;
 use JsonException;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Admin\OpenAI\Config;
+use Schoolbox\Config\ArrayLoader;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\OpenAi\Feature;
@@ -24,6 +25,19 @@ use TypeError;
  */
 class ConfigTest extends TestCase
 {
+    /**
+     * @return void
+     */
+    public function testFetchFeaturesReturnsEmptyArrayWhenNoAiFeaturesAreConfigured(): void
+    {
+        $configMapper = $this->createMock(ConfigMapper::class);
+        $configMapper->expects($this->once())
+                     ->method('findByColumn')
+                     ->willReturn([]);
+
+        $this->assertSame([], (new Config())->fetchFeatures($configMapper, new ArrayLoader()));
+    }
+
     /**
      * The rubric generation card remains configuration-only, but uses the same
      * provider fields and model options as Learning Activity Customisation.

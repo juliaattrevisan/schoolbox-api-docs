@@ -683,6 +683,8 @@ class Config
     public function fetchFeatures(ConfigMapper $configMapper, IConfigLoader $configLoader): array
     {
         if ($this->features === null) {
+            $this->features = [];
+
             // hit the db once, get all module configs for AI features, then build the array
             $rows = $configMapper->findByColumn(ConfigMapper::COL_NAME, self::ALL_MODULES, [
                 'order' => [
