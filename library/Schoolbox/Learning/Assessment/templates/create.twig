@@ -209,6 +209,10 @@
 {% endif %}
 
 
+{#
+    The generic activity chooser does not define assessmentType until the chosen form is loaded asynchronously.
+    Render the modal up front for that flow, but exclude it from direct creation pages for non-quiz types.
+#}
 {% if assessmentType is not defined or assessmentType == 'quiz' %}
     {% set importRoute = routeLookupIfAuthorized('learningQuiz.postImport', {
         contextId: context.id,
