@@ -67,7 +67,7 @@ class Controller extends Base
      */
     public function getIndex(): void
     {
-        $features = new AIConfig()->fetchFeatures($this->configMapper, $this->getConfigLoader());
+        $features = new AIConfig()->fetchFeatures($this->configMapper, $this->getConfigLoader(), true);
 
         // add on image as a feature
         $features['image'] = [

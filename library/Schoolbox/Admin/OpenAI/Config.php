@@ -676,12 +676,17 @@ class Config
 
     /**
      * Fetch all features and their config from the DB
-     * @param ConfigMapper $configMapper
+     * @param ConfigMapper  $configMapper
+     * @param IConfigLoader $configLoader
+     * @param bool          $includeDisabledPlanFeatures Whether to include features hidden by plan controls.
      * @return array
      * @throws \JsonException
      */
-    public function fetchFeatures(ConfigMapper $configMapper, IConfigLoader $configLoader): array
-    {
+    public function fetchFeatures(
+        ConfigMapper $configMapper,
+        IConfigLoader $configLoader,
+        bool $includeDisabledPlanFeatures = false,
+    ): array {
         if ($this->features === null) {
             $this->features = [];
 
@@ -695,7 +700,10 @@ class Config
             // TODO set which options are allowed: e.g. provider options, fields
             foreach ($rows as $row) {
                 $feature = array_search($row->getName(), self::ALL_MODULES, true);
-                if (!is_string($feature) || !$this->isConfigurationPlanEnabled($row->getName(), $configLoader)) {
+                if (
+                    !is_string($feature)
+                    || (!$includeDisabledPlanFeatures && !$this->isConfigurationPlanEnabled($row->getName(), $configLoader))
+                ) {
                     continue;
                 }
 
