@@ -1289,12 +1289,6 @@ class Subnav
             return $aiConfig->isPlanEnabled($feature->value, $this->configLoader);
         }
 
-        foreach (array_keys(OpenAiConfig::ALL_MODULES) as $featureName) {
-            if ($aiConfig->isPlanEnabled($featureName, $this->configLoader)) {
-                return true;
-            }
-        }
-
-        return false;
+        return $aiConfig->hasEnabledPlanFeature($this->configLoader);
     }
 }

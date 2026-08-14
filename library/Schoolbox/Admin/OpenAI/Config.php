@@ -600,6 +600,23 @@ class Config
     }
 
     /**
+     * Checks whether the plan enables at least one AI configuration page feature.
+     *
+     * @param IConfigLoader $configLoader
+     * @return bool
+     */
+    public function hasEnabledPlanFeature(IConfigLoader $configLoader): bool
+    {
+        foreach (array_keys(self::ALL_MODULES) as $feature) {
+            if ($this->isPlanEnabled($feature, $configLoader)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Checks whether the plan enables an AI configuration.
      *
      * @param string        $featureConfigName

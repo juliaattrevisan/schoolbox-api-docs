@@ -14,6 +14,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Admin\OpenAI\Authorizer\Rule\IsAnyAIFeaturePlanEnabled;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -37,7 +38,8 @@ class Module extends BaseModule
          */
         $perms = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\IsSuperuser()
+            new Rule\IsSuperuser(),
+            new IsAnyAIFeaturePlanEnabled($this->getConfig()),
         );
 
         $this->register('GET', '', 'getIndex', $perms);
