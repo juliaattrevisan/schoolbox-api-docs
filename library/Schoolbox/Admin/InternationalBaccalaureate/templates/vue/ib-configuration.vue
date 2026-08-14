@@ -27,6 +27,9 @@ const isLoading = window.Vue.ref<boolean>(false);
 const loadError = window.Vue.ref<string | null>(null);
 const currentConfigurations = window.Vue.ref<IBConfiguration[]>([]);
 const currentSubjectsFromAPI = window.Vue.ref<IBSubject[]>([]);
+const isSubjectLoading = window.Vue.ref<boolean>(false);
+const subjectLoadError = window.Vue.ref<string | null>(null);
+let subjectRequestId = 0;
 const categoryParamName = "category";
 
 // Computed property to check if current tab is general config
@@ -42,17 +45,31 @@ const isGeneralConfigTab = window.Vue.computed(
  * Load subjects for the current category from the API.
  */
 async function loadCategorySubjects(): Promise<void> {
+    const requestId = ++subjectRequestId;
+
     if (!props.subjectsEndpoint || isGeneralConfigTab.value) {
         currentSubjectsFromAPI.value = [];
+        isSubjectLoading.value = false;
+        subjectLoadError.value = null;
         return;
     }
+
+    isSubjectLoading.value = true;
+    subjectLoadError.value = null;
 
     const url = props.subjectsEndpoint.replace("{groupId}", currentCategory.value.id.toString());
     const response = await apiRequest<IBSubject[]>({ url, method: "GET" });
 
+    if (requestId !== subjectRequestId) {
+        return;
+    }
+
+    isSubjectLoading.value = false;
+
     if (!response.success || !Array.isArray(response.data)) {
         console.error("Failed to load subjects:", response.success ? "Unexpected format" : response.message);
         currentSubjectsFromAPI.value = [];
+        subjectLoadError.value = response.success ? "Unexpected response format" : response.message;
         return;
     }
 
@@ -108,9 +125,7 @@ async function onCategorySelected(category: IBCategory): Promise<void> {
     url.searchParams.set(categoryParamName, category.name);
     window.history.replaceState(null, "", url.toString());
 
-    // Load configurations and subjects sequentially to avoid race conditions
-    await loadCategoryConfigurations();
-    await loadCategorySubjects();
+    await Promise.all([loadCategoryConfigurations(), loadCategorySubjects()]);
 }
 
 /**
@@ -169,6 +184,8 @@ window.Vue.onMounted((): void => {
                     :search-languages-endpoint="props.routes.searchLanguages"
                     :search-class-codes-endpoint="props.routes.searchClassCodes"
                     :student-count-endpoint="props.routes.studentCount"
+                    :is-loading="isSubjectLoading"
+                    :load-error="subjectLoadError"
                 />
             </div>
         </section>

@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { apiRequest } from "@js/util/sbx/apiUtils";
+import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
+import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import SearchSelectModal from "@schoolboxVue/components/searchSelect/modal/search-select-modal.vue";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 import type {
@@ -58,6 +60,8 @@ const props = defineProps<{
     searchLanguagesEndpoint: string | null;
     searchClassCodesEndpoint: string | null;
     studentCountEndpoint: string | null;
+    isLoading: boolean;
+    loadError: string | null;
 }>();
 
 const isSaving = window.Vue.ref<boolean>(false);
@@ -657,7 +661,11 @@ async function saveSubjectConfiguration(): Promise<void> {
 
 <template>
     <div>
-        <div v-if="subjectRows.length === 0" class="alert alert-info">
+        <loading-table v-if="isLoading" />
+
+        <data-load-error v-else-if="loadError" :data-title="categoryTitle" :further-info="loadError" />
+
+        <div v-else-if="subjectRows.length === 0" class="alert alert-info">
             <i class="fa fa-info-circle"></i>
             No subjects configured yet for {{ categoryTitle }}. Use the table below to add subjects.
         </div>
