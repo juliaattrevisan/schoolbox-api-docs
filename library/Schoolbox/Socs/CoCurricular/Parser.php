@@ -39,10 +39,30 @@ class Parser
         \SimpleXMLElement $eventsXml,
         \SimpleXMLElement ...$registersXml,
     ): array {
+        return $this->parseWithEvents($clubsXml, $this->parseEvents($eventsXml), ...$registersXml);
+    }
+
+    /**
+     * Parse clubs and registers using events that have already been normalized.
+     *
+     * @param array<string,Event> $events
+     * @param \SimpleXMLElement ...$registersXml
+     * @return array{
+     *     0:array<string,Club>,
+     *     1:array<string,Event>,
+     *     2:array<string,string[]>,
+     *     3:array<string,string[]>
+     * }
+     * @throws ParseException When a feed has an invalid root
+     */
+    public function parseWithEvents(
+        \SimpleXMLElement $clubsXml,
+        array $events,
+        \SimpleXMLElement ...$registersXml,
+    ): array {
         $this->requireRoot($clubsXml, 'clubs');
 
         $clubs = $this->parseClubs($clubsXml);
-        $events = $this->parseEvents($eventsXml);
         $pupilIdsByClubId = $this->parseRegisters($registersXml, $events);
         $staffIdsByClubId = $this->parseStaff($events);
 
@@ -187,11 +207,12 @@ class Parser
     private function parseRegisters(array $registersXml, array $events): array
     {
         $pupilIdSetsByClubId = [];
+        $number = 0;
 
         foreach ($registersXml as $xml) {
             $this->requireRoot($xml, 'registers');
-            foreach ($xml->pupil as $index => $pupilXml) {
-                $number = ((int)$index) + 1;
+            foreach ($xml->pupil as $pupilXml) {
+                $number++;
                 try {
                     $context = "SOCS co-curricular register #{$number}";
                     $eventId = $this->requireValue($pupilXml, 'eventid', $context);

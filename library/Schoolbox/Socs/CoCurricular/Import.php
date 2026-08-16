@@ -61,8 +61,9 @@ class Import implements IStrategy
 
         $clubsXml = $this->httpClient->get(self::PATH, ['data' => 'clubs']);
         $eventsXml = $this->httpClient->get(self::PATH, ['data' => 'events', 'startdate' => $start, 'enddate' => $end, 'staff' => 1]);
+        $events = $this->parser->parseEvents($eventsXml);
         $eventDates = [];
-        foreach ($this->parser->parseEvents($eventsXml) as $event) {
+        foreach ($events as $event) {
             $eventDates[$event->start->getUsingFormat(Registry::SOCS_DATE_FORMAT)] = true;
         }
         $registersXml = [];
@@ -73,9 +74,9 @@ class Import implements IStrategy
                 ['data' => 'registers', 'startdate' => $eventDate],
             );
         }
-        [$clubs, $events, $pupilIdsByClubId, $staffIdsByClubId] = $this->parser->parse(
+        [$clubs, $events, $pupilIdsByClubId, $staffIdsByClubId] = $this->parser->parseWithEvents(
             $clubsXml,
-            $eventsXml,
+            $events,
             ...$registersXml,
         );
 
