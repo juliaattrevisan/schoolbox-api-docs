@@ -354,7 +354,7 @@ class Module extends BaseModule
         // that one route rather than the general preload below.
         $this->addRoutePreload($matcher, 'getStudentRecordInsertForm', function ($params) {
             if (array_key_exists('studentId', $params) && $params['studentId'] !== '0') {
-                return ['student' => $this->loadStudent($params['studentId'])];
+                return ['student' => $this->loadStudent((int)$params['studentId'])];
             }
             return [];
         });
@@ -365,7 +365,7 @@ class Module extends BaseModule
             // Load student record
 
             if (array_key_exists('studentId', $params)) {
-                $injectedValues['student'] = $this->loadStudent($params['studentId']);
+                $injectedValues['student'] = $this->loadStudent((int)$params['studentId']);
             }
 
             // Load linked student details
@@ -480,11 +480,11 @@ class Module extends BaseModule
     /**
      * Loads a student by id for use in pastoral route preloads.
      *
-     * @param string $id
+     * @param int $id The ID of the student to load.
      * @return User
      * @throws SchoolboxException if $id doesn't resolve to a student
      */
-    private function loadStudent($id): User
+    private function loadStudent(int $id): User
     {
         try {
             /** @var UserMapper $userMapper */
