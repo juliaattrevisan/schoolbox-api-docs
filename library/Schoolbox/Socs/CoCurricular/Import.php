@@ -74,7 +74,7 @@ class Import implements IStrategy
                 ['data' => 'registers', 'startdate' => $eventDate],
             );
         }
-        [$clubs, $events, $pupilIdsByClubId, $staffIdsByClubId] = $this->parser->parseWithEvents(
+        [$clubs, $events, $pupilIdsByClubId, $staffIdsByClubId] = $this->parser->parse(
             $clubsXml,
             $events,
             ...$registersXml,

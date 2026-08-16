@@ -24,25 +24,6 @@ class Parser
     }
 
     /**
-     * Parse and validate the clubs, events, and registers feeds together.
-     *
-     * @return array{
-     *     0:array<string,Club>,
-     *     1:array<string,Event>,
-     *     2:array<string,string[]>,
-     *     3:array<string,string[]>
-     * }
-     * @throws ParseException When a feed has an invalid root
-     */
-    public function parse(
-        \SimpleXMLElement $clubsXml,
-        \SimpleXMLElement $eventsXml,
-        \SimpleXMLElement ...$registersXml,
-    ): array {
-        return $this->parseWithEvents($clubsXml, $this->parseEvents($eventsXml), ...$registersXml);
-    }
-
-    /**
      * Parse clubs and registers using events that have already been normalized.
      *
      * @param array<string,Event> $events
@@ -55,7 +36,7 @@ class Parser
      * }
      * @throws ParseException When a feed has an invalid root
      */
-    public function parseWithEvents(
+    public function parse(
         \SimpleXMLElement $clubsXml,
         array $events,
         \SimpleXMLElement ...$registersXml,
