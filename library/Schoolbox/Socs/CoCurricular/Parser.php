@@ -24,8 +24,10 @@ class Parser
     }
 
     /**
-     * Parse and validate the clubs, events, and registers feeds together.
+     * Parse clubs and registers using events that have already been normalized.
      *
+     * @param array<string,Event> $events
+     * @param \SimpleXMLElement ...$registersXml
      * @return array{
      *     0:array<string,Club>,
      *     1:array<string,Event>,
@@ -36,15 +38,12 @@ class Parser
      */
     public function parse(
         \SimpleXMLElement $clubsXml,
-        \SimpleXMLElement $eventsXml,
-        \SimpleXMLElement $registersXml,
+        array $events,
+        \SimpleXMLElement ...$registersXml,
     ): array {
         $this->requireRoot($clubsXml, 'clubs');
-        $this->requireRoot($eventsXml, 'events');
-        $this->requireRoot($registersXml, 'registers');
 
         $clubs = $this->parseClubs($clubsXml);
-        $events = $this->parseEvents($eventsXml);
         $pupilIdsByClubId = $this->parseRegisters($registersXml, $events);
         $staffIdsByClubId = $this->parseStaff($events);
 
@@ -99,9 +98,11 @@ class Parser
      * Parse unique event occurrences indexed by SOCS EventID.
      *
      * @return array<string,Event>
+     * @throws ParseException When the feed has an invalid root
      */
-    private function parseEvents(\SimpleXMLElement $xml): array
+    public function parseEvents(\SimpleXMLElement $xml): array
     {
+        $this->requireRoot($xml, 'events');
         $events = [];
 
         foreach ($xml->event as $index => $eventXml) {
@@ -179,28 +180,34 @@ class Parser
      * SOCS pupil records are occurrence-specific. This union intentionally supports
      * the Fixtures team-membership visibility model used by the importer.
      *
+     * @param \SimpleXMLElement[] $registersXml
      * @param array<string,Event> $events
      * @return array<string,string[]>
+     * @throws ParseException When a feed has an invalid root
      */
-    private function parseRegisters(\SimpleXMLElement $xml, array $events): array
+    private function parseRegisters(array $registersXml, array $events): array
     {
         $pupilIdSetsByClubId = [];
+        $number = 0;
 
-        foreach ($xml->pupil as $index => $pupilXml) {
-            $number = ((int)$index) + 1;
-            try {
-                $context = "SOCS co-curricular register #{$number}";
-                $eventId = $this->requireValue($pupilXml, 'eventid', $context);
-                $pupilId = $this->requireValue($pupilXml, 'pupilid', $context);
+        foreach ($registersXml as $xml) {
+            $this->requireRoot($xml, 'registers');
+            foreach ($xml->pupil as $pupilXml) {
+                $number++;
+                try {
+                    $context = "SOCS co-curricular register #{$number}";
+                    $eventId = $this->requireValue($pupilXml, 'eventid', $context);
+                    $pupilId = $this->requireValue($pupilXml, 'pupilid', $context);
 
-                if (
-                    isset($events[$eventId])
-                    && !in_array($pupilId, $pupilIdSetsByClubId[$events[$eventId]->clubId] ?? [], true)
-                ) {
-                    $pupilIdSetsByClubId[$events[$eventId]->clubId][] = $pupilId;
+                    if (
+                        isset($events[$eventId])
+                        && !in_array($pupilId, $pupilIdSetsByClubId[$events[$eventId]->clubId] ?? [], true)
+                    ) {
+                        $pupilIdSetsByClubId[$events[$eventId]->clubId][] = $pupilId;
+                    }
+                } catch (ParseException $e) {
+                    $this->logMalformedRecord($e);
                 }
-            } catch (ParseException $e) {
-                $this->logMalformedRecord($e);
             }
         }
 
