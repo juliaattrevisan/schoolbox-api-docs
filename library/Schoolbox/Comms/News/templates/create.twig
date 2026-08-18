@@ -525,7 +525,15 @@
                     {% endif %}
                     <div class="small-12 columns">
                         <label for="news-title" class="required">Title</label>
-                        <input id="news-title" name="title" type="text" maxlength="255" value="{{ article.title }}" required />
+                        <input
+                            id="news-title"
+                            name="title"
+                            type="text"
+                            maxlength="255"
+                            value="{{ article.title }}"
+                            data-test="news-article-form-title"
+                            required
+                        />
                     </div>
 
                     <div class="small-12 columns">

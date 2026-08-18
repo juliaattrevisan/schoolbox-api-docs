@@ -1,9 +1,9 @@
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">Notification Delivery Options</h2>
+        <h2 class="subheader" data-test="notifications-delivery-options-title">Notification Delivery Options</h2>
         <section>
             <ul class="information-list">
-                <li>
+                <li data-test="notifications-delivery-option-muted">
                     <div class="list-item">
                         <div class="small-12 card">
                             <div class="u-flex-row u-gap-m u-pad-s--vert">
@@ -20,7 +20,7 @@
                 </li>
 
                 {% if digest %}
-                <li>
+                <li data-test="notifications-delivery-option-digest">
                     <div class="list-item">
                         <div class="small-12 card">
                             <div class="u-flex-row u-gap-m u-pad-s--vert">
@@ -38,7 +38,7 @@
                 </li>
                 {% endif %}
 
-                <li>
+                <li data-test="notifications-delivery-option-instant">
                     <div class="list-item">
                         <div class="small-12 card">
                             <div class="u-flex-row u-gap-m u-pad-s--vert">
@@ -65,7 +65,7 @@
                 </li>
 
                 {% if mobile %}
-                <li>
+                <li data-test="notifications-delivery-option-device">
                     <div class="list-item">
                         <div class="small-12 card">
                             <div class="u-flex-row u-gap-m u-pad-s--vert">
@@ -83,7 +83,7 @@
                 </li>
                 {% endif %}
 
-                <li>
+                <li data-test="notifications-delivery-option-email">
                     <div class="list-item">
                         <div class="small-12 card">
                             <div class="u-flex-row u-gap-m u-pad-s--vert">

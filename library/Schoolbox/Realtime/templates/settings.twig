@@ -89,10 +89,10 @@
         {% for namespace in msgConfig %}
             {% if ns[namespace.id] is defined %}
                 <h3 class="subheader">Receive <span class="u-ts-capitalize">{{ locale.translateSentence(namespace.label) }}</span> notifications when&hellip;</h3>
-                <section>
+                <section data-test="notification-settings-namespace-{{ ns[namespace.id].slug }}">
                     <ul class='permission-list' data-roles data-digest-settings>
                         {% for source in namespace.sources %}
-                            <li>
+                            <li data-test="notification-settings-source-{{ ns[namespace.id].slug }}-{{ sources[source.id].key }}">
                                 <label class="content">&hellip;{{ locale.translateSentence(source.description) }}.</label>
                                 <div class="actions-small-6" data-source="{{ source.id }}">
                                     <nav>

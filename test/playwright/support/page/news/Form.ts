@@ -22,9 +22,11 @@ export default class Form {
 
     static readonly FORM = "#newsForm";
 
+    static readonly DATA_TEST_FORM_SAVE = "news-article-form-submit";
+
     static readonly FORM_SAVE = "#news-submit";
 
-    static readonly ARTICLE_HEADLINE = "#news-title";
+    static readonly DATA_TEST_ARTICLE_HEADLINE = "news-article-form-title";
 
     static readonly DATA_TEST_ARTICLE_BODY = "news-article-form-body";
 
@@ -35,6 +37,12 @@ export default class Form {
     static readonly DATA_TEST_AUDIENCE_LIST_ITEM_LABEL = "news-item-audience-select-audience-list-item-label";
 
     static readonly DATA_TEST_AUDIENCE_LIST_ITEM_REMOVE = "news-item-audience-select-remove-{nameLabel}";
+
+    static readonly DATA_TEST_AUDIENCE_BROWSE = "news-item-audience-select-browse";
+
+    static readonly DATA_TEST_AUDIENCE_TYPE = "news-item-audience-select-type-";
+
+    static readonly DATA_TEST_AUDIENCE_ADD = "news-item-audience-select-add";
 
     static readonly FORM_CREATE = "form#createForm";
 
@@ -57,8 +65,10 @@ export default class Form {
      * submit the form
      */
     async submit(): Promise<void> {
-        await expect(this.page.locator(Form.FORM_SAVE)).toBeEnabled({ timeout: 30000 });
-        await this.page.locator(Form.FORM_SAVE).click();
+        const submitButton = this.page.getByTestId(Form.DATA_TEST_FORM_SAVE).or(this.page.locator(Form.FORM_SAVE));
+        await expect(submitButton).toBeEnabled({ timeout: 30000 });
+        await submitButton.click();
+        await expect(submitButton).not.toBeVisible();
     }
 
     /**
@@ -66,7 +76,7 @@ export default class Form {
      * @param headline - The headline to fill
      */
     async fillHeadline(headline: string): Promise<void> {
-        await this.page.fill(Form.ARTICLE_TITLE_CKEDITOR, headline);
+        await this.page.getByTestId(Form.DATA_TEST_ARTICLE_HEADLINE).fill(headline);
     }
 
     /**
@@ -74,7 +84,7 @@ export default class Form {
      * @param headline - The headline to see
      */
     async seeHeadline(headline: string): Promise<void> {
-        await expect(this.page.locator(Form.ARTICLE_HEADLINE)).toHaveValue(headline);
+        await expect(this.page.getByTestId(Form.DATA_TEST_ARTICLE_HEADLINE)).toHaveValue(headline);
     }
 
     /**
@@ -168,9 +178,27 @@ export default class Form {
      * @param audienceBrick - The audience brick
      */
     async selectAudienceOption(audienceBrick: string): Promise<void> {
-        await this.page.locator("button.button:has(sbx-icon[name='drag-drop'])").click();
+        const audienceTypeByLabel: Record<string, string> = {
+            Campuses: "campus",
+            Roles: "role",
+            Groups: "folder",
+            "Year Levels": "year",
+        };
+
+        await this.page
+            .getByTestId(Form.DATA_TEST_AUDIENCE_BROWSE)
+            .or(this.page.locator("button.button:has(sbx-icon[name='drag-drop'])"))
+            .click();
         await this.common.waitForModalToBeOpen();
-        await this.page.locator(`button.button-block:has-text("${audienceBrick}")`).click();
+        const audienceType = audienceTypeByLabel[audienceBrick];
+        if (audienceType) {
+            await this.page
+                .getByTestId(`${Form.DATA_TEST_AUDIENCE_TYPE}${audienceType}`)
+                .or(this.page.getByRole("button", { name: audienceBrick }))
+                .click();
+        } else {
+            await this.page.getByRole("button", { name: audienceBrick }).click();
+        }
         await expect(this.page.getByTestId(Form.DATA_TEST_AUDIENCE_LIST_ITEM).first()).toBeVisible();
     }
 
@@ -196,7 +224,11 @@ export default class Form {
      * click Add Audience in the modal
      */
     async clickAddAudience(): Promise<void> {
-        await this.page.locator(Common.MODAL_SUBMIT_BUTTON).first().click();
+        await this.page
+            .getByTestId(Form.DATA_TEST_AUDIENCE_ADD)
+            .or(this.page.locator(Common.MODAL_SUBMIT_BUTTON).first())
+            .click();
+        await this.tester.common.waitForModalToBeClosed();
         await this.waitForDraftToast();
     }
 

@@ -105,7 +105,11 @@ set labelDisplayNames = {
 
 <ul id="adv" class="information-list">
     <li data-source="{{ source.id }}">
-        <form method="post" action="">
+        <form
+            method="post"
+            action=""
+            data-test="notifications-configure-advanced-form-{{ ns[namespace.id].slug }}-{{ source.key }}-{{ role.id }}"
+        >
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
@@ -126,9 +130,15 @@ set labelDisplayNames = {
                                         <input id="opt-{{ source.id }}-{{ role.id }}-{{ level }}"
                                                name="data[{{ ns[namespace.id].slug ?: 0 }}][{{ source.key ?: 0 }}][{{ role.id }}][mask][]"
                                                value="{{ level }}" type="checkbox"
+                                               data-test="notification-advanced-mask-input-{{ ns[namespace.id].slug }}-{{ source.key }}-{{ role.id }}-{{ labelDisplayNames[perm[1]] | lower }}"
                                                {% if perm[1] | slice(0, 2) | upper in role.mask %}checked="checked"{% endif %}
                                         />
-                                        <label for="opt-{{ source.id }}-{{ role.id }}-{{ level }}" title="{{ labelDisplayNames[perm[1]] }}" class="input-toggle">
+                                        <label
+                                            for="opt-{{ source.id }}-{{ role.id }}-{{ level }}"
+                                            title="{{ labelDisplayNames[perm[1]] }}"
+                                            class="input-toggle"
+                                            data-test="notification-advanced-mask-{{ ns[namespace.id].slug }}-{{ source.key }}-{{ role.id }}-{{ labelDisplayNames[perm[1]] | lower }}"
+                                        >
                                             <sbx-icon name="{{ iconClassnames[perm[1]] }}" size="l" color="currentColor"></sbx-icon>
                                         </label>
                                     </span>
@@ -167,7 +177,7 @@ set labelDisplayNames = {
                 </fieldset>
             </section>
 
-            <input type="submit" value="Save" />
+            <input type="submit" value="Save" data-test="notifications-configure-advanced-save" />
         </form>
     </li>
 </ul>
