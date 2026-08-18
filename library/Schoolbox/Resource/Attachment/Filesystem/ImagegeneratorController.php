@@ -13,6 +13,7 @@ use OutOfRangeException;
 use Ramsey\Uuid\Uuid;
 use Schoolbox\Admin\OpenAI\ValidAIFeatureEnabled;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Editor\OpenAI;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Attachment\AbstractController;
 use Schoolbox\User;
