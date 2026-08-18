@@ -34,7 +34,7 @@ CREATE TABLE `_openai_log` (
   `output_text` text DEFAULT NULL,
   `model` varchar(255) DEFAULT NULL,
   `endpoint` varchar(255) DEFAULT NULL,
-  `feature` enum('chat','lessonplan','image','differentiation','dialogagent','learningactivitycustomisation','rubricgeneration','aimoderationagent') NOT NULL DEFAULT 'chat',
+  `feature` enum('chat','lessonplan','image','differentiation','dialogagent','learningactivitycustomisation','aimoderationagent') NOT NULL DEFAULT 'chat',
   `log_format` enum('agent_chat','guardrail') DEFAULT NULL,
   `response` mediumtext DEFAULT NULL,
   `return_code` int(11) DEFAULT NULL,
@@ -91,7 +91,7 @@ DROP TABLE IF EXISTS `ai_session`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ai_session` (
   `id` char(36) NOT NULL,
-  `feature` enum('chat','lessonplan','image','differentiation','dialogagent','learningactivitycustomisation','rubricgeneration','aimoderationagent') NOT NULL,
+  `feature` enum('chat','lessonplan','image','differentiation','dialogagent','learningactivitycustomisation','aimoderationagent') NOT NULL,
   `created_at` datetime NOT NULL,
   `created_by` int(10) unsigned DEFAULT NULL COMMENT 'Null for system-created logs.',
   PRIMARY KEY (`id`),
