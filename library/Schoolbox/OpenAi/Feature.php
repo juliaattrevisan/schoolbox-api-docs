@@ -21,6 +21,7 @@ enum Feature: string
     case DIFFERENTIATION = 'differentiation';
     case DIALOG_AGENT = 'dialogagent';
     case LEARNING_ACTIVITY_CUSTOMISATION = 'learningactivitycustomisation';
+    case RUBRIC_GENERATION = 'rubricgeneration';
     case AI_MODERATION_AGENT = 'aimoderationagent';
 
     /**

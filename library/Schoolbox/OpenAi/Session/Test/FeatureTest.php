@@ -31,6 +31,7 @@ class FeatureTest extends TestCase
             'differentiation',
             'dialogagent',
             'learningactivitycustomisation',
+            'rubricgeneration',
             'aimoderationagent',
         ], $values);
     }
