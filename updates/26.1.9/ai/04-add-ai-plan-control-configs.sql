@@ -19,7 +19,7 @@ VALUES
     ('ai_image_generation_enabled', 'AI Image Generation Enabled', 'true', 'Controls whether AI Image Generation is available for this plan.', (SELECT id FROM lu_config_field WHERE field = 'boolean'), (SELECT id FROM lu_config_type WHERE type = 'Modules'), 'false', 'true', 'false', 'settings', 0),
     ('ai_learning_activity_customisation_enabled', 'AI Learning Activity Customisation Enabled', 'true', 'Controls whether AI Learning Activity Customisation is available for this plan.', (SELECT id FROM lu_config_field WHERE field = 'boolean'), (SELECT id FROM lu_config_type WHERE type = 'Modules'), 'false', 'true', 'false', 'settings', 0),
     ('ai_moderation_agent_enabled', 'AI Moderation Agent Enabled', 'true', 'Controls whether the AI Moderation Agent runs for this plan.', (SELECT id FROM lu_config_field WHERE field = 'boolean'), (SELECT id FROM lu_config_type WHERE type = 'Modules'), 'false', 'true', 'false', 'settings', 0),
-    ('ai_rubric_generation_enabled', 'AI Rubric Generation Enabled', 'true', 'Controls whether AI Rubric Generation is available for this plan.', (SELECT id FROM lu_config_field WHERE field = 'boolean'), (SELECT id FROM lu_config_type WHERE type = 'Modules'), 'false', 'true', 'false', 'settings', 0)
+    ('ai_rubric_generation_enabled', 'AI Rubric Generation Enabled', 'false', 'Controls whether AI Rubric Generation is available for this plan.', (SELECT id FROM lu_config_field WHERE field = 'boolean'), (SELECT id FROM lu_config_type WHERE type = 'Modules'), 'false', 'true', 'false', 'settings', 0)
 ON DUPLICATE KEY UPDATE
     title = VALUES(title),
     description = VALUES(description),
