@@ -515,8 +515,6 @@ class Tracer
     ): void {
         $hub = SentrySdk::getCurrentHub();
 
-        /** @var array<Span> $spanStack */
-        $spanStack   = [];
         $transaction = $hub->getTransaction();
 
         // No transaction or not sampled? Return
@@ -525,8 +523,11 @@ class Tracer
         }
 
         // Apply each change to the actual transaction stack.
+        // The stack is held on the instance rather than locally, so that a span
+        // left open by a partial flush is still there to be popped by a later
+        // one.
         foreach ($this->stackChanges as $stackChange) {
-            $spanStack = $stackChange->operate($hub, $spanStack);
+            $this->spanStack = $stackChange->operate($hub, $this->spanStack);
         }
         $this->stackChanges = [];
 
