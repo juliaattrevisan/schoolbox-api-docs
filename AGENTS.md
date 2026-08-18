@@ -263,6 +263,7 @@ Co-Authored-By: <agent>
 - `upstream` is the canonical `alaress/schoolbox` repository and `origin` is the developer fork.
 - Push task, bug, and hotfix branches to `origin`, then create pull requests against `upstream`.
 - The pull request base branch should match the branch suffix: `*-develop/*` targets `develop`, and `*-master/*` targets `master`.
+- PR titles follow the same format as commits: `Short imperative description [SA-XXXXX]`
 - Features usually require only a `develop` PR: occasionally they will also require a `master` PR
   - There's no set rule for whether a feature is to be released to `master`: this will have been determined by stakeholders
 - Bug fixes usually require two PRs: prepare the `develop` PR first, then replay the same scoped change onto a matching
