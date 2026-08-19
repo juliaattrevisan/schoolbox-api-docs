@@ -13,6 +13,7 @@ use Schoolbox\Admin\Package\Model as PackageModel;
 use Schoolbox\Admin\SkinConfig\Category as SkinConfigCategory;
 use Schoolbox\Admin\SkinConfig\Subcategory as SkinConfigSubcategory;
 use Schoolbox\GenericCollection;
+use Schoolbox\IB\Qualification\Mapper as QualificationMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
 
@@ -62,27 +63,6 @@ class ConfigMapper extends Mapper
     public const string NAME_IBIS_ENDPOINT = 'ibis_endpoint';
     public const string NAME_IBIS_APP_ID = 'ibis_app_id';
     public const string NAME_IBIS_SECRET_KEY = 'ibis_secret_key';
-
-    /**
-     * IB qualifications to create when IB is enabled.
-     *
-     * Existing active qualifications are matched by system purpose, so a "Diploma Programme" qualification already
-     * linked to the "Diploma Programme Year 2" system purpose is treated as present.
-     *
-     * @var array<int, array{qualificationName: string, systemPurposeName: string, categoryName: string}>
-     */
-    private const array IB_QUALIFICATIONS = [
-        [
-            'qualificationName' => 'Diploma Programme',
-            'systemPurposeName' => 'Diploma Programme Year 2',
-            'categoryName' => 'DIPLOMA',
-        ],
-        [
-            'qualificationName' => 'Diploma Course',
-            'systemPurposeName' => 'Diploma Course',
-            'categoryName' => 'COURSE',
-        ],
-    ];
 
     // Field enum (kinda)
     public const int FIELD_INPUT         =  1;
@@ -798,35 +778,6 @@ class ConfigMapper extends Mapper
     }
 
     /**
-     * Create the required IB qualifications if they do not already exist.
-     *
-     * @return void
-     */
-    protected function ensureIbQualificationsExist(): void
-    {
-        $query = "
-            INSERT INTO `lu_qualification` (`name`, `system_purpose_id`, `sequence`)
-            SELECT :qualificationName, sp.`id`, (SELECT COALESCE(MAX(`sequence`), 0) + 1 FROM `lu_qualification`)
-            FROM `ib_system_purposes` sp
-            INNER JOIN `lu_ib_category` c ON c.`id` = sp.`category_id`
-            WHERE sp.`name` = :systemPurposeName
-              AND c.`name` = :categoryName
-              AND NOT EXISTS (
-                  SELECT 1
-                  FROM `lu_qualification` q
-                  WHERE q.`system_purpose_id` = sp.`id`
-                    AND q.`deleted_at` IS NULL
-              )
-        ";
-
-        $statement = $this->getDatabase()->prepareQuery($query);
-
-        foreach (self::IB_QUALIFICATIONS as $qualification) {
-            $statement->execute($qualification);
-        }
-    }
-
-    /**
      * Show or hide IB packages based on the IB enabled configuration value.
      *
      * @param bool $ibEnabled
@@ -867,7 +818,7 @@ class ConfigMapper extends Mapper
         if ($model->getName() === self::NAME_IB_ENABLED && $prev !== null && $model->getValue() !== $prev->getValue()) {
             $ibEnabled = (bool)$model->getValue();
             if ($ibEnabled) {
-                $this->ensureIbQualificationsExist();
+                QualificationMapper::getInstance()->ensureIbQualificationsExist();
             }
             $this->setIbPackageVisibility($ibEnabled);
         }
