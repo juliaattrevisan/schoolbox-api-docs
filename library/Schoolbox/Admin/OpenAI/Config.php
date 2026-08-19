@@ -717,9 +717,10 @@ class Config
             // TODO set which options are allowed: e.g. provider options, fields
             foreach ($rows as $row) {
                 $feature = array_search($row->getName(), self::ALL_MODULES, true);
+                $planEnabled = $this->isConfigurationPlanEnabled($row->getName(), $configLoader);
                 if (
                     !is_string($feature)
-                    || (!$includeDisabledPlanFeatures && !$this->isConfigurationPlanEnabled($row->getName(), $configLoader))
+                    || (!$includeDisabledPlanFeatures && !$planEnabled)
                 ) {
                     continue;
                 }
@@ -728,6 +729,7 @@ class Config
                     'feature' => $feature,
                     'title' => $row->getTitle(),
                     'config' => $this->decode($row->getValue()),
+                    'planEnabled' => $planEnabled,
                     'formInputs' => $this->buildFormInputs($feature),
                 ];
             }

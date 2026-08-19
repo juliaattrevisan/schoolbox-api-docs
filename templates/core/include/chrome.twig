@@ -155,7 +155,7 @@
         {% if user.current.role.staff %}
             {% for feature, aiConfig in aiFeatures %}
                 {# TODO: why does this require you to know the data structure... It really should be a class with an ->isEnabled() method #}
-                {% set isEnabled = aiConfig.config.provider.value != 'Off' %}
+                {% set isEnabled = aiConfig.planEnabled and aiConfig.config.provider.value != 'Off' %}
                 window.sbProps.aiFeatures["{{ feature }}"] = {
                     enabled: {{ isEnabled ? 'true' : 'false' }},
                 };

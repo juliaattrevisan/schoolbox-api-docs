@@ -109,6 +109,33 @@ class ConfigTest extends TestCase
     }
 
     /**
+     * Plan-disabled features retain explicit availability metadata for browser consumers.
+     *
+     * @return void
+     */
+    public function testFetchFeaturesIncludesPlanAvailabilityMetadata(): void
+    {
+        $featureConfig = (new ConfigModel())
+            ->setName(ConfigMapper::NAME_AI_TEXT_CHAT)
+            ->setTitle('AI Text Chat')
+            ->setValue(json_encode([
+                                       Config::FIELD_PROVIDER => ['value' => Helper::ENDPOINT_TYPE_OPENAI],
+                                   ], JSON_THROW_ON_ERROR));
+        $configMapper = $this->createMock(ConfigMapper::class);
+        $configMapper->expects($this->once())
+                     ->method('findByColumn')
+                     ->willReturn([$featureConfig]);
+
+        $features = (new Config())->fetchFeatures(
+            $configMapper,
+            new ArrayLoader([ConfigMapper::NAME_AI_TEXT_CHAT_ENABLED => 'false']),
+            true,
+        );
+
+        $this->assertFalse($features['chat']['planEnabled']);
+    }
+
+    /**
      * Data provider for isEnabled
      *
      * @return array

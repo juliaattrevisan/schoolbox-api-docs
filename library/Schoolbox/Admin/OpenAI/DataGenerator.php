@@ -29,6 +29,6 @@ class DataGenerator implements IDataGenerator
     public function generate(?array $chromeData = []): array
     {
         // returns each feature / module for ai, its creds, and if its enabled
-        return new Config()->fetchFeatures($this->configMapper, $this->configLoader);
+        return new Config()->fetchFeatures($this->configMapper, $this->configLoader, true);
     }
 }
