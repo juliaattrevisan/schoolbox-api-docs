@@ -37,6 +37,7 @@ class Module extends BaseModule
         $dpEnabled = new Rule\All(
             $isStaff,
             new Rule\IsConfigOn(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED, $this->getConfig()),
+            new IsAIFeatureEnabled(ConfigMapper::NAME_AI_DIFFERENTIATION, $this->getConfig())
         );
 
         $hasDifferentiationProfileService = new Rule\All(

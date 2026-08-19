@@ -662,6 +662,14 @@ class ConfigMapper extends Mapper
         self::NAME_CURRICULUM_COVERAGE_REPORT_ENABLED,
         self::NAME_IB_ENABLED,
         self::NAME_ZENDA_ENABLED,
+        // all the AI features now manage routes also
+        self::NAME_AI_DIALOGAGENT_ENABLED,
+        self::NAME_AI_DIFFERENTIATION_ENABLED,
+        self::NAME_AI_LEARNING_ACTIVITY_CUSTOMISATION_ENABLED,
+        self::NAME_AI_LESSONPLAN_ENABLED,
+        self::NAME_AI_TEXT_CHAT_ENABLED,
+        self::NAME_AI_RUBRIC_GENERATION_ENABLED,
+        self::NAME_AI_IMAGE_GENERATION_ENABLED,
     ];
 
     /**
