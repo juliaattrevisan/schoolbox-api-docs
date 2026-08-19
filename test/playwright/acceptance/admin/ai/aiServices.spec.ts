@@ -30,6 +30,7 @@ test.describe("Admin AI Services Settings", () => {
             [AiFeature.IMAGE]: true,
             [AiFeature.LEARNING_ACTIVITY_CUSTOMISATION]: true,
             [AiFeature.LESSON_PLAN]: true,
+            [AiFeature.RUBRIC_GENERATION]: true,
         };
 
         const featuresWithAzure: Record<AiFeature, boolean> = {
@@ -40,6 +41,7 @@ test.describe("Admin AI Services Settings", () => {
             [AiFeature.IMAGE]: false,
             [AiFeature.LEARNING_ACTIVITY_CUSTOMISATION]: true,
             [AiFeature.LESSON_PLAN]: true,
+            [AiFeature.RUBRIC_GENERATION]: true,
         };
 
         for (const featureKey of Object.values(AiFeature)) {

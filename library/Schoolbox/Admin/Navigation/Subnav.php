@@ -872,6 +872,11 @@ class Subnav
                                 'visible' => true,
                                 'description' => 'Configure AI settings for learning activity customisation.',
                             ],
+                            '/adminv2/ai-services#ai_' . Feature::RUBRIC_GENERATION->value => [
+                                'name' => 'AI Rubric Generation',
+                                'visible' => true,
+                                'description' => 'Configure AI settings for AI rubric generation.',
+                            ],
                         ]
                     ],
                     '/adminv2/aiLog' => [

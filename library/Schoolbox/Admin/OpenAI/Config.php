@@ -30,6 +30,7 @@ class Config
         Feature::DIALOG_AGENT->value                    => ConfigMapper::NAME_AI_DIALOGAGENT,
         Feature::IMAGE->value                           => ConfigMapper::NAME_AI_IMAGE_GENERATION,
         Feature::LEARNING_ACTIVITY_CUSTOMISATION->value => ConfigMapper::NAME_AI_LEARNING_ACTIVITY_CUSTOMISATION,
+        Feature::RUBRIC_GENERATION->value               => ConfigMapper::NAME_AI_RUBRIC_GENERATION,
         Feature::AI_MODERATION_AGENT->value             => ConfigMapper::NAME_AI_MODERATION_AGENT,
     ];
 
@@ -128,6 +129,9 @@ class Config
             'image' => ['gpt-image-2'],
         ],
         Feature::LEARNING_ACTIVITY_CUSTOMISATION->value => [
+            'text' => ['gpt-5.4-nano'],
+        ],
+        Feature::RUBRIC_GENERATION->value => [
             'text' => ['gpt-5.4-nano'],
         ],
         Feature::AI_MODERATION_AGENT->value => [

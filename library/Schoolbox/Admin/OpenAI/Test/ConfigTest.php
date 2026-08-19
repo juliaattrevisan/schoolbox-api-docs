@@ -12,7 +12,9 @@ namespace Schoolbox\Admin\OpenAI\Test;
 use JsonException;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Admin\OpenAI\Config;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Editor\OpenAI\Helper;
+use Schoolbox\OpenAi\Feature;
 use TypeError;
 
 /**
@@ -22,6 +24,36 @@ use TypeError;
  */
 class ConfigTest extends TestCase
 {
+    /**
+     * The rubric generation card remains configuration-only, but uses the same
+     * provider fields and model options as Learning Activity Customisation.
+     */
+    public function testRubricGenerationConfigurationMatchesLearningActivityCustomisation(): void
+    {
+        $config = new Config();
+
+        $this->assertSame(
+            ConfigMapper::NAME_AI_RUBRIC_GENERATION,
+            Config::ALL_MODULES[Feature::RUBRIC_GENERATION->value],
+        );
+        $this->assertSame(
+            Config::RECOMMENDED_MODELS[Feature::LEARNING_ACTIVITY_CUSTOMISATION->value],
+            Config::RECOMMENDED_MODELS[Feature::RUBRIC_GENERATION->value],
+        );
+        $this->assertSame(
+            $config->initGeneral(Feature::LEARNING_ACTIVITY_CUSTOMISATION->value),
+            $config->initGeneral(Feature::RUBRIC_GENERATION->value),
+        );
+        $this->assertSame(
+            $config->initOpenAi(Feature::LEARNING_ACTIVITY_CUSTOMISATION->value),
+            $config->initOpenAi(Feature::RUBRIC_GENERATION->value),
+        );
+        $this->assertSame(
+            $config->initAzure(Feature::LEARNING_ACTIVITY_CUSTOMISATION->value),
+            $config->initAzure(Feature::RUBRIC_GENERATION->value),
+        );
+    }
+
     /**
      * Data provider for isEnabled
      *
