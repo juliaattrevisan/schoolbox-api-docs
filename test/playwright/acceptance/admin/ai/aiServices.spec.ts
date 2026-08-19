@@ -1,6 +1,18 @@
 import { AiFeature } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
-import { test } from "@schoolboxTest/playwright/support/integrations";
+import { expect, test } from "@schoolboxTest/playwright/support/integrations";
 import AIServices, { AiProvider } from "@schoolboxTest/playwright/support/page/admin/ai/AIServices";
+
+const planEnabledFeatures = [
+    AiFeature.AI_MODERATION_AGENT,
+    AiFeature.CHAT,
+    AiFeature.DIALOG_AGENT,
+    AiFeature.DIFFERENTIATION,
+    AiFeature.IMAGE,
+    AiFeature.LEARNING_ACTIVITY_CUSTOMISATION,
+    AiFeature.LESSON_PLAN,
+] as const;
+
+type PlanEnabledFeature = (typeof planEnabledFeatures)[number];
 
 test.describe("Admin AI Services Settings", () => {
     // Keep a copy of the initial AI settings so they can be reset after the tests are done
@@ -18,11 +30,13 @@ test.describe("Admin AI Services Settings", () => {
         await tester.loginAsAdmin();
     });
 
-    test("supported AI providers", async ({ page, tester }) => {
+    test("supported AI providers for plan-enabled features", async ({ page, tester }) => {
         const aiServices = new AIServices(page, tester);
         await aiServices.goto();
 
-        const featuresWithOpenAI: Record<AiFeature, boolean> = {
+        await expect(aiServices.locateFeature(AiFeature.RUBRIC_GENERATION)).toHaveCount(0);
+
+        const featuresWithOpenAI: Record<PlanEnabledFeature, boolean> = {
             [AiFeature.AI_MODERATION_AGENT]: true,
             [AiFeature.CHAT]: true,
             [AiFeature.DIALOG_AGENT]: true,
@@ -30,10 +44,9 @@ test.describe("Admin AI Services Settings", () => {
             [AiFeature.IMAGE]: true,
             [AiFeature.LEARNING_ACTIVITY_CUSTOMISATION]: true,
             [AiFeature.LESSON_PLAN]: true,
-            [AiFeature.RUBRIC_GENERATION]: false, // at launch this defaults to OFF, this will change later to default ON (depending on plan)
         };
 
-        const featuresWithAzure: Record<AiFeature, boolean> = {
+        const featuresWithAzure: Record<PlanEnabledFeature, boolean> = {
             [AiFeature.AI_MODERATION_AGENT]: true,
             [AiFeature.CHAT]: true,
             [AiFeature.DIALOG_AGENT]: true,
@@ -41,10 +54,9 @@ test.describe("Admin AI Services Settings", () => {
             [AiFeature.IMAGE]: false,
             [AiFeature.LEARNING_ACTIVITY_CUSTOMISATION]: true,
             [AiFeature.LESSON_PLAN]: true,
-            [AiFeature.RUBRIC_GENERATION]: false, // at launch this defaults to OFF, this will change later to default ON (depending on plan)
         };
 
-        for (const featureKey of Object.values(AiFeature)) {
+        for (const featureKey of planEnabledFeatures) {
             const feature = aiServices.locateFeature(featureKey);
 
             if (featuresWithOpenAI[featureKey]) {
