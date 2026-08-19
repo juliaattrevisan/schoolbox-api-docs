@@ -91,9 +91,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
 
         if ($action === 'reload') {
             $this->log->debug('Reloading subscription cache to router');
-            // this is the only action we currently know about
             $this->postman->reloadRouter();
-            $this->onHangup();
             return;
         }
 
