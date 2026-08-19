@@ -212,9 +212,7 @@ class Client
      */
     private function createTokenUrl(): Uri
     {
-        return (new Uri())
-            ->withScheme('https')
-            ->withHost(rtrim($this->host, "/ \n\r\t\v\x00"))
+        return Uri::fromBaseAndPath($this->host, '')
             ->withPath('/auth/connect/token');
     }
 
