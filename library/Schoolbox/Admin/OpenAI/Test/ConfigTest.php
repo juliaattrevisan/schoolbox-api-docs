@@ -160,6 +160,33 @@ class ConfigTest extends TestCase
     }
 
     /**
+     * The combined predicate must require both plan and provider availability.
+     *
+     * @return void
+     */
+    public function testIsFeatureEnabledRequiresPlanAndProvider(): void
+    {
+        $cfg = new Config();
+        $config = [Config::FIELD_PROVIDER => ['value' => Helper::ENDPOINT_TYPE_OPENAI]];
+
+        $this->assertTrue($cfg->isFeatureEnabled(
+            $config,
+            ConfigMapper::NAME_AI_TEXT_CHAT,
+            new ArrayLoader([ConfigMapper::NAME_AI_TEXT_CHAT_ENABLED => 'true']),
+        ));
+        $this->assertFalse($cfg->isFeatureEnabled(
+            $config,
+            ConfigMapper::NAME_AI_TEXT_CHAT,
+            new ArrayLoader([ConfigMapper::NAME_AI_TEXT_CHAT_ENABLED => 'false']),
+        ));
+        $this->assertFalse($cfg->isFeatureEnabled(
+            [Config::FIELD_PROVIDER => ['value' => Helper::ENDPOINT_TYPE_OFF]],
+            ConfigMapper::NAME_AI_TEXT_CHAT,
+            new ArrayLoader([ConfigMapper::NAME_AI_TEXT_CHAT_ENABLED => 'true']),
+        ));
+    }
+
+    /**
      * Data provider for decode
      *
      * @return array

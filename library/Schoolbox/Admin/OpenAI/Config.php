@@ -583,6 +583,23 @@ class Config
     }
 
     /**
+     * Check whether an AI feature is enabled by both its plan and provider configuration.
+     *
+     * @param array|null     $config
+     * @param string         $featureConfigName
+     * @param IConfigLoader  $configLoader
+     * @return bool
+     */
+    public function isFeatureEnabled(
+        ?array $config,
+        string $featureConfigName,
+        IConfigLoader $configLoader,
+    ): bool {
+        return $this->isConfigurationPlanEnabled($featureConfigName, $configLoader)
+            && $this->isEnabled($config);
+    }
+
+    /**
      * Checks whether the plan enables an AI feature.
      *
      * @param string        $feature
