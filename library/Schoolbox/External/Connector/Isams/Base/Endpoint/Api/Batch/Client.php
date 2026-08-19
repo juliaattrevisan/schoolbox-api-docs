@@ -135,7 +135,10 @@ class Client
      */
     private function createBatchUrl(string $path): Uri
     {
-        return Uri::fromBaseAndPath($this->host, $path)
+        return (new Uri())
+            ->withScheme('https')
+            ->withHost(rtrim($this->host, "/ \n\r\t\v\x00"))
+            ->withPath('/' . ltrim($path, '/'))
             ->appendQueryParameters(['apikey' => $this->apiKey]);
     }
 
