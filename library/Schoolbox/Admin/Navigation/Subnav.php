@@ -875,7 +875,7 @@ class Subnav
                             ],
                             '/adminv2/ai-services#ai_' . Feature::RUBRIC_GENERATION->value => [
                                 'name' => 'AI Rubric Generation',
-                                'visible' => true,
+                                'visible' => $this->hasEnabledAiPlanFeature(Feature::RUBRIC_GENERATION),
                                 'description' => 'Configure AI settings for AI rubric generation.',
                             ],
                         ]
