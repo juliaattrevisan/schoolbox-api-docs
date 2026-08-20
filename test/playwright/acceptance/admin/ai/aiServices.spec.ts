@@ -1,6 +1,6 @@
 import { AiFeature } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
-import { expect, test } from "@schoolboxTest/playwright/support/integrations";
-import AIServices, { AiProvider } from "@schoolboxTest/playwright/support/page/admin/ai/AIServices";
+import { test } from "@schoolboxTest/playwright/support/integrations";
+import AIServices, { AiFeatureConfigMap, AiProvider } from "@schoolboxTest/playwright/support/page/admin/ai/AIServices";
 
 const planEnabledFeatures = [
     AiFeature.AI_MODERATION_AGENT,
@@ -15,19 +15,34 @@ const planEnabledFeatures = [
 type PlanEnabledFeature = (typeof planEnabledFeatures)[number];
 
 test.describe("Admin AI Services Settings", () => {
-    // Keep a copy of the initial AI settings so they can be reset after the tests are done
-    const initialSettings: Record<string, string | null> = {
-        ai_text_chat: null,
-    };
+    /// Keep a copy of the initial AI settings so they can be reset after the tests are done
+    const initialSettings = Object.values(AiFeature).reduce(
+        (acc, feature) => {
+            acc[feature] = { config: null, enabled: null };
+            return acc;
+        },
+        {} as Record<AiFeature, { config: string | null; enabled: boolean | null }>,
+    );
 
     test.beforeAll(async ({ db }) => {
-        for (const setting of Object.keys(initialSettings)) {
-            initialSettings[setting] = (await db.grabFromDatabase("config", "value", { name: setting })) as string;
+        for (const feature of Object.values(AiFeature)) {
+            const configName = AiFeatureConfigMap[feature];
+            initialSettings[feature] = {
+                config: (await db.grabFromDatabase("config", "value", { name: configName })) as string,
+                enabled: (await db.grabFromDatabase("config", "value", { name: `${configName}_enabled` })) === "true",
+            };
         }
-    });
 
-    test.beforeEach(async ({ tester }) => {
-        await tester.loginAsAdmin();
+        // Force all AI features to be enabled, the intent of these tests is to verify parts of the settings page and not the feature availability itself
+        for (const feature of Object.values(AiFeature)) {
+            if (!initialSettings[feature].enabled) {
+                await db.updateInDatabase(
+                    "config",
+                    { value: "true" },
+                    { name: `${AiFeatureConfigMap[feature]}_enabled` },
+                );
+            }
+        }
     });
 
     test("supported AI providers for plan-enabled features", async ({ page, tester }) => {
@@ -93,8 +108,14 @@ test.describe("Admin AI Services Settings", () => {
      * Restore all original AI settings after tests have completed
      */
     test.afterAll(async ({ db }) => {
-        for (const [setting, value] of Object.entries(initialSettings)) {
-            await db.updateInDatabase("config", { value }, { name: setting });
+        for (const feature of Object.values(AiFeature)) {
+            const configName = AiFeatureConfigMap[feature];
+            await db.updateInDatabase("config", { value: initialSettings[feature].config }, { name: configName });
+            await db.updateInDatabase(
+                "config",
+                { value: initialSettings[feature].enabled ? "true" : "false" },
+                { name: `${configName}_enabled` },
+            );
         }
     });
 });
