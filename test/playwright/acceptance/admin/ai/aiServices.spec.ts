@@ -30,7 +30,7 @@ test.describe("Admin AI Services Settings", () => {
             const configName = AiFeatureConfigMap[feature];
             initialSettings[feature] = {
                 config: (await db.grabFromDatabase("config", "value", { name: configName })) as string,
-                enabled: (await db.grabFromDatabase("config", "value", { name: `${configName}_enabled` })) === "true",
+                enabled: (await db.grabFromDatabase("config", "value", { name: `${configName}_enabled` })) === "1",
             };
         }
 
@@ -39,7 +39,7 @@ test.describe("Admin AI Services Settings", () => {
             if (!initialSettings[feature].enabled) {
                 await db.updateInDatabase(
                     "config",
-                    { value: "true" },
+                    { value: "1" },
                     { name: `${AiFeatureConfigMap[feature]}_enabled` },
                 );
             }
@@ -118,7 +118,7 @@ test.describe("Admin AI Services Settings", () => {
             await db.updateInDatabase("config", { value: initialSettings[feature].config }, { name: configName });
             await db.updateInDatabase(
                 "config",
-                { value: initialSettings[feature].enabled ? "true" : "false" },
+                { value: initialSettings[feature].enabled ? "1" : "0" },
                 { name: `${configName}_enabled` },
             );
         }
