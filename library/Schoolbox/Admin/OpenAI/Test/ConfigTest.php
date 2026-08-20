@@ -12,6 +12,8 @@ namespace Schoolbox\Admin\OpenAI\Test;
 use JsonException;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Admin\OpenAI\Config;
+use Schoolbox\Config\ArrayLoader;
+use Schoolbox\Config\Config as ConfigModel;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\OpenAi\Feature;
@@ -24,6 +26,19 @@ use TypeError;
  */
 class ConfigTest extends TestCase
 {
+    /**
+     * @return void
+     */
+    public function testFetchFeaturesReturnsEmptyArrayWhenNoAiFeaturesAreConfigured(): void
+    {
+        $configMapper = $this->createMock(ConfigMapper::class);
+        $configMapper->expects($this->once())
+                     ->method('findByColumn')
+                     ->willReturn([]);
+
+        $this->assertSame([], (new Config())->fetchFeatures($configMapper, new ArrayLoader()));
+    }
+
     /**
      * The rubric generation card remains configuration-only, but uses the same
      * provider fields and model options as Learning Activity Customisation.
@@ -52,6 +67,72 @@ class ConfigTest extends TestCase
             $config->initAzure(Feature::LEARNING_ACTIVITY_CUSTOMISATION->value),
             $config->initAzure(Feature::RUBRIC_GENERATION->value),
         );
+    }
+
+    /**
+     * @return array<string, array{bool, bool}>
+     */
+    public static function fetchFeaturesPlanVisibilityProvider(): array
+    {
+        return [
+            'excludes disabled plan feature' => [false, false],
+            'includes disabled plan feature for history' => [true, true],
+        ];
+    }
+
+    /**
+     * @param bool $includeDisabledPlanFeatures
+     * @param bool $containsFeature
+     * @return void
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('fetchFeaturesPlanVisibilityProvider')]
+    public function testFetchFeaturesPlanVisibility(bool $includeDisabledPlanFeatures, bool $containsFeature): void
+    {
+        $featureConfig = (new ConfigModel())
+            ->setName(ConfigMapper::NAME_AI_TEXT_CHAT)
+            ->setTitle('AI Text Chat')
+            ->setValue(json_encode([
+                                       Config::FIELD_PROVIDER => ['value' => Helper::ENDPOINT_TYPE_OFF],
+                                   ], JSON_THROW_ON_ERROR));
+        $configMapper = $this->createMock(ConfigMapper::class);
+        $configMapper->expects($this->once())
+                     ->method('findByColumn')
+                     ->willReturn([$featureConfig]);
+
+        $features = (new Config())->fetchFeatures(
+            $configMapper,
+            new ArrayLoader([ConfigMapper::NAME_AI_TEXT_CHAT_ENABLED => 'false']),
+            $includeDisabledPlanFeatures,
+        );
+
+        $this->assertSame($containsFeature, isset($features['chat']));
+    }
+
+    /**
+     * Plan-disabled features retain explicit availability metadata for browser consumers.
+     *
+     * @return void
+     */
+    public function testFetchFeaturesIncludesPlanAvailabilityMetadata(): void
+    {
+        $featureConfig = (new ConfigModel())
+            ->setName(ConfigMapper::NAME_AI_TEXT_CHAT)
+            ->setTitle('AI Text Chat')
+            ->setValue(json_encode([
+                                       Config::FIELD_PROVIDER => ['value' => Helper::ENDPOINT_TYPE_OPENAI],
+                                   ], JSON_THROW_ON_ERROR));
+        $configMapper = $this->createMock(ConfigMapper::class);
+        $configMapper->expects($this->once())
+                     ->method('findByColumn')
+                     ->willReturn([$featureConfig]);
+
+        $features = (new Config())->fetchFeatures(
+            $configMapper,
+            new ArrayLoader([ConfigMapper::NAME_AI_TEXT_CHAT_ENABLED => 'false']),
+            true,
+        );
+
+        $this->assertFalse($features['chat']['planEnabled']);
     }
 
     /**
@@ -103,6 +184,33 @@ class ConfigTest extends TestCase
     {
         $cfg = new Config();
         $this->assertFalse($cfg->isEnabled(null));
+    }
+
+    /**
+     * The combined predicate must require both plan and provider availability.
+     *
+     * @return void
+     */
+    public function testIsFeatureEnabledRequiresPlanAndProvider(): void
+    {
+        $cfg = new Config();
+        $config = [Config::FIELD_PROVIDER => ['value' => Helper::ENDPOINT_TYPE_OPENAI]];
+
+        $this->assertTrue($cfg->isFeatureEnabled(
+            $config,
+            ConfigMapper::NAME_AI_TEXT_CHAT,
+            new ArrayLoader([ConfigMapper::NAME_AI_TEXT_CHAT_ENABLED => 'true']),
+        ));
+        $this->assertFalse($cfg->isFeatureEnabled(
+            $config,
+            ConfigMapper::NAME_AI_TEXT_CHAT,
+            new ArrayLoader([ConfigMapper::NAME_AI_TEXT_CHAT_ENABLED => 'false']),
+        ));
+        $this->assertFalse($cfg->isFeatureEnabled(
+            [Config::FIELD_PROVIDER => ['value' => Helper::ENDPOINT_TYPE_OFF]],
+            ConfigMapper::NAME_AI_TEXT_CHAT,
+            new ArrayLoader([ConfigMapper::NAME_AI_TEXT_CHAT_ENABLED => 'true']),
+        ));
     }
 
     /**

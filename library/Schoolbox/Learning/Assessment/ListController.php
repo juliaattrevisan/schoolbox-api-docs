@@ -628,10 +628,7 @@ class ListController extends Web\Controller\Base
             }
         }
 
-        // TODO: avoid this AI config copypasta to check if dialog agent is enabled
-        $aiConfig = new \Schoolbox\Admin\OpenAI\Config();
-        $dialogAgentAIFeatureConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_DIALOGAGENT));
-        if ($aiConfig->isEnabled($dialogAgentAIFeatureConfig)) {
+        if ((new \Schoolbox\Admin\OpenAI\ValidAIFeatureEnabled($this->getConfigLoader()))->isSatisfiedBy(ConfigMapper::NAME_AI_DIALOGAGENT)) {
             $data['types'][] = [
                 'id'    => 'dialog-agent',
                 'value' => AssessmentType::TYPE_DIALOG_AGENT,

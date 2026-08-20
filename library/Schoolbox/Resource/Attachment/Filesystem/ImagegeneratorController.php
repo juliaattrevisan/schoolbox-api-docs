@@ -11,11 +11,11 @@ namespace Schoolbox\Resource\Attachment\Filesystem;
 
 use OutOfRangeException;
 use Ramsey\Uuid\Uuid;
-use Schoolbox\Admin\OpenAI\Config;
+use Schoolbox\Admin\OpenAI\ValidAIFeatureEnabled;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Editor\OpenAI;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Attachment\AbstractController;
-use Schoolbox\Editor\OpenAI;
 use Schoolbox\User;
 use Scrub;
 use SitePage;
@@ -62,12 +62,7 @@ class ImagegeneratorController extends AbstractController
             throw new OutOfRangeException("mimeType is not an image.");
         }
 
-        /* is AI image generation enabled? */
-        $imageGenerationConfig = new Config()->decode(
-            (string)$this->conf->get(ConfigMapper::NAME_AI_IMAGE_GENERATION)
-        );
-        $provider = $imageGenerationConfig[Config::FIELD_PROVIDER]['value'] ?? OpenAI\Helper::ENDPOINT_TYPE_OFF;
-        if (OpenAI\Helper::ENDPOINT_TYPE_OFF === $provider) {
+        if (!(new ValidAIFeatureEnabled($this->conf))->isSatisfiedBy(ConfigMapper::NAME_AI_IMAGE_GENERATION)) {
             throw new OutOfRangeException("Image generation is not enabled.");
         }
 

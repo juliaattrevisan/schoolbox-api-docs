@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Navigation;
 
 use Schoolbox\Cdn\PrefixGenerator;
+use Schoolbox\Admin\OpenAI\Config as OpenAiConfig;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\Type\Model as ConfigType;
@@ -838,43 +839,43 @@ class Subnav
                      */
                     '/adminv2/ai-services' => [
                         'name' => 'AI Services',
-                        'visible' => true,
+                        'visible' => $this->hasEnabledAiPlanFeature(),
                         'description' => 'Enable and configure OpenAI integration to enable AI services to be made available to users.',
                         'searchable' => true,
                         'children' => [
                             '/adminv2/ai-services#ai_' . Feature::CHAT->value => [
                                 'name' => 'AI Text Chat',
-                                'visible' => true,
+                                'visible' => $this->hasEnabledAiPlanFeature(Feature::CHAT),
                                 'description' => 'Configure AI settings for interactive text editors.',
                             ],
                             '/adminv2/ai-services#ai_' . Feature::LESSON_PLAN->value => [
                                 'name' => 'AI Lesson Plan',
-                                'visible' => true,
+                                'visible' => $this->hasEnabledAiPlanFeature(Feature::LESSON_PLAN),
                                 'description' => 'Configure AI settings for generating lesson plan content.',
                             ],
                             '/adminv2/ai-services#ai_' . Feature::DIALOG_AGENT->value => [
                                 'name' => 'AI Discussion Activity',
-                                'visible' => true,
+                                'visible' => $this->hasEnabledAiPlanFeature(Feature::DIALOG_AGENT),
                                 'description' => 'Configure AI settings for discussion learning activities.',
                             ],
                             '/adminv2/ai-services#ai_' . Feature::DIFFERENTIATION->value => [
                                 'name' => 'AI Differentiation Profiles',
-                                'visible' => true,
+                                'visible' => $this->hasEnabledAiPlanFeature(Feature::DIFFERENTIATION),
                                 'description' => 'Configure AI settings for differentiation profile support in discussion learning activities.',
                             ],
                             '/adminv2/ai-services#ai_' . Feature::IMAGE->value => [
                                 'name' => 'AI Image Generation',
-                                'visible' => true,
+                                'visible' => $this->hasEnabledAiPlanFeature(Feature::IMAGE),
                                 'description' => 'Configure AI settings for image generation.',
                             ],
                             '/adminv2/ai-services#ai_' . Feature::LEARNING_ACTIVITY_CUSTOMISATION->value => [
                                 'name' => 'AI Learning Activity Customisation',
-                                'visible' => true,
+                                'visible' => $this->hasEnabledAiPlanFeature(Feature::LEARNING_ACTIVITY_CUSTOMISATION),
                                 'description' => 'Configure AI settings for learning activity customisation.',
                             ],
                             '/adminv2/ai-services#ai_' . Feature::RUBRIC_GENERATION->value => [
                                 'name' => 'AI Rubric Generation',
-                                'visible' => true,
+                                'visible' => $this->hasEnabledAiPlanFeature(Feature::RUBRIC_GENERATION),
                                 'description' => 'Configure AI settings for AI rubric generation.',
                             ],
                         ]
@@ -1273,5 +1274,21 @@ class Subnav
     public static function isIbVisible(bool $ibEnabled, bool $userIsSuperuser, bool $userHasServicePermissionIbCoordinator): bool
     {
         return $ibEnabled && ($userIsSuperuser || $userHasServicePermissionIbCoordinator);
+    }
+
+    /**
+     * Checks whether one or more AI plan controls are enabled.
+     *
+     * @param Feature|null $feature
+     * @return bool
+     */
+    private function hasEnabledAiPlanFeature(?Feature $feature = null): bool
+    {
+        $aiConfig = new OpenAiConfig();
+        if ($feature !== null) {
+            return $aiConfig->isPlanEnabled($feature->value, $this->configLoader);
+        }
+
+        return $aiConfig->hasEnabledPlanFeature($this->configLoader);
     }
 }

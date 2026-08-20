@@ -153,7 +153,9 @@ class Admin extends ModuleLoader
          */
         $this->loadModule($di, \Schoolbox\Admin\OpenAI\Module::class, '/adminv2/ai-services');
         $this->loadModule($di, \Schoolbox\Admin\OpenAI\Usage\Module::class, '/adminv2/aiLog');
-        $this->loadModule($di, \Schoolbox\Admin\OpenAI\Moderation\Module::class, '/adminv2/ai-moderation');
+        if ($di->get('config')->get(ConfigMapper::NAME_AI_MODERATION_AGENT_ENABLED)) {
+            $this->loadModule($di, \Schoolbox\Admin\OpenAI\Moderation\Module::class, '/adminv2/ai-moderation');
+        }
 
         /* Editor Templates
          */

@@ -73,11 +73,15 @@ class Learning extends ModuleLoader
             $this->loadModule($di, AssessmentExporterModule::class, "/{$namespace}/export");
             $this->loadModule($di, MarkScheme\Module::class, "/{$namespace}/markscheme");
             $this->loadModule($di, LessonPlanActivitiesModule::class, "/{$namespace}/lessonplan");
-            /* TODO Technical Uplift Candidate: rename Discussion to Commentary
-             *  The /discussion/* namespace is already occupied by Discussion Threads which would be better
-             *  served in the /commentary/* namespace instead, to disambiguate this new learning activity
-             */
-            $this->loadModule($di, DialogAgentModule::class, "/{$namespace}/discussion");
+
+            // AI feature needs to be enabled, to make this space work
+            if ($config->get(ConfigMapper::NAME_AI_DIALOGAGENT_ENABLED)) {
+                /* TODO Technical Uplift Candidate: rename Discussion to Commentary
+                 *  The /discussion/* namespace is already occupied by Discussion Threads which would be better
+                 *  served in the /commentary/* namespace instead, to disambiguate this new learning activity
+                 */
+                $this->loadModule($di, DialogAgentModule::class, "/{$namespace}/discussion");
+            }
             $this->loadModule($di, ReportingModule::class, "/{$namespace}/reporting");
             $this->loadModule($di, ReportingFeedbackModule::class, "/{$namespace}/reporting");
         }

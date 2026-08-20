@@ -78,6 +78,10 @@ class ClientFactory
      */
     public function buildForFeature(Feature $feature): IClient
     {
+        if (!(new OpenAI\Config())->isPlanEnabled($feature->value, $this->config)) {
+            throw new Exception\AgentNotEnabled('AI queries are not enabled for this plan.');
+        }
+
         // Each feature maps to a config which holds the API key and provider
         $configKey = OpenAI\Config::ALL_MODULES[$feature->value] ?? null;
         if ($configKey === null) {

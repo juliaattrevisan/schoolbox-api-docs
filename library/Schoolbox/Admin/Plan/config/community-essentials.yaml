@@ -2,6 +2,16 @@ config:
 
   site_plan : { value : Community-Essentials }
 
+  # AI plan controls
+  ai_text_chat_enabled: { value: true, hide: true, edit: false }
+  ai_lessonplan_enabled: { value: true, hide: true, edit: false }
+  ai_differentiation_enabled: { value: true, hide: true, edit: false }
+  ai_dialogagent_enabled: { value: true, hide: true, edit: false }
+  ai_image_generation_enabled: { value: true, hide: true, edit: false }
+  ai_learning_activity_customisation_enabled: { value: true, hide: true, edit: false }
+  ai_moderation_agent_enabled: { value: true, hide: true, edit: false }
+  ai_rubric_generation_enabled: { value: false, hide: true, edit: false }
+
   #Modules
   canvas_enabled: {value: false}
   teams_enabled: {edit: true}

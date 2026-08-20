@@ -29,10 +29,13 @@ class ValidAIFeatureEnabled
      */
     public function isSatisfiedBy(string $featureConfigName): bool
     {
-
         $aiConfig = new \Schoolbox\Admin\OpenAI\Config();
+        if (!in_array($featureConfigName, Config::ALL_MODULES, true)) {
+            return false;
+        }
+
         $featureConfig = $aiConfig->decode((string)$this->configLoader->get($featureConfigName));
 
-        return $aiConfig->isEnabled($featureConfig);
+        return $aiConfig->isFeatureEnabled($featureConfig, $featureConfigName, $this->configLoader);
     }
 }

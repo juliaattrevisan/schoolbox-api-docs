@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\DialogAgent;
 
+use Schoolbox\Admin\OpenAI\ValidAIFeatureEnabled;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 
@@ -33,9 +34,6 @@ class ValidDialogAgentEnabled
     public function isSatisfied(): bool
     {
 
-        $aiConfig = new \Schoolbox\Admin\OpenAI\Config();
-        $featureConfig = $aiConfig->decode((string)$this->configLoader->get(ConfigMapper::NAME_AI_DIALOGAGENT));
-
-        return $aiConfig->isEnabled($featureConfig);
+        return (new ValidAIFeatureEnabled($this->configLoader))->isSatisfiedBy(ConfigMapper::NAME_AI_DIALOGAGENT);
     }
 }
