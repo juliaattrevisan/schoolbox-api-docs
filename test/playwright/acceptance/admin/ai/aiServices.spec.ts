@@ -46,6 +46,10 @@ test.describe("Admin AI Services Settings", () => {
         }
     });
 
+    test.beforeEach(async ({ tester }) => {
+        await tester.loginAsAdmin();
+    });
+
     test("supported AI providers for plan-enabled features", async ({ page, tester }) => {
         const aiServices = new AIServices(page, tester);
         await aiServices.goto();
