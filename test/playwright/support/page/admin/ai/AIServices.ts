@@ -1,5 +1,5 @@
 import type { Locator, Page } from "@playwright/test";
-import type { AiFeature } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
+import { AiFeature } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
 import { expect } from "@schoolboxTest/playwright/support/integrations";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 
@@ -8,6 +8,17 @@ export enum AiProvider {
     OPENAI = "OpenAI",
     AZURE = "Azure",
 }
+
+export const AiFeatureConfigMap: Record<AiFeature, string> = {
+    [AiFeature.CHAT]: "ai_text_chat",
+    [AiFeature.LESSON_PLAN]: "ai_lessonplan",
+    [AiFeature.IMAGE]: "ai_image_generation",
+    [AiFeature.DIALOG_AGENT]: "ai_dialogagent",
+    [AiFeature.DIFFERENTIATION]: "ai_differentiation",
+    [AiFeature.LEARNING_ACTIVITY_CUSTOMISATION]: "ai_learning_activity_customisation",
+    [AiFeature.RUBRIC_GENERATION]: "ai_rubric_generation",
+    [AiFeature.AI_MODERATION_AGENT]: "ai_moderation_agent",
+};
 
 export default class AIServices {
     private page: Page;
