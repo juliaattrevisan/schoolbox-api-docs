@@ -10,6 +10,7 @@ const planEnabledFeatures = [
     AiFeature.IMAGE,
     AiFeature.LEARNING_ACTIVITY_CUSTOMISATION,
     AiFeature.LESSON_PLAN,
+    AiFeature.RUBRIC_GENERATION,
 ] as const;
 
 type PlanEnabledFeature = (typeof planEnabledFeatures)[number];
