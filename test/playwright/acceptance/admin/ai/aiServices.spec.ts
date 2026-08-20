@@ -22,7 +22,7 @@ test.describe("Admin AI Services Settings", () => {
             acc[feature] = { config: null, enabled: null };
             return acc;
         },
-        {} as Record<AiFeature, { config: string | null; enabled: boolean | null }>,
+        {} as Record<AiFeature, { config: string | null; enabled: string | null }>,
     );
 
     test.beforeAll(async ({ db }) => {
@@ -30,13 +30,14 @@ test.describe("Admin AI Services Settings", () => {
             const configName = AiFeatureConfigMap[feature];
             initialSettings[feature] = {
                 config: (await db.grabFromDatabase("config", "value", { name: configName })) as string,
-                enabled: (await db.grabFromDatabase("config", "value", { name: `${configName}_enabled` })) === "1",
+                enabled: (await db.grabFromDatabase("config", "value", { name: `${configName}_enabled` })) as string,
             };
         }
 
         // Force all AI features to be enabled, the intent of these tests is to verify parts of the settings page and not the feature availability itself
         for (const feature of Object.values(AiFeature)) {
-            if (!initialSettings[feature].enabled) {
+            const enabled = initialSettings[feature].enabled === "true" || initialSettings[feature].enabled === "1";
+            if (!enabled) {
                 await db.updateInDatabase("config", { value: "1" }, { name: `${AiFeatureConfigMap[feature]}_enabled` });
             }
         }
@@ -114,7 +115,7 @@ test.describe("Admin AI Services Settings", () => {
             await db.updateInDatabase("config", { value: initialSettings[feature].config }, { name: configName });
             await db.updateInDatabase(
                 "config",
-                { value: initialSettings[feature].enabled ? "1" : "0" },
+                { value: initialSettings[feature].enabled },
                 { name: `${configName}_enabled` },
             );
         }
