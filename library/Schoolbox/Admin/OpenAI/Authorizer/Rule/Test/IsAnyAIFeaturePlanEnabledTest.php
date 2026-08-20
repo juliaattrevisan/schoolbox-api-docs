@@ -30,6 +30,7 @@ class IsAnyAIFeaturePlanEnabledTest extends TestCase
             ConfigMapper::NAME_AI_IMAGE_GENERATION_ENABLED => 'false',
             ConfigMapper::NAME_AI_LEARNING_ACTIVITY_CUSTOMISATION_ENABLED => 'false',
             ConfigMapper::NAME_AI_MODERATION_AGENT_ENABLED => 'false',
+            ConfigMapper::NAME_AI_RUBRIC_GENERATION_ENABLED => 'false',
         ]));
 
         $this->expectException(Unauthorized::class);
