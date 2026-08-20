@@ -49,8 +49,6 @@ test.describe("Admin AI Services Settings", () => {
         const aiServices = new AIServices(page, tester);
         await aiServices.goto();
 
-        await expect(aiServices.locateFeature(AiFeature.RUBRIC_GENERATION)).toHaveCount(0);
-
         const featuresWithOpenAI: Record<PlanEnabledFeature, boolean> = {
             [AiFeature.AI_MODERATION_AGENT]: true,
             [AiFeature.CHAT]: true,
@@ -59,6 +57,7 @@ test.describe("Admin AI Services Settings", () => {
             [AiFeature.IMAGE]: true,
             [AiFeature.LEARNING_ACTIVITY_CUSTOMISATION]: true,
             [AiFeature.LESSON_PLAN]: true,
+            [AiFeature.RUBRIC_GENERATION]: true,
         };
 
         const featuresWithAzure: Record<PlanEnabledFeature, boolean> = {
@@ -69,6 +68,7 @@ test.describe("Admin AI Services Settings", () => {
             [AiFeature.IMAGE]: false,
             [AiFeature.LEARNING_ACTIVITY_CUSTOMISATION]: true,
             [AiFeature.LESSON_PLAN]: true,
+            [AiFeature.RUBRIC_GENERATION]: true,
         };
 
         for (const featureKey of planEnabledFeatures) {
