@@ -37,11 +37,7 @@ test.describe("Admin AI Services Settings", () => {
         // Force all AI features to be enabled, the intent of these tests is to verify parts of the settings page and not the feature availability itself
         for (const feature of Object.values(AiFeature)) {
             if (!initialSettings[feature].enabled) {
-                await db.updateInDatabase(
-                    "config",
-                    { value: "1" },
-                    { name: `${AiFeatureConfigMap[feature]}_enabled` },
-                );
+                await db.updateInDatabase("config", { value: "1" }, { name: `${AiFeatureConfigMap[feature]}_enabled` });
             }
         }
     });
