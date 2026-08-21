@@ -22,7 +22,7 @@ use SensitiveParameter;
 class Service extends AbstractService
 {
     private const PARENT_TASS_ORBIT_NOTIFICATION = 'setParentPushNotificaiton';
-    private const PARENT_TASS_ORBIT_DATETIME_FORMAT = 'Y-m-d h:00:00';
+    private const PARENT_TASS_ORBIT_DATETIME_FORMAT = 'Y-m-d H:00:00';
     private const PARENT_TASS_ORBIT_TYPE = 'tassapi';
     private const PARENT_TASS_ORBIT_MAX_PAR_CODE_LENGTH = 8;
     private const PARENT_TASS_ORBIT_MAX_SFA_NUM_LENGTH = 5;
