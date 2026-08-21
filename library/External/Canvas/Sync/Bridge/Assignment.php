@@ -49,8 +49,19 @@ class Assignment
     /** @var GenericCollection|SubmissionBox\MarkType[] */
     protected $markTypes;
 
-    /** @var GenericCollection|WorkType\Model[] */
+    /**
+     * Canvas quiz work type configuration stores Schoolbox work type IDs.
+     *
+     * @var GenericCollection|WorkType\Model[]
+     */
     protected $workTypes;
+
+    /**
+     * Canvas assignment groups map strictly to Schoolbox work type names, without a numeric ID fallback.
+     *
+     * @var GenericCollection|WorkType\Model[]
+     */
+    protected $submissionBoxWorkTypes;
 
     /**
      * @param GenericCollection|SubmissionBox\MarkType[] $markTypes
@@ -62,8 +73,9 @@ class Assignment
         GenericCollection $workTypes,
         private CanvasDb $canvasDb,
     ) {
-        $this->markTypes    = $markTypes->shallowClone()->indexBy('slug');
-        $this->workTypes    = $workTypes->indexBy('id');
+        $this->markTypes             = $markTypes->shallowClone()->indexBy('slug');
+        $this->submissionBoxWorkTypes = $workTypes->shallowClone()->indexBy('name');
+        $this->workTypes             = $workTypes->indexBy('id');
     }
 
     /**
@@ -155,7 +167,7 @@ class Assignment
      */
     public function getSubmissionBoxWorkType(string $workTypeName): ?WorkType\Model
     {
-        return $this->workTypes->offsetGet($workTypeName);
+        return $this->submissionBoxWorkTypes->offsetGet($workTypeName);
     }
 
 
